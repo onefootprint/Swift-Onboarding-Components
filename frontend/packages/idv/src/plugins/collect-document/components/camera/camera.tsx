@@ -96,12 +96,15 @@ const videoElementStateListener =
   (event: Event) => {
     if (!videoElement) return;
     logTrack(`Video event: ${event.type}`);
+    logInfo(`(VideoElementStateListener) video element status: ${event.type}`);
     // TODO: add `&& videoElement.readyState >= 2` condition after the experimentation
     if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event)) {
       setPlayingState(false);
+      logInfo('(VideoElementStateListener) attempting to play video');
       videoElement
         .play()
         .then(() => {
+          logInfo('(VideoElementStateListener) video playing');
           logTrack('Video event: playing');
           setPlayingState(true);
         })
@@ -267,9 +270,11 @@ const Camera = ({
     // }
     if (!isAttemptingToPlay) {
       setIsAttemptingToPlay(true);
+      logInfo('(onCanPlay) Attempting to play video');
       videoRef.current
         .play()
         .then(() => {
+          logInfo('(onCanPlay) video element status: playing');
           logTrack('(onCanPlay) video element status: playing');
           setIsVideoPlaying(true);
           setIsAttemptingToPlay(false);
@@ -297,9 +302,11 @@ const Camera = ({
       // }
       if (!isAttemptingToPlay) {
         setIsAttemptingToPlay(true);
+        logInfo('(onLoadedMetadata) Attempting to play video');
         videoRef.current
           .play()
           .then(() => {
+            logInfo('(onLoadedMetadata) video element status: playing');
             logTrack('(onLoadedMetadata) video element status: playing');
             setIsVideoPlaying(true);
             setIsAttemptingToPlay(false);
@@ -351,9 +358,11 @@ const Camera = ({
       // }
       if (!isAttemptingToPlay) {
         setIsAttemptingToPlay(true);
+        logInfo('(interval) Attempting to play video');
         videoRef.current
           .play()
           .then(() => {
+            logInfo('(interval) video element status: started playing');
             logWarn('(interval) video element status: started playing');
             setIsVideoPlaying(true);
             setIsAttemptingToPlay(false);
@@ -524,6 +533,20 @@ const Camera = ({
             onLoadedMetadata={handleLoadMetadata}
             playsInline
             ref={videoRef}
+            onLoadStart={() => logInfo('video load started')}
+            onLoadedData={() => logInfo('video loaded data')}
+            onDurationChange={() => logInfo('video duration changed')}
+            onPlay={() => logInfo('video play')}
+            onPlaying={() => logInfo('video playing')}
+            onCanPlayThrough={() => logInfo('video can play through')}
+            onStalled={() => logInfo('video stalled')}
+            onSuspend={() => logInfo('video suspend')}
+            onAbort={() => logInfo('video abort')}
+            onWaiting={() => logInfo('video waiting')}
+            onEmptied={() => logInfo('video emptied')}
+            onEnded={() => logInfo('video ended')}
+            onError={err => logWarn('video error', err)}
+            onProgress={() => logInfo('video progress')}
           />
           {isVideoPlaying && isDetecting
             ? children({
