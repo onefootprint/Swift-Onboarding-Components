@@ -53,17 +53,13 @@ export const useFootprint = () => {
     } catch (error: unknown) {
       throw new InlineProcessError((error as Error).message || 'Something happened');
     }
-    const [{ requirements }, { validationToken }] = await Promise.all([
-      getRequirementsReq({ authToken: context.verifiedAuthToken }),
-      validateOnboarding({ authToken: context.verifiedAuthToken }),
-    ]);
-
+    const { requirements } = await getRequirementsReq({ authToken: context.verifiedAuthToken });
     requirements.all.forEach(req => {
       if (!req.isMet) {
-        throw new InlineProcessError('Something happened');
+        throw new InlineProcessError('Found a requirement not met. Handoff must be done');
       }
     });
-
+    const { validationToken } = await validateOnboarding({ authToken: context.verifiedAuthToken });
     return { validationToken, requirements };
   };
 
