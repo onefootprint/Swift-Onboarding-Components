@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS risk_signal_group_workflow_id;

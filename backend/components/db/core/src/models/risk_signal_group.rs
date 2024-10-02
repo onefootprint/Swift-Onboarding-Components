@@ -9,6 +9,7 @@ use diesel::Queryable;
 use newtypes::RiskSignalGroupId;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = risk_signal_group)]
@@ -19,6 +20,7 @@ pub struct RiskSignalGroup {
     pub created_at: DateTime<Utc>,
     pub scoped_vault_id: ScopedVaultId,
     pub kind: RiskSignalGroupKind,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Insertable)]

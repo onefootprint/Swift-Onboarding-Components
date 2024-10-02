@@ -941,6 +941,7 @@ diesel::table! {
         created_at -> Timestamptz,
         scoped_vault_id -> Text,
         kind -> Text,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -1911,6 +1912,7 @@ diesel::joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 diesel::joinable!(risk_signal -> risk_signal_group (risk_signal_group_id));
 diesel::joinable!(risk_signal -> verification_result (verification_result_id));
 diesel::joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
+diesel::joinable!(risk_signal_group -> workflow (workflow_id));
 diesel::joinable!(rule_instance -> ob_configuration (ob_configuration_id));
 diesel::joinable!(rule_instance_references_list -> list (list_id));
 diesel::joinable!(rule_instance_references_list -> rule_instance (rule_instance_id));
