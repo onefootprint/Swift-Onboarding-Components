@@ -17,6 +17,7 @@ export type IconButtonProps = {
   size?: IconButtonSize;
   testID?: string;
   variant?: 'outline' | 'ghost';
+  disabled?: boolean;
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
@@ -28,6 +29,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       size = 'default',
       testID,
       variant = 'ghost',
+      disabled,
       ...props
     }: IconButtonProps,
     ref,
@@ -44,6 +46,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         aria-label={ariaLabel}
         data-testid={testID}
         onClick={handleClick}
+        disabled={disabled}
         ref={ref}
         tabIndex={0}
         type="button"

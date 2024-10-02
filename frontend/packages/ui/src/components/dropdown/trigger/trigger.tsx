@@ -1,24 +1,33 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
 import type * as CSS from 'csstype';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import Text from '../../text';
 import type { TriggerProps } from '../dropdown.types';
 
-const Trigger = ({ children, variant = 'default', maxWidth, ...props }: TriggerProps) => {
-  if (variant === 'chevron') {
+const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
+  ({ children, variant = 'default', maxWidth, ...props }, ref) => {
+    if (variant === 'chevron') {
+      return (
+        <ChevronTriggerContainer {...props} ref={ref}>
+          <Text variant="body-3" truncate>
+            {children}
+          </Text>
+          <IcoChevronDown16 className="chevronContainer" />
+        </ChevronTriggerContainer>
+      );
+    }
     return (
-      <ChevronTriggerContainer {...props}>
-        <Text variant="body-3" truncate>
-          {children}
-        </Text>
-        <IcoChevronDown16 className="chevronContainer" />
-      </ChevronTriggerContainer>
+      <DefaultTriggerContainer {...props} ref={ref}>
+        {children}
+      </DefaultTriggerContainer>
     );
-  }
-  return <DefaultTriggerContainer {...props}>{children}</DefaultTriggerContainer>;
-};
+  },
+);
+
+Trigger.displayName = 'Trigger';
 
 const baseTriggerStyles = css`
   all: unset;

@@ -72,7 +72,7 @@ const UserActions = ({ entity }: WithEntityProps) => {
   return (
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-        <Dropdown.Trigger>
+        <Dropdown.Trigger asChild>
           <IconButton variant="outline" aria-label={t('trigger')} size="compact">
             <IcoDotsHorizontal24 />
           </IconButton>
