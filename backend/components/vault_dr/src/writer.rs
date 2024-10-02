@@ -18,8 +18,8 @@ use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::primitives::SdkBody;
 use db::errors::FpOptionalExtension;
 use db::helpers::bulk_get_vdr_blob_keys_active_at;
-use db::helpers::get_vault_dr_data_lifetime_batch;
-use db::helpers::get_vault_dr_scoped_vault_version_batch;
+use db::helpers::incorrect_get_vault_dr_data_lifetime_batch;
+use db::helpers::incorrect_get_vault_dr_scoped_vault_version_batch;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::IsLive;
 use db::models::scoped_vault::ScopedVault;
@@ -182,7 +182,7 @@ impl VaultDrWriter {
         let (dls, sv_id_to_fp_id) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let dls = get_vault_dr_data_lifetime_batch(
+                let dls = incorrect_get_vault_dr_data_lifetime_batch(
                     conn,
                     &tenant_id,
                     is_live,
@@ -448,7 +448,7 @@ impl VaultDrWriter {
             .db_query(move |conn| -> FpResult<_> {
                 let tenant = Tenant::get(conn, &tenant_id)?;
 
-                let svvs = get_vault_dr_scoped_vault_version_batch(
+                let svvs = incorrect_get_vault_dr_scoped_vault_version_batch(
                     conn,
                     &tenant_id,
                     is_live,

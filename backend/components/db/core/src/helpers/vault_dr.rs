@@ -22,6 +22,72 @@ use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
 use std::collections::HashMap;
 
+#[tracing::instrument(skip_all, fields(
+    tenant_id = %tenant_id,
+    is_live = %is_live,
+    config_id = %config_id,
+    batch_size = %batch_size,
+    fp_id_filter = ?fp_id_filter,
+))]
+pub fn get_scoped_vault_version_batch(
+    conn: &mut PgConn,
+    tenant_id: &TenantId,
+    is_live: IsLive,
+    config_id: &VaultDrConfigId,
+    batch_size: usize,
+    fp_id_filter: Option<Vec<FpId>>,
+) -> DbResult<Vec<ScopedVaultVersion>> {
+    // Implementation is based on GetVaultVersionBatch in
+    // backend/formal_methods/vault_disaster_recovery/vdr.tla
+
+    let mut query = scoped_vault_version::table
+        .inner_join(scoped_vault::table)
+        .filter(scoped_vault_version::tenant_id.eq(tenant_id))
+        .filter(scoped_vault_version::is_live.eq(is_live))
+        // backed_up_by_vdr_config_id serves as the progress marker for the worker, indicating that
+        // all blobs/DLs and manifests/SVVs with seqnos <= this SVV have been backed up.
+        // The correctness of this filter relies on the fact that there is at most one active VDR
+        // config ID per (tenant_id, is_live) pair.
+        .filter(
+            scoped_vault_version::backed_up_by_vdr_config_id.is_null()
+                .or(scoped_vault_version::backed_up_by_vdr_config_id.ne(config_id))
+        )
+        .into_boxed();
+
+    if let Some(fp_ids) = fp_id_filter {
+        // It's valid to filter by fp_ids since the worker does not rely on any global ordering of
+        // processed SVVs, only the ordering of the subsequences of SVVs for each scoped vault.
+        // Filtering by fp_id selects SVV subsequences for the corresponding scoped vaults.
+        query = query.filter(scoped_vault::fp_id.eq_any(fp_ids));
+    }
+
+    // Ordering by seqno here means we process ScopedVaultVersions *for each ScopedVault* in order
+    // of creation. There is no implied global ordering.
+    //
+    // For a SVV to be considered complete, all DLs/blobs for the vault <= svv.seqno must be
+    // written. If we choose SVVs with prerequisites that haven't been written and aren't present
+    // in the batch, the SVVs in each batch will never be considered complete. Iterating in seqno
+    // order ensures that we make progress.
+    //
+    // However, if a seqno is skipped due to out-of-order or delayed API commits (see
+    // VaultApiInstance comment block), we still don't lose consistency in VDR. The SVV will be
+    // completed in a later batch. With read-committed isolation in Postgres, we can be sure that
+    // if a SVV is skipped in one batch, there will be no greater SVV for the same vault in the
+    // same batch. This is because a SELECT sees a snapshot of the database as of the instant the
+    // query begins to run. In other words, by sorting the SVVs by seqno, we can be sure that for
+    // all vaults present in the batch, those SVVs are the minimum non-backed up SVVs for those
+    // vaults.
+    //
+    // Sorting by seqnos here does *NOT* imply that the batch represents the global minimum seqnos
+    // for un-backed up SVVs, as inflight transactions may commit SVVs with lesser seqnos.
+    let svv_batch = query
+        .select(ScopedVaultVersion::as_select())
+        .order(scoped_vault_version::seqno)
+        .limit(batch_size as i64)
+        .load(conn)?;
+
+    Ok(svv_batch)
+}
 
 // Load up to `batch_size` DataLifetime records for the given tenant/is_live that do not have
 // corresponding blobs for the given config.
@@ -32,7 +98,7 @@ use std::collections::HashMap;
     batch_size = %batch_size,
     fp_id_filter = ?fp_id_filter,
 ))]
-pub fn get_vault_dr_data_lifetime_batch(
+pub fn incorrect_get_vault_dr_data_lifetime_batch(
     conn: &mut PgConn,
     tenant_id: &TenantId,
     is_live: IsLive,
@@ -40,6 +106,8 @@ pub fn get_vault_dr_data_lifetime_batch(
     batch_size: u32,
     fp_id_filter: Option<Vec<FpId>>,
 ) -> DbResult<Vec<DataLifetime>> {
+    // This is incorrect.
+    //
     // Query performance optimization:
     //
     // We know that we process records in order of ascending created_seqno and transactionally
@@ -89,7 +157,7 @@ pub fn get_vault_dr_data_lifetime_batch(
     batch_size = %batch_size,
     fp_id_filter = ?fp_id_filter,
 ))]
-pub fn get_vault_dr_scoped_vault_version_batch(
+pub fn incorrect_get_vault_dr_scoped_vault_version_batch(
     conn: &mut PgConn,
     tenant_id: &TenantId,
     is_live: IsLive,
@@ -97,6 +165,8 @@ pub fn get_vault_dr_scoped_vault_version_batch(
     batch_size: u32,
     fp_id_filter: Option<Vec<FpId>>,
 ) -> DbResult<Vec<ScopedVaultVersion>> {
+    // This is incorrect.
+    //
     // Query performance optimization:
     //
     // We know that we process ScopedVaultVersions in order of ascending seqno and transactionally
@@ -253,7 +323,7 @@ mod tests {
     use newtypes::ScopedVaultVersionNumber;
 
     #[db_test]
-    fn test_vault_dr_batch_query(conn: &mut TestPgConn) {
+    fn test_incorrect_vault_dr_batch_query(conn: &mut TestPgConn) {
         let tenant_id = fixtures::tenant::create(conn).id;
         let is_live = true;
         let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, is_live).id;
@@ -384,7 +454,7 @@ mod tests {
         let mut dl_created_seqnos = dls.iter().map(|dl| dl.created_seqno);
 
         for (i, (expected_batch_size, expected_svv_count)) in expected_batch_sizes.into_iter().enumerate() {
-            let got_dl_batch = get_vault_dr_data_lifetime_batch(
+            let got_dl_batch = incorrect_get_vault_dr_data_lifetime_batch(
                 conn,
                 &tenant_id,
                 is_live,
@@ -416,7 +486,7 @@ mod tests {
 
             write_fake_blobs(conn, &vdr_config.id, got_dl_batch);
 
-            let svv_batch = get_vault_dr_scoped_vault_version_batch(
+            let svv_batch = incorrect_get_vault_dr_scoped_vault_version_batch(
                 conn,
                 &tenant_id,
                 is_live,

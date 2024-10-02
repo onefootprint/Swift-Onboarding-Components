@@ -264,7 +264,6 @@ begin
         \* Get a batch of vault versions that aren't written yet
         \* Only blobs and manifests associated with these VVs will be written in this run.
         GetVaultVersionBatch:
-            \* TODO: Implement me IRL
             \* Make this fast using an index on scoped_vault_version(tenant_id, is_live, config_id, seqno)
             with
                 vvs_not_backed_up_by_this_config = {
