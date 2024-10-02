@@ -52,6 +52,7 @@ use crate::NtResult;
 use crate::PiiJsonValue;
 use crate::PiiString;
 use crate::ValidateArgs;
+use crate::ValidationError;
 use crate::VaultKind;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
@@ -241,8 +242,7 @@ impl CleanAndValidate for DataIdentifier {
         all_data: &AllData,
     ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         if value.is_string() && self.expected_json_format() {
-            // TODO make this return a hard validation error at some point
-            tracing::error!(di=%self, "Tried to vault data in incorrect format");
+            return Err(ValidationError("Expected JSON format, received string").into());
         }
         match self {
             Self::Id(s) => s.clean_and_validate(value, args, all_data).map(Into::into),

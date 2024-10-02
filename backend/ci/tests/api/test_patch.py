@@ -111,6 +111,11 @@ def test_data_vaulting(tenant, key, value):
             "laksdjflasdjhfahsdkfhiuewr",
             "Cannot vault document data. Please use the vault upload endpoint instead for this attribute.",
         ),
+        (
+            "id.citizenships",
+            '["US"]',
+            "Expected JSON format, received string",
+        ),
     ],
 )
 def test_data_validation(tenant, key, value, expected_error):

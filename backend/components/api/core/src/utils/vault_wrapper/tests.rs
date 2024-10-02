@@ -22,6 +22,7 @@ use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::KvDataKey;
+use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::S3Url;
 use newtypes::ScopedVaultVersionNumber;
@@ -421,7 +422,7 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
     let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
     struct Test {
-        update: Vec<(DataIdentifier, PiiString)>,
+        update: Vec<(DataIdentifier, PiiJsonValue)>,
         is_allowed: bool,
     }
 
@@ -429,34 +430,31 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
     let tests = vec![
         Test {
             update: vec![
-                (BDK::Name.into(), PiiString::new("Acme Inc".to_owned())),
-                (BDK::Dba.into(), PiiString::new("Acme".to_owned())),
+                (BDK::Name.into(), PiiJsonValue::new_string("Acme Inc".to_owned())),
+                (BDK::Dba.into(), PiiJsonValue::new_string("Acme".to_owned())),
             ],
             is_allowed: true,
         },
         // Allowed to replace name
         Test {
             update: vec![
-                (BDK::Name.into(), PiiString::new("Flerp Inc".to_owned())),
-                (BDK::Dba.into(), PiiString::new("Flerp".to_owned())),
+                (BDK::Name.into(), PiiJsonValue::new_string("Flerp Inc".to_owned())),
+                (BDK::Dba.into(), PiiJsonValue::new_string("Flerp".to_owned())),
             ],
             is_allowed: true,
         },
         // Allowed to add tin
         Test {
-            update: vec![(BDK::Tin.into(), PiiString::new("121231234".to_owned()))],
+            update: vec![(BDK::Tin.into(), PiiJsonValue::new_string("121231234".to_owned()))],
             is_allowed: true,
         },
         // Allowed to add beneficial owners
         Test {
             update: vec![(
                 BDK::BeneficialOwners.into(),
-                PiiString::new(
-                    serde_json::ser::to_string(&serde_json::json!([
-                        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                    ]))
-                    .unwrap(),
-                ),
+                PiiJsonValue::new(serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                ])),
             )],
             is_allowed: true,
         },
@@ -464,13 +462,10 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
         Test {
             update: vec![(
                 BDK::BeneficialOwners.into(),
-                PiiString::new(
-                    serde_json::ser::to_string(&serde_json::json!([
-                        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                        {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
-                    ]))
-                    .unwrap(),
-                ),
+                PiiJsonValue::new(serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                    {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
+                ])),
             )],
             is_allowed: true,
         },
@@ -478,13 +473,10 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
         Test {
             update: vec![(
                 BDK::KycedBeneficialOwners.into(),
-                PiiString::new(
-                    serde_json::ser::to_string(&serde_json::json!([
-                        {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
-                        {"first_name": "Franklin", "last_name": "Frog", "email": "franklin@onefootprint.com", "phone_number": "+14154444444", "ownership_stake": 30},
-                    ]))
-                    .unwrap(),
-                ),
+                PiiJsonValue::new(serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
+                    {"first_name": "Franklin", "last_name": "Frog", "email": "franklin@onefootprint.com", "phone_number": "+14154444444", "ownership_stake": 30},
+                ])),
             )],
             is_allowed: true,
         },
@@ -492,46 +484,58 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
         Test {
             update: vec![(
                 BDK::KycedBeneficialOwners.into(),
-                PiiString::new(
-                    serde_json::ser::to_string(&serde_json::json!([
-                        {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
-                    ]))
-                    .unwrap(),
-                ),
+                PiiJsonValue::new(serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
+                ])),
             )],
             is_allowed: false,
         },
         Test {
             update: vec![(
                 BDK::BeneficialOwners.into(),
-                PiiString::new(
-                    serde_json::ser::to_string(&serde_json::json!([
-                        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                    ]))
-                    .unwrap(),
-                ),
+                PiiJsonValue::new(serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                ])),
             )],
             is_allowed: false,
         },
         // Allowed to update all remaining info
         Test {
             update: vec![
-                (BDK::Name.into(), PiiString::new("Flerp Inc".to_owned())),
-                (BDK::Dba.into(), PiiString::new("Flerp".to_owned())),
-                (BDK::Website.into(), PiiString::new("onefootprint.com".to_owned())),
-                (BDK::PhoneNumber.into(), PiiString::new("+14155555555".to_owned())),
-                (BDK::Tin.into(), PiiString::new("12-1231234".to_owned())),
-                (BDK::CorporationType.into(), PiiString::new("llc".to_owned())),
-                (BDK::AddressLine1.into(), PiiString::new("1 Fp Way".to_owned())),
-                (BDK::AddressLine2.into(), PiiString::new("Unit 1".to_owned())),
-                (BDK::City.into(), PiiString::new("San Francisco".to_owned())),
-                (BDK::State.into(), PiiString::new("CA".to_owned())),
-                (BDK::Zip.into(), PiiString::new("94117".to_owned())),
-                (BDK::Country.into(), PiiString::new("US".to_owned())),
+                (BDK::Name.into(), PiiJsonValue::new_string("Flerp Inc".to_owned())),
+                (BDK::Dba.into(), PiiJsonValue::new_string("Flerp".to_owned())),
+                (
+                    BDK::Website.into(),
+                    PiiJsonValue::new_string("onefootprint.com".to_owned()),
+                ),
+                (
+                    BDK::PhoneNumber.into(),
+                    PiiJsonValue::new_string("+14155555555".to_owned()),
+                ),
+                (BDK::Tin.into(), PiiJsonValue::new_string("12-1231234".to_owned())),
+                (
+                    BDK::CorporationType.into(),
+                    PiiJsonValue::new_string("llc".to_owned()),
+                ),
+                (
+                    BDK::AddressLine1.into(),
+                    PiiJsonValue::new_string("1 Fp Way".to_owned()),
+                ),
+                (
+                    BDK::AddressLine2.into(),
+                    PiiJsonValue::new_string("Unit 1".to_owned()),
+                ),
+                (
+                    BDK::City.into(),
+                    PiiJsonValue::new_string("San Francisco".to_owned()),
+                ),
+                (BDK::State.into(), PiiJsonValue::new_string("CA".to_owned())),
+                (BDK::Zip.into(), PiiJsonValue::new_string("94117".to_owned())),
+                (BDK::Country.into(), PiiJsonValue::new_string("US".to_owned())),
                 // And custom data!
                 (
                     KvDataKey::test_data("flerp".to_owned()).into(),
-                    PiiString::new("blerp".to_owned()),
+                    PiiJsonValue::new_string("blerp".to_owned()),
                 ),
             ],
             is_allowed: true,
@@ -539,8 +543,11 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
         // Can't add personal data
         Test {
             update: vec![
-                (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
-                (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+                (
+                    IDK::FirstName.into(),
+                    PiiJsonValue::new_string("Flerp".to_owned()),
+                ),
+                (IDK::LastName.into(), PiiJsonValue::new_string("Derp".to_owned())),
             ],
             is_allowed: false,
         },
@@ -551,7 +558,7 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
     for (i, test) in tests.into_iter().enumerate() {
         let Test { update, is_allowed } = test;
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
-        let result = bvw.patch_data_test_str(conn, update.clone(), true);
+        let result = bvw.patch_data_test(conn, update.clone(), true);
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
@@ -566,36 +573,30 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
     let updates = vec![
         // Name with DBA
         vec![
-            (BDK::Name.into(), PiiString::new("Flerp Inc".to_owned())),
-            (BDK::Dba.into(), PiiString::new("Flerp".to_owned())),
+            (BDK::Name.into(), PiiJsonValue::new_string("Flerp Inc".to_owned())),
+            (BDK::Dba.into(), PiiJsonValue::new_string("Flerp".to_owned())),
         ],
         // Name without DBA should wipe name
-        vec![(BDK::Name.into(), PiiString::new("Derp Inc".to_owned()))],
+        vec![(BDK::Name.into(), PiiJsonValue::new_string("Derp Inc".to_owned()))],
         // BOs
         vec![(
             BDK::BeneficialOwners.into(),
-            PiiString::new(
-                serde_json::ser::to_string(&serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                ]))
-                .unwrap(),
-            ),
+            PiiJsonValue::new(serde_json::json!([
+                {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+            ])),
         )],
         // Replace with fully-KYCed BOs
         vec![(
             BDK::KycedBeneficialOwners.into(),
-            PiiString::new(
-                serde_json::ser::to_string(&serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
-                ]))
-                .unwrap(),
-            ),
+            PiiJsonValue::new(serde_json::json!([
+                {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
+            ])),
         )],
     ];
 
     for update in updates {
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
-        bvw.patch_data_test_str(conn, update.clone(), true).unwrap();
+        bvw.patch_data_test(conn, update.clone(), true).unwrap();
         // Make sure fields are set
         let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
         for (di, _) in update {
@@ -619,7 +620,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
     let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
     struct Test<'a> {
-        update: Vec<(DataIdentifier, PiiString)>,
+        update: Vec<(DataIdentifier, PiiJsonValue)>,
         su_id: &'a newtypes::ScopedVaultId,
         is_allowed: bool,
     }
@@ -628,8 +629,11 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
     let tests = vec![
         Test {
             update: vec![
-                (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
-                (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+                (
+                    IDK::FirstName.into(),
+                    PiiJsonValue::new_string("Flerp".to_owned()),
+                ),
+                (IDK::LastName.into(), PiiJsonValue::new_string("Derp".to_owned())),
             ],
             su_id: &su.id,
             is_allowed: true,
@@ -637,56 +641,68 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
         // Allowed to replace name
         Test {
             update: vec![
-                (IDK::FirstName.into(), PiiString::new("Merp".to_owned())),
-                (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+                (IDK::FirstName.into(), PiiJsonValue::new_string("Merp".to_owned())),
+                (IDK::LastName.into(), PiiJsonValue::new_string("Derp".to_owned())),
             ],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add email
         Test {
-            update: vec![(IDK::Email.into(), PiiString::new("flerp@1fp.com".to_owned()))],
+            update: vec![(
+                IDK::Email.into(),
+                PiiJsonValue::new_string("flerp@1fp.com".to_owned()),
+            )],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add phone
         Test {
-            update: vec![(IDK::PhoneNumber.into(), PiiString::new("+14154444444".to_owned()))],
+            update: vec![(
+                IDK::PhoneNumber.into(),
+                PiiJsonValue::new_string("+14154444444".to_owned()),
+            )],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add ssn4
         Test {
-            update: vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))],
+            update: vec![(IDK::Ssn4.into(), PiiJsonValue::new_string("1234".to_owned()))],
             su_id: &su.id,
             is_allowed: true,
         },
         // Allowed to add ssn9 after ssn4
         Test {
-            update: vec![(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))],
+            update: vec![(IDK::Ssn9.into(), PiiJsonValue::new_string("123121234".to_owned()))],
             su_id: &su.id,
             is_allowed: true,
         },
         // NOT allowed to add ssn4 after ssn9
         Test {
-            update: vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))],
+            update: vec![(IDK::Ssn4.into(), PiiJsonValue::new_string("1234".to_owned()))],
             su_id: &su.id,
             is_allowed: false,
         },
         // BUT, can add ssn4 on different scoped user
         Test {
-            update: vec![(IDK::Ssn4.into(), PiiString::new("1234".to_owned()))],
+            update: vec![(IDK::Ssn4.into(), PiiJsonValue::new_string("1234".to_owned()))],
             su_id: &su2.id, // This is the only test that uses su2
             is_allowed: true,
         },
         // Allowed to add full address
         Test {
             update: vec![
-                (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
-                (IDK::City.into(), PiiString::new("San Francisco".to_owned())),
-                (IDK::State.into(), PiiString::new("CA".to_owned())),
-                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
-                (IDK::Country.into(), PiiString::new("US".to_owned())),
+                (
+                    IDK::AddressLine1.into(),
+                    PiiJsonValue::new_string("Flerp".to_owned()),
+                ),
+                (
+                    IDK::City.into(),
+                    PiiJsonValue::new_string("San Francisco".to_owned()),
+                ),
+                (IDK::State.into(), PiiJsonValue::new_string("CA".to_owned())),
+                (IDK::Zip.into(), PiiJsonValue::new_string("94117".to_owned())),
+                (IDK::Country.into(), PiiJsonValue::new_string("US".to_owned())),
             ],
             su_id: &su.id,
             is_allowed: true,
@@ -694,19 +710,25 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
         // Allowed to update all remaining info
         Test {
             update: vec![
-                (IDK::FirstName.into(), PiiString::new("Lerp".to_owned())),
-                (IDK::LastName.into(), PiiString::new("Merp".to_owned())),
-                (IDK::Dob.into(), PiiString::new("1990-12-25".to_owned())),
-                (IDK::Ssn9.into(), PiiString::new("123121234".to_owned())),
-                (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
-                (IDK::City.into(), PiiString::new("San Francisco".to_owned())),
-                (IDK::State.into(), PiiString::new("CA".to_owned())),
-                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
-                (IDK::Country.into(), PiiString::new("US".to_owned())),
+                (IDK::FirstName.into(), PiiJsonValue::new_string("Lerp".to_owned())),
+                (IDK::LastName.into(), PiiJsonValue::new_string("Merp".to_owned())),
+                (IDK::Dob.into(), PiiJsonValue::new_string("1990-12-25".to_owned())),
+                (IDK::Ssn9.into(), PiiJsonValue::new_string("123121234".to_owned())),
+                (
+                    IDK::AddressLine1.into(),
+                    PiiJsonValue::new_string("Flerp".to_owned()),
+                ),
+                (
+                    IDK::City.into(),
+                    PiiJsonValue::new_string("San Francisco".to_owned()),
+                ),
+                (IDK::State.into(), PiiJsonValue::new_string("CA".to_owned())),
+                (IDK::Zip.into(), PiiJsonValue::new_string("94117".to_owned())),
+                (IDK::Country.into(), PiiJsonValue::new_string("US".to_owned())),
                 // And custom data!
                 (
                     KvDataKey::test_data("flerp".into()).into(),
-                    PiiString::new("blerp".to_owned()),
+                    PiiJsonValue::new_string("blerp".to_owned()),
                 ),
             ],
             su_id: &su.id,
@@ -715,22 +737,34 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
         // Can add investor profile
         Test {
             update: vec![
-                (IPK::Occupation.into(), PiiString::new("Penguin".to_owned())),
-                (IPK::AnnualIncome.into(), PiiString::new("s50k_to100k".to_owned())),
-                (IPK::NetWorth.into(), PiiString::new("s100k_to250k".to_owned())),
+                (
+                    IPK::Occupation.into(),
+                    PiiJsonValue::new_string("Penguin".to_owned()),
+                ),
+                (
+                    IPK::AnnualIncome.into(),
+                    PiiJsonValue::new_string("s50k_to100k".to_owned()),
+                ),
+                (
+                    IPK::NetWorth.into(),
+                    PiiJsonValue::new_string("s100k_to250k".to_owned()),
+                ),
                 (
                     IPK::InvestmentGoals.into(),
-                    PiiString::new("[\"buy_a_home\"]".to_owned()),
+                    PiiJsonValue::new(serde_json::json!(["buy_a_home"])),
                 ),
-                (IPK::RiskTolerance.into(), PiiString::new("aggressive".to_owned())),
-                (IPK::Declarations.into(), PiiString::new("[]".to_owned())),
+                (
+                    IPK::RiskTolerance.into(),
+                    PiiJsonValue::new_string("aggressive".to_owned()),
+                ),
+                (IPK::Declarations.into(), PiiJsonValue::new(serde_json::json!([]))),
             ],
             su_id: &su.id,
             is_allowed: true,
         },
         // Can't add business data
         Test {
-            update: vec![(BDK::Name.into(), PiiString::new("Acme Inc".to_owned()))],
+            update: vec![(BDK::Name.into(), PiiJsonValue::new_string("Acme Inc".to_owned()))],
             su_id: &su.id,
             is_allowed: false,
         },
@@ -745,7 +779,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
             is_allowed,
         } = test;
         let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, su_id).unwrap();
-        let result = uvw.patch_data_test_str(conn, update, true);
+        let result = uvw.patch_data_test(conn, update, true);
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
@@ -907,17 +941,29 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     let custom_key1 = KvDataKey::from_str("blerp").unwrap();
     let custom_key2 = KvDataKey::from_str("flerp").unwrap();
     let update = vec![
-        (IDK::Ssn4.into(), PiiString::new("1234".to_owned())),
-        (IPK::AnnualIncome.into(), PiiString::from("lt50k")),
-        (IPK::NetWorth.into(), PiiString::from("lt50k")),
+        (IDK::Ssn4.into(), PiiJsonValue::new_string("1234".to_owned())),
+        (
+            IPK::AnnualIncome.into(),
+            PiiJsonValue::new_string("lt50k".to_owned()),
+        ),
+        (IPK::NetWorth.into(), PiiJsonValue::new_string("lt50k".to_owned())),
         (
             IPK::InvestmentGoals.into(),
-            PiiString::from("[\"grow_long_term_wealth\"]"),
+            PiiJsonValue::new(serde_json::json!(["grow_long_term_wealth"])),
         ),
-        (IPK::RiskTolerance.into(), PiiString::from("moderate")),
-        (IPK::Declarations.into(), PiiString::from("[]")),
-        (custom_key1.clone().into(), PiiString::from("BLERP")),
-        (custom_key2.clone().into(), PiiString::from("FLERP")),
+        (
+            IPK::RiskTolerance.into(),
+            PiiJsonValue::new_string("moderate".to_owned()),
+        ),
+        (IPK::Declarations.into(), PiiJsonValue::new(serde_json::json!([]))),
+        (
+            custom_key1.clone().into(),
+            PiiJsonValue::new_string("BLERP".to_owned()),
+        ),
+        (
+            custom_key2.clone().into(),
+            PiiJsonValue::new_string("FLERP".to_owned()),
+        ),
     ];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
 
@@ -939,7 +985,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
         )
         .unwrap();
 
-    uvw.patch_data_test_str(conn, update, true).unwrap();
+    uvw.patch_data_test(conn, update, true).unwrap();
 
     // Commit the identity data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
