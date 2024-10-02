@@ -31,12 +31,12 @@ use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use db::models::vault_dr::VaultDrManifest;
-use futures::future::BoxFuture;
 use futures::FutureExt;
 use futures::Stream;
 use futures::StreamExt;
 use futures::TryFutureExt;
 use futures::TryStreamExt;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
 use newtypes::FpId;
@@ -467,20 +467,73 @@ impl VaultDrWriter {
             return Ok(0);
         }
 
-        let svv_chunks = svvs.into_iter().chunks(SVV_CHUNK_SIZE);
-        let svv_chunks = futures::stream::iter(svv_chunks.into_iter());
+        // Determine which SVVs should have a manifest.latest.json written in this batch.
+        let sv_id_to_latest_svv_in_batch = svvs
+            .iter()
+            .map(|svv| (svv.scoped_vault_id.clone(), svv))
+            .into_grouping_map()
+            .max_by_key(|_id, svv| svv.version);
+        let latest_svvs = sv_id_to_latest_svv_in_batch.into_values().cloned().collect_vec();
 
-        let tenant_id = self.tenant_id.clone();
-        let config_id = self.config_id.clone();
+        // The ordering of the two calls to build_and_write_manifests_to_s3 is important.
+        //
+        // Within a batch we write all the manifest.latest.json files after the
+        // manifest.<version.json> files so that we have the property that for each vault, once a
+        // manifest.latest.json file is written (with version x), all manifest.<V>.json files for
+        // 1 <= x <= V have already been written. This isn't necessary for correctness, but it
+        // allows the client to more easily reason about what data versions should be fully
+        // available.
+        //
+        // In the TLA+ spec (backend/formal_methods/vault_disaster_recovery/vdr.tla) this ordering
+        // of S3 writes supports the following invariants:
+        // - LatestS3ManifestNotWrittenWithoutVersionedManifest
+        // - S3VersionedManifestVersionsAreNotSkippedBeforeLatestManifestsWritten
+        let new_versioned_manifests = self
+            .build_and_write_manifests_to_s3(state, &self.config_id, &self.tenant_id, is_live, svvs, false)
+            .await?;
+        let new_latest_manifests = self
+            .build_and_write_manifests_to_s3(
+                state,
+                &self.config_id,
+                &self.tenant_id,
+                is_live,
+                latest_svvs,
+                true,
+            )
+            .await?;
 
+        let all_new_manifests = chain!(new_versioned_manifests, new_latest_manifests).collect_vec();
+
+        let manifest_count = all_new_manifests.len();
+        state
+            .db_pool
+            .db_transaction(move |conn| VaultDrManifest::bulk_create(conn, all_new_manifests))
+            .await?;
+
+        Ok(manifest_count as u32)
+    }
+
+    async fn build_and_write_manifests_to_s3(
+        &self,
+        state: &State,
+        config_id: &VaultDrConfigId,
+        tenant_id: &TenantId,
+        is_live: bool,
+        svvs: Vec<ScopedVaultVersion>,
+        write_latest_manifests: bool,
+    ) -> FpResult<Vec<NewVaultDrManifest>> {
         let concurrency_limit = self.knobs.manifest_task_concurrency;
         tracing::info!(
             config_id=%self.config_id,
             tenant_id=%self.tenant_id,
             is_live,
             concurrency_limit,
+            write_latest_manifests,
             "Writing vault manifests to S3 in parallel"
         );
+
+        let svv_chunks = svvs.into_iter().chunks(SVV_CHUNK_SIZE);
+        let svv_chunks = futures::stream::iter(svv_chunks.into_iter());
 
         // For each chunk of SVVs in the batch, map to a stream of manifests and flatten into a
         // unified stream of manifests for the entire batch.
@@ -497,15 +550,15 @@ impl VaultDrWriter {
                     tenant_id.clone(),
                     is_live,
                     svvs,
+                    write_latest_manifests,
                 )
                 .boxed()
             })
             .buffered(2)
             .try_flatten();
 
-        // We don't care about the order in which we write manifests within a batch since the
-        // client doesn't rely on all versions of a vault having data available. The client only
-        // looks at the latest available manifest version.
+        // We don't care about the order in which we write manifests in this context, since this
+        // function is not writing a mix of latest and versioned manifests.
         let new_manifests = manifest_tasks_stream
             .map_ok(|join_handle| join_handle.map_err(Into::into))
             .try_buffer_unordered(concurrency_limit)
@@ -514,22 +567,16 @@ impl VaultDrWriter {
             .into_iter()
             .collect::<FpResult<Vec<_>>>()?;
 
-        let manifest_count = new_manifests.len();
-        state
-            .db_pool
-            .db_transaction(move |conn| VaultDrManifest::bulk_create(conn, new_manifests))
-            .await?;
-
         tracing::info!(
             config_id=%self.config_id,
             tenant_id=%self.tenant_id,
             is_live,
-            manifest_count,
+            manifest_count = new_manifests.len(),
             concurrency_limit,
             "Wrote batch of vault manifests to S3"
         );
 
-        Ok(manifest_count as u32)
+        Ok(new_manifests)
     }
 
     /// Constructs a stream that spawns tasks to write manifests for the given chunk of
@@ -544,6 +591,7 @@ impl VaultDrWriter {
         tenant_id: TenantId,
         is_live: bool,
         svvs: Vec<ScopedVaultVersion>,
+        write_latest_manifests: bool,
     ) -> FpResult<impl Stream<Item = FpResult<JoinHandle<FpResult<NewVaultDrManifest>>>> + Send + 'static>
     {
         let writer = self.clone();
@@ -565,14 +613,6 @@ impl VaultDrWriter {
             })
             .await?;
 
-        // Compute the max version for each scoped vault. In each batch, we'll write
-        // manifest.latest.json only for the max manifest version.
-        let sv_id_to_max_batch_version = svvs
-            .iter()
-            .map(|svv| (svv.scoped_vault_id.clone(), svv.version))
-            .into_grouping_map()
-            .max();
-
         // Regroup the data so we can get the fp_id for each ScopedVaultVersion.
         let sv_id_to_fp_id: HashMap<_, _> = scoped_vaults
             .into_iter()
@@ -588,8 +628,8 @@ impl VaultDrWriter {
             .collect();
         let svvs_by_id: HashMap<_, _> = svvs.into_iter().map(|svv| (svv.id.clone(), svv)).collect();
 
-        let manifest_stream = futures::stream::iter(svv_id_to_blobs.into_iter())
-            .map(move |(svv_id, blobs)| -> FpResult<_> {
+        let manifest_stream =
+            futures::stream::iter(svv_id_to_blobs.into_iter()).map(move |(svv_id, blobs)| -> FpResult<_> {
                 let fp_id = svv_id_to_fp_id
                     .get(&svv_id)
                     .ok_or(AssertionError("svv_id not in svv_id_to_fp_id"))?
@@ -611,46 +651,17 @@ impl VaultDrWriter {
                     fields,
                 };
 
-                let mut manifest_futs: Vec<BoxFuture<_>> = vec![];
-
-                // Write manifest.<n>.json.
-                let fut = {
-                    let writer = writer.clone();
-                    let fp_id = fp_id.clone();
-                    let svv_id = svv_id.clone();
-                    let manifest = manifest.clone();
-                    async move {
+                let writer = writer.clone();
+                let manifest_task = tokio::task::spawn(
+                    Box::pin(async move {
                         writer
-                            .write_manifest_to_s3(fp_id, svv_id, seqno, manifest, false)
+                            .write_manifest_to_s3(fp_id, svv_id, seqno, manifest, write_latest_manifests)
                             .await
-                    }
-                };
-                manifest_futs.push(Box::pin(fut));
-
-                // Write manifest.latest.json as well if this is the latest manifest version in the
-                // batch.
-                let batch_max_version = sv_id_to_max_batch_version
-                    .get(&svv.scoped_vault_id)
-                    .ok_or(AssertionError("svv_id not in sv_id_to_max_version"))?;
-                let is_latest_manifest = svv.version == *batch_max_version;
-                if is_latest_manifest {
-                    let writer = writer.clone();
-                    let fut = async move {
-                        writer
-                            .write_manifest_to_s3(fp_id, svv_id, seqno, manifest, true)
-                            .await
-                    };
-                    manifest_futs.push(Box::pin(fut));
-                }
-
-                let manifest_tasks = futures::stream::iter(manifest_futs).map(|manifest_fut| {
-                    let task = tokio::task::spawn(manifest_fut.in_current_span());
-                    Ok(task)
-                });
-
-                Ok(manifest_tasks)
-            })
-            .try_flatten();
+                    })
+                    .in_current_span(),
+                );
+                Ok(manifest_task)
+            });
 
         Ok(manifest_stream)
     }

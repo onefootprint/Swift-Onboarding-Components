@@ -472,7 +472,12 @@ impl S3Client {
             .await
             .map_err(|e| {
                 let svc_error = e.into_service_error();
-                anyhow!("GetObject failed: {:?}", svc_error)
+                anyhow!(
+                    "Failed to GetObject s3://{}/{}: {:?}",
+                    &bucket_name,
+                    key,
+                    svc_error
+                )
             })?;
 
         let body = obj.body.collect().await.map(|data| data.into_bytes())?;

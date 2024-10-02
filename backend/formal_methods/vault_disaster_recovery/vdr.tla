@@ -402,7 +402,6 @@ begin
             \* Crashing here isn't interesting since we haven't written anything new.
 
         WriteVersionedManifestsToS3:
-            \* TODO: update implementation IRL
             with
                 vv_to_key = [vv \in complete_vv_batch |-> S3ManifestKeyForVaultVersion(vv)],
                 key_to_vv = AntiFunction(vv_to_key), \* Valid since key function is injective
@@ -444,9 +443,7 @@ begin
 
         WriteLatestManifestsToS3:
             \* We write latest manifests after the batch of unversioned manifests was successfully written for causal ordering.
-            \* manifest.latest.json with version V is only written if the all manifest.<x>.json have been successfully written for x <= V.
-
-            \* TODO: update implementation IRL
+            \* manifest.latest.json with version V is only written if the all manifest.<x>.json have been successfully written for 1 <= x <= V.
             with
                 latest_version_vvs = LatestVaultVersionsInSet(complete_vv_batch),
                 latest_vv_to_key = [vv \in latest_version_vvs |-> S3LatestManifestKeyForVaultVersion(vv)],
