@@ -38,7 +38,7 @@ const BusinessActions = () => {
   return (
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-        <Dropdown.Trigger>
+        <Dropdown.Trigger asChild>
           <IconButton variant="outline" aria-label={t('trigger')} size="compact">
             <Box>
               <IcoDotsHorizontal24 />
