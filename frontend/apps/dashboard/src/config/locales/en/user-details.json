@@ -1,0 +1,26 @@
+{
+  "header": {
+    "actions": {
+      "trigger": "Open actions menu",
+      "management": {
+        "title": "User management",
+        "edit": "Edit user information",
+        "edit-tags": "Edit tags",
+        "add-tags": "Add tags",
+        "upload-document": "Upload document",
+        "view-historical-data": "View historical data",
+        "add-to-list": "Add to list",
+        "summarize": "Summarize with AI"
+      },
+      "requests": {
+        "title": "User requests",
+        "request-more-info": "Request more information",
+        "allow-updating-login-methods": "Allow updating login methods"
+      },
+      "internal": {
+        "title": "Internal",
+        "datadog": "Open in Datadog"
+      }
+    }
+  }
+}

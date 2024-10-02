@@ -1,4 +1,4 @@
-import { EntityStatus, RoleScopeKind } from '@onefootprint/types';
+import { EntityKind, EntityStatus, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +11,11 @@ import { DECRYPT_VAULT_FORM_ID, HEADER_ACTIONS_SELECTOR } from '@/entity/constan
 import useCurrentEntity from '@/entity/hooks/use-current-entity';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
-import Actions from './components/actions';
+import BusinessActions from './components/business-actions';
 import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
 import Shortcuts from './components/shortcuts';
+import UserActions from './components/user-actions';
 import useDecryptControls from './hooks/use-decrypt-controls';
 import useEditControls from './hooks/use-edit-controls';
 
@@ -79,7 +80,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             <ManualReview status={entityData.status} kind={entityData.kind} />
           </PermissionGate>
         )}
-        <Actions />
+        {entity.kind === EntityKind.person ? <UserActions /> : <BusinessActions />}
       </Stack>
     );
   };

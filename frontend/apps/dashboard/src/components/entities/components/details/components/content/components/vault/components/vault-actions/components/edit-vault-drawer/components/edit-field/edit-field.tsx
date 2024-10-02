@@ -23,7 +23,7 @@ const EditField = ({ di, entity }: EditFieldProps) => {
   const renderValue = () => {
     if (isDecrypted || isEmpty) {
       return canEdit ? (
-        <Editable entity={entity} value={value} fieldName={di as DataIdentifier} />
+        <Editable entity={entity} value={value} fieldName={di} />
       ) : (
         <Tooltip text={t('not-allowed')} position="bottom">
           <TextInput

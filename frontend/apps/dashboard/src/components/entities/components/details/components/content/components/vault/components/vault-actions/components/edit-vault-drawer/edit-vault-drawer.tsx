@@ -22,8 +22,10 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'header-default.actions.edit-vault-drawer',
   });
+
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
+
   const { data: vaultData, update: updateVault } = useEntityVault(entity.id, entity);
   const isPersonVault = entity.kind === EntityKind.person;
 

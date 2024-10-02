@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next';
 
 import apiKeys from '../locales/en/api-keys.json';
 import authentication from '../locales/en/authentication.json';
+import businessDetails from '../locales/en/business-details.json';
 import businesses from '../locales/en/businesses.json';
 import common from '../locales/en/common.json';
 import domainRestrictions from '../locales/en/domain-restrictions.json';
@@ -19,55 +20,61 @@ import roles from '../locales/en/roles.json';
 import securityLogs from '../locales/en/security-logs.json';
 import settings from '../locales/en/settings.json';
 import switchOrg from '../locales/en/switch-org.json';
+import userDetails from '../locales/en/user-details.json';
 import users from '../locales/en/users.json';
 import webhooks from '../locales/en/webhooks.json';
+
 i18next.use(initReactI18next).init({
   resources: {
     en: {
+      'api-keys': apiKeys,
+      'business-details': businessDetails,
       'domain-restrictions': domainRestrictions,
       'entity-details': entityDetails,
       'entity-documents': entityDocuments,
+      'proxy-configs': proxyConfigs,
+      'security-logs': securityLogs,
       'switch-org': switchOrg,
-      'api-keys': apiKeys,
+      'user-details': userDetails,
       authentication,
       businesses,
       common,
+      home,
       internal,
       lists,
+      onboarding,
       playbooks,
       roles,
+      settings,
       ui,
       users,
-      home,
-      settings,
-      onboarding,
-      'security-logs': securityLogs,
-      'proxy-configs': proxyConfigs,
       webhooks: webhooks,
     },
   },
   lng: 'en',
   defaultNS: 'common',
   ns: [
+    'api-keys',
     'authetication',
+    'business-details',
     'businesses',
     'common',
     'domain-restrictions',
     'entity-details',
     'entity-documents',
+    'home',
     'internal',
     'lists',
+    'onboarding',
     'playbooks',
+    'proxy-configs',
     'roles',
+    'security-logs',
+    'settings',
     'switch-org',
     'ui',
+    'user-details',
     'users',
-    'home',
-    'settings',
-    'api-keys',
-    'onboarding',
-    'security-logs',
-    'proxy-configs',
     'webhooks',
   ],
   returnNull: false,

@@ -557,12 +557,6 @@
     }
   },
   "actions": {
-    "cta": "Open actions",
-    "groups": {
-      "user-management": "User Management",
-      "user-requests": "User Requests",
-      "internal": "Internal"
-    },
     "edit-user": {
       "label": "Edit user information",
       "not-allowed": "You're not allowed to edit user information"

@@ -17,7 +17,7 @@ import {
 import { asAdminUser } from 'src/config/tests';
 
 import TestWrapper from '../../../utils/test-wrapper';
-import Actions from './actions';
+import UserActions from './user-actions';
 import {
   entityId,
   entityWithPhoneFixture,
@@ -31,18 +31,18 @@ import {
   withTokenSendLink,
   withTrigger,
   withTriggerError,
-} from './actions.test.config';
+} from './user-actions.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const renderActions = async (isNoPhone?: boolean) =>
   customRender(
     <TestWrapper>
-      <Actions entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture} />
+      <UserActions entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture} />
     </TestWrapper>,
   );
 
-describe('<Actions />', () => {
+describe('<UserActions />', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl(`/entities/${entityId}`);
     mockRouter.query = {
@@ -88,7 +88,7 @@ describe('<Actions />', () => {
           renderActions(true);
 
           const button = screen.getByRole('button', {
-            name: 'Open actions',
+            name: 'Open actions menu',
           });
           await userEvent.click(button);
 
@@ -157,7 +157,7 @@ describe('<Actions />', () => {
           renderActions();
 
           const button = screen.getByRole('button', {
-            name: 'Open actions',
+            name: 'Open actions menu',
           });
           await userEvent.click(button);
 
@@ -227,7 +227,7 @@ describe('<Actions />', () => {
         renderActions();
 
         const button = screen.getByRole('button', {
-          name: 'Open actions',
+          name: 'Open actions menu',
         });
         await userEvent.click(button);
 
