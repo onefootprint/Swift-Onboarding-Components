@@ -10,6 +10,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::insight_event::InsightEvent;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -156,7 +157,11 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
 
     let signals = sandbox::get_fixture_kyb_reason_codes(fixture_result);
-    let rsg = RiskSignalGroup::get_or_create(conn, &biz_wf.scoped_vault_id, RiskSignalGroupKind::Kyb)?;
+    let scope = RiskSignalGroupScope::WorkflowId {
+        id: &biz_wf.id,
+        sv_id: &sb.id,
+    };
+    let rsg = RiskSignalGroup::get_or_create(conn, scope, RiskSignalGroupKind::Kyb)?;
     let rses = signals
         .into_iter()
         .map(|s| (s.0, s.1, vres.id.clone()))

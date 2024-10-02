@@ -22,6 +22,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_result::RuleResult;
 use db::models::rule_set_result::RuleSetResult;
@@ -676,7 +677,11 @@ pub async fn mock_incode_doc_collection(
                 .map(|frc| (frc, VendorAPI::IncodeFetchScores, vres.id.clone()))
                 .collect();
             // incode state machine defaults this to not hidden
-            RiskSignal::bulk_create(conn, &scoped_vault_id, signals, RiskSignalGroupKind::Doc, false)?;
+            let scope = RiskSignalGroupScope::WorkflowId {
+                id: &wf_id,
+                sv_id: &scoped_vault_id,
+            };
+            RiskSignal::bulk_create(conn, scope, signals, RiskSignalGroupKind::Doc, false)?;
 
             Ok(())
         })

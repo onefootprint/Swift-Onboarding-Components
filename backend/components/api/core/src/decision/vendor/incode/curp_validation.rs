@@ -31,6 +31,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::TxnPgConn;
@@ -227,7 +228,7 @@ pub async fn run_curp_validation_check(
                     Ok(Some(vendor_result))
                 }
                 either::Either::Right(errors) => {
-                    handle_curp_error(state, &di.scoped_vault_id, &vres_id, errors).await?;
+                    handle_curp_error(state, &di.scoped_vault_id, wf_id, &vres_id, errors).await?;
 
                     Err(into_fp_error(idv::incode::error::Error::InvalidCurp))
                 }
@@ -468,10 +469,12 @@ fn doc_expects_curp(doc: &Document) -> bool {
 async fn handle_curp_error(
     state: &State,
     sv_id: &ScopedVaultId,
+    wf_id: &WorkflowId,
     vres_id: &VerificationResultId,
     errors: Option<Vec<IncodeFailureReason>>,
 ) -> FpResult<()> {
     let svid = sv_id.clone();
+    let wfid = wf_id.clone();
     // We save under the same RSG created during the incode state machine if it ran so we
     // don't invalidate the old RSG
     if errors
@@ -487,7 +490,12 @@ async fn handle_curp_error(
         state
             .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
-                let rsg = RiskSignalGroup::get_or_create(conn, &svid, RiskSignalGroupKind::Doc)?;
+                let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
+                    id: &wfid,
+                    sv_id: &svid,
+                };
+                let rsg =
+                    RiskSignalGroup::get_or_create(conn, risk_signal_group_scope, RiskSignalGroupKind::Doc)?;
                 RiskSignal::bulk_add(conn, new_reason_codes, false, rsg.id)?;
 
                 Ok(())

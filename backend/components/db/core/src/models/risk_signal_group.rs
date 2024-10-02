@@ -25,21 +25,52 @@ pub struct RiskSignalGroup {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = risk_signal_group)]
-pub struct NewRiskSignalGroup {
+struct NewRiskSignalGroup {
     pub created_at: DateTime<Utc>,
     pub scoped_vault_id: ScopedVaultId,
     pub kind: RiskSignalGroupKind,
+    pub workflow_id: Option<WorkflowId>,
 }
+
+#[derive(Clone, Debug)]
+pub enum RiskSignalGroupScope<'a> {
+    ScopedVaultId {
+        id: &'a ScopedVaultId,
+    },
+    WorkflowId {
+        id: &'a WorkflowId,
+        sv_id: &'a ScopedVaultId,
+    },
+}
+impl<'a> RiskSignalGroupScope<'a> {
+    pub fn scoped_vault_id(&self) -> ScopedVaultId {
+        match &self {
+            RiskSignalGroupScope::ScopedVaultId { id } => (*id).clone(),
+            RiskSignalGroupScope::WorkflowId { sv_id, .. } => (*sv_id).clone(),
+        }
+    }
+
+    pub fn workflow_id(&self) -> Option<WorkflowId> {
+        match &self {
+            RiskSignalGroupScope::ScopedVaultId { .. } => None,
+            RiskSignalGroupScope::WorkflowId { id, .. } => Some((*id).clone()),
+        }
+    }
+}
+
 
 impl RiskSignalGroup {
     pub fn create(
         conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scope: RiskSignalGroupScope,
         kind: RiskSignalGroupKind,
     ) -> DbResult<Self> {
+        let sv_id = scope.scoped_vault_id();
+        let wf_id = scope.workflow_id();
         let new = NewRiskSignalGroup {
             created_at: Utc::now(),
-            scoped_vault_id: scoped_vault_id.clone(),
+            scoped_vault_id: sv_id,
+            workflow_id: wf_id,
             kind,
         };
 
@@ -50,18 +81,19 @@ impl RiskSignalGroup {
     }
 
     #[tracing::instrument("RiskSignalGroup::get_or_create", skip(conn))]
-    pub fn get_or_create(
+    pub fn get_or_create<'a>(
         conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,
     ) -> DbResult<Self> {
-        let existing = Self::latest_by_kind(conn, scoped_vault_id, kind)?;
+        let existing = Self::latest_by_kind(conn, &scope.scoped_vault_id(), kind)?;
         match existing {
             Some(e) => Ok(e),
-            None => Self::create(conn, scoped_vault_id, kind),
+            None => Self::create(conn, scope, kind),
         }
     }
 
+    // TODO: accept scope here
     #[tracing::instrument("RiskSignalGroup::latest_by_kind", skip(conn))]
     pub fn latest_by_kind(
         conn: &mut PgConn,
@@ -78,7 +110,7 @@ impl RiskSignalGroup {
         Ok(res)
     }
 
-    #[tracing::instrument("RiskSignalGroup::latest_by_kind", skip(conn))]
+    #[tracing::instrument("RiskSignalGroup::latest_by_kinds", skip(conn))]
     pub fn latest_by_kinds(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let res = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))

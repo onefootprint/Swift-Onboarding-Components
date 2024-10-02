@@ -18,6 +18,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::tenant::Tenant;
@@ -202,9 +203,10 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     Some(crate::GIT_HASH.to_string()),
                 )?;
 
+                let rsg_scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
                 RiskSignal::bulk_create(
                     conn,
-                    &sv.id,
+                    rsg_scope,
                     watchlist_result.reason_codes().unwrap_or(vec![]),
                     RiskSignalGroupKind::Aml,
                     false,

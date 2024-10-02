@@ -44,6 +44,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -323,6 +324,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
+        // For all reason codes, we scope them to the onboarding/wf
+        let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
+            id: &wf.id,
+            sv_id: &wf.scoped_vault_id,
+        };
 
         let curp_reason_codes = curp_result.map(|v| {
             let vendor_api: VendorAPI = (&v.response.response).into();
@@ -342,7 +348,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         if !new_doc_reason_codes.is_empty() {
             // We save under the same RSG created during the incode state machine if it ran so we
             // don't invalidate the old RSG
-            let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Doc)?;
+
+            let rsg = RiskSignalGroup::get_or_create(
+                conn,
+                risk_signal_group_scope.clone(),
+                RiskSignalGroupKind::Doc,
+            )?;
             RiskSignal::bulk_add(conn, new_doc_reason_codes, false, rsg.id)?;
         }
 
@@ -353,7 +364,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
 
-            let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Behavior)?;
+            let rsg = RiskSignalGroup::get_or_create(
+                conn,
+                risk_signal_group_scope.clone(),
+                RiskSignalGroupKind::Behavior,
+            )?;
             RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
         }
 
@@ -363,8 +378,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
-
-            let rsg = RiskSignalGroup::create(conn, &self.sv_id, RiskSignalGroupKind::Synthetic)?;
+            let rsg = RiskSignalGroup::create(
+                conn,
+                risk_signal_group_scope.clone(),
+                RiskSignalGroupKind::Synthetic,
+            )?;
             RiskSignal::bulk_add(conn, sentilink_frc, false, rsg.id)?;
         }
 
@@ -377,7 +395,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
 
-            let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Phone)?;
+            let rsg = RiskSignalGroup::get_or_create(
+                conn,
+                risk_signal_group_scope.clone(),
+                RiskSignalGroupKind::Phone,
+            )?;
             RiskSignal::bulk_add(conn, twilio_frc, false, rsg.id)?;
         }
 
@@ -401,7 +423,13 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .into_iter()
                 .chain(user_input_risk_signals)
                 .collect();
-            RiskSignal::bulk_create(conn, &self.sv_id, rses, RiskSignalGroupKind::Kyc, false)?;
+            RiskSignal::bulk_create(
+                conn,
+                risk_signal_group_scope.clone(),
+                rses,
+                RiskSignalGroupKind::Kyc,
+                false,
+            )?;
         }
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
@@ -422,7 +450,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             };
             RiskSignal::bulk_create(
                 conn,
-                &self.sv_id,
+                risk_signal_group_scope.clone(),
                 aml_risk_signals,
                 RiskSignalGroupKind::Aml,
                 false,
@@ -431,7 +459,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&vw, kyc_vendor_result)?;
             RiskSignal::bulk_create(
                 conn,
-                &self.sv_id,
+                risk_signal_group_scope,
                 aml_risk_signals,
                 RiskSignalGroupKind::Aml,
                 false,

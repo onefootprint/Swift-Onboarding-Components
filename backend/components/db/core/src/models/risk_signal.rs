@@ -1,5 +1,6 @@
 use super::data_lifetime::DataLifetime;
 use super::risk_signal_group::RiskSignalGroup;
+use super::risk_signal_group::RiskSignalGroupScope;
 use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -63,17 +64,18 @@ pub struct AtSeqno(pub Option<DataLifetimeSeqno>);
 
 impl RiskSignal {
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
-    pub fn bulk_create(
+    pub fn bulk_create<'a>(
         conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
+        risk_group_scope: RiskSignalGroupScope<'a>,
         signals: Vec<NewRiskSignalInfo>,
         risk_group_kind: RiskSignalGroupKind,
         hidden: bool,
     ) -> DbResult<Vec<Self>> {
-        let rsg = RiskSignalGroup::create(conn.conn(), scoped_vault_id, risk_group_kind)?;
+        let sv_id = risk_group_scope.scoped_vault_id();
+        let rsg = RiskSignalGroup::create(conn.conn(), risk_group_scope, risk_group_kind)?;
         let duplicates = Self::generate_duplicate_frc_by_reason_code_and_vendor_api(signals.clone());
         if !duplicates.is_empty() {
-            tracing::error!(reason_codes=format!("{:?}", duplicates), scoped_vault_id =%scoped_vault_id, "duplicate reason codes produced");
+            tracing::error!(reason_codes=format!("{:?}", duplicates), scoped_vault_id =%sv_id, "duplicate reason codes produced");
         }
         Self::bulk_add(conn, signals, hidden, rsg.id)
     }
@@ -146,6 +148,7 @@ impl RiskSignal {
         scoped_vault_id: &ScopedVaultId,
         kind: RiskSignalGroupKind,
     ) -> DbResult<Vec<Self>> {
+        // TODO: For now we only pull risk signals by sv_id. Keep this interface as is for now
         let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, kind)?;
         if let Some(rsg) = rsg {
             // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to

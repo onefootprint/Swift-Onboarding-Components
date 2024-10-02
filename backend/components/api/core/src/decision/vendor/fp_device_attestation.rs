@@ -7,6 +7,7 @@ use db::models::apple_device_attest::DeviceMetadata;
 use db::models::decision_intent::DecisionIntent;
 use db::models::google_device_attest::GoogleDeviceAttestation;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
@@ -117,9 +118,10 @@ pub fn save_vendor_result_and_risk_signals(
         }
     };
 
+    let scope = RiskSignalGroupScope::WorkflowId { id: wf_id, sv_id };
     let rs = RiskSignal::bulk_create(
         conn,
-        sv_id,
+        scope,
         reason_codes
             .into_iter()
             .map(|rc| (rc, VendorAPI::FootprintDeviceAttestation, vres.id.clone()))

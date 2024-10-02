@@ -16,6 +16,7 @@ use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::stytch_fingerprint_event::NewStytchFingerprintEvent;
 use db::models::stytch_fingerprint_event::StytchFingerprintEvent;
 use db::models::vault::Vault;
@@ -158,10 +159,11 @@ fn save_successful_response(
 
     let reason_codes =
         decision::features::stytch::lookup_response_to_footprint_reason_codes(&res.parsed_response);
+    let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
 
     let _rs = RiskSignal::bulk_create(
         conn,
-        sv_id,
+        scope,
         reason_codes
             .into_iter()
             .map(|rc| (rc, VendorAPI::StytchLookup, vres.id.clone()))

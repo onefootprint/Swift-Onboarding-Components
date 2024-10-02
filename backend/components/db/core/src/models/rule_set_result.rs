@@ -270,6 +270,7 @@ mod tests {
     use crate::models::ob_configuration::ObConfiguration;
     use crate::models::onboarding_decision::OnboardingDecision;
     use crate::models::risk_signal::RiskSignal;
+    use crate::models::risk_signal_group::RiskSignalGroupScope;
     use crate::models::rule_instance::NewRule;
     use crate::models::rule_instance::RuleInstance;
     use crate::models::scoped_vault::ScopedVault;
@@ -338,9 +339,10 @@ mod tests {
         let vreq =
             tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
+        let scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
         let risk_signals = RiskSignal::bulk_create(
             conn,
-            &sv.id,
+            scope,
             vec![(FRC::NameDoesNotMatch, vreq.vendor_api, vres.id.clone())],
             RiskSignalGroupKind::Kyc,
             false,
@@ -416,9 +418,10 @@ mod tests {
         let vreq =
             tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
+        let scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
         let risk_signals = RiskSignal::bulk_create(
             conn,
-            &sv.id,
+            scope,
             vec![(FRC::NameDoesNotMatch, vreq.vendor_api, vres.id.clone())],
             RiskSignalGroupKind::Kyc,
             false,

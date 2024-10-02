@@ -29,6 +29,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
@@ -605,8 +606,12 @@ impl MiddeskState<Complete> {
                 } else {
                     Err(AssertionError("no kyb check configured"))
                 }?;
-
-                let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
+                let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
+                    id: &wf_id,
+                    sv_id: &sv.id,
+                };
+                let rsg =
+                    RiskSignalGroup::get_or_create(conn, risk_signal_group_scope, RiskSignalGroupKind::Kyb)?;
                 RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
                 BillingEvent::create(conn, &sv.id, Some(&obc_id), billing_event_kind)?;
 

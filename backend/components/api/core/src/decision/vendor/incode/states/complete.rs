@@ -32,6 +32,7 @@ use db::models::document::DocumentUpdate;
 use db::models::document_upload::DocumentUpload;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
@@ -409,7 +410,8 @@ impl Complete {
         DataLifetime::bulk_deactivate_kinds(conn, &sv_txn, odks_to_clear)?;
 
         // Save Risk Signals
-        RiskSignal::bulk_create(conn, sv_id, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
+        let scope = RiskSignalGroupScope::WorkflowId { id: wf_id, sv_id };
+        RiskSignal::bulk_create(conn, scope, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
 
         // Then add some extracted OCR data to the vault.
         let seqno = uvw.patch_data(conn, ocr_data, DataRequestSource::Ocr)?.seqno;

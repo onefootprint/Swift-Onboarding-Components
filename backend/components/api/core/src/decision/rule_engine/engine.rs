@@ -292,6 +292,7 @@ pub fn evaluate_rules(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use db::models::risk_signal_group::RiskSignalGroupScope;
     use db::models::rule_instance::NewRule;
     use db::models::scoped_vault::ScopedVault;
     use db::test_helpers::assert_have_same_elements;
@@ -461,9 +462,11 @@ mod tests {
         let vreq =
             tests::fixtures::verification_request::create(conn, sv_id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
+
+        let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
         RiskSignal::bulk_create(
             conn,
-            sv_id,
+            scope,
             frcs.into_iter()
                 .map(|frc| (frc, vreq.vendor_api, vres.id.clone()))
                 .collect_vec(),

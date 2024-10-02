@@ -34,6 +34,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -165,7 +166,12 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         let bo_obds = async_res;
         // TODO: this will be fixed in another stack https://github.com/onefootprint/monorepo/pull/12144
         // Create the risk signal group. We'll add other risk signals into here
-        let rsg = RiskSignalGroup::create(conn, &wf.scoped_vault_id, RiskSignalGroupKind::Kyb)?;
+
+        let scope = RiskSignalGroupScope::WorkflowId {
+            id: &wf.id,
+            sv_id: &wf.scoped_vault_id,
+        };
+        let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
 
         if bo_obds.iter().any(|o| o.status == DecisionStatus::Fail) {
             // Add risk signal for BO failing KYC
@@ -174,6 +180,8 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
                 .first()
                 .and_then(|obd| DbWorkflow::get(conn, &obd.workflow_id).ok())
                 .and_then(|wf| {
+                    // take latest for BO
+                    // TODO: fetch by wf_id once this is backfilled
                     RiskSignal::latest_by_risk_signal_group_kind(
                         conn,
                         &wf.scoped_vault_id,

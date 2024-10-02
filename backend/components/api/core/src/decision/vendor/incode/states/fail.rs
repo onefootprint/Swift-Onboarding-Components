@@ -10,6 +10,7 @@ use async_trait::async_trait;
 use db::models::document::Document;
 use db::models::document::DocumentUpdate;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::user_timeline::UserTimeline;
 use db::DbPool;
 use db::TxnPgConn;
@@ -48,10 +49,12 @@ impl Fail {
             validated_country_code: None,
             review_status: None,
         };
-
+        // TODO: fix this to add wf_id
+        // https://linear.app/footprint/issue/BE-1605/fix-failenter-to-have-rsg-scope-wf
+        let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
         let _ = RiskSignal::bulk_create(
             conn,
-            sv_id,
+            scope,
             vec![(FootprintReasonCode::DocumentUploadFailed, vendor_api, vres_id)],
             newtypes::RiskSignalGroupKind::Doc,
             false,
