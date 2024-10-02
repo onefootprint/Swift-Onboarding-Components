@@ -1,16 +1,33 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { Logger, getLogger, useGetOnboardingConfig } from '@onefootprint/idv';
+import { Logger, getLogger, trackAction, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage, useRequestError } from '@onefootprint/request';
-import type { BusinessResponse } from '@onefootprint/types';
-import { Shimmer, media } from '@onefootprint/ui';
+import { Shimmer, Stack, media } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled, { css } from 'styled-components';
 
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { useEffect } from 'react';
 import useGetBusiness from './hooks/use-get-business';
 import useParseUrl from './hooks/use-url-params';
 
-const { logError } = getLogger({ location: 'hosted-init' });
+const { logError, logInfo } = getLogger({ location: 'hosted-init' });
+
+const setupLogger = (config: PublicOnboardingConfig) => {
+  Logger.startSessionReplay();
+  Logger.setGlobalContext({
+    appClipExperienceId: config.appClipExperienceId,
+    isAppClipEnabled: config.isAppClipEnabled,
+    isInstantAppEnabled: config.isInstantAppEnabled,
+    isNoPhoneFlow: config.isNoPhoneFlow,
+    isStepupEnabled: Boolean(config.isStepupEnabled),
+    kind: String(config.kind),
+    orgId: config.orgId,
+    orgName: config.orgName,
+    publicKey: config.key,
+    requiresIdDoc: config.requiresIdDoc,
+  });
+};
 
 const Init = () => {
   const [state, send] = useHostedMachine();
@@ -20,8 +37,17 @@ const Init = () => {
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const { getErrorCode } = useRequestError();
 
+  const queryGetBusiness = useGetBusiness({ obConfigAuth });
+  const isGetBusinessLoading = queryGetBusiness.isFetching && queryGetBusiness.isPending;
+  const businessBoKycData = queryGetBusiness.data;
+
+  const queryGetOnboardingConfig = useGetOnboardingConfig({ obConfigAuth, authToken });
+  const isGetOnboardingConfigLoading = queryGetOnboardingConfig.isFetching && queryGetOnboardingConfig.isPending;
+  const onboardingConfig = queryGetOnboardingConfig.data;
+
   useParseUrl({
     onSuccess: ({ obConfigAuth: parsedObConfigAuth, authToken: parsedAuthToken, urlType }) => {
+      logInfo(`URL parsed with type: ${urlType}`);
       send({
         type: 'initContextUpdated',
         payload: {
@@ -37,75 +63,63 @@ const Init = () => {
     },
   });
 
-  useGetBusiness(
-    { obConfigAuth },
-    {
-      onSuccess: (data: BusinessResponse) => {
-        send({
-          type: 'initContextUpdated',
-          payload: {
-            obConfigAuth,
-            businessBoKycData: { ...data },
-          },
-        });
-      },
-      onError: err => {
-        logError(`Fetching business details: ${getErrorMessage(err)}`, err);
-        showRequestError(err);
-        const errorCode = getErrorCode(err);
-        if (errorCode === 'E118') {
-          send({ type: 'expired' });
-        } else {
-          send({ type: 'invalidUrlReceived' });
-        }
-      },
-    },
-  );
+  useEffect(() => {
+    if (isGetBusinessLoading || isGetOnboardingConfigLoading) return;
 
-  useGetOnboardingConfig(
-    { obConfigAuth, authToken },
-    {
-      onSuccess: onboardingConfig => {
-        if (onboardingConfig.isLive && !orgIds.has(onboardingConfig.orgId)) {
-          Logger.startSessionReplay();
-          Logger.setGlobalContext({
-            appClipExperienceId: onboardingConfig.appClipExperienceId,
-            isAppClipEnabled: onboardingConfig.isAppClipEnabled,
-            isInstantAppEnabled: onboardingConfig.isInstantAppEnabled,
-            kind: String(onboardingConfig.kind),
-            orgId: onboardingConfig.orgId,
-            orgName: onboardingConfig.orgName,
-            publicKey: onboardingConfig.key,
-          });
-        }
+    const businessError = queryGetBusiness.error;
+    const configError = queryGetOnboardingConfig.error;
+    const error = businessError || configError;
+    if (error) {
+      if (businessError) {
+        logError(`Fetching business details: ${getErrorMessage(businessError)}`, businessError);
+      }
+      if (configError) {
+        logError(`Fetching onboarding config: ${getErrorMessage(configError)}`, configError);
+      }
 
-        send({
-          type: 'initContextUpdated',
-          payload: { obConfigAuth, onboardingConfig },
-        });
-      },
-      onError: err => {
-        logError(`Fetching onboarding config: ${getErrorMessage(err)}`, err);
-        showRequestError(err);
-        const errorCode = getErrorCode(err);
-        if (errorCode === 'E118') {
-          send({ type: 'expired' });
-        } else {
-          send({ type: 'invalidUrlReceived' });
-        }
-      },
-    },
-  );
+      if (getErrorCode(error) === 'E118') {
+        send({ type: 'expired' });
+      } else {
+        send({ type: 'invalidUrlReceived' });
+      }
+
+      showRequestError(error);
+      return;
+    }
+
+    if (onboardingConfig?.isLive === true && orgIds.has(onboardingConfig?.orgId)) {
+      setupLogger(onboardingConfig);
+    }
+
+    if (businessBoKycData || onboardingConfig) {
+      trackAction('hosted:started');
+      send({
+        type: 'initContextUpdated',
+        payload: {
+          businessBoKycData,
+          onboardingConfig,
+        },
+      });
+    }
+  }, [
+    isGetBusinessLoading,
+    isGetOnboardingConfigLoading,
+    queryGetBusiness.error,
+    queryGetOnboardingConfig.error,
+    onboardingConfig,
+    businessBoKycData,
+    orgIds,
+  ]);
 
   return (
     <Container>
-      <HeaderContainer>
+      <Stack flexDirection="column" justifyContent="center" alignItems="center" rowGap={5}>
         <Avatar />
-        <HeaderTitle>
+        <Stack flexDirection="column" justifyContent="center" alignItems="center" rowGap={3} marginTop={5}>
           <Title />
           <Subtitle />
-        </HeaderTitle>
-      </HeaderContainer>
+        </Stack>
+      </Stack>
       <Button />
     </Container>
   );
@@ -130,27 +144,6 @@ const Container = styled.div`
     ${media.greaterThan('md')`
       padding-top: ${theme.spacing[7]}; 
     `}
-  `}
-`;
-
-const HeaderTitle = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[3]};
-    justify-content: center;
-    align-items: center;
-    margin-top: ${theme.spacing[5]};
-  `}
-`;
-
-const HeaderContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[5]};
-    justify-content: center;
-    align-items: center;
   `}
 `;
 

@@ -1,6 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
-import Idv, { AppErrorBoundary, Logger } from '@onefootprint/idv';
+import Idv, { AppErrorBoundary, Logger, trackAction } from '@onefootprint/idv';
 import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import type { GetServerSideProps } from 'next';
@@ -23,6 +23,7 @@ const Root = ({ variant }: RootProps) => {
 
   const handleComplete = () => {
     send({ type: 'idvCompleted' });
+    trackAction('hosted:completed');
     Logger.info('IDV flow is completed on hosted');
     Logger.stopSessionReplay();
   };
