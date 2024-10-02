@@ -302,11 +302,8 @@ begin
 
             \* Crashing here isn't interesting since we haven't written anything.
 
-        \* VaultDrWriter::write_blob_batch
         \* Get a batch of DLs for the vv_batch that do not have corresponding blobs.
         GetDlBatch:
-            \* get_vault_dr_data_lifetime_batch
-            \* TODO: Update implementation IRL
             with
                 \* We select only DLs created at the vv_batch seqnos since:
                 \* a) DLs created before a VV seqno would be captured by a prior VV
@@ -341,8 +338,6 @@ begin
             \* Crashing here isn't interesting since we haven't written anything.
 
         WriteBlobsToS3:
-            \* VaultDrWriter::encrypt_and_write_record_to_s3
-
             \* Either do a partial or complete write.
             if Cardinality(dl_batch) > 1 then
                 either

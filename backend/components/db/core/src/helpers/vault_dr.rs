@@ -89,6 +89,63 @@ pub fn get_scoped_vault_version_batch(
     Ok(svv_batch)
 }
 
+#[tracing::instrument(skip_all, fields(
+    tenant_id = %tenant_id,
+    is_live = %is_live,
+    config_id = %config_id,
+    batch_size = %batch_size,
+))]
+pub fn get_dl_batch_for_svv_batch(
+    conn: &mut PgConn,
+    tenant_id: &TenantId,
+    is_live: IsLive,
+    config_id: &VaultDrConfigId,
+    svv_batch: &[ScopedVaultVersion],
+    batch_size: usize,
+) -> DbResult<Vec<DataLifetime>> {
+    // Implementation is based on GetDlBatch in
+    // backend/formal_methods/vault_disaster_recovery/vdr.tla
+
+    let svv_ids = svv_batch.iter().map(|svv| &svv.id).collect_vec();
+
+    // We select only DLs created at the svv_batch seqnos since:
+    // a) DLs created before a SVV seqno would be captured by a prior SVV
+    // b) DLs created after a SVV seqno would be captured by a later SVV
+    // c) There's no need to filter on deactivated_seqno, since
+    //    deactivated_seqno >= created_seqno, so if a SVV seqno equals
+    //    the deactivated_seqno, the SVV would be captured by a prior
+    //    SVV or the same SVV.
+
+    let query = data_lifetime::table
+        .inner_join(scoped_vault::table)
+        .filter(scoped_vault::tenant_id.eq(tenant_id))
+        .filter(scoped_vault::is_live.eq(is_live))
+        .filter(diesel::dsl::exists(
+            scoped_vault_version::table
+                .filter(scoped_vault_version::id.eq_any(svv_ids))
+                .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault::id))
+                .filter(scoped_vault_version::seqno.eq(data_lifetime::created_seqno)),
+        ))
+        .filter(diesel::dsl::not(diesel::dsl::exists(
+            vault_dr_blob::table
+                .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
+                .filter(vault_dr_blob::config_id.eq(config_id)),
+        )))
+        .into_boxed();
+
+    // The sort order *doesn't* matter here since all blobs associated with the svv_batch must be
+    // written before the manifests are eligible to be written. If the batch_size isn't large
+    // enough to finish backing up all DLs associated with the svv_batch, then unfinished SVVs will
+    // be present in the next batch, and the DL batch will continue to make progress.
+    let dls = query
+        .select(DataLifetime::as_select())
+        .limit(batch_size as i64)
+        .load(conn)?;
+
+    Ok(dls)
+}
+
+
 // Load up to `batch_size` DataLifetime records for the given tenant/is_live that do not have
 // corresponding blobs for the given config.
 #[tracing::instrument(skip_all, fields(
