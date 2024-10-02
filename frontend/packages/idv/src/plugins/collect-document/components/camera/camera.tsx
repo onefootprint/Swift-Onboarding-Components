@@ -200,6 +200,7 @@ const Camera = ({
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
   const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] = useState(false);
+  const [isAttemptingToPlay, setIsAttemptingToPlay] = useState(false);
 
   useEffectOnce(() => {
     trackAction('camera-page:started');
@@ -229,7 +230,7 @@ const Camera = ({
   const positionFromBottom = getPositionFromBottom(deviceKind);
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
-    logInfo('Setting video src object');
+    logInfo(`Setting video src object - mediastream id: ${mediaStream.id}, mediaStream active: ${mediaStream.active}`);
     videoRef.current.srcObject = mediaStream;
     videoRef.current.load();
   } else {
@@ -239,6 +240,7 @@ const Camera = ({
   }
 
   const handlePlayError = (err: unknown) => {
+    setIsAttemptingToPlay(false);
     if (err instanceof Error && isNotAllowedError(err?.name)) {
       if (!showPlayAllowDialog) setShowPlayAllowDialog(true);
       logWarn('video play: not allowed - prompting user interaction', err);
@@ -263,13 +265,17 @@ const Camera = ({
     //   logWarn('(onCanPlay) video not ready to play');
     //   return;
     // }
-    videoRef.current
-      .play()
-      .then(() => {
-        logTrack('(onCanPlay) video element status: playing');
-        setIsVideoPlaying(true);
-      })
-      .catch(handlePlayError);
+    if (!isAttemptingToPlay) {
+      setIsAttemptingToPlay(true);
+      videoRef.current
+        .play()
+        .then(() => {
+          logTrack('(onCanPlay) video element status: playing');
+          setIsVideoPlaying(true);
+          setIsAttemptingToPlay(false);
+        })
+        .catch(handlePlayError);
+    }
   };
 
   const handleLoadMetadata = () => {
@@ -289,13 +295,17 @@ const Camera = ({
       //   logWarn('(onCanPlay) video not ready to play');
       //   return;
       // }
-      videoRef.current
-        .play()
-        .then(() => {
-          logTrack('(onLoadedMetadata) video element status: playing');
-          setIsVideoPlaying(true);
-        })
-        .catch(handlePlayError);
+      if (!isAttemptingToPlay) {
+        setIsAttemptingToPlay(true);
+        videoRef.current
+          .play()
+          .then(() => {
+            logTrack('(onLoadedMetadata) video element status: playing');
+            setIsVideoPlaying(true);
+            setIsAttemptingToPlay(false);
+          })
+          .catch(handlePlayError);
+      }
     }
   };
 
@@ -318,23 +328,38 @@ const Camera = ({
         logWarn('(interval) video src object not set');
         if (mediaStream?.active) {
           logInfo('(interval) setting video src object');
+          logInfo(
+            `(interval) Setting video src object - mediastream id: ${mediaStream.id}, mediaStream active: ${mediaStream.active}`,
+          );
           videoRef.current.srcObject = mediaStream;
           videoRef.current.load();
         }
         return;
+      }
+      // check if the src object is a mediastream
+      if (videoRef.current.srcObject instanceof MediaStream) {
+        logInfo(
+          `(interval) video src object already set - src object mediastream id: ${(videoRef.current.srcObject as MediaStream).id}, mediaStream active: ${(videoRef.current.srcObject as MediaStream).active}`,
+        );
+      } else {
+        logError('(interval) video src object is not a mediastream');
       }
       // TODO: uncomment or completely remove after the experimentation
       // if (videoRef.current.readyState < 2) {
       //   logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
       //   return;
       // }
-      videoRef.current
-        .play()
-        .then(() => {
-          logWarn('(interval) video element status: started playing');
-          setIsVideoPlaying(true);
-        })
-        .catch(handlePlayError);
+      if (!isAttemptingToPlay) {
+        setIsAttemptingToPlay(true);
+        videoRef.current
+          .play()
+          .then(() => {
+            logWarn('(interval) video element status: started playing');
+            setIsVideoPlaying(true);
+            setIsAttemptingToPlay(false);
+          })
+          .catch(handlePlayError);
+      }
     },
     isVideoPlaying ? null : PLAY_CHECK_INTERVAL,
   );
