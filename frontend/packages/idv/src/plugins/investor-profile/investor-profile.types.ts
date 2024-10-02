@@ -1,7 +1,9 @@
+import type { CollectInvestorProfileRequirement } from '@onefootprint/types';
 import type { CommonIdvContext } from '../../utils/state-machine';
 
-export type InvestorProfileContext = {
+type InvestorProfileContext = {
   showTransition?: boolean;
+  investorRequirement?: CollectInvestorProfileRequirement;
 };
 
 export type InvestorProfileProps = {

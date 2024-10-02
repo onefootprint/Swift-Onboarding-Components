@@ -1,103 +1,34 @@
-import { InvestorProfileDI } from '@onefootprint/types';
+import cloneDeep from 'lodash/cloneDeep';
 import { assign, createMachine } from 'xstate';
 
+import type { CollectInvestorProfileRequirement } from '@onefootprint/types';
 import type { DeviceInfo } from '../../../../hooks';
-import { isStringValid } from '../../../../utils/type-guards';
+import {
+  hasAnyDeclarationsData,
+  isMissingDeclarationsData,
+  isMissingEmploymentData,
+  isMissingFundingSources,
+  isMissingIncomeData,
+  isMissingInvestmentGoalsData,
+  isMissingNetWorthData,
+  isMissingRiskToleranceData,
+  omitNullAndUndefined,
+} from '../utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export type CreateInvestorProfileArgs = {
   device?: DeviceInfo;
   authToken?: string;
   showTransition?: boolean;
+  investorRequirement?: CollectInvestorProfileRequirement;
 };
 
-export const isMissingEmploymentData = ({ data }: MachineContext): boolean => {
-  const employmentStatus = data?.[InvestorProfileDI.employmentStatus];
-  const occupation = data?.[InvestorProfileDI.occupation];
-  const employer = data?.[InvestorProfileDI.employer];
-
-  if (!employmentStatus) return true;
-  return employmentStatus === 'employed' && (!occupation || !employer);
-};
-
-export const isMissingIncomeData = ({ data }: MachineContext): boolean => {
-  return !data?.[InvestorProfileDI.annualIncome];
-};
-
-export const isMissingNetWorthData = ({ data }: MachineContext): boolean => {
-  return !data?.[InvestorProfileDI.netWorth];
-};
-
-export const isMissingFundingSources = ({ data }: MachineContext): boolean => {
-  const sources = data?.[InvestorProfileDI.fundingSources];
-  if (!sources || !Array.isArray(sources)) return true;
-  return sources.length === 0;
-};
-
-export const isMissingInvestmentGoalsData = ({ data }: MachineContext): boolean => {
-  const goals = data?.[InvestorProfileDI.investmentGoals];
-  if (!goals || !Array.isArray(goals)) return true;
-  return goals.length === 0;
-};
-
-export const isMissingRiskToleranceData = ({ data }: MachineContext): boolean => {
-  return !data?.[InvestorProfileDI.riskTolerance];
-};
-
-export const isMissingDeclarationsData = (_: MachineContext): boolean => {
-  return false; /** Declarations are not mandatory step */
-};
-
-/** Triggers track actions for initial missing data in the investor profile. */
-export const trackInitializedSteps = (tracker: (action: string) => void, data: MachineContext['data'] = {}): void => {
-  const flowOrder = [
-    { isMissing: isMissingEmploymentData, action: 'investor-profile:employment-submit' },
-    { isMissing: isMissingIncomeData, action: 'investor-profile:income-submit' },
-    { isMissing: isMissingNetWorthData, action: 'investor-profile:net-worth-submit' },
-    { isMissing: isMissingFundingSources, action: 'investor-profile:funding-sources-submit' },
-    { isMissing: isMissingInvestmentGoalsData, action: 'investor-profile:investment-goals-submit' },
-    { isMissing: isMissingRiskToleranceData, action: 'investor-profile:risk-tolerance-submit' },
-  ];
-
-  for (const { isMissing, action } of flowOrder) {
-    if (!isMissing({ data })) {
-      tracker(action);
-    } else {
-      break;
-    }
-  }
-};
-
-export const hasAnyDeclarationsData = ({ data }: MachineContext): boolean => {
-  if (isStringValid(data?.[InvestorProfileDI.brokerageFirmEmployer])) {
-    return true;
-  }
-  if (isStringValid(data?.[InvestorProfileDI.politicalOrganization])) {
-    return true;
-  }
-
-  const familyMemberNamesValue = data?.[InvestorProfileDI.familyMemberNames];
-  if (
-    Array.isArray(familyMemberNamesValue) &&
-    familyMemberNamesValue.length > 0 &&
-    familyMemberNamesValue.every(isStringValid)
-  ) {
-    return true;
-  }
-
-  const seniorExecutiveSymbolsValue = data?.[InvestorProfileDI.seniorExecutiveSymbols];
-  if (
-    Array.isArray(seniorExecutiveSymbolsValue) &&
-    seniorExecutiveSymbolsValue.length > 0 &&
-    seniorExecutiveSymbolsValue.every(isStringValid)
-  ) {
-    return true;
-  }
-
-  return false;
-};
-
-const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransition }: CreateInvestorProfileArgs) =>
+const createCollectInvestorProfileDataMachine = ({
+  device,
+  authToken,
+  showTransition,
+  investorRequirement,
+}: CreateInvestorProfileArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -113,6 +44,7 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
         device,
         authToken,
         showTransition,
+        investorRequirement,
         data: {},
       },
       states: {
@@ -211,10 +143,12 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
                 ...context,
                 declarationFiles: event.payload.files,
                 data: { ...context.data, ...event.payload.data },
+                vaultData: cloneDeep(omitNullAndUndefined({ ...context.vaultData, ...event.payload.data })),
               }
             : {
                 ...context,
                 data: { ...context.data, ...event.payload },
+                vaultData: cloneDeep(omitNullAndUndefined({ ...context.vaultData, ...event.payload })),
               };
         }),
         setDeclarationStateVisited: assign(context => {

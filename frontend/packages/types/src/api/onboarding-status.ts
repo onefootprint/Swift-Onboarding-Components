@@ -46,6 +46,8 @@ export type CollectInvestorProfileRequirement = {
   kind: OnboardingRequirementKind.investorProfile;
   isMet: boolean;
   missingAttributes: CollectedInvestorProfileDataOption[];
+  missingDocument?: boolean;
+  populatedAttributes?: CollectedInvestorProfileDataOption[];
 };
 
 export type DocumentRequirement<TConfig = DocumentRequirementConfig> = {

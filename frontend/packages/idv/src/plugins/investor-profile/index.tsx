@@ -8,6 +8,7 @@ const InvestorProfile = ({ idvContext, context, onDone }: InvestorProfileProps) 
     device,
     authToken,
     showTransition: context.showTransition,
+    investorRequirement: context.investorRequirement,
   };
 
   return (

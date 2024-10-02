@@ -7,7 +7,7 @@ import { useLogStateMachine } from '../../../../hooks';
 import { trackAction } from '../../../../utils/logger';
 import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
-import { trackInitializedSteps } from '../../utils/state-machine/machine';
+import { trackInitializedSteps } from '../../utils/utils';
 import Animation from '../animation';
 import Confirm from '../confirm/confirm';
 import Declarations from '../declarations';

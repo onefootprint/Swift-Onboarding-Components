@@ -1,4 +1,4 @@
-import type { InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
+import type { CollectInvestorProfileRequirement, InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks';
 
@@ -35,7 +35,9 @@ export type MachineContext = {
   // Whether to show the animation at the start, if transitioning from collect-kyc-data
   // In the future, we can generalize to use different icons to indicate prev plugin type
   showTransition?: boolean;
+  investorRequirement?: CollectInvestorProfileRequirement;
   data: InvestorProfileData;
+  vaultData?: Readonly<NonNullable<InvestorProfileData>>;
   declarationFiles?: File[];
   isDeclarationStateVisited?: boolean;
 };

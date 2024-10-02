@@ -98,7 +98,10 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <InvestorProfile
         idvContext={idvContext}
-        context={{ showTransition: !!isKycDataCollected }}
+        context={{
+          showTransition: !!isKycDataCollected,
+          investorRequirement: getRequirement(requirements, OnboardingRequirementKind.investorProfile),
+        }}
         onDone={handleRequirementCompleted}
       />
     );
