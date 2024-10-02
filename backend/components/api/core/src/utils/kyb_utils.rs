@@ -26,6 +26,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::KybState;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
+use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
 use std::pin::Pin;
 
@@ -218,12 +219,13 @@ pub async fn progress_business_workflow(
         .await?;
 
     let dbo = bvw.decrypt_business_owners(state).await?;
-
     let is_waiting_for_bo_kyc = is_waiting_for_bo_kyc(&dbo, &obc).await?;
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
 
     if is_waiting_for_bo_kyc {
         send_missing_secondary_bo_links(state, &biz_wf, &bvw, tenant, &dbo).await?;
+        return Ok(());
+    } else if !matches!(biz_wf.kind, WorkflowKind::Kyb) {
         return Ok(());
     }
 
