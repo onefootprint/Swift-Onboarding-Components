@@ -145,6 +145,43 @@ pub fn get_dl_batch_for_svv_batch(
     Ok(dls)
 }
 
+#[tracing::instrument(skip_all)]
+pub fn get_complete_svvs_for_svv_batch(
+    conn: &mut PgConn,
+    config_id: &VaultDrConfigId,
+    svv_batch: &[ScopedVaultVersion],
+) -> DbResult<Vec<ScopedVaultVersion>> {
+    // Implementation is based on GetCompleteVaultVersionBatch in
+    // backend/formal_methods/vault_disaster_recovery/vdr.tla
+
+    let svv_ids = svv_batch.iter().map(|svv| &svv.id).collect_vec();
+
+    // Get SVVs from svv_batch such that:
+    //   All data_lifetimes present on the vault at or before the SVV
+    //   have a vault_dr_blob written for this config...
+    //
+    //   Equivalently (and easier to express in SQL): where there does not exist a data_lifetime
+    //   for the SVV with created_seqno <= svv.seqno that does not have a vault_dr_blob written for
+    //   this config...
+
+    let complete_svvs = scoped_vault_version::table
+        .filter(scoped_vault_version::id.eq_any(svv_ids))
+        .filter(diesel::dsl::not(diesel::dsl::exists(
+            data_lifetime::table
+                .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_version::scoped_vault_id))
+                .filter(data_lifetime::created_seqno.le(scoped_vault_version::seqno))
+                .filter(diesel::dsl::not(diesel::dsl::exists(
+                    vault_dr_blob::table
+                        .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
+                        .filter(vault_dr_blob::config_id.eq(config_id)),
+                ))),
+        )))
+        .select(ScopedVaultVersion::as_select())
+        .load(conn)?;
+
+    Ok(complete_svvs)
+}
+
 
 // Load up to `batch_size` DataLifetime records for the given tenant/is_live that do not have
 // corresponding blobs for the given config.

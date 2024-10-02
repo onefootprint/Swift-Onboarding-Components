@@ -42,7 +42,7 @@ VaultVersion == [id: VaultVersionId, vault: Vaults, seqno: Seqno, version: Vault
 \* We model blobs simply as their corresponding DL ID, since  blob writes are idempotent w.r.t. the DL ID & content:
 \* https://github.com/onefootprint/monorepo/blob/f9369c1f3597ba397e18fdece474e3d44a25f5ae/backend/components/vault_dr/src/writer.rs#L344-L346
 VaultBlob == DataLifetimeId
-BlobForDl(dl, _dummy_vdr_config_arg) == dl.id 
+BlobForDl(dl, _dummy_vdr_config_arg) == dl.id
 
 \* Manifests are little more subtle:
 \* We don't actually need to model DB manifests since we don't query the table. It's simply a debugging log since we don't have read access to the bucket.
@@ -95,7 +95,7 @@ define
 
 
     VaultVersionCorrectness == Cardinality(db_vault_versions) >= Cardinality(db_dls)
-    WorkerNotAheadOfApi == 
+    WorkerNotAheadOfApi ==
         /\ Cardinality(db_blobs) <= Cardinality(db_dls)
         /\ Cardinality({key \in DOMAIN s3_manifests : key[2] # LATEST_VERSION }) <= Cardinality(db_vault_versions)
         /\ Cardinality({key \in DOMAIN s3_manifests : key[2] = LATEST_VERSION }) <= Cardinality({vv.vault : vv \in db_vault_versions})
@@ -180,7 +180,7 @@ begin
 
         \* Atomically create DLs and VaultVersions
         with
-            should_create_new_vault_version = 
+            should_create_new_vault_version =
               \/ request.deactivate = FALSE \* New DL
               \/ \E dl \in db_dls : (dl.vault = request.vault /\ dl.di = request.di /\ dl.deactivated_seqno = NULL), \* Deactivating existing DL
 
@@ -272,7 +272,7 @@ begin
                         /\ vv.backed_up_by_vdr_config # VdrConfig1
                 },
                 \* (Note: SVV is equivalent to VV in this spec)
-                \* 
+                \*
                 \* The sort order *does* matter here. For a SVV to be
                 \* considered complete, all DLs/blobs for the vault <= svv.seqno
                 \* must be written. If we choose SVVs with prerequisites that haven't
@@ -291,7 +291,7 @@ begin
                 \* SVVs by seqno, we can be sure that for all vaults present in
                 \* the batch, those SVVs are the minimum non-backed up SVVs for
                 \* those vaults.
-                \* 
+                \*
                 \* Sorting by seqnos here does *NOT* imply that the batch
                 \* represents the global minimum seqnos for un-backed up SVVs, as
                 \* inflight transactions may commit SVVs with lesser seqnos.
@@ -307,7 +307,7 @@ begin
             with
                 \* We select only DLs created at the vv_batch seqnos since:
                 \* a) DLs created before a VV seqno would be captured by a prior VV
-                \* b) DLs created after a VV seqno would be captured by a later VV 
+                \* b) DLs created after a VV seqno would be captured by a later VV
                 \* c) There's no need to filter on deactivated_seqno, since
                 \*    deactivated_seqno >= created_seqno, so if a VV seqno equals
                 \*    the deactivated_seqno, the VV would be captured by a prior
@@ -327,7 +327,7 @@ begin
                 \* the vv_batch, then unfinished vault versions will be present in
                 \* the next batch, and the dl_batch will continue to make progress
                 \* on the associated DLs.
-                \* 
+                \*
                 \* We arbitrarily choose to sort in descending seqno order just
                 \* to make it interesting and deterministic.
                 dl_batch_seq = FirstN(SetToSortSeq(dls_for_vv_batch_without_blobs, LAMBDA a, b: a.created_seqno > b.created_seqno), BlobBatchSize)
@@ -362,7 +362,6 @@ begin
             end if;
 
         CommitBlobBatch:
-            \* VaultDrBlob::bulk_create
             db_blobs := db_blobs \union Ids(dl_batch);
 
             \* Simulate possible crash of the worker
@@ -370,9 +369,6 @@ begin
 
 
         GetCompleteVaultVersionBatch:
-            \* TODO: Update implementation IRL
-            \* get_vault_dr_scoped_vault_version_batch
-            
             \* Get vault versions from vv_batch such that:
             \*   All data_lifetimes present on the vault at or before the VV
             \*   have a vault_dr_blob written for this config...
@@ -383,7 +379,7 @@ begin
 
             complete_vv_batch := {
                 vv \in vv_batch :
-                    ~(\E dl \in db_dls : 
+                    ~(\E dl \in db_dls :
                          /\ dl.vault = vv.vault
                          /\ dl.created_seqno <= vv.seqno
                          /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
@@ -393,7 +389,6 @@ begin
             \* Crashing here isn't interesting since we haven't written anything new.
 
         GetDlsForCompleteVaultVersionBatch:
-            \* bulk_get_vdr_blob_keys_active_at
             dls_for_complete_vv_batch := [
                 vv \in complete_vv_batch |->
                     {
@@ -431,8 +426,8 @@ begin
                 or
                     \* Simulate a partial write to S3 followed by a crash:
                     \* Any single manifest could be written, since we don't guarantee ordering of S3 writes.
-                   with 
-                        key = CHOOSE key \in DOMAIN s3_manifest_batch: \A other \in DOMAIN s3_manifest_batch: key[2] = LATEST_VERSION \/ key[2] >= other[2] 
+                   with
+                        key = CHOOSE key \in DOMAIN s3_manifest_batch: \A other \in DOMAIN s3_manifest_batch: key[2] = LATEST_VERSION \/ key[2] >= other[2]
                     do
                         write_manifests_to_s3(key :> s3_manifest_batch[key]);
                     end with;
@@ -476,8 +471,8 @@ begin
                 or
                     \* Simulate a partial write to S3 followed by a crash:
                     \* Any single manifest could be written, since we don't guarantee ordering of S3 writes.
-                    with 
-                        key \in DOMAIN s3_manifest_batch 
+                    with
+                        key \in DOMAIN s3_manifest_batch
                     do
                         write_manifests_to_s3(key :> s3_manifest_batch[key]);
                     end with;
@@ -500,7 +495,7 @@ begin
                 IF vv \in complete_vv_batch
                 THEN [vv EXCEPT !.backed_up_by_vdr_config = VdrConfig1]
                 ELSE vv
-                : 
+                :
                 vv \in db_vault_versions
             };
 
