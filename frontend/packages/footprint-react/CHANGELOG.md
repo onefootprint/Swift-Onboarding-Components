@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.7.1
+
+### Patch Changes
+
+- cd48cfd7d8: Fix validation token creation
+
 ## 7.7.0
 
 ### Minor Changes
