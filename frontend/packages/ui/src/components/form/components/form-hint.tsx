@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-import { createText } from '../../utils/mixins';
+import { createText } from '../../../utils/mixins';
 
 export type FormHintProps = {
   children?: string;

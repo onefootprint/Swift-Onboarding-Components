@@ -1,5 +1,5 @@
 import { forwardRef, useContext } from 'react';
-import Checkbox, { type CheckboxProps } from '../checkbox';
+import Checkbox, { type CheckboxProps } from '../../checkbox';
 import formFieldContext from './form-field-context';
 
 export const FormCheckbox = forwardRef<HTMLInputElement, CheckboxProps>(({ ...props }, ref) => {

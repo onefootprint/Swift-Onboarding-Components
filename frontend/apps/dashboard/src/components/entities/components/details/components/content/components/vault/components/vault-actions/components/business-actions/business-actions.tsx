@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import usePermissions from 'src/hooks/use-permissions';
 import EditVaultDrawer from '../edit-vault-drawer';
+import RequestMoreInfoDialog from './components/request-more-';
 
 enum ActionDialog {
   RequestMoreInfo = 'request-more-info',
@@ -60,6 +61,7 @@ const BusinessActions = () => {
         </Dropdown.Portal>
       </Dropdown.Root>
       <EditVaultDrawer open={openDialog === ActionDialog.EditVault} onClose={handleCloseDialog} />
+      <RequestMoreInfoDialog open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
     </>
   );
 };

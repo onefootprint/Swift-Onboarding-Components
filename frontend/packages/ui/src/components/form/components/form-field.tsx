@@ -1,5 +1,5 @@
 import { useId, useMemo } from 'react';
-import Stack from '../stack';
+import Stack from '../../stack';
 import FormFieldContext from './form-field-context';
 
 export type FormFieldProps = {

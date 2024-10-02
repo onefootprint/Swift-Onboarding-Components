@@ -5,6 +5,39 @@
       "trigger": "Open actions menu",
       "edit": "Edit business information",
       "request-info": "Request more information"
+    },
+    "request-more-info": {
+      "intro-text": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document.",
+      "beneficial-owner": {
+        "label": "Beneficial owner",
+        "placeholder": "Select a beneficial owner"
+      },
+      "document": {
+        "name": {
+          "label": "Document name",
+          "placeholder": "Enter document name",
+          "tooltip": "Enter the name of the document",
+          "error": "Document name is required"
+        },
+        "identifier": {
+          "label": "Identifier",
+          "tooltip": "Enter a unique identifier for the document",
+          "prefix": "document.custom.",
+          "error": {
+            "required": "Document identifier is required",
+            "invalid": "Identifier can only contain letters, numbers, underscores, and hyphens"
+          }
+        },
+        "description": {
+          "label": "Description (optional)",
+          "tooltip": "Provide a brief description of the document"
+        }
+      },
+      "add-more": "Add more",
+      "note": {
+        "label": "Note for the beneficial owner (optional)",
+        "placeholder": "We'd need you to check if there's a typo in the address information you provided..."
+      }
     }
   }
 }

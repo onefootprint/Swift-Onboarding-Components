@@ -1,6 +1,6 @@
 import type React from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles } from '../../utils';
+import { createFontStyles } from '../../../utils';
 
 type FormInputAddonSize = 'default' | 'compact';
 

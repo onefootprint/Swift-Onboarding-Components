@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
-import { createText } from '../../utils/mixins';
-import Box, { type BoxProps } from '../box';
+import { createText } from '../../../utils/mixins';
+import Box, { type BoxProps } from '../../box';
 
 export type FormErrorsProps = {
   children?: unknown;
