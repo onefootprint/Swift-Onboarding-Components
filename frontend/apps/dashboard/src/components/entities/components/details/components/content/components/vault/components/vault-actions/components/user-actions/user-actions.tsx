@@ -1,6 +1,6 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, Dropdown, IconButton } from '@onefootprint/ui';
+import { Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
