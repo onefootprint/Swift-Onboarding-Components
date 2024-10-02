@@ -6,6 +6,7 @@ pub mod auth_event;
 pub mod billing_event;
 pub mod billing_profile;
 pub mod business_owner;
+pub mod business_workflow_link;
 pub mod compliance_doc;
 pub mod compliance_doc_assignment;
 pub mod compliance_doc_request;

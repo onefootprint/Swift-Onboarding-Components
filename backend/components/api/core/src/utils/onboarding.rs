@@ -194,6 +194,8 @@ pub fn get_or_create_business_wf(
     } = common_args;
 
     if let Some(biz_wf_id) = user_auth.business_workflow_id() {
+        // Either a duplicate call to `POST /hosted/onboarding`, or we're using a secondary beneficial owner
+        // token and the business has already been created
         let biz_wf = Workflow::get(conn, &biz_wf_id)?;
         return Ok(biz_wf);
     };

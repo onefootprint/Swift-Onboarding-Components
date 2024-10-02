@@ -194,10 +194,17 @@ impl BusinessOwner {
     }
 
     #[tracing::instrument("BusinessOwner::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &BoId) -> DbResult<Self> {
-        let result = business_owner::table
-            .filter(business_owner::id.eq(id))
-            .get_result(conn)?;
+    pub fn get<'a, T: Into<BoIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Self> {
+        let mut query = business_owner::table.into_boxed();
+        match id.into() {
+            BoIdentifier::Id(id) => query = query.filter(business_owner::id.eq(id)),
+            BoIdentifier::Vaults { uv_id, bv_id } => {
+                query = query
+                    .filter(business_owner::user_vault_id.eq(uv_id))
+                    .filter(business_owner::business_vault_id.eq(bv_id))
+            }
+        }
+        let result = query.get_result(conn)?;
         Ok(result)
     }
 
@@ -222,6 +229,16 @@ impl BusinessOwner {
             .get_result(conn)?;
         Ok(result)
     }
+}
+
+#[derive(derive_more::From)]
+pub enum BoIdentifier<'a> {
+    Id(&'a BoId),
+    #[from(ignore)]
+    Vaults {
+        uv_id: &'a VaultId,
+        bv_id: &'a VaultId,
+    },
 }
 
 pub struct BusinessOwnerQuery<'a> {

@@ -168,6 +168,19 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    business_workflow_link (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        business_owner_id -> Text,
+        business_workflow_id -> Text,
+        user_workflow_id -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     compliance_doc (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -1840,6 +1853,7 @@ diesel::joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
 diesel::joinable!(billing_event -> ob_configuration (ob_configuration_id));
 diesel::joinable!(billing_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(billing_profile -> tenant (tenant_id));
+diesel::joinable!(business_workflow_link -> business_owner (business_owner_id));
 diesel::joinable!(compliance_doc -> compliance_doc_template (template_id));
 diesel::joinable!(compliance_doc -> tenant_compliance_partnership (tenant_compliance_partnership_id));
 diesel::joinable!(compliance_doc_assignment -> compliance_doc (compliance_doc_id));
@@ -2004,6 +2018,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     billing_event,
     billing_profile,
     business_owner,
+    business_workflow_link,
     compliance_doc,
     compliance_doc_assignment,
     compliance_doc_request,

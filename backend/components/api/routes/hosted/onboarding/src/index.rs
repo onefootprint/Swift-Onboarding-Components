@@ -23,6 +23,10 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use api_wire_types::PostOnboardingRequest;
+use db::models::business_owner::BoIdentifier;
+use db::models::business_owner::BusinessOwner;
+use db::models::business_workflow_link::BusinessWorkflowLink;
+use db::models::business_workflow_link::NewBusinessWorkflowLinkRow;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -124,12 +128,29 @@ pub async fn post(
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,
             };
-            let (wf_id, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
+            let (wf_id, is_new_wf) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
             let kyb_fixture_result = request.kyb_fixture_result.or(request.fixture_result);
             let biz_wf = maybe_new_biz_keypair
                 .map(|kp| get_or_create_business_wf(conn, common_args, kp, &user_auth, kyb_fixture_result))
                 .transpose()?;
+
+            if is_new_wf {
+                if let Some(biz_wf) = biz_wf.as_ref() {
+                    let sb = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
+                    let bo_id = BoIdentifier::Vaults {
+                        uv_id: &scoped_user.vault_id,
+                        bv_id: &sb.vault_id,
+                    };
+                    let bo = BusinessOwner::get(conn, bo_id)?;
+                    let new = NewBusinessWorkflowLinkRow {
+                        business_owner_id: &bo.id,
+                        business_workflow_id: &biz_wf.id,
+                        user_workflow_id: &wf_id,
+                    };
+                    BusinessWorkflowLink::create(conn, new)?;
+                }
+            }
 
             // Update auth token with new identifiers
             let (biz_wf_id, sb_id) = biz_wf.map(|wf| (wf.id, wf.scoped_vault_id)).unzip();

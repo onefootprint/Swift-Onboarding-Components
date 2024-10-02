@@ -8,6 +8,11 @@ define_newtype_id!(
 
 define_newtype_id!(TenantId, String, "Identifier for a Org");
 define_newtype_id!(BillingProfileId, String, "Identifier for a billing profile");
+define_newtype_id!(
+    BusinessWorkflowLinkId,
+    String,
+    "Identifier for a business workflow link"
+);
 define_newtype_id!(BillingEventId, String, "Identifier for a billing event");
 define_newtype_id!(StripeCustomerId, String, "Identifier for stripe customer");
 define_newtype_id!(SvixAppId, String, "Identifier for svix app");
