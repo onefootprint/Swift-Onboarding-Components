@@ -21,6 +21,7 @@ const DMSans = DM_Sans({
   preload: true,
   subsets: ['latin'],
   variable: '--font-family-default',
+  fallback: ['Inter'],
 });
 
 const codeFont = DM_Mono({
@@ -49,7 +50,7 @@ export async function generateStaticParams() {
 const RootLayout = ({ children, params }: RootLayoutProps) => {
   const lang = params.lang || LangFallback;
   return (
-    <html lang={lang} dir={dir(lang)} className={`${DMSans.className} ${codeFont.className}`}>
+    <html lang={lang} dir={dir(lang)} className={`${DMSans.variable} ${codeFont.variable}`}>
       <head>
         <link rel="shortcut icon" href="/favicon.ico" />
         <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />

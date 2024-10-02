@@ -58,8 +58,7 @@ const SideNav = () => {
             </Dropdown.Trigger>
             <Dropdown.Portal>
               <Dropdown.Content align="start" sideOffset={8}>
-                <Dropdown.Item onSelect={() => router.push('/auth/logout')}>
-                  <IcoLogOut24 />
+                <Dropdown.Item onSelect={() => router.push('/auth/logout')} iconLeft={IcoLogOut24}>
                   Log out
                 </Dropdown.Item>
               </Dropdown.Content>
