@@ -1942,11 +1942,13 @@
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
                                 "card.*.issuer",
+                                "card.*.fingerprint",
                                 "bank.*.name",
                                 "bank.*.ach_routing_number",
                                 "bank.*.ach_account_number",
                                 "bank.*.ach_account_id",
-                                "bank.*.account_type"
+                                "bank.*.account_type",
+                                "bank.*.fingerprint"
                             ]
                         },
                         "style": "simple"
@@ -3520,11 +3522,13 @@
                                         "card.*.expiration_year",
                                         "card.*.number_last4",
                                         "card.*.issuer",
+                                        "card.*.fingerprint",
                                         "bank.*.name",
                                         "bank.*.ach_routing_number",
                                         "bank.*.ach_account_number",
                                         "bank.*.ach_account_id",
-                                        "bank.*.account_type"
+                                        "bank.*.account_type",
+                                        "bank.*.fingerprint"
                                     ]
                                 }
                             },
@@ -5195,11 +5199,13 @@
                             "card.*.expiration_year",
                             "card.*.number_last4",
                             "card.*.issuer",
+                            "card.*.fingerprint",
                             "bank.*.name",
                             "bank.*.ach_routing_number",
                             "bank.*.ach_account_number",
                             "bank.*.ach_account_id",
-                            "bank.*.account_type"
+                            "bank.*.account_type",
+                            "bank.*.fingerprint"
                         ]
                     },
                     "<value>": {
@@ -5649,11 +5655,13 @@
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
                                 "card.*.issuer",
+                                "card.*.fingerprint",
                                 "bank.*.name",
                                 "bank.*.ach_routing_number",
                                 "bank.*.ach_account_number",
                                 "bank.*.ach_account_id",
-                                "bank.*.account_type"
+                                "bank.*.account_type",
+                                "bank.*.fingerprint"
                             ]
                         }
                     },
@@ -5915,11 +5923,13 @@
                             "card.*.expiration_year",
                             "card.*.number_last4",
                             "card.*.issuer",
+                            "card.*.fingerprint",
                             "bank.*.name",
                             "bank.*.ach_routing_number",
                             "bank.*.ach_account_number",
                             "bank.*.ach_account_id",
-                            "bank.*.account_type"
+                            "bank.*.account_type",
+                            "bank.*.fingerprint"
                         ]
                     },
                     "<value>": {
