@@ -77,7 +77,7 @@ describe('<KycKybDataCollection />', () => {
                 kind: DocumentRequestKind.Custom,
                 data: {
                   name: 'Business License',
-                  identifier: 'custom.document.business_license',
+                  identifier: 'document.custom.business_license',
                   requiresHumanReview: false,
                 },
               },

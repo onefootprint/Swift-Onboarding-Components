@@ -1,3 +1,4 @@
+import { IS_DEV } from '@onefootprint/global-constants';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
@@ -15,7 +16,8 @@ enum ActionDialog {
 
 const DROPDOWN_ITEM_HEIGHT = '32px';
 
-const IS_REQUEST_MORE_INFO_ENABLED = false;
+// TODO: Remove this once feature is done
+const IS_REQUEST_MORE_INFO_ENABLED = IS_DEV;
 
 const BusinessActions = () => {
   const { t } = useTranslation('business-details', { keyPrefix: 'header.actions' });

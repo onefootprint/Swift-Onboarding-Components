@@ -16,12 +16,12 @@
         "name": {
           "label": "Document name",
           "placeholder": "Enter document name",
-          "tooltip": "Enter the name of the document",
+          "tooltip": "Specify a clear name for the document to help users understand what kind of document to upload.",
           "error": "Document name is required"
         },
         "identifier": {
           "label": "Identifier",
-          "tooltip": "Enter a unique identifier for the document",
+          "tooltip": "Use this string to retrieve the document from the vault.",
           "prefix": "document.custom.",
           "error": {
             "required": "Document identifier is required",
@@ -29,11 +29,11 @@
           }
         },
         "description": {
-          "label": "Description (optional)",
-          "tooltip": "Provide a brief description of the document"
+          "label": "Description (optional)"
         }
       },
-      "add-more": "Add more",
+      "add": "Add another",
+      "remove": "Remove",
       "note": {
         "label": "Note for the beneficial owner (optional)",
         "placeholder": "We'd need you to check if there's a typo in the address information you provided..."

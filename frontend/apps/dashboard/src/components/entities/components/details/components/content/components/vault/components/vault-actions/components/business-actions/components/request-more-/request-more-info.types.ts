@@ -1,5 +1,5 @@
 export type FormValues = {
-  beneficialOwner: string;
+  boId: string;
   note: string;
   docs: Doc[];
 };

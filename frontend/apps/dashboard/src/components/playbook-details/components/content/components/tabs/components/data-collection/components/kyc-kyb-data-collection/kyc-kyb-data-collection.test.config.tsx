@@ -75,7 +75,7 @@ export const playbookFixtureWithBusinessAndKYCDocsFixture: OnboardingConfig = {
       kind: DocumentRequestKind.Custom,
       data: {
         name: 'Business license',
-        identifier: 'custom.document.business_license',
+        identifier: 'document.custom.business_license',
         requiresHumanReview: false,
         uploadSettings: 'prefer_upload',
       },
