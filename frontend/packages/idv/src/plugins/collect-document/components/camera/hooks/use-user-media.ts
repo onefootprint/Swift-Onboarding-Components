@@ -19,7 +19,7 @@ type UseUserMediaOutput = {
 
 const { logInfo } = getLogger({ location: 'useUserMedia' });
 
-const getMediaStream = (options: MediaStreamConstraints): Promise<MediaStream> => {
+export const getMediaStream = (options: MediaStreamConstraints): Promise<MediaStream> => {
   if (isUndefined(navigator)) {
     return Promise.reject(new Error('navigator is not defined'));
   }
@@ -62,7 +62,9 @@ const useUserMedia = ({ side = 'back', isLazy = false, onError, onSuccess }: Use
 
   useEffect(() => {
     // When lazy, don't run the effect until requestMediaStream is called
-    if (isLazy && !isRunning.current) return;
+    if (isLazy && !isRunning.current) {
+      return;
+    }
 
     const cleanup = () => {
       if (mediaStream) {

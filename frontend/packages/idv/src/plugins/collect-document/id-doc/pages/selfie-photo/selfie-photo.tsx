@@ -11,7 +11,7 @@ const SelfiePhoto = () => {
     keyPrefix: 'document-flow.id-doc.pages.selfie-photo',
   });
   const [state, send] = useIdDocMachine();
-  const { orgId, requirement, hasBadConnectivity, device } = state.context;
+  const { orgId, requirement, hasBadConnectivity } = state.context;
 
   const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedImage', payload });
 
@@ -34,7 +34,6 @@ const SelfiePhoto = () => {
       title={{ camera: t('title'), preview: t('title') }}
       onComplete={onComplete}
       onBack={handleClickBack}
-      deviceInfo={device}
     />
   );
 };

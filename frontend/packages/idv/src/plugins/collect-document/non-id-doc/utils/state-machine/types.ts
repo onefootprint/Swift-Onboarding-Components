@@ -23,7 +23,7 @@ export type MachineContext = {
 
 export type MachineEvents =
   | { type: 'cameraAccessDenied'; payload: { status: PermissionState } }
-  | { type: 'cameraAccessGranted'; payload: { status: PermissionState; stream: MediaStream } }
+  | { type: 'cameraAccessGranted'; payload: { status: PermissionState } }
   | { type: 'cameraErrored' }
   | { type: 'cameraStuck' }
   | { type: 'contextInitializationFailed' }

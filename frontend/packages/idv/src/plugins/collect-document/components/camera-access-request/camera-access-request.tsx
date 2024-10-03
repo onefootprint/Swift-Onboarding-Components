@@ -4,13 +4,13 @@ import type { TFunction } from 'i18next';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle } from 'styled-components';
 import { getLogger, trackAction } from '../../../../utils/logger';
-import useUserMedia from '../camera/hooks/use-user-media';
+import { getMediaStream } from '../camera/hooks/use-user-media';
 
 type T = TFunction<'idv', 'document-flow'>;
 type CameraAccessRequestProps = {
   onClose: () => void;
   onError: (error: unknown) => void;
-  onSuccess: (stream: MediaStream) => void;
+  onSuccess: () => void;
 };
 
 const underlineStyle = { textDecoration: 'underline' };
@@ -49,14 +49,20 @@ const CameraAccessRequest = ({ onClose, onError, onSuccess }: CameraAccessReques
   const { t } = useTranslation('idv', { keyPrefix: 'document-flow' });
   const toast = useToast();
   const errorToast = (description: string) => toast.show({ description, title: 'Uh-oh!', variant: 'error' });
-  const { requestMediaStream } = useUserMedia({
-    isLazy: true,
-    onError: err => {
+
+  const handleAllowAccess = async () => {
+    try {
+      const stream = await getMediaStream({ video: true });
+
+      // Now that we have the stream, it means the user has granted access
+      // So, let's stop the stream and call the onSuccess callback
+      stream.getTracks().forEach(track => track.stop());
+      onSuccess();
+    } catch (err) {
       showFeedbackToast(t, errorToast, err);
       onError(err);
-    },
-    onSuccess,
-  });
+    }
+  };
 
   return (
     <>
@@ -105,7 +111,7 @@ const CameraAccessRequest = ({ onClose, onError, onSuccess }: CameraAccessReques
             <Text variant="label-2">{t('no-camera-access')}</Text>
           </Box>
         </Box>
-        <Button fullWidth onClick={() => requestMediaStream('back')} testID="allow-access" size="large">
+        <Button fullWidth onClick={handleAllowAccess} testID="allow-access" size="large">
           {t('allow-access')}
         </Button>
       </Box>

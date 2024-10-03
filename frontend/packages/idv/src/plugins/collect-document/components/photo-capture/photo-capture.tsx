@@ -4,7 +4,6 @@ import { Box } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
-import type { DeviceInfo } from '../../../../../src/hooks';
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
 import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../components';
 import useHandleCameraError from '../../../../plugins/collect-document/hooks/use-handle-camera-error';
@@ -40,7 +39,6 @@ type PhotoCaptureProps = {
   outlineWidthRatio: number; // with respect to the video width
   subtitle?: Partial<HeaderTextType>;
   title: HeaderTextType;
-  deviceInfo: DeviceInfo;
 };
 
 const DesktopNavProps: NavigationHeaderLeftButtonProps = {
@@ -67,7 +65,6 @@ const PhotoCapture = ({
   outlineWidthRatio,
   subtitle,
   title,
-  deviceInfo,
 }: PhotoCaptureProps) => {
   const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
   const allowUpload = requirement.uploadSettings !== DocumentUploadSettings.captureOnlyOnMobile;
@@ -218,7 +215,6 @@ const PhotoCapture = ({
         allowPdf={allowPdf}
         onCameraStuck={handleCameraStuck}
         allowUpload={allowUpload}
-        deviceInfo={deviceInfo}
       >
         {({
           canvasAutoCaptureRef,

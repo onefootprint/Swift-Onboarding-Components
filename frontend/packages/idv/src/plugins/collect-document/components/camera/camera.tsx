@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
-import type { DeviceInfo } from '../../../../../src/hooks';
 import { getLogger, trackAction } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import {
@@ -41,9 +40,10 @@ import PlayPermissionDialog from './components/play-permission-dialog';
 import UploadButton from './components/upload-button';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
-import useUserMedia from './hooks/use-user-media';
+import { getMediaStream } from './hooks/use-user-media';
 import type { AutoCaptureKind, CaptureStatus, DeviceKind, Resolution, VideoRef } from './types';
 import type { CameraSide } from './utils/get-camera-options';
+import getCameraOptions from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 
 type ChildrenProps = {
@@ -76,7 +76,6 @@ type CameraProps = {
   allowPdf: boolean;
   onCameraStuck: () => void;
   allowUpload: boolean;
-  deviceInfo: DeviceInfo;
 };
 
 const CountDownProps = {
@@ -96,15 +95,11 @@ const videoElementStateListener =
   (event: Event) => {
     if (!videoElement) return;
     logTrack(`Video event: ${event.type}`);
-    logInfo(`(VideoElementStateListener) video element status: ${event.type}`);
-    // TODO: add `&& videoElement.readyState >= 2` condition after the experimentation
-    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event)) {
+    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event) && videoElement.readyState >= 2) {
       setPlayingState(false);
-      logInfo('(VideoElementStateListener) attempting to play video');
       videoElement
         .play()
         .then(() => {
-          logInfo('(VideoElementStateListener) video playing');
           logTrack('Video event: playing');
           setPlayingState(true);
         })
@@ -188,7 +183,6 @@ const Camera = ({
   onCameraStuck,
   allowUpload,
   hasBadConnectivity,
-  deviceInfo,
 }: CameraProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'document-flow.components.camera' });
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
@@ -203,7 +197,7 @@ const Camera = ({
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
   const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] = useState(false);
-  const [isAttemptingToPlay, setIsAttemptingToPlay] = useState(false);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
   useEffectOnce(() => {
     trackAction('camera-page:started');
@@ -220,7 +214,29 @@ const Camera = ({
 
   const getImageStringFromVideo = useGetImageString();
 
-  const { mediaStream } = useUserMedia({ side: cameraSide, onError });
+  useEffect(() => {
+    if (!mediaStream) {
+      const cameraOptions = getCameraOptions(cameraSide);
+      getMediaStream(cameraOptions)
+        .then(stream => {
+          setMediaStream(stream);
+        })
+        .catch(err => {
+          logError('(camera useEffect) Error getting media stream', err);
+          onError?.(err);
+        });
+    }
+
+    return () => {
+      if (mediaStream) {
+        logInfo("Camera unmounting - stopping media stream's tracks");
+        mediaStream.getTracks().forEach(track => {
+          track.stop();
+        });
+      }
+    };
+  }, [mediaStream]);
+
   const isCameraVisible = Boolean(mediaStream?.active) && isVideoPlaying;
   const { outlineWidth, outlineHeight } = getOutlineDimensions({
     videoSize,
@@ -233,9 +249,8 @@ const Camera = ({
   const positionFromBottom = getPositionFromBottom(deviceKind);
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
-    logInfo(`Setting video src object - mediastream id: ${mediaStream.id}, mediaStream active: ${mediaStream.active}`);
+    logInfo('Setting video src object');
     videoRef.current.srcObject = mediaStream;
-    videoRef.current.load();
   } else {
     logTrack(
       `Could not set video src object. MediaStream ${mediaStream}, videoRef ${videoRef.current}, has srcObject ${!!videoRef?.current?.srcObject}`,
@@ -243,12 +258,11 @@ const Camera = ({
   }
 
   const handlePlayError = (err: unknown) => {
-    setIsAttemptingToPlay(false);
     if (err instanceof Error && isNotAllowedError(err?.name)) {
       if (!showPlayAllowDialog) setShowPlayAllowDialog(true);
       logWarn('video play: not allowed - prompting user interaction', err);
     } else {
-      logWarn('video play: error', err);
+      logError('video play: error', err);
     }
   };
 
@@ -263,57 +277,17 @@ const Camera = ({
       logWarn('(onCanPlay) video ref not initialized');
       return;
     }
-    // TODO: uncomment or completely remove after the experimentation
-    // if (videoRef.current.readyState < 2) {
-    //   logWarn('(onCanPlay) video not ready to play');
-    //   return;
-    // }
-    if (!isAttemptingToPlay) {
-      setIsAttemptingToPlay(true);
-      logInfo('(onCanPlay) Attempting to play video');
-      videoRef.current
-        .play()
-        .then(() => {
-          logInfo('(onCanPlay) video element status: playing');
-          logTrack('(onCanPlay) video element status: playing');
-          setIsVideoPlaying(true);
-          setIsAttemptingToPlay(false);
-        })
-        .catch(handlePlayError);
+    if (videoRef.current.readyState < 2) {
+      logWarn('(onCanPlay) video not ready to play');
+      return;
     }
-  };
-
-  const handleLoadMetadata = () => {
-    logTrack('(onLoadedMetadata) video metadata loaded');
-    if (deviceInfo.browser.toLowerCase().includes('safari')) {
-      logInfo('(onLoadedMetadata) Safari browser detected. Attempting to play video');
-      if (isVideoPlaying) {
-        logTrack('(onLoadedMetadata) video already playing');
-        return;
-      }
-      if (!videoRef.current) {
-        logWarn('(onLoadedMetadata) video ref not initialized');
-        return;
-      }
-      // TODO: uncomment or completely remove after the experimentation
-      // if (videoRef.current.readyState < 2) {
-      //   logWarn('(onCanPlay) video not ready to play');
-      //   return;
-      // }
-      if (!isAttemptingToPlay) {
-        setIsAttemptingToPlay(true);
-        logInfo('(onLoadedMetadata) Attempting to play video');
-        videoRef.current
-          .play()
-          .then(() => {
-            logInfo('(onLoadedMetadata) video element status: playing');
-            logTrack('(onLoadedMetadata) video element status: playing');
-            setIsVideoPlaying(true);
-            setIsAttemptingToPlay(false);
-          })
-          .catch(handlePlayError);
-      }
-    }
+    videoRef.current
+      .play()
+      .then(() => {
+        logTrack('(onCanPlay) video element status: playing');
+        setIsVideoPlaying(true);
+      })
+      .catch(handlePlayError);
   };
 
   useInterval(
@@ -335,40 +309,21 @@ const Camera = ({
         logWarn('(interval) video src object not set');
         if (mediaStream?.active) {
           logInfo('(interval) setting video src object');
-          logInfo(
-            `(interval) Setting video src object - mediastream id: ${mediaStream.id}, mediaStream active: ${mediaStream.active}`,
-          );
           videoRef.current.srcObject = mediaStream;
-          videoRef.current.load();
         }
         return;
       }
-      // check if the src object is a mediastream
-      if (videoRef.current.srcObject instanceof MediaStream) {
-        logInfo(
-          `(interval) video src object already set - src object mediastream id: ${(videoRef.current.srcObject as MediaStream).id}, mediaStream active: ${(videoRef.current.srcObject as MediaStream).active}`,
-        );
-      } else {
-        logError('(interval) video src object is not a mediastream');
+      if (videoRef.current.readyState < 2) {
+        logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
+        return;
       }
-      // TODO: uncomment or completely remove after the experimentation
-      // if (videoRef.current.readyState < 2) {
-      //   logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
-      //   return;
-      // }
-      if (!isAttemptingToPlay) {
-        setIsAttemptingToPlay(true);
-        logInfo('(interval) Attempting to play video');
-        videoRef.current
-          .play()
-          .then(() => {
-            logInfo('(interval) video element status: started playing');
-            logWarn('(interval) video element status: started playing');
-            setIsVideoPlaying(true);
-            setIsAttemptingToPlay(false);
-          })
-          .catch(handlePlayError);
-      }
+      videoRef.current
+        .play()
+        .then(() => {
+          logWarn('(interval) video element status: started playing');
+          setIsVideoPlaying(true);
+        })
+        .catch(handlePlayError);
     },
     isVideoPlaying ? null : PLAY_CHECK_INTERVAL,
   );
@@ -502,7 +457,106 @@ const Camera = ({
 
   return (
     <>
-      {!isCameraVisible ? (
+      <Container>
+        <VideoContainer data-device-kind={deviceKind}>
+          <Video
+            autoPlay
+            data-camera-kind={cameraSide}
+            data-device-kind={deviceKind}
+            hidden={!isVideoPlaying}
+            muted
+            onCanPlay={handleCanPlay}
+            playsInline
+            ref={videoRef}
+            onSuspend={() => logInfo('Video suspended')}
+          />
+          {isVideoPlaying && isDetecting
+            ? children({
+                canvasAutoCaptureRef,
+                feedbackPositionFromBottom: positionFromBottom,
+                videoResolution: getVideoResolution(mediaStream),
+                onDetectionComplete: handleDetectionComplete,
+                onDetectionReset: handleResetDetectionTimer,
+                outlineHeight,
+                outlineWidth,
+                videoRef,
+                videoSize,
+              })
+            : null}
+          {isCameraVisible && (
+            <>
+              {!isImageProcessing ? (
+                <>
+                  <Overlay
+                    width={videoSize?.width ?? 0}
+                    height={positionFromTop}
+                    videoHeight={videoSize?.height ?? 0}
+                    captureKind={autoCaptureKind}
+                    outlineWidth={outlineWidth}
+                    outlineHeight={outlineHeight}
+                    timerAnimationVal={isTimerRunning ? autoCaptureTimerVal : undefined}
+                  />
+                  <Canvas
+                    ref={canvasImageCaptureRef as React.Ref<HTMLCanvasElement>}
+                    width={videoSize?.width}
+                    height={videoSize?.height}
+                  />
+                  <Canvas
+                    ref={canvasAutoCaptureRef as React.Ref<HTMLCanvasElement>}
+                    width={videoSize?.width}
+                    height={videoSize?.height}
+                  />
+                  {autoCaptureFeedback ? (
+                    <Feedback deviceKind={deviceKind} top={positionFromTop}>
+                      {feedbackText}
+                    </Feedback>
+                  ) : null}
+                  {isMobile(deviceKind) && (
+                    <CaptureButton
+                      onClick={onMobileCaptureClick}
+                      variant={isTimerRunning ? 'stop' : 'round'}
+                      disabled={!isCameraVisible || !videoSize}
+                    />
+                  )}
+                  {isDocument(autoCaptureKind) && allowUpload && (
+                    <UploadButton
+                      onUploadBtnClick={onImageUpload}
+                      onUploadChangeDone={onUploadComplete}
+                      allowPdf={allowPdf}
+                      onUploadSuccess={onUpload}
+                      hasBadConnectivity={hasBadConnectivity}
+                    />
+                  )}
+                  {isTimerRunning ? (
+                    <TimerContainer height={positionFromTop}>
+                      <CountdownTimer current={autoCaptureTimerVal} start={AUTOCAPTURE_TIMER_START_VAL} />
+                    </TimerContainer>
+                  ) : null}
+                </>
+              ) : (
+                <ProcessingContainer>
+                  <LoadingSpinner />
+                </ProcessingContainer>
+              )}
+            </>
+          )}
+        </VideoContainer>
+        {isDesktop(deviceKind) && isCameraVisible && (
+          <CaptureButton
+            onClick={() => handleClick('manual')}
+            disabled={!isCameraVisible || !videoSize}
+            variant="default"
+          />
+        )}
+        {isCameraVisible && (
+          <PlayPermissionDialog
+            open={showPlayAllowDialog}
+            hide={() => setShowPlayAllowDialog(false)}
+            onAllow={handlePlayAllow}
+          />
+        )}
+      </Container>
+      {!isCameraVisible && (
         <LoadingContainer data-device-kind={deviceKind} $desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}>
           <AnimatePresence>
             <LoadingSpinner />
@@ -520,119 +574,7 @@ const Camera = ({
             )}
           </AnimatePresence>
         </LoadingContainer>
-      ) : null}
-      <Container data-visible={isCameraVisible}>
-        <VideoContainer data-device-kind={deviceKind}>
-          <Video
-            autoPlay
-            data-camera-kind={cameraSide}
-            data-device-kind={deviceKind}
-            hidden={!isVideoPlaying}
-            muted
-            onCanPlay={handleCanPlay}
-            onLoadedMetadata={handleLoadMetadata}
-            playsInline
-            ref={videoRef}
-            onLoadStart={() => logInfo('video load started')}
-            onLoadedData={() => logInfo('video loaded data')}
-            onDurationChange={() => logInfo('video duration changed')}
-            onPlay={() => logInfo('video play')}
-            onPlaying={() => logInfo('video playing')}
-            onCanPlayThrough={() => logInfo('video can play through')}
-            onStalled={() => logInfo('video stalled')}
-            onSuspend={() => {
-              logInfo('video suspend');
-              mediaStream?.getTracks().forEach(track => {
-                logInfo(`Track readyState: ${track.readyState}; track id: ${track.id}`);
-              });
-            }}
-            onAbort={() => logInfo('video abort')}
-            onWaiting={() => logInfo('video waiting')}
-            onEmptied={() => logInfo('video emptied')}
-            onEnded={() => logInfo('video ended')}
-            onError={err => logWarn('video error', err)}
-            onProgress={() => logInfo('video progress')}
-          />
-          {isVideoPlaying && isDetecting
-            ? children({
-                canvasAutoCaptureRef,
-                feedbackPositionFromBottom: positionFromBottom,
-                videoResolution: getVideoResolution(mediaStream),
-                onDetectionComplete: handleDetectionComplete,
-                onDetectionReset: handleResetDetectionTimer,
-                outlineHeight,
-                outlineWidth,
-                videoRef,
-                videoSize,
-              })
-            : null}
-          {!isImageProcessing ? (
-            <>
-              <Overlay
-                width={videoSize?.width ?? 0}
-                height={positionFromTop}
-                videoHeight={videoSize?.height ?? 0}
-                captureKind={autoCaptureKind}
-                outlineWidth={outlineWidth}
-                outlineHeight={outlineHeight}
-                timerAnimationVal={isTimerRunning ? autoCaptureTimerVal : undefined}
-              />
-              <Canvas
-                ref={canvasImageCaptureRef as React.Ref<HTMLCanvasElement>}
-                width={videoSize?.width}
-                height={videoSize?.height}
-              />
-              <Canvas
-                ref={canvasAutoCaptureRef as React.Ref<HTMLCanvasElement>}
-                width={videoSize?.width}
-                height={videoSize?.height}
-              />
-              {autoCaptureFeedback ? (
-                <Feedback deviceKind={deviceKind} top={positionFromTop}>
-                  {feedbackText}
-                </Feedback>
-              ) : null}
-              {isMobile(deviceKind) && (
-                <CaptureButton
-                  onClick={onMobileCaptureClick}
-                  variant={isTimerRunning ? 'stop' : 'round'}
-                  disabled={!isCameraVisible || !videoSize}
-                />
-              )}
-              {isDocument(autoCaptureKind) && allowUpload && (
-                <UploadButton
-                  onUploadBtnClick={onImageUpload}
-                  onUploadChangeDone={onUploadComplete}
-                  allowPdf={allowPdf}
-                  onUploadSuccess={onUpload}
-                  hasBadConnectivity={hasBadConnectivity}
-                />
-              )}
-              {isTimerRunning ? (
-                <TimerContainer height={positionFromTop}>
-                  <CountdownTimer current={autoCaptureTimerVal} start={AUTOCAPTURE_TIMER_START_VAL} />
-                </TimerContainer>
-              ) : null}
-            </>
-          ) : (
-            <ProcessingContainer>
-              <LoadingSpinner />
-            </ProcessingContainer>
-          )}
-        </VideoContainer>
-        {isDesktop(deviceKind) && (
-          <CaptureButton
-            onClick={() => handleClick('manual')}
-            disabled={!isCameraVisible || !videoSize}
-            variant="default"
-          />
-        )}
-        <PlayPermissionDialog
-          open={showPlayAllowDialog}
-          hide={() => setShowPlayAllowDialog(false)}
-          onAllow={handlePlayAllow}
-        />
-      </Container>
+      )}
     </>
   );
 };
@@ -653,13 +595,15 @@ const LoadingContainer = styled.div<{ $desktopHeight: number }>`
     flex-direction: column;
     flex: 1;
     width: 100%;
+    height: 100%;
     gap: ${theme.spacing[7]};
 
     &[data-device-kind='mobile'] {
       position: absolute;
-      top: calc(50% - ${theme.spacing[5]});
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      background-color: ${theme.backgroundColor.primary};
     }
 
     &[data-device-kind='desktop'] {
@@ -677,7 +621,6 @@ const LoadingContainer = styled.div<{ $desktopHeight: number }>`
 
 export const Container = styled.div`
   ${({ theme }) => css`
-    visibility: hidden;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -685,10 +628,6 @@ export const Container = styled.div`
     width: 100%;
     height: 100%;
     row-gap: ${theme.spacing[7]};
-
-    &[data-visible='true'] {
-      visibility: visible;
-    }
   `}
 `;
 

@@ -39,7 +39,7 @@ const Router = ({ onDone }: RouterProps) => {
       <CameraAccessRequest
         onClose={() => send({ type: 'navigatedToPrev' })}
         onError={() => send({ type: 'cameraAccessDenied', payload: { status: 'denied' } })}
-        onSuccess={stream => send({ type: 'cameraAccessGranted', payload: { stream, status: 'granted' } })}
+        onSuccess={() => send({ type: 'cameraAccessGranted', payload: { status: 'granted' } })}
       />
     );
   }

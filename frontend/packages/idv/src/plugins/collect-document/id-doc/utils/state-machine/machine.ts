@@ -93,7 +93,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
                 target: 'mobileFrontImageCapture',
                 cond: (ctx, { payload }) =>
                   isMobileKind(ctx.device.type) && !ctx.isConsentMissing && isGranted(payload.status),
-                actions: ['assignCameraPermissionState'], // TODO: implement 'assignMediaStream' ?
+                actions: ['assignCameraPermissionState'], // TODO: implement 'assignMediaStream' ? Not sure if this is needed or is a good idea to pass around the stream
               },
               {
                 target: 'desktopFrontImage',

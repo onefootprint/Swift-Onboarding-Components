@@ -451,9 +451,7 @@ describe('Non Id Doc Machine Tests', () => {
       state = machine.send([{ type: 'navigatedToPrev' }]);
       expect(state.value).toEqual('mobileRequestCameraAccess');
 
-      state = machine.send([
-        { type: 'cameraAccessGranted', payload: { status: 'granted', stream: {} as MediaStream } },
-      ]);
+      state = machine.send([{ type: 'cameraAccessGranted', payload: { status: 'granted' } }]);
       expect(state.value).toEqual('mobileImageCapture');
     });
   });

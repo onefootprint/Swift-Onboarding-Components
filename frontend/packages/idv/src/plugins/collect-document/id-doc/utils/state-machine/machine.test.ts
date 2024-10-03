@@ -85,9 +85,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('mobileRequestCameraAccess');
       expect(state.context.idDoc.country).toEqual('US');
 
-      state = machine.send([
-        { type: 'cameraAccessGranted', payload: { status: 'granted', stream: {} as MediaStream } },
-      ]);
+      state = machine.send([{ type: 'cameraAccessGranted', payload: { status: 'granted' } }]);
       expect(state.context.idDoc.type).toEqual(SupportedIdDocTypes.driversLicense);
 
       state = machine.send({ type: 'navigatedToPrev' });
@@ -924,9 +922,7 @@ describe('Id Doc Machine Tests', () => {
       state = machine.send([{ type: 'navigatedToPrev' }]);
       expect(state.value).toEqual('mobileRequestCameraAccess');
 
-      state = machine.send([
-        { type: 'cameraAccessGranted', payload: { status: 'granted', stream: {} as MediaStream } },
-      ]);
+      state = machine.send([{ type: 'cameraAccessGranted', payload: { status: 'granted' } }]);
       expect(state.value).toEqual('mobileFrontImageCapture');
     });
   });
