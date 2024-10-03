@@ -138,7 +138,7 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     data = {"id.email": "flerpderp"}
     post("hosted/user/vault/validate", data, bifrost.auth_token, status_code=400)
 
-    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_one_requirement("collect_data")
 
     # Should be allowed to update speculative fields that are already set
     data = {
@@ -150,11 +150,9 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     for k, v in data.items():
         bifrost.data[k] = v
 
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("liveness")
 
-    # Manually authorize
-    bifrost.handle_requirements(kind="authorize")
-    bifrost.handle_requirements(kind="process")
+    bifrost.handle_one_requirement("process")
     body = bifrost.validate()
     data = dict(validation_token=body["validation_token"])
     # Shouldn't be able to validate with other tenant

@@ -179,7 +179,7 @@ class BifrostClient:
         status = self.get_status()
         return get_requirement_from_requirements(kind, status["all_requirements"])
 
-    def handle_requirements(self, kind=None):
+    def handle_all_requirements(self):
         """
         Handle all onboarding requirements.
         If `kind` is provided, will only handle the requested requirement
@@ -193,11 +193,7 @@ class BifrostClient:
         while True:
             requirements = [r for r in body["all_requirements"] if not r["is_met"]]
             try:
-                next_requirement = (
-                    next(r for r in requirements)
-                    if not kind
-                    else next(r for r in requirements if r["kind"] == kind)
-                )
+                next_requirement = next(r for r in requirements)
             except StopIteration:
                 break
 
@@ -210,6 +206,10 @@ class BifrostClient:
             self.handle_requirement(next_requirement)
             last_handled_requirement = next_requirement
             body = self.get_status()
+
+    def handle_one_requirement(self, kind: str):
+        req = self.get_requirement(kind)
+        self.handle_requirement(req)
 
     def handle_requirement(self, requirement):
         """
@@ -423,7 +423,7 @@ class BifrostClient:
         """
         Simulates all bifrost logic of satisfying requirements and authorizing.
         """
-        self.handle_requirements()
+        self.handle_all_requirements()
         validation_token = self.validate()["validation_token"]
         (fp_id, fp_bid) = self.validate_token(validation_token)
 

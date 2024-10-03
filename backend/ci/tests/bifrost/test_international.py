@@ -56,8 +56,8 @@ def test_user_without_documents_international(
 
     # simulate collecting international address
     bifrost.data["id.country"] = "MX"
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
 
     status = bifrost.get_status()
     doc_requirement_after = get_requirement_from_requirements(
@@ -92,8 +92,8 @@ def test_with_documents_handles_international_address(
     )
     bifrost = BifrostClient.new_user(obc)
     bifrost.data["id.country"] = "MX"
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
 
     status = bifrost.get_status()
 
@@ -129,8 +129,8 @@ def test_with_documents_handles_international_address_restricted_documents(
     )
     bifrost = BifrostClient.new_user(obc)
     bifrost.data["id.country"] = "MX"
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
 
     status = bifrost.get_status()
 
@@ -178,8 +178,8 @@ def test_with_documents_handles_international_address_restricted_documents_with_
 
     # collect MX address
     bifrost.data["id.country"] = "MX"
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
 
     status = bifrost.get_status()
 
@@ -236,8 +236,8 @@ def test_us_legal_status(sandbox_tenant):
     bifrost.data["id.country"] = "MX"
     # remove legal status
     bifrost.data.pop("id.us_legal_status")
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
 
     status = bifrost.get_status()
     collect_data_requirement_after_address = get_requirement_from_requirements(

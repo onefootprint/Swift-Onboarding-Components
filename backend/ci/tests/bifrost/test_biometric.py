@@ -44,7 +44,7 @@ def test_skip_liveness(sandbox_tenant):
 def test_d2p_biometric(sandbox_tenant):
     # Create user with requirements handled except liveness
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
-    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_one_requirement("collect_data")
 
     # Try generating tokens with no metadata for backwards compatibility
     post("hosted/onboarding/d2p/generate", None, bifrost.auth_token)

@@ -279,8 +279,8 @@ def test_upload_documents_with_ob_config_restriction(
     restricted_doc_ob_config_only_international,
 ):
     bifrost = BifrostClient.new_user(restricted_doc_ob_config_only_international)
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # make sure we've collected country
@@ -321,7 +321,7 @@ def test_upload_documents_with_ob_config_restriction(
     }
     post("hosted/documents", data, bifrost.auth_token)
 
-    bifrost.handle_requirements(kind="collect_document")
+    bifrost.handle_one_requirement("collect_document")
     status = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
         "authorize", status["all_requirements"], is_met=True
@@ -347,8 +347,8 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         },
     )
     bifrost = BifrostClient.new_user(obc)
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # Manually handle the document requirement with some invalid data
@@ -407,7 +407,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
     }
     post("hosted/documents", data, bifrost.auth_token)
 
-    bifrost.handle_requirements(kind="collect_document")
+    bifrost.handle_one_requirement("collect_document")
     status = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
         "authorize", status["all_requirements"], is_met=True
@@ -419,8 +419,8 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config):
     bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
     status = bifrost.get_status()
     doc_requirement = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
@@ -535,8 +535,8 @@ def test_upload_apis(doc_request_sandbox_ob_config):
 
 def test_user_uploading_small_image(doc_request_sandbox_ob_config):
     bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # consent
@@ -569,8 +569,8 @@ def test_user_having_trouble_with_their_mobile_camera(
     sandbox_tenant, doc_request_sandbox_ob_config
 ):
     bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
-    bifrost.handle_requirements(kind="collect_data")
-    bifrost.handle_requirements(kind="liveness")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # consent

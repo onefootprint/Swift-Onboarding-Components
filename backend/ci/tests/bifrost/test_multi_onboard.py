@@ -43,7 +43,7 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant):
 
     # Decryption perms don't change after onboarding onto ob config 2, but we can see ssn9
     bifrost = BifrostClient.inherit_user(ob_config2, sandbox_id)
-    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_one_requirement("collect_data")
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
     assert set(body["attributes"]) >= {
         "id.phone_number",
