@@ -87,10 +87,10 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
 
   const renderInProgressControls = () => (
     <Stack gap={3}>
-      <Button variant="secondary" onClick={decryptControls.cancel}>
+      <Button variant="secondary" size="compact" onClick={decryptControls.cancel}>
         {t('cancel')}
       </Button>
-      <Button form={DECRYPT_VAULT_FORM_ID} type="submit">
+      <Button size="compact" form={DECRYPT_VAULT_FORM_ID} type="submit">
         {t('next')}
       </Button>
     </Stack>

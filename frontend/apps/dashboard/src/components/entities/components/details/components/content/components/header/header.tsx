@@ -29,6 +29,8 @@ const Header = ({ entity, isDisabled }: HeaderProps) => {
       direction="column"
       gap={1}
       align="flex-start"
+      minHeight="28px"
+      justifyContent="center"
       tag="header"
       aria-label={t(`${kind}.title` as ParseKeys<'common'>)}
       data-is-disabled={isDisabled}

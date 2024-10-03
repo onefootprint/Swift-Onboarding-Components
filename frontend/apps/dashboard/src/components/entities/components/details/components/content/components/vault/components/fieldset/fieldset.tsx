@@ -57,7 +57,7 @@ const Fieldset = ({ children, entity, fields, footer, iconComponent: IconCompone
       <Header data-primary-background={isViewingHistorical}>
         <Title>
           <IconComponent />
-          <Text variant="label-2" tag="h2">
+          <Text variant="label-3" tag="h2">
             {title}
           </Text>
         </Title>

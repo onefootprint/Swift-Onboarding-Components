@@ -9,7 +9,7 @@ type FieldSectionProps = {
 
 const FieldSection = ({ title, children }: FieldSectionProps) => (
   <Box>
-    <Text variant="label-2" marginBottom={5}>
+    <Text variant="label-3" marginBottom={5}>
       {title}
     </Text>
     <FieldsContainer>{children}</FieldsContainer>
