@@ -4,6 +4,7 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  InvestorProfileDI,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
@@ -18,6 +19,10 @@ type CdoListProps = {
   disableSort?: boolean;
   singleDocument?: boolean;
 };
+
+const investorProfileDIOrder: Record<string, number> = Object.fromEntries(
+  Object.values(InvestorProfileDI).map((value, index) => [value, index]),
+);
 
 // We need to clean this up when we re-do the CDO structure in the dashboard
 const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
@@ -46,6 +51,22 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   SupportedIdDocTypes.residenceDocument,
   'selfie',
 ];
+
+export const InvestorProfileDiList = ({ diList }: { diList?: InvestorProfileDI[] }) => {
+  const { t } = useTranslation('common');
+  const investorProfileLabel = t(`cdo.${CollectedInvestorProfileDataOption.investorProfile}`);
+
+  if (diList && diList.length > 0) {
+    const investorDILabels = diList
+      .filter(di => di !== InvestorProfileDI.declarations)
+      .sort((diA, diB) => investorProfileDIOrder[diA] - investorProfileDIOrder[diB])
+      .map(di => t(`di.${di}`));
+
+    return <Text variant="label-3">{`${investorProfileLabel} (${investorDILabels.join(', ')})`}</Text>;
+  }
+
+  return <Text variant="label-3">{investorProfileLabel}</Text>;
+};
 
 const CdoList = ({ cdos, optionalCdos = [], disableSort, singleDocument }: CdoListProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'cdo' });

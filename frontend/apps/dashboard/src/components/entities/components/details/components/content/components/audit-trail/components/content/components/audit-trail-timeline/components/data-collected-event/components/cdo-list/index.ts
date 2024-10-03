@@ -1,1 +1,1 @@
-export { default } from './cdo-list';
+export { default, InvestorProfileDiList } from './cdo-list';
