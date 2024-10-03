@@ -60,31 +60,30 @@ const FraudLabel = () => {
           </Main>
         </NoLabelContainer>
       )}
-      <Dropdown.Portal>
-        <Dropdown.Content align={label ? 'end' : 'start'} sideOffset={4}>
-          <Dropdown.Group>
-            {Object.values(EntityLabel).map(labelOption => (
-              <Dropdown.Item
-                key={labelOption}
-                onClick={() => handleEditLabel(labelOption)}
-                checked={labelOption === label}
-              >
-                {labelT(labelOption)}
+
+      <Dropdown.Content align={label ? 'end' : 'start'} sideOffset={4}>
+        <Dropdown.Group>
+          {Object.values(EntityLabel).map(labelOption => (
+            <Dropdown.Item
+              key={labelOption}
+              onClick={() => handleEditLabel(labelOption)}
+              checked={labelOption === label}
+            >
+              {labelT(labelOption)}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Group>
+        {label && (
+          <>
+            <Dropdown.Divider />
+            <Dropdown.Group>
+              <Dropdown.Item onClick={() => handleEditLabel(null)} variant="destructive" iconLeft={IcoTrash16}>
+                {t('labels.remove')}
               </Dropdown.Item>
-            ))}
-          </Dropdown.Group>
-          {label && (
-            <>
-              <Dropdown.Divider />
-              <Dropdown.Group>
-                <Dropdown.Item onClick={() => handleEditLabel(null)} variant="destructive" iconLeft={IcoTrash16}>
-                  {t('labels.remove')}
-                </Dropdown.Item>
-              </Dropdown.Group>
-            </>
-          )}
-        </Dropdown.Content>
-      </Dropdown.Portal>
+            </Dropdown.Group>
+          </>
+        )}
+      </Dropdown.Content>
     </Dropdown.Root>
   );
 };

@@ -75,7 +75,7 @@ describe('<CardHeader />', () => {
         onChange: () => undefined,
       });
 
-      const dropdownTrigger = screen.getByRole('button', { name: 'Open card options' });
+      const dropdownTrigger = screen.getByRole('combobox', { name: 'Open card options' });
       await userEvent.click(dropdownTrigger);
 
       const businessCard = await screen.findByText('Business', { exact: false });
@@ -113,7 +113,7 @@ describe('<CardHeader />', () => {
         onChange: () => undefined,
       });
 
-      const dropdownTrigger = screen.getByRole('button', { name: 'Open card options' });
+      const dropdownTrigger = screen.getByRole('combobox', { name: 'Open card options' });
       await userEvent.click(dropdownTrigger);
 
       const lastFourDigits = await screen.findByText('••••1234');

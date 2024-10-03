@@ -1,7 +1,7 @@
 import type { Color } from '@onefootprint/design-tokens';
 import type { Rule } from '@onefootprint/types';
 import { RuleAction, RuleActionSection, RuleResultGroup } from '@onefootprint/types';
-import { Dropdown, Stack, Text } from '@onefootprint/ui';
+import { SelectCustom, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import { useState } from 'react';
@@ -18,59 +18,54 @@ const ActionResultSection = ({ actionSection, data }: ActionResultSectionProps) 
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'audit-trail.timeline.rule-set-results',
   });
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedResultGroup, setSelectedResultGroup] = useState<RuleResultGroup>(RuleResultGroup.isPresent);
   const actionName = kebabCase(actionSection);
   const stepUpActions = [RuleAction.stepUpIdentitySsn, RuleAction.stepUpPoA, RuleAction.stepUpIdentity];
-  const textColors: Record<string, Color> = {
-    fail: 'error',
-    'step-up': 'info',
-    'manual-review': 'warning',
-    'pass-with-manual-review': 'success',
+  const textColors: Record<RuleActionSection, Color> = {
+    [RuleActionSection.fail]: 'error',
+    [RuleActionSection.stepUp]: 'info',
+    [RuleActionSection.manualReview]: 'warning',
+    [RuleActionSection.passWithManualReview]: 'success',
   };
 
-  const toggleDropdown = () => {
-    setIsOpen(isCurrentlyOpen => !isCurrentlyOpen);
-  };
+  const options = Object.values(RuleResultGroup).map(group => ({
+    id: group,
+    name: t(kebabCase(group) as ParseKeys<'common'>),
+  }));
 
-  const onChange = (group: RuleResultGroup) => {
-    setSelectedResultGroup(group);
-    setIsOpen(false);
+  const onValueChange = (value: string) => {
+    setSelectedResultGroup(value as RuleResultGroup);
   };
 
   return (
-    <Stack direction="column" gap={5} role="group" aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}>
+    <Stack
+      direction="column"
+      gap={5}
+      role="group"
+      aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
+      position="relative"
+    >
       <Stack align="center" justify="space-between">
-        <Text variant="label-3" color={textColors[actionName]}>
+        <Text variant="label-3" color={textColors[actionSection as RuleActionSection]}>
           {t(`${actionName}.title` as ParseKeys<'common'>)}
         </Text>
-        <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
-          <Dropdown.Trigger aria-label="Rule result groups" variant="chevron">
-            <Stack align="center">
-              <Text variant="body-3">{t(kebabCase(selectedResultGroup) as ParseKeys<'common'>)}</Text>
-            </Stack>
-          </Dropdown.Trigger>
-          <Dropdown.Portal>
-            <Dropdown.Content align="end" sideOffset={4}>
-              <Dropdown.Group>
-                {Object.values(RuleResultGroup).map(group => {
-                  const label = t(kebabCase(group) as ParseKeys<'common'>);
-                  return (
-                    <Dropdown.Item
-                      key={group}
-                      role="option"
-                      aria-label={label}
-                      onClick={() => onChange(group)}
-                      checked={group === selectedResultGroup}
-                    >
-                      <Text variant="body-3">{label}</Text>
-                    </Dropdown.Item>
-                  );
-                })}
-              </Dropdown.Group>
-            </Dropdown.Content>
-          </Dropdown.Portal>
-        </Dropdown.Root>
+        <SelectCustom.Root value={selectedResultGroup} onValueChange={onValueChange}>
+          <SelectCustom.Trigger aria-label={t('rule-result-groups')}>
+            <SelectCustom.Value placeholder={t('select')}>
+              {t(kebabCase(selectedResultGroup) as ParseKeys<'common'>)}
+            </SelectCustom.Value>
+            <SelectCustom.ChevronIcon />
+          </SelectCustom.Trigger>
+          <SelectCustom.Content>
+            <SelectCustom.Group>
+              {options.map(option => (
+                <SelectCustom.Item key={option.id} value={option.id} asChild>
+                  {option.name}
+                </SelectCustom.Item>
+              ))}
+            </SelectCustom.Group>
+          </SelectCustom.Content>
+        </SelectCustom.Root>
       </Stack>
       {actionSection === RuleActionSection.stepUp ? (
         stepUpActions.map(action => (

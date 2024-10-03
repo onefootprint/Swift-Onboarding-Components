@@ -1,7 +1,8 @@
-import { Stack, Text } from '@onefootprint/ui';
 import type { Meta, StoryFn } from '@storybook/react';
 import { add, format, startOfWeek } from 'date-fns';
 import { useState } from 'react';
+import Stack from '../stack';
+import Text from '../text';
 
 import DateRangeSelector from './date-selector-sheet';
 import type { DateSelectorSheetProps } from './date-selector-sheet.types';

@@ -1,6 +1,5 @@
 import type { EntityCard } from '@onefootprint/types';
-import { Dropdown, Text, media } from '@onefootprint/ui';
-import { useState } from 'react';
+import { SelectCustom, Text, media } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 import CardIcon from '../card-icon';
@@ -12,15 +11,11 @@ export type CardHeaderProps = {
 };
 
 export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const handleToggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
-
-  const handleCardChange = (card: EntityCard) => {
-    onChange(card);
-    setShowDropdown(false);
+  const handleCardChange = (value: string) => {
+    const newCard = cards.find(card => card.alias === value);
+    if (newCard) {
+      onChange(newCard);
+    }
   };
 
   const sortedCards = cards
@@ -29,32 +24,29 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
 
   return (
     <CardHeaderContainer>
-      <Dropdown.Root open={showDropdown} onOpenChange={handleToggleDropdown}>
-        <Dropdown.Trigger aria-label="Open card options" variant="chevron">
+      <SelectCustom.Root value={selectedCard.alias || ''} onValueChange={handleCardChange}>
+        <SelectCustom.Trigger aria-label="Open card options">
           <CardIcon issuer={selectedCard?.issuer || ''} />
           <CardLine>
-            <Text variant="body-3">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : '••••'}</Text>
-            <Text variant="body-3">({selectedCard.alias})</Text>
+            <SelectCustom.Value placeholder="Select card">
+              <Text variant="body-3">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : '••••'}</Text>
+              <Text variant="body-3">({selectedCard.alias})</Text>
+            </SelectCustom.Value>
           </CardLine>
-        </Dropdown.Trigger>
-        <Dropdown.Portal>
-          <Dropdown.Content align="end" width="240px">
-            <Dropdown.RadioGroup value={selectedCard.alias || ''}>
-              {sortedCards.map(card => (
-                <Dropdown.RadioItem
-                  key={`${card?.number_last4}-${card.alias}`}
-                  value={card.alias || ''}
-                  onSelect={() => handleCardChange(card)}
-                >
-                  <CardIcon key={card.issuer} issuer={card.issuer || ''} />
-                  <Text variant="body-3">{card?.number_last4 ? `••••${card.number_last4}` : '••••'}</Text>
-                  <Text variant="body-3">({card.alias})</Text>
-                </Dropdown.RadioItem>
-              ))}
-            </Dropdown.RadioGroup>
-          </Dropdown.Content>
-        </Dropdown.Portal>
-      </Dropdown.Root>
+          <SelectCustom.ChevronIcon />
+        </SelectCustom.Trigger>
+        <SelectCustom.Content>
+          <SelectCustom.Group>
+            {sortedCards.map(card => (
+              <SelectCustom.Item key={`${card?.number_last4}-${card.alias}`} value={card.alias || ''}>
+                <CardIcon key={card.issuer} issuer={card.issuer || ''} />
+                <Text variant="body-3">{card?.number_last4 ? `••••${card.number_last4}` : '••••'}</Text>
+                <Text variant="body-3">({card.alias})</Text>
+              </SelectCustom.Item>
+            ))}
+          </SelectCustom.Group>
+        </SelectCustom.Content>
+      </SelectCustom.Root>
     </CardHeaderContainer>
   );
 };

@@ -1,8 +1,9 @@
 import { IcoCloseSmall16, IcoSearchSmall16 } from '@onefootprint/icons';
-import { IconButton, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import { createFontStyles } from '../../../../utils/mixins';
+import IconButton from '../../../icon-button';
 
 type ComboInputProps = {
   value?: string;

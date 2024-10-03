@@ -60,7 +60,7 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
             setActiveOption(option);
             option.onSelect();
           }}
-          $width={triggerWidths[size]}
+          width={triggerWidths[size]}
           tab-index={1}
         />
       </Container>

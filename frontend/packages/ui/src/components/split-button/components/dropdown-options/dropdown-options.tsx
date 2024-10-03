@@ -17,7 +17,7 @@ type DropdownOptionsProps = {
   disabled: boolean;
   onOptionChange: (option: Option) => void;
   flat?: boolean;
-  $width: string;
+  width: string;
 };
 
 const DropdownOptions = ({
@@ -25,12 +25,12 @@ const DropdownOptions = ({
   variant,
   loading,
   disabled,
-  $width,
+  width,
   flat = false,
   onOptionChange,
 }: DropdownOptionsProps) => (
   <Dropdown.Root>
-    <Trigger variant={variant} data-loading={loading} disabled={disabled} data-flat={flat} $width={$width}>
+    <Trigger variant={variant} data-loading={loading} disabled={disabled} data-flat={flat} $width={width}>
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
     <Dropdown.Portal>

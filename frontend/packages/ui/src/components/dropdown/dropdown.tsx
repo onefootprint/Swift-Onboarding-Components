@@ -20,17 +20,15 @@ const Divider = styled(RadixDropdown.Separator)`
 const Dropdown = {
   Portal: RadixDropdown.Portal,
   Root: RadixDropdown.Root,
-  Indicator: RadixDropdown.ItemIndicator,
-  Sub: RadixDropdown.Sub,
-  Trigger: Trigger,
-  Content: Content,
-  Group: Group,
-  GroupTitle: GroupTitle,
-  Divider: Divider,
-  RadioGroup: RadioGroup,
-  RadioItem: RadioItem,
-  RadioIndicator: ItemIndicator,
-  Item: Item,
+  Trigger,
+  Content,
+  Group,
+  GroupTitle,
+  Divider,
+  RadioGroup,
+  RadioItem,
+  ItemIndicator,
+  Item,
 };
 
 export default Dropdown;

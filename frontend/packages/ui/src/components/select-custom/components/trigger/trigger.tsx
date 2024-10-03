@@ -1,6 +1,6 @@
-import { createFontStyles } from '@onefootprint/ui';
 import * as RadixSelect from '@radix-ui/react-select';
 import styled from 'styled-components';
+import { createFontStyles } from '../../../../utils/mixins';
 type TriggerProps = RadixSelect.SelectTriggerProps;
 
 const Trigger = ({ children, ...props }: TriggerProps) => {

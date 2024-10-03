@@ -26,8 +26,10 @@ export type ItemProps = DropdownMenuItemProps & {
 };
 
 export type TriggerProps = DropdownMenuTriggerProps & {
-  variant?: 'default' | 'chevron';
   maxWidth?: CSS.Property.Width;
+  minWidth?: CSS.Property.Width;
+  width?: CSS.Property.Width;
+  height?: CSS.Property.Height;
 };
 
 export type RadioItemProps = DropdownMenuRadioItemProps & {

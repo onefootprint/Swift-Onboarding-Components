@@ -301,7 +301,7 @@ describe('<Members />', () => {
         it('should show an error message', async () => {
           await renderMembersAndWaitData();
 
-          const roleButton = screen.getByRole('button', {
+          const roleButton = screen.getByRole('combobox', {
             name: `Change ${memberToEdit.email} role`,
           });
           await userEvent.click(roleButton);
@@ -329,7 +329,7 @@ describe('<Members />', () => {
         it('should update the member role', async () => {
           await renderMembersAndWaitData();
 
-          const roleButton = screen.getByRole('button', {
+          const roleButton = screen.getByRole('combobox', {
             name: `Change ${memberToEdit.email} role`,
           });
           await userEvent.click(roleButton);

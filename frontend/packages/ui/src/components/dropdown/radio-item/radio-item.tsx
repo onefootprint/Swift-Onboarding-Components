@@ -3,7 +3,7 @@ import { styled } from 'styled-components';
 import { css } from 'styled-components';
 import BaseItem from '../base-item';
 import type { RadioItemProps } from '../dropdown.types';
-import RadioIndicator from '../item-indicator';
+import ItemIndicator from '../item-indicator';
 
 const RadioItem = ({ value, children, height, onSelect }: RadioItemProps) => {
   return (
@@ -11,7 +11,7 @@ const RadioItem = ({ value, children, height, onSelect }: RadioItemProps) => {
       <BaseItem layout="radio-item" $height={height}>
         <Content>{children}</Content>
         <IndicatorWrapper>
-          <RadioIndicator />
+          <ItemIndicator />
         </IndicatorWrapper>
       </BaseItem>
     </RadixDropdown.RadioItem>

@@ -1,8 +1,8 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { media } from '@onefootprint/ui';
 import * as Portal from '@radix-ui/react-portal';
 import { AnimatePresence, motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
+import media from '../../../../utils/media';
 import IconButton from '../../../icon-button';
 import Text from '../../../text';
 

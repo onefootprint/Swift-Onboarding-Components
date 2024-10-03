@@ -144,3 +144,4 @@ export { default as Toggle } from './toggle';
 export type { TooltipProps } from './tooltip';
 export { default as Tooltip } from './tooltip';
 export { default as Command } from './command';
+export { default as SelectCustom } from './select-custom';

@@ -8,6 +8,7 @@ import Trigger from './components/trigger';
 
 const SelectCustom = {
   Root: RadixSelect.Root,
+  Portal: RadixSelect.Portal,
   Trigger,
   Content,
   Item,

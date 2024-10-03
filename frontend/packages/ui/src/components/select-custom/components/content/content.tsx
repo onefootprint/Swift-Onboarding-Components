@@ -1,6 +1,7 @@
 import * as RadixSelect from '@radix-ui/react-select';
 import type * as CSS from 'csstype';
 import styled, { css, keyframes } from 'styled-components';
+import Box from '../../../box';
 import ScrollButton from './scroll-button';
 
 const ANIMATION_DURATION = '0.05s';
@@ -25,22 +26,20 @@ const Content = ({
   ...props
 }: ContentProps) => {
   return (
-    <RadixSelect.Portal>
-      <RadixSelect.Content {...props} asChild>
-        <Container
-          $minWidth={minWidth}
-          $maxWidth={maxWidth}
-          $width={width}
-          $minHeight={minHeight}
-          $maxHeight={maxHeight}
-          $height={height}
-        >
-          <ScrollButton direction="up" />
-          <RadixSelect.Viewport>{children}</RadixSelect.Viewport>
-          <ScrollButton direction="down" />
-        </Container>
-      </RadixSelect.Content>
-    </RadixSelect.Portal>
+    <RadixSelect.Content {...props} asChild>
+      <Container
+        $minWidth={minWidth}
+        $maxWidth={maxWidth}
+        $width={width}
+        $minHeight={minHeight}
+        $maxHeight={maxHeight}
+        $height={height}
+      >
+        <ScrollButton direction="up" />
+        <RadixSelect.Viewport>{children}</RadixSelect.Viewport>
+        <ScrollButton direction="down" />
+      </Container>
+    </RadixSelect.Content>
   );
 };
 
@@ -66,7 +65,7 @@ const translateOut = keyframes`
   }
 `;
 
-const Container = styled.div<{
+const Container = styled(Box)<{
   $maxWidth?: CSS.Property.Width;
   $minWidth?: CSS.Property.Width;
   $width?: CSS.Property.Width;

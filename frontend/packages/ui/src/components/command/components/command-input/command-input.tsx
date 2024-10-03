@@ -1,9 +1,10 @@
 import { IcoCloseSmall16, IcoSearch16 } from '@onefootprint/icons';
-import { IconButton, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import { createFontStyles } from '../../../../utils/mixins';
+import IconButton from '../../../icon-button';
 
 type CommandInputProps = {
   value: string;

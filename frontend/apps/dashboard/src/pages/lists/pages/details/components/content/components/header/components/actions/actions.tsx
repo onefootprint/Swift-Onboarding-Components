@@ -44,7 +44,7 @@ const Actions = ({ disabled }: ActionsProps) => {
 
   return (
     <Dropdown.Root>
-      <Dropdown.Trigger aria-label={t('delete')} disabled={disabled}>
+      <Dropdown.Trigger aria-label={t('delete')} disabled={disabled} asChild>
         <IconButton aria-label={t('delete')} size="compact">
           <IcoDotsHorizontal24 />
         </IconButton>

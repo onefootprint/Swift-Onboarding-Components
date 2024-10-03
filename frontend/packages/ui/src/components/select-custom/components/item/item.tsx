@@ -1,8 +1,8 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
-import { createFontStyles } from '@onefootprint/ui';
 import * as RadixSelect from '@radix-ui/react-select';
 import { forwardRef } from 'react';
 import { css, styled } from 'styled-components';
+import { createFontStyles } from '../../../../utils/mixins';
 
 type Size = 'default' | 'compact';
 
@@ -47,7 +47,7 @@ const Container = styled.div<{ $size?: Size }>`
     padding-left: ${$size === 'compact' ? theme.spacing[3] : theme.spacing[4]};
     padding-right: ${theme.spacing[4]}; 
     border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[1]});
-    background-color: ${theme.backgroundColor.primary};
+    background-color: ${theme.backgroundColor.transparent};
     transition: background-color 0.05s ease-in-out;
     position: relative; 
 

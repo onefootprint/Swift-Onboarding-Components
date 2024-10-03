@@ -49,22 +49,18 @@ const Actions = ({ member }: ActionsProps) => {
       <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
         <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
           <Dropdown.Trigger asChild>
-            <Box>
-              <IconButton aria-label={t('aria-label', { email })} size="tiny">
-                <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />
-              </IconButton>
-            </Box>
+            <IconButton aria-label={t('aria-label', { email })} size="tiny">
+              <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />
+            </IconButton>
           </Dropdown.Trigger>
         </PermissionGate>
-        <Dropdown.Portal>
-          <Dropdown.Content align="end">
-            <Dropdown.Group>
-              <Dropdown.Item onSelect={handleRemove} variant="destructive">
-                {t('remove.cta')}
-              </Dropdown.Item>
-            </Dropdown.Group>
-          </Dropdown.Content>
-        </Dropdown.Portal>
+        <Dropdown.Content align="end">
+          <Dropdown.Group>
+            <Dropdown.Item onSelect={handleRemove} variant="destructive">
+              {t('remove.cta')}
+            </Dropdown.Item>
+          </Dropdown.Group>
+        </Dropdown.Content>
       </Dropdown.Root>
       <Box>
         <Dialog

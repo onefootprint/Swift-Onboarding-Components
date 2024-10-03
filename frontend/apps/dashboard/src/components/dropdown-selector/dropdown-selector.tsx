@@ -1,6 +1,5 @@
-import { Dropdown, Stack, Text } from '@onefootprint/ui';
+import { SelectCustom, Text } from '@onefootprint/ui';
 import type React from 'react';
-import { useState } from 'react';
 import styled from 'styled-components';
 
 export type Option<T> = {
@@ -18,37 +17,22 @@ export type DropdownSelectorProps<T> = {
 };
 
 const DropdownSelector = <T,>({ onValueChange, triggerAriaLabel, value, options }: DropdownSelectorProps<T>) => {
-  const [activeOption, setActiveOption] = useState<Option<T> | null>(value);
-  const handleSelect = (option: Option<T>) => {
-    onValueChange(option.id);
-    setActiveOption(option);
-  };
-
   return (
-    <Dropdown.Root>
-      <Dropdown.Trigger aria-label={triggerAriaLabel} variant="chevron">
-        {activeOption?.name || 'Select'}
-      </Dropdown.Trigger>
-      <Dropdown.Portal>
-        <Dropdown.Content maxWidth="240px" align="center">
-          <Dropdown.RadioGroup value={value.id}>
-            {options?.map(option => (
-              <Dropdown.RadioItem
-                value={option.id}
-                textValue={option.name}
-                key={option.id}
-                height="fit-content"
-                onSelect={() => handleSelect(option)}
-              >
-                <Stack direction="column" gap={1} maxWidth="100%" paddingTop={2} paddingBottom={2}>
-                  <Name variant="body-3">{option.name}</Name>
-                </Stack>
-              </Dropdown.RadioItem>
-            ))}
-          </Dropdown.RadioGroup>
-        </Dropdown.Content>
-      </Dropdown.Portal>
-    </Dropdown.Root>
+    <SelectCustom.Root value={value.id} onValueChange={onValueChange}>
+      <SelectCustom.Trigger aria-label={triggerAriaLabel}>
+        <SelectCustom.Value placeholder="Select">{value.name}</SelectCustom.Value>
+        <SelectCustom.ChevronIcon />
+      </SelectCustom.Trigger>
+      <SelectCustom.Content>
+        <SelectCustom.Group>
+          {options?.map(option => (
+            <SelectCustom.Item key={option.id} value={option.id} asChild>
+              <Name variant="body-3">{option.name}</Name>
+            </SelectCustom.Item>
+          ))}
+        </SelectCustom.Group>
+      </SelectCustom.Content>
+    </SelectCustom.Root>
   );
 };
 

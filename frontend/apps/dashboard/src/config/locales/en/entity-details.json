@@ -946,6 +946,8 @@
       },
       "rule-set-results": {
         "onboarding-decision": "Onboarding decision",
+        "rule-result-groups": "Rule result groups",
+        "select": "Select",
         "is-present": "Rules present",
         "is-not-present": "Rules not present",
         "fail": {

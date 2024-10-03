@@ -1,8 +1,8 @@
-import { createFontStyles } from '@onefootprint/ui';
 import { Command as CommandPrimitive } from 'cmdk';
 import { forwardRef } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
 import styled, { css } from 'styled-components';
+import { createFontStyles } from '../../../../utils/mixins';
 
 type CommandEmptyProps = ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>;
 

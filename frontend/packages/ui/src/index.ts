@@ -143,6 +143,7 @@ export {
   Stack,
   Stepper,
   SuccessCheck,
+  SelectCustom,
   Table,
   Tabs,
   Tag,
