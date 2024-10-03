@@ -22,6 +22,7 @@ use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use geoutils::Distance;
 use geoutils::Location;
+use newtypes::DecisionIntentKind;
 use newtypes::DecisionStatus;
 use newtypes::DocumentFixtureResult;
 use newtypes::OnboardingStatus;
@@ -143,7 +144,12 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     // TODO should these state transitions be handled by the ww machines?
     let (biz_wf, _, _) = Workflow::update_status_if_valid(biz_wf, conn, OnboardingStatus::Pending)?;
 
-    let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
+    let di = DecisionIntent::get_or_create_for_workflow(
+        conn,
+        &sb.id,
+        &biz_wf.id,
+        DecisionIntentKind::OnboardingKyb,
+    )?;
     let uv = Vault::get(conn, &sb.id)?;
     let vreq = VerificationRequest::create(
         conn,

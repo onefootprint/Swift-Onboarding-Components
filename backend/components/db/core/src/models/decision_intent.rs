@@ -91,36 +91,6 @@ impl DecisionIntent {
 
         Ok(new_di)
     }
-
-    #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyb", skip_all)]
-    pub fn get_or_create_onboarding_kyb(
-        conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Self> {
-        let kind = DecisionIntentKind::OnboardingKyb;
-        let new_di = NewDecisionIntent {
-            created_at: Utc::now(),
-            kind,
-            scoped_vault_id: scoped_vault_id.clone(),
-            workflow_id: None,
-        };
-
-        let existing_di = decision_intent::table
-            .filter(decision_intent::scoped_vault_id.eq(scoped_vault_id))
-            .filter(decision_intent::kind.eq(kind))
-            .first(conn.conn())
-            .optional()?;
-
-        if let Some(existing_di) = existing_di {
-            return Ok(existing_di);
-        }
-
-        let new_di = diesel::insert_into(decision_intent::table)
-            .values(new_di)
-            .get_result::<DecisionIntent>(conn.conn())?;
-
-        Ok(new_di)
-    }
 }
 
 #[cfg(test)]
