@@ -1,4 +1,5 @@
 use crate::PiiString;
+use base_62::base62;
 use derive_more::From;
 use derive_more::Into;
 use diesel::backend::Backend;
@@ -21,9 +22,9 @@ impl Fingerprint {
     /// Converts Fingerprint content to a token, so that it can be saved as a searchable DI.
     pub fn to_token(&self) -> PiiString {
         let hash = crypto::sha256(&self.0);
-        let top16 = &hash[0..16];
-        let token = crypto::base64::encode_config(top16, crypto::base64::URL_SAFE_NO_PAD);
-        PiiString::new(token)
+        let token = base62::encode(&hash);
+        let top16 = token.chars().take(16).collect();
+        PiiString::new(top16)
     }
 }
 
@@ -62,5 +63,18 @@ where
 {
     fn from_sql(bytes: DB::RawValue<'_>) -> diesel::deserialize::Result<Self> {
         Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_to_token() {
+        // Ensure that the output of to_token remains constant to avoid breaking searchability.
+        let fp = Fingerprint("foo bar".as_bytes().to_vec());
+        let token = fp.to_token();
+        assert_eq!(token.leak(), "rCcQbqZ0gP9LPnm5")
     }
 }
