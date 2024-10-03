@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { RiskSignalSeverity } from '@onefootprint/types';
 import useRiskSignals from '../../hooks/use-risk-signals';
 
 type RiskSignalsGlossaryProps = {
@@ -31,6 +32,19 @@ const RiskSignalsGlossary = ({ open, onClose }: RiskSignalsGlossaryProps) => {
     [riskSignalsQuery.data, searchTerm],
   );
 
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case RiskSignalSeverity.High:
+        return 'error';
+      case RiskSignalSeverity.Medium:
+        return 'warning';
+      case RiskSignalSeverity.Low:
+        return 'success';
+      default:
+        return 'info';
+    }
+  };
+
   return (
     <Drawer open={open} title={t('title')} onClose={onClose}>
       <Stack direction="column" paddingBottom={5}>
@@ -46,7 +60,13 @@ const RiskSignalsGlossary = ({ open, onClose }: RiskSignalsGlossaryProps) => {
         )}
         {filteredRiskSignals?.map(riskSignal => (
           <Stack key={riskSignal.reasonCode} direction="column" gap={2} paddingTop={2} paddingBottom={2}>
-            <Text variant="label-3">{riskSignal.reasonCode}</Text>
+            <Stack direction="row" gap={2} display="inline-flex" align="center">
+              <Text variant="label-3">{riskSignal.reasonCode}</Text>
+              <Text variant="label-3">⋅</Text>
+              <Text variant="label-3" color={getSeverityColor(riskSignal.severity)}>
+                {riskSignal.severity.charAt(0).toUpperCase() + riskSignal.severity.slice(1)}
+              </Text>
+            </Stack>
             <Text variant="body-3" color="tertiary">
               {riskSignal.description}
             </Text>
