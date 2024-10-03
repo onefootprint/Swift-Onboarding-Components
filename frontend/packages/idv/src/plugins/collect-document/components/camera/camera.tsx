@@ -540,7 +540,12 @@ const Camera = ({
             onPlaying={() => logInfo('video playing')}
             onCanPlayThrough={() => logInfo('video can play through')}
             onStalled={() => logInfo('video stalled')}
-            onSuspend={() => logInfo('video suspend')}
+            onSuspend={() => {
+              logInfo('video suspend');
+              mediaStream?.getTracks().forEach(track => {
+                logInfo(`Track readyState: ${track.readyState}; track id: ${track.id}`);
+              });
+            }}
             onAbort={() => logInfo('video abort')}
             onWaiting={() => logInfo('video waiting')}
             onEmptied={() => logInfo('video emptied')}

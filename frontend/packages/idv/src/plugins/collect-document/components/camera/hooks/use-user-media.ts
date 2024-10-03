@@ -48,6 +48,11 @@ const useUserMedia = ({ side = 'back', isLazy = false, onError, onSuccess }: Use
     isRunning.current = true;
     try {
       const stream = await getMediaStream(getCameraOptions(str));
+      stream.getVideoTracks().forEach(track => {
+        track.addEventListener('ended', () => {
+          logInfo(`use-user-media: video track ended. track id: ${track.id}`);
+        });
+      });
       setMediaStream(stream);
       onSuccess?.(stream);
     } catch (err) {
