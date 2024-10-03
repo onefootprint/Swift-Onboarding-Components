@@ -39,7 +39,11 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
     <Container role="row" aria-label={ariaLabel}>
       <Form.Field variant="horizontal">
         {field.showCheckbox ? (
-          <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
+          <Tooltip
+            disabled={field.canDecrypt}
+            position="right"
+            text={field.isEmpty ? t('empty-not-allowed', { field: field.label }) : t('not-allowed')}
+          >
             <Box>
               <Checkbox
                 checked={isChecked || undefined}
