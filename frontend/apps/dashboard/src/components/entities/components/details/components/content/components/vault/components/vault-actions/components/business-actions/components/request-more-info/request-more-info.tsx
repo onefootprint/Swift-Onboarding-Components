@@ -1,6 +1,6 @@
 import useEntityId from '@/entity/hooks/use-entity-id';
 import { ActionRequestKind, DocumentRequestKind, TriggerKind } from '@onefootprint/types';
-import { Dialog } from '@onefootprint/ui';
+import { Dialog, useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSubmitActions from '../../../../hooks/use-submit-actions';
@@ -19,7 +19,9 @@ const RequestMoreInfo = ({ open, onClose }: RequestMoreInfoProps) => {
   const entityId = useEntityId();
   const bosQuery = useBusinessOwners(entityId);
   const submitMutation = useSubmitActions();
+  const toast = useToast();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const action = submitMutation.data?.[0];
 
   const handleActionSubmit = (formValues: FormValues) => {
     submitMutation.mutate(
@@ -55,6 +57,16 @@ const RequestMoreInfo = ({ open, onClose }: RequestMoreInfoProps) => {
     );
   };
 
+  const handleCopyLink = () => {
+    const { link } = action || {};
+    if (!link) return;
+    navigator.clipboard.writeText(link);
+    toast.show({
+      title: t('confirmation.copied.header'),
+      description: t('confirmation.copied.description'),
+    });
+  };
+
   return showConfirmationDialog ? (
     <Dialog
       size="compact"
@@ -63,15 +75,14 @@ const RequestMoreInfo = ({ open, onClose }: RequestMoreInfoProps) => {
       title={t('confirmation.title')}
       primaryButton={{
         label: t('confirmation.copy-link'),
-        loading: submitMutation.isPending,
+        onClick: handleCopyLink,
       }}
       secondaryButton={{
         label: t('confirmation.send-via-sms'),
         onClick: onClose,
-        disabled: submitMutation.isPending,
       }}
     >
-      <Confirmation />
+      {action && <Confirmation link={action.link} expiresAt={action.expiresAt} />}
     </Dialog>
   ) : (
     <Dialog

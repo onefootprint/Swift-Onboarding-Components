@@ -15,11 +15,13 @@ const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOw
   const randomFirstNames = ['John', 'Jane', 'Michael', 'Emily', 'David', 'Sarah'];
   const lastNameLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-  return response.data.map(owner => ({
-    id: owner.id ?? `owner-${Math.random().toString(36).substr(2, 9)}`,
-    firstName: randomFirstNames[Math.floor(Math.random() * randomFirstNames.length)],
-    lastName: `${lastNameLetters[Math.floor(Math.random() * lastNameLetters.length)]}${'*'.repeat(Math.floor(Math.random() * 4) + 2)}`,
-  }));
+  return response.data
+    .filter(owner => owner.id !== undefined)
+    .map(owner => ({
+      id: owner.id || '',
+      firstName: randomFirstNames[Math.floor(Math.random() * randomFirstNames.length)],
+      lastName: `${lastNameLetters[Math.floor(Math.random() * lastNameLetters.length)]}${'*'.repeat(Math.floor(Math.random() * 4) + 2)}`,
+    }));
 };
 
 const useBusinessOwners = (id: string) => {

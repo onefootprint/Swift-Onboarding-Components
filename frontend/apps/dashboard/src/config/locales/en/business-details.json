@@ -45,9 +45,13 @@
     "confirmation": {
       "title": "Link generated!",
       "description": "Share this link with the beneficial owner. They will be asked to login and securely provide the requested information",
-      "expiration": "Link will automatically expire in {{duration}}",
+      "expiration": "Link will automatically expire in {{duration}} day(s)",
       "copy-link": "Copy link",
-      "send-via-sms": "Send via sms"
+      "send-via-sms": "Send via sms",
+      "copied": {
+        "header": "Success!",
+        "description": "Link copied to clipboard"
+      }
     }
   }
 }

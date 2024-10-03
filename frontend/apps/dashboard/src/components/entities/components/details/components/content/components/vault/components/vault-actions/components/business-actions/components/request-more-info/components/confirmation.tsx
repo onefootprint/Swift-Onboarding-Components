@@ -2,10 +2,20 @@ import { IcoClock16 } from '@onefootprint/icons';
 import { Box, Stack, Text, TextInput } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-const Confirmation = () => {
+type ConfirmationProps = {
+  link: string;
+  expiresAt: string;
+};
+
+const Confirmation = ({ link, expiresAt }: ConfirmationProps) => {
   const { t } = useTranslation('business-details', {
     keyPrefix: 'request-more-info.confirmation',
   });
+
+  const calculateExpirationDays = (expiresAt: string): number => {
+    const expiresInMs = new Date(expiresAt).getTime() - new Date().getTime();
+    return Math.round(expiresInMs / (1000 * 3600 * 24));
+  };
 
   return (
     <>
@@ -18,7 +28,7 @@ const Confirmation = () => {
       <Box marginBottom={4}>
         <TextInput
           placeholder=""
-          value="https://onefootprint.com/kDHjmdjkdsahjkDm"
+          value={link}
           size="compact"
           disabled
           sx={{
@@ -31,7 +41,7 @@ const Confirmation = () => {
       <Stack gap={2}>
         <IcoClock16 color="quaternary" />
         <Text color="quaternary" variant="caption-4">
-          {t('expiration', { duration: 3 })}
+          {t('expiration', { duration: calculateExpirationDays(expiresAt) })}
         </Text>
       </Stack>
     </>
