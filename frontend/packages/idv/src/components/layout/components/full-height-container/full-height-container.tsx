@@ -9,6 +9,7 @@ import use100vh from './hooks/use-100vh';
 type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
   variant?: FootprintVariant;
   hasBorderRadius?: boolean;
+  isSandbox?: boolean;
 };
 
 // In iPhones, with the recent changes to move the URL bar and buttons
@@ -18,20 +19,27 @@ type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
 // Apple engineers replied saying 'it is a feature, not a bug'.
 // This component resizes itself to the actual height of the screen.
 const FullHeightContainer = forwardRef<HTMLDivElement, FullHeightContainerProps>(
-  ({ variant = 'modal', id, hasBorderRadius, children }, ref) => {
+  ({ variant = 'modal', id, hasBorderRadius, children, isSandbox = false }, ref) => {
     const viewportHeight = use100vh();
     const height = viewportHeight ? `${viewportHeight}px` : '100vh';
 
     return (
-      <Container id={id} ref={ref} $hasBorderRadius={!!hasBorderRadius} height={height} data-variant={variant}>
+      <Container
+        id={id}
+        ref={ref}
+        $hasBorderRadius={!!hasBorderRadius}
+        height={height}
+        data-variant={variant}
+        $isSandbox={isSandbox}
+      >
         {children}
       </Container>
     );
   },
 );
 
-const Container = styled.div<{ $hasBorderRadius: boolean; height: string }>`
-  ${({ theme, height }) => css`
+const Container = styled.div<{ $hasBorderRadius: boolean; height: string; $isSandbox: boolean }>`
+  ${({ theme, height, $isSandbox }) => css`
     background: ${theme.components.bifrost.container.bg};
     border: ${theme.components.bifrost.container.border};
     box-shadow: ${theme.components.bifrost.container.elevation};
@@ -50,7 +58,7 @@ const Container = styled.div<{ $hasBorderRadius: boolean; height: string }>`
 
       ${media.greaterThan('md')`
         height: auto;
-        max-height: min(980px, calc(100vh - (2 * ${theme.spacing[9]})));
+        max-height: min(980px, calc(100vh - (2 * ${$isSandbox ? theme.spacing[10] : theme.spacing[9]})));
         width: ${theme.components.bifrost.container.width || '480px'};
       `}
     }

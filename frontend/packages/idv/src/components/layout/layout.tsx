@@ -21,7 +21,12 @@ export type LayoutProps = {
 
 const Layout = ({ children, variant, options = {}, isSandbox, onClose, config }: LayoutProps) => (
   <LayoutOptionsProvider options={options} onClose={onClose}>
-    <FullHeightContainer variant={variant} id={LAYOUT_CONTAINER_ID} hasBorderRadius={!!options.hasDesktopBorderRadius}>
+    <FullHeightContainer
+      variant={variant}
+      id={LAYOUT_CONTAINER_ID}
+      hasBorderRadius={!!options.hasDesktopBorderRadius}
+      isSandbox={isSandbox}
+    >
       <Content isSandbox={isSandbox} config={config}>
         {children}
       </Content>
