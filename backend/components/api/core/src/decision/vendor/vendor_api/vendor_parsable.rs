@@ -4,6 +4,7 @@ use idv::idology::expectid::response::ExpectIDResponse;
 use idv::idology::pa::response::PaResponse;
 use idv::incode::curp_validation::response::CurpValidationResponse;
 use idv::incode::doc::response::AddCustomerResponse;
+use idv::incode::doc::response::AddSelfieResponse;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
@@ -101,6 +102,11 @@ impl AsParsedResponse for AddCustomerResponse {
     fn into_parsed_response(self) -> ParsedResponse {
         ParsedResponse::IncodeApproveSession(self)
     }
+}
+
+// Incode Selfie
+impl VendorParsable for IncodeAddSelfie {
+    type ParsedType = AddSelfieResponse;
 }
 // Idology watchlist
 impl VendorParsable for IdologyPa {

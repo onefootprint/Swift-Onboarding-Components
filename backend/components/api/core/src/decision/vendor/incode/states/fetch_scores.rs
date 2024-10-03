@@ -12,6 +12,7 @@ use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::into_fp_error;
+use crate::decision::vendor::vendor_api::loaders;
 use crate::decision::vendor::verification_result::save_vreq_and_vres;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::VendorAPIError;
@@ -30,6 +31,7 @@ use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
 use db::models::incode_customer_session::IncodeCustomerSession;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::verification_request::VReqIdentifier;
 use db::models::verification_result::VerificationResult;
 use db::DbPool;
 use db::DbResult;
@@ -52,6 +54,7 @@ use newtypes::DataIdentifier;
 use newtypes::DecisionIntentKind;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentSide;
+use newtypes::IncodeAddSelfie;
 use newtypes::IncodeVerificationSessionId;
 use newtypes::PiiJsonValue;
 use newtypes::VendorAPI;
@@ -207,6 +210,35 @@ impl IncodeStateTransition for FetchScores {
             }
             .in_current_span(),
         );
+
+        // Incode suggests this might be an interesting risk signal
+        if session.kind.is_selfie() {
+            let selfie_age = loaders::load_response_for_vendor_api(
+                &ctx.state,
+                VReqIdentifier::WfId(ctx.wf_id.clone()),
+                &ctx.vault.e_private_key,
+                IncodeAddSelfie,
+            )
+            .await
+            .ok()
+            .and_then(|r| r.ok())
+            .and_then(|(resp, _)| resp.age);
+            let document_age = &ocr_response.age().ok();
+
+            if let (Some(sa), Some(da)) = (selfie_age, document_age) {
+                let diff = (da - sa as i64).abs();
+                tracing::info!(
+                    ?diff,
+                    document_age=%da,
+                    selfie_age=%sa,
+                    ivs_id=%session.id,
+                    sv_id=%&ctx.sv_id,
+                    wf_id=%&ctx.wf_id,
+                    "incode selfie age"
+                );
+            }
+        }
+
 
         let args = PreCompleteArgs {
             obc: &obc,
