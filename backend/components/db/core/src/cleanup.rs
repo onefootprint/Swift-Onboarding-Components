@@ -19,6 +19,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use db_schema::schema::audit_event;
     use db_schema::schema::billing_event;
     use db_schema::schema::business_owner;
+    use db_schema::schema::business_workflow_link;
     use db_schema::schema::contact_info;
     use db_schema::schema::data_lifetime;
     use db_schema::schema::decision_intent;
@@ -301,6 +302,14 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             let workflow_ids = workflow::table
                 .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
                 .select(workflow::id);
+
+            deleted_rows += diesel::delete(business_workflow_link::table)
+                .filter(business_workflow_link::user_workflow_id.eq_any(workflow_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(business_workflow_link::table)
+                .filter(business_workflow_link::business_workflow_id.eq_any(workflow_ids.clone()))
+                .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(workflow_event::table)
                 .filter(workflow_event::workflow_id.eq_any(workflow_ids.clone()))
