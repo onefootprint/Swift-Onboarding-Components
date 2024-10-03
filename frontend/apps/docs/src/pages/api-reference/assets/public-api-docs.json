@@ -4195,7 +4195,8 @@
                                 "incode",
                                 "stytch",
                                 "neuro_id",
-                                "samba_safety"
+                                "samba_safety",
+                                "sentilink"
                             ]
                         }
                     },
@@ -4228,7 +4229,8 @@
                                 "incode",
                                 "stytch",
                                 "neuro_id",
-                                "samba_safety"
+                                "samba_safety",
+                                "sentilink"
                             ]
                         }
                     },
@@ -4296,7 +4298,8 @@
                                 "incode",
                                 "stytch",
                                 "neuro_id",
-                                "samba_safety"
+                                "samba_safety",
+                                "sentilink"
                             ]
                         }
                     },
@@ -6026,6 +6029,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -6431,6 +6437,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -6836,6 +6845,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -7241,6 +7253,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -7646,6 +7661,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -8051,6 +8069,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -8456,6 +8477,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -8861,6 +8885,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -9266,6 +9293,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -9671,6 +9701,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -10076,6 +10109,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -10481,6 +10517,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -10886,6 +10925,9 @@
                                                 "email_high_risk_tumbled",
                                                 "email_high_risk_disposable",
                                                 "email_high_risk_domain",
+                                                "synthetic_identity_high_risk",
+                                                "synthetic_identity_medium_risk",
+                                                "synthetic_identity_low_risk",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
                                                 "phone_number_is_voip",
@@ -12173,16 +12215,13 @@
                                         "card_number_cvc"
                                     ]
                                 },
-                                "labels": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string",
-                                        "enum": [
-                                            "active",
-                                            "offboard_fraud",
-                                            "offboard_other"
-                                        ]
-                                    }
+                                "label": {
+                                    "type": "string",
+                                    "enum": [
+                                        "active",
+                                        "offboard_fraud",
+                                        "offboard_other"
+                                    ]
                                 },
                                 "tags": {
                                     "type": "array",
@@ -12194,7 +12233,6 @@
                             "required": [
                                 "fp_id",
                                 "kind",
-                                "labels",
                                 "tags"
                             ]
                         }
@@ -12476,6 +12514,9 @@
                             "email_high_risk_tumbled",
                             "email_high_risk_disposable",
                             "email_high_risk_domain",
+                            "synthetic_identity_high_risk",
+                            "synthetic_identity_medium_risk",
+                            "synthetic_identity_low_risk",
                             "phone_number_input_invalid",
                             "phone_number_located_is_voip",
                             "phone_number_is_voip",
@@ -12896,6 +12937,9 @@
                             "email_high_risk_tumbled",
                             "email_high_risk_disposable",
                             "email_high_risk_domain",
+                            "synthetic_identity_high_risk",
+                            "synthetic_identity_medium_risk",
+                            "synthetic_identity_low_risk",
                             "phone_number_input_invalid",
                             "phone_number_located_is_voip",
                             "phone_number_is_voip",

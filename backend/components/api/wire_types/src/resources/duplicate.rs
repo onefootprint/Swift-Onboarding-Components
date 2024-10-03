@@ -8,7 +8,7 @@ use serde::Serialize;
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicDuplicateFingerprint {
     pub fp_id: FpId,
-    pub labels: Vec<LabelKind>,
+    pub label: Option<LabelKind>,
     pub tags: Vec<TagKind>,
     pub kind: DupeKind,
 }

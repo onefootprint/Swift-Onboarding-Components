@@ -63,10 +63,10 @@ pub async fn get(
         .map(|scoped_vault| (scoped_vault.id.clone(), scoped_vault.fp_id.clone()))
         .collect();
 
-    let sv_id_to_label: HashMap<ScopedVaultId, Vec<LabelKind>> = labels
+    let sv_id_to_label: HashMap<ScopedVaultId, LabelKind> = labels
         .into_iter()
         .map(|label| (label.scoped_vault_id.clone(), label.kind))
-        .into_group_map();
+        .collect();
 
     let sv_id_to_tag: HashMap<ScopedVaultId, Vec<TagKind>> = tags
         .into_iter()
@@ -81,10 +81,7 @@ pub async fn get(
                 .cloned()
                 .unwrap_or_default();
 
-            let labels = sv_id_to_label
-                .get(&fingerprint.scoped_vault_id)
-                .cloned()
-                .unwrap_or_default();
+            let label = sv_id_to_label.get(&fingerprint.scoped_vault_id).cloned();
 
             let fp_id = sv_id_to_fp_id
                 .get(&fingerprint.scoped_vault_id)
@@ -94,7 +91,7 @@ pub async fn get(
             match DupeKind::try_from(fingerprint.kind) {
                 Ok(kind) => Some(PublicDuplicateFingerprint {
                     fp_id: fp_id.clone(),
-                    labels,
+                    label,
                     tags,
                     kind,
                 }),
