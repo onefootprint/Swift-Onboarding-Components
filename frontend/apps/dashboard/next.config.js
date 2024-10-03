@@ -113,6 +113,10 @@ const getNextConfig = () => {
         },
         {
           protocol: 'https',
+          hostname: '*.i-dev.onefp.net',
+        },
+        {
+          protocol: 'https',
           hostname: 'i.onefp.net',
         },
         {
