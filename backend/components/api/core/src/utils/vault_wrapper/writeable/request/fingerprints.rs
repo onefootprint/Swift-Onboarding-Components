@@ -106,7 +106,7 @@ impl ValidatedFingerprints {
         //
         let sh_data_fingerprints = new_vd
             .iter()
-            .filter(|vd| vd.kind.is_fingerprintable())
+            .filter(|vd| !vd.kind.store_plaintext() && vd.kind.is_fingerprintable())
             .flat_map(|vd| {
                 let fps = fps
                     .iter()
