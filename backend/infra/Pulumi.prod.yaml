@@ -157,11 +157,11 @@ config:
       fromEmail: verify@noreply.onefootprint.com
     sentilink:
       authPassword:
-        secure: v1:UIVHA0OMuVdAWW9h:3OegtLPZn5UOQ/nPdKTn//YRCbmnPjoEpkJKU2X+8lFzNd4rtGsiIu+vUQbqQ0Hi
+        secure: v1:dkZsyUf+Bmjt3zZ3:3KELdcpa4uMMIS2xwuJ1OpGmEci7D+LRW7nUvj7veWz60wu2XE36oMRujoocve45
       authUsername:
-        secure: v1:z7Oq6w2O3ZXAnoaw:p/U+JrVXZv/kHigcxT4gc+w7GV2KTc77/YaenM6znyJHBmjiBnswd2Ee
+        secure: v1:exFU4iixk55+ruCe:pgO+Jfk4qXilQMQwHNcVWnKOVHMufYtOJiMmRemrXz1Jn23ZEPbBoadS
       baseUrl:
-        secure: v1:1XRZ/Jmx/viRqBte:rbvfUHm8LM13Xx1fhdj9UOB2kqmklrEtUabMU3WuKBcxjFXwd5XJdeK795UkwHdHfw==
+        secure: v1:s14My9ppoWxAM/5X:rxHe2VQpjXEboaPfqcs5TD+bDkdweToJguHCiUG+ISlnju510+qkD7DV1smWac+gWPfkRGSP3J4=
     socure:
       certificationApiKey:
         secure: v1:hu3JSlQDBxn2W+wI:kawQei7qPaCswzA51+1I4VNbr273Wqs1OSNpH1iLAYuLtMhfTRNDHdgvGoo9SsoaR3z6Yg==
