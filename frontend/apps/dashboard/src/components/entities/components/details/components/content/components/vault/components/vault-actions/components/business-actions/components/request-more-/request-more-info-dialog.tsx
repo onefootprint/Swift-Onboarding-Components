@@ -1,5 +1,8 @@
+import useEntityId from '@/entity/hooks/use-entity-id';
 import { Dialog } from '@onefootprint/ui';
+
 import Form from './components/request-more-info-form';
+import useBusinessOwners from './hooks/use-business-owners';
 
 export type RequestMoreInfoDialogProps = {
   open: boolean;
@@ -7,6 +10,9 @@ export type RequestMoreInfoDialogProps = {
 };
 
 const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) => {
+  const entityId = useEntityId();
+  const bosQuery = useBusinessOwners(entityId);
+
   const handleSubmit = () => {
     console.log('submit');
   };
@@ -27,7 +33,7 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
         onClick: onClose,
       }}
     >
-      <Form onSubmit={handleSubmit} />
+      <Form onSubmit={handleSubmit} businessOwners={bosQuery.data ?? []} />
     </Dialog>
   );
 };

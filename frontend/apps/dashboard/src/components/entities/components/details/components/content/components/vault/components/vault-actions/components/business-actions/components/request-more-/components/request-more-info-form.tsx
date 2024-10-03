@@ -3,7 +3,16 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormValues } from '../request-more-info.types';
 
-const RequestMoreInfoForm = ({ onSubmit }: { onSubmit: (data: FormValues) => void }) => {
+type RequestMoreInfoFormProps = {
+  onSubmit: (data: FormValues) => void;
+  businessOwners: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  }[];
+};
+
+const RequestMoreInfoForm = ({ onSubmit, businessOwners }: RequestMoreInfoFormProps) => {
   const { t } = useTranslation('business-details', { keyPrefix: 'header.request-more-info' });
   const {
     register,
@@ -29,9 +38,11 @@ const RequestMoreInfoForm = ({ onSubmit }: { onSubmit: (data: FormValues) => voi
       <Form.Field>
         <Form.Label>{t('beneficial-owner.label')}</Form.Label>
         <Form.Select size="compact" {...register('beneficialOwner', { required: true })}>
-          <option value="">{t('beneficial-owner.placeholder')}</option>
-          <option value="john">John Lorem</option>
-          <option value="jane">Jane Lorem</option>
+          {businessOwners.map(owner => (
+            <option key={owner.id} value={owner.id}>
+              {owner.firstName} {owner.lastName}
+            </option>
+          ))}
         </Form.Select>
         <Form.Errors>{errors.beneficialOwner?.message}</Form.Errors>
       </Form.Field>
