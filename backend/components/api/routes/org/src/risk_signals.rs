@@ -19,6 +19,7 @@ pub fn get(
 
     let response = FootprintReasonCode::iter()
         .filter(|frc| !frc.to_be_deprecated())
+        .filter(|frc| !frc.in_preview())
         .filter(|frc| !matches!(frc, FootprintReasonCode::Other(_)))
         .map(|frc| PublicRiskSignalDescription {
             reason_code: frc.clone(),

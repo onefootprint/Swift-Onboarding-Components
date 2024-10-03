@@ -1584,6 +1584,15 @@ impl FootprintReasonCode {
         // This risk signal is raised properly even in sandbox mode, so don't use it for fixture data
         !matches!(self, Self::BeneficialOwnerFailedKyc)
     }
+
+    pub fn in_preview(&self) -> bool {
+        matches!(
+            self,
+            Self::SyntheticIdentityHighRisk
+                | Self::SyntheticIdentityMediumRisk
+                | Self::SyntheticIdentityLowRisk
+        )
+    }
 }
 
 impl FootprintReasonCode {
