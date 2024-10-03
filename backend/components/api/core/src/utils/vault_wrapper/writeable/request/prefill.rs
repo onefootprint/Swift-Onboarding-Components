@@ -19,6 +19,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::VaultKind;
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 /// Precomputed portable data from the user-scoped vault that we will use to prefill data for a new
@@ -186,7 +187,7 @@ impl<Type> VaultWrapper<Type> {
             .enclave_client
             .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
             .await?;
-        let fingerprints = Fingerprints::new(fingerprints, vec![]);
+        let fingerprints = Fingerprints::new(fingerprints, vec![], HashMap::new());
 
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
         // data that we will be prefilling.

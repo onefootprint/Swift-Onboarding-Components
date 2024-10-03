@@ -36,24 +36,13 @@ impl Fingerprints {
     pub(super) fn new(
         fps: Vec<(FingerprintSalt, Fingerprint)>,
         composite_fps: Vec<(CompositeFingerprint, Fingerprint)>,
+        salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
     ) -> Self {
-        let salt_to_dl_id = HashMap::new();
         Self {
             fps,
             composite_fps,
             salt_to_dl_id,
         }
-    }
-
-    pub(super) fn extend(
-        &mut self,
-        fps: Vec<(FingerprintSalt, Fingerprint)>,
-        composite_fps: Vec<(CompositeFingerprint, Fingerprint)>,
-        salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
-    ) {
-        self.fps.extend(fps);
-        self.composite_fps.extend(composite_fps);
-        self.salt_to_dl_id.extend(salt_to_dl_id);
     }
 
     pub(super) fn validate<Type>(self, vw: &WriteableVw<Type>) -> FpResult<ValidatedFingerprints> {

@@ -44,63 +44,35 @@ impl FingerprintedDataRequest {
             .db_pool
             .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sv_id))
             .await?;
+
         let t_id = &vw.scoped_vault.tenant_id;
-        let mut res = Self::build_for_new_user(state, data, t_id).await?;
+        let DataRequest {
+            mut data,
+            json_fields,
+        } = data;
 
-        // If we're only updating some of the DIs that makes up a composite fingerprint, generate
-        // fingerprints from the existing data in the vault for all other DIs that make up the
-        // composite fingerprint
-        let new_dis = res.data.keys().collect_vec();
-        let needed_fps = CompositeFingerprint::list(t_id, &new_dis)
-            .into_iter()
-            .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &new_dis))
-            .flat_map(|cfp| cfp.salts())
-            .map(|pfpk| pfpk.di())
-            .unique()
-            .collect_vec();
-
-        let data_to_fp = needed_fps
+        let request_fingerprints = Self::generate_request_fingerprints(state, &data, t_id).await?;
+        let (vault_fingerprints, salt_to_dl_id) =
+            Self::generate_vault_fingerprints(state, &vw, &data, t_id).await?;
+        let fingerprints = request_fingerprints
             .iter()
-            .filter(|di| !new_dis.contains(di))
-            .flat_map(|di| vw.data(di))
-            .filter_map(|d| d.data.vd())
-            // Add verified phone number here?
-            .flat_map(|d| {
-                let fps = d.kind.get_fingerprint_payload(&d.e_data, Some(t_id));
-                // Attach a Key to each fingerprint payload that includes the lifetime ID and salt
-                fps.into_iter().map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
-            })
-            .collect_vec();
-
-        let fingerprints = state
-            .enclave_client
-            .batch_fingerprint_sealed(&vw.vault.e_private_key, data_to_fp)
-            .await?;
-
-        let (addl_fingerprints, salt_to_dl_id): (
-            Vec<(FingerprintSalt, Fingerprint)>,
-            HashMap<FingerprintSalt, DataLifetimeId>,
-        ) = fingerprints
-            .clone()
-            .into_iter()
-            .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
-            .unzip();
-
-        let fingerprints: HashMap<_, _> = res
-            .fingerprints
-            .iter()
-            .chain(addl_fingerprints.iter())
+            .chain(vault_fingerprints.iter())
             .cloned()
-            .collect();
+            .collect_vec();
+
+        let fp_salt_to_fp: HashMap<_, _> = fingerprints.iter().cloned().collect();
+        let new_dis = data.keys().collect_vec();
 
         let (composite_fingerprints, addl_dis) =
-            Self::generate_composite_fingerprints(&fingerprints, &vw.populated_dis(), &new_dis, t_id)?;
+            Self::generate_composite_fingerprints(&fp_salt_to_fp, &vw.populated_dis(), &new_dis, t_id)?;
 
-        res.fingerprints
-            .extend(vec![], composite_fingerprints.clone(), salt_to_dl_id);
-
-        res.data.extend(addl_dis);
-        Ok(res)
+        data.extend(addl_dis);
+        let request = Self {
+            data,
+            json_fields,
+            fingerprints: Fingerprints::new(fingerprints, composite_fingerprints, salt_to_dl_id),
+        };
+        Ok(request)
     }
 
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
@@ -117,6 +89,27 @@ impl FingerprintedDataRequest {
             mut data,
             json_fields,
         } = data;
+        let new_dis = data.keys().collect_vec();
+        let fingerprints = Self::generate_request_fingerprints(state, &data, tenant_id).await?;
+        let salt_to_fp: HashMap<_, _> = fingerprints.iter().cloned().collect();
+
+        let (composite_fingerprints, addl_dis) =
+            Self::generate_composite_fingerprints(&salt_to_fp, &[], &new_dis, tenant_id)?;
+
+        data.extend(addl_dis);
+        let request = Self {
+            data,
+            json_fields,
+            fingerprints: Fingerprints::new(fingerprints, composite_fingerprints, HashMap::new()),
+        };
+        Ok(request)
+    }
+
+    async fn generate_request_fingerprints(
+        state: &State,
+        data: &HashMap<DataIdentifier, PiiString>,
+        tenant_id: &TenantId,
+    ) -> FpResult<Vec<(FingerprintSalt, Fingerprint)>> {
         let data_to_fingerprint: Vec<_> = data
             .iter()
             .flat_map(|(di, pii)| di.get_fingerprint_payload(pii, Some(tenant_id)))
@@ -127,19 +120,58 @@ impl FingerprintedDataRequest {
             .batch_fingerprint(data_to_fingerprint)
             .await?;
 
-        let salt_to_fp: HashMap<_, _> = fingerprints.iter().cloned().collect();
+        Ok(fingerprints)
+    }
+
+    async fn generate_vault_fingerprints(
+        state: &State,
+        vault_wrapper: &VaultWrapper,
+        data: &HashMap<DataIdentifier, PiiString>,
+        tenant_id: &TenantId,
+    ) -> FpResult<(
+        Vec<(FingerprintSalt, Fingerprint)>,
+        HashMap<FingerprintSalt, DataLifetimeId>,
+    )> {
+        // If we're only updating some of the DIs that makes up a composite fingerprint, generate
+        // fingerprints from the existing data in the vault for all other DIs that make up the
+        // composite fingerprint
         let new_dis = data.keys().collect_vec();
+        let needed_fps = CompositeFingerprint::list(tenant_id, &new_dis)
+            .into_iter()
+            .filter(|cfp| cfp.should_generate(&vault_wrapper.populated_dis(), &new_dis))
+            .flat_map(|cfp| cfp.salts())
+            .map(|pfpk| pfpk.di())
+            .unique()
+            .collect_vec();
 
-        let (composite_fingerprints, addl_dis) =
-            Self::generate_composite_fingerprints(&salt_to_fp, &[], &new_dis, tenant_id)?;
+        let data_to_fp = needed_fps
+            .iter()
+            .filter(|di| !new_dis.contains(di))
+            .flat_map(|di| vault_wrapper.data(di))
+            .filter_map(|d| d.data.vd())
+            // Add verified phone number here?
+            .flat_map(|d| {
+                let fps = d.kind.get_fingerprint_payload(&d.e_data, Some(tenant_id));
+                // Attach a Key to each fingerprint payload that includes the lifetime ID and salt
+                fps.into_iter().map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
+            })
+            .collect_vec();
 
-        data.extend(addl_dis);
-        let request = Self {
-            data,
-            json_fields,
-            fingerprints: Fingerprints::new(fingerprints, composite_fingerprints),
-        };
-        Ok(request)
+        let fingerprints = state
+            .enclave_client
+            .batch_fingerprint_sealed(&vault_wrapper.vault.e_private_key, data_to_fp)
+            .await?;
+
+        let (addl_fingerprints, salt_to_dl_id): (
+            Vec<(FingerprintSalt, Fingerprint)>,
+            HashMap<FingerprintSalt, DataLifetimeId>,
+        ) = fingerprints
+            .clone()
+            .into_iter()
+            .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
+            .unzip();
+
+        Ok((addl_fingerprints, salt_to_dl_id))
     }
 
     fn generate_composite_fingerprints(
@@ -193,7 +225,7 @@ impl FingerprintedDataRequest {
         Self {
             data: data.data,
             json_fields: data.json_fields,
-            fingerprints: Fingerprints::new(fingerprints, vec![]),
+            fingerprints: Fingerprints::new(fingerprints, vec![], HashMap::new()),
         }
     }
 
@@ -203,7 +235,7 @@ impl FingerprintedDataRequest {
         Self {
             data: data.data,
             json_fields: data.json_fields,
-            fingerprints: Fingerprints::new(vec![], vec![]),
+            fingerprints: Fingerprints::new(vec![], vec![], HashMap::new()),
         }
     }
 }
