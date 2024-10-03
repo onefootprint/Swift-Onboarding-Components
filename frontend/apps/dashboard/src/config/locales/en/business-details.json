@@ -1,43 +1,46 @@
 {
   "page-title": "Footprint | Business",
-  "header": {
-    "actions": {
-      "trigger": "Open actions menu",
-      "edit": "Edit business information",
-      "request-info": "Request more information"
+  "actions": {
+    "trigger": "Open actions menu",
+    "edit": "Edit business information",
+    "request-info": "Request more information"
+  },
+  "request-more-info": {
+    "intro-text": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document.",
+    "beneficial-owner": {
+      "label": "Beneficial owner",
+      "placeholder": "Select a beneficial owner"
     },
-    "request-more-info": {
-      "intro-text": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document.",
-      "beneficial-owner": {
-        "label": "Beneficial owner",
-        "placeholder": "Select a beneficial owner"
+    "document": {
+      "name": {
+        "label": "Document name",
+        "placeholder": "Enter document name",
+        "tooltip": "Specify a clear name for the document to help users understand what kind of document to upload.",
+        "error": "Document name is required"
       },
-      "document": {
-        "name": {
-          "label": "Document name",
-          "placeholder": "Enter document name",
-          "tooltip": "Specify a clear name for the document to help users understand what kind of document to upload.",
-          "error": "Document name is required"
-        },
-        "identifier": {
-          "label": "Identifier",
-          "tooltip": "Use this string to retrieve the document from the vault.",
-          "prefix": "document.custom.",
-          "error": {
-            "required": "Document identifier is required",
-            "invalid": "Identifier can only contain letters, numbers, underscores, and hyphens"
-          }
-        },
-        "description": {
-          "label": "Description (optional)"
+      "identifier": {
+        "label": "Identifier",
+        "tooltip": "Use this string to retrieve the document from the vault.",
+        "prefix": "document.custom.",
+        "error": {
+          "required": "Document identifier is required",
+          "invalid": "Identifier can only contain letters, numbers, underscores, and hyphens"
         }
       },
-      "add": "Add another",
-      "remove": "Remove",
-      "note": {
-        "label": "Note for the beneficial owner (optional)",
-        "placeholder": "We'd need you to check if there's a typo in the address information you provided..."
+      "description": {
+        "label": "Description (optional)"
       }
+    },
+    "add": "Add another",
+    "remove": "Remove",
+    "note": {
+      "label": "Note for the beneficial owner (optional)",
+      "placeholder": "We'd need you to check if there's a typo in the address information you provided..."
+    },
+    "confirmation": {
+      "title": "Link generated!",
+      "description": "Share this link with the beneficial owner. They will be asked to login and securely provide the requested information",
+      "expiration": "Link will automatically expire in {{duration}}"
     }
   }
 }

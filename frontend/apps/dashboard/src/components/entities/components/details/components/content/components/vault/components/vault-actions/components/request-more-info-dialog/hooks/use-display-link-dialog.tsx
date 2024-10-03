@@ -2,8 +2,8 @@ import type { TriggerResponse } from '@onefootprint/types';
 import { IdDI, TokenKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useEntity from 'src/components/entities/components/details/hooks/use-entity';
 
+import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useSendTokenLinkMutation from '../../../hooks/use-send-token-link';

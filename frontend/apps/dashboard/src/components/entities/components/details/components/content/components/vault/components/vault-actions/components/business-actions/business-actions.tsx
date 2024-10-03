@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import usePermissions from 'src/hooks/use-permissions';
 import EditVaultDrawer from '../edit-vault-drawer';
-import RequestMoreInfoDialog from './components/request-more-';
+import RequestMoreInfo from './components/request-more-info';
 
 enum ActionDialog {
   RequestMoreInfo = 'request-more-info',
@@ -20,7 +20,7 @@ const DROPDOWN_ITEM_HEIGHT = '32px';
 const IS_REQUEST_MORE_INFO_ENABLED = IS_DEV;
 
 const BusinessActions = () => {
-  const { t } = useTranslation('business-details', { keyPrefix: 'header.actions' });
+  const { t } = useTranslation('business-details', { keyPrefix: 'actions' });
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { hasPermission } = usePermissions();
@@ -65,7 +65,7 @@ const BusinessActions = () => {
         </Dropdown.Portal>
       </Dropdown.Root>
       <EditVaultDrawer open={openDialog === ActionDialog.EditVault} onClose={handleCloseDialog} />
-      <RequestMoreInfoDialog open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
+      <RequestMoreInfo open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
     </>
   );
 };

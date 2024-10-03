@@ -14,7 +14,7 @@ type RequestMoreInfoFormProps = {
 };
 
 const RequestMoreInfoForm = ({ onSubmit, businessOwners }: RequestMoreInfoFormProps) => {
-  const { t } = useTranslation('business-details', { keyPrefix: 'header.request-more-info' });
+  const { t } = useTranslation('business-details', { keyPrefix: 'request-more-info' });
   const {
     register,
     control,
