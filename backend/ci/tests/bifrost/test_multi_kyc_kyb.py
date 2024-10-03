@@ -23,7 +23,9 @@ MULTI_KYC_KYB_CDOS = [
 @pytest.fixture(scope="session")
 def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data):
     cdos = must_collect_data + MULTI_KYC_KYB_CDOS
-    return create_ob_config(sandbox_tenant, "Multi-KYC KYB config", cdos, kind="kyb")
+    return create_ob_config(
+        sandbox_tenant, "Multi-KYC KYB config", cdos, kind="kyb", allow_reonboard=True
+    )
 
 
 @pytest.mark.flaky
@@ -297,6 +299,90 @@ def test_kyb_fail_kyc(
         i for i in body if i["reason_code"] == "beneficial_owner_failed_kyc"
     ]
     assert len(bo_failed_rses) == 1
+
+
+def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
+    """
+    Test that the KYC results used to decide whether BOs passed KYC all come from the same business workflow.
+    """
+    # First, fail the user when onboarding onto this playbook
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        fixture_result="fail",
+        kyb_fixture_result="use_rules_outcome",
+    )
+    primary_bo = bifrost.run()
+    assert primary_bo.client.validate_response["user"]["status"] == "fail"
+    assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
+
+    # Extract the secondary BO token, but don't use it yet
+    secondary_bo_token = extract_bo_token(bifrost)
+
+    # Then, onboard the same user onto the same playbook and pass them this time. This creates a new business.
+    bifrost = BifrostClient.inherit_user(
+        kyb_sandbox_ob_config, sandbox_id=bifrost.sandbox_id, fixture_result="pass"
+    )
+    primary_bo2 = bifrost.run()
+    assert primary_bo2.client.validate_response["user"]["status"] == "pass"
+    assert primary_bo2.fp_bid != primary_bo.fp_bid
+
+    # Make sure the initial business is still incomplete
+    body = get(f"entities/{primary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "in_progress"
+
+    # Then, onboard the secondary BO from the first business. It should fail since the primary BO failed KYC
+    # when onboarding this business.
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result="pass",
+    )
+    secondary_bo = bifrost.run()
+    assert secondary_bo.client.validate_response["user"]["status"] == "pass"
+    assert secondary_bo.client.validate_response["business"]["status"] == "fail"
+
+    # Make sure the second business that was created is still incomplete + unaffected
+    body = get(f"entities/{primary_bo2.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "in_progress"
+
+    # Ensure the failure is from the primary BO failing KYC
+    body = get(
+        f"entities/{secondary_bo.fp_bid}/risk_signals", None, sandbox_tenant.s_sk
+    )
+    assert any(i["reason_code"] == "beneficial_owner_failed_kyc" for i in body)
+
+
+def test_dont_proceed_on_nonterminal(kyb_sandbox_ob_config, sandbox_tenant):
+    """Make sure we don't allow finishing KYB when one BO is in step up"""
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        fixture_result="fail",
+        kyb_fixture_result="use_rules_outcome",
+    )
+    primary_bo = bifrost.run()
+    assert primary_bo.client.validate_response["user"]["status"] == "fail"
+    assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
+
+    secondary_bo_token = extract_bo_token(bifrost)
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result="step_up",
+    )
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
+    bifrost.handle_one_requirement("process")
+    assert not bifrost.get_requirement("collect_document")["is_met"]
+    # This should leave the user in step-up
+    body = get("hosted/user/private/token", None, bifrost.auth_token)
+    secondary_fp_id = body["fp_id"]
+
+    # Make sure the user is still incomplete, and so the business is also still incomplete
+    body = get(f"entities/{secondary_fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "in_progress"
+
+    body = get(f"entities/{primary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "in_progress"
 
 
 def extract_bo_session_sms(twilio, phone_number, business_name):

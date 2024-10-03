@@ -1,6 +1,7 @@
 use super::vault_wrapper::BusinessOwnerInfo;
 use crate::auth::session::onboarding::BoSession;
 use crate::config::LinkKind;
+use crate::decision::biz_risk::get_bo_obds;
 use crate::decision::state::Authorize;
 use crate::decision::state::BoKycCompleted;
 use crate::decision::state::DocCollected;
@@ -15,7 +16,6 @@ use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
@@ -91,9 +91,9 @@ pub async fn send_missing_secondary_bo_links(
     biz_wf: &Workflow,
     bvw: &TenantVw<Business>,
     tenant: &Tenant,
-    dbos: &[BusinessOwnerInfo],
 ) -> FpResult<()> {
-    let tokens = generate_secondary_bo_links(state, biz_wf, dbos).await?;
+    let dbos = bvw.decrypt_business_owners(state).await?;
+    let tokens = generate_secondary_bo_links(state, biz_wf, &dbos).await?;
     // Generate a link for each business owner
     let primary_bo = dbos
         .iter()
@@ -159,22 +159,6 @@ pub async fn send_missing_secondary_bo_links(
     Ok(())
 }
 
-async fn is_waiting_for_bo_kyc(dbo: &[BusinessOwnerInfo], obc: &ObConfiguration) -> FpResult<bool> {
-    if obc.verification_checks().skip_kyc() {
-        // Safe to proceed, don't need to wait for any BOs
-        return Ok(false);
-    }
-
-    // TODO: consolidate this with kyb state machine logic, we should check if there's a complete WF
-    // for the obc_id https://linear.app/footprint/issue/BE-513/consolidate-logic-for-bo-is-done-with-kyc
-    // Or TODO: consolidate this to read BusinessWorkflowLink in the future
-    let all_bos_complete = dbo
-        .iter()
-        .filter(|bo| bo.linked_bo.is_some())
-        .all(|bo| bo.scoped_user.as_ref().is_some_and(|su| su.status.is_terminal()));
-    Ok(!all_bos_complete)
-}
-
 #[tracing::instrument(skip(state))]
 pub async fn progress_business_workflow(
     state: &State,
@@ -207,25 +191,29 @@ pub async fn progress_business_workflow(
             .map_err(|err| tracing::error!(?err, ?biz_wf.kind, "Error running business workflow"));
     }
 
-    // Refresh the wf since it may have changed above
-    let (biz_wf, bvw, obc) = state
+    // Trigger BoKycCompleted to the workflow if it needs
+
+    if !matches!(biz_wf.kind, WorkflowKind::Kyb) {
+        return Ok(());
+    }
+
+    let (biz_wf, bvw) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
+            // Refresh the wf since it may have changed above
             let biz_wf = Workflow::get(conn, &wf_id)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
-            let (obc, _) = ObConfiguration::get(conn, &biz_wf.ob_configuration_id)?;
-            Ok((biz_wf, bvw, obc))
+            Ok((biz_wf, bvw))
         })
         .await?;
 
-    let dbo = bvw.decrypt_business_owners(state).await?;
-    let is_waiting_for_bo_kyc = is_waiting_for_bo_kyc(&dbo, &obc).await?;
+    let obds = get_bo_obds(state, &biz_wf.id).await?;
+
+    let is_waiting_for_bo_kyc = obds.is_not_ready();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
 
     if is_waiting_for_bo_kyc {
-        send_missing_secondary_bo_links(state, &biz_wf, &bvw, tenant, &dbo).await?;
-        return Ok(());
-    } else if !matches!(biz_wf.kind, WorkflowKind::Kyb) {
+        send_missing_secondary_bo_links(state, &biz_wf, &bvw, tenant).await?;
         return Ok(());
     }
 

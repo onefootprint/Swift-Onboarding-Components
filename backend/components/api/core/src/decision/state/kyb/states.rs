@@ -5,6 +5,7 @@ use super::KybDataCollection;
 use super::KybDecisioning;
 use super::KybState;
 use super::KybVendorCalls;
+use crate::decision::biz_risk::BoOnboardingResult;
 use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::rule_engine::engine::VaultDataForRules;
@@ -140,7 +141,7 @@ impl KybAwaitingBoKyc {
 
 #[async_trait]
 impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
-    type AsyncRes = Vec<OnboardingDecision>;
+    type AsyncRes = Vec<(DbWorkflow, OnboardingDecision)>;
 
     #[tracing::instrument(
         "KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::execute_async_idempotent_actions",
@@ -151,7 +152,10 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         _action: BoKycCompleted,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
-        let bo_obds = decision::biz_risk::get_bo_obds(state, &self.wf_id).await?;
+        let bo_obds = match decision::biz_risk::get_bo_obds(state, &self.wf_id).await? {
+            BoOnboardingResult::Ready(bo_obds) => bo_obds,
+            BoOnboardingResult::NotReady(err) => return Err(err),
+        };
         Ok(bo_obds)
     }
 
@@ -173,28 +177,19 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         };
         let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
 
-        if bo_obds.iter().any(|o| o.status == DecisionStatus::Fail) {
+        if let Some((wf, _)) = bo_obds.iter().find(|(_, obd)| obd.status == DecisionStatus::Fail) {
             // Add risk signal for BO failing KYC
             // TODO: one of these days we need to drop the non-null vres constraint
-            if let Some(bo_risk_signal) = bo_obds
-                .first()
-                .and_then(|obd| DbWorkflow::get(conn, &obd.workflow_id).ok())
-                .and_then(|wf| {
-                    // take latest for BO
-                    // TODO: fetch by wf_id once this is backfilled
-                    RiskSignal::latest_by_risk_signal_group_kind(
-                        conn,
-                        &wf.scoped_vault_id,
-                        RiskSignalGroupKind::Kyc,
-                    )
-                    .ok()
-                })
-                .and_then(|mut rs| rs.pop())
-            {
+            let rses = RiskSignal::latest_by_risk_signal_group_kind(
+                conn,
+                &wf.scoped_vault_id,
+                RiskSignalGroupKind::Kyc,
+            )?;
+            if let Some(rs) = rses.into_iter().next() {
                 let bo_rs = (
                     FootprintReasonCode::BeneficialOwnerFailedKyc,
-                    bo_risk_signal.vendor_api,
-                    bo_risk_signal.verification_result_id.clone(),
+                    rs.vendor_api,
+                    rs.verification_result_id,
                 );
 
                 RiskSignal::bulk_add(conn, vec![bo_rs], false, rsg.id)?;

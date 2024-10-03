@@ -5,7 +5,6 @@ use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
-use newtypes::WorkflowId;
 use std::fmt::Display;
 use thiserror::Error;
 
@@ -39,8 +38,6 @@ pub enum OnboardingError {
     BusinessOwnersNotSet,
     #[error("Expected BO to have an Onboarding but it was not found")]
     MissingBoOnboarding,
-    #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
-    MissingBoOnboardingDecision(Csv<WorkflowId>),
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,
     #[error("Unsupported document country. Supported document countries: {0}")]

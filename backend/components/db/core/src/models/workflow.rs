@@ -2,7 +2,6 @@ use super::fingerprint::Fingerprint;
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReviewDelta;
 use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
 use super::scoped_vault::ScopedVaultUpdate;
 use super::scoped_vault::SvStatusDelta;
@@ -27,7 +26,6 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::AlpacaKycState;
 use newtypes::ApiKeyStatus;
-use newtypes::DbActor;
 use newtypes::DocumentConfig;
 use newtypes::DocumentState;
 use newtypes::Fingerprint as FingerprintData;
@@ -423,29 +421,6 @@ impl Workflow {
             .into_iter()
             .map(|w| (w.id.clone(), w))
             .collect();
-
-        Ok(res)
-    }
-
-    #[tracing::instrument("Workflow::get_with_fp_decision", skip_all)]
-    pub fn get_with_fp_decision(
-        conn: &mut PgConn,
-        sv_ids: Vec<ScopedVaultId>,
-        obc_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(Self, Option<OnboardingDecision>)>> {
-        use db_schema::schema::onboarding_decision;
-        let res = workflow::table
-            .filter(workflow::scoped_vault_id.eq_any(&sv_ids))
-            .filter(workflow::deactivated_at.is_null())
-            .filter(workflow::ob_configuration_id.eq(obc_id))
-            .left_join(
-                onboarding_decision::table.on(onboarding_decision::workflow_id
-                    .eq(workflow::id)
-                    // Grab the Footprint decision even if it's deactivated. We only use the Footprint
-                    // decision of user workflows to determine the business's workflow status
-                    .and(onboarding_decision::actor.eq(DbActor::Footprint))),
-            )
-            .get_results(conn)?;
 
         Ok(res)
     }
