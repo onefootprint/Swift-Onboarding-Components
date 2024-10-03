@@ -32,6 +32,7 @@ const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) 
       onDone: onClose,
     });
   };
+
   const handleCopyLink = () => {
     const link = linkData?.link || '';
     navigator.clipboard.writeText(link);

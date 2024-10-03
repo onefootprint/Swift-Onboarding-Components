@@ -48,9 +48,14 @@
       "expiration": "Link will automatically expire in {{duration}} day(s)",
       "copy-link": "Copy link",
       "send-via-sms": "Send via sms",
+      "send-via-email": "Send via email",
       "copied": {
         "header": "Success!",
         "description": "Link copied to clipboard"
+      },
+      "sent": {
+        "header": "Success!",
+        "description": "Link was sent to the beneficial owner"
       }
     }
   }

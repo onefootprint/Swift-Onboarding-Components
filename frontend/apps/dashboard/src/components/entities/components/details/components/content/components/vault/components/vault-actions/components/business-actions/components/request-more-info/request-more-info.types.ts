@@ -7,5 +7,5 @@ export type FormValues = {
 export type Doc = {
   name: string;
   identifier: string;
-  description?: string;
+  description: string;
 };
