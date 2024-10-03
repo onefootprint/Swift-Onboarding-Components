@@ -58,7 +58,6 @@ export const InvestorProfileDiList = ({ diList }: { diList?: InvestorProfileDI[]
 
   if (diList && diList.length > 0) {
     const investorDILabels = diList
-      .filter(di => di !== InvestorProfileDI.declarations)
       .sort((diA, diB) => investorProfileDIOrder[diA] - investorProfileDIOrder[diB])
       .map(di => t(`di.${di}`));
 
