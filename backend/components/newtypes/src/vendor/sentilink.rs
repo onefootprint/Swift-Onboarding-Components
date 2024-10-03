@@ -1,8 +1,9 @@
 use crate::IdentityDataKind as IDK;
 use serde::Serialize;
+use strum::EnumIter;
 
 
-#[derive(Clone, Copy, Serialize, Debug)]
+#[derive(Clone, Copy, Serialize, Debug, EnumIter)]
 pub enum SentilinkProduct {
     #[serde(rename = "sentilink_synthetic_score")]
     SyntheticScore,

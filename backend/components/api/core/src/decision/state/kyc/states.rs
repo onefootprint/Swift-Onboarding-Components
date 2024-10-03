@@ -48,7 +48,6 @@ use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
-use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
@@ -266,9 +265,9 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         //   FF is temporary to avoid serializing stuff in DB that we need to fix later
         // TODO: FP reason codes
         // TODO: models for storing score-specific reason codes?
-        let sentilink_result = if state
-            .ff_client
-            .flag(BoolFlag::RunSentilinkForPlaybookTemporary(&obc.key))
+        let sentilink_result = if obc
+            .verification_checks()
+            .is_enabled(VerificationCheckKind::Sentilink)
         {
             match common::run_application_risk(state, &self.wf_id).await {
                 Ok(res) => res,

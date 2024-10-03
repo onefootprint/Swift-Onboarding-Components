@@ -10,11 +10,13 @@ use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::output::Csv;
+use newtypes::sentilink::SentilinkProduct;
 use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedData as CD;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::CollectedDataOptionKind as CDOK;
+use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::DocumentRequestConfig;
 use newtypes::EnhancedAmlOption;
@@ -597,8 +599,25 @@ impl ObConfigurationArgsToValidate {
                             Ok(())
                         }
                     }
+                    VerificationCheck::Kyc {  } => Ok(()),
+                    VerificationCheck::IdentityDocument {  } => Ok(()),
+                    VerificationCheck::StytchDevice {  } => Ok(()),
+                    VerificationCheck::NeuroId {  } => Ok(()),
+                    VerificationCheck::Sentilink {  } => {
+                        let required_idks = SentilinkProduct::iter().flat_map(|p| p.required_identity_data_kinds()).unique();
+                        let missing = required_idks.map(DataIdentifier::from).filter(|x| {
+                            let must_collect_dis = self.must_collect_data.iter().flat_map(|cdo| cdo.data_identifiers().unwrap_or_default()).collect_vec();
+                            !must_collect_dis.contains(x)
+                        }).collect_vec();
 
-                    _ => Ok(()),
+                        if !missing.is_empty() {
+                            Err(TenantError::ValidationError(
+                                format!("Must collect {} to use Sentilink", Csv::from(missing))
+                            ).into())
+                        } else {
+                            Ok(())
+                        }
+                    },
                 }
             })?;
 

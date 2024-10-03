@@ -51,4 +51,5 @@ pub enum VerificationCheck {
     Phone {
         attributes: Vec<PhoneLookupAttributes>,
     },
+    Sentilink {},
 }

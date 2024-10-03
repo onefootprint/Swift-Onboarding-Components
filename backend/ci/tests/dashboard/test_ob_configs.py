@@ -754,6 +754,44 @@ def test_config_create(sandbox_tenant):
             ),
             "Cannot collect business documents in non-KYB playbook",
         ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "email",
+                    "phone_number",
+                    "full_address",
+                ],
+                kind="kyc",
+                optional_data=[],
+                can_access_data=[],
+                verification_checks=[
+                    {"kind": "kyc", "data": {}},
+                    {"kind": "sentilink", "data": {}},
+                ],
+            ),
+            "Validation error: Must collect id.dob, id.ssn9 to use Sentilink",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "email",
+                    "dob",
+                    "ssn9",
+                    "phone_number",
+                    "full_address",
+                ],
+                kind="kyc",
+                optional_data=[],
+                can_access_data=[],
+                verification_checks=[
+                    {"kind": "kyc", "data": {}},
+                    {"kind": "sentilink", "data": {}},
+                ],
+            ),
+            None,
+        ),
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):
