@@ -2,6 +2,7 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 import { ActionRequestKind, DocumentRequestKind, TriggerKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSubmitActions from '../../../../hooks/use-submit-actions';
 import Confirmation from './components/confirmation';
 import Form from './components/form';
@@ -14,6 +15,7 @@ export type RequestMoreInfoProps = {
 };
 
 const RequestMoreInfo = ({ open, onClose }: RequestMoreInfoProps) => {
+  const { t } = useTranslation('business-details', { keyPrefix: 'request-more-info' });
   const entityId = useEntityId();
   const bosQuery = useBusinessOwners(entityId);
   const submitMutation = useSubmitActions();
@@ -58,13 +60,13 @@ const RequestMoreInfo = ({ open, onClose }: RequestMoreInfoProps) => {
       size="compact"
       open={open}
       onClose={onClose}
-      title="Request more information"
+      title={t('confirmation.title')}
       primaryButton={{
-        label: 'Copy link',
+        label: t('confirmation.copy-link'),
         loading: submitMutation.isPending,
       }}
       secondaryButton={{
-        label: 'Send via sms',
+        label: t('confirmation.send-via-sms'),
         onClick: onClose,
         disabled: submitMutation.isPending,
       }}
@@ -78,13 +80,13 @@ const RequestMoreInfo = ({ open, onClose }: RequestMoreInfoProps) => {
       onClose={onClose}
       title="Request more information"
       primaryButton={{
-        label: 'Next',
+        label: t('form.next'),
         type: 'submit',
         form: 'request-more-info-form',
         loading: submitMutation.isPending,
       }}
       secondaryButton={{
-        label: 'Cancel',
+        label: t('form.cancel'),
         onClick: onClose,
         disabled: submitMutation.isPending,
       }}
