@@ -31,7 +31,7 @@ const TeamRoles = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Stack direction="column" gap={7} marginTop={3}>
+      <Stack direction="column" gap={7}>
         <Text variant="heading-2">{t('meta-title')}</Text>
         <section data-testid="team-roles-section">
           <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>

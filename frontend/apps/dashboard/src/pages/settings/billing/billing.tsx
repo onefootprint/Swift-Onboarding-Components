@@ -41,7 +41,7 @@ const Billing = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Stack direction="column" gap={7} marginTop={3}>
+      <Stack direction="column" gap={7}>
         <Text variant="heading-2">{t('meta-title')}</Text>
         <Stack direction="column">
           <Text variant="heading-5">{t('title')}</Text>

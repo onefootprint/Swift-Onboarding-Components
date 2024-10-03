@@ -49,7 +49,6 @@ const Header = styled.header`
     display: flex;
     justify-content: space-between;
     margin-bottom: ${theme.spacing[7]};
-    margin-top: ${theme.spacing[3]};
   `};
 `;
 
