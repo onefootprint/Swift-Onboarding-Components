@@ -123,6 +123,7 @@ const createCollectInvestorProfileDataMachine = ({
         confirm: {
           on: {
             navigatedToPrevPage: { target: 'declarations' },
+            employmentSubmitted: { actions: 'assignData' },
             incomeSubmitted: { actions: 'assignData' },
             netWorthSubmitted: { actions: 'assignData' },
             fundingSourcesSubmitted: { actions: 'assignData' },

@@ -5,12 +5,12 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import FormWithErrorAndFooter from '../../../../components/form-with-error-footer';
-import ContinueButton from '../../../../components/form-with-error-footer/components/continue-button';
+
 import type { EmploymentData } from '../../../../utils/state-machine/types';
 
 export type EmploymentFormProps = {
   defaultValues?: Partial<EmploymentData>;
-  isLoading?: boolean;
+  footer: React.ReactNode;
   onSubmit: (data: EmploymentData) => void;
 };
 
@@ -20,7 +20,7 @@ type FormData = {
   employer?: string;
 };
 
-const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormProps) => {
+const EmploymentForm = ({ defaultValues, footer, onSubmit }: EmploymentFormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.employment' });
   const options: SelectOption[] = [
     {
@@ -71,10 +71,7 @@ const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormPr
   };
 
   return (
-    <FormWithErrorAndFooter
-      footer={<ContinueButton isLoading={isLoading} trackActionName="investor-profile:employment-continue" />}
-      formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
-    >
+    <FormWithErrorAndFooter footer={footer} formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}>
       <Controller
         control={control}
         name="status"

@@ -10,11 +10,14 @@ import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import Declarations from '../declarations';
+import Employment from '../employment/employment';
 import FundingSources from '../funding-sources';
 import Income from '../income';
 import InvestmentGoals from '../investment-goals';
 import NetWorth from '../net-worth';
 import RiskTolerance from '../risk-tolerance';
+
+type EmploymentStatus = 'employed' | 'unemployed' | 'retired' | 'student';
 
 const { logError } = getLogger({ location: 'investor-profile-confirm' });
 
@@ -23,6 +26,7 @@ const Confirm = () => {
   const { authToken, data, declarationFiles } = state.context;
   const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages' });
 
+  const [isEmploymentStatusOpen, setIsEmploymentStatusOpen] = useState(false);
   const [isAnnualIncomeOpen, setIsAnnualIncomeOpen] = useState(false);
   const [isNetWorthOpen, setIsNetWorthOpen] = useState(false);
   const [isFundingSourcesOpen, setIsFundingSourcesOpen] = useState(false);
@@ -34,6 +38,9 @@ const Confirm = () => {
   const uploadFileMutation = useUploadFile();
   const isLoading = mutSyncData.isPending || uploadFileMutation.isPending;
 
+  const valueEmploymentStatus = data?.[InvestorProfileDI.employmentStatus] as EmploymentStatus | undefined;
+  const valueOccupation = data?.[InvestorProfileDI.occupation];
+  const valueEmployer = data?.[InvestorProfileDI.employer];
   const valueAnnualIncome = data?.[InvestorProfileDI.annualIncome];
   const valueNetWorth = data?.[InvestorProfileDI.netWorth];
   const listFundingSources = data?.[InvestorProfileDI.fundingSources];
@@ -78,19 +85,92 @@ const Confirm = () => {
   return (
     <>
       <Container>
+        {valueEmploymentStatus ? (
+          <>
+            <Stack direction="row" justify="space-between" alignItems="center" marginBottom={6}>
+              <Text variant="label-2" isPrivate>
+                {t('employment.title')}
+              </Text>
+              {!isEmploymentStatusOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsEmploymentStatusOpen(!isEmploymentStatusOpen)}
+                  data-dd-action-name="investor-profile:edit-employment-status"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
+            </Stack>
+            {isEmploymentStatusOpen ? (
+              <Employment
+                onSuccess={() => setIsEmploymentStatusOpen(false)}
+                renderFooter={(loading: boolean) => (
+                  <Stack direction="row" justifyContent="end" gap={3}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setIsEmploymentStatusOpen(!isEmploymentStatusOpen)}
+                    >
+                      {t('cancel')}
+                    </Button>
+                    <Button type="submit" loading={loading} disabled={loading} loadingAriaLabel={t('loading')}>
+                      {t('save')}
+                    </Button>
+                  </Stack>
+                )}
+              />
+            ) : (
+              <>
+                {valueEmploymentStatus ? (
+                  <Stack flexDirection="column" data-dd-privacy="mask">
+                    <Text tag="div" variant="label-3" color="tertiary">
+                      {t('employment.employment-status.label')}
+                    </Text>
+                    <Text tag="div" variant="body-3" color="primary">
+                      {t(`employment.employment-status.${valueEmploymentStatus}`)}
+                    </Text>
+                  </Stack>
+                ) : null}
+                {valueOccupation ? (
+                  <Stack flexDirection="column" data-dd-privacy="mask" marginTop={7}>
+                    <Text tag="div" variant="label-3" color="tertiary">
+                      {t('employment.occupation.label')}
+                    </Text>
+                    <Text tag="div" variant="body-3" color="primary">
+                      {valueOccupation}
+                    </Text>
+                  </Stack>
+                ) : null}
+                {valueEmployer ? (
+                  <Stack flexDirection="column" data-dd-privacy="mask" marginTop={7}>
+                    <Text tag="div" variant="label-3" color="tertiary">
+                      {t('employment.employer.label')}
+                    </Text>
+                    <Text tag="div" variant="body-3" color="primary">
+                      {valueEmployer}
+                    </Text>
+                  </Stack>
+                ) : null}
+              </>
+            )}
+            <Divider marginTop={7} marginBottom={7} />
+          </>
+        ) : null}
         {valueAnnualIncome ? (
           <>
-            <Stack direction="row" justify="space-between" alignItems="flex-start" marginBottom={6}>
+            <Stack direction="row" justify="space-between" alignItems="center" marginBottom={6}>
               <Text variant="label-2" isPrivate>
                 {t('income.title')}
               </Text>
-              <LinkButton
-                type="button"
-                onClick={() => setIsAnnualIncomeOpen(!isAnnualIncomeOpen)}
-                data-dd-action-name="investor-profile:edit-income"
-              >
-                {t('edit')}
-              </LinkButton>
+              {!isAnnualIncomeOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsAnnualIncomeOpen(!isAnnualIncomeOpen)}
+                  data-dd-action-name="investor-profile:edit-income"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
             </Stack>
             {isAnnualIncomeOpen ? (
               <Income
@@ -120,17 +200,19 @@ const Confirm = () => {
         ) : null}
         {valueNetWorth ? (
           <>
-            <Stack direction="row" justify="space-between" alignItems="flex-start" marginBottom={6}>
+            <Stack direction="row" justify="space-between" alignItems="center" marginBottom={6}>
               <Text variant="label-2" isPrivate>
                 {t('net-worth.title')}
               </Text>
-              <LinkButton
-                type="button"
-                onClick={() => setIsNetWorthOpen(!isNetWorthOpen)}
-                data-dd-action-name="investor-profile:edit-net-worth"
-              >
-                {t('edit')}
-              </LinkButton>
+              {!isNetWorthOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsNetWorthOpen(!isNetWorthOpen)}
+                  data-dd-action-name="investor-profile:edit-net-worth"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
             </Stack>
             {isNetWorthOpen ? (
               <NetWorth
@@ -156,17 +238,19 @@ const Confirm = () => {
         ) : null}
         {listFundingSources ? (
           <>
-            <Stack direction="row" justify="space-between" alignItems="flex-start" marginBottom={6}>
+            <Stack direction="row" justify="space-between" alignItems="center" marginBottom={6}>
               <Text variant="label-2" isPrivate>
                 {t('funding-sources.title')}
               </Text>
-              <LinkButton
-                type="button"
-                onClick={() => setIsFundingSourcesOpen(!isFundingSourcesOpen)}
-                data-dd-action-name="investor-profile:edit-funding-sources"
-              >
-                {t('edit')}
-              </LinkButton>
+              {!isFundingSourcesOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsFundingSourcesOpen(!isFundingSourcesOpen)}
+                  data-dd-action-name="investor-profile:edit-funding-sources"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
             </Stack>
             {isFundingSourcesOpen ? (
               <FundingSources
@@ -206,17 +290,19 @@ const Confirm = () => {
         ) : null}
         {listInvestmentGoals ? (
           <>
-            <Stack direction="row" justify="space-between" alignItems="flex-start" marginBottom={6}>
+            <Stack direction="row" justify="space-between" alignItems="center" marginBottom={6}>
               <Text variant="label-2" isPrivate>
                 {t('investment-goals.title')}
               </Text>
-              <LinkButton
-                type="button"
-                onClick={() => setIsInvestmentGoals(!isInvestmentGoalsOpen)}
-                data-dd-action-name="investor-profile:edit-investment-goals"
-              >
-                {t('edit')}
-              </LinkButton>
+              {!isInvestmentGoalsOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsInvestmentGoals(!isInvestmentGoalsOpen)}
+                  data-dd-action-name="investor-profile:edit-investment-goals"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
             </Stack>
             {isInvestmentGoalsOpen ? (
               <InvestmentGoals
@@ -256,17 +342,19 @@ const Confirm = () => {
         ) : null}
         {valueRiskTolerance ? (
           <>
-            <Stack direction="row" justify="space-between" alignItems="flex-start" marginBottom={6}>
+            <Stack direction="row" justify="space-between" alignItems="center" marginBottom={6}>
               <Text variant="label-2" isPrivate>
                 {t('risk-tolerance.title')}
               </Text>
-              <LinkButton
-                type="button"
-                onClick={() => setIsRiskToleranceOpen(!isRiskToleranceOpen)}
-                data-dd-action-name="investor-profile:edit-risk-tolerance"
-              >
-                {t('edit')}
-              </LinkButton>
+              {!isRiskToleranceOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsRiskToleranceOpen(!isRiskToleranceOpen)}
+                  data-dd-action-name="investor-profile:edit-risk-tolerance"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
             </Stack>
             {isRiskToleranceOpen ? (
               <RiskTolerance
@@ -300,13 +388,15 @@ const Confirm = () => {
               <Text variant="label-2" isPrivate>
                 {t('declarations.title')}
               </Text>
-              <LinkButton
-                type="button"
-                onClick={() => setIsDeclarationsOpen(!isDeclarationsOpen)}
-                data-dd-action-name="investor-profile:edit-declarations"
-              >
-                {t('edit')}
-              </LinkButton>
+              {!isDeclarationsOpen ? (
+                <LinkButton
+                  type="button"
+                  onClick={() => setIsDeclarationsOpen(!isDeclarationsOpen)}
+                  data-dd-action-name="investor-profile:edit-declarations"
+                >
+                  {t('edit')}
+                </LinkButton>
+              ) : null}
             </Stack>
             {isDeclarationsOpen ? (
               <Declarations

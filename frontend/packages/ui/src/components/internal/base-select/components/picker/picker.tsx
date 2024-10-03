@@ -130,7 +130,7 @@ const Picker = ({
                 data-dd-privacy="mask"
               />
             </SearchContainer>
-            <OptionsContainer maxHeight={height - 100} onScroll={handleScroll}>
+            <OptionsContainer $maxHeight={height - 100} onScroll={handleScroll}>
               {filteredOptions?.length
                 ? filteredOptions.map(option => (
                     <OptionComponent option={option} value={value} onSelect={() => onChange(option)} />
@@ -192,10 +192,10 @@ const Content = styled.div`
   `}
 `;
 
-const OptionsContainer = styled.div<{ maxHeight: number }>`
-  ${({ maxHeight }) => css`
+const OptionsContainer = styled.div<{ $maxHeight: number }>`
+  ${({ $maxHeight }) => css`
     overflow-y: auto;
-    max-height: ${maxHeight}px;
+    max-height: ${$maxHeight}px;
   `}
 `;
 
