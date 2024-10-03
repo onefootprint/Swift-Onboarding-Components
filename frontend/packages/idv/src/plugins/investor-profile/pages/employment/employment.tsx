@@ -12,20 +12,16 @@ const Employment = () => {
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
 
-  const handleSubmit = (employmentData: EmploymentData) => {
+  const handleSubmit = (data: EmploymentData) => {
     trackAction('investor-profile:employment-submit');
     syncData({
       authToken,
-      data: employmentData,
-      speculative: true,
+      data,
       onSuccess: () => {
-        send({ type: 'employmentSubmitted', payload: { ...employmentData } });
+        send({ type: 'employmentSubmitted', payload: { ...data } });
       },
       onError: (error: unknown) => {
-        logError(
-          `Encountered error while speculatively syncing data on investor-profile employment page ${error}`,
-          error,
-        );
+        logError('Encountered error while speculatively syncing data on investor-profile employment pages', error);
       },
     });
   };

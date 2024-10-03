@@ -4,23 +4,23 @@ import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 import { useUserData } from '../../../queries';
+import { omitEqualData } from '../utils/utils';
+import useInvestorProfileMachine from './use-investor-profile-machine';
 
 type SyncDataArgs = {
   authToken?: string;
   data: InvestorProfileData;
-  speculative?: boolean;
   onSuccess?: (data: UserDataResponse) => void;
   onError?: (error: string) => void;
 };
 
 const useSyncData = () => {
   const investorProfileDataMutation = useUserData();
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.components',
-  });
+  const [state] = useInvestorProfileMachine();
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.components' });
   const toast = useToast();
 
-  const syncData = ({ authToken, data, speculative, onSuccess, onError }: SyncDataArgs) => {
+  const syncData = ({ authToken, data, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
         title: t('sync-data-error.empty-auth-token.title'),
@@ -35,13 +35,18 @@ const useSyncData = () => {
       return;
     }
 
+    const filteredData = omitEqualData(state.context.vaultData, data);
+    if (Object.keys(filteredData).length === 0) {
+      onSuccess?.({ data: filteredData });
+      return;
+    }
+
     investorProfileDataMutation.mutate(
       {
-        data,
+        data: filteredData,
         // TODO we should populate this
         bootstrapDis: [],
         authToken,
-        speculative,
         allowExtraFields: true,
       },
       {
@@ -52,11 +57,7 @@ const useSyncData = () => {
             description: t('invalid-inputs.description'),
             variant: 'error',
           });
-          onError?.(
-            `Investor profile useSyncData encountered error while syncing data${
-              speculative ? ' speculatively' : ''
-            }: ${getErrorMessage(error)}`,
-          );
+          onError?.(`Investor profile useSyncData encountered error while syncing data: ${getErrorMessage(error)}`);
         },
       },
     );

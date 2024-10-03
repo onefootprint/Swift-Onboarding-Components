@@ -26,16 +26,12 @@ const FundingSources = ({ onSuccess, renderFooter }: FundingSourcesProps) => {
     syncData({
       authToken,
       data,
-      speculative: true,
       onSuccess: () => {
         send({ type: 'fundingSourcesSubmitted', payload: { ...data } });
         onSuccess?.();
       },
       onError: (error: unknown) => {
-        logError(
-          `Encountered error while speculatively syncing data on investor profile funding sources page: ${error}`,
-          error,
-        );
+        logError('Encountered error while speculatively syncing data on investor profile funding sources page', error);
       },
     });
   };

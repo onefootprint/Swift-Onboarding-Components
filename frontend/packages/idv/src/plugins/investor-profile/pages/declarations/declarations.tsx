@@ -21,24 +21,20 @@ const Declarations = ({ onSuccess, renderFooter }: DeclarationsProps) => {
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const isLoading = syncDataMutation.isPending;
 
-  const handleSubmit = (declarationData: DeclarationData, files?: File[]) => {
+  const handleSubmit = (data: DeclarationData, files?: File[]) => {
     trackAction('investor-profile:declarations-submit');
     syncData({
       authToken,
-      data: declarationData,
-      speculative: true, // First send the declarations data speculatively to check for any errors
+      data,
       onSuccess: () => {
         send({
           type: 'declarationsSubmitted',
-          payload: { data: declarationData, files },
+          payload: { data: { ...data }, files },
         });
         onSuccess?.();
       },
       onError: (error: unknown) => {
-        logError(
-          `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
-          error,
-        );
+        logError('Encountered error while speculatively saving data on investor profile declarations page', error);
       },
     });
   };

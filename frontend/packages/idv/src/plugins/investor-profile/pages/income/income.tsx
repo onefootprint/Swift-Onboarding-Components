@@ -21,14 +21,13 @@ const Income = ({ onSuccess, renderFooter }: IncomeProps) => {
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
 
-  const handleSubmit = (incomeData: IncomeData) => {
+  const handleSubmit = (data: IncomeData) => {
     trackAction('investor-profile:income-submit');
     syncData({
       authToken,
-      data: incomeData,
-      speculative: true,
+      data,
       onSuccess: () => {
-        send({ type: 'incomeSubmitted', payload: { ...incomeData } });
+        send({ type: 'incomeSubmitted', payload: { ...data } });
         onSuccess?.();
       },
       onError: error => {

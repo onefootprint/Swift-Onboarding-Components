@@ -21,21 +21,17 @@ const InvestmentGoals = ({ onSuccess, renderFooter }: InvestmentGoalsProps) => {
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
 
-  const handleSubmit = (investmentGoalsData: InvestmentGoalsData) => {
+  const handleSubmit = (data: InvestmentGoalsData) => {
     trackAction('investor-profile:investment-goals-submit');
     syncData({
       authToken,
-      data: investmentGoalsData,
-      speculative: true,
+      data,
       onSuccess: () => {
-        send({ type: 'investmentGoalsSubmitted', payload: { ...investmentGoalsData } });
+        send({ type: 'investmentGoalsSubmitted', payload: { ...data } });
         onSuccess?.();
       },
       onError: (error: unknown) => {
-        logError(
-          `Encountered error while speculatively syncing data on investor profile investment goals page: ${error}`,
-          error,
-        );
+        logError('Encountered error while speculatively syncing data on investor profile investment goals page', error);
       },
     });
   };

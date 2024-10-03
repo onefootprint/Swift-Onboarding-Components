@@ -21,21 +21,17 @@ const RiskTolerance = ({ onSuccess, renderFooter }: RiskToleranceProps) => {
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
 
-  const handleSubmit = (riskToleranceData: RiskToleranceData) => {
+  const handleSubmit = (data: RiskToleranceData) => {
     trackAction('investor-profile:risk-tolerance-submit');
     syncData({
       authToken,
-      data: riskToleranceData,
-      speculative: true,
+      data,
       onSuccess: () => {
-        send({ type: 'riskToleranceSubmitted', payload: { ...riskToleranceData } });
+        send({ type: 'riskToleranceSubmitted', payload: { ...data } });
         onSuccess?.();
       },
       onError: (error: unknown) => {
-        logError(
-          `Encountered error while speculatively syncing data on investor profile risk tolerance page: ${error}`,
-          error,
-        );
+        logError('Encountered error while speculatively syncing data on investor profile risk tolerance page', error);
       },
     });
   };

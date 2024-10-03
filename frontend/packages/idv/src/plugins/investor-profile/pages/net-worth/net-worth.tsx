@@ -21,21 +21,17 @@ const NetWorth = ({ onSuccess, renderFooter }: NetWorthProps) => {
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
 
-  const handleSubmit = (networthData: NetWorthData) => {
+  const handleSubmit = (data: NetWorthData) => {
     trackAction('investor-profile:net-worth-submit');
     syncData({
       authToken,
-      data: networthData,
-      speculative: true,
+      data,
       onSuccess: () => {
-        send({ type: 'netWorthSubmitted', payload: { ...networthData } });
+        send({ type: 'netWorthSubmitted', payload: { ...data } });
         onSuccess?.();
       },
       onError: (error: unknown) => {
-        logError(
-          `Encountered error while speculatively syncing data on investor profile net worth page: ${error}`,
-          error,
-        );
+        logError('Encountered error while speculatively syncing data on investor profile net worth page', error);
       },
     });
   };
