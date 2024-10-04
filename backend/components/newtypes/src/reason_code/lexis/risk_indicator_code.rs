@@ -101,7 +101,7 @@ vendor_reason_code_enum! {
 
         #[ser = "37", description = "Unable to verify name"]
         #[footprint_reason_code = None]
-        R73,
+        R37,
 
         #[ser = "38", description = "The input SSN is associated with multiple last names"]
         #[footprint_reason_code = Some(SsnInputTiedToMultipleNames)]

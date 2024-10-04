@@ -294,6 +294,83 @@ impl LexisMatchLogic for CurrentMatchLogic {
     }
 }
 
+struct MatchLogicRiskIndicatorsOnly;
+impl MatchLogicRiskIndicatorsOnly {
+    fn name_match(risk_indicator_codes: &[RiskIndicatorCode]) -> Vec<FRC> {
+        let first_name_frc = if risk_indicator_codes.contains(&RiskIndicatorCode::R48) {
+            FRC::NameFirstDoesNotMatch
+        } else {
+            FRC::NameFirstMatches
+        };
+
+        // Apparently this only applies to Last name
+        let last_name_matches = !risk_indicator_codes.contains(&RiskIndicatorCode::R37);
+        // Apparently this only applies to Last name
+        let last_name_partially_matches = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R76);
+
+        let last_name_frc = match (last_name_matches, last_name_partially_matches) {
+            (true, true) => FRC::NameLastPartiallyMatches,
+            (true, false) => FRC::NameLastMatches,
+            _ => FRC::NameLastDoesNotMatch,
+        };
+
+        let overall_name_frc = if matches!(first_name_frc, FRC::NameFirstMatches)
+            && matches!(last_name_frc, FRC::NameLastMatches)
+        {
+            FRC::NameMatches
+        } else if matches!(first_name_frc, FRC::NameFirstDoesNotMatch)
+            && matches!(last_name_frc, FRC::NameLastDoesNotMatch)
+        {
+            FRC::NameDoesNotMatch
+        } else {
+            FRC::NamePartiallyMatches
+        };
+
+
+        // TODO: handle flipped name?
+        vec![first_name_frc, last_name_frc, overall_name_frc]
+    }
+
+    fn address_match(risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
+        if risk_indicator_codes.contains(&RiskIndicatorCode::R25)
+            || risk_indicator_codes.contains(&RiskIndicatorCode::R19)
+        {
+            FRC::AddressDoesNotMatch
+        } else if risk_indicator_codes.contains(&RiskIndicatorCode::R30) {
+            FRC::AddressPartiallyMatches
+        } else {
+            FRC::AddressMatches
+        }
+    }
+}
+impl LexisMatchLogic for MatchLogicRiskIndicatorsOnly {
+    fn name_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC> {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        Self::name_match(&risk_indicator_codes)
+    }
+
+    fn address_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        Self::address_match(&risk_indicator_codes)
+    }
+
+    fn ssn_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        let risk_indicator_codes = res.risk_indicator_codes();
+        CurrentMatchLogic::ssn_match_code(&nas, &risk_indicator_codes)
+    }
+
+    fn phone_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nap = res.name_address_phone_summary().name_address_phone_matches();
+        CurrentMatchLogic::phone_match_code(&nap, &risk_indicator_codes)
+    }
+
+    fn dob_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC> {
+        Into::<Vec<FRC>>::into(&res.dob_match_level())
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -329,7 +406,7 @@ mod tests {
     }
 
     #[test_case(true, vec![] => FRC::AddressMatches)]
-    #[test_case(true, vec![RIC::R73] => FRC::AddressMatches)]
+    #[test_case(true, vec![RIC::R37] => FRC::AddressMatches)]
     #[test_case(true, vec![RIC::R30] => FRC::AddressPartiallyMatches)]
     #[test_case(false, vec![RIC::R30] => FRC::AddressDoesNotMatch)]
     #[test_case(false, vec![] => FRC::AddressDoesNotMatch)]
