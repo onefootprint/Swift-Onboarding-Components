@@ -65,7 +65,7 @@ def test_allow_reonboard_kyb(sandbox_tenant, must_collect_data):
         "business_name",
         "business_tin",
         "business_address",
-        "business_beneficial_owners",
+        "business_kyced_beneficial_owners",
     ]
     allow_reonboard_obc = create_ob_config(
         sandbox_tenant,

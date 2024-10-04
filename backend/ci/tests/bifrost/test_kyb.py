@@ -7,7 +7,7 @@ from tests.utils import (
     create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
-from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.constants import BUSINESS_MULTIPLE_BOS, FIXTURE_PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")
@@ -162,8 +162,7 @@ def test_one_click_kyb(kyb_sandbox_ob_config):
     [
         "dont_collect",
         "collect_without_kyc",
-        "collect_with_single_kyc",
-        "collect_with_multi_kyc",
+        "collect_and_kyc",
     ],
 )
 def test_business_owners(sandbox_tenant, beneficial_owners):
@@ -182,10 +181,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     elif beneficial_owners == "collect_without_kyc":
         must_collect_data = business_cdos + user_cdos
         skip_kyc = True
-    elif beneficial_owners == "collect_with_single_kyc":
-        must_collect_data = business_cdos + user_cdos + ["business_beneficial_owners"]
-        skip_kyc = False
-    elif beneficial_owners == "collect_with_multi_kyc":
+    elif beneficial_owners == "collect_and_kyc":
         must_collect_data = (
             business_cdos + user_cdos + ["business_kyced_beneficial_owners"]
         )
@@ -203,22 +199,15 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     bifrost = BifrostClient.new_user(
         obc, fixture_result=fixture_result, kyb_fixture_result="pass"
     )
-    # Make sure we don't send an sms to the secondary BO
 
-    bifrost.data["business.kyced_beneficial_owners"] = [
-        bifrost.data["business.kyced_beneficial_owners"][0],
-        {
-            **bifrost.data["business.kyced_beneficial_owners"][1],
-            "phone_number": FIXTURE_PHONE_NUMBER,
-        },
-    ]
+    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
     user = bifrost.run()
 
     # Just because we're not running it in this test
     expected_status = "none" if skip_kyc else "pass"
     assert bifrost.validate_response["user"]["status"] == expected_status
     expected_business_status = (
-        "incomplete" if beneficial_owners == "collect_with_multi_kyc" else "pass"
+        "incomplete" if beneficial_owners == "collect_and_kyc" else "pass"
     )
     assert bifrost.validate_response["business"]["status"] == expected_business_status
 
@@ -239,7 +228,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
 def test_skip_kyb(sandbox_tenant, must_collect_data):
     data = must_collect_data + [
         "business_name",
-        "business_beneficial_owners",
+        "business_kyced_beneficial_owners",
         "business_address",
     ]
     obc = create_ob_config(
@@ -260,7 +249,7 @@ def test_skip_kyb(sandbox_tenant, must_collect_data):
 def test_business_docs(sandbox_tenant, must_collect_data):
     data = must_collect_data + [
         "business_name",
-        "business_beneficial_owners",
+        "business_kyced_beneficial_owners",
         "business_address",
     ]
     obc = create_ob_config(

@@ -3,7 +3,16 @@ import typing
 from tests.dashboard.utils import latest_audit_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, patch
-from tests.constants import BUSINESS_DATA, CDO_TO_DIS, BUSINESS_VAULT_DERIVED_DATA
+from tests.constants import (
+    BUSINESS_DATA,
+    BUSINESS_MULTIPLE_BOS,
+    CDO_TO_DIS,
+)
+
+BUSINESS_VAULT_DERIVED_DATA = {
+    "business.formation_state": "CA",
+    "business.formation_date": "2024-02-02",
+}
 
 
 @pytest.fixture(scope="session")
@@ -48,14 +57,11 @@ def test_get_business_owners(sandbox_tenant, primary_bo):
     body = get(
         f"entities/{primary_bo.fp_bid}/business_owners", None, *sandbox_tenant.db_auths
     )
-    assert len(body) == 2
+    assert len(body) == 1
     assert body[0]["id"] == primary_bo.fp_id
     assert body[0]["ownership_stake"] == 50
     assert body[0]["status"] == "pass"
     assert body[0]["kind"] == "primary"
-    assert not body[1].get("id")
-    assert body[1]["ownership_stake"] == 30
-    assert body[1]["kind"] == "secondary"
 
 
 def test_get_businesses(sandbox_tenant, primary_bo):
@@ -90,7 +96,6 @@ def test_get_vault(sandbox_tenant, primary_bo, populated_business_data):
         ],
         ["business.city", "business.zip", "business.state", "business.country"],
         ["business.website", "business.phone_number"],
-        ["business.beneficial_owners"],
     ],
 )
 def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
@@ -115,4 +120,7 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
     expected_audit_event_fields = (
         set(fields_to_decrypt) - {"business.name"}
     ) & populated_keys
-    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == expected_audit_event_fields
+    assert (
+        set(audit_event["detail"]["data"]["decrypted_fields"])
+        == expected_audit_event_fields
+    )

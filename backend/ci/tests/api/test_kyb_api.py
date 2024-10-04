@@ -94,11 +94,11 @@ def test_kyb_non_us_country_code(obc, sandbox_tenant):
 
 def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     """
-    Even on a playbook that requires business_beneficial_owners, the requirement should be met by the presence
+    Even on a playbook that requires business_kyced_beneficial_owners, the requirement should be met by the presence
     of BOs linked via API
     """
     business_cdos = ["business_name", "business_tin", "business_address"]
-    bo_cdos = ["business_beneficial_owners", "name"]
+    bo_cdos = ["business_kyced_beneficial_owners", "name"]
     must_collect_data = business_cdos + bo_cdos
     obc = create_ob_config(
         sandbox_tenant,
@@ -121,7 +121,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     )
     assert (
         body["message"]
-        == "Cannot run kyb playbook due to unmet requirements. Missing business_beneficial_owners. At a minimum, the following vault data must be provided: business.beneficial_owners"
+        == "Cannot run kyb playbook due to unmet requirements. Missing business_kyced_beneficial_owners. At a minimum, the following vault data must be provided: business.kyced_beneficial_owners"
     )
 
     # Link the BO, then should be able to KYB
@@ -141,7 +141,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
 
 def test_kyb_with_no_bo_collection_but_bos_linked(sandbox_tenant):
     """
-    For a playbook that does NOT require collection of business owners via `business_beneficial_owners`, tenants can still link BOs via API
+    For a playbook that does NOT require collection of business owners via `business_kyced_beneficial_owners`, tenants can still link BOs via API
     """
     business_cdos = ["business_name", "business_tin", "business_address"]
     must_collect_data = business_cdos
@@ -259,7 +259,7 @@ def test_error_linking_bo_with_vaulted_bos(sandbox_tenant, sandbox_user):
     Make sure we can't add link BOs via API when there are already vaulted BOs
     """
     bo_di = "business.beneficial_owners"
-    data = {bo_di: BUSINESS_DATA[bo_di]}
+    data = {bo_di: BUSINESS_DATA["business.kyced_beneficial_owners"]}
     body = post("businesses", data, sandbox_tenant.sk.key)
     fp_bid = body["id"]
 
@@ -293,7 +293,9 @@ def test_cannot_vault_bos_when_linked(sandbox_tenant):
     body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
     # Cannot vault BOs because there are already linked BOs
-    data = {"business.beneficial_owners": BUSINESS_DATA["business.beneficial_owners"]}
+    data = {
+        "business.beneficial_owners": BUSINESS_DATA["business.kyced_beneficial_owners"]
+    }
     body = patch(
         f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -342,5 +344,5 @@ def test_onboard_kyb_bos_linked_via_api(sandbox_tenant, kyb_sandbox_ob_config):
     )
 
     # Business beneficial owners should already be populated from the BO linked via API
-    assert "business_beneficial_owners" in r["populated_attributes"]
+    assert "business_kyced_beneficial_owners" in r["populated_attributes"]
     bifrost.run()
