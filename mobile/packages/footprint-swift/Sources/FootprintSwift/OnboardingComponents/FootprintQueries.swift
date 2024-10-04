@@ -1,7 +1,6 @@
 import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
-import CustomDump
 
 public class FootprintQueries {
     private let client: Client
@@ -24,15 +23,20 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "OnboardingConfigError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while fetching onboarding config")
         }
     }
 
-    func identify(email: String? = nil, phoneNumber: String? = nil, authToken: String? = nil) async throws -> Components.Schemas.IdentifyResponse {
+    func identify(email: String? = nil,
+                  phoneNumber: String? = nil,
+                  authToken: String? = nil,
+                  sandboxId: String? = nil) async throws -> Components.Schemas.IdentifyResponse {
         let input = Operations.identify.Input(
             headers: Operations.identify.Input.Headers(
+                X_hyphen_Sandbox_hyphen_Id:sandboxId,
                 X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey,
-                X_hyphen_Fp_hyphen_Authorization: authToken
+                X_hyphen_Fp_hyphen_Authorization: authToken                
             ),
             body: .json(Components.Schemas.IdentifyRequest(
                 email: email,
@@ -47,11 +51,14 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "IdentifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while identifying")
         }
     }
 
-    func getSignupChallenge(email: String, phoneNumber: String, kind: Components.Schemas.SignupChallengeRequest.challenge_kindPayload? = Components.Schemas.SignupChallengeRequest.challenge_kindPayload.sms, sandboxId: String? = nil) async throws -> Components.Schemas.SignupChallengeResponse {
+    func getSignupChallenge(email: String?, phoneNumber: String?,
+                            kind: Components.Schemas.SignupChallengeRequest.challenge_kindPayload,
+                            sandboxId: String? = nil) async throws -> Components.Schemas.SignupChallengeResponse {
         let input = Operations.signupChallenge.Input(
             headers: Operations.signupChallenge.Input.Headers(
                 X_hyphen_Sandbox_hyphen_Id: sandboxId,
@@ -59,9 +66,9 @@ public class FootprintQueries {
                 X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey
             ), 
             body: .json(Components.Schemas.SignupChallengeRequest(
-                challenge_kind: Components.Schemas.SignupChallengeRequest.challenge_kindPayload.sms,
-                email: Components.Schemas.SignupChallengeRequest.emailPayload(is_bootstrap: false, value: email),
-                phone_number: Components.Schemas.SignupChallengeRequest.phone_numberPayload(is_bootstrap: false, value: phoneNumber),
+                challenge_kind: kind,
+                email: email != nil ? Components.Schemas.SignupChallengeRequest.emailPayload(is_bootstrap: false, value: email!) : nil,
+                phone_number: phoneNumber != nil ? Components.Schemas.SignupChallengeRequest.phone_numberPayload(is_bootstrap: false, value: phoneNumber!) : nil,
                 scope: Components.Schemas.SignupChallengeRequest.scopePayload.onboarding
             ))
         )
@@ -72,7 +79,8 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "SignupChallengeError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while signup challenge")
         }
     }
 
@@ -92,14 +100,15 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "LoginChallengeError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while login challenge")
         }
     }
 
-    func getValidationToken() async throws -> Components.Schemas.HostedValidateResponse {
+    func getValidationToken(authToken: String) async throws -> Components.Schemas.HostedValidateResponse {
         let input = Operations.validationToken.Input(
             headers: Operations.validationToken.Input.Headers(
-                X_hyphen_Fp_hyphen_Authorization: self.configKey
+                X_hyphen_Fp_hyphen_Authorization: authToken
             )
         )
         
@@ -109,7 +118,8 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "ValidationTokenError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while getting the validation token")
         }
     }
 
@@ -132,7 +142,8 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "VerifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while verifying")
         }
     }
 
@@ -155,26 +166,70 @@ public class FootprintQueries {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "OnboardingError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred during onboarding"])
+            throw FootprintError.error(domain: FootprintErrorDomain.onboarding,
+                                       message: "Unexpected error occurred while initializing the onboarding")            
         }
     }
 
-    func vaultingToken(authToken: String) async throws -> Components.Schemas.CreateUserTokenResponse {
-        let input = Operations.vaultingToken.Input(
-            headers: Operations.vaultingToken.Input.Headers(
+    func getOnboardingStatus(authToken: String) async throws -> RequirementAttributes {
+        let input = Operations.onboardingStatus.Input(
+            headers: Operations.onboardingStatus.Input.Headers(
                 X_hyphen_Fp_hyphen_Authorization: authToken
-            ),
-            body: .json(Components.Schemas.CreateUserTokenRequest(requested_scope: Components.Schemas.CreateUserTokenRequest.requested_scopePayload.onboarding
-            ))
+            )
         )
         
-        let response = try await client.vaultingToken(input)
+        let response = try await client.onboardingStatus(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try  RequirementAttributes.getRequirements(from: okResponse.body.json)
+        default:
+            throw FootprintError.error(domain: FootprintErrorDomain.onboarding,
+                                       message: "Unexpected error occurred while fetching onboarding status")
+        }
+    }
+
+    func validateOnboarding(authToken: String) async throws -> Components.Schemas.HostedValidateResponse {
+        let input = Operations.validateOnboarding.Input(
+            headers: Operations.validateOnboarding.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            )
+        )
+        
+        let response = try await client.validateOnboarding(input)
         
         switch response {
         case .ok(let okResponse):
             return try okResponse.body.json
         default:
-            throw NSError(domain: "VaultingTokenError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain vaulting token"])
+            throw FootprintError.error(domain: FootprintErrorDomain.onboarding,
+                                       message: "Unexpected error occurred during onboarding validation")
+        }
+    }
+
+    func decrypt(authToken: String, fields: [Components.Schemas.VaultDI] ) async throws -> VaultData {
+        let filteredFields = fields.filter { field in
+            !["id.ssn9", "id.ssn4", "id.us_tax_id"].contains(field.rawValue) && !field.rawValue.starts(with: "document.")
+        }
+
+        let input = Operations.decryptUserVault.Input(
+            headers: Operations.decryptUserVault.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+           
+            body: .json(Components.Schemas.UserDecryptRequest(
+                fields: filteredFields
+            ))
+        )
+        
+        let response = try await client.decryptUserVault(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try  VaultData.fromRawUserDataRequest(okResponse.body.json)
+        default:            
+            throw FootprintError.error(domain: FootprintErrorDomain.vault,
+                                       message: "Unexpected error occurred during decryption")
         }
     }
 
@@ -225,11 +280,6 @@ public class FootprintQueries {
             investor_profile_period_brokerage_firm_employer: vaultData.investorProfileBrokerageFirmEmployer
         )
     
-        // VaultCustomProps
-        var vaultCustomProps: Components.Schemas.VaultCustomProps? = nil
-        if let customProperties = vaultData.customProperties {
-            vaultCustomProps = Components.Schemas.VaultCustomProps(additionalProperties: customProperties)
-        }
         
         let input = Operations.vault.Input(
             headers: Operations.vault.Input.Headers(
@@ -237,8 +287,8 @@ public class FootprintQueries {
             ),
             body: .json(Components.Schemas.RawUserDataRequest.init(
                 value1: vaultIdProps,
-                value2: vaultInvestorProps,
-                value3: vaultCustomProps)
+                value2: vaultInvestorProps
+               )
             )
         )            
         
@@ -249,11 +299,15 @@ public class FootprintQueries {
             return try okResponse.body.json
         case .badRequest(let badRequestResponse):
             let error = try badRequestResponse.body.json
-            throw NSError(domain: "VaultError", code: 400, userInfo: [
-                NSLocalizedDescriptionKey: error.value2?.message,
-                "context": error.value1?.context])
+            throw FootprintError.error(domain: FootprintErrorDomain.vault,
+                                       message: error.value2!.message,
+                                       debug: error.value2?.debug,
+                                       supportId:error.value2?.support_id,
+                                       code: error.value2?.code,
+                                       context: error.value1?.context)
         default:
-            throw NSError(domain: "VaultError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred during vault creation"])
+            throw FootprintError.error(domain: FootprintErrorDomain.vault,
+                                       message: "Unexpected error occurred during vault creation")
         }
 
     }
@@ -278,13 +332,15 @@ public class FootprintQueries {
             return try okResponse.body.json
         case .badRequest(let badRequestResponse):
             let error = try badRequestResponse.body.json
-            throw NSError(domain: "ProcessError", code: 400, userInfo: [
-                NSLocalizedDescriptionKey: error.message,
-                "debug": error.debug,
-                "supportId": error.support_id,
-                "code": error.code])
+            throw FootprintError.error(domain: FootprintErrorDomain.process,
+                                       message: error.message,
+                                       debug: error.debug,
+                                       supportId:error.support_id,
+                                       code: error.code)        
         default:
-            throw NSError(domain: "ProcessError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred during processing"])
+            throw FootprintError.error(domain: FootprintErrorDomain.process,
+                                       message: "Unexpected error occurred during processing"
+                                       )
         }
     }
 

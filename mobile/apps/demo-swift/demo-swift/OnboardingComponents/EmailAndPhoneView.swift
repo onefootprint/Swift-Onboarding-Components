@@ -1,14 +1,12 @@
 import SwiftUI
 import FootprintSwift
 import Inject
-import CustomDump
 
 
 struct EmailAndPhoneView: View {
     @ObserveInjection var inject
     @State private var email: String = "sandbox@onefootprint.com"
     @State private var phoneNumber: String = "+15555550100"
-    private var onboardingComponents = FootprintProvider.shared
     @State private var shouldNavigateToNextView = false
     @State private var isLoading = false
     
@@ -23,11 +21,10 @@ struct EmailAndPhoneView: View {
                     isLoading = true
                     Task {
                         do {
-                            try await onboardingComponents.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
+                            try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
 
                             shouldNavigateToNextView = true
-                        } catch {
-                            customDump(error)
+                        } catch {                          
                             shouldNavigateToNextView = false
                         }
                         isLoading = false
@@ -57,7 +54,7 @@ struct EmailAndPhoneView: View {
                     let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
                     try await FootprintProvider.shared.initialize(
                         configKey: "pb_test_QeSAeS8XHohiSpCOj2l4vd",
-//                        sandboxId: "gC2hvdsN06Q12",
+                        sandboxId: "gC2hvdsN06Q53",
                         sandboxOutcome: sandboxOutcome
                        )
                 }

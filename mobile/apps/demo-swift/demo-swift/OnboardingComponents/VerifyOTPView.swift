@@ -1,7 +1,6 @@
 import SwiftUI
 import FootprintSwift
 import Inject
-import CustomDump
 
 
 struct VerifyOTPView: View {
@@ -62,7 +61,7 @@ struct VerifyOTPView: View {
         
         Task {
             do {
-                try await FootprintProvider.shared.verify(verificationCode: pin)
+               let response =  try await FootprintProvider.shared.verify(verificationCode: pin)               
                 DispatchQueue.main.async {
                     self.navigateToBasicInfo = true
                 }

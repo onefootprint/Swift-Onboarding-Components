@@ -2,23 +2,21 @@ import SwiftUI
 import FootprintSwift
 
 struct BasicInfoView: View {
-    @State private var firstName: String = "John"
-    @State private var middleName: String = "Doe"
-    @State private var lastName: String = "Smith"
-    @State private var dateOfBirth: Date = Calendar.current.date(from: DateComponents(year: 1990, month: 1, day: 1)) ?? Date()
-    @State private var addressLine1: String = "123 Main St"
-    @State private var addressLine2: String = "Apt 4B"
-    @State private var city: String = "New York"
-    @State private var state: String = "NY"
-    @State private var zipCode: String = "10001"
-    @State private var country: String = "US"
-    @State private var ssn: String = "123-45-6789"
+    @State private var firstName: String = ""
+    @State private var middleName: String = ""
+    @State private var lastName: String = ""
+    @State private var dateOfBirth: Date = Date()
+    @State private var addressLine1: String = ""
+    @State private var addressLine2: String = ""
+    @State private var city: String = ""
+    @State private var state: String = ""
+    @State private var zipCode: String = ""
+    @State private var country: String = ""
+    @State private var ssn: String = ""
     @State private var isLoading: Bool = false
-    @State private var errorMessage: String?
-    @State private var email: String = ""
-    @State private var phoneNumber: String = ""
-    @State private var otpCode: String = ""
+    @State private var errorMessage: String?  
     @State private var showSuccessView: Bool = false
+    @State private var vaultData: VaultData?
     
     var body: some View {
         NavigationView {
@@ -108,13 +106,14 @@ struct BasicInfoView: View {
                                 
                                 try await FootprintProvider.shared.vault(vaultData: vaultData)
                                 print("Vault data submitted successfully")
-                                try await FootprintProvider.shared.process()
+                               let response = try await FootprintProvider.shared.process()                               
                                 showSuccessView = true
                                 print("Process submitted successfully : \(showSuccessView)")
                                
                             } catch {
                                 print("Error: \(error)")
-                                if (error as NSError).domain == "ProcessError" {
+                                if let footprintError = error as? FootprintError,
+                                   footprintError.domain == FootprintErrorDomain.process.rawValue {
                                     do {
                                         try await FootprintProvider.shared.handoff(
                                             onCancel: {
@@ -131,12 +130,7 @@ struct BasicInfoView: View {
                                                 errorMessage = "An error occurred during verification. Please try again."
                                             }
                                         )
-                                    } catch {
-                                        errorMessage = "Failed to complete handoff. Please try again."
-                                        print("Error during handoff: \(error)")
                                     }
-                                } else {
-                                    errorMessage = "Failed to submit data. Please try again."
                                 }
                             }
                             isLoading = false
@@ -172,7 +166,42 @@ struct BasicInfoView: View {
                     EmptyView()
                 }
             )
+            .onAppear {
+                Task {
+                    do {
+                        let fetchedVaultData = try await FootprintProvider.shared.getVaultData()
+                        DispatchQueue.main.async {
+                            self.vaultData = fetchedVaultData
+                            self.updateFieldsWithVaultData()
+                        }
+                    } catch {
+                        print("Error fetching vault data: \(error)")
+                        errorMessage = "Failed to fetch your information. Please try again."
+                    }
+                }
+            }
         }
+    }
+    
+    private func updateFieldsWithVaultData() {
+        guard let vaultData = vaultData else { return }
+        
+        firstName = vaultData.idFirstName ?? "John"
+        middleName = vaultData.idMiddleName ?? "Doe"
+        lastName = vaultData.idLastName ?? "Smith"
+        if let dobString = vaultData.idDob,
+           let dob = ISO8601DateFormatter().date(from: dobString) {
+            dateOfBirth = dob
+        } else {
+            dateOfBirth = Calendar.current.date(from: DateComponents(year: 1990, month: 1, day: 1)) ?? Date()
+        }
+        addressLine1 = vaultData.idAddressLine1 ?? "123 Main St"
+        addressLine2 = vaultData.idAddressLine2 ?? "Apt 4B"
+        city = vaultData.idCity ?? "New York"
+        state = vaultData.idState ?? "NY"
+        zipCode = vaultData.idZip ?? "10001"
+        country = vaultData.idCountry ?? "US"
+        ssn = vaultData.idSsn9 ?? "123-45-6789"
     }
 }
 
