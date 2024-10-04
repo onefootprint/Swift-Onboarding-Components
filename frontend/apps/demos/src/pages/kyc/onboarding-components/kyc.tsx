@@ -114,7 +114,7 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
     } catch (e) {
       if (e instanceof InlineOtpNotSupported) {
         await fp.launchIdentify(
-          { email: phoneNumber, phoneNumber },
+          { email, phoneNumber },
           {
             onAuthenticated() {
               onDone();
