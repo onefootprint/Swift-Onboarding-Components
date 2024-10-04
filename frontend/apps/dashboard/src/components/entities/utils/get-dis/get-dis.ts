@@ -29,10 +29,20 @@ export const getDI = (target: string) => {
 
 const sort = (attributes: DataIdentifier[]) =>
   attributes.sort((a, b) => {
-    const aKey = a.split('.')[2];
-    const bKey = b.split('.')[2];
+    const aParts = a.split('.');
+    const bParts = b.split('.');
+    const aKey = aParts[2] || '';
+    const bKey = bParts[2] || '';
 
-    return order[aKey] - order[bKey];
+    const keyComparison = order[aKey] - order[bKey];
+    if (keyComparison !== 0) {
+      return keyComparison;
+    }
+
+    // If the third part is the same, compare based on the fourth part
+    const aSubKey = aParts[3] || '';
+    const bSubKey = bParts[3] || '';
+    return aSubKey.localeCompare(bSubKey);
   });
 
 export const getCustomDIs = (data: EntityVault) => {
