@@ -138,7 +138,14 @@ pub(super) fn apply_trigger_request(
         workflow_request_id: Some(wfr.id.clone()),
         actor,
     };
-    UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
+    UserTimeline::create(conn, event.clone(), sv.vault_id.clone(), sv.id.clone())?;
+
+    // Create the same workflow request timeline event on the business to indicate that the workflow was
+    // triggered
+    if let Some(fp_bid) = fp_bid.clone() {
+        let sb = ScopedVault::get(conn, (&fp_bid, &sv.tenant_id, sv.is_live))?;
+        UserTimeline::create(conn, event, sb.vault_id.clone(), sb.id.clone())?;
+    }
 
     // Create an inherit token for the WFR
     let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
