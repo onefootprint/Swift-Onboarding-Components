@@ -72,23 +72,33 @@ pub struct SentilinkAPIResponse {
 impl SentilinkAPIResponse {
     pub async fn from_response(response: reqwest::Response) -> Self {
         let (cl, http_status) = (response.content_length(), response.status());
+
         // we might get json for 200 or 4xx
-        let raw_json: Result<serde_json::Value, SentilinkError> =
-            response.json().await.map_err(SentilinkError::from);
+        // let raw_json: Result<serde_json::Value, SentilinkError> =
+        //     response.json().await.map_err(SentilinkError::from);
+        // match raw_json {
+        //     Ok(j) => Self::from_value(j, http_status, cl),
+        //     Err(e) => {
+        //         let result = SentilinkAPIResult::Error(e);
+        // Self {
+        //     result,
+        //     raw_response: serde_json::json!({}).into(),
+        // }
+        //     }
+        // }
+        // TEMPORARY testing prod integration
+        let raw_text = response.text().await.unwrap_or("error".to_string());
 
-        match raw_json {
-            Ok(j) => Self::from_value(j, http_status, cl),
-            Err(e) => {
-                let result = SentilinkAPIResult::Error(e);
+        tracing::info!(raw_resp=%raw_text, ?http_status, ?cl, "sentilink error response");
 
-                Self {
-                    result,
-                    raw_response: serde_json::json!({}).into(),
-                }
-            }
+        let result = SentilinkAPIResult::Error(SentilinkError::AssertionError("erroring".to_string()));
+        Self {
+            result,
+            raw_response: serde_json::json!({}).into(),
         }
     }
 
+    #[allow(unused)]
     fn from_value(value: serde_json::Value, status_code: StatusCode, content_length: Option<u64>) -> Self {
         if status_code.is_success() {
             let parsed: Result<ApplicationRiskResponse, SentilinkError> =
