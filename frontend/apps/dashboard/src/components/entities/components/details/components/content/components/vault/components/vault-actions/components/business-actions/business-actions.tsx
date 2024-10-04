@@ -1,10 +1,12 @@
-import { IS_DEV } from '@onefootprint/global-constants';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useEntityId from '@/entity/hooks/use-entity-id';
+
+import useBusinessOwners from 'src/hooks/use-business-owners';
 import usePermissions from 'src/hooks/use-permissions';
 import EditVaultDrawer from '../edit-vault-drawer';
 import RequestMoreInfo from './components/request-more-info';
@@ -16,14 +18,14 @@ enum ActionDialog {
 
 const DROPDOWN_ITEM_HEIGHT = '32px';
 
-// TODO: Remove this once feature is done
-const IS_REQUEST_MORE_INFO_ENABLED = IS_DEV;
-
 const BusinessActions = () => {
   const { t } = useTranslation('business-details', { keyPrefix: 'actions' });
+  const entityId = useEntityId();
+  const bosQuery = useBusinessOwners(entityId);
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { hasPermission } = usePermissions();
+  const hasBusinessOwners = !!bosQuery.data?.length;
 
   const handleCloseDialog = () => {
     setOpenDialog(null);
@@ -51,16 +53,18 @@ const BusinessActions = () => {
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
-            {hasPermission(RoleScopeKind.writeEntities) && (
-              <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleEditVault}>
-                {t('edit')}
-              </Dropdown.Item>
-            )}
-            {IS_REQUEST_MORE_INFO_ENABLED && hasPermission(RoleScopeKind.manualReview) && (
-              <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleRequestMoreInfo}>
-                {t('request-info')}
-              </Dropdown.Item>
-            )}
+            <Dropdown.Group>
+              {hasPermission(RoleScopeKind.writeEntities) && (
+                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleEditVault}>
+                  {t('edit')}
+                </Dropdown.Item>
+              )}
+              {hasBusinessOwners && hasPermission(RoleScopeKind.manualReview) && (
+                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleRequestMoreInfo}>
+                  {t('request-info')}
+                </Dropdown.Item>
+              )}
+            </Dropdown.Group>
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>

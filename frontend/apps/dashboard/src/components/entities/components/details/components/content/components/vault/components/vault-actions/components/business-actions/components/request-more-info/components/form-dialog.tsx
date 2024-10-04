@@ -20,7 +20,6 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
   const submitMutation = useSubmitActions();
 
   const handleSubmit = (formValues: FormValues) => {
-    console.log(formValues);
     submitMutation.mutate(
       {
         entityId: formValues.boId,
@@ -59,7 +58,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
       size="compact"
       open={open}
       onClose={onClose}
-      title="Request more information"
+      title={t('title')}
       primaryButton={{
         label: t('form.next'),
         type: 'submit',

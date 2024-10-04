@@ -26,18 +26,17 @@ const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOw
       }),
     ),
   );
-  return entityResponses.map(({ data: entity }) => {
-    const getAttribute = (identifier: IdDI) =>
-      (entity.data.find(item => item.identifier === identifier)?.value as string) || '';
-
-    return {
-      id: entity.id,
-      attributes: entity.attributes,
-      firstName: getAttribute(IdDI.firstName),
-      lastName: getAttribute(IdDI.lastName),
-      hasPhone: entity.attributes.includes(IdDI.phoneNumber),
-    };
-  });
+  return entityResponses
+    .map(({ data: entity }) => {
+      return {
+        id: entity.id,
+        attributes: entity.attributes,
+        firstName: (entity.data.find(item => item.identifier === IdDI.firstName)?.value as string) || '',
+        lastName: (entity.data.find(item => item.identifier === IdDI.lastName)?.transforms?.prefix_1 as string) || '',
+        hasPhone: entity.attributes.includes(IdDI.phoneNumber),
+      };
+    })
+    .filter(entity => entity.firstName);
 };
 
 const useBusinessOwners = (id: string) => {
