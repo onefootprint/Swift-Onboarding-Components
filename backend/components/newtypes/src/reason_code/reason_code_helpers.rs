@@ -336,6 +336,32 @@ impl LexisNAP {
     }
 }
 
+pub struct NameAddress {
+    pub first_name_match: bool,
+    pub last_name_match: bool,
+    pub address_match: bool,
+}
+
+impl From<&LexisNAP> for NameAddress {
+    fn from(value: &LexisNAP) -> Self {
+        Self {
+            first_name_match: value.first_name_match,
+            last_name_match: value.last_name_match,
+            address_match: value.address_match,
+        }
+    }
+}
+
+impl From<&LexisNAS> for NameAddress {
+    fn from(value: &LexisNAS) -> Self {
+        Self {
+            first_name_match: value.first_name_match,
+            last_name_match: value.last_name_match,
+            address_match: value.address_match,
+        }
+    }
+}
+
 pub(crate) struct PhRCH {
     pub phone_match_level: MatchLevel,
     #[allow(unused)]
