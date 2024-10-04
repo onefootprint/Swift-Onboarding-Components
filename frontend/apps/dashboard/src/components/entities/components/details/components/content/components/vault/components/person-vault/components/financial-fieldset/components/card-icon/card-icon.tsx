@@ -22,6 +22,7 @@ const cardIcons: Record<string, JSX.Element> = {
   discover: <IcoDiscover24 />,
   jcb: <IcoJcb24 />,
   mastercard: <IcoMastercard24 />,
+  master_card: <IcoMastercard24 />,
   unionpay: <IcoUnionpay24 />,
   visa: <IcoVisa24 />,
   visaelectron: <IcoVisaelectron24 />,
