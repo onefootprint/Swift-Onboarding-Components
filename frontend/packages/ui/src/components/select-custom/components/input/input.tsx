@@ -8,18 +8,27 @@ type InputProps = {
   maxWidth?: string;
   minWidth?: string;
   width?: string;
+  disabled?: boolean;
   size?: 'default' | 'compact';
+  hasError?: boolean;
 };
 
-const Input = ({ children, placeholder, maxWidth, minWidth, width, size = 'default' }: InputProps) => {
+const Input = ({
+  children,
+  placeholder,
+  maxWidth,
+  minWidth,
+  width,
+  size = 'default',
+  disabled,
+  hasError = false,
+}: InputProps) => {
   return (
     <Box maxWidth={maxWidth} minWidth={minWidth} width={width}>
-      <SelectCustom.Trigger asChild>
-        <Box>
-          <BaseSelectTrigger size={size}>
-            <SelectCustom.Value placeholder={placeholder}>{children}</SelectCustom.Value>
-          </BaseSelectTrigger>
-        </Box>
+      <SelectCustom.Trigger disabled={disabled} asChild>
+        <BaseSelectTrigger size={size} disabled={disabled} data-has-error={hasError}>
+          <SelectCustom.Value placeholder={placeholder}>{children}</SelectCustom.Value>
+        </BaseSelectTrigger>
       </SelectCustom.Trigger>
     </Box>
   );

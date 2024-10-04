@@ -1,6 +1,6 @@
 import * as RadixSelect from '@radix-ui/react-select';
 import styled from 'styled-components';
-import { createFontStyles } from '../../../../utils/mixins';
+import { createFontStyles } from '../../../../utils';
 type TriggerProps = RadixSelect.SelectTriggerProps;
 
 const Trigger = ({ children, ...props }: TriggerProps) => {

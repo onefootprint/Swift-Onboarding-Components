@@ -20,7 +20,18 @@ type BaseSelectTriggerProps = {
 
 const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
   (
-    { children, disabled, hasError, hasFocus, isPrivate, onClick, size, testID, hasIcon }: BaseSelectTriggerProps,
+    {
+      children,
+      disabled,
+      hasError,
+      hasFocus,
+      isPrivate,
+      onClick,
+      size,
+      testID,
+      hasIcon,
+      ...props
+    }: BaseSelectTriggerProps,
     ref,
   ) => (
     <BaseSelectTriggerContainer
@@ -33,6 +44,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       onClick={onClick}
       ref={ref}
       type="button"
+      {...props}
       /** Do not change/remove these classes */
       className="fp-input fp-custom-appearance"
     >
@@ -69,6 +81,7 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       outline: none;
       text-align: left;
       width: 100%;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 
       &[data-size='default'] {
         ${createText(input.size.default.typography)};
@@ -83,15 +96,13 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       }
 
       &[data-has-error='false'] {
-        @media (hover: hover) {
-          &:enabled:hover {
-            background: ${input.state.default.hover.bg};
-            border-color: ${input.state.default.hover.border};
-          }
+        &:not(:disabled):hover {
+          background: ${input.state.default.hover.bg};
+          border-color: ${input.state.default.hover.border};
         }
 
         &[data-has-focus='true'],
-        &:enabled:focus {
+        &:not(:disabled):focus {
           background: ${input.state.default.focus.bg};
           border-color: ${input.state.default.focus.border};
           box-shadow: ${input.state.default.focus.elevation};
@@ -102,14 +113,12 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
         background: ${input.state.error.initial.bg};
         border-color: ${input.state.error.initial.border};
 
-        @media (hover: hover) {
-          &:enabled:hover {
-            background: ${input.state.error.hover.bg};
-            border-color: ${input.state.error.hover.border};
-          }
+        &:not(:disabled):hover {
+          background: ${input.state.error.hover.bg};
+          border-color: ${input.state.error.hover.border};
         }
 
-        &:enabled:focus {
+        &:not(:disabled):focus {
           background: ${input.state.error.focus.bg};
           border-color: ${input.state.error.focus.border};
           box-shadow: ${input.state.error.focus.elevation};
