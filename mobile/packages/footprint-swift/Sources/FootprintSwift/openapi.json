@@ -2826,9 +2826,9 @@
           "fixture_result": {
             "type": "string",
             "enum": [
-              "Fail",
-              "Pass",
-              "Real"
+              "fail",
+              "pass",
+              "real"
             ]
           },
           "request_id": {

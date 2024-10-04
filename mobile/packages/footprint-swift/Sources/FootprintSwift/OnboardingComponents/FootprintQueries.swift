@@ -137,14 +137,15 @@ public class FootprintQueries {
     }
 
     func initOnboarding(
-        authToken: String
+        authToken: String,
+        overallOutcome: OverallOutcome? = OverallOutcome.pass
     ) async throws -> Components.Schemas.OnboardingResponse {
         let input = Operations.onboarding.Input(
             headers: Operations.onboarding.Input.Headers(
                 X_hyphen_Fp_hyphen_Authorization: authToken
             ),
             body: .json(Components.Schemas.PostOnboardingRequest(
-                fixture_result: Components.Schemas.PostOnboardingRequest.fixture_resultPayload.pass
+                fixture_result: Components.Schemas.PostOnboardingRequest.fixture_resultPayload(rawValue: overallOutcome!.rawValue)
             ))
         )
         
@@ -256,14 +257,17 @@ public class FootprintQueries {
         }
 
     }
-     
-    func process(authToken: String) async throws -> Components.Schemas.Empty {
+    
+
+    func process(authToken: String,
+                 overallOutcome: OverallOutcome? = OverallOutcome.pass
+    ) async throws -> Components.Schemas.Empty {
         let input = Operations.process.Input(
             headers: Operations.process.Input.Headers(
                 X_hyphen_Fp_hyphen_Authorization: authToken
             ),
             body: .json(Components.Schemas.ProcessRequest(
-                fixture_result: Components.Schemas.ProcessRequest.fixture_resultPayload.pass
+                fixture_result: Components.Schemas.ProcessRequest.fixture_resultPayload(rawValue: overallOutcome!.rawValue)
             ))
         )
         

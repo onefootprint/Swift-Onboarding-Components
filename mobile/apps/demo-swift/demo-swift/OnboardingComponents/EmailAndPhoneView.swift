@@ -54,7 +54,12 @@ struct EmailAndPhoneView: View {
         .onAppear(perform: {
             Task {
                 do {
-                    try await FootprintProvider.shared.initialize(configKey:"pb_test_QeSAeS8XHohiSpCOj2l4vd")
+                    let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
+                    try await FootprintProvider.shared.initialize(
+                        configKey: "pb_test_QeSAeS8XHohiSpCOj2l4vd",
+//                        sandboxId: "gC2hvdsN06Q12",
+                        sandboxOutcome: sandboxOutcome
+                       )
                 }
             }
         })

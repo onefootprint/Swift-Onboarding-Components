@@ -11,11 +11,15 @@ public struct FootprintConfiguration: Encodable {
     public var options: FootprintOptions?
     public var l10n: FootprintL10n?
     public var appearance: FootprintAppearance?
-    public let fixtureResult: String?
+    private var sandboxOutcome: SandboxOutcome?
+    public var sandboxId: String?
+    public var isComponentsSdk: Bool?
 
     public init(publicKey: String? = nil,
                 authToken: String? = nil,
-                fixtureResult: String? = nil,
+                sandboxId: String? = nil,
+                isComponentsSdk: Bool? = false,
+                sandboxOutcome: SandboxOutcome? = nil,
                 scheme: String,
                 bootstrapData: FootprintBootstrapData? = nil,
                 options: FootprintOptions? = nil,
@@ -37,7 +41,9 @@ public struct FootprintConfiguration: Encodable {
         self.options = options
         self.l10n = l10n
         self.appearance = appearance
-        self.fixtureResult = fixtureResult
+        self.sandboxOutcome = sandboxOutcome
+        self.sandboxId = sandboxId
+        self.isComponentsSdk = isComponentsSdk
     }
 
     // Callbacks and redirectUrl should not be serialized
@@ -49,6 +55,8 @@ public struct FootprintConfiguration: Encodable {
         case l10n = "l10n"
         case documentFixtureResult = "document_fixture_result"
         case fixtureResult = "fixture_result"
+        case sandboxId = "sandbox_id"
+        case isComponentsSdk = "is_components_sdk"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -58,7 +66,9 @@ public struct FootprintConfiguration: Encodable {
         try container.encodeIfPresent(self.bootstrapData, forKey: .bootstrapData)
         try container.encodeIfPresent(self.options, forKey: .options)
         try container.encodeIfPresent(self.l10n, forKey: .l10n)
-        try container.encodeIfPresent(self.fixtureResult, forKey: .fixtureResult)
-        try container.encodeIfPresent(self.fixtureResult, forKey: .documentFixtureResult)
+        try container.encodeIfPresent(self.sandboxOutcome?.overallOutcome, forKey: .fixtureResult)
+        try container.encodeIfPresent(self.sandboxOutcome?.documentOutcome, forKey: .documentFixtureResult)
+        try container.encodeIfPresent(self.sandboxId, forKey: .sandboxId)
+        try container.encodeIfPresent(self.isComponentsSdk, forKey: .isComponentsSdk)
     }
 } 

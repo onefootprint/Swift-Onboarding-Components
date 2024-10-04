@@ -12,8 +12,11 @@ public final class FootprintProvider {
     var onboardingConfig: Components.Schemas.PublicOnboardingConfiguration?
     var signupChallengeResponse: Components.Schemas.SignupChallengeResponse?
     var loginChallengeResponse: Components.Schemas.LoginChallengeResponse?
-    private var sandboxId: String
-    
+    private var sandboxId: String = String(UUID().uuidString.prefix(12).filter { $0.isLetter || $0.isNumber })
+    private var sandboxOutcome: SandboxOutcome?
+    private var l10n: FootprintL10n?
+    private var appearance: FootprintAppearance?
+
     public static let shared: FootprintProvider = {
         let instance = FootprintProvider()
         return instance
@@ -30,16 +33,27 @@ public final class FootprintProvider {
                 configuration: .init(dateTranscoder: .iso8601WithFractionalSeconds),
                 transport: URLSessionTransport()
             )
-        self.sandboxId = String(UUID().uuidString.prefix(11).filter { $0.isLetter || $0.isNumber })
     }
     
-    public func initialize(configKey: String, authToken: String? = nil) async throws {
+    public func initialize(configKey: String,
+                           authToken: String? = nil,
+                           sandboxId: String? = nil,
+                           sandboxOutcome: SandboxOutcome? = nil,
+                           options: FootprintOptions? = nil,
+                           l10n: FootprintL10n? = nil,
+                           appearance: FootprintAppearance? = nil
+    ) async throws {
+        self.l10n = l10n
+        self.appearance = appearance
         self.configKey = configKey
         self.authToken = authToken
+        self.sandboxOutcome = sandboxOutcome
         self.queries = FootprintQueries(client: self.client, configKey: self.configKey)
-        
+        if let sandboxId = sandboxId {
+            self.sandboxId = sandboxId
+        }
         self.onboardingConfig  = try await self.queries.getOnboardingConfig()
-        customDump(self.onboardingConfig)            
+        customDump(self.onboardingConfig)
     }
 
     public func createEmailPhoneBasedChallenge(email: String, phoneNumber: String) async throws  {
@@ -87,7 +101,7 @@ public final class FootprintProvider {
             throw NSError(domain: "VerifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing authentication token"])
         } 
 
-        try await self.queries.initOnboarding(authToken: authToken)        
+        try await self.queries.initOnboarding(authToken: authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)        
         let vaultingTokenResponse = try await self.queries.vaultingToken(authToken: authToken)
 
         self.vaultAuthToken = vaultingTokenResponse.token
@@ -108,7 +122,7 @@ public final class FootprintProvider {
             throw NSError(domain: "ProcessError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing authentication token"])
         }        
         
-        try await self.queries.process(authToken: authToken)
+        try await self.queries.process(authToken: authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)
     }
 
     public func handoff( 
@@ -119,11 +133,15 @@ public final class FootprintProvider {
                     let config = FootprintConfiguration(
                         publicKey: self.configKey,
                         authToken:  self.authToken,
-                        fixtureResult: "pass",
-                        scheme: "footprintapp-callback",
+                        sandboxId: self.sandboxId,
+                        isComponentsSdk: true,
+                        sandboxOutcome: self.sandboxOutcome,
+                        scheme: "footprintapp-callback",                     
+                        l10n: self.l10n,
+                        appearance: self.appearance,
                         onCancel: onCancel,
                         onComplete: onComplete,
-                        onError: onError
+                        onError: onError                        
                     )
                 customDump(config)
                 try await Footprint.initialize(with: config)
