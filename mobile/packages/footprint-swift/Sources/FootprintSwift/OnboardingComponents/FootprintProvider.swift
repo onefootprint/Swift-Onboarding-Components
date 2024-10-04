@@ -11,7 +11,7 @@ public final class FootprintProvider {
     private var queries: FootprintQueries!
     var onboardingConfig: Components.Schemas.PublicOnboardingConfiguration?
     var signupChallengeResponse: Components.Schemas.SignupChallengeResponse?
-    var identifyResponse: Components.Schemas.IdentifyResponse?       
+    var loginChallengeResponse: Components.Schemas.LoginChallengeResponse?
     private var sandboxId: String
     
     public static let shared: FootprintProvider = {
@@ -33,38 +33,52 @@ public final class FootprintProvider {
         self.sandboxId = String(UUID().uuidString.prefix(11).filter { $0.isLetter || $0.isNumber })
     }
     
-    public func initialize(configKey: String) async throws {
+    public func initialize(configKey: String, authToken: String? = nil) async throws {
         self.configKey = configKey
+        self.authToken = authToken
         self.queries = FootprintQueries(client: self.client, configKey: self.configKey)
         
         self.onboardingConfig  = try await self.queries.getOnboardingConfig()
         customDump(self.onboardingConfig)            
     }
 
-    public func identify(email: String, phoneNumber: String) async throws  {        
-            self.identifyResponse = try await self.queries.identify(email: email, phoneNumber: phoneNumber)            
-            customDump(self.identifyResponse)
-            
-        if identifyResponse?.user == nil {
-                self.signupChallengeResponse = try await self.queries.getSignupChallenge(
-                    email: email, 
-                    phoneNumber: phoneNumber,
-                    sandboxId: self.sandboxId
-                )
-                customDump(self.signupChallengeResponse)
-        } else {
-            self.authToken = identifyResponse?.user?.token
-        }
+    public func createEmailPhoneBasedChallenge(email: String, phoneNumber: String) async throws  {
+        let identifyResponse = try await self.queries.identify(email: email, phoneNumber: phoneNumber)
+        customDump(identifyResponse)
+        
+        if identifyResponse.user == nil {
+            self.signupChallengeResponse = try await self.queries.getSignupChallenge(
+                email: email,
+                phoneNumber: phoneNumber,
+                sandboxId: self.sandboxId
+            )
+            customDump(self.signupChallengeResponse)
+    } else {
+        self.authToken = identifyResponse.user?.token
+        self.loginChallengeResponse = try await self.queries.getLoginChallenge(authToken: self.authToken!)
+    }
+    }
+    
+    
+    public func createAuthTokenBasedChallenge() async throws  {
+        let identifyResponse = try await self.queries.identify(authToken: self.authToken) 
+        customDump(self.signupChallengeResponse)
+        
+        if identifyResponse.user != nil {
+            self.authToken = identifyResponse.user?.token
+            self.loginChallengeResponse = try await self.queries.getLoginChallenge(authToken: self.authToken!)
+            customDump(self.signupChallengeResponse)
+         }
     }
 
-    public func submitOTPCode(code: String) async throws {
-        guard let challengeToken = self.signupChallengeResponse?.challenge_data.challenge_token,
-              let challengeAuthToken = self.signupChallengeResponse?.challenge_data.token else {
+    public func verify(verificationCode: String) async throws {
+        guard let challengeToken = self.loginChallengeResponse?.challenge_data.challenge_token ??  self.signupChallengeResponse?.challenge_data.challenge_token,
+              let challengeAuthToken = self.loginChallengeResponse?.challenge_data.token ?? self.signupChallengeResponse?.challenge_data.token else {
             throw NSError(domain: "SubmitOTPError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing challenge token or auth token"])
         }
         
         let verifyResponse = try await self.queries.verify(
-            challenge: code,
+            challenge: verificationCode,
             challengeToken: challengeToken,
             authToken: challengeAuthToken
         )       
@@ -102,7 +116,6 @@ public final class FootprintProvider {
         onComplete: ((_ validationToken: String) -> Void)? = nil,
         onError: ((_ errorMessage: String) -> Void)? = nil
                 ) async throws {
-                    
                     let config = FootprintConfiguration(
                         publicKey: self.configKey,
                         authToken:  self.authToken,
@@ -112,9 +125,7 @@ public final class FootprintProvider {
                         onComplete: onComplete,
                         onError: onError
                     )
-                          
                 customDump(config)
-
                 try await Footprint.initialize(with: config)
     }
 }

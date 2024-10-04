@@ -6,7 +6,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
         VStack  {
-            Button("Verify with hosted flow") {
+            Button("Hosted flow") {
                 let bootstrapData = FootprintBootstrapData(
                     email: "example@gmail.com",
                     phoneNumber: "+15555550100",
@@ -72,7 +72,8 @@ struct ContentView: View {
             }
         }
         .padding(50)        
-            NavigationLink("Verify with onboarding components", destination: EmailAndPhoneView())
+            NavigationLink("Onboarding components - signup", destination: EmailAndPhoneView()).padding(50)
+            NavigationLink("Onboarding components - authToken", destination: AuthTokenView()).padding(50)
             
         }.enableInjection()
     }

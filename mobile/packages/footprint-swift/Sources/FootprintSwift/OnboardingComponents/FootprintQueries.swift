@@ -28,13 +28,16 @@ public class FootprintQueries {
         }
     }
 
-    func identify(email: String, phoneNumber: String) async throws -> Components.Schemas.IdentifyResponse {
+    func identify(email: String? = nil, phoneNumber: String? = nil, authToken: String? = nil) async throws -> Components.Schemas.IdentifyResponse {
         let input = Operations.identify.Input(
             headers: Operations.identify.Input.Headers(
-                X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey
+                X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey,
+                X_hyphen_Fp_hyphen_Authorization: authToken
             ),
             body: .json(Components.Schemas.IdentifyRequest(
-                email: email, phone_number: phoneNumber, scope: Components.Schemas.IdentifyRequest.scopePayload.onboarding
+                email: email,
+                phone_number: phoneNumber,
+                scope: Components.Schemas.IdentifyRequest.scopePayload.onboarding
             ))
         )
         
@@ -48,7 +51,7 @@ public class FootprintQueries {
         }
     }
 
-    func getSignupChallenge(email: String, phoneNumber: String, sandboxId: String? = nil) async throws -> Components.Schemas.SignupChallengeResponse {
+    func getSignupChallenge(email: String, phoneNumber: String, kind: Components.Schemas.SignupChallengeRequest.challenge_kindPayload? = Components.Schemas.SignupChallengeRequest.challenge_kindPayload.sms, sandboxId: String? = nil) async throws -> Components.Schemas.SignupChallengeResponse {
         let input = Operations.signupChallenge.Input(
             headers: Operations.signupChallenge.Input.Headers(
                 X_hyphen_Sandbox_hyphen_Id: sandboxId,
@@ -70,6 +73,26 @@ public class FootprintQueries {
             return try okResponse.body.json
         default:
             throw NSError(domain: "SignupChallengeError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+        }
+    }
+
+    func getLoginChallenge(kind: Components.Schemas.LoginChallengeRequest.challenge_kindPayload? = Components.Schemas.LoginChallengeRequest.challenge_kindPayload.sms, authToken: String) async throws -> Components.Schemas.LoginChallengeResponse {
+        let input = Operations.loginChallenge.Input(
+            headers: Operations.loginChallenge.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+            body: .json(Components.Schemas.LoginChallengeRequest(
+                challenge_kind: kind!
+            ))
+        )
+
+        let response = try await client.loginChallenge(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try okResponse.body.json
+        default:
+            throw NSError(domain: "LoginChallengeError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
         }
     }
 

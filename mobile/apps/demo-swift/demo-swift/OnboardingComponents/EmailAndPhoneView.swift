@@ -23,7 +23,7 @@ struct EmailAndPhoneView: View {
                     isLoading = true
                     Task {
                         do {
-                            try await onboardingComponents.identify(email: email, phoneNumber: phoneNumber)
+                            try await onboardingComponents.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
 
                             shouldNavigateToNextView = true
                         } catch {
@@ -46,10 +46,11 @@ struct EmailAndPhoneView: View {
                 .background(isLoading ? Color.gray : Color.blue)
                 .cornerRadius(8)
                 .disabled(isLoading)
-                .padding()
-                NavigationLink(destination: SignUpChallengeView(), isActive: $shouldNavigateToNextView) { EmptyView() }
+                .padding()               
+                NavigationLink(destination: VerifyOTPView(), isActive: $shouldNavigateToNextView) { EmptyView() }
             }
         }
+        .navigationTitle("Signup flow")
         .onAppear(perform: {
             Task {
                 do {

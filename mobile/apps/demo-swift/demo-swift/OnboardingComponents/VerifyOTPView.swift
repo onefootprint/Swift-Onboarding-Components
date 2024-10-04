@@ -4,7 +4,7 @@ import Inject
 import CustomDump
 
 
-struct SignUpChallengeView: View {
+struct VerifyOTPView: View {
     @ObserveInjection var inject
     private var onboardingComponents = FootprintProvider.shared
     @State private var pin: String = "000000"
@@ -62,7 +62,7 @@ struct SignUpChallengeView: View {
         
         Task {
             do {
-                try await FootprintProvider.shared.submitOTPCode(code: pin)
+                try await FootprintProvider.shared.verify(verificationCode: pin)
                 DispatchQueue.main.async {
                     self.navigateToBasicInfo = true
                 }
