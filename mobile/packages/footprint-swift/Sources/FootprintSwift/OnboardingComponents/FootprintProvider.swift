@@ -1,79 +1,57 @@
-//
-//  File.swift
-//  
-//
-//  Created by Rodrigo on 11/09/24.
-//
-
 import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
 import CustomDump
 
-
-
 public final class FootprintProvider {
-    var client: Client  = Client(serverURL: try!Servers.server1(), transport: URLSessionTransport())
-    var configKey: String = ""
+    private var client: Client
+    private var configKey: String = ""
+    private var queries: FootprintQueries!
     var onboardingConfig: Components.Schemas.PublicOnboardingConfiguration?
-    
+    var signupChallengeResponse: Components.Schemas.SignupChallengeResponse?
+    var identifyResponse: Components.Schemas.IdentifyResponse?
+    var verifyResponse: Components.Schemas.IdentifyVerifyResponse?
+    private var sandboxId: String
     
     public static let shared: FootprintProvider = {
-            let instance = FootprintProvider()
-
-            return instance
-        }()
+        let instance = FootprintProvider()
+        return instance
+    }()
     
-    
-    private init() {}
-    
+    private init() {
+        self.client = Client(serverURL: try!Servers.server1(), transport: URLSessionTransport())
+        self.sandboxId = String(UUID().uuidString.prefix(11).filter { $0.isLetter || $0.isNumber })
+    }
     
     public func initialize(configKey: String) async throws {
         self.configKey = configKey
+        self.queries = FootprintQueries(client: self.client, configKey: self.configKey)
         
-       let response =  try await self.getOnboardingConfig()
-        
-        customDump(response)
-        
-       self.onboardingConfig = response
+        self.onboardingConfig  = try await self.queries.getOnboardingConfig()
+        customDump(self.onboardingConfig)            
     }
 
-    public func identify(email: String, phoneNumber: String) async throws -> Components.Schemas.IdentifyResponse {
-              
-        let input = Operations.identify.Input(
-            headers: Operations.identify.Input.Headers(
-                X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey
-            ),
-            body: .json(Components.Schemas.IdentifyRequest(
-                email: email, phone_number: phoneNumber, scope: Components.Schemas.IdentifyRequest.scopePayload.onboarding
-                
-            ))
-        )
-        
-        let response = try await client.identify(input)
-                
-        switch response {
-        case .ok(let okResponse):
-            return try okResponse.body.json
-        default:
-            throw NSError(domain: "IdentifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
-        }
-    }
-        
-    private func getOnboardingConfig() async throws -> Components.Schemas.PublicOnboardingConfiguration {
-    
-        let input = Operations.getOnboardingConfig.Input(
-            headers: Operations.getOnboardingConfig.Input.Headers(X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey)
-    )
-        
-        let response =  try await client.getOnboardingConfig(input)
+    public func identify(email: String, phoneNumber: String) async throws  {        
+            self.identifyResponse = try await self.queries.identify(email: email, phoneNumber: phoneNumber)            
+            customDump(self.identifyResponse)
             
-        switch response {
-        case .ok(let okResponse):
-            return try okResponse.body.json
-        default:
-            throw NSError(domain: "IdentifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
+        if identifyResponse?.user == nil {
+                self.signupChallengeResponse = try await self.queries.getSignupChallenge(
+                    email: email, 
+                    phoneNumber: phoneNumber,
+                    sandboxId: sandboxId
+                )
+                customDump(self.signupChallengeResponse)
         }
     }
-    
+
+    public func submitOTPCode(code: String) async throws {
+       self.verifyResponse = try await self.queries.verify(
+            challenge: code, 
+            challengeToken: self.signupChallengeResponse?.challenge_data.challenge_token ?? "",
+            authToken: self.signupChallengeResponse?.challenge_data.token ?? ""
+            )
+        customDump(self.verifyResponse)
+    }
+
 }

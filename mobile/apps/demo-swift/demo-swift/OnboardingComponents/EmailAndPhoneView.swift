@@ -6,10 +6,11 @@ import CustomDump
 
 struct EmailAndPhoneView: View {
     @ObserveInjection var inject
-    @State private var email: String = ""
-    @State private var phoneNumber: String = ""
+    @State private var email: String = "sandbox@onefootprint.com"
+    @State private var phoneNumber: String = "+15555550100"
     private var onboardingComponents = FootprintProvider.shared
     @State private var shouldNavigateToNextView = false
+    @State private var isLoading = false
     
     var body: some View {
         NavigationView {
@@ -19,6 +20,7 @@ struct EmailAndPhoneView: View {
                 PhoneInputField(phoneNumber: $phoneNumber, placeholder: "Enter your phone number", label: "Phone")
                     .padding()
                 Button(action: {
+                    isLoading = true
                     Task {
                         do {
                             let response = try await onboardingComponents.identify(email: email, phoneNumber: phoneNumber)
@@ -29,15 +31,22 @@ struct EmailAndPhoneView: View {
                             customDump(error)
                             shouldNavigateToNextView = false
                         }
+                        isLoading = false
                     }
                 }) {
-                    Text("Continue")
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(8)
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Text("Continue")
+                    }
                 }
+                .foregroundColor(.white)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(isLoading ? Color.gray : Color.blue)
+                .cornerRadius(8)
+                .disabled(isLoading)
                 .padding()
                 NavigationLink(destination: SignUpChallengeView(), isActive: $shouldNavigateToNextView) { EmptyView() }
             }
