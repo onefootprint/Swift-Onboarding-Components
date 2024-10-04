@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 
+import { FIELDSET_HEADER_HEIGHT } from '../../../../constants';
 import useDecryptForm from '../../hooks/use-decrypt-form';
 import useField from '../../hooks/use-field';
 import type { DiField } from '../../vault.types';
@@ -104,6 +105,7 @@ const Header = styled.header`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
+    height: ${FIELDSET_HEADER_HEIGHT}px;
 
     &[data-primary-background='true'] {
       background-color: ${theme.backgroundColor.primary};

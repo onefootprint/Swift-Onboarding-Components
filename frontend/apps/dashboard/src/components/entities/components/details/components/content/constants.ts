@@ -1,0 +1,1 @@
+export const FIELDSET_HEADER_HEIGHT = 40;
