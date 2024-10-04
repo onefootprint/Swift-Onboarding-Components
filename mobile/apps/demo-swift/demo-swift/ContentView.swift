@@ -74,7 +74,7 @@ struct ContentView: View {
             }
         }
         .padding(50)        
-        NavigationLink("Verify with onboarding components", destination: OnboardingComponentsInitialView())
+        NavigationLink("Verify with onboarding components", destination: EmailAndPhoneView())
             
         }.enableInjection()
     }

@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "FootprintSwift",
     platforms: [
-           .iOS(.v13),
+           .iOS(.v14),
            ],
     products: [
         .library(
@@ -16,6 +16,8 @@ let package = Package(
           .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.0.0"),
           .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
           .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.0.0"),
+          .package(url: "https://github.com/RedMadRobot/input-mask-ios", from: "1.0.0"),
+          .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0")
       ],
     targets: [
         .target(
@@ -23,6 +25,7 @@ let package = Package(
             dependencies: [
                            .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                            .product(name: "OpenAPIURLSession", package: "swift-openapi-urlsession"),
+                           .product(name: "InputMask", package: "input-mask-ios"),
                        ],
             plugins: [
                            .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
