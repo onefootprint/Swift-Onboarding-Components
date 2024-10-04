@@ -11,9 +11,11 @@ public struct FootprintConfiguration: Encodable {
     public var options: FootprintOptions?
     public var l10n: FootprintL10n?
     public var appearance: FootprintAppearance?
+    public let fixtureResult: String?
 
     public init(publicKey: String? = nil,
                 authToken: String? = nil,
+                fixtureResult: String? = nil,
                 scheme: String,
                 bootstrapData: FootprintBootstrapData? = nil,
                 options: FootprintOptions? = nil,
@@ -35,6 +37,7 @@ public struct FootprintConfiguration: Encodable {
         self.options = options
         self.l10n = l10n
         self.appearance = appearance
+        self.fixtureResult = fixtureResult
     }
 
     // Callbacks and redirectUrl should not be serialized
@@ -44,6 +47,8 @@ public struct FootprintConfiguration: Encodable {
         case bootstrapData = "user_data"
         case options = "options"
         case l10n = "l10n"
+        case documentFixtureResult = "document_fixture_result"
+        case fixtureResult = "fixture_result"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -53,5 +58,7 @@ public struct FootprintConfiguration: Encodable {
         try container.encodeIfPresent(self.bootstrapData, forKey: .bootstrapData)
         try container.encodeIfPresent(self.options, forKey: .options)
         try container.encodeIfPresent(self.l10n, forKey: .l10n)
+        try container.encodeIfPresent(self.fixtureResult, forKey: .fixtureResult)
+        try container.encodeIfPresent(self.fixtureResult, forKey: .documentFixtureResult)
     }
-}
+} 

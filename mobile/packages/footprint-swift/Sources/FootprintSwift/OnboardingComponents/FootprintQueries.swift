@@ -48,7 +48,7 @@ public class FootprintQueries {
         }
     }
 
-    func getSignupChallenge(email: String, phoneNumber: String, sandboxId: String) async throws -> Components.Schemas.SignupChallengeResponse {
+    func getSignupChallenge(email: String, phoneNumber: String, sandboxId: String? = nil) async throws -> Components.Schemas.SignupChallengeResponse {
         let input = Operations.signupChallenge.Input(
             headers: Operations.signupChallenge.Input.Headers(
                 X_hyphen_Sandbox_hyphen_Id: sandboxId,

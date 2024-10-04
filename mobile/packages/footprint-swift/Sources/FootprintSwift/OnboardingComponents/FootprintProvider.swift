@@ -6,12 +6,12 @@ import CustomDump
 public final class FootprintProvider {
     private var client: Client
     private var configKey: String = ""
+    private var authToken: String?
+    private var vaultAuthToken: String?
     private var queries: FootprintQueries!
     var onboardingConfig: Components.Schemas.PublicOnboardingConfiguration?
     var signupChallengeResponse: Components.Schemas.SignupChallengeResponse?
-    var identifyResponse: Components.Schemas.IdentifyResponse?
-    var verifyResponse: Components.Schemas.IdentifyVerifyResponse?
-    var vaultingTokenResponse: Components.Schemas.CreateUserTokenResponse?
+    var identifyResponse: Components.Schemas.IdentifyResponse?       
     private var sandboxId: String
     
     public static let shared: FootprintProvider = {
@@ -49,50 +49,72 @@ public final class FootprintProvider {
                 self.signupChallengeResponse = try await self.queries.getSignupChallenge(
                     email: email, 
                     phoneNumber: phoneNumber,
-                    sandboxId: sandboxId
+                    sandboxId: self.sandboxId
                 )
                 customDump(self.signupChallengeResponse)
+        } else {
+            self.authToken = identifyResponse?.user?.token
         }
     }
 
     public func submitOTPCode(code: String) async throws {
         guard let challengeToken = self.signupChallengeResponse?.challenge_data.challenge_token,
-              let authToken = self.signupChallengeResponse?.challenge_data.token else {
+              let challengeAuthToken = self.signupChallengeResponse?.challenge_data.token else {
             throw NSError(domain: "SubmitOTPError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing challenge token or auth token"])
         }
         
-        self.verifyResponse = try await self.queries.verify(
+        let verifyResponse = try await self.queries.verify(
             challenge: code,
             challengeToken: challengeToken,
-            authToken: authToken
+            authToken: challengeAuthToken
         )       
-        guard let authToken = self.verifyResponse?.auth_token else {
-            throw NSError(domain: "InitOnboardingError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing authentication token"])
-        }        
+        self.authToken = verifyResponse.auth_token   
+          guard let authToken = self.authToken else {
+            throw NSError(domain: "VerifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing authentication token"])
+        } 
+
         try await self.queries.initOnboarding(authToken: authToken)        
-        self.vaultingTokenResponse = try await self.queries.vaultingToken(authToken: authToken)
-        customDump(self.vaultingTokenResponse)        
+        let vaultingTokenResponse = try await self.queries.vaultingToken(authToken: authToken)
+
+        self.vaultAuthToken = vaultingTokenResponse.token
     }
 
 
     public func vault(vaultData: VaultData) async throws {
-        guard let vaultAuthToken = self.vaultingTokenResponse?.token else {
+        guard let vaultAuthToken = self.vaultAuthToken else {
             throw NSError(domain: "VaultError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing authentication token"])
         }
         
-        let response = try await self.queries.vault(authToken: vaultAuthToken, vaultData: vaultData)
-        customDump(response)
+        try await self.queries.vault(authToken: vaultAuthToken, vaultData: vaultData)        
     }
 
 
     public func process() async throws {
-        guard let authToken = self.verifyResponse?.auth_token else {
+        guard let authToken = self.authToken else {
             throw NSError(domain: "ProcessError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing authentication token"])
         }        
         
-        let response = try await self.queries.process(authToken: authToken)
-        customDump(response)
+        try await self.queries.process(authToken: authToken)
     }
 
-   
+    public func handoff( 
+        onCancel: (() -> Void)? = nil,
+        onComplete: ((_ validationToken: String) -> Void)? = nil,
+        onError: ((_ errorMessage: String) -> Void)? = nil
+                ) async throws {
+                    
+                    let config = FootprintConfiguration(
+                        publicKey: self.configKey,
+                        authToken:  self.authToken,
+                        fixtureResult: "pass",
+                        scheme: "footprintapp-callback",
+                        onCancel: onCancel,
+                        onComplete: onComplete,
+                        onError: onError
+                    )
+                          
+                customDump(config)
+
+                try await Footprint.initialize(with: config)
+    }
 }

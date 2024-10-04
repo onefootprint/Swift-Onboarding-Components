@@ -23,8 +23,7 @@ struct EmailAndPhoneView: View {
                     isLoading = true
                     Task {
                         do {
-                            let response = try await onboardingComponents.identify(email: email, phoneNumber: phoneNumber)
-                            customDump(response)
+                            try await onboardingComponents.identify(email: email, phoneNumber: phoneNumber)
 
                             shouldNavigateToNextView = true
                         } catch {
@@ -54,10 +53,8 @@ struct EmailAndPhoneView: View {
         .onAppear(perform: {
             Task {
                 do {
-                    try await onboardingComponents.initialize(configKey:"pb_test_2i5Sl82d7NQOnToRYrD2dx")
-                } catch {
-                    customDump(error)
-                }                
+                    try await FootprintProvider.shared.initialize(configKey:"pb_test_QeSAeS8XHohiSpCOj2l4vd")
+                }
             }
         })
         .enableInjection()

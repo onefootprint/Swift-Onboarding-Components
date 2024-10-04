@@ -3,12 +3,10 @@ import FootprintSwift
 import Inject
 
 struct ContentView: View {
-    @ObserveInjection var inject
-    
     var body: some View {
         NavigationStack {
         VStack  {
-            Button("Verify with iFrame") {
+            Button("Verify with hosted flow") {
                 let bootstrapData = FootprintBootstrapData(
                     email: "example@gmail.com",
                     phoneNumber: "+15555550100",
@@ -53,7 +51,7 @@ struct ContentView: View {
                 )
                 
                 let config = FootprintConfiguration(
-                    publicKey: "pb_test_pZoERpZeZkGW7RRVeBawSm", // KYB pb_key to test all bootstrap data
+                    publicKey: "pb_test_2i5Sl82d7NQOnToRYrD2dx", // KYB pb_key to test all bootstrap data
                     scheme: "footprintapp-callback",
                     bootstrapData: bootstrapData,
                     options: options,
