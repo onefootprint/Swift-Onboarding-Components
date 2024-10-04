@@ -10,8 +10,8 @@ pub mod error_code;
 pub enum Error {
     #[error("Sentilink reqwest middleware error: {0}")]
     ReqwestMiddlewareError(#[from] reqwest_middleware::Error),
-    #[error("Sentilink reqwest error: {0}")]
-    ReqwestError(#[from] reqwest::Error),
+    #[error("Sentilink reqwest error: {0} http status: {1}")]
+    ReqwestErrorWithCode(reqwest::Error, u16),
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
     #[error("Sentilink http error {0}")]
