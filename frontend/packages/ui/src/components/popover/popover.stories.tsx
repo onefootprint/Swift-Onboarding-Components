@@ -1,43 +1,53 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import Stack from '../stack';
 import Text from '../text';
+
+import Button from '../button';
 import Popover from './popover';
-import type { PopoverProps } from './popover';
 
 export default {
-  component: Popover,
   title: 'Components/Popover',
-  argTypes: {
-    content: {
-      control: 'text',
-      description: 'The content of the popover',
-      table: {
-        type: { summary: 'ReactNode' },
-      },
-    },
-  },
-} satisfies Meta<typeof Popover>;
+} satisfies Meta<typeof Popover.Root>;
 
-const PopoverContent = () => {
-  return (
-    <Stack direction="column">
-      <Text variant="label-3">Popover content</Text>
-      <Text variant="body-3">Popover content</Text>
-    </Stack>
-  );
+type Story = StoryObj<typeof Popover.Root>;
+
+const Template: Story = {
+  render: () => (
+    <Popover.Root>
+      <Popover.Trigger>
+        <Button variant="secondary" size="compact" type="button">
+          Click to Open Popover
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content>
+          <Stack direction="column" gap={2} padding={3}>
+            <Text variant="label-3">This content appears on click</Text>
+          </Stack>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  ),
 };
 
-const Template: StoryFn<PopoverProps> = () => {
-  return (
-    <Stack justify="center" align="center" width="100vw" height="100vh">
-      <Popover content={<PopoverContent />}>
-        <Text variant="body-3" color="primary">
-          Open Popover
-        </Text>
-      </Popover>
-    </Stack>
-  );
+export const Default: Story = {
+  ...Template,
 };
 
-export const Default = Template.bind({});
-Default.args = {};
+export const TextTrigger: Story = {
+  ...Template,
+  render: () => (
+    <Popover.Root>
+      <Popover.Trigger>
+        <Text variant="label-3">Click to Open Popover</Text>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content>
+          <Stack direction="column" gap={2} padding={3}>
+            <Text variant="body-3">This content appears on click</Text>
+          </Stack>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  ),
+};

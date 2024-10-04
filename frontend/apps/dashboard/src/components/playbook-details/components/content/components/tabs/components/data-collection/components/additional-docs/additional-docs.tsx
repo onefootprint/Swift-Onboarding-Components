@@ -133,20 +133,23 @@ const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSe
           <Text variant="body-2" color="secondary">
             ⋅
           </Text>
-          <Popover
-            content={
-              <PopoverContent
-                uploadSettings={uploadSettings}
-                identifier={identifier}
-                description={description}
-                requiresHumanReview={requiresHumanReview}
-              />
-            }
-          >
-            <Text variant="body-2" color="secondary">
-              {t('more-details')}
-            </Text>
-          </Popover>
+          <Popover.Root>
+            <Popover.Trigger>
+              <Text variant="body-2" color="secondary">
+                {t('more-details')}
+              </Text>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content>
+                <PopoverContent
+                  uploadSettings={uploadSettings}
+                  identifier={identifier}
+                  description={description}
+                  requiresHumanReview={requiresHumanReview}
+                />
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
         </>
       ) : null}
     </Stack>

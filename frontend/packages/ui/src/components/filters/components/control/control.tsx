@@ -4,19 +4,21 @@
 import { useId, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import Box from '../../../box';
-import Fade from '../../../fade';
+import { useTranslation } from 'react-i18next';
+import Button from '../../../button';
 import LoadingSpinner from '../../../loading-spinner';
+import Popover from '../../../popover';
+import ScrollArea from '../../../scroll-area';
+import Stack from '../../../stack';
+import Text from '../../../text';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
 import ClearPill from './components/clear-pill';
 import DateForm from './components/date-form';
 import MultiSelectGroupedForm from './components/multi-select-grouped-form';
-import Popover from './components/popover';
 import SelectForm, { SelectFormKind } from './components/select-form';
 import SelectedPill from './components/selected-pill';
 import useDateOptions from './hooks/use-date-options';
-import usePopper from './hooks/use-popper';
 import getDateLabel from './utils/get-date-label';
 import getMultiSelectGroupedLabel from './utils/get-multi-select-grouped-label';
 import getMultiSelectLabel from './utils/get-multi-select-label';
@@ -29,16 +31,12 @@ export type ControlProps = {
 };
 
 const Control = ({ control, disabled, onChange }: ControlProps) => {
+  const { t } = useTranslation('ui');
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const dateOptions = useDateOptions();
   const { query, kind, label, loading, options, selectedOptions } = control;
   const hasSelectedOptions = selectedOptions && selectedOptions.length > 0;
-  const { attributes, setReferenceElement, setPopperElement } = usePopper();
-
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen);
-  };
 
   const close = () => {
     setOpen(false);
@@ -54,41 +52,39 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
   };
 
   return (
-    <Box ref={setReferenceElement} position="relative" aria-busy={loading}>
-      {hasSelectedOptions ? (
-        <PillGroup>
-          <ClearPill onClick={clear} disabled={disabled}>
-            {label}
-          </ClearPill>
-          <SelectedPillMotion isVisible={hasSelectedOptions} from="left" to="right">
-            <SelectedPill
-              aria-controls={popoverId}
-              aria-expanded={open}
-              aria-haspopup="dialog"
-              disabled={disabled}
-              onClick={handleToggle}
-            >
-              {kind === 'single-select' && getSingleSelectLabel(options, selectedOptions)}
-              {kind === 'multi-select' && getMultiSelectLabel(options, selectedOptions)}
-              {kind === 'multi-select-grouped' && getMultiSelectGroupedLabel(options, selectedOptions)}
-              {kind === 'date' && getDateLabel(dateOptions, selectedOptions)}
-            </SelectedPill>
-          </SelectedPillMotion>
-        </PillGroup>
-      ) : (
-        <AddPill
-          aria-controls={popoverId}
-          aria-expanded={open}
-          aria-haspopup="dialog"
-          onClick={handleToggle}
-          disabled={disabled}
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Stack direction="row">
+          {hasSelectedOptions ? (
+            <PillGroup>
+              <ClearPill onClick={clear} disabled={disabled}>
+                {label}
+              </ClearPill>
+              <SelectedPill aria-controls={popoverId} aria-expanded={open} aria-haspopup="dialog" disabled={disabled}>
+                {kind === 'single-select' && getSingleSelectLabel(options, selectedOptions)}
+                {kind === 'multi-select' && getMultiSelectLabel(options, selectedOptions)}
+                {kind === 'multi-select-grouped' && getMultiSelectGroupedLabel(options, selectedOptions)}
+                {kind === 'date' && getDateLabel(dateOptions, selectedOptions)}
+              </SelectedPill>
+            </PillGroup>
+          ) : (
+            <AddPill aria-controls={popoverId} aria-expanded={open} aria-haspopup="dialog" disabled={disabled}>
+              {label}
+            </AddPill>
+          )}
+        </Stack>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          side="bottom"
+          align="start"
+          minWidth="300px"
+          aria-label={t('components.filters.filter-by', { label })}
         >
-          {label}
-        </AddPill>
-      )}
-      {open ? (
-        <StyledFade isVisible={open} from="center" to="center" ref={setPopperElement} {...attributes.popper}>
-          <Popover id={popoverId} onClose={close} title={label}>
+          <Header>
+            <Text variant="label-3">{t('components.filters.filter-by', { label })}</Text>
+          </Header>
+          <ScrollArea padding={6}>
             {loading ? (
               <LoadingSpinner color="secondary" ariaLabel={`Loading ${label}`} size={24} />
             ) : (
@@ -115,25 +111,20 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
                 {kind === 'date' && <DateForm onSubmit={handleSubmit} selectedOptions={selectedOptions} />}
               </>
             )}
-          </Popover>
-        </StyledFade>
-      ) : null}
-    </Box>
+          </ScrollArea>
+          <Footer>
+            <Button onClick={close} variant="secondary">
+              {t('components.filters.popover.cancel')}
+            </Button>
+            <Button form="filter-form" type="submit" variant="primary">
+              {t('components.filters.popover.apply')}
+            </Button>
+          </Footer>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 };
-
-const SelectedPillMotion = styled(Fade)`
-  && {
-    ${({ theme }) => css`
-      button:first-of-type {
-        color: ${theme.color.primary};
-        border-left: none;
-        border-radius: 0 ${theme.borderRadius.default}
-          ${theme.borderRadius.default} 0;
-      }
-    `}
-  }
-`;
 
 const PillGroup = styled.div`
   display: flex;
@@ -142,15 +133,31 @@ const PillGroup = styled.div`
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+
+  button:last-of-type {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
 `;
 
-const StyledFade = styled(Fade)`
+const Footer = styled.footer`
   ${({ theme }) => css`
-    z-index: ${theme.zIndex.dialog};
-    position: absolute;
-    margin-top: ${theme.spacing[3]};
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[4]};
+    justify-content: flex-end;
+    padding: ${theme.spacing[4]};
+  `}
+`;
+
+const Header = styled.header`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: ${theme.spacing[3]};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 

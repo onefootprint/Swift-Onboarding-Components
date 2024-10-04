@@ -1,11 +1,10 @@
 import { IcoClose24 } from '@onefootprint/icons';
-import FocusTrap from 'focus-trap-react';
+import * as Dialog from '@radix-ui/react-dialog';
 import type React from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useEffectOnce } from 'usehooks-ts';
 
-import { useOnClickOutside } from '../../../../../hooks';
+import Box from '../../../../box';
 import IconButton from '../../../../icon-button';
 import Overlay from '../../../../overlay';
 import SearchInput from '../../../../search-input';
@@ -27,15 +26,6 @@ type PickerProps = {
   OptionComponent?: React.ComponentType<ItemProps>;
 };
 
-enum State {
-  open = 'open',
-  opening = 'opening',
-  closed = 'closed',
-  closing = 'closing',
-}
-
-const OPEN_CLOSE_DELAY = 200;
-
 const Picker = ({
   open,
   onClose,
@@ -48,50 +38,13 @@ const Picker = ({
   onChange,
   OptionComponent = Item,
 }: PickerProps) => {
-  const bottomSheetRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
   const [hasScroll, setHasScroll] = useState(false);
-  const [visibleState, setVisibleState] = useState<State>(State.closed);
-  useOnClickOutside(bottomSheetRef, () => {
-    if (open) {
-      onClose?.();
-    }
-  });
 
   const handleScroll = (e: React.UIEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
-    if (target.scrollTop > 0 && !hasScroll) {
-      setHasScroll(true);
-    }
-    if (target.scrollTop <= 0 && hasScroll) {
-      setHasScroll(false);
-    }
+    setHasScroll(target.scrollTop > 0);
   };
-
-  useEffectOnce(() => {
-    setVisibleState(open ? State.open : State.closed);
-  });
-
-  useEffect(() => {
-    if (visibleState === State.opening || visibleState === State.closing) {
-      return;
-    }
-
-    if (visibleState === State.open && !open) {
-      setVisibleState(State.closing);
-      setTimeout(() => {
-        setVisibleState(State.closed);
-      }, OPEN_CLOSE_DELAY);
-      return;
-    }
-
-    if (visibleState === State.closed && open) {
-      setVisibleState(State.opening);
-      setTimeout(() => {
-        setVisibleState(State.open);
-      }, OPEN_CLOSE_DELAY);
-    }
-  }, [open, visibleState]);
 
   const filteredOptions = useMemo(() => {
     if (!search) return options;
@@ -99,23 +52,28 @@ const Picker = ({
   }, [search, options]);
 
   useEffect(() => {
-    if (!open) resetSearch();
+    if (!open) setSearch('');
   }, [open]);
 
-  const resetSearch = () => {
-    setSearch('');
+  const handleClose = () => {
+    onClose();
   };
 
-  return visibleState === State.closed ? null : (
-    <FocusTrap active={open}>
-      <span>
-        <Sheet className={visibleState} role="dialog" ref={bottomSheetRef} height={height}>
+  return (
+    <Dialog.Root open={open} onOpenChange={handleClose}>
+      <Dialog.Portal>
+        <Dialog.Overlay asChild>
+          <Overlay isVisible={open} />
+        </Dialog.Overlay>
+        <DialogContent height={height}>
           <Header>
-            <CloseContainer onClick={onClose}>
-              <IconButton aria-label="close" onClick={onClose}>
-                <IcoClose24 />
-              </IconButton>
-            </CloseContainer>
+            <Dialog.Close asChild>
+              <IconAligner>
+                <IconButton aria-label="close" variant="ghost" onClick={handleClose}>
+                  <IcoClose24 />
+                </IconButton>
+              </IconAligner>
+            </Dialog.Close>
             <Text variant="label-2">Search...</Text>
           </Header>
           <Content>
@@ -124,7 +82,7 @@ const Picker = ({
                 placeholder={placeholder}
                 id={id}
                 onChangeText={setSearch}
-                onReset={resetSearch}
+                onReset={() => setSearch('')}
                 tabIndex={0}
                 value={search}
                 data-dd-privacy="mask"
@@ -133,19 +91,34 @@ const Picker = ({
             <OptionsContainer $maxHeight={height - 100} onScroll={handleScroll}>
               {filteredOptions?.length
                 ? filteredOptions.map(option => (
-                    <OptionComponent option={option} value={value} onSelect={() => onChange(option)} />
+                    <OptionComponent
+                      key={option.value}
+                      option={option}
+                      value={value}
+                      onSelect={() => onChange(option)}
+                    />
                   ))
                 : renderEmptyState()}
             </OptionsContainer>
           </Content>
-        </Sheet>
-        <Overlay aria-modal isVisible={open} />
-      </span>
-    </FocusTrap>
+        </DialogContent>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 };
 
-const Sheet = styled.div<{ height: number }>`
+const IconAligner = styled(Box)`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: ${theme.spacing[3]};
+    right: ${theme.spacing[3]};
+  `}
+`;
+
+const DialogContent = styled(Dialog.Content)<{ height: number }>`
   ${({ theme, height }) => css`
     position: fixed;
     left: 0;
@@ -154,24 +127,22 @@ const Sheet = styled.div<{ height: number }>`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.xl} ${theme.borderRadius.xl} 0 0;
     z-index: ${theme.zIndex.bottomSheet};
-    align-self: end;
-    transition: all 0.2s linear;
     height: ${height}px;
-    &.open {
-      translateY(0%);
-    }
-    &.opening,
-    &.closing {
-      transform: translateY(100%);
-    }
-  `}
-`;
+    animation: slideUp 150ms cubic-bezier(0.16, 1, 0.3, 1);
 
-const CloseContainer = styled.div`
-  ${({ theme }) => css`
-    position: absolute;
-    top: ${theme.spacing[3]};
-    left: ${theme.spacing[3]};
+    &[data-state="closed"] {
+      animation: slideDown 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(0); }
+      to { transform: translateY(100%); }
+    }
   `}
 `;
 
