@@ -25,9 +25,10 @@ impl DataIdentifier {
                     .map(DataIdentifier::from)
                     .filter(|di| !di.is_verified_ci())
                     .collect_vec(),
-                DataIdentifierDiscriminant::Business => {
-                    BusinessDataKind::iter().map(DataIdentifier::from).collect_vec()
-                }
+                DataIdentifierDiscriminant::Business => BusinessDataKind::non_bo_variants()
+                    .into_iter()
+                    .map(DataIdentifier::from)
+                    .collect_vec(),
                 DataIdentifierDiscriminant::InvestorProfile => InvestorProfileKind::iter()
                     .map(DataIdentifier::from)
                     .collect_vec(),

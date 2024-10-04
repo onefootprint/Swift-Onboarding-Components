@@ -1,6 +1,7 @@
 use crate::CollectedData;
 use crate::DataIdentifier;
 use crate::IsDataIdentifierDiscriminant;
+use strum::IntoEnumIterator;
 use strum_macros::Display;
 use strum_macros::EnumIter;
 use strum_macros::EnumString;
@@ -76,5 +77,11 @@ impl BusinessDataKind {
     /// The list of BDKs that are searchable by fingerprint
     pub fn searchable() -> Vec<Self> {
         vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Tin]
+    }
+
+    pub fn non_bo_variants() -> Vec<Self> {
+        BusinessDataKind::iter()
+            .filter(|i| !matches!(i, Self::BeneficialOwners | Self::KycedBeneficialOwners))
+            .collect()
     }
 }
