@@ -1,3 +1,4 @@
+use super::risk_signals::UserSubmittedInfoForFRC;
 use idv::lexis::response::FlexIdResponse;
 use idv::lexis::response::ValidElementSummary;
 use itertools::Itertools;
@@ -19,24 +20,10 @@ use std::convert::Into;
 // 50 Full name, address, phone, SSN verified
 const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 20;
 
-pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_submitted: bool) -> Vec<FRC> {
+pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoForFRC) -> Vec<FRC> {
     let risk_indicator_codes = res.risk_indicator_codes();
-    let nas = res.name_address_ssn_summary().name_address_ssn_matches();
-    let nap = res.name_address_phone_summary().name_address_phone_matches();
-
-    let mut match_frcs = vec![];
-    match_frcs.append(&mut name_match_codes(&nas, &risk_indicator_codes));
-    match_frcs.push(address_match_code(&nas, &risk_indicator_codes));
-
-    if ssn_submitted {
-        match_frcs.push(ssn_match_code(&nas, &risk_indicator_codes));
-    }
-
-    if phone_submitted {
-        match_frcs.push(phone_match_code(&nap, &risk_indicator_codes));
-    }
-
-    let dob_codes = Into::<Vec<FRC>>::into(&res.dob_match_level());
+    let match_logic = CurrentMatchLogic {};
+    let match_frcs = IdentityAttributeMatch::new(match_logic, &res, user_info);
 
     let valid_element_summary_codes = if let Some(ves) = res.valid_element_summary() {
         let mut codes = vec![];
@@ -54,7 +41,7 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_su
             ssn_found_for_lex_id: _,
         } = ves;
 
-        if ssn_submitted && ssn_valid.map(|s| !s).unwrap_or(false) {
+        if user_info.ssn && ssn_valid.map(|s| !s).unwrap_or(false) {
             codes.push(FRC::SsnInputIsInvalid);
         }
         if ssn_deceased.unwrap_or(false) {
@@ -124,8 +111,8 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_su
         .collect_vec();
 
     match_frcs
+        .into_reason_codes()
         .into_iter()
-        .chain(dob_codes)
         .chain(valid_element_summary_codes)
         .chain(misc_codes)
         .chain(risk_indicator_codes)
@@ -134,24 +121,82 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_su
         .collect()
 }
 
-fn name_match_codes(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> Vec<FRC> {
-    // supposedly R76 only applies to last name and there is no way to know if first name was partial..
-    // might have to require exact match on first name if we think distinguishing partial is critical
-    // here
-    let first_name_frc = match nas.first_name_match {
-        true => FRC::NameFirstMatches,
-        false => FRC::NameFirstDoesNotMatch,
-    };
+struct IdentityAttributeMatch {
+    name: Vec<FRC>,
+    address: FRC,
+    ssn: Option<FRC>,
+    dob: Vec<FRC>,
+    phone: Option<FRC>,
+}
+impl IdentityAttributeMatch {
+    pub fn new<T>(
+        match_logic: T,
+        res: &FlexIdResponse,
+        user_info: UserSubmittedInfoForFRC,
+    ) -> IdentityAttributeMatch
+    where
+        T: LexisMatchLogic,
+    {
+        let name = match_logic.name_match_codes(res);
+        let address = match_logic.address_match_code(res);
+        let ssn = user_info.ssn.then_some(match_logic.ssn_match_code(res));
+        let phone = user_info.phone.then_some(match_logic.phone_match_code(res));
+        let dob = match_logic.dob_match_codes(res);
 
-    let name_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R76);
-    let last_name_frc = match (nas.last_name_match, name_was_partial_match) {
-        (true, true) => FRC::NameLastPartiallyMatches,
-        (true, false) => FRC::NameLastMatches,
-        _ => FRC::NameLastDoesNotMatch,
-    };
+        Self {
+            name,
+            address,
+            ssn,
+            dob,
+            phone,
+        }
+    }
 
-    let overall_name_frc =
-        if matches!(first_name_frc, FRC::NameFirstMatches) && matches!(last_name_frc, FRC::NameLastMatches) {
+    pub fn into_reason_codes(self) -> Vec<FRC> {
+        let ssn = vec![self.ssn].into_iter().flatten();
+        let phone = vec![self.phone].into_iter().flatten();
+
+        self.name
+            .into_iter()
+            .chain(vec![self.address])
+            .chain(ssn)
+            .chain(self.dob)
+            .chain(phone)
+            .unique()
+            .collect()
+    }
+}
+
+trait LexisMatchLogic {
+    fn name_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC>;
+    fn address_match_code(&self, res: &FlexIdResponse) -> FRC;
+    fn ssn_match_code(&self, res: &FlexIdResponse) -> FRC;
+    fn phone_match_code(&self, res: &FlexIdResponse) -> FRC;
+    fn dob_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC>;
+}
+
+struct CurrentMatchLogic;
+
+impl CurrentMatchLogic {
+    fn name_match_codes(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> Vec<FRC> {
+        // supposedly R76 only applies to last name and there is no way to know if first name was partial..
+        // might have to require exact match on first name if we think distinguishing partial is critical
+        // here
+        let first_name_frc = match nas.first_name_match {
+            true => FRC::NameFirstMatches,
+            false => FRC::NameFirstDoesNotMatch,
+        };
+
+        let name_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R76);
+        let last_name_frc = match (nas.last_name_match, name_was_partial_match) {
+            (true, true) => FRC::NameLastPartiallyMatches,
+            (true, false) => FRC::NameLastMatches,
+            _ => FRC::NameLastDoesNotMatch,
+        };
+
+        let overall_name_frc = if matches!(first_name_frc, FRC::NameFirstMatches)
+            && matches!(last_name_frc, FRC::NameLastMatches)
+        {
             FRC::NameMatches
         } else if matches!(first_name_frc, FRC::NameFirstDoesNotMatch)
             && matches!(last_name_frc, FRC::NameLastDoesNotMatch)
@@ -161,62 +206,94 @@ fn name_match_codes(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) 
             FRC::NamePartiallyMatches
         };
 
-    vec![first_name_frc, last_name_frc, overall_name_frc]
-}
+        vec![first_name_frc, last_name_frc, overall_name_frc]
+    }
 
-// LexisNAS - The InstantID NAS summary is an index from 0 through 12 that indicates the level of
-// the match of the submitted name, address, and SSN.
-// Risk Indicator code 30 - Input address may have been miskeyed
-// - e.g Considered miskeyed if it has a match score of 80% or better. (460 Whisper Lake matches to
-//   4660 Whisper Lake Dr **Apt 4**). Unsure if we can configure this 80%.
-fn address_match_code(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
-    // check if Lexis is saying this might be a close/miskey match (e.g. it matched >= 80%)
-    let address_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R30);
-    // Note: We can control whether the NAS only return match if exact match (via `RequireExactMatch` in
-    // the flex ID request). We do not currently require exact matches.
-    //
-    // So we interpret:
-    //  - NAS Address matched (it may be non-exact per the flexid request setting)
-    //  - was it miskeyed (it was a partial match via the Risk indicator)
-    // in order to determine if it's an exact match
-    match (nas.address_match, address_was_partial_match) {
-        (true, true) => FRC::AddressPartiallyMatches,
-        (true, false) => FRC::AddressMatches,
-        (false, true) => {
-            // it's unclear if there's 2 thresholds here for computing the NAS and the risk indicator, so we
-            // just log
-            tracing::info!("Unexpected Lexis response address match combination: address_match = false, address_was_partial_match = true");
-            FRC::AddressDoesNotMatch
+    // LexisNAS - The InstantID NAS summary is an index from 0 through 12 that indicates the level of
+    // the match of the submitted name, address, and SSN.
+    // Risk Indicator code 30 - Input address may have been miskeyed
+    // - e.g Considered miskeyed if it has a match score of 80% or better. (460 Whisper Lake matches to
+    //   4660 Whisper Lake Dr **Apt 4**). Unsure if we can configure this 80%.
+    fn address_match_code(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
+        // check if Lexis is saying this might be a close/miskey match (e.g. it matched >= 80%)
+        let address_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R30);
+        // Note: We can control whether the NAS only return match if exact match (via `RequireExactMatch` in
+        // the flex ID request). We do not currently require exact matches.
+        //
+        // So we interpret:
+        //  - NAS Address matched (it may be non-exact per the flexid request setting)
+        //  - was it miskeyed (it was a partial match via the Risk indicator)
+        // in order to determine if it's an exact match
+        match (nas.address_match, address_was_partial_match) {
+            (true, true) => FRC::AddressPartiallyMatches,
+            (true, false) => FRC::AddressMatches,
+            (false, true) => {
+                // it's unclear if there's 2 thresholds here for computing the NAS and the risk indicator, so
+                // we just log
+                tracing::info!("Unexpected Lexis response address match combination: address_match = false, address_was_partial_match = true");
+                FRC::AddressDoesNotMatch
+            }
+            (false, false) => FRC::AddressDoesNotMatch,
         }
-        (false, false) => FRC::AddressDoesNotMatch,
+    }
+
+    fn ssn_match_code(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
+        let ssn_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R29);
+        match (nas.ssn_match, ssn_was_partial_match) {
+            (true, true) => FRC::SsnPartiallyMatches,
+            (true, false) => FRC::SsnMatches,
+            (false, true) => {
+                tracing::error!("Unexpected Lexis response ssn match combination: ssn_match = false, ssn_was_partial_match = true");
+                FRC::SsnDoesNotMatch
+            }
+            (false, false) => FRC::SsnDoesNotMatch,
+        }
+    }
+
+    fn phone_match_code(nap: &LexisNAP, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
+        let phone_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R31);
+        match (nap.phone_match, phone_was_partial_match) {
+            (true, true) => FRC::PhoneLocatedPartiallyMatches,
+            (true, false) => FRC::PhoneLocatedMatches,
+            (false, true) => {
+                tracing::error!("Unexpected Lexis response phone match combination: phone_match = false, phone_was_partial_match = true");
+                FRC::PhoneLocatedDoesNotMatch
+            }
+            (false, false) => FRC::PhoneLocatedDoesNotMatch,
+        }
     }
 }
 
-fn ssn_match_code(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
-    let ssn_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R29);
-    match (nas.ssn_match, ssn_was_partial_match) {
-        (true, true) => FRC::SsnPartiallyMatches,
-        (true, false) => FRC::SsnMatches,
-        (false, true) => {
-            tracing::error!("Unexpected Lexis response ssn match combination: ssn_match = false, ssn_was_partial_match = true");
-            FRC::SsnDoesNotMatch
-        }
-        (false, false) => FRC::SsnDoesNotMatch,
+impl LexisMatchLogic for CurrentMatchLogic {
+    fn name_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC> {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        Self::name_match_codes(&nas, &risk_indicator_codes)
+    }
+
+    fn address_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        Self::address_match_code(&nas, &risk_indicator_codes)
+    }
+
+    fn ssn_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        let risk_indicator_codes = res.risk_indicator_codes();
+        Self::ssn_match_code(&nas, &risk_indicator_codes)
+    }
+
+    fn phone_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nap = res.name_address_phone_summary().name_address_phone_matches();
+        Self::phone_match_code(&nap, &risk_indicator_codes)
+    }
+
+    fn dob_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC> {
+        Into::<Vec<FRC>>::into(&res.dob_match_level())
     }
 }
 
-fn phone_match_code(nap: &LexisNAP, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
-    let phone_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R31);
-    match (nap.phone_match, phone_was_partial_match) {
-        (true, true) => FRC::PhoneLocatedPartiallyMatches,
-        (true, false) => FRC::PhoneLocatedMatches,
-        (false, true) => {
-            tracing::error!("Unexpected Lexis response phone match combination: phone_match = false, phone_was_partial_match = true");
-            FRC::PhoneLocatedDoesNotMatch
-        }
-        (false, false) => FRC::PhoneLocatedDoesNotMatch,
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -240,7 +317,7 @@ mod tests {
     #[test_case(false, true, vec![RIC::R76] => vec![FRC::NameFirstDoesNotMatch, FRC::NameLastPartiallyMatches, FRC::NamePartiallyMatches])]
     #[test_case(true, false, vec![RIC::R76] => vec![FRC::NameFirstMatches, FRC::NameLastDoesNotMatch, FRC::NamePartiallyMatches])]
     fn test_name_match_code(first_name_match: bool, last_name_match: bool, ric: Vec<RIC>) -> Vec<FRC> {
-        name_match_codes(
+        CurrentMatchLogic::name_match_codes(
             &LexisNAS {
                 ssn_match: false,
                 first_name_match,
@@ -257,7 +334,7 @@ mod tests {
     #[test_case(false, vec![RIC::R30] => FRC::AddressDoesNotMatch)]
     #[test_case(false, vec![] => FRC::AddressDoesNotMatch)]
     fn test_address_match_code(address_match: bool, ric: Vec<RIC>) -> FRC {
-        address_match_code(
+        CurrentMatchLogic::address_match_code(
             &LexisNAS {
                 ssn_match: false,
                 first_name_match: false,
@@ -274,7 +351,7 @@ mod tests {
     #[test_case(false, vec![RIC::R29] => FRC::SsnDoesNotMatch)]
     #[test_case(false, vec![] => FRC::SsnDoesNotMatch)]
     fn test_ssn_match_code(ssn_match: bool, ric: Vec<RIC>) -> FRC {
-        ssn_match_code(
+        CurrentMatchLogic::ssn_match_code(
             &LexisNAS {
                 ssn_match,
                 first_name_match: false,
@@ -291,7 +368,7 @@ mod tests {
     #[test_case(false, vec![RIC::R31] => FRC::PhoneLocatedDoesNotMatch)]
     #[test_case(false, vec![] => FRC::PhoneLocatedDoesNotMatch)]
     fn test_phone_match_code(phone_match: bool, ric: Vec<RIC>) -> FRC {
-        phone_match_code(
+        CurrentMatchLogic::phone_match_code(
             &LexisNAP {
                 phone_match,
                 first_name_match: false,
@@ -412,10 +489,12 @@ mod tests {
         expected_frc: Vec<FootprintReasonCode>,
     ) {
         let res = idv::lexis::parse_response(json).unwrap();
-        assert_have_same_elements(
-            expected_frc,
-            super::footprint_reason_codes(res, ssn_submitted, phone_submitted),
-        );
+        let user_info = UserSubmittedInfoForFRC {
+            ssn: ssn_submitted,
+            phone: phone_submitted,
+            dob: false,
+        };
+        assert_have_same_elements(expected_frc, super::footprint_reason_codes(res, user_info));
     }
 
     fn example1() -> serde_json::Value {

@@ -74,13 +74,12 @@ pub fn parse_reason_codes(
 ) -> Vec<FootprintReasonCode> {
     let dob_submitted = submitted_info.dob;
     let ssn_submitted = submitted_info.ssn;
-    let phone_submitted = submitted_info.phone;
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
             idology_expectid::footprint_reason_codes(r, dob_submitted, ssn_submitted)
         }
         ParsedResponse::ExperianPreciseID(r) => experian::footprint_reason_codes(r),
-        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted, phone_submitted)
+        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, submitted_info)
             .into_iter()
             .collect(),
         ParsedResponse::IncodeCurpValidation(ref r) => {
