@@ -112,4 +112,153 @@ public class FootprintQueries {
             throw NSError(domain: "VerifyError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred"])
         }
     }
+
+    func initOnboarding(
+        authToken: String
+    ) async throws -> Components.Schemas.OnboardingResponse {
+        let input = Operations.onboarding.Input(
+            headers: Operations.onboarding.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+            body: .json(Components.Schemas.PostOnboardingRequest(
+                fixture_result: Components.Schemas.PostOnboardingRequest.fixture_resultPayload.pass
+            ))
+        )
+        
+        let response = try await client.onboarding(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try okResponse.body.json
+        default:
+            throw NSError(domain: "OnboardingError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred during onboarding"])
+        }
+    }
+
+    func vaultingToken(authToken: String) async throws -> Components.Schemas.CreateUserTokenResponse {
+        let input = Operations.vaultingToken.Input(
+            headers: Operations.vaultingToken.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+            body: .json(Components.Schemas.CreateUserTokenRequest(requested_scope: Components.Schemas.CreateUserTokenRequest.requested_scopePayload.onboarding
+            ))
+        )
+        
+        let response = try await client.vaultingToken(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try okResponse.body.json
+        default:
+            throw NSError(domain: "VaultingTokenError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain vaulting token"])
+        }
+    }
+
+    func vault(
+        authToken: String,
+        vaultData: VaultData
+    ) async throws -> Components.Schemas.Empty {
+        // VaultIdProps
+        let vaultIdProps = Components.Schemas.VaultIdProps(
+            id_period_address_line1: vaultData.idAddressLine1,
+            id_period_address_line2: vaultData.idAddressLine2,
+            id_period_citizenships: vaultData.idCitizenships,
+            id_period_city: vaultData.idCity,
+            id_period_country: vaultData.idCountry,
+            id_period_dob: vaultData.idDob,
+            id_period_drivers_license_number: vaultData.idDriversLicenseNumber,
+            id_period_drivers_license_state: vaultData.idDriversLicenseState,
+            id_period_email: vaultData.idEmail,
+            id_period_first_name: vaultData.idFirstName,
+            id_period_itin: vaultData.idItin,
+            id_period_last_name: vaultData.idLastName,
+            id_period_middle_name: vaultData.idMiddleName,
+            id_period_nationality: vaultData.idNationality,
+            id_period_phone_number: vaultData.idPhoneNumber,
+            id_period_ssn4: vaultData.idSsn4,
+            id_period_ssn9: vaultData.idSsn9,
+            id_period_state: vaultData.idState,
+            id_period_us_legal_status: vaultData.idUsLegalStatus,
+            id_period_us_tax_id: vaultData.idUsTaxId,
+            id_period_visa_expiration_date: vaultData.idVisaExpirationDate,
+            id_period_visa_kind: vaultData.idVisaKind,
+            id_period_zip: vaultData.idZip
+        )
+        // VaultInvestorProps
+        let vaultInvestorProps = Components.Schemas.VaultInvestorProps(
+            investor_profile_period_employment_status: vaultData.investorProfileEmploymentStatus,
+            investor_profile_period_occupation: vaultData.investorProfileOccupation,
+            investor_profile_period_employer: vaultData.investorProfileEmployer,
+            investor_profile_period_annual_income: vaultData.investorProfileAnnualIncome,
+            investor_profile_period_net_worth: vaultData.investorProfileNetWorth,
+            investor_profile_period_funding_sources: vaultData.investorProfileFundingSources,
+            investor_profile_period_investment_goals: vaultData.investorProfileInvestmentGoals,
+            investor_profile_period_risk_tolerance: vaultData.investorProfileRiskTolerance,
+            investor_profile_period_declarations: vaultData.investorProfileDeclarations,
+            investor_profile_period_senior_executive_symbols: vaultData.investorProfileSeniorExecutiveSymbols,
+            investor_profile_period_family_member_names: vaultData.investorProfileFamilyMemberNames,
+            investor_profile_period_political_organization: vaultData.investorProfilePoliticalOrganization,
+            investor_profile_period_brokerage_firm_employer: vaultData.investorProfileBrokerageFirmEmployer
+        )
+    
+        // VaultCustomProps
+        var vaultCustomProps: Components.Schemas.VaultCustomProps? = nil
+        if let customProperties = vaultData.customProperties {
+            vaultCustomProps = Components.Schemas.VaultCustomProps(additionalProperties: customProperties)
+        }
+        
+        let input = Operations.vault.Input(
+            headers: Operations.vault.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+            body: .json(Components.Schemas.RawUserDataRequest.init(
+                value1: vaultIdProps,
+                value2: vaultInvestorProps,
+                value3: vaultCustomProps)
+            )
+        )            
+        
+        let response = try await client.vault(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try okResponse.body.json
+        case .badRequest(let badRequestResponse):
+            let error = try badRequestResponse.body.json
+            throw NSError(domain: "VaultError", code: 400, userInfo: [
+                NSLocalizedDescriptionKey: error.value2?.message,
+                "context": error.value1?.context])
+        default:
+            throw NSError(domain: "VaultError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred during vault creation"])
+        }
+
+    }
+     
+    func process(authToken: String) async throws -> Components.Schemas.Empty {
+        let input = Operations.process.Input(
+            headers: Operations.process.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+            body: .json(Components.Schemas.ProcessRequest(
+                fixture_result: Components.Schemas.ProcessRequest.fixture_resultPayload.pass
+            ))
+        )
+        
+        let response = try await client.process(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try okResponse.body.json
+        case .badRequest(let badRequestResponse):
+            let error = try badRequestResponse.body.json
+            throw NSError(domain: "ProcessError", code: 400, userInfo: [
+                NSLocalizedDescriptionKey: error.message,
+                "debug": error.debug,
+                "supportId": error.support_id,
+                "code": error.code])
+        default:
+            throw NSError(domain: "ProcessError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected error occurred during processing"])
+        }
+    }
+
 }

@@ -6,7 +6,12 @@
   },
   "servers": [
     {
-      "url": "https://api.onefootprint.com"
+      "url": "https://api.onefootprint.com",
+      "description": "Prod"
+    },
+    {
+      "url": "https://api.dev.onefootprint.com",
+      "description": "Dev"
     }
   ],
   "paths": {
@@ -683,6 +688,17 @@
           {
             "BusinessOwnerToken": []
           }
+        ],
+        "operationId": "onboarding",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "X-Fp-Authorization",
+            "required": true
+          }
         ]
       }
     },
@@ -1004,11 +1020,32 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         },
         "security": [
           {
             "UserOnboardingToken": []
+          }
+        ],
+        "operationId": "process",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "X-Fp-Authorization",
+            "required": true
           }
         ]
       }
@@ -1134,6 +1171,17 @@
         "security": [
           {
             "UserOnboardingToken": []
+          }
+        ],
+        "operationId": "onboardingStatus",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "X-Fp-Authorization",
+            "required": true
           }
         ]
       }
@@ -1737,7 +1785,18 @@
           {
             "UserToken": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "X-Fp-Authorization",
+            "required": true
+          }
+        ],
+        "operationId": "vaultingToken"
       }
     },
     "/hosted/user/upload/{document_identifier}": {
@@ -2039,11 +2098,32 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VaultBadRequestResponse"
+                }
+              }
+            }
           }
         },
         "security": [
           {
             "UserOnboardingToken": []
+          }
+        ],
+        "operationId": "vault",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "X-Fp-Authorization",
+            "required": true
           }
         ]
       }
@@ -2081,6 +2161,17 @@
         "security": [
           {
             "UserToken": []
+          }
+        ],
+        "operationId": "decryptUserVault",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "X-Fp-Authorization",
+            "required": true
           }
         ]
       }
@@ -2787,7 +2878,8 @@
         },
         "required": [
           "requested_scope"
-        ]
+        ],
+        "title": ""
       },
       "CreateUserTokenResponse": {
         "type": "object",
@@ -5378,241 +5470,22 @@
         ]
       },
       "RawUserDataRequest": {
-        "example": {
-          "id.first_name": "Jane",
-          "id.last_name": "Doe",
-          "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58"
-        },
-        "type": "object",
-        "properties": {
-          "<key>": {
-            "type": "string",
-            "enum": [
-              "id.first_name",
-              "id.middle_name",
-              "id.last_name",
-              "id.dob",
-              "id.ssn4",
-              "id.ssn9",
-              "id.address_line1",
-              "id.address_line2",
-              "id.city",
-              "id.state",
-              "id.zip",
-              "id.country",
-              "id.email",
-              "id.phone_number",
-              "id.us_legal_status",
-              "id.visa_kind",
-              "id.visa_expiration_date",
-              "id.nationality",
-              "id.citizenships",
-              "id.drivers_license_number",
-              "id.drivers_license_state",
-              "id.itin",
-              "id.us_tax_id",
-              "custom.*",
-              "investor_profile.employment_status",
-              "investor_profile.occupation",
-              "investor_profile.employer",
-              "investor_profile.annual_income",
-              "investor_profile.net_worth",
-              "investor_profile.investment_goals",
-              "investor_profile.risk_tolerance",
-              "investor_profile.declarations",
-              "investor_profile.brokerage_firm_employer",
-              "investor_profile.senior_executive_symbols",
-              "investor_profile.family_member_names",
-              "investor_profile.political_organization",
-              "investor_profile.funding_sources",
-              "document.id_card.front.image",
-              "document.id_card.front.mime_type",
-              "document.id_card.back.image",
-              "document.id_card.back.mime_type",
-              "document.id_card.selfie.image",
-              "document.id_card.selfie.mime_type",
-              "document.id_card.full_name",
-              "document.id_card.dob",
-              "document.id_card.gender",
-              "document.id_card.full_address",
-              "document.id_card.document_number",
-              "document.id_card.expires_at",
-              "document.id_card.issued_at",
-              "document.id_card.issuing_state",
-              "document.id_card.issuing_country",
-              "document.id_card.ref_number",
-              "document.id_card.nationality",
-              "document.id_card.curp",
-              "document.id_card.classified_document_type",
-              "document.id_card.curp_validation_response",
-              "document.drivers_license.front.image",
-              "document.drivers_license.front.mime_type",
-              "document.drivers_license.back.image",
-              "document.drivers_license.back.mime_type",
-              "document.drivers_license.selfie.image",
-              "document.drivers_license.selfie.mime_type",
-              "document.drivers_license.full_name",
-              "document.drivers_license.dob",
-              "document.drivers_license.gender",
-              "document.drivers_license.full_address",
-              "document.drivers_license.document_number",
-              "document.drivers_license.expires_at",
-              "document.drivers_license.issued_at",
-              "document.drivers_license.issuing_state",
-              "document.drivers_license.issuing_country",
-              "document.drivers_license.ref_number",
-              "document.drivers_license.nationality",
-              "document.drivers_license.curp",
-              "document.drivers_license.classified_document_type",
-              "document.drivers_license.curp_validation_response",
-              "document.passport.front.image",
-              "document.passport.front.mime_type",
-              "document.passport.back.image",
-              "document.passport.back.mime_type",
-              "document.passport.selfie.image",
-              "document.passport.selfie.mime_type",
-              "document.passport.full_name",
-              "document.passport.dob",
-              "document.passport.gender",
-              "document.passport.full_address",
-              "document.passport.document_number",
-              "document.passport.expires_at",
-              "document.passport.issued_at",
-              "document.passport.issuing_state",
-              "document.passport.issuing_country",
-              "document.passport.ref_number",
-              "document.passport.nationality",
-              "document.passport.curp",
-              "document.passport.classified_document_type",
-              "document.passport.curp_validation_response",
-              "document.passport_card.front.image",
-              "document.passport_card.front.mime_type",
-              "document.passport_card.back.image",
-              "document.passport_card.back.mime_type",
-              "document.passport_card.selfie.image",
-              "document.passport_card.selfie.mime_type",
-              "document.passport_card.full_name",
-              "document.passport_card.dob",
-              "document.passport_card.gender",
-              "document.passport_card.full_address",
-              "document.passport_card.document_number",
-              "document.passport_card.expires_at",
-              "document.passport_card.issued_at",
-              "document.passport_card.issuing_state",
-              "document.passport_card.issuing_country",
-              "document.passport_card.ref_number",
-              "document.passport_card.nationality",
-              "document.passport_card.curp",
-              "document.passport_card.classified_document_type",
-              "document.passport_card.curp_validation_response",
-              "document.permit.front.image",
-              "document.permit.front.mime_type",
-              "document.permit.back.image",
-              "document.permit.back.mime_type",
-              "document.permit.selfie.image",
-              "document.permit.selfie.mime_type",
-              "document.permit.full_name",
-              "document.permit.dob",
-              "document.permit.gender",
-              "document.permit.full_address",
-              "document.permit.document_number",
-              "document.permit.expires_at",
-              "document.permit.issued_at",
-              "document.permit.issuing_state",
-              "document.permit.issuing_country",
-              "document.permit.ref_number",
-              "document.permit.nationality",
-              "document.permit.curp",
-              "document.permit.classified_document_type",
-              "document.permit.curp_validation_response",
-              "document.visa.front.image",
-              "document.visa.front.mime_type",
-              "document.visa.back.image",
-              "document.visa.back.mime_type",
-              "document.visa.selfie.image",
-              "document.visa.selfie.mime_type",
-              "document.visa.full_name",
-              "document.visa.dob",
-              "document.visa.gender",
-              "document.visa.full_address",
-              "document.visa.document_number",
-              "document.visa.expires_at",
-              "document.visa.issued_at",
-              "document.visa.issuing_state",
-              "document.visa.issuing_country",
-              "document.visa.ref_number",
-              "document.visa.nationality",
-              "document.visa.curp",
-              "document.visa.classified_document_type",
-              "document.visa.curp_validation_response",
-              "document.residence_document.front.image",
-              "document.residence_document.front.mime_type",
-              "document.residence_document.back.image",
-              "document.residence_document.back.mime_type",
-              "document.residence_document.selfie.image",
-              "document.residence_document.selfie.mime_type",
-              "document.residence_document.full_name",
-              "document.residence_document.dob",
-              "document.residence_document.gender",
-              "document.residence_document.full_address",
-              "document.residence_document.document_number",
-              "document.residence_document.expires_at",
-              "document.residence_document.issued_at",
-              "document.residence_document.issuing_state",
-              "document.residence_document.issuing_country",
-              "document.residence_document.ref_number",
-              "document.residence_document.nationality",
-              "document.residence_document.curp",
-              "document.residence_document.classified_document_type",
-              "document.residence_document.curp_validation_response",
-              "document.voter_identification.front.image",
-              "document.voter_identification.front.mime_type",
-              "document.voter_identification.back.image",
-              "document.voter_identification.back.mime_type",
-              "document.voter_identification.selfie.image",
-              "document.voter_identification.selfie.mime_type",
-              "document.voter_identification.full_name",
-              "document.voter_identification.dob",
-              "document.voter_identification.gender",
-              "document.voter_identification.full_address",
-              "document.voter_identification.document_number",
-              "document.voter_identification.expires_at",
-              "document.voter_identification.issued_at",
-              "document.voter_identification.issuing_state",
-              "document.voter_identification.issuing_country",
-              "document.voter_identification.ref_number",
-              "document.voter_identification.nationality",
-              "document.voter_identification.curp",
-              "document.voter_identification.classified_document_type",
-              "document.voter_identification.curp_validation_response",
-              "document.finra_compliance_letter",
-              "document.proof_of_address.image",
-              "document.ssn_card.image",
-              "document.custom.*",
-              "card.*.number",
-              "card.*.expiration",
-              "card.*.cvc",
-              "card.*.name",
-              "card.*.billing_address.zip",
-              "card.*.billing_address.country",
-              "card.*.expiration_month",
-              "card.*.expiration_year",
-              "card.*.number_last4",
-              "card.*.issuer",
-              "bank.*.name",
-              "bank.*.ach_routing_number",
-              "bank.*.ach_account_number",
-              "bank.*.ach_account_id",
-              "bank.*.account_type"
-            ]
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/VaultIdProps"
           },
-          "<value>": {
-            "type": "object"
+          {
+            "$ref": "#/components/schemas/VaultInvestorProps"
+          },
+          {
+            "$ref": "#/components/schemas/VaultCustomProps"
+          },
+          {
+            "type": "object",
+            "x-stoplight": {
+              "id": "2v2afey16id1z"
+            }
           }
-        },
-        "required": [
-          "<key>",
-          "<value>"
         ]
       },
       "SdkArgs": {
@@ -6366,6 +6239,284 @@
         "required": [
           "<key>",
           "<value>"
+        ]
+      },
+      "VaultIdProps": {
+        "title": "VaultIdProps",
+        "x-stoplight": {
+          "id": "uq84qpudiffq1"
+        },
+        "type": "object",
+        "properties": {
+          "id.address_line1": {
+            "type": "string"
+          },
+          "id.address_line2": {
+            "type": "string"
+          },
+          "id.citizenships": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2
+            },
+            "description": "Array of 2 letter country codes"
+          },
+          "id.city": {
+            "type": "string"
+          },
+          "id.country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "description": "2 letter country code"
+          },
+          "id.dob": {
+            "type": "string"
+          },
+          "id.drivers_license_number": {
+            "type": "string"
+          },
+          "id.drivers_license_state": {
+            "type": "string"
+          },
+          "id.email": {
+            "type": "string"
+          },
+          "id.first_name": {
+            "type": "string"
+          },
+          "id.itin": {
+            "type": "string"
+          },
+          "id.last_name": {
+            "type": "string"
+          },
+          "id.middle_name": {
+            "type": "string"
+          },
+          "id.nationality": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "description": "2 letter country code"
+          },
+          "id.phone_number": {
+            "type": "string"
+          },
+          "id.ssn4": {
+            "type": "string"
+          },
+          "id.ssn9": {
+            "type": "string"
+          },
+          "id.state": {
+            "type": "string"
+          },
+          "id.us_legal_status": {
+            "type": "string"
+          },
+          "id.us_tax_id": {
+            "type": "string"
+          },
+          "id.visa_expiration_date": {
+            "type": "string"
+          },
+          "id.visa_kind": {
+            "type": "string"
+          },
+          "id.zip": {
+            "type": "string"
+          }
+        }
+      },
+      "VaultInvestorProps": {
+        "type": "object",
+        "properties": {
+          "investor_profile.employment_status": {
+            "type": "string",
+            "enum": [
+              "employed",
+              "unemployed",
+              "student",
+              "retired"
+            ]
+          },
+          "investor_profile.occupation": {
+            "type": "string"
+          },
+          "investor_profile.employer": {
+            "type": "string"
+          },
+          "investor_profile.annual_income": {
+            "type": "string",
+            "enum": [
+              "le25k",
+              "gt25k_le50k",
+              "gt50k_le100k",
+              "gt100k_le200k",
+              "gt200k_le300k",
+              "gt300k_le500k",
+              "gt500k_le1200k"
+            ]
+          },
+          "investor_profile.net_worth": {
+            "type": "string",
+            "enum": [
+              "le50k",
+              "gt50k_le100k",
+              "gt100k_le200k",
+              "gt200k_le500k",
+              "gt500k_le1m",
+              "gt1m_le5m",
+              "gt5m"
+            ]
+          },
+          "investor_profile.funding_sources": {
+            "type": "string",
+            "enum": [
+              "employment_income",
+              "investments",
+              "inheritance",
+              "business_income",
+              "savings",
+              "family"
+            ]
+          },
+          "investor_profile.investment_goals": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "growth",
+                "income",
+                "preserve_capital",
+                "speculation",
+                "diversification",
+                "other"
+              ]
+            }
+          },
+          "investor_profile.risk_tolerance": {
+            "type": "string",
+            "enum": [
+              "conservative",
+              "moderate",
+              "aggressive"
+            ]
+          },
+          "investor_profile.declarations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "affiliated_with_us_broker",
+                "senior_executive",
+                "senior_political_figure"
+              ]
+            }
+          },
+          "investor_profile.senior_executive_symbols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "investor_profile.family_member_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "investor_profile.political_organization": {
+            "type": "string"
+          },
+          "investor_profile.brokerage_firm_employer": {
+            "type": "string"
+          }
+        }
+      },
+      "VaultCustomProps": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "propertyNames": {
+          "pattern": "^custom\\.[a-zA-Z0-9_]+$"
+        }
+      },
+      "VaultBadRequestResponse": {
+        "title": "VaultBadRequestResponse",
+        "x-stoplight": {
+          "id": "4j8q21t7xpgoj"
+        },
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "context": {
+                "x-stoplight": {
+                  "id": "40o2nwjmyngno"
+                },
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/VaultIdProps"
+                  },
+                  {
+                    "$ref": "#/components/schemas/VaultInvestorProps"
+                  },
+                  {
+                    "$ref": "#/components/schemas/VaultCustomProps"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "context"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        ]
+      },
+      "ErrorResponse": {
+        "title": "ErrorResponse",
+        "x-stoplight": {
+          "id": "rpx1iamcwqamh"
+        },
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "j03btiz4kymmb"
+            }
+          },
+          "debug": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "n77dpb6b6yblc"
+            }
+          },
+          "message": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "o2k2bao7ba40l"
+            }
+          },
+          "support_id": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "3iitwccogx689"
+            }
+          }
+        },
+        "required": [
+          "debug",
+          "message",
+          "support_id"
         ]
       }
     }

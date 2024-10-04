@@ -54,7 +54,7 @@ struct EmailAndPhoneView: View {
         .onAppear(perform: {
             Task {
                 do {
-                    try await onboardingComponents.initialize(configKey:"pb_test_pZoERpZeZkGW7RRVeBawSm")
+                    try await onboardingComponents.initialize(configKey:"pb_test_2i5Sl82d7NQOnToRYrD2dx")
                 } catch {
                     customDump(error)
                 }                
