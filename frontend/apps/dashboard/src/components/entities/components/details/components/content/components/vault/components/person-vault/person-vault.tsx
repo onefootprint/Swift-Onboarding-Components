@@ -13,8 +13,8 @@ import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
-import CardFieldset from './components/card-fieldset';
 import DocumentsFields from './components/document-fields';
+import FinancialFieldset from './components/financial-fieldset';
 import InvestorProfileFields from './components/investor-profile-fields';
 import OwnedBusinesses from './components/owned-businesses';
 import useFieldsets from './hooks/use-fieldsets';
@@ -124,7 +124,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
         ) : null}
         {hasCards ? (
           <GridItem>
-            <CardFieldset title={cards.title} iconComponent={cards.iconComponent} />
+            <FinancialFieldset title={cards.title} iconComponent={cards.iconComponent} />
           </GridItem>
         ) : null}
         {hasBusinesses ? (
