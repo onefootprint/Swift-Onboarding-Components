@@ -7,6 +7,7 @@ use newtypes::LexisNAP;
 use newtypes::LexisNAS;
 use newtypes::NameAddress;
 use newtypes::RiskIndicatorCode;
+use serde::Serialize;
 use std::convert::Into;
 
 // 0 Nothing verified
@@ -25,6 +26,14 @@ pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoF
     let risk_indicator_codes = res.risk_indicator_codes();
     let match_logic = CurrentMatchLogic {};
     let match_frcs = IdentityAttributeMatch::new(match_logic, &res, user_info);
+
+    // Other logic, logging
+    let ri_match_logic = MatchLogicRiskIndicatorsOnly {};
+    let ri_logic = IdentityAttributeMatch::new(ri_match_logic, &res, user_info);
+    let max_match_logic = MatchLogicMaxAcrossNasNap {};
+    let max_logic = IdentityAttributeMatch::new(max_match_logic, &res, user_info);
+    let query_id = res.query_id();
+    log_match_logic(query_id, match_frcs.clone(), ri_logic, max_logic);
 
     let valid_element_summary_codes = if let Some(ves) = res.valid_element_summary() {
         let mut codes = vec![];
@@ -122,6 +131,20 @@ pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoF
         .collect()
 }
 
+fn log_match_logic(
+    query_id: Option<String>,
+    match_frcs: IdentityAttributeMatch,
+    ri_logic: IdentityAttributeMatch,
+    max_logic: IdentityAttributeMatch,
+) {
+    tracing::info!(
+      match_frcs=?serde_json::to_value(match_frcs), 
+      ri_logic=?serde_json::to_value(ri_logic), 
+      max_logic=?serde_json::to_value(max_logic), 
+      ?query_id, "lexis match logic");
+}
+
+#[derive(Clone, Serialize)]
 struct IdentityAttributeMatch {
     name: Vec<FRC>,
     address: FRC,
@@ -374,6 +397,49 @@ impl LexisMatchLogic for MatchLogicRiskIndicatorsOnly {
     }
 }
 
+struct MatchLogicMaxAcrossNasNap;
+impl MatchLogicMaxAcrossNasNap {
+    pub fn max_name_address(nas: &LexisNAS, nap: &LexisNAP) -> NameAddress {
+        NameAddress {
+            first_name_match: nas.first_name_match || nap.first_name_match,
+            last_name_match: nas.last_name_match || nap.last_name_match,
+            address_match: nas.address_match || nap.address_match,
+        }
+    }
+}
+impl LexisMatchLogic for MatchLogicMaxAcrossNasNap {
+    fn name_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC> {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        let nap = res.name_address_phone_summary().name_address_phone_matches();
+        let name_address = Self::max_name_address(&nas, &nap);
+        CurrentMatchLogic::name_match_codes(&name_address, &risk_indicator_codes)
+    }
+
+    fn address_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        let nap = res.name_address_phone_summary().name_address_phone_matches();
+        let name_address = Self::max_name_address(&nas, &nap);
+        CurrentMatchLogic::address_match_code(&name_address, &risk_indicator_codes)
+    }
+
+    fn ssn_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let nas = res.name_address_ssn_summary().name_address_ssn_matches();
+        let risk_indicator_codes = res.risk_indicator_codes();
+        CurrentMatchLogic::ssn_match_code(&nas, &risk_indicator_codes)
+    }
+
+    fn phone_match_code(&self, res: &FlexIdResponse) -> FRC {
+        let risk_indicator_codes = res.risk_indicator_codes();
+        let nap = res.name_address_phone_summary().name_address_phone_matches();
+        CurrentMatchLogic::phone_match_code(&nap, &risk_indicator_codes)
+    }
+
+    fn dob_match_codes(&self, res: &FlexIdResponse) -> Vec<FRC> {
+        Into::<Vec<FRC>>::into(&res.dob_match_level())
+    }
+}
 
 #[cfg(test)]
 mod tests {

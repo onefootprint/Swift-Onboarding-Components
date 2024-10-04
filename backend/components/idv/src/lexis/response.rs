@@ -451,6 +451,11 @@ impl FlexIdResponse {
             .and_then(|r| r.header.as_ref())
     }
 
+    // as of 2024-10 we set this to VerificationRequestId
+    pub fn query_id(&self) -> Option<String> {
+        self.header().and_then(|h| h.query_id.clone())
+    }
+
     fn error(&self) -> Option<ResponseError> {
         let error_message = self.header().and_then(|r| r.message.clone());
         let exceptions = self
