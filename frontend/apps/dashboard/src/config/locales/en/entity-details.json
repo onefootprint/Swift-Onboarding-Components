@@ -35,6 +35,25 @@
         "fieldsets": {
           "not-allowed": "This can't be edited",
           "decrypt-first": "Only decrypted data can be edited",
+          "placeholders": {
+            "first-name": "Jane",
+            "middle-name": "Sue",
+            "last-name": "Doe",
+            "address-line-1": "Street and house number",
+            "address-line-2": "Apartment, suite, etc.",
+            "dob": "YYYY-MM-DD",
+            "city": "City",
+            "zip-code": "11206",
+            "ssn9": "XXX-XX-XXXX",
+            "ssn4": "XXXX",
+            "business-name": "Acme Bank Inc.",
+            "doing-business-as": "Acme Bank",
+            "tin": "12-3456789",
+            "website": "https://www.acmebank.com",
+            "formation-date": "YYYY-MM-DD",
+            "occupation": "Software Engineer",
+            "employer": "Acme Bank"
+          },
           "legal-status": {
             "legal-status-mapping": {
               "none": "Select",
@@ -174,7 +193,6 @@
               "invalid": "Invalid country code: {{ countries }}"
             },
             "website": {
-              "placeholder": "https://www.acmebank.com",
               "invalid": "Invalid website URL"
             },
             "tin": {

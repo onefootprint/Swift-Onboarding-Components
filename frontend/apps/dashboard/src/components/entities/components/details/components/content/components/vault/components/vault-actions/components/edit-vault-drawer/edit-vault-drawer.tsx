@@ -26,7 +26,7 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
 
-  const { data: vaultData, update: updateVault } = useEntityVault(entity.id, entity);
+  const { data: vaultData, update: updateVault, isAllDecrypted } = useEntityVault(entity.id, entity);
   const isPersonVault = entity.kind === EntityKind.person;
 
   useEffectOnce(() => {
@@ -83,15 +83,17 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
       }}
     >
       <Stack direction="column" gap={7}>
-        <InlineAlert
-          variant="info"
-          cta={{
-            label: t('decrypt-alert.cta'),
-            onClick: handleDecryptAll,
-          }}
-        >
-          {t('decrypt-alert.text')}
-        </InlineAlert>
+        {!isAllDecrypted && (
+          <InlineAlert
+            variant="info"
+            cta={{
+              label: t('decrypt-alert.cta'),
+              onClick: handleDecryptAll,
+            }}
+          >
+            {t('decrypt-alert.text')}
+          </InlineAlert>
+        )}
         <EditForm onSubmit={handleBeforeEditSubmit}>
           {isPersonVault ? <PersonVaultFieldsets entity={entity} /> : <BusinessVaultFieldsets />}
         </EditForm>

@@ -1,7 +1,8 @@
 import { type DataIdentifier, type Entity, InvestorProfileDI } from '@onefootprint/types';
-import { Form, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { Form, Shimmer, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import { FIELD_VALUE_WIDTH } from '../../constants';
+import useDecryptControls from '../../../../hooks/use-decrypt-controls';
+import { FIELD_VALUE_HEIGHT, FIELD_VALUE_WIDTH } from '../../constants';
 import useEditField from '../../hooks/use-edit-field';
 import ErrorOrHint from '../edit-field/components/error-or-hint';
 import Editable from '../editable';
@@ -15,6 +16,7 @@ const EditInvestorProfileField = ({ di, entity }: EditInvestorProfileFieldProps)
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'header-default.actions.edit-vault-drawer.fieldsets',
   });
+  const decryptControls = useDecryptControls();
   const field = useEditField(entity)(di);
   const { label, value, canEdit, isDecrypted, isEmpty } = field;
   const encryptedText = <Text variant="body-2">{t('investor-profile.encrypted')}</Text>;
@@ -34,6 +36,9 @@ const EditInvestorProfileField = ({ di, entity }: EditInvestorProfileFieldProps)
   }
 
   const renderValue = () => {
+    if (decryptControls.inProgressDecryptingAll) {
+      return <Shimmer height={FIELD_VALUE_HEIGHT} />;
+    }
     if (isDecrypted || isEmpty) {
       // TODO: in future add the declaration fields and display their values, even if not editable
       return canEdit ? (

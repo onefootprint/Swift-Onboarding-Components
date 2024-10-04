@@ -21,6 +21,12 @@ export const createDecryptStateMachine = () =>
                 actions: [Action.assignFields],
               },
             ],
+            [Event.submittedReason]: [
+              {
+                target: State.decryptingAll,
+                actions: [Action.assignFieldsAndReason],
+              },
+            ],
           },
         },
         [State.selectingFields]: {
@@ -99,6 +105,13 @@ export const createDecryptStateMachine = () =>
         },
         [Action.assignReason]: (context, event) => {
           if (event.type === Event.submittedReason) {
+            context.reason = event.payload.reason;
+          }
+        },
+        [Action.assignFieldsAndReason]: (context, event) => {
+          if (event.type === Event.submittedReason) {
+            context.dis = event.payload.fields;
+            context.documents = event.payload.documents;
             context.reason = event.payload.reason;
           }
         },

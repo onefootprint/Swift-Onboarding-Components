@@ -1,5 +1,5 @@
 import type { DataIdentifier, DataKind, Entity, EntityVault, VaultValue } from '@onefootprint/types';
-import { IdDI } from '@onefootprint/types';
+import { IdDI, isVaultDataDecrypted } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import type { QueryClient } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -99,13 +99,18 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     });
   };
 
+  const isAllDecrypted = (data: VaultType | undefined) => {
+    if (!entity || !data) return false;
+    return entity.decryptableAttributes.every(di => isVaultDataDecrypted(data.vault[di]));
+  };
+
   const query = useQuery<VaultType>({
     queryKey: ['entity', entityId, 'vault'],
     queryFn: () => getVaultOrCreate(queryClient, entity as Entity),
     enabled: !!entityId && !!entity,
   });
 
-  return { ...query, update, updateForHistorical };
+  return { ...query, update, updateForHistorical, isAllDecrypted: isAllDecrypted(query.data) };
 };
 
 export default useEntityVault;

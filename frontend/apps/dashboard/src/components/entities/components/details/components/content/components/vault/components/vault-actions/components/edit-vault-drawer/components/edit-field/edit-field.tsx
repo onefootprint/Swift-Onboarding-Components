@@ -1,8 +1,9 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { Form, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { Form, Shimmer, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { FIELD_VALUE_WIDTH } from '../../constants';
+import useDecryptControls from '../../../../hooks/use-decrypt-controls';
+import { FIELD_VALUE_HEIGHT, FIELD_VALUE_WIDTH } from '../../constants';
 import useEditField from '../../hooks/use-edit-field';
 import Editable from '../editable';
 import EncryptedInput from './components/encrypted-input';
@@ -19,8 +20,12 @@ const EditField = ({ di, entity }: EditFieldProps) => {
   });
   const field = useEditField(entity)(di);
   const { label, value, canEdit, isDecrypted, isEmpty } = field;
+  const decryptControls = useDecryptControls();
 
   const renderValue = () => {
+    if (decryptControls.inProgressDecryptingAll) {
+      return <Shimmer height={FIELD_VALUE_HEIGHT} width={FIELD_VALUE_WIDTH} />;
+    }
     if (isDecrypted || isEmpty) {
       return canEdit ? (
         <Editable entity={entity} value={value} fieldName={di} />

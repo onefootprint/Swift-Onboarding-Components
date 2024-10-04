@@ -28,6 +28,7 @@ export enum Guard {
 export enum Action {
   assignFields = 'assignFields',
   assignReason = 'assignReason',
+  assignFieldsAndReason = 'assignFieldsAndReason',
 }
 
 export type Context = {
@@ -46,7 +47,7 @@ export type MachineEvents =
     }
   | {
       type: Event.submittedReason;
-      payload: { reason: string };
+      payload: { reason: string; fields?: DataIdentifier[]; documents?: SupportedIdDocTypes[] };
     }
   | { type: Event.decryptSucceeded }
   | { type: Event.decryptFailed };

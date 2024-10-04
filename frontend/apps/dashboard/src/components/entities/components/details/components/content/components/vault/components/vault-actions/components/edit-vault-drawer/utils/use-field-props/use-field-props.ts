@@ -119,6 +119,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.firstName) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.first-name'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.name.required') : true;
@@ -135,6 +136,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.middleName) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.middle-name'),
         validate: (value: string) => {
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
@@ -148,6 +150,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.lastName) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.last-name'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.name.required') : true;
@@ -164,7 +167,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.dob) {
     return {
       inputOptions: {
-        placeholder: 'YYYY-MM-DD',
+        placeholder: entityT('placeholders.dob'),
         inputMode: 'numeric',
         pattern: {
           value: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
@@ -185,6 +188,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
     return {
       inputOptions: {
         type: 'tel',
+        placeholder: entityT('placeholders.ssn9'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.ssn.required') : true;
@@ -200,6 +204,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.ssn4) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.ssn4'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.ssn.required') : true;
@@ -215,6 +220,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.addressLine1) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.address-line-1'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.address-line.required') : true;
@@ -230,6 +236,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.city) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.city'),
         validate: (value: string) => {
           if (!value || typeof value !== 'string') return previousValue ? entityT('errors.city') : true;
           return true;
@@ -353,6 +360,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
     const isEmployed = formEmployment === 'employed';
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.occupation'),
         validate: (value: string) => {
           if (isEmployed && !value) {
             return entityT('errors.occupation.required');
@@ -368,6 +376,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
     const isEmployed = formEmployment === 'employed';
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.employer'),
         validate: (value: string) => {
           if (isEmployed && !value) {
             return entityT('errors.employer.required');
@@ -558,6 +567,14 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   }
 
   // Overlapping DI fields
+  if (di === IdDI.addressLine2 || di === BusinessDI.addressLine2) {
+    return {
+      inputOptions: {
+        placeholder: entityT('placeholders.address-line-2'),
+      },
+    };
+  }
+
   if (di === IdDI.country || di === BusinessDI.country) {
     return {
       selectOptions: {
@@ -576,6 +593,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.name) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.business-name'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.name.required') : true;
@@ -592,6 +610,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.doingBusinessAs) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.doing-business-as'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.name.required') : true;
@@ -608,7 +627,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.website) {
     return {
       inputOptions: {
-        placeholder: entityT('errors.website.placeholder'),
+        placeholder: entityT('placeholders.website'),
         validate: (value: string) => {
           if (!isURL(value ?? '')) {
             return previousValue ? entityT('errors.website.invalid') : true;
@@ -621,6 +640,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.tin) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.tin'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.tin.required') : true;
@@ -668,6 +688,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.addressLine1) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.address-line-1'),
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.address-line.required') : true;
@@ -683,6 +704,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.city) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.city'),
         validate: (value: string) => {
           if (!value || typeof value !== 'string') return previousValue ? entityT('errors.city') : true;
           return true;
@@ -732,6 +754,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.formationDate) {
     return {
       inputOptions: {
+        placeholder: entityT('placeholders.formation-date'),
         pattern: {
           value: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
           message: entityT('errors.dob.pattern'),
