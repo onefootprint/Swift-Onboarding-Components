@@ -17,7 +17,9 @@ const getCards = (entity: Entity): EntityCard[] => {
       cards[alias] = { ...cards[alias], [field]: value };
     }
   });
-  return Object.entries(cards).map(([alias, card]) => ({ ...card, alias }));
+  return Object.entries(cards)
+    .sort(([aliasA], [aliasB]) => aliasA.localeCompare(aliasB))
+    .map(([alias, card]) => ({ ...card, alias }));
 };
 
 export default getCards;

@@ -131,4 +131,54 @@ describe('getBankAccounts', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('with three bank accounts with different aliases', () => {
+    it('should return the accounts sorted alphabetically by alias with all relevant DIs', () => {
+      const entity: Entity = {
+        ...entityFixture,
+        decryptedAttributes: {
+          [`bank.chase.${BankDIField.accountNumber}`]: '1234567890',
+          [`bank.chase.${BankDIField.routingNumber}`]: '021000021',
+          [`bank.chase.${BankDIField.accountType}`]: 'checking',
+          [`bank.chase.${BankDIField.name}`]: 'Chase Checking',
+          [`bank.wells.${BankDIField.accountNumber}`]: '0987654321',
+          [`bank.wells.${BankDIField.routingNumber}`]: '121000248',
+          [`bank.wells.${BankDIField.accountType}`]: 'savings',
+          [`bank.wells.${BankDIField.name}`]: 'Wells Fargo Savings',
+          [`bank.bofa.${BankDIField.accountNumber}`]: '5678901234',
+          [`bank.bofa.${BankDIField.routingNumber}`]: '026009593',
+          [`bank.bofa.${BankDIField.accountType}`]: 'checking',
+          [`bank.bofa.${BankDIField.name}`]: 'Bank of America Checking',
+        },
+      };
+      const result = getBankAccountsFromEntity(entity);
+      const expectedResult = [
+        {
+          alias: 'bofa',
+          [BankDIField.accountNumber]: '5678901234',
+          [BankDIField.routingNumber]: '026009593',
+          [BankDIField.accountType]: 'checking',
+          [BankDIField.name]: 'Bank of America Checking',
+        },
+        {
+          alias: 'chase',
+          [BankDIField.accountNumber]: '1234567890',
+          [BankDIField.routingNumber]: '021000021',
+          [BankDIField.accountType]: 'checking',
+          [BankDIField.name]: 'Chase Checking',
+        },
+        {
+          alias: 'wells',
+          [BankDIField.accountNumber]: '0987654321',
+          [BankDIField.routingNumber]: '121000248',
+          [BankDIField.accountType]: 'savings',
+          [BankDIField.name]: 'Wells Fargo Savings',
+        },
+      ];
+      expect(result).toEqual(expectedResult);
+      expect(result[0].alias).toBe('bofa');
+      expect(result[1].alias).toBe('chase');
+      expect(result[2].alias).toBe('wells');
+    });
+  });
 });

@@ -127,4 +127,65 @@ describe('getCards', () => {
       expect(getCardFromEntity(entity)).toEqual([]);
     });
   });
+
+  describe('with three cards and all card DIs', () => {
+    it('should return a sorted array of the DIs that is alphabetically correct', () => {
+      const entity: Entity = {
+        ...entityFixture,
+        decryptedAttributes: {
+          'card.visa.issuer': 'visa',
+          'card.visa.number': '4111111111111111',
+          'card.visa.number_last4': '1111',
+          'card.visa.expiration_month': '12',
+          'card.visa.expiration_year': '2025',
+          'card.visa.name': 'John Doe',
+          'card.mastercard.issuer': 'mastercard',
+          'card.mastercard.number': '5555555555554444',
+          'card.mastercard.number_last4': '4444',
+          'card.mastercard.expiration_month': '06',
+          'card.mastercard.expiration_year': '2024',
+          'card.mastercard.name': 'Jane Smith',
+          'card.amex.issuer': 'amex',
+          'card.amex.number': '378282246310005',
+          'card.amex.number_last4': '0005',
+          'card.amex.expiration_month': '03',
+          'card.amex.expiration_year': '2026',
+          'card.amex.name': 'Bob Johnson',
+        },
+      };
+      const result = getCardFromEntity(entity);
+      expect(result).toEqual([
+        {
+          alias: 'amex',
+          issuer: 'amex',
+          number: '378282246310005',
+          number_last4: '0005',
+          expiration_month: '03',
+          expiration_year: '2026',
+          name: 'Bob Johnson',
+        },
+        {
+          alias: 'mastercard',
+          issuer: 'mastercard',
+          number: '5555555555554444',
+          number_last4: '4444',
+          expiration_month: '06',
+          expiration_year: '2024',
+          name: 'Jane Smith',
+        },
+        {
+          alias: 'visa',
+          issuer: 'visa',
+          number: '4111111111111111',
+          number_last4: '1111',
+          expiration_month: '12',
+          expiration_year: '2025',
+          name: 'John Doe',
+        },
+      ]);
+      expect(result[0].alias).toBe('amex');
+      expect(result[1].alias).toBe('mastercard');
+      expect(result[2].alias).toBe('visa');
+    });
+  });
 });

@@ -17,7 +17,10 @@ const getBankAccounts = (entity: Entity): EntityBankAccount[] => {
       bankAccounts[alias] = { ...bankAccounts[alias], [field]: value };
     }
   });
-  return Object.entries(bankAccounts).map(([alias, account]) => ({ ...account, alias }));
+
+  return Object.entries(bankAccounts)
+    .sort(([aliasA], [aliasB]) => aliasA.localeCompare(aliasB))
+    .map(([alias, account]) => ({ ...account, alias }));
 };
 
 export default getBankAccounts;
