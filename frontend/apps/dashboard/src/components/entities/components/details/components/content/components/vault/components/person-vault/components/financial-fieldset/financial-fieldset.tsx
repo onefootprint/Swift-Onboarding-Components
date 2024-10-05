@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
-import getDis from '../../../../../../../../../../utils/get-dis';
+import { getCardDis } from 'src/components/entities/utils/get-dis';
 import useDecryptForm from '../../../../hooks/use-decrypt-form';
 import useField from '../../../../hooks/use-field';
 import getCards from '../../../../utils/get-cards';
@@ -34,7 +34,7 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
 
   const cards: EntityCard[] = getCards(entity) ?? [];
   const [selectedCard, setSelectedCard] = useState(cards[0]);
-  const dis = getDis(entity.attributes, selectedCard.alias);
+  const dis = getCardDis(entity.attributes, selectedCard.alias);
   const fields = dis.map(di => ({ di }));
 
   const getFieldProps = useField(entity);

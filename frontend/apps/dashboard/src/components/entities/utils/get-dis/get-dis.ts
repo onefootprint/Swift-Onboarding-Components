@@ -9,11 +9,15 @@ const order: Record<string, number> = {
   billing_address: 6,
 };
 
-const filter = (attributes: DataIdentifier[], search: string | null | undefined) => {
+const filterCards = (attributes: DataIdentifier[], search: string | null | undefined) => {
   const hiddenAttributes = ['expiration_month', 'expiration_year', 'number_last4'];
   return attributes.filter(
     attr => attr.includes(`card.${search}`) && !hiddenAttributes.some(hiddenAttr => attr.includes(hiddenAttr)),
   );
+};
+
+const filterBankAccounts = (attributes: DataIdentifier[], search: string | null | undefined) => {
+  return attributes.filter(attr => attr.includes(`bank.${search}`));
 };
 
 export const getDI = (target: string) => {
@@ -53,10 +57,16 @@ export const getCustomDIs = (data: EntityVault) => {
   return filtered as DataIdentifier[];
 };
 
-const getDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
-  const filtered = filter(attributes, search);
+export const getCardDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
+  const filtered = filterCards(attributes, search);
   const sorted = sort(filtered);
   return sorted;
 };
 
-export default getDis;
+export const getBankDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
+  const filtered = filterBankAccounts(attributes, search);
+  const sorted = sort(filtered);
+  return sorted;
+};
+
+export default getDI;

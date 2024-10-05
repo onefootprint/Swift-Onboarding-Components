@@ -1,60 +1,120 @@
 import type { DataIdentifier } from '@onefootprint/types';
 
-import getDis, { getDI } from './get-dis';
+import { getBankDis, getCardDis, getDI } from './get-dis';
 
 describe('getDis', () => {
-  it('should filter, sort attributes and return in correct order', () => {
-    const input: DataIdentifier[] = [
-      'card.primary.name',
-      'card.primary.issuer',
-      'card.primary.expiration',
-      'card.primary.cvc',
-      'card.primary.number',
-      'card.primary.expiration_month',
-      'card.primary.expiration_year',
-      'card.primary.number_last4',
-    ];
+  describe('getCardDis', () => {
+    it('should filter, sort attributes and return in correct order for cards', () => {
+      const input: DataIdentifier[] = [
+        'card.primary.name',
+        'card.primary.issuer',
+        'card.primary.expiration',
+        'card.primary.cvc',
+        'card.primary.number',
+        'card.primary.expiration_month',
+        'card.primary.expiration_year',
+        'card.primary.number_last4',
+      ];
 
-    const result = getDis(input, 'primary');
-    const expected: DataIdentifier[] = [
-      'card.primary.issuer',
-      'card.primary.name',
-      'card.primary.number',
-      'card.primary.expiration',
-      'card.primary.cvc',
-    ];
+      const result = getCardDis(input, 'primary');
+      const expected: DataIdentifier[] = [
+        'card.primary.issuer',
+        'card.primary.name',
+        'card.primary.number',
+        'card.primary.expiration',
+        'card.primary.cvc',
+      ];
 
-    expect(result).toEqual(expected);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return the same order if input is already sorted and filtered for cards', () => {
+      const input: DataIdentifier[] = [
+        'card.primary.issuer',
+        'card.primary.name',
+        'card.primary.number',
+        'card.primary.expiration',
+        'card.primary.cvc',
+      ];
+
+      const result = getCardDis(input, 'primary');
+      const expected: DataIdentifier[] = [...input];
+
+      expect(result).toEqual(expected);
+    });
+
+    it('should sort by subkey if primary key is the same for cards', () => {
+      const input: DataIdentifier[] = ['card.primary.billing_address.zip', 'card.primary.billing_address.country'];
+
+      const result = getCardDis(input, 'primary');
+      const expected: DataIdentifier[] = ['card.primary.billing_address.country', 'card.primary.billing_address.zip'];
+
+      expect(result).toEqual(expected);
+    });
+
+    it('should default to card case when no type parameter is provided', () => {
+      const input: DataIdentifier[] = [
+        'card.primary.name',
+        'card.primary.issuer',
+        'card.primary.number',
+        'card.primary.expiration',
+        'card.primary.cvc',
+        'card.primary.expiration_month',
+        'card.primary.expiration_year',
+        'card.primary.number_last4',
+      ];
+
+      const result = getCardDis(input, 'primary');
+      const expected: DataIdentifier[] = [
+        'card.primary.issuer',
+        'card.primary.name',
+        'card.primary.number',
+        'card.primary.expiration',
+        'card.primary.cvc',
+      ];
+
+      expect(result).toEqual(expected);
+    });
   });
 
-  it('should return the same order if input is already sorted and filtered', () => {
-    const input: DataIdentifier[] = [
-      'card.primary.issuer',
-      'card.primary.name',
-      'card.primary.number',
-      'card.primary.expiration',
-      'card.primary.cvc',
-    ];
+  describe('getBankDis', () => {
+    it('should filter and sort attributes for bank accounts', () => {
+      const input: DataIdentifier[] = [
+        'bank.account1.name',
+        'bank.account1.ach_account_number',
+        'bank.account1.ach_routing_number',
+        'bank.account1.account_type',
+        'bank.account2.name',
+      ];
 
-    const result = getDis(input, 'primary');
-    const expected: DataIdentifier[] = [...input];
+      const result = getBankDis(input, 'account1');
+      const expected: DataIdentifier[] = [
+        'bank.account1.name',
+        'bank.account1.ach_account_number',
+        'bank.account1.ach_routing_number',
+        'bank.account1.account_type',
+      ];
 
-    expect(result).toEqual(expected);
+      expect(result).toEqual(expected);
+    });
+
+    it('should handle bank accounts with no matching search term', () => {
+      const input: DataIdentifier[] = [
+        'bank.account1.name',
+        'bank.account1.ach_account_number',
+        'bank.account2.name',
+        'bank.account2.ach_account_number',
+      ];
+
+      const result = getBankDis(input, 'account3');
+      expect(result).toEqual([]);
+    });
   });
 
   it('should handle empty input', () => {
     const input: DataIdentifier[] = [];
-    const result = getDis(input, 'primary');
+    const result = getCardDis(input, 'primary');
     expect(result).toEqual([]);
-  });
-
-  it('should sort by subkey if primary key is the same', () => {
-    const input: DataIdentifier[] = ['card.primary.billing_address.zip', 'card.primary.billing_address.country'];
-
-    const result = getDis(input, 'primary');
-    const expected: DataIdentifier[] = ['card.primary.billing_address.country', 'card.primary.billing_address.zip'];
-
-    expect(result).toEqual(expected);
   });
 });
 

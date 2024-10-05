@@ -1,1 +1,1 @@
-export { default, getCustomDIs, getDI } from './get-dis';
+export { default, getCustomDIs, getDI, getBankDis, getCardDis } from './get-dis';
