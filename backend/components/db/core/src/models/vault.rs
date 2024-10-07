@@ -38,7 +38,7 @@ use newtypes::VaultPublicKey;
 pub type IsFixture = bool;
 pub type IsNew = bool;
 
-#[derive(Debug, Clone, Queryable, Insertable, Identifiable, PartialEq, Eq)]
+#[derive(Debug, Clone, Queryable, Insertable, Identifiable, PartialEq, Eq, Hash)]
 #[diesel(table_name = vault)]
 pub struct Vault {
     pub id: VaultId,

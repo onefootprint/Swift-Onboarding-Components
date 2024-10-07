@@ -25,7 +25,7 @@ use newtypes::VaultDataFormat;
 use newtypes::VdId;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Eq, PartialEq, Hash)]
 #[diesel(table_name = vault_data)]
 pub struct VaultData {
     pub id: VdId,

@@ -53,5 +53,9 @@ struct CursorBackfillResponse<T, TCursor> {
 #[allow(unused)]
 struct BatchBackfillResponse {}
 
+mod backfill_kyced_bos;
+
 #[allow(unused)]
-pub fn configure(config: &mut web::ServiceConfig) {}
+pub fn configure(config: &mut web::ServiceConfig) {
+    config.service(backfill_kyced_bos::post);
+}

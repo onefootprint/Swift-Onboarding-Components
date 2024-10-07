@@ -32,7 +32,7 @@ use newtypes::ScopedVaultVersionNumber;
 use newtypes::VaultId;
 
 
-#[derive(Debug, Clone, Queryable, Selectable)]
+#[derive(Debug, Clone, Queryable, Selectable, Eq, PartialEq, Hash)]
 #[diesel(table_name = data_lifetime)]
 /// DataLifetime is a generic model that allows us to represent the lifecycle of a piece of data
 /// that belongs to a user. All pieces of data "belonging" to a user vault share some attributes,

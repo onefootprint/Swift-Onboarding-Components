@@ -122,6 +122,9 @@ impl TenantVw<Business> {
                 })
                 .collect::<FpResult<Vec<_>>>()?
         } else if let Some(vault_bos) = decrypted.remove(&BDK::BeneficialOwners.into()) {
+            // We should stop hitting this branch because every backfilled user will have
+            // KycedBeneficialOwners
+
             // Either bifrost-initiated flow or API-initiated flow. There will be at most one linked BO (for
             // bifrost)
             let vault_bos: Vec<BusinessOwnerData> = vault_bos.deserialize()?;

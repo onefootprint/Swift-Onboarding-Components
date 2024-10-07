@@ -160,7 +160,6 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiJsonValue, args: Validat
         if args.is_live && bos.iter().map(|bo| &bo.email).unique().count() != bos.len() {
             return Err(Error::NonUniqueBusinessOwners);
         }
-        // TODO make sure unique set of emails + phones
         // Create a BoID for each Kyced BO item. This ID will be used to link the JSON BO to the
         // BO in the DB
         let bos_with_id = bos

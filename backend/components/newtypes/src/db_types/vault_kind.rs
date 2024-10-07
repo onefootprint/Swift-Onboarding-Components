@@ -19,6 +19,7 @@ use strum_macros::EnumString;
     Copy,
     Eq,
     PartialEq,
+    Hash,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,
