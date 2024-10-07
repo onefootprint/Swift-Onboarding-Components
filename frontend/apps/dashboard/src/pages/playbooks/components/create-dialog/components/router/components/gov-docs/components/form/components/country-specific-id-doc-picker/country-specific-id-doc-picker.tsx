@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';

@@ -1,60 +1,42 @@
-// @ts-nocheck
-
-import type { CountryRecord } from '@onefootprint/global-constants';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { useTranslation } from 'react-i18next';
+import useIdDocText from 'src/hooks/use-id-doc-text';
 
-const useIdDocOptions = (country: CountryRecord) => {
-  const { t } = useTranslation('common', { keyPrefix: 'id_document' });
-  const options = [];
-  if (country.driversLicense) {
-    options.push({
+const useIdDocOptions = () => {
+  const t = useIdDocText();
+  const options = [
+    {
       value: SupportedIdDocTypes.driversLicense,
-      label: t('drivers_license'),
-    });
-  }
-  if (country.passport) {
-    options.push({
+      label: t(SupportedIdDocTypes.driversLicense),
+    },
+    {
       value: SupportedIdDocTypes.passport,
-      label: t('passport'),
-    });
-  }
-  if (country.passportCard) {
-    options.push({
+      label: t(SupportedIdDocTypes.passport),
+    },
+    {
       value: SupportedIdDocTypes.passportCard,
-      label: t('passport_card'),
-    });
-  }
-  if (country.idCard) {
-    options.push({
+      label: t(SupportedIdDocTypes.passportCard),
+    },
+    {
       value: SupportedIdDocTypes.idCard,
-      label: t('id_card'),
-    });
-  }
-  if (country.residenceDocument) {
-    options.push({
+      label: t(SupportedIdDocTypes.idCard),
+    },
+    {
       value: SupportedIdDocTypes.residenceDocument,
-      label: t('residence_document'),
-    });
-  }
-  if (country.workPermit) {
-    options.push({
+      label: t(SupportedIdDocTypes.residenceDocument),
+    },
+    {
       value: SupportedIdDocTypes.workPermit,
-      label: t('permit'),
-    });
-  }
-  if (country.visa) {
-    options.push({
+      label: t(SupportedIdDocTypes.workPermit),
+    },
+    {
       value: SupportedIdDocTypes.visa,
-      label: t('visa'),
-    });
-  }
-  if (country.voterIdentification) {
-    options.push({
+      label: t(SupportedIdDocTypes.visa),
+    },
+    {
       value: SupportedIdDocTypes.voterIdentification,
-      label: t('voter_identification'),
-    });
-  }
+      label: t(SupportedIdDocTypes.voterIdentification),
+    },
+  ];
 
   return options;
 };

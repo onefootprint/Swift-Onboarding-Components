@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoTrash16 } from '@onefootprint/icons';
@@ -34,7 +32,7 @@ const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProp
     country => country.value === editingCountry || !existingCountries.includes(country.value),
   );
   const [selectedCountry, setSelectedCountry] = useState<CountryRecord>(editingCountryRecord ?? countryOptions[0]);
-  const documentOptions = useIdDocOptions(selectedCountry);
+  const documentOptions = useIdDocOptions();
   const globalDocOptions = documentOptions.filter(doc => globalDocs?.includes(doc.value));
   let preselectedDocs = documentOptions.filter(
     doc => selectedCountry.value === editingCountry && editingDocs?.includes(doc.value),
@@ -55,7 +53,10 @@ const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProp
     );
   };
 
-  const handleCheckboxChange = doc => {
+  const handleCheckboxChange = (doc: {
+    value: SupportedIdDocTypes;
+    label: string;
+  }) => {
     const isSelected = selectedDocuments.some(selectedDoc => selectedDoc.value === doc.value);
     if (isSelected) {
       setSelectedDocuments(selectedDocuments.filter(d => d.value !== doc.value));
