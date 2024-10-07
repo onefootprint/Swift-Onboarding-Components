@@ -17,6 +17,7 @@ import type { DiField } from '../../../../vault.types';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';
 import CardHeader from './components/card-header';
+import useGetTranslationWithoutAlias from './utils/use-get-translation-without-alias';
 
 export type FieldsetProps = WithEntityProps & {
   iconComponent: Icon;
@@ -27,10 +28,10 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'fieldset',
   });
-  const { t: tAll } = useTranslation('common');
 
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
+  const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
 
   const cards: EntityCard[] = getCards(entity) ?? [];
   const [selectedCard, setSelectedCard] = useState(cards[0]);
@@ -59,7 +60,6 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
 
   const renderField = (field: DiField) => {
     const { di } = field;
-    const tKeyWithoutAlias = `di.${di.replace(`${selectedCard.alias}.`, '')}`;
 
     if (di.endsWith('issuer')) {
       return (
@@ -68,11 +68,11 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
           key={di}
           di={di}
           entity={entity}
-          renderLabel={() => tAll(tKeyWithoutAlias as ParseKeys<'common'>)}
+          renderLabel={() => getTranslationsWithoutAlias(di)}
         />
       );
     }
-    return <Field key={di} di={di} entity={entity} renderLabel={() => tAll(tKeyWithoutAlias as ParseKeys<'common'>)} />;
+    return <Field key={di} di={di} entity={entity} renderLabel={() => getTranslationsWithoutAlias(di)} />;
   };
 
   return (

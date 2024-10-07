@@ -315,6 +315,7 @@ export enum CardDIField {
   expirationYear = 'expiration_year',
   zip = 'billing_address.zip',
   country = 'billing_address.country',
+  fingerprint = 'fingerprint',
 }
 
 export enum BankDIField {
@@ -323,6 +324,7 @@ export enum BankDIField {
   routingNumber = 'ach_routing_number',
   accountNumber = 'ach_account_number',
   accountId = 'ach_account_id',
+  fingerprint = 'fingerprint',
 }
 
 export type CardDI<T extends string = string> =
