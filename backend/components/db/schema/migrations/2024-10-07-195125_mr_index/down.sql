@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY manual_review_incomplete_sv_query_idx;

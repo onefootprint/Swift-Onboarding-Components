@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY manual_review_incomplete_sv_query_idx ON manual_review(tenant_id, is_live, scoped_vault_id) WHERE completed_at IS NULL;
