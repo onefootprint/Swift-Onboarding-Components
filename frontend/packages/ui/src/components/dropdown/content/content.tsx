@@ -27,7 +27,14 @@ const translateOut = keyframes`
   }
 `;
 
-const Content = ({ children, minWidth = '200px', maxWidth, width, sideOffset = 4, ...props }: ContentProps) => {
+const Content = ({
+  children,
+  minWidth = '200px',
+  maxWidth = '360px',
+  width,
+  sideOffset = 4,
+  ...props
+}: ContentProps) => {
   return (
     <Container sideOffset={sideOffset} $minWidth={minWidth} $maxWidth={maxWidth} $width={width} {...props}>
       {children}
@@ -48,9 +55,9 @@ const Container = styled(RadixDropdown.Content)<
     border-radius: ${theme.borderRadius.default};
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
-    min-width: ${$minWidth};
-    max-width: ${$maxWidth};
-    width: ${$width};
+    ${$minWidth && `min-width: ${$minWidth};`}
+    ${$maxWidth && `max-width: ${$maxWidth};`}
+    ${$width && `width: ${$width};`}
     max-height: 50vh;
     z-index: ${theme.zIndex.dropdown};
     animation-duration: ${ANIMATION_DURATION};

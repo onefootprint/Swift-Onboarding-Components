@@ -1,6 +1,5 @@
 import { SelectCustom, Text } from '@onefootprint/ui';
 import type React from 'react';
-import styled from 'styled-components';
 
 export type Option<T> = {
   id: string;
@@ -26,8 +25,10 @@ const DropdownSelector = <T,>({ onValueChange, triggerAriaLabel, value, options 
       <SelectCustom.Content>
         <SelectCustom.Group>
           {options?.map(option => (
-            <SelectCustom.Item key={option.id} value={option.id} asChild>
-              <Name variant="body-3">{option.name}</Name>
+            <SelectCustom.Item key={option.id} value={option.id} asChild showChecked>
+              <Text variant="body-3" truncate>
+                {option.name}
+              </Text>
             </SelectCustom.Item>
           ))}
         </SelectCustom.Group>
@@ -35,14 +36,5 @@ const DropdownSelector = <T,>({ onValueChange, triggerAriaLabel, value, options 
     </SelectCustom.Root>
   );
 };
-
-// cap role name at 2 lines
-const Name = styled(Text)`
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
 
 export default DropdownSelector;

@@ -5,6 +5,7 @@ import Icon from './components/icon';
 import Input from './components/input';
 import Item from './components/item';
 import Trigger from './components/trigger';
+import Value from './components/value';
 
 const SelectCustom = {
   Root: RadixSelect.Root,
@@ -13,7 +14,7 @@ const SelectCustom = {
   Content,
   Item,
   Group,
-  Value: RadixSelect.Value,
+  Value,
   ChevronIcon: Icon,
   Input,
 };

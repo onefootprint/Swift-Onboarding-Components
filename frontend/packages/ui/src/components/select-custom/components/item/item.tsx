@@ -3,6 +3,7 @@ import * as RadixSelect from '@radix-ui/react-select';
 import { forwardRef } from 'react';
 import { css, styled } from 'styled-components';
 import { createFontStyles } from '../../../../utils/mixins';
+import Text from '../../../text';
 
 type Size = 'default' | 'compact';
 
@@ -22,7 +23,11 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
     return (
       <RadixSelect.Item {...props} value={value} asChild>
         <Container $size={size} ref={ref}>
-          <RadixSelect.ItemText>{children}</RadixSelect.ItemText>
+          <RadixSelect.ItemText asChild>
+            <Text variant="body-3" width="100%" truncate>
+              {children}
+            </Text>
+          </RadixSelect.ItemText>
           {showChecked && (
             <RadixSelect.ItemIndicator>
               <CheckContainer>
@@ -39,17 +44,18 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
 const Container = styled.div<{ $size?: Size }>`
   ${({ theme, $size }) => css`
     ${createFontStyles('body-3')}
-    cursor: pointer;
     display: flex;
-    flex-direction: row;
     align-items: center;
+    width: 100%;
     height: ${HEIGHT[$size || 'default']};
     padding-left: ${$size === 'compact' ? theme.spacing[3] : theme.spacing[4]};
-    padding-right: ${theme.spacing[4]}; 
+    padding-right: ${theme.spacing[4]};
+    position: relative;
+    cursor: pointer;
     border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[1]});
     background-color: ${theme.backgroundColor.transparent};
     transition: background-color 0.05s ease-in-out;
-    position: relative; 
+    overflow: hidden;
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};
@@ -77,10 +83,8 @@ const CheckContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    right: ${theme.spacing[4]};
-    top: 0;
-    height: 100%;
+    padding-left: ${theme.spacing[2]};
+    flex-shrink: 0;
   `}
 `;
 

@@ -14,6 +14,7 @@ const StyledTrigger = styled(RadixSelect.Trigger)`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
 
   .icon-component {
     transform: rotate(0deg);

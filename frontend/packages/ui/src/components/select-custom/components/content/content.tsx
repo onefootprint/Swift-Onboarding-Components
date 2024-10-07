@@ -18,7 +18,7 @@ type ContentProps = RadixSelect.SelectContentProps & {
 const Content = ({
   children,
   minWidth = '200px',
-  maxWidth,
+  maxWidth = '360px',
   width,
   minHeight,
   maxHeight,
