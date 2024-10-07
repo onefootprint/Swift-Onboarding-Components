@@ -1,4 +1,4 @@
-import { SelectNew, Shimmer } from '@onefootprint/ui';
+import { SelectCustom, Shimmer } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 import ALL_PLAYBOOKS_ID from '../../constants';
@@ -34,13 +34,24 @@ const PlaybooksFilter = () => {
     <>
       {isPending && <Loading />}
       {data && (
-        <SelectNew
+        <SelectCustom.Root
           disabled={playbooksData.length === 1}
-          onChange={handleChange}
-          options={playbooksData}
-          size="compact"
+          onValueChange={handleChange}
           value={playbooksFilterValue.value}
-        />
+        >
+          <SelectCustom.Input size="compact" placeholder={t('all-playbooks')}>
+            <SelectCustom.Value placeholder={t('all-playbooks')}>{playbooksFilterValue.label}</SelectCustom.Value>
+          </SelectCustom.Input>
+          <SelectCustom.Content maxHeight="50vh" maxWidth="400px">
+            <SelectCustom.Group>
+              {playbooksData.map(option => (
+                <SelectCustom.Item key={option.value} value={option.value} showChecked>
+                  {option.label}
+                </SelectCustom.Item>
+              ))}
+            </SelectCustom.Group>
+          </SelectCustom.Content>
+        </SelectCustom.Root>
       )}
     </>
   );
