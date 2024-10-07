@@ -80,19 +80,18 @@ describe('getDis', () => {
   describe('getBankDis', () => {
     it('should filter and sort attributes for bank accounts', () => {
       const input: DataIdentifier[] = [
+        'bank.account1.ach_routing_number',
         'bank.account1.name',
         'bank.account1.ach_account_number',
-        'bank.account1.ach_routing_number',
         'bank.account1.account_type',
-        'bank.account2.name',
       ];
 
       const result = getBankDis(input, 'account1');
       const expected: DataIdentifier[] = [
         'bank.account1.name',
+        'bank.account1.account_type',
         'bank.account1.ach_account_number',
         'bank.account1.ach_routing_number',
-        'bank.account1.account_type',
       ];
 
       expect(result).toEqual(expected);

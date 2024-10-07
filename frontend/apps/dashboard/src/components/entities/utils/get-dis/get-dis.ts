@@ -1,6 +1,6 @@
 import type { DataIdentifier, EntityVault } from '@onefootprint/types';
 
-const order: Record<string, number> = {
+const cardOrder: Record<string, number> = {
   issuer: 1,
   name: 2,
   number: 3,
@@ -8,6 +8,15 @@ const order: Record<string, number> = {
   cvc: 5,
   billing_address: 6,
   fingerprint: 7,
+};
+
+const bankOrder: Record<string, number> = {
+  name: 1,
+  account_type: 2,
+  ach_account_id: 3,
+  ach_account_number: 4,
+  ach_routing_number: 5,
+  fingerprint: 6,
 };
 
 const filterCards = (attributes: DataIdentifier[], search: string | null | undefined) => {
@@ -32,14 +41,14 @@ export const getDI = (target: string) => {
   return `di.${target}`;
 };
 
-const sort = (attributes: DataIdentifier[]) =>
+const sortCardDIs = (attributes: DataIdentifier[]) =>
   attributes.sort((a, b) => {
     const aParts = a.split('.');
     const bParts = b.split('.');
     const aKey = aParts[2] || '';
     const bKey = bParts[2] || '';
 
-    const keyComparison = order[aKey] - order[bKey];
+    const keyComparison = cardOrder[aKey] - cardOrder[bKey];
     if (keyComparison !== 0) {
       return keyComparison;
     }
@@ -48,6 +57,15 @@ const sort = (attributes: DataIdentifier[]) =>
     const aSubKey = aParts[3] || '';
     const bSubKey = bParts[3] || '';
     return aSubKey.localeCompare(bSubKey);
+  });
+
+const sortBankDIs = (attributes: DataIdentifier[]) =>
+  attributes.sort((a, b) => {
+    const aParts = a.split('.');
+    const bParts = b.split('.');
+    const aKey = aParts[2] || '';
+    const bKey = bParts[2] || '';
+    return bankOrder[aKey] - bankOrder[bKey];
   });
 
 export const getCustomDIs = (data: EntityVault) => {
@@ -60,13 +78,13 @@ export const getCustomDIs = (data: EntityVault) => {
 
 export const getCardDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
   const filtered = filterCards(attributes, search);
-  const sorted = sort(filtered);
+  const sorted = sortCardDIs(filtered);
   return sorted;
 };
 
 export const getBankDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
   const filtered = filterBankAccounts(attributes, search);
-  const sorted = sort(filtered);
+  const sorted = sortBankDIs(filtered);
   return sorted;
 };
 

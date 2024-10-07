@@ -400,6 +400,14 @@
         "cvc": "Card security code (CVC)",
         "number_last4": "Card number (last 4)"
       }
+    },
+    "bank": {
+      "account_type": "Account type",
+      "ach_account_id": "ACH account ID",
+      "ach_account_number": "ACH account number",
+      "name": "Name",
+      "ach_routing_number": "ACH routing number",
+      "fingerprint": "Fingerprint"
     }
   },
   "cdo": {
