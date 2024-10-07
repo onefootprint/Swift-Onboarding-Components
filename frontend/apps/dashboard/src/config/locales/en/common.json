@@ -388,6 +388,7 @@
         "zip": "Billing address (Zip code)",
         "country": "Billing address (Country)"
       },
+      "fingerprint": "Fingerprint",
       "verbose": {
         "name": "Name on card",
         "number": "Card number",
