@@ -39,8 +39,9 @@ pub struct ManualReview {
     pub workflow_id: WorkflowId,
     pub scoped_vault_id: ScopedVaultId,
     pub kind: ManualReviewKind,
-    pub tenant_id: Option<TenantId>,
-    pub is_live: Option<bool>,
+    /// Denormalized from scoped vault
+    pub tenant_id: TenantId,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]

@@ -1,0 +1,2 @@
+ALTER TABLE manual_review ALTER COLUMN tenant_id DROP NOT NULL;
+ALTER TABLE manual_review ALTER COLUMN is_live DROP NOT NULL;

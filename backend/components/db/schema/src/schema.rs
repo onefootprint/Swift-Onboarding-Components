@@ -700,8 +700,8 @@ diesel::table! {
         workflow_id -> Text,
         scoped_vault_id -> Text,
         kind -> Text,
-        tenant_id -> Nullable<Text>,
-        is_live -> Nullable<Bool>,
+        tenant_id -> Text,
+        is_live -> Bool,
     }
 }
 
