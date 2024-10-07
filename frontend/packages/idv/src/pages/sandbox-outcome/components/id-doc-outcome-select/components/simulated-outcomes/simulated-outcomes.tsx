@@ -1,4 +1,4 @@
-import { Box, NativeSelect, Stack, Text } from '@onefootprint/ui';
+import { Box, Form, Stack, Text } from '@onefootprint/ui';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -38,18 +38,20 @@ const SimulatedOutcomes = () => {
         borderColor="tertiary"
       >
         <Stack alignItems="center" justifyContent="space-between">
-          <label htmlFor="idDocOutcome">
-            <Text variant="label-3" color="primary">
-              {t('label')}
-            </Text>
-          </label>
-          <NativeSelect {...register('idDocOutcome')} id="idDocOutcome" size="compact">
-            {options.map(({ value, label }) => (
-              <option key={value} value={value} aria-selected={watchIdDocOutcome === value}>
-                {label}
-              </option>
-            ))}
-          </NativeSelect>
+          <Form.Field>
+            <Form.Label htmlFor="idDocOutcome">
+              <Text variant="label-3" color="primary">
+                {t('label')}
+              </Text>
+            </Form.Label>
+            <Form.Select {...register('idDocOutcome')} id="idDocOutcome" size="compact">
+              {options.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Field>
         </Stack>
       </Box>
       {watchIdDocOutcome === IdDocOutcome.fail && (

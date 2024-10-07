@@ -1,6 +1,6 @@
 import { IdVerificationOutcome, type PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
-import { NativeSelect, Stack, Text } from '@onefootprint/ui';
+import { Form, Stack, Text } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -82,23 +82,25 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
   return (
     <Stack flexDirection="column" gap={5}>
       <Stack alignItems="center" justifyContent="space-between">
-        <label htmlFor="overallOutcome">
-          <Text variant="label-3" color="primary">
-            {t('title')}
-          </Text>
-        </label>
-        <NativeSelect size="compact" disabled={isDisabled} {...register('overallOutcome')} id="overallOutcome">
-          {options.map(({ value, label }) => (
-            <option key={value} value={value} aria-selected={watchOverallOutcome === value}>
-              {label}
-            </option>
-          ))}
-          {isDisabled && (
-            <option value={OverallOutcome.useRulesOutcome} aria-selected={true}>
-              -
-            </option>
-          )}
-        </NativeSelect>
+        <Form.Field>
+          <Form.Label htmlFor="overallOutcome">
+            <Text variant="label-3" color="primary">
+              {t('title')}
+            </Text>
+          </Form.Label>
+          <Form.Select size="compact" disabled={isDisabled} {...register('overallOutcome')} id="overallOutcome">
+            {options.map(({ value, label }) => (
+              <option key={value} value={value} aria-selected={watchOverallOutcome === value}>
+                {label}
+              </option>
+            ))}
+            {isDisabled && (
+              <option value={OverallOutcome.useRulesOutcome} aria-selected={true}>
+                -
+              </option>
+            )}
+          </Form.Select>
+        </Form.Field>
       </Stack>
       {watchOverallOutcome === OverallOutcome.stepUp && (
         <Text variant="body-3" color="tertiary">

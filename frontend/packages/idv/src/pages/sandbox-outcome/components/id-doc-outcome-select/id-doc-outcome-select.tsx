@@ -1,5 +1,5 @@
 import { IdVerificationOutcome } from '@onefootprint/types/src/data/sandbox-outcomes-type';
-import { NativeSelect, Stack, Text } from '@onefootprint/ui';
+import { Form, Stack, Text } from '@onefootprint/ui';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSandboxOutcomeOptions from '../../../sandbox-outcome/hooks/use-sandbox-outcome-options';
@@ -26,22 +26,24 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
   return (
     <Stack flexDirection="column" gap={5} borderStyle="dashed" borderTopWidth={1} paddingTop={5} borderColor="tertiary">
       <Stack justifyContent="space-between" alignItems="center">
-        <label htmlFor="docVerificationOutcome">
-          <Text variant="label-3" color="primary">
-            {t('title')}
-          </Text>
-        </label>
-        {allowRealOutcome ? (
-          <NativeSelect {...register('docVerificationOutcome')} id="docVerificationOutcome" size="compact">
-            {options.map(({ value, label }) => (
-              <option key={value} value={value} aria-selected={docVerificationOutcome === value}>
-                {label}
-              </option>
-            ))}
-          </NativeSelect>
-        ) : (
-          <Text variant="label-2">{idDocOutcomeSimulated.label}</Text>
-        )}
+        <Form.Field>
+          <Form.Label>
+            <Text variant="label-3" color="primary">
+              {t('title')}
+            </Text>
+          </Form.Label>
+          {allowRealOutcome ? (
+            <Form.Select {...register('docVerificationOutcome')} id="docVerificationOutcome" size="compact">
+              {options.map(({ value, label }) => (
+                <option key={value} value={value} aria-selected={docVerificationOutcome === value}>
+                  {label}
+                </option>
+              ))}
+            </Form.Select>
+          ) : (
+            <Text variant="label-2">{idDocOutcomeSimulated.label}</Text>
+          )}
+        </Form.Field>
       </Stack>
       {docVerificationOutcome === IdVerificationOutcome.real ? (
         <Text variant="body-3" color="tertiary">
