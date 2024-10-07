@@ -7,6 +7,7 @@ const order: Record<string, number> = {
   expiration: 4,
   cvc: 5,
   billing_address: 6,
+  fingerprint: 7,
 };
 
 const filterCards = (attributes: DataIdentifier[], search: string | null | undefined) => {
