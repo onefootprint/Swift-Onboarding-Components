@@ -1,5 +1,6 @@
 import type { Entity } from '@onefootprint/types';
 import {
+  hasEntityBankAccounts,
   hasEntityCards,
   hasEntityCustomData,
   hasEntityDocuments,
@@ -30,6 +31,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
     !hasUsLegalStatus,
   );
   const hasCards = hasEntityCards(entity);
+  const hasBankAccounts = hasEntityBankAccounts(entity);
   const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
   const hasCustomData = hasEntityCustomData(entity);
@@ -122,7 +124,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
             </Fieldset>
           </GridItem>
         ) : null}
-        {hasCards ? (
+        {hasCards || hasBankAccounts ? (
           <GridItem>
             <FinancialFieldset title={cards.title} iconComponent={cards.iconComponent} />
           </GridItem>
