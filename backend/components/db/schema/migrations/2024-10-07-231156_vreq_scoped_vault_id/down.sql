@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS verification_request_scoped_vault_id;

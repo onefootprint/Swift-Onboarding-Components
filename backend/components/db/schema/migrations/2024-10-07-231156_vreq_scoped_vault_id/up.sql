@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS verification_request_scoped_vault_id ON verification_request(scoped_vault_id);
