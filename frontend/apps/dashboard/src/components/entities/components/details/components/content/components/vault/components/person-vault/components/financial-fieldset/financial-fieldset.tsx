@@ -1,7 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import type { EntityCard, VaultValue } from '@onefootprint/types';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
@@ -17,6 +16,7 @@ import type { DiField } from '../../../../vault.types';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';
 import CardHeader from './components/card-header';
+import useGetCardIssuer from './utils/use-get-card-issuer';
 import useGetTranslationWithoutAlias from './utils/use-get-translation-without-alias';
 
 export type FieldsetProps = WithEntityProps & {
@@ -32,6 +32,7 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
+  const getCardIssuer = useGetCardIssuer();
 
   const cards: EntityCard[] = getCards(entity) ?? [];
   const [selectedCard, setSelectedCard] = useState(cards[0]);
@@ -54,7 +55,7 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
   };
 
   const renderCardIssuer = (value: VaultValue) => {
-    const changedValue = t(`cards.card-brands.${value}` as ParseKeys<'common'>) as string;
+    const changedValue = getCardIssuer(value);
     return <FieldOrPlaceholder data={changedValue} />;
   };
 
