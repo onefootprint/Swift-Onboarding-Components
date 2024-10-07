@@ -37,10 +37,7 @@ const renderRules = ({ playbook = kycPlaybookFixture }: Partial<RulesProps>) => 
 
 const renderRulesAndWaitFinishLoading = async () => {
   renderRules({});
-  const loading = await screen.findByRole('progressbar', {
-    name: 'Loading...',
-  });
-  await waitForElementToBeRemoved(loading);
+  await waitForElementToBeRemoved(() => screen.queryAllByRole('progressbar'));
 };
 
 describe('<Rules />', () => {
