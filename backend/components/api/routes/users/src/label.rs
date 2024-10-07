@@ -1,13 +1,14 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
-use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use api_wire_types::UpdateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
+use newtypes::preview_api;
 use newtypes::DbActor;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -16,12 +17,12 @@ use paperclip::actix::{
     self,
 };
 
-#[api_v2_operation(description = "Update a user's label", tags(Entities, Private))]
-#[actix::post("/entities/{fp_id:fp_[_A-Za-z0-9]*}/label")]
+#[api_v2_operation(description = "Update a user's label", tags(Users, Preview))]
+#[actix::post("/users/{fp_id:fp_[_A-Za-z0-9]*}/label")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: TenantSessionAuth,
+    auth: TenantApiKeyGated<preview_api::Labels>,
     request: Json<UpdateLabelRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
@@ -48,12 +49,12 @@ pub async fn post(
     Ok(api_wire_types::Empty)
 }
 
-#[api_v2_operation(description = "View a user's label", tags(Entities, Private))]
-#[actix::get("/entities/{fp_id:fp_[_A-Za-z0-9]*}/label")]
+#[api_v2_operation(description = "View a user's label", tags(Users, Preview))]
+#[actix::get("/users/{fp_id:fp_[_A-Za-z0-9]*}/label")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: TenantSessionAuth,
+    auth: TenantApiKeyGated<preview_api::Labels>,
 ) -> ApiResponse<api_wire_types::UserLabel> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

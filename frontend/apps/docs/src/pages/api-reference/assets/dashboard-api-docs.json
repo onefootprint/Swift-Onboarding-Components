@@ -1014,11 +1014,6 @@
                     },
                     {
                         "Firm Employee Assume Token": []
-                    },
-                    {
-                        "Secret API Key": [
-                            "preview:labels"
-                        ]
                     }
                 ]
             },
@@ -1068,11 +1063,6 @@
                     },
                     {
                         "Firm Employee Assume Token": []
-                    },
-                    {
-                        "Secret API Key": [
-                            "preview:labels"
-                        ]
                     }
                 ]
             }
@@ -1117,11 +1107,6 @@
                     },
                     {
                         "Firm Employee Assume Token": []
-                    },
-                    {
-                        "Secret API Key": [
-                            "preview:tags"
-                        ]
                     }
                 ]
             },
@@ -1171,11 +1156,6 @@
                     },
                     {
                         "Firm Employee Assume Token": []
-                    },
-                    {
-                        "Secret API Key": [
-                            "preview:tags"
-                        ]
                     }
                 ]
             }
@@ -1227,11 +1207,6 @@
                     },
                     {
                         "Firm Employee Assume Token": []
-                    },
-                    {
-                        "Secret API Key": [
-                            "preview:tags"
-                        ]
                     }
                 ]
             }

@@ -26,11 +26,6 @@ mod vault;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
-    tags::configure_post_aliases(config);
-    tags::configure_get_aliases(config);
-    tags::configure_delete_aliases(config);
-    label::configure_post_aliases(config);
-    label::configure_get_aliases(config);
     config
         .service(client_token::post::post)
         .service(client_token::get::get)

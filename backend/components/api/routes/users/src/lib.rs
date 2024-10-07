@@ -8,6 +8,7 @@ mod detail;
 mod documents;
 mod duplicates;
 mod kyc;
+mod label;
 mod liveness;
 mod match_signals;
 mod onboardings;
@@ -15,6 +16,7 @@ mod patch;
 mod post;
 mod risk_signals;
 mod search;
+mod tags;
 mod token;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -35,6 +37,11 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(detail::detail)
         .service(kyc::post)
         .service(onboardings::get)
+        .service(label::get)
+        .service(label::post)
+        .service(tags::post)
+        .service(tags::get)
+        .service(tags::delete)
         .service(duplicates::get);
 
     delete::configure_delete_aliases(config);
