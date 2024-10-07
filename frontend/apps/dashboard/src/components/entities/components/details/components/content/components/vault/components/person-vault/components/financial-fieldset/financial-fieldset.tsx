@@ -1,17 +1,14 @@
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import type { Icon } from '@onefootprint/icons';
-import {
-  type EntityBankAccount,
-  type EntityCard,
-  type VaultValue,
-  hasEntityBankAccounts,
-  hasEntityCards,
-} from '@onefootprint/types';
-import { Divider, SegmentedControl, Stack, Text } from '@onefootprint/ui';
+import type { DataIdentifier, EntityBankAccount, EntityCard, VaultValue } from '@onefootprint/types';
+import { hasEntityBankAccounts, hasEntityCards } from '@onefootprint/types';
+import { Divider, LinkButton, SegmentedControl, Stack, Text } from '@onefootprint/ui';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import styled, { css } from 'styled-components';
+import useDecryptForm from '../../../../hooks/use-decrypt-form';
+import useField from '../../../../hooks/use-field';
 
 import { getBankDis, getCardDis } from 'src/components/entities/utils/get-dis';
 import { FIELDSET_HEADER_HEIGHT } from '../../../../../../constants';
@@ -47,12 +44,28 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
   );
   const selectedItem = isCard ? selectedCard : selectedBankAccount;
 
-  const fields = useMemo(() => {
-    const dis = isCard
+  const dis = useMemo(() => {
+    return isCard
       ? getCardDis(entity.attributes, selectedItem?.alias)
       : getBankDis(entity.attributes, selectedItem?.alias);
+  }, [isCard, entity.attributes, selectedItem?.alias]);
+  const fields = useMemo(() => {
     return dis.map(di => ({ di }));
   }, [entity.attributes, selectedItem?.alias, isCard]);
+
+  const decryptForm = useDecryptForm();
+  const getFieldProps = useField(entity);
+  const selectableFields: DataIdentifier[] = dis.filter(di => getFieldProps(di).canSelect);
+  const allSelected = selectableFields.every(decryptForm.isChecked);
+  const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
+
+  const handleSelectAll = () => {
+    decryptForm.set(selectableFields, true);
+  };
+
+  const handleDeselectAll = () => {
+    decryptForm.set(selectableFields, false);
+  };
 
   const renderCardIssuer = (value: VaultValue) => {
     const changedValue = getCardIssuer(value);
@@ -99,6 +112,11 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
               setIsCard(value === 'cards');
             }}
           />
+        )}
+        {shouldShowSelectAll && (
+          <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
+            {allSelected ? t('deselect-all') : t('select-all')}
+          </LinkButton>
         )}
       </Header>
       <Stack direction="column" gap={5} padding={5} flex={1}>
