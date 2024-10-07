@@ -1,5 +1,5 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import { Box, Form, Grid, LinkButton, NativeSelect, Text, TextInput } from '@onefootprint/ui';
+import { Box, Form, Grid, LinkButton, Text, TextInput } from '@onefootprint/ui';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
@@ -43,10 +43,10 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
       <Box marginBottom={8}>
         <Form.Field>
           <Form.Label htmlFor="method">{t('content-type.label')}</Form.Label>
-          <NativeSelect id="method" {...register('ingressSettings.contentType')}>
+          <Form.Select id="method" {...register('ingressSettings.contentType')}>
             <option value="none">None</option>
             <option value="json">JSON</option>
-          </NativeSelect>
+          </Form.Select>
         </Form.Field>
       </Box>
       {ingressContentType !== 'none' && (

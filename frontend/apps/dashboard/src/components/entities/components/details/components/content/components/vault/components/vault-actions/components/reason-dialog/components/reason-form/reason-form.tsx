@@ -1,6 +1,5 @@
-import { Box, Divider, Hint, NativeSelect, Text, TextArea } from '@onefootprint/ui';
-import Label from '@onefootprint/ui/src/components/label';
-import { useId, useState } from 'react';
+import { Box, Divider, Form, Hint, Text, TextArea } from '@onefootprint/ui';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -42,28 +41,31 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
     t('form.reason.options.change-of-direct-deposit'),
     t('form.reason.options.other'),
   ];
+  const defaultValue = options[2];
 
   return (
     <form id="decrypt-reason-form" onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Text variant="label-1" marginBottom={7}>
         {t('description')}
       </Text>
-      <Label htmlFor={useId()}>{t('form.reason.label')}</Label>
-      <NativeSelect
-        defaultValue={t('form.reason.options.customer-verification')}
-        {...register('reason', {
-          required: true,
-          onChange: ({ target }) => setShowCustomReason(target.value === t('form.reason.options.other')),
-        })}
-      >
-        {options.map(option => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </NativeSelect>
+      <Form.Field>
+        <Form.Label>{t('form.reason.label')}</Form.Label>
+        <Form.Select
+          {...register('reason', {
+            required: t('form.reason.errors.required'),
+            onChange: ({ target }) => setShowCustomReason(target.value === t('form.reason.options.other')),
+          })}
+          defaultValue={defaultValue}
+        >
+          {options.map(option => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </Form.Select>
+        <Form.Errors>{errors.reason?.message}</Form.Errors>
+      </Form.Field>
       {hasError && <Hint hasError={hasError}>{t('form.reason.errors.required')}</Hint>}
-
       {showCustomReason && (
         <Box marginTop={4}>
           <TextArea

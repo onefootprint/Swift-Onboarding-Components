@@ -1,6 +1,6 @@
 import { IcoCode16, IcoUser16 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
-import { NativeSelect, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
+import { Form, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
@@ -28,7 +28,7 @@ export type FormProps = {
   }[];
 };
 
-const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
+const CopyForm = ({ onSubmit, playbook, tenants }: FormProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'copy' });
   const org = useOrgSession();
   const form = useForm<FormData>({
@@ -60,13 +60,16 @@ const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
           {...form.register('name', { required: true })}
         />
         {tenants.length > 1 && (
-          <NativeSelect {...form.register('tenantId', { required: true })} label={t('form.tenant.label')}>
-            {tenants.map(tenant => (
-              <option key={tenant.value} value={tenant.value}>
-                {tenant.label}
-              </option>
-            ))}
-          </NativeSelect>
+          <Form.Field>
+            <Form.Label>{t('form.tenant.label')}</Form.Label>
+            <Form.Select {...form.register('tenantId', { required: true })}>
+              {tenants.map(tenant => (
+                <option key={tenant.value} value={tenant.value}>
+                  {tenant.label}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Field>
         )}
         <Controller
           control={form.control}
@@ -99,4 +102,4 @@ const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
   );
 };
 
-export default Form;
+export default CopyForm;
