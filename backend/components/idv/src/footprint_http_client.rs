@@ -4,7 +4,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use reqwest_middleware::Middleware;
 use reqwest_retry::policies::ExponentialBackoff;
 use reqwest_retry::RetryTransientMiddleware;
-use reqwest_tracing::ReqwestOtelSpanBackend;
+use reqwest_tracing::SpanBackendWithUrl;
 use reqwest_tracing::TracingMiddleware;
 use std::time::Duration;
 
@@ -36,7 +36,7 @@ impl FootprintVendorHttpClient {
             // Log when a soft timeout has been reached
             .with(SoftTimeoutMiddleware)
             // Trace each individual API request
-            .with(TracingMiddleware::<OtelPathSpanName>::new())
+            .with(TracingMiddleware::<SpanBackendWithUrl>::new())
             .build();
 
         Ok(Self { client })
@@ -48,31 +48,6 @@ impl std::ops::Deref for FootprintVendorHttpClient {
 
     fn deref(&self) -> &Self::Target {
         &self.client
-    }
-}
-
-/// An implementation of ReqwestOtelSpanBackend that uses the request method and request URL as
-/// the span name.
-struct OtelPathSpanName;
-
-impl ReqwestOtelSpanBackend for OtelPathSpanName {
-    fn on_request_start(req: &reqwest::Request, _: &mut task_local_extensions::Extensions) -> tracing::Span {
-        let name = format!(
-            "{} {} {}",
-            req.method(),
-            req.url().host_str().unwrap_or("-"),
-            req.url().path()
-        );
-        use reqwest_tracing::reqwest_otel_span;
-        reqwest_otel_span!(name = name, req)
-    }
-
-    fn on_request_end(
-        span: &tracing::Span,
-        outcome: &reqwest_middleware::Result<reqwest::Response>,
-        _: &mut task_local_extensions::Extensions,
-    ) {
-        reqwest_tracing::default_on_request_end(span, outcome)
     }
 }
 

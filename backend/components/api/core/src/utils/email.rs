@@ -19,6 +19,7 @@ use newtypes::TenantId;
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use reqwest_middleware::ClientWithMiddleware;
+use reqwest_tracing::SpanBackendWithUrl;
 use reqwest_tracing::TracingMiddleware;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -86,7 +87,7 @@ impl SendgridClient {
     pub fn new(api_key: String) -> Self {
         let client = reqwest::Client::new();
         let client = reqwest_middleware::ClientBuilder::new(client)
-            .with(TracingMiddleware::default())
+            .with(TracingMiddleware::<SpanBackendWithUrl>::new())
             .build();
         Self { api_key, client }
     }

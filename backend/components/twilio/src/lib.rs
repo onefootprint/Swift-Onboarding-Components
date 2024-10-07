@@ -12,6 +12,7 @@ use reqwest::IntoUrl;
 use reqwest::Method;
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_middleware::RequestBuilder;
+use reqwest_tracing::SpanBackendWithUrl;
 use reqwest_tracing::TracingMiddleware;
 use response::decode_response;
 use response::lookup::LookupResponse;
@@ -108,7 +109,7 @@ impl Client {
     fn new(config: TwilioConfig) -> Self {
         let client = reqwest::Client::new();
         let client = reqwest_middleware::ClientBuilder::new(client)
-            .with(TracingMiddleware::default())
+            .with(TracingMiddleware::<SpanBackendWithUrl>::new())
             .build();
 
         Self { config, client }

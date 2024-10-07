@@ -1,4 +1,5 @@
 use reqwest_middleware::ClientWithMiddleware;
+use reqwest_tracing::SpanBackendWithUrl;
 use reqwest_tracing::TracingMiddleware;
 use rpc::EnclavePayload;
 use rpc::RpcRequest;
@@ -30,7 +31,7 @@ impl ProxyHttpClient {
             .timeout(Duration::from_secs(5))
             .build()?;
         let client = reqwest_middleware::ClientBuilder::new(reqwest_client)
-            .with(TracingMiddleware::default())
+            .with(TracingMiddleware::<SpanBackendWithUrl>::new())
             .build();
 
         Ok(Self {
