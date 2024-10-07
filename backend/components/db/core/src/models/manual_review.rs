@@ -1,4 +1,5 @@
 use super::onboarding_decision::OnboardingDecision;
+use super::scoped_vault::ScopedVault;
 use super::workflow::Workflow;
 use crate::DbError;
 use crate::DbResult;
@@ -16,6 +17,7 @@ use newtypes::ManualReviewKind;
 use newtypes::OnboardingDecisionId;
 use newtypes::ReviewReason;
 use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable)]
@@ -37,6 +39,8 @@ pub struct ManualReview {
     pub workflow_id: WorkflowId,
     pub scoped_vault_id: ScopedVaultId,
     pub kind: ManualReviewKind,
+    pub tenant_id: Option<TenantId>,
+    pub is_live: Option<bool>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -47,6 +51,8 @@ struct NewManualReview {
     workflow_id: WorkflowId,
     scoped_vault_id: ScopedVaultId,
     kind: ManualReviewKind,
+    tenant_id: TenantId,
+    is_live: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -90,6 +96,7 @@ impl ManualReview {
         let filters = ManualReviewFilters::get_active();
         let existing_mrs = Self::get(conn, &workflow.scoped_vault_id, filters)?;
         let old_has_mrs = !existing_mrs.is_empty();
+        let sv = ScopedVault::get(conn, &workflow.scoped_vault_id)?;
         for ManualReviewArgs { kind, action } in mrs {
             let existing = existing_mrs.iter().find(|mr| mr.kind == kind);
             match (existing, action) {
@@ -101,8 +108,10 @@ impl ManualReview {
                         timestamp: Utc::now(),
                         review_reasons,
                         workflow_id: workflow.id.clone(),
-                        scoped_vault_id: workflow.scoped_vault_id.clone(),
+                        scoped_vault_id: sv.id.clone(),
                         kind,
+                        tenant_id: sv.tenant_id.clone(),
+                        is_live: sv.is_live,
                     };
                     diesel::insert_into(manual_review::table)
                         .values(new)

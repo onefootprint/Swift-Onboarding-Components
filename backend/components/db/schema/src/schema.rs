@@ -700,6 +700,8 @@ diesel::table! {
         workflow_id -> Text,
         scoped_vault_id -> Text,
         kind -> Text,
+        tenant_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 
@@ -1903,6 +1905,7 @@ diesel::joinable!(liveness_event -> insight_event (insight_event_id));
 diesel::joinable!(liveness_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
 diesel::joinable!(manual_review -> scoped_vault (scoped_vault_id));
+diesel::joinable!(manual_review -> tenant (tenant_id));
 diesel::joinable!(manual_review -> workflow (workflow_id));
 diesel::joinable!(middesk_request -> decision_intent (decision_intent_id));
 diesel::joinable!(middesk_request -> workflow (workflow_id));
