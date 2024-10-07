@@ -1,23 +1,30 @@
+import type { WithEntityProps } from '@/entity/components/with-entity';
 import type { Icon } from '@onefootprint/icons';
-import type { EntityCard, VaultValue } from '@onefootprint/types';
-import { LinkButton, Stack, Text } from '@onefootprint/ui';
-import { useState } from 'react';
+import {
+  type EntityBankAccount,
+  type EntityCard,
+  type VaultValue,
+  hasEntityBankAccounts,
+  hasEntityCards,
+} from '@onefootprint/types';
+import { Divider, SegmentedControl, Stack, Text } from '@onefootprint/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import styled, { css } from 'styled-components';
 
-import type { WithEntityProps } from '@/entity/components/with-entity';
-
-import { getCardDis } from 'src/components/entities/utils/get-dis';
-import useDecryptForm from '../../../../hooks/use-decrypt-form';
-import useField from '../../../../hooks/use-field';
+import { getBankDis, getCardDis } from 'src/components/entities/utils/get-dis';
+import { FIELDSET_HEADER_HEIGHT } from '../../../../../../constants';
+import getBankAccounts from '../../../../utils/get-bank-accounts';
 import getCards from '../../../../utils/get-cards';
 import type { DiField } from '../../../../vault.types';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';
-import CardHeader from './components/card-header';
 import useGetCardIssuer from './utils/use-get-card-issuer';
 import useGetTranslationWithoutAlias from './utils/use-get-translation-without-alias';
+
+import BankAccountSelector from './components/bank-account-selector';
+import CardSelector from './components/card-selector';
 
 export type FieldsetProps = WithEntityProps & {
   iconComponent: Icon;
@@ -25,34 +32,27 @@ export type FieldsetProps = WithEntityProps & {
 };
 
 const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'fieldset',
-  });
-
+  const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset' });
   const decrypt = useDecryptControls();
-  const decryptForm = useDecryptForm();
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
   const getCardIssuer = useGetCardIssuer();
 
-  const cards: EntityCard[] = getCards(entity) ?? [];
-  const [selectedCard, setSelectedCard] = useState(cards[0]);
-  const dis = getCardDis(entity.attributes, selectedCard.alias);
-  const fields = dis.map(di => ({ di }));
+  const cards: EntityCard[] = getCards(entity);
+  const bankAccounts: EntityBankAccount[] = getBankAccounts(entity);
+  const hasCardsAndBankAccounts = hasEntityCards(entity) && hasEntityBankAccounts(entity);
+  const [isCard, setIsCard] = useState(cards?.length > 0);
+  const [selectedCard, setSelectedCard] = useState<EntityCard | undefined>(cards.length > 0 ? cards[0] : undefined);
+  const [selectedBankAccount, setSelectedBankAccount] = useState<EntityBankAccount | undefined>(
+    bankAccounts.length > 0 ? bankAccounts[0] : undefined,
+  );
+  const selectedItem = isCard ? selectedCard : selectedBankAccount;
 
-  const getFieldProps = useField(entity);
-  const selectableFields = dis.filter(di => getFieldProps(di).canSelect);
-  const allSelected = selectableFields.every(decryptForm.isChecked);
-  const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
-
-  const getCardTitle = (count: number) => `${title} ${t('cards.title', { count })}`;
-
-  const handleSelectAll = () => {
-    decryptForm.set(selectableFields, true);
-  };
-
-  const handleDeselectAll = () => {
-    decryptForm.set(selectableFields, false);
-  };
+  const fields = useMemo(() => {
+    const dis = isCard
+      ? getCardDis(entity.attributes, selectedItem?.alias)
+      : getBankDis(entity.attributes, selectedItem?.alias);
+    return dis.map(di => ({ di }));
+  }, [entity.attributes, selectedItem?.alias, isCard]);
 
   const renderCardIssuer = (value: VaultValue) => {
     const changedValue = getCardIssuer(value);
@@ -62,7 +62,7 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
   const renderField = (field: DiField) => {
     const { di } = field;
 
-    if (di.endsWith('issuer')) {
+    if (di.endsWith('issuer') && isCard) {
       return (
         <Field
           renderValue={renderCardIssuer}
@@ -82,20 +82,43 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
         <Title>
           <IconComponent />
           <Text whiteSpace="nowrap" variant="label-3">
-            {getCardTitle(cards.length)}
+            {t('financial.title')}
           </Text>
         </Title>
-        {!decrypt.inProgress && cards.length > 1 && (
-          <CardHeader cards={cards} selectedCard={selectedCard} onChange={setSelectedCard} />
-        )}
-        {shouldShowSelectAll && (
-          <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
-            {allSelected ? t('deselect-all') : t('select-all')}
-          </LinkButton>
+        {hasCardsAndBankAccounts && !decrypt.inProgress && (
+          <SegmentedControl
+            size="compact"
+            variant="secondary"
+            aria-label={t('financial.control.aria')}
+            options={[
+              { label: t('financial.control.cards'), value: 'cards' },
+              { label: t('financial.control.bank-accounts'), value: 'bank-accounts' },
+            ]}
+            value={isCard ? 'cards' : 'bank-accounts'}
+            onChange={value => {
+              setIsCard(value === 'cards');
+            }}
+          />
         )}
       </Header>
-      <Stack direction="column" gap={4} padding={5} flex={1}>
-        {fields.map(renderField)}
+      <Stack direction="column" gap={5} padding={5} flex={1}>
+        {hasCardsAndBankAccounts && (
+          <>
+            {isCard ? (
+              <CardSelector cards={cards} selected={selectedCard} onChange={setSelectedCard} />
+            ) : (
+              <BankAccountSelector
+                bankAccounts={bankAccounts}
+                selected={selectedBankAccount}
+                onChange={setSelectedBankAccount}
+              />
+            )}
+            <Divider />
+          </>
+        )}
+        <Stack direction="column" gap={4}>
+          {fields.map(field => renderField(field))}
+        </Stack>
       </Stack>
     </Container>
   );
@@ -118,6 +141,10 @@ const Header = styled.header`
     border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
     flex: 0;
     display: flex;
+    align-items: center;
+    // keep constant height even when segmented control is removed
+    min-height: ${FIELDSET_HEADER_HEIGHT}px;
+    max-height: ${FIELDSET_HEADER_HEIGHT}px;
     justify-content: space-between;
     gap: ${theme.spacing[4]};
     padding: ${theme.spacing[3]} ${theme.spacing[5]};

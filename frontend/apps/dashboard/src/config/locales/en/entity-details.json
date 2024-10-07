@@ -352,6 +352,14 @@
     "custom": {
       "see-document": "See document"
     },
+    "financial": {
+      "title": "Financial data",
+      "control": {
+        "cards": "Cards",
+        "bank-accounts": "Bank accounts",
+        "aria": "Select between cards and bank accounts"
+      }
+    },
     "document": {
       "see-details": "See details",
       "cannot-edit": "Can't be edited",
