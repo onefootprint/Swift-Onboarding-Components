@@ -45,7 +45,7 @@ const BusinessActions = () => {
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <Dropdown.Trigger>
-          <IconButton variant="outline" aria-label={t('trigger')} size="compact">
+          <IconButton variant="outline" aria-label={t('trigger')} size="compact" disabled={bosQuery.isPending}>
             <Box>
               <IcoDotsHorizontal24 />
             </Box>
