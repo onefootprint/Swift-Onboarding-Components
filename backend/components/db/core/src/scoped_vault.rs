@@ -139,10 +139,10 @@ macro_rules! list_query {
             let q_has_manual_review = exists(
                 manual_review::table
                     .filter(manual_review::completed_at.is_null())
-                    // Filter on denormalized columns for better performance
-                    .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
-                    .filter(scoped_vault::is_live.eq($params.is_live))
                     .filter(manual_review::scoped_vault_id.eq(scoped_vault::id))
+                    // Filter on denormalized columns for better performance
+                    .filter(manual_review::tenant_id.eq(&$params.tenant_id))
+                    .filter(manual_review::is_live.eq($params.is_live))
             );
             if requires_manual_review {
                 query = query.filter(q_has_manual_review)
