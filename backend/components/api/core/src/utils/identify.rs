@@ -165,6 +165,7 @@ pub async fn get_user_auth_methods(
             m.can_initiate_login_challenge || allowed_unverified_methods.contains(&m.kind())
     });
 
+    tracing::info!(?auth_methods, "Auth methods for user");
     let ctx = UserAuthMethodsContext {
         vw: uvw,
         auth_methods,
