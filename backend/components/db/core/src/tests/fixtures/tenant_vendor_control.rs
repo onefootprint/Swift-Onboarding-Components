@@ -21,5 +21,6 @@ pub fn create_in_memory(
         middesk_api_key: None,
         lexis_enabled: false,
         sentilink_credentials: None,
+        neuro_enabled: false,
     }
 }

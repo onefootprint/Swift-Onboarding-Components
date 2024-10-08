@@ -1,0 +1,1 @@
+ALTER TABLE tenant_vendor_control DROP COLUMN IF EXISTS neuro_enabled;

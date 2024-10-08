@@ -37,9 +37,9 @@ pub struct TenantVendorControl {
     tenant_id: TenantId,
     tenant_name: String,
     tbi: Option<newtypes::TenantBusinessInfo>,
-    neuro_id_api_key: NeuroIdApiKeys,
+    neuro_id_api_key: CredentialType<NeuroIdApiKeys>,
     samba_safety_credentials: SambaSafetyCredentials,
-    sentilink_credentials: SentilinkCredentialType,
+    sentilink_credentials: CredentialType<SentilinkCredentials>,
 }
 
 impl TenantVendorControl {
@@ -83,7 +83,7 @@ impl TenantVendorControl {
         self.samba_safety_credentials.clone()
     }
 
-    pub fn sentilink_credentials(&self) -> SentilinkCredentialType {
+    pub fn sentilink_credentials(&self) -> CredentialType<SentilinkCredentials> {
         self.sentilink_credentials.clone()
     }
 
@@ -106,7 +106,7 @@ impl TenantVendorControl {
         self.tbi.clone()
     }
 
-    pub fn neuro_api_key(&self) -> NeuroIdApiKeys {
+    pub fn neuro_api_key(&self) -> CredentialType<NeuroIdApiKeys> {
         self.neuro_id_api_key.clone()
     }
 }
@@ -123,7 +123,12 @@ impl TenantVendorControl {
         let idology_credentials = IdologyCredentials::from(config);
         // TODO: we'll likely need to have diff site_ids in the future that we store on playbooks so we will
         // refactor then
-        let neuro_id_api_key = NeuroIdApiKeys::from(config);
+        let default_neuro = NeuroIdApiKeys::from(config);
+        let neuro_id_api_key = if vendor_control.as_ref().is_some_and(|vc| vc.neuro_enabled) {
+            CredentialType::TenantSpecific(default_neuro)
+        } else {
+            CredentialType::Default(default_neuro)
+        };
 
         // For experian, we use the bulk of the same credentials, just need to update subscriber code
         let experian_credential_builder = ExperianCredentialBuilder::from(config);
@@ -165,10 +170,10 @@ impl TenantVendorControl {
                     .ok_or(AssertionError("Missing decrypt field: SentilinkAuthPassword"))?
                     .clone(),
             };
-            SentilinkCredentialType::TenantSpecific(creds)
+            CredentialType::TenantSpecific(creds)
         } else {
             let creds = SentilinkCredentials::from(config);
-            SentilinkCredentialType::Default(creds)
+            CredentialType::Default(creds)
         };
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
@@ -274,10 +279,7 @@ impl TenantVendorControl {
     }
 
     pub fn is_sentilink_enabled_for_tenant(&self) -> bool {
-        matches!(
-            self.sentilink_credentials(),
-            SentilinkCredentialType::TenantSpecific(_)
-        )
+        matches!(self.sentilink_credentials(), CredentialType::TenantSpecific(_))
     }
 }
 
@@ -399,33 +401,44 @@ impl From<&Config> for ExperianCredentialBuilder {
     }
 }
 
+
+/// An enum that represents whether a tenant has specific access to a vendor
+/// or is using our default/platform level credentials
 #[derive(Clone, Debug)]
-pub enum SentilinkCredentialType {
-    Default(SentilinkCredentials),
-    TenantSpecific(SentilinkCredentials),
+pub enum CredentialType<T>
+where
+    T: Clone + std::fmt::Debug + Default,
+{
+    Default(T),
+    TenantSpecific(T),
 }
 
-impl Default for SentilinkCredentialType {
+impl<T> Default for CredentialType<T>
+where
+    T: Clone + std::fmt::Debug + Default,
+{
     fn default() -> Self {
-        let d = SentilinkCredentials::default();
+        let d = T::default();
         Self::Default(d)
     }
 }
 
-impl SentilinkCredentialType {
-    pub fn try_into_tenant_specific_credentials(self) -> FpResult<SentilinkCredentials> {
+impl<T> CredentialType<T>
+where
+    T: Clone + std::fmt::Debug + Default,
+{
+    pub fn try_into_tenant_specific_credentials(self) -> FpResult<T> {
         match self {
-            SentilinkCredentialType::Default(_) => {
+            CredentialType::Default(_) => {
                 Err(AssertionError("could not convert to tenant specific credentials").into())
             }
-            SentilinkCredentialType::TenantSpecific(sentilink_credentials) => Ok(sentilink_credentials),
+            CredentialType::TenantSpecific(t) => Ok(t),
         }
     }
 
-    pub fn into_unchecked_sentilink_credentials(self) -> SentilinkCredentials {
+    pub fn into_unchecked(self) -> T {
         match self {
-            SentilinkCredentialType::Default(sentilink_credentials)
-            | SentilinkCredentialType::TenantSpecific(sentilink_credentials) => sentilink_credentials,
+            CredentialType::Default(t) | CredentialType::TenantSpecific(t) => t,
         }
     }
 }

@@ -131,6 +131,7 @@ fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<Updat
         experian_enabled,
         experian_subscriber_code,
         middesk_api_key,
+        neuro_enabled,
     } = request;
     let tvc = UpdateTenantVendorControlArgs {
         idology_enabled,
@@ -141,6 +142,7 @@ fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<Updat
             .map(|key| tenant.public_key.seal_bytes(key.leak().as_bytes()))
             .transpose()?
             .to_changeset(),
+        neuro_enabled,
     };
     Ok(tvc)
 }

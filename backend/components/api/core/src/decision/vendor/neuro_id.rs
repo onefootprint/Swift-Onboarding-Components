@@ -112,7 +112,7 @@ pub async fn run_neuro_call(
     // TODO: get this site_id from a playbook config somewhere
     let use_test_key = !(state.config.service_config.is_production() && scoped_vault.is_live);
     let credentials = NeuroIdCredentials::new(
-        tvc.neuro_api_key(),
+        tvc.neuro_api_key().try_into_tenant_specific_credentials()?,
         NeuroIdSiteId("form_humor717".into()),
         use_test_key,
     );

@@ -76,6 +76,7 @@ pub struct PrivateTenantVendorControl {
     pub experian_subscriber_code: Option<String>,
     pub middesk_api_key_exists: bool,
     pub sentilink_credentials_exists: bool,
+    pub neuro_enabled: bool,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
@@ -96,6 +97,7 @@ pub struct PrivateUpdateTvc {
     pub experian_subscriber_code: Patch<String>,
     #[serde(default)]
     pub middesk_api_key: Patch<PiiString>,
+    pub neuro_enabled: Option<bool>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]

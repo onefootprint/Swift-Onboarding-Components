@@ -1,0 +1,1 @@
+ALTER TABLE tenant_vendor_control ADD COLUMN neuro_enabled bool DEFAULT false NOT NULL;

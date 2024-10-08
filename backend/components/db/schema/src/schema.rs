@@ -1497,6 +1497,7 @@ diesel::table! {
         middesk_api_key -> Nullable<Bytea>,
         lexis_enabled -> Bool,
         sentilink_credentials -> Nullable<Jsonb>,
+        neuro_enabled -> Bool,
     }
 }
 

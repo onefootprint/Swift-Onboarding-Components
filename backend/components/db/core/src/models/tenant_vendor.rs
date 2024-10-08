@@ -29,6 +29,7 @@ pub struct TenantVendorControl {
     pub middesk_api_key: Option<SealedVaultBytes>,
     pub lexis_enabled: bool,
     pub sentilink_credentials: Option<SentilinkTenantVendorControlCredentials>,
+    pub neuro_enabled: bool,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -40,6 +41,7 @@ struct NewTenantVendorControl<'a> {
     experian_subscriber_code: Option<String>,
     middesk_api_key: Option<SealedVaultBytes>,
     lexis_enabled: bool,
+    neuro_enabled: bool,
 }
 
 #[derive(Default)]
@@ -49,6 +51,7 @@ pub struct UpdateTenantVendorControlArgs {
     pub experian_subscriber_code: Option<Option<String>>,
     pub middesk_api_key: Option<Option<SealedVaultBytes>>,
     pub lexis_enabled: Option<bool>,
+    pub neuro_enabled: Option<bool>,
 }
 
 impl TenantVendorControl {
@@ -69,6 +72,7 @@ impl TenantVendorControl {
             lexis_enabled: bool,
             experian_subscriber_code: Option<String>,
             middesk_api_key: Option<SealedVaultBytes>,
+            neuro_enabled: bool,
         }
         let existing = if let Some(existing) = existing {
             ExistingArgs {
@@ -77,6 +81,7 @@ impl TenantVendorControl {
                 lexis_enabled: existing.lexis_enabled,
                 experian_subscriber_code: existing.experian_subscriber_code,
                 middesk_api_key: existing.middesk_api_key,
+                neuro_enabled: existing.neuro_enabled,
             }
         } else {
             ExistingArgs::default()
@@ -98,6 +103,7 @@ impl TenantVendorControl {
                 .experian_subscriber_code
                 .unwrap_or(existing.experian_subscriber_code),
             middesk_api_key: args.middesk_api_key.unwrap_or(existing.middesk_api_key),
+            neuro_enabled: args.neuro_enabled.unwrap_or(existing.neuro_enabled),
         };
         let tvc = diesel::insert_into(tenant_vendor_control::table)
             .values(new)
