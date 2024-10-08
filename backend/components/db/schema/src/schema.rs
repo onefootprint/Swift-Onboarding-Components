@@ -1140,6 +1140,8 @@ diesel::table! {
         _updated_at -> Timestamptz,
         created_by_actor -> Nullable<Jsonb>,
         deactivated_by_actor -> Nullable<Jsonb>,
+        tenant_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 
@@ -1158,6 +1160,8 @@ diesel::table! {
         _updated_at -> Timestamptz,
         created_by_actor -> Nullable<Jsonb>,
         deactivated_by_actor -> Nullable<Jsonb>,
+        tenant_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 
@@ -1953,7 +1957,9 @@ diesel::joinable!(samba_report -> verification_result (verification_result_id));
 diesel::joinable!(scoped_vault -> tenant (tenant_id));
 diesel::joinable!(scoped_vault -> vault (vault_id));
 diesel::joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
+diesel::joinable!(scoped_vault_label -> tenant (tenant_id));
 diesel::joinable!(scoped_vault_tag -> scoped_vault (scoped_vault_id));
+diesel::joinable!(scoped_vault_tag -> tenant (tenant_id));
 diesel::joinable!(scoped_vault_version -> scoped_vault (scoped_vault_id));
 diesel::joinable!(scoped_vault_version -> tenant (tenant_id));
 diesel::joinable!(scoped_vault_version -> vault_dr_config (backed_up_by_vdr_config_id));

@@ -46,7 +46,7 @@ pub async fn post(
             let args = NewScopedVaultTag {
                 created_at: Utc::now(),
                 created_seqno: seqno,
-                scoped_vault_id: sv.id,
+                scoped_vault: sv,
                 kind: tag_kind,
                 created_by_actor: actor,
             };

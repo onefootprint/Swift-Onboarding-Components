@@ -1,4 +1,5 @@
 use super::data_lifetime::DataLifetime;
+use super::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::PgConn;
 use chrono::DateTime;
@@ -12,6 +13,7 @@ use newtypes::DbActor;
 use newtypes::ScopedVaultId;
 use newtypes::TagId;
 use newtypes::TagKind;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = scoped_vault_tag)]
@@ -27,6 +29,8 @@ pub struct ScopedVaultTag {
     pub _updated_at: DateTime<Utc>,
     pub created_by_actor: Option<DbActor>,
     pub deactivated_by_actor: Option<DbActor>,
+    pub tenant_id: Option<TenantId>,
+    pub is_live: Option<bool>,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -86,30 +90,50 @@ impl ScopedVaultTag {
     #[tracing::instrument("ScopedVaultTag::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut PgConn, args: NewScopedVaultTag) -> Result<ScopedVaultTag, DbError> {
         let existing = scoped_vault_tag::table
-            .filter(scoped_vault_tag::scoped_vault_id.eq(&args.scoped_vault_id))
+            .filter(scoped_vault_tag::scoped_vault_id.eq(&args.scoped_vault.id))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())
             .filter(scoped_vault_tag::kind.eq(&args.kind))
             .get_result(conn)
             .optional()?;
 
         if let Some(tag) = existing {
-            Ok(tag)
-        } else {
-            let res = diesel::insert_into(scoped_vault_tag::table)
-                .values(args)
-                .get_result(conn)?;
-
-            Ok(res)
+            return Ok(tag);
         }
+        let new = NewScopedVaultTagRow {
+            created_at: args.created_at,
+            created_seqno: args.created_seqno,
+            scoped_vault_id: args.scoped_vault.id,
+            kind: args.kind,
+            created_by_actor: args.created_by_actor,
+            tenant_id: args.scoped_vault.tenant_id,
+            is_live: args.scoped_vault.is_live,
+        };
+        let res = diesel::insert_into(scoped_vault_tag::table)
+            .values(new)
+            .get_result(conn)?;
+
+        Ok(res)
     }
 }
 
-#[derive(Debug, Clone, Insertable)]
-#[diesel(table_name = scoped_vault_tag)]
+#[derive(Debug, Clone)]
 pub struct NewScopedVaultTag {
     pub created_at: DateTime<Utc>,
     pub created_seqno: DataLifetimeSeqno,
-    pub scoped_vault_id: ScopedVaultId,
+    pub scoped_vault: ScopedVault,
     pub kind: String,
     pub created_by_actor: DbActor,
+}
+
+
+#[derive(Debug, Insertable)]
+#[diesel(table_name = scoped_vault_tag)]
+struct NewScopedVaultTagRow {
+    created_at: DateTime<Utc>,
+    created_seqno: DataLifetimeSeqno,
+    scoped_vault_id: ScopedVaultId,
+    kind: String,
+    created_by_actor: DbActor,
+    tenant_id: TenantId,
+    is_live: bool,
 }

@@ -16,6 +16,7 @@ use newtypes::LabelAddedInfo;
 use newtypes::LabelId;
 use newtypes::LabelKind;
 use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable, Default)]
@@ -32,6 +33,8 @@ pub struct ScopedVaultLabel {
     pub _updated_at: DateTime<Utc>,
     pub created_by_actor: Option<DbActor>,
     pub deactivated_by_actor: Option<DbActor>,
+    pub tenant_id: Option<TenantId>,
+    pub is_live: Option<bool>,
 }
 
 impl ScopedVaultLabel {
@@ -96,6 +99,8 @@ struct NewScopedVaultLabelRow {
     scoped_vault_id: ScopedVaultId,
     kind: LabelKind,
     created_by_actor: DbActor,
+    tenant_id: TenantId,
+    is_live: bool,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -124,6 +129,8 @@ impl ScopedVaultLabel {
             scoped_vault_id: sv.id.clone(),
             created_by_actor: actor,
             kind,
+            tenant_id: sv.tenant_id,
+            is_live: sv.is_live,
         };
         let ev = diesel::insert_into(db_schema::schema::scoped_vault_label::table)
             .values(row)
