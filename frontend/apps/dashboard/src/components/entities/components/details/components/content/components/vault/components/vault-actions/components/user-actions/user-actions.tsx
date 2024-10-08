@@ -3,6 +3,7 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useTags from '@/entity/hooks/use-tags';
@@ -29,8 +30,6 @@ enum ActionDialog {
   EditTags = 'edit-tags',
   EditVault = 'edit-vault',
 }
-
-const DROPDOWN_ITEM_HEIGHT = '32px';
 
 const UserActions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('user-details', { keyPrefix: 'header.actions' });
@@ -67,73 +66,41 @@ const UserActions = ({ entity }: WithEntityProps) => {
           <Dropdown.Group>
             <Dropdown.GroupTitle>{t('management.title')}</Dropdown.GroupTitle>
             {hasPermission(RoleScopeKind.writeEntities) && (
-              <Dropdown.Item
-                key="edit-vault"
-                height={DROPDOWN_ITEM_HEIGHT}
-                onSelect={handleDialogOpen(ActionDialog.EditVault)}
-              >
-                {t('management.edit')}
-              </Dropdown.Item>
+              <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditVault)}>{t('management.edit')}</DropdownItem>
             )}
             {hasLabelAndTagPermissions && (
-              <Dropdown.Item key="edit-tags" height="32px" onSelect={handleDialogOpen(ActionDialog.EditTags)}>
+              <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditTags)}>
                 {tags?.length ? t('management.edit-tags') : t('management.add-tags')}
-              </Dropdown.Item>
+              </DropdownItem>
             )}
             {hasPermission(RoleScopeKind.writeEntities) && (
-              <Dropdown.Item
-                key="upload-doc"
-                height={DROPDOWN_ITEM_HEIGHT}
-                onSelect={handleDialogOpen(ActionDialog.UploadDoc)}
-              >
+              <DropdownItem onSelect={handleDialogOpen(ActionDialog.UploadDoc)}>
                 {t('management.upload-document')}
-              </Dropdown.Item>
+              </DropdownItem>
             )}
             {hasPermission(RoleScopeKind.manualReview) && (
-              <Dropdown.Item
-                key="historical-data"
-                height={DROPDOWN_ITEM_HEIGHT}
-                onSelect={handleDialogOpen(ActionDialog.HistoricalData)}
-              >
+              <DropdownItem onSelect={handleDialogOpen(ActionDialog.HistoricalData)}>
                 {t('management.view-historical-data')}
-              </Dropdown.Item>
+              </DropdownItem>
             )}
             {hasPermission(RoleScopeKind.writeLists) && (
-              <Dropdown.Item
-                key="add-to-list"
-                height={DROPDOWN_ITEM_HEIGHT}
-                onSelect={handleDialogOpen(ActionDialog.AddToList)}
-              >
+              <DropdownItem onSelect={handleDialogOpen(ActionDialog.AddToList)}>
                 {t('management.add-to-list')}
-              </Dropdown.Item>
+              </DropdownItem>
             )}
-            <Dropdown.Item
-              key="summarize"
-              height={DROPDOWN_ITEM_HEIGHT}
-              onSelect={handleDialogOpen(ActionDialog.Summarize)}
-            >
-              {t('management.summarize')}
-            </Dropdown.Item>
+            <DropdownItem onSelect={handleDialogOpen(ActionDialog.Summarize)}>{t('management.summarize')}</DropdownItem>
           </Dropdown.Group>
           {hasPermission(RoleScopeKind.manualReview) && (
             <>
               <Dropdown.Divider />
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
-                <Dropdown.Item
-                  key="request-more-info"
-                  height={DROPDOWN_ITEM_HEIGHT}
-                  onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}
-                >
+                <DropdownItem onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}>
                   {t('requests.request-more-info')}
-                </Dropdown.Item>
-                <Dropdown.Item
-                  key="auth-methods"
-                  height={DROPDOWN_ITEM_HEIGHT}
-                  onSelect={handleDialogOpen(ActionDialog.Auth)}
-                >
+                </DropdownItem>
+                <DropdownItem onSelect={handleDialogOpen(ActionDialog.Auth)}>
                   {t('requests.allow-updating-login-methods')}
-                </Dropdown.Item>
+                </DropdownItem>
               </Dropdown.Group>
             </>
           )}
@@ -142,9 +109,7 @@ const UserActions = ({ entity }: WithEntityProps) => {
               <Dropdown.Divider />
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('internal.title')}</Dropdown.GroupTitle>
-                <Dropdown.Item key="datadog" height={DROPDOWN_ITEM_HEIGHT} onSelect={openDatadog}>
-                  {t('internal.datadog')}
-                </Dropdown.Item>
+                <DropdownItem onSelect={openDatadog}>{t('internal.datadog')}</DropdownItem>
               </Dropdown.Group>
             </>
           )}
@@ -165,5 +130,9 @@ const UserActions = ({ entity }: WithEntityProps) => {
     </>
   );
 };
+
+const DropdownItem = styled(Dropdown.Item)`
+  height: 32px;
+`;
 
 export default UserActions;

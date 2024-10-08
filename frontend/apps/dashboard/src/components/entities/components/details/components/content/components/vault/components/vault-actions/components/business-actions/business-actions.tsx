@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useBusinessOwners from 'src/hooks/use-business-owners';
 import usePermissions from 'src/hooks/use-permissions';
+import styled from 'styled-components';
 import EditTagsDialog from '../edit-tags-dialog';
 import EditVaultDrawer from '../edit-vault-drawer';
 import RequestMoreInfo from './components/request-more-info';
@@ -17,8 +18,6 @@ enum ActionDialog {
   EditTags = 'edit-tags',
 }
 
-const DROPDOWN_ITEM_HEIGHT = '32px';
-
 const BusinessActions = () => {
   const { t } = useTranslation('business-details', { keyPrefix: 'actions' });
   const entityId = useEntityId();
@@ -28,7 +27,6 @@ const BusinessActions = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { hasPermission } = usePermissions();
   const hasBusinessOwners = !!bosQuery.data?.length;
-  const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
   const isPending = tagsQuery.isPending || bosQuery.isPending;
 
   const handleCloseDialog = () => {
@@ -53,14 +51,12 @@ const BusinessActions = () => {
             <Dropdown.Group>
               <Dropdown.GroupTitle>{t('management.title')}</Dropdown.GroupTitle>
               {hasPermission(RoleScopeKind.writeEntities) && (
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleDialogOpen(ActionDialog.EditVault)}>
-                  {t('management.edit')}
-                </Dropdown.Item>
+                <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditVault)}>{t('management.edit')}</DropdownItem>
               )}
-              {hasLabelAndTagPermissions && tagsQuery.data && (
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleDialogOpen(ActionDialog.EditTags)}>
+              {hasPermission(RoleScopeKind.labelAndTag) && tagsQuery.data && (
+                <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditTags)}>
                   {tagsQuery.data.length > 0 ? t('management.edit-tags') : t('management.add-tags')}
-                </Dropdown.Item>
+                </DropdownItem>
               )}
             </Dropdown.Group>
             {hasBusinessOwners && hasPermission(RoleScopeKind.manualReview) && (
@@ -68,25 +64,30 @@ const BusinessActions = () => {
                 <Dropdown.Divider />
                 <Dropdown.Group>
                   <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
-                  <Dropdown.Item
-                    height={DROPDOWN_ITEM_HEIGHT}
-                    onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}
-                  >
+                  <DropdownItem onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}>
                     {t('requests.request-info')}
-                  </Dropdown.Item>
+                  </DropdownItem>
                 </Dropdown.Group>
               </>
             )}
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>
-      <EditVaultDrawer open={openDialog === ActionDialog.EditVault} onClose={handleCloseDialog} />
-      <RequestMoreInfo open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
-      {hasLabelAndTagPermissions && (
+      {hasPermission(RoleScopeKind.writeEntities) && (
+        <EditVaultDrawer open={openDialog === ActionDialog.EditVault} onClose={handleCloseDialog} />
+      )}
+      {hasPermission(RoleScopeKind.manualReview) && (
+        <RequestMoreInfo open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
+      )}
+      {hasPermission(RoleScopeKind.labelAndTag) && (
         <EditTagsDialog open={openDialog === ActionDialog.EditTags} onClose={handleCloseDialog} />
       )}
     </>
   );
 };
+
+const DropdownItem = styled(Dropdown.Item)`
+  height: 32px;
+`;
 
 export default BusinessActions;
