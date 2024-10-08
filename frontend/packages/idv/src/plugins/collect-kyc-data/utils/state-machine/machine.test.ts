@@ -1,4 +1,4 @@
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import type { CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   IdDI,
@@ -11,7 +11,11 @@ import { interpret } from 'xstate';
 
 import type { KycData } from '../data-types';
 import type { InitMachineArgs } from './machine';
-import createCollectKycDataMachine from './machine';
+import createCollectKycDataMachine, {
+  getScreenOrder,
+  getDataCollectionScreensToShow,
+  nextScreenTransitions,
+} from './machine';
 
 describe('Collect KYC Data Machine Tests', () => {
   const TestOnboardingConfig: PublicOnboardingConfig = {
@@ -31,7 +35,6 @@ describe('Collect KYC Data Machine Tests', () => {
     isKyb: false,
     allowInternationalResidents: false,
   };
-
   const createMachine = (missingAttributes: CollectedKycDataOption[], data: KycData = {}, deviceType?: string) => {
     const initialContext: InitMachineArgs = {
       authToken: 'authToken',
@@ -58,6 +61,28 @@ describe('Collect KYC Data Machine Tests', () => {
   };
 
   describe('When user has missing fields', () => {
+    it('should take user to all pages in order', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.email,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.usLegalStatus,
+          CollectedKycDataOption.ssn9,
+        ],
+        {},
+        'sandboxTest',
+      );
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
+        'email',
+        'basicInformation',
+        'residentialAddress',
+        'usLegalStatus',
+        'ssn',
+        'confirm',
+      ]);
+    });
+
     it('If missing at least one attribute from each page, takes user to all pages in order', () => {
       const machine = createMachine(
         [
@@ -80,10 +105,7 @@ describe('Collect KYC Data Machine Tests', () => {
       machine.send({ type: 'initialized', payload: {} });
       let { state } = machine;
       let { context } = state;
-      expect(context.data[IdDI.email]).toEqual({
-        value: 'piip@onefootprint.com',
-        bootstrap: true,
-      });
+      expect(context.data[IdDI.email]).toEqual({ value: 'piip@onefootprint.com', bootstrap: true });
       expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
@@ -97,21 +119,24 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('residentialAddress');
       context = state.context;
       expect(context.data[IdDI.firstName]).toEqual({ value: 'Otto' });
+      expect(context.data[IdDI.middleName]).toEqual({ value: 'M.' });
+      expect(context.data[IdDI.lastName]).toEqual({ value: 'Footprint' });
 
       // Navigate to prev
-      state = machine.send({
-        type: 'navigatedToPrevPage',
-      });
+      state = machine.send({ type: 'navigatedToPrevPage' });
       expect(state.value).toEqual('basicInformation');
+
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
           [IdDI.firstName]: { value: 'Diffie' },
-          [IdDI.lastName]: { value: 'Footprint' },
+          [IdDI.lastName]: { value: 'Print' },
         },
       });
       context = state.context;
       expect(context.data[IdDI.firstName]).toEqual({ value: 'Diffie' });
+      expect(context.data[IdDI.middleName]).toEqual({ value: 'M.' });
+      expect(context.data[IdDI.lastName]).toEqual({ value: 'Print' });
       expect(state.value).toEqual('residentialAddress');
 
       state = machine.send({
@@ -127,18 +152,15 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('usLegalStatus');
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'US' });
-      expect(context.data[IdDI.addressLine1]).toEqual({
-        value: 'Address line 1',
-      });
+      expect(context.data[IdDI.addressLine1]).toEqual({ value: 'Address line 1' });
       expect(context.data[IdDI.city]).toEqual({ value: 'City' });
       expect(context.data[IdDI.state]).toEqual({ value: 'CA' });
       expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
 
       // Navigate to prev
-      state = machine.send({
-        type: 'navigatedToPrevPage',
-      });
+      state = machine.send({ type: 'navigatedToPrevPage' });
       expect(state.value).toEqual('residentialAddress');
+
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
@@ -151,9 +173,7 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'US' });
-      expect(context.data[IdDI.addressLine1]).toEqual({
-        value: 'Address!',
-      });
+      expect(context.data[IdDI.addressLine1]).toEqual({ value: 'Address!' });
       expect(context.data[IdDI.city]).toEqual({ value: 'Ankara' });
       expect(context.data[IdDI.state]).toEqual({ value: 'Eskisehir' });
       expect(context.data[IdDI.zip]).toEqual({ value: '12345' });
@@ -169,17 +189,14 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('ssn');
       context = state.context;
-      expect(context.data[IdDI.usLegalStatus]).toEqual({
-        value: UsLegalStatus.permanentResident,
-      });
+      expect(context.data[IdDI.usLegalStatus]).toEqual({ value: UsLegalStatus.permanentResident });
       expect(context.data[IdDI.nationality]).toEqual({ value: 'CA' });
       expect(context.data[IdDI.citizenships]).toEqual({ value: ['HK'] });
 
       // Navigate to prev
-      state = machine.send({
-        type: 'navigatedToPrevPage',
-      });
+      state = machine.send({ type: 'navigatedToPrevPage' });
       expect(state.value).toEqual('usLegalStatus');
+
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
@@ -187,9 +204,7 @@ describe('Collect KYC Data Machine Tests', () => {
         },
       });
       context = state.context;
-      expect(context.data[IdDI.usLegalStatus]).toEqual({
-        value: UsLegalStatus.citizen,
-      });
+      expect(context.data[IdDI.usLegalStatus]).toEqual({ value: UsLegalStatus.citizen });
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
@@ -202,9 +217,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
       expect(state.value).toEqual('confirm');
 
-      state = machine.send({
-        type: 'confirmed',
-      });
+      state = machine.send({ type: 'confirmed' });
       context = state.context;
       expect(state.value).toEqual('completed');
     });
@@ -231,9 +244,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[IdDI.firstName]).toEqual({ value: 'Otto' });
 
       // Navigate to prev
-      state = machine.send({
-        type: 'navigatedToPrevPage',
-      });
+      state = machine.send({ type: 'navigatedToPrevPage' });
       expect(state.value).toEqual('basicInformation');
       state = machine.send({
         type: 'dataSubmitted',
@@ -256,9 +267,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
       expect(state.value).toEqual('confirm');
 
-      state = machine.send({
-        type: 'confirmed',
-      });
+      state = machine.send({ type: 'confirmed' });
       context = state.context;
       expect(state.value).toEqual('completed');
     });
@@ -305,11 +314,8 @@ describe('Collect KYC Data Machine Tests', () => {
       ]);
 
       // Skip US legal status and SSN because MX address
-
       expect(state.value).toEqual('confirm');
-      state = machine.send({
-        type: 'navigatedToPrevPage',
-      });
+      state = machine.send({ type: 'navigatedToPrevPage' });
       expect(state.value).toEqual('residentialAddress');
 
       state = machine.send([
@@ -1075,5 +1081,171 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('confirm');
     });
+  });
+});
+
+describe('getScreenOrder', () => {
+  it('returns the index of the screen if it exists', () => {
+    expect(getScreenOrder('email')).toBe(0);
+    expect(getScreenOrder('basicInformation')).toBe(1);
+    expect(getScreenOrder('residentialAddress')).toBe(2);
+    expect(getScreenOrder('usLegalStatus')).toBe(3);
+    expect(getScreenOrder('ssn')).toBe(4);
+    expect(getScreenOrder('confirm')).toBe(5);
+
+    expect(getScreenOrder('does-not-exist')).toBe(-1);
+  });
+});
+
+describe('getDataCollectionScreensToShow', () => {
+  const baseReq = {
+    isMet: false,
+    kind: OnboardingRequirementKind.collectKycData,
+    populatedAttributes: [],
+  };
+
+  it('should return email', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [CollectedKycDataOption.email],
+      optionalAttributes: [],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['email', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return basicInformation 1/3', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.name],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['basicInformation', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return basicInformation 2/3', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.dob],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['basicInformation', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return basicInformation 3/3', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.nationality],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['basicInformation', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return residentialAddress', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.address],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['residentialAddress', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return usLegalStatus', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.usLegalStatus],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['usLegalStatus', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return ssn 1/3', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.usTaxId],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['ssn', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return ssn 2/3', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.ssn9],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['ssn', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return ssn 3/3', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [CollectedKycDataOption.ssn4],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['ssn', 'confirm'];
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+
+  it('should return only confirm screen', () => {
+    const req = {
+      ...baseReq,
+      missingAttributes: [],
+      optionalAttributes: [],
+    } as CollectKycDataRequirement;
+    const initialData: KycData = {};
+    const expectedScreens = ['confirm'];
+
+    expect(getDataCollectionScreensToShow(req, initialData)).toEqual(expectedScreens);
+  });
+});
+
+describe('nextScreenTransitions', () => {
+  const Targets = ['email', 'basicInformation', 'residentialAddress', 'usLegalStatus', 'ssn', 'confirm'];
+
+  it('should return same targets when init', () => {
+    const result = nextScreenTransitions('init');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when email', () => {
+    const result = nextScreenTransitions('email');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when basicInformation', () => {
+    const result = nextScreenTransitions('basicInformation');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when residentialAddress', () => {
+    const result = nextScreenTransitions('residentialAddress');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when usLegalStatus', () => {
+    const result = nextScreenTransitions('usLegalStatus');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when ssn', () => {
+    const result = nextScreenTransitions('ssn');
+    expect(result.map(x => x.target)).toEqual(Targets);
   });
 });

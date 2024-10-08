@@ -47,14 +47,14 @@ const ORDERED_SCREENS: Screen[] = [
   },
 ];
 
-const getScreenOrder = (screen: StateValue) => ORDERED_SCREENS.findIndex(s => s.screen === screen) ?? -1;
+export const getScreenOrder = (screen: StateValue) => ORDERED_SCREENS.findIndex(s => s.screen === screen) ?? -1;
 
 /**
  * Given the CollectKycDataRequirement and initial data, computes the static set of screens we
  * might show. The state machine transitions will only navigate forward and backward through this
  * set of static pages of data that need to be collected.
  */
-const getDataCollectionScreensToShow = (req: CollectKycDataRequirement, initialData: KycData): StateValue[] => {
+export const getDataCollectionScreensToShow = (req: CollectKycDataRequirement, initialData: KycData): StateValue[] => {
   const missingAttributes = [...req.missingAttributes, ...req.optionalAttributes];
   return ORDERED_SCREENS.filter(s => isMissing(s.cdos, missingAttributes, initialData) || s.screen === 'confirm').map(
     s => s.screen,
@@ -65,7 +65,7 @@ const getDataCollectionScreensToShow = (req: CollectKycDataRequirement, initialD
  * The forward transitions made for the specific `currentScreen`.
  * They don't allow transitioning to a screen that is before the `currentScreen`.
  */
-const nextScreenTransitions = (currentScreen: StateValue) => {
+export const nextScreenTransitions = (currentScreen: StateValue) => {
   const currentScreenOrder = getScreenOrder(currentScreen);
 
   return ORDERED_SCREENS.map(s => ({
