@@ -26,7 +26,7 @@ export const CardSelector = ({ selected, onChange, cards }: CardSelectorProps) =
           </Stack>
         )}
       </SelectCustom.Input>
-      <SelectCustom.Content>
+      <SelectCustom.Content width="100%">
         <SelectCustom.Group>
           {cards.map(card => (
             <SelectCustom.Item key={card.alias} value={card.alias || ''}>
