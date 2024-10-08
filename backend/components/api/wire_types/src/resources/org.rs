@@ -26,7 +26,7 @@ pub struct Organization {
     pub is_prod_auth_playbook_restricted: bool,
     // Only serialize in the GET /org response
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_sentilink_enabled: Option<bool>,
+    pub is_prod_sentilink_enabled: Option<bool>,
     pub support_email: Option<String>,
     pub support_phone: Option<String>,
     pub support_website: Option<String>,

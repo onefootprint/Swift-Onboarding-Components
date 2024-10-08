@@ -81,7 +81,8 @@ impl
         ),
     ) -> Self {
         let t = twp.tenant;
-        let is_sentilink_enabled = tenant_vendor_control.map(|tvc| tvc.is_sentilink_enabled_for_tenant());
+        let is_prod_sentilink_enabled =
+            tenant_vendor_control.map(|tvc| tvc.is_sentilink_enabled_for_tenant());
         let Tenant {
             id,
             name,
@@ -123,7 +124,7 @@ impl
                 name: p.name,
             }),
             allowed_preview_apis,
-            is_sentilink_enabled,
+            is_prod_sentilink_enabled,
         }
     }
 }
