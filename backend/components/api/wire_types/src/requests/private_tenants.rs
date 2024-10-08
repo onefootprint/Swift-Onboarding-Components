@@ -75,6 +75,7 @@ pub struct PrivateTenantVendorControl {
     pub lexis_enabled: bool,
     pub experian_subscriber_code: Option<String>,
     pub middesk_api_key_exists: bool,
+    pub sentilink_credentials_exists: bool,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]

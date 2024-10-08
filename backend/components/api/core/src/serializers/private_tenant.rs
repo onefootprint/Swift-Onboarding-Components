@@ -119,6 +119,7 @@ impl DbToApi<TenantVendorControl> for api_wire_types::PrivateTenantVendorControl
             lexis_enabled,
             experian_subscriber_code,
             middesk_api_key,
+            sentilink_credentials,
 
             id: _,
             tenant_id: _,
@@ -133,6 +134,7 @@ impl DbToApi<TenantVendorControl> for api_wire_types::PrivateTenantVendorControl
             lexis_enabled,
             experian_subscriber_code,
             middesk_api_key_exists: middesk_api_key.is_some(),
+            sentilink_credentials_exists: sentilink_credentials.is_some(),
         }
     }
 }

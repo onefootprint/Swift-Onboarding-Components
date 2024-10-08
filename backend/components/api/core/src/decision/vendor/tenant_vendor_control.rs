@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::enclave_client::DecryptReq;
 use crate::enclave_client::EnclaveClient;
 use crate::utils;
 use crate::FpResult;
@@ -138,7 +139,37 @@ impl TenantVendorControl {
 
         let lexis_credentials = LexisCredentials::from(config);
         let samba_safety_credentials = SambaSafetyCredentials::from(config);
-        let sentilink_credentials = SentilinkCredentialType::Default(SentilinkCredentials::from(config));
+        let sentilink_credentials = if let Some(senti_creds) = vendor_control
+            .as_ref()
+            .and_then(|vc| vc.sentilink_credentials.clone())
+        {
+            let encrypted_data = [
+                (SentilinkCreds::AuthUsername, senti_creds.account),
+                (SentilinkCreds::AuthPassword, senti_creds.token),
+            ];
+
+            let data = encrypted_data
+                .iter()
+                .map(|(sc, bytes)| (sc, DecryptReq(&tenant.e_private_key, bytes, vec![])))
+                .collect();
+
+            let sentilink = enclave_client.batch_decrypt_to_piistring(data).await?;
+            let creds = SentilinkCredentials {
+                base_url: config.sentilink_config.base_url.clone(),
+                auth_username: sentilink
+                    .get(&SentilinkCreds::AuthUsername)
+                    .ok_or(AssertionError("Missing decrypt field: SentilinkAuthUsername"))?
+                    .clone(),
+                auth_password: sentilink
+                    .get(&SentilinkCreds::AuthPassword)
+                    .ok_or(AssertionError("Missing decrypt field: SentilinkAuthPassword"))?
+                    .clone(),
+            };
+            SentilinkCredentialType::TenantSpecific(creds)
+        } else {
+            let creds = SentilinkCredentials::from(config);
+            SentilinkCredentialType::Default(creds)
+        };
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
         let incode_sandbox_credentials = IncodeSandboxCredentials::from(config);
@@ -335,6 +366,7 @@ impl From<&Config> for SentilinkCredentials {
     }
 }
 
+
 impl From<&Config> for ExperianCredentialBuilder {
     fn from(config: &Config) -> Self {
         // only load real creds in prod
@@ -388,4 +420,10 @@ impl SentilinkCredentialType {
             | SentilinkCredentialType::TenantSpecific(sentilink_credentials) => sentilink_credentials,
         }
     }
+}
+
+#[derive(Hash, PartialEq, Eq)]
+enum SentilinkCreds {
+    AuthUsername,
+    AuthPassword,
 }

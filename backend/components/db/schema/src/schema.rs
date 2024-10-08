@@ -1492,6 +1492,7 @@ diesel::table! {
         experian_subscriber_code -> Nullable<Text>,
         middesk_api_key -> Nullable<Bytea>,
         lexis_enabled -> Bool,
+        sentilink_credentials -> Nullable<Jsonb>,
     }
 }
 

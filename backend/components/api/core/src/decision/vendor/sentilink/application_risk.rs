@@ -78,8 +78,9 @@ pub async fn run_sentilink_application_risk(
 
     let request = SentilinkApplicationRiskRequest {
         idv_data,
-        // TODO update this in PR above
-        credentials: tvc.sentilink_credentials().into_unchecked_sentilink_credentials(),
+        credentials: tvc
+            .sentilink_credentials()
+            .try_into_tenant_specific_credentials()?,
         // TODO: from verification check?
         products: vec![SentilinkProduct::SyntheticScore, SentilinkProduct::IdTheftScore],
     };

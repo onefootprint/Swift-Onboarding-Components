@@ -11,6 +11,7 @@ use diesel::QueryDsl;
 use diesel::Queryable;
 use diesel::RunQueryDsl;
 use newtypes::SealedVaultBytes;
+use newtypes::SentilinkTenantVendorControlCredentials;
 use newtypes::TenantId;
 use newtypes::TenantVendorControlId;
 
@@ -20,18 +21,14 @@ pub struct TenantVendorControl {
     pub id: TenantVendorControlId,
     pub tenant_id: TenantId,
     pub deactivated_at: Option<DateTime<Utc>>,
-
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-
     pub idology_enabled: bool,
-
     pub experian_enabled: bool,
     pub experian_subscriber_code: Option<String>,
-
     pub middesk_api_key: Option<SealedVaultBytes>,
-
     pub lexis_enabled: bool,
+    pub sentilink_credentials: Option<SentilinkTenantVendorControlCredentials>,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
