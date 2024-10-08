@@ -10,10 +10,17 @@ import {
 describe('<DuplicateDataDrawer />', () => {
   const defaultProps = {
     isOpen: true,
+    isLoading: false,
     onClose: jest.fn(),
     isCard: true,
     fingerprint: 'fingerprint1' as VaultValue,
   };
+
+  it('should show three shimmers when isLoading is true', () => {
+    customRender(<CardDuplicateDrawer {...defaultProps} isLoading={true} dupes={allMatchingDupesFixture} />);
+    const progressbars = screen.getAllByRole('progressbar');
+    expect(progressbars).toHaveLength(3);
+  });
 
   it('should show all dupes when all fingerprints are the same as the one passed in', () => {
     customRender(<CardDuplicateDrawer {...defaultProps} dupes={allMatchingDupesFixture} />);

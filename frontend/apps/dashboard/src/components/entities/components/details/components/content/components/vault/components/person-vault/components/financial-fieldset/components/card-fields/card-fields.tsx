@@ -21,7 +21,7 @@ export type CardFieldsProps = {
 const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
   const getCardIssuer = useGetCardIssuer();
-  const { data: duplicateData } = useEntityDuplicateData(entity.id);
+  const { data: duplicateData, isLoading: isDuplicateDataLoading } = useEntityDuplicateData(entity.id);
 
   const cards: EntityCard[] = getCards(entity);
   const [selectedCard, setSelectedCard] = useState<EntityCard | undefined>(cards.length > 0 ? cards[0] : undefined);
@@ -76,6 +76,7 @@ const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
         onClose={closeDuplicateDataDrawer}
         dupes={duplicateData?.sameTenant ?? []}
         fingerprint={selectedCard?.fingerprint}
+        isLoading={isDuplicateDataLoading}
       />
     </Stack>
   );
