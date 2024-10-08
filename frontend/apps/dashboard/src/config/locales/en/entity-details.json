@@ -1218,7 +1218,8 @@
         "subtitle": "Users with this card in common:"
       },
       "bank": {
-        "title": "Duplicate bank accounts"
+        "title": "Duplicate bank accounts",
+        "subtitle": "Users with this bank account in common:"
       },
       "fp-id": "Footprint ID",
       "name": "Name",

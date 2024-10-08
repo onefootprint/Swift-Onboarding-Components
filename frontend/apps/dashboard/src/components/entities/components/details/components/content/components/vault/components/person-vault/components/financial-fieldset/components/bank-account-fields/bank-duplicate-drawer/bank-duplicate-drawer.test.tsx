@@ -1,13 +1,13 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import type { VaultValue } from '@onefootprint/types';
-import CardDuplicateDrawer from './card-duplicate-drawer';
+import BankDuplicateDrawer from './bank-duplicate-drawer';
 import {
   allMatchingDupesFixture,
   mixedDupesFixture,
   nonMatchingDupesFixture,
-} from './card-duplicate-drawer.test.config';
+} from './bank-duplicate-drawer.test.config';
 
-describe('<CardDuplicateDrawer />', () => {
+describe('<BankDuplicateDrawer />', () => {
   const defaultProps = {
     isOpen: true,
     isLoading: false,
@@ -16,21 +16,21 @@ describe('<CardDuplicateDrawer />', () => {
   };
 
   it('should show correct title and subtitle', () => {
-    customRender(<CardDuplicateDrawer {...defaultProps} dupes={allMatchingDupesFixture} />);
-    const title = screen.getByText('Duplicate cards');
+    customRender(<BankDuplicateDrawer {...defaultProps} dupes={allMatchingDupesFixture} />);
+    const title = screen.getByText('Duplicate bank accounts');
     expect(title).toBeInTheDocument();
-    const subtitle = screen.getByText('Users with this card in common:');
+    const subtitle = screen.getByText('Users with this bank account in common:');
     expect(subtitle).toBeInTheDocument();
   });
 
   it('should show three shimmers when isLoading is true', () => {
-    customRender(<CardDuplicateDrawer {...defaultProps} isLoading={true} dupes={allMatchingDupesFixture} />);
+    customRender(<BankDuplicateDrawer {...defaultProps} isLoading={true} dupes={allMatchingDupesFixture} />);
     const progressbars = screen.getAllByRole('progressbar');
     expect(progressbars).toHaveLength(3);
   });
 
   it('should show all dupes when all fingerprints are the same as the one passed in', () => {
-    customRender(<CardDuplicateDrawer {...defaultProps} dupes={allMatchingDupesFixture} />);
+    customRender(<BankDuplicateDrawer {...defaultProps} dupes={allMatchingDupesFixture} />);
     const firstDupe = screen.getByText('fp_id_1');
     expect(firstDupe).toBeInTheDocument();
     const secondDupe = screen.getByText('fp_id_2');
@@ -40,7 +40,7 @@ describe('<CardDuplicateDrawer />', () => {
   });
 
   it('should show only matching dupes when some fingerprints match', () => {
-    customRender(<CardDuplicateDrawer {...defaultProps} dupes={mixedDupesFixture} />);
+    customRender(<BankDuplicateDrawer {...defaultProps} dupes={mixedDupesFixture} />);
     const firstDupe = screen.getByText('fp_id_1');
     expect(firstDupe).toBeInTheDocument();
     const secondDupe = screen.getByText('fp_id_2');
@@ -50,7 +50,7 @@ describe('<CardDuplicateDrawer />', () => {
   });
 
   it('should show no dupes when no fingerprints match', () => {
-    customRender(<CardDuplicateDrawer {...defaultProps} dupes={nonMatchingDupesFixture} />);
+    customRender(<BankDuplicateDrawer {...defaultProps} dupes={nonMatchingDupesFixture} />);
     const firstDupe = screen.queryByText('fp_id_1');
     expect(firstDupe).not.toBeInTheDocument();
     const secondDupe = screen.queryByText('fp_id_2');
@@ -60,7 +60,7 @@ describe('<CardDuplicateDrawer />', () => {
   });
 
   it('should show nothing when there are no dupes', () => {
-    customRender(<CardDuplicateDrawer {...defaultProps} dupes={[]} />);
+    customRender(<BankDuplicateDrawer {...defaultProps} dupes={[]} />);
     const firstDupe = screen.queryByText('fp_id_1');
     expect(firstDupe).not.toBeInTheDocument();
     const secondDupe = screen.queryByText('fp_id_2');
