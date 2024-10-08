@@ -9,6 +9,7 @@ const defaultCard: EntityCard = {
   expiration: '12/2025',
   expiration_month: '12',
   expiration_year: '2025',
+  fingerprint: 'fingerprint1',
 };
 
 export { defaultCard };

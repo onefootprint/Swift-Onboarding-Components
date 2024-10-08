@@ -9,4 +9,5 @@ export type EntityBankAccount = {
   routingNumber: VaultValue;
   accountNumber: VaultValue;
   accountId: VaultValue;
+  fingerprint: VaultValue;
 };

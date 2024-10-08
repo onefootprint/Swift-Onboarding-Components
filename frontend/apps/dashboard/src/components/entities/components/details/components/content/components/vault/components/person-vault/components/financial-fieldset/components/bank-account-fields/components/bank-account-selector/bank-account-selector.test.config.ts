@@ -7,6 +7,7 @@ const defaultBankAccount: EntityBankAccount = {
   routingNumber: '123456789',
   accountNumber: '987654321',
   accountId: 'ABCD1234',
+  fingerprint: 'fingerprint1',
 };
 
 export { defaultBankAccount };

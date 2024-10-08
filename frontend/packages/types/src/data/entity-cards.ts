@@ -11,4 +11,5 @@ export type EntityCard = {
   expiration: VaultValue;
   expiration_month: VaultValue;
   expiration_year: VaultValue;
+  fingerprint: VaultValue;
 };
