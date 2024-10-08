@@ -1,6 +1,6 @@
-import type { Entity, EntityCard, VaultValue } from '@onefootprint/types';
+import type { DataIdentifier, Entity, EntityCard, VaultValue } from '@onefootprint/types';
 import { Divider, Stack } from '@onefootprint/ui';
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { getCardDis } from 'src/components/entities/utils/get-dis';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
@@ -10,21 +10,23 @@ import Field from '../../../../../field';
 import useGetCardIssuer from '../../utils/use-get-card-issuer';
 import useGetTranslationWithoutAlias from '../../utils/use-get-translation-without-alias';
 import CardSelector from '../card-selector';
+
 export type CardFieldsProps = {
   entity: Entity;
+  setSelectedItemDis: (dis: DataIdentifier[]) => void;
 };
 
-const CardFields = ({ entity }: CardFieldsProps) => {
+const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
   const getCardIssuer = useGetCardIssuer();
   const cards: EntityCard[] = getCards(entity);
   const [selectedCard, setSelectedCard] = useState<EntityCard | undefined>(cards.length > 0 ? cards[0] : undefined);
-  const dis = useMemo(() => {
-    return getCardDis(entity.attributes, selectedCard?.alias);
-  }, [entity.attributes, selectedCard?.alias]);
-  const fields = useMemo(() => {
-    return dis.map(di => ({ di }));
-  }, [dis]);
+  const dis = getCardDis(entity.attributes, selectedCard?.alias);
+  const fields = dis.map(di => ({ di }));
+
+  useEffect(() => {
+    setSelectedItemDis(dis);
+  }, [selectedCard]);
 
   const renderCardIssuer = (value: VaultValue) => {
     const changedValue = getCardIssuer(value);

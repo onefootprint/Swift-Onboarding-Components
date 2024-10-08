@@ -1,12 +1,14 @@
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import type { Icon } from '@onefootprint/icons';
-import { hasEntityBankAccounts, hasEntityCards } from '@onefootprint/types';
-import { SegmentedControl, Text } from '@onefootprint/ui';
+import { type DataIdentifier, hasEntityBankAccounts, hasEntityCards } from '@onefootprint/types';
+import { LinkButton, SegmentedControl, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { FIELDSET_HEADER_HEIGHT } from '../../../../../../constants';
+import useDecryptForm from '../../../../hooks/use-decrypt-form';
+import useField from '../../../../hooks/use-field';
 import { useDecryptControls } from '../../../vault-actions';
 import BankAccountFields from './components/bank-account-fields';
 import CardFields from './components/card-fields';
@@ -22,6 +24,21 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
 
   const hasCardsAndBankAccounts = hasEntityCards(entity) && hasEntityBankAccounts(entity);
   const [isCard, setIsCard] = useState(hasEntityCards(entity));
+  const [selectedItemDis, setSelectedItemDis] = useState<DataIdentifier[]>([]);
+
+  const decryptForm = useDecryptForm();
+  const getFieldProps = useField(entity);
+  const selectableFields: DataIdentifier[] = selectedItemDis.filter(di => getFieldProps(di).canSelect);
+  const allSelected = selectableFields.every(decryptForm.isChecked);
+  const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
+
+  const handleSelectAll = () => {
+    decryptForm.set(selectableFields, true);
+  };
+
+  const handleDeselectAll = () => {
+    decryptForm.set(selectableFields, false);
+  };
 
   return (
     <Container aria-label={title}>
@@ -47,8 +64,17 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
             }}
           />
         )}
+        {shouldShowSelectAll && (
+          <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
+            {allSelected ? t('deselect-all') : t('select-all')}
+          </LinkButton>
+        )}
       </Header>
-      {isCard ? <CardFields entity={entity} /> : <BankAccountFields entity={entity} />}
+      {isCard ? (
+        <CardFields entity={entity} setSelectedItemDis={setSelectedItemDis} />
+      ) : (
+        <BankAccountFields entity={entity} setSelectedItemDis={setSelectedItemDis} />
+      )}
     </Container>
   );
 };
