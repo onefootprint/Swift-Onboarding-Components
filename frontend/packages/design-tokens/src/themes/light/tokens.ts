@@ -55,7 +55,7 @@ export const destructiveBtnBorderColor = {
 export const borderColor = {
   primary: `${p.Gray150}`,
   primaryHover: `${p.Gray300}`,
-  secondary: `${p.Purple500}`,
+  secondary: `${p.Purple400}`,
   tertiary: `${p.Gray100}`,
   tertiaryHover: `${p.Gray200}`,
   error: `${p.Red500}`,
@@ -548,14 +548,14 @@ const tokens: Tokens = {
           color: textColor.primary,
         },
         selected: {
-          bg: backgroundColor.primary,
+          bg: backgroundColor.active,
           borderColor: borderColor.tertiary,
           color: textColor.accent,
         },
       },
       selected: {
         color: textColor.accent,
-        bg: backgroundColor.primary,
+        bg: backgroundColor.active,
         borderColor: borderColor.secondary,
       },
       disabled: {
