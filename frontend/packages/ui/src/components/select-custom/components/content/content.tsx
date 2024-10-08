@@ -13,24 +13,47 @@ type ContentProps = RadixSelect.SelectContentProps & {
   minWidth?: CSS.Property.Width;
   maxWidth?: CSS.Property.Width;
   width?: CSS.Property.Width;
+  popper?: boolean;
 };
 
 const Content = ({
   children,
-  minWidth = '200px',
-  maxWidth = '360px',
+  minWidth,
+  maxWidth,
   width,
   minHeight,
   maxHeight,
   height,
+  popper,
   ...props
 }: ContentProps) => {
+  const getWidthProps = () => {
+    if (popper) {
+      return {
+        $width: 'var(--radix-select-trigger-width)',
+        $maxWidth: undefined,
+      };
+    }
+    if (width) {
+      return {
+        $width: width,
+        $maxWidth: undefined,
+      };
+    }
+    return {
+      $width: undefined,
+      $maxWidth: maxWidth || '360px',
+    };
+  };
+
+  const { $width, $maxWidth } = getWidthProps();
+
   return (
-    <RadixSelect.Content {...props} asChild>
+    <RadixSelect.Content {...props} sideOffset={8} position={popper ? 'popper' : undefined} asChild>
       <Container
         $minWidth={minWidth}
-        $maxWidth={maxWidth}
-        $width={width}
+        $maxWidth={$maxWidth}
+        $width={$width}
         $minHeight={minHeight}
         $maxHeight={maxHeight}
         $height={height}
@@ -73,33 +96,35 @@ const Container = styled(Box)<{
   $maxHeight?: CSS.Property.Height;
   $height?: CSS.Property.Height;
 }>`
-  ${({ theme, $minWidth, $maxWidth, $width, $minHeight, $maxHeight, $height }) => css`
-    position: relative;
-    z-index: ${theme.zIndex.dropdown};
-    ${$minWidth && `min-width: ${$minWidth};`}
-    ${$maxWidth && `max-width: ${$maxWidth};`}
-    ${$width && `width: ${$width};`}
-    ${$minHeight && `min-height: ${$minHeight};`}
-    ${$maxHeight && `max-height: ${$maxHeight};`}
-    ${$height && `height: ${$height};`}
-    border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    overflow: auto;
-    background: ${theme.backgroundColor.primary};
-    box-shadow: ${theme.elevation[2]};
-    animation-duration: ${ANIMATION_DURATION};
-    transform-origin: var(--radix-select-content-transform-origin);
+  ${({ theme, $minWidth, $maxWidth, $width, $minHeight, $maxHeight, $height }) => {
+    return css`
+      position: relative;
+      z-index: ${theme.zIndex.dropdown};
+      ${$minWidth && `min-width: ${$minWidth};`}
+      ${$maxWidth && `max-width: ${$maxWidth};`}
+      ${$width && `width: ${$width};`}
+      ${$minHeight && `min-height: ${$minHeight};`}
+      ${$maxHeight && `max-height: ${$maxHeight};`}
+      ${$height && `height: ${$height};`}
+      border: 1px solid ${theme.borderColor.tertiary};
+      border-radius: ${theme.borderRadius.default};
+      overflow: auto;
+      background: ${theme.backgroundColor.primary};
+      box-shadow: ${theme.elevation[2]};
+      animation-duration: ${ANIMATION_DURATION};
+      transform-origin: var(--radix-select-content-transform-origin);
    
-    &[data-state="open"] {
-      animation: ${translateIn} ${ANIMATION_DURATION} ease-out;
-      animation-fill-mode: forwards;
-    }
+      &[data-state="open"] {
+        animation: ${translateIn} ${ANIMATION_DURATION} ease-out;
+        animation-fill-mode: forwards;
+      }
     
-    &[data-state="closed"] {
-      animation: ${translateOut} ${ANIMATION_DURATION} ease-in;
-      animation-fill-mode: forwards;
-    }
-  `}
+      &[data-state="closed"] {
+        animation: ${translateOut} ${ANIMATION_DURATION} ease-in;
+        animation-fill-mode: forwards;
+      }
+    `;
+  }}
 `;
 
 export default Content;

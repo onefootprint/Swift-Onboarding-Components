@@ -4,12 +4,34 @@ import { useState } from 'react';
 import Box from '../box';
 import SelectCustom from './select-custom';
 
+const meta: Meta<typeof SelectCustom.Root> = {
+  title: 'Components/SelectCustom',
+  component: SelectCustom.Root,
+  argTypes: {
+    defaultValue: {
+      control: 'text',
+      description: 'Default selected value',
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Whether the select is disabled',
+    },
+  },
+};
+
+export default meta;
+
 const options = [
   { value: 'apple', label: 'Apple', emoji: '🍎' },
   { value: 'banana', label: 'Banana', emoji: '🍌' },
   { value: 'orange', label: 'Orange', emoji: '🍊' },
   { value: 'grape', label: 'Grape', emoji: '🍇' },
   { value: 'pear', label: 'Pear', emoji: '🍐' },
+  {
+    value: 'a very long value',
+    label: 'A very long label that should be truncated because it is too long',
+    emoji: '🍐',
+  },
 ];
 
 const renderValue = (value: string) => {
@@ -29,88 +51,23 @@ const CenterAligner = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const Template = (args: { defaultValue?: string }) => {
-  const [value, setValue] = useState(args.defaultValue || '');
-  return (
-    <CenterAligner>
-      <SelectCustom.Root {...args} value={value} onValueChange={setValue}>
-        <SelectCustom.Trigger>
-          <SelectCustom.Value placeholder="Select a fruit">{renderValue(value)}</SelectCustom.Value>
-          <SelectCustom.ChevronIcon />
-        </SelectCustom.Trigger>
-        <SelectCustom.Content>
-          <SelectCustom.Group>
-            {options.map(option => (
-              <SelectCustom.Item key={option.value} value={option.value}>
-                {option.emoji} {option.label}
-              </SelectCustom.Item>
-            ))}
-          </SelectCustom.Group>
-        </SelectCustom.Content>
-      </SelectCustom.Root>
-    </CenterAligner>
-  );
-};
-
-const meta: Meta<typeof SelectCustom.Root> = {
-  title: 'Components/SelectCustom',
-  component: Template,
-  argTypes: {
-    defaultValue: { control: 'text' },
-  },
-};
-
-export default meta;
 type Story = StoryObj<typeof SelectCustom.Root>;
 
 export const Default: Story = {
   args: {
     defaultValue: '',
+    disabled: false,
   },
-};
-
-export const WithDefaultValue: Story = {
-  args: {
-    defaultValue: 'banana',
-  },
-};
-
-export const Compact: Story = {
   render: args => {
     const [value, setValue] = useState(args.defaultValue || '');
     return (
       <CenterAligner>
-        <SelectCustom.Root value={value} onValueChange={setValue}>
+        <SelectCustom.Root {...args} value={value} onValueChange={setValue}>
           <SelectCustom.Trigger>
             <SelectCustom.Value placeholder="Select a fruit">{renderValue(value)}</SelectCustom.Value>
             <SelectCustom.ChevronIcon />
           </SelectCustom.Trigger>
           <SelectCustom.Content>
-            <SelectCustom.Group>
-              {options.map(option => (
-                <SelectCustom.Item key={option.value} value={option.value} size="compact">
-                  {option.emoji} {option.label}
-                </SelectCustom.Item>
-              ))}
-            </SelectCustom.Group>
-          </SelectCustom.Content>
-        </SelectCustom.Root>
-      </CenterAligner>
-    );
-  },
-};
-
-export const CustomWidth: Story = {
-  render: args => {
-    const [value, setValue] = useState(args.defaultValue || '');
-    return (
-      <CenterAligner>
-        <SelectCustom.Root value={value} onValueChange={setValue}>
-          <SelectCustom.Trigger>
-            <SelectCustom.Value placeholder="Select a fruit">{renderValue(value)}</SelectCustom.Value>
-            <SelectCustom.ChevronIcon />
-          </SelectCustom.Trigger>
-          <SelectCustom.Content width="300px">
             <SelectCustom.Group>
               {options.map(option => (
                 <SelectCustom.Item key={option.value} value={option.value}>
@@ -125,13 +82,22 @@ export const CustomWidth: Story = {
   },
 };
 
+export const WithDefaultValue: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    defaultValue: 'banana',
+  },
+};
+
 export const CustomTrigger: Story = {
+  ...Default,
   render: args => {
     const [value, setValue] = useState(args.defaultValue || '');
     return (
       <CenterAligner>
         <SelectCustom.Root value={value} onValueChange={setValue}>
-          <SelectCustom.Input placeholder="Select a fruit" maxWidth="300px">
+          <SelectCustom.Input placeholder="Select a fruit" maxWidth="300px" disabled={args.disabled}>
             {renderValue(value)}
           </SelectCustom.Input>
           <SelectCustom.Content>
@@ -148,21 +114,24 @@ export const CustomTrigger: Story = {
     );
   },
 };
-export const WithCheckedItem: Story = {
+
+export const SelectInDialogs: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+  },
   render: args => {
     const [value, setValue] = useState(args.defaultValue || '');
-    console.log('value', value);
     return (
       <CenterAligner>
-        <SelectCustom.Root value={value} onValueChange={setValue}>
-          <SelectCustom.Trigger>
-            <SelectCustom.Value placeholder="Select a fruit">{renderValue(value)}</SelectCustom.Value>
-            <SelectCustom.ChevronIcon />
-          </SelectCustom.Trigger>
-          <SelectCustom.Content>
+        <SelectCustom.Root {...args} value={value} onValueChange={setValue}>
+          <SelectCustom.Input placeholder="Select a fruit" width="400px" disabled={args.disabled}>
+            {renderValue(value)}
+          </SelectCustom.Input>
+          <SelectCustom.Content popper>
             <SelectCustom.Group>
               {options.map(option => (
-                <SelectCustom.Item key={option.value} value={option.value} showChecked>
+                <SelectCustom.Item key={option.value} value={option.value}>
                   {option.emoji} {option.label}
                 </SelectCustom.Item>
               ))}
@@ -175,6 +144,7 @@ export const WithCheckedItem: Story = {
 };
 
 export const SelectItemInteraction: Story = {
+  ...Default,
   play: async ({ step }) => {
     const body = within(document.body);
 
