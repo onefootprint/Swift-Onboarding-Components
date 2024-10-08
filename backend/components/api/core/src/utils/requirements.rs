@@ -329,6 +329,12 @@ pub fn get_requirements_inner(
         .into_iter()
         .flatten()
         .filter(|r| {
+            if !r.is_met() {
+                // Always show an unmet requirement
+                return true;
+            }
+            // Sometimes we omit serializing met data collection requirements to the frontend, which
+            // functionally allows skipping the confirm screen
             let kind = OnboardingRequirementKind::from(r);
             let is_data_collection_step = matches!(
                 kind,
@@ -343,19 +349,17 @@ pub fn get_requirements_inner(
             );
             if is_data_collection_step {
                 if wf.completed_at.is_some() {
-                    // TODO this logic looks like it should only be hit if r.is_met(). Logging now to see if
-                    // we are ever hiding unmet requirements. If not, we can consolidate this logic
-                    tracing::info!(%kind, is_met=%r.is_met(), "Removing data collection step for completed wf");
                     // Omit the confirm screen when the workflow is entirely completed
                     return false;
                 }
-                if r.is_met() && is_stepup {
+                if is_stepup {
                     // Omit the confirm screen when an alpaca user is in step up
                     return false;
                 }
             }
-            if kind == OnboardingRequirementKind::CollectBusinessData && r.is_met() && entity_info.is_secondary_bo {
-                // Omit the confirm screen for business data when the user filling out the form is not the primary BO
+            if kind == OnboardingRequirementKind::CollectBusinessData && entity_info.is_secondary_bo {
+                // Omit the confirm screen for business data when the user filling out the form is not the
+                // primary BO
                 return false;
             }
             true
