@@ -2,8 +2,16 @@
   "page-title": "Footprint | Business",
   "actions": {
     "trigger": "Open actions menu",
-    "edit": "Edit business information",
-    "request-info": "Request more information"
+    "management": {
+      "title": "Management",
+      "edit": "Edit business information",
+      "edit-tags": "Edit tags",
+      "add-tags": "Add tags"
+    },
+    "requests": {
+      "title": "Requests",
+      "request-info": "Request more information"
+    }
   },
   "request-more-info": {
     "title": "Request more information",

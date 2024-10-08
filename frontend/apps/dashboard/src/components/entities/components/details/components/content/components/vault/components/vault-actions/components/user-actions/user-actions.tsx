@@ -48,26 +48,10 @@ const UserActions = ({ entity }: WithEntityProps) => {
     setOpenDialog(null);
   };
 
-  const handleDialogOpen = (dialog: ActionDialog) => {
+  const handleDialogOpen = (dialog: ActionDialog) => () => {
     setDropdownOpen(false);
     setOpenDialog(dialog);
   };
-
-  const handleEditVaultDrawer = () => handleDialogOpen(ActionDialog.EditVault);
-
-  const handleRequestMoreInfo = () => handleDialogOpen(ActionDialog.RequestMoreInfo);
-
-  const handleAuthMethods = () => handleDialogOpen(ActionDialog.Auth);
-
-  const handleAddToList = () => handleDialogOpen(ActionDialog.AddToList);
-
-  const handleSummarize = () => handleDialogOpen(ActionDialog.Summarize);
-
-  const handleUploadDoc = () => handleDialogOpen(ActionDialog.UploadDoc);
-
-  const handleHistoricalData = () => handleDialogOpen(ActionDialog.HistoricalData);
-
-  const handleEditTags = () => handleDialogOpen(ActionDialog.EditTags);
 
   return (
     <>
@@ -83,31 +67,51 @@ const UserActions = ({ entity }: WithEntityProps) => {
           <Dropdown.Group>
             <Dropdown.GroupTitle>{t('management.title')}</Dropdown.GroupTitle>
             {hasPermission(RoleScopeKind.writeEntities) && (
-              <Dropdown.Item key="edit-vault" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleEditVaultDrawer}>
+              <Dropdown.Item
+                key="edit-vault"
+                height={DROPDOWN_ITEM_HEIGHT}
+                onSelect={handleDialogOpen(ActionDialog.EditVault)}
+              >
                 {t('management.edit')}
               </Dropdown.Item>
             )}
             {hasLabelAndTagPermissions && (
-              <Dropdown.Item key="edit-tags" height="32px" onSelect={handleEditTags}>
+              <Dropdown.Item key="edit-tags" height="32px" onSelect={handleDialogOpen(ActionDialog.EditTags)}>
                 {tags?.length ? t('management.edit-tags') : t('management.add-tags')}
               </Dropdown.Item>
             )}
             {hasPermission(RoleScopeKind.writeEntities) && (
-              <Dropdown.Item key="upload-doc" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleUploadDoc}>
+              <Dropdown.Item
+                key="upload-doc"
+                height={DROPDOWN_ITEM_HEIGHT}
+                onSelect={handleDialogOpen(ActionDialog.UploadDoc)}
+              >
                 {t('management.upload-document')}
               </Dropdown.Item>
             )}
             {hasPermission(RoleScopeKind.manualReview) && (
-              <Dropdown.Item key="historical-data" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleHistoricalData}>
+              <Dropdown.Item
+                key="historical-data"
+                height={DROPDOWN_ITEM_HEIGHT}
+                onSelect={handleDialogOpen(ActionDialog.HistoricalData)}
+              >
                 {t('management.view-historical-data')}
               </Dropdown.Item>
             )}
             {hasPermission(RoleScopeKind.writeLists) && (
-              <Dropdown.Item key="add-to-list" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleAddToList}>
+              <Dropdown.Item
+                key="add-to-list"
+                height={DROPDOWN_ITEM_HEIGHT}
+                onSelect={handleDialogOpen(ActionDialog.AddToList)}
+              >
                 {t('management.add-to-list')}
               </Dropdown.Item>
             )}
-            <Dropdown.Item key="summarize" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleSummarize}>
+            <Dropdown.Item
+              key="summarize"
+              height={DROPDOWN_ITEM_HEIGHT}
+              onSelect={handleDialogOpen(ActionDialog.Summarize)}
+            >
               {t('management.summarize')}
             </Dropdown.Item>
           </Dropdown.Group>
@@ -116,10 +120,18 @@ const UserActions = ({ entity }: WithEntityProps) => {
               <Dropdown.Divider />
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
-                <Dropdown.Item key="request-more-info" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleRequestMoreInfo}>
+                <Dropdown.Item
+                  key="request-more-info"
+                  height={DROPDOWN_ITEM_HEIGHT}
+                  onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}
+                >
                   {t('requests.request-more-info')}
                 </Dropdown.Item>
-                <Dropdown.Item key="auth-methods" height={DROPDOWN_ITEM_HEIGHT} onSelect={handleAuthMethods}>
+                <Dropdown.Item
+                  key="auth-methods"
+                  height={DROPDOWN_ITEM_HEIGHT}
+                  onSelect={handleDialogOpen(ActionDialog.Auth)}
+                >
                   {t('requests.allow-updating-login-methods')}
                 </Dropdown.Item>
               </Dropdown.Group>
