@@ -12,9 +12,16 @@ describe('<DuplicateDataDrawer />', () => {
     isOpen: true,
     isLoading: false,
     onClose: jest.fn(),
-    isCard: true,
     fingerprint: 'fingerprint1' as VaultValue,
   };
+
+  it('should show correct title and subtitle', () => {
+    customRender(<CardDuplicateDrawer {...defaultProps} dupes={allMatchingDupesFixture} />);
+    const title = screen.getByText('Duplicate cards');
+    expect(title).toBeInTheDocument();
+    const subtitle = screen.getByText('Users with this card in common:');
+    expect(subtitle).toBeInTheDocument();
+  });
 
   it('should show three shimmers when isLoading is true', () => {
     customRender(<CardDuplicateDrawer {...defaultProps} isLoading={true} dupes={allMatchingDupesFixture} />);

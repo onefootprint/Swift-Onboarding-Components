@@ -1213,8 +1213,13 @@
       }
     },
     "drawer": {
-      "card-title": "Duplicate cards",
-      "bank-title": "Duplicate bank accounts",
+      "card": {
+        "title": "Duplicate cards",
+        "subtitle": "Users with this card in common:"
+      },
+      "bank": {
+        "title": "Duplicate bank accounts"
+      },
       "fp-id": "Footprint ID",
       "name": "Name",
       "created-at": "Created at",

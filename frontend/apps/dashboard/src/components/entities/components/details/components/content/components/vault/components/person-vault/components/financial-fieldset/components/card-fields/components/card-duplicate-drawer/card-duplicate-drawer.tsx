@@ -1,5 +1,5 @@
 import type { DuplicateDataItem, VaultValue } from '@onefootprint/types';
-import { Drawer, Stack } from '@onefootprint/ui';
+import { Drawer, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import DuplicateUser from '../../../duplicate-user';
 import DuplicatesLoading from '../../../duplicates-loading';
@@ -20,11 +20,12 @@ const CardDuplicateDrawer = ({ isOpen, onClose, dupes, fingerprint, isLoading }:
   const filteredDupes = dupes.filter(dupe => dupe.data.some(data => data.value === fingerprint));
 
   return (
-    <Drawer open={isOpen} onClose={onClose} title={t('card-title')}>
+    <Drawer open={isOpen} onClose={onClose} title={t('card.title')}>
       {isLoading ? (
         <DuplicatesLoading />
       ) : (
         <Stack direction="column" gap={4}>
+          <Text variant="body-3">{t('card.subtitle')}</Text>
           {filteredDupes.map(dupe => (
             <DuplicateUser key={dupe.fpId} dupe={dupe} />
           ))}
