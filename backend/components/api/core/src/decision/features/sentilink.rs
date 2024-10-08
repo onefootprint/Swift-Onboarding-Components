@@ -3,19 +3,29 @@ use newtypes::FootprintReasonCode as FRC;
 
 
 // TODO: put thresholds on TVC or RuleSetVersion. We don't want to require a deploy here
-const SYNTHETIC_SCORE_HIGH: i32 = 600;
-const SYNTHETIC_SCORE_MEDIUM: i32 = 400;
+// Recommendations from Sentilink. Test and adjust for individual Tenants
+// 750-800 high risk
+// 400-700 medium
+// 400 low risk
+const SCORE_THRESHOLD_HIGH: i32 = 750;
+const SCORE_THRESHOLD_MEDIUM: i32 = 400;
 
 pub fn footprint_reason_codes(response: &ValidatedApplicationRiskResponse) -> Vec<FRC> {
-    // TODO: sentilink score reason codes
-    // TODO: id theft
-    let synthetic_reason_code = if response.synthetic_score.score > SYNTHETIC_SCORE_HIGH {
-        FRC::SyntheticIdentityHighRisk
-    } else if response.synthetic_score.score > SYNTHETIC_SCORE_MEDIUM {
-        FRC::SyntheticIdentityMediumRisk
+    let synthetic_reason_code = if response.synthetic_score.score >= SCORE_THRESHOLD_HIGH {
+        FRC::SentilinkSyntheticIdentityHighRisk
+    } else if response.synthetic_score.score > SCORE_THRESHOLD_MEDIUM {
+        FRC::SentilinkSyntheticIdentityMediumRisk
     } else {
-        FRC::SyntheticIdentityLowRisk
+        FRC::SentilinkSyntheticIdentityLowRisk
     };
 
-    vec![synthetic_reason_code]
+    let id_theft = if response.id_theft_score.score >= SCORE_THRESHOLD_HIGH {
+        FRC::SentilinkIdentityTheftHighRisk
+    } else if response.id_theft_score.score > SCORE_THRESHOLD_MEDIUM {
+        FRC::SentilinkIdentityTheftMediumRisk
+    } else {
+        FRC::SentilinkIdentityTheftLowRisk
+    };
+
+    vec![synthetic_reason_code, id_theft]
 }

@@ -551,9 +551,21 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Email, additional_scopes = vec![], match_level = None]
         #[note = "High risk email domain", severity = SignalSeverity::Low,  description = "The domain has been reported as fraud or is potentially fraudulent."]
         EmailHighRiskDomain,
-        // ~~~~~~~~~~~~~ Sythentic ~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~ Sentilink ~~~~~~~~~~~~~
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
-        #[note = "High synthetic identity fraud risk", severity = SignalSeverity::High,  description = "The information submitted has a high risk of being a synthetic identity. "]
+        #[note = "High synthetic identity fraud risk", severity = SignalSeverity::High,  description = "The information submitted has a high risk of being a synthetic identity."]
+        SentilinkSyntheticIdentityHighRisk,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
+        #[note = "Medium synthetic identity fraud risk", severity = SignalSeverity::Medium,  description = "The information submitted has a medium risk of being a synthetic identity."]
+        SentilinkSyntheticIdentityMediumRisk,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
+        #[note = "Lower synthetic identity fraud risk", severity = SignalSeverity::Low,  description = "The information submitted has a lower risk of being a synthetic identity."]
+        SentilinkSyntheticIdentityLowRisk,
+        //// DEPRECATING
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
+        #[note = "High synthetic identity fraud risk", severity = SignalSeverity::High,  description = "The information submitted has a high risk of being a synthetic identity."]
         SyntheticIdentityHighRisk,
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
         #[note = "Medium synthetic identity fraud risk", severity = SignalSeverity::Medium,  description = "The information submitted has a medium risk of being a synthetic identity."]
@@ -561,6 +573,19 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
         #[note = "Lower synthetic identity fraud risk", severity = SignalSeverity::Low,  description = "The information submitted has a lower risk of being a synthetic identity."]
         SyntheticIdentityLowRisk,
+        //// DEPRECATING
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![SignalScope::Address, SignalScope::Name, SignalScope::Email], match_level = None]
+        #[note = "High identity theft fraud risk", severity = SignalSeverity::High,  description = "The information submitted has a high risk of being a case of identity theft."]
+        SentilinkIdentityTheftHighRisk,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![SignalScope::Address, SignalScope::Name, SignalScope::Email], match_level = None]
+        #[note = "Medium identity theft fraud risk", severity = SignalSeverity::Medium,  description = "The information submitted has a medium risk of being a case of identity theft."]
+        SentilinkIdentityTheftMediumRisk,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![SignalScope::Address, SignalScope::Name, SignalScope::Email], match_level = None]
+        #[note = "Lower identity theft fraud risk", severity = SignalSeverity::Low,  description = "The information submitted has a lower risk of being a case of identity theft."]
+        SentilinkIdentityTheftLowRisk,
 
         // ~~~~~~~~~~~~ Phone Number ~~~~~~~~~~~~
 
@@ -1577,6 +1602,9 @@ impl FootprintReasonCode {
                 | Self::DocumentRequiresReview
                 | Self::DocumentLowMatchScoreWithSelfie
                 | Self::IpAlertHighRiskTor // 2024-04-12 new naming for this one
+                | Self::SyntheticIdentityHighRisk
+                | Self::SyntheticIdentityMediumRisk
+                | Self::SyntheticIdentityLowRisk
         )
     }
 
@@ -1585,12 +1613,16 @@ impl FootprintReasonCode {
         !matches!(self, Self::BeneficialOwnerFailedKyc)
     }
 
+    // Controls whether this gets return in /org/risk_signals
     pub fn in_preview(&self) -> bool {
         matches!(
             self,
-            Self::SyntheticIdentityHighRisk
-                | Self::SyntheticIdentityMediumRisk
-                | Self::SyntheticIdentityLowRisk
+            Self::SentilinkSyntheticIdentityHighRisk
+                | Self::SentilinkSyntheticIdentityMediumRisk
+                | Self::SentilinkSyntheticIdentityLowRisk
+                | Self::SentilinkIdentityTheftHighRisk
+                | Self::SentilinkIdentityTheftMediumRisk
+                | Self::SentilinkIdentityTheftLowRisk
         )
     }
 }
