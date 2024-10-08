@@ -13,11 +13,6 @@ from tests.constants import (
     CUSTODIAN_AUTH,
     TEST_URL,
 )
-from http.cookiejar import DefaultCookiePolicy
-
-session = requests.Session()
-# Block all cookies
-session.cookies.set_policy(DefaultCookiePolicy(allowed_domains=[]))
 
 url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
 
@@ -116,7 +111,7 @@ def _make_request(
 
 def get_raw(path, params=None, *auths, body=None, status_code=200):
     return _make_request(
-        method=session.get,
+        method=requests.get,
         path=path,
         data=body,
         params=params,
@@ -132,7 +127,7 @@ def get(path, params=None, *auths, body=None, status_code=200):
 
 def put_raw(path, data, *auths, status_code=200, files=None):
     return _make_request(
-        method=session.put,
+        method=requests.put,
         path=path,
         data=data,
         params=None,
@@ -156,7 +151,7 @@ def post_raw(
     raw_data=None,
 ):
     return _make_request(
-        method=session.post,
+        method=requests.post,
         path=path,
         data=data,
         params=None,
@@ -196,7 +191,7 @@ def patch_raw(
     addl_headers=None,
 ):
     return _make_request(
-        method=session.patch,
+        method=requests.patch,
         path=path,
         data=data,
         params=None,
@@ -231,7 +226,7 @@ def delete_raw(
     addl_headers=None,
 ):
     return _make_request(
-        method=session.delete,
+        method=requests.delete,
         path=path,
         data=data,
         params=None,
