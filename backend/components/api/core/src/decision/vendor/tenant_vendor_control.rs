@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::enclave_client::EnclaveClient;
 use crate::utils;
 use crate::FpResult;
+use api_errors::AssertionError;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
@@ -37,7 +38,7 @@ pub struct TenantVendorControl {
     tbi: Option<newtypes::TenantBusinessInfo>,
     neuro_id_api_key: NeuroIdApiKeys,
     samba_safety_credentials: SambaSafetyCredentials,
-    sentilink_credentials: SentilinkCredentials,
+    sentilink_credentials: SentilinkCredentialType,
 }
 
 impl TenantVendorControl {
@@ -81,7 +82,7 @@ impl TenantVendorControl {
         self.samba_safety_credentials.clone()
     }
 
-    pub fn sentilink_credentials(&self) -> SentilinkCredentials {
+    pub fn sentilink_credentials(&self) -> SentilinkCredentialType {
         self.sentilink_credentials.clone()
     }
 
@@ -137,7 +138,7 @@ impl TenantVendorControl {
 
         let lexis_credentials = LexisCredentials::from(config);
         let samba_safety_credentials = SambaSafetyCredentials::from(config);
-        let sentilink_credentials = SentilinkCredentials::from(config);
+        let sentilink_credentials = SentilinkCredentialType::Default(SentilinkCredentials::from(config));
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
         let incode_sandbox_credentials = IncodeSandboxCredentials::from(config);
@@ -355,6 +356,36 @@ impl From<&Config> for ExperianCredentialBuilder {
                 cross_core_username: PiiString::from(""),
                 cross_core_password: PiiString::from(""),
             }
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum SentilinkCredentialType {
+    Default(SentilinkCredentials),
+    TenantSpecific(SentilinkCredentials),
+}
+
+impl Default for SentilinkCredentialType {
+    fn default() -> Self {
+        let d = SentilinkCredentials::default();
+        Self::Default(d)
+    }
+}
+impl SentilinkCredentialType {
+    pub fn try_into_tenant_specific_credentials(self) -> FpResult<SentilinkCredentials> {
+        match self {
+            SentilinkCredentialType::Default(_) => {
+                Err(AssertionError("could not convert to tenant specific credentials").into())
+            }
+            SentilinkCredentialType::TenantSpecific(sentilink_credentials) => Ok(sentilink_credentials),
+        }
+    }
+
+    pub fn into_unchecked_sentilink_credentials(self) -> SentilinkCredentials {
+        match self {
+            SentilinkCredentialType::Default(sentilink_credentials)
+            | SentilinkCredentialType::TenantSpecific(sentilink_credentials) => sentilink_credentials,
         }
     }
 }
