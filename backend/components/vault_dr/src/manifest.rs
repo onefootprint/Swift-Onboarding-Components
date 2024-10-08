@@ -1,4 +1,4 @@
-use db::helpers::VdrBlobKey;
+use db::helpers::vault_dr::VdrBlobKey;
 use newtypes::DataIdentifier;
 use newtypes::ScopedVaultVersionNumber;
 use serde::Serialize;

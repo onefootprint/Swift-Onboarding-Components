@@ -161,4 +161,27 @@ impl ScopedVaultVersion {
             .map(|v| v.version)
             .unwrap_or(ScopedVaultVersionNumber::from(0)))
     }
+
+    #[tracing::instrument("ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id", skip_all)]
+    pub fn bulk_update_backed_up_by_vdr_config_id(
+        conn: &mut TxnPgConn,
+        svv_ids: &[ScopedVaultVersionId],
+        config_id: &VaultDrConfigId,
+    ) -> DbResult<()> {
+        let num_updated = diesel::update(scoped_vault_version::table)
+            .filter(scoped_vault_version::id.eq_any(svv_ids))
+            .set(scoped_vault_version::backed_up_by_vdr_config_id.eq(Some(config_id)))
+            .execute(conn.conn())?;
+
+        // Assert that svv_ids were all valid.
+        if num_updated != svv_ids.len() {
+            return Err(DbError::AssertionError(format!(
+                "ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id expected to update {} rows, but updated {}",
+                svv_ids.len(),
+                num_updated
+            )));
+        }
+
+        Ok(())
+    }
 }

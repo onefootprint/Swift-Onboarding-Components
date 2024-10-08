@@ -137,8 +137,11 @@ pub fn get_dl_batch_for_svv_batch(
     // written before the manifests are eligible to be written. If the batch_size isn't large
     // enough to finish backing up all DLs associated with the svv_batch, then unfinished SVVs will
     // be present in the next batch, and the DL batch will continue to make progress.
+    //
+    // We sort by created_seqno for determinism, to assist with testing.
     let dls = query
         .select(DataLifetime::as_select())
+        .order(data_lifetime::created_seqno)
         .limit(batch_size as i64)
         .load(conn)?;
 
@@ -401,11 +404,9 @@ mod tests {
     use crate::models::vault_dr::NewVaultDrAwsPreEnrollment;
     use crate::models::vault_dr::NewVaultDrBlob;
     use crate::models::vault_dr::NewVaultDrConfig;
-    use crate::models::vault_dr::NewVaultDrManifest;
     use crate::models::vault_dr::VaultDrAwsPreEnrollment;
     use crate::models::vault_dr::VaultDrBlob;
     use crate::models::vault_dr::VaultDrConfig;
-    use crate::models::vault_dr::VaultDrManifest;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
@@ -416,8 +417,15 @@ mod tests {
     use newtypes::IdentityDataKind;
     use newtypes::ScopedVaultVersionNumber;
 
+    #[derive(Debug, derive_more::Constructor)]
+    struct ExpectedBatchSizes {
+        expected_num_svvs: usize,
+        expected_num_dls: usize,
+        expected_num_complete_svvs: usize,
+    }
+
     #[db_test]
-    fn test_incorrect_vault_dr_batch_query(conn: &mut TestPgConn) {
+    fn test_vault_dr_batch_query(conn: &mut TestPgConn) {
         let tenant_id = fixtures::tenant::create(conn).id;
         let is_live = true;
         let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, is_live).id;
@@ -446,7 +454,6 @@ mod tests {
         };
         let vdr_config = VaultDrConfig::create(conn, new_vdr_config).unwrap();
 
-        let batch_size: usize = 5;
         let mut dls = vec![];
         for _ in 0..=5 {
             let sv1_txn1 = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
@@ -501,9 +508,8 @@ mod tests {
             dls.push(dl);
         }
 
-        // Make sure we're triggering a condition where a batch of blobs doesn't contain all DLs
-        // for a seqno.
-        assert_eq!(dls[batch_size - 1].created_seqno, dls[batch_size].created_seqno);
+        let manifest_batch_size: usize = 5;
+        let blob_batch_size: usize = 5;
 
         // Deactivate the last DL.
         let deactivate_txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
@@ -515,19 +521,30 @@ mod tests {
         .unwrap();
         let deactivate_seqno = deactivate_txn.seqno();
 
-        let expected_batch_sizes = vec![
-            // (blob count, svv/manifest count)
-            (batch_size, 3),
-            (batch_size, 4),
-            (batch_size, 3),
-            (3, 3),
-            (0, 0),
-            (0, 0),
+
+        let expected_batch_sizes_each_run = vec![
+            ExpectedBatchSizes::new(manifest_batch_size, blob_batch_size, 3),
+            ExpectedBatchSizes::new(manifest_batch_size, blob_batch_size, 4),
+            ExpectedBatchSizes::new(manifest_batch_size, blob_batch_size, 3),
+            ExpectedBatchSizes::new(3, 3, 3),
+            ExpectedBatchSizes::new(0, 0, 0),
+            ExpectedBatchSizes::new(0, 0, 0),
         ];
+
+        // Make sure we're triggering a condition where a batch of blobs doesn't contain all DLs
+        // for a seqno.
+        let first_batch_num_dls = expected_batch_sizes_each_run[0].expected_num_dls;
+        assert_eq!(
+            dls[first_batch_num_dls - 1].created_seqno,
+            dls[first_batch_num_dls].created_seqno
+        );
 
         assert_eq!(
             // We should be writing one blob per DL.
-            expected_batch_sizes.iter().map(|s| s.0).sum::<usize>(),
+            expected_batch_sizes_each_run
+                .iter()
+                .map(|r| r.expected_num_dls)
+                .sum::<usize>(),
             dls.len()
         );
 
@@ -539,7 +556,10 @@ mod tests {
             .collect_vec();
         assert_eq!(
             // We should be writing one manifest per seqno.
-            expected_batch_sizes.iter().map(|s| s.1).sum::<usize>(),
+            expected_batch_sizes_each_run
+                .iter()
+                .map(|r| r.expected_num_complete_svvs)
+                .sum::<usize>(),
             unique_seqnos.len(),
         );
 
@@ -547,25 +567,48 @@ mod tests {
         let mut expected_svv_seqnos = unique_seqnos.into_iter();
         let mut dl_created_seqnos = dls.iter().map(|dl| dl.created_seqno);
 
-        for (i, (expected_batch_size, expected_svv_count)) in expected_batch_sizes.into_iter().enumerate() {
-            let got_dl_batch = incorrect_get_vault_dr_data_lifetime_batch(
+        for (i, expected_batch_sizes) in expected_batch_sizes_each_run.into_iter().enumerate() {
+            let ExpectedBatchSizes {
+                expected_num_svvs,
+                expected_num_dls,
+                expected_num_complete_svvs,
+            } = expected_batch_sizes;
+
+
+            let got_svv_batch = get_scoped_vault_version_batch(
                 conn,
                 &tenant_id,
                 is_live,
                 &vdr_config.id,
-                batch_size as u32,
+                manifest_batch_size,
                 Some(vec![sv1.fp_id.clone()]),
             )
             .unwrap();
-            assert_eq!(got_dl_batch.len(), expected_batch_size, "Batch {} size", i);
+            assert_eq!(
+                got_svv_batch.len(),
+                expected_num_svvs,
+                "Run {}: SVV batch size",
+                i
+            );
+
+            let got_dls = get_dl_batch_for_svv_batch(
+                conn,
+                &tenant_id,
+                is_live,
+                &vdr_config.id,
+                &got_svv_batch,
+                blob_batch_size,
+            )
+            .unwrap();
+            assert_eq!(got_dls.len(), expected_num_dls, "Run {}: DL batch size", i);
 
             // We can't predict the DL IDs in the batch, since DLs created at the same
             // seqno may not all be contained in the same batch. However, we can check
             // that the seqnos in the batch match the expected seqnos, and we can check that all
             // DL IDs in the batch correspond with the expected seqnos.
-            let expected_seqnos = (&mut dl_created_seqnos).take(expected_batch_size).collect_vec();
+            let expected_seqnos = (&mut dl_created_seqnos).take(expected_num_dls).collect_vec();
             assert_have_same_elements(
-                got_dl_batch.iter().map(|dl| dl.created_seqno).collect_vec(),
+                got_dls.iter().map(|dl| dl.created_seqno).collect_vec(),
                 expected_seqnos.clone(),
             );
 
@@ -574,39 +617,52 @@ mod tests {
                 .filter(|dl| expected_seqnos.contains(&dl.created_seqno))
                 .map(|dl| dl.id.clone())
                 .collect_vec();
-            for dl in got_dl_batch.iter() {
+            for dl in got_dls.iter() {
                 assert!(candidate_dl_ids_for_seqnos.contains(&dl.id));
             }
 
-            write_fake_blobs(conn, &vdr_config.id, got_dl_batch);
+            write_fake_blobs(conn, &vdr_config.id, got_dls);
 
-            let svv_batch = incorrect_get_vault_dr_scoped_vault_version_batch(
-                conn,
-                &tenant_id,
-                is_live,
-                &vdr_config.id,
-                batch_size as u32,
-                Some(vec![sv1.fp_id.clone()]),
-            )
-            .unwrap();
-            assert_eq!(svv_batch.len(), expected_svv_count, "Batch {} size", i);
 
-            let expected_svvns = (&mut expected_svvns).take(expected_svv_count).collect_vec();
+            let got_complete_svvs =
+                get_complete_svvs_for_svv_batch(conn, &vdr_config.id, &got_svv_batch).unwrap();
+            assert_eq!(
+                got_complete_svvs.len(),
+                expected_num_complete_svvs,
+                "Run {}: complete SVV batch size",
+                i
+            );
+
+            let expected_svvns = (&mut expected_svvns)
+                .take(expected_num_complete_svvs)
+                .collect_vec();
             assert_have_same_elements(
-                svv_batch.iter().map(|svv| svv.version).collect_vec(),
+                got_complete_svvs.iter().map(|svv| svv.version).collect_vec(),
                 expected_svvns,
             );
 
-            let expected_seqnos = (&mut expected_svv_seqnos).take(expected_svv_count).collect_vec();
+            let expected_seqnos = (&mut expected_svv_seqnos)
+                .take(expected_num_complete_svvs)
+                .collect_vec();
             assert_have_same_elements(
-                svv_batch.iter().map(|svv| svv.seqno).collect_vec(),
+                got_complete_svvs.iter().map(|svv| svv.seqno).collect_vec(),
                 expected_seqnos,
             );
 
-            assert!(svv_batch.iter().all(|svv| svv.scoped_vault_id == sv1.id));
-            assert!(svv_batch.iter().all(|svv| svv.scoped_vault_id == sv1.id));
+            let batch_svv_ids = got_svv_batch.iter().map(|svv| svv.id.clone()).collect_vec();
+            let complete_svv_ids = got_complete_svvs.iter().map(|svv| svv.id.clone()).collect_vec();
+            assert!(
+                complete_svv_ids.iter().all(|id| batch_svv_ids.contains(id)),
+                "Run {}: complete SVVs are a subset of the SVV batch",
+                i
+            );
 
-            write_fake_manifests(conn, &vdr_config.id, svv_batch);
+            ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id(
+                conn,
+                &complete_svv_ids,
+                &vdr_config.id,
+            )
+            .unwrap();
         }
     }
 
@@ -625,25 +681,5 @@ mod tests {
             .collect_vec();
 
         VaultDrBlob::bulk_create(conn, new_blobs).unwrap();
-    }
-
-    fn write_fake_manifests(
-        conn: &mut TestPgConn,
-        config_id: &VaultDrConfigId,
-        svvs: Vec<ScopedVaultVersion>,
-    ) {
-        let new_manifests = svvs
-            .into_iter()
-            .map(|svv| NewVaultDrManifest {
-                config_id: config_id.clone(),
-                scoped_vault_version_id: svv.id,
-                bucket_path: crypto::random::gen_rand_bytes(32).encode_hex(),
-                content_etag: "content-etag".to_owned(),
-                content_length_bytes: 123,
-                seqno: svv.seqno,
-            })
-            .collect_vec();
-
-        VaultDrManifest::bulk_create(conn, new_manifests).unwrap();
     }
 }

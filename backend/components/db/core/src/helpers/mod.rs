@@ -7,5 +7,4 @@ pub use tenant_or_partner_tenant::*;
 mod workos;
 pub use workos::*;
 
-mod vault_dr;
-pub use vault_dr::*;
+pub mod vault_dr;
