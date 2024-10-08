@@ -1,6 +1,8 @@
 use crate::models::data_lifetime::DataLifetime;
 use crate::models::ob_configuration::IsLive;
 use crate::models::scoped_vault_version::ScopedVaultVersion;
+use crate::models::vault_dr::VaultDrConfig;
+use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
 use chrono::DateTime;
@@ -383,11 +385,10 @@ pub fn bulk_get_vdr_blob_keys_active_at(
 
 
 #[tracing::instrument(skip_all)]
-pub fn get_latest_vault_dr_backup_record_timestamp(
+pub fn incorrect_get_latest_vault_dr_backup_record_timestamp(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
 ) -> DbResult<Option<DateTime<Utc>>> {
-    // TODO: After backfilling manifests, query based on committed manifests, not just blobs.
     let ts = vault_dr_blob::table
         .inner_join(data_lifetime::table)
         .filter(vault_dr_blob::config_id.eq(config_id))
@@ -397,6 +398,99 @@ pub fn get_latest_vault_dr_backup_record_timestamp(
         .optional()?;
     Ok(ts)
 }
+
+/// Returns the greatest timestamp associated with the given SVV, determined by way of connected
+/// DLs.
+#[tracing::instrument(skip_all)]
+fn get_greatest_dl_timestamp_for_svv(conn: &mut PgConn, svv: &ScopedVaultVersion) -> DbResult<DateTime<Utc>> {
+    let dls: Vec<DataLifetime> = data_lifetime::table
+        .filter(data_lifetime::scoped_vault_id.eq(&svv.scoped_vault_id))
+        .filter(
+            data_lifetime::created_seqno
+                .eq(svv.seqno)
+                .or(data_lifetime::deactivated_seqno.eq(svv.seqno)),
+        )
+        .select(DataLifetime::as_select())
+        .load(conn)?;
+
+    let ts = dls
+        .into_iter()
+        .map(|dl| {
+            let ts = if dl.created_seqno == svv.seqno {
+                dl.created_at
+            } else if dl.deactivated_seqno == Some(svv.seqno) {
+                dl.deactivated_at.ok_or(DbError::AssertionError(format!(
+                    "Found deactivated DL without deactivated_at: {:?}",
+                    dl.id
+                )))?
+            } else {
+                return Err(DbError::AssertionError(
+                    "Got DL that shouldn't match get_latest_backup_record_timestamp query".to_owned(),
+                ));
+            };
+
+            Ok(ts)
+        })
+        .collect::<DbResult<Vec<_>>>()?
+        .into_iter()
+        .max();
+
+    let ts = ts.ok_or(DbError::AssertionError(
+        "Got no DLs for SVV in get_latest_backup_record_timestamp query".to_owned(),
+    ))?;
+
+    Ok(ts)
+}
+
+/// Gets the timestamp of the latest record backed up by the given VDR config. The timestamp is
+/// approximate since it is not guaranteed to be monotonic. This is because we're using the
+/// DataLifetime seqnos as an approximate global sort order, and timestamps are not monotonic with
+/// respect to seqnos. In practice, any decreases should be small (<= the duration of the longest
+/// transaction that commits new DLs).
+#[tracing::instrument(skip_all)]
+pub fn get_approximate_latest_backup_record_timestamp(
+    conn: &mut PgConn,
+    config: &VaultDrConfig,
+) -> DbResult<Option<DateTime<Utc>>> {
+    let latest_backed_up_svv: Option<ScopedVaultVersion> = scoped_vault_version::table
+        // tenant_id/is_live are included so we can use the index
+        // svv_tenant_id_is_live_vdr_cfg_id_seqno
+        .filter(scoped_vault_version::tenant_id.eq(&config.tenant_id))
+        .filter(scoped_vault_version::is_live.eq(config.is_live))
+        .filter(scoped_vault_version::backed_up_by_vdr_config_id.eq(&config.id))
+        .select(ScopedVaultVersion::as_select())
+        .order(scoped_vault_version::seqno.desc())
+        .first(conn)
+        .optional()?;
+
+    let Some(svv) = latest_backed_up_svv else {
+        return Ok(None);
+    };
+
+    let ts = get_greatest_dl_timestamp_for_svv(conn, &svv)?;
+
+    Ok(Some(ts))
+}
+
+/// Gets the timestamp of the next record that would be backed up by the given VDR config. See
+/// docs for get_approximate_latest_backup_record_timestamp for caveats.
+#[tracing::instrument(skip_all)]
+pub fn get_approximate_next_backup_record_timestamp(
+    conn: &mut PgConn,
+    config: &VaultDrConfig,
+) -> DbResult<Option<DateTime<Utc>>> {
+    let next_svv_batch =
+        get_scoped_vault_version_batch(conn, &config.tenant_id, config.is_live, &config.id, 1, None)?;
+
+    let Some(svv) = next_svv_batch.first() else {
+        return Ok(None);
+    };
+
+    let ts = get_greatest_dl_timestamp_for_svv(conn, svv)?;
+
+    Ok(Some(ts))
+}
+
 
 #[cfg(test)]
 mod tests {

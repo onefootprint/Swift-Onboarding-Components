@@ -7,7 +7,7 @@ use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
 use db::errors::FpOptionalExtension;
-use db::helpers::vault_dr::get_latest_vault_dr_backup_record_timestamp;
+use db::helpers::vault_dr::incorrect_get_latest_vault_dr_backup_record_timestamp;
 use db::helpers::vault_dr::incorrect_get_vault_dr_data_lifetime_batch;
 use db::models::vault_dr::VaultDrConfig;
 use newtypes::preview_api;
@@ -38,8 +38,9 @@ pub async fn get(
                 return Ok(None);
             };
 
+            // TODO: replace with corrected implementations.
             let latest_backup_record_timestamp =
-                get_latest_vault_dr_backup_record_timestamp(conn, &config.id)?;
+                incorrect_get_latest_vault_dr_backup_record_timestamp(conn, &config.id)?;
 
             let next_batch = incorrect_get_vault_dr_data_lifetime_batch(
                 conn,
