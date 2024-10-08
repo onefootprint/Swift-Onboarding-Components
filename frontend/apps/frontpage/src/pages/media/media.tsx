@@ -20,8 +20,8 @@ const Media = ({ articles }: MediaProps) => {
         <Grid.Container
           gap={5}
           marginBottom={10}
-          paddingTop={0}
-          paddingBottom={0}
+          paddingTop={10}
+          paddingBottom={7}
           paddingLeft={5}
           paddingRight={5}
           textAlign="center"

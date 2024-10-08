@@ -5,6 +5,16 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '15',
+      url: 'https://www.businessinsider.com/49-most-promising-fintech-startups-according-top-vc-investors-2024',
+      website: 'Business Insider',
+      imageUrl: '/media/business-insider-3.png',
+      imageAlt: 'Footprint Pitch Deck',
+      publishedAt: 'May 21, 2024',
+      title: 'Footprint makes the Top 49 Fintechs list for the second year in a row!',
+      excerpt: 'Check out the 49 startups identified as most promising by 27 top investors.',
+    },
+    {
       id: '14',
       url: 'https://www.businessinsider.com/footprint-pitch-deck-fintech-series-a-2024-5',
       website: 'Business Insider',
