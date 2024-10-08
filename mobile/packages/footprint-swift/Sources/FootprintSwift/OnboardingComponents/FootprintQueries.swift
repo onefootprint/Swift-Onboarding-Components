@@ -5,12 +5,12 @@ import OpenAPIURLSession
 public class FootprintQueries {
     private let client: Client
     private let configKey: String
-
+    
     init(client: Client, configKey: String) {
         self.client = client
         self.configKey = configKey
     }
-
+    
     func getOnboardingConfig() async throws -> Components.Schemas.PublicOnboardingConfiguration {
         let input = Operations.getOnboardingConfig.Input(
             headers: Operations.getOnboardingConfig.Input.Headers(
@@ -27,26 +27,28 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while fetching onboarding config")
         }
     }
-
+    
     func identify(email: String? = nil,
                   phoneNumber: String? = nil,
                   authToken: String? = nil,
-                  sandboxId: String? = nil) async throws -> Components.Schemas.IdentifyResponse {
+                  sandboxId: String? = nil,
+                  scope: Components.Schemas.IdentifyRequest.scopePayload = .onboarding
+    ) async throws -> Components.Schemas.IdentifyResponse {
         let input = Operations.identify.Input(
             headers: Operations.identify.Input.Headers(
                 X_hyphen_Sandbox_hyphen_Id:sandboxId,
                 X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey,
-                X_hyphen_Fp_hyphen_Authorization: authToken                
+                X_hyphen_Fp_hyphen_Authorization: authToken
             ),
             body: .json(Components.Schemas.IdentifyRequest(
                 email: email,
                 phone_number: phoneNumber,
-                scope: Components.Schemas.IdentifyRequest.scopePayload.onboarding
+                scope: scope
             ))
         )
         
         let response = try await client.identify(input)
-
+        
         switch response {
         case .ok(let okResponse):
             return try okResponse.body.json
@@ -55,7 +57,7 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while identifying")
         }
     }
-
+    
     func getSignupChallenge(email: String?, phoneNumber: String?,
                             kind: Components.Schemas.SignupChallengeRequest.challenge_kindPayload,
                             sandboxId: String? = nil) async throws -> Components.Schemas.SignupChallengeResponse {
@@ -64,7 +66,7 @@ public class FootprintQueries {
                 X_hyphen_Sandbox_hyphen_Id: sandboxId,
                 X_hyphen_Fp_hyphen_Is_hyphen_Components_hyphen_Sdk: true,
                 X_hyphen_Onboarding_hyphen_Config_hyphen_Key: self.configKey
-            ), 
+            ),
             body: .json(Components.Schemas.SignupChallengeRequest(
                 challenge_kind: kind,
                 email: email != nil ? Components.Schemas.SignupChallengeRequest.emailPayload(is_bootstrap: false, value: email!) : nil,
@@ -72,7 +74,7 @@ public class FootprintQueries {
                 scope: Components.Schemas.SignupChallengeRequest.scopePayload.onboarding
             ))
         )
-
+        
         let response = try await client.signupChallenge(input)
         
         switch response {
@@ -83,7 +85,7 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while signup challenge")
         }
     }
-
+    
     func getLoginChallenge(kind: Components.Schemas.LoginChallengeRequest.challenge_kindPayload? = Components.Schemas.LoginChallengeRequest.challenge_kindPayload.sms, authToken: String) async throws -> Components.Schemas.LoginChallengeResponse {
         let input = Operations.loginChallenge.Input(
             headers: Operations.loginChallenge.Input.Headers(
@@ -93,7 +95,7 @@ public class FootprintQueries {
                 challenge_kind: kind!
             ))
         )
-
+        
         let response = try await client.loginChallenge(input)
         
         switch response {
@@ -104,7 +106,7 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while login challenge")
         }
     }
-
+    
     func getValidationToken(authToken: String) async throws -> Components.Schemas.HostedValidateResponse {
         let input = Operations.validationToken.Input(
             headers: Operations.validationToken.Input.Headers(
@@ -122,7 +124,7 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while getting the validation token")
         }
     }
-
+    
     func verify(challenge: String, challengeToken: String, authToken: String) async throws -> Components.Schemas.IdentifyVerifyResponse {
         let input = Operations.verify.Input(
             headers: Operations.verify.Input.Headers(
@@ -146,7 +148,7 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while verifying")
         }
     }
-
+    
     func initOnboarding(
         authToken: String,
         overallOutcome: OverallOutcome? = OverallOutcome.pass
@@ -167,10 +169,10 @@ public class FootprintQueries {
             return try okResponse.body.json
         default:
             throw FootprintError.error(domain: FootprintErrorDomain.onboarding,
-                                       message: "Unexpected error occurred while initializing the onboarding")            
+                                       message: "Unexpected error occurred while initializing the onboarding")
         }
     }
-
+    
     func getOnboardingStatus(authToken: String) async throws -> RequirementAttributes {
         let input = Operations.onboardingStatus.Input(
             headers: Operations.onboardingStatus.Input.Headers(
@@ -188,7 +190,7 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred while fetching onboarding status")
         }
     }
-
+    
     func validateOnboarding(authToken: String) async throws -> Components.Schemas.HostedValidateResponse {
         let input = Operations.validateOnboarding.Input(
             headers: Operations.validateOnboarding.Input.Headers(
@@ -206,17 +208,17 @@ public class FootprintQueries {
                                        message: "Unexpected error occurred during onboarding validation")
         }
     }
-
+    
     func decrypt(authToken: String, fields: [Components.Schemas.VaultDI] ) async throws -> VaultData {
         let filteredFields = fields.filter { field in
             !["id.ssn9", "id.ssn4", "id.us_tax_id"].contains(field.rawValue) && !field.rawValue.starts(with: "document.")
         }
-
+        
         let input = Operations.decryptUserVault.Input(
             headers: Operations.decryptUserVault.Input.Headers(
                 X_hyphen_Fp_hyphen_Authorization: authToken
             ),
-           
+            
             body: .json(Components.Schemas.UserDecryptRequest(
                 fields: filteredFields
             ))
@@ -227,12 +229,12 @@ public class FootprintQueries {
         switch response {
         case .ok(let okResponse):
             return try  VaultData.fromRawUserDataRequest(okResponse.body.json)
-        default:            
+        default:
             throw FootprintError.error(domain: FootprintErrorDomain.vault,
                                        message: "Unexpected error occurred during decryption")
         }
     }
-
+    
     func vault(
         authToken: String,
         vaultData: VaultData
@@ -279,7 +281,7 @@ public class FootprintQueries {
             investor_profile_period_political_organization: vaultData.investorProfilePoliticalOrganization,
             investor_profile_period_brokerage_firm_employer: vaultData.investorProfileBrokerageFirmEmployer
         )
-    
+        
         
         let input = Operations.vault.Input(
             headers: Operations.vault.Input.Headers(
@@ -288,9 +290,9 @@ public class FootprintQueries {
             body: .json(Components.Schemas.RawUserDataRequest.init(
                 value1: vaultIdProps,
                 value2: vaultInvestorProps
-               )
             )
-        )            
+            )
+        )
         
         let response = try await client.vault(input)
         
@@ -309,10 +311,10 @@ public class FootprintQueries {
             throw FootprintError.error(domain: FootprintErrorDomain.vault,
                                        message: "Unexpected error occurred during vault creation")
         }
-
+        
     }
     
-
+    
     func process(authToken: String,
                  overallOutcome: OverallOutcome? = OverallOutcome.pass
     ) async throws -> Components.Schemas.Empty {
@@ -336,12 +338,12 @@ public class FootprintQueries {
                                        message: error.message,
                                        debug: error.debug,
                                        supportId:error.support_id,
-                                       code: error.code)        
+                                       code: error.code)
         default:
             throw FootprintError.error(domain: FootprintErrorDomain.process,
                                        message: "Unexpected error occurred during processing"
-                                       )
+            )
         }
     }
-
+    
 }
