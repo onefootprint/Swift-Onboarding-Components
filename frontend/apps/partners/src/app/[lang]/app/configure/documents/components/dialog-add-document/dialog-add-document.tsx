@@ -30,7 +30,6 @@ const DialogAddDocument = ({ initialValues, isOpen, onClose, onSubmit }: DialogA
       open
       primaryButton={{ label: t('save'), type: 'submit', form: formId }}
       secondaryButton={{ label: t('cancel'), onClick: onClose }}
-      size="compact"
       title={t('doc.add-document')}
     >
       <form onSubmit={handleFormSubmit} id={formId}>

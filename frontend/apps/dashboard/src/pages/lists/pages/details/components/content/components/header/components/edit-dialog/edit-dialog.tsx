@@ -63,7 +63,6 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
   return (
     <Dialog
       size="compact"
-      testID="edit-dialog"
       onClose={onClose}
       open={open}
       title={t('title')}

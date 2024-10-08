@@ -7,7 +7,6 @@ import Dialog from './dialog';
 
 describe('<Dialog />', () => {
   const renderDialog = ({
-    headerIcon = {},
     title = 'Title',
     onClose = jest.fn(),
     primaryButton = {
@@ -16,24 +15,18 @@ describe('<Dialog />', () => {
     secondaryButton,
     linkButton,
     size,
-    testID,
     open = true,
     children = 'content',
     isConfirmation = false,
   }: Partial<DialogProps>) =>
     customRender(
-      // we need to ignore ts-lint given the constraints we have
-      // as this is a test file, it's okay
-      // @ts-ignore
       <Dialog
-        headerIcon={headerIcon}
         linkButton={linkButton}
         onClose={onClose}
         open={open}
         primaryButton={primaryButton}
         secondaryButton={secondaryButton}
         size={size}
-        testID={testID}
         title={title}
         isConfirmation={isConfirmation}
       >
@@ -51,13 +44,6 @@ describe('<Dialog />', () => {
   });
 
   describe('when the dialog is open', () => {
-    it('should assign a test id', async () => {
-      renderDialog({ open: true, testID: 'dialog-test-id' });
-      await waitFor(() => {
-        expect(screen.getByTestId('dialog-test-id')).toBeInTheDocument();
-      });
-    });
-
     it('should show the header text', async () => {
       renderDialog({ open: true, title: 'header' });
       await waitFor(() => {
@@ -134,14 +120,14 @@ describe('<Dialog />', () => {
           });
         });
       });
-    });
 
-    it('should render the right width when is default', async () => {
-      renderDialog({ open: true, size: 'default', isConfirmation: false });
-      const dialog = screen.getByRole('dialog');
-      await waitFor(() => {
-        expect(dialog).toHaveStyle({
-          width: '650px',
+      it('should render the right width when is default', async () => {
+        renderDialog({ open: true, size: 'default', isConfirmation: false });
+        const dialog = screen.getByRole('dialog');
+        await waitFor(() => {
+          expect(dialog).toHaveStyle({
+            width: '650px',
+          });
         });
       });
     });

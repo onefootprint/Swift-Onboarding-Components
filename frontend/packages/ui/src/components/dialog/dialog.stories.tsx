@@ -1,7 +1,9 @@
-import { IcoClose24, icos } from '@onefootprint/icons';
 import type { Meta, StoryFn } from '@storybook/react';
+import { uniqueId } from 'lodash';
+import Image from 'next/image';
 import { useState } from 'react';
-
+import Button from '../button';
+import Stack from '../stack';
 import Text from '../text';
 import type { DialogProps } from './dialog';
 import Dialog from './dialog';
@@ -11,45 +13,36 @@ export default {
   title: 'Components/Dialog',
   argTypes: {
     title: { control: 'text' },
-    headerIcon: { control: 'select', options: Object.keys(icos) },
     onClose: { action: 'onClose' },
     children: { control: 'text' },
-    testID: { control: 'text' },
     open: { control: 'boolean' },
-    size: { control: 'select', options: ['default', 'compact', 'large', 'full-screen'] },
+    size: { control: 'select', options: ['default', 'compact', 'full-screen'] },
     primaryButton: { control: 'object' },
     secondaryButton: { control: 'object' },
     linkButton: { control: 'object' },
-    headerButton: { control: 'object' },
     isConfirmation: { control: 'boolean' },
   },
 } satisfies Meta<typeof Dialog>;
 
 const Template: StoryFn<DialogProps> = args => {
   const [open, setOpen] = useState(true);
-  const HeaderIcon =
-    typeof args.headerIcon?.component === 'string'
-      ? icos[args.headerIcon.component]
-      : args.headerIcon?.component || IcoClose24;
 
   const handleClose = () => {
     setOpen(false);
     args.onClose?.();
   };
 
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
   return (
-    <Dialog
-      {...args}
-      open={open}
-      onClose={handleClose}
-      headerIcon={{
-        ...args.headerIcon,
-        component: HeaderIcon,
-        onClick: handleClose,
-      }}
-    >
-      <Text variant="body-3">{args.children}</Text>
-    </Dialog>
+    <>
+      <Dialog {...args} open={open} onClose={handleClose}>
+        {args.children}
+      </Dialog>
+      {!open && <Button onClick={handleOpen}>Open Dialog</Button>}
+    </>
   );
 };
 
@@ -58,7 +51,6 @@ Base.args = {
   children: 'Content',
   open: true,
   size: 'default',
-  testID: 'dialog-test-id',
   title: 'Title',
   isConfirmation: false,
 };
@@ -84,10 +76,99 @@ PrimarySecondaryAndLink.args = {
   linkButton: { label: 'Link button', onClick: () => alert('Link clicked') },
 };
 
-export const Confirmation = Template.bind({});
-Confirmation.args = {
+export const Confirmation: StoryFn<DialogProps> = args => {
+  const [regularOpen, setRegularOpen] = useState(true);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+
+  const handleRegularClose = () => setRegularOpen(false);
+  const handleConfirmationClose = () => setConfirmationOpen(false);
+  const openConfirmation = () => setConfirmationOpen(true);
+  const openRegular = () => setRegularOpen(true);
+
+  return (
+    <>
+      <Dialog
+        {...args}
+        open={regularOpen}
+        onClose={handleRegularClose}
+        primaryButton={{ label: 'Open Confirmation', onClick: openConfirmation }}
+        secondaryButton={{ label: 'Also Open Confirmation', onClick: openConfirmation }}
+      >
+        <Text variant="body-3">This is the regular dialog. Click a button to open the confirmation dialog.</Text>
+      </Dialog>
+      <Dialog
+        {...args}
+        open={confirmationOpen}
+        onClose={handleConfirmationClose}
+        isConfirmation={true}
+        title="Confirmation"
+        primaryButton={{
+          label: 'Confirm',
+          onClick: () => {
+            alert('Confirmed');
+            handleConfirmationClose();
+          },
+        }}
+        secondaryButton={{ label: 'Cancel', onClick: handleConfirmationClose }}
+      >
+        <Text variant="body-3">Are you sure you want to proceed?</Text>
+      </Dialog>
+      {!regularOpen && <Button onClick={openRegular}>Open Regular Dialog</Button>}
+    </>
+  );
+};
+
+export const FullScreen = Template.bind({});
+FullScreen.args = {
   ...Base.args,
-  isConfirmation: true,
-  primaryButton: { label: 'Confirm', onClick: () => alert('Confirmed') },
+  children: (
+    <Stack direction="column" gap={4}>
+      {Array.from({ length: 100 }, (_, i) => (
+        <Text key={uniqueId()} variant="body-3">
+          Dialog with overflowing content. Item {i + 1}
+        </Text>
+      ))}
+    </Stack>
+  ),
+  primaryButton: { label: 'Continue', onClick: () => alert('Continue') },
   secondaryButton: { label: 'Cancel', onClick: () => alert('Cancelled') },
+  size: 'full-screen',
+};
+
+export const FullScreenOneButton = Template.bind({});
+FullScreenOneButton.args = {
+  ...Base.args,
+  primaryButton: { label: 'Continue', onClick: () => alert('Continue') },
+  size: 'full-screen',
+};
+
+export const FullScreenNoScrollNoPadding = Template.bind({});
+FullScreenNoScrollNoPadding.args = {
+  title: 'Full Screen',
+  primaryButton: { label: 'Continue', onClick: () => alert('Continue') },
+  secondaryButton: { label: 'Cancel', onClick: () => alert('Cancelled') },
+  size: 'full-screen',
+  noPadding: true,
+  noScroll: true,
+  children: (
+    <Image src="https://picsum.photos/seed/picsum/200/300" alt="Random image" layout="fill" objectFit="cover" />
+  ),
+};
+
+export const OverflowingContent = Template.bind({});
+OverflowingContent.args = {
+  ...Base.args,
+  open: true,
+  title:
+    'Irure velit ea non id aute exercitation in. Magna elit enim esse. Minim amet non reprehenderit duis ea amet commodo culpa. Tempor nisi ullamco pariatur ullamco ipsum excepteur. Magna aliquip deserunt reprehenderit ullamco ipsum aliqua sit consequat commodo. Proident ex cupidatat ipsum in ipsum.',
+  size: 'default',
+  children: (
+    <Stack direction="column" gap={4}>
+      {Array.from({ length: 100 }, (_, i) => (
+        <Text key={uniqueId()} variant="body-3">
+          Dialog with overflowing content. Item {i + 1}
+        </Text>
+      ))}
+    </Stack>
+  ),
 };

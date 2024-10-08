@@ -57,7 +57,7 @@ const BacktestingDialog = ({ open, playbookId, ruleEdits, isSaveLoading, onSave,
       size="full-screen"
       onClose={onClose}
       open={open}
-      headerButton={{
+      primaryButton={{
         label: t('save'),
         loading: isSaveLoading,
         onClick: onSave,

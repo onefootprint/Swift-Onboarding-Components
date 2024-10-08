@@ -34,20 +34,7 @@ export type { HintProps } from './hint';
 export { default as DateSelectorSheet } from './date-selector-sheet';
 export { default as DateRangeSelector } from './date-selector-sheet';
 export { default as Popover } from './popover';
-export type {
-  DialogAllButtons,
-  DialogAllExceptHeaderButtons,
-  DialogButton,
-  DialogHeaderIcon,
-  DialogLinkButton,
-  DialogNoButtons,
-  DialogOnlyButtons,
-  DialogOnlyHeaderButton,
-  DialogOnlyPrimaryButton,
-  DialogPrimaryAndLinkButtons,
-  DialogProps,
-  DialogSize,
-} from './dialog';
+export type { DialogButton, DialogLinkButton, DialogProps, DialogSize } from './dialog';
 export { default as Dialog } from './dialog';
 export type { DividerProps } from './divider';
 export { default as Divider } from './divider';

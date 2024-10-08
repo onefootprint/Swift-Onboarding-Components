@@ -165,7 +165,7 @@ describe('<EditTagsDialog />', () => {
     expect(onSave).toHaveBeenCalledWith(args);
   });
 
-  it('should allow creation of new org tags', async () => {
+  it('  ', async () => {
     withTags();
     const onSave = jest.fn();
     withAddTag();

@@ -3,10 +3,9 @@
 import type { Spacing } from '@onefootprint/design-tokens';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import type * as CSS from 'csstype';
-import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useEffectOnce } from 'usehooks-ts';
+
 type ScrollAreaProps = {
   asChild?: boolean;
   children: React.ReactNode;
@@ -18,128 +17,90 @@ type ScrollAreaProps = {
   paddingRight?: Spacing;
   paddingBottom?: Spacing;
   paddingLeft?: Spacing;
-  maxWidth?: CSS.Property.MaxWidth;
+  height?: CSS.Property.Height;
   maxHeight?: CSS.Property.MaxHeight;
+  overflow?: CSS.Property.Overflow;
 };
 
-const ScrollArea = ({
-  children,
-  className,
-  asChild,
-  hideBottomLine,
-  hideTopLine,
-  padding,
-  paddingTop,
-  paddingRight,
-  paddingBottom,
-  paddingLeft,
-  maxWidth,
-  maxHeight,
-}: ScrollAreaProps) => {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [viewportHeight, setViewportHeight] = useState(0);
-  const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [showBottomLine, setShowBottomLine] = useState(true);
-  const [showTopLine, setShowTopLine] = useState(false);
+const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
+  (
+    {
+      children,
+      className,
+      asChild,
+      hideBottomLine,
+      hideTopLine,
+      padding,
+      paddingTop,
+      paddingRight,
+      paddingBottom,
+      paddingLeft,
+      height,
+      maxHeight = '100%',
+    },
+    ref,
+  ) => {
+    const viewportRef = useRef<HTMLDivElement>(null);
+    const [isOverflowTop, setIsOverflowTop] = useState(false);
+    const [isOverflowBottom, setIsOverflowBottom] = useState(false);
 
-  const noOverflow = viewportHeight <= scrollAreaHeight;
-  const scrolledToBottom = scrollTop > 0 && scrollTop + scrollAreaHeight >= viewportHeight;
-  const scrolledToTop = scrollTop === 0;
+    useEffect(() => {
+      const scrollContainer = viewportRef.current;
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    setScrollTop(e.currentTarget.scrollTop);
-  };
+      const checkOverflow = () => {
+        if (scrollContainer) {
+          const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+          setIsOverflowTop(scrollTop > 0);
+          setIsOverflowBottom(scrollTop + clientHeight < scrollHeight);
+        }
+      };
 
-  useEffect(() => {
-    if (noOverflow || hideBottomLine) {
-      setShowBottomLine(false);
-    } else {
-      setShowBottomLine(!scrolledToBottom);
-    }
-  }, [noOverflow, scrolledToBottom, hideBottomLine]);
+      checkOverflow();
 
-  useEffect(() => {
-    if (noOverflow || hideTopLine) {
-      setShowTopLine(false);
-    } else {
-      setShowTopLine(!scrolledToTop);
-    }
-  }, [noOverflow, scrolledToTop, hideTopLine]);
+      scrollContainer?.addEventListener('scroll', checkOverflow);
 
-  useEffectOnce(() => {
-    const updateDimensions = () => {
-      setScrollAreaHeight(scrollAreaRef.current?.clientHeight ?? 0);
-      setViewportHeight(viewportRef.current?.clientHeight ?? 0);
-    };
+      return () => {
+        scrollContainer?.removeEventListener('scroll', checkOverflow);
+      };
+    }, []);
 
-    const resizeObserver = new ResizeObserver(updateDimensions);
+    return (
+      <StyledRoot className={className} $maxHeight={maxHeight} $height={height} ref={ref}>
+        <StyledViewport
+          ref={viewportRef}
+          $padding={padding}
+          $paddingTop={paddingTop}
+          $paddingRight={paddingRight}
+          $paddingBottom={paddingBottom}
+          $paddingLeft={paddingLeft}
+          $isOverflowTop={isOverflowTop && !hideTopLine}
+          $isOverflowBottom={isOverflowBottom && !hideBottomLine}
+          asChild={asChild}
+        >
+          {children}
+        </StyledViewport>
+        <ScrollAreaRadix.Scrollbar orientation="vertical">
+          <ScrollAreaRadix.Thumb />
+        </ScrollAreaRadix.Scrollbar>
+      </StyledRoot>
+    );
+  },
+);
 
-    const startResizeObserve = () => {
-      if (viewportRef.current) resizeObserver.observe(viewportRef.current);
-    };
-
-    const stopResizeObserve = () => {
-      if (viewportRef.current) resizeObserver.unobserve(viewportRef.current);
-    };
-
-    startResizeObserve();
-
-    return stopResizeObserve;
-  });
-
-  return (
-    <StyledRoot
-      ref={scrollAreaRef}
-      data-line-bottom={showBottomLine}
-      data-line-top={showTopLine}
-      onScroll={handleScroll}
-      asChild={asChild}
-      style={{ maxHeight }}
-      className={className}
-    >
-      <StyledViewport
-        className={className}
-        asChild
-        ref={viewportRef}
-        $padding={padding}
-        $paddingTop={paddingTop}
-        $paddingRight={paddingRight}
-        $paddingBottom={paddingBottom}
-        $paddingLeft={paddingLeft}
-        $maxWidth={maxWidth}
-        $maxHeight={maxHeight}
-      >
-        {children}
-      </StyledViewport>
-      <ScrollAreaRadix.Scrollbar orientation="vertical">
-        <ScrollAreaRadix.Thumb />
-      </ScrollAreaRadix.Scrollbar>
-    </StyledRoot>
-  );
-};
-
-const StyledRoot = styled(ScrollAreaRadix.Root)`
-  ${({ theme }) => css`
-    overflow: auto;
-
-    &[data-line-bottom='false'] {
-      border-bottom: ${theme.borderWidth[1]} solid
-        ${theme.borderColor.transparent};
-    }
-
-    &[data-line-bottom='true'] {
-      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    }
-
-    &[data-line-top='false'] {
-      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.transparent};
-    }
-
-    &[data-line-top='true'] {
-      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    }
+const StyledRoot = styled(ScrollAreaRadix.Root)<{
+  $maxHeight?: CSS.Property.MaxHeight;
+  $height?: CSS.Property.Height;
+  $overflow?: CSS.Property.Overflow;
+}>`
+  ${({ $maxHeight, $height, $overflow }) => css`
+    ${$maxHeight && `max-height: ${$maxHeight};`}
+    ${$height && `height: ${$height};`}
+    ${$overflow && `overflow: ${$overflow};`}
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 100%;
+    position: relative;
   `}
 `;
 
@@ -149,21 +110,50 @@ const StyledViewport = styled(ScrollAreaRadix.Viewport)<{
   $paddingRight?: Spacing;
   $paddingBottom?: Spacing;
   $paddingLeft?: Spacing;
-  $maxWidth?: CSS.Property.MaxWidth;
-  $maxHeight?: CSS.Property.MaxHeight;
+  $isOverflowTop: boolean;
+  $isOverflowBottom: boolean;
 }>`
-  ${({ $padding, $paddingTop, $paddingRight, $paddingBottom, $paddingLeft, $maxWidth, $maxHeight }) => css`
-    ${({ theme }) => css`
-      height: 100%;
-      width: 100%;
-      padding: ${$padding ? theme.spacing[$padding] : undefined};
-      padding-top: ${$paddingTop ? theme.spacing[$paddingTop] : undefined};
-      padding-right: ${$paddingRight ? theme.spacing[$paddingRight] : undefined};
-      padding-bottom: ${$paddingBottom ? theme.spacing[$paddingBottom] : undefined};
-      padding-left: ${$paddingLeft ? theme.spacing[$paddingLeft] : undefined};
-      max-width: ${$maxWidth};
-      max-height: ${$maxHeight};
-    `}
+  ${({
+    $padding,
+    $paddingTop,
+    $paddingRight,
+    $paddingBottom,
+    $paddingLeft,
+    $isOverflowTop,
+    $isOverflowBottom,
+    theme,
+  }) => css`
+    width: 100%;
+    box-sizing: border-box;
+    max-height: 100%;
+    min-height: 100%;
+    ${$padding && `padding: ${theme.spacing[$padding]};`}
+    ${$paddingTop && `padding-top: ${theme.spacing[$paddingTop]};`}
+    ${$paddingRight && `padding-right: ${theme.spacing[$paddingRight]};`}
+    ${$paddingBottom && `padding-bottom: ${theme.spacing[$paddingBottom]};`}
+    ${$paddingLeft && `padding-left: ${theme.spacing[$paddingLeft]};`}
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: ${theme.borderWidth[1]};
+      background-color: ${theme.borderColor.tertiary};
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    &::before {
+      top: 0;
+      opacity: ${$isOverflowTop ? 1 : 0};
+    }
+
+    &::after {
+      bottom: 0;
+      opacity: ${$isOverflowBottom ? 1 : 0};
+    }
   `}
 `;
 

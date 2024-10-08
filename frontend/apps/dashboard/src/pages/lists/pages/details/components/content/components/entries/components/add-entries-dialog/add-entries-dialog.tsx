@@ -76,7 +76,6 @@ const AddEntriesDialog = ({ open, onClose, onAdd }: AddEntriesDialogProps) => {
     <Dialog
       size="compact"
       title={t('title')}
-      testID="add-entries-dialog"
       open={open}
       onClose={onClose}
       primaryButton={{

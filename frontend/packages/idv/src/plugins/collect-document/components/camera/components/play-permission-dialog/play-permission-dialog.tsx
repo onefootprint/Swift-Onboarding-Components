@@ -23,7 +23,6 @@ const PlayPermissionDialog = ({ open, hide, onAllow }: PlayPermissionDialogProps
         onClick: onAllow,
       }}
       isConfirmation
-      disableResponsiveness
     >
       <Text variant="body-2" color="secondary" textAlign="center">
         {t('description')}

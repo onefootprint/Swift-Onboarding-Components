@@ -3,16 +3,7 @@ export type FormDialogButton = {
   form?: string;
   label: string;
   loading?: boolean;
+  loadingAriaLabel?: string;
   onClick?: (dataSubmitted?: unknown) => void;
   type?: 'button' | 'submit' | 'reset';
-};
-
-export type AllButtons = {
-  primaryButton: FormDialogButton;
-  secondaryButton: FormDialogButton;
-};
-
-export type OnlyPrimaryButton = {
-  primaryButton: FormDialogButton;
-  secondaryButton?: never;
 };

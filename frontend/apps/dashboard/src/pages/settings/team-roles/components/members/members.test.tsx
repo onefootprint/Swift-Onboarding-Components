@@ -431,8 +431,10 @@ describe('<Members />', () => {
             expect(confirmationMessage).toBeInTheDocument();
           });
 
-          const userRemovedName = screen.queryByText(`${userToRemove.firstName} ${userToRemove.lastName}`);
-          await waitForElementToBeRemoved(userRemovedName);
+          await waitFor(() => {
+            const userRemovedName = screen.queryByText(`${userToRemove.firstName} ${userToRemove.lastName}`);
+            expect(userRemovedName).not.toBeInTheDocument();
+          });
         });
       });
     });

@@ -5,7 +5,7 @@ import type React from 'react';
 import Container from '../../../container';
 import Footer from './components/footer';
 import Header from './components/header';
-import type { AllButtons, OnlyPrimaryButton } from './types';
+import type { FormDialogButton } from './types';
 
 export type FormDialogProps = {
   title?: string;
@@ -16,7 +16,9 @@ export type FormDialogProps = {
   hideFootprintLogo?: boolean;
   hideSaveButton?: boolean;
   hideCancelButton?: boolean;
-} & (AllButtons | OnlyPrimaryButton);
+  primaryButton: FormDialogButton;
+  secondaryButton?: FormDialogButton;
+};
 
 const FormDialog = ({
   title,

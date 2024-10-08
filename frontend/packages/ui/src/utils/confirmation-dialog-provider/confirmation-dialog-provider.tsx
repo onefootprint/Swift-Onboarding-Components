@@ -29,7 +29,6 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
       {confirmationDialog && (
         <Dialog
           open
-          disableResponsiveness
           isConfirmation
           size="compact"
           title={confirmationDialog.title}

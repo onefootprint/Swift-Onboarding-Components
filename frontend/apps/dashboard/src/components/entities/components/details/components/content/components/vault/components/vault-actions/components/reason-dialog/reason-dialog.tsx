@@ -25,7 +25,6 @@ const ReasonDialog = ({ open, loading, onClose, onSubmit }: ReasonDialogProps) =
     <Dialog
       size="compact"
       title={t('decrypt.start')}
-      headerIcon={{ onClick: loading ? noop : onClose }}
       onClose={loading ? noop : onClose}
       open={open}
       primaryButton={{

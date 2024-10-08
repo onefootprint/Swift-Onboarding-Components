@@ -398,8 +398,10 @@ describe('<Roles />', () => {
             expect(confirmationMessage).toBeInTheDocument();
           });
 
-          const userRemovedName = screen.queryByText(roleToDisable.name);
-          await waitForElementToBeRemoved(userRemovedName);
+          await waitFor(() => {
+            const userRemovedName = screen.queryByText(roleToDisable.name);
+            expect(userRemovedName).not.toBeInTheDocument();
+          });
         });
       });
 
