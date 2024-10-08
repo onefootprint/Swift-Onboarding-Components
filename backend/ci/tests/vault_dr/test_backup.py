@@ -411,7 +411,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
                 "id.first_name",
                 "id.last_name",
                 "id.phone_number",
-                "custom.field_that_doest_exist",
+                # Fields that don't exist are skipped.
+                "custom.field_that_doesnt_exist",
             ],
         },
         {
@@ -538,6 +539,44 @@ def test_footprint_dr_backup(tenant, tmp_path):
         )
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 1
+
+    # Attempt to decrypt for a vault version that doesn't exist.
+    for bad_version in [-1, 0, 1000]:
+        record_to_decrypt = {
+            "fp_id": fp_id_1,
+            "version": bad_version,
+            "fields": [
+                "id.email",
+                "id.first_name",
+                "id.last_name",
+                "id.phone_number",
+            ],
+        }
+        records_file = tmp_path / "records.jsonl"
+        with records_file.open("w") as f:
+            json.dump(record_to_decrypt, f)
+
+        output_dir = tmp_path / f"pii_test_invalid_version_{bad_version}"
+        output_dir.mkdir()
+
+        org_identity_file = tmp_path / "org_identity.txt"
+        org_identity_file.write_text(org_identity)
+
+        with footprint_dr(
+            "decrypt",
+            "--live",
+            "--records",
+            str(records_file),
+            "--org-identity",
+            str(org_identity_file),
+            "--output-dir",
+            str(output_dir),
+        ) as cmd:
+            fp_id = record_to_decrypt["fp_id"]
+            version = record_to_decrypt["version"]
+            cmd.expect_exact(f"Vault version {version} not found for {fp_id}")
+            cmd.expect(pexpect.EOF)
+        assert cmd.exitstatus == 1
 
 
 def validate_decrypted_data(output_dir, records_to_decrypt, expected_data):

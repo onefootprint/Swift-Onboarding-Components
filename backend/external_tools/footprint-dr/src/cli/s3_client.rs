@@ -251,6 +251,8 @@ impl S3Client {
         )
     }
 
+    /// Lists fp_ids in the bucket. This does not check for presence of manifests, so it may
+    /// include fp_ids that have not been committed yet, meaning they will return no records.
     pub fn list_fp_ids(
         &self,
         fp_id_gt: Option<String>,
@@ -453,32 +455,39 @@ impl S3Client {
         Ok(sample.into_iter().collect())
     }
 
+    /// Reads a manifest for the given fp_id. If version is None, reads manifest.latest.json,
+    /// otherwise reads manifest.<version>.json. If the requested manifest is not present, returns
+    /// None.
     async fn read_manifest(
         client: aws_sdk_s3::Client,
         bucket_name: String,
         fp_id: FpId,
         version: Option<i64>,
-    ) -> Result<Manifest> {
+    ) -> Result<Option<Manifest>> {
         let version_str = version
             .map(|v| v.to_string())
             .unwrap_or_else(|| "latest".to_string());
         let key = format!("{}meta/manifest.{}.json", fp_id.path, version_str);
 
-        let obj = client
-            .get_object()
-            .bucket(&bucket_name)
-            .key(&key)
-            .send()
-            .await
-            .map_err(|e| {
+        let obj_result = client.get_object().bucket(&bucket_name).key(&key).send().await;
+
+        let obj = match obj_result {
+            Ok(obj) => Ok(obj),
+            Err(e) => {
                 let svc_error = e.into_service_error();
-                anyhow!(
+
+                if svc_error.is_no_such_key() {
+                    return Ok(None);
+                }
+
+                Err(anyhow!(
                     "Failed to GetObject s3://{}/{}: {:?}",
                     &bucket_name,
                     key,
                     svc_error
-                )
-            })?;
+                ))
+            }
+        }?;
 
         let body = obj.body.collect().await.map(|data| data.into_bytes())?;
 
@@ -487,7 +496,7 @@ impl S3Client {
             bail!("Invalid manifest version {} at key {}", manifest.version, key);
         }
 
-        Ok(manifest)
+        Ok(Some(manifest))
     }
 
     pub async fn list_records(
@@ -521,6 +530,13 @@ impl S3Client {
                         let _ = tx.send(Err(e)).await;
                         return;
                     }
+                };
+
+                let Some(manifest) = manifest else {
+                    // No manifest found for this fp_id.
+                    // This likely means the initial write to the fp_id is still in progress.
+                    // Continue to the next fp_id.
+                    continue;
                 };
 
                 let fp_id_fields = FpIdFields {
@@ -569,6 +585,15 @@ impl S3Client {
                         let manifest = manifest.clone();
 
                         Box::pin(async move {
+                            let Some(manifest) = manifest else {
+                                // If the requested manifest version is missing, return an error.
+                                return Some(Err(anyhow!(
+                                    "Vault version {} not found for {}",
+                                    version,
+                                    &fp_id.fp_id,
+                                )));
+                            };
+
                             // Skip the requested field if it's not present in the manifest.
                             let data_key_basename = manifest.fields.get(&field)?;
 
