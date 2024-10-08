@@ -281,6 +281,10 @@ impl TenantVendorControl {
     pub fn is_sentilink_enabled_for_tenant(&self) -> bool {
         matches!(self.sentilink_credentials(), CredentialType::TenantSpecific(_))
     }
+
+    pub fn is_neuro_enabled_for_tenant(&self) -> bool {
+        matches!(self.neuro_api_key(), CredentialType::TenantSpecific(_))
+    }
 }
 
 impl TenantVendorControl {
