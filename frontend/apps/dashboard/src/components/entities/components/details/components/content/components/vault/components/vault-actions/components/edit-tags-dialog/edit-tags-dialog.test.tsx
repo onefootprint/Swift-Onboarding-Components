@@ -1,13 +1,7 @@
-import {
-  customRender,
-  mockRouter,
-  screen,
-  userEvent,
-  waitForElementToBeRemoved,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
 
 import { EntityKind } from '@onefootprint/types';
+import mockRouter from 'next-router-mock';
 import type { EditTagsDialogProps } from './edit-tags-dialog';
 import EditTagsDialog from './edit-tags-dialog';
 import {

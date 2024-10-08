@@ -1,14 +1,8 @@
-import {
-  customRender,
-  mockRouter,
-  screen,
-  userEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 import { EntityKind, EntityStatus, OrgFrequentNoteKind } from '@onefootprint/types';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
+import mockRouter from 'next-router-mock';
 import type { ManualReviewProps } from './manual-review';
 import ManualReview from './manual-review';
 import { entityFixture, withDecision, withDecisionError, withEntity } from './manual-review.test.config';

@@ -5,6 +5,6 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist",
-    "types": ["bun-types", "google.maps", "jest"]
+    "types": ["bun-types", "jest"]
   }
 }

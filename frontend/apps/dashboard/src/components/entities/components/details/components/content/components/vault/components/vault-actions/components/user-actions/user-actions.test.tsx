@@ -2,7 +2,6 @@ import {
   customRender,
   fireEvent,
   mockRequest,
-  mockRouter,
   screen,
   selectEvents,
   userEvent,
@@ -16,6 +15,7 @@ import {
 } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 import { asAdminUser } from 'src/config/tests';
 
+import mockRouter from 'next-router-mock';
 import TestWrapper from '../../../utils/test-wrapper';
 import UserActions from './user-actions';
 import {

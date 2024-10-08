@@ -1,8 +1,9 @@
 import '../../config/initializers/i18next-test';
 
 import { COUNTRIES as options } from '@onefootprint/global-constants';
-import { customRender, screen, selectEvents } from '@onefootprint/test-utils';
+import { screen } from '@testing-library/react';
 import take from 'lodash/take';
+import { customRender, selectEvents } from '../../utils/test-utils';
 
 import type { CountrySelectProps } from './country-select';
 import Select from './country-select';

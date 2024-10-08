@@ -7,7 +7,7 @@
     "rootDir": ".",
     "outDir": "dist",
     "baseUrl": ".",
-    "types": ["google.maps", "jest", "../../styled.d.ts", "bun-types"],
+    "types": ["google.maps", "jest", "../../styled.d.ts"],
     "paths": {
       "src/*": ["./src/*"],
       "@/proxy-configs/*": ["src/pages/proxy-configs/*"],

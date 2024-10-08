@@ -1,13 +1,6 @@
-import {
-  createFileSaverSpy,
-  customRender,
-  mockRouter,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createFileSaverSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import { DocumentDI, IdDI, InvestorProfileDI, UsLegalStatus, VisaKind } from '@onefootprint/types';
+import mockRouter from 'next-router-mock';
 import { asAdminUser } from 'src/config/tests';
 
 import Details from './details';

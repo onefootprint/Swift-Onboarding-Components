@@ -1,6 +1,9 @@
+import '@testing-library/jest-dom/extend-expect';
 import '../../config/initializers/i18next-test';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender } from '../../utils/test-utils';
 
 import Button from '../button';
 import type { TooltipProps } from './tooltip';

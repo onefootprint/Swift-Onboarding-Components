@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'frontend/.changeset/**'
+      - "frontend/.changeset/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,18 +28,24 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # ratchet:pnpm/action-setup@v4
+        with:
+          version: 8
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
 
       - name: Install Dependencies
         working-directory: ./frontend
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: Build
         working-directory: ./frontend
-        run: yarn build:packages
+        run: pnpm build:packages
 
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@aba318e9165b45b7948c60273e0b72fce0a64eb9 # ratchet:changesets/action@v1
@@ -48,6 +54,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
           cwd: ./frontend
-          publish: yarn release
+          publish: pnpm release
           title: Bump frontend public packages
           commit: Bump frontend public packages

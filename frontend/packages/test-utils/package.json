@@ -8,25 +8,29 @@
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
+  "dependencies": {
+    "@juggle/resize-observer": "^3.4.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
   "devDependencies": {
-    "@onefootprint/design-tokens": "*",
-    "@onefootprint/ui": "*",
+    "@onefootprint/design-tokens": "workspace:*",
+    "@onefootprint/ui": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
     "@testing-library/dom": "^8.14.0",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^6.2.20",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/file-saver": "^2.0.5",
     "@types/jest": "^29.4.2",
+    "@types/react-dom": "^18",
+    "@types/react": "^18",
     "file-saver": "^2.0.5",
     "mockdate": "^3.0.5",
     "msw": "^1.1.0",
     "next": "14.2.3",
-    "next-router-mock": "^0.9.13",
-    "react": "^18",
-    "react-dom": "^18",
     "ts-node": "^10.9.2",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "typescript": "^5.5.2"
   }
 }

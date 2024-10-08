@@ -1,8 +1,12 @@
-import { expect, userEvent, within } from '@onefootprint/storybook-utils';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import Box from '../box';
 import SelectCustom from './select-custom';
+
+import * as storybook from '@storybook/test';
+import { expect, within } from '@storybook/test';
+
+const userEvent = storybook.userEvent.setup({ delay: 100 });
 
 const options = [
   { value: 'apple', label: 'Apple', emoji: '🍎' },

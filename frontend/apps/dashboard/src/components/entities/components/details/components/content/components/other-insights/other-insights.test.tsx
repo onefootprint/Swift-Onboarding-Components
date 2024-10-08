@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import OtherInsights from './other-insights';
 import { withOtherInsights, withOtherInsightsEmpty, withOtherInsightsError } from './other-insights.test.config';

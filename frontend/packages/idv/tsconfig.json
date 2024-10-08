@@ -5,6 +5,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "dist",
+    "types": ["google.maps", "jest"],
     "baseUrl": ".",
     "paths": {
       "src/*": ["./src/*"],

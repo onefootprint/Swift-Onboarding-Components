@@ -1,10 +1,13 @@
-import { expect, fn, userEvent, within } from '@onefootprint/storybook-utils';
+import * as storybook from '@storybook/test';
+import { expect, fn, within } from '@storybook/test';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import Button from '../button';
 import Text from '../text';
 import Combo from './combo';
 
+const userEvent = storybook.userEvent.setup({ delay: 100 });
 const fruits = [
   { value: 'apple', label: 'Apple' },
   { value: 'banana', label: 'Banana' },

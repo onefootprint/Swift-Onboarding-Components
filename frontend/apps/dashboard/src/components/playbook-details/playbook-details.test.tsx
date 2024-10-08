@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
+import { customRender, screen, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import PlaybookDetails from './playbook-details';
 import {

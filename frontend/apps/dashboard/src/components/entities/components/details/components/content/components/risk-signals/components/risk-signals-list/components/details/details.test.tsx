@@ -1,12 +1,5 @@
-import {
-  customRender,
-  mockRouter,
-  screen,
-  userEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import RiskSignalDetails from './details';
 import {

@@ -1,7 +1,8 @@
-import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
+import mockRouter from 'next-router-mock';
 import type { ManualReviewDialogProps } from './manual-review-dialog';
 import ManualReviewDialog from './manual-review-dialog';
 

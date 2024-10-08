@@ -21,7 +21,7 @@
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
     "test": "bun test --bail",
-    "typecheck": "yarn tsc --noEmit"
+    "typecheck": "pnpm tsc --noEmit"
   },
   "dependencies": {
     "date-fns": "^2.30.0"
@@ -30,7 +30,7 @@
     "@happy-dom/global-registrator": "^14.7.1",
     "@types/node": "^20",
     "bun-types": "^1.0.25",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "tsup": "^6.5.0",
     "typescript": "^5.5.2"
   },

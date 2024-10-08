@@ -2,7 +2,8 @@ import '../../config/initializers/i18next-test';
 
 import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
 import themes from '@onefootprint/design-tokens';
-import { customRender, screen } from '@onefootprint/test-utils';
+import { screen } from '@testing-library/react';
+import { customRender } from '../../utils/test-utils';
 
 import type { BannerProps } from './banner';
 import Badge from './banner';

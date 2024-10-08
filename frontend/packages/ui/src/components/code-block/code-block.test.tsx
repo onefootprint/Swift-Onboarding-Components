@@ -1,6 +1,8 @@
 import '../../config/initializers/i18next-test';
 
-import { createClipboardSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createClipboardSpy, customRender } from '../../utils/test-utils';
 
 import ToastProvider from '../toast/toast-provider';
 import type { CodeBlockProps } from './code-block';

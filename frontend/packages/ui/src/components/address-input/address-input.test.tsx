@@ -1,13 +1,8 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  createGoogleMapsSpy,
-  customRender,
-  getPlacePredictions,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createGoogleMapsSpy, customRender, getPlacePredictions } from '../../utils/test-utils';
 
 import type { AddressInputProps } from './address-input';
 import AddressInput from './address-input';

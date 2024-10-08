@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor, within } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import { asAdminUser } from 'src/config/tests';
 
 import List from './list';

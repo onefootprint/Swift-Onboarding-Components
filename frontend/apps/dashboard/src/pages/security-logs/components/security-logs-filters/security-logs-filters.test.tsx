@@ -1,4 +1,5 @@
-import { customRender, filterEvents, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, filterEvents, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import SecurityLogsFilters from './security-logs-filters';
 
@@ -66,7 +67,6 @@ describe('<SecurityLogsFilters />', () => {
       });
     } catch (error) {
       console.error('Error applying filters:', error);
-      console.log(screen.debug());
       throw error;
     }
 
