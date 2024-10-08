@@ -9,7 +9,7 @@ import type { DiField } from '../../../../../../vault.types';
 import Field from '../../../../../field';
 import useGetCardIssuer from '../../utils/use-get-card-issuer';
 import useGetTranslationWithoutAlias from '../../utils/use-get-translation-without-alias';
-import CardSelector from '../card-selector';
+import CardSelector from './components/card-selector';
 
 export type CardFieldsProps = {
   entity: Entity;

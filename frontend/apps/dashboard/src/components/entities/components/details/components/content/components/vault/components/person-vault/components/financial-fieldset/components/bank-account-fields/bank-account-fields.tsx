@@ -7,7 +7,7 @@ import getBankAccounts from '../../../../../../utils/get-bank-accounts';
 import type { DiField } from '../../../../../../vault.types';
 import Field from '../../../../../field';
 import useGetTranslationWithoutAlias from '../../utils/use-get-translation-without-alias';
-import BankAccountSelector from '../bank-account-selector';
+import BankAccountSelector from './components/bank-account-selector';
 
 export type BankAccountFieldsProps = {
   entity: Entity;

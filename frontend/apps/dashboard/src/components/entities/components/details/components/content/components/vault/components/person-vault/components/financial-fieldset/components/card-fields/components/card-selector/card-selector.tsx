@@ -1,6 +1,6 @@
 import type { EntityCard } from '@onefootprint/types';
 import { SelectCustom, Stack } from '@onefootprint/ui';
-import CardIcon from '../card-icon';
+import CardIcon from '../../../card-icon';
 
 export type CardSelectorProps = {
   selected?: EntityCard;
