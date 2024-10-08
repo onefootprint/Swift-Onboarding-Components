@@ -6,6 +6,7 @@ use db::models::rule_instance::RuleInstance;
 use db::TxnPgConn;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
+use itertools::Itertools;
 use newtypes::BooleanOperator;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
@@ -42,6 +43,19 @@ pub fn ssn_rules() -> Vec<(RuleExpression, RuleAction)> {
         (if_risk_signal(FRC::SsnLocatedIsInvalid), RA::Fail),
         (if_risk_signal(FRC::SsnIssuedPriorToDob), RA::Fail),
     ]
+}
+
+
+pub fn default_verification_check_rules(check: &VerificationCheck) -> Vec<(RuleExpression, RuleAction)> {
+    match check {
+        VerificationCheck::Sentilink {} => {
+            vec![
+                (if_risk_signal(FRC::SentilinkIdentityTheftHighRisk), RA::Fail),
+                (if_risk_signal(FRC::SentilinkSyntheticIdentityHighRisk), RA::Fail),
+            ]
+        }
+        _ => vec![],
+    }
 }
 
 // we use this base set of Document rules for both Alpaca and regular playbooks. However, precedent
@@ -240,10 +254,19 @@ pub fn default_rules_for_obc(
     .into_iter()
     .map(|(r, a)| (r, a, RuleInstanceKind::Business));
 
+    let verification_check_rules = obc
+        .verification_checks()
+        .inner()
+        .iter()
+        .flat_map(default_verification_check_rules)
+        .map(|(re, ra)| (re, ra, RuleInstanceKind::Person))
+        .collect_vec();
+
     person_rules
         .into_iter()
         .map(|(r, a)| (r, a, RuleInstanceKind::Person))
         .chain(business_rules)
+        .chain(verification_check_rules)
         .collect()
 }
 
