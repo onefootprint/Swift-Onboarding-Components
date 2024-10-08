@@ -503,6 +503,7 @@ pub struct FetchOCRResponse {
     pub mrz1: Option<ScrubbedPiiString>,
     pub mrz2: Option<ScrubbedPiiString>,
     pub mrz3: Option<ScrubbedPiiString>,
+    pub clave_de_elector: Option<ScrubbedPiiString>,
     //
     // Leaving a lot of these Values just in case they aren't consistent across diff countries...
     pub full_name_mrz: Option<serde_json::Value>,
@@ -512,7 +513,6 @@ pub struct FetchOCRResponse {
     pub invalid_address: Option<serde_json::Value>,
     pub exterior_number: Option<serde_json::Value>,
     pub interior_number: Option<serde_json::Value>,
-    pub clave_de_elector: Option<serde_json::Value>,
     // not sure - i think this is MX specific
     pub ocr: Option<serde_json::Value>,
     pub registration_date: Option<serde_json::Value>,

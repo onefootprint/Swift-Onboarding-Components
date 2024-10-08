@@ -89,6 +89,7 @@ pub enum OcrDataKind {
     RefNumber,
     Nationality,
     Curp,
+    ClaveDeElector,
     /// Incode-determined document type
     ClassifiedDocumentType,
     /// This is the full response from Curp validation

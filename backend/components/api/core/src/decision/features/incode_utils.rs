@@ -109,6 +109,11 @@ impl ParsedIncodeFields {
                     r.curp.clone().map(|s| s.into()),
                 ),
                 pif(
+                    ODK::ClaveDeElector,
+                    conf.as_ref().and_then(|c| c.clave_de_elector_confidence),
+                    r.clave_de_elector.clone().map(|s| s.into()),
+                ),
+                pif(
                     ODK::ClassifiedDocumentType,
                     None,
                     r.type_of_id.clone().map(|s| s.to_string().into()),
