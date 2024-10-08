@@ -75,6 +75,7 @@ const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
         isOpen={duplicateDrawerOpen}
         onClose={closeDuplicateDataDrawer}
         dupes={duplicateData?.sameTenant ?? []}
+        fingerprint={selectedCard?.fingerprint}
       />
     </Stack>
   );
