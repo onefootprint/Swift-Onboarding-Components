@@ -10,11 +10,13 @@ use api_core::utils::identify::UserAuthMethodsContext;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
+use api_wire_types::IdentifyIdKind;
 use crypto::sha256;
 use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
+use newtypes::output::Csv;
 use newtypes::AuthEventKind;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
@@ -125,6 +127,7 @@ async fn get_identify_challenge_context(
         obc,
         root_span,
     } = args;
+    tracing::info!(identifiers=?Csv(identifiers.iter().map(IdentifyIdKind::from).collect()), has_user_auth=%user_auth.is_some(), has_ob_context=%obc.is_some(), has_sandbox_id=%sandbox_id.is_some(), "Getting identify challenge context");
 
     // Get the OBC from either user auth or obc auth, preferring to extract from the auth token
     let obc = (user_auth.as_ref().and_then(|ua| ua.ob_config()))

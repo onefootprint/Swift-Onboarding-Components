@@ -9,9 +9,11 @@ use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
+use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, EnumDiscriminants)]
 #[serde(rename_all = "snake_case")]
+#[strum_discriminants(name(IdentifyIdKind), vis(pub))]
 /// An identifier for the identify flow that will uniquely identify a user
 pub enum IdentifyId {
     Email(Email),
