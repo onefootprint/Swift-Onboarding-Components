@@ -1217,7 +1217,8 @@
       "bank-title": "Duplicate bank accounts",
       "fp-id": "Footprint ID",
       "name": "Name",
-      "created-at": "Created at"
+      "created-at": "Created at",
+      "view-user-details": "View user details"
     },
     "dupe-kinds": {
       "ssn9": "SSN",

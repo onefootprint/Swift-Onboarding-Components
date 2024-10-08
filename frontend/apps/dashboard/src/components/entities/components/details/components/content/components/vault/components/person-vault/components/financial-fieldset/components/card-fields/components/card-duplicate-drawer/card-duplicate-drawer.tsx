@@ -1,6 +1,7 @@
 import type { DuplicateDataItem } from '@onefootprint/types';
-import { Drawer } from '@onefootprint/ui';
+import { Drawer, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import DuplicateUser from '../../../duplicate-user';
 
 type CardDuplicateDrawerProps = {
   isOpen: boolean;
@@ -15,9 +16,11 @@ const CardDuplicateDrawer = ({ isOpen, onClose, dupes }: CardDuplicateDrawerProp
 
   return (
     <Drawer open={isOpen} onClose={onClose} title={t('card-title')}>
-      {dupes.map(dupe => (
-        <div key={dupe.fpId}>{dupe.fpId}</div>
-      ))}
+      <Stack direction="column" gap={4}>
+        {dupes.map(dupe => (
+          <DuplicateUser key={dupe.fpId} dupe={dupe} />
+        ))}
+      </Stack>
     </Drawer>
   );
 };
