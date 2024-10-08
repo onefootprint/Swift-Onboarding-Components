@@ -1,5 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
 import { asAssumedUser, asUser } from 'src/config/tests';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));

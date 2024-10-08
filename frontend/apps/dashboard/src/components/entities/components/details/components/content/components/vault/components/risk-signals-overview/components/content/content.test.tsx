@@ -1,6 +1,5 @@
-import { customRender, screen, userEvent, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, within } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 
 import type { ContentProps } from './content';
 import Content from './content';

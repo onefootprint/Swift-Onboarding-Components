@@ -1,5 +1,5 @@
-import { customRender, screen } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
+
 import type { PinnedNoteProps } from './pinned-note';
 import PinnedNote from './pinned-note';
 

@@ -1,7 +1,14 @@
-import { createClipboardSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import {
+  createClipboardSpy,
+  customRender,
+  mockRequest,
+  mockRouter,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import { ContactInfoKind } from '@onefootprint/types';
 
-import mockRouter from 'next-router-mock';
 import type { UpdateAuthDialogProps } from './update-auth-dialog';
 import UpdateAuthDialog from './update-auth-dialog';
 import { entityFixture, withEntity } from './update-auth-dialog.test.config';

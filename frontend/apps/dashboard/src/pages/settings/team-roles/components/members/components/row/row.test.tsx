@@ -1,5 +1,4 @@
-import { customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 
 import type { RowProps } from './row';
 import Row from './row';

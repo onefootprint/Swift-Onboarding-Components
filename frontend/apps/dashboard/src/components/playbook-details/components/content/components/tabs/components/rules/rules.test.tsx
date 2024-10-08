@@ -1,6 +1,13 @@
-import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
+import {
+  customRender,
+  mockRouter,
+  screen,
+  userEvent,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from '@onefootprint/test-utils';
 import { RiskSignalRuleOp } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 import { asAdminUserFirmEmployee } from 'src/config/tests';
 
 import type { RulesProps } from './rules';

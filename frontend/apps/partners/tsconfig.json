@@ -1,7 +1,7 @@
 {
   "exclude": ["node_modules"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "extends": "../../packages/tsconfig/nextjs.json",
+  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "types": ["bun-types", "google.maps", "../../styled.d.ts"],
     "baseUrl": ".",

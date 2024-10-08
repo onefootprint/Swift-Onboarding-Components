@@ -4,7 +4,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build:analyze": "ANALYZE=true pnpm build",
+    "build:analyze": "ANALYZE=true yarn build",
     "build": "next build",
     "dev": "next dev -p 3012",
     "i18n:clean": "rm -rf ./public/locales/",
@@ -17,13 +17,13 @@
     "test:ci:bun": "bun test --bail",
     "test:watch": "DEBUG_PRINT_LIMIT=100000 bun test --watch",
     "test": "bun test",
-    "typecheck": "pnpm tsc --noEmit"
+    "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "@onefootprint/design-tokens": "workspace:*",
-    "@onefootprint/dev-tools": "workspace:*",
-    "@onefootprint/icons": "workspace:*",
-    "@onefootprint/ui": "workspace:*",
+    "@onefootprint/design-tokens": "*",
+    "@onefootprint/dev-tools": "*",
+    "@onefootprint/icons": "*",
+    "@onefootprint/ui": "*",
     "@radix-ui/react-navigation-menu": "1.0.0",
     "i18next": "^23.10.1",
     "i18next-resources-to-backend": "^1.2.0",
@@ -39,14 +39,12 @@
   "devDependencies": {
     "@happy-dom/global-registrator": "^14.7.1",
     "@next/bundle-analyzer": "^14.1.0",
-    "@onefootprint/types": "workspace:*",
+    "@onefootprint/types": "*",
     "@testing-library/react": "^14.3.0",
     "@testing-library/user-event": "^14.5.2",
-    "@types/google.maps": "^3.55.11",
     "@types/node": "^20",
-    "@types/react-dom": "^18",
     "@types/react": "^18",
-    "copy-and-watch": "^0.1.6",
+    "@types/react-dom": "^18",
     "bun-types": "^1",
     "msw": "^2.2.13",
     "typescript": "^5.5.2"

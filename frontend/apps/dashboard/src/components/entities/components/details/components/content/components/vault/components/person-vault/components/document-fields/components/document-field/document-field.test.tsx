@@ -1,6 +1,5 @@
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 
 import TestWrapper from '../../../../../utils/test-wrapper';
 import type { DocumentFieldProps } from './document-field';

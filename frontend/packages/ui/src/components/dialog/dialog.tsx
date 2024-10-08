@@ -69,8 +69,6 @@ const Dialog = ({
 }: DialogProps) => {
   const { t } = useTranslation('ui');
   const dialogRef = useRef<HTMLDivElement>(null);
-  // @ts-ignore: Type instantiation is excessively deep and possibly infinite.
-  const ariaLabel = headerIconAriaLabel || (t('components.dialog.header-icon.aria-label-default') as string);
 
   return (
     <RadixDialog.Root open={open} onOpenChange={onClose}>
@@ -97,7 +95,10 @@ const Dialog = ({
             <Header>
               <CloseContainer>
                 <RadixDialog.Close asChild>
-                  <IconButton aria-label={ariaLabel} onClick={onHeaderIconClick}>
+                  <IconButton
+                    aria-label={headerIconAriaLabel ?? t('components.dialog.header-icon.aria-label-default')}
+                    onClick={onHeaderIconClick}
+                  >
                     <HeaderIconComponent />
                   </IconButton>
                 </RadixDialog.Close>

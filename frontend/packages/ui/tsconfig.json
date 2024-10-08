@@ -5,6 +5,6 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist",
-    "types": ["../../styled.d.ts", "google.maps", "jest"]
+    "types": ["../../styled.d.ts", "google.maps"]
   }
 }

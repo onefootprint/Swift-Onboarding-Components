@@ -2,13 +2,13 @@ import {
   createClipboardSpy,
   customRender,
   mockRequest,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
   within,
 } from '@onefootprint/test-utils';
 import type { TimelineEvent } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 import { withEntity } from 'src/components/entities/components/details/details.test.config';
 import { asAdminUser } from 'src/config/tests';
 

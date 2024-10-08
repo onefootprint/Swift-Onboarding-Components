@@ -2,8 +2,7 @@ import '../../config/initializers/i18next-test';
 
 import type { UIState } from '@onefootprint/design-tokens';
 import themes from '@onefootprint/design-tokens';
-import { screen } from '@testing-library/react';
-import { customRender } from '../../utils/test-utils';
+import { customRender, screen } from '@onefootprint/test-utils';
 
 import type { BadgeProps } from './badge';
 import Badge from './badge';

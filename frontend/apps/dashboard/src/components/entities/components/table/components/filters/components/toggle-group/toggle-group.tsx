@@ -53,7 +53,7 @@ const ToggleGroup = ({ 'aria-label': ariaLabel, options, value, onChange, disabl
             onClick={() => {
               onChange?.(option.value);
             }}
-            variants={buttonVariants(theme as Theme)}
+            variants={buttonVariants(theme)}
             initial="unselected"
             animate={getAnimate(option)}
           >

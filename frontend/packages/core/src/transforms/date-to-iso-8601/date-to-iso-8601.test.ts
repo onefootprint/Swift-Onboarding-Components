@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'bun:test';
 import transformDateStringToISO8601 from './date-to-iso-8601';
 
 describe('transformDateStringToISO8601', () => {
@@ -22,7 +21,6 @@ describe('transformDateStringToISO8601', () => {
       const invalidDateStrings = ['02/35/2020'];
 
       invalidDateStrings.forEach(dateString => {
-        // @ts-expect-error: intentional invalid argument
         expect(transformDateStringToISO8601(dateString)).toBe(undefined);
       });
     });

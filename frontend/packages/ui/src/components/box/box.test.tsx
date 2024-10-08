@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import { screen } from '@testing-library/react';
-import { customRender } from '../../utils/test-utils';
+import { customRender, screen } from '@onefootprint/test-utils';
 
 import Box from './box';
 import type { BoxProps } from './box.types';

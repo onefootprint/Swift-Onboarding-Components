@@ -1,7 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-// import { Wrapper, renderHook } from '@onefootprint/test-utils'; // Circular dependency
-import { renderHook } from '@testing-library/react';
-import { Wrapper } from '../../utils/test-utils';
+import { Wrapper, renderHook } from '@onefootprint/test-utils';
 
 import useSX from './use-sx';
 

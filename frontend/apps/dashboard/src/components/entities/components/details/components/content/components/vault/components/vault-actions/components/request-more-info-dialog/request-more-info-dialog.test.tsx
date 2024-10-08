@@ -3,6 +3,7 @@ import {
   customRender,
   fireEvent,
   mockRequest,
+  mockRouter,
   screen,
   selectEvents,
   userEvent,
@@ -14,7 +15,6 @@ import {
   withPlaybooks,
 } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
-import mockRouter from 'next-router-mock';
 import type { RequestMoreInfoDialogProps } from './request-more-info-dialog';
 import RequestMoreInfoDialog from './request-more-info-dialog';
 import {

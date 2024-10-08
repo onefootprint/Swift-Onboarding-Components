@@ -1,3 +1,4 @@
+import { Popover } from '@onefootprint/ui';
 import {
   add,
   eachDayOfInterval,
@@ -13,7 +14,6 @@ import { motion } from 'framer-motion';
 import type React from 'react';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import Popover from '../popover/';
 
 import Stack from '../stack';
 import DayButton from './components/day-button';

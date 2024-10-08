@@ -1,8 +1,7 @@
 import '../../config/initializers/i18next-test';
 
-import { customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRequest, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, IdDI, UserTokenScope } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 
 import { Layout } from '../layout';
 import Identify from './identify';

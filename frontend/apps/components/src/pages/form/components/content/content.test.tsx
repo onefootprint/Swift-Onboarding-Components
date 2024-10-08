@@ -1,13 +1,12 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { render, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ProviderReturn } from 'src/components/footprint-provider';
 import FootprintProvider from 'src/components/footprint-provider';
 
-import mockRouter from 'next-router-mock';
 import Loading from '../loading';
 import Content from './content';
 import {

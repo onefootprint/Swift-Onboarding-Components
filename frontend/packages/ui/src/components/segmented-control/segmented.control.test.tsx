@@ -1,9 +1,7 @@
 import '../../config/initializers/i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { customRender } from '../../utils/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 
 import type { SegmentedControlProps } from './segmented-control';
 import SegmentedControl from './segmented-control';

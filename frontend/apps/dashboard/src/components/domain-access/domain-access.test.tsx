@@ -1,6 +1,5 @@
-import { customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRequest, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { Organization } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
 
 import DomainAccess from './domain-access';

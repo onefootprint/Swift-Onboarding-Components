@@ -2,7 +2,7 @@ import type { LogsEvent } from '@datadog/browser-logs';
 import { datadogLogs } from '@datadog/browser-logs';
 import type { RumEvent, RumEventDomainContext } from '@datadog/browser-rum';
 import { datadogRum } from '@datadog/browser-rum';
-import type { RumInitConfiguration } from '@datadog/browser-rum';
+import type { RumInitConfiguration } from '@datadog/browser-rum-core';
 
 type BaseConfig = { applicationId: string; clientToken: string; env: string; service: string };
 

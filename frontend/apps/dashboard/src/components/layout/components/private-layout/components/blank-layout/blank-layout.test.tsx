@@ -1,5 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import type { BlankLayoutProps } from './blank-layout';

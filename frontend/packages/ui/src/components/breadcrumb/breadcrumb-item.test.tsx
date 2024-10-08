@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import { screen } from '@testing-library/react';
-import { customRender } from '../../utils/test-utils';
+import { customRender, screen } from '@onefootprint/test-utils';
 
 import type { BreadcrumbItemProps } from './breadcrumb-item';
 import BreadcrumbItem from './breadcrumb-item';

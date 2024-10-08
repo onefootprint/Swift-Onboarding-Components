@@ -1,6 +1,7 @@
 import {
   MockDate,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -9,7 +10,6 @@ import {
 } from '@onefootprint/test-utils';
 import type { Role } from '@onefootprint/types';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Roles from './roles';

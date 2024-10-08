@@ -1,5 +1,4 @@
-import { customRenderHook } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRenderHook, mockRouter } from '@onefootprint/test-utils';
 
 import useSecurityLogsFilters from './use-security-logs-filters';
 

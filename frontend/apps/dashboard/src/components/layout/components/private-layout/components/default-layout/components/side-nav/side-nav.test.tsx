@@ -1,5 +1,4 @@
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { asAdminUserFirmEmployee, asAdminUserInLive } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 

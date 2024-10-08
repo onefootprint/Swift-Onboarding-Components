@@ -83,7 +83,7 @@
     },
     "test:ci:bun": {
       "cache": false,
-      "dependsOn": ["^build"]
+      "dependsOn": []
     },
     "start": {},
     "lint": {

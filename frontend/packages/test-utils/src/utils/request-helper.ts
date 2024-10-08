@@ -3,9 +3,17 @@ import { rest } from 'msw';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const combineURL = (baseURL: string, relativeURL: string) =>
-  relativeURL ? `${baseURL.replace(/\/+$/, '')}/${relativeURL.replace(/^\/+/, '')}` : baseURL;
+  relativeURL
+    ? `${baseURL.replace(/\/+$/, '')}/${relativeURL.replace(/^\/+/, '')}`
+    : baseURL;
 
-export type RequestMethod = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options';
+export type RequestMethod =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'patch'
+  | 'delete'
+  | 'options';
 
 export type RequestParams = {
   delay?: number;
@@ -14,7 +22,6 @@ export type RequestParams = {
   path: string;
   queryParams?: URLSearchParams;
   statusCode?: number;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   response: any;
   once?: boolean;
   /** Called with information from the mocked request. Can be used to check the HTTP body, headers, and query params in the request. */
@@ -22,7 +29,6 @@ export type RequestParams = {
 };
 
 export type OnRequestCalledArgs = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   body: any;
   headers: Record<string, string>;
   queryParams: URLSearchParams;
@@ -43,8 +49,8 @@ const requestHelper = ({
   const URL = fullPath ? path : combineURL(API_BASE_URL ?? '', path);
   return caller(URL, async (req, res, ctx) => {
     if (queryParams) {
-      const gotParams = new URLSearchParams(req.url.searchParams);
-      const wantParams = new URLSearchParams(queryParams);
+      let gotParams = new URLSearchParams(req.url.searchParams);
+      let wantParams = new URLSearchParams(queryParams);
       gotParams.sort();
       wantParams.sort();
       if (gotParams.toString() !== wantParams.toString()) {

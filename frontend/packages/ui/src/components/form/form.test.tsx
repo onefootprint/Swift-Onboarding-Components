@@ -1,6 +1,5 @@
-import { screen } from '@testing-library/react';
+import { customRender, screen } from '@onefootprint/test-utils';
 import userEvent from '@testing-library/user-event';
-import { customRender } from '../../utils/test-utils';
 import Form from './form';
 import '@testing-library/jest-dom';
 

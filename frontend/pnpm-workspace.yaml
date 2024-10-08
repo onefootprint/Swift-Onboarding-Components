@@ -1,8 +1,0 @@
-packages:
-  - 'apps/**'
-  - 'packages/**'
-
-  # exclude .next projects
-  - '!**/.next**'
-  # # exclude dist projects
-  # - '!**/dist**'

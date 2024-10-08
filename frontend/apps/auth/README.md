@@ -25,7 +25,7 @@ http://localhost:3011/user?variant=modal#tok_TOKEN
 1. **build:analyze**
 
    - Description: Runs the build process with analysis enabled.
-   - Command: `ANALYZE=true pnpm build`
+   - Command: `ANALYZE=true yarn build`
 
 2. **build**
 
@@ -40,7 +40,7 @@ http://localhost:3011/user?variant=modal#tok_TOKEN
 4. **dev**
 
    - Description: Initiates the i18n watch process and starts the Next.js development server on port 3011.
-   - Command: `pnpm i18n:copy-watch & next dev -p 3011`
+   - Command: `yarn i18n:copy-watch & next dev -p 3011`
 
 
 6. **i18n:copy-en**
@@ -91,7 +91,7 @@ http://localhost:3011/user?variant=modal#tok_TOKEN
 
 16. **typecheck**
     - Description: Builds internationalization files and performs TypeScript type checking without emitting files.
-    - Command: `pnpm tsc --noEmit`
+    - Command: `yarn tsc --noEmit`
 
 These are brief explanations of each script's purpose and the corresponding command to execute it. Adjustments can be made based on your specific project requirements.
 

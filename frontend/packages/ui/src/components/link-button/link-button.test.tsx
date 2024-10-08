@@ -1,9 +1,7 @@
 import '../../config/initializers/i18next-test';
 
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { customRender } from '../../utils/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 
 import type { LinkButtonProps } from './link-button';
 import LinkButton from './link-button';

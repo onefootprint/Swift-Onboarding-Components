@@ -1,5 +1,4 @@
-import { customRender, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 
 import Documents from './documents';
 import { entityFixture, withDocuments } from './documents.test.config';

@@ -1,5 +1,5 @@
+import { Text } from '@onefootprint/ui';
 import * as RadixSelect from '@radix-ui/react-select';
-import Text from '../../../text';
 
 type ValueProps = RadixSelect.SelectValueProps;
 

@@ -1,9 +1,7 @@
 import '../../config/initializers/i18next-test';
 
-import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
 import MockDate from 'mockdate';
-import { customRender } from '../../utils/test-utils';
 
 import type { FiltersProps } from './filters';
 import Filters from './filters';

@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'bun:test';
 import isSandboxFixtureNumber from './is-sandbox-fixture-number';
 
 describe('isSandboxFixtureNumber', () => {

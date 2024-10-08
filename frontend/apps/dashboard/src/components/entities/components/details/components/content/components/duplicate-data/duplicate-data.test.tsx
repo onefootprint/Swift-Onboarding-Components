@@ -1,5 +1,5 @@
-import { customRender, screen, waitFor, within } from '@onefootprint/test-utils';
-import mockRouter from 'next-router-mock';
+import { customRender, mockRouter, screen, waitFor, within } from '@onefootprint/test-utils';
+
 import DuplicateData from './duplicate-data';
 import {
   withDuplicateDataEmpty,

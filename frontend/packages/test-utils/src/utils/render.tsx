@@ -37,13 +37,12 @@ export const Wrapper = ({ children }: WrapperProps) => {
   );
 };
 
-export const customRender = (Component?: React.ReactNode): ReturnType<typeof render> => {
+export const customRender = (Component?: React.ReactNode) => {
   throwOnConsoleErrors();
   return render(<Wrapper>{Component}</Wrapper>);
 };
 
 export const customRenderHook = (
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   render: (initialProps: any) => any,
   wrapper?: (props: WrapperProps) => JSX.Element,
 ) => {

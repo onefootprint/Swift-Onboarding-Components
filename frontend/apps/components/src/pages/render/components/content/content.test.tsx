@@ -1,10 +1,9 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { render, screen } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import mockRouter from 'next-router-mock';
 import type { ProviderReturn } from 'src/components/footprint-provider';
 import FootprintProvider from 'src/components/footprint-provider';
 
@@ -60,7 +59,9 @@ describe('<Content />', () => {
 
     it('should show shimmer loading page', async () => {
       renderContent(getMockClient());
-      expect(await screen.findByTestId('init-shimmer')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('init-shimmer')).toBeInTheDocument();
+      });
     });
   });
 
@@ -72,7 +73,9 @@ describe('<Content />', () => {
 
     it('should show shimmer page while still waiting for post messages', async () => {
       renderContent(getMockClient());
-      expect(await screen.findByTestId('init-shimmer')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('init-shimmer')).toBeInTheDocument();
+      });
     });
   });
 
@@ -84,7 +87,9 @@ describe('<Content />', () => {
 
     it('shows rendered data', async () => {
       renderContent(getMockClient());
-      expect(await screen.findByText('Email')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Email')).toBeInTheDocument();
+      });
     });
   });
 
@@ -96,7 +101,9 @@ describe('<Content />', () => {
 
     it('shows invalid page', async () => {
       renderContent(getMockClient());
-      expect(await screen.findByTestId('invalid')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('invalid')).toBeInTheDocument();
+      });
     });
   });
 
@@ -108,7 +115,9 @@ describe('<Content />', () => {
 
     it('should show invalid page', async () => {
       renderContent(getMockClient());
-      expect(await screen.findByTestId('invalid')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('invalid')).toBeInTheDocument();
+      });
     });
   });
 });

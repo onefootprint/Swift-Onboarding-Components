@@ -31,3 +31,4 @@ export {
 } from './utils/request-helper';
 export { selectEvents, filterEvents } from './utils/custom-commands';
 export { default as MockDate } from 'mockdate';
+export { default as mockRouter } from 'next-router-mock';

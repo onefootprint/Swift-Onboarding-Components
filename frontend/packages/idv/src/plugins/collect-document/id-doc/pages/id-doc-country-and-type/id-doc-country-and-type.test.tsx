@@ -1,8 +1,9 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import { act, fireEvent, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
+import { fireEvent, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import noop from 'lodash/noop';
+import { act } from 'react-dom/test-utils';
 
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';

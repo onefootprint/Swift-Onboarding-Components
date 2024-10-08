@@ -1,6 +1,5 @@
-import { customRenderHook, waitFor } from '@onefootprint/test-utils';
+import { customRenderHook, mockRouter, waitFor } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
-import mockRouter from 'next-router-mock';
 
 import useRiskSignalsOverview from './use-risk-signals-overview';
 import { createRiskSignal, withRiskSignals } from './use-risk-signals-overview.test.config';
