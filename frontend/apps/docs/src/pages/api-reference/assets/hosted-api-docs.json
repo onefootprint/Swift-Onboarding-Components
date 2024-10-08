@@ -3789,6 +3789,9 @@
                             "requires_id_doc": {
                                 "type": "boolean"
                             },
+                            "skip_confirm": {
+                                "type": "boolean"
+                            },
                             "status": {
                                 "type": "string",
                                 "enum": [
@@ -4080,6 +4083,7 @@
                             "org_id",
                             "org_name",
                             "requires_id_doc",
+                            "skip_confirm",
                             "status",
                             "supported_countries"
                         ]
@@ -4207,6 +4211,9 @@
                             "requires_id_doc": {
                                 "type": "boolean"
                             },
+                            "skip_confirm": {
+                                "type": "boolean"
+                            },
                             "status": {
                                 "type": "string",
                                 "enum": [
@@ -4498,6 +4505,7 @@
                             "org_id",
                             "org_name",
                             "requires_id_doc",
+                            "skip_confirm",
                             "status",
                             "supported_countries"
                         ]
@@ -4635,6 +4643,9 @@
                         }
                     },
                     "requires_id_doc": {
+                        "type": "boolean"
+                    },
+                    "skip_confirm": {
                         "type": "boolean"
                     },
                     "status": {
@@ -4928,6 +4939,7 @@
                     "org_id",
                     "org_name",
                     "requires_id_doc",
+                    "skip_confirm",
                     "status",
                     "supported_countries"
                 ]

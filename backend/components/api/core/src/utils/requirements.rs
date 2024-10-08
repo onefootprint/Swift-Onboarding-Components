@@ -349,15 +349,9 @@ pub fn get_requirements_inner(
                     // Omit the confirm screen when the workflow is entirely completed
                     return false;
                 }
-                if r.is_met() {
-                    if is_stepup {
-                        // Omit the confirm screen when an alpaca user is in step up
-                        return false;
-                    }
-                    if obc.skip_confirm {
-                        // Omit the confirm screen when the obc prefers it
-                        return false;
-                    }
+                if r.is_met() && is_stepup {
+                    // Omit the confirm screen when an alpaca user is in step up
+                    return false;
                 }
             }
             if kind == OnboardingRequirementKind::CollectBusinessData && r.is_met() && entity_info.is_secondary_bo {

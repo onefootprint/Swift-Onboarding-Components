@@ -52,7 +52,6 @@ def test_decisions(sandbox_tenant, must_collect_data):
         documents_to_collect=[dict(kind="proof_of_ssn", data=dict())],
         kind="document",
         skip_kyc=True,
-        skip_confirm=True,
     )
     bifrost = bifrost_client_for(
         user, sandbox_tenant, doc_obc, fixture_result="use_rules_outcome"

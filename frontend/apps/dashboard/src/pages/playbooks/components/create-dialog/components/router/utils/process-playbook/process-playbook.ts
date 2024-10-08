@@ -68,7 +68,7 @@ const processPlaybook = ({
     name: createNamePayload(nameForm),
     optionalData,
     requiredAuthMethods: createRequiredAuthMethodsPayload(playbook),
-    skipConfirm: createSkipConfirmPayload(kind),
+    skipConfirm: false,
     skipKyc: createShouldSkipKyc(skipKyc || false, playbook),
     verificationChecks: createVerificationChecksPayload({ kind, verificationChecks }),
   };
@@ -342,9 +342,6 @@ const createVerificationChecksPayload = ({
     ];
   }
   return null;
-};
-const createSkipConfirmPayload = (kind: PlaybookKind) => {
-  return isDocOnly(kind);
 };
 
 export default processPlaybook;

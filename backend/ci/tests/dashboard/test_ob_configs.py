@@ -348,7 +348,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="document",
                 skip_kyc=True,
-                skip_confirm=True,
             ),
             "Validation error: Playbooks of kind document cannot collect name",
         ),
@@ -358,19 +357,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=[],
                 can_access_data=[],
                 kind="document",
-                skip_kyc=True,
-                skip_confirm=False,
-            ),
-            "Playbook of kind document must skip confirm",
-        ),
-        (
-            dict(
-                must_collect_data=["document.drivers_license.none.none"],
-                optional_data=[],
-                can_access_data=[],
-                kind="document",
                 skip_kyc=False,
-                skip_confirm=True,
             ),
             "Playbook of kind document must skip KYC",
         ),
@@ -381,7 +368,6 @@ def test_config_create(sandbox_tenant):
                 optional_data=[],
                 can_access_data=[],
                 kind="document",
-                skip_confirm=True,
                 verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Playbook of kind document must skip KYC",
@@ -402,7 +388,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
-                skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=True,
                     ofac=True,
@@ -428,7 +413,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
-                skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=True,
                     ofac=True,
@@ -454,7 +438,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
-                skip_confirm=True,
                 allow_us_residents=True,
                 allow_us_territories=True,
                 verification_checks=[
@@ -488,7 +471,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
-                skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=True,
                     ofac=True,
@@ -515,7 +497,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
-                skip_confirm=True,
                 allow_us_residents=True,
                 allow_us_territories=False,
                 verification_checks=[
@@ -548,7 +529,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
-                skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=True,
                     ofac=True,
@@ -575,7 +555,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
-                skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=True,
                     ofac=True,
@@ -614,7 +593,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
-                skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=False,
                     ofac=False,
@@ -641,7 +619,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
-                skip_confirm=True,
                 allow_us_residents=True,
                 allow_us_territories=True,
                 verification_checks=[{"kind": "kyc", "data": {}}],  # no AML check
@@ -656,7 +633,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind=None,
                 skip_kyc=False,
-                skip_confirm=False,
                 enhanced_aml=dict(
                     enhanced_aml=False,
                     ofac=False,
@@ -685,7 +661,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind=None,
-                skip_confirm=False,
                 allow_us_residents=False,
                 allow_us_territories=False,
                 documents_to_collect=[
@@ -709,7 +684,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind=None,
                 skip_kyc=False,
-                skip_confirm=False,
                 enhanced_aml=dict(
                     enhanced_aml=False,
                     ofac=False,
@@ -738,7 +712,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind=None,
-                skip_confirm=False,
                 allow_us_residents=True,
                 allow_us_territories=False,
                 business_documents_to_collect=[
@@ -839,7 +812,6 @@ def test_doc_only(sandbox_tenant):
         can_access_data=collect_data,
         kind="document",
         skip_kyc=True,
-        skip_confirm=True,
         document_types_and_countries={
             "global": ["passport"],
             "country_specific": {"US": ["drivers_license"]},
@@ -1295,7 +1267,6 @@ def test_copy_playbook(
         ["name", "full_address", "email", "phone_number", "nationality", "ssn4"],
         optional_data=["ssn9"],
         is_doc_first_flow=True,
-        skip_confirm=True,
         documents_to_collect=[dict(kind="proof_of_address", data=dict())],
     )
     # Add a rule to this obc

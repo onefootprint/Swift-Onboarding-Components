@@ -83,8 +83,8 @@ pub struct ObConfiguration {
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
-    /// When true on a KYC or KYB playbook, allows skipping confirm screen.
-    /// Will still collect all data if it's missing, but skips confirm.
+    /// When true on a KYC or KYB playbook, allows skipping confirm screen after data is collected.
+    /// Serializes this flag to the frontend which decides whether to show the confirm screen.
     pub skip_confirm: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     /// The list of additional non-identity documents to be collected by this playbook.

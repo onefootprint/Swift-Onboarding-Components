@@ -205,11 +205,9 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
         sandbox_tenant,
         "Doc request config",
         [],
-        [],
         kind="document",
         documents_to_collect=[dict(kind="proof_of_address", data=dict())],
         skip_kyc=True,
-        skip_confirm=True,
     )
     body = get(
         f"org/onboarding_configs/{doc_playbook.id}/rules",
@@ -229,6 +227,29 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     # The status of the user should remain unchanged
     body = get(f"users/{user.fp_id}", None, sandbox_tenant.s_sk)
     assert body["status"] == initial_fixture_result
+
+
+def test_document_playbook_no_collect_data_requirement(sandbox_tenant):
+    """
+    Test that onboardings onto a document playbook never serialize a collect_data requirement.
+    """
+    doc_playbook = create_ob_config(
+        sandbox_tenant,
+        "Doc request config",
+        [],
+        kind="document",
+        documents_to_collect=[dict(kind="proof_of_address", data=dict())],
+        skip_kyc=True,
+    )
+    bifrost = BifrostClient.new_user(doc_playbook)
+    bifrost.run()
+    # No collect_data requirement
+    assert [r["kind"] for r in bifrost.handled_requirements] == [
+        "liveness",
+        "collect_document",
+        "process",
+    ]
+    assert [r["kind"] for r in bifrost.already_met_requirements] == ["authorize"]
 
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(

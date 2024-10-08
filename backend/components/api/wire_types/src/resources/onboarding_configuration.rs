@@ -33,11 +33,11 @@ pub struct OnboardingConfiguration {
     pub allow_us_territory_residents: bool,
     pub is_no_phone_flow: bool,
     pub is_doc_first_flow: bool,
+    pub skip_confirm: bool,
     pub author: Option<Actor>,
     // TODO: remove this since migrated to verification checks
     pub skip_kyc: bool,
     pub skip_kyb: bool,
-    pub skip_confirm: bool,
     pub enhanced_aml: EnhancedAml,
     pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
     pub kind: ObConfigurationKind,
@@ -79,6 +79,7 @@ pub struct PublicOnboardingConfiguration {
     pub doc_scan_required_if_ssn_skipped: Option<bool>,
 
     pub is_no_phone_flow: bool,
+    pub skip_confirm: bool,
     pub requires_id_doc: bool,
     pub can_make_real_doc_scan_calls_in_sandbox: bool,
     pub is_kyb: bool,

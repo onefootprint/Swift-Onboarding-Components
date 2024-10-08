@@ -1,0 +1,2 @@
+-- This flag was previously only set for document playbooks. But for document playbooks, it didn't matter whether this value was true or false.
+UPDATE ob_configuration SET skip_confirm = 'f' WHERE kind = 'document';

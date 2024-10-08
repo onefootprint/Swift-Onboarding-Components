@@ -357,7 +357,6 @@ def create_ob_config(
     doc_scan_for_optional_ssn=None,
     kind=None,
     override_auths=None,
-    skip_confirm=None,
     enhanced_aml=None,
     document_types_and_countries=None,  # TODO: argoff fix this, not what the FE uses as the default
     documents_to_collect=None,
@@ -391,7 +390,6 @@ def create_ob_config(
         "international_country_restrictions": international_country_restrictions,
         "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
         "kind": kind,
-        "skip_confirm": skip_confirm,
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
         "documents_to_collect": documents_to_collect or [],

@@ -309,13 +309,8 @@ impl ObConfigurationArgsToValidate {
         }
 
         // Document playbooks must not run KYC
-        if self.kind == ObConfigurationKind::Document {
-            if !self.verification_checks.skip_kyc() {
-                return Err(ValidationError("Playbook of kind document must skip KYC").into());
-            }
-            if !self.skip_confirm {
-                return Err(ValidationError("Playbook of kind document must skip confirm").into());
-            }
+        if self.kind == ObConfigurationKind::Document && !self.verification_checks.skip_kyc() {
+            return Err(ValidationError("Playbook of kind document must skip KYC").into());
         }
 
         // KYB playbooks have some additional rules around collecting KYC data
