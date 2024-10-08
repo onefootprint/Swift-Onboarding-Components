@@ -337,14 +337,16 @@ export type CardDI<T extends string = string> =
   | `card.${T}.${CardDIField.expirationMonth}`
   | `card.${T}.${CardDIField.expirationYear}`
   | `card.${T}.${CardDIField.zip}`
-  | `card.${T}.${CardDIField.country}`;
+  | `card.${T}.${CardDIField.country}`
+  | `card.${T}.${CardDIField.fingerprint}`;
 
 export type BankDI<T extends string = string> =
   | `bank.${T}.${BankDIField.name}`
   | `bank.${T}.${BankDIField.accountType}`
   | `bank.${T}.${BankDIField.routingNumber}`
   | `bank.${T}.${BankDIField.accountNumber}`
-  | `bank.${T}.${BankDIField.accountId}`;
+  | `bank.${T}.${BankDIField.accountId}`
+  | `bank.${T}.${BankDIField.fingerprint}`;
 
 export type CustomDocumentIdentifier<T extends string = string> = `document.custom.${T}`;
 
