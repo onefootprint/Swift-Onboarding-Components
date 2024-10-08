@@ -19,7 +19,6 @@ use newtypes::BusinessDataKind as BDK;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
-use strum::IntoEnumIterator;
 
 #[api_v2_operation(
     description = "Retrieve business insights for a given fp_bid.",
@@ -31,8 +30,7 @@ pub async fn get_business_insights(
     request: FpIdPath,
     auth: TenantSessionAuth,
 ) -> ApiResponse<BusinessInsights> {
-    let dis = BDK::iter().collect();
-    let auth = auth.check_guard(CanDecrypt::new(dis))?;
+    let auth = auth.check_guard(CanDecrypt::new(BDK::non_bo_variants()))?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

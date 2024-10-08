@@ -774,8 +774,10 @@ pub struct MiddeskResponseDerivedVaultData {
     data_request: FingerprintedDataRequest,
 }
 impl MiddeskResponseDerivedVaultData {
-    pub const DATA_KINDS: &'static [BusinessDataKind] =
-        &[BusinessDataKind::FormationState, BusinessDataKind::FormationDate];
+    pub const DATA_KINDS: &'static [DataIdentifier] = &[
+        DataIdentifier::Business(BusinessDataKind::FormationState),
+        DataIdentifier::Business(BusinessDataKind::FormationDate),
+    ];
 
     pub async fn create(
         state: &State,
@@ -828,16 +830,12 @@ impl MiddeskResponseDerivedVaultData {
     }
 
     pub fn write(self, conn: &mut TxnPgConn) -> FpResult<()> {
-        let dis = Self::DATA_KINDS
-            .iter()
-            .map(|bdk| DataIdentifier::Business(*bdk))
-            .collect();
-
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &self.scoped_vault_id)?;
 
         let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
 
         // Clear all derived data kinds
+        let dis = Self::DATA_KINDS.to_vec();
         DataLifetime::bulk_deactivate_kinds(conn, &sv_txn, dis)?;
 
         // note: there is an edge case here where the formation is null which

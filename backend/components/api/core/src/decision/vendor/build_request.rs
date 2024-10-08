@@ -242,8 +242,8 @@ pub async fn build_business_data_from_verification_request(
 
 
     // Get remaining Business vault data
-    let all_bdks: Vec<_> = BDK::iter()
-        .filter(|b| !matches!(b, BDK::BeneficialOwners | BDK::KycedBeneficialOwners))
+    let all_bdks: Vec<_> = BDK::non_bo_variants()
+        .into_iter()
         .map(DataIdentifier::from)
         .collect();
     let mut decrypted_values = bvw.decrypt_unchecked(&state.enclave_client, &all_bdks).await?;

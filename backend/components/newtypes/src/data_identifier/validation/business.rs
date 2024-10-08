@@ -1,7 +1,5 @@
+use super::utils;
 use super::utils::validate_state;
-use super::utils::{
-    self,
-};
 use super::Error;
 use super::VResult;
 use crate::email::Email;
@@ -10,12 +8,14 @@ use crate::BoLinkId;
 use crate::BusinessDataKind as BDK;
 use crate::BusinessOwnerKind;
 use crate::CleanAndValidate;
+use crate::DataIdentifier;
 use crate::DataIdentifierValue;
 use crate::NtResult;
 use crate::PhoneNumber;
 use crate::PiiJsonValue;
 use crate::PiiString;
 use crate::ValidateArgs;
+use crate::ValidationError;
 use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
@@ -33,7 +33,7 @@ impl CleanAndValidate for BDK {
         args: ValidateArgs,
         all_data: &AllData,
     ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
-        let value = match self {
+        let value = match &self {
             BDK::Name => value.as_string()?,
             BDK::Dba => value.as_string()?,
             BDK::Website => clean_and_validate_website(value.as_string()?)?,
@@ -47,6 +47,9 @@ impl CleanAndValidate for BDK {
             BDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
             BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value, args)?,
+            BDK::BeneficialOwnerData(_, di) => {
+                clean_and_validate_beneficial_owner_data(*di.clone(), args, value, all_data)?
+            }
             BDK::CorporationType => utils::parse_enum::<CorporationType>(value.as_string()?)?,
             BDK::FormationState => {
                 utils::validate_state(value.as_string()?, all_data.get(&BDK::Country.into()))?
@@ -61,6 +64,20 @@ impl CleanAndValidate for BDK {
             parsed: (),
         })
     }
+}
+
+fn clean_and_validate_beneficial_owner_data(
+    di: DataIdentifier,
+    args: ValidateArgs,
+    input: PiiJsonValue,
+    all_data: &AllData,
+) -> NtResult<PiiString> {
+    let can_vault_bo_data = matches!(di, DataIdentifier::Id(_) | DataIdentifier::Custom(_));
+    if !can_vault_bo_data {
+        return Err(ValidationError("Cannot vault this kind of beneficial owner data").into());
+    }
+    let DataIdentifierValue { value, .. } = di.clean_and_validate(input, args, all_data)?;
+    Ok(value)
 }
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]

@@ -90,6 +90,7 @@ pub async fn id(
     .await
 }
 
+#[allow(clippy::large_enum_variant)]
 enum ProxySource {
     Id(ProxyConfigId, ProxyHeaderParams),
     JustInTime(ProxyConfig),

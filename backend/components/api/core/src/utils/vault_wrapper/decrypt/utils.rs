@@ -124,6 +124,9 @@ impl TenantVw<Business> {
         } else if let Some(vault_bos) = decrypted.remove(&BDK::BeneficialOwners.into()) {
             // We should stop hitting this branch because every backfilled user will have
             // KycedBeneficialOwners
+            tracing::info!(
+                "Decrypting business.beneficial_owners instead of business.kyced_beneficial_owners"
+            );
 
             // Either bifrost-initiated flow or API-initiated flow. There will be at most one linked BO (for
             // bifrost)

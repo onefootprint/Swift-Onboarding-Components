@@ -425,6 +425,7 @@ impl_enum_string_diesel!(DataIdentifier);
 mod tests {
     use super::*;
     use crate::AliasId;
+    use crate::BoLinkId;
     use crate::DocumentSide;
     use crate::IdDocKind;
     use itertools::Itertools;
@@ -437,6 +438,9 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwners) => "business.beneficial_owners")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Id(IdentityDataKind::FirstName)))) => "business.beneficial_owners.link_id.id.first_name")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned()))))) => "business.beneficial_owners.link_id.custom.flerp")]
     #[test_case(DataIdentifier::Document(DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.image")]
     #[test_case(DataIdentifier::Document(DocumentDiKind::MimeType(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.mime_type")]
     #[test_case(DataIdentifier::Document(DocumentDiKind::LatestUpload(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.latest_upload")]
@@ -455,6 +459,9 @@ mod tests {
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
+    #[test_case("business.beneficial_owners" => DataIdentifier::Business(BusinessDataKind::BeneficialOwners))]
+    #[test_case("business.beneficial_owners.link_id.id.first_name" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Id(IdentityDataKind::FirstName)))))]
+    #[test_case("business.beneficial_owners.link_id.custom.flerp" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned()))))))]
     #[test_case("document.drivers_license.front.image" => DataIdentifier::Document(DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front)))]
     #[test_case("document.drivers_license.front.mime_type" => DataIdentifier::Document(DocumentDiKind::MimeType(IdDocKind::DriversLicense, DocumentSide::Front)))]
     #[test_case("document.drivers_license.front.latest_upload" => DataIdentifier::Document(DocumentDiKind::LatestUpload(IdDocKind::DriversLicense, DocumentSide::Front)))]
@@ -490,7 +497,10 @@ mod tests {
                 .map(DataIdentifier::from)
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            BusinessDataKind::non_bo_variants()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
             CardInfo::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)
@@ -532,7 +542,10 @@ mod tests {
                 .map(DataIdentifier::from)
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            BusinessDataKind::non_bo_variants()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
             DocumentDiKind::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)

@@ -17,7 +17,7 @@ impl ImplDisplayGuardError for UserAuthScope {}
 
 fn can_decrypt(di: &DataIdentifier, token_scopes: &[UserAuthScope]) -> bool {
     match di {
-        DataIdentifier::Id(id) => match id {
+        DataIdentifier::Id(idk) => match idk {
             IDK::PhoneNumber | IDK::Email | IDK::VerifiedPhoneNumber | IDK::VerifiedEmail => {
                 UserAuthScope::BasicProfile
                     .or(UserAuthScope::SignUp)
@@ -71,6 +71,8 @@ fn can_decrypt(di: &DataIdentifier, token_scopes: &[UserAuthScope]) -> bool {
                     .is_met(token_scopes)
             }
             BDK::Tin => UserAuthScope::SensitiveProfile.is_met(token_scopes),
+            // Use normal DI permissions when decrypting beneficial owner data
+            BDK::BeneficialOwnerData(_, di) => can_decrypt(di, token_scopes),
         },
         DataIdentifier::InvestorProfile(_) => true,
         // We don't allow decrypting business data with a user auth token right now - we
