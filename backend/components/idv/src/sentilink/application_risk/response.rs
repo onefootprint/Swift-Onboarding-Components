@@ -11,7 +11,7 @@ use serde::Serialize;
 use std::str::FromStr;
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ApplicationRiskResponse {
     pub application_id: String,
     pub customer_id: String,
@@ -67,7 +67,7 @@ pub struct ValidatedApplicationRiskResponse {
 }
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum ScoreResult {
     Score(Score),
@@ -83,7 +83,7 @@ pub struct Score {
     pub reason_codes: Vec<ReasonCode>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ScoreError {
     // A list of error messages. errors is an optional field that is only present when a requested score
     // cannot be calculated.

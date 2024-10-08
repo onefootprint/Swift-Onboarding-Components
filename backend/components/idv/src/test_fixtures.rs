@@ -7145,3 +7145,67 @@ pub fn samba_license_validation_pass() -> serde_json::Value {
       }
     })
 }
+
+pub struct SentilinkTestOpts {
+    pub synthetic_score: Option<i32>,
+    pub id_theft_score: Option<i32>,
+}
+pub fn sentilink_result(opts: SentilinkTestOpts) -> serde_json::Value {
+    serde_json::json!({
+        "application_id": "APP-10848",
+        "customer_id": "01J7GYCK7XH7CSZXS2H106D9FA",
+        "environment": "SANDBOX",
+        "latency_ms": 156,
+        "response_status": "SUCCESS",
+        "sentilink_id_theft_score": {
+            "reason_codes": [
+                {
+                    "code": "R034",
+                    "direction": "more_fraudy",
+                    "explanation": "Length of history of the email",
+                    "rank": 1
+                },
+                {
+                    "code": "R029",
+                    "direction": "less_fraudy",
+                    "explanation": "Whether the applicant appears to be the best owner of the phone",
+                    "rank": 2
+                },
+                {
+                    "code": "R021",
+                    "direction": "more_fraudy",
+                    "explanation": "Whether the supplied phone number corresponds to a risky carrier or line type",
+                    "rank": 3
+                }
+            ],
+            "score": opts.id_theft_score.unwrap_or(400),
+            "version": "1.7.2"
+        },
+        "sentilink_synthetic_score": {
+            "reason_codes": [
+                {
+                    "code": "R000",
+                    "direction": "more_fraudy",
+                    "explanation": "Whether the supplied name or SSN is nonsense",
+                    "rank": 1
+                },
+                {
+                    "code": "R008",
+                    "direction": "more_fraudy",
+                    "explanation": "Whether the SSN is tied to a clump of SSNs empirically used for fraud",
+                    "rank": 2
+                },
+                {
+                    "code": "R004",
+                    "direction": "more_fraudy",
+                    "explanation": "Whether the supplied SSN aligns with the consumer's DOB",
+                    "rank": 3
+                }
+            ],
+            "score": opts.synthetic_score.unwrap_or(400),
+            "version": "1.8.1"
+        },
+        "timestamp": "2024-09-19T18:47:53.962217803Z",
+        "transaction_id": "01J85SSE-PAPV-04P4RHED"
+    })
+}

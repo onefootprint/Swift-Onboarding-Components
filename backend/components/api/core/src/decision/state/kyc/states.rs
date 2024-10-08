@@ -269,7 +269,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .verification_checks()
             .is_enabled(VerificationCheckKind::Sentilink)
         {
-            match common::run_application_risk(state, &self.wf_id).await {
+            match common::run_application_risk(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
                     tracing::warn!(?err, wf_id=?self.wf_id, "error running sentilink");

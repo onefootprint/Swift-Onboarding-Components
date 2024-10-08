@@ -1,3 +1,4 @@
+use super::vendor::into_fp_error;
 use super::vendor::vendor_result::VendorResult;
 use super::vendor::{
     self,
@@ -18,7 +19,12 @@ use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroAPIResult;
 use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use idv::sentilink::application_risk::response::ApplicationRiskResponse;
+use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
+use idv::sentilink::SentilinkAPIResponse;
+use idv::sentilink::SentilinkAPIResult;
 use idv::test_fixtures::NeuroTestOpts;
+use idv::test_fixtures::SentilinkTestOpts;
 use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::CipKind;
@@ -352,6 +358,47 @@ pub async fn save_fixture_neuro_result(
     let neuro_id = NeuroIdentityId::from(wf_id.clone());
     save_neuro_event(state, &parsed, t_id, neuro_id, sv_id, wf_id, &vres_id).await?;
     Ok(Some((parsed, vres_id)))
+}
+
+pub async fn save_fixture_sentilink_result(
+    state: &State,
+    fixture_result: WorkflowFixtureResult,
+    di_id: &DecisionIntentId,
+    sv_id: &ScopedVaultId,
+    vault_public_key: &VaultPublicKey,
+) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
+    let opts = match fixture_result {
+        WorkflowFixtureResult::Fail => SentilinkTestOpts {
+            synthetic_score: Some(970),
+            id_theft_score: Some(200),
+        },
+        WorkflowFixtureResult::Pass
+        | WorkflowFixtureResult::ManualReview
+        | WorkflowFixtureResult::StepUp
+        | WorkflowFixtureResult::UseRulesOutcome => SentilinkTestOpts {
+            synthetic_score: Some(200),
+            id_theft_score: Some(100),
+        },
+    };
+    let raw_resp = idv::test_fixtures::sentilink_result(opts);
+
+    let parsed = serde_json::from_value::<ApplicationRiskResponse>(raw_resp.clone())?;
+    let request_result = Ok(SentilinkAPIResponse {
+        result: SentilinkAPIResult::Success(parsed.clone()),
+        raw_response: raw_resp.into(),
+    });
+
+    let args = SaveVerificationResultArgs::new_for_sentilink(
+        &request_result,
+        di_id.clone(),
+        sv_id.clone(),
+        vault_public_key.clone(),
+        VendorAPI::SentilinkApplicationRisk,
+    );
+
+    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let validated = parsed.validate().map_err(into_fp_error)?;
+    Ok(Some((validated, vres_id)))
 }
 
 #[cfg(test)]

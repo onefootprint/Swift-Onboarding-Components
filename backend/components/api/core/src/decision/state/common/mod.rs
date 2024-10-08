@@ -147,22 +147,37 @@ pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> FpResult<Optio
 pub async fn run_application_risk(
     state: &State,
     wf_id: &WorkflowId,
+    tenant_id: &TenantId,
 ) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
-    let (wf, di) = state
+    let (wf, di, v) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
                 &wf.scoped_vault_id,
                 &wfid,
                 DecisionIntentKind::OnboardingKyc,
             )?;
-            Ok((wf, di))
+            Ok((wf, di, v))
         })
         .await?;
-    run_sentilink_application_risk(state, &di, &wf.id).await
+
+    let ff_client = state.ff_client.clone();
+    let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, tenant_id)?;
+    if let Some(fixture_result) = fixture_result {
+        decision::sandbox::save_fixture_sentilink_result(
+            state,
+            fixture_result,
+            &di.id,
+            &wf.scoped_vault_id,
+            &v.public_key,
+        )
+        .await
+    } else {
+        run_sentilink_application_risk(state, &di, &wf.id).await
+    }
 }
 
 #[tracing::instrument(skip(state))]
