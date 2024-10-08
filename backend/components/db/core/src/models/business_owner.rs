@@ -38,7 +38,6 @@ pub struct BusinessOwner {
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub source: BusinessOwnerSource,
-    /// Only set for BOs linked via API
     pub ownership_stake: Option<i32>,
 }
 
@@ -52,6 +51,11 @@ struct NewBusinessOwnerRow {
     created_at: DateTime<Utc>,
     source: BusinessOwnerSource,
     ownership_stake: Option<i32>,
+}
+
+pub struct NewSecondaryBo {
+    pub link_id: BoLinkId,
+    pub ownership_stake: i32,
 }
 
 pub type UserData = (ScopedVault, Vault);
@@ -81,19 +85,25 @@ impl BusinessOwner {
     #[tracing::instrument("BusinessOwner::bulk_create_secondary", skip_all)]
     pub fn bulk_create_secondary(
         conn: &mut TxnPgConn,
-        link_ids: Vec<BoLinkId>,
+        bos: Vec<NewSecondaryBo>,
         business_vault_id: VaultId,
     ) -> DbResult<Vec<Self>> {
-        let rows = link_ids
+        let rows = bos
             .into_iter()
-            .map(|link_id| NewBusinessOwnerRow {
-                user_vault_id: None,
-                business_vault_id: business_vault_id.clone(),
-                kind: BusinessOwnerKind::Secondary,
-                link_id,
-                created_at: Utc::now(),
-                source: BusinessOwnerSource::Hosted,
-                ownership_stake: None,
+            .map(|bo| {
+                let NewSecondaryBo {
+                    link_id,
+                    ownership_stake,
+                } = bo;
+                NewBusinessOwnerRow {
+                    user_vault_id: None,
+                    business_vault_id: business_vault_id.clone(),
+                    kind: BusinessOwnerKind::Secondary,
+                    link_id,
+                    created_at: Utc::now(),
+                    source: BusinessOwnerSource::Hosted,
+                    ownership_stake: Some(ownership_stake),
+                }
             })
             .collect_vec();
         let result = diesel::insert_into(business_owner::table)
