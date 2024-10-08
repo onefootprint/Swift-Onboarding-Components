@@ -522,6 +522,8 @@ impl VaultDrWriter {
         svvs: Vec<ScopedVaultVersion>,
         write_latest_manifests: bool,
     ) -> FpResult<Vec<NewVaultDrManifest>> {
+        let expected_manifest_count = svvs.len();
+
         let concurrency_limit = self.knobs.manifest_task_concurrency;
         tracing::info!(
             config_id=%self.config_id,
@@ -567,11 +569,20 @@ impl VaultDrWriter {
             .into_iter()
             .collect::<FpResult<Vec<_>>>()?;
 
+        let manifest_count = new_manifests.len();
+        if manifest_count != expected_manifest_count {
+            return AssertionError(&format!(
+                "Expected {} manifests to be written, but {} were written",
+                expected_manifest_count, manifest_count,
+            ))
+            .into();
+        }
+
         tracing::info!(
             config_id=%self.config_id,
             tenant_id=%self.tenant_id,
             is_live,
-            manifest_count = new_manifests.len(),
+            manifest_count,
             concurrency_limit,
             "Wrote batch of vault manifests to S3"
         );
@@ -618,14 +629,17 @@ impl VaultDrWriter {
             .into_iter()
             .map(|(sv, _)| (sv.id, sv.fp_id))
             .collect();
+
         let svv_id_to_fp_id: HashMap<_, _> = svvs
             .iter()
-            .filter_map(|svv| {
-                sv_id_to_fp_id
+            .map(|svv| -> FpResult<_> {
+                let fp_id = sv_id_to_fp_id
                     .get(&svv.scoped_vault_id)
-                    .map(|fp_id| (svv.id.clone(), fp_id.clone()))
+                    .ok_or(AssertionError("sv_id not in sv_id_to_fp_id"))?;
+                Ok((svv.id.clone(), fp_id.clone()))
             })
-            .collect();
+            .collect::<FpResult<HashMap<_, _>>>()?;
+
         let svvs_by_id: HashMap<_, _> = svvs.into_iter().map(|svv| (svv.id.clone(), svv)).collect();
 
         let manifest_stream =

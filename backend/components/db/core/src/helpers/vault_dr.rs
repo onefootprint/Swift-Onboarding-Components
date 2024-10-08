@@ -336,6 +336,8 @@ pub fn incorrect_get_vault_dr_scoped_vault_version_batch(
 #[derive(Debug, Clone, derive_more::From, derive_more::Into)]
 pub struct VdrBlobKey(String);
 
+/// Returns a map from the given SVV IDs to the DIs and corresponding blob keys for the DLs active
+/// at each SVV. If no DLs are active at an SVV for the vault, the map values will be empty.
 #[tracing::instrument(skip_all)]
 pub fn bulk_get_vdr_blob_keys_active_at(
     conn: &mut PgConn,
@@ -360,14 +362,14 @@ pub fn bulk_get_vdr_blob_keys_active_at(
                 .eq(data_lifetime::id)
                 .and(vault_dr_blob::config_id.eq(config_id))),
         )
-        .filter(scoped_vault_version::id.eq_any(svv_ids))
+        .filter(scoped_vault_version::id.eq_any(&svv_ids))
         .select((
             scoped_vault_version::id,
             (data_lifetime::kind, vault_dr_blob::bucket_path),
         ))
         .load(conn)?;
 
-    let grouped = svvid_di_blobkey
+    let mut grouped: HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>> = svvid_di_blobkey
         .into_iter()
         .into_group_map()
         .into_iter()
@@ -379,6 +381,12 @@ pub fn bulk_get_vdr_blob_keys_active_at(
             (svv_id, di_to_blobkey)
         })
         .collect();
+
+    for svv_id in svv_ids {
+        if !grouped.contains_key(svv_id) {
+            grouped.insert(svv_id.clone(), HashMap::new());
+        }
+    }
 
     Ok(grouped)
 }
