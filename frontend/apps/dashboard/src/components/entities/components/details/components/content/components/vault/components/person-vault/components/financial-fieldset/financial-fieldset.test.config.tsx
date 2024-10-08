@@ -1,5 +1,5 @@
 import withEntity from '@/entity/components/with-entity';
-import { customRender } from '@onefootprint/test-utils';
+import { customRender, mockRequest } from '@onefootprint/test-utils';
 import type {
   DataIdentifier,
   Entity,
@@ -65,5 +65,15 @@ export const renderFinancialFieldset = ({ entity }: { entity?: Entity } = {}) =>
   const mockEntity = entity || bothEntity;
   (useCurrentEntity as jest.Mock).mockReturnValue({ data: mockEntity });
   const WrappedFinancialFieldset = withEntity(InternalFinancialFieldset);
+
+  mockRequest({
+    path: `/entities/${mockEntity.id}/dupes`,
+    method: 'get',
+    response: {
+      sameTenant: [],
+      otherTenants: [],
+    },
+  });
+
   customRender(<WrappedFinancialFieldset />);
 };

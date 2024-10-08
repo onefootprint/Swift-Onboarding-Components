@@ -81,7 +81,6 @@ describe('<CardSelector />', () => {
 
     const dropdownTrigger = screen.getByRole('combobox');
     await userEvent.click(dropdownTrigger);
-    screen.debug(undefined, 30000);
 
     const businessCard = await screen.findByText('•••• 1234 (Business)');
     expect(businessCard).toBeInTheDocument();

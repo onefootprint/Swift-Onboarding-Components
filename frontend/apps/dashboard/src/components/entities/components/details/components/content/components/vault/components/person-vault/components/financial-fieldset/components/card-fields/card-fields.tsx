@@ -2,6 +2,7 @@ import type { DataIdentifier, Entity, EntityCard, VaultValue } from '@onefootpri
 import { Divider, Stack } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import useEntityDuplicateData from 'src/components/entities/components/details/hooks/use-entity-duplicate-data';
 import { getCardDis } from 'src/components/entities/utils/get-dis';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import getCards from '../../../../../../utils/get-cards';
@@ -9,6 +10,7 @@ import type { DiField } from '../../../../../../vault.types';
 import Field from '../../../../../field';
 import useGetCardIssuer from '../../utils/use-get-card-issuer';
 import useGetTranslationWithoutAlias from '../../utils/use-get-translation-without-alias';
+import CardDuplicateDrawer from './components/card-duplicate-drawer';
 import CardSelector from './components/card-selector';
 
 export type CardFieldsProps = {
@@ -19,10 +21,17 @@ export type CardFieldsProps = {
 const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
   const getCardIssuer = useGetCardIssuer();
+  const { data: duplicateData } = useEntityDuplicateData(entity.id);
+
   const cards: EntityCard[] = getCards(entity);
   const [selectedCard, setSelectedCard] = useState<EntityCard | undefined>(cards.length > 0 ? cards[0] : undefined);
+  const [duplicateDrawerOpen, setDuplicateDrawerOpen] = useState(false);
   const dis = getCardDis(entity.attributes, selectedCard?.alias);
   const fields = dis.map(di => ({ di }));
+
+  const closeDuplicateDataDrawer = () => {
+    setDuplicateDrawerOpen(false);
+  };
 
   useEffect(() => {
     setSelectedItemDis(dis);
@@ -62,6 +71,11 @@ const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
       <Stack direction="column" gap={4}>
         {fields.map(field => renderField(field))}
       </Stack>
+      <CardDuplicateDrawer
+        isOpen={duplicateDrawerOpen}
+        onClose={closeDuplicateDataDrawer}
+        dupes={duplicateData?.sameTenant ?? []}
+      />
     </Stack>
   );
 };

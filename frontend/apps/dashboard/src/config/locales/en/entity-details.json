@@ -1212,6 +1212,13 @@
         "name": "Name"
       }
     },
+    "drawer": {
+      "card-title": "Duplicate cards",
+      "bank-title": "Duplicate bank accounts",
+      "fp-id": "Footprint ID",
+      "name": "Name",
+      "created-at": "Created at"
+    },
     "dupe-kinds": {
       "ssn9": "SSN",
       "email": "Email address",
