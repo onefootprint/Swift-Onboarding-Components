@@ -2,6 +2,7 @@ use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::tenant::TenantError;
 use api_core::serializers::IsDomainAlreadyClaimed;
 use api_core::types::ApiResponse;
@@ -28,6 +29,13 @@ pub async fn get(
 ) -> ApiResponse<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::Read)?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
+    let tvc = TenantVendorControl::new(
+        tenant.id.clone(),
+        &state.db_pool,
+        &state.config,
+        &state.enclave_client,
+    )
+    .await?;
 
     let domains = tenant.domains.clone();
     let (is_domain_already_claimed, tenant_with_parent) = state
@@ -43,6 +51,7 @@ pub async fn get(
     Ok(api_wire_types::Organization::from_db((
         tenant_with_parent,
         IsDomainAlreadyClaimed(is_domain_already_claimed),
+        Some(tvc),
     )))
 }
 

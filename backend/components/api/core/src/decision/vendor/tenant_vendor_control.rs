@@ -272,6 +272,13 @@ impl TenantVendorControl {
     pub fn tenant_identifier(&self) -> String {
         format!("{}:{}", self.tenant_id, self.tenant_name)
     }
+
+    pub fn is_sentilink_enabled_for_tenant(&self) -> bool {
+        matches!(
+            self.sentilink_credentials(),
+            SentilinkCredentialType::TenantSpecific(_)
+        )
+    }
 }
 
 impl TenantVendorControl {
@@ -404,6 +411,7 @@ impl Default for SentilinkCredentialType {
         Self::Default(d)
     }
 }
+
 impl SentilinkCredentialType {
     pub fn try_into_tenant_specific_credentials(self) -> FpResult<SentilinkCredentials> {
         match self {
