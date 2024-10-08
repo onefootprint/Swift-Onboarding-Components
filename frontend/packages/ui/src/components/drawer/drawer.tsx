@@ -152,8 +152,8 @@ const DrawerSurface = styled(Box)`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
     isolation: isolate;
@@ -199,6 +199,7 @@ const Footer = styled(Stack)`
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[4]} ${theme.spacing[7]};
     height: ${FOOTER_HEIGHT};
+    flex-shrink: 0;
   `}
 `;
 
