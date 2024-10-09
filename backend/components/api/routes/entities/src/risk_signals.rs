@@ -21,6 +21,8 @@ use api_core::FpResult;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
+use api_wire_types::SentilinkDetail;
+use api_wire_types::SentilinkScoreDetail;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -47,8 +49,11 @@ use newtypes::FpId;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiJsonValue;
 use newtypes::RiskSignalId;
+use newtypes::SentilinkApplicationRisk;
 use newtypes::TenantId;
+use newtypes::Vendor;
 use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::post;
@@ -159,11 +164,15 @@ pub async fn get_detail(
     let is_live = auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
-    let (rs, aml_detail) =
-        get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id, is_live).await?;
+    let (rs, aml_detail, sentilink_detail) =
+        get_risk_signal_and_maybe_detail(&state, risk_signal_id, fp_id, tenant_id, is_live).await?;
     let has_aml_hits = aml_detail.is_some();
 
-    Ok(api_wire_types::RiskSignalDetail::from_db((rs, has_aml_hits)))
+    Ok(api_wire_types::RiskSignalDetail::from_db((
+        rs,
+        has_aml_hits,
+        sentilink_detail,
+    )))
 }
 
 const DECRYPT_AML_HITS_AUDIT_EVENT_REASON: &str = "Reviewing AML information";
@@ -188,9 +197,8 @@ pub async fn decrypt_aml_hits(
     // as (FirstName, MiddleName, LastName, Dob) or need to rework some of this stuff to not be so DI
     // dependent
 
-    let (_rs, aml_detail) =
-        get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id.clone(), is_live)
-            .await?;
+    let (_rs, aml_detail, _) =
+        get_risk_signal_and_maybe_detail(&state, risk_signal_id, fp_id, tenant_id.clone(), is_live).await?;
     let Some((aml_detail, vreq)) = aml_detail else {
         Err(AssertionError("No AML hit data for risk signal"))?
     };
@@ -250,7 +258,78 @@ pub async fn decrypt_aml_hits(
     Ok(aml_detail)
 }
 
-async fn get_risk_signal_and_maybe_aml_detail(
+
+#[api_v2_operation(
+    description = "Decrypts structured information about the sentilink risk levels",
+    tags(EntityDetails, Entities, Private)
+)]
+#[post("/entities/{fp_id}/sentilink/{signal_id}")]
+pub async fn get_sentilink_detail(
+    state: web::Data<State>,
+    request: web::Path<(FpId, RiskSignalId)>,
+    auth: TenantSessionAuth,
+) -> ApiResponse<api_wire_types::SentilinkDetail> {
+    // TODO: check for some sort of tenant_user permission for senti dash access?
+    let read_auth = auth.clone().check_guard(TenantGuard::Read)?;
+    let tenant_id = read_auth.tenant().id.clone();
+    let is_live = read_auth.is_live()?;
+    let (fp_id, risk_signal_id) = request.into_inner();
+
+    let (vreq_id, vw) = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
+            let (vreq, _) = VerificationResult::get(conn, &rs.verification_result_id)?;
+            let vw = VaultWrapper::<Any>::build(
+                conn,
+                VwArgs::Historical(&vreq.scoped_vault_id, vreq.uvw_snapshot_seqno),
+            )?;
+
+            Ok((vreq.id, vw))
+        })
+        .await?;
+
+    let detail = get_synthetic_reason_codes_for_risk_signal(&state, vreq_id, &vw).await?;
+
+
+    Ok(detail)
+}
+
+async fn get_synthetic_reason_codes_for_risk_signal(
+    state: &State,
+    vreq_id: VerificationRequestId,
+    vw: &VaultWrapper,
+) -> FpResult<api_wire_types::SentilinkDetail> {
+    let res = load_response_for_vendor_api(
+        state,
+        VReqIdentifier::Id(vreq_id.clone()),
+        &vw.vault.e_private_key,
+        SentilinkApplicationRisk,
+    )
+    .await?
+    .ok();
+
+    let Some((response, _)) = res else {
+        Err(AssertionError("No sentilink result found"))?
+    };
+
+    let synthetic = response
+        .sentilink_synthetic_score
+        .clone()
+        .and_then(|s| s.score().ok())
+        .map(SentilinkScoreDetail::from_db);
+    let id_theft = response
+        .sentilink_id_theft_score
+        .clone()
+        .and_then(|s| s.score().ok())
+        .map(SentilinkScoreDetail::from_db);
+
+    Ok(SentilinkDetail { synthetic, id_theft })
+}
+
+pub type HasSentilinkDetail = bool;
+async fn get_risk_signal_and_maybe_detail(
     state: &State,
     risk_signal_id: RiskSignalId,
     fp_id: FpId,
@@ -259,6 +338,7 @@ async fn get_risk_signal_and_maybe_aml_detail(
 ) -> FpResult<(
     RiskSignal,
     Option<(api_wire_types::AmlDetail, VerificationRequest)>,
+    HasSentilinkDetail,
 )> {
     let (rs, vreq_vres_key_obc) = state
         .db_pool
@@ -292,7 +372,10 @@ async fn get_risk_signal_and_maybe_aml_detail(
         None
     };
 
-    Ok((rs, aml_detail))
+    let has_sentilink_detail = matches!(rs.vendor_api.into(), Vendor::Sentilink);
+
+
+    Ok((rs, aml_detail, has_sentilink_detail))
 }
 
 async fn get_aml_hits(

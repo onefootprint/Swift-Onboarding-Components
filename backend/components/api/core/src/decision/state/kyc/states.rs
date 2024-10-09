@@ -382,7 +382,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 risk_signal_group_scope.clone(),
                 RiskSignalGroupKind::Synthetic,
             )?;
-            RiskSignal::bulk_add(conn, sentilink_frc, true, rsg.id)?;
+            RiskSignal::bulk_add(conn, sentilink_frc, false, rsg.id)?;
         }
 
         if let Some((twilio_res, vres_id)) = twilio_result {

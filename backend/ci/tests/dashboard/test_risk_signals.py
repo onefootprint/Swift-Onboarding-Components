@@ -1,7 +1,7 @@
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number
 from tests.bifrost_client import BifrostClient
-from tests.utils import get, post
+from tests.utils import get, post, create_ob_config
 from tests.integrations.test_alpaca import alpaca_kyc_ob_config
 
 
@@ -39,8 +39,14 @@ def test_aml(sandbox_tenant, must_collect_data):
             )
             audit_event = audit_events["data"][0]
             assert audit_event["name"] == "decrypt_user_data"
-            assert audit_event["detail"]["data"]["reason"] == "Reviewing AML information"
-            assert audit_event["detail"]["data"]["decrypted_fields"] == ["id.first_name", "id.last_name", "id.dob"]
+            assert (
+                audit_event["detail"]["data"]["reason"] == "Reviewing AML information"
+            )
+            assert audit_event["detail"]["data"]["decrypted_fields"] == [
+                "id.first_name",
+                "id.last_name",
+                "id.dob",
+            ]
 
             assert (
                 aml["share_url"]
@@ -84,3 +90,57 @@ def test_aml(sandbox_tenant, must_collect_data):
             )
         else:
             assert rs["has_aml_hits"] == False
+
+
+def test_synthetic(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "sentilink",
+        must_collect_data=[
+            "name",
+            "email",
+            "dob",
+            "ssn9",
+            "phone_number",
+            "full_address",
+        ],
+        kind="kyc",
+        optional_data=[],
+        can_access_data=[],
+        verification_checks=[
+            {"kind": "sentilink", "data": {}},
+        ],
+    )
+
+    bifrost = BifrostClient.new_user(obc, fixture_result="fail")
+    user = bifrost.run()
+
+    risk_signals = get(
+        f"entities/{user.fp_id}/risk_signals", None, sandbox_tenant.sk.key
+    )
+    test_ran = False
+    for risk_signal in risk_signals:
+        rs = get(
+            f"entities/{user.fp_id}/risk_signals/{risk_signal['id']}",
+            None,
+            *sandbox_tenant.db_auths,
+        )
+
+        if rs["reason_code"].startswith("sentilink"):
+
+            assert rs["has_sentilink_detail"] == True
+
+            sentilink_detail = post(
+                f"entities/{user.fp_id}/sentilink/{risk_signal['id']}",
+                None,
+                *sandbox_tenant.db_auths,
+            )
+
+            assert sentilink_detail["synthetic"]["score"] > 800
+            assert len(sentilink_detail["synthetic"]["reason_codes"]) == 3
+
+            assert sentilink_detail["id_theft"]["score"] is not None
+            assert len(sentilink_detail["id_theft"]["reason_codes"]) == 3
+            test_ran = True
+
+    assert test_ran

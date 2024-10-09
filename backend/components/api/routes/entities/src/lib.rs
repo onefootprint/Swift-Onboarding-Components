@@ -44,6 +44,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(match_signals::get)
         .service(risk_signals::get_detail)
         .service(risk_signals::decrypt_aml_hits)
+        .service(risk_signals::get_sentilink_detail)
         .service(auth_events::get)
         .service(rule_set_result::get_latest_workflow_decision)
         .service(rule_set_result::get)

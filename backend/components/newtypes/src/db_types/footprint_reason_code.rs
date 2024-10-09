@@ -1615,15 +1615,7 @@ impl FootprintReasonCode {
 
     // Controls whether this gets return in /org/risk_signals
     pub fn in_preview(&self) -> bool {
-        matches!(
-            self,
-            Self::SentilinkSyntheticIdentityHighRisk
-                | Self::SentilinkSyntheticIdentityMediumRisk
-                | Self::SentilinkSyntheticIdentityLowRisk
-                | Self::SentilinkIdentityTheftHighRisk
-                | Self::SentilinkIdentityTheftMediumRisk
-                | Self::SentilinkIdentityTheftLowRisk
-        )
+        false
     }
 }
 

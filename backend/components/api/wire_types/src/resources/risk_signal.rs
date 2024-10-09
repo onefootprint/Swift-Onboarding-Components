@@ -33,8 +33,7 @@ pub struct PublicRiskSignal {
     pub timestamp: chrono::DateTime<Utc>,
 }
 
-/// Non-public RiskSignal serialization that has additional information (at the moment just AML
-/// stuff about specific hits)
+/// Non-public RiskSignal serialization that has additional information
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct RiskSignalDetail {
     pub id: RiskSignalId,
@@ -46,6 +45,7 @@ pub struct RiskSignalDetail {
     pub scopes: Vec<SignalScope>,
     pub timestamp: chrono::DateTime<Utc>,
     pub has_aml_hits: bool,
+    pub has_sentilink_detail: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

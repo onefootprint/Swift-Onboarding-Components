@@ -2189,6 +2189,56 @@
                 ]
             }
         },
+        "/entities/{fp_id}/sentilink/{signal_id}": {
+            "post": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Decrypts structured information about the sentilink risk levels",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "signal_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SentilinkDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/timeline": {
             "get": {
                 "tags": [
@@ -26808,13 +26858,16 @@
                 ]
             },
             "RiskSignalDetail": {
-                "description": "Non-public RiskSignal serialization that has additional information (at the moment just AML\n stuff about specific hits)",
+                "description": "Non-public RiskSignal serialization that has additional information",
                 "type": "object",
                 "properties": {
                     "description": {
                         "type": "string"
                     },
                     "has_aml_hits": {
+                        "type": "boolean"
+                    },
+                    "has_sentilink_detail": {
                         "type": "boolean"
                     },
                     "id": {
@@ -27234,6 +27287,7 @@
                 "required": [
                     "description",
                     "has_aml_hits",
+                    "has_sentilink_detail",
                     "id",
                     "note",
                     "reason_code",
@@ -27595,6 +27649,91 @@
                     "scrubbed_key",
                     "status"
                 ]
+            },
+            "SentilinkDetail": {
+                "type": "object",
+                "properties": {
+                    "id_theft": {
+                        "type": "object",
+                        "properties": {
+                            "reason_codes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "direction": {
+                                            "type": "string"
+                                        },
+                                        "explanation": {
+                                            "type": "string"
+                                        },
+                                        "rank": {
+                                            "type": "integer",
+                                            "format": "int32"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "direction",
+                                        "explanation",
+                                        "rank"
+                                    ]
+                                }
+                            },
+                            "score": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "required": [
+                            "reason_codes",
+                            "score"
+                        ]
+                    },
+                    "synthetic": {
+                        "type": "object",
+                        "properties": {
+                            "reason_codes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "direction": {
+                                            "type": "string"
+                                        },
+                                        "explanation": {
+                                            "type": "string"
+                                        },
+                                        "rank": {
+                                            "type": "integer",
+                                            "format": "int32"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "direction",
+                                        "explanation",
+                                        "rank"
+                                    ]
+                                }
+                            },
+                            "score": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "required": [
+                            "reason_codes",
+                            "score"
+                        ]
+                    }
+                }
             },
             "SubmitExternalUrlRequest": {
                 "type": "object",

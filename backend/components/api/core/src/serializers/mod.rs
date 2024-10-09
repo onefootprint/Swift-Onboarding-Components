@@ -30,6 +30,7 @@ mod proxy_config;
 mod risk_signal;
 mod rule;
 mod secret_api_key;
+mod sentilink;
 mod tenant_android_app_meta;
 mod tenant_ios_app_meta;
 mod user;
