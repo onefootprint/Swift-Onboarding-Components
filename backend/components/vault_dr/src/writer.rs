@@ -150,7 +150,7 @@ impl VaultDrWriter {
             knobs,
         };
 
-        writer.aws_config.validate().await?;
+        writer.aws_config.validate(false).await?;
 
         Ok(writer)
     }

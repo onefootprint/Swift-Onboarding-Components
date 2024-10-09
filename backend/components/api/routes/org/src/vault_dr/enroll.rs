@@ -72,7 +72,7 @@ pub async fn post(
         s3_bucket_name,
     };
 
-    aws_config.validate().await?;
+    aws_config.validate(true).await?;
 
     let EnrollmentKeys {
         recovery_public_key,

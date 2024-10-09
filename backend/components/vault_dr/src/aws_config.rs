@@ -107,7 +107,12 @@ impl VaultDrAwsConfig {
         self.state_config.use_localstack.is_some()
     }
 
-    pub async fn validate(&self) -> Result<(), Error> {
+    /// Validate that the AWS configuration has all the proper permissions and no more. Optionally
+    /// omits s3:PutObject validation to avoid unnecessary writes, which have a higher billing cost
+    /// to the owner of the bucket than reads, and also create many redundant object versions if
+    /// versioning is enabled. Lack of s3:PutObject permissions will be detected when records are
+    /// written either way.
+    pub async fn validate(&self, test_s3_putobject: bool) -> Result<(), Error> {
         let aws_config = self.default_sdk_config().await?;
 
         // Test that the assumed role works.
@@ -174,21 +179,23 @@ impl VaultDrAwsConfig {
         let s3_client = self.s3_client().await?;
 
         // Test for s3:PutObject.
-        let req = s3_client
-            .put_object()
-            .bucket(&self.s3_bucket_name)
-            .key(S3_ACCESS_PROBE_KEY);
-        req.send().await.map_err(|e| {
-            let svc_error = e.into_service_error();
+        if test_s3_putobject {
+            let req = s3_client
+                .put_object()
+                .bucket(&self.s3_bucket_name)
+                .key(S3_ACCESS_PROBE_KEY);
+            req.send().await.map_err(|e| {
+                let svc_error = e.into_service_error();
 
-            warn!(error=?svc_error, "S3 PutObject failed");
+                warn!(error=?svc_error, "S3 PutObject failed");
 
-            if let Some(code) = aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
-                Error::RoleValidationFailed(format!("S3 PutObject failed: {}", code))
-            } else {
-                Box::new(svc_error).into()
-            }
-        })?;
+                if let Some(code) = aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
+                    Error::RoleValidationFailed(format!("S3 PutObject failed: {}", code))
+                } else {
+                    Box::new(svc_error).into()
+                }
+            })?;
+        }
 
         // Test for s3:ListBucket.
         let req = s3_client
