@@ -204,6 +204,31 @@ def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data):
     )
 
 
+def test_kyb_with_sentilink_on_bos(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Multi-KYC Business config with sentilink",
+        must_collect_data + MULTI_KYC_KYB_CDOS,
+        kind="kyb",
+        verification_checks=[
+            dict(kind="kyb", data=dict(ein_only=False)),
+            dict(kind="sentilink", data=dict()),
+        ],
+    )
+
+    bifrost = BifrostClient.new_user(obc)
+    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.run()
+
+    secondary_bo_token = extract_bo_token(bifrost)
+
+    bifrost = BifrostClient.new_user(obc, override_ob_config_auth=secondary_bo_token)
+    bo = bifrost.run()
+
+    risk_signals = get(f"entities/{bo.fp_id}/risk_signals", None, sandbox_tenant.sk.key)
+    assert any(r["reason_code"].startswith("sentilink") for r in risk_signals)
+
+
 @pytest.fixture(scope="session")
 def ob_config2(sandbox_tenant, must_collect_data):
     # Need a new ob config that has access to decrypt everything - otherwise, one-click workflows
