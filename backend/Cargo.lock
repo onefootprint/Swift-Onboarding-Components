@@ -4481,6 +4481,7 @@ dependencies = [
  "indicatif",
  "itertools",
  "keyring",
+ "lazy_static",
  "log",
  "mime_guess",
  "num_cpus",

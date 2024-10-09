@@ -150,6 +150,8 @@ services:
       - "127.0.0.1:4510-4559:4510-4559"  # External services port range
     environment:
       SERVICES: "s3,iam,sts"
+      # To see S3 request logs:
+      # LS_LOG: trace
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
@@ -180,6 +182,8 @@ services:
       # Don't run by default.
       - test
 
+  # To run the stack with tracing:
+  # docker compose --profile trace up
   jaeger:
     image: jaegertracing/all-in-one
     networks:

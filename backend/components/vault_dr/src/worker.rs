@@ -21,6 +21,9 @@ pub struct Knobs {
 
     pub record_task_concurrency: usize,
     pub manifest_task_concurrency: usize,
+
+    /// Skipping client validation helps speed up some tests.
+    pub skip_client_validation: bool,
 }
 
 impl Default for Knobs {
@@ -30,6 +33,7 @@ impl Default for Knobs {
             blob_batch_size: 2048,
             record_task_concurrency: 64,
             manifest_task_concurrency: 64,
+            skip_client_validation: false,
         }
     }
 }

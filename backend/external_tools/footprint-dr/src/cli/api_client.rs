@@ -11,6 +11,7 @@ use anyhow::Context;
 use anyhow::Ok;
 use anyhow::Result;
 use keyring::Entry;
+use lazy_static::lazy_static;
 use reqwest::header::HeaderMap;
 use reqwest::header::HeaderValue;
 use reqwest::Client;
@@ -28,6 +29,11 @@ use std::ops::Not;
 use std::result::Result as StdResult;
 
 pub(crate) const API_KEY_ENV_VAR: &str = "FOOTPRINT_API_KEY";
+
+lazy_static! {
+    /// Skipping client checks is useful to speed up some tests.
+    pub(crate) static ref SKIP_FOOTPRINT_CLIENT_CHECKS: bool = env::var("SKIP_FOOTPRINT_CLIENT_CHECKS").is_ok();
+}
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub(crate) enum IsLive {
@@ -139,6 +145,10 @@ impl VaultDrApiClient {
 
         let client = Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))?;
 
+        if *SKIP_FOOTPRINT_CLIENT_CHECKS {
+            return Ok(client);
+        }
+
         // Check that the credentials in the keyring are valid.
         let status = client.get_status().await?;
         if IsLive::from(status.is_live) != is_live {
@@ -164,6 +174,10 @@ impl VaultDrApiClient {
         };
 
         let client = Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))?;
+
+        if *SKIP_FOOTPRINT_CLIENT_CHECKS {
+            return Ok(Some(client));
+        }
 
         // Check that the credentials are valid.
         let status = client.get_status().await?;

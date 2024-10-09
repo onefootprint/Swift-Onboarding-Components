@@ -150,7 +150,9 @@ impl VaultDrWriter {
             knobs,
         };
 
-        writer.aws_config.validate(false).await?;
+        if !knobs.skip_client_validation {
+            writer.aws_config.validate(false).await?;
+        }
 
         Ok(writer)
     }

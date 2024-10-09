@@ -2,8 +2,6 @@
 
 ## Tips for running the worker locally
 
-TODO: private API to run a batch synchronously
-
 In one window:
 
 ```

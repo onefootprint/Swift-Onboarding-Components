@@ -84,6 +84,7 @@ impl VaultDrWorker {
             blob_batch_size: self.blob_batch_size,
             record_task_concurrency: self.record_task_concurrency,
             manifest_task_concurrency: self.manifest_task_concurrency,
+            skip_client_validation: false,
         }
     }
 

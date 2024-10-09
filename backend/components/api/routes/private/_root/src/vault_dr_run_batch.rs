@@ -24,6 +24,8 @@ struct VaultDrRunBatchRequest {
 
     pub manifest_batch_size: u32,
     pub blob_batch_size: u32,
+
+    pub skip_client_validation: Option<bool>,
 }
 
 #[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]
@@ -45,6 +47,7 @@ pub async fn post(
         manifest_batch_size,
         blob_batch_size,
         fp_ids,
+        skip_client_validation,
     } = request.into_inner();
 
     if !tenant_id.is_integration_test_tenant() {
@@ -62,6 +65,7 @@ pub async fn post(
     let knobs = vault_dr::Knobs {
         manifest_batch_size,
         blob_batch_size,
+        skip_client_validation: skip_client_validation.unwrap_or_default(),
         ..Default::default()
     };
 

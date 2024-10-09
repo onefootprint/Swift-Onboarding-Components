@@ -1,5 +1,6 @@
 use super::api_client::get_cli_client;
 use super::api_client::IsLive;
+use super::api_client::SKIP_FOOTPRINT_CLIENT_CHECKS;
 use super::manifest::Field;
 use super::manifest::Manifest;
 use super::BucketNamespace;
@@ -119,10 +120,23 @@ impl S3Client {
         .build();
         let s3_client = aws_sdk_s3::Client::from_conf(s3_config);
 
-        // Test the client.
-        s3_client
+        let client = Self {
+            client: s3_client,
+            bucket_name: bucket_name.to_owned(),
+            bucket_path_namespace: bucket_path_namespace.to_owned(),
+        };
+
+        if !*SKIP_FOOTPRINT_CLIENT_CHECKS {
+            client.validate().await?;
+        }
+
+        Ok(client)
+    }
+
+    async fn validate(&self) -> Result<()> {
+        self.client
             .list_objects_v2()
-            .bucket(&bucket_name)
+            .bucket(&self.bucket_name)
             .max_keys(1)
             .send()
             .await
@@ -130,31 +144,39 @@ impl S3Client {
                 let svc_error = e.into_service_error();
                 anyhow!(
                     "Testing s3:ListBucket permissions failed for bucket {}: {:?}",
-                    &bucket_name,
+                    &self.bucket_name,
                     svc_error
                 )
             })?;
 
-        s3_client
+        let get_object_result = self
+            .client
             .get_object()
-            .bucket(&bucket_name)
+            .bucket(&self.bucket_name)
             .key(S3_ACCESS_PROBE_KEY)
             .send()
-            .await
-            .map_err(|e| {
-                let svc_error = e.into_service_error();
-                anyhow!(
-                    "Testing s3:GetObject permissions failed for bucket {}: {:?}",
-                    &bucket_name,
-                    svc_error,
-                )
-            })?;
+            .await;
 
-        Ok(Self {
-            client: s3_client,
-            bucket_name: bucket_name.to_owned(),
-            bucket_path_namespace: bucket_path_namespace.to_owned(),
-        })
+        match get_object_result {
+            Ok(_) => {}
+            Err(e) => {
+                let svc_error = e.into_service_error();
+
+                // We want to check for lack of s3:GetObject permissions. However, in the
+                // localstack dev env, sometimes the probe object is missing since state is not
+                // maintained across restarts. In that case, since localstck doesn't properly
+                // enforce IAM, we get a NoSuchKey error instead. We can ignore this error.
+                if !svc_error.is_no_such_key() {
+                    bail!(
+                        "Testing s3:GetObject permissions failed for bucket {}: {:?}",
+                        &self.bucket_name,
+                        svc_error,
+                    );
+                }
+            }
+        }
+
+        Ok(())
     }
 
     fn list_common_prefixes(
