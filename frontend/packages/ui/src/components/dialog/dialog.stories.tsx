@@ -21,6 +21,7 @@ export default {
     secondaryButton: { control: 'object' },
     linkButton: { control: 'object' },
     isConfirmation: { control: 'boolean' },
+    preventEscapeKeyDown: { control: 'boolean' },
   },
 } satisfies Meta<typeof Dialog>;
 

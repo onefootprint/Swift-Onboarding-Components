@@ -14,16 +14,17 @@ import DialogHeader from './header';
 
 export type DialogProps = {
   children?: React.ReactNode;
-  isConfirmation?: boolean;
-  linkButton?: DialogLinkButton;
-  noPadding?: boolean;
-  noScroll?: boolean;
-  onClose: () => void;
   open: boolean;
+  onClose: () => void;
+  title: string;
+  size?: DialogSize;
   primaryButton?: DialogButton;
   secondaryButton?: DialogButton;
-  size?: DialogSize;
-  title: string;
+  linkButton?: DialogLinkButton;
+  isConfirmation?: boolean;
+  noPadding?: boolean;
+  noScroll?: boolean;
+  preventEscapeKeyDown?: boolean;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   headerIcon?: {
     component: Icon;
@@ -35,18 +36,19 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
   (
     {
       children,
-      headerIcon,
-      isConfirmation = false,
-      linkButton,
-      noPadding = false,
-      noScroll = false,
-      onClose,
-      onEscapeKeyDown,
       open,
+      onClose,
+      title,
+      size = 'default',
       primaryButton,
       secondaryButton,
-      size = 'default',
-      title,
+      linkButton,
+      isConfirmation = false,
+      noPadding = false,
+      noScroll = false,
+      preventEscapeKeyDown,
+      onEscapeKeyDown,
+      headerIcon,
     },
     ref,
   ) => {
@@ -68,6 +70,7 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
                 isConfirmation={isConfirmation}
                 onClose={onClose}
                 onEscapeKeyDown={onEscapeKeyDown}
+                preventEscapeKeyDown={preventEscapeKeyDown}
                 ref={ref}
                 size={size}
               >

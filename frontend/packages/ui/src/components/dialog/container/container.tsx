@@ -12,6 +12,7 @@ type ContainerProps = {
   isConfirmation: boolean;
   onClose: () => void;
   size: DialogSize;
+  preventEscapeKeyDown?: boolean;
 } & DialogContentProps;
 
 const dialogAppearVariants = (isConfirmation: boolean, size: DialogSize) => {
@@ -56,12 +57,14 @@ const dialogAppearVariants = (isConfirmation: boolean, size: DialogSize) => {
 };
 
 const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  ({ children, onEscapeKeyDown, onClose, dataTestId, size, isConfirmation, ...props }, ref) => (
+  ({ children, onEscapeKeyDown, onClose, dataTestId, size, isConfirmation, preventEscapeKeyDown, ...props }, ref) => (
     <RadixDialog.Content
       {...props}
       onPointerDownOutside={onClose}
       onEscapeKeyDown={event => {
-        if (onEscapeKeyDown) {
+        if (preventEscapeKeyDown) {
+          event.preventDefault();
+        } else if (onEscapeKeyDown) {
           onEscapeKeyDown(event);
         } else {
           onClose();

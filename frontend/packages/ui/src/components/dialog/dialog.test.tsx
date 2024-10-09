@@ -43,6 +43,15 @@ describe('<Dialog />', () => {
     });
   });
 
+  describe('when the prop preventEscapeKeyDown is true', () => {
+    it('should not trigger onClose when pressing Escape', async () => {
+      const onCloseMockFn = jest.fn();
+      renderDialog({ open: true, preventEscapeKeyDown: true, onClose: onCloseMockFn });
+      await userEvent.keyboard('{Escape}');
+      expect(onCloseMockFn).not.toHaveBeenCalled();
+    });
+  });
+
   describe('when the dialog is open', () => {
     it('should show the header text', async () => {
       renderDialog({ open: true, title: 'header' });
