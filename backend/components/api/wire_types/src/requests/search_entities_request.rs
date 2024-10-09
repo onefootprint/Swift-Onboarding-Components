@@ -5,6 +5,7 @@ use newtypes::LabelKind;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::PiiString;
+use newtypes::TagKind;
 use newtypes::VaultKind;
 
 #[derive(Default, Deserialize, Apiv2Schema)]
@@ -26,6 +27,8 @@ pub struct SearchEntitiesRequest {
     pub labels: Vec<LabelKind>,
     pub playbook_ids: Option<Vec<ObConfigurationId>>,
     pub external_id: Option<ExternalId>,
+    #[serde(default)]
+    pub tags: Vec<TagKind>,
 }
 
 #[derive(Deserialize, Apiv2Schema)]

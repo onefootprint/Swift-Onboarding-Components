@@ -40,21 +40,15 @@ async fn get(
             tenant_id: tenant_id.clone(),
             is_live,
             kind: Some(kind),
-            search: None,
-            fp_id: None,
             timestamp_lte,
             timestamp_gte,
-            requires_manual_review: None,
-            watchlist_hit: None,
             // TODO this could drift easily. Be careful changing this since it could affect the
             // pass rate we display if we start also looking for vaults that aren't verified
             only_active: true,
             statuses,
             playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
-            has_outstanding_workflow_request: None,
             has_workflow: only_has_wf.then_some(true),
-            external_id: None,
-            labels: vec![],
+            ..ScopedVaultListQueryParams::default()
         }
     };
 

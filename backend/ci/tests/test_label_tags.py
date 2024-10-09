@@ -106,6 +106,16 @@ def test_create_tag(sandbox_tenant, is_api):
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert set(i["tag"] for i in body["tags"]) == {tag1, tag2}
 
+    # Test searching on tag
+    body = post(
+        f"/entities/search", dict(tags=[tag1, "flerp"]), *sandbox_tenant.db_auths
+    )
+    assert any(i["id"] == user.fp_id for i in body["data"])
+    body = post(
+        f"/entities/search", dict(tags=["derp", "flerp"]), *sandbox_tenant.db_auths
+    )
+    assert not any(i["id"] == user.fp_id for i in body["data"])
+
     delete(f"/{api_base}/{user.fp_id}/tags/{tag1_id}", None, *auth)
     body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
     assert len(body) == 1

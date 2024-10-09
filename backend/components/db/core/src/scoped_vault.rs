@@ -25,6 +25,7 @@ use newtypes::PiiString;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
+use newtypes::TagKind;
 use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
@@ -50,6 +51,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub has_workflow: Option<bool>,
     pub external_id: Option<ExternalId>,
     pub labels: Vec<LabelKind>,
+    pub tags: Vec<TagKind>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -80,6 +82,7 @@ impl ScopedVaultListQueryParams {
             has_workflow,
             external_id,
             labels,
+            tags,
         } = self;
 
         let matching_vaults = if let Some(search) = search {
@@ -106,6 +109,7 @@ impl ScopedVaultListQueryParams {
             has_workflow,
             external_id,
             labels,
+            tags,
         };
         Ok(result)
     }
@@ -122,6 +126,7 @@ macro_rules! list_query {
         use db_schema::schema::manual_review;
         use db_schema::schema::scoped_vault;
         use db_schema::schema::scoped_vault_label;
+        use db_schema::schema::scoped_vault_tag;
         use db_schema::schema::watchlist_check;
         use db_schema::schema::workflow;
         use db_schema::schema::workflow_request;
@@ -232,9 +237,24 @@ macro_rules! list_query {
                 scoped_vault_label::table
                     .filter(scoped_vault_label::deactivated_at.is_null())
                     .filter(scoped_vault_label::kind.eq_any(&$params.labels))
-                    .filter(scoped_vault_label::scoped_vault_id.eq(scoped_vault::id)),
+                    .filter(scoped_vault_label::scoped_vault_id.eq(scoped_vault::id))
+                    // Filter on denormalized columns for better performance
+                    .filter(scoped_vault_label::tenant_id.eq(&$params.tenant_id))
+                    .filter(scoped_vault_label::is_live.eq($params.is_live))
             );
             query = query.filter(q_has_matching_label)
+        }
+        if !$params.tags.is_empty() {
+            let q_has_matching_tag = exists(
+                scoped_vault_tag::table
+                    .filter(scoped_vault_tag::deactivated_at.is_null())
+                    .filter(scoped_vault_tag::kind.eq_any(&$params.tags))
+                    .filter(scoped_vault_tag::scoped_vault_id.eq(scoped_vault::id))
+                    // Filter on denormalized columns for better performance
+                    .filter(scoped_vault_tag::tenant_id.eq(&$params.tenant_id))
+                    .filter(scoped_vault_tag::is_live.eq($params.is_live))
+            );
+            query = query.filter(q_has_matching_tag)
         }
 
         query

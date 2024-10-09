@@ -22519,6 +22519,12 @@
                             ]
                         }
                     },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
                     "timestamp_gte": {
                         "type": "string",
                         "format": "date-time"
@@ -22533,7 +22539,8 @@
                 },
                 "required": [
                     "labels",
-                    "statuses"
+                    "statuses",
+                    "tags"
                 ]
             },
             "ListEntry": {

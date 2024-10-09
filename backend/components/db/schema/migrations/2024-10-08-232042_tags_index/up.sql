@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS scoped_vault_tag_active_query_idx ON scoped_vault_tag(tenant_id, is_live, kind, scoped_vault_id) WHERE deactivated_at IS NULL;
