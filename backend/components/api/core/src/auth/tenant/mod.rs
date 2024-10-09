@@ -122,6 +122,7 @@ impl From<PartnerTenantSessionAuth> for TenantOrPartnerTenantSessionAuth {
 
 pub trait TenantAuth: BasicTenantAuth {
     fn scopes(&self) -> Vec<TenantScope>;
+    fn is_firm_employee(&self) -> bool;
 }
 
 pub trait BasicTenantAuth {

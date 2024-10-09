@@ -14,7 +14,9 @@ use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::PiiString;
 use newtypes::SandboxId;
+use newtypes::ScopedVaultId;
 use newtypes::TenantId;
+use newtypes::VaultId;
 use newtypes::VaultKind;
 use paperclip::actix::Apiv2Response;
 use paperclip::actix::Apiv2Schema;
@@ -28,6 +30,10 @@ use strum_macros::EnumString;
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct Entity {
+    /// Only serialized for firm employess
+    pub sv_id: Option<ScopedVaultId>,
+    /// Only serialized for firm employess
+    pub v_id: Option<VaultId>,
     pub id: FpId,
     pub sandbox_id: Option<SandboxId>,
     pub is_portable: bool,

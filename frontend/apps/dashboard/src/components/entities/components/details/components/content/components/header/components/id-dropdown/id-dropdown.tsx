@@ -11,6 +11,7 @@ type IdDropdownProps = {
 const IdDropdown = ({ entity }: IdDropdownProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'header.id-dropdown' });
   const toast = useToast();
+
   const ids = [
     {
       label: t('footprint-id'),
@@ -23,6 +24,15 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
     {
       label: t('external-id'),
       value: entity.externalId,
+    },
+    // These are only serialized for firm employees
+    {
+      label: t('scoped-vault-id'),
+      value: entity.svId,
+    },
+    {
+      label: t('vault-id'),
+      value: entity.vId,
     },
   ].filter(item => item.value);
 

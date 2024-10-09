@@ -318,6 +318,8 @@
       "on-watchlist-business": "This business is on a watchlist"
     },
     "id-dropdown": {
+      "scoped-vault-id": "Copy Scoped Vault ID",
+      "vault-id": "Copy Vault ID",
       "footprint-id": "Copy FP ID",
       "sandbox-id": "Copy Sandbox ID",
       "external-id": "Copy External ID",

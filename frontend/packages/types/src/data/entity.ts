@@ -46,6 +46,8 @@ export type Attribute = {
 };
 
 export type Entity = {
+  svId?: string;
+  vId?: string;
   data: Attribute[];
   tags?: Tag[];
   hasOutstandingWorkflowRequest: boolean;

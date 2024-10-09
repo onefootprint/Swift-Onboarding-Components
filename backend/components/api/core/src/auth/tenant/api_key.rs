@@ -138,6 +138,10 @@ impl TenantAuth for CheckedTenantApiKey {
     fn scopes(&self) -> Vec<TenantScope> {
         self.role.scopes.clone()
     }
+
+    fn is_firm_employee(&self) -> bool {
+        false
+    }
 }
 
 impl CanCheckTenantGuard for TenantApiKey {

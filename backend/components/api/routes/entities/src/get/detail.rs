@@ -51,6 +51,6 @@ pub async fn get(
         .next()
         .unwrap_or_default();
 
-    let result = api_wire_types::Entity::from_db((entity, &vw, &scopes, decrypted_results));
+    let result = api_wire_types::Entity::from_db((entity, &vw, &auth, decrypted_results));
     Ok(result)
 }

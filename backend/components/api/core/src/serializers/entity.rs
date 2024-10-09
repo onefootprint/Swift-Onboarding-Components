@@ -1,3 +1,4 @@
+use crate::auth::tenant::TenantAuth;
 use crate::auth::CanDecrypt;
 use crate::auth::IsGuardMet;
 use crate::utils::db2api::DbToApi;
@@ -23,15 +24,15 @@ use std::collections::HashMap;
 pub type EntityDetail<'a> = (
     SerializableEntity,
     &'a TenantVw<Any>,
-    &'a [TenantScope],
+    &'a Box<dyn TenantAuth>,
     DecryptedData,
 );
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
-    fn from_db((entity, vw, scopes, decrypted_attrs): EntityDetail) -> Self {
+    fn from_db((entity, vw, auth, decrypted_attrs): EntityDetail) -> Self {
         let (sv, watchlist_check, wr, label, mrs, wfs, tags) = entity;
 
-        let data = entity_attributes(vw, scopes, decrypted_attrs);
+        let data = entity_attributes(vw, &auth.scopes(), decrypted_attrs);
 
         //
         // All of these are derivative of the much more descriptive `data`.
@@ -55,6 +56,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .collect();
 
         let Vault {
+            id: v_id,
             is_portable,
             is_identifiable,
             kind,
@@ -66,6 +68,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         let status = status_from_sv(&sv);
 
         let ScopedVault {
+            id: sv_id,
             fp_id,
             start_timestamp,
             ordering_id,
@@ -83,6 +86,8 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .collect_vec();
 
         api_wire_types::Entity {
+            sv_id: auth.is_firm_employee().then_some(sv_id),
+            v_id: auth.is_firm_employee().then_some(v_id),
             id: fp_id,
             sandbox_id,
             is_portable,

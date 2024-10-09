@@ -151,7 +151,7 @@ pub async fn post(
         })
         .collect::<FpResult<Vec<_>>>()?
         .into_iter()
-        .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &scopes, d)))
+        .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &auth, d)))
         .collect();
     CursorPaginatedResponseInner::ok(entities, page_size, cursor, Some(count))
 }

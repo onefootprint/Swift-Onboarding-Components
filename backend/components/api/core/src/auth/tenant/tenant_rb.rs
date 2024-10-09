@@ -157,6 +157,10 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
     fn scopes(&self) -> Vec<TenantScope> {
         self.data.tenant_role.scopes.clone()
     }
+
+    fn is_firm_employee(&self) -> bool {
+        self.tenant_user.is_firm_employee
+    }
 }
 
 impl<const IS_SECONDARY: bool> GetFirmEmployee for TenantRbAuthContext<IS_SECONDARY> {

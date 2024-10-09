@@ -218,6 +218,10 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
     fn scopes(&self) -> Vec<TenantScope> {
         self.token_scopes()
     }
+
+    fn is_firm_employee(&self) -> bool {
+        self.tenant_user.is_firm_employee
+    }
 }
 
 #[cfg(test)]
