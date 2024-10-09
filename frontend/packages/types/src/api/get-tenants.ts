@@ -80,6 +80,7 @@ export type TenantVendorControl = {
   lexisEnabled: boolean;
   experianSubscriberCode?: string;
   middeskApiKeyExists: boolean;
+  sentilinkCredentialsExists: boolean;
   neuroEnabled: boolean;
 };
 

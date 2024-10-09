@@ -12,6 +12,11 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: '12345',
         middeskApiKey: '••••••',
+        neuroEnabled: false,
+        sentilinkCredentials: {
+          account: '••••••',
+          token: '••••••',
+        },
       },
       tvc: {
         idologyEnabled: true,
@@ -19,6 +24,8 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: '12345',
         middeskApiKeyExists: true,
+        neuroEnabled: false,
+        sentilinkCredentialsExists: true,
       },
       x: {
         idologyEnabled: undefined,
@@ -26,6 +33,8 @@ describe('convertFormData', () => {
         lexisEnabled: undefined,
         experianSubscriberCode: undefined,
         middeskApiKey: undefined,
+        neuroEnabled: undefined,
+        sentilinkCredentials: undefined,
       },
     },
     {
@@ -35,6 +44,11 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: '',
         middeskApiKey: '',
+        neuroEnabled: false,
+        sentilinkCredentials: {
+          account: '',
+          token: '',
+        },
       },
       tvc: undefined,
       x: {
@@ -43,6 +57,8 @@ describe('convertFormData', () => {
         lexisEnabled: undefined,
         experianSubscriberCode: undefined,
         middeskApiKey: undefined,
+        neuroEnabled: undefined,
+        sentilinkCredentials: undefined,
       },
     },
     {
@@ -52,6 +68,11 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: '12345',
         middeskApiKey: '54321',
+        neuroEnabled: true,
+        sentilinkCredentials: {
+          account: 'newAccount',
+          token: 'newToken',
+        },
       },
       tvc: undefined,
       x: {
@@ -60,6 +81,11 @@ describe('convertFormData', () => {
         lexisEnabled: undefined,
         experianSubscriberCode: '12345',
         middeskApiKey: '54321',
+        neuroEnabled: true,
+        sentilinkCredentials: {
+          account: 'newAccount',
+          token: 'newToken',
+        },
       },
     },
     {
@@ -69,6 +95,11 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: '',
         middeskApiKey: '12345',
+        neuroEnabled: true,
+        sentilinkCredentials: {
+          account: 'updatedAccount',
+          token: '••••••',
+        },
       },
       tvc: {
         idologyEnabled: true,
@@ -76,14 +107,20 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: undefined,
         middeskApiKeyExists: true,
+        neuroEnabled: false,
+        sentilinkCredentialsExists: true,
       },
       x: {
         idologyEnabled: undefined,
         experianEnabled: undefined,
         lexisEnabled: undefined,
         experianSubscriberCode: undefined,
-        // API key updated
         middeskApiKey: '12345',
+        neuroEnabled: true,
+        sentilinkCredentials: {
+          account: 'updatedAccount',
+          token: undefined,
+        },
       },
     },
     {
@@ -93,6 +130,11 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: '',
         middeskApiKey: '',
+        neuroEnabled: false,
+        sentilinkCredentials: {
+          account: '',
+          token: '',
+        },
       },
       tvc: {
         idologyEnabled: true,
@@ -100,14 +142,17 @@ describe('convertFormData', () => {
         lexisEnabled: false,
         experianSubscriberCode: undefined,
         middeskApiKeyExists: true,
+        neuroEnabled: true,
+        sentilinkCredentialsExists: true,
       },
       x: {
         idologyEnabled: undefined,
         experianEnabled: undefined,
         lexisEnabled: undefined,
         experianSubscriberCode: undefined,
-        // API key cleared out
         middeskApiKey: null,
+        neuroEnabled: false,
+        sentilinkCredentials: null,
       },
     },
   ])('.', ({ data, tvc, x }) => {

@@ -26,6 +26,11 @@ const getDefaultValues = (tvc?: TenantVendorControl): TenantVendorControlFormDat
   // Since the middesk API key is encrypted, use encrypted text as a placeholder
   middeskApiKey: tvc?.middeskApiKeyExists ? '••••••••••' : '',
   neuroEnabled: tvc?.neuroEnabled || false,
+  // Since the Sentilink credentials are encrypted, use encrypted text as a placeholder
+  sentilinkCredentials: {
+    account: tvc?.sentilinkCredentialsExists ? '••••••••••' : '',
+    token: tvc?.sentilinkCredentialsExists ? '••••••••••' : '',
+  },
 });
 
 const VendorControl = ({ tenant }: BillingProfileProps) => {
@@ -67,6 +72,16 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
       title: 'Middesk API key',
       content: tvc?.middeskApiKeyExists ? <EncryptedCell /> : '-',
       editModeContent: <TextInput placeholder="key" {...register('middeskApiKey')} />,
+    },
+    {
+      title: 'Sentilink Account',
+      content: tvc?.sentilinkCredentialsExists ? <EncryptedCell /> : '-',
+      editModeContent: <TextInput placeholder="Account" {...register('sentilinkCredentials.account')} />,
+    },
+    {
+      title: 'Sentilink Token',
+      content: tvc?.sentilinkCredentialsExists ? <EncryptedCell /> : '-',
+      editModeContent: <TextInput placeholder="Token" {...register('sentilinkCredentials.token')} />,
     },
   ];
 

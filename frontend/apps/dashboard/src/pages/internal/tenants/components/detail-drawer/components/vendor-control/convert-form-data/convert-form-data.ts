@@ -10,6 +10,10 @@ export type TenantVendorControlFormData = {
   experianSubscriberCode: string;
   middeskApiKey: string;
   neuroEnabled: boolean;
+  sentilinkCredentials: {
+    account: string;
+    token: string;
+  };
 };
 
 const newMiddeskApiKey = (newKey: string, exists: boolean) => {
@@ -25,6 +29,26 @@ const newMiddeskApiKey = (newKey: string, exists: boolean) => {
   return undefined;
 };
 
+const newSentilinkCredentials = (newCredentials: { account: string; token: string }, exists: boolean) => {
+  if (newCredentials.account || newCredentials.token) {
+    // No-op if both new credentials are just the encrypted representation
+    const newAccountIsEncrypted = Array.from(newCredentials.account.trim()).every(c => c === '•');
+    const newTokenIsEncrypted = Array.from(newCredentials.token.trim()).every(c => c === '•');
+    if (!newAccountIsEncrypted || !newTokenIsEncrypted) {
+      return {
+        account: newAccountIsEncrypted ? undefined : newCredentials.account,
+        token: newTokenIsEncrypted ? undefined : newCredentials.token,
+      };
+    }
+  }
+  if (exists) {
+    if (!newCredentials.account || !newCredentials.token) {
+      return null;
+    }
+  }
+  return undefined;
+};
+
 export const convertFormData = (
   tvc: TenantVendorControl | undefined,
   formData: TenantVendorControlFormData,
@@ -35,4 +59,5 @@ export const convertFormData = (
   experianSubscriberCode: ifChanged(strOrNull(formData.experianSubscriberCode), strOrNull(tvc?.experianSubscriberCode)),
   middeskApiKey: newMiddeskApiKey(formData.middeskApiKey, !!tvc?.middeskApiKeyExists),
   neuroEnabled: ifChanged(formData.neuroEnabled, tvc?.neuroEnabled),
+  sentilinkCredentials: newSentilinkCredentials(formData.sentilinkCredentials, !!tvc?.sentilinkCredentialsExists),
 });

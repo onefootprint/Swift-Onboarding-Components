@@ -16,6 +16,10 @@ export type UpdateTenantVendorControl = {
   experianSubscriberCode?: string | null;
   middeskApiKey?: string | null;
   neuroEnabled?: boolean;
+  sentilinkCredentials?: {
+    account?: string;
+    token?: string;
+  } | null;
 };
 
 export type UpdateTenantBillingProfile = {
