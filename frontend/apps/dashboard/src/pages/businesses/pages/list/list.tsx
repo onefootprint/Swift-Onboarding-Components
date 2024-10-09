@@ -11,8 +11,8 @@ const List = () => {
     { text: t('table.header.name'), width: '20%' },
     { text: t('table.header.id'), width: '22.5%' },
     { text: t('table.header.status'), width: '17.5%' },
-    { text: t('table.header.last-activity'), width: '20%' },
-    { text: t('table.header.other'), width: '20%' },
+    { text: t('table.header.last-activity'), width: '15%' },
+    { text: t('table.header.other'), width: '30%' },
   ];
 
   return (

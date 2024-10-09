@@ -1,5 +1,5 @@
 export type RemoveTagRequest = {
-  id: string;
+  entityId: string;
   tagId: string;
 };
 

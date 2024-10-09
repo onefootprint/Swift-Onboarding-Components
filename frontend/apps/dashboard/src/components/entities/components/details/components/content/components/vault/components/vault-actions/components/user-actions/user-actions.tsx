@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
-import useTags from '@/entity/hooks/use-tags';
+import useTags from '@/entity/hooks/use-entity-tags';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
 import DecryptMachineProvider from '../../../../../decrypt-machine';

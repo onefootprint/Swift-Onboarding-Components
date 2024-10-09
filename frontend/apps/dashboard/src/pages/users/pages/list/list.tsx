@@ -29,10 +29,10 @@ const List = () => {
       <EntitiesList title={t('header.title')} kind={EntityKind.person} basePath="users">
         <EntitiesTable
           aria-label={t('table.aria-label')}
-          searchPlaceholder={t('table.search-placeholder')}
           columns={columns}
           emptyStateText={t('table.empty-state')}
           renderTr={entity => <Row entity={entity} />}
+          searchPlaceholder={t('table.search-placeholder')}
         />
       </EntitiesList>
     </>

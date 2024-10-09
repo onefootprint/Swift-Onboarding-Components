@@ -8,6 +8,7 @@ import useEntityOtherInsights from './use-entity-other-insights';
 import useEntityOwnedBusinesses from './use-entity-owned-businesses';
 import useEntityRiskSignals from './use-entity-risk-signals';
 import useEntitySeqno from './use-entity-seqno';
+import useEntityTags from './use-entity-tags';
 import useEntityTimeline from './use-entity-timeline';
 
 const useEntityInitialData = () => {
@@ -21,6 +22,7 @@ const useEntityInitialData = () => {
   const entityAnnotations = useEntityAnnotations(id);
   const entityOtherInsights = useEntityOtherInsights(id);
   const entityOwnedBusinesses = useEntityOwnedBusinesses(id);
+  const entityTags = useEntityTags(id);
   const businessOwners = useBusinessOwners(id);
   const isPendingVault = entityVaultQuery.isPending && !entityQuery.isError;
 
@@ -34,6 +36,7 @@ const useEntityInitialData = () => {
       entityAnnotations.isPending ||
       entityOtherInsights.isPending ||
       entityOwnedBusinesses.isPending ||
+      entityTags.isPending ||
       businessOwners.isPending ||
       isPendingVault,
   };

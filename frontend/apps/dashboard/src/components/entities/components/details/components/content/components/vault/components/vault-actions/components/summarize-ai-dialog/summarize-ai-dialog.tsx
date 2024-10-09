@@ -73,7 +73,7 @@ const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
   };
 
   return (
-    <Dialog size="default" title={t('label')} onClose={handleClose} open={open}>
+    <Dialog size="default" title={t('title')} onClose={handleClose} open={open}>
       <Stack gap={3} direction="column" paddingBottom={4}>
         <AnimatePresence>
           {generateSummaryMutation.isPending ? (

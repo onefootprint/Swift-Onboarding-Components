@@ -227,24 +227,6 @@
           }
         }
       },
-      "edit-tags": {
-        "edit-title": "Edit tags",
-        "add-title": "Add tags",
-        "description": "Tags are an unstructured way to organize, categorize, and add metadata about your users.",
-        "empty-active-tags": "There are no tags associated with this user yet",
-        "inactive-tags": "Tags already used by {{org}}",
-        "add-tag": "Add custom tag",
-        "save": "Save",
-        "cancel": "Cancel",
-        "success-toast": {
-          "title": "Success!",
-          "description": "Your changes to tags have been saved."
-        },
-        "error-toast": {
-          "title": "Uh oh!",
-          "description": "One or more changes could not be saved: \n{{details}}"
-        }
-      },
       "upload-doc": {
         "label": "Upload document",
         "not-allowed": "You're not allowed to upload documents",
@@ -282,7 +264,6 @@
     "behavior": "Behavior",
     "device": "Browser / IP behavior"
   },
-
   "banner": {
     "cta": "See audit trail",
     "incomplete": {
@@ -583,18 +564,25 @@
     }
   },
   "actions": {
-    "edit-user": {
-      "label": "Edit user information",
-      "not-allowed": "You're not allowed to edit user information"
-    },
     "edit-tags": {
-      "edit-label": "Edit tags",
-      "add-label": "Add tags",
-      "not-allowed": "You are not allowed to edit tags"
+      "edit-title": "Edit tags",
+      "add-title": "Add tags",
+      "instructions": "Tags are an unstructured way to organize, categorize, and add metadata about your users.",
+      "empty-active-tags": "There are no tags associated with this user yet",
+      "org-tags": "Tags already used by {{org}}",
+      "add": "Add custom tag",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success-toast": {
+        "title": "Success!",
+        "description": "Your changes to tags have been saved."
+      },
+      "error-toast": {
+        "title": "Uh oh!",
+        "description": "One or more changes could not be saved: \n{{details}}"
+      }
     },
-    "open-datadog": "Open in Datadog",
     "summarize": {
-      "label": "Summarize with AI",
       "title": "Summarize user identity results",
       "detail": "Using AI, Footprint creates a human-readable summary of the user's verification decision, including manual review annotations, risk signals, rules triggered, authentication events, and timeline attributes.",
       "generate": "Re-generate summary",
@@ -605,7 +593,6 @@
       "conclusion": "Conclusion"
     },
     "request-more-info": {
-      "label": "Request more information",
       "title": "Request more information",
       "not-allowed": "You're not allowed to request additional information",
       "send-request": "Send request",
@@ -674,7 +661,6 @@
       }
     },
     "add-to-list": {
-      "label": "Add to list",
       "title": "Add to list",
       "description": "Add, edit, and remove lists from",
       "not-allowed": "You're not allowed to add entries to lists",
@@ -700,7 +686,6 @@
       }
     },
     "update-auth-methods": {
-      "label": "Allow updating login methods",
       "title": "Allowing updating login methods",
       "header": "Allow user to update authentication methods",
       "not-allowed": "You are not allowed to perform this action",
@@ -717,7 +702,6 @@
       "send-link-email": "Send via email"
     },
     "view-historical-data": {
-      "label": "View historical data",
       "title": "View historical data",
       "not-allowed": "You are not allowed to view historical data",
       "no-events": "This user has no events to select from, so there is no historical data available.",
@@ -733,19 +717,12 @@
         "exit": "Exit"
       }
     },
-    "share": {
-      "label": "Share"
-    },
     "send-link": {
       "header": "Success!",
       "description": {
         "phone": "User will receive an SMS detailing the next steps shortly",
         "email": "User will receive an email detailing the next steps shortly"
       }
-    },
-    "edit-business": {
-      "label": "Edit business information",
-      "not-allowed": "You're not allowed to edit business information"
     }
   },
   "manual-note-entry-form": {

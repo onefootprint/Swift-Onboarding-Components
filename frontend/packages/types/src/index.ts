@@ -400,7 +400,6 @@ export type {
   StepUpEventData,
   SupportedLocale,
   Tag,
-  TagWithId,
   OrgTag,
   Tenant,
   Timeline,

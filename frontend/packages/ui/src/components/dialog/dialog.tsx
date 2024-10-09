@@ -1,10 +1,10 @@
+import type { Icon } from '@onefootprint/icons';
 import * as RadixDialog from '@radix-ui/react-dialog';
+import { AnimatePresence } from 'framer-motion';
 import type React from 'react';
 import { forwardRef } from 'react';
 import ScrollArea from '../scroll-area';
 
-import type { Icon } from '@onefootprint/icons';
-import { AnimatePresence } from 'framer-motion';
 import Box from '../box';
 import Overlay from '../overlay';
 import Container from './container';
@@ -13,17 +13,18 @@ import Footer from './footer';
 import DialogHeader from './header';
 
 export type DialogProps = {
-  onClose: () => void;
-  open: boolean;
   children?: React.ReactNode;
-  size?: DialogSize;
-  title: string;
   isConfirmation?: boolean;
+  linkButton?: DialogLinkButton;
   noPadding?: boolean;
   noScroll?: boolean;
-  linkButton?: DialogLinkButton;
+  onClose: () => void;
+  open: boolean;
   primaryButton?: DialogButton;
   secondaryButton?: DialogButton;
+  size?: DialogSize;
+  title: string;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   headerIcon?: {
     component: Icon;
     onClick: () => void;
@@ -34,17 +35,18 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
   (
     {
       children,
-      onClose,
-      open,
-      size = 'default',
-      title,
+      headerIcon,
       isConfirmation = false,
+      linkButton,
       noPadding = false,
       noScroll = false,
+      onClose,
+      onEscapeKeyDown,
+      open,
       primaryButton,
       secondaryButton,
-      linkButton,
-      headerIcon,
+      size = 'default',
+      title,
     },
     ref,
   ) => {
@@ -61,12 +63,13 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
           <AnimatePresence>
             {open && (
               <Container
-                size={size}
+                aria-label={title}
+                data-has-footer={hasFooter}
                 isConfirmation={isConfirmation}
                 onClose={onClose}
-                ariaLabel={title}
+                onEscapeKeyDown={onEscapeKeyDown}
                 ref={ref}
-                data-has-footer={hasFooter}
+                size={size}
               >
                 <DialogHeader title={title} onClose={onClose} icon={headerIcon} />
                 {noScroll ? (

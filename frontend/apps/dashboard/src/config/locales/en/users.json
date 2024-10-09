@@ -16,15 +16,13 @@
       "last-activity-tooltip": "The timestamp at which the user last onboarded"
     },
     "row": {
-      "status": {
-        "on-watchlist": "Watchlist",
-        "on-review": "Manual review",
-        "outstanding-workflow-request": "Info requested",
-        "label": {
-          "active": "Active",
-          "offboard_fraud": "Offboarded (fraud)",
-          "offboard_other": "Offboarded (other)"
-        }
+      "on-watchlist": "Watchlist",
+      "on-review": "Manual review",
+      "outstanding-workflow-request": "Info requested",
+      "label": {
+        "active": "Active",
+        "offboard_fraud": "Offboarded (fraud)",
+        "offboard_other": "Offboarded (other)"
       }
     }
   }

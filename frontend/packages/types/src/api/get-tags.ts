@@ -1,5 +1,3 @@
-import type { TagWithId } from '../data';
+import type { Tag } from '../data';
 
-export type GetTagsResponse = (Omit<TagWithId, 'text'> & {
-  tag: string;
-})[];
+export type GetTagsResponse = Tag[];

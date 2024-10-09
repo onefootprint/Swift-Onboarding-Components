@@ -1,4 +1,5 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
+import type { DialogContentProps } from '@radix-ui/react-dialog';
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
@@ -6,15 +7,12 @@ import media from 'styled-media-query';
 import { FULL_SCREEN_PADDING, TOP_PADDING } from '../dialog.constants';
 import type { DialogSize } from '../dialog.types';
 
-interface ContainerProps {
-  children: React.ReactNode;
-  onClose: () => void;
-  ariaDescribedBy?: string;
-  ariaLabel: string;
+type ContainerProps = {
   dataTestId?: string;
-  size: DialogSize;
   isConfirmation: boolean;
-}
+  onClose: () => void;
+  size: DialogSize;
+} & DialogContentProps;
 
 const dialogAppearVariants = (isConfirmation: boolean, size: DialogSize) => {
   const theme = useTheme();
@@ -58,19 +56,23 @@ const dialogAppearVariants = (isConfirmation: boolean, size: DialogSize) => {
 };
 
 const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  ({ children, onClose, ariaDescribedBy, ariaLabel, dataTestId, size, isConfirmation }, ref) => (
+  ({ children, onEscapeKeyDown, onClose, dataTestId, size, isConfirmation, ...props }, ref) => (
     <RadixDialog.Content
+      {...props}
       onPointerDownOutside={onClose}
-      onEscapeKeyDown={onClose}
-      aria-describedby={ariaDescribedBy}
+      onEscapeKeyDown={event => {
+        if (onEscapeKeyDown) {
+          onEscapeKeyDown(event);
+        } else {
+          onClose();
+        }
+      }}
+      data-testid={dataTestId}
       ref={ref}
       asChild
     >
       <DialogContainer
         $isConfirmation={isConfirmation}
-        aria-label={ariaLabel}
-        data-testid={dataTestId}
-        aria-describedby={ariaDescribedBy}
         ref={ref}
         size={size}
         variants={dialogAppearVariants(isConfirmation, size)}

@@ -1,5 +1,5 @@
 import useEntityId from '@/entity/hooks/use-entity-id';
-import useTags from '@/entity/hooks/use-tags';
+import useTags from '@/entity/hooks/use-entity-tags';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, IconButton } from '@onefootprint/ui';

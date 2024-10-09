@@ -1,18 +1,18 @@
 import useEntityId from '@/entity/hooks/use-entity-id';
-import useTags from '@/entity/hooks/use-tags';
+import useEntityTags from '@/entity/hooks/use-entity-tags';
 import { Stack } from '@onefootprint/ui';
 import Tag from './components/tag';
 
 const Tags = () => {
   const entityId = useEntityId();
-  const { data: tags } = useTags(entityId);
+  const { data: tags } = useEntityTags(entityId);
   if (!tags || tags.length === 0) return null;
 
   return (
     <Stack direction="row" gap={3}>
       <Stack direction="row" gap={2}>
-        {tags.map(({ id, text }) => (
-          <Tag text={text} key={id} />
+        {tags.map(({ id, tag }) => (
+          <Tag text={tag} key={id} />
         ))}
       </Stack>
     </Stack>

@@ -1,11 +1,8 @@
-import type { TagWithId } from '../data';
+import type { Tag } from '../data';
 
 export type AddTagRequest = {
-  id: string;
+  entityId: string;
   text: string;
 };
 
-export type AddTagResponse = Omit<TagWithId, 'text'> &
-  {
-    tag: string; // On frontend this field is 'text', but backend uses 'tag'
-  }[];
+export type AddTagResponse = Tag[];

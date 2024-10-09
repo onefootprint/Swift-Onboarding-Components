@@ -1,5 +1,5 @@
 import { type Entity, EntityLabel } from '@onefootprint/types';
-import { Stack, Tag } from '@onefootprint/ui';
+import { Stack, Tag, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 export type TagsProps = {
@@ -7,11 +7,11 @@ export type TagsProps = {
 };
 
 const Labels = ({
-  entity: { watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest, label },
+  entity: { watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest, label, tags },
 }: TagsProps) => {
-  const { t } = useTranslation('users', { keyPrefix: 'table.row.status' });
+  const { t } = useTranslation('users', { keyPrefix: 'table.row' });
   const onWatchlist = watchlistCheck?.status === 'fail';
-  const showLabels = hasOutstandingWorkflowRequest || onWatchlist || requiresManualReview || label;
+  const showLabels = hasOutstandingWorkflowRequest || onWatchlist || requiresManualReview || label || tags?.length;
 
   const getLabel = () => {
     if (label === EntityLabel.active) {
@@ -32,6 +32,19 @@ const Labels = ({
       {onWatchlist && <Tag>{t('on-watchlist')}</Tag>}
       {requiresManualReview && <Tag>{t('on-review')}</Tag>}
       {label && <Tag>{getLabel()}</Tag>}
+      {tags && tags.length > 0 && (
+        <Tooltip
+          alignment="end"
+          disabled={tags.length < 2}
+          position="bottom"
+          text={tags.map(({ tag }) => `#${tag}`).join(', ')}
+        >
+          <Tag>
+            #{tags[0].tag}
+            {tags.length > 1 && ` +${Math.min(tags.length - 1, 9)}`}
+          </Tag>
+        </Tooltip>
+      )}
     </Stack>
   ) : null;
 };

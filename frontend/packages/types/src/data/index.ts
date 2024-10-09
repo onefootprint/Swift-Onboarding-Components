@@ -20,7 +20,7 @@ export type { ApiKey } from './api-key';
 export type { BeneficialOwner } from './beneficial-owner';
 export { BeneficialOwnerDataAttribute } from './beneficial-owner';
 export type { BiometricLoginChallengeJson } from './biometric-login-challenge-json';
-export type { Tag, TagWithId } from './tag';
+export type { Tag } from './tag';
 export type { OrgTag } from './org-tag';
 export type { BiometricRegisterChallengeJson } from './biometric-register-challenge-json';
 export type {

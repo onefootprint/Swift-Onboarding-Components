@@ -8,7 +8,7 @@ export type TagsProps = {
 };
 
 const Labels = ({ entity: { watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest } }: TagsProps) => {
-  const { t } = useTranslation('users', { keyPrefix: 'table.row.status' });
+  const { t } = useTranslation('users', { keyPrefix: 'table.row' });
   const onWatchlist = watchlistCheck?.status === 'fail';
   const showLabels = hasOutstandingWorkflowRequest || onWatchlist || requiresManualReview;
 
