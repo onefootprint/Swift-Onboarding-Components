@@ -17,6 +17,7 @@ use db::models::vault::Vault;
 use db::schema::data_lifetime;
 use db::schema::fingerprint;
 use db::schema::fingerprint_junction;
+use db::schema::scoped_vault_version;
 use db::schema::vault;
 use db::schema::vault_data;
 use db::DbError;
@@ -110,6 +111,12 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
                 .get_results::<(DbFingerprint, DataLifetime)>(conn.conn())
                 .map_err(DbError::from)?;
 
+            let lowest_dl = results
+                .iter()
+                .map(|(_, dl)| dl)
+                .min_by_key(|dl| dl.created_seqno)
+                .cloned();
+
             let latest_dl_per_fp = results
                 .into_iter()
                 .into_group_map_by(|(fp, _)| fp.id.clone())
@@ -151,7 +158,6 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
                         }
                     };
 
-                    // TODO: fetch token_di and token from dl and vd...
                     let e_data = v.public_key.seal_pii(&p_data)?;
                     let new_dl = NewDataLifetime {
                         vault_id: dl.vault_id,
@@ -206,6 +212,15 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
 
             for result in results {
                 result?
+            }
+
+            if let Some(lowest_dl) = lowest_dl {
+                let _ = diesel::update(scoped_vault_version::table)
+                    .filter(scoped_vault_version::scoped_vault_id.eq(&sv.id))
+                    .filter(scoped_vault_version::seqno.ge(&lowest_dl.created_seqno))
+                    .set(scoped_vault_version::backed_up_by_vdr_config_id.eq(None as Option<String>))
+                    .execute(conn.conn())
+                    .map_err(DbError::from)?;
             }
 
             Ok(())
