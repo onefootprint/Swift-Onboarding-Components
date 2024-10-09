@@ -15,6 +15,7 @@ export type UpdateTenantVendorControl = {
   lexisEnabled?: boolean;
   experianSubscriberCode?: string | null;
   middeskApiKey?: string | null;
+  neuroEnabled?: boolean;
 };
 
 export type UpdateTenantBillingProfile = {
@@ -62,7 +63,7 @@ const useUpdateTenant = (id: string) => {
   return useMutation({
     mutationFn: (data: PrivatePatchTenantRequest) => patchTenant(authHeaders, id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries();
     },
   });
 };

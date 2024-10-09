@@ -9,6 +9,7 @@ export type TenantVendorControlFormData = {
   lexisEnabled: boolean;
   experianSubscriberCode: string;
   middeskApiKey: string;
+  neuroEnabled: boolean;
 };
 
 const newMiddeskApiKey = (newKey: string, exists: boolean) => {
@@ -33,4 +34,5 @@ export const convertFormData = (
   lexisEnabled: ifChanged(formData.lexisEnabled, tvc?.lexisEnabled),
   experianSubscriberCode: ifChanged(strOrNull(formData.experianSubscriberCode), strOrNull(tvc?.experianSubscriberCode)),
   middeskApiKey: newMiddeskApiKey(formData.middeskApiKey, !!tvc?.middeskApiKeyExists),
+  neuroEnabled: ifChanged(formData.neuroEnabled, tvc?.neuroEnabled),
 });

@@ -25,6 +25,7 @@ const getDefaultValues = (tvc?: TenantVendorControl): TenantVendorControlFormDat
   experianSubscriberCode: tvc?.experianSubscriberCode || '',
   // Since the middesk API key is encrypted, use encrypted text as a placeholder
   middeskApiKey: tvc?.middeskApiKeyExists ? '••••••••••' : '',
+  neuroEnabled: tvc?.neuroEnabled || false,
 });
 
 const VendorControl = ({ tenant }: BillingProfileProps) => {
@@ -51,6 +52,11 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
       title: 'Lexis Enabled',
       content: checkbox(tvc?.lexisEnabled),
       editModeContent: <Checkbox {...register('lexisEnabled', {})} />,
+    },
+    {
+      title: 'Neuro Enabled',
+      content: checkbox(tvc?.neuroEnabled),
+      editModeContent: <Checkbox {...register('neuroEnabled', {})} />,
     },
     {
       title: 'Experian Subscriber Code',
