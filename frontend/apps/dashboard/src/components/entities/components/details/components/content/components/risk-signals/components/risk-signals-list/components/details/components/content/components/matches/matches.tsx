@@ -1,6 +1,6 @@
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
-import { CopyButton, LinkButton, Stack, Text, createFontStyles, useToast } from '@onefootprint/ui';
+import { Box, CopyButton, LinkButton, Stack, Text, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -46,12 +46,16 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
       )}
       <AmlSection>
         {aml?.shareUrl && (
-          <Stack direction="column" width="100%">
+          <Stack direction="column" width="100%" maxWidth="100%">
             <Text variant="label-3" color="tertiary" marginBottom={2}>
               {t('source-url.label')}
             </Text>
-            <Stack align="center" justify="space-between">
-              <SourceUrl>{aml.shareUrl}</SourceUrl>
+            <Stack align="center" gap={3}>
+              <Box maxWidth="100%" overflow="hidden">
+                <Text variant="body-3" truncate>
+                  {aml.shareUrl}
+                </Text>
+              </Box>
               <CopyButton
                 ariaLabel={t('source-url.copy')}
                 contentToCopy={aml.shareUrl}
@@ -95,14 +99,6 @@ const MatchesSection = styled.section`
 const AmlSection = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const SourceUrl = styled.p`
-  width: 90%;
-  ${createFontStyles('body-3')};
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
 `;
 
 export default Matches;

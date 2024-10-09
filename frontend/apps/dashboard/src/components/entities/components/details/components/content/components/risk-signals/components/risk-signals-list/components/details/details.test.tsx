@@ -53,12 +53,10 @@ describe('<Details />', () => {
       withRiskSignalDetailsError();
       renderRiskSignalDetails();
 
-      await waitFor(() => {
-        const loader = screen.getByRole('progressbar', {
-          name: 'Loading details...',
-        });
-        expect(loader).toBeInTheDocument();
+      const loader = await screen.findByRole('progressbar', {
+        name: 'Loading details...',
       });
+      expect(loader).toBeInTheDocument();
 
       await waitForElementToBeRemoved(() =>
         screen.queryByRole('progressbar', {
@@ -77,12 +75,10 @@ describe('<Details />', () => {
         withRiskSignalDetails();
         renderRiskSignalDetails();
 
-        await waitFor(() => {
-          const loader = screen.getByRole('progressbar', {
-            name: 'Loading details...',
-          });
-          expect(loader).toBeInTheDocument();
+        const loader = await screen.findByRole('progressbar', {
+          name: 'Loading details...',
         });
+        expect(loader).toBeInTheDocument();
 
         await waitForElementToBeRemoved(() =>
           screen.queryByRole('progressbar', {
@@ -115,111 +111,86 @@ describe('<Details />', () => {
       it('should initially be encrypted', async () => {
         await renderRiskSignalDetailsAndWaitData();
 
-        await waitFor(() => {
-          const decryptTitle = screen.getByText('Protected details');
-          expect(decryptTitle).toBeInTheDocument();
+        const decryptTitle = await screen.findByText('Protected details');
+        expect(decryptTitle).toBeInTheDocument();
+
+        const decryptButton = await screen.findByRole('button', {
+          name: 'Decrypt',
         });
-        await waitFor(() => {
-          const decryptButton = screen.getByRole('button', {
-            name: 'Decrypt',
-          });
-          expect(decryptButton).toBeInTheDocument();
-        });
+        expect(decryptButton).toBeInTheDocument();
       });
 
       it('should show the aml hits data after decryption', async () => {
         withDecryptRiskSignalAmlHits();
         await renderRiskSignalDetailsAndWaitData();
 
-        await waitFor(() => {
-          const decryptButton = screen.getByRole('button', {
-            name: 'Decrypt',
-          });
-          expect(decryptButton).toBeInTheDocument();
+        const decryptButton = await screen.findByRole('button', {
+          name: 'Decrypt',
         });
+        expect(decryptButton).toBeInTheDocument();
         await userEvent.click(
           screen.getByRole('button', {
             name: 'Decrypt',
           }),
         );
 
-        await waitFor(() => {
-          const sourceUrlValue = screen.getByText(`${amlDetailFixture.shareUrl}`);
-          expect(sourceUrlValue).toBeInTheDocument();
-        });
+        const sourceUrlValue = await screen.findByText(`${amlDetailFixture.shareUrl}`);
+        expect(sourceUrlValue).toBeInTheDocument();
 
         // Show Name, Match types, first 6 fields, Show all, and Relevant media
-        await waitFor(() => {
-          const nameRow = screen.getByRole('group', {
-            name: 'name',
-          });
-          expect(within(nameRow).getByText('John Smith')).toBeInTheDocument();
+        const nameRow = await screen.findByRole('group', {
+          name: 'name',
         });
+        expect(within(nameRow).getByText('John Smith')).toBeInTheDocument();
 
-        await waitFor(() => {
-          const matchTypesRow = screen.getByRole('group', {
-            name: 'matchTypes',
-          });
-          expect(within(matchTypesRow).getByText('Name exact')).toBeInTheDocument();
+        const matchTypesRow = await screen.findByRole('group', {
+          name: 'matchTypes',
         });
+        expect(within(matchTypesRow).getByText('Name exact')).toBeInTheDocument();
 
-        await waitFor(() => {
-          const showAllRow = screen.getByRole('group', {
-            name: 'showAll',
-          });
-          expect(within(showAllRow).getByText('2 more data matches')).toBeInTheDocument();
+        const showAllRow = await screen.findByRole('group', {
+          name: 'showAll',
         });
+        expect(within(showAllRow).getByText('2 more data matches')).toBeInTheDocument();
 
-        await waitFor(() => {
-          const relevantMediaRow = screen.getByRole('group', {
-            name: 'relevantMedia',
-          });
-          expect(within(relevantMediaRow).getByText('Relevant media')).toBeInTheDocument();
+        const relevantMediaRow = await screen.findByRole('group', {
+          name: 'relevantMedia',
         });
+        expect(within(relevantMediaRow).getByText('Relevant media')).toBeInTheDocument();
 
-        await waitFor(() => {
-          const genderRow = screen.queryByRole('group', {
-            name: 'gender',
-          });
-          expect(genderRow).not.toBeInTheDocument();
+        const genderRow = screen.queryByRole('group', {
+          name: 'gender',
         });
+        expect(genderRow).not.toBeInTheDocument();
       });
 
       it('should reveal all fields after clicking Show all', async () => {
         withDecryptRiskSignalAmlHits();
         await renderRiskSignalDetailsAndWaitData();
 
-        await waitFor(() => {
-          const decryptButton = screen.getByRole('button', {
-            name: 'Decrypt',
-          });
-          expect(decryptButton).toBeInTheDocument();
+        const decryptButton = await screen.findByRole('button', {
+          name: 'Decrypt',
         });
+        expect(decryptButton).toBeInTheDocument();
         await userEvent.click(
           screen.getByRole('button', {
             name: 'Decrypt',
           }),
         );
 
-        await waitFor(() => {
-          const showAllButton = screen.getByText('Show all');
-          expect(showAllButton).toBeInTheDocument();
-        });
+        const showAllButton = await screen.findByText('Show all');
+        expect(showAllButton).toBeInTheDocument();
         await userEvent.click(screen.getByText('Show all'));
 
-        await waitFor(() => {
-          const genderRow = screen.getByRole('group', {
-            name: 'gender',
-          });
-          expect(within(genderRow).getByText('Male')).toBeInTheDocument();
+        const genderRow = await screen.findByRole('group', {
+          name: 'gender',
         });
+        expect(within(genderRow).getByText('Male')).toBeInTheDocument();
 
-        await waitFor(() => {
-          const locationurlRow = screen.getByRole('group', {
-            name: 'locationurl',
-          });
-          expect(within(locationurlRow).getByText('https://locationurl.com')).toBeInTheDocument();
+        const locationurlRow = await screen.findByRole('group', {
+          name: 'locationurl',
         });
+        expect(within(locationurlRow).getByText('https://locationurl.com')).toBeInTheDocument();
       });
 
       it('should show aml media data after clicking See more', async () => {

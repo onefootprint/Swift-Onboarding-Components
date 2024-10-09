@@ -51,6 +51,7 @@ const Container = styled.header`
     flex-shrink: 0;
     height: 52px;
     position: relative;
+    width: 100%;
   `}
 `;
 

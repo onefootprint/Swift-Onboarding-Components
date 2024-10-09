@@ -1,4 +1,3 @@
-import { IcoUserCircle16 } from '@onefootprint/icons';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -48,9 +47,6 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
 
   return (
     <HitContainer key={JSON.stringify(flattenedHit)}>
-      <IconContainer>
-        <IcoUserCircle16 />
-      </IconContainer>
       {flattenedHit.map(({ key, value }) => (
         <HitItemRow
           key={key}
@@ -63,12 +59,6 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
     </HitContainer>
   );
 };
-
-const IconContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[2]};
-  `}
-`;
 
 const HitContainer = styled.div`
   ${({ theme }) => css`

@@ -1,4 +1,3 @@
-import { IcoCopy16 } from '@onefootprint/icons';
 import type { AmlHitMedia } from '@onefootprint/types';
 import { Box, CopyButton, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
@@ -21,21 +20,23 @@ const HitItemRow = ({ fieldName, fieldValue, handleShowAllFields, handleShowAmlM
   const renderMatchTypes = (matchTypes: string[]) => matchTypes.map((str: string) => toReadableString(str)).join(', ');
 
   const renderLocationUrlValue = (url: string) => (
-    <Stack align="center" justify="space-between">
-      <Url>{url}</Url>
-      <CopyButton ariaLabel={t('copy')} contentToCopy={url} tooltip={{ position: 'bottom' }}>
-        <IcoCopy16 />
-      </CopyButton>
+    <Stack align="center" justify="space-between" direction="row" maxWidth="100%">
+      <Text variant="body-3" truncate>
+        {url}
+      </Text>
+      <CopyButton ariaLabel={t('copy')} contentToCopy={url} tooltip={{ position: 'bottom' }} />
     </Stack>
   );
 
   const renderGeneralValue = (generalValue: string) => (
-    <Text variant="body-3" truncate textAlign="right">
-      {generalValue.charAt(0).toUpperCase() + generalValue.slice(1)}
-    </Text>
+    <Text variant="body-3">{generalValue.charAt(0).toUpperCase() + generalValue.slice(1)}</Text>
   );
 
-  const renderShowAllValue = () => <LinkButton onClick={handleShowAllFields}>{t('show-all.value')}</LinkButton>;
+  const renderShowAllValue = () => (
+    <LinkButton variant="label-3" onClick={handleShowAllFields}>
+      {t('show-all.value')}
+    </LinkButton>
+  );
 
   const renderMediaValue = (media: AmlHitMedia[]) => (
     <LinkButton onClick={() => handleShowAmlMedia(media)}>{t('media')}</LinkButton>
@@ -57,36 +58,17 @@ const HitItemRow = ({ fieldName, fieldValue, handleShowAllFields, handleShowAmlM
   const labelText =
     fieldName === 'showAll' ? t('show-all.label', { count: fieldValue as number }) : toReadableString(fieldName);
   return (
-    <Box alignItems="center" justifyContent="space-between" display="flex" gap={9} role="group" aria-label={fieldName}>
-      <LabelContainer>
-        <Text variant="body-3" color="tertiary" textAlign="left" width="fit-content">
-          {labelText}
-        </Text>
-      </LabelContainer>
+    <Stack direction="column" role="group" aria-label={fieldName} gap={1}>
+      <Text variant="body-3" color="tertiary" textAlign="left">
+        {labelText}
+      </Text>
       <ValueContainer>{valueElement}</ValueContainer>
-    </Box>
+    </Stack>
   );
 };
 
-const LabelContainer = styled.div`
-  text-align: left;
-  max-width: fit-content;
-  flex: 1;
-`;
-
-const ValueContainer = styled.div`
-  text-align: right;
-  max-width: fit-content;
-  flex: 1;
-  overflow: hidden;
-`;
-
-const Url = styled.div`
-  width: 90%;
-  ${createFontStyles('body-3')};
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+const ValueContainer = styled(Box)`
+  ${createFontStyles('body-3')}
 `;
 
 export default HitItemRow;
