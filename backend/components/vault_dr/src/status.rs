@@ -12,6 +12,7 @@ pub struct BackupStatus {
     pub lag_seconds: i64,
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn get_backup_status(state: &State, config_id: &VaultDrConfigId) -> FpResult<BackupStatus> {
     let config_id = config_id.clone();
     state

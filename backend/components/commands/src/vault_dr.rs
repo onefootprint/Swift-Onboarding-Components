@@ -80,8 +80,8 @@ impl VaultDrWorker {
 
     fn knobs(&self) -> Knobs {
         Knobs {
-            blob_batch_size: self.blob_batch_size,
             manifest_batch_size: self.manifest_batch_size,
+            blob_batch_size: self.blob_batch_size,
             record_task_concurrency: self.record_task_concurrency,
             manifest_task_concurrency: self.manifest_task_concurrency,
         }

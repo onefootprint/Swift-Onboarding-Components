@@ -207,12 +207,12 @@ config:
       memoryMB: 1024
       name: execute-tasks
     - args:
-      - vault-dr-worker
-      - --blob-batch-size=1024
-      - --manifest-batch-size=0
-      - --poll-period-ms=5000
-      - --record-task-concurrency=64
-      - --manifest-task-concurrency=64
+        - vault-dr-worker
+        - --manifest-batch-size=1024
+        - --blob-batch-size=2048
+        - --poll-period-ms=5000
+        - --record-task-concurrency=64
+        - --manifest-task-concurrency=64
       cpuUnits: 1024
       memoryMB: 2048
       name: vault-dr

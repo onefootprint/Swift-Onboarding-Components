@@ -22,8 +22,8 @@ struct VaultDrRunBatchRequest {
 
     pub fp_ids: Option<Vec<FpId>>,
 
-    pub blob_batch_size: u32,
     pub manifest_batch_size: u32,
+    pub blob_batch_size: u32,
 }
 
 #[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]
@@ -42,8 +42,8 @@ pub async fn post(
     let VaultDrRunBatchRequest {
         tenant_id,
         is_live,
-        blob_batch_size,
         manifest_batch_size,
+        blob_batch_size,
         fp_ids,
     } = request.into_inner();
 
@@ -60,8 +60,8 @@ pub async fn post(
         .await?;
 
     let knobs = vault_dr::Knobs {
-        blob_batch_size,
         manifest_batch_size,
+        blob_batch_size,
         ..Default::default()
     };
 
@@ -70,10 +70,10 @@ pub async fn post(
     let BatchResult {
         num_blobs,
         num_manifests,
-    } = writer.write_batch(&state, fp_ids).await?;
+    } = writer.run_batch(&state, fp_ids).await?;
 
     Ok(VaultDrRunBatchResponse {
-        num_blobs,
-        num_manifests,
+        num_blobs: num_blobs as u32,
+        num_manifests: num_manifests as u32,
     })
 }

@@ -1,3 +1,6 @@
+use crate::get_backup_status;
+use crate::BackupStatus;
+use crate::BatchResult;
 use crate::VaultDrWriter;
 use api_core::FpResult;
 use api_core::State;
@@ -6,17 +9,14 @@ use newtypes::VaultDrConfigId;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Knobs {
-    // The number of new manifests/scoped vault versions is <= the number of new blobs, since
-    // there can be at most one manifest per blob already written to the DB. Therefore, under
-    // ideal conditions, equal batch sizes would allow for the writer to stay up to date on
-    // writing manifests. However, since writing manifests may fail after successfully writing
-    // blobs, the queue of manifests to write may grow larger than the blob batch size. So to
-    // allow the writer to catch up a modest backlog of manifests without intervention, we use
-    // a greater batch size limit for manifests.
-    //
-    // We allow for independent control of these batch sizes to facilitate backfills.
-    pub blob_batch_size: u32,
+    /// The maximum number of manifests to attempt to write in a single batch.
+    /// The number of manifests actually written is constrained by whether associated blobs have
+    /// all been written.
     pub manifest_batch_size: u32,
+    /// The maximum number of blobs to write in a single batch. The number of blobs actually
+    /// selected for writing is determined by the number of manifests chosen for the batch and how
+    /// many associated blobs have not been written.
+    pub blob_batch_size: u32,
 
     pub record_task_concurrency: usize,
     pub manifest_task_concurrency: usize,
@@ -25,15 +25,15 @@ pub struct Knobs {
 impl Default for Knobs {
     fn default() -> Self {
         Self {
-            blob_batch_size: 1000,
-            manifest_batch_size: 1500,
+            manifest_batch_size: 1024,
+            blob_batch_size: 2048,
             record_task_concurrency: 64,
             manifest_task_concurrency: 64,
         }
     }
 }
 
-// For each enrolled tenant, encrypt and write up to `batch_size` records to Vault DR buckets.
+// For each enrolled tenant, encrypt and write records to Vault DR buckets.
 // Errors returned from this function cause the worker to shut down.
 pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
     let configs = state.db_pool.db_query(VaultDrConfig::list).await?;
@@ -55,12 +55,26 @@ pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
         );
         let result = run_batch_for_config(state, knobs, &config_id).await;
         match result {
-            Ok(_) => {
+            Ok((batch_result, backup_status)) => {
+                let BatchResult {
+                    num_blobs,
+                    num_manifests,
+                } = batch_result;
+
+                let BackupStatus {
+                    latest_backup_record_timestamp,
+                    lag_seconds,
+                } = backup_status;
+
                 tracing::info!(
                     %config_id,
                     %tenant_id,
                     is_live,
                     ?knobs,
+                    num_blobs,
+                    num_manifests,
+                    ?latest_backup_record_timestamp,
+                    lag_seconds,
                     "Batch completed for config"
                 );
             }
@@ -81,11 +95,16 @@ pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
 }
 
 
-#[tracing::instrument("vault_dr::run_batch_for_config", skip_all)]
-async fn run_batch_for_config(state: &State, knobs: Knobs, config_id: &VaultDrConfigId) -> FpResult<()> {
+#[tracing::instrument("vault_dr::run_batch_for_config", skip_all, fields(config_id = %config_id))]
+async fn run_batch_for_config(
+    state: &State,
+    knobs: Knobs,
+    config_id: &VaultDrConfigId,
+) -> FpResult<(BatchResult, BackupStatus)> {
     let vdr_writer = VaultDrWriter::new(state, config_id, knobs).await?;
+    let result = vdr_writer.run_batch(state, None).await?;
 
-    vdr_writer.write_batch(state, None).await?;
+    let status = get_backup_status(state, config_id).await?;
 
-    Ok(())
+    Ok((result, status))
 }

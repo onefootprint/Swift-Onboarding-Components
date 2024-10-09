@@ -18,8 +18,9 @@ use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::primitives::SdkBody;
 use db::errors::FpOptionalExtension;
 use db::helpers::vault_dr::bulk_get_vdr_blob_keys_active_at;
-use db::helpers::vault_dr::incorrect_get_vault_dr_data_lifetime_batch;
-use db::helpers::vault_dr::incorrect_get_vault_dr_scoped_vault_version_batch;
+use db::helpers::vault_dr::get_complete_svvs_for_svv_batch;
+use db::helpers::vault_dr::get_dl_batch_for_svv_batch;
+use db::helpers::vault_dr::get_scoped_vault_version_batch;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::IsLive;
 use db::models::scoped_vault::ScopedVault;
@@ -31,6 +32,7 @@ use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use db::models::vault_dr::VaultDrManifest;
+use db::DbResult;
 use futures::FutureExt;
 use futures::Stream;
 use futures::StreamExt;
@@ -84,8 +86,8 @@ pub struct EncryptedRecord {
 }
 
 pub struct BatchResult {
-    pub num_blobs: u32,
-    pub num_manifests: u32,
+    pub num_blobs: usize,
+    pub num_manifests: usize,
 }
 
 impl VaultDrWriter {
@@ -153,13 +155,86 @@ impl VaultDrWriter {
         Ok(writer)
     }
 
-    pub async fn write_batch(&self, state: &State, fp_id_filter: Option<Vec<FpId>>) -> FpResult<BatchResult> {
-        let num_blobs = self
-            .write_blob_batch(state, self.knobs.blob_batch_size, fp_id_filter.clone())
+    pub async fn run_batch(&self, state: &State, fp_id_filter: Option<Vec<FpId>>) -> FpResult<BatchResult> {
+        // Modeled in backend/formal_methods/vault_disaster_recovery/vdr.tla
+
+        let tenant_id = self.tenant_id.clone();
+        let config_id = self.config_id.clone();
+        let is_live = self.is_live;
+
+        let manifest_batch_size = self.knobs.manifest_batch_size as usize;
+        let blob_batch_size = self.knobs.blob_batch_size as usize;
+
+        let (svv_batch, dls) = state
+            .db_pool
+            .db_query(move |conn| -> DbResult<_> {
+                // TLA+ Spec: GetVaultVersionBatch
+                let svv_batch = get_scoped_vault_version_batch(
+                    conn,
+                    &tenant_id,
+                    is_live,
+                    &config_id,
+                    manifest_batch_size,
+                    fp_id_filter,
+                )?;
+
+                // TLA+ Spec: GetDlBatch
+                let dls = get_dl_batch_for_svv_batch(
+                    conn,
+                    &tenant_id,
+                    is_live,
+                    &config_id,
+                    &svv_batch,
+                    blob_batch_size,
+                )?;
+
+                Ok((svv_batch, dls))
+            })
             .await?;
 
-        let num_manifests = self
-            .write_manifest_batch(state, self.knobs.manifest_batch_size, fp_id_filter)
+        // TLA+ Spec: WriteBlobsToS3
+        let new_blobs = self.write_blob_batch_to_s3(state, dls).await?;
+        let num_blobs = new_blobs.len();
+
+        // TLA+ Spec: CommitBlobBatch
+        state
+            .db_pool
+            .db_transaction(move |conn| VaultDrBlob::bulk_create(conn, new_blobs))
+            .await?;
+
+        // TLA+ Spec: GetCompleteVaultVersionBatch
+        let config_id = self.config_id.clone();
+        let complete_svvs = state
+            .db_pool
+            .db_query(move |conn| -> DbResult<_> {
+                get_complete_svvs_for_svv_batch(conn, &config_id, &svv_batch)
+            })
+            .await?;
+
+        let complete_svv_ids = complete_svvs.iter().map(|svv| svv.id.clone()).collect_vec();
+
+        // TLA+ Spec:
+        //  GetDlsForCompleteVaultVersionBatch
+        //  WriteVersionedManifestsToS3
+        //  WriteLatestManifestsToS3
+        let new_manifests = self.write_manifests_to_s3(state, complete_svvs).await?;
+        let num_manifests = new_manifests.len();
+
+        let config_id = self.config_id.clone();
+        state
+            .db_pool
+            .db_transaction(move |conn| -> DbResult<_> {
+                VaultDrManifest::bulk_create(conn, new_manifests)?;
+
+                // TLA+ Spec: CommitManifests
+                ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id(
+                    conn,
+                    &complete_svv_ids,
+                    &config_id,
+                )?;
+
+                Ok(())
+            })
             .await?;
 
         Ok(BatchResult {
@@ -169,33 +244,24 @@ impl VaultDrWriter {
     }
 
     #[tracing::instrument("VaultDrWriter::write_blob_batch", skip_all)]
-    async fn write_blob_batch(
+    async fn write_blob_batch_to_s3(
         &self,
         state: &State,
-        batch_size: u32,
-        fp_id_filter: Option<Vec<FpId>>,
-    ) -> FpResult<u32> {
+        dls: Vec<DataLifetime>,
+    ) -> FpResult<Vec<NewVaultDrBlob>> {
         let tenant_id = self.tenant_id.clone();
-        let config_id = self.config_id.clone();
         let is_live = self.is_live;
+
+        let sv_ids = dls.iter().map(|dl| dl.scoped_vault_id.clone()).collect_vec();
 
         let (dls, sv_id_to_fp_id) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let dls = incorrect_get_vault_dr_data_lifetime_batch(
-                    conn,
-                    &tenant_id,
-                    is_live,
-                    &config_id,
-                    batch_size,
-                    fp_id_filter,
-                )?;
-
-                let sv_ids = dls.iter().map(|dl| &dl.scoped_vault_id).collect_vec();
-                let sv_id_to_fp_id: HashMap<_, _> = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, is_live)?
-                    .into_iter()
-                    .map(|(sv, _)| (sv.id, sv.fp_id))
-                    .collect();
+                let sv_id_to_fp_id: HashMap<_, _> =
+                    ScopedVault::bulk_get(conn, sv_ids.iter().collect_vec(), &tenant_id, is_live)?
+                        .into_iter()
+                        .map(|(sv, _)| (sv.id, sv.fp_id))
+                        .collect();
 
                 Ok((dls, sv_id_to_fp_id))
             })
@@ -246,22 +312,16 @@ impl VaultDrWriter {
             .into_iter()
             .collect::<FpResult<Vec<_>>>()?;
 
-        let blob_count = new_blobs.len();
-        state
-            .db_pool
-            .db_transaction(move |conn| VaultDrBlob::bulk_create(conn, new_blobs))
-            .await?;
-
         tracing::info!(
             config_id=%self.config_id,
             tenant_id=%self.tenant_id,
             is_live,
-            blob_count,
+            blob_count = new_blobs.len(),
             concurrency_limit,
             "Wrote batch of encrypted record blobs to S3"
         );
 
-        Ok(blob_count as u32)
+        Ok(new_blobs)
     }
 
     #[tracing::instrument("VaultDrWriter::encrypt_and_write_record_to_s3", skip_all, fields(
@@ -430,41 +490,24 @@ impl VaultDrWriter {
         Ok(new_blob)
     }
 
-    /// Writes manifests corresponding with up to `batch_size` ScopedVaultVersions.
-    #[tracing::instrument("VaultDrWriter::write_manifest_batch", skip_all)]
-    async fn write_manifest_batch(
+    /// For ScopedVaultVersions that have all dependant blobs written and all previous manifests
+    /// written, build and write manifests to S3.
+    #[tracing::instrument("VaultDrWriter::write_manifests_to_s3", skip_all)]
+    async fn write_manifests_to_s3(
         &self,
         state: &State,
-        batch_size: u32,
-        fp_id_filter: Option<Vec<FpId>>,
-    ) -> FpResult<u32> {
+        svvs: Vec<ScopedVaultVersion>,
+    ) -> FpResult<Vec<NewVaultDrManifest>> {
         let tenant_id = self.tenant_id.clone();
-        let config_id = self.config_id.clone();
-        let is_live = self.is_live;
-
-        // First get all ScopedVaultVersions for this batch.
-        let (tenant, svvs) = state
+        let tenant = state
             .db_pool
-            .db_query(move |conn| -> FpResult<_> {
-                let tenant = Tenant::get(conn, &tenant_id)?;
-
-                let svvs = incorrect_get_vault_dr_scoped_vault_version_batch(
-                    conn,
-                    &tenant_id,
-                    is_live,
-                    &config_id,
-                    batch_size,
-                    fp_id_filter,
-                )?;
-
-                Ok((tenant, svvs))
-            })
+            .db_query(move |conn| -> DbResult<_> { Tenant::get(conn, &tenant_id) })
             .await?;
 
         // Only write manifests for demo tenants for now until we update the client to test the
         // feature end-to-end. That way, we can easily clean up bugs without involving customers.
         if !tenant.is_demo_tenant {
-            return Ok(0);
+            return Ok(vec![]);
         }
 
         // Determine which SVVs should have a manifest.latest.json written in this batch.
@@ -488,29 +531,33 @@ impl VaultDrWriter {
         // of S3 writes supports the following invariants:
         // - LatestS3ManifestNotWrittenWithoutVersionedManifest
         // - S3VersionedManifestVersionsAreNotSkippedBeforeLatestManifestsWritten
+
+        // TLA+ Spec: WriteVersionedManifestsToS3
         let new_versioned_manifests = self
-            .build_and_write_manifests_to_s3(state, &self.config_id, &self.tenant_id, is_live, svvs, false)
+            .build_and_write_manifests_to_s3(
+                state,
+                &self.config_id,
+                &self.tenant_id,
+                self.is_live,
+                svvs,
+                false,
+            )
             .await?;
+
+        // TLA+ Spec: WriteLatestManifestsToS3
         let new_latest_manifests = self
             .build_and_write_manifests_to_s3(
                 state,
                 &self.config_id,
                 &self.tenant_id,
-                is_live,
+                self.is_live,
                 latest_svvs,
                 true,
             )
             .await?;
 
         let all_new_manifests = chain!(new_versioned_manifests, new_latest_manifests).collect_vec();
-
-        let manifest_count = all_new_manifests.len();
-        state
-            .db_pool
-            .db_transaction(move |conn| VaultDrManifest::bulk_create(conn, all_new_manifests))
-            .await?;
-
-        Ok(manifest_count as u32)
+        Ok(all_new_manifests)
     }
 
     async fn build_and_write_manifests_to_s3(
@@ -614,6 +661,8 @@ impl VaultDrWriter {
                 let svvs = svvs.clone();
                 move |conn| -> FpResult<_> {
                     let svv_ids = svvs.iter().map(|svv| &svv.id).collect_vec();
+
+                    // TLA+ Spec: GetDlsForCompleteVaultVersionBatch
                     let svv_id_to_blobs = bulk_get_vdr_blob_keys_active_at(conn, &config_id, svv_ids)?;
 
                     let sv_ids = svvs.iter().map(|svv| &svv.scoped_vault_id).collect_vec();
