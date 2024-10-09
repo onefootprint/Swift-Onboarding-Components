@@ -20,7 +20,6 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
 
     if (name) sortedHit.push({ key: 'name', value: name });
     if (matchTypes) sortedHit.push({ key: 'matchTypes', value: matchTypes });
-
     if (fields) {
       const numTotalFields = Object.keys(fields).length;
       const numFieldsShown = isCollapsed ? MAX_NUM_FIELDS_SHOWN : numTotalFields;
@@ -30,14 +29,13 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
           sortedHit.push({ key, value: fields[key] });
         }
       });
-      if (isCollapsed) {
+      if (isCollapsed && numTotalFields > numFieldsShown) {
         sortedHit.push({
           key: 'showAll',
           value: numTotalFields - numFieldsShown,
         });
       }
     }
-
     if (media?.length) sortedHit.push({ key: 'relevantMedia', value: media });
 
     return sortedHit;
