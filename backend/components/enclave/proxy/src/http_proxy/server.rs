@@ -89,6 +89,7 @@ pub async fn run(config: Config) -> Result<(), std::io::Error> {
 /// Record errors that occur from enclave pool connections
 #[derive(Debug, Clone)]
 struct EnclavePoolErrorSink;
+
 impl bb8::ErrorSink<crate::Error> for EnclavePoolErrorSink {
     fn sink(&self, err: crate::Error) {
         tracing::error!(target: "enclave_pool_error", ?err, "enclave connection pool error");
