@@ -1,6 +1,13 @@
 import arrow
 import pytest
-from tests.utils import post, create_ob_config, get, patch, _gen_random_ssn
+from tests.utils import (
+    _gen_random_n_digit_number,
+    post,
+    create_ob_config,
+    get,
+    patch,
+    _gen_random_ssn,
+)
 from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
@@ -327,8 +334,11 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     Test that we can portablize data on a vault initially created via API. We test this by
     one-click authing onto the user via another tenant
     """
+    first_name = f"Piip {_gen_random_n_digit_number(10)}"
     data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.first_name": first_name,
+        "id.last_name": "Penguin",
     }
     body = post("users", data, sandbox_tenant.sk.key)
     fp_id = body["id"]
@@ -370,6 +380,7 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
         foo_sandbox_tenant.default_ob_config, sandbox_id
     )
     foo_user = bifrost.run()
+    assert foo_user.fp_id != user.fp_id
     assert set(r["kind"] for r in foo_user.client.handled_requirements) == {
         "authorize",
         "process",
@@ -377,14 +388,14 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     assert [r["kind"] for r in foo_user.client.already_met_requirements] == [
         "collect_data",
     ]
-    assert foo_user.fp_id != user.fp_id
 
     # Make sure both tenants can find this user based on the phone's fingerprint
     for t, fp_id in [
         (sandbox_tenant, user.fp_id),
         (foo_sandbox_tenant, foo_user.fp_id),
     ]:
-        data = dict(search=FIXTURE_PHONE_NUMBER, pagination=dict(page_size=100))
+        print(t.id)
+        data = dict(search=first_name, pagination=dict(page_size=100))
         body = post("entities/search", data, *t.db_auths)
         assert any(i["id"] == fp_id for i in body["data"])
 
