@@ -42,6 +42,7 @@ struct NewTenantVendorControl<'a> {
     middesk_api_key: Option<SealedVaultBytes>,
     lexis_enabled: bool,
     neuro_enabled: bool,
+    sentilink_credentials: Option<SentilinkTenantVendorControlCredentials>,
 }
 
 #[derive(Default)]
@@ -52,6 +53,7 @@ pub struct UpdateTenantVendorControlArgs {
     pub middesk_api_key: Option<Option<SealedVaultBytes>>,
     pub lexis_enabled: Option<bool>,
     pub neuro_enabled: Option<bool>,
+    pub sentilink_credentials: Option<Option<SentilinkTenantVendorControlCredentials>>,
 }
 
 impl TenantVendorControl {
@@ -73,6 +75,7 @@ impl TenantVendorControl {
             experian_subscriber_code: Option<String>,
             middesk_api_key: Option<SealedVaultBytes>,
             neuro_enabled: bool,
+            sentilink_credentials: Option<SentilinkTenantVendorControlCredentials>,
         }
         let existing = if let Some(existing) = existing {
             ExistingArgs {
@@ -82,6 +85,7 @@ impl TenantVendorControl {
                 experian_subscriber_code: existing.experian_subscriber_code,
                 middesk_api_key: existing.middesk_api_key,
                 neuro_enabled: existing.neuro_enabled,
+                sentilink_credentials: existing.sentilink_credentials,
             }
         } else {
             ExistingArgs::default()
@@ -104,6 +108,9 @@ impl TenantVendorControl {
                 .unwrap_or(existing.experian_subscriber_code),
             middesk_api_key: args.middesk_api_key.unwrap_or(existing.middesk_api_key),
             neuro_enabled: args.neuro_enabled.unwrap_or(existing.neuro_enabled),
+            sentilink_credentials: args
+                .sentilink_credentials
+                .unwrap_or(existing.sentilink_credentials),
         };
         let tvc = diesel::insert_into(tenant_vendor_control::table)
             .values(new)
@@ -131,12 +138,17 @@ mod test {
     use crate::tests::prelude::*;
     use macros::db_test;
     use newtypes::SealedVaultBytes;
+    use newtypes::SentilinkTenantVendorControlCredentials;
     use newtypes::TenantId;
 
     #[db_test]
     fn test_update_tvc(conn: &mut TestPgConn) {
         let tenant_id = TenantId::test_data("org_xxx".into());
         let middesk_api_key = SealedVaultBytes(vec![1, 2, 3]);
+        let senti_creds = SentilinkTenantVendorControlCredentials {
+            account: SealedVaultBytes(vec![1, 2, 3]),
+            token: SealedVaultBytes(vec![1, 2, 3]),
+        };
 
         // First, create the TVC with some defaults
         let args = UpdateTenantVendorControlArgs {
@@ -150,32 +162,41 @@ mod test {
         assert!(tvc.idology_enabled);
         assert!(tvc.experian_enabled);
         assert!(!tvc.lexis_enabled);
+        assert!(!tvc.neuro_enabled);
         assert!(tvc.experian_subscriber_code.is_none());
+        assert!(tvc.sentilink_credentials.is_none());
         assert_eq!(tvc.middesk_api_key.as_ref(), Some(&middesk_api_key));
 
         // Then, update the TVC. We should overlay the patch request over the existing TVC
         let args = UpdateTenantVendorControlArgs {
             idology_enabled: Some(false),
+            neuro_enabled: Some(true),
             middesk_api_key: Some(Some(middesk_api_key.clone())),
+            sentilink_credentials: Some(Some(senti_creds.clone())),
             ..Default::default()
         };
         let tvc = TenantVendorControl::update_or_create(conn, &tenant_id, args).unwrap();
         assert!(!tvc.idology_enabled);
         assert!(tvc.experian_enabled);
         assert!(!tvc.lexis_enabled);
+        assert!(tvc.neuro_enabled);
         assert!(tvc.experian_subscriber_code.is_none());
         assert_eq!(tvc.middesk_api_key.as_ref(), Some(&middesk_api_key));
+        assert_eq!(tvc.sentilink_credentials.as_ref(), Some(&senti_creds));
 
-        // And one more update to clear out middesk api key
+        // And one more update to clear out middesk and sentilink api key
         let args = UpdateTenantVendorControlArgs {
             middesk_api_key: Some(None),
+            sentilink_credentials: Some(None),
             ..Default::default()
         };
         let tvc = TenantVendorControl::update_or_create(conn, &tenant_id, args).unwrap();
         assert!(tvc.middesk_api_key.is_none());
+        assert!(tvc.sentilink_credentials.is_none());
         // Other properties didn't change
         assert!(!tvc.idology_enabled);
         assert!(tvc.experian_enabled);
+        assert!(tvc.neuro_enabled);
         assert!(!tvc.lexis_enabled);
         assert!(tvc.experian_subscriber_code.is_none());
     }

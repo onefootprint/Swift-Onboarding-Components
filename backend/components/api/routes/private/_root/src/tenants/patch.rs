@@ -7,6 +7,7 @@ use api_core::FpResult;
 use api_core::State;
 use api_errors::ValidationError;
 use api_wire_types::PrivateUpdateBillingProfile;
+use api_wire_types::PrivateUpdateSentilinkCredentials;
 use api_wire_types::PrivateUpdateTvc;
 use db::models::billing_profile::BillingProfile;
 use db::models::billing_profile::UpdateBillingProfileArgs;
@@ -15,6 +16,7 @@ use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl;
 use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
+use newtypes::SentilinkTenantVendorControlCredentials;
 use newtypes::TenantId;
 
 #[patch("/private/tenants/{id}")]
@@ -132,7 +134,15 @@ fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<Updat
         experian_subscriber_code,
         middesk_api_key,
         neuro_enabled,
+        sentilink_credentials,
     } = request;
+    let sealed_sentilink_credentials = sentilink_credentials
+        .map(|sc| {
+            let PrivateUpdateSentilinkCredentials { account, token } = sc;
+            SentilinkTenantVendorControlCredentials::new_for_update(account, token, &tenant.public_key)
+        })
+        .transpose()?
+        .to_changeset();
     let tvc = UpdateTenantVendorControlArgs {
         idology_enabled,
         lexis_enabled,
@@ -143,6 +153,7 @@ fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<Updat
             .transpose()?
             .to_changeset(),
         neuro_enabled,
+        sentilink_credentials: sealed_sentilink_credentials,
     };
     Ok(tvc)
 }

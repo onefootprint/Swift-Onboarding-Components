@@ -89,6 +89,11 @@ pub struct PrivateUpdateBillingProfile {
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct PrivateUpdateSentilinkCredentials {
+    pub account: PiiString,
+    pub token: PiiString,
+}
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateUpdateTvc {
     pub idology_enabled: Option<bool>,
     pub lexis_enabled: Option<bool>,
@@ -98,6 +103,7 @@ pub struct PrivateUpdateTvc {
     #[serde(default)]
     pub middesk_api_key: Patch<PiiString>,
     pub neuro_enabled: Option<bool>,
+    pub sentilink_credentials: Patch<PrivateUpdateSentilinkCredentials>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]

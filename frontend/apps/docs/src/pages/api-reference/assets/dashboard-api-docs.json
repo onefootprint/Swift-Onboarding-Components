@@ -8897,6 +8897,9 @@
                             "is_prod_kyc_playbook_restricted": {
                                 "type": "boolean"
                             },
+                            "is_prod_neuro_enabled": {
+                                "type": "boolean"
+                            },
                             "is_prod_sentilink_enabled": {
                                 "type": "boolean"
                             },
@@ -24569,6 +24572,9 @@
                             "is_prod_kyc_playbook_restricted": {
                                 "type": "boolean"
                             },
+                            "is_prod_neuro_enabled": {
+                                "type": "boolean"
+                            },
                             "is_prod_sentilink_enabled": {
                                 "type": "boolean"
                             },
@@ -24924,6 +24930,9 @@
                         "type": "boolean"
                     },
                     "is_prod_kyc_playbook_restricted": {
+                        "type": "boolean"
+                    },
+                    "is_prod_neuro_enabled": {
                         "type": "boolean"
                     },
                     "is_prod_sentilink_enabled": {
