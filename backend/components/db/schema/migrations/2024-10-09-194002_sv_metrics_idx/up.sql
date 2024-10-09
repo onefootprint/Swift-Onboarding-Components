@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS scoped_vault_metrics_query_idx ON scoped_vault(tenant_id, is_live, kind, id);
