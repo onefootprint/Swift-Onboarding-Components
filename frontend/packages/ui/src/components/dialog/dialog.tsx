@@ -51,9 +51,13 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
     const hasFooter = primaryButton || secondaryButton || linkButton;
 
     return (
-      <RadixDialog.Root open={open} onOpenChange={onClose}>
+      <RadixDialog.Root open={open} onOpenChange={onClose} modal={true}>
         <RadixDialog.Portal forceMount>
-          <Overlay isVisible={open} isConfirmation={isConfirmation} />
+          {open && (
+            <RadixDialog.Overlay asChild>
+              <Overlay isVisible={open} isConfirmation={isConfirmation} />
+            </RadixDialog.Overlay>
+          )}
           <AnimatePresence>
             {open && (
               <Container
