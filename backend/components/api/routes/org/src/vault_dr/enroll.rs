@@ -4,6 +4,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
+use api_core::FpError;
 use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
@@ -11,6 +12,7 @@ use db::errors::FpOptionalExtension;
 use db::models::vault_dr::NewVaultDrConfig;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrConfig;
+use db::DbError;
 use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
@@ -120,7 +122,12 @@ pub async fn post(
                 bucket_path_namespace,
             };
 
-            VaultDrConfig::create(conn, new_config)?;
+            VaultDrConfig::create(conn, new_config).map_err(|err| -> FpError {
+                match err {
+                    DbError::UniqueConstraintViolation(_) => vault_dr::Error::AlreadyEnrolled.into(),
+                    err => err.into(),
+                }
+            })?;
 
             Ok(())
         })
