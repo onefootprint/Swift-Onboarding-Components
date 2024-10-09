@@ -4,13 +4,11 @@ import { useTheme } from 'next-themes';
 import React, { useEffect, useRef } from 'react';
 import type { MapRef } from 'react-map-gl';
 import { Map as MapboxMap, Marker } from 'react-map-gl';
+import { MAP_BOX_TOKEN } from 'src/config/constants';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 
 import GoogleMapsLoader from '../content/utils/google-maps-loader';
 import type { MapMarkerProps } from './components/map-marker';
-
-const PUBLIC_MAP_BOX_TOKEN =
-  'pk.eyJ1IjoiYmVsY2VvbmVmb290cHJpbnQiLCJhIjoiY2x2empoY2EwMDA5aDJrcGg0Y3RkOTBreiJ9.2TyaEVdUljarrNN4XXoeUA';
 
 const DEFAULT_ZOOM = 11;
 const MAX_ZOOM = 20;
@@ -80,7 +78,7 @@ const MapComponent = ({ markers, selectedCoords, onSelect }: MapProps) => {
     <Container>
       <MapboxMap
         ref={mapRef}
-        mapboxAccessToken={PUBLIC_MAP_BOX_TOKEN}
+        mapboxAccessToken={MAP_BOX_TOKEN}
         mapStyle={isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/streets-v12'}
         style={{ width: '100%', height: '100%' }}
         initialViewState={{

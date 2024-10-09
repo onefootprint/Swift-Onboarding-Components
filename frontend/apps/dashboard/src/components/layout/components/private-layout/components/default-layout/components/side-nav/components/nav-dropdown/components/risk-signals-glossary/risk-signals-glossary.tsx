@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RiskSignalSeverity } from '@onefootprint/types';
-import useRiskSignals from '../../hooks/use-risk-signals';
+import useRiskSignals from 'src/hooks/use-risk-signals';
 
 type RiskSignalsGlossaryProps = {
   open: boolean;

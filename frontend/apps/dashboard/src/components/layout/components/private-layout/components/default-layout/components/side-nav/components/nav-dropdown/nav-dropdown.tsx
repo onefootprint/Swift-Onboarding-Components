@@ -5,16 +5,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import RiskSignalsGlossary from 'src/components/risk-signals-glossary';
 
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import PgpUploadTool from 'src/components/pgp-upload-tool';
 import type { UserSession } from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
 
 const WhatsNew = lazy(() => import('./components/whats-new'));
+const PgpUploadTool = lazy(() => import('./components/pgp-upload-tool'));
+const RiskSignalsGlossary = lazy(() => import('./components/risk-signals-glossary'));
 
 export type NavDropdownProps = {
   tenants: GetAuthRolesOrg[];
@@ -120,9 +120,9 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>
-      <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
-      <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
       <Suspense fallback={<Box />}>
+        <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
+        <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
         <WhatsNew open={isWhatsNewOpen} onClose={handleWhatsNewClose} />
       </Suspense>
     </>
