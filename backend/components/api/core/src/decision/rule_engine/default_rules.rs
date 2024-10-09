@@ -54,6 +54,15 @@ pub fn default_verification_check_rules(check: &VerificationCheck) -> Vec<(RuleE
                 (if_risk_signal(FRC::SentilinkSyntheticIdentityHighRisk), RA::Fail),
             ]
         }
+        // TODO: Change FRCs to be neuro specific maybe?
+        VerificationCheck::NeuroId {} => {
+            // These are the suggested rules from Neuro
+            vec![
+                (if_risk_signal(FRC::BehaviorHighRisk), RA::Fail),
+                (if_risk_signal(FRC::DeviceHighRisk), RA::Fail),
+                (if_risk_signal(FRC::DeviceMediumRisk), RA::ManualReview),
+            ]
+        }
         _ => vec![],
     }
 }
@@ -254,6 +263,7 @@ pub fn default_rules_for_obc(
     .into_iter()
     .map(|(r, a)| (r, a, RuleInstanceKind::Business));
 
+    // TODO: fix rule instance kind in the future to not be pinned to person potentially
     let verification_check_rules = obc
         .verification_checks()
         .inner()
