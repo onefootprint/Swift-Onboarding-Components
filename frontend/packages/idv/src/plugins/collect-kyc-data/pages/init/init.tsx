@@ -1,5 +1,4 @@
-import { LoadingSpinner } from '@onefootprint/ui';
-import styled from 'styled-components';
+import { LoadingSpinner, Stack } from '@onefootprint/ui';
 
 import { getLogger, trackAction } from '../../../../utils/logger';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
@@ -35,20 +34,17 @@ const Init = () => {
   });
 
   return (
-    <Container>
+    <Stack
+      height="100%"
+      minHeight="var(--loading-container-min-height)"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+    >
       <LoadingSpinner />
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: var(--loading-container-min-height);
-  justify-content: center;
-  text-align: center;
-`;
 
 export default Init;
