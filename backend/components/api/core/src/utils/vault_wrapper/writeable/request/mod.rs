@@ -24,6 +24,7 @@ use self::fingerprints::Fingerprints;
 pub use fingerprinted::FingerprintedDataRequest;
 pub use prefill::PrefillData;
 pub use prefill::PrefillKind;
+pub(super) use validation::assert_allowed_for_sources;
 pub use validation::DataRequestSource;
 pub use validation::DlSourceWithOverrides;
 

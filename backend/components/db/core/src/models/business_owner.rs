@@ -227,6 +227,20 @@ impl BusinessOwner {
         Ok(Locked::new(result))
     }
 
+    pub fn update_ownership_stake(
+        conn: &mut TxnPgConn,
+        bv_id: &VaultId,
+        link_id: BoLinkId,
+        ownership_stake: i32,
+    ) -> DbResult<Self> {
+        let result = diesel::update(business_owner::table)
+            .filter(business_owner::business_vault_id.eq(bv_id))
+            .filter(business_owner::link_id.eq(link_id))
+            .set(business_owner::ownership_stake.eq(ownership_stake))
+            .get_result::<Self>(conn.conn())?;
+        Ok(result)
+    }
+
     #[tracing::instrument("BusinessOwner::add_user_vault_id", skip_all)]
     pub fn add_user_vault_id(self, conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>

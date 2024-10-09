@@ -1,4 +1,5 @@
 pub mod apple_device_attestation;
+pub mod business_owner;
 pub mod compliance_partnership;
 pub mod fingerprint;
 pub mod insight_event;

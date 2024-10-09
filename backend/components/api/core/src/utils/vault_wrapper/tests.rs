@@ -416,7 +416,9 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
+    let uv = fixtures::vault::create_person(conn, false);
     let bv = fixtures::vault::create_business(conn);
+    fixtures::business_owner::create_primary(conn, &uv.id, &bv.id);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
@@ -565,7 +567,9 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_bvw_replacements(conn: &mut TestPgConn) {
+    let uv = fixtures::vault::create_person(conn, false);
     let bv = fixtures::vault::create_business(conn);
+    fixtures::business_owner::create_primary(conn, &uv.id, &bv.id);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);

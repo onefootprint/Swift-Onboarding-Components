@@ -364,7 +364,7 @@ fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultKind)
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-fn assert_allowed_for_sources(
+pub fn assert_allowed_for_sources(
     request: &FingerprintedDataRequest,
     request_source: &DataRequestSource,
 ) -> NtResult<()> {
