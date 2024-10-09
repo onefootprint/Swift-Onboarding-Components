@@ -103,6 +103,7 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
                 .inner_join(fingerprint_junction::table)
                 .inner_join(data_lifetime::table.on(data_lifetime::id.eq(fingerprint_junction::lifetime_id)))
                 .filter(fingerprint::scoped_vault_id.eq(&sv.id))
+                .filter(fingerprint::deactivated_at.is_null())
                 .filter(fingerprint::kind.eq_any(&[
                     FingerprintKind::Composite(CompositeFingerprintKind::BankRoutingAccount),
                     FingerprintKind::Composite(CompositeFingerprintKind::CardNumberCvc),
