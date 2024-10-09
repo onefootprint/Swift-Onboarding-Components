@@ -9,22 +9,25 @@ export enum OrganizationSize {
 }
 
 export type Organization = {
-  id: string;
-  name: string;
-  logoUrl: string | null;
-  websiteUrl: string | null;
-  companySize: OrganizationSize | null;
-  isSandboxRestricted: boolean;
-  domains: string[];
   allowDomainAccess: boolean;
+  allowedPreviewApis: TenantPreviewApi[];
+  companySize: OrganizationSize | null;
+  domains: string[];
+  id: string;
   isDomainAlreadyClaimed: boolean | null;
-  isProdKycPlaybookRestricted: boolean;
   isProdKybPlaybookRestricted: boolean;
+  isProdKycPlaybookRestricted: boolean;
+  isProdAuthPlaybookRestricted: boolean;
+  isProdNeuroEnabled: boolean;
+  isProdSentilinkEnabled: boolean;
+  isSandboxRestricted: boolean;
+  logoUrl: string | null;
+  name: string;
+  parent: ParentOrganization | null;
   supportEmail?: string | null;
   supportPhone?: string | null;
   supportWebsite?: string | null;
-  parent: ParentOrganization | null;
-  allowedPreviewApis: TenantPreviewApi[];
+  websiteUrl: string | null;
 };
 
 export type ParentOrganization = {

@@ -18,15 +18,19 @@ export type UserSession = {
 };
 
 export type OrgSession = {
-  id: string;
-  name: Organization['name'];
-  logoUrl: Organization['logoUrl'];
-  isSandboxRestricted: Organization['isSandboxRestricted'];
   isLive: boolean;
-  isProdAuthPlaybookRestricted?: boolean;
-  isProdKybPlaybookRestricted: boolean;
-  isProdKycPlaybookRestricted: boolean;
-};
+} & Pick<
+  Organization,
+  | 'isProdKybPlaybookRestricted'
+  | 'isProdKycPlaybookRestricted'
+  | 'isProdAuthPlaybookRestricted'
+  | 'isProdNeuroEnabled'
+  | 'isProdSentilinkEnabled'
+  | 'isSandboxRestricted'
+  | 'logoUrl'
+  | 'id'
+  | 'name'
+>;
 
 export type MetaSession = {
   createdNewTenant: boolean;

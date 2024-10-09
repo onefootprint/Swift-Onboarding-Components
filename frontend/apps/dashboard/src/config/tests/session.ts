@@ -17,12 +17,14 @@ const baseUser: UserSession = {
 const baseOrg: OrgSession = {
   id: 'org_hyZP3ksCvsT0AlLqMZsgrI',
   name: 'Acme',
-  logoUrl: null,
-  isSandboxRestricted: false,
   isLive: false,
-  isProdKybPlaybookRestricted: false,
   isProdAuthPlaybookRestricted: false,
+  isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
+  isProdNeuroEnabled: false,
+  isProdSentilinkEnabled: false,
+  isSandboxRestricted: false,
+  logoUrl: null,
 };
 
 const baseMeta = {

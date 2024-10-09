@@ -4,17 +4,20 @@ import type { Organization } from '@onefootprint/types';
 export const organizationFixture: Organization = {
   id: 'org_9L42CAdpXhDeSmi1DI8Qks',
   name: 'Acme',
-  logoUrl: 'https://acme.com/logo.png',
-  isSandboxRestricted: false,
-  websiteUrl: 'https://acme.com',
+  allowDomainAccess: false,
+  allowedPreviewApis: [],
   companySize: null,
   domains: [],
-  allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
+  isProdAuthPlaybookRestricted: false,
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
+  isProdNeuroEnabled: false,
+  isProdSentilinkEnabled: false,
+  isSandboxRestricted: false,
+  logoUrl: 'https://acme.com/logo.png',
   parent: null,
-  allowedPreviewApis: [],
+  websiteUrl: 'https://acme.com',
 };
 
 export const withUpdateOrg = (newOrg: Partial<Organization>) =>

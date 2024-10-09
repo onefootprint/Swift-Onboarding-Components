@@ -44,6 +44,8 @@ describe('useOrgSession', () => {
       isProdKybPlaybookRestricted: false,
       isProdKycPlaybookRestricted: false,
       isProdAuthPlaybookRestricted: false,
+      isProdNeuroEnabled: false,
+      isProdSentilinkEnabled: false,
     });
   });
 

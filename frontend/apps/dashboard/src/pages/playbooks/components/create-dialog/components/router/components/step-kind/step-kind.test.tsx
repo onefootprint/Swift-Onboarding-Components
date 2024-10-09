@@ -14,6 +14,7 @@ describe('<WhoToOnboard />', () => {
       isLive: false,
       isProdKybPlaybookRestricted: true,
       isProdKycPlaybookRestricted: true,
+      isProdAuthPlaybookRestricted: true,
     });
   });
   it('should submit KYC correctly', async () => {
@@ -49,6 +50,7 @@ describe('<WhoToOnboard />', () => {
         isLive: false,
         isProdKybPlaybookRestricted: true,
         isProdKycPlaybookRestricted: true,
+        isProdAuthPlaybookRestricted: true,
       });
 
       const onSubmit = jest.fn();
@@ -64,6 +66,7 @@ describe('<WhoToOnboard />', () => {
       asAdminUserWithOrg({
         isLive: true,
         isProdKybPlaybookRestricted: true,
+        isProdAuthPlaybookRestricted: true,
         isProdKycPlaybookRestricted: false,
       });
 
@@ -82,6 +85,7 @@ describe('<WhoToOnboard />', () => {
     it('both disabled when both restricted', async () => {
       asAdminUserWithOrg({
         isLive: true,
+        isProdAuthPlaybookRestricted: true,
         isProdKybPlaybookRestricted: true,
         isProdKycPlaybookRestricted: true,
       });
@@ -103,6 +107,7 @@ describe('<WhoToOnboard />', () => {
         isLive: true,
         isProdKybPlaybookRestricted: false,
         isProdKycPlaybookRestricted: false,
+        isProdAuthPlaybookRestricted: false,
       });
 
       const onSubmit = jest.fn();

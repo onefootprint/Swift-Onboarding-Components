@@ -11,17 +11,20 @@ export const userFixture: UserUpdateResponse = {
 export const orgFixture: Organization = {
   id: 'org_9242CAdpXXlDDeSmi1DQks',
   name: 'Acme Inc',
-  logoUrl: null,
-  isSandboxRestricted: false,
-  websiteUrl: null,
+  allowDomainAccess: false,
+  allowedPreviewApis: [],
   companySize: null,
   domains: [],
-  allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
+  isProdAuthPlaybookRestricted: false,
+  isProdNeuroEnabled: false,
+  isProdSentilinkEnabled: false,
+  isSandboxRestricted: false,
+  logoUrl: null,
   parent: null,
-  allowedPreviewApis: [],
+  websiteUrl: null,
 };
 
 export const RolesFixture: Role[] = [
