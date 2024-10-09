@@ -55,7 +55,11 @@ struct CursorBackfillResponse<T, TCursor> {
 #[allow(unused)]
 struct BatchBackfillResponse {}
 
+mod backfill_bo_dis;
+
 #[allow(unused)]
 pub fn configure(config: &mut web::ServiceConfig) {
-    config.service(token_fingerprint_batch::post);
+    config
+        .service(token_fingerprint_batch::post)
+        .service(backfill_bo_dis::post);
 }

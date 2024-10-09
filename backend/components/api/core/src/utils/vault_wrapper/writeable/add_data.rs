@@ -220,17 +220,17 @@ impl<Type> WriteableVw<Type> {
             // now.
             let link_id = BoLinkId::generate(BusinessOwnerKind::Primary);
             let ownership_stake = p_bo.ownership_stake as i32;
-            BusinessOwner::update_ownership_stake(conn, &self.sv.vault_id, link_id, ownership_stake)?;
+            BusinessOwner::update_ownership_stake(conn, &self.sv.vault_id, &link_id, ownership_stake)?;
             // NOTE: we omit vaulting the primary BO's vault data because it is vaulted under the
             // linked vault shortly thereafter
         } else {
             tracing::error!("Missing primary beneficial owner when vaulting KYCed BOs");
         }
-        let kyced_bos = kyced_bos.collect_vec();
+        let secondary_kyced_bos = kyced_bos.collect_vec();
 
         // Note that we won't support writing KycedBeneficialOwners outside of bifrost, so a tenant cannot
         // write Kyced BOs here when there are no beneficial owner rows in the database
-        let new_bos = kyced_bos
+        let new_bos = secondary_kyced_bos
             .iter()
             .map(|bo| NewSecondaryBo {
                 link_id: bo.link_id.clone(),
@@ -239,7 +239,7 @@ impl<Type> WriteableVw<Type> {
             .collect_vec();
         BusinessOwner::bulk_create_secondary(conn, new_bos, self.sv.vault_id.clone())?;
 
-        let extra_data = kyced_bos
+        let extra_data = secondary_kyced_bos
             .into_iter()
             .flat_map(|bo| {
                 let bo_di =

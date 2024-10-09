@@ -230,7 +230,7 @@ impl BusinessOwner {
     pub fn update_ownership_stake(
         conn: &mut TxnPgConn,
         bv_id: &VaultId,
-        link_id: BoLinkId,
+        link_id: &BoLinkId,
         ownership_stake: i32,
     ) -> DbResult<Self> {
         let result = diesel::update(business_owner::table)
