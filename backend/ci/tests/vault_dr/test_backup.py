@@ -8,7 +8,7 @@ from tests.constants import (
     FAKE_WRAPPED_RECOVERY_KEY_B64,
 )
 from tests.vault_dr.utils import *
-from tests.utils import file_contents, patch_raw, post, post_raw, get
+from tests.utils import file_contents, patch, patch_raw, post, post_raw, get, delete
 
 
 FINAL_FP_ID_1_DATA = {
@@ -577,6 +577,93 @@ def test_footprint_dr_backup(tenant, tmp_path):
             cmd.expect_exact(f"Vault version {version} not found for {fp_id}")
             cmd.expect(pexpect.EOF)
         assert cmd.exitstatus == 1
+
+    # TODO: make this a new test. For now, it's flaky in separate tests because of the incorrect worker logic.
+    # @pytest.mark.skipif(
+    #     ENVIRONMENT in ("ephemeral", "dev", "production"),
+    #     reason="This test relies on localstack",
+    # )
+    # def test_vaults_without_data(tenant, tmp_path):
+    cfg = enroll_tenant_in_live_vdr(tenant)
+
+    # Create a vault with no data.
+    resp = post(
+        "users",
+        {},
+        tenant.sk.key,
+    )
+    fp_id = resp["id"]
+
+    # Run the VDR batch.
+    resp = post(
+        "private/vault_dr/run_batch",
+        {
+            "tenant_id": tenant.id,
+            "is_live": True,
+            "blob_batch_size": 100,
+            "manifest_batch_size": 100,
+            "fp_ids": [fp_id],
+        },
+        CUSTODIAN_AUTH,
+    )
+
+    # Vaults created without data aren't present in VDR.
+    # We might choose to reconsider this in the future.
+    assert resp["num_blobs"] == 0
+    assert resp["num_manifests"] == 0
+
+    with footprint_dr("list-vaults", "--live") as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    assert fp_id not in cmd.before.decode()
+
+    # We can list records for the fp_id, but there are no record lines in the output.
+    with footprint_dr("list-records", "--live", fp_id) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    assert '{"fp_id":' not in cmd.before.decode()
+
+    # Write some data to the vault.
+    patch(
+        f"users/{fp_id}/vault",
+        {
+            "id.first_name": "first",
+            "id.last_name": "last",
+        },
+        tenant.sk.key,
+    )
+
+    # Deactivate the data.
+    delete(
+        f"users/{fp_id}/vault",
+        {
+            "fields": ["id.first_name", "id.last_name"],
+        },
+        tenant.sk.key,
+    )
+
+    # Run the VDR batch again.
+    # The data should be backed up even though it's no longer active.
+    resp = post(
+        "private/vault_dr/run_batch",
+        {
+            "tenant_id": tenant.id,
+            "is_live": True,
+            "blob_batch_size": 100,
+            "manifest_batch_size": 100,
+            "fp_ids": [fp_id],
+        },
+        CUSTODIAN_AUTH,
+    )
+
+    assert resp["num_blobs"] == 2
+    assert resp["num_manifests"] == 3  # latest + 2 versions
+
+    # The latest version (2) shows no fields.
+    with footprint_dr("list-records", "--live", fp_id) as cmd:
+        cmd.expect_exact('{"fp_id":"' + fp_id + '","version":2,"fields":[]}')
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
 
 
 def validate_decrypted_data(output_dir, records_to_decrypt, expected_data):
