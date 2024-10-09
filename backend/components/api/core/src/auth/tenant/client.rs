@@ -1,5 +1,5 @@
 use super::AuthActor;
-use super::TenantAuth;
+use super::BasicTenantAuth;
 use crate::auth::session::tenant::ClientTenantAuth;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
@@ -158,8 +158,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
     }
 }
 
-// Though this is a little different, still implement TenantAuth for maximal code sharing
-impl TenantAuth for SessionContext<ClientTenantData> {
+impl BasicTenantAuth for SessionContext<ClientTenantData> {
     fn tenant(&self) -> &db::models::tenant::Tenant {
         &self.tenant
     }

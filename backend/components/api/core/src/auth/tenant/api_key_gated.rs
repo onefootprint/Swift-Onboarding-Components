@@ -1,3 +1,4 @@
+use super::BasicTenantAuth;
 use super::CanCheckTenantGuard;
 use super::TenantApiKeyAuth;
 use super::TenantAuth;

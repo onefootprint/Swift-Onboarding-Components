@@ -6,8 +6,9 @@ use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_core::auth::tenant::BasicTenantAuth;
+use api_core::auth::tenant::BasicTenantAuthWrapper;
 use api_core::auth::tenant::ClientTenantAuthContext;
-use api_core::auth::tenant::TenantAuth;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::CanVault;
 use api_core::auth::Either;
@@ -65,6 +66,7 @@ pub async fn patch(
     let path = path.into_inner();
     let request = request.into_inner().into();
     let source = DataRequestSource::TenantPatchVault(auth.actor());
+    let auth = BasicTenantAuthWrapper(auth);
     let result = patch_inner(
         &state,
         path,
@@ -96,6 +98,7 @@ pub async fn patch_business(
     let path = path.into_inner();
     let request = request.into_inner().into();
     let source = DataRequestSource::TenantPatchVault(auth.actor());
+    let auth = BasicTenantAuthWrapper(auth);
     let result = patch_inner(
         &state,
         path,
@@ -132,16 +135,7 @@ pub async fn patch_client(
     let fp_id = auth.fp_id.clone();
     let source = DataRequestSource::ClientTenant;
 
-    let result = patch_inner(
-        &state,
-        fp_id,
-        request.into(),
-        Box::new(auth),
-        insight,
-        false,
-        source,
-    )
-    .await?;
+    let result = patch_inner(&state, fp_id, request.into(), auth, insight, false, source).await?;
     Ok(result)
 }
 
@@ -149,7 +143,7 @@ async fn patch_inner(
     state: &State,
     fp_id: FpId,
     request: RawDataRequest,
-    auth: Box<dyn TenantAuth>,
+    auth: impl BasicTenantAuth,
     insight: InsightHeaders,
     ignore_luhn_validation: bool,
     source: DataRequestSource,

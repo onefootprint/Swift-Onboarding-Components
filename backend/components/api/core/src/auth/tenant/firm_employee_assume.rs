@@ -1,4 +1,5 @@
 use super::AuthActor;
+use super::BasicTenantAuth;
 use super::CanCheckTenantGuard;
 use super::GetFirmEmployee;
 use super::TenantAuth;
@@ -192,7 +193,7 @@ impl<const IS_SECONDARY: bool> CanCheckTenantGuard for FirmEmployeeAssumeAuthCon
     }
 }
 
-impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
+impl BasicTenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
     fn is_live(&self) -> FpResult<bool> {
         if self.tenant.sandbox_restricted && self.is_live {
             // error if the tenant is sandbox-restricted but is requesting live data
@@ -210,6 +211,12 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
 
     fn actor(&self) -> AuthActor {
         AuthActor::FirmEmployee(self.tenant_user.id.clone())
+    }
+}
+
+impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
+    fn scopes(&self) -> Vec<TenantScope> {
+        self.token_scopes()
     }
 }
 

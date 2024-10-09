@@ -6,8 +6,9 @@ use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::auth::tenant::BasicTenantAuth;
+use api_core::auth::tenant::BasicTenantAuthWrapper;
 use api_core::auth::tenant::ClientTenantAuthContext;
-use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
@@ -143,16 +144,9 @@ pub async fn post(
         None
     };
 
-    let result = post_inner(
-        &state,
-        path.into_inner(),
-        request,
-        vault_version,
-        auth,
-        insights,
-        root_span,
-    )
-    .await?;
+    let path = path.into_inner();
+    let auth = BasicTenantAuthWrapper(auth);
+    let result = post_inner(&state, path, request, vault_version, auth, insights, root_span).await?;
     Ok(WithVaultVersionHeader::new(
         UserDecryptResponse(result),
         vault_version,
@@ -194,16 +188,9 @@ pub async fn post_business(
         version_at: None,
     };
 
-    let result = post_inner(
-        &state,
-        path.into_inner(),
-        request,
-        vault_version,
-        auth,
-        insights,
-        root_span,
-    )
-    .await?;
+    let path = path.into_inner();
+    let auth = BasicTenantAuthWrapper(auth);
+    let result = post_inner(&state, path, request, vault_version, auth, insights, root_span).await?;
     Ok(WithVaultVersionHeader::new(
         BusinessDecryptResponse(result),
         vault_version,
@@ -248,7 +235,7 @@ pub async fn post_client(
         version_at: None,
     };
 
-    let result = post_inner(&state, fp_id, request, None, Box::new(auth), insights, root_span).await?;
+    let result = post_inner(&state, fp_id, request, None, auth, insights, root_span).await?;
     Ok(UserDecryptResponse(result))
 }
 
@@ -269,7 +256,7 @@ pub(super) async fn post_inner(
     fp_id: FpId,
     request: UserDecryptRequest,
     vault_version: Option<ScopedVaultVersionNumber>,
-    auth: Box<dyn TenantAuth>,
+    auth: impl BasicTenantAuth,
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> FpResult<DecryptResponse> {

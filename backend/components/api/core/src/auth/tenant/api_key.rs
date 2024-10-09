@@ -1,4 +1,5 @@
 use super::AuthActor;
+use super::BasicTenantAuth;
 use super::CanCheckTenantGuard;
 use crate::auth::tenant::TenantAuth;
 use crate::auth::AuthError;
@@ -115,7 +116,7 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> FpResult<SecretApiKey> {
     Ok(tenant_sk_input)
 }
 
-impl TenantAuth for CheckedTenantApiKey {
+impl BasicTenantAuth for CheckedTenantApiKey {
     fn tenant(&self) -> &Tenant {
         &self.tenant
     }
@@ -130,6 +131,12 @@ impl TenantAuth for CheckedTenantApiKey {
 
     fn actor(&self) -> AuthActor {
         AuthActor::TenantApiKey(self.api_key.id.clone())
+    }
+}
+
+impl TenantAuth for CheckedTenantApiKey {
+    fn scopes(&self) -> Vec<TenantScope> {
+        self.role.scopes.clone()
     }
 }
 

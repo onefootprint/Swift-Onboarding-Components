@@ -5,8 +5,9 @@ use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_core::auth::tenant::BasicTenantAuth;
+use api_core::auth::tenant::BasicTenantAuthWrapper;
 use api_core::auth::tenant::ClientTenantAuthContext;
-use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanVault;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::DataRequestSource;
@@ -48,6 +49,7 @@ pub async fn post(
     let actor = auth.actor();
     let source = DataRequestSource::TenantPatchVault(actor);
 
+    let auth = BasicTenantAuthWrapper(auth);
     let result = post_inner(&state, path.into_inner(), request, auth, source).await?;
     Ok(result)
 }
@@ -69,6 +71,7 @@ pub async fn post_business(
     let actor = auth.actor();
     let source = DataRequestSource::TenantPatchVault(actor);
 
+    let auth = BasicTenantAuthWrapper(auth);
     let result = post_inner(&state, path.into_inner(), request, auth, source).await?;
     Ok(result)
 }
@@ -95,7 +98,7 @@ pub async fn post_client(
     let fp_id = auth.fp_id.clone();
     let source = DataRequestSource::ClientTenant;
 
-    let result = post_inner(&state, fp_id, request.into(), Box::new(auth), source).await?;
+    let result = post_inner(&state, fp_id, request.into(), auth, source).await?;
     Ok(result)
 }
 
@@ -103,7 +106,7 @@ async fn post_inner(
     state: &State,
     fp_id: FpId,
     request: RawDataRequest,
-    auth: Box<dyn TenantAuth>,
+    auth: impl BasicTenantAuth,
     source: DataRequestSource,
 ) -> ApiResponse<api_wire_types::Empty> {
     let tenant_id = auth.tenant().id.clone();

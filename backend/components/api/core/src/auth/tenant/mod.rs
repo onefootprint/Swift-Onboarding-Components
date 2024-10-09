@@ -120,10 +120,31 @@ impl From<PartnerTenantSessionAuth> for TenantOrPartnerTenantSessionAuth {
     }
 }
 
-pub trait TenantAuth {
+pub trait TenantAuth: BasicTenantAuth {
+    fn scopes(&self) -> Vec<TenantScope>;
+}
+
+pub trait BasicTenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> FpResult<bool>;
     fn actor(&self) -> AuthActor;
+}
+
+
+/// Horrible workaround because rust won't let us upcast TenantAuth to BasicTenantAuth
+pub struct BasicTenantAuthWrapper(pub Box<dyn TenantAuth>);
+impl BasicTenantAuth for BasicTenantAuthWrapper {
+    fn tenant(&self) -> &Tenant {
+        self.0.tenant()
+    }
+
+    fn is_live(&self) -> FpResult<bool> {
+        self.0.is_live()
+    }
+
+    fn actor(&self) -> AuthActor {
+        self.0.actor()
+    }
 }
 
 pub trait PartnerTenantAuth {

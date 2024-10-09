@@ -2,6 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
+use api_core::auth::tenant::BasicTenantAuthWrapper;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -85,6 +86,7 @@ pub async fn post(
 
     let fp_id = path.into_inner();
 
+    let auth = BasicTenantAuthWrapper(auth);
     let response = super::decrypt::post_inner(&state, fp_id, req, None, auth, insights, root_span).await?;
     let response = IntegrityResponse(response);
     Ok(response)

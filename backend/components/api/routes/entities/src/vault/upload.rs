@@ -6,9 +6,10 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use api_core::api_headers_schema;
+use api_core::auth::tenant::BasicTenantAuth;
+use api_core::auth::tenant::BasicTenantAuthWrapper;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::ClientTenantAuthContext;
-use api_core::auth::tenant::TenantAuth;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::CanVault;
 use api_core::auth::Either;
@@ -83,6 +84,7 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (fp_id, identifier) = path.into_inner();
     let source = DataLifetimeSource::Tenant;
+    let auth = BasicTenantAuthWrapper(auth);
     post_upload_inner(&state, body, headers, auth, fp_id, identifier, insight, source).await
 }
 
@@ -112,7 +114,7 @@ pub async fn post_client(
         &state,
         body,
         headers,
-        Box::new(auth),
+        auth,
         fp_id,
         identifier,
         insight,
@@ -126,7 +128,7 @@ async fn post_upload_inner(
     state: &State,
     body: BodyBytes<TEN_MB>,
     headers: UploadHeaderParams,
-    auth: Box<dyn TenantAuth>,
+    auth: impl BasicTenantAuth,
     fp_id: FpId,
     di: DataIdentifier,
     insight: InsightHeaders,
