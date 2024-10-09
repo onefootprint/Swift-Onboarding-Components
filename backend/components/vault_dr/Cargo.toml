@@ -15,6 +15,7 @@ api_errors = { path = "../api/errors" }
 db = { path = "../db/core" }
 crypto = { path = "../enclave/crypto" }
 newtypes = { path = "../newtypes" }
+feature_flag = { path = "../feature_flag" }
 
 actix-web = { workspace = true }
 aws-config = { workspace = true }

@@ -5,6 +5,7 @@ use crate::VaultDrWriter;
 use api_core::FpResult;
 use api_core::State;
 use db::models::vault_dr::VaultDrConfig;
+use feature_flag::BoolFlag;
 use newtypes::VaultDrConfigId;
 
 #[derive(Debug, Clone, Copy)]
@@ -45,6 +46,21 @@ pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
             is_live,
             ..
         } = config;
+
+
+        if state
+            .ff_client
+            .flag(BoolFlag::DisableVaultDisasterRecoveryWorker(&config_id))
+        {
+            tracing::info!(
+                %config_id,
+                %tenant_id,
+                is_live,
+                ?knobs,
+                "Skipping batch for config: disabled by feature flag"
+            );
+            continue;
+        }
 
         tracing::info!(
             %config_id,

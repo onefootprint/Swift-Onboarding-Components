@@ -2,6 +2,7 @@ use newtypes::ObConfigurationKey;
 use newtypes::OrgMemberEmail;
 use newtypes::PiiString;
 use newtypes::TenantId;
+use newtypes::VaultDrConfigId;
 use serde_json::json;
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]
@@ -91,6 +92,9 @@ pub enum BoolFlag<'a> {
     CanSendSmsToHighFraudCountries(&'a TenantId),
     #[strum(to_string = "RunSentilinkForPlaybookTemporary")]
     RunSentilinkForPlaybookTemporary(&'a ObConfigurationKey),
+
+    #[strum(to_string = "DisableVaultDisasterRecoveryWorker")]
+    DisableVaultDisasterRecoveryWorker(&'a VaultDrConfigId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -141,6 +145,7 @@ impl<'a> BoolFlag<'a> {
             Self::ApiKycSkipEmailAndPhoneRequirements(k) => Some(k.to_string()),
             Self::CanSendSmsToHighFraudCountries(k) => Some(k.to_string()),
             Self::RunSentilinkForPlaybookTemporary(k) => Some(k.to_string()),
+            Self::DisableVaultDisasterRecoveryWorker(k) => Some(k.to_string()),
         }
     }
 
@@ -187,6 +192,7 @@ impl<'a> BoolFlag<'a> {
             Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
             Self::CanSendSmsToHighFraudCountries(_) => false,
             Self::RunSentilinkForPlaybookTemporary(_) => false,
+            Self::DisableVaultDisasterRecoveryWorker(_) => false,
         }
     }
 
@@ -236,7 +242,8 @@ impl<'a> BoolFlag<'a> {
             | Self::UseKycWaterfallV2Rollout(_)
             | Self::CanSendSmsToHighFraudCountries(_)
             | Self::RunSentilinkForPlaybookTemporary(_)
-            | Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
+            | Self::ApiKycSkipEmailAndPhoneRequirements(_)
+            | Self::DisableVaultDisasterRecoveryWorker(_) => false,
             // These are migrated to the newer format
             Self::PreferWhatsapp(_) => true,
             Self::UseBackupTwilioCredentials(_) => true,
