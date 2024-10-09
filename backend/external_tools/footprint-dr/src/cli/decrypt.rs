@@ -76,8 +76,32 @@ pub async fn decrypt_cmd(
         bail!("Either --all or --records must be specified");
     };
 
+    let manifest_stream = s3_client.manifest_stream(records).boxed();
+
+    // Create empty directories for each vault version, regardless of whether it
+    // ends up having fields to decrypt.
+    let output_dir_copy = output_dir.clone();
+    let manifest_stream = manifest_stream
+        .and_then(move |(record, manifest)| {
+            let version_dir = output_dir_copy
+                .clone()
+                .join(&record.fp_id.fp_id)
+                .join(record.version.to_string());
+
+            Box::pin(async move {
+                tokio::fs::create_dir_all(&version_dir).await.context(format!(
+                    "failed to create output directory: {}",
+                    version_dir.display()
+                ))?;
+
+                Ok((record, manifest))
+            })
+        })
+        .boxed();
+
+    // Flatten the manifest stream into a stream of encrypted data keys.
     let mut enc_data_key_stream = s3_client
-        .enc_data_keys_unordered(concurrency_limit, records)
+        .enc_data_keys_unordered(concurrency_limit, manifest_stream)
         .boxed();
 
     // Unwrap all necessary keys upfront so we can take advantage of the YubiKey's "cache" tap

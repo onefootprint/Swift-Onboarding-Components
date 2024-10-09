@@ -1,3 +1,4 @@
+import pexpect
 import pytest
 import json
 import base64
@@ -7,7 +8,14 @@ from tests.constants import (
     VDR_AGE_KEYS,
     FAKE_WRAPPED_RECOVERY_KEY_B64,
 )
-from tests.vault_dr.utils import *
+from tests.vault_dr.utils import (
+    footprint_dr,
+    enroll_tenant_in_live_vdr,
+    new_org_identity_file,
+    new_output_dir,
+    new_records_file,
+    validate_decrypted_data,
+)
 from tests.utils import file_contents, patch, patch_raw, post, post_raw, get, delete
 
 
@@ -33,7 +41,7 @@ INVALID_API_ROOT = "http://127.0.0.1:123"
     ENVIRONMENT in ("ephemeral", "dev", "production"),
     reason="This test relies on localstack",
 )
-def test_footprint_dr_backup(tenant, tmp_path):
+def test_footprint_dr_backup(tenant, tmp_path_factory):
     cfg = enroll_tenant_in_live_vdr(tenant)
 
     expected_num_blobs = 0
@@ -429,14 +437,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
         },
     ]
 
-    records_file = tmp_path / "records.jsonl"
-    with records_file.open("w") as f:
-        for record in records_to_decrypt:
-            json.dump(record, f)
-            f.write("\n")
-
-            # Include some extra whitespace to test that it's ignored.
-            f.write("   \n")
+    records_file = new_records_file(tmp_path_factory, records_to_decrypt)
 
     expected_data = {
         fp_id_1: {
@@ -459,11 +460,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
             VDR_AGE_KEYS["2"]["private"],
         ]
     ):
-        output_dir = tmp_path / f"pii_test_{i}"
-        output_dir.mkdir()
-
-        org_identity_file = tmp_path / "org_identity.txt"
-        org_identity_file.write_text(org_identity)
+        output_dir = new_output_dir(tmp_path_factory)
+        org_identity_file = new_org_identity_file(tmp_path_factory, org_identity)
 
         with footprint_dr(
             "decrypt",
@@ -478,7 +476,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
             cmd.expect(pexpect.EOF)
         assert cmd.exitstatus == 0
 
-        validate_decrypted_data(output_dir, records_to_decrypt, expected_data)
+        validate_decrypted_data(output_dir, expected_data)
 
         # Check that we generated audit events for the test decryption.
         for record in expected_data:
@@ -509,9 +507,9 @@ def test_footprint_dr_backup(tenant, tmp_path):
     # with an incorrect key wrapped with the correct org public keys.
 
     # This won't decrypt successfully, but we'll just test that we get a decrypt error.
-    fake_wrapped_recovery_key = tmp_path / "fake_wrapped_recovery_key.age"
-    fake_wrapped_recovery_key.write_text(
-        base64.b64decode(FAKE_WRAPPED_RECOVERY_KEY_B64).decode("utf-8")
+    fake_wrapped_recovery_key = new_org_identity_file(
+        tmp_path_factory,
+        base64.b64decode(FAKE_WRAPPED_RECOVERY_KEY_B64).decode("utf-8"),
     )
 
     with footprint_dr(
@@ -552,15 +550,9 @@ def test_footprint_dr_backup(tenant, tmp_path):
                 "id.phone_number",
             ],
         }
-        records_file = tmp_path / "records.jsonl"
-        with records_file.open("w") as f:
-            json.dump(record_to_decrypt, f)
-
-        output_dir = tmp_path / f"pii_test_invalid_version_{bad_version}"
-        output_dir.mkdir()
-
-        org_identity_file = tmp_path / "org_identity.txt"
-        org_identity_file.write_text(org_identity)
+        records_file = new_records_file(tmp_path_factory, [record_to_decrypt])
+        output_dir = new_output_dir(tmp_path_factory)
+        org_identity_file = new_org_identity_file(tmp_path_factory, org_identity)
 
         with footprint_dr(
             "decrypt",
@@ -578,12 +570,12 @@ def test_footprint_dr_backup(tenant, tmp_path):
             cmd.expect(pexpect.EOF)
         assert cmd.exitstatus == 1
 
-    # TODO: make this a new test. For now, it's flaky in separate tests because of the incorrect worker logic.
-    # @pytest.mark.skipif(
-    #     ENVIRONMENT in ("ephemeral", "dev", "production"),
-    #     reason="This test relies on localstack",
-    # )
-    # def test_vaults_without_data(tenant, tmp_path):
+
+@pytest.mark.skipif(
+    ENVIRONMENT in ("ephemeral", "dev", "production"),
+    reason="This test relies on localstack",
+)
+def test_vaults_without_data(tenant, tmp_path_factory):
     cfg = enroll_tenant_in_live_vdr(tenant)
 
     # Create a vault with no data.
@@ -665,35 +657,33 @@ def test_footprint_dr_backup(tenant, tmp_path):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
+    # Test decryption with no active fields.
+    records_to_decrypt = [
+        {"fp_id": fp_id, "version": 2, "fields": ["id.first_name"]},
+    ]
 
-def validate_decrypted_data(output_dir, records_to_decrypt, expected_data):
-    for record in records_to_decrypt:
-        fp_id = record["fp_id"]
-        version = record["version"]
+    records_file = new_records_file(tmp_path_factory, records_to_decrypt)
+    output_dir = new_output_dir(tmp_path_factory)
+    org_identity_file = new_org_identity_file(
+        tmp_path_factory, VDR_AGE_KEYS["1"]["private"]
+    )
 
-        num_versions = len(list((output_dir / fp_id).iterdir()))
-        assert num_versions == len(expected_data[fp_id])
+    with footprint_dr(
+        "decrypt",
+        "--live",
+        "--records",
+        str(records_file),
+        "--org-identity",
+        str(org_identity_file),
+        "--output-dir",
+        str(output_dir),
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
 
-        for field in record["fields"]:
-            path = output_dir / fp_id / str(version) / field
-
-            if field in expected_data[fp_id][version]:
-                assert path.exists(), f"Missing path: {path}"
-            else:
-                assert not path.exists(), f"Unexpected path: {path}"
-                continue
-
-            pii_file = list(path.iterdir())
-            assert len(pii_file) == 1
-            pii_file = pii_file[0]
-
-            if field.startswith("document."):
-                assert pii_file.name == "document.png"
-
-                got_data = pii_file.read_bytes()
-                assert got_data == expected_data[fp_id][version][field]
-            else:
-                assert pii_file.name == "value.txt"
-
-                got_data = pii_file.read_text()
-                assert got_data == expected_data[fp_id][version][field]
+    expected_data = {
+        fp_id: {
+            2: {},
+        },
+    }
+    validate_decrypted_data(output_dir, expected_data)

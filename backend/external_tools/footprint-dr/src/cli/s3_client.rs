@@ -554,46 +554,61 @@ impl S3Client {
         ReceiverStream::new(rx)
     }
 
-    // Creates a stream that outputs the keys for each record.
-    pub fn enc_data_keys_unordered(
+    /// Hydrates a stream of versioned fields with the corresponding manifests. Yields an error if
+    /// the manifest for a given version doesn't exist.
+    pub fn manifest_stream(
         &self,
-        limit: usize,
         records: Pin<Box<dyn Stream<Item = Result<FpIdFields>> + Send>>,
-    ) -> impl Stream<Item = Result<EncDataKey>> + Send {
+    ) -> impl Stream<Item = Result<(FpIdFields, Manifest)>> {
         let client = self.client.clone();
         let bucket_name = self.bucket_name.clone();
 
+        records.and_then(move |record| {
+            let client = client.clone();
+            let bucket_name = bucket_name.clone();
+
+            Box::pin(async move {
+                let FpIdFields {
+                    fp_id,
+                    version,
+                    fields: _,
+                } = &record;
+
+                // Fetch the manifest before we start processing the fields in the batch.
+                let manifest =
+                    Self::read_manifest(client, bucket_name, fp_id.clone(), Some(*version)).await?;
+                let Some(manifest) = manifest else {
+                    // If the requested manifest version is missing, return an error.
+                    bail!("Vault version {} not found for {}", version, &fp_id.fp_id,);
+                };
+
+                Ok((record, manifest))
+            })
+        })
+    }
+
+    /// Creates a stream that outputs the keys for each record.
+    #[allow(clippy::type_complexity)]
+    pub fn enc_data_keys_unordered(
+        &self,
+        limit: usize,
+        records: Pin<Box<dyn Stream<Item = Result<(FpIdFields, Manifest)>> + Send>>,
+    ) -> impl Stream<Item = Result<EncDataKey>> + Send {
         records
-            .and_then(move |record| {
+            .and_then(move |(record, manifest)| {
                 let FpIdFields {
                     fp_id,
                     version,
                     fields,
                 } = record;
 
-                let client = client.clone();
-                let bucket_name = bucket_name.clone();
-
                 Box::pin(async move {
-                    // Fetch the manifest before we start processing the fields in the batch.
-                    let manifest =
-                        Self::read_manifest(client, bucket_name, fp_id.clone(), Some(version)).await?;
-
                     let enc_data_key_stream = futures::stream::iter(fields).filter_map(move |field| {
                         let fp_id = fp_id.clone();
                         let fp_id_path = fp_id.path.clone();
                         let manifest = manifest.clone();
 
                         Box::pin(async move {
-                            let Some(manifest) = manifest else {
-                                // If the requested manifest version is missing, return an error.
-                                return Some(Err(anyhow!(
-                                    "Vault version {} not found for {}",
-                                    version,
-                                    &fp_id.fp_id,
-                                )));
-                            };
-
                             // Skip the requested field if it's not present in the manifest.
                             let data_key_basename = manifest.fields.get(&field)?;
 

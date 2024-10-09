@@ -294,3 +294,63 @@ def enroll_tenant_in_live_vdr(tenant):
     assert cfg.client_params_match(got_cfg)
 
     return got_cfg
+
+
+def validate_decrypted_data(output_dir, expected_data):
+    # Validate directory structure.
+    got_fp_ids = set(entry.name for entry in output_dir.iterdir())
+    expected_fp_ids = set(expected_data.keys())
+    assert got_fp_ids == expected_fp_ids, f"{got_fp_ids} != {expected_fp_ids}"
+
+    for fp_id in got_fp_ids:
+        path = output_dir / fp_id
+        got_versions = set(entry.name for entry in path.iterdir())
+        expected_versions = set(str(version) for version in expected_data[fp_id])
+        assert (
+            got_versions == expected_versions
+        ), f"{got_versions} != {expected_versions}"
+
+        for version in got_versions:
+            path = output_dir / fp_id / version
+            got_fields = set(entry.name for entry in path.iterdir())
+            expected_fields = set(expected_data[fp_id][int(version)])
+            assert got_fields == expected_fields, f"{got_fields} != {expected_fields}"
+
+            for field in got_fields:
+                path = output_dir / fp_id / version / field
+                pii_file = list(path.iterdir())
+                assert len(pii_file) == 1
+                pii_file = pii_file[0]
+
+                if field.startswith("document."):
+                    assert pii_file.name == "document.png"
+
+                    got_data = pii_file.read_bytes()
+                    assert got_data == expected_data[fp_id][int(version)][field]
+                else:
+                    assert pii_file.name == "value.txt"
+
+                    got_data = pii_file.read_text()
+                    assert got_data == expected_data[fp_id][int(version)][field]
+
+
+def new_records_file(tmp_path_factory, records):
+    path = tmp_path_factory.mktemp("records") / "records.jsonl"
+    with path.open("w") as f:
+        for record in records:
+            f.write(json.dumps(record) + "\n")
+
+            # Include some extra whitespace to test that it's ignored.
+            f.write("   \n")
+    return path
+
+
+def new_output_dir(tmp_path_factory):
+    return tmp_path_factory.mktemp("output")
+
+
+def new_org_identity_file(tmp_path_factory, identity):
+    path = tmp_path_factory.mktemp("keys") / "keys.txt"
+    with path.open("w") as f:
+        f.write(identity)
+    return path

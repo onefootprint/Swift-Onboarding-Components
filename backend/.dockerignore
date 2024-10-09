@@ -1,4 +1,6 @@
 infra
+infra_global
+machine_images
 target
 vscode-target
 .pytest_cache
