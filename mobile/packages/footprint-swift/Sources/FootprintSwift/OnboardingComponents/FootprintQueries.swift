@@ -125,6 +125,28 @@ public class FootprintQueries {
         }
     }
     
+    func createVaultingToken(authToken: String) async throws -> Components.Schemas.CreateUserTokenResponse {
+        let input = Operations.vaultingToken.Input(
+            headers: Operations.vaultingToken.Input.Headers(
+                X_hyphen_Fp_hyphen_Authorization: authToken
+            ),
+            body: .json(Components.Schemas.CreateUserTokenRequest(
+                requested_scope: Components.Schemas.CreateUserTokenRequest.requested_scopePayload.onboarding
+            ))
+        )
+        
+        let response = try await client.vaultingToken(input)
+        
+        switch response {
+        case .ok(let okResponse):
+            return try okResponse.body.json
+        default:
+            throw FootprintError.error(domain: FootprintErrorDomain.auth,
+                                       message: "Unexpected error occurred while getting the vaulting token")
+        }
+    }
+    
+    
     func verify(challenge: String, challengeToken: String, authToken: String) async throws -> Components.Schemas.IdentifyVerifyResponse {
         let input = Operations.verify.Input(
             headers: Operations.verify.Input.Headers(

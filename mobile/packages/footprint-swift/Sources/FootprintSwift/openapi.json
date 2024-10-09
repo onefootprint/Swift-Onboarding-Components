@@ -4226,6 +4226,9 @@
       "OnboardingResponse": {
         "type": "object",
         "properties": {
+            "auth_token": {
+                "type": "string"
+            },
           "onboarding_config": {
             "description": "The public onboarding configuration",
             "type": "object",
@@ -4612,6 +4615,7 @@
           }
         },
         "required": [
+            "auth_token",
           "onboarding_config"
         ]
       },
