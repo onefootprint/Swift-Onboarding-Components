@@ -15,7 +15,7 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
   });
 
   return (
-    <Dialog size="full-screen" onClose={onClose} open={open} title={t('title')}>
+    <Dialog size="full-screen" onClose={onClose} open={open} title={t('title')} preventEscapeKeyDown>
       <Router onCreate={onCreate} />
     </Dialog>
   );
