@@ -3,6 +3,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
@@ -183,8 +184,15 @@ pub async fn post(
         prompt_for_passkey,
         allow_reonboard,
     };
-
-    let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;
+    // Need to check Tenants are able to use certain vendors
+    let tvc = TenantVendorControl::new(
+        tenant.id.clone(),
+        &state.db_pool,
+        &state.config,
+        &state.enclave_client,
+    )
+    .await?;
+    let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, &tvc)?;
     let ff_client = state.ff_client.clone();
     let (obc, actor, rs) = state
         .db_pool

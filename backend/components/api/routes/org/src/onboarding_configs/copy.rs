@@ -3,6 +3,7 @@ use crate::rules::validate_rules_request;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -82,9 +83,17 @@ async fn post(
         })
         .await?;
 
+    let tvc = TenantVendorControl::new(
+        target_tenant_id.clone(),
+        &state.db_pool,
+        &state.config,
+        &state.enclave_client,
+    )
+    .await?;
+
     let tt_id = target_tenant.id.clone();
     let args = copy_playbook(obc, target_actor.clone().into(), tt_id, target_is_live, name);
-    let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant)?;
+    let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant, &tvc)?;
 
     let rules = rules.into_iter().map(copy_rule).collect_vec();
 

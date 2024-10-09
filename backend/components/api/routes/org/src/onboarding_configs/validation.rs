@@ -1,4 +1,5 @@
 use super::post::CreateOnboardingConfigurationRequest;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
@@ -38,13 +39,15 @@ impl ObConfigurationArgsToValidate {
         state: &State,
         args: NewObConfigurationArgs,
         tenant: &Tenant,
+        tvc: &TenantVendorControl,
     ) -> FpResult<NewObConfigurationArgs> {
-        let args = Self(args);
+        let args: ObConfigurationArgsToValidate = Self(args);
+
         args.validate_inner()?;
         args.validate_kind()?;
         args.validate_flags(state, &tenant.id)?;
         args.validate_tenant_restrictions(tenant)?;
-        args.validate_checks()?;
+        args.validate_checks(tvc, args.is_live)?;
         args.validate_required_auth_methods()?;
         Ok(args.0)
     }
@@ -516,7 +519,7 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    pub(super) fn validate_checks(&self) -> FpResult<()> {
+    pub(super) fn validate_checks(&self, tvc: &TenantVendorControl, obc_is_live: bool) -> FpResult<()> {
         let duplicates: Vec<VerificationCheckKind> = self
             .verification_checks
             .clone()
@@ -597,7 +600,18 @@ impl ObConfigurationArgsToValidate {
                     VerificationCheck::Kyc {  } => Ok(()),
                     VerificationCheck::IdentityDocument {  } => Ok(()),
                     VerificationCheck::StytchDevice {  } => Ok(()),
-                    VerificationCheck::NeuroId {  } => Ok(()),
+                    VerificationCheck::NeuroId {  } => {
+                        if !matches!(self.kind, ObConfigurationKind::Kyc) {
+                            let err = format!("Cannot create playbook with Neuro ID of kind {}, only KYC", self.kind);
+                            return Err(TenantError::ValidationError(err).into())
+                        }
+                        if !tvc.is_neuro_enabled_for_tenant() && obc_is_live {
+                            return Err(TenantError::ValidationError("Cannot create playbook with Neuro ID. Please reach out to support@onefootprint.com to enable".into()
+                           ).into())
+                        }
+
+                        Ok(())
+                    },
                     VerificationCheck::Sentilink {  } => {
                         let required_idks = SentilinkProduct::iter().flat_map(|p| p.required_identity_data_kinds()).unique();
                         let missing = required_idks.map(DataIdentifier::from).filter(|x| {
@@ -606,12 +620,22 @@ impl ObConfigurationArgsToValidate {
                         }).collect_vec();
 
                         if !missing.is_empty() {
-                            Err(TenantError::ValidationError(
+                            return Err(TenantError::ValidationError(
                                 format!("Must collect {} to use Sentilink", Csv::from(missing))
                             ).into())
-                        } else {
-                            Ok(())
                         }
+
+                        if !tvc.is_sentilink_enabled_for_tenant() && obc_is_live {
+                            return Err(TenantError::ValidationError("Cannot create playbook with Sentilink. Please reach out to support@onefootprint.com to enable".into()
+                           ).into())
+                        }
+
+                        if !matches!(self.kind, ObConfigurationKind::Kyc | ObConfigurationKind::Kyb) {
+                            let err = format!("Cannot create playbook with Sentilink of kind {}. Only KYC and KYB are supported", self.kind);
+                            return Err(TenantError::ValidationError(err).into())
+                        }
+
+                        Ok(())
                     },
                 }
             })?;
