@@ -10,7 +10,6 @@ from tests.constants import (
 )
 from tests.vault_dr.utils import (
     footprint_dr,
-    enroll_tenant_in_live_vdr,
     new_org_identity_file,
     new_output_dir,
     new_records_file,
@@ -41,8 +40,8 @@ INVALID_API_ROOT = "http://127.0.0.1:123"
     ENVIRONMENT in ("ephemeral", "dev", "production"),
     reason="This test relies on localstack",
 )
-def test_footprint_dr_backup(tenant, tmp_path_factory):
-    cfg = enroll_tenant_in_live_vdr(tenant)
+def test_footprint_dr_backup(tenant_and_live_vdr_cfg, tmp_path_factory):
+    tenant, cfg = tenant_and_live_vdr_cfg
 
     expected_num_blobs = 0
 
@@ -575,8 +574,8 @@ def test_footprint_dr_backup(tenant, tmp_path_factory):
     ENVIRONMENT in ("ephemeral", "dev", "production"),
     reason="This test relies on localstack",
 )
-def test_vaults_without_data(tenant, tmp_path_factory):
-    cfg = enroll_tenant_in_live_vdr(tenant)
+def test_vaults_without_data(tenant_and_live_vdr_cfg, tmp_path_factory):
+    tenant, cfg = tenant_and_live_vdr_cfg
 
     # Create a vault with no data.
     resp = post(

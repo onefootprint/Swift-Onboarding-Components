@@ -187,7 +187,7 @@ class EnrollmentConfig:
 
 
 # Idempotently enroll a tenant Vault Disaster Recovery (live mode)
-def enroll_tenant_in_live_vdr(tenant):
+def ensure_enrolled_in_live_vdr(tenant):
     login_live(tenant)
 
     external_id = get_external_id("live")
@@ -272,18 +272,27 @@ def enroll_tenant_in_live_vdr(tenant):
         cmd.sendline("n")
 
         cmd.expect("Enter AWS account ID: ")
-        cmd.sendline(aws_account_id)
+        cmd.sendline(cfg.aws_account_id)
 
         cmd.expect("Enter AWS role name: ")
-        cmd.sendline(iam_role_name)
+        cmd.sendline(cfg.aws_role_name)
 
         cmd.expect("Enter S3 bucket name: ")
-        cmd.sendline(bucket_name)
+        cmd.sendline(cfg.s3_bucket_name)
 
-        cmd.expect("Verifying configuration... OK")
+        outcome = cmd.expect_exact(
+            [
+                "Verifying configuration... OK",
+                # Multiple pytest processes can race against each other to
+                # enroll. Only one can win. We verify the configuration below
+                # to make sure it's correct and return the true config.
+                "Verifying configuration... Failed\r\nError: Already enrolled in Vault Disaster Recovery",
+            ]
+        )
+        enrollment_failed = outcome == 1
 
         cmd.expect(pexpect.EOF)
-    assert cmd.exitstatus == 0
+    assert cmd.exitstatus == (1 if enrollment_failed else 0)
 
     # Check that the configuration is now correct.
     with footprint_dr("status", "--live") as cmd:
