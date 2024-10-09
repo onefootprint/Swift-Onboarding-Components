@@ -1140,8 +1140,8 @@ diesel::table! {
         _updated_at -> Timestamptz,
         created_by_actor -> Nullable<Jsonb>,
         deactivated_by_actor -> Nullable<Jsonb>,
-        tenant_id -> Nullable<Text>,
-        is_live -> Nullable<Bool>,
+        tenant_id -> Text,
+        is_live -> Bool,
     }
 }
 
@@ -1160,8 +1160,8 @@ diesel::table! {
         _updated_at -> Timestamptz,
         created_by_actor -> Nullable<Jsonb>,
         deactivated_by_actor -> Nullable<Jsonb>,
-        tenant_id -> Nullable<Text>,
-        is_live -> Nullable<Bool>,
+        tenant_id -> Text,
+        is_live -> Bool,
     }
 }
 

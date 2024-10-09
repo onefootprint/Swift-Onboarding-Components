@@ -33,8 +33,8 @@ pub struct ScopedVaultLabel {
     pub _updated_at: DateTime<Utc>,
     pub created_by_actor: Option<DbActor>,
     pub deactivated_by_actor: Option<DbActor>,
-    pub tenant_id: Option<TenantId>,
-    pub is_live: Option<bool>,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
 }
 
 impl ScopedVaultLabel {
