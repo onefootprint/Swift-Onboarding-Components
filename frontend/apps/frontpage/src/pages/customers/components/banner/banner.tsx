@@ -5,7 +5,6 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import ContactDialog from 'src/components/contact-dialog';
-import { GET_FORM_URL } from 'src/config/constants';
 import Penguin from './components/penguin/penguin';
 
 type BannerProps = {
@@ -35,7 +34,7 @@ const Banner = ({ children, cta, title }: BannerProps) => {
       <Button onClick={handleOpenDialog} type="button">
         {cta}
       </Button>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
+      <ContactDialog open={showDialog} onClose={handleClose} />
       <PenguinContainer>
         <Penguin />
       </PenguinContainer>

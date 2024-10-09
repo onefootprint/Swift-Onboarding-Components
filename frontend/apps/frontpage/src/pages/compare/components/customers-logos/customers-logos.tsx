@@ -7,8 +7,6 @@ import { LINTRK_CONVERSION_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import Logos from './logos';
 
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
-
 const CustomersLogos = () => {
   const [showDialog, setShowDialog] = useState(false);
   const { t } = useTranslation('common', {
@@ -16,7 +14,6 @@ const CustomersLogos = () => {
   });
 
   const handleBookDemoClick = () => {
-    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
     setShowDialog(true);
   };
 
@@ -47,14 +44,14 @@ const CustomersLogos = () => {
           </Button>
         </ButtonContainer>
       </StyledContainer>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleCloseDialog} />
+      <ContactDialog open={showDialog} onClose={handleCloseDialog} />
     </>
   );
 };
 
 const StyledContainer = styled(Container)`
   ${({ theme }) => css`
-    position: relative; 
+    position: relative;
 
     &:before {
       content: '';
@@ -74,7 +71,7 @@ const ButtonContainer = styled(Stack)`
     gap: ${theme.spacing[4]};
     width: 100%;
 
-    ${media.greaterThan('md')`     
+    ${media.greaterThan('md')`
       flex-direction: row;
       align-items: center;
       justify-content: center;

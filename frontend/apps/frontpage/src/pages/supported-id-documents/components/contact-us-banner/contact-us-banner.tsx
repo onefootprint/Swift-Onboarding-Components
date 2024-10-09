@@ -10,8 +10,6 @@ type ContactUsBannerProps = {
   cta: string;
 };
 
-const GET_FORM_URL = 'https://api.getform.io/v1/forms/pbygomeb';
-
 const ContactUsBanner: React.FC<ContactUsBannerProps> = ({ title, subtitle, cta }) => {
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const handleClick = (): void => {
@@ -29,7 +27,7 @@ const ContactUsBanner: React.FC<ContactUsBannerProps> = ({ title, subtitle, cta 
         {subtitle}
       </Text>
       <Button onClick={handleClick}>{cta}</Button>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
+      <ContactDialog open={showDialog} onClose={handleClose} />
     </ContactContainer>
   );
 };

@@ -11,8 +11,6 @@ type ContactButtonsProps = {
   justify?: 'left' | 'center' | 'right';
 };
 
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
-
 const ContactButtons = ({ signUpButton, bookADemoButton, justify = 'left' }: ContactButtonsProps) => {
   const [showDialog, setShowDialog] = useState(false);
 
@@ -38,7 +36,7 @@ const ContactButtons = ({ signUpButton, bookADemoButton, justify = 'left' }: Con
           {bookADemoButton}
         </Button>
       </Buttons>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
+      <ContactDialog open={showDialog} onClose={handleClose} />
     </>
   );
 };

@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
-import { GET_FORM_URL, SIGN_UP_URL } from 'src/config/constants';
+import { SIGN_UP_URL } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import FishingPenguin from './components/fishing-penguin';
 
@@ -48,7 +48,7 @@ const Banner = ({ title, imgSrc }: BannerProps) => {
           </ButtonContainer>
         </TextContainer>
       </BannerContainer>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={() => setShowDialog(false)} />
+      <ContactDialog open={showDialog} onClose={() => setShowDialog(false)} />
     </>
   );
 };

@@ -11,8 +11,6 @@ import Header from './components/header';
 import PlansDetails from './plans-table-data';
 import { Plans } from './plans-table-types';
 
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
-
 const PlansTable = () => {
   const [showDialog, setShowDialog] = useState(false);
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
@@ -49,7 +47,7 @@ const PlansTable = () => {
           </>
         ))}
       </PlansContainer>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
+      <ContactDialog open={showDialog} onClose={handleClose} />
     </>
   );
 };

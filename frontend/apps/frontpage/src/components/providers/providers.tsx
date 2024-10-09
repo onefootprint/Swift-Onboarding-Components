@@ -1,4 +1,5 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { HubspotProvider } from 'next-hubspot';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -16,7 +17,9 @@ const Providers = ({ children }: React.PropsWithChildren) => (
   <QueryClientProvider client={queryClient}>
     <CustomDesignSystemProvider>
       <SpeedInsights />
-      <MDXProvider>{children}</MDXProvider>
+      <MDXProvider>
+        <HubspotProvider>{children}</HubspotProvider>
+      </MDXProvider>
     </CustomDesignSystemProvider>
   </QueryClientProvider>
 );

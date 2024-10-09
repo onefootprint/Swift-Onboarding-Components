@@ -20,8 +20,9 @@
     "contact-us-dialog": {
       "title": "Book a demo",
       "description": "Let us know where to get back to you and we'll find some options to chat.",
-      "send-button": "Send",
-      "cancel-button": "Cancel",
+      "load-error": "Error loading contact form. Please try again later.",
+      "loading": "Loading contact form...",
+      "exit": "Exit",
       "submit-success": {
         "title": "Message sent",
         "description": "We'll get back to you as soon as possible."
@@ -29,34 +30,6 @@
       "submit-error": {
         "title": "Oops, something went wrong. Please try again.",
         "description": "Please try again."
-      },
-      "name": {
-        "label": "Full name",
-        "placeholder": "Jane Doe",
-        "errors": {
-          "required": "Name is required"
-        }
-      },
-      "email": {
-        "label": "Business email address",
-        "placeholder": "janedoe@company.com",
-        "errors": {
-          "required": "Email is required"
-        }
-      },
-      "company": {
-        "label": "Company",
-        "placeholder": "Company name",
-        "errors": {
-          "required": "Company name is required"
-        }
-      },
-      "message": {
-        "label": "Anything else?",
-        "placeholder": "I'm interested in a Footprint demo for...",
-        "errors": {
-          "required": "Message is required"
-        }
       }
     },
     "navbar": {

@@ -1,7 +1,7 @@
 import { Button, Stack, media } from '@onefootprint/ui';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GET_FORM_URL, LINTRK_CONVERSION_ID, SIGN_UP_URL } from 'src/config/constants';
+import { LINTRK_CONVERSION_ID, SIGN_UP_URL } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import ContactDialog from '../contact-dialog';
 
@@ -31,7 +31,6 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
   };
 
   const handleBookCall = useCallback(() => {
-    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
     setShowDialog(true);
   }, []);
 
@@ -45,7 +44,7 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
           {labels?.secondary || t('sign-up-for-free')}
         </Button>
       </ButtonsContainer>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={() => setShowDialog(false)} />
+      <ContactDialog open={showDialog} onClose={() => setShowDialog(false)} />
     </>
   );
 };
