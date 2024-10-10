@@ -81,7 +81,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
         />
       </GridItem>
       <GridItem>
-        <Fieldset
+        <AddressFieldset
           fields={address.fields}
           iconComponent={address.iconComponent}
           title={address.title}
