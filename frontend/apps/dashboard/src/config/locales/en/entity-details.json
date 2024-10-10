@@ -920,10 +920,10 @@
         "actions": {
           "onboard": "onboard onto",
           "redo_kyc": "reonboard onto playbook",
-          "id_document": "upload ID photo",
-          "custom_document": "upload {{ docName }}",
-          "proof_of_ssn": "provide proof of SSN",
-          "proof_of_address": "provide proof of address"
+          "document": "upload {{ docConfigs }}",
+          "id_document": "ID photo",
+          "proof_of_ssn": "proof of SSN",
+          "proof_of_address": "proof of address"
         },
         "link-generated": "Generated a link for the user to complete this task",
         "create-link": {

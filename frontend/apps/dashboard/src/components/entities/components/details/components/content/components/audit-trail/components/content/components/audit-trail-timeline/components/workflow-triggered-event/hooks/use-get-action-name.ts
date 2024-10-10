@@ -8,31 +8,31 @@ const useGetActionName = () => {
   });
 
   const getActionName = (config: WorkflowRequestConfig) => {
-    let action;
     if (config.kind === TriggerKind.Onboard) {
-      action = t('actions.onboard');
-    } else if (config.kind === TriggerKind.RedoKyc) {
-      action = t('actions.redo_kyc');
-    } else if (config.kind === TriggerKind.Document) {
-      // TODO when we start supporting requesting multiple documents, adjust the timeline event
-      // accordingly
+      return t('actions.onboard');
+    }
+    if (config.kind === TriggerKind.RedoKyc) {
+      return t('actions.redo_kyc');
+    }
+    if (config.kind === TriggerKind.Document) {
       const { configs, businessConfigs = [] } = config.data;
       const docConfigs = [...configs, ...businessConfigs];
-      const customConfig = docConfigs.find(c => c.kind === DocumentRequestKind.Custom);
-      if (docConfigs.some(c => c.kind === DocumentRequestKind.ProofOfAddress)) {
-        action = t('actions.proof_of_address');
-      } else if (docConfigs.some(c => c.kind === DocumentRequestKind.ProofOfSsn)) {
-        action = t('actions.proof_of_ssn');
-      } else if (customConfig && 'name' in customConfig.data) {
-        action = t('actions.custom_document', {
-          docName: customConfig.data.name,
-        });
-      } else if (docConfigs.some(c => c.kind === DocumentRequestKind.Identity)) {
-        action = t('actions.id_document');
+      const docConfigKindMap = {
+        [DocumentRequestKind.ProofOfAddress]: t('actions.proof_of_address'),
+        [DocumentRequestKind.ProofOfSsn]: t('actions.proof_of_ssn'),
+        [DocumentRequestKind.Identity]: t('actions.id_document'),
+      };
+      const actions = docConfigs.map(dc =>
+        dc.kind === DocumentRequestKind.Custom ? dc.data.name : docConfigKindMap[dc.kind],
+      );
+      if (actions.length === 1) {
+        return t('actions.document', { docConfigs: actions[0] });
       }
+      const lastAction = actions.pop();
+      return t('actions.document', { docConfigs: `${actions.join(', ')}, and ${lastAction}` });
     }
-    return action;
   };
+
   return getActionName;
 };
 
