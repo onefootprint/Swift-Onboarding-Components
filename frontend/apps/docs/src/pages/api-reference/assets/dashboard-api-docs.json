@@ -8513,6 +8513,9 @@
                             "is_prod_kyc_playbook_restricted": {
                                 "type": "boolean"
                             },
+                            "is_prod_neuro_enabled": {
+                                "type": "boolean"
+                            },
                             "is_prod_sentilink_enabled": {
                                 "type": "boolean"
                             },
@@ -12254,6 +12257,10 @@
                                         "none"
                                     ]
                                 },
+                                "sv_id": {
+                                    "description": "Only serialized for firm employess",
+                                    "type": "string"
+                                },
                                 "tags": {
                                     "type": "array",
                                     "items": {
@@ -12278,6 +12285,10 @@
                                             "tag"
                                         ]
                                     }
+                                },
+                                "v_id": {
+                                    "description": "Only serialized for firm employess",
+                                    "type": "string"
                                 },
                                 "watchlist_check": {
                                     "type": "object",
@@ -14866,6 +14877,10 @@
                             "none"
                         ]
                     },
+                    "sv_id": {
+                        "description": "Only serialized for firm employess",
+                        "type": "string"
+                    },
                     "tags": {
                         "type": "array",
                         "items": {
@@ -14890,6 +14905,10 @@
                                 "tag"
                             ]
                         }
+                    },
+                    "v_id": {
+                        "description": "Only serialized for firm employess",
+                        "type": "string"
                     },
                     "watchlist_check": {
                         "type": "object",
@@ -27939,6 +27958,9 @@
                         "type": "string"
                     },
                     "prompt_for_passkey": {
+                        "type": "boolean"
+                    },
+                    "skip_confirm": {
                         "type": "boolean"
                     },
                     "status": {

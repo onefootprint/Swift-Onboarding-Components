@@ -447,6 +447,7 @@ pub struct ObConfigurationUpdate {
     pub verification_checks: Option<Vec<VerificationCheck>>,
     pub prompt_for_passkey: Option<bool>,
     pub allow_reonboard: Option<bool>,
+    pub skip_confirm: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
