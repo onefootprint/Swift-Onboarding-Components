@@ -1,5 +1,5 @@
 import type { DataIdentifier, Entity, EntityCard, VaultValue } from '@onefootprint/types';
-import { Divider, Stack } from '@onefootprint/ui';
+import { Divider, LinkButton, Stack } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import useEntityDuplicateData from 'src/components/entities/components/details/hooks/use-entity-duplicate-data';
@@ -29,22 +29,44 @@ const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
   const dis = getCardDis(entity.data, selectedCard?.alias);
   const fields = dis.map(di => ({ di }));
 
+  useEffect(() => {
+    setSelectedItemDis(dis);
+  }, [selectedCard]);
+
   const closeDuplicateDataDrawer = () => {
     setDuplicateDrawerOpen(false);
   };
 
-  useEffect(() => {
-    setSelectedItemDis(dis);
-  }, [selectedCard]);
+  const openDuplicateDataDrawer = () => {
+    setDuplicateDrawerOpen(true);
+  };
 
   const renderCardIssuer = (value: VaultValue) => {
     const changedValue = getCardIssuer(value);
     return <FieldOrPlaceholder data={changedValue} />;
   };
 
+  const renderCardFingerprint = (value: VaultValue) => {
+    if (typeof value === 'string') {
+      return <LinkButton onClick={openDuplicateDataDrawer}>{value}</LinkButton>;
+    }
+    return null;
+  };
+
   const renderField = (field: DiField) => {
     const { di } = field;
 
+    if (di.endsWith('fingerprint')) {
+      return (
+        <Field
+          renderValue={renderCardFingerprint}
+          key={di}
+          di={di}
+          entity={entity}
+          renderLabel={() => getTranslationsWithoutAlias(di)}
+        />
+      );
+    }
     if (di.endsWith('issuer')) {
       return (
         <Field
@@ -67,7 +89,6 @@ const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
           <Divider />
         </>
       )}
-
       <Stack direction="column" gap={4}>
         {fields.map(field => renderField(field))}
       </Stack>

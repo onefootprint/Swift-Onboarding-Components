@@ -18,7 +18,7 @@ export const CardSelector = ({ selected, onChange, cards }: CardSelectorProps) =
 
   return (
     <SelectCustom.Root value={selected?.alias || ''} onValueChange={handleChange}>
-      <SelectCustom.Input>
+      <SelectCustom.Input size="compact">
         {selected && (
           <Stack alignItems="center" gap={2}>
             {selected.issuer && <CardIcon issuer={selected.issuer} />}
