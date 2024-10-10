@@ -29,6 +29,7 @@ use newtypes::TagKind;
 use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
+use newtypes::WorkflowKind;
 use std::str::FromStr;
 use tracing::instrument;
 
@@ -196,7 +197,9 @@ macro_rules! list_query {
             let q_onboarded_onto_playbook = exists(
                 workflow::table
                     .filter(workflow::ob_configuration_id.eq_any(playbook_ids))
-                    .filter(workflow::scoped_vault_id.eq(scoped_vault::id)),
+                    .filter(workflow::scoped_vault_id.eq(scoped_vault::id))
+                    // Document workflows have a bogus playbook associated with them
+                    .filter(not(workflow::kind.eq(WorkflowKind::Document)))
             );
             query = query.filter(q_onboarded_onto_playbook)
         }
