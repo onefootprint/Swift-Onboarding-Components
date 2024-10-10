@@ -1,18 +1,14 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, media } from '@onefootprint/ui';
 import { useToast } from '@onefootprint/ui';
-import { createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence } from 'framer-motion';
 import { useHubspotForm } from 'next-hubspot';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LINTRK_CONVERSION_ID } from 'src/config/constants';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const HubspotContactForm = () => {
-  const theme = useTheme();
-  const { button } = theme.components;
-  const { input } = theme.components;
   const { t } = useTranslation('common', { keyPrefix: 'components.contact-us-dialog' });
   const [showSuccess, setShowSuccess] = useState(false);
   const toast = useToast();
@@ -36,81 +32,6 @@ const HubspotContactForm = () => {
     target: '#hubspot-form-wrapper',
     onFormSubmit: handleFormSubmit,
     onFormError: handleFormError,
-    css: `
-      .hs-form-private, fieldset {
-        ${createFontStyles('body-3')};
-        margin: ${theme.spacing[3]} 0 0 0 !important;
-        align-items: flex-end;
-      }
-
-      .hs-form-field, field {
-        color: ${theme.color.primary};
-        display: flex;
-        flex-direction: column;
-        gap: ${theme.spacing[2]};
-        width: 100%;
-      }
-
-      .hs-form-field label, field label {
-        margin-bottom: ${theme.spacing[2]};
-        ${createFontStyles('label-3')};
-      }
-
-      .hs-button {
-        ${createFontStyles('label-3')};
-        color: ${button.variant.primary.color};
-        background-color: ${button.variant.primary.bg};
-        border: none;
-        border-radius: ${theme.borderRadius.sm};
-        cursor: pointer;
-        width: fit-content;
-        height: ${button.size.large.height};
-        padding: ${theme.spacing[3]} ${theme.spacing[5]};
-      }
-
-      .hs-button:hover {
-        background-color: ${button.variant.primary.hover.bg};
-      }
-
-      .hs-input, input {
-        width: 100%;
-        height: ${input.size.compact.height};
-        font-size: ${input.size.compact.typography.fontSize};
-        font-weight: ${input.size.compact.typography.fontWeight};
-        line-height: ${input.size.compact.typography.lineHeight};
-        border: ${input.global.borderWidth} solid ${input.state.default.initial.border};
-        border-radius: ${input.global.borderRadius};
-      }
-
-      .hs-input:focus, input:focus {
-        border: ${input.global.borderWidth} solid ${input.state.default.focus.border};
-      }
-
-      .hs-input:focus-visible, input:focus-visible {
-        outline: ${input.global.borderWidth} solid ${input.state.default.focus.border};
-      }
-
-      .hs-input:disabled, input:disabled {
-        background-color: ${input.state.disabled.bg};
-        color: ${input.state.disabled.color};
-      }
-
-      .hs-input.hs-fieldtype-textarea {
-        height: calc(4 * ${input.size.compact.typography.lineHeight} + ${theme.spacing[2]});
-        padding: ${theme.spacing[2]};
-        resize: vertical;
-      }
-
-      .hs-input.hs-fieldtype-textarea legend {
-        display: none;
-      }
-
-      .hs-error-msg {
-        ${createFontStyles('caption-1')};
-        color: ${input.state.error.initial.border};
-        margin-top: ${theme.spacing[1]};
-      }
-    `,
   });
 
   if (error) {
@@ -126,7 +47,7 @@ const HubspotContactForm = () => {
   }
 
   return (
-    <Box>
+    <Styles>
       <AnimatePresence>
         <Stack gap={7} height="100%" flex={1}>
           {showSuccess ? (
@@ -146,7 +67,7 @@ const HubspotContactForm = () => {
           )}
         </Stack>
       </AnimatePresence>
-    </Box>
+    </Styles>
   );
 };
 
@@ -166,6 +87,113 @@ const ImageContainer = styled(Box)`
       width: 100%;
       height: 100%;
       object-fit: contain;  
+    }
+  `}
+`;
+
+const Styles = styled(Box)`
+  ${({ theme }) => css`
+    .hs-form-private, fieldset {
+      font-family: ${theme.fontFamily.default};
+      font-size: ${theme.typography['body-3'].fontSize};
+      font-weight: ${theme.typography['body-3'].fontWeight};
+      line-height: ${theme.typography['body-3'].lineHeight};
+    }
+
+    .hs-form-field, field {
+      color: ${theme.color.primary};
+      display: flex;
+      flex-direction: column;
+      gap: ${theme.spacing[2]};
+      margin-bottom: ${theme.spacing[5]};
+      width: 100% !important;
+    }
+      
+    .form-columns-2 {
+      display: flex;
+      flex-direction: column;
+
+      ${media.greaterThan('sm')` 
+        flex-direction: row;
+        gap: ${theme.spacing[5]};
+      `}
+    }
+
+    .hs-form-field label, field label {
+      font-weight: ${theme.typography['label-3'].fontWeight};      
+    }
+
+    .hs-button {
+      font-family: ${theme.fontFamily.default};
+      font-weight: ${theme.components.button.size.large.typography.fontWeight};
+      font-size: ${theme.components.button.size.large.typography.fontSize};
+      line-height: ${theme.components.button.size.large.typography.lineHeight};
+      color: ${theme.components.button.variant.primary.color};
+      background-color: ${theme.components.button.variant.primary.bg};
+      border: ${theme.components.button.borderWidth} solid ${theme.components.button.variant.primary.borderColor};
+      border-radius: ${theme.components.button.borderRadius};
+      cursor: pointer;
+      width: fit-content;
+      height: ${theme.components.button.size.large.height};
+      padding: 0 ${theme.components.button.size.large.paddingHorizontal} !important;
+      margin-top: ${theme.spacing[5]};
+      box-shadow: ${theme.components.button.variant.primary.boxShadow};
+    }
+
+    .hs-button:hover {
+      background-color: ${theme.components.button.variant.primary.hover.bg};
+    }
+
+    .hs-input {
+      width: 100% !important;
+      height: ${theme.components.input.size.compact.height};
+      font-size: ${theme.components.input.size.compact.typography.fontSize};
+      font-weight: ${theme.components.input.size.compact.typography.fontWeight};
+      line-height: ${theme.components.input.size.compact.typography.lineHeight};
+      border: ${theme.components.input.global.borderWidth} solid ${theme.components.input.state.default.initial.border};
+      border-radius: ${theme.components.input.global.borderRadius};
+      padding: 0 ${theme.spacing[4]} !important;
+    }
+
+    .input {
+      margin-right: 0 !important;
+    }
+
+    .hs-input:focus, input:focus {
+      border: ${theme.components.input.global.borderWidth} solid ${theme.components.input.state.default.focus.border};
+    }
+
+    .hs-input:focus-visible, input:focus-visible {
+      outline: ${theme.components.input.global.borderWidth} solid ${theme.components.input.state.default.focus.border};
+    }
+
+    .hs-input:disabled, input:disabled {
+      background-color: ${theme.components.input.state.disabled.bg};
+      color: ${theme.components.input.state.disabled.color};
+    }
+
+    .hs-input.hs-fieldtype-textarea {
+      font-family: ${theme.fontFamily.default};
+      font-size: ${theme.typography['body-3'].fontSize};
+      font-weight: ${theme.typography['body-3'].fontWeight};
+      line-height: ${theme.typography['body-3'].lineHeight};
+      min-height: 80px;
+      padding: ${theme.spacing[4]} !important;
+      width: 100% !important;
+    } 
+
+    .hs-error-msg {
+      font-family: ${theme.fontFamily.default};
+      font-size: ${theme.typography['caption-1'].fontSize};
+      font-weight: ${theme.typography['caption-1'].fontWeight};
+      line-height: ${theme.typography['caption-1'].lineHeight};
+      color: ${theme.components.input.state.error.initial.border};
+      margin-top: ${theme.spacing[1]};
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
     }
   `}
 `;
