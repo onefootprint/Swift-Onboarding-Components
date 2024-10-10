@@ -11,6 +11,7 @@ import styled, { css } from 'styled-components';
 
 import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses';
 
+import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
@@ -59,7 +60,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
         />
       </GridArea>
       <GridArea name="address">
-        <Fieldset
+        <AddressFieldset
           fields={address.fields}
           iconComponent={address.iconComponent}
           title={address.title}

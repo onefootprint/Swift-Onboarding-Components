@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import useBusinessOwners from '@/entity/hooks/use-business-owners';
 import { type Entity, hasEntityCustomData } from '@onefootprint/types';
+import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
@@ -44,7 +45,7 @@ const BusinessVault = ({ entity }: BusinessVaultProps) => {
         </Bos>
       ) : null}
       <Address>
-        <Fieldset
+        <AddressFieldset
           fields={address.fields}
           iconComponent={address.iconComponent}
           title={address.title}
