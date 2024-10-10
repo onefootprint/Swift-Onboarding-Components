@@ -21,7 +21,7 @@ const BankAccountFields = ({ entity, setSelectedItemDis }: BankAccountFieldsProp
   const [selectedBankAccount, setSelectedBankAccount] = useState<EntityBankAccount | undefined>(
     bankAccounts.length > 0 ? bankAccounts[0] : undefined,
   );
-  const [duplicateDrawerOpen, setDuplicateDrawerOpen] = useState(true);
+  const [duplicateDrawerOpen, setDuplicateDrawerOpen] = useState(false);
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
   const { data: duplicateData, isLoading: isDuplicateDataLoading } = useEntityDuplicateData(entity.id);
 
