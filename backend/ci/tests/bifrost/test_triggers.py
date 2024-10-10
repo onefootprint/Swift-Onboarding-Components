@@ -231,6 +231,46 @@ def test_collect_document(document_configs, sandbox_tenant, expected_docs):
     assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
+def test_collect_document_no_onboardings(sandbox_tenant):
+    """
+    Cover our horrid codepath that attaches a random playbook to WFRs for an ad-hoc document for users
+    who have never onboarded onto a playbook
+    """
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": FIXTURE_EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+    sandbox_id = body["sandbox_id"]
+
+    # Trigger recollect document
+    document_configs = [dict(kind="identity", data=dict(collect_selfie=False))]
+    trigger = dict(
+        kind="document",
+        data=dict(configs=document_configs),
+    )
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
+
+    # re-run Bifrost with the token from the link we sent to user
+    def pre_run(bifrost):
+        # Check that requirements are what we expect
+        requirements = bifrost.get_status()["all_requirements"]
+        assert any(i["kind"] == "collect_document" for i in requirements)
+        assert set(
+            i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
+        ) == set(i["kind"] for i in document_configs)
+        assert all(
+            not i["is_met"] for i in requirements if i["kind"] == "collect_document"
+        )
+
+    complete_redo_flow(
+        initial_auth_token, fp_id, sandbox_tenant.default_ob_config, pre_run
+    )
+
+
 def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
     document_configs = [
         dict(
