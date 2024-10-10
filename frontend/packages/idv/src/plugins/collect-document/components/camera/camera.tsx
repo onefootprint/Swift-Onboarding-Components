@@ -290,6 +290,32 @@ const Camera = ({
       .catch(handlePlayError);
   };
 
+  const logMediaStreamState = () => {
+    logInfo(`mediaStream state: ${mediaStream ? 1 : 0}, mediaStream active: ${mediaStream?.active ? 1 : 0}`);
+    mediaStream?.getTracks().forEach(track => {
+      logInfo(`Track: ${track.id}, readyState: ${track.readyState}, kind: ${track.kind}, label: ${track.label}`);
+    });
+  };
+
+  const handleWaiting = () => {
+    logWarn('video waiting');
+    // Log the media stream state
+    logMediaStreamState();
+
+    // Force load
+    // TODO: if this doesn't work, we will re-create the media stream - try a simple reload first
+    videoRef.current?.load();
+    if (isVideoPlaying) {
+      setIsVideoPlaying(false);
+    }
+  };
+
+  const handleSuspension = () => {
+    logWarn('video suspended');
+    // Log the media stream state
+    logMediaStreamState();
+  };
+
   useInterval(
     () => {
       logInfo(
@@ -468,7 +494,8 @@ const Camera = ({
             onCanPlay={handleCanPlay}
             playsInline
             ref={videoRef}
-            onSuspend={() => logInfo('Video suspended')}
+            onSuspend={handleSuspension}
+            onWaiting={handleWaiting}
           />
           {isVideoPlaying && isDetecting
             ? children({
