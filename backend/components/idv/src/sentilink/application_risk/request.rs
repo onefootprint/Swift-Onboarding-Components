@@ -5,11 +5,12 @@ use chrono::Utc;
 use newtypes::output::Csv;
 use newtypes::sentilink::SentilinkProduct;
 use newtypes::IdentityDataKind;
+use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
+use std::str::FromStr;
 
 #[derive(Serialize)]
 pub struct ApplicationRiskRequest {
@@ -19,7 +20,7 @@ pub struct ApplicationRiskRequest {
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct Application {
-    // ID of application.
+    // ID of application. We use workflow_id for now
     application_id: String,
     // Timestamp string of application, default: timestamp string for when SentiLink receives the request.
     application_created: DateTime<Utc>,
@@ -81,6 +82,8 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             idv_data,
             products,
             credentials: _,
+            workflow_id,
+            ip_address,
         } = value;
         // Check products
         if products.is_empty() {
@@ -108,6 +111,16 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             return Err(SentilinkError::MissingRequiredFields(missing_required_fields));
         };
 
+        // Only US supported
+        if idv_data.country.as_ref().is_some_and(|c| {
+            Iso3166TwoDigitCountryCode::from_str(c.leak())
+                .ok()
+                .map(|iso| !iso.is_us_including_territories())
+                .unwrap_or(false)
+        }) {
+            return Err(SentilinkError::UnsupportedCountry);
+        }
+
         let get_di = |idk: IdentityDataKind| -> Result<PiiString, SentilinkError> {
             idv_data
                 .get(idk)
@@ -117,18 +130,14 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
 
         // TODO: ip_address, user_id, user_created, device_id
         let application = Application {
-            application_id: idv_data
-                .verification_request_id
-                .clone()
-                .map(|v| v.to_string())
-                .unwrap_or(Uuid::new_v4().to_string()),
-            // TODO: wf_created
+            application_id: workflow_id.to_string(),
             application_created: Utc::now(),
             first_name: get_di(IdentityDataKind::FirstName)?,
             last_name: get_di(IdentityDataKind::LastName)?,
             dob: get_di(IdentityDataKind::Dob)?,
             ssn: idv_data.get(IdentityDataKind::Ssn9).cloned(),
             address_line_1: get_di(IdentityDataKind::AddressLine1)?,
+            address_line_2: idv_data.get(IdentityDataKind::AddressLine2).cloned(),
             // Does this always have to be US?
             country_code: idv_data.get(IdentityDataKind::Country).cloned(),
             city: get_di(IdentityDataKind::City)?,
@@ -136,6 +145,7 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             zipcode: get_di(IdentityDataKind::Zip)?,
             phone: idv_data.get(IdentityDataKind::PhoneNumber).cloned(),
             email: idv_data.get(IdentityDataKind::Email).cloned(),
+            ip_address,
             ..Default::default()
         };
 

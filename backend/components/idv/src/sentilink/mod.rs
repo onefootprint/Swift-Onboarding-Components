@@ -2,6 +2,8 @@ use application_risk::response::ApplicationRiskResponse;
 use newtypes::sentilink::SentilinkProduct;
 use newtypes::vendor_credentials::SentilinkCredentials;
 use newtypes::IdvData;
+use newtypes::PiiString;
+use newtypes::WorkflowId;
 use strum::EnumDiscriminants;
 use strum::EnumString;
 
@@ -142,6 +144,8 @@ pub struct SentilinkApplicationRiskRequest {
     pub idv_data: IdvData,
     pub credentials: SentilinkCredentials,
     pub products: Vec<SentilinkProduct>,
+    pub workflow_id: WorkflowId,
+    pub ip_address: Option<PiiString>,
 }
 
 

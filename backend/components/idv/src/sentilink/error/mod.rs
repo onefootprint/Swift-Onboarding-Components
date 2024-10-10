@@ -28,4 +28,6 @@ pub enum Error {
     AssertionError(String),
     #[error("Missing score {0:?}")]
     MissingScore(SentilinkProduct),
+    #[error("Unsupported country")]
+    UnsupportedCountry,
 }

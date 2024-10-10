@@ -10,6 +10,7 @@ use crate::FpResult;
 use crate::State;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
+use db::models::insight_event::InsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
@@ -28,12 +29,14 @@ pub async fn run_sentilink_application_risk(
     wf_id: &WorkflowId,
 ) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
+    let wf_id2 = wf_id.clone();
 
-    let (vw, tenant_id, curr_seqno) = state
+    let (vw, tenant_id, curr_seqno, ie) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
+            let ie = InsightEvent::get_for_workflow(conn, &wf_id2)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             // TODO: Fix this to read from DI
             // https://linear.app/footprint/issue/BE-1582/add-seqno-to-di
@@ -41,7 +44,7 @@ pub async fn run_sentilink_application_risk(
             // that to reconstruct the vault. For now in testing it doesn't matter
             let curr_seqno = DataLifetime::get_current_seqno(conn)?;
 
-            Ok((vw, tenant_id, curr_seqno))
+            Ok((vw, tenant_id, curr_seqno, ie))
         })
         .await?;
 
@@ -83,6 +86,9 @@ pub async fn run_sentilink_application_risk(
             .try_into_tenant_specific_credentials()?,
         // TODO: from verification check?
         products: vec![SentilinkProduct::SyntheticScore, SentilinkProduct::IdTheftScore],
+        workflow_id: wf_id.clone(),
+        // Currently from the wf creation IE event
+        ip_address: ie.and_then(|i| i.ip_address.map(|ip| ip.into())),
     };
 
     // make request
