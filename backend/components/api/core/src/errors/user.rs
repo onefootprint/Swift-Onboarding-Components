@@ -16,8 +16,8 @@ pub enum UserError {
     SandboxMismatch,
     #[error("Invalid auth session: {0}")]
     InvalidAuthSession(String),
-    #[error("Cannot reonboard user - user has no complete onboardings. Please request additional information by onboarding a user onto a specific Playbook.")]
-    NoCompleteOnboardings,
+    #[error("Cannot reonboard user - no playbooks exist for your organization.")]
+    NoPlaybooksExist,
 }
 
 impl api_errors::FpErrorTrait for UserError {

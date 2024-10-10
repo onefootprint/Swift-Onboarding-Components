@@ -378,39 +378,3 @@ def test_complete_trigger_w_user_specific_token(sandbox_tenant):
     body = post(f"users/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
     complete_redo_flow_user(sandbox_user, auth_token)
-
-
-def test_request_more_info_with_disabled_obc(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Playbook", must_collect_data, must_collect_data
-    )
-
-    bifrost = BifrostClient.new_user(obc)
-    sandbox_user = bifrost.run()
-
-    # disable the obc user was onboarded onto
-    data = dict(status="disabled")
-    patch(
-        f"org/onboarding_configs/{obc.id}",
-        data,
-        *sandbox_tenant.db_auths,
-    )
-
-    # Attempt to trigger recollect document
-    trigger = dict(
-        kind="document",
-        data=dict(configs=[dict(kind="identity", data=dict(collect_selfie=False))]),
-    )
-    action = dict(trigger=trigger, kind="trigger")
-    data = dict(actions=[action])
-    res = post(
-        f"entities/{sandbox_user.fp_id}/actions",
-        data,
-        *sandbox_tenant.db_auths,
-        status_code=400,
-    )
-
-    assert (
-        res["message"]
-        == "Cannot reonboard user - user has no complete onboardings. Please request additional information by onboarding a user onto a specific Playbook."
-    )

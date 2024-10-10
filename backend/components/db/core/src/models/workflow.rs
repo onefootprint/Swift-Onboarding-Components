@@ -69,6 +69,8 @@ pub struct Workflow {
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub status: OnboardingStatus,
+    /// NOTE: this could be absolute gibberish for document workflows, which don't need owrkflow
+    /// information but just generally need a playbook that belongs to this tenant
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,

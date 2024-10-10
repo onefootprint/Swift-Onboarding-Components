@@ -14,7 +14,8 @@ use serde::Serialize;
 #[serde(tag = "kind", content = "data")]
 pub enum WorkflowRequestConfig {
     /// Allow editing data, re-verify data, and then re-trigger decision engine
-    /// DEPRECATED
+    /// DEPRECATED. TODO: add validation that we don't make new ones with this, only in integration
+    /// tests
     RedoKyc,
     /// Allow onboarding onto the specific playbook.
     /// This allows editing data, re-verifies data, and then re-triggers decision engine
