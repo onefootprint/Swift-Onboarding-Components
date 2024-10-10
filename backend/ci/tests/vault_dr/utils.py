@@ -14,7 +14,7 @@ from tests.constants import VDR_AGE_KEYS
 EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
 
 
-def footprint_dr(*args, api_root=None, api_key=None):
+def footprint_dr(*args, api_root=None, api_key=None, skip_client_checks=False):
     api_root = api_root or os.environ["TEST_URL"]
 
     return pexpect.spawn(
@@ -33,6 +33,15 @@ def footprint_dr(*args, api_root=None, api_key=None):
                 "FOOTPRINT_API_KEY": api_key,
             }
             if api_key
+            else {}
+        )
+        | (
+            {
+                # Skipping client checks speeds up tests by eliminating
+                # repetitive calls to GET /org/vault_dr/status.
+                "SKIP_FOOTPRINT_CLIENT_CHECKS": "1",
+            }
+            if skip_client_checks
             else {}
         ),
     )
@@ -308,7 +317,12 @@ def ensure_enrolled_in_live_vdr(tenant):
 def validate_decrypted_data(output_dir, expected_data):
     # Validate directory structure.
     got_fp_ids = set(entry.name for entry in output_dir.iterdir())
-    expected_fp_ids = set(expected_data.keys())
+    expected_fp_ids = set(
+        fp_id
+        for fp_id, versions in expected_data.items()
+        # fp_ids without any vault data are not present in the output.
+        if len(versions) > 0
+    )
     assert got_fp_ids == expected_fp_ids, f"{got_fp_ids} != {expected_fp_ids}"
 
     for fp_id in got_fp_ids:

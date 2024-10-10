@@ -88,7 +88,6 @@ impl VaultDrWorker {
         }
     }
 
-    #[tracing::instrument("VaultDrWorker::run_batch", skip_all)]
     async fn run_batch(&self, state: &State) -> Result<()> {
         vault_dr::run_batch(state, self.knobs())
             .await

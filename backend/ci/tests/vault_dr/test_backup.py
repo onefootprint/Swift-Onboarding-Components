@@ -1,7 +1,8 @@
+import base64
+import json
 import pexpect
 import pytest
-import json
-import base64
+
 from tests.constants import (
     CUSTODIAN_AUTH,
     ENVIRONMENT,

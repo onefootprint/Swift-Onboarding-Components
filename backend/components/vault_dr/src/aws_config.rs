@@ -112,6 +112,7 @@ impl VaultDrAwsConfig {
     /// to the owner of the bucket than reads, and also create many redundant object versions if
     /// versioning is enabled. Lack of s3:PutObject permissions will be detected when records are
     /// written either way.
+    #[tracing::instrument("VaultDrAwsConfig::validate", skip_all)]
     pub async fn validate(&self, test_s3_putobject: bool) -> Result<(), Error> {
         let aws_config = self.default_sdk_config().await?;
 
@@ -179,7 +180,8 @@ impl VaultDrAwsConfig {
         let s3_client = self.s3_client().await?;
 
         // Test for s3:PutObject.
-        if test_s3_putobject {
+        // Always write the probe for localstack since it doesn't persist data across restarts.
+        if test_s3_putobject || self.use_localstack() {
             let req = s3_client
                 .put_object()
                 .bucket(&self.s3_bucket_name)
@@ -275,8 +277,8 @@ impl VaultDrAwsConfig {
             Err(e) => {
                 let svc_error = e.into_service_error();
 
-                info!(error = ?svc_error, "S3 GetObject failed as expected. Expected code is AccessDenied");
                 if aws_error_has_code(&svc_error, &["AccessDenied"]).is_none() {
+                    warn!(?resp, "S3 GetObject failed with unexpected error code");
                     return Err(Box::new(svc_error).into());
                 }
             }
