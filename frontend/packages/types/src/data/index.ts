@@ -91,7 +91,7 @@ export type {
   SameTenantDuplicateData,
 } from './duplicate-data';
 export { DupeKind } from './duplicate-data';
-export type { Entity, EntityVault, EntityWorkflow } from './entity';
+export type { Entity, EntityVault, EntityWorkflow, Attribute } from './entity';
 export {
   EntityKind,
   EntityLabel,

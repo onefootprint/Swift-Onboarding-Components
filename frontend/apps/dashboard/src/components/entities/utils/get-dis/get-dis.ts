@@ -1,4 +1,4 @@
-import type { DataIdentifier, EntityVault } from '@onefootprint/types';
+import type { Attribute, DataIdentifier, EntityVault } from '@onefootprint/types';
 
 const cardOrder: Record<string, number> = {
   issuer: 1,
@@ -19,15 +19,17 @@ const bankOrder: Record<string, number> = {
   fingerprint: 6,
 };
 
-const filterCards = (attributes: DataIdentifier[], search: string | null | undefined) => {
+const filterCards = (attributes: Attribute[], search: string | null | undefined) => {
   const hiddenAttributes = ['expiration_month', 'expiration_year', 'number_last4'];
   return attributes.filter(
-    attr => attr.includes(`card.${search}`) && !hiddenAttributes.some(hiddenAttr => attr.includes(hiddenAttr)),
+    attr =>
+      attr.identifier.includes(`card.${search}`) &&
+      !hiddenAttributes.some(hiddenAttr => attr.identifier.includes(hiddenAttr)),
   );
 };
 
-const filterBankAccounts = (attributes: DataIdentifier[], search: string | null | undefined) => {
-  return attributes.filter(attr => attr.includes(`bank.${search}`));
+const filterBankAccounts = (attributes: Attribute[], search: string | null | undefined) => {
+  return attributes.filter(attr => attr.identifier.includes(`bank.${search}`));
 };
 
 export const getDI = (target: string) => {
@@ -41,10 +43,10 @@ export const getDI = (target: string) => {
   return `di.${target}`;
 };
 
-const sortCardDIs = (attributes: DataIdentifier[]) =>
+const sortCardDIs = (attributes: Attribute[]) =>
   attributes.sort((a, b) => {
-    const aParts = a.split('.');
-    const bParts = b.split('.');
+    const aParts = a.identifier.split('.');
+    const bParts = b.identifier.split('.');
     const aKey = aParts[2] || '';
     const bKey = bParts[2] || '';
 
@@ -59,10 +61,10 @@ const sortCardDIs = (attributes: DataIdentifier[]) =>
     return aSubKey.localeCompare(bSubKey);
   });
 
-const sortBankDIs = (attributes: DataIdentifier[]) =>
+const sortBankDIs = (attributes: Attribute[]) =>
   attributes.sort((a, b) => {
-    const aParts = a.split('.');
-    const bParts = b.split('.');
+    const aParts = a.identifier.split('.');
+    const bParts = b.identifier.split('.');
     const aKey = aParts[2] || '';
     const bKey = bParts[2] || '';
     return bankOrder[aKey] - bankOrder[bKey];
@@ -76,16 +78,22 @@ export const getCustomDIs = (data: EntityVault) => {
   return filtered as DataIdentifier[];
 };
 
-export const getCardDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
-  const filtered = filterCards(attributes, search);
-  const sorted = sortCardDIs(filtered);
-  return sorted;
+export const attributesToDIs = (attributes: Attribute[]) => {
+  return attributes.map(attr => attr.identifier);
 };
 
-export const getBankDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
+export const getCardDis = (attributes: Attribute[], search: string | null | undefined) => {
+  const filtered = filterCards(attributes, search);
+  const sorted = sortCardDIs(filtered);
+  const dis = attributesToDIs(sorted);
+  return dis;
+};
+
+export const getBankDis = (attributes: Attribute[], search: string | null | undefined) => {
   const filtered = filterBankAccounts(attributes, search);
   const sorted = sortBankDIs(filtered);
-  return sorted;
+  const dis = attributesToDIs(sorted);
+  return dis;
 };
 
 export default getDI;

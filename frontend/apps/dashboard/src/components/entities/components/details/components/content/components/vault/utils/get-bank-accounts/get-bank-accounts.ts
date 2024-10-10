@@ -1,24 +1,21 @@
 import type { Entity, EntityBankAccount } from '@onefootprint/types';
 
 const getBankAccounts = (entity: Entity): EntityBankAccount[] => {
-  if (!entity.attributes.length && !Object.keys(entity.decryptedAttributes).length) {
+  if (!Object.keys(entity.data).length) {
     return [];
   }
   const bankAccounts: Record<string, EntityBankAccount> = {};
-  entity.attributes.forEach(key => {
-    if (key.startsWith('bank')) {
-      const [, alias, field] = key.split('.');
-      bankAccounts[alias] = { ...bankAccounts[alias], [field]: null };
-    }
-  });
-  Object.entries(entity.decryptedAttributes).forEach(([key, value]) => {
-    if (key.startsWith('bank')) {
-      const [, alias, field] = key.split('.');
-      bankAccounts[alias] = { ...bankAccounts[alias], [field]: value };
+  entity.data.forEach(attribute => {
+    if (attribute.identifier.startsWith('bank')) {
+      const [, alias, field] = attribute.identifier.split('.');
+      if (alias && field) {
+        bankAccounts[alias] = { ...bankAccounts[alias], [field]: attribute.value };
+      }
     }
   });
 
   return Object.entries(bankAccounts)
+    .filter(([alias, account]) => alias !== 'undefined' && Object.keys(account).length > 0)
     .sort(([aliasA], [aliasB]) => aliasA.localeCompare(aliasB))
     .map(([alias, account]) => ({ ...account, alias }));
 };

@@ -1,23 +1,21 @@
 import type { Entity, EntityCard } from '@onefootprint/types';
 
 const getCards = (entity: Entity): EntityCard[] => {
-  if (!entity.attributes.length && !Object.keys(entity.decryptedAttributes).length) {
+  if (!Object.keys(entity.data).length) {
     return [];
   }
   const cards: Record<string, EntityCard> = {};
-  entity.attributes.forEach(key => {
-    if (key.startsWith('card')) {
-      const [, alias, field] = key.split('.');
-      cards[alias] = { ...cards[alias], [field]: null };
+  entity.data.forEach(attribute => {
+    if (attribute.identifier.startsWith('card')) {
+      const [, alias, field] = attribute.identifier.split('.');
+      if (alias && field) {
+        cards[alias] = { ...cards[alias], [field]: attribute.value };
+      }
     }
   });
-  Object.entries(entity.decryptedAttributes).forEach(([key, value]) => {
-    if (key.startsWith('card')) {
-      const [, alias, field] = key.split('.');
-      cards[alias] = { ...cards[alias], [field]: value };
-    }
-  });
+
   return Object.entries(cards)
+    .filter(([alias, card]) => alias !== 'undefined' && Object.keys(card).length > 0)
     .sort(([aliasA], [aliasB]) => aliasA.localeCompare(aliasB))
     .map(([alias, card]) => ({ ...card, alias }));
 };

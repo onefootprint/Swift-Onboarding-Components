@@ -1,99 +1,78 @@
-import type { Entity } from '@onefootprint/types';
 import { BankDIField } from '@onefootprint/types';
 
 import getBankAccountsFromEntity from './get-bank-accounts';
-import entityFixture from './get-bank-accounts.test.config';
+import {
+  entityWithExistingData,
+  entityWithMissingData,
+  entityWithNestedAttributes,
+  entityWithNoData,
+  entityWithNonBankData,
+  entityWithThreeBankAccounts,
+  entityWithTwoAccountNumbers,
+} from './get-bank-accounts.test.config';
 
 describe('getBankAccounts', () => {
-  describe('handles encrypted and decrypted attributes properly', () => {
-    it('should return null for encrypted attrs', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        attributes: [
-          `bank.chase.${BankDIField.accountNumber}`,
-          `bank.chase.${BankDIField.routingNumber}`,
-          `bank.chase.${BankDIField.accountType}`,
-          `bank.wells.${BankDIField.name}`,
-          `bank.wells.${BankDIField.accountNumber}`,
-        ],
-        decryptedAttributes: {},
-      };
-
-      const result = getBankAccountsFromEntity(entity);
+  describe('handles data properly', () => {
+    it('should return null for missing data', () => {
+      const result = getBankAccountsFromEntity(entityWithMissingData);
       expect(result).toEqual([
         {
           alias: 'chase',
           [BankDIField.accountNumber]: null,
           [BankDIField.routingNumber]: null,
           [BankDIField.accountType]: null,
+          [BankDIField.fingerprint]: 'chase_fingerprint_123',
         },
-        { alias: 'wells', [BankDIField.name]: null, [BankDIField.accountNumber]: null },
+        {
+          alias: 'wells',
+          [BankDIField.name]: null,
+          [BankDIField.accountNumber]: null,
+          [BankDIField.fingerprint]: 'wells_fingerprint_456',
+        },
       ]);
     });
 
-    it('should return null for encrypted attrs but replace with values if we have decrypted attrs', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        attributes: [
-          `bank.chase.${BankDIField.accountNumber}`,
-          `bank.chase.${BankDIField.routingNumber}`,
-          `bank.chase.${BankDIField.accountType}`,
-          `bank.wells.${BankDIField.name}`,
-          `bank.wells.${BankDIField.accountNumber}`,
-        ],
-        decryptedAttributes: {
-          [`bank.chase.${BankDIField.accountNumber}`]: '1234567890',
-          [`bank.wells.${BankDIField.name}`]: 'John Doe',
-        },
-      };
-
-      const result = getBankAccountsFromEntity(entity);
+    it('should return values for existing data', () => {
+      const result = getBankAccountsFromEntity(entityWithExistingData);
       expect(result).toEqual([
         {
           alias: 'chase',
           [BankDIField.accountNumber]: '1234567890',
           [BankDIField.routingNumber]: null,
           [BankDIField.accountType]: null,
+          [BankDIField.fingerprint]: 'chase_fingerprint_789',
         },
         {
           alias: 'wells',
           [BankDIField.name]: 'John Doe',
           [BankDIField.accountNumber]: null,
+          [BankDIField.fingerprint]: 'wells_fingerprint_012',
         },
       ]);
     });
   });
 
-  describe('with two bank accounts that only have decrypted account numbers', () => {
+  describe('with two bank accounts that only have account numbers', () => {
     it('should return the correct shape', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        decryptedAttributes: {
-          [`bank.chase.${BankDIField.accountNumber}`]: '1234567890',
-          [`bank.wells.${BankDIField.accountNumber}`]: '0987654321',
-        },
-      };
-      const result = getBankAccountsFromEntity(entity);
+      const result = getBankAccountsFromEntity(entityWithTwoAccountNumbers);
       expect(result).toEqual([
-        { alias: 'chase', [BankDIField.accountNumber]: '1234567890' },
-        { alias: 'wells', [BankDIField.accountNumber]: '0987654321' },
+        {
+          alias: 'chase',
+          [BankDIField.accountNumber]: '1234567890',
+          [BankDIField.fingerprint]: 'chase_fingerprint_345',
+        },
+        {
+          alias: 'wells',
+          [BankDIField.accountNumber]: '0987654321',
+          [BankDIField.fingerprint]: 'wells_fingerprint_678',
+        },
       ]);
     });
   });
 
   describe('with nested attributes', () => {
     it('should return the correct shape, no longer nesting attributes', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        decryptedAttributes: {
-          [`bank.chase.${BankDIField.accountNumber}`]: '1234567890',
-          [`bank.chase.${BankDIField.routingNumber}`]: '021000021',
-          [`bank.wells.${BankDIField.accountNumber}`]: '0987654321',
-          [`bank.chase.${BankDIField.accountType}`]: 'checking',
-          [`bank.chase.${BankDIField.name}`]: 'Chase Bank',
-        },
-      };
-      const result = getBankAccountsFromEntity(entity);
+      const result = getBankAccountsFromEntity(entityWithNestedAttributes);
       expect(result).toEqual([
         {
           alias: 'chase',
@@ -101,57 +80,34 @@ describe('getBankAccounts', () => {
           [BankDIField.routingNumber]: '021000021',
           [BankDIField.accountType]: 'checking',
           [BankDIField.name]: 'Chase Bank',
+          [BankDIField.fingerprint]: 'chase_fingerprint_901',
         },
-        { alias: 'wells', [BankDIField.accountNumber]: '0987654321' },
+        {
+          alias: 'wells',
+          [BankDIField.accountNumber]: '0987654321',
+          [BankDIField.fingerprint]: 'wells_fingerprint_234',
+        },
       ]);
     });
   });
 
-  describe('with no decrypted attributes', () => {
+  describe('with no data', () => {
     it('should return an empty array', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        decryptedAttributes: {},
-      };
-      const result = getBankAccountsFromEntity(entity);
+      const result = getBankAccountsFromEntity(entityWithNoData);
       expect(result).toEqual([]);
     });
   });
 
-  describe('with decrypted attributes, but none related to bank accounts', () => {
+  describe('with data, but none related to bank accounts', () => {
     it('should return an empty array', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        decryptedAttributes: {
-          'id.first_name': 'Jane',
-          'id.last_name': 'Doe',
-        },
-      };
-      const result = getBankAccountsFromEntity(entity);
+      const result = getBankAccountsFromEntity(entityWithNonBankData);
       expect(result).toEqual([]);
     });
   });
 
   describe('with three bank accounts with different aliases', () => {
     it('should return the accounts sorted alphabetically by alias with all relevant DIs', () => {
-      const entity: Entity = {
-        ...entityFixture,
-        decryptedAttributes: {
-          [`bank.chase.${BankDIField.accountNumber}`]: '1234567890',
-          [`bank.chase.${BankDIField.routingNumber}`]: '021000021',
-          [`bank.chase.${BankDIField.accountType}`]: 'checking',
-          [`bank.chase.${BankDIField.name}`]: 'Chase Checking',
-          [`bank.wells.${BankDIField.accountNumber}`]: '0987654321',
-          [`bank.wells.${BankDIField.routingNumber}`]: '121000248',
-          [`bank.wells.${BankDIField.accountType}`]: 'savings',
-          [`bank.wells.${BankDIField.name}`]: 'Wells Fargo Savings',
-          [`bank.bofa.${BankDIField.accountNumber}`]: '5678901234',
-          [`bank.bofa.${BankDIField.routingNumber}`]: '026009593',
-          [`bank.bofa.${BankDIField.accountType}`]: 'checking',
-          [`bank.bofa.${BankDIField.name}`]: 'Bank of America Checking',
-        },
-      };
-      const result = getBankAccountsFromEntity(entity);
+      const result = getBankAccountsFromEntity(entityWithThreeBankAccounts);
       const expectedResult = [
         {
           alias: 'bofa',
@@ -159,6 +115,7 @@ describe('getBankAccounts', () => {
           [BankDIField.routingNumber]: '026009593',
           [BankDIField.accountType]: 'checking',
           [BankDIField.name]: 'Bank of America Checking',
+          [BankDIField.fingerprint]: 'bofa_fingerprint_123',
         },
         {
           alias: 'chase',
@@ -166,6 +123,7 @@ describe('getBankAccounts', () => {
           [BankDIField.routingNumber]: '021000021',
           [BankDIField.accountType]: 'checking',
           [BankDIField.name]: 'Chase Checking',
+          [BankDIField.fingerprint]: 'chase_fingerprint_567',
         },
         {
           alias: 'wells',
@@ -173,6 +131,7 @@ describe('getBankAccounts', () => {
           [BankDIField.routingNumber]: '121000248',
           [BankDIField.accountType]: 'savings',
           [BankDIField.name]: 'Wells Fargo Savings',
+          [BankDIField.fingerprint]: 'wells_fingerprint_890',
         },
       ];
       expect(result).toEqual(expectedResult);

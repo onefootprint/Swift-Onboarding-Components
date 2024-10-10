@@ -25,7 +25,7 @@ const BankAccountFields = ({ entity, setSelectedItemDis }: BankAccountFieldsProp
   const getTranslationsWithoutAlias = useGetTranslationWithoutAlias();
   const { data: duplicateData, isLoading: isDuplicateDataLoading } = useEntityDuplicateData(entity.id);
 
-  const dis = getBankDis(entity.attributes, selectedBankAccount?.alias);
+  const dis = getBankDis(entity.data, selectedBankAccount?.alias);
   const fields = dis.map(di => ({ di }));
 
   const renderField = (field: DiField) => {

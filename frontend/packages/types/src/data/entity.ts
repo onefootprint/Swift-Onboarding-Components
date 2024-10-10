@@ -2,6 +2,7 @@ import CdoToAllDisMap from './cdo-to-di-map';
 import { CollectedKycDataOption } from './collected-data-option';
 import type { DataIdentifier } from './di';
 import { DocumentDI, IdDI, InvestorProfileDI } from './di';
+import type { EntityBankAccount } from './entity-bank-account';
 import type { EntityCard } from './entity-cards';
 import type { InsightEvent } from './insight-event';
 import type { Tag } from './tag';
@@ -10,6 +11,7 @@ import type { DataKind, VaultValue } from './vault';
 
 export type EntityVault = Partial<Record<DataIdentifier, VaultValue>> & {
   cards?: EntityCard[];
+  bankAccounts?: EntityBankAccount[];
 };
 
 export enum EntityKind {
@@ -86,28 +88,28 @@ export type EntityWorkflow = {
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>
-  entity.attributes.some(attr => CdoToAllDisMap[CollectedKycDataOption.usLegalStatus].includes(attr));
+  entity.data.some(attr => CdoToAllDisMap[CollectedKycDataOption.usLegalStatus].includes(attr.identifier));
 
-export const hasEntityNationality = (entity: Entity) => entity.attributes.some(attr => attr === IdDI.nationality);
+export const hasEntityNationality = (entity: Entity) => entity.data.some(attr => attr.identifier === IdDI.nationality);
 
 export const hasEntityInvestorProfile = (entity: Entity) => {
   const values = Object.values(InvestorProfileDI);
-  return values.some(investorProfileDi => entity.attributes.some(attribute => attribute === investorProfileDi));
+  return values.some(investorProfileDi => entity.data.some(attribute => attribute.identifier === investorProfileDi));
 };
 
-export const hasEntityBankAccounts = (entity: Entity) => entity.attributes.some(attr => attr.startsWith('bank'));
+export const hasEntityBankAccounts = (entity: Entity) => entity.data.some(attr => attr.identifier.startsWith('bank'));
 
-export const hasEntityCards = (entity: Entity) => entity.attributes.some(attr => attr.startsWith('card'));
+export const hasEntityCards = (entity: Entity) => entity.data.some(attr => attr.identifier.startsWith('card'));
 
 export const hasEntityCustomData = (entity: Entity) =>
-  entity.attributes.some(attr => attr.startsWith('custom') || attr.startsWith('document.custom'));
+  entity.data.some(attr => attr.identifier.startsWith('custom') || attr.identifier.startsWith('document.custom'));
 
 export const hasEntityDocuments = (entity: Entity) => {
   const values = Object.values(DocumentDI);
   return values.some(documentDI =>
-    entity.attributes.some(
+    entity.data.some(
       attribute =>
-        attribute === documentDI &&
+        attribute.identifier === documentDI &&
         // this is a little bit hacky for now, but finra compliance belongs to the investor profile CDO in theory
         // however in the backend, is part of the documentCDO
         documentDI !== DocumentDI.finraComplianceLetter,

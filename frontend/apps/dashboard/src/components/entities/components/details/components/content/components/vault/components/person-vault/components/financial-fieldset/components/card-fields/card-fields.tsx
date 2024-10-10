@@ -26,7 +26,7 @@ const CardFields = ({ entity, setSelectedItemDis }: CardFieldsProps) => {
   const cards: EntityCard[] = getCards(entity);
   const [selectedCard, setSelectedCard] = useState<EntityCard | undefined>(cards.length > 0 ? cards[0] : undefined);
   const [duplicateDrawerOpen, setDuplicateDrawerOpen] = useState(false);
-  const dis = getCardDis(entity.attributes, selectedCard?.alias);
+  const dis = getCardDis(entity.data, selectedCard?.alias);
   const fields = dis.map(di => ({ di }));
 
   const closeDuplicateDataDrawer = () => {

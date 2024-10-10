@@ -1,49 +1,93 @@
 import withEntity from '@/entity/components/with-entity';
 import { customRender, mockRequest } from '@onefootprint/test-utils';
-import type {
-  DataIdentifier,
-  Entity,
-  EntityKind,
-  EntityLabel,
-  EntityStatus,
-  WatchlistCheckStatus,
-} from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { BankDIField, DataKind, EntityKind, EntityStatus } from '@onefootprint/types';
 import { FormProvider, useForm } from 'react-hook-form';
 import useCurrentEntity from '../../../../../../../../hooks/use-current-entity';
 import DecryptMachineProvider from '../../../../../decrypt-machine';
 import FinancialFieldset from './financial-fieldset';
 
-export const entityFixture: Entity = {
-  id: '123',
-  data: [],
-  attributes: [] as DataIdentifier[],
-  hasOutstandingWorkflowRequest: false,
+const entityFixture: Entity = {
+  id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
   isIdentifiable: true,
-  kind: 'person' as EntityKind,
-  label: 'Test Person' as EntityLabel,
-  lastActivityAt: new Date().toISOString(),
-  requiresManualReview: false,
-  startTimestamp: new Date().toISOString(),
-  status: 'active' as EntityStatus,
-  watchlistCheck: { status: 'clear' as WatchlistCheckStatus, id: '123', reasonCodes: [] },
+  kind: EntityKind.person,
+  data: [],
+  attributes: [],
+  startTimestamp: '2023-03-27T14:43:47.444716Z',
+  lastActivityAt: '2023-03-27T14:43:47.444716Z',
+  watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
+  status: EntityStatus.pass,
   workflows: [],
+  requiresManualReview: false,
   decryptableAttributes: [],
   decryptedAttributes: {},
+  label: null,
+};
+
+const defaultField = {
+  source: 'source',
+  isDecryptable: true,
+  dataKind: DataKind.vaultData,
+  transforms: {},
 };
 
 export const cardEntity: Entity = {
   ...entityFixture,
-  attributes: ['card.personal.issuer', 'card.personal.number'] as DataIdentifier[],
+  data: [
+    {
+      ...defaultField,
+      identifier: 'card.personal.issuer',
+      value: 'Visa',
+    },
+    {
+      ...defaultField,
+      identifier: 'card.personal.number',
+      value: '4111111111111111',
+    },
+  ],
 };
 
 export const bankAccountEntity: Entity = {
   ...entityFixture,
-  attributes: ['bank.checking.ach_account_number', 'bank.checking.ach_routing_number'] as DataIdentifier[],
+  data: [
+    {
+      ...defaultField,
+      identifier: `bank.checking.${BankDIField.accountNumber}`,
+      value: '1234567890',
+    },
+    {
+      ...defaultField,
+      identifier: `bank.checking.${BankDIField.routingNumber}`,
+      value: '021000021',
+    },
+  ],
 };
 
 export const bothEntity: Entity = {
   ...entityFixture,
-  attributes: [...cardEntity.attributes, ...bankAccountEntity.attributes] as DataIdentifier[],
+  data: [
+    {
+      ...defaultField,
+      identifier: 'card.personal.issuer',
+      value: 'Visa',
+    },
+    {
+      ...defaultField,
+      identifier: 'card.personal.number',
+      value: '4111111111111111',
+    },
+    {
+      ...defaultField,
+      identifier: `bank.checking.${BankDIField.accountNumber}`,
+      value: '1234567890',
+    },
+    {
+      ...defaultField,
+      identifier: `bank.checking.${BankDIField.routingNumber}`,
+      value: '021000021',
+    },
+  ],
 };
 
 const mockIconComponent = () => <div aria-label="test icon" />;

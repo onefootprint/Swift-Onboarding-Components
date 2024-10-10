@@ -1,14 +1,26 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { DocumentDI, EntityKind, EntityStatus, IdDI, InvestorProfileDI } from '@onefootprint/types';
+import { DataKind, DocumentDI, EntityKind, EntityStatus, IdDI, InvestorProfileDI } from '@onefootprint/types';
 
 import getGridTemplateAreas from './get-grid-template-areas';
 
 describe('getGridTemplateAreas', () => {
+  const defaultAttribute = {
+    identifier: 'card.primary.name' as DataIdentifier,
+    source: 'source',
+    isDecryptable: true,
+    dataKind: DataKind.vaultData,
+    value: 'value',
+    transforms: {},
+  };
+
   const createEntity = (attributes: DataIdentifier[]): Entity => ({
-    attributes,
-    decryptableAttributes: [],
+    attributes: [],
+    data: attributes.map(attribute => ({
+      ...defaultAttribute,
+      identifier: attribute,
+    })),
     id: '123',
-    data: [],
+    decryptableAttributes: [],
     isIdentifiable: true,
     kind: EntityKind.person,
     requiresManualReview: false,

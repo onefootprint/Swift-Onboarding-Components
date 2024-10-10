@@ -272,6 +272,7 @@ export type {
   AnnotationSource,
   BootstrapIgnoredBusinessDI,
   ApiKey,
+  Attribute,
   AuthEvent,
   AuthTokenIdentifier,
   BacktestedOnboarding,

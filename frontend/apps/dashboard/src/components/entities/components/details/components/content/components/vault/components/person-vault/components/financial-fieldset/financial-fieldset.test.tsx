@@ -48,7 +48,8 @@ describe('Fieldset', () => {
   });
 
   it('renders card fields when cards are selected', () => {
-    renderFinancialFieldset({ entity: cardEntity });
+    // will default to cards
+    renderFinancialFieldset({ entity: bothEntity });
     const issuerField = screen.getByText('Issuer');
     const numberField = screen.getByText('Card number');
     expect(issuerField).toBeInTheDocument();
