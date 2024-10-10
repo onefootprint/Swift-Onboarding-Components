@@ -56,6 +56,7 @@ const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOn
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,
+      isSkipConfirmEnabled: !!config.skipConfirm,
       isStepUpEnabled: !!config.isStepupEnabled,
       kind: String(config.kind),
       orgId: config.orgId,

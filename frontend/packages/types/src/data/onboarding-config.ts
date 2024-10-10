@@ -75,6 +75,7 @@ export type PublicOnboardingConfig = {
   supportWebsite?: string;
   requiredAuthMethods?: AuthMethodKind[];
   nidEnabled?: boolean;
+  skipConfirm?: boolean;
 };
 
 // Used in the dashboard context

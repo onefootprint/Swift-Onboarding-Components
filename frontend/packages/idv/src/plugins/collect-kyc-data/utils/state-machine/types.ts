@@ -14,18 +14,15 @@ export type MachineContext = {
   // Machine-generated
   data: KycData; // combines bootstrapData, disabledFields and fieldsToDecrypt after decrypting the values
   readonly initialData: Readonly<KycData>; // Snapshotted before we start collecting data to know what data we started with
+  isConfirmScreenVisible?: boolean;
 };
 
 export type MachineEvents =
   | { type: 'addVerification'; payload: `${AuthMethodKind}` }
   | { type: 'confirmed' }
+  | { type: 'confirmFailed' }
   | { type: 'dataSubmitted'; payload: KycData }
   | { type: 'decryptedData'; payload: KycData }
-  | { type: 'editAddress' }
-  | { type: 'editBasicInfo' }
-  | { type: 'editEmail' }
-  | { type: 'editIdentity' }
-  | { type: 'editUsLegalStatus' }
   | { type: 'initialized'; payload: KycData }
   | { type: 'navigatedToPrevPage' }
   | { type: 'returnToSummary' }

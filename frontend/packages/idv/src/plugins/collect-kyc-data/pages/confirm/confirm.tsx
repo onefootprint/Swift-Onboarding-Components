@@ -1,6 +1,6 @@
 import { IdDI } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
-import { useMemo } from 'react';
+import { LoadingSpinner, Stack, useToast } from '@onefootprint/ui';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
@@ -18,7 +18,8 @@ const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.confirm' });
 
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, requirement, initialData, dataCollectionScreensToShow } = state.context;
+  const { authToken, data, requirement, initialData, dataCollectionScreensToShow, isConfirmScreenVisible } =
+    state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
 
   const toast = useToast();
@@ -41,15 +42,14 @@ const Confirm = () => {
       data: checkPhoneEmailBeforeSubmit(initialData, data, requirement, verifiedMethods),
       onSuccess: () => send({ type: 'confirmed' }),
       onError: (fieldErrors: SyncDataFieldErrors) => {
+        send({ type: 'confirmFailed' });
         // We can't show the error messages as hints unless the sub-forms are in edit mode
         // For simplicity, just show the field names.
         // Ideally, these errors should be caught in earlier pages anyways (unless bootstrapped)
         if (typeof fieldErrors === 'string') {
           toast.show({
             title: t('errors.invalid-inputs.title'),
-            description: t('errors.invalid-inputs.description-with-message', {
-              message: fieldErrors,
-            }),
+            description: t('errors.invalid-inputs.description-with-message', { message: fieldErrors }),
             variant: 'error',
           });
           return;
@@ -66,16 +66,21 @@ const Confirm = () => {
         const fieldNames = fields.map(di => t(`di.${di}` as unknown as TemplateStringsArray)).join(', ');
         toast.show({
           title: t('errors.invalid-inputs.title'),
-          description: t('errors.invalid-inputs.description-with-fields', {
-            fields: fieldNames,
-          }),
+          description: t('errors.invalid-inputs.description-with-fields', { fields: fieldNames }),
           variant: 'error',
         });
       },
     });
   };
 
-  return (
+  /** If skip_confirm flag is enabled, trigger confirmation CTA silently */
+  useEffect(() => {
+    if (!isConfirmScreenVisible && syncDataMutation.isIdle && !syncDataMutation.isPending) {
+      handleConfirm();
+    }
+  }, [isConfirmScreenVisible, syncDataMutation.isIdle, syncDataMutation.isPending]);
+
+  return isConfirmScreenVisible ? (
     <ConfirmCollectedData
       title={t('summary.title')}
       subtitle={t('summary.subtitle')}
@@ -90,6 +95,17 @@ const Confirm = () => {
       <LegalStatusSection />
       <IdentitySection />
     </ConfirmCollectedData>
+  ) : (
+    <Stack
+      height="100%"
+      minHeight="var(--loading-container-min-height)"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+    >
+      <LoadingSpinner />
+    </Stack>
   );
 };
 

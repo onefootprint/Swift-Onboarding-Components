@@ -17,49 +17,54 @@ import createCollectKycDataMachine, {
   nextScreenTransitions,
 } from './machine';
 
-describe('Collect KYC Data Machine Tests', () => {
-  const TestOnboardingConfig: PublicOnboardingConfig = {
-    isLive: true,
-    logoUrl: 'url',
-    privacyPolicyUrl: 'url',
-    name: 'tenant',
-    orgName: 'tenantOrg',
-    orgId: 'orgId',
-    status: OnboardingConfigStatus.enabled,
-    isAppClipEnabled: false,
-    isInstantAppEnabled: false,
-    appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
-    isNoPhoneFlow: false,
-    requiresIdDoc: false,
-    key: 'key',
-    isKyb: false,
-    allowInternationalResidents: false,
+const createMachine = (
+  missingAttributes: CollectedKycDataOption[],
+  data: KycData = {},
+  deviceType?: string,
+  additionalConfig?: Partial<PublicOnboardingConfig>,
+) => {
+  const initialContext: InitMachineArgs = {
+    authToken: 'authToken',
+    requirement: {
+      kind: OnboardingRequirementKind.collectKycData,
+      isMet: false,
+      missingAttributes,
+      populatedAttributes: [],
+      optionalAttributes: [],
+    },
+    device: {
+      type: deviceType ?? 'desktop',
+      hasSupportForWebauthn: false,
+      osName: 'iOS',
+      browser: 'Mobile Safari',
+    },
+    config: {
+      isLive: true,
+      logoUrl: 'url',
+      privacyPolicyUrl: 'url',
+      name: 'tenant',
+      orgName: 'tenantOrg',
+      orgId: 'orgId',
+      status: OnboardingConfigStatus.enabled,
+      isAppClipEnabled: false,
+      isInstantAppEnabled: false,
+      appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
+      isNoPhoneFlow: false,
+      requiresIdDoc: false,
+      key: 'key',
+      isKyb: false,
+      allowInternationalResidents: false,
+      ...additionalConfig,
+    },
+    data,
+    initialData: {},
   };
-  const createMachine = (missingAttributes: CollectedKycDataOption[], data: KycData = {}, deviceType?: string) => {
-    const initialContext: InitMachineArgs = {
-      authToken: 'authToken',
-      requirement: {
-        kind: OnboardingRequirementKind.collectKycData,
-        isMet: false,
-        missingAttributes,
-        populatedAttributes: [],
-        optionalAttributes: [],
-      },
-      device: {
-        type: deviceType ?? 'desktop',
-        hasSupportForWebauthn: false,
-        osName: 'iOS',
-        browser: 'Mobile Safari',
-      },
-      config: { ...TestOnboardingConfig },
-      data,
-      initialData: {},
-    };
-    const machine = interpret(createCollectKycDataMachine(initialContext));
-    machine.start();
-    return machine;
-  };
+  const machine = interpret(createCollectKycDataMachine(initialContext));
+  machine.start();
+  return machine;
+};
 
+describe('Collect KYC Data Machine Tests', () => {
   describe('When user has missing fields', () => {
     it('should take user to all pages in order', () => {
       const machine = createMachine(
@@ -792,25 +797,16 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
 
       // These events shouldn't trigger any state changes
-      state = machine.send({
-        type: 'editEmail',
-      });
+      state = machine.send({ type: 'decryptedData', payload: {} as KycData });
       expect(state.value).toEqual('confirm');
-      state = machine.send({
-        type: 'editBasicInfo',
-      });
+
+      state = machine.send({ type: 'stepUpCompleted', payload: { authToken: 'tok_321' } });
+      expect(state.context.authToken).toEqual('tok_321');
       expect(state.value).toEqual('confirm');
-      state = machine.send({
-        type: 'editAddress',
-      });
-      expect(state.value).toEqual('confirm');
-      state = machine.send({
-        type: 'editUsLegalStatus',
-      });
-      expect(state.value).toEqual('confirm');
-      state = machine.send({
-        type: 'editIdentity',
-      });
+
+      expect(state.context.isConfirmScreenVisible).toEqual(true);
+      state = machine.send({ type: 'confirmFailed' });
+      expect(state.context.isConfirmScreenVisible).toEqual(true);
       expect(state.value).toEqual('confirm');
 
       // We should be able to edit the data from the confirm state
@@ -826,12 +822,12 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
-          [IdDI.firstName]: { value: 'Belce' },
-          [IdDI.lastName]: { value: 'Dogru' },
+          [IdDI.firstName]: { value: 'Bob' },
+          [IdDI.lastName]: { value: 'Lee' },
         },
       });
-      expect(state.context.data[IdDI.firstName]).toEqual({ value: 'Belce' });
-      expect(state.context.data[IdDI.lastName]).toEqual({ value: 'Dogru' });
+      expect(state.context.data[IdDI.firstName]).toEqual({ value: 'Bob' });
+      expect(state.context.data[IdDI.lastName]).toEqual({ value: 'Lee' });
       expect(state.value).toBe('confirm');
 
       state = machine.send({
@@ -857,9 +853,7 @@ describe('Collect KYC Data Machine Tests', () => {
         value: UsLegalStatus.permanentResident,
       });
       expect(state.context.data[IdDI.nationality]).toEqual({ value: 'BR' });
-      expect(state.context.data[IdDI.citizenships]).toEqual({
-        value: ['IT', 'VE'],
-      });
+      expect(state.context.data[IdDI.citizenships]).toEqual({ value: ['IT', 'VE'] });
       expect(state.value).toBe('confirm');
 
       state = machine.send({
@@ -870,6 +864,55 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.context.data[IdDI.ssn9]).toEqual({ value: '99999999' });
       expect(state.value).toEqual('confirm');
+    });
+
+    it('should start with invisible confirm screen, after confirm error shows the confirm screen', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.email,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.usLegalStatus,
+          CollectedKycDataOption.ssn9,
+        ],
+        {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
+          [IdDI.firstName]: { value: 'Otto', bootstrap: true },
+          [IdDI.lastName]: { value: 'Footprint', bootstrap: true },
+          [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
+          [IdDI.city]: { value: 'San Francisco', bootstrap: true },
+          [IdDI.state]: { value: 'CA', bootstrap: true },
+          [IdDI.zip]: { value: '94107', bootstrap: true },
+          [IdDI.country]: { value: 'US', bootstrap: true },
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen, bootstrap: true },
+          [IdDI.ssn9]: { value: '101010101', bootstrap: true },
+        },
+        undefined,
+        { skipConfirm: true },
+      );
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['confirm']);
+      machine.send({ type: 'initialized', payload: {} });
+      let { state } = machine;
+      const { context } = state;
+
+      expect(context.data[IdDI.email]).toEqual({ value: 'piip@onefootprint.com', bootstrap: true });
+      expect(context.data[IdDI.firstName]).toEqual({ value: 'Otto', bootstrap: true });
+      expect(context.data[IdDI.lastName]).toEqual({ value: 'Footprint', bootstrap: true });
+      expect(context.data[IdDI.country]).toEqual({ value: 'US', bootstrap: true });
+      expect(context.data[IdDI.zip]).toEqual({ value: '94107', bootstrap: true });
+      expect(context.data[IdDI.usLegalStatus]).toEqual({ value: UsLegalStatus.citizen, bootstrap: true });
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101', bootstrap: true });
+
+      expect(state.value).toEqual('confirm');
+
+      expect(state.context.isConfirmScreenVisible).toEqual(false);
+      state = machine.send({ type: 'confirmFailed' });
+      expect(state.context.isConfirmScreenVisible).toEqual(true);
+      expect(state.value).toEqual('confirm');
+
+      state = machine.send({ type: 'confirmed' });
+      expect(state.value).toEqual('completed');
+      expect(state.done).toEqual(true);
     });
   });
 
