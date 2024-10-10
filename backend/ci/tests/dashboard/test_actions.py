@@ -8,7 +8,10 @@ def test_trigger_action(sandbox_tenant):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
-    trigger_action = dict(kind="trigger", trigger=dict(kind="redo_kyc"), note="Flerp")
+    trigger = dict(
+        kind="onboard", data=dict(playbook_id=sandbox_tenant.default_ob_config.id)
+    )
+    trigger_action = dict(kind="trigger", trigger=trigger, note="Flerp")
     data = dict(actions=[trigger_action])
     body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
     trigger_response = next(i for i in body if i["kind"] == "trigger")
@@ -69,7 +72,10 @@ def test_trigger_and_clear_review(sandbox_tenant):
     assert user.client.validate_response["user"]["status"] == "fail"
     assert user.client.validate_response["user"]["requires_manual_review"]
 
-    trigger_action = dict(kind="trigger", trigger=dict(kind="redo_kyc"), note="Flerp")
+    trigger = dict(
+        kind="onboard", data=dict(playbook_id=sandbox_tenant.default_ob_config.id)
+    )
+    trigger_action = dict(kind="trigger", trigger=trigger, note="Flerp")
     clear_review_action = dict(kind="clear_review")
     data = dict(actions=[trigger_action, clear_review_action])
     body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)

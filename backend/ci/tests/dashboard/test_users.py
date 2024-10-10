@@ -103,7 +103,10 @@ def test_get_users_filter_workflow_request(sandbox_user2):
     body = post("entities/search", filters, *tenant.db_auths)
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
-    action = dict(trigger=dict(kind="redo_kyc"), note="Flerp", kind="trigger")
+    trigger = dict(
+        kind="onboard", data=dict(playbook_id=sandbox_user2.client.ob_config.id)
+    )
+    action = dict(trigger=trigger, note="Flerp", kind="trigger")
     data = dict(actions=[action])
     body = post(f"entities/{sandbox_user2.fp_id}/actions", data, *tenant.db_auths)
 
@@ -227,7 +230,9 @@ def test_audit_events_list(sandbox_user):
     audit_events = body["data"]
     assert len(audit_events) == 2
     assert "id.email" in set(audit_events[0]["detail"]["data"]["decrypted_fields"])
-    assert "id.address_line1" in set(audit_events[1]["detail"]["data"]["decrypted_fields"])
+    assert "id.address_line1" in set(
+        audit_events[1]["detail"]["data"]["decrypted_fields"]
+    )
 
     # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
     params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
