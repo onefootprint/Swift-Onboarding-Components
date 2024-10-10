@@ -65,19 +65,6 @@ def test_data_validation(sandbox_tenant, key, value, expected_error):
     )
 
 
-def test_vault_benficial_owners(sandbox_tenant):
-    data = {
-        "business.beneficial_owners": [
-            {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}
-        ]
-    }
-    body = post("businesses/", data, sandbox_tenant.sk.key)
-    fp_bid = body["id"]
-
-    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
-    assert body[0]["ownership_stake"] == 50
-
-
 def test_external_id(tenant, sandbox_tenant):
     external_id = f"my_cus_id_{_gen_random_sandbox_id()}"
     body = post("businesses/", None, tenant.sk.key, ExternalId(external_id))

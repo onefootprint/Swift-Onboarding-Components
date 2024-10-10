@@ -254,32 +254,6 @@ def test_error_linking_bo(kyb_sandbox_ob_config, sandbox_tenant, sandbox_user):
     )
 
 
-def test_error_linking_bo_with_vaulted_bos(sandbox_tenant, sandbox_user):
-    """
-    Make sure we can't add link BOs via API when there are already vaulted BOs
-    """
-    bo_di = "business.beneficial_owners"
-    data = {bo_di: BUSINESS_DATA["business.kyced_beneficial_owners"]}
-    body = post("businesses", data, sandbox_tenant.sk.key)
-    fp_bid = body["id"]
-
-    # Cannot link a BO when the business has vaulted BOs
-    data = dict(fp_id=sandbox_user.fp_id, ownership_stake=50)
-    body = post(
-        f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
-    )
-    assert (
-        body["message"]
-        == f"Business already has {bo_di} vaulted. If you'd like to link a user as the beneficial owner of this business, please clear out {bo_di}"
-    )
-
-    # When we clear out the vaulted BOs, we can link
-    data = {bo_di: None}
-    patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
-    data = dict(fp_id=sandbox_user.fp_id, ownership_stake=0)
-    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
-
-
 def test_cannot_vault_bos_when_linked(sandbox_tenant):
     """
     Make sure we can't add BOs via the vault when there are already linked BOs

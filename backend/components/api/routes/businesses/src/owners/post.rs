@@ -69,7 +69,7 @@ pub async fn post(
             let bvw = VaultWrapper::<Any>::build_for_tenant(conn, &sb.id)?;
             for disallowed_di in [DI::Business(BDK::BeneficialOwners), DI::Business(BDK::KycedBeneficialOwners)] {
                 if bvw.populated_dis().iter().any(|di| di == &disallowed_di) {
-                    let err_str = format!("Business already has {} vaulted. If you'd like to link a user as the beneficial owner of this business, please clear out {}", disallowed_di, disallowed_di);
+                    let err_str = format!("Business already has vaulted BOs. If you'd like to link a user as the beneficial owner of this business, please clear out {}", disallowed_di);
                     return ValidationError(&err_str).into();
                 }
             }
