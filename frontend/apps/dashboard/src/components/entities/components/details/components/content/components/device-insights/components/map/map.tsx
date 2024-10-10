@@ -7,7 +7,7 @@ import { Map as MapboxMap, Marker } from 'react-map-gl';
 import { MAP_BOX_TOKEN } from 'src/config/constants';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 
-import GoogleMapsLoader from '../content/utils/google-maps-loader';
+import GoogleMapsLoader from '../../../../../../../../utils/google-maps-loader';
 import type { MapMarkerProps } from './components/map-marker';
 
 const DEFAULT_ZOOM = 11;

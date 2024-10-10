@@ -1,8 +1,8 @@
 import type { Entity } from '@onefootprint/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
+import GoogleMapsLoader from '../../../../../../../../../utils/google-maps-loader';
 import AddressType from '../components/address-card/types';
-import GoogleMapsLoader from '../utils/google-maps-loader';
 import useAddressFieldsProps from './use-address-fields-props';
 
 type Coordinates = {
