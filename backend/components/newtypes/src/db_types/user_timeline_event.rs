@@ -121,10 +121,10 @@ pub struct VaultCreatedInfo {
 pub struct WorkflowTriggeredInfo {
     /// Old format when triggers would create Workflows inline
     pub workflow_id: Option<WorkflowId>,
-    /// New format when triggers simply reonboard to a playbook
-    pub ob_config_id: Option<ObConfigurationId>,
     /// Newer format when triggers make a WorkflowRequest
     pub workflow_request_id: Option<WorkflowRequestId>,
+
+    pub ob_config_id: ObConfigurationId,
     pub actor: DbActor,
 }
 

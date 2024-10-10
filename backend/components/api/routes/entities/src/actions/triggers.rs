@@ -156,7 +156,7 @@ pub(super) fn apply_trigger_request(
     // Create a timeline event logging that the workflow was triggered
     let event = WorkflowTriggeredInfo {
         workflow_id: None,
-        ob_config_id: Some(obc.id),
+        ob_config_id: obc.id,
         workflow_request_id: Some(wfr.id.clone()),
         actor,
     };
