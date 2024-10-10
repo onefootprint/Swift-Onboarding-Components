@@ -34,6 +34,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEvent;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::ExternalIntegrationInfo;
+use newtypes::ObConfigurationId;
 use newtypes::OnboardingTimelineInfo;
 use newtypes::ScopedVaultId;
 use newtypes::UserTimelineId;
@@ -76,6 +77,13 @@ pub struct SaturatedDataCollectedEvent {
     pub is_prefill: bool,
 }
 
+pub struct SaturatedWorkflowTriggeredEvent(
+    pub Option<Workflow>,
+    pub ObConfigurationId,
+    pub SaturatedActor,
+    pub Option<WorkflowRequest>,
+);
+
 #[allow(clippy::large_enum_variant)]
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than
 /// identifiers
@@ -87,7 +95,7 @@ pub enum SaturatedTimelineEvent {
     Annotation(AnnotationInfo),
     WatchlistCheck(WatchlistCheck),
     VaultCreated(SaturatedActor),
-    WorkflowTriggered((Option<Workflow>, SaturatedActor, Option<WorkflowRequest>)),
+    WorkflowTriggered(SaturatedWorkflowTriggeredEvent),
     WorkflowStarted((Workflow, ObConfiguration)),
     AuthMethodUpdated((AuthMethodUpdatedInfo, AuthEvent, InsightEvent)),
     LabelAdded(ScopedVaultLabel),
@@ -289,6 +297,14 @@ impl UserTimeline {
                             .clone(),
                     ),
                     DbUserTimelineEvent::WorkflowTriggered(ref e) => {
+                        // Modern events have a WFR
+                        let wfr = e
+                            .workflow_request_id
+                            .as_ref()
+                            .and_then(|id| wfrs.get(id).cloned());
+                        // Legacy events, before 2023-12-07, have a workflow_id.
+                        // But before 2023-11-29, events didn't have a workflow either and only had an
+                        // obc_id...
                         let workflow = e
                             .workflow_id
                             .as_ref()
@@ -297,11 +313,9 @@ impl UserTimeline {
                             .get(&e.actor)
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
-                        let wfr = e
-                            .workflow_request_id
-                            .as_ref()
-                            .and_then(|id| wfrs.get(id).cloned());
-                        SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr))
+                        let event =
+                            SaturatedWorkflowTriggeredEvent(workflow, e.ob_config_id.clone(), actor, wfr);
+                        SaturatedTimelineEvent::WorkflowTriggered(event)
                     }
                     DbUserTimelineEvent::WorkflowStarted(ref e) => {
                         let workflow = workflows

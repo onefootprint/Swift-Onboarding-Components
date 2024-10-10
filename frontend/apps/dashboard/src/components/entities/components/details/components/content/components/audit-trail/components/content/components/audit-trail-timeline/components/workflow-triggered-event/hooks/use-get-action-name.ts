@@ -11,9 +11,6 @@ const useGetActionName = () => {
     if (config.kind === TriggerKind.Onboard) {
       return t('actions.onboard');
     }
-    if (config.kind === TriggerKind.RedoKyc) {
-      return t('actions.redo_kyc');
-    }
     if (config.kind === TriggerKind.Document) {
       const { configs, businessConfigs = [] } = config.data;
       const docConfigs = [...configs, ...businessConfigs];

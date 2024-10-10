@@ -4,6 +4,7 @@ use api_wire_types::WorkflowStartedEventKind;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use db::models::user_timeline::SaturatedDataCollectedEvent;
 use db::models::user_timeline::SaturatedTimelineEvent;
+use db::models::user_timeline::SaturatedWorkflowTriggeredEvent;
 use db::models::user_timeline::UserTimeline;
 use db::models::user_timeline::UserTimelineInfo;
 use itertools::Itertools;
@@ -81,7 +82,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::VaultCreated(actor) => Self::VaultCreated(api_wire_types::VaultCreated {
                 actor: api_wire_types::Actor::from_db(actor),
             }),
-            SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr)) => {
+            SaturatedTimelineEvent::WorkflowTriggered(event) => {
+                let SaturatedWorkflowTriggeredEvent(workflow, playbook_id, actor, wfr) = event;
                 let note = wfr.as_ref().and_then(|wfr| wfr.note.clone());
                 // Some weird logic for backcompat to determine the trigger type
                 let config = if let Some(wfr) = wfr.as_ref() {
@@ -103,7 +105,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     }
                 } else {
                     // And even more legacy triggers didn't have a workflow associated with them
-                    WorkflowRequestConfig::RedoKyc
+                    WorkflowRequestConfig::Onboard { playbook_id }
                 };
                 let request_is_active = wfr.as_ref().is_some_and(|wfr| wfr.deactivated_at.is_none());
 

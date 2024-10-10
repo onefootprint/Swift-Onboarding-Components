@@ -41,13 +41,9 @@ export type WorkflowRequestConfig =
         configs: DocumentRequestConfig[];
         businessConfigs: DocumentRequestConfig[];
       };
-    }
-  | {
-      kind: TriggerKind.RedoKyc;
     };
 
 export enum TriggerKind {
-  RedoKyc = 'redo_kyc',
   Onboard = 'onboard',
   Document = 'document',
 }

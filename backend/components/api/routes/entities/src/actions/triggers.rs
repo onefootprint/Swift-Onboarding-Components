@@ -44,7 +44,7 @@ fn validate(
     scoped_vault: &ScopedVault,
 ) -> FpResult<()> {
     match trigger {
-        WorkflowRequestConfig::RedoKyc { .. } | WorkflowRequestConfig::Onboard { .. } => Ok(()),
+        WorkflowRequestConfig::Onboard { .. } => Ok(()),
         WorkflowRequestConfig::Document {
             configs,
             fp_bid,
@@ -108,36 +108,39 @@ pub(super) fn apply_trigger_request(
         return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
     }
 
-    let obc = if let WorkflowRequestConfig::Onboard { playbook_id } = &trigger {
-        // Trigger specifically requested the playbook onto which the user should onboard
-        let (obc, _) = ObConfiguration::get(conn, (playbook_id, &sv.tenant_id, sv.is_live))?;
-        obc
-    } else {
-        // For all other trigger kinds, just associate the last playbook with the WFR.
-        // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
-        // associated a playbook with these WFRs
-        if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &sv.id, false)? {
-            obc
-        } else {
-            // This is a hack: these triggers all need a playbook associated to display various tenant
-            // information. Select the most recently created playbook to randomly associate with this
-            // workflow. Its rules will not be used...
-            let query = ObConfigurationQuery {
-                tenant_id: sv.tenant_id.clone(),
-                is_live: sv.is_live,
-                status: Some(ApiKeyStatus::Enabled),
-                kinds: Some(ObConfigurationKind::reonboardable()),
-                search: None,
-            };
-
-            let (obcs, _) = ObConfiguration::list(conn, &query, OffsetPagination::page(1))?;
-            let (obc, _, _) = obcs.into_iter().next().ok_or(UserError::NoPlaybooksExist)?;
+    let obc = match &trigger {
+        WorkflowRequestConfig::Onboard { playbook_id } => {
+            // Trigger specifically requested the playbook onto which the user should onboard
+            let (obc, _) = ObConfiguration::get(conn, (playbook_id, &sv.tenant_id, sv.is_live))?;
             obc
         }
-        // Both of these methods choose a pretty arbitrary playbook. This will have minor effects in
-        // bifrost any place where bifrost reads a playbook setting that is technically not
-        // pertinent to the document workflow.
-        // https://github.com/onefootprint/monorepo/blob/bf8d6eb7e391e66ccafe73bbd2866d427160da54/frontend/packages/types/src/data/onboarding-config.ts#L51
+        WorkflowRequestConfig::Document { .. } => {
+            // For all other trigger kinds, just associate the last playbook with the WFR.
+            // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
+            // associated a playbook with these WFRs
+            if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &sv.id, false)? {
+                obc
+            } else {
+                // This is a hack: these triggers all need a playbook associated to display various tenant
+                // information. Select the most recently created playbook to randomly associate with this
+                // workflow. Its rules will not be used...
+                let query = ObConfigurationQuery {
+                    tenant_id: sv.tenant_id.clone(),
+                    is_live: sv.is_live,
+                    status: Some(ApiKeyStatus::Enabled),
+                    kinds: Some(ObConfigurationKind::reonboardable()),
+                    search: None,
+                };
+
+                let (obcs, _) = ObConfiguration::list(conn, &query, OffsetPagination::page(1))?;
+                let (obc, _, _) = obcs.into_iter().next().ok_or(UserError::NoPlaybooksExist)?;
+                obc
+            }
+            // Both of these methods choose a pretty arbitrary playbook. This will have minor
+            // effects in bifrost any place where bifrost reads a playbook setting that
+            // is technically not pertinent to the document workflow.
+            // https://github.com/onefootprint/monorepo/blob/bf8d6eb7e391e66ccafe73bbd2866d427160da54/frontend/packages/types/src/data/onboarding-config.ts#L51
+        }
     };
     if obc.kind == ObConfigurationKind::Auth {
         return ValidationError("Cannot trigger onboarding onto an auth playbook").into();

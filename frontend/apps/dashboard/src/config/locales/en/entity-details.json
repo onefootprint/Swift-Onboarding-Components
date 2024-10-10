@@ -919,7 +919,6 @@
         "user-requested-to": "Requested to {{action}} <playbook /> by <actor />",
         "actions": {
           "onboard": "onboard onto",
-          "redo_kyc": "reonboard onto playbook",
           "document": "upload {{ docConfigs }}",
           "id_document": "ID photo",
           "proof_of_ssn": "proof of SSN",

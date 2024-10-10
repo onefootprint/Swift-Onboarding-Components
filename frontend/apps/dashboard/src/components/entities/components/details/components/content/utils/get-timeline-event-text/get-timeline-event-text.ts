@@ -197,8 +197,6 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
     let actionText;
     if (config.kind === TriggerKind.Onboard) {
       actionText = 'onboard onto another playbook'; // TODO: more complex logic to fetch playbook name
-    } else if (config.kind === TriggerKind.RedoKyc) {
-      actionText = 'reonboard onto playbook';
     } else if (config.kind === TriggerKind.Document) {
       const { configs } = config.data;
       const customConfig = configs.find(c => c.kind === DocumentRequestKind.Custom);
