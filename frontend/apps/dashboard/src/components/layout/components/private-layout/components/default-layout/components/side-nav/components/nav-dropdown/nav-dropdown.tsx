@@ -50,10 +50,12 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   };
 
   const handlePgpHelperOpen = () => {
+    setIsDropdownOpen(false);
     setIsPgpHelperOpen(true);
   };
 
   const handlePgpHelperClose = () => {
+    setIsDropdownOpen(false);
     setIsPgpHelperOpen(false);
   };
 
@@ -63,6 +65,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   };
 
   const handleWhatsNewClose = () => {
+    setIsDropdownOpen(false);
     setIsWhatsNewOpen(false);
   };
 
