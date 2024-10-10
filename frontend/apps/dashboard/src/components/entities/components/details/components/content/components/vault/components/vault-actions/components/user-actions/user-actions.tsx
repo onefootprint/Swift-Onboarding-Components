@@ -1,5 +1,5 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { RoleScopeKind } from '@onefootprint/types';
+import { type DataIdentifier, IdDI, RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +42,8 @@ const UserActions = ({ entity }: WithEntityProps) => {
   const { hasPermission } = usePermissions();
   const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
   const { openDatadog, isEnabled: isOpenDatadogEnabled } = useOpenDatadog();
+
+  const hasContactInfo = entity.data.some(d => [IdDI.phoneNumber as DataIdentifier, IdDI.email].includes(d.identifier));
 
   const handleCloseDialog = () => {
     setOpenDialog(null);
@@ -95,9 +97,11 @@ const UserActions = ({ entity }: WithEntityProps) => {
               <Dropdown.Divider />
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
-                <DropdownItem onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}>
-                  {t('requests.request-more-info')}
-                </DropdownItem>
+                {hasContactInfo && (
+                  <DropdownItem onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}>
+                    {t('requests.request-more-info')}
+                  </DropdownItem>
+                )}
                 <DropdownItem onSelect={handleDialogOpen(ActionDialog.Auth)}>
                   {t('requests.allow-updating-login-methods')}
                 </DropdownItem>

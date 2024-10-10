@@ -1,5 +1,5 @@
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
-import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
+import { type DataIdentifier, EntityKind, EntityStatus, IdDI, ReviewStatus } from '@onefootprint/types';
 import { Command } from '@onefootprint/ui';
 import { parseInt as lodashParseInt } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -31,6 +31,7 @@ type Action = {
   onSelect: () => void;
   closeAfterSelect: boolean;
   disabled?: boolean;
+  disabledText?: string;
 };
 
 type ActionGroup = {
@@ -50,6 +51,8 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const [search, setSearch] = useState('');
   const [openDialog, setOpenDialog] = useState<CmdKDialog | null>(null);
   const [discoverOpen, setDiscoverOpen] = useState(false);
+
+  const hasContactInfo = entity.data.some(d => [IdDI.phoneNumber as DataIdentifier, IdDI.email].includes(d.identifier));
 
   const resetSearch = () => {
     setSearch('');
@@ -166,6 +169,8 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'request',
           onSelect: handleOpenRequestMoreInfoDialog,
           closeAfterSelect: true,
+          disabled: !hasContactInfo,
+          disabledText: t('components.cmdk.disabled'),
         },
       ],
     },
@@ -179,6 +184,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           onSelect: decryptControls.start,
           closeAfterSelect: true,
           disabled: !canDecrypt,
+          disabledText: t('components.cmdk.missing-permissions'),
         },
         {
           label: t('components.cmdk.decrypt.decrypt-all'),
@@ -186,6 +192,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           onSelect: () => decryptControls.submitAllFields(),
           closeAfterSelect: true,
           disabled: !canDecrypt,
+          disabledText: t('components.cmdk.missing-permissions'),
         },
       ],
     },
@@ -203,7 +210,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           <Command.Empty>{t('components.cmdk.no-results')}</Command.Empty>
           {actions.map(({ title, actions }) => (
             <Command.Group key={title} heading={title}>
-              {actions.map(({ label, value, onSelect, closeAfterSelect, disabled }) => (
+              {actions.map(({ label, value, onSelect, closeAfterSelect, disabled, disabledText }) => (
                 <Command.Item
                   key={value}
                   value={value}
@@ -211,7 +218,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
                   disabled={disabled}
                 >
                   {label}
-                  {disabled && <span>{t('components.cmdk.disabled')}</span>}
+                  {disabled && <span>{disabledText}</span>}
                 </Command.Item>
               ))}
             </Command.Group>

@@ -523,7 +523,8 @@
     "cmdk": {
       "erase-search": "Erase search",
       "no-results": "No results found",
-      "disabled": "Not enough permissions",
+      "missing-permissions": "Missing permissions",
+      "disabled": "Disabled",
       "discover": "Press ⌘ + K to access actions faster",
       "decrypt": {
         "title": "Decrypt",
