@@ -1,4 +1,5 @@
-import { Box, Dialog } from '@onefootprint/ui';
+import { IcoPinMarker24 } from '@onefootprint/icons';
+import { Box, Dialog, Stack, Text } from '@onefootprint/ui';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import GoogleMapsLoader from 'src/components/entities/utils/google-maps-loader';
@@ -39,6 +40,29 @@ const StreetViewDialog = ({ onClose, open }: StreetViewDialogProps) => {
     <Dialog open={open} onClose={onClose} title={t('title')} size="full-screen" noPadding>
       <Box position="relative" height="100%">
         <StreetViewContainer ref={streetViewRef} />
+        {isSuccess && (
+          <Stack
+            position="absolute"
+            backgroundColor="primary"
+            borderRadius="default"
+            paddingBlock={3}
+            paddingLeft={3}
+            paddingRight={4}
+            transform="translate(-50%, 0%)"
+            left="50%"
+            bottom="24px"
+            zIndex={1000}
+            gap={3}
+          >
+            <IcoPinMarker24 />
+            <Stack direction="column" gap={0}>
+              <Text variant="label-3">521 Ivy Street, San Francisco, CA 94102</Text>
+              <Text variant="body-3" color="tertiary">
+                San Francisco, CA 94102
+              </Text>
+            </Stack>
+          </Stack>
+        )}
       </Box>
     </Dialog>
   );
