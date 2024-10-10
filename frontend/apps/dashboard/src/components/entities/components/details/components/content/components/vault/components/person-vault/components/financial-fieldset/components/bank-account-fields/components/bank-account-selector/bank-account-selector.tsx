@@ -17,7 +17,7 @@ export const BankAccountSelector = ({ selected, onChange, bankAccounts }: BankAc
 
   return (
     <SelectCustom.Root value={selected?.alias || ''} onValueChange={handleChange}>
-      <SelectCustom.Input>{selected?.alias}</SelectCustom.Input>
+      <SelectCustom.Input size="compact">{selected?.alias}</SelectCustom.Input>
       <SelectCustom.Content>
         <SelectCustom.Group>
           {bankAccounts.map(bankAccount => (

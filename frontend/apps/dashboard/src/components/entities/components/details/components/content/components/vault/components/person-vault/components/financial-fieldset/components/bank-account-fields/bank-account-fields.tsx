@@ -1,5 +1,5 @@
-import type { DataIdentifier, Entity, EntityBankAccount } from '@onefootprint/types';
-import { Stack } from '@onefootprint/ui';
+import type { DataIdentifier, Entity, EntityBankAccount, VaultValue } from '@onefootprint/types';
+import { LinkButton, Stack } from '@onefootprint/ui';
 import { Divider } from '@onefootprint/ui';
 import { useEffect, useState } from 'react';
 import useEntityDuplicateData from 'src/components/entities/components/details/hooks/use-entity-duplicate-data';
@@ -28,29 +28,50 @@ const BankAccountFields = ({ entity, setSelectedItemDis }: BankAccountFieldsProp
   const dis = getBankDis(entity.data, selectedBankAccount?.alias);
   const fields = dis.map(di => ({ di }));
 
-  const renderField = (field: DiField) => {
-    const { di } = field;
-    return <Field key={di} di={di} entity={entity} renderLabel={() => getTranslationsWithoutAlias(di)} />;
-  };
+  useEffect(() => {
+    setSelectedItemDis(dis);
+  }, [selectedBankAccount]);
 
   const closeDuplicateDataDrawer = () => {
     setDuplicateDrawerOpen(false);
   };
 
-  useEffect(() => {
-    setSelectedItemDis(dis);
-  }, [selectedBankAccount]);
+  const openDuplicateDataDrawer = () => {
+    setDuplicateDrawerOpen(true);
+  };
+
+  const renderBankAccountFingerprint = (value: VaultValue) => {
+    if (typeof value === 'string') {
+      return <LinkButton onClick={openDuplicateDataDrawer}>{value}</LinkButton>;
+    }
+    return null;
+  };
+
+  const renderField = (field: DiField) => {
+    const { di } = field;
+    if (di.endsWith('fingerprint')) {
+      return (
+        <Field
+          renderValue={renderBankAccountFingerprint}
+          key={di}
+          di={di}
+          entity={entity}
+          renderLabel={() => getTranslationsWithoutAlias(di)}
+        />
+      );
+    }
+    return <Field key={di} di={di} entity={entity} renderLabel={() => getTranslationsWithoutAlias(di)} />;
+  };
 
   return (
     <Stack direction="column" gap={5} padding={5} flex={1}>
-      {bankAccounts.length > 0 && (
+      {bankAccounts.length > 1 && (
         <>
           <BankAccountSelector
             bankAccounts={bankAccounts}
             selected={selectedBankAccount}
             onChange={setSelectedBankAccount}
           />
-
           <Divider />
         </>
       )}
