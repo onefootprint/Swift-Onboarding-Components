@@ -1,7 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
 import { Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -14,6 +14,7 @@ import useField from '../../hooks/use-field';
 import type { DiField } from '../../vault.types';
 import Field from '../field';
 import { useDecryptControls } from '../vault-actions';
+import StreetViewDialog from './components/street-view-dialog';
 
 export type AddressFieldsetProps = WithEntityProps & {
   children?: React.ReactNode;
@@ -42,6 +43,7 @@ const AddressFieldset = ({
   const selectableFields = dis.filter(di => getFieldProps(di).canSelect);
   const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
+  const [streetViewDialogOpen, setStreetViewDialogOpen] = useState(false);
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -49,6 +51,10 @@ const AddressFieldset = ({
 
   const handleDeselectAll = () => {
     decryptForm.set(selectableFields, false);
+  };
+
+  const closeStreetViewDialog = () => {
+    setStreetViewDialogOpen(false);
   };
 
   const renderField = (field: DiField) => {
@@ -78,6 +84,7 @@ const AddressFieldset = ({
       <Stack direction="column" gap={4} padding={5} flex={1}>
         {children || fields.map(renderField)}
       </Stack>
+      <StreetViewDialog open={streetViewDialogOpen} onClose={closeStreetViewDialog} />
       {footer && (
         <Footer tag="footer">
           <Divider />

@@ -476,6 +476,11 @@
         "dankort": "Dankort",
         "unknown": "Unknown"
       }
+    },
+    "address": {
+      "street-view": {
+        "title": "Street View"
+      }
     }
   },
   "decrypt": {
