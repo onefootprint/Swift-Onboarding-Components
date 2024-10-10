@@ -1,6 +1,7 @@
 use crate::utils::db2api::DbToApi;
 use idv::sentilink::application_risk::response::ReasonCode as IdvSentilinkReasonCode;
 use idv::sentilink::application_risk::response::Score;
+use newtypes::SentilinkHumanReadableScoreReasonCode;
 
 
 impl DbToApi<Score> for api_wire_types::SentilinkScoreDetail {
@@ -25,8 +26,9 @@ impl DbToApi<IdvSentilinkReasonCode> for api_wire_types::SentilinkReasonCode {
             explanation,
         } = rc;
 
+        let human_readable: SentilinkHumanReadableScoreReasonCode = code.into();
         Self {
-            code,
+            code: human_readable.to_string(),
             rank,
             direction,
             explanation,

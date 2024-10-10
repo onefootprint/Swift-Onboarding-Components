@@ -5,6 +5,7 @@ mod experian_ssn_codes;
 mod idology;
 mod lexis;
 mod reason_code_helpers;
+mod sentilink;
 mod signal_attribute;
 mod socure;
 
@@ -15,6 +16,7 @@ pub use experian_ssn_codes::*;
 pub use idology::*;
 pub use lexis::*;
 pub use reason_code_helpers::*;
+pub use sentilink::*;
 pub use signal_attribute::*;
 pub use socure::*;
 

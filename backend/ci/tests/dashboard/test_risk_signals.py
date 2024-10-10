@@ -127,8 +127,7 @@ def test_synthetic(sandbox_tenant, must_collect_data):
         )
 
         if rs["reason_code"].startswith("sentilink"):
-
-            assert rs["has_sentilink_detail"] == True
+            assert rs["has_sentilink_detail"]
 
             sentilink_detail = post(
                 f"entities/{user.fp_id}/sentilink/{risk_signal['id']}",
@@ -137,10 +136,20 @@ def test_synthetic(sandbox_tenant, must_collect_data):
             )
 
             assert sentilink_detail["synthetic"]["score"] > 800
-            assert len(sentilink_detail["synthetic"]["reason_codes"]) == 3
+            synthetic_rs = sentilink_detail["synthetic"]["reason_codes"]
+            assert len(synthetic_rs) == 3
+            # check that we are displaying in human readable form
+            assert any(
+                [
+                    rs["code"] == "supplied_name_or_ssn_is_nonsense"
+                    for rs in synthetic_rs
+                ]
+            )
 
             assert sentilink_detail["id_theft"]["score"] is not None
             assert len(sentilink_detail["id_theft"]["reason_codes"]) == 3
             test_ran = True
+        else:
+            assert not rs["has_sentilink_detail"]
 
     assert test_ran
