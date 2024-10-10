@@ -17,12 +17,7 @@ import {
 
 import type { RequestMoreInfoDialogProps } from './request-more-info-dialog';
 import RequestMoreInfoDialog from './request-more-info-dialog';
-import {
-  entityFixture,
-  entityFixtureWithIncompleteOnboarding,
-  withEntity,
-  withEntityWithIncompleteOnboarding,
-} from './request-more-info.test.config';
+import { entityFixture, withEntity } from './request-more-info.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -85,37 +80,6 @@ describe('<RequestMoreInfoDialog />', () => {
     await waitFor(() => {
       const playbookWarning = screen.getByText('You must select a playbook');
       expect(playbookWarning).toBeInTheDocument();
-    });
-  });
-
-  describe('Incomplete onboarding', () => {
-    beforeEach(() => {
-      mockRouter.setCurrentUrl(`/entities/${entityFixtureWithIncompleteOnboarding.id}`);
-      mockRouter.query = {
-        id: entityFixtureWithIncompleteOnboarding.id,
-      };
-    });
-
-    beforeEach(() => {
-      withEntityWithIncompleteOnboarding(entityFixtureWithIncompleteOnboarding.id);
-      withPlaybooks();
-      withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
-    });
-
-    it('document option is disabled and onboard option is selected by default', async () => {
-      renderDialog({ onClose: jest.fn() });
-      const documentOption = screen.getByRole('radio', {
-        name: 'Ask user to upload documents',
-      });
-      expect(documentOption).toBeDisabled();
-      const nextButton = screen.getByRole('button', {
-        name: 'Next',
-      });
-      await userEvent.click(nextButton);
-      await waitFor(() => {
-        const playbookWarning = screen.getByText('You must select a playbook');
-        expect(playbookWarning).toBeInTheDocument();
-      });
     });
   });
 

@@ -26,13 +26,11 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
-  const hasPriorOnboarding = !!entity.data?.workflows.length;
-  const defaultVariant = hasPriorOnboarding ? 'document' : 'onboard';
-  const [requestVariant, setRequestVariant] = useState<RequestVariant>(defaultVariant);
+  const [requestVariant, setRequestVariant] = useState<RequestVariant>('document');
 
   const methods = useForm<TriggerFormData>({
     defaultValues: {
-      kinds: defaultVariant === 'onboard' ? [RequestMoreInfoKind.Onboard] : [],
+      kinds: [],
       collectSelfie: false,
       clearManualReview: true,
     },
@@ -91,12 +89,11 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
         <Stack direction="column" gap={4}>
-          <Tooltip text={t('kind.cannot-request-document')} disabled={hasPriorOnboarding}>
+          <Tooltip text={t('kind.cannot-request-document')}>
             <Radio
               label={t('request-variant.document')}
               checked={requestVariant === 'document'}
               onChange={() => handleRequestVariantSelect('document')}
-              disabled={!hasPriorOnboarding}
             />
           </Tooltip>
           <Radio
