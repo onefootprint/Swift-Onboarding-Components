@@ -20,7 +20,6 @@ export type MachineContext = {
 export type MachineEvents =
   | { type: 'addVerification'; payload: `${AuthMethodKind}` }
   | { type: 'confirmed' }
-  | { type: 'confirmFailed' }
   | { type: 'dataSubmitted'; payload: KycData }
   | { type: 'decryptedData'; payload: KycData }
   | { type: 'initialized'; payload: KycData }

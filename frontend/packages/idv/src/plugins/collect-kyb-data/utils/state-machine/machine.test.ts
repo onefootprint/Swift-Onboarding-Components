@@ -10,28 +10,28 @@ import {
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks';
-import createCollectKybDataMachine from './machine';
+import createCollectKybDataMachine, { nextScreenTransitions, getDataCollectionScreensToShow } from './machine';
 import type { BeneficialOwnersData, MachineContext } from './types';
 
-describe('Collect KYB Data Machine Tests', () => {
-  const TestOnboardingConfig: PublicOnboardingConfig = {
-    isLive: true,
-    logoUrl: 'url',
-    privacyPolicyUrl: 'url',
-    name: 'tenant',
-    orgName: 'tenantOrg',
-    orgId: 'orgId',
-    status: OnboardingConfigStatus.enabled,
-    isAppClipEnabled: false,
-    isInstantAppEnabled: false,
-    appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
-    isNoPhoneFlow: false,
-    requiresIdDoc: false,
-    key: 'key',
-    isKyb: false,
-    allowInternationalResidents: false,
-  };
+const TestOnboardingConfig: PublicOnboardingConfig = {
+  isLive: true,
+  logoUrl: 'url',
+  privacyPolicyUrl: 'url',
+  name: 'tenant',
+  orgName: 'tenantOrg',
+  orgId: 'orgId',
+  status: OnboardingConfigStatus.enabled,
+  isAppClipEnabled: false,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
+  isNoPhoneFlow: false,
+  requiresIdDoc: false,
+  key: 'key',
+  isKyb: false,
+  allowInternationalResidents: false,
+};
 
+describe('Collect KYB Data Machine Tests', () => {
   const createMachine = (
     missingKybAttributes: CollectedKybDataOption[],
     missingKycAttributes: CollectedKycDataOption[],
@@ -41,13 +41,14 @@ describe('Collect KYB Data Machine Tests', () => {
       osName: 'Windows',
       browser: 'Chrome',
     },
+    additionalConfig?: Partial<PublicOnboardingConfig>,
   ) => {
     const initialContext: MachineContext = {
       idvContext: {
         authToken: 'authToken',
         device,
       },
-      config: { ...TestOnboardingConfig },
+      config: { ...TestOnboardingConfig, ...additionalConfig },
       kybRequirement: {
         kind: OnboardingRequirementKind.collectKybData,
         isMet: false,
@@ -109,12 +110,16 @@ describe('Collect KYB Data Machine Tests', () => {
 
     state = machine.send({ type: 'navigatedToPrevPage' });
     expect(state.value).toEqual('basicData');
+
     state = machine.send({ type: 'navigatedToPrevPage' });
     expect(state.value).toEqual('introduction');
 
     state = machine.send('introductionCompleted');
     expect(state.value).toEqual('basicData');
+
     state = machine.send('basicDataSubmitted', {});
+    expect(state.value).toEqual('businessAddress');
+
     state = machine.send('businessAddressSubmitted', {
       payload: {
         [BusinessDI.addressLine1]: '123 Main St',
@@ -170,18 +175,25 @@ describe('Collect KYB Data Machine Tests', () => {
     ]);
     expect(state.value).toEqual('confirm');
     state = machine.send({ type: 'navigatedToPrevPage' });
+
     expect(state.value).toEqual('beneficialOwners');
     state = machine.send({ type: 'navigatedToPrevPage' });
+
     expect(state.value).toEqual('businessAddress');
     state = machine.send({ type: 'navigatedToPrevPage' });
+
     expect(state.value).toEqual('basicData');
     state = machine.send({ type: 'navigatedToPrevPage' });
+
     expect(state.value).toEqual('introduction');
     state = machine.send('introductionCompleted');
+
     expect(state.value).toEqual('basicData');
     state = machine.send('basicDataSubmitted', {});
+
     expect(state.value).toEqual('businessAddress');
     state = machine.send('businessAddressSubmitted', {});
+
     expect(state.value).toEqual('beneficialOwners');
     state = machine.send({
       type: 'beneficialOwnersSubmitted',
@@ -197,6 +209,7 @@ describe('Collect KYB Data Machine Tests', () => {
 
     state = machine.send({ type: 'beneficialOwnerKycSubmitted' });
     expect(state.value).toEqual('completed');
+    expect(state.done).toEqual(true);
   });
 
   it('when there are no missing attributes with success load', () => {
@@ -222,8 +235,8 @@ describe('Collect KYB Data Machine Tests', () => {
 
     let { state } = machine;
     expect(state.value).toEqual('loadFromVault');
-    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
 
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
     expect(state.value).toEqual('introduction');
 
     state = machine.send('introductionCompleted');
@@ -252,16 +265,17 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.context.data[BusinessDI.state]).toEqual('NY');
     expect(state.context.data[BusinessDI.country]).toEqual('USA');
     expect(state.context.data[BusinessDI.zip]).toEqual('023123');
-
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'navigatedToPrevPage' });
     expect(state.value).toEqual('businessAddress');
+
     state = machine.send({ type: 'navigatedToPrevPage' });
     expect(state.value).toEqual('introduction');
 
     state = machine.send('introductionCompleted');
     expect(state.value).toEqual('businessAddress');
+
     state = machine.send('businessAddressSubmitted', {});
     expect(state.value).toEqual('confirm');
 
@@ -270,6 +284,7 @@ describe('Collect KYB Data Machine Tests', () => {
 
     state = machine.send({ type: 'beneficialOwnerKycSubmitted' });
     expect(state.value).toEqual('completed');
+    expect(state.done).toEqual(true);
   });
 
   describe('Confirm flow', () => {
@@ -408,5 +423,228 @@ describe('Collect KYB Data Machine Tests', () => {
       ]);
       expect(state.value).toEqual('confirm');
     });
+
+    it('should start with invisible confirm screen, after confirm error shows the confirm screen', () => {
+      const machine = createMachine(
+        [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.tin,
+          CollectedKybDataOption.address,
+          CollectedKybDataOption.beneficialOwners,
+        ],
+        [],
+        { type: 'desktop', hasSupportForWebauthn: false, osName: 'Windows', browser: 'Chrome' },
+        { skipConfirm: true },
+      );
+      let { state } = machine;
+
+      expect(state.value).toEqual('loadFromVault');
+      state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+
+      // Collect all fields first
+      state = machine.send('introductionCompleted');
+      state = machine.send('basicDataSubmitted', {
+        payload: {
+          [BusinessDI.name]: 'Acme Inc.',
+          [BusinessDI.tin]: '123-3243423',
+        },
+      });
+      state = machine.send('businessAddressSubmitted', {
+        payload: {
+          [BusinessDI.addressLine1]: '123 Main St',
+          [BusinessDI.addressLine2]: 'Apt 1',
+          [BusinessDI.city]: 'New York',
+          [BusinessDI.state]: 'NY',
+          [BusinessDI.country]: 'USA',
+          [BusinessDI.zip]: '023123',
+        },
+      });
+      state = machine.send('beneficialOwnersSubmitted', {
+        payload: {
+          data: {
+            [BusinessDI.beneficialOwners]: [
+              {
+                [BeneficialOwnerDataAttribute.firstName]: 'John',
+                [BeneficialOwnerDataAttribute.lastName]: 'Doey',
+                [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
+                [BeneficialOwnerDataAttribute.ownershipStake]: 30,
+              },
+              {
+                [BeneficialOwnerDataAttribute.firstName]: 'Jane',
+                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+                [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
+                [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+              },
+            ],
+          },
+          vaultBusinessData: {} as BeneficialOwnersData,
+        },
+      });
+
+      expect(state.value).toEqual('confirm');
+      expect(state.context.isConfirmScreenVisible).toEqual(false);
+    });
+  });
+});
+
+describe('nextScreenTransitions', () => {
+  const Targets = ['introduction', 'basicData', 'businessAddress', 'beneficialOwners', 'confirm'];
+
+  it('should return same targets when loadFromVault', () => {
+    const result = nextScreenTransitions('loadFromVault');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when introduction', () => {
+    const result = nextScreenTransitions('introduction');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when basicData', () => {
+    const result = nextScreenTransitions('basicData');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when businessAddress', () => {
+    const result = nextScreenTransitions('businessAddress');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when beneficialOwners', () => {
+    const result = nextScreenTransitions('beneficialOwners');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+
+  it('should return same targets when confirm', () => {
+    const result = nextScreenTransitions('confirm');
+    expect(result.map(x => x.target)).toEqual(Targets);
+  });
+});
+
+describe('getDataCollectionScreensToShow', () => {
+  const baseCtx: MachineContext = {
+    idvContext: {
+      authToken: 'authToken',
+      device: { type: 'desktop', hasSupportForWebauthn: false, osName: 'Windows', browser: 'Chrome' },
+    },
+    config: { ...TestOnboardingConfig },
+    kybRequirement: {
+      kind: OnboardingRequirementKind.collectKybData,
+      isMet: false,
+      missingAttributes: [],
+      hasLinkedBos: false,
+    },
+    kycRequirement: {
+      kind: OnboardingRequirementKind.collectKycData,
+      isMet: false,
+      missingAttributes: [],
+      populatedAttributes: [],
+      optionalAttributes: [],
+    },
+    bootstrapBusinessData: {},
+    bootstrapUserData: {},
+    data: {},
+    dataCollectionScreensToShow: [],
+    isConfirmScreenVisible: true,
+  };
+
+  it('should return introduction, basicData, confirm 1/5', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.name],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+  });
+
+  it('should return introduction, basicData, confirm 2/5', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.tin],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+  });
+
+  it('should return introduction, basicData, confirm 3/5', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.phoneNumber],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+  });
+
+  it('should return introduction, basicData, confirm 4/5', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.website],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+  });
+
+  it('should return introduction, basicData, confirm 5/5', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.corporationType],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+  });
+
+  it('should return introduction, businessAddress, confirm', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.address],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'businessAddress', 'confirm']);
+  });
+
+  it('should return introduction, beneficialOwners, confirm 1/2', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.beneficialOwners],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'beneficialOwners', 'confirm']);
+  });
+
+  it('should return introduction, beneficialOwners, confirm 2/2', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'beneficialOwners', 'confirm']);
+  });
+
+  it('should return confirm', () => {
+    expect(getDataCollectionScreensToShow(baseCtx)).toEqual(['confirm']);
   });
 });

@@ -42,7 +42,6 @@ const Confirm = () => {
       data: checkPhoneEmailBeforeSubmit(initialData, data, requirement, verifiedMethods),
       onSuccess: () => send({ type: 'confirmed' }),
       onError: (fieldErrors: SyncDataFieldErrors) => {
-        send({ type: 'confirmFailed' });
         // We can't show the error messages as hints unless the sub-forms are in edit mode
         // For simplicity, just show the field names.
         // Ideally, these errors should be caught in earlier pages anyways (unless bootstrapped)
@@ -80,7 +79,7 @@ const Confirm = () => {
     }
   }, [isConfirmScreenVisible, syncDataMutation.isIdle, syncDataMutation.isPending]);
 
-  return isConfirmScreenVisible ? (
+  return isConfirmScreenVisible || syncDataMutation.isError ? (
     <ConfirmCollectedData
       title={t('summary.title')}
       subtitle={t('summary.subtitle')}

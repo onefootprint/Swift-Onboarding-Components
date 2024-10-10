@@ -43,14 +43,14 @@ const getScreenOrder = (screen: StateValue) => ORDERED_SCREENS.findIndex(s => s.
  * might show. The state machine transitions will only navigate forward and backward through this
  * set of static pages of data that need to be collected.
  */
-const getDataCollectionScreensToShow = (initialContext: MachineContext): StateValue[] =>
+export const getDataCollectionScreensToShow = (initialContext: MachineContext): StateValue[] =>
   ORDERED_SCREENS.filter(s => s.missingCheck(initialContext)).map(s => s.screen);
 
 /**
  * The forward transitions made for the specific `currentScreen`.
  * They don't allow transitioning to a screen that is before the `currentScreen`.
  */
-const nextScreenTransitions = (currentScreen: StateValue) => {
+export const nextScreenTransitions = (currentScreen: StateValue) => {
   const currentScreenOrder = getScreenOrder(currentScreen);
 
   return ORDERED_SCREENS.map(s => ({
@@ -102,6 +102,8 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
       context: {
         ...initialContext,
         dataCollectionScreensToShow: getDataCollectionScreensToShow(initialContext),
+        /** Whether the user can skip the confirm screen */
+        isConfirmScreenVisible: !initialContext.config?.skipConfirm,
       },
       states: {
         loadFromVault: {

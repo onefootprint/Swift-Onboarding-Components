@@ -131,7 +131,7 @@ const createCollectKycDataMachine = (initialContext: InitMachineArgs, initState?
          * This helps us decide the pages to visit when navigated forward and backward */
         dataCollectionScreensToShow: getDataCollectionScreensToShow(initialContext.requirement, initialContext.data),
         /** Whether the user can skip the confirm screen */
-        isConfirmScreenVisible: !initialContext.config?.skipConfirm === true,
+        isConfirmScreenVisible: !initialContext.config?.skipConfirm,
       },
       states: {
         init: {
@@ -187,9 +187,6 @@ const createCollectKycDataMachine = (initialContext: InitMachineArgs, initState?
             decryptedData: {
               actions: ['assignData'],
             },
-            confirmFailed: {
-              actions: ['assignConfirmScreenVisibility'],
-            },
             confirmed: [{ target: 'completed' }],
             navigatedToPrevPage: prevScreenTransitions('confirm'),
             dataSubmitted: {
@@ -236,10 +233,6 @@ const createCollectKycDataMachine = (initialContext: InitMachineArgs, initState?
             initialData,
           };
         }),
-        assignConfirmScreenVisibility: assign(context => ({
-          ...context,
-          isConfirmScreenVisible: true,
-        })),
       },
     },
   );

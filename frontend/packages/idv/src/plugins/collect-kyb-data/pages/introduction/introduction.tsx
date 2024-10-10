@@ -1,7 +1,6 @@
 import { IcoStore24, IcoUser24 } from '@onefootprint/icons';
-import { Button } from '@onefootprint/ui';
+import { Button, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import InfoBox from '../../../../components/info-box';
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -19,7 +18,7 @@ const Introduction = () => {
   };
 
   return (
-    <Container>
+    <Stack flexDirection="column" rowGap={7} justifyContent="center" alignItems="center">
       <CollectKybDataNavigationHeader />
       <HeaderTitle title={t('introduction.title')} subtitle={t('introduction.subtitle')} />
       <InfoBox
@@ -40,18 +39,8 @@ const Introduction = () => {
       <Button fullWidth onClick={handleClick} size="large">
         {t('cta.continue')}
       </Button>
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[7]};
-    justify-content: center;
-    align-items: center;
-  `}
-`;
 
 export default Introduction;

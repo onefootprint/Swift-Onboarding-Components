@@ -1,31 +1,21 @@
-import { Box, Shimmer } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
+import { Box, Shimmer, Stack } from '@onefootprint/ui';
+import styled from 'styled-components';
 
 type LoadingProps = { children?: JSX.Element | null };
 
 const Loading = ({ children }: LoadingProps): JSX.Element => (
   <Box>
     <NavHeader />
-    <TitleContainer>
+    <Stack flexDirection="column" justifyContent="center" alignItems="center" marginBottom={8}>
       <Shimmer height="28px" width="272px" marginBottom={5} />
       <Shimmer height="70px" width="340px" />
-    </TitleContainer>
+    </Stack>
     <Box marginBottom={5}>
       <Shimmer height="331px" width="100%" />
     </Box>
     {children}
   </Box>
 );
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-bottom: ${theme.spacing[8]};
-  `}
-`;
 
 const NavHeader = styled.div`
   width: 100%;

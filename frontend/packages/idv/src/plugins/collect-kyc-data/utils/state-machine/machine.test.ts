@@ -805,8 +805,6 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
 
       expect(state.context.isConfirmScreenVisible).toEqual(true);
-      state = machine.send({ type: 'confirmFailed' });
-      expect(state.context.isConfirmScreenVisible).toEqual(true);
       expect(state.value).toEqual('confirm');
 
       // We should be able to edit the data from the confirm state
@@ -903,11 +901,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[IdDI.usLegalStatus]).toEqual({ value: UsLegalStatus.citizen, bootstrap: true });
       expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101', bootstrap: true });
 
-      expect(state.value).toEqual('confirm');
-
       expect(state.context.isConfirmScreenVisible).toEqual(false);
-      state = machine.send({ type: 'confirmFailed' });
-      expect(state.context.isConfirmScreenVisible).toEqual(true);
       expect(state.value).toEqual('confirm');
 
       state = machine.send({ type: 'confirmed' });

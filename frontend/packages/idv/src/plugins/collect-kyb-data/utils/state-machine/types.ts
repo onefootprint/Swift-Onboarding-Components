@@ -47,6 +47,7 @@ export type MachineContext = {
   /** Readonly object with decrypted ``business.*`` data */
   vaultBusinessData?: Readonly<BusinessDIData>;
   dataCollectionScreensToShow: StateValue[];
+  isConfirmScreenVisible?: boolean;
 };
 
 export type MachineEvents =

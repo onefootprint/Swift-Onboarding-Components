@@ -14,7 +14,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'stepUpCompleted';
-    assignConfirmScreenVisibility: 'confirmFailed';
     assignData: 'dataSubmitted' | 'decryptedData';
     assignInitialData: 'initialized';
   };
