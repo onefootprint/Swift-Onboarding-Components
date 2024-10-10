@@ -255,20 +255,24 @@ def test_collect_document_no_onboardings(sandbox_tenant):
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
 
     # re-run Bifrost with the token from the link we sent to user
-    def pre_run(bifrost):
-        # Check that requirements are what we expect
-        requirements = bifrost.get_status()["all_requirements"]
-        assert any(i["kind"] == "collect_document" for i in requirements)
-        assert set(
-            i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
-        ) == set(i["kind"] for i in document_configs)
-        assert all(
-            not i["is_met"] for i in requirements if i["kind"] == "collect_document"
-        )
-
-    complete_redo_flow(
-        initial_auth_token, fp_id, sandbox_tenant.default_ob_config, pre_run
+    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
     )
+    # OBC here isn't actually correct
+    bifrost = BifrostClient.raw_auth(sandbox_tenant.default_ob_config, auth_token, sandbox_id)
+
+    # Check that requirements are what we expect
+    requirements = bifrost.get_status()["all_requirements"]
+    assert any(i["kind"] == "collect_document" for i in requirements)
+    assert set(
+        i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
+    ) == set(i["kind"] for i in document_configs)
+    assert all(
+        not i["is_met"] for i in requirements if i["kind"] == "collect_document"
+    )
+
+    bifrost.handle_all_requirements()
+    bifrost.validate()
 
 
 def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
