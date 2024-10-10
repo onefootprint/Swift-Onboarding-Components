@@ -178,7 +178,7 @@ fn backfill_dl(conn: &mut TxnPgConn, dl: DataLifetime, v: Vault, kyced_bos: PiiS
         .collect_vec();
     let backfilled_dls = data_lifetime::table
         .filter(data_lifetime::kind.eq_any(possible_dis))
-        .filter(data_lifetime::scoped_vault_id.eq_any(&dl.scoped_vault_id))
+        .filter(data_lifetime::scoped_vault_id.eq(&dl.scoped_vault_id))
         .get_results::<DataLifetime>(conn.conn())
         .map_err(DbError::from)?;
     if !backfilled_dls.is_empty() {
