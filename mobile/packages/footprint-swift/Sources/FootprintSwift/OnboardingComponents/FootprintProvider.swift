@@ -415,6 +415,87 @@ public final class FootprintProvider {
         return try await self.queries.validateOnboarding(authToken: authToken)
     }
     
+    
+    public func launchIdentify(
+        email: String?,
+        phone: String?,
+        onCancel: (() -> Void)? = nil,
+        onAuthenticated: ((_ result: Verify) -> Void)? = nil,
+        onError: ((_ errorMessage: String) -> Void)? = nil
+    ) {
+        guard let obConfigKind = self.onboardingConfig?.kind else {
+            onError?("Missing onboarding configuration kind")
+            return
+        }
+        
+        let hasEmailOrPhone = email != nil || phone != nil
+        
+        if hasEmailOrPhone && self.authToken != nil {
+            onError?("Please don't use both email/phone and auth token at the same time")
+            return
+        }
+        
+        let onCompleteCallback: ((String) -> Void)? = obConfigKind == .auth ? { validationToken in
+            self.authValidationToken = validationToken
+            onAuthenticated?(
+                Verify(
+                    requirements: nil,
+                    validationToken: validationToken,
+                    vaultData: nil
+                )
+            )
+        } : nil
+        
+        
+        var onAuth: ((String, String) async throws -> Verify) = { authToken, vaultingToken in
+            self.verifiedAuthToken = authToken
+            self.vaultingToken = vaultingToken
+            let validationToken = (try await self.queries.getValidationToken(authToken: authToken)).validation_token
+            self.authValidationToken = validationToken
+            let requirements = try await self.queries.getOnboardingStatus(authToken: authToken)
+            self.requirements = requirements
+            let vaultData = try await self.getVaultData()
+            self.vaultData = vaultData
+            return Verify(requirements: requirements, validationToken: validationToken, vaultData: vaultData)
+        }
+        
+        let onAuthenticationCompleteCallback: ((String, String) -> Void)? = obConfigKind == .auth ? nil :
+        { authToken, vaultingToken in
+            Task {
+                do {
+                    let verification = try await onAuth(authToken, vaultingToken)
+                    onAuthenticated?(verification)
+                } catch {
+                    onError?(error.localizedDescription)
+                }
+            }
+        }
+        
+        let config = FootprintConfiguration(
+            publicKey: self.configKey,
+            authToken:  authToken,
+            sandboxId: self.sandboxId,
+            sandboxOutcome: self.sandboxOutcome,
+            scheme: "footprintapp-callback",
+            bootstrapData: FootprintBootstrapData(email: email, phoneNumber: phone),
+            l10n: self.l10n,
+            appearance: self.appearance,
+            isAuthPlaybook: obConfigKind == .auth,
+            isComponentsSdk: true,
+            shouldRelayToComponents: true,
+            onCancel: onCancel,
+            onComplete: onCompleteCallback,
+            onAuthenticationComplete: onAuthenticationCompleteCallback,
+            onError: onError
+        )
+        do {
+            Footprint.initialize(with: config)
+        } catch {
+            onError?(error.localizedDescription)
+        }
+    }
+    
+    
     public func handoff(
         onCancel: (() -> Void)? = nil,
         onComplete: ((_ validationToken: String) -> Void)? = nil,
@@ -432,16 +513,17 @@ public final class FootprintProvider {
             throw NSError(domain: "HandoffError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unsupported onboarding configuration kind. Only KYC is supported"])
         }
         
-        
         let config = FootprintConfiguration(
             publicKey: self.configKey,
             authToken:  authToken,
             sandboxId: self.sandboxId,
-            isComponentsSdk: true,
             sandboxOutcome: self.sandboxOutcome,
             scheme: "footprintapp-callback",
             l10n: self.l10n,
             appearance: self.appearance,
+            isAuthPlaybook: false,
+            isComponentsSdk: true,
+            shouldRelayToComponents: false,
             onCancel: onCancel,
             onComplete: onComplete,
             onError: onError

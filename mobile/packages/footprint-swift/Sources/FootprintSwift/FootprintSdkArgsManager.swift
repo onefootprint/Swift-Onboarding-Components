@@ -26,7 +26,7 @@ public class FootprintSdkArgsManager {
                     return nil
                 }
                 let body = try JSONSerialization.data(withJSONObject: [
-                    "kind": "verify_v1",
+                    "kind": (configuration.isAuthPlaybook == true) ? FootprintSdkMetadata.kindAuth : FootprintSdkMetadata.kindVerify,
                     "data": configurationJSON
                 ])
                 request.httpBody = body

@@ -16,7 +16,8 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
     }
     
     private func getURL(token: String) throws -> URL {
-        var urlComponents = URLComponents(string: FootprintSdkMetadata.bifrostBaseUrl)!
+        let baseUrl = configuration.isAuthPlaybook == true ? FootprintSdkMetadata.authBaseUrl : FootprintSdkMetadata.bifrostBaseUrl
+        var urlComponents = URLComponents(string: baseUrl)!
         var queryItems: [URLQueryItem] = []
         queryItems.append(URLQueryItem(name: "redirect_url", value: self.getDeepLink()))
         
@@ -118,9 +119,11 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
                     self?.configuration.onCancel?()
                 } else if let validationToken = queryItems.first(where: { $0.name == "validation_token" })?.value {
                     self?.configuration.onComplete?(validationToken)
+                } else if let authToken = queryItems.first(where: { $0.name == "auth_token" })?.value, let vaultingToken = queryItems.first(where: { $0.name == "components_vault_token" })?.value {
+                    self?.configuration.onAuthenticationComplete?(authToken, vaultingToken)
                 }
             } else {
-                self?.logger?.logError(error: "Encountered error when redirecting after verification is complete.", shouldCancel: true)
+                self?.logger?.logError(error: "Encountered error when redirecting after flow is complete.", shouldCancel: true)
             }
         }
         

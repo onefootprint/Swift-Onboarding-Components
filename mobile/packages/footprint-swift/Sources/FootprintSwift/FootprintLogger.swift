@@ -47,7 +47,7 @@ public class FootprintLogger {
                 encoder.keyEncodingStrategy = .convertToSnakeCase
                 let telemetry = FootprintSdkTelemetry(
                     tenantDomain: configuration?.scheme,
-                    sdkKind: FootprintSdkMetadata.kind,
+                    sdkKind: (configuration?.isAuthPlaybook == true) ? FootprintSdkMetadata.kindAuth : FootprintSdkMetadata.kindVerify,
                     sdkName: FootprintSdkMetadata.name,
                     sdkVersion: FootprintSdkMetadata.version,
                     logLevel: level,
