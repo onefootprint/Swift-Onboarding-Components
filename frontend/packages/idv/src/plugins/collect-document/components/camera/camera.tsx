@@ -339,11 +339,10 @@ const Camera = ({
         }
         return;
       }
-      // TODO: uncomment after testing
-      // if (videoRef.current.readyState < 2) {
-      //   logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
-      //   return;
-      // }
+      if (videoRef.current.readyState < 2) {
+        logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
+        return;
+      }
       videoRef.current
         .play()
         .then(() => {
