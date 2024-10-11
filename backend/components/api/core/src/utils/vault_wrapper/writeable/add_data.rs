@@ -237,7 +237,7 @@ impl<Type> WriteableVw<Type> {
                 ownership_stake: bo.ownership_stake as i32,
             })
             .collect_vec();
-        BusinessOwner::bulk_create_secondary(conn, new_bos, self.sv.vault_id.clone())?;
+        BusinessOwner::bulk_create_secondary(conn, new_bos, &self.sv.vault_id)?;
 
         let extra_data = secondary_kyced_bos
             .into_iter()

@@ -131,11 +131,12 @@ impl TenantVw<Business> {
             // Either bifrost-initiated flow or API-initiated flow. There will be at most one linked BO (for
             // bifrost)
             let vault_bos: Vec<BusinessOwnerData> = vault_bos.deserialize()?;
-            if linked_bos.len() > 1 {
-                return Err(BusinessError::TooManyBos.into());
-            }
-            // There should only be one linked BO maximum, the primary
-            let (primary_bo, primary_bo_data) = linked_bos.into_iter().next().unzip();
+            // There should only be one linked BO maximum, the primary.
+            // Some backfilled users here will have secondary BOs too, but we can ignore reading those
+            let (primary_bo, primary_bo_data) = linked_bos
+                .into_iter()
+                .find(|(bo, _)| bo.kind == BusinessOwnerKind::Primary)
+                .unzip();
             let primary_sv = primary_bo_data.flatten().map(|d| d.0);
 
             vault_bos

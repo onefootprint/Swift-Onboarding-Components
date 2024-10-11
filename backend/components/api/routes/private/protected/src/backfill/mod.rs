@@ -56,10 +56,12 @@ struct CursorBackfillResponse<T, TCursor> {
 struct BatchBackfillResponse {}
 
 mod backfill_bo_dis;
+mod backfill_bo_dis_from_non_kyced;
 
 #[allow(unused)]
 pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(token_fingerprint_batch::post)
-        .service(backfill_bo_dis::post);
+        .service(backfill_bo_dis::post)
+        .service(backfill_bo_dis_from_non_kyced::post);
 }

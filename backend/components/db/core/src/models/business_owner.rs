@@ -86,7 +86,7 @@ impl BusinessOwner {
     pub fn bulk_create_secondary(
         conn: &mut TxnPgConn,
         bos: Vec<NewSecondaryBo>,
-        business_vault_id: VaultId,
+        business_vault_id: &VaultId,
     ) -> DbResult<Vec<Self>> {
         let rows = bos
             .into_iter()
