@@ -1,11 +1,10 @@
 import { tabsRouterSchema } from '@/playbooks/utils/schema';
 import type { PlaybookTabs } from '@/playbooks/utils/schema/schema';
 import { type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
-import { Tabs as UITabs } from '@onefootprint/ui';
+import { Stack, Tabs as UITabs } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import useGetQueryParam from 'src/hooks/use-query-param';
-import styled, { css } from 'styled-components';
 import DataCollection from './components/data-collection';
 import Rules from './components/rules';
 import Settings from './components/settings';
@@ -44,22 +43,14 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
   };
 
   return (
-    <Container>
+    <Stack flexDirection="column" gap={8}>
       <UITabs options={options} onChange={handleChange} disabled={isTabsDisabled} defaultValue={tab} />
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'verification-checks' && <VerificationChecks playbook={playbook} />}
       {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
       {tab === 'settings' && <Settings playbook={playbook} />}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[8]};
-  `}
-`;
 
 export default Tabs;

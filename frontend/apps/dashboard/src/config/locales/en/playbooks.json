@@ -773,6 +773,10 @@
       "allow-reonboard": {
         "title": "Allow reonboarding",
         "description": "If the user has already onboarded onto this playbook, allow them to onboard again. Please note repeat onboardings incur normal charges. You are responsible for all charges incurred from repeat users onboarding onto your platform multiple times."
+      },
+      "skip-confirm": {
+        "title": "Skip confirmation screen",
+        "description": "When enabled, users will not see the confirmation screen during the onboarding flow."
       }
     },
     "rules": {

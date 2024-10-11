@@ -13,6 +13,7 @@ export type PasskeysProps = {
 type LocalState = {
   allowReonboard: boolean;
   promptForPasskey: boolean;
+  skipConfirm: boolean;
 };
 
 const Settings = ({ playbook }: PasskeysProps) => {
@@ -20,10 +21,11 @@ const Settings = ({ playbook }: PasskeysProps) => {
   const [localState, setLocalState] = useState<LocalState>({
     promptForPasskey: playbook.promptForPasskey,
     allowReonboard: playbook.allowReonboard,
+    skipConfirm: Boolean(playbook.skipConfirm),
   });
   const mutation = useUpdatePlaybook();
 
-  const handleToggle = (property: 'promptForPasskey' | 'allowReonboard') => () => {
+  const handleToggle = (property: keyof LocalState) => () => {
     const nextState = !localState[property];
     setLocalState({
       ...localState,
@@ -95,6 +97,21 @@ const Settings = ({ playbook }: PasskeysProps) => {
           </DescriptionContainer>
         </Stack>
       )}
+      {playbook.kind === OnboardingConfigKind.kyb ||
+        (playbook.kind === OnboardingConfigKind.kyc && (
+          <Stack direction="column">
+            <Toggle
+              label={t('skip-confirm.title')}
+              checked={localState.skipConfirm}
+              onChange={handleToggle('skipConfirm')}
+            />
+            <DescriptionContainer>
+              <Text variant="body-2" color="tertiary">
+                {t('skip-confirm.description')}
+              </Text>
+            </DescriptionContainer>
+          </Stack>
+        ))}
     </Stack>
   );
 };

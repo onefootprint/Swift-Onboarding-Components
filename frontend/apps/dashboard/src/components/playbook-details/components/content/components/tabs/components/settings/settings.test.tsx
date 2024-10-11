@@ -85,4 +85,56 @@ describe('Settings', () => {
       expect(toggle.checked).toBe(true);
     });
   });
+
+  describe('when the skip confirm is enabled', () => {
+    it('should render the switch correctly', () => {
+      renderSettings({ ...playbookWithPasskeysFixture, skipConfirm: true });
+
+      const toggle = screen.getByRole('switch', { name: 'Skip confirmation screen' }) as HTMLInputElement;
+      expect(toggle.checked).toBe(true);
+    });
+  });
+
+  describe('when the skip confirm is disabled', () => {
+    it('should render the switch correctly', () => {
+      renderSettings({ ...playbookWithPasskeysFixture, skipConfirm: false });
+
+      const toggle = screen.getByRole('switch', { name: 'Skip confirmation screen' }) as HTMLInputElement;
+      expect(toggle.checked).toBe(false);
+    });
+  });
+
+  describe('when updating the skip confirm settings', () => {
+    describe('when it fails', () => {
+      beforeEach(() => {
+        withUpdatePlaybookError({ ...playbookWithPasskeysFixture, skipConfirm: false });
+      });
+
+      it('should render the switch correctly', async () => {
+        renderSettings();
+
+        const toggle = screen.getByRole('switch', { name: 'Skip confirmation screen' }) as HTMLInputElement;
+        await userEvent.click(toggle);
+
+        await waitFor(() => {
+          expect(toggle.checked).toBe(false);
+        });
+      });
+    });
+
+    describe('when it succeeds', () => {
+      beforeEach(() => {
+        withUpdatePlaybook({ ...playbookWithPasskeysFixture, skipConfirm: false });
+      });
+
+      it('should render the switch correctly', async () => {
+        renderSettings({ ...playbookWithPasskeysFixture, skipConfirm: true });
+
+        const toggle = screen.getByRole('switch', { name: 'Skip confirmation screen' }) as HTMLInputElement;
+        await userEvent.click(toggle);
+
+        expect(toggle.checked).toBe(false);
+      });
+    });
+  });
 });
