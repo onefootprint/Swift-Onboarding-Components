@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 
+import type { IdDI } from '@onefootprint/types';
 import { FIELDSET_HEADER_HEIGHT } from '../../../../constants';
 import useDecryptForm from '../../hooks/use-decrypt-form';
 import useField from '../../hooks/use-field';
@@ -44,6 +45,13 @@ const AddressFieldset = ({
   const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
   const [streetViewDialogOpen, setStreetViewDialogOpen] = useState(false);
+
+  const addressValues: Partial<Record<IdDI, string>> = Object.fromEntries(
+    fields.map(field => [
+      field.di,
+      typeof getFieldProps(field.di).value === 'string' ? getFieldProps(field.di).value : '',
+    ]),
+  );
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -84,7 +92,7 @@ const AddressFieldset = ({
       <Stack direction="column" gap={4} padding={5} flex={1}>
         {children || fields.map(renderField)}
       </Stack>
-      <StreetViewDialog open={streetViewDialogOpen} onClose={closeStreetViewDialog} />
+      <StreetViewDialog open={streetViewDialogOpen} onClose={closeStreetViewDialog} addressValues={addressValues} />
       {footer && (
         <Footer tag="footer">
           <Divider />

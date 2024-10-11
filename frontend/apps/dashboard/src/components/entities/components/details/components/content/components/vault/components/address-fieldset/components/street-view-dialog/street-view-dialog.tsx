@@ -1,4 +1,5 @@
 import { IcoPinMarker24 } from '@onefootprint/icons';
+import { IdDI } from '@onefootprint/types';
 import { Box, Dialog, Stack, Text } from '@onefootprint/ui';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,14 +10,22 @@ import useInitializeStreetView from './utils/use-initialize-street-view';
 type StreetViewDialogProps = {
   onClose: () => void;
   open: boolean;
+  addressValues: Partial<Record<IdDI, string>>;
 };
 
-const StreetViewDialog = ({ onClose, open }: StreetViewDialogProps) => {
+const StreetViewDialog = ({ onClose, open, addressValues }: StreetViewDialogProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'fieldset.address.street-view',
   });
   const streetViewRef = useRef<HTMLDivElement>(null);
-  const address = '521 Ivy Street, San Francisco, CA 94102';
+
+  const addressLine1 = addressValues[IdDI.addressLine1] || '';
+  const addressLine2 = addressValues[IdDI.addressLine2] || '';
+  const city = addressValues[IdDI.city] || '';
+  const state = addressValues[IdDI.state] || '';
+  const zip = addressValues[IdDI.zip] || '';
+
+  const address = `${addressLine1}${addressLine2 ? ` ${addressLine2}` : ''} ${city} ${state} ${zip}`;
 
   const { isSuccess, data: coordinates } = useInitializeStreetView(address);
 
@@ -56,9 +65,11 @@ const StreetViewDialog = ({ onClose, open }: StreetViewDialogProps) => {
           >
             <IcoPinMarker24 />
             <Stack direction="column" gap={0}>
-              <Text variant="label-3">521 Ivy Street, San Francisco, CA 94102</Text>
+              <Text variant="label-3">
+                {addressLine1} {addressLine2 ? `${addressLine2}, ` : ''}
+              </Text>
               <Text variant="body-3" color="tertiary">
-                San Francisco, CA 94102
+                {city}, {state} {zip}
               </Text>
             </Stack>
           </Stack>
