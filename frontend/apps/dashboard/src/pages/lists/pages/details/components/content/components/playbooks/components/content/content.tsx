@@ -25,7 +25,7 @@ const Content = ({ list }: ContentProps) => {
     <Stack direction="column" gap={7} marginTop={3}>
       {list.playbooks?.map(playbook => (
         <Stack gap={4} direction="column" key={playbook.id}>
-          <Stack gap={3} direction="row">
+          <Stack gap={3} direction="row" alignItems="center">
             <Text variant="label-3">{playbook.name}</Text>
             <Text tag="span" variant="label-2">
               •
