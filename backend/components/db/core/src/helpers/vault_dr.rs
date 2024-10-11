@@ -11,11 +11,13 @@ use db_schema::schema::data_lifetime;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::scoped_vault_version;
 use db_schema::schema::vault_dr_blob;
+use db_schema::schema::vault_dr_config;
 use diesel::prelude::*;
 use diesel::QueryDsl;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
+use newtypes::ScopedVaultId;
 use newtypes::ScopedVaultVersionId;
 use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
@@ -39,27 +41,19 @@ pub fn get_scoped_vault_version_batch(
     // Implementation is based on GetVaultVersionBatch in
     // backend/formal_methods/vault_disaster_recovery/vdr.tla
 
-    let mut query = scoped_vault_version::table
-        .inner_join(scoped_vault::table)
-        .filter(scoped_vault_version::tenant_id.eq(tenant_id))
-        .filter(scoped_vault_version::is_live.eq(is_live))
-        // backed_up_by_vdr_config_id serves as the progress marker for the worker, indicating that
-        // all blobs/DLs and manifests/SVVs with seqnos <= this SVV have been backed up.
-        // The correctness of this filter relies on the fact that there is at most one active VDR
-        // config ID per (tenant_id, is_live) pair.
-        .filter(
-            scoped_vault_version::backed_up_by_vdr_config_id.is_null()
-                .or(scoped_vault_version::backed_up_by_vdr_config_id.ne(config_id))
-        )
-        .into_boxed();
-
-    if let Some(fp_ids) = fp_id_filter {
-        // It's valid to filter by fp_ids since the worker does not rely on any global ordering of
-        // processed SVVs, only the ordering of the subsequences of SVVs for each scoped vault.
-        // Filtering by fp_id selects SVV subsequences for the corresponding scoped vaults.
-        query = query.filter(scoped_vault::fp_id.eq_any(fp_ids));
-    }
-
+    // backed_up_by_vdr_config_id serves as the progress marker for the worker, indicating that
+    // all blobs/DLs and manifests/SVVs with seqnos <= this SVV have been backed up. The
+    // correctness of these queries relies on the fact that there is at most one active VDR
+    // config ID per (tenant_id, is_live) pair.
+    //
+    // The basic approach is to get the seqno-sorted & row-count-limited batches of two
+    // complimentary and exhaustive sets of SVVs for the current VDR config:
+    // a) SVVs for the tenant/is_live with backed_up_by_vdr_config_id == NULL
+    // b) SVVs for the tenant/is_live with a backed_up_by_vdr_config_id equal to a deactivated
+    //    config ID for the tenant_id/is_live.
+    // and then union those together, sort the combined result by seqno, and limit again to the
+    // batch size.
+    //
     // Ordering by seqno here means we process ScopedVaultVersions *for each ScopedVault* in order
     // of creation. There is no implied global ordering.
     //
@@ -71,19 +65,73 @@ pub fn get_scoped_vault_version_batch(
     // However, if a seqno is skipped due to out-of-order or delayed API commits (see
     // VaultApiInstance comment block), we still don't lose consistency in VDR. The SVV will be
     // completed in a later batch. With read-committed isolation in Postgres, we can be sure that
-    // if a SVV is skipped in one batch, there will be no greater SVV for the same vault in the
-    // same batch. This is because a SELECT sees a snapshot of the database as of the instant the
-    // query begins to run. In other words, by sorting the SVVs by seqno, we can be sure that for
-    // all vaults present in the batch, those SVVs are the minimum non-backed up SVVs for those
-    // vaults.
+    // if a SVV is skipped in one batch, there will be no SVV for the same vault with a greater
+    // seqno in the same batch. This is because a SELECT sees a snapshot of the database as of the
+    // instant the query begins to run. In other words, by sorting the SVVs by seqno, we can be
+    // sure that for all vaults present in the batch, those SVVs are the minimum non-backed up SVVs
+    // for those vaults.
+    //
+    // In summary, ordering by seqno is important to ensure we make progress, but the ordering does
+    // not affect correctness.
     //
     // Sorting by seqnos here does *NOT* imply that the batch represents the global minimum seqnos
     // for un-backed up SVVs, as inflight transactions may commit SVVs with lesser seqnos.
-    let svv_batch = query
+
+
+    // It's much faster to filter on a small set of known VDR config IDs than to filter on != the
+    // current config ID. Pre-fetch the deactivated VDR config IDs that could be present on SVVs
+    // for the current tenant/is_live.
+    //
+    // Doing this using a subquery or join is far slower than pre-fetching the configs.
+    let deactivated_vdr_config_ids: Vec<VaultDrConfigId> = vault_dr_config::table
+        .filter(vault_dr_config::tenant_id.eq(tenant_id))
+        .filter(vault_dr_config::is_live.eq(is_live))
+        .filter(vault_dr_config::deactivated_at.is_not_null())
+        .select(vault_dr_config::id)
+        .load(conn)?;
+
+    let base_batch_query = scoped_vault_version::table
+        .filter(scoped_vault_version::tenant_id.eq(tenant_id))
+        .filter(scoped_vault_version::is_live.eq(is_live))
         .select(ScopedVaultVersion::as_select())
         .order(scoped_vault_version::seqno)
-        .limit(batch_size as i64)
+        .limit(batch_size as i64);
+
+    let mut batch_vdr_config_is_null = base_batch_query
+        .filter(scoped_vault_version::backed_up_by_vdr_config_id.is_null())
+        .into_boxed();
+    let mut batch_vdr_config_is_deactivated = base_batch_query
+        .filter(scoped_vault_version::backed_up_by_vdr_config_id.eq_any(deactivated_vdr_config_ids))
+        .into_boxed();
+
+    // It's valid to filter by sv_ids/fp_ids since the worker does not rely on any global ordering of
+    // processed SVVs, only the ordering of the subsequences of SVVs for each scoped vault.
+    // Filtering by fp_id selects SVV subsequences for the corresponding scoped vaults.
+    if let Some(fp_ids) = fp_id_filter {
+        let sv_ids: Vec<ScopedVaultId> = scoped_vault::table
+            .filter(scoped_vault::fp_id.eq_any(fp_ids))
+            .select(scoped_vault::id)
+            .load(conn)?;
+
+        batch_vdr_config_is_null =
+            batch_vdr_config_is_null.filter(scoped_vault_version::scoped_vault_id.eq_any(sv_ids.clone()));
+        batch_vdr_config_is_deactivated =
+            batch_vdr_config_is_deactivated.filter(scoped_vault_version::scoped_vault_id.eq_any(sv_ids));
+    }
+
+    // Until https://github.com/diesel-rs/diesel/pull/4245 is merged, we can't order and limit on
+    // the union directly, so we have to do it client side. The union has at most 2 * batch_size
+    // rows and in practice only batch_size rows, since batch_vdr_config_is_deactivated will
+    // usually be empty except for right after re-enrolling.
+    let combined_batches = batch_vdr_config_is_null
+        .union(batch_vdr_config_is_deactivated)
         .load(conn)?;
+
+    let svv_batch = combined_batches
+        .into_iter()
+        .sorted_by_key(|svv| svv.seqno)
+        .take(batch_size)
+        .collect();
 
     Ok(svv_batch)
 }
