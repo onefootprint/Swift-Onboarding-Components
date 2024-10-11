@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
-import Details from './pages/details/components/content/components/playbooks';
+import Details from './pages/details';
 
 const ListDetails = () => {
   const { t } = useTranslation('lists', { keyPrefix: 'details' });
