@@ -3,11 +3,11 @@ import Image from 'next/image';
 import styled, { css } from 'styled-components';
 
 type AuthorProps = {
-  avatarUrl: string;
   name: string;
+  avatarUrl: string;
 };
 
-const Author = ({ avatarUrl, name }: AuthorProps) => (
+const Author = ({ name, avatarUrl }: AuthorProps) => (
   <Stack direction="row" alignItems="center" gap={4}>
     {avatarUrl && (
       <AuthorImg>

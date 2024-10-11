@@ -4,6 +4,9 @@ import { Box, Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import Author from './components/author';
+import DateRow from './components/date-row';
+import HtmlContent from './components/html-content';
 import useChangelogArticles from './hooks/use-changelog-articles';
 import type { PostDetails } from './whats-new.types';
 
@@ -24,22 +27,12 @@ const WhatsNew = ({ open, onClose }: WhatsNewProps) => {
             <PostContent key={post.uuid}>
               <PostImage src={post.featureImage} alt={post.title} width={800} height={800} />
               <TextContainer direction="column" justifyContent="space-between" alignItems="start" gap={3}>
-                <Stack direction="row" justifyContent="space-between" width="100%">
-                  <Text variant="label-2" color="tertiary">
-                    {post.publishedAt}
-                  </Text>
-                  <LinkButton
-                    variant="label-2"
-                    iconComponent={IcoArrowUpRight16}
-                    href={`${FRONTPAGE_BASE_URL}/changelog/${post.slug}`}
-                  >
-                    {t('whats-new.more-details')}
-                  </LinkButton>
+                <Stack direction="column" gap={4} width="100%" marginBottom={5}>
+                  <DateRow publishedAt={post.publishedAt} slug={post.slug} />
+                  <Text variant="heading-2">{post.title}</Text>
+                  <Author name={post.primaryAuthor.name} avatarUrl={post.primaryAuthor.profileImage} />
                 </Stack>
-                <Text variant="label-1">{post.title}</Text>
-                <Text variant="body-2" color="secondary">
-                  {post.excerpt}
-                </Text>
+                <HtmlContent html={post.html} />
               </TextContainer>
             </PostContent>
           ))}

@@ -9,7 +9,7 @@ const getChangelogArticles = async () => {
   const { data } = await request<{ posts: PostDetails[] }>(
     {
       baseURL: GHOST_API_URL,
-      url: `/ghost/api/v3/content/posts/?key=${GHOST_CONTENT_API_KEY}&include=tags`,
+      url: `/ghost/api/v3/content/posts/?key=${GHOST_CONTENT_API_KEY}&include=tags,authors`,
       method: 'GET',
       withCredentials: false,
     },

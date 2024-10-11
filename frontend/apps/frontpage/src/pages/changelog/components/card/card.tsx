@@ -54,7 +54,7 @@ const Card = ({ post, hideLine }: CardProps) => {
             contentToCopy={`${BASE_URL}/${post.slug}`}
           />
         </Stack>
-        <Author authorImg={post.primary_author.profile_image} authorName={post.primary_author.name} />
+        <Author avatarUrl={post.primary_author.profile_image} name={post.primary_author.name} />
         {post.html && <HtmlContent html={post.html} />}
       </TextContent>
     </PostContainer>

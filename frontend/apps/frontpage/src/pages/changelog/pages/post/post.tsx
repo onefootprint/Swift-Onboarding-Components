@@ -52,7 +52,7 @@ const PostPage = ({ post }: PostProps) => {
               {formattedDate}
             </Text>
             <Text variant="display-3">{post.title}</Text>
-            <Author authorName={post.primary_author.name} authorImg={post.primary_author.profile_image} />
+            <Author name={post.primary_author.name} avatarUrl={post.primary_author.profile_image} />
           </Stack>
           {post.html && <HtmlContent html={post.html} />}
         </PostContainer>
