@@ -1,7 +1,7 @@
 import { IcoArrowTopRight16 } from '@onefootprint/icons';
 import { type DuplicateDataItem, IdDI } from '@onefootprint/types';
 import { CodeInline, LinkButton, Stack, Text } from '@onefootprint/ui';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
 type DuplicateUserProps = {
@@ -43,7 +43,7 @@ const DuplicateUser = ({ dupe }: DuplicateUserProps) => {
           <Text variant="body-3" color="tertiary">
             {t('created-at')}
           </Text>
-          <Text variant="label-3">{dayjs(dupe.startTimestamp).format('MM/DD/YY, h:mma').toLowerCase()}</Text>
+          <Text variant="label-3">{format(dupe.startTimestamp, 'MM/dd/yy, h:mma').toLowerCase()}</Text>
         </Stack>
       </Stack>
       <LinkButton iconPosition="right" iconComponent={IcoArrowTopRight16} href={`/users/${dupe.fpId}`}>
