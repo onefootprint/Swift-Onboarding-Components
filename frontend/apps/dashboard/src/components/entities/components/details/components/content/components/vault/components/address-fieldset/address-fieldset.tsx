@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 
+import { IcoInfo16 } from '@onefootprint/icons';
 import type { IdDI } from '@onefootprint/types';
 import { FIELDSET_HEADER_HEIGHT } from '../../../../constants';
 import useDecryptForm from '../../hooks/use-decrypt-form';
@@ -74,6 +75,27 @@ const AddressFieldset = ({
     );
   };
 
+  const renderStreetViewToggle = () => {
+    const validAddressValues = Object.values(addressValues).filter(value => !!value);
+    const hasDecryptedFullAddress = validAddressValues.length >= 5;
+
+    if (hasDecryptedFullAddress) {
+      return (
+        <LinkButton onClick={() => setStreetViewDialogOpen(true)}>
+          {t('address.street-view.see-street-view')}
+        </LinkButton>
+      );
+    }
+    return (
+      <Stack direction="row" gap={1} alignItems="center">
+        <IcoInfo16 color="tertiary" />
+        <Text variant="body-3" color="tertiary">
+          {t('address.street-view.decrypt-data')}
+        </Text>
+      </Stack>
+    );
+  };
+
   return (
     <Container aria-label={title} data-primary-background={isViewingHistorical}>
       <Header data-primary-background={isViewingHistorical}>
@@ -89,8 +111,11 @@ const AddressFieldset = ({
           </LinkButton>
         )}
       </Header>
-      <Stack direction="column" gap={4} padding={5} flex={1}>
-        {children || fields.map(renderField)}
+      <Stack direction="column" gap={7} padding={5} flex={1}>
+        <Stack direction="column" gap={4}>
+          {children || fields.map(renderField)}
+        </Stack>
+        {renderStreetViewToggle()}
       </Stack>
       <StreetViewDialog open={streetViewDialogOpen} onClose={closeStreetViewDialog} addressValues={addressValues} />
       {footer && (

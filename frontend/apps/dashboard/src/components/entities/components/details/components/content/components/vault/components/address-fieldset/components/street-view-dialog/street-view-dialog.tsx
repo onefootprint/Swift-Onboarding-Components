@@ -43,7 +43,7 @@ const StreetViewDialog = ({ onClose, open, addressValues }: StreetViewDialogProp
     if (isSuccess && streetViewRef.current) {
       displayStreetView({ coordinates });
     }
-  }, [isSuccess, coordinates]);
+  }, [isSuccess, coordinates, addressValues]);
 
   return (
     <Dialog open={open} onClose={onClose} title={t('title')} size="full-screen" noPadding>

@@ -479,7 +479,9 @@
     },
     "address": {
       "street-view": {
-        "title": "Street View"
+        "title": "Street View",
+        "see-street-view": "See Street View",
+        "decrypt-data": "Decrypt data to see Street View"
       }
     }
   },
