@@ -30,7 +30,7 @@ const StyledCommandPrimitiveItem = styled(CommandPrimitive.Item)`
       background-color: ${theme.backgroundColor.secondary};
     }
 
-    &[aria-disabled='true'] {
+    &[data-disabled='true'] {
       pointer-events: none;
       color: ${theme.color.quaternary};
       cursor: not-allowed;

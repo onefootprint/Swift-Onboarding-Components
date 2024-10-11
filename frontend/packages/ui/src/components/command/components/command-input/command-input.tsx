@@ -31,9 +31,11 @@ const CommandInput = ({ value, onValueChange, onErase }: CommandInputProps) => {
     <InputContainer>
       <IcoSearch16 color="tertiary" />
       <StyledInput ref={inputRef} value={value} onValueChange={onValueChange} />
-      <IconButton aria-label={t('erase-search')} onClick={handleErase} size="compact">
-        <IcoCloseSmall16 color="tertiary" />
-      </IconButton>
+      {value && (
+        <IconButton aria-label={t('erase-search')} onClick={handleErase} size="compact">
+          <IcoCloseSmall16 color="tertiary" />
+        </IconButton>
+      )}
     </InputContainer>
   );
 };
@@ -56,6 +58,7 @@ const StyledInput = styled(Command.Input)`
     color: ${theme.color.primary};
     width: 100%;
     height: 100%;
+    min-height: 28px;
     flex: 1;
     &::placeholder {
       color: ${theme.color.tertiary};

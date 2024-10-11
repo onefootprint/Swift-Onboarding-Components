@@ -1,11 +1,12 @@
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
-import { type DataIdentifier, EntityKind, EntityStatus, IdDI, ReviewStatus } from '@onefootprint/types';
+import { type DataIdentifier, EntityKind, EntityStatus, IdDI, ReviewStatus, RoleScopeKind } from '@onefootprint/types';
 import { Command } from '@onefootprint/ui';
 import { parseInt as lodashParseInt } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 
+import usePermissions from 'src/hooks/use-permissions';
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
 import EditVaultDrawer from '../edit-vault-drawer';
@@ -30,8 +31,7 @@ type Action = {
   value: string;
   onSelect: () => void;
   closeAfterSelect: boolean;
-  disabled?: boolean;
-  disabledText?: string;
+  disabled: boolean;
 };
 
 type ActionGroup = {
@@ -45,6 +45,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const { data: entityData } = useCurrentEntity();
   const decryptControls = useDecryptControls();
   const { kind } = useEntityContext();
+  const { hasPermission } = usePermissions();
   const canDecrypt = !!entity.decryptableAttributes.length;
 
   const [open, setOpen] = useState(false);
@@ -78,7 +79,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
     setOpenDialog(CmdKDialog.requestMoreInfo);
   };
 
-  const handleOnSelect = (onSelect: () => void, closeAfterSelect: boolean | undefined) => () => {
+  const handleOnSelect = (onSelect: () => void, closeAfterSelect: boolean) => () => {
     if (onSelect) {
       onSelect();
     }
@@ -138,6 +139,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'failed',
           onSelect: handleOpenFailDialog,
           closeAfterSelect: true,
+          disabled: !hasPermission(RoleScopeKind.manualReview),
         },
         {
           label:
@@ -151,6 +153,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'verified',
           onSelect: handleOpenPassDialog,
           closeAfterSelect: true,
+          disabled: !hasPermission(RoleScopeKind.manualReview),
         },
       ],
     },
@@ -163,14 +166,14 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'edit',
           onSelect: handleOpenEditVaultDrawer,
           closeAfterSelect: true,
+          disabled: !hasPermission(RoleScopeKind.writeEntities),
         },
         {
           label: t('components.cmdk.actions.request'),
           value: 'request',
           onSelect: handleOpenRequestMoreInfoDialog,
           closeAfterSelect: true,
-          disabled: !hasContactInfo,
-          disabledText: t('components.cmdk.disabled'),
+          disabled: !hasPermission(RoleScopeKind.manualReview) || !hasContactInfo,
         },
       ],
     },
@@ -184,7 +187,6 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           onSelect: decryptControls.start,
           closeAfterSelect: true,
           disabled: !canDecrypt,
-          disabledText: t('components.cmdk.missing-permissions'),
         },
         {
           label: t('components.cmdk.decrypt.decrypt-all'),
@@ -192,11 +194,12 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           onSelect: () => decryptControls.submitAllFields(),
           closeAfterSelect: true,
           disabled: !canDecrypt,
-          disabledText: t('components.cmdk.missing-permissions'),
         },
       ],
     },
   ];
+
+  const visibleActions = actions.filter(group => group.actions.some(action => !action.disabled));
 
   return (
     <>
@@ -207,20 +210,18 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
       <Command.Container open={open} onOpenChange={setOpen}>
         <Command.Input value={search} onValueChange={setSearch} onErase={resetSearch} />
         <Command.List>
-          <Command.Empty>{t('components.cmdk.no-results')}</Command.Empty>
-          {actions.map(({ title, actions }) => (
+          <Command.Empty>
+            {visibleActions.length > 0 ? t('components.cmdk.no-results') : t('components.cmdk.no-permissions')}
+          </Command.Empty>
+          {visibleActions.map(({ title, actions }) => (
             <Command.Group key={title} heading={title}>
-              {actions.map(({ label, value, onSelect, closeAfterSelect, disabled, disabledText }) => (
-                <Command.Item
-                  key={value}
-                  value={value}
-                  onSelect={handleOnSelect(onSelect, closeAfterSelect)}
-                  disabled={disabled}
-                >
-                  {label}
-                  {disabled && <span>{disabledText}</span>}
-                </Command.Item>
-              ))}
+              {actions
+                .filter(action => !action.disabled)
+                .map(({ label, value, onSelect, closeAfterSelect }) => (
+                  <Command.Item key={value} value={value} onSelect={handleOnSelect(onSelect, closeAfterSelect)}>
+                    {label}
+                  </Command.Item>
+                ))}
             </Command.Group>
           ))}
         </Command.List>
