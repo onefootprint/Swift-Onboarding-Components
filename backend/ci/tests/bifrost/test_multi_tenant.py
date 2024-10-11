@@ -155,7 +155,12 @@ def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
     """
     phone_number = dual_onboarded_user.user.client.data["id.phone_number"]
     email = dual_onboarded_user.user.client.data["id.email"]
-    for search_query in [phone_number, email]:
+
+    first_name = dual_onboarded_user.user.client.data["id.first_name"]
+    last_name = dual_onboarded_user.user.client.data["id.last_name"]
+    full_name = f"{first_name} {last_name}"
+
+    for search_query in [phone_number, email, full_name]:
         data = dict(search=search_query, external_id=dual_onboarded_user.external_id)
         # Both tenants should be able to find the user based on the search query
 

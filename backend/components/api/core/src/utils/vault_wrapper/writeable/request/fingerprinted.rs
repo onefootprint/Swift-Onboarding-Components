@@ -174,7 +174,7 @@ impl FingerprintedDataRequest {
         Ok((addl_fingerprints, salt_to_dl_id))
     }
 
-    fn generate_composite_fingerprints(
+    pub fn generate_composite_fingerprints(
         salt_to_fp: &HashMap<FingerprintSalt, Fingerprint>,
         existing_dis: &[DataIdentifier],
         new_dis: &[&DataIdentifier],

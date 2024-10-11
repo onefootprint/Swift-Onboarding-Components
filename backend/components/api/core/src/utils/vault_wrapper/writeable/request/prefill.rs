@@ -4,6 +4,7 @@ use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
@@ -187,7 +188,25 @@ impl<Type> VaultWrapper<Type> {
             .enclave_client
             .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
             .await?;
-        let fingerprints = Fingerprints::new(fingerprints, vec![], HashMap::new());
+
+        //
+        // Compute the composite fingerprints for all data that we're going to prefill
+        //
+        let salt_to_fp = fingerprints.iter().cloned().collect();
+        let new_dis = data.iter().map(|vd| &vd.kind).collect_vec();
+
+        let (composite_fingerprints, addl_dis) = FingerprintedDataRequest::generate_composite_fingerprints(
+            &salt_to_fp,
+            &[],
+            &new_dis,
+            &pb.tenant_id,
+        )?;
+
+        if !addl_dis.is_empty() {
+            tracing::error!(dis=%Csv::from(addl_dis.keys().cloned().collect_vec()), "Got derived DIs when prefilling data, but this is unimplemented");
+        }
+
+        let fingerprints = Fingerprints::new(fingerprints, composite_fingerprints, HashMap::new());
 
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
         // data that we will be prefilling.
