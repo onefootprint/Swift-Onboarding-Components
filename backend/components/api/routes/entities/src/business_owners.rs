@@ -43,14 +43,7 @@ pub async fn get(
 
     let results = decrypted_bos
         .into_iter()
-        .sorted_by_key(|bo| {
-            (
-                bo.kind,
-                bo.ownership_stake,
-                bo.first_name.as_ref().map(|n| n.leak_to_string()),
-                bo.last_name.as_ref().map(|n| n.leak_to_string()),
-            )
-        })
+        .sorted_by_key(|bo| (bo.bo.kind, bo.bo.ownership_stake, bo.bo.link_id.clone()))
         .map(api_wire_types::PrivateBusinessOwner::from_db)
         .collect();
     Ok(results)

@@ -7,11 +7,11 @@ use db::models::scoped_vault::ScopedVault;
 impl DbToApi<BusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner {
     fn from_db(bo: BusinessOwnerInfo) -> Self {
         Self {
-            status: bo.scoped_user.as_ref().map(|su| su.status),
-            id: bo.scoped_user.map(|su| su.fp_id),
-            ownership_stake: bo.ownership_stake,
-            kind: bo.kind,
-            source: bo.linked_bo.map(|bo| bo.source),
+            status: bo.su.as_ref().map(|su| su.status),
+            id: bo.su.map(|su| su.fp_id),
+            ownership_stake: bo.bo.ownership_stake.map(|i| i as u32),
+            kind: bo.bo.kind,
+            source: bo.bo.source,
         }
     }
 }

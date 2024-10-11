@@ -242,14 +242,12 @@ impl<Type> WriteableVw<Type> {
         let extra_data = secondary_kyced_bos
             .into_iter()
             .flat_map(|bo| {
-                let bo_di =
-                    |di| DataIdentifier::Business(BDK::BeneficialOwnerData(bo.link_id.clone(), Box::new(di)));
+                let bo_di = |di| BDK::bo_data(bo.link_id.clone(), di).into();
                 vec![
-                    bo.phone_number
-                        .map(|p| (bo_di(IDK::PhoneNumber.into()), p.e164())),
-                    bo.email.map(|p| (bo_di(IDK::Email.into()), p.email)),
-                    Some((bo_di(IDK::FirstName.into()), bo.first_name)),
-                    Some((bo_di(IDK::LastName.into()), bo.last_name)),
+                    bo.phone_number.map(|p| (bo_di(IDK::PhoneNumber), p.e164())),
+                    bo.email.map(|p| (bo_di(IDK::Email), p.email)),
+                    Some((bo_di(IDK::FirstName), bo.first_name)),
+                    Some((bo_di(IDK::LastName), bo.last_name)),
                 ]
             })
             .flatten()

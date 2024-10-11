@@ -330,6 +330,7 @@ impl<Type> TenantVw<Type> {
                 let sv = ScopedVault::get(conn, sv_id)?;
                 let bos = BusinessOwner::list_all(conn, &self.vault.id, &sv.tenant_id)?;
                 let has_linked_bos = bos.iter().any(|(bo, _)| bo.source == BusinessOwnerSource::Tenant);
+                // TODO stop allowing vaulting this DI at all
                 let request_has_vaulted_bos = request.contains_key(&BDK::BeneficialOwners.into());
                 if has_linked_bos && request_has_vaulted_bos {
                     // We shouldn't allow BOs to be vaulted when the tenant has already linked BOs

@@ -1,24 +1,19 @@
 use super::super::Business;
 use super::super::VaultWrapper;
-use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
+use api_errors::AssertionError;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::DbError;
 use itertools::Itertools;
-use newtypes::email::Email;
 use newtypes::BusinessDataKind as BDK;
-use newtypes::BusinessOwnerData;
-use newtypes::BusinessOwnerKind;
-use newtypes::DataIdentifier;
+use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::KycedBusinessOwnerData;
-use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -29,7 +24,7 @@ impl<Type> VaultWrapper<Type> {
         T: FromStr,
         FpError: From<<T as FromStr>::Err>,
     {
-        let di = DataIdentifier::from(idk);
+        let di = DI::from(idk);
         if !self.has_field(&di) {
             return Ok(None);
         };
@@ -50,20 +45,29 @@ impl<Type> VaultWrapper<Type> {
 
 #[derive(Debug, Clone)]
 pub struct BusinessOwnerInfo {
-    pub first_name: Option<PiiString>,
-    pub last_name: Option<PiiString>,
-    /// Only populated for BOs in `business.kyced_beneficial_owners`
-    pub phone_number: Option<PhoneNumber>,
-    /// Only populated for BOs in `business.kyced_beneficial_owners`
-    pub email: Option<Email>,
-    /// Only populated for vaulted BOs
-    pub ownership_stake: Option<u32>,
-    /// Only populated for linked BOs
-    pub linked_bo: Option<BusinessOwner>,
-    pub scoped_user: Option<ScopedVault>,
-    /// True if the user came from kyced_beneficial_owners
-    pub from_kyced_beneficial_owners: bool,
-    pub kind: BusinessOwnerKind,
+    pub bo: BusinessOwner,
+    /// Only populated for users who have started onboarding their beneficial owner.
+    /// When populated, all vault data comes from the linked scoped_user's vault.
+    pub su: Option<ScopedVault>,
+    /// Data for the provided beneficial owner. Includes at most id.phone_number, id.email,
+    /// id.first_name, and id.last_name. Accessed only through util methods
+    data: HashMap<DI, PiiString>,
+}
+
+impl BusinessOwnerInfo {
+    pub fn name(mut self) -> Option<(PiiString, PiiString)> {
+        let first_name = self.data.remove(&IDK::FirstName.into());
+        let last_name = self.data.remove(&IDK::LastName.into());
+        first_name.zip(last_name)
+    }
+
+    pub fn email(&self) -> Option<&PiiString> {
+        self.data.get(&IDK::Email.into())
+    }
+
+    pub fn phone_number(&self) -> Option<&PiiString> {
+        self.data.get(&IDK::PhoneNumber.into())
+    }
 }
 
 impl TenantVw<Business> {
@@ -91,123 +95,60 @@ impl TenantVw<Business> {
             })
             .await?;
 
-        let dis = &[BDK::BeneficialOwners.into(), BDK::KycedBeneficialOwners.into()];
-        let mut decrypted = self.decrypt_unchecked(&state.enclave_client, dis).await?;
-
-        let results = if let Some(kyced_bos) = decrypted.remove(&BDK::KycedBeneficialOwners.into()) {
-            // Bifrost-initiated flow. There should be a linked_bo for each vault_bo
-            let kyced_bos: Vec<KycedBusinessOwnerData> = kyced_bos.deserialize()?;
-            kyced_bos
-                .into_iter()
-                .map(|vault_bo| -> FpResult<_> {
-                    let linked_bo = linked_bos
-                        .iter()
-                        .find(|bo| bo.0.link_id == vault_bo.link_id)
-                        .cloned()
-                        .ok_or(BusinessError::LinkedBoNotFound)?;
-                    Ok((vault_bo, linked_bo))
-                })
-                .map_ok(|(vault_bo, (linked_bo, linked_bo_data))| BusinessOwnerInfo {
-                    // Vaulted BO fields
-                    first_name: Some(vault_bo.first_name),
-                    last_name: Some(vault_bo.last_name),
-                    phone_number: vault_bo.phone_number,
-                    email: vault_bo.email,
-                    ownership_stake: Some(vault_bo.ownership_stake),
-                    // Linked BO fields
-                    kind: linked_bo.kind,
-                    linked_bo: Some(linked_bo),
-                    scoped_user: linked_bo_data.map(|(su, _)| su),
-                    from_kyced_beneficial_owners: true,
-                })
-                .collect::<FpResult<Vec<_>>>()?
-        } else if let Some(vault_bos) = decrypted.remove(&BDK::BeneficialOwners.into()) {
-            // We should stop hitting this branch because every backfilled user will have
-            // KycedBeneficialOwners
-            tracing::info!(
-                "Decrypting business.beneficial_owners instead of business.kyced_beneficial_owners"
-            );
-
-            // Either bifrost-initiated flow or API-initiated flow. There will be at most one linked BO (for
-            // bifrost)
-            let vault_bos: Vec<BusinessOwnerData> = vault_bos.deserialize()?;
-            // There should only be one linked BO maximum, the primary.
-            // Some backfilled users here will have secondary BOs too, but we can ignore reading those
-            let (primary_bo, primary_bo_data) = linked_bos
-                .into_iter()
-                .find(|(bo, _)| bo.kind == BusinessOwnerKind::Primary)
-                .unzip();
-            let primary_sv = primary_bo_data.flatten().map(|d| d.0);
-
-            vault_bos
-                .into_iter()
-                .enumerate()
-                .map(|(i, vault_bo)| {
-                    let (kind, linked_bo, scoped_user) = if i == 0 {
-                        (BusinessOwnerKind::Primary, primary_bo.clone(), primary_sv.clone())
-                    } else {
-                        (BusinessOwnerKind::Secondary, None, None)
-                    };
-                    (kind, linked_bo, scoped_user, vault_bo)
-                })
-                .map(|(kind, linked_bo, scoped_user, vault_bo)| BusinessOwnerInfo {
-                    first_name: Some(vault_bo.first_name),
-                    last_name: Some(vault_bo.last_name),
-                    phone_number: None,
-                    email: None,
-                    ownership_stake: Some(vault_bo.ownership_stake),
-                    // Implicitly, the first user in the vaulted BOs is the one linked to the business
-                    linked_bo,
-                    scoped_user,
-                    from_kyced_beneficial_owners: false,
-                    kind,
-                })
-                .collect_vec()
-        } else {
-            // API-initiated flow with BOs linked via API, or bifrost-initiated flow with only primary BO
-            // before the full list of BOs has been collected
-            linked_bos
-                .into_iter()
-                .map(|(bo, bd)| BusinessOwnerInfo {
-                    first_name: None,
-                    last_name: None,
-                    phone_number: None,
-                    email: None,
-                    ownership_stake: bo.ownership_stake.map(|p| p as u32),
-                    kind: bo.kind,
-                    linked_bo: Some(bo),
-                    scoped_user: bd.map(|(su, _)| su),
-                    // For now, we never allow initiating KYB via API on a playbook that requires KYCing BOs.
-                    from_kyced_beneficial_owners: false,
-                })
-                .collect_vec()
+        let user_dis = || {
+            [
+                IDK::FirstName.into(),
+                IDK::LastName.into(),
+                IDK::PhoneNumber.into(),
+                IDK::Email.into(),
+            ]
         };
 
-        // Augment the results with the decrypted name from the linked vault, if exist.
-        let decrypt_futs = vws.into_values().map(|vw| async move {
-            let dis = &[IDK::FirstName.into(), IDK::LastName.into()];
-            let mut res = vw.decrypt_unchecked(&state.enclave_client, dis).await?;
-            let first_name = res.remove(&IDK::FirstName.into());
-            let last_name = res.remove(&IDK::LastName.into());
-            Ok::<_, FpError>((vw.scoped_vault.id, (first_name, last_name)))
+        let decrypt_futs = vws.into_iter().map(|(sv_id, vw)| async move {
+            let decrypted = vw.decrypt_unchecked(&state.enclave_client, &user_dis()).await?;
+            let results = (decrypted.results)
+                .into_iter()
+                .map(|(k, v)| (k.identifier, v))
+                .collect::<HashMap<_, _>>();
+            Ok::<_, FpError>((sv_id, results))
         });
-        // Future optimization would be to bulk decrypt multiple vaults data in one enclave call
-        let bo_names = futures::future::join_all(decrypt_futs)
+        let mut user_data = futures::future::join_all(decrypt_futs)
             .await
             .into_iter()
             .collect::<FpResult<HashMap<_, _>>>()?;
-        let results = results
-            .into_iter()
-            .map(|mut bo| {
-                let su = bo.scoped_user.as_ref();
-                if let Some((first_name, last_name)) = su.and_then(|su| bo_names.get(&su.id).cloned()) {
-                    bo.first_name = first_name.or(bo.first_name);
-                    bo.last_name = last_name.or(bo.last_name);
-                }
-                bo
-            })
-            .collect_vec();
 
-        Ok(results)
+        let dis = linked_bos
+            .iter()
+            .flat_map(|(bo, _)| user_dis().map(|idk| BDK::bo_data(bo.link_id.clone(), idk).into()))
+            .collect_vec();
+        let biz_data = self.decrypt_unchecked(&state.enclave_client, &dis).await?;
+
+
+        // For each beneficial owner, zip with the vault data either from the user vault or the business
+        // vault
+        let bos = linked_bos
+            .into_iter()
+            .map(|(bo, linked_user)| -> FpResult<_> {
+                let (su, _) = linked_user.unzip();
+                let data = if let Some(su) = su.as_ref() {
+                    // There is a linked user, so all data should come from the vault directly
+                    user_data.remove(&su.id).ok_or(AssertionError("Missing data"))?
+                } else {
+                    // There is no linked user, so we fall back to read the vault data on the business vault
+                    biz_data
+                        .iter()
+                        .filter_map(|(op, v)| {
+                            let DI::Business(BDK::BeneficialOwnerData(bo_l_id, di)) = &op.identifier else {
+                                return None;
+                            };
+                            (bo_l_id == &bo.link_id).then_some(((**di).clone(), v.clone()))
+                        })
+                        .collect()
+                };
+                Ok(BusinessOwnerInfo { data, bo, su })
+            })
+            .collect::<FpResult<Vec<_>>>()?;
+
+        Ok(bos)
     }
 }

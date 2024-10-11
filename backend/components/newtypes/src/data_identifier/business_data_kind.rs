@@ -94,6 +94,10 @@ impl BusinessDataKind {
             .filter(|i| !matches!(i, Self::BeneficialOwners | Self::KycedBeneficialOwners))
             .collect()
     }
+
+    pub fn bo_data(link_id: BoLinkId, di: impl Into<DataIdentifier>) -> Self {
+        Self::BeneficialOwnerData(link_id, Box::new(di.into()))
+    }
 }
 
 impl TryFrom<BusinessDataKindDiscriminant> for BusinessDataKind {
@@ -137,7 +141,7 @@ impl std::str::FromStr for BusinessDataKind {
             let di = parts.join(".");
             let link_id = BoLinkId::from_str(link_id).map_err(|_| strum::ParseError::VariantNotFound)?;
             let di = DataIdentifier::from_str(&di).map_err(|_| strum::ParseError::VariantNotFound)?;
-            return Ok(Self::BeneficialOwnerData(link_id, Box::new(di)));
+            return Ok(Self::bo_data(link_id, di));
         }
 
         if let Ok(bdk) = BusinessDataKindDiscriminant::from_str(s).and_then(Self::try_from) {

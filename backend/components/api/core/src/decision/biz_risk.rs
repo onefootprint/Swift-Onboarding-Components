@@ -9,8 +9,6 @@ use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::workflow::Workflow;
-use itertools::Itertools;
-use newtypes::BusinessOwnerKind;
 use newtypes::OnboardingStatus;
 use newtypes::WorkflowId;
 
@@ -38,22 +36,12 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOn
     }
 
     let dbos = bvw.decrypt_business_owners(state).await?;
-    let dbos_expecting_kyc = dbos
-        .iter()
-        .filter(|bo| {
-            // We always KYC BOs from KycedBeneficialOwners.
-            // And otherwise, we always KYC the primary BO if created via bifrost.
-            bo.from_kyced_beneficial_owners
-                || (bo.kind == BusinessOwnerKind::Primary && bo.linked_bo.is_some())
-        })
-        .collect_vec();
 
-    let result = dbos_expecting_kyc
+    let result = dbos
         .iter()
         .map(|bo| -> Result<_, &'static str> {
-            let bo = (bo.linked_bo.as_ref()).ok_or("Beneficial owner doesn't have a linked user")?;
             let (wf, obd) =
-                (user_decisions.remove(&bo.id)).ok_or("Beneficial owner hasn't started onboarding")?;
+                (user_decisions.remove(&bo.bo.id)).ok_or("Beneficial owner hasn't started onboarding")?;
             let obd = obd.ok_or("Beneficial owner hasn't finished onboarding")?;
             if !OnboardingStatus::from(obd.status).is_terminal() {
                 // This is only for verrrrry legacy OBDs that could have an OBD in status `step_up`
@@ -66,7 +54,7 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOn
         Ok(user_decisions) => user_decisions,
         Err(err) => return Ok(BoOnboardingResult::NotReady(ValidationError(err).into())),
     };
-    if user_decisions.len() != dbos_expecting_kyc.len() {
+    if user_decisions.len() != dbos.len() {
         return AssertionError("Number of user decisions does not match number of BOs").into();
     }
     Ok(BoOnboardingResult::Ready(user_decisions))

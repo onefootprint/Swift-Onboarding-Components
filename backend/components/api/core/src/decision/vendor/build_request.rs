@@ -231,11 +231,9 @@ pub async fn build_business_data_from_verification_request(
         .await?
         .into_iter()
         .filter_map(|bo| {
-            bo.first_name.and_then(|first_name| {
-                bo.last_name.map(|last_name| BoData {
-                    first_name,
-                    last_name,
-                })
+            bo.name().map(|(first_name, last_name)| BoData {
+                first_name,
+                last_name,
             })
         })
         .collect();

@@ -46,10 +46,13 @@ pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiL
 
     let results = tokens
         .into_iter()
-        .map(|(bo_data, token)| BoToken {
-            token,
-            first_name: bo_data.first_name.clone(),
-            last_name: bo_data.last_name.clone(),
+        .map(|(bo_data, token)| {
+            let (first_name, last_name) = bo_data.clone().name().unzip();
+            BoToken {
+                token,
+                first_name,
+                last_name,
+            }
         })
         .collect();
     Ok(results)

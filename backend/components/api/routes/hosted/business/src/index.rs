@@ -37,31 +37,26 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     let dbos = bvw.decrypt_business_owners(&state).await?;
     let primary_bo = dbos
         .iter()
-        .find(|bo| bo.kind == BusinessOwnerKind::Primary)
+        .find(|bo| bo.bo.kind == BusinessOwnerKind::Primary)
         .ok_or(BusinessError::PrimaryBoNotFound)?
         .clone();
     let invited_bo = dbos
         .into_iter()
-        .find(|b| {
-            b.linked_bo
-                .as_ref()
-                .is_some_and(|b| b.link_id == bo_auth.bo.link_id)
-        })
+        .find(|b| b.bo.link_id == bo_auth.bo.link_id)
         .ok_or(BusinessError::LinkedBoNotFound)?;
 
+    let (first_name, last_name) = primary_bo.name().ok_or(ValidationError("No name"))?;
     let inviter = Inviter {
-        first_name: primary_bo.first_name.ok_or(ValidationError("No phone"))?,
-        last_name: primary_bo.last_name.ok_or(ValidationError("No email"))?,
+        first_name,
+        last_name,
     };
     let invited = Invited {
-        email: invited_bo
-            .email
+        email: (invited_bo.email())
             .ok_or(ValidationError("Invited no email"))?
-            .into(),
-        phone_number: invited_bo
-            .phone_number
+            .clone(),
+        phone_number: (invited_bo.phone_number())
             .ok_or(ValidationError("Invited no phone"))?
-            .e164(),
+            .clone(),
     };
 
     let business_name = bvw

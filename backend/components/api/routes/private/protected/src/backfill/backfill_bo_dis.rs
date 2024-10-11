@@ -173,7 +173,7 @@ fn backfill_dl(conn: &mut TxnPgConn, dl: DataLifetime, v: Vault, kyced_bos: PiiS
         .iter()
         .flat_map(|bo| {
             [IDK::FirstName, IDK::LastName, IDK::PhoneNumber, IDK::Email]
-                .map(|idk| DI::Business(BDK::BeneficialOwnerData(bo.link_id.clone(), Box::new(idk.into()))))
+                .map(|idk| DI::Business(BDK::bo_data(bo.link_id.clone(), idk)))
         })
         .collect_vec();
     let backfilled_dls = data_lifetime::table
@@ -194,13 +194,12 @@ fn backfill_dl(conn: &mut TxnPgConn, dl: DataLifetime, v: Vault, kyced_bos: PiiS
     let extra_data = vault_secondary_bos
         .into_iter()
         .flat_map(|bo| {
-            let bo_di = |di| DI::Business(BDK::BeneficialOwnerData(bo.link_id.clone(), Box::new(di)));
+            let bo_di = |di| DI::Business(BDK::bo_data(bo.link_id.clone(), di));
             vec![
-                bo.phone_number
-                    .map(|p| (bo_di(IDK::PhoneNumber.into()), p.e164())),
-                bo.email.map(|p| (bo_di(IDK::Email.into()), p.email)),
-                Some((bo_di(IDK::FirstName.into()), bo.first_name)),
-                Some((bo_di(IDK::LastName.into()), bo.last_name)),
+                bo.phone_number.map(|p| (bo_di(IDK::PhoneNumber), p.e164())),
+                bo.email.map(|p| (bo_di(IDK::Email), p.email)),
+                Some((bo_di(IDK::FirstName), bo.first_name)),
+                Some((bo_di(IDK::LastName), bo.last_name)),
             ]
         })
         .flatten()

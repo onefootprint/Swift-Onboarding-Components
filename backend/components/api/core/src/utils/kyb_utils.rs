@@ -24,6 +24,7 @@ use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::KybState;
+use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
 use newtypes::WorkflowKind;
@@ -37,9 +38,8 @@ pub async fn generate_secondary_bo_links<'a>(
 ) -> FpResult<Vec<(&'a BusinessOwnerInfo, SessionAuthToken)>> {
     let missing_kyc_secondary_bos = dbos
         .iter()
-        .filter(|bo| bo.kind == BusinessOwnerKind::Secondary)
-        .filter(|bo| bo.from_kyced_beneficial_owners)
-        .filter(|bo| bo.scoped_user.is_none())
+        .filter(|bo| bo.bo.kind == BusinessOwnerKind::Secondary)
+        .filter(|bo| bo.su.is_none())
         .collect_vec();
     if missing_kyc_secondary_bos.is_empty() {
         return Ok(vec![]);
@@ -52,14 +52,13 @@ pub async fn generate_secondary_bo_links<'a>(
     let sealing_key = state.session_sealing_key.clone();
     let sessions_to_make = missing_kyc_secondary_bos
         .iter()
-        .flat_map(|bo| bo.linked_bo.as_ref())
         .map(|bo| {
             let session_data = BoSession {
-                bo_id: bo.id.clone(),
+                bo_id: bo.bo.id.clone(),
                 ob_config_id: biz_wf.ob_configuration_id.clone(),
                 biz_wf_id: Some(biz_wf.id.clone()),
             };
-            (bo.link_id.clone(), session_data)
+            (bo.bo.link_id.clone(), session_data)
         })
         .collect_vec();
     let tokens: Vec<_> = state
@@ -76,7 +75,7 @@ pub async fn generate_secondary_bo_links<'a>(
         .map(|(l_id, token)| {
             missing_kyc_secondary_bos
                 .iter()
-                .find(|bo| bo.linked_bo.as_ref().is_some_and(|bo| bo.link_id == l_id))
+                .find(|bo| bo.bo.link_id == l_id)
                 .ok_or(BusinessError::LinkedBoNotFound)
                 .map(|bo_data| (*bo_data, token))
         })
@@ -97,11 +96,10 @@ pub async fn send_missing_secondary_bo_links(
     // Generate a link for each business owner
     let primary_bo = dbos
         .iter()
-        .find(|bo| bo.kind == BusinessOwnerKind::Primary)
+        .find(|bo| bo.bo.kind == BusinessOwnerKind::Primary)
         .ok_or(BusinessError::PrimaryBoNotFound)?
         .clone();
-    let first_name = primary_bo.first_name.ok_or(ValidationError("No first name"))?;
-    let last_name = primary_bo.last_name.ok_or(ValidationError("No last name"))?;
+    let (first_name, last_name) = primary_bo.name().ok_or(ValidationError("No name"))?;
     let inviter = PiiString::new(format!("{} {}", first_name.leak(), last_name.leak()));
     let business_name = bvw
         .get_p_data(&BDK::Name.into())
@@ -120,14 +118,12 @@ pub async fn send_missing_secondary_bo_links(
                 tenant_name: tenant.name.clone(),
                 url: url.clone(),
             };
-            let phone_number = bo_data
-                .phone_number
-                .as_ref()
-                .ok_or(ValidationError("BO has no phone"))?;
-            let email = bo_data.email.as_ref().ok_or(ValidationError("BO has no email"))?;
-            let sms = (sms_message, phone_number.clone());
+            let phone_number = bo_data.phone_number().ok_or(ValidationError("BO has no phone"))?;
+            let phone_number = PhoneNumber::parse(phone_number.clone())?;
+            let email = bo_data.email().ok_or(ValidationError("BO has no email"))?;
+            let sms = (sms_message, phone_number);
             let email = BoInviteEmailInfo {
-                to_email: email.to_piistring(),
+                to_email: email.clone(),
                 inviter: &inviter,
                 business_name: &business_name,
                 org_name: &tenant.name,
