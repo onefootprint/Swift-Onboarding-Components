@@ -3,3 +3,5 @@ states/
 *.old
 *.out
 *.bin
+.vscode/
+*.jar
