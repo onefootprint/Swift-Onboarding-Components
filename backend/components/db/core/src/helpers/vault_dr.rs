@@ -355,7 +355,7 @@ mod tests {
     use newtypes::IdentityDataKind;
     use newtypes::ScopedVaultVersionNumber;
 
-    #[derive(Debug, derive_more::Constructor)]
+    #[derive(Debug, Clone, derive_more::Constructor)]
     struct ExpectedBatchSizes {
         expected_num_svvs: usize,
         expected_num_dls: usize,
@@ -376,21 +376,6 @@ mod tests {
             aws_external_id: crypto::random::gen_rand_bytes(16).encode_hex::<String>().into(),
         };
         let ape = VaultDrAwsPreEnrollment::get_or_create(conn, new_ape).unwrap();
-
-        let new_vdr_config = NewVaultDrConfig {
-            created_at: Utc::now(),
-            tenant_id: &tenant_id,
-            is_live,
-            aws_pre_enrollment_id: &ape.id,
-            aws_account_id: "12345678".to_owned(),
-            aws_role_name: "my-role".to_owned(),
-            s3_bucket_name: "my-bucket".to_owned(),
-            recovery_public_key: "pub-key".to_owned(),
-            wrapped_recovery_key: "wrapped-recovery-key".to_owned(),
-            org_public_keys: vec!["org-pub-key".to_owned()],
-            bucket_path_namespace: "the-namespace".to_owned(),
-        };
-        let vdr_config = VaultDrConfig::create(conn, new_vdr_config).unwrap();
 
         let mut dls = vec![];
         for _ in 0..=5 {
@@ -501,106 +486,133 @@ mod tests {
             unique_seqnos.len(),
         );
 
-        let mut expected_svvns = (1..=(unique_seqnos.len() as i64)).map(ScopedVaultVersionNumber::from);
-        let mut expected_svv_seqnos = unique_seqnos.into_iter();
-        let mut dl_created_seqnos = dls.iter().map(|dl| dl.created_seqno);
+        let mut last_vdr_config = None;
+        for enrollment_num in 0..=2 {
+            // Test for the first enrollment as well as re-enrollments.
 
-        for (i, expected_batch_sizes) in expected_batch_sizes_each_run.into_iter().enumerate() {
-            let ExpectedBatchSizes {
-                expected_num_svvs,
-                expected_num_dls,
-                expected_num_complete_svvs,
-            } = expected_batch_sizes;
-
-
-            let got_svv_batch = get_scoped_vault_version_batch(
-                conn,
-                &tenant_id,
-                is_live,
-                &vdr_config.id,
-                manifest_batch_size,
-                Some(vec![sv1.fp_id.clone()]),
-            )
-            .unwrap();
-            assert_eq!(
-                got_svv_batch.len(),
-                expected_num_svvs,
-                "Run {}: SVV batch size",
-                i
-            );
-
-            let got_dls = get_dl_batch_for_svv_batch(
-                conn,
-                &tenant_id,
-                is_live,
-                &vdr_config.id,
-                &got_svv_batch,
-                blob_batch_size,
-            )
-            .unwrap();
-            assert_eq!(got_dls.len(), expected_num_dls, "Run {}: DL batch size", i);
-
-            // We can't predict the DL IDs in the batch, since DLs created at the same
-            // seqno may not all be contained in the same batch. However, we can check
-            // that the seqnos in the batch match the expected seqnos, and we can check that all
-            // DL IDs in the batch correspond with the expected seqnos.
-            let expected_seqnos = (&mut dl_created_seqnos).take(expected_num_dls).collect_vec();
-            assert_have_same_elements(
-                got_dls.iter().map(|dl| dl.created_seqno).collect_vec(),
-                expected_seqnos.clone(),
-            );
-
-            let candidate_dl_ids_for_seqnos = dls
-                .iter()
-                .filter(|dl| expected_seqnos.contains(&dl.created_seqno))
-                .map(|dl| dl.id.clone())
-                .collect_vec();
-            for dl in got_dls.iter() {
-                assert!(candidate_dl_ids_for_seqnos.contains(&dl.id));
+            if let Some(last_vdr_config) = last_vdr_config.take() {
+                VaultDrConfig::deactivate(conn, last_vdr_config).unwrap();
             }
 
-            write_fake_blobs(conn, &vdr_config.id, got_dls);
+            let new_vdr_config = NewVaultDrConfig {
+                created_at: Utc::now(),
+                tenant_id: &tenant_id,
+                is_live,
+                aws_pre_enrollment_id: &ape.id,
+                aws_account_id: "12345678".to_owned(),
+                aws_role_name: "my-role".to_owned(),
+                s3_bucket_name: "my-bucket".to_owned(),
+                recovery_public_key: "pub-key".to_owned(),
+                wrapped_recovery_key: "wrapped-recovery-key".to_owned(),
+                org_public_keys: vec!["org-pub-key".to_owned()],
+                bucket_path_namespace: format!("the-namespace-{}", enrollment_num),
+            };
+            let vdr_config = VaultDrConfig::create(conn, new_vdr_config).unwrap();
+            println!("VDR enrollment {}: {:?}", enrollment_num, vdr_config.id);
+
+            let mut expected_svvns = (1..=(unique_seqnos.len() as i64)).map(ScopedVaultVersionNumber::from);
+            let mut expected_svv_seqnos = unique_seqnos.iter().copied();
+            let mut dl_created_seqnos = dls.iter().map(|dl| dl.created_seqno);
+
+            for (i, expected_batch_sizes) in expected_batch_sizes_each_run.clone().into_iter().enumerate() {
+                let ExpectedBatchSizes {
+                    expected_num_svvs,
+                    expected_num_dls,
+                    expected_num_complete_svvs,
+                } = expected_batch_sizes;
 
 
-            let got_complete_svvs =
-                get_complete_svvs_for_svv_batch(conn, &vdr_config.id, &got_svv_batch).unwrap();
-            assert_eq!(
-                got_complete_svvs.len(),
-                expected_num_complete_svvs,
-                "Run {}: complete SVV batch size",
-                i
-            );
+                let got_svv_batch = get_scoped_vault_version_batch(
+                    conn,
+                    &tenant_id,
+                    is_live,
+                    &vdr_config.id,
+                    manifest_batch_size,
+                    Some(vec![sv1.fp_id.clone()]),
+                )
+                .unwrap();
+                assert_eq!(
+                    got_svv_batch.len(),
+                    expected_num_svvs,
+                    "Run {}: SVV batch size",
+                    i
+                );
 
-            let expected_svvns = (&mut expected_svvns)
-                .take(expected_num_complete_svvs)
-                .collect_vec();
-            assert_have_same_elements(
-                got_complete_svvs.iter().map(|svv| svv.version).collect_vec(),
-                expected_svvns,
-            );
+                let got_dls = get_dl_batch_for_svv_batch(
+                    conn,
+                    &tenant_id,
+                    is_live,
+                    &vdr_config.id,
+                    &got_svv_batch,
+                    blob_batch_size,
+                )
+                .unwrap();
+                assert_eq!(got_dls.len(), expected_num_dls, "Run {}: DL batch size", i);
 
-            let expected_seqnos = (&mut expected_svv_seqnos)
-                .take(expected_num_complete_svvs)
-                .collect_vec();
-            assert_have_same_elements(
-                got_complete_svvs.iter().map(|svv| svv.seqno).collect_vec(),
-                expected_seqnos,
-            );
+                // We can't predict the DL IDs in the batch, since DLs created at the same
+                // seqno may not all be contained in the same batch. However, we can check
+                // that the seqnos in the batch match the expected seqnos, and we can check that all
+                // DL IDs in the batch correspond with the expected seqnos.
+                let expected_seqnos = (&mut dl_created_seqnos).take(expected_num_dls).collect_vec();
+                assert_have_same_elements(
+                    got_dls.iter().map(|dl| dl.created_seqno).collect_vec(),
+                    expected_seqnos.clone(),
+                );
 
-            let batch_svv_ids = got_svv_batch.iter().map(|svv| svv.id.clone()).collect_vec();
-            let complete_svv_ids = got_complete_svvs.iter().map(|svv| svv.id.clone()).collect_vec();
-            assert!(
-                complete_svv_ids.iter().all(|id| batch_svv_ids.contains(id)),
-                "Run {}: complete SVVs are a subset of the SVV batch",
-                i
-            );
+                let candidate_dl_ids_for_seqnos = dls
+                    .iter()
+                    .filter(|dl| expected_seqnos.contains(&dl.created_seqno))
+                    .map(|dl| dl.id.clone())
+                    .collect_vec();
+                for dl in got_dls.iter() {
+                    assert!(candidate_dl_ids_for_seqnos.contains(&dl.id));
+                }
 
-            ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id(
-                conn,
-                &complete_svv_ids,
-                &vdr_config.id,
-            )
-            .unwrap();
+                write_fake_blobs(conn, &vdr_config.id, got_dls);
+
+
+                let got_complete_svvs =
+                    get_complete_svvs_for_svv_batch(conn, &vdr_config.id, &got_svv_batch).unwrap();
+                assert_eq!(
+                    got_complete_svvs.len(),
+                    expected_num_complete_svvs,
+                    "Run {}: complete SVV batch size",
+                    i
+                );
+
+                let expected_svvns = (&mut expected_svvns)
+                    .take(expected_num_complete_svvs)
+                    .collect_vec();
+                assert_have_same_elements(
+                    got_complete_svvs.iter().map(|svv| svv.version).collect_vec(),
+                    expected_svvns,
+                );
+
+                let expected_seqnos = (&mut expected_svv_seqnos)
+                    .take(expected_num_complete_svvs)
+                    .collect_vec();
+                assert_have_same_elements(
+                    got_complete_svvs.iter().map(|svv| svv.seqno).collect_vec(),
+                    expected_seqnos,
+                );
+
+                let batch_svv_ids = got_svv_batch.iter().map(|svv| svv.id.clone()).collect_vec();
+                let complete_svv_ids = got_complete_svvs.iter().map(|svv| svv.id.clone()).collect_vec();
+                assert!(
+                    complete_svv_ids.iter().all(|id| batch_svv_ids.contains(id)),
+                    "Run {}: complete SVVs are a subset of the SVV batch",
+                    i
+                );
+
+                ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id(
+                    conn,
+                    &complete_svv_ids,
+                    &vdr_config.id,
+                )
+                .unwrap();
+            }
+
+            last_vdr_config = Some(vdr_config);
         }
     }
 
