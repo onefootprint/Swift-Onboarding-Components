@@ -100,21 +100,11 @@ impl ObConfigurationArgsToValidate {
         }
 
         let is_collecting_doc = self.collects_document();
-
         if self.is_doc_first {
+            // We need to collect a document for doc_first playbooks
             if !is_collecting_doc {
                 return Err(TenantError::ValidationError(
                     "Must collect document if is_doc_first is true".to_owned(),
-                )
-                .into());
-            }
-
-            // it would be really difficult to support the doc-first flow (for now)
-            // since we won’t know what document kinds/countries to restrict to until we have the residential
-            // address
-            if self.allow_international_residents {
-                return Err(TenantError::ValidationError(
-                    "Cannot have is_doc_first and allow_international_residents".to_owned(),
                 )
                 .into());
             }
@@ -252,7 +242,6 @@ impl ObConfigurationArgsToValidate {
         }
 
         DocumentRequestConfig::validate(&self.documents_to_collect)?;
-
         Ok(())
     }
 

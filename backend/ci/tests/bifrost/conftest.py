@@ -16,5 +16,9 @@ def doc_first_obc(sandbox_tenant):
             "ssn9",
         ],
         can_access_data=["phone_number", "full_address", "name", "email"],
+        document_types_and_countries={
+            "global": [],
+            "country_specific": {"US": ["drivers_license"]},
+        },
         is_doc_first_flow=True,
     )

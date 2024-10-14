@@ -61,6 +61,7 @@ use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ScrubbedPiiString;
+use newtypes::TenantId;
 use newtypes::ValidateArgs;
 use newtypes::VendorAPI;
 use newtypes::VendorValidatedCountryCode;
@@ -104,10 +105,6 @@ pub(super) async fn compute_ocr_data<'a>(
     } = args;
     let validate_args = ValidateArgs::for_bifrost(obc.is_live);
 
-    let barcode_read_successfully = rs
-        .iter()
-        .any(|r| r.0 == FootprintReasonCode::DocumentBarcodeCouldBeRead);
-
     let data = ParsedIncodeFields::from_fetch_ocr_res(r)
         .0
         .into_iter()
@@ -117,25 +114,41 @@ pub(super) async fn compute_ocr_data<'a>(
             (di, v)
         })
         .collect_vec();
+
     // For doc-first onboardings, populate identity data
     let id_data = if obc.is_doc_first {
-        if barcode_read_successfully {
+        if can_fill_doc_first_id_data(dk, rs, &obc.tenant_id) {
             doc_first_id_data(r, validate_args)
                 .into_iter()
                 // Don't add OCR data to the vault that already exists
                 .filter(|(k, _)| !vw.has_field(k))
                 .collect()
         } else {
-            tracing::warn!("Skipping prefilling IDK data from doc because !barcode_read_successfully");
+            tracing::warn!("Skipping prefilling IDK data from doc because !can_fill_doc_first_id_data");
             vec![]
         }
     } else {
         vec![]
     };
+
     let data = HashMap::from_iter(data.into_iter().chain(id_data));
     let data = DataRequest::clean_and_validate(data, validate_args)?;
     let data = FingerprintedDataRequest::build(state, data, sv_id).await?;
+
     Ok(data)
+}
+
+fn can_fill_doc_first_id_data(dk: ValidatedIdDocKind, rs: &[NewRiskSignal], tenant_id: &TenantId) -> bool {
+    let id_doc_kind = dk.into_inner();
+
+    if matches!(id_doc_kind, IdDocKind::DriversLicense) && tenant_id.is_flexcar() {
+        // Flexcar has specific downstream logic so we only want to prefill if we have high confidence in
+        // the extracted data
+        rs.iter()
+            .any(|r| r.0 == FootprintReasonCode::DocumentBarcodeCouldBeRead)
+    } else {
+        true
+    }
 }
 
 fn doc_first_id_data(

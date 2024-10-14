@@ -765,6 +765,41 @@ def test_config_create(sandbox_tenant):
             ),
             None,
         ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "email",
+                    "dob",
+                    "ssn9",
+                    "phone_number",
+                    "full_address",
+                ],
+                kind="kyc",
+                optional_data=[],
+                can_access_data=[],
+                is_doc_first_flow=True,
+            ),
+            "Validation error: Must collect document if is_doc_first is true",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "email",
+                    "dob",
+                    "ssn9",
+                    "phone_number",
+                    "full_address",
+                    "document",
+                ],
+                kind="kyc",
+                optional_data=[],
+                can_access_data=[],
+                is_doc_first_flow=True,
+            ),
+            None,
+        ),
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):

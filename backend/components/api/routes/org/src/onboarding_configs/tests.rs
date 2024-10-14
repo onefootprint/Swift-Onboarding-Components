@@ -105,42 +105,6 @@ fn test_is_no_phone_flow(
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
-#[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], false => true)]
-#[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], true => false)]
-#[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], vec![], false => false)]
-fn test_is_doc_first(
-    must_collect_data: Vec<CDO>,
-    can_access_data: Vec<CDO>,
-    allow_international: bool,
-) -> bool {
-    let args = NewObConfigurationArgs {
-        name: "Flerp".to_owned(),
-        tenant_id: TenantId::test_data("flerp".into()),
-        is_live: true,
-        author: DbActor::Footprint,
-        must_collect_data,
-        optional_data: vec![],
-        can_access_data,
-        cip_kind: None,
-        is_no_phone_flow: false,
-        is_doc_first: true,
-        allow_international_residents: allow_international,
-        international_country_restrictions: None,
-        doc_scan_for_optional_ssn: None,
-        allow_us_residents: true,
-        allow_us_territory_residents: false,
-        kind: ObConfigurationKind::Kyc,
-        skip_confirm: false,
-        document_types_and_countries: None,
-        documents_to_collect: vec![],
-        business_documents_to_collect: vec![],
-        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
-        required_auth_methods: None,
-        prompt_for_passkey: true,
-        allow_reonboard: false,
-    };
-    ObConfigurationArgsToValidate(args).validate_inner().is_ok()
-}
 
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], true => true)]
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], false => true)]

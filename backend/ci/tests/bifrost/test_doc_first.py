@@ -1,10 +1,44 @@
-from tests.utils import get, patch
-from tests.utils import get_requirement_from_requirements
+import pytest
+from tests.utils import get, patch, get_requirement_from_requirements, create_ob_config
 from tests.bifrost_client import BifrostClient
 
 
-def test_doc_first(sandbox_tenant, doc_first_obc):
-    bifrost = BifrostClient.new_user(doc_first_obc)
+@pytest.mark.parametrize(
+    "documents_and_countries",
+    [
+        {
+            "global": [],
+            "country_specific": {"US": ["drivers_license"]},
+        },
+        {
+            "global": [],
+            "country_specific": {"MX": ["voter_identification"]},
+        },
+        {
+            "global": [],
+            "country_specific": {
+                "US": ["drivers_license", "voter_identification", "passport"]
+            },
+        },
+    ],
+)
+def test_doc_first(sandbox_tenant, documents_and_countries):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "KYC with document first",
+        must_collect_data=[
+            "phone_number",
+            "full_address",
+            "name",
+            "email",
+            "document",
+            "ssn9",
+        ],
+        can_access_data=["phone_number", "full_address", "name", "email"],
+        document_types_and_countries=documents_and_countries,
+        is_doc_first_flow=True,
+    )
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
 
     # These should be ordered
