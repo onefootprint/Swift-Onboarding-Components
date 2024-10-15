@@ -183,6 +183,12 @@ fn doc_first_id_data(
             (None, None)
         };
 
+    let address_line2 = if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::VoterIdentification) {
+        address.and_then(|a| a.colony.as_ref())
+    } else {
+        None
+    };
+
     let all_data = vec![
         (
             IDK::FirstName,
@@ -197,6 +203,7 @@ fn doc_first_id_data(
             parsed_names.last_name.map(ScrubbedPiiString::from).as_ref(),
         ),
         (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
+        (IDK::AddressLine2, address_line2),
         (IDK::City, address.and_then(|n| n.city.as_ref())),
         (IDK::State, state.as_ref()),
         (IDK::Zip, zip5.as_ref()),
