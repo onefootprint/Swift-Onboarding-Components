@@ -26,6 +26,7 @@ tokio = { workspace = true }
 serde = { workspace = true }
 futures = { workspace = true }
 paperclip = { workspace = true }
+diesel = { workspace = true }
 
 strum = { workspace = true }
 aws-config = { workspace = true }

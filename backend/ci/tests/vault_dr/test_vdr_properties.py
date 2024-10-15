@@ -44,7 +44,7 @@ states.
 """
 
 
-def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
+def new_vdr_state_machine(tenant, cfg, tmp_path_factory, enable_backfill=False):
     def fast_footprint_dr(*args, **kwargs):
         # Attempts to avoid extraneous validation calls.
         # Also passes the API key directly to avoid using the keychain.
@@ -54,10 +54,15 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
             f"--namespace={cfg.namespace}",
             api_key=tenant.l_sk.value,
             skip_client_checks=True,
+            # Debug is a little noisy for these tests.
+            log_level="info",
             **kwargs,
         )
 
-    num_fp_ids = 2
+    num_fp_ids_initialized_with_data = 1
+    num_fp_ids_initialized_without_data = 1
+    num_fp_ids = num_fp_ids_initialized_with_data + num_fp_ids_initialized_without_data
+
     num_pii_values = 2
     num_dis = 2
 
@@ -65,57 +70,84 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
     all_pii = [f"pii_🐧_{i}" for i in range(num_pii_values)]
     all_dis = [f"custom.field_{i}" for i in range(num_dis)]
 
+    STATE_INIT = "STATE_INIT"
+    STATE_UPDATE = "STATE_UPDATE"
+    STATE_DELETE = "STATE_DELETE"
+    STATE_RUN_VDR_BATCH = "STATE_RUN_VDR_BATCH"
+    STATE_DB_BACKFILL = "STATE_DB_BACKFILL"
+
     # Add @reproduce_failure decorator here, if needed.
     class VdrStateMachine(RuleBasedStateMachine):
         all_fp_ids = Bundle("all_fp_ids")
+        fp_ids_with_data = Bundle("fp_ids_with_data")
 
-        @initialize(target=all_fp_ids)
-        def init(self):
+        def __init__(self):
+            super().__init__()
+
             # Maps fp_id -> version -> di -> value
             self.expected_vault_data: dict[str, dict[int, dict[str, str]]] = {}
 
-            self.last_state_is_vdr_run_batch = False
+            self.last_state = STATE_INIT
+            self.has_run_vdr_batch = False
 
+        @initialize(target=all_fp_ids)
+        def init_fp_ids_without_data(self):
             fp_ids = []
-            for i in range(num_fp_ids):
-                create_with_data = i == 0
-
-                initial_data = {}
-                if create_with_data:
-                    initial_data = {
-                        "custom.some_field": all_pii[0],
-                        all_dis[0]: "def456",
-                    }
-
-                resp = post_raw(
-                    "users",
-                    initial_data,
-                    tenant.sk.key,
-                )
-                fp_id = resp.json()["id"]
+            for i in range(num_fp_ids_initialized_without_data):
+                fp_id = self.new_fp_id(False)
                 fp_ids.append(fp_id)
-
-                initial_version = int(resp.headers["x-fp-vault-version"])
-                assert initial_version == (1 if create_with_data else 0)
-                if initial_version == 0:
-                    # Don't store empty version 0. This makes assertions a bit simpler.
-                    self.expected_vault_data[fp_id] = {}
-                else:
-                    self.expected_vault_data[fp_id] = {
-                        initial_version: initial_data,
-                    }
-
-            note(f"Initial vault data: {self.expected_vault_data}")
 
             return multiple(*fp_ids)
 
+        @initialize(targets=(all_fp_ids, fp_ids_with_data))
+        def init_fp_ids_with_data(self):
+            fp_ids = []
+            for i in range(num_fp_ids_initialized_with_data):
+                fp_id = self.new_fp_id(True)
+                fp_ids.append(fp_id)
+
+            return multiple(*fp_ids)
+
+        def new_fp_id(self, init_with_data):
+            initial_data = {}
+            if init_with_data:
+                initial_data = {
+                    "custom.some_field": all_pii[0],
+                    all_dis[0]: "def456",
+                }
+
+            resp = post_raw(
+                "users",
+                initial_data,
+                tenant.sk.key,
+            )
+            fp_id = resp.json()["id"]
+
+            initial_version = int(resp.headers["x-fp-vault-version"])
+
+            assert initial_version == (1 if init_with_data else 0)
+            if initial_version == 0:
+                # Don't store empty version 0. This makes assertions a bit simpler.
+                self.expected_vault_data[fp_id] = {}
+            else:
+                self.expected_vault_data[fp_id] = {
+                    initial_version: initial_data,
+                }
+
+            note(f"Initial data for {fp_id}: {initial_data}")
+
+            return fp_id
+
         @rule(
             fp_id=all_fp_ids,
+            target=fp_ids_with_data,
             data=st.dictionaries(
                 st.sampled_from(all_dis), st.sampled_from(all_pii), min_size=1
             ),
         )
         def update(self, fp_id, data):
+            self.last_state = STATE_UPDATE
+
             note(f"Updating {fp_id} with {data}")
 
             resp = patch_raw(
@@ -124,6 +156,10 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
                 tenant.sk.key,
             )
             new_version = int(resp.headers["x-fp-vault-version"])
+
+            new_fp_ids_with_data = []
+            if new_version == 1:
+                new_fp_ids_with_data.append(fp_id)
 
             old_data = (
                 self.expected_vault_data[fp_id][new_version - 1]
@@ -134,12 +170,13 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
             self.expected_vault_data[fp_id][new_version] = new_data
 
             note(f"Post-update vault data: {self.expected_vault_data}")
-            self.last_state_is_vdr_run_batch = False
 
-        @rule(fp_id=all_fp_ids, data=st.data())
+            return multiple(*new_fp_ids_with_data)
+
+        @rule(fp_id=fp_ids_with_data, data=st.data())
         def delete(self, fp_id, data):
-            # Filter out deletes on vaults with no writes.
-            assume(len(self.expected_vault_data[fp_id]) > 0)
+            self.last_state = STATE_DELETE
+
             existing_version = max(self.expected_vault_data[fp_id].keys())
             existing_dis = sorted(
                 self.expected_vault_data[fp_id][existing_version].keys()
@@ -168,7 +205,20 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
             self.expected_vault_data[fp_id][new_version] = new_data
 
             note(f"Post-delete vault data: {self.expected_vault_data}")
-            self.last_state_is_vdr_run_batch = False
+
+        @rule(fp_id=fp_ids_with_data)
+        @precondition(lambda self: enable_backfill and self.has_run_vdr_batch)
+        def db_backfill(self, fp_id):
+            self.last_state = STATE_DB_BACKFILL
+
+            # Delete an arbitrary vault_dr_blob and mark impacted scoped vault
+            # versions as not backed up. Simulates a DB backfill that results in
+            # VDR needing to backfill.
+            post(
+                f"private/vault_dr/test_backfill",
+                [fp_id],
+                CUSTODIAN_AUTH,
+            )
 
         def num_scoped_vault_versions(self):
             return sum(
@@ -183,7 +233,7 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
         def fp_ids(self):
             return list(self.expected_vault_data.keys())
 
-        def run_vdr_run_batch(self, manifest_batch_size, blob_batch_size):
+        def vdr_run_batch(self, manifest_batch_size, blob_batch_size):
             req = {
                 "tenant_id": tenant.id,
                 "is_live": True,
@@ -200,23 +250,29 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
                 CUSTODIAN_AUTH,
             )
             note(f"Batch result: {resp}")
-            assert resp["num_manifests"] > 0
+            return resp
 
         @rule()
-        @precondition(lambda self: not self.last_state_is_vdr_run_batch)
-        def run_complete_vdr_run_batch(self):
+        @precondition(
+            lambda self: self.last_state not in (STATE_INIT, STATE_RUN_VDR_BATCH)
+        )
+        def run_vdr_batch(self):
+            self.last_state = STATE_RUN_VDR_BATCH
+
             manifest_batch_size = self.num_scoped_vault_versions()
             assume(manifest_batch_size > 0)
 
             blob_batch_size = self.max_num_blobs()
             assume(blob_batch_size > 0)
 
-            self.run_vdr_run_batch(manifest_batch_size, blob_batch_size)
-            self.last_state_is_vdr_run_batch = True
+            resp = self.vdr_run_batch(manifest_batch_size, blob_batch_size)
+            assert resp["num_manifests"] > 0
+
+            self.has_run_vdr_batch = True
 
         @invariant()
-        @precondition(lambda self: self.last_state_is_vdr_run_batch)
-        def vdr_matches_ground_truth(self):
+        @precondition(lambda self: self.last_state == STATE_RUN_VDR_BATCH)
+        def check_vdr_matches_ground_truth(self):
             # list-vaults is not super interesting for this test since it has
             # relaxed consistency guarantees compared to listing records and
             # decrypting data. Also, it requires a lot of S3 calls for
@@ -293,6 +349,14 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
 
             validate_decrypted_data(output_dir, self.expected_vault_data)
 
+        def teardown(self):
+            # Ensure we finish with a VDR batch run & check.
+            if self.last_state not in (STATE_INIT, STATE_RUN_VDR_BATCH):
+                manifest_batch_size = self.num_scoped_vault_versions()
+                blob_batch_size = self.max_num_blobs()
+                self.vdr_run_batch(manifest_batch_size, blob_batch_size)
+                self.check_vdr_matches_ground_truth()
+
     return VdrStateMachine
 
 
@@ -303,13 +367,18 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory):
 )
 def test_vdr_properties(tenant_and_live_vdr_cfg, tmp_path_factory):
     tenant, cfg = tenant_and_live_vdr_cfg
-    state = new_vdr_state_machine(tenant, cfg, tmp_path_factory)
+    state_machine = new_vdr_state_machine(
+        tenant, cfg, tmp_path_factory, enable_backfill=True
+    )
 
     run_state_machine_as_test(
-        state,
+        state_machine,
         settings=settings(
-            max_examples=100,
-            stateful_step_count=6,  # Max search depth
+            max_examples=200,
+            # Max search depth.
+            # Note that both @initialize and @rule count toward this limit.
+            stateful_step_count=10,
+            deadline=timedelta(seconds=5),
             print_blob=True,
         ),
     )

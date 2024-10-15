@@ -369,6 +369,7 @@ jobs:
           filters: |
             src:
               - 'backend/**/vault_dr.*'
+              - 'backend/**/*vault_dr*'
               - 'backend/**/vault_dr/**'
               - 'backend/**/footprint-dr/**'
       - uses: ./.github/actions/backend_run_local

@@ -14,7 +14,9 @@ from tests.constants import VDR_AGE_KEYS
 EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
 
 
-def footprint_dr(*args, api_root=None, api_key=None, skip_client_checks=False):
+def footprint_dr(
+    *args, api_root=None, api_key=None, skip_client_checks=False, log_level="DEBUG"
+):
     api_root = api_root or os.environ["TEST_URL"]
 
     return pexpect.spawn(
@@ -24,7 +26,7 @@ def footprint_dr(*args, api_root=None, api_key=None, skip_client_checks=False):
         logfile=sys.stdout.buffer,
         env=os.environ
         | {
-            "LOG_LEVEL": "debug",
+            "LOG_LEVEL": log_level,
             "FOOTPRINT_API_ROOT": api_root,
             "AWS_PROFILE": "localstack",
         }

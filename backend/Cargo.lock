@@ -1411,6 +1411,7 @@ dependencies = [
  "chrono",
  "crypto",
  "db",
+ "diesel",
  "feature_flag",
  "futures",
  "itertools",
