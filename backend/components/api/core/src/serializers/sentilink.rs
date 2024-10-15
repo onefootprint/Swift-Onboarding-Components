@@ -1,6 +1,7 @@
 use crate::utils::db2api::DbToApi;
 use idv::sentilink::application_risk::response::ReasonCode as IdvSentilinkReasonCode;
 use idv::sentilink::application_risk::response::Score;
+use itertools::Itertools;
 use newtypes::SentilinkHumanReadableScoreReasonCode;
 
 
@@ -11,6 +12,7 @@ impl DbToApi<Score> for api_wire_types::SentilinkScoreDetail {
             reason_codes: s
                 .reason_codes
                 .into_iter()
+                .sorted_by_key(|r| r.rank)
                 .map(api_wire_types::SentilinkReasonCode::from_db)
                 .collect(),
         }
