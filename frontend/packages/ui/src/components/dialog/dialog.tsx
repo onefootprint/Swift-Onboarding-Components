@@ -75,19 +75,19 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
                 size={size}
               >
                 <DialogHeader title={title} onClose={onClose} icon={headerIcon} />
-                {noScroll ? (
-                  <Box overflow="auto" flex="1">
-                    {children}
-                  </Box>
-                ) : (
-                  <ScrollArea
-                    padding={noPadding ? 0 : 7}
-                    hideTopLine
-                    hideBottomLine={size === 'full-screen' || !hasFooter}
-                  >
-                    {children}
-                  </ScrollArea>
-                )}
+                <Box overflow="auto" flex="1">
+                  {noScroll ? (
+                    children
+                  ) : (
+                    <ScrollArea
+                      padding={noPadding ? 0 : 7}
+                      hideTopLine
+                      hideBottomLine={size === 'full-screen' || !hasFooter}
+                    >
+                      {children}
+                    </ScrollArea>
+                  )}
+                </Box>
                 {hasFooter && (
                   <Footer
                     primaryButton={primaryButton}
