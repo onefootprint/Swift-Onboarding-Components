@@ -1,4 +1,7 @@
+use crate::auth::tenant::TenantAuth;
 use crate::auth::user::CheckUserWfAuthContext;
+use crate::auth::CanDecrypt;
+use crate::auth::IsGuardMet;
 use crate::utils::db2api::DbToApi;
 use crate::utils::vault_wrapper::BusinessOwnerInfo;
 use db::models::business_owner::BusinessOwner;
@@ -6,15 +9,27 @@ use db::models::business_owner::UserData;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::PiiString;
 
-impl DbToApi<BusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner {
-    fn from_db(bo: BusinessOwnerInfo) -> Self {
+impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_types::PrivateBusinessOwner {
+    fn from_db((bo, auth): (BusinessOwnerInfo, &'a Box<dyn TenantAuth>)) -> Self {
+        let can_see_name = CanDecrypt::new(vec![IDK::FirstName, IDK::LastName]).is_met(&auth.scopes());
+        let name = can_see_name.then_some(bo.clone().name()).flatten();
+        let name = name.map(|(first_name, last_name)| {
+            PiiString::from(format!(
+                "{} {}.",
+                first_name.leak(),
+                last_name.leak().chars().take(1).collect::<String>()
+            ))
+        });
         Self {
             status: bo.su.as_ref().map(|su| su.status),
-            id: bo.su.map(|su| su.fp_id),
+            id: bo.su.as_ref().map(|su| su.fp_id.clone()),
+            fp_id: bo.su.map(|su| su.fp_id),
             ownership_stake: bo.bo.ownership_stake.map(|i| i as u32),
             kind: bo.bo.kind,
             source: bo.bo.source,
+            name,
         }
     }
 }

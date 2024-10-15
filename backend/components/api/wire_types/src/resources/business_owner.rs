@@ -5,17 +5,18 @@ use newtypes::BusinessOwnerKind;
 use newtypes::BusinessOwnerSource;
 use newtypes::FpId;
 use newtypes::OnboardingStatus;
+use newtypes::PiiString;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PrivateBusinessOwner {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<FpId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fp_id: Option<FpId>,
     pub status: Option<OnboardingStatus>,
     pub ownership_stake: Option<u32>,
     pub kind: BusinessOwnerKind,
     pub source: BusinessOwnerSource,
+    pub name: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
