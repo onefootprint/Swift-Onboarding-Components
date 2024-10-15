@@ -1,10 +1,9 @@
-import { IcoBuilding16, IcoFileText16, IcoFileText216, IcoUsers16 } from '@onefootprint/icons';
+import { IcoFileText16, IcoFileText216, IcoUsers16 } from '@onefootprint/icons';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 import type { Fieldset } from '../../../../vault.types';
-import BusinessOwners from './components/business-owners';
 import CorporationType from './components/corporation-type';
 
 const useFieldsets = (): Fieldset => {
@@ -40,16 +39,6 @@ const useFieldsets = (): Fieldset => {
         },
         {
           di: BusinessDI.formationDate,
-        },
-      ],
-    },
-    bos: {
-      title: t('bos.title'),
-      iconComponent: IcoBuilding16,
-      fields: [
-        {
-          di: BusinessDI.beneficialOwners,
-          renderCustomField: BusinessOwners,
         },
       ],
     },

@@ -1,69 +1,21 @@
-import type { BusinessOwner, Entity } from '@onefootprint/types';
-import { BusinessDI, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
+import type { BusinessOwner } from '@onefootprint/types';
 import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 import StatusBadge from 'src/components/status-badge';
-import getFullName from 'src/utils/get-full-name';
-import styled, { css } from 'styled-components';
-
-import useField from '../../../../../../../../hooks/use-field';
-import Field from '../../../../../../../field';
-import isVaultDataBusinessOwner from './utils/is-vault-data-business-owner';
+import styled from 'styled-components';
 
 export type ContentProps = {
   businessOwners: BusinessOwner[];
-  entity: Entity;
 };
 
-const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
+const BusinessOwnersField = ({ businessOwners }: ContentProps) => {
+  const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.business.vault.bos',
   });
-  const field = useField(entity);
-  let di = BusinessDI.beneficialOwners;
-  if (entity.attributes.includes(BusinessDI.kycedBeneficialOwners)) {
-    // This is really unique - we render two different DIs in the same section since their contents
-    // are almost identical: kycedBOs and BOs.
-    // Here, we just check which type DI for BOs exists in the vault and use it
-    // TODO: this displays the BOs' name from the vault, but if the BO is kyced they may have a
-    // different name on their profile
-    di = BusinessDI.kycedBeneficialOwners;
-  }
-  const { label, value } = field(di);
-
-  const renderValue = (index: number) => {
-    if (isVaultDataEncrypted(value) || isVaultDataEmpty(value) || !isVaultDataBusinessOwner(value)) {
-      return <FieldOrPlaceholder data={value} />;
-    }
-
-    if (isVaultDataBusinessOwner(value)) {
-      const bo = value[index];
-      return <FieldOrPlaceholder data={getFullName(bo.first_name, bo.middle_name, bo.last_name)} />;
-    }
-
-    return null;
-  };
-
-  const renderLabel = (businessOwner: BusinessOwner) => (
-    <Stack align="center" gap={2}>
-      <Text variant="body-3" color="tertiary">
-        {label}
-      </Text>
-      {businessOwner.status && <StatusBadge status={businessOwner.status} />}
-      {businessOwner.id && (
-        <>
-          <span>·</span>
-          <Text color="accent" variant="label-3">
-            <Link target="_blank" href={`/users/${businessOwner.id}`}>
-              {t('link')}
-            </Link>
-          </Text>
-        </>
-      )}
-    </Stack>
-  );
+  const label = allT('di.business.kyced_beneficial_owners');
 
   const boHintText = ({ ownershipStake: stake, kind, source }: BusinessOwner): string => {
     const isPrimary = kind === 'primary' && source !== 'tenant';
@@ -77,15 +29,29 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
     <Box testID="business-owners-content">
       <Grid.Container gap={4}>
         {businessOwners.map((businessOwner, index) => (
-          <FieldContainer key={businessOwner.id || index} $hideCheckbox={index !== 0}>
-            <Field
-              entity={entity}
-              di={di}
-              hint={boHintText(businessOwner)}
-              renderValue={() => renderValue(index)}
-              renderLabel={() => renderLabel(businessOwner)}
-              skipRegisterFieldToDecryptForm={index > 0}
-            />
+          <FieldContainer key={businessOwner.id || index} aria-label={label}>
+            <Stack direction="column" gap={2}>
+              <Stack align="center" gap={2}>
+                <Text variant="body-3" color="tertiary">
+                  {label}
+                </Text>
+                {businessOwner.status && <StatusBadge status={businessOwner.status} />}
+                {businessOwner.id && (
+                  <>
+                    <span>·</span>
+                    <Text color="accent" variant="label-3">
+                      <Link target="_blank" href={`/users/${businessOwner.id}`}>
+                        {t('link')}
+                      </Link>
+                    </Text>
+                  </>
+                )}
+              </Stack>
+              <Text variant="caption-2" color="secondary">
+                {boHintText(businessOwner)}
+              </Text>
+            </Stack>
+            <FieldOrPlaceholder data={businessOwner.name} />
           </FieldContainer>
         ))}
       </Grid.Container>
@@ -93,14 +59,10 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
   );
 };
 
-const FieldContainer = styled.div<{ $hideCheckbox: boolean }>`
-  ${({ $hideCheckbox }) =>
-    $hideCheckbox &&
-    css`
-      input[type='checkbox'] {
-        visibility: hidden;
-      }
-    `}
+const FieldContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 export default BusinessOwnersField;

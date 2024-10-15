@@ -6,4 +6,5 @@ export type BusinessOwner = {
   ownershipStake?: number; // Can be empty before they have entered anything
   status?: EntityStatus;
   source?: 'hosted' | 'tenant';
+  name?: string;
 };

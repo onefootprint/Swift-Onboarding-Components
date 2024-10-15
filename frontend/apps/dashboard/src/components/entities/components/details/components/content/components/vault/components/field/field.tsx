@@ -12,13 +12,11 @@ import FieldValue from './components/field-value';
 export type FieldProps = {
   di: DataIdentifier;
   entity: Entity;
-  hint?: string;
   renderLabel?: () => React.ReactNode;
   renderValue?: (value: VaultValue, isValueDecrypted: boolean) => React.ReactNode;
-  skipRegisterFieldToDecryptForm?: boolean;
 };
 
-const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldToDecryptForm }: FieldProps) => {
+const Field = ({ di, entity, renderValue, renderLabel }: FieldProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'decrypt' });
   const { register } = useFormContext();
   const field = useField(entity)(di);
@@ -27,7 +25,7 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
   const label = customLabel ?? field.label;
   const ariaLabel = typeof customLabel === 'string' ? customLabel : field.label;
   const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
-  const registerField = skipRegisterFieldToDecryptForm || !decrypt.inProgress ? undefined : register(field.name);
+  const registerField = !decrypt.inProgress ? undefined : register(field.name);
 
   const labelDisplay = (
     <Text variant="body-3" color="tertiary">
@@ -50,18 +48,12 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
                 {...registerField}
                 disabled={field.disabled}
                 label={labelDisplay}
-                hint={hint}
               />
             </Box>
           </Tooltip>
         ) : (
           <LabelContainer>
             {customLabel && React.isValidElement(customLabel) ? customLabel : labelDisplay}
-            {hint && (
-              <Text variant="caption-2" color="secondary">
-                {hint}
-              </Text>
-            )}
           </LabelContainer>
         )}
         <ValueContainer>

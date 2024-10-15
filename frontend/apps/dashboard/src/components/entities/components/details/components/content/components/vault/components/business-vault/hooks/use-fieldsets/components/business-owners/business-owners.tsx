@@ -18,7 +18,7 @@ const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
     return <ErrorComponent error={error} />;
   }
   if (data) {
-    return <Content businessOwners={data} entity={entity} />;
+    return <Content businessOwners={data} />;
   }
   return null;
 };
