@@ -225,33 +225,21 @@ impl Workflow {
             }
         }
 
-        let config = if let Some(wfr_config) = wfr.map(|wfr| &wfr.config) {
-            match wfr_config {
-                WorkflowRequestConfig::Onboard { .. } => {
-                    if v.kind != VaultKind::Person {
-                        return Err(
-                            ValidationError("Cannot create a RedoKyc flow for non-person vault").into(),
-                        );
-                    }
-                    // This is_redo flag can be deprecated - redo flows are treated no differently
-                    KycConfig { is_redo: false }.into()
-                }
-                WorkflowRequestConfig::Document {
-                    configs,
-                    business_configs,
-                    fp_bid,
-                } => DocumentConfig {
-                    configs: configs.clone(),
-                    fp_bid: fp_bid.clone(),
-                    business_configs: business_configs.clone(),
-                }
-                .into(),
+        let config = match wfr.map(|wfr| &wfr.config) {
+            Some(WorkflowRequestConfig::Document {
+                configs,
+                business_configs,
+                fp_bid,
+            }) => DocumentConfig {
+                configs: configs.clone(),
+                fp_bid: fp_bid.clone(),
+                business_configs: business_configs.clone(),
             }
-        } else {
-            match v.kind {
+            .into(),
+            Some(WorkflowRequestConfig::Onboard { .. }) | None => match v.kind {
                 VaultKind::Person => KycConfig { is_redo: false }.into(),
                 VaultKind::Business => KybConfig {}.into(),
-            }
+            },
         };
 
         // Create a new workflow

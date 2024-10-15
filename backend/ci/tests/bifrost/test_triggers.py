@@ -119,7 +119,7 @@ def test_onboard_non_portable_document(sandbox_tenant, doc_first_obc):
 
 def test_retrigger_onboard(sandbox_tenant):
     obc = sandbox_tenant.default_ob_config
-    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
     fp_id = user.fp_id
 
@@ -153,6 +153,36 @@ def test_retrigger_onboard(sandbox_tenant):
     assert len(obds) == 2
     obd = obds[0]
     assert obd["event"]["data"]["decision"]["ob_configuration"]["id"] == obc.id
+
+
+def test_retrigger_kyb(sandbox_tenant, kyb_sandbox_ob_config):
+    obc = kyb_sandbox_ob_config
+    bifrost = BifrostClient.new_user(obc)
+    first_user = bifrost.run()
+
+    # Trigger onboarding
+    data = dict(kind="onboard", data=dict(playbook_id=obc.id))
+    initial_auth_token = send_trigger(first_user.fp_id, sandbox_tenant, data)
+
+    # Make sure the proper ob config is associated with the token
+    body = get("hosted/onboarding/config", None, initial_auth_token)
+    assert body["name"] == obc.name
+    assert body["key"] == obc.key.value
+
+    # Re-run Bifrost with the token, optionally with any pre_run assertion checks
+    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(obc, auth_token, bifrost.sandbox_id)
+    requirements = bifrost.get_status()["all_requirements"]
+    assert requirements[0]["kind"] == "collect_business_data"
+    assert not requirements[0]["is_met"]
+    assert requirements[1]["kind"] == "collect_data"
+    assert requirements[1]["is_met"]
+    second_user = bifrost.run()
+
+    # For now, we don't allow reonboarding a business, so we should make a second business
+    assert first_user.fp_bid != second_user.fp_bid
 
 
 @pytest.mark.parametrize(
@@ -259,7 +289,9 @@ def test_collect_document_no_onboardings(sandbox_tenant):
         assert_had_no_scopes=True
     )
     # OBC here isn't actually correct
-    bifrost = BifrostClient.raw_auth(sandbox_tenant.default_ob_config, auth_token, sandbox_id)
+    bifrost = BifrostClient.raw_auth(
+        sandbox_tenant.default_ob_config, auth_token, sandbox_id
+    )
 
     # Check that requirements are what we expect
     requirements = bifrost.get_status()["all_requirements"]
@@ -267,9 +299,7 @@ def test_collect_document_no_onboardings(sandbox_tenant):
     assert set(
         i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
     ) == set(i["kind"] for i in document_configs)
-    assert all(
-        not i["is_met"] for i in requirements if i["kind"] == "collect_document"
-    )
+    assert all(not i["is_met"] for i in requirements if i["kind"] == "collect_document")
 
     bifrost.handle_all_requirements()
     bifrost.validate()
