@@ -39,7 +39,7 @@ def inactive_ob_configuration(sandbox_tenant, must_collect_data, can_access_data
 
 
 def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration):
-    body = get("org/onboarding_configs", None, *sandbox_tenant.db_auths)
+    body = get("org/onboarding_configs", dict(page_size=100), *sandbox_tenant.db_auths)
 
     config = next(
         config for config in body["data"] if config["id"] == ob_configuration.id
