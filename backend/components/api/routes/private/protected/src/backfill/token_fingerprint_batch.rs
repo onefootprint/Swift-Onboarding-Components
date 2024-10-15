@@ -44,6 +44,7 @@ use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultDataFormat;
 use newtypes::VaultId;
+use std::collections::HashSet;
 
 #[post("/private/backfill/batch_token_fingerprints")]
 pub async fn post(
@@ -112,6 +113,19 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
                 .get_results::<(DbFingerprint, DataLifetime)>(conn.conn())
                 .map_err(DbError::from)?;
 
+            let existing_token_dis = data_lifetime::table
+                .filter(data_lifetime::scoped_vault_id.eq(&sv.id))
+                .filter(data_lifetime::deactivated_at.is_null())
+                .filter(
+                    data_lifetime::kind
+                        .ilike("bank.%.fingerprint")
+                        .or(data_lifetime::kind.ilike("card.%.fingerprint")),
+                )
+                .select(data_lifetime::kind)
+                .get_results::<DataIdentifier>(conn.conn())
+                .map_err(DbError::from)?;
+
+            let existing_token_dis: HashSet<_> = existing_token_dis.iter().collect();
             let lowest_dl = results
                 .iter()
                 .map(|(_, dl)| dl)
@@ -130,14 +144,13 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
                 .map(|(fp, dl)| -> FpResult<()> {
                     let token_di = match fp.kind {
                         FingerprintKind::Composite(cfk) => match (cfk, dl.kind) {
-                            (
-                                newtypes::CompositeFingerprintKind::BankRoutingAccount,
-                                DataIdentifier::Bank(bi),
-                            ) => DataIdentifier::Bank(BankInfo {
-                                kind: BankDataKind::Fingerprint,
-                                alias: bi.alias.clone(),
-                            }),
-                            (newtypes::CompositeFingerprintKind::CardNumberCvc, DataIdentifier::Card(ci)) => {
+                            (CompositeFingerprintKind::BankRoutingAccount, DataIdentifier::Bank(bi)) => {
+                                DataIdentifier::Bank(BankInfo {
+                                    kind: BankDataKind::Fingerprint,
+                                    alias: bi.alias.clone(),
+                                })
+                            }
+                            (CompositeFingerprintKind::CardNumberCvc, DataIdentifier::Card(ci)) => {
                                 DataIdentifier::Card(CardInfo {
                                     kind: CardDataKind::Fingerprint,
                                     alias: ci.alias.clone(),
@@ -151,6 +164,11 @@ async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: V
                             return Ok(());
                         }
                     };
+
+                    // Don't try to insert anything if we have a fingerprinted token already.
+                    if existing_token_dis.contains(&token_di) {
+                        return Ok(());
+                    }
 
                     let p_data = match fp.sh_data {
                         Some(fp) => fp.to_token(),
