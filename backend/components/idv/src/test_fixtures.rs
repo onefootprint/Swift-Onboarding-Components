@@ -4120,7 +4120,7 @@ pub fn incode_fetch_ocr_response(opts: Option<OcrTestOpts>) -> serde_json::Value
       "documentNumber": "S3441243",
       "refNumber": "06/13/2015 Rev 02/22/2016",
       "issuedAt": "1560384000000",
-      "expireAt": "1728950400000",
+      "expireAt": "2549464802000",
       "expirationDate": 2024,
       "issueDate": 2019,
       "additionalTimestamps": [],

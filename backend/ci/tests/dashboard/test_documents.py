@@ -76,7 +76,7 @@ def test_tenant_document_decrypt(user_with_documents):
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.document_number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "CALIFORNIA"
-    assert resp["document.drivers_license.expires_at"] == "2024-10-15"
+    assert resp["document.drivers_license.expires_at"] == "2050-10-15"
     # by default, we put the id.dob into the OCR response in sandbox
     assert resp["document.drivers_license.dob"] == "1995-12-25"
 

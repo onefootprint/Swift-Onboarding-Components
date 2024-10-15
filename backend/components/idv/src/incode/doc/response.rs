@@ -746,7 +746,7 @@ impl FetchOCRResponse {
             "documentFrontSubtype":null,
             "documentNumber":"Y12341234",
             "expirationDate":null,
-            "expireAt":"1728950400000",
+            "expireAt":"2549464802000",
             "gender":"M",
             "issueDate":2022,
             "issuingAuthority":null,
@@ -1189,7 +1189,7 @@ mod tests {
         // serde_json doens't like i32, so add in the bday
         parsed.birth_date = Some(ScrubbedPiiLong::new(PiiLong::new(529873860000)));
 
-        assert_eq!(parsed.expiration_date().unwrap().leak(), "2024-10-15");
+        assert_eq!(parsed.expiration_date().unwrap().leak(), "2050-10-15");
         assert_eq!(parsed.dob().unwrap().leak(), "1986-10-16");
 
         // check negatives

@@ -786,7 +786,7 @@ mod tests {
             "MA".to_string().into()
         );
 
-        assert_eq!(ocr.expiration_date().unwrap().leak(), "2024-10-15");
+        assert_eq!(ocr.expiration_date().unwrap().leak(), "2050-10-15");
         assert_eq!(ocr.dob().unwrap().leak(), "1986-10-16");
     }
 
