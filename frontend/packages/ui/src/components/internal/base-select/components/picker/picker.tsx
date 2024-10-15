@@ -1,5 +1,5 @@
 import { IcoClose24 } from '@onefootprint/icons';
-import * as Dialog from '@radix-ui/react-dialog';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -60,20 +60,20 @@ const Picker = ({
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={handleClose}>
-      <Dialog.Portal>
-        <Dialog.Overlay asChild>
+    <RadixDialog.Root open={open} onOpenChange={handleClose}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay asChild>
           <Overlay isVisible={open} />
-        </Dialog.Overlay>
-        <DialogContent height={height}>
+        </RadixDialog.Overlay>
+        <RadixDialogContent height={height} aria-describedby={undefined}>
           <Header>
-            <Dialog.Close asChild>
+            <RadixDialog.Close asChild>
               <IconAligner>
                 <IconButton aria-label="close" variant="ghost" onClick={handleClose}>
                   <IcoClose24 />
                 </IconButton>
               </IconAligner>
-            </Dialog.Close>
+            </RadixDialog.Close>
             <Text variant="label-2">Search...</Text>
           </Header>
           <Content>
@@ -101,9 +101,9 @@ const Picker = ({
                 : renderEmptyState()}
             </OptionsContainer>
           </Content>
-        </DialogContent>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </RadixDialogContent>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 };
 
@@ -118,7 +118,7 @@ const IconAligner = styled(Box)`
   `}
 `;
 
-const DialogContent = styled(Dialog.Content)<{ height: number }>`
+const RadixDialogContent = styled(RadixDialog.Content)<{ height: number }>`
   ${({ theme, height }) => css`
     position: fixed;
     left: 0;

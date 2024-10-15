@@ -1,16 +1,15 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoClose24 } from '@onefootprint/icons';
-import * as DrawerPrimitive from '@radix-ui/react-dialog';
+import * as RadixDialog from '@radix-ui/react-dialog';
+
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css, keyframes } from 'styled-components';
 
 import { media } from '../../utils';
 import Box from '../box';
-import Button from '../button';
-import LinkButton from '../link-button';
 import Overlay from '../overlay';
-import Stack from '../stack';
+import Footer from './components/footer';
 import Header from './components/header';
 
 type DrawerButton = {
@@ -27,6 +26,7 @@ export type DrawerProps = {
   closeAriaLabel?: string;
   open?: boolean;
   title: string;
+  description?: string;
   closeIconComponent?: Icon;
   onClose: () => void;
   onClickOutside?: () => void;
@@ -37,8 +37,6 @@ export type DrawerProps = {
     onClick: () => void;
   };
 };
-
-const FOOTER_HEIGHT = '56px';
 
 const Drawer = ({
   children,
@@ -62,8 +60,8 @@ const Drawer = ({
   };
 
   return (
-    <DrawerPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-      <DrawerPrimitive.Portal>
+    <RadixDialog.Root open={open} onOpenChange={handleOpenChange}>
+      <RadixDialog.Portal>
         <DrawerSurface onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} aria-describedby={undefined}>
           <Header
             closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}
@@ -76,43 +74,13 @@ const Drawer = ({
           <Box padding={7} overflow="auto" maxWidth="100%">
             {children}
           </Box>
-          {(primaryButton || secondaryButton || linkButton) && (
-            <Footer justify="space-between" align="center" tag="footer">
-              <Stack flex={1}>
-                {linkButton && <LinkButton onClick={linkButton.onClick}>{linkButton.label}</LinkButton>}
-              </Stack>
-              <Stack direction="row" gap={3}>
-                {secondaryButton && (
-                  <Button
-                    form={secondaryButton.form}
-                    loading={secondaryButton.loading}
-                    onClick={secondaryButton.onClick}
-                    type={secondaryButton.type}
-                    variant="secondary"
-                  >
-                    {secondaryButton.label}
-                  </Button>
-                )}
-                {primaryButton && (
-                  <Button
-                    form={primaryButton.form}
-                    loading={primaryButton.loading}
-                    onClick={primaryButton.onClick}
-                    type={primaryButton.type}
-                    variant="primary"
-                  >
-                    {primaryButton.label}
-                  </Button>
-                )}
-              </Stack>
-            </Footer>
-          )}
+          <Footer linkButton={linkButton} secondaryButton={secondaryButton} primaryButton={primaryButton} />
         </DrawerSurface>
-        <DrawerPrimitive.Overlay asChild>
+        <RadixDialog.Overlay asChild>
           <Overlay isVisible={open} />
-        </DrawerPrimitive.Overlay>
-      </DrawerPrimitive.Portal>
-    </DrawerPrimitive.Root>
+        </RadixDialog.Overlay>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 };
 
@@ -138,7 +106,7 @@ const slideOut = keyframes`
   }
 `;
 
-const DrawerSurface = styled(DrawerPrimitive.Content)`
+const DrawerSurface = styled(RadixDialog.Content)`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
@@ -167,19 +135,6 @@ const DrawerSurface = styled(DrawerPrimitive.Content)`
     &[data-state='closed'] {
       animation: ${slideOut} 0.2s ease-out;
     }
-  `}
-`;
-
-const Footer = styled(Stack)`
-  ${({ theme }) => css`
-    bottom: 0;
-    z-index: ${theme.zIndex.drawer};
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[4]} ${theme.spacing[7]};
-    height: ${FOOTER_HEIGHT};
-    flex-shrink: 0;
-    width: 100%;
-    box-sizing: border-box;
   `}
 `;
 

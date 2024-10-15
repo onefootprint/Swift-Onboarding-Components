@@ -17,6 +17,7 @@ export type DialogProps = {
   open: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   size?: DialogSize;
   primaryButton?: DialogButton;
   secondaryButton?: DialogButton;
@@ -66,6 +67,7 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
             {open && (
               <Container
                 aria-label={title}
+                aria-describedby={undefined}
                 data-has-footer={hasFooter}
                 isConfirmation={isConfirmation}
                 onClose={onClose}

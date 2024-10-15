@@ -1,5 +1,5 @@
 import { IcoClose24 } from '@onefootprint/icons';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import styled, { css } from 'styled-components';
 
 import Box from '../../box';
@@ -17,13 +17,13 @@ type HeaderProps = {
 
 const Header = ({ title, closeAriaLabel = 'Close', onClose }: HeaderProps) => (
   <Container $hasBorder={!!title} flexGrow={0}>
-    <DialogPrimitive.Close asChild>
+    <RadixDialog.Close asChild>
       <Box>
         <IconButton aria-label={closeAriaLabel} onClick={onClose}>
           <IcoClose24 />
         </IconButton>
       </Box>
-    </DialogPrimitive.Close>
+    </RadixDialog.Close>
     {title && (
       <Title>
         <Text variant="label-2">{title}</Text>
@@ -51,7 +51,7 @@ const Container = styled(Stack)<{ $hasBorder: boolean }>`
   `}
 `;
 
-const Title = styled(DialogPrimitive.Title)`
+const Title = styled(RadixDialog.Title)`
   display: flex;
   flex-grow: 1;
   align-items: center;

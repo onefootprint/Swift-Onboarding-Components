@@ -1,6 +1,6 @@
 'use client';
 
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import type React from 'react';
@@ -61,12 +61,12 @@ const BottomSheet = ({
   }, [open]);
 
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onClose}>
-      <DialogPrimitive.Portal container={portalRef.current || undefined}>
-        <Content role="dialog" onPointerDownOutside={onClose}>
-          <DialogPrimitive.Title asChild>
+    <RadixDialog.Root open={open} onOpenChange={onClose}>
+      <RadixDialog.Portal container={portalRef.current || undefined}>
+        <Content role="dialog" onPointerDownOutside={onClose} aria-describedby={undefined}>
+          <RadixDialog.Title asChild>
             <VisuallyHidden>{title}</VisuallyHidden>
-          </DialogPrimitive.Title>
+          </RadixDialog.Title>
           <Stack maxHeight={componentMaxHeight} direction="column">
             <Header
               closeAriaLabel={closeAriaLabel ?? t('components.bottom-sheet.close-aria-label-default')}
@@ -78,11 +78,11 @@ const BottomSheet = ({
             </ScrollArea>
           </Stack>
         </Content>
-        <DialogPrimitive.Overlay asChild>
+        <RadixDialog.Overlay asChild>
           <Overlay isVisible={open} />
-        </DialogPrimitive.Overlay>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
+        </RadixDialog.Overlay>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 };
 
@@ -108,7 +108,7 @@ const slideOut = keyframes`
   }
 `;
 
-const Content = styled(DialogPrimitive.Content)`
+const Content = styled(RadixDialog.Content)`
   ${({ theme }) => css`
     position: fixed;
     left: 0;

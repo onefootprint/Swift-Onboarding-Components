@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoClose24 } from '@onefootprint/icons';
-import * as DrawerPrimitive from '@radix-ui/react-dialog';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import styled, { css } from 'styled-components';
 
 import IconButton from '../../../icon-button';
@@ -21,18 +21,18 @@ const Header = ({
 }: HeaderProps) => (
   <Container>
     <CloseContainer>
-      <DrawerPrimitive.Close asChild>
+      <RadixDialog.Close asChild>
         <IconButton aria-label={closeAriaLabel} onClick={onClose}>
           <CloseIconComponent />
         </IconButton>
-      </DrawerPrimitive.Close>
+      </RadixDialog.Close>
     </CloseContainer>
     <TitleContainer>
-      <DrawerPrimitive.Title asChild>
+      <RadixDialog.Title asChild>
         <Text variant="label-2" tag="h2" width="100%" textAlign="center" truncate>
           {children}
         </Text>
-      </DrawerPrimitive.Title>
+      </RadixDialog.Title>
     </TitleContainer>
   </Container>
 );
