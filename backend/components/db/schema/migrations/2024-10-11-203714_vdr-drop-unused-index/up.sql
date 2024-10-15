@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY vault_dr_manifest_config_id_seqno;
