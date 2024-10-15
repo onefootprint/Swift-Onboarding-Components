@@ -62,11 +62,12 @@ const StreetViewDialog = ({ onClose, open, addressValues }: StreetViewDialogProp
             bottom="24px"
             zIndex={1000}
             gap={3}
+            alignItems="center"
           >
             <IcoPinMarker24 />
             <Stack direction="column" gap={0}>
               <Text variant="label-3">
-                {addressLine1} {addressLine2 ? `${addressLine2}, ` : ''}
+                {addressLine1} {addressLine2 ? `${addressLine2}` : ''}
               </Text>
               <Text variant="body-3" color="tertiary">
                 {city}, {state} {zip}

@@ -87,7 +87,7 @@ const AddressFieldset = ({
       );
     }
     return (
-      <Stack direction="row" gap={1} alignItems="center">
+      <Stack direction="row" gap={2} alignItems="center">
         <IcoInfo16 color="tertiary" />
         <Text variant="body-3" color="tertiary">
           {t('address.street-view.decrypt-data')}

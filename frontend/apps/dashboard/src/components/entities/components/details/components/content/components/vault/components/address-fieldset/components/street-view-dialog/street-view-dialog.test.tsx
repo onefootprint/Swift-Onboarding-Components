@@ -23,7 +23,7 @@ describe('<StreetViewDialog />', () => {
   it('formats the address correctly in the card', () => {
     customRender(<StreetViewDialog open={true} onClose={jest.fn()} addressValues={mockAddressValues} />);
 
-    const addressLine1Element = screen.getByText('123 Main St Apt 4B,');
+    const addressLine1Element = screen.getByText('123 Main St Apt 4B');
     expect(addressLine1Element).toBeInTheDocument();
 
     const cityStateZipElement = screen.getByText('New York, NY 10001');
