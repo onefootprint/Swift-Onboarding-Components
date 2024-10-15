@@ -502,12 +502,24 @@ fn get_requirement_inner<T>(
                 let has_linked_bos = business_owners
                     .iter()
                     .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
+                let are_all_bos_complete = !business_owners.is_empty()
+                    && business_owners.iter().all(|bo| {
+                        let vd_exists = (BusinessOwnerInfo::USER_DIS.iter())
+                            .all(|i| bo.data.iter().any(|(di, _)| di == i));
+                        let ownership_stake_exists = bo.bo.ownership_stake.is_some();
+                        ownership_stake_exists && vd_exists
+                    });
 
                 let bo_cdo = (obc.must_collect_data.iter())
                     .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
                 if let Some(bo_cdo) = bo_cdo {
                     let is_missing_bo = missing_attributes.contains(bo_cdo);
-                    if has_linked_bos && is_missing_bo {
+                    if !is_missing_bo && !are_all_bos_complete {
+                        // This should never happen, just spot checking this logic before we stop writing
+                        // KycedBos
+                        tracing::error!("All BOs not complete, but CDO is satisfied");
+                    }
+                    if (has_linked_bos || are_all_bos_complete) && is_missing_bo {
                         // BOs linked manually via API meet the BeneficialOwners requirement
                         missing_attributes.retain(|missing_cdo| missing_cdo != bo_cdo);
                         populated_attributes.push(bo_cdo.clone());
