@@ -1,5 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use crate::State;
+use api_core::auth::Any;
 use api_core::errors::ValidationError;
 use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -35,7 +36,7 @@ pub async fn get(
     let requirements = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
+            let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id)?;
             let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &user_auth.auth_events)?;
             Ok(reqs)
         })

@@ -26,11 +26,11 @@ pub use decrypt::*;
 pub use tenant::*;
 pub use writeable::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Person;
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Business;
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Any;
 
 /// VaultWrapper represents the current "state" of a vault - the most up to date and complete

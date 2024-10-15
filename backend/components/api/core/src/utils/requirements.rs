@@ -1,4 +1,6 @@
 use super::vault_wrapper::Any;
+use super::vault_wrapper::Business;
+use super::vault_wrapper::BusinessOwnerInfo;
 use super::vault_wrapper::TenantVw;
 use crate::auth::session::user::AssociatedAuthEvent;
 use crate::auth::user::load_auth_events;
@@ -7,14 +9,12 @@ use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::liveness_event::LivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::passkey::Passkey;
-use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::workflow::Workflow;
 use db::PgConn;
@@ -77,27 +77,27 @@ impl GetRequirementsArgs {
 /// Wrapper type around DecryptUncheckedResult that is guaranteed to have all the IDKs we need for
 /// requirement checking
 #[derive(derive_more::Deref)]
-pub struct DecryptUncheckedResultForReqs(#[deref] DecryptUncheckedResult);
+pub struct UserDecryptResultForReqs(#[deref] DecryptUncheckedResult);
 
 impl GetRequirementsArgs {
     /// Fetch various values from the vault that may conditionally affect requirements
     pub async fn get_decrypted_values(
         state: &State,
         vw: &VaultWrapper<Any>,
-    ) -> FpResult<DecryptUncheckedResultForReqs> {
+    ) -> FpResult<UserDecryptResultForReqs> {
         let values = vec![
             IPK::Declarations.into(),
             IDK::UsLegalStatus.into(),
             IDK::Country.into(),
         ];
         let decrypted_values = vw.decrypt_unchecked(&state.enclave_client, &values).await?;
-        Ok(DecryptUncheckedResultForReqs(decrypted_values))
+        Ok(UserDecryptResultForReqs(decrypted_values))
     }
 }
 
-impl DecryptUncheckedResultForReqs {
+impl UserDecryptResultForReqs {
     /// Auth playbooks don't require complex checking of what's populated
-    pub fn for_auth() -> Self {
+    pub fn empty() -> Self {
         Self(DecryptUncheckedResult::default())
     }
 }
@@ -129,25 +129,24 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
     let su_id = person_workflow.scoped_vault_id.clone();
     let sb_id = business_sv.clone();
-    let (uvw, bvw_wf) = state
+    let (uvw, biz_info) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
-            let bvw = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
-                let bvw = VaultWrapper::<Any>::build_for_tenant(conn, &sb_id)?;
-                let (business_workflow, _) = Workflow::get_all(conn, &biz_wf_id)?;
-                Some((bvw, business_workflow))
+            let biz_info = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
+                let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sb_id)?;
+                let (biz_wf, _) = Workflow::get_all(conn, &biz_wf_id)?;
+                Some((bvw, biz_wf))
             } else {
                 None
             };
-            Ok((uvw, bvw))
+            Ok((uvw, biz_info))
         })
         .await?;
-    let person_decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
-    // technically not needed, but safer mb
-    let bvw_wf_decrypted_values = if let Some((bvw, biz_wf)) = bvw_wf {
-        let business_decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &bvw).await?;
-        Some((bvw, biz_wf, business_decrypted_values))
+    let user_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
+    let biz_info = if let Some((bvw, biz_wf)) = biz_info {
+        let dbos = bvw.decrypt_business_owners(state).await?;
+        Some((bvw, biz_wf, dbos))
     } else {
         None
     };
@@ -165,28 +164,29 @@ pub async fn get_requirements_for_person_and_maybe_business(
             let entity = EntityInfo {
                 vw: &uvw,
                 wf: &person_workflow,
-                decrypted_values: &person_decrypted_values,
+                user_values: &user_values,
+                business_owners: &[],
                 auth_events: &auth_events,
                 is_secondary_bo,
             };
             let person_requirements = get_requirements_inner(conn, entity, &person_obc, requirement_opts)?;
 
-            let business_requirements =
-                if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {
-                    let entity = EntityInfo {
-                        vw: &bvw,
-                        wf: &business_workflow,
-                        decrypted_values: &business_decrypted_values,
-                        auth_events: &[],
-                        is_secondary_bo,
-                    };
-                    // Technically for this case, the business's OBC should be the same as the person's and
-                    // it'd be a bit more clear to see business_obc here. But they should be same and this is
-                    // the existing logic so may as well keep as is
-                    get_requirements_inner(conn, entity, &person_obc, requirement_opts)?
-                } else {
-                    vec![]
+            let business_requirements = if let Some((bvw, biz_wf, dbos)) = biz_info {
+                let entity = EntityInfo {
+                    vw: &bvw,
+                    wf: &biz_wf,
+                    user_values: &UserDecryptResultForReqs::empty(),
+                    business_owners: &dbos,
+                    auth_events: &[],
+                    is_secondary_bo,
                 };
+                // Technically for this case, the business's OBC should be the same as the person's and
+                // it'd be a bit more clear to see business_obc here. But they should be same and this is
+                // the existing logic so may as well keep as is
+                get_requirements_inner(conn, entity, &person_obc, requirement_opts)?
+            } else {
+                vec![]
+            };
 
             Ok(chain!(business_requirements, person_requirements).collect_vec())
         })
@@ -204,11 +204,7 @@ struct RequirementProgress {
 /// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
 /// requirements that are a function of data in the vault - you must pass in the pre-decrypted
 /// values as well
-fn is_cdo_met<Type>(
-    vw: &VaultWrapper<Type>,
-    cdo: &CDO,
-    decrypted_values: &DecryptUncheckedResultForReqs,
-) -> bool {
+fn is_cdo_met<Type>(vw: &VaultWrapper<Type>, cdo: &CDO, decrypted_values: &UserDecryptResultForReqs) -> bool {
     if should_skip_us_only_cdos(cdo, decrypted_values) {
         return true;
     }
@@ -261,7 +257,7 @@ fn is_cdo_met<Type>(
 }
 
 // these are CDOs only applicable to US
-pub(crate) fn should_skip_us_only_cdos(cdo: &CDO, decrypted_values: &DecryptUncheckedResultForReqs) -> bool {
+pub(crate) fn should_skip_us_only_cdos(cdo: &CDO, decrypted_values: &UserDecryptResultForReqs) -> bool {
     match cdo {
         CDO::Ssn4 | CDO::Ssn9 | CDO::UsLegalStatus => {
             let country = decrypted_values
@@ -278,7 +274,7 @@ fn get_data_collection_progress<Type>(
     vw: &VaultWrapper<Type>,
     ob_config: &ObConfiguration,
     di_kind: DID,
-    decrypted_values: &DecryptUncheckedResultForReqs,
+    decrypted_values: &UserDecryptResultForReqs,
 ) -> RequirementProgress {
     let mut populated_attributes = Vec::new();
     let mut missing_attributes = Vec::new();
@@ -310,10 +306,10 @@ fn get_data_collection_progress<Type>(
 
 // gets oustanding requirements for a Vault with respect to a specific OBC/WF
 #[tracing::instrument(skip_all)]
-pub fn get_requirements_inner(
-    conn: &mut PgConn,
-    entity_info: EntityInfo,
-    obc: &ObConfiguration,
+pub fn get_requirements_inner<'a, T: Copy>(
+    conn: &'a mut PgConn,
+    entity_info: EntityInfo<'a, T>,
+    obc: &'a ObConfiguration,
     opts: RequirementOpts,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let wf = &entity_info.wf;
@@ -371,10 +367,10 @@ pub fn get_requirements_inner(
     Ok(requirements)
 }
 
-pub fn get_register_auth_method_requirements(
+pub fn get_register_auth_method_requirements<T>(
     conn: &mut PgConn,
     obc: &ObConfiguration,
-    vw: &TenantVw,
+    vw: &TenantVw<T>,
     auth_events: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let auth_events = load_auth_events(conn, auth_events)?;
@@ -413,10 +409,11 @@ pub fn get_register_auth_method_requirements(
 
 
 #[derive(Clone, Copy)]
-pub struct EntityInfo<'a> {
-    pub vw: &'a TenantVw<Any>,
+pub struct EntityInfo<'a, T> {
+    pub vw: &'a TenantVw<T>,
     pub wf: &'a Workflow,
-    pub decrypted_values: &'a DecryptUncheckedResultForReqs,
+    pub user_values: &'a UserDecryptResultForReqs,
+    pub business_owners: &'a [BusinessOwnerInfo],
     pub auth_events: &'a [AssociatedAuthEvent],
     pub is_secondary_bo: bool,
 }
@@ -424,17 +421,18 @@ pub struct EntityInfo<'a> {
 /// Generates a requirement of the given kind `k`, if one exists.
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument("get_requirement_inner", skip_all, fields(kind = ?k))]
-fn get_requirement_inner(
+fn get_requirement_inner<T>(
     k: OnboardingRequirementKind,
     conn: &mut PgConn,
-    entity_info: EntityInfo,
+    entity_info: EntityInfo<T>,
     obc: &ObConfiguration,
     opts: RequirementOpts,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let EntityInfo {
         vw,
         wf,
-        decrypted_values,
+        user_values,
+        business_owners,
         auth_events,
         is_secondary_bo: _,
     } = entity_info;
@@ -452,7 +450,7 @@ fn get_requirement_inner(
                         populated_attributes,
                         missing_attributes,
                         optional_attributes,
-                    } = get_data_collection_progress(vw, obc, DID::Id, decrypted_values);
+                    } = get_data_collection_progress(vw, obc, DID::Id, user_values);
                     // if ob config needs to collect id data
                     OnboardingRequirement::CollectData {
                         missing_attributes,
@@ -470,8 +468,8 @@ fn get_requirement_inner(
                         populated_attributes,
                         optional_attributes: _,
                         missing_attributes,
-                    } = get_data_collection_progress(vw, obc, DID::InvestorProfile, decrypted_values);
-                    let declarations = decrypted_values.get_di(IPK::Declarations).ok();
+                    } = get_data_collection_progress(vw, obc, DID::InvestorProfile, user_values);
+                    let declarations = user_values.get_di(IPK::Declarations).ok();
                     let missing_document = if let Some(declarations) = declarations {
                         let declarations: Vec<Declaration> = declarations.deserialize()?;
                         // The finra compliance doc is missing if any of the declarations require a doc and we
@@ -498,20 +496,23 @@ fn get_requirement_inner(
                     mut populated_attributes,
                     optional_attributes: _,
                     mut missing_attributes,
-                } = get_data_collection_progress(vw, obc, DID::Business, decrypted_values);
-                let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
-                let bos = BusinessOwner::list_all(conn, &vw.vault.id, &sv.tenant_id)?;
-                let has_linked_bos = bos.iter().any(|bo| bo.0.source == BusinessOwnerSource::Tenant);
-                CollectedData::BusinessBeneficialOwners
-                    .options()
-                    .into_iter()
-                    .for_each(|cdo| {
-                        if has_linked_bos && missing_attributes.contains(&cdo) {
-                            // BOs linked manually via API meet the BeneficialOwners requirement
-                            missing_attributes.retain(|missing_cdo| missing_cdo != &cdo);
-                            populated_attributes.push(cdo);
-                        }
-                    });
+                } = get_data_collection_progress(vw, obc, DID::Business, user_values);
+
+
+                let has_linked_bos = business_owners
+                    .iter()
+                    .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
+
+                let bo_cdo = (obc.must_collect_data.iter())
+                    .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
+                if let Some(bo_cdo) = bo_cdo {
+                    let is_missing_bo = missing_attributes.contains(bo_cdo);
+                    if has_linked_bos && is_missing_bo {
+                        // BOs linked manually via API meet the BeneficialOwners requirement
+                        missing_attributes.retain(|missing_cdo| missing_cdo != bo_cdo);
+                        populated_attributes.push(bo_cdo.clone());
+                    }
+                }
                 Ok(OnboardingRequirement::CollectBusinessData {
                     missing_attributes,
                     populated_attributes,
@@ -569,7 +570,7 @@ fn get_requirement_inner(
                         DocumentRequestConfig::Custom(c) => c.upload_settings,
                     };
 
-                    let country = decrypted_values
+                    let country = user_values
                         .get(&IDK::Country.into())
                         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
                     let config = match dr.config {
@@ -637,7 +638,7 @@ fn get_requirement_inner(
                     !matches!(cdo, CDO::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie)))
                         || !skipped_selfie
                 })
-                .filter(|cdo| !should_skip_us_only_cdos(cdo, decrypted_values))
+                .filter(|cdo| !should_skip_us_only_cdos(cdo, user_values))
                 .cloned()
                 .collect();
 

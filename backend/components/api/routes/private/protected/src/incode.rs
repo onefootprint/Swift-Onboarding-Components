@@ -460,7 +460,8 @@ pub async fn adhoc_document_process(
             let entity = EntityInfo {
                 vw: &uvw,
                 wf: &wf,
-                decrypted_values: &decrypted_values,
+                user_values: &decrypted_values,
+                business_owners: &[],
                 auth_events: &[],
                 is_secondary_bo: false,
             };

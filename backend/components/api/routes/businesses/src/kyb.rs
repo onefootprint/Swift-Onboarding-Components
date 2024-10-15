@@ -14,9 +14,9 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::EntityInfo;
-use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
-use api_core::utils::vault_wrapper::Any;
+use api_core::utils::requirements::UserDecryptResultForReqs;
+use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
@@ -87,7 +87,7 @@ pub async fn post(
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let bvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &sb.id, seqno)?;
+            let bvw = VaultWrapper::<Business>::build_for_tenant_version(conn, &sb.id, seqno)?;
             Ok((bvw, sb, seqno))
         })
         .await?;
@@ -107,7 +107,7 @@ pub async fn post(
         .map(|country_code| country_code.is_us())
         .unwrap_or(false);
 
-    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
+    let dbos = bvw.decrypt_business_owners(&state).await?;
     let tenant_id = auth.tenant().id.clone();
     let (biz_wf, obc) = state
         .db_pool
@@ -154,7 +154,8 @@ pub async fn post(
             let entity = EntityInfo {
                 vw: &bvw,
                 wf: &biz_wf,
-                decrypted_values: &decrypted_values,
+                user_values: &UserDecryptResultForReqs::empty(),
+                business_owners: &dbos,
                 auth_events: &[],
                 is_secondary_bo: false,
             };

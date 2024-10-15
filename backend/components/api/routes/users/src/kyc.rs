@@ -208,7 +208,8 @@ pub async fn post(
             let entity = EntityInfo {
                 vw: &uvw,
                 wf: &wf,
-                decrypted_values: &decrypted_values,
+                business_owners: &[],
+                user_values: &decrypted_values,
                 auth_events: &[],
                 is_secondary_bo: false,
             };
