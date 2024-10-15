@@ -58,8 +58,6 @@ export type {
 export { FilterDateRange, default as Filters } from './filters';
 export type { FlagProps } from './flag';
 export { default as Flag } from './flag';
-export type { FootprintButtonProps } from './footprint-button';
-export { default as FootprintButton } from './footprint-button';
 export { default as Form } from './form';
 export type { GoogleButtonProps } from './google-button';
 export { default as GoogleButton } from './google-button';

@@ -1,6 +1,6 @@
 import footprint from '@onefootprint/footprint-js';
 import { LogoFpDefault } from '@onefootprint/icons';
-import { FootprintButton, Stack, Text, media } from '@onefootprint/ui';
+import { Button, Stack, Text, media } from '@onefootprint/ui';
 import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -105,7 +105,9 @@ const Live = () => {
               </Text>
             </MotionStack>
             <MotionStack variants={childrenVariants}>
-              <FootprintButton onClick={handleOpen} />
+              <Button size="large" onClick={handleOpen}>
+                Start verification
+              </Button>
             </MotionStack>
             <MotionStack variants={childrenVariants}>
               <Text tag="p" variant="body-2" color="tertiary" maxWidth="520px">

@@ -231,7 +231,6 @@ export { default as IcoFilter24 } from './ico-filter-24';
 export { default as IcoFingerprint24 } from './ico-fingerprint-24';
 export { default as IcoFlag24 } from './ico-flag-24';
 export { default as IcoFlask24 } from './ico-flask-24';
-export { default as IcoFootprint24 } from './ico-footprint-24';
 export { default as IcoFootprintShield24 } from './ico-footprint-shield-24';
 export { default as IcoGlobe24 } from './ico-globe-24';
 export { default as IcoGoogle24 } from './ico-google-colored-24';

@@ -1,6 +1,6 @@
 import footprint from '@onefootprint/footprint-js';
 import type { OnboardingConfigKind } from '@onefootprint/types';
-import { Box, FootprintButton, Text, media } from '@onefootprint/ui';
+import { Box, Button, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -56,7 +56,9 @@ const Preview = ({ obConfig }: PreviewProps) => {
                 {t.body}
               </Text>
               <ButtonContainer>
-                <FootprintButton onClick={handleOpen} text={t.cta} />
+                <Button size="large" onClick={handleOpen}>
+                  {t.cta}
+                </Button>
               </ButtonContainer>
             </>
           )}

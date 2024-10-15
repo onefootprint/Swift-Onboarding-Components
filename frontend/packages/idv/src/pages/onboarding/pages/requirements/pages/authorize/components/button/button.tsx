@@ -1,4 +1,4 @@
-import { FootprintButton, Text } from '@onefootprint/ui';
+import { Button as BaseButton, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -23,14 +23,9 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
 
   return (
     <ButtonContainer>
-      <FootprintButton
-        fullWidth
-        loading={isLoading}
-        onClick={onClick}
-        text={t('cta')}
-        size="large"
-        data-dd-action-name="authorize:cta"
-      />
+      <BaseButton onClick={onClick} size="large" data-dd-action-name="authorize:cta" loading={isLoading}>
+        {t('cta')}
+      </BaseButton>
       {privacyPolicyUrl && (
         <Text variant="label-3" color="secondary" textAlign="center">
           <Trans

@@ -1,4 +1,4 @@
-import { Box, FootprintButton } from '@onefootprint/ui';
+import { Box, Button } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -14,7 +14,9 @@ const Illustration = () => {
   return (
     <Container>
       <Box marginTop={5}>
-        <FootprintButton onClick={handleClick} />
+        <Button size="large" onClick={handleClick}>
+          Click me
+        </Button>
       </Box>
       <AnimatePresence>
         {showDialog && (
