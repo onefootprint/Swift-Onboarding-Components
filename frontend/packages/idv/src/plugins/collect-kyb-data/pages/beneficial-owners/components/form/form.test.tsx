@@ -204,7 +204,7 @@ describe('<Form />', () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            "We need to verify all other beneficial owners’ identities. We'll email them a link after you finish filling out your business verification.",
+            'We need to verify all other beneficial owners’ identities. We’ll send them a text message with a link after you finish filling out your business verification.',
           ),
         ).toBeInTheDocument();
       });
