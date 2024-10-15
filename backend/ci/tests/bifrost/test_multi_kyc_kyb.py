@@ -78,6 +78,86 @@ def test_onboard_secondary_bo_live_phone(
     assert bifrost.validate_response["business"]["status"] == "pass"
 
 
+def test_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
+    """
+    This will test the flow using the new BO APIs as we develop them
+    """
+    USER_BO_FIELDS = ["id.first_name", "id.last_name", "id.phone_number", "id.email"]
+
+    def assert_bo_data(bo, decrypted_fields, populated_fields, expected_data):
+        for field in decrypted_fields:
+            assert bo["decrypted_data"][field] == expected_data[field]
+        assert set(bo["decrypted_data"]) == set(decrypted_fields)
+        assert set(bo["populated_data"]) == set(populated_fields)
+
+    primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    primary_bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    primary_bo = primary_bifrost.run()
+    fp_bid = primary_bo.fp_bid
+
+    # Check the new business owners APIs
+    body = get("hosted/business/owners", None, primary_bifrost.auth_token)
+    [primary_bo, secondary_bo] = body
+    # First BO is self
+    assert primary_bo["has_linked_user"]
+    assert primary_bo["is_authed_user"]
+    assert primary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[0]["ownership_stake"]
+    assert_bo_data(primary_bo, USER_BO_FIELDS, USER_BO_FIELDS, primary_bifrost.data)
+
+    # Secondary BO is incomplete, but has all data (from the business vault)
+    ex_secondary_bo_data = {
+        # This will be nicer when the BO data can be provided with DIs
+        "id.first_name": BUSINESS_MULTIPLE_BOS[1]["first_name"],
+        "id.last_name": BUSINESS_MULTIPLE_BOS[1]["last_name"],
+        "id.phone_number": BUSINESS_MULTIPLE_BOS[1]["phone_number"],
+        "id.email": BUSINESS_MULTIPLE_BOS[1]["email"],
+    }
+    assert not secondary_bo["has_linked_user"]
+    assert not secondary_bo["is_authed_user"]
+    assert (
+        secondary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[1]["ownership_stake"]
+    )
+    assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, ex_secondary_bo_data)
+
+    # Test decrypting the new business owner DIs
+    secondary_link_id = secondary_bo["id"]
+    dis = [
+        f"business.beneficial_owners.{secondary_link_id}.{di}" for di in USER_BO_FIELDS
+    ]
+    data = dict(fields=dis, reason="Looking at BO data")
+    body = post(f"entities/{fp_bid}/vault/decrypt", data, *sandbox_tenant.db_auths)
+    for field in USER_BO_FIELDS:
+        di = f"business.beneficial_owners.{secondary_link_id}.{field}"
+        assert body[di] == ex_secondary_bo_data[field]
+
+    #
+    # Finish onboarding the secondary BO
+    #
+    secondary_bo_token = extract_bo_token(primary_bifrost)
+    secondary_bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
+    )
+    secondary_bifrost.run()
+
+    body = get("hosted/business/owners", None, secondary_bifrost.auth_token)
+    [primary_bo, secondary_bo] = body
+
+    # Can only see primary owner's first name and last name
+    assert primary_bo["has_linked_user"]
+    assert not primary_bo["is_authed_user"]
+    assert primary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[0]["ownership_stake"]
+    decrypted_fields = ["id.first_name", "id.last_name"]
+    assert_bo_data(primary_bo, decrypted_fields, USER_BO_FIELDS, primary_bifrost.data)
+
+    # Secondary BO is now the authed user
+    assert secondary_bo["has_linked_user"]
+    assert secondary_bo["is_authed_user"]
+    assert (
+        secondary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[1]["ownership_stake"]
+    )
+    assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, secondary_bifrost.data)
+
+
 def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS

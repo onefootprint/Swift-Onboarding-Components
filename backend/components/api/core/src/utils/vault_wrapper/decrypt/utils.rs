@@ -9,6 +9,7 @@ use api_errors::AssertionError;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::DbError;
+use itertools::iproduct;
 use itertools::Itertools;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
@@ -51,10 +52,17 @@ pub struct BusinessOwnerInfo {
     pub su: Option<ScopedVault>,
     /// Data for the provided beneficial owner. Includes at most id.phone_number, id.email,
     /// id.first_name, and id.last_name. Accessed only through util methods
-    data: HashMap<DI, PiiString>,
+    pub data: HashMap<DI, PiiString>,
 }
 
 impl BusinessOwnerInfo {
+    pub const USER_DIS: &'static [DI; 4] = &[
+        DI::Id(IDK::FirstName),
+        DI::Id(IDK::LastName),
+        DI::Id(IDK::PhoneNumber),
+        DI::Id(IDK::Email),
+    ];
+
     pub fn name(mut self) -> Option<(PiiString, PiiString)> {
         let first_name = self.data.remove(&IDK::FirstName.into());
         let last_name = self.data.remove(&IDK::LastName.into());
@@ -95,17 +103,10 @@ impl TenantVw<Business> {
             })
             .await?;
 
-        let user_dis = || {
-            [
-                IDK::FirstName.into(),
-                IDK::LastName.into(),
-                IDK::PhoneNumber.into(),
-                IDK::Email.into(),
-            ]
-        };
-
         let decrypt_futs = vws.into_iter().map(|(sv_id, vw)| async move {
-            let decrypted = vw.decrypt_unchecked(&state.enclave_client, &user_dis()).await?;
+            let decrypted = vw
+                .decrypt_unchecked(&state.enclave_client, BusinessOwnerInfo::USER_DIS)
+                .await?;
             let results = (decrypted.results)
                 .into_iter()
                 .map(|(k, v)| (k.identifier, v))
@@ -117,9 +118,8 @@ impl TenantVw<Business> {
             .into_iter()
             .collect::<FpResult<HashMap<_, _>>>()?;
 
-        let dis = linked_bos
-            .iter()
-            .flat_map(|(bo, _)| user_dis().map(|idk| BDK::bo_data(bo.link_id.clone(), idk).into()))
+        let dis = iproduct!(linked_bos.iter(), BusinessOwnerInfo::USER_DIS)
+            .map(|((bo, _), di)| BDK::bo_data(bo.link_id.clone(), di.clone()).into())
             .collect_vec();
         let biz_data = self.decrypt_unchecked(&state.enclave_client, &dis).await?;
 

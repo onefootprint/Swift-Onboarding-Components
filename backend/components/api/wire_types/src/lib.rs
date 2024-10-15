@@ -8,6 +8,7 @@ use serde::Serialize;
 mod resources;
 pub use resources::*;
 pub mod hosted;
+pub use hosted::*;
 mod requests;
 pub use self::requests::*;
 

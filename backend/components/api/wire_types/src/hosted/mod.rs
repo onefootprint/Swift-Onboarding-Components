@@ -5,7 +5,11 @@ pub mod fingerprint_visit;
 pub mod neuro_id;
 pub mod onboarding;
 pub mod onboarding_status;
+pub mod onboarding_validate;
+mod owners;
 pub mod socure_device;
 pub mod stytch;
 pub mod tokens;
-pub mod validate;
+
+
+pub use owners::*;

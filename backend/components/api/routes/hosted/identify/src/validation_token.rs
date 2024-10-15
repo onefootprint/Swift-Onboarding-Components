@@ -5,7 +5,7 @@ use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
-use api_wire_types::hosted::validate::HostedValidateResponse;
+use api_wire_types::hosted::onboarding_validate::HostedValidateResponse;
 use newtypes::ObConfigurationKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;

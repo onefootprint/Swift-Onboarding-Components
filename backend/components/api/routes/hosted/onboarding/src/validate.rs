@@ -13,7 +13,7 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
-use api_wire_types::hosted::validate::HostedValidateResponse;
+use api_wire_types::hosted::onboarding_validate::HostedValidateResponse;
 use itertools::Itertools;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;

@@ -28,6 +28,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     let bvw = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
+            // TODO can read `biz_wf_id` once we make this required
             let (_, sb) = Workflow::get_all(conn, (&bv_id, &ob_config_id))?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             Ok(bvw)
