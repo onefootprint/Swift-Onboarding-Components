@@ -55,10 +55,7 @@
           "subtitle": "{{tenantName}} needs to collect some personal information to confirm your identity."
         }
       },
-      "cta": {
-        "kyb": "Verify your business",
-        "kyc": "Verify your identity"
-      }
+      "cta": "Verify your identity"
     },
     "invalid-url": {
       "title": "The link you opened is invalid",

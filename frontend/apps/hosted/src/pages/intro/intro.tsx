@@ -7,9 +7,9 @@ import Header from './components/header';
 import useIsKyb from './utils/is-kyb';
 
 const Intro = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.intro.cta' });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.intro' });
   const [, send] = useHostedMachine();
-  const isKyb = useIsKyb();
+  const _isKyb = useIsKyb();
 
   const handleClick = () => {
     send({ type: 'introductionCompleted' });
@@ -19,7 +19,7 @@ const Intro = () => {
     <Container>
       <Header />
       <Button fullWidth onClick={handleClick} size="large">
-        {isKyb ? t('kyb') : t('kyc')}
+        {t('cta')}
       </Button>
     </Container>
   );

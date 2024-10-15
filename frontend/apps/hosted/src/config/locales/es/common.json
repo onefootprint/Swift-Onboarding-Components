@@ -55,10 +55,7 @@
           "subtitle": "{{tenantName}} necesita recopilar su información personal y así poder verificar los datos de su empresa."
         }
       },
-      "cta": {
-        "kyb": "Verificar tu empresa",
-        "kyc": "Verificar tu identidad"
-      }
+      "cta": "Verificar tu identidad"
     },
     "invalid-url": {
       "title": "El enlace no es válido",

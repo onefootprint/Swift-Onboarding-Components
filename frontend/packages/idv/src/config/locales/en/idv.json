@@ -671,7 +671,7 @@
       },
       "beneficial-owners": {
         "title": "Who are the beneficial owners?",
-        "subtitle": "List all individuals who own at least 25% of the business or have substantial control over the business.",
+        "subtitle": "List all individuals who own at least 25% of the business or have substantial control over it.",
         "form": {
           "fields-header": {
             "beneficial-owner-you": "Beneficial owner (You)",
