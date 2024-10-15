@@ -29,18 +29,18 @@ const BusinessOwnersField = ({ businessOwners }: ContentProps) => {
     <Box testID="business-owners-content">
       <Grid.Container gap={4}>
         {businessOwners.map((businessOwner, index) => (
-          <FieldContainer key={businessOwner.id || index} aria-label={label}>
+          <FieldContainer key={businessOwner.fpId || index} aria-label={label}>
             <Stack direction="column" gap={2}>
               <Stack align="center" gap={2}>
                 <Text variant="body-3" color="tertiary">
                   {label}
                 </Text>
                 {businessOwner.status && <StatusBadge status={businessOwner.status} />}
-                {businessOwner.id && (
+                {businessOwner.fpId && (
                   <>
                     <span>·</span>
                     <Text color="accent" variant="label-3">
-                      <Link target="_blank" href={`/users/${businessOwner.id}`}>
+                      <Link target="_blank" href={`/users/${businessOwner.fpId}`}>
                         {t('link')}
                       </Link>
                     </Text>

@@ -137,7 +137,7 @@ export const timelineFixture: Timeline = [
 
 export const businessOwnersFixture: BusinessOwner[] = [
   {
-    id: 'fp_id_XW3pNYPpV4Niup1PgFZBg6',
+    fpId: 'fp_id_XW3pNYPpV4Niup1PgFZBg6',
     status: EntityStatus.pass,
     ownershipStake: 50,
     kind: 'primary',

@@ -16,12 +16,12 @@ const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOw
     headers: authHeaders,
   });
 
-  const ownerIds = businessOwnersResponse.data.map(owner => owner.id).filter(Boolean);
+  const ownerFpIds = businessOwnersResponse.data.map(owner => owner.fpId).filter(Boolean);
   const entityResponses = await Promise.all(
-    ownerIds.map(id =>
+    ownerFpIds.map(fpId =>
       request<GetEntityResponse>({
         method: 'GET',
-        url: `/entities/${id}`,
+        url: `/entities/${fpId}`,
         headers: authHeaders,
       }),
     ),
