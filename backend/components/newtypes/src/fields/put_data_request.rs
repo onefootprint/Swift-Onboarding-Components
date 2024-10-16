@@ -19,7 +19,14 @@ use std::collections::HashMap;
 pub type RawDataRequest = HashMap<DataIdentifier, PiiJsonValue>;
 
 #[derive(
-    Debug, Clone, Default, serde::Deserialize, derive_more::Deref, derive_more::DerefMut, derive_more::Into,
+    Debug,
+    Clone,
+    Default,
+    serde::Deserialize,
+    derive_more::Deref,
+    derive_more::DerefMut,
+    derive_more::Into,
+    derive_more::IntoIterator,
 )]
 pub struct RawUserDataRequest(RawDataRequest);
 

@@ -1,6 +1,6 @@
 import time
 import pytest
-from tests.constants import BUSINESS_MULTIPLE_BOS
+from tests.constants import BUSINESS_MULTIPLE_BOS, FIXTURE_EMAIL2, FIXTURE_PHONE_NUMBER2
 from tests.headers import BusinessOwnerAuth, FpAuth, SandboxId
 from tests.identify_client import IdentifyClient
 from tests.utils import (
@@ -83,6 +83,16 @@ def test_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     This will test the flow using the new BO APIs as we develop them
     """
     USER_BO_FIELDS = ["id.first_name", "id.last_name", "id.phone_number", "id.email"]
+    primary_bo_data = BUSINESS_MULTIPLE_BOS[0]
+    secondary_bo_data = {
+        "data": {
+            "id.first_name": "Franklin",
+            "id.last_name": "Frog",
+            "id.email": FIXTURE_EMAIL2,
+            "id.phone_number": FIXTURE_PHONE_NUMBER2,
+        },
+        "ownership_stake": 30,
+    }
 
     def assert_bo_data(bo, decrypted_fields, populated_fields, expected_data):
         for field in decrypted_fields:
@@ -91,7 +101,9 @@ def test_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
         assert set(bo["populated_data"]) == set(populated_fields)
 
     primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    primary_bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    # TODO stop vaulting this here once we can PATCH the primary BO's ownership stake
+    primary_bifrost.data["business.kyced_beneficial_owners"] = [primary_bo_data]
+    post("hosted/business/owners", secondary_bo_data, primary_bifrost.auth_token)
     primary_bo = primary_bifrost.run()
     fp_bid = primary_bo.fp_bid
 
@@ -101,23 +113,16 @@ def test_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     # First BO is self
     assert primary_bo["has_linked_user"]
     assert primary_bo["is_authed_user"]
-    assert primary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[0]["ownership_stake"]
+    assert primary_bo["ownership_stake"] == primary_bo_data["ownership_stake"]
     assert_bo_data(primary_bo, USER_BO_FIELDS, USER_BO_FIELDS, primary_bifrost.data)
 
     # Secondary BO is incomplete, but has all data (from the business vault)
-    ex_secondary_bo_data = {
-        # This will be nicer when the BO data can be provided with DIs
-        "id.first_name": BUSINESS_MULTIPLE_BOS[1]["first_name"],
-        "id.last_name": BUSINESS_MULTIPLE_BOS[1]["last_name"],
-        "id.phone_number": BUSINESS_MULTIPLE_BOS[1]["phone_number"],
-        "id.email": BUSINESS_MULTIPLE_BOS[1]["email"],
-    }
     assert not secondary_bo["has_linked_user"]
     assert not secondary_bo["is_authed_user"]
-    assert (
-        secondary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[1]["ownership_stake"]
+    assert secondary_bo["ownership_stake"] == secondary_bo_data["ownership_stake"]
+    assert_bo_data(
+        secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, secondary_bo_data["data"]
     )
-    assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, ex_secondary_bo_data)
 
     # Test decrypting the new business owner DIs
     secondary_link_id = secondary_bo["id"]
@@ -128,7 +133,7 @@ def test_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     body = post(f"entities/{fp_bid}/vault/decrypt", data, *sandbox_tenant.db_auths)
     for field in USER_BO_FIELDS:
         di = f"business.beneficial_owners.{secondary_link_id}.{field}"
-        assert body[di] == ex_secondary_bo_data[field]
+        assert body[di] == secondary_bo_data["data"][field]
 
     #
     # Finish onboarding the secondary BO
@@ -145,16 +150,14 @@ def test_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     # Can only see primary owner's first name and last name
     assert primary_bo["has_linked_user"]
     assert not primary_bo["is_authed_user"]
-    assert primary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[0]["ownership_stake"]
+    assert primary_bo["ownership_stake"] == primary_bo_data["ownership_stake"]
     decrypted_fields = ["id.first_name", "id.last_name"]
     assert_bo_data(primary_bo, decrypted_fields, USER_BO_FIELDS, primary_bifrost.data)
 
     # Secondary BO is now the authed user
     assert secondary_bo["has_linked_user"]
     assert secondary_bo["is_authed_user"]
-    assert (
-        secondary_bo["ownership_stake"] == BUSINESS_MULTIPLE_BOS[1]["ownership_stake"]
-    )
+    assert secondary_bo["ownership_stake"] == secondary_bo_data["ownership_stake"]
     assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, secondary_bifrost.data)
 
 
