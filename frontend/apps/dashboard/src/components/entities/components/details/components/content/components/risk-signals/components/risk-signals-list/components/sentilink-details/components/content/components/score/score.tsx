@@ -7,9 +7,10 @@ import sortReasonCodes from './utils/sort-reason-codes';
 type ScoreProps = {
   score: number;
   reasonCodes: SentilinkReasonCode[];
+  title: string;
 };
 
-const Score = ({ score, reasonCodes }: ScoreProps) => {
+const Score = ({ score, reasonCodes, title }: ScoreProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details.score' });
   const sortedReasonCodes = sortReasonCodes(reasonCodes);
 
@@ -24,7 +25,7 @@ const Score = ({ score, reasonCodes }: ScoreProps) => {
         borderStyle="solid"
       >
         <Text variant="label-1" color="secondary">
-          {t('label')}
+          {title}
         </Text>
         <Text variant="heading-1" color={score >= 500 ? 'error' : 'success'}>
           {score}

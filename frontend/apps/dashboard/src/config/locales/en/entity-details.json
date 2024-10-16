@@ -1184,6 +1184,7 @@
     },
     "sentilink": {
       "details": {
+        "powered-by": "Powered by Sentilink",
         "title": "Synthetic and ID Theft scores",
         "risk-indicator": {
           "more_fraudy": "More fraudy",
@@ -1192,7 +1193,8 @@
           "less-icon-aria-label": "Down arrow"
         },
         "score": {
-          "label": "Score",
+          "synthetic-title": "Synthetic score",
+          "id-theft-title": "ID theft score",
           "detected-reason-codes": "Detected reason codes"
         }
       }

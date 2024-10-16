@@ -9,9 +9,11 @@ type ReasonCodeProps = {
 export const ReasonCode = ({ reasonCode }: ReasonCodeProps) => {
   return (
     <Stack justifyContent="space-between" alignItems="flex-start">
-      <Stack direction="column" gap={2}>
-        <Text variant="snippet-1">{reasonCode.code}</Text>
-        <Text variant="body-3" color="tertiary">
+      <Stack direction="column" gap={2} maxWidth="300px">
+        <Text variant="snippet-1" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+          {reasonCode.code}
+        </Text>
+        <Text variant="body-3" color="tertiary" overflowWrap="break-word" whiteSpace="normal">
           {reasonCode.explanation}
         </Text>
       </Stack>
