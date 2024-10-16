@@ -242,17 +242,47 @@ def ensure_enrolled_in_live_vdr(tenant):
     if cfg.client_params_match(got_cfg):
         return got_cfg
 
-    # Otherwise, re-enroll the tenant in Vault Disaster Recovery.
+    # If the existing configuration is not correct, ensure that the tenant is
+    # not enrolled yet. This should never fail in CI, since the DB starts from
+    # an empty state. If it fails in your local environment, you may have
+    # changed the integration test configuration. To fix, reset your local
+    # state by running:
+    #   docker compose exec -u postgres postgres psql -c "UPDATE vault_dr_config SET deactivated_at = now() WHERE deactivated_at IS NULL;"
+    assert got_cfg is None
+
+    # Otherwise, enroll the tenant in Vault Disaster Recovery.
+    # We don't support re-enrollment in integration tests to avoid parallel pytest race conditions.
+    try:
+        enroll_in_live_vdr(tenant, cfg)
+    except AlreadyEnrolled:
+        print("Already enrolled in VDR")
+        pass
+
+    # Check that the configuration is now correct.
+    with footprint_dr("status", "--live") as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    output = cmd.before.decode()
+    got_cfg = EnrollmentConfig.parse_from_footprint_dr_status(output)
+    assert cfg.client_params_match(got_cfg)
+
+    return got_cfg
+
+
+class AlreadyEnrolled(Exception):
+    pass
+
+
+def enroll_in_live_vdr(tenant, cfg):
     with footprint_dr("enroll", "--live") as cmd:
         i = cmd.expect_exact(
             [
-                r"Re-enrolling will deactivate the current configuration",
                 f"Enrolling {tenant.name} (Live) in Vault Disaster Recovery",
+                r"Re-enrolling will deactivate the current configuration",
             ]
         )
-        if i == 0:
-            cmd.expect("Type .+ to continue, or anything else to cancel: ")
-            cmd.sendline("restart live-mode Vault Disaster Recovery from scratch")
+        if i == 1:
+            raise AlreadyEnrolled
 
         cmd.expect_exact("Enter org public key (age recipient): ")
         cmd.sendline(cfg.org_public_keys[0])
@@ -282,38 +312,27 @@ def ensure_enrolled_in_live_vdr(tenant):
         cmd.expect_exact("Add another org public key? [y/n] ")
         cmd.sendline("n")
 
-        cmd.expect("Enter AWS account ID: ")
+        cmd.expect_exact("Enter AWS account ID: ")
         cmd.sendline(cfg.aws_account_id)
 
-        cmd.expect("Enter AWS role name: ")
+        cmd.expect_exact("Enter AWS role name: ")
         cmd.sendline(cfg.aws_role_name)
 
-        cmd.expect("Enter S3 bucket name: ")
+        cmd.expect_exact("Enter S3 bucket name: ")
         cmd.sendline(cfg.s3_bucket_name)
 
-        outcome = cmd.expect_exact(
+        i = cmd.expect_exact(
             [
                 "Verifying configuration... OK",
                 # Multiple pytest processes can race against each other to
-                # enroll. Only one can win. We verify the configuration below
-                # to make sure it's correct and return the true config.
+                # enroll. Only one can win. We don't re-enroll on conflict, we just re-fetch the config from `footprint-dr status` to get the result of the race.
                 "Verifying configuration... Failed\r\nError: Already enrolled in Vault Disaster Recovery",
             ]
         )
-        enrollment_failed = outcome == 1
-
-        cmd.expect(pexpect.EOF)
-    assert cmd.exitstatus == (1 if enrollment_failed else 0)
-
-    # Check that the configuration is now correct.
-    with footprint_dr("status", "--live") as cmd:
+        if i == 1:
+            raise AlreadyEnrolled
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
-    output = cmd.before.decode()
-    got_cfg = EnrollmentConfig.parse_from_footprint_dr_status(output)
-    assert cfg.client_params_match(got_cfg)
-
-    return got_cfg
 
 
 def validate_decrypted_data(output_dir, expected_data):
