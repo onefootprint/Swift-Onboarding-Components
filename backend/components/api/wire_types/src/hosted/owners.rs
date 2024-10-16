@@ -24,3 +24,10 @@ pub struct CreateHostedBusinessOwnerRequest {
     pub data: RawUserDataRequest,
     pub ownership_stake: u32,
 }
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct UpdateHostedBusinessOwnerRequest {
+    #[serde(default)]
+    pub data: RawUserDataRequest,
+    pub ownership_stake: Option<u32>,
+}

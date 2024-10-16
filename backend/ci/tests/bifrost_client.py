@@ -264,6 +264,30 @@ class BifrostClient:
         post("/hosted/business/vault/validate", data, self.auth_token)
         patch("/hosted/business/vault", data, self.auth_token)
 
+        # Special handling for business owners
+        if "business_kyced_beneficial_owners" in requirement["missing_attributes"]:
+            # Set the primary owner's stake
+            primary_owner_stake = self.data.get("business.primary_owner_stake", None)
+            if primary_owner_stake:
+                data = dict(ownership_stake=primary_owner_stake)
+                # The id of the primary BO is always hardcoded
+                patch("/hosted/business/owners/bo_link_primary", data, self.auth_token)
+                data = {
+                    "id.first_name": self.data["id.first_name"],
+                    "id.last_name": self.data["id.last_name"],
+                }
+                patch("/hosted/user/vault", data, self.auth_token)
+
+            # Create any secondary owners
+            secondary_owners = self.data.get("business.secondary_beneficial_owners", [])
+            for secondary_owner in secondary_owners:
+                secondary_owner = {**secondary_owner}
+                data = dict(
+                    ownership_stake=secondary_owner.pop("ownership_stake"),
+                    data=secondary_owner,
+                )
+                post("/hosted/business/owners", data, self.auth_token)
+
     def handle_ip_doc(self):
         """Some special logic to upload a document for certain investor profile options"""
         doc_required_declarations = {"affiliated_with_us_broker", "senior_executive"}

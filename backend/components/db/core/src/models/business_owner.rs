@@ -220,6 +220,11 @@ impl BusinessOwner {
                     .filter(business_owner::user_vault_id.eq(uv_id))
                     .filter(business_owner::business_vault_id.eq(bv_id))
             }
+            BoIdentifier::LinkId { bv_id, link_id } => {
+                query = query
+                    .filter(business_owner::business_vault_id.eq(bv_id))
+                    .filter(business_owner::link_id.eq(link_id))
+            }
         }
         let result = query.get_result(conn)?;
         Ok(result)
@@ -272,6 +277,10 @@ pub enum BoIdentifier<'a> {
     Vaults {
         uv_id: &'a VaultId,
         bv_id: &'a VaultId,
+    },
+    LinkId {
+        bv_id: &'a VaultId,
+        link_id: &'a BoLinkId,
     },
 }
 
