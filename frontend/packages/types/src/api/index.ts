@@ -262,6 +262,10 @@ export type {
   StytchTelemetryResponse,
 } from './send-stytch-telemetry';
 export type {
+  GetEntitySentilinkSignalRequest,
+  GetEntitySentilinkSignalResponse,
+} from './get-entity-entilink-signal';
+export type {
   SessionValidateRequest,
   SessionValidateResponse,
 } from './session-validate';

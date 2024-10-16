@@ -130,6 +130,8 @@ export type {
   GetRolesRequest,
   GetRolesResponse,
   GetRulesResponse,
+  GetEntitySentilinkSignalRequest,
+  GetEntitySentilinkSignalResponse,
   GetTagsResponse,
   GetOrgTagsResponse,
   GetBusinessInsightsResponse,
