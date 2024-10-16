@@ -100,7 +100,7 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
       numericOnly: true,
     },
     validations: {
-      required: 'Dob is required',
+      required: 'Date of birth is required',
       validate: (value: string) => validateDob(value, options.locale),
     },
   },
