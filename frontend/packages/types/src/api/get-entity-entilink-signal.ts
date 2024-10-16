@@ -1,13 +1,8 @@
+import type { SentilinkReasonCode } from './../data/sentilink';
+
 export type GetEntitySentilinkSignalRequest = {
   entityId: string;
   riskSignalId: string;
-};
-
-type SentilinkReasonCode = {
-  code: string;
-  direction: string;
-  explanation: string;
-  rank: number;
 };
 
 export type GetEntitySentilinkSignalResponse = {

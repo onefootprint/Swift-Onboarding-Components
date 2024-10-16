@@ -253,6 +253,7 @@ export {
 } from './rule';
 export { IdDocOutcome, OverallOutcome, IdVerificationOutcome } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';
+export { SentilinkFraudLevel, type SentilinkReasonCode } from './sentilink';
 export type { Tenant } from './tenant';
 export type {
   CollectedDataEvent,
