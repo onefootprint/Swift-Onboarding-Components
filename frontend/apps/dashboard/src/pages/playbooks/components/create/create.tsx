@@ -7,10 +7,10 @@ import styled from 'styled-components';
 import StepKind from './components/step-kind';
 import { DialogButtonsProvider, useDialogButtons } from './hooks/use-dialog-buttons';
 
-const FlowAuth = lazy(() => import('./components/flow-auth'));
-const FlowDocument = lazy(() => import('./components/flow-document'));
-const FlowKyc = lazy(() => import('./components/flow-kyc'));
-const FlowKyb = lazy(() => import('./components/flow-kyb'));
+const AuthFlow = lazy(() => import('./components/flow-auth'));
+const DocumentFlow = lazy(() => import('./components/flow-document'));
+const KycFlow = lazy(() => import('./components/kyc-flow'));
+const KybFlow = lazy(() => import('./components/flow-kyb'));
 
 type Step = 'select-kind' | OnboardingConfigKind;
 
@@ -69,10 +69,10 @@ const Form = ({ onDone }: { onDone: () => void }) => {
       <Content>
         {step === 'select-kind' && <StepKind defaultValues={{ kind }} onSubmit={handleSubmitStep} />}
         <Suspense fallback={null}>
-          {step === 'auth' && <FlowAuth onDone={onDone} onBack={handleBack} />}
-          {step === 'document' && <FlowDocument onDone={onDone} onBack={handleBack} />}
-          {step === 'kyc' && <FlowKyc onDone={onDone} onBack={handleBack} />}
-          {step === 'kyb' && <FlowKyb onDone={onDone} onBack={handleBack} />}
+          {step === 'auth' && <AuthFlow onDone={onDone} onBack={handleBack} />}
+          {step === 'document' && <DocumentFlow onDone={onDone} onBack={handleBack} />}
+          {step === 'kyc' && <KycFlow onDone={onDone} onBack={handleBack} />}
+          {step === 'kyb' && <KybFlow onDone={onDone} onBack={handleBack} />}
         </Suspense>
       </Content>
     </Box>

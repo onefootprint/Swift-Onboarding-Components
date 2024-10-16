@@ -4,13 +4,13 @@ import { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import useOrg from 'src/hooks/use-org';
 import useCreatePlaybook from '../../hooks/use-create-playbook';
-import PersonData from '../person-data';
-import KycTemplatesStep, { OnboardingTemplate } from '../step-kyc-templates';
-import KycVerificationChecksStep from '../step-kyc-verification-checks';
 import NameStep from '../step-name';
 import RequiredAuthMethodsStep from '../step-required-auth-methods';
 import ResidencyStep from '../step-residency';
 import StepperContainer from '../stepper-container';
+import PersonStep from './components/details-step';
+import Templates, { OnboardingTemplate } from './components/templates-step';
+import KycVerificationChecksStep from './components/verification-checks-step';
 import createPayload from './utils/create-payload';
 import getStepperValue from './utils/get-stepper-value';
 import { initialState, reducer } from './utils/reducer';
@@ -83,7 +83,7 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
         />
       )}
       {state.step === 'templates' && (
-        <KycTemplatesStep
+        <Templates
           defaultValues={state.data.templateForm}
           onBack={() => {
             dispatch({ type: 'updateStep', payload: 'name' });
@@ -110,18 +110,18 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
         />
       )}
       {state.step === 'kycData' && (
-        <PersonData
+        <PersonStep
           meta={{
             canEdit: state.data.residencyForm.residencyType === 'us' && isTemplateEditable,
             residencyForm: state.data.residencyForm,
             templateForm: state.data.templateForm,
           }}
-          defaultValues={state.data.kycForm}
+          defaultValues={state.data.detailsForm}
           onBack={() => {
             dispatch({ type: 'updateStep', payload: 'residency' });
           }}
           onSubmit={data => {
-            dispatch({ type: 'updateKycData', payload: data });
+            dispatch({ type: 'updateDetailsData', payload: data });
             dispatch({ type: 'updateStep', payload: 'requiredAuthMethods' });
           }}
         />
@@ -144,11 +144,11 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
           meta={{
             canEdit: isTemplateEditable,
             allowInternationalResident: state.data.residencyForm.residencyType !== 'us',
-            collectsDocs: state.data.kycForm.gov.global.length > 0,
-            collectsPhone: state.data.kycForm.person.phoneNumber,
+            collectsDocs: state.data.detailsForm.gov.global.length > 0,
+            collectsPhone: state.data.detailsForm.person.phoneNumber,
             collectsSsn9:
-              state.data.kycForm.person.ssn.collect &&
-              state.data.kycForm.person.ssn.kind === CollectedKycDataOption.ssn9,
+              state.data.detailsForm.person.ssn.collect &&
+              state.data.detailsForm.person.ssn.kind === CollectedKycDataOption.ssn9,
             isProdNeuroEnabled: orgQuery.data?.isProdNeuroEnabled || false,
             isProdSentilinkEnabled: orgQuery.data?.isProdSentilinkEnabled || false,
           }}

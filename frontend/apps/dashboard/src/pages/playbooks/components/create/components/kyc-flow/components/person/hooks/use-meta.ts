@@ -1,9 +1,9 @@
 import { CollectedKycDataOption } from '@onefootprint/types';
 import { useFormContext, useWatch } from 'react-hook-form';
-import type { KycPersonFormData } from '../kyc-person.types';
+import type { PersonFormData } from '../person.types';
 
 const useMeta = () => {
-  const { control } = useFormContext<KycPersonFormData>();
+  const { control } = useFormContext<PersonFormData>();
   const person = useWatch({ control, name: 'person' });
 
   return {

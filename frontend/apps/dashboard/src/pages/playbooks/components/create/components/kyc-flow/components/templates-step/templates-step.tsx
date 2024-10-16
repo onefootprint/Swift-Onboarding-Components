@@ -4,19 +4,19 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { type KycTemplatesFormData, OnboardingTemplate } from './kyc-templates-step.types';
+import { OnboardingTemplate, type TemplatesFormData } from './templates-step.types';
 
-import Header from '../header';
+import Header from '../../../header';
 
-export type KycTemplatesStepProps = {
-  defaultValues: KycTemplatesFormData;
+export type TemplatesStepProps = {
+  defaultValues: TemplatesFormData;
   onBack: () => void;
-  onSubmit: (data: KycTemplatesFormData) => void;
+  onSubmit: (data: TemplatesFormData) => void;
 };
 
-const KycTemplatesStep = ({ defaultValues, onSubmit, onBack }: KycTemplatesStepProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.kyc-templates' });
-  const { handleSubmit, control } = useForm<KycTemplatesFormData>({
+const TemplatesStep = ({ defaultValues, onSubmit, onBack }: TemplatesStepProps) => {
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.templates' });
+  const { handleSubmit, control } = useForm<TemplatesFormData>({
     defaultValues,
   });
 
@@ -142,4 +142,4 @@ const SectionHeader = styled(Stack)`
   `}
 `;
 
-export default KycTemplatesStep;
+export default TemplatesStep;

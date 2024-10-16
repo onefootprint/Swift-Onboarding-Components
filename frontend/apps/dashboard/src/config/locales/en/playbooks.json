@@ -246,7 +246,7 @@
         }
       }
     },
-    "kyc-templates": {
+    "templates": {
       "title": "Templates",
       "subtitle": "Configure your own KYC settings or select a pre-defined template.",
       "custom": {

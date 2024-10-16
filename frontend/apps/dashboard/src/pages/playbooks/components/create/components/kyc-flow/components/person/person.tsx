@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import Panel from '../panel';
-import type { ResidencyFormData } from '../step-residency';
+import Panel from '../../../panel';
+import type { ResidencyFormData } from '../../../step-residency';
 import Cta from './components/cta';
 import Form from './components/form';
 import Preview from './components/preview';
 
-type KycPersonProps = {
+type PersonProps = {
   meta: {
     canEdit: boolean;
     residencyForm: ResidencyFormData;
   };
 };
 
-const KycPerson = ({ meta }: KycPersonProps) => {
+const Person = ({ meta }: PersonProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.person' });
   const [showForm, setShowForm] = useState(false);
 
@@ -38,4 +38,4 @@ const KycPerson = ({ meta }: KycPersonProps) => {
   );
 };
 
-export default KycPerson;
+export default Person;

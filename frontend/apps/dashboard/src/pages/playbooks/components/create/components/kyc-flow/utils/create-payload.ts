@@ -5,28 +5,28 @@ import {
   OnboardingConfigKind,
   type OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
-import type { KycPersonFormData } from '../../collect-kyc-person';
 import type { InvestorFormData } from '../../investor';
-import type { KycFormData } from '../../person-data';
-import type { KycVerificationChecksFormData } from '../../step-kyc-verification-checks';
 import type { NameFormData } from '../../step-name';
 import type { RequiredAuthMethodsFormData } from '../../step-required-auth-methods';
 import type { ResidencyFormData } from '../../step-residency';
+import type { DetailsFormData } from '../components/details-step';
+
+import type { VerificationChecksFormData } from '../components/verification-checks-step';
 
 import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
 
 type KycFlowFormData = {
   nameForm: NameFormData;
   residencyForm: ResidencyFormData;
-  kycForm: KycFormData;
+  detailsForm: DetailsFormData;
   requiredAuthMethodsForm: RequiredAuthMethodsFormData;
-  verificationChecksForm: KycVerificationChecksFormData;
+  verificationChecksForm: VerificationChecksFormData;
 };
 
 const createPayload = ({
   nameForm,
   residencyForm,
-  kycForm,
+  detailsForm,
   requiredAuthMethodsForm,
   verificationChecksForm,
 }: KycFlowFormData): OrgOnboardingConfigCreateRequest => {
@@ -34,12 +34,12 @@ const createPayload = ({
     name: nameForm.name,
     kind: OnboardingConfigKind.kyc,
     documentTypesAndCountries: {
-      countrySpecific: kycForm.gov.country,
-      global: kycForm.gov.global,
+      countrySpecific: detailsForm.gov.country,
+      global: detailsForm.gov.global,
     },
     ...createResidencyPayload(residencyForm),
-    ...createMustCollect(kycForm.person, kycForm.investor),
-    ...createAdditionalDocsPayload(kycForm.docs),
+    ...createMustCollect(detailsForm.person, detailsForm.investor),
+    ...createAdditionalDocsPayload(detailsForm.docs),
     ...createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
     ...createVerificationChecks(verificationChecksForm),
   };
@@ -53,7 +53,7 @@ const requiredKycFields = [
 ];
 
 const createMustCollect = (
-  { ssn, phoneNumber, usLegalStatus, usTaxIdAcceptable }: KycPersonFormData['person'],
+  { ssn, phoneNumber, usLegalStatus, usTaxIdAcceptable }: DetailsFormData['person'],
   { collect: collectInvestorQuestion }: InvestorFormData['investor'],
 ) => {
   const mustCollectData: CollectedDataOption[] = [...requiredKycFields];
@@ -102,7 +102,7 @@ const createResidencyPayload = (residencyForm: ResidencyFormData) => {
   };
 };
 
-const createVerificationChecks = (verificationChecksForm: KycVerificationChecksFormData) => {
+const createVerificationChecks = (verificationChecksForm: VerificationChecksFormData) => {
   return {
     enhancedAml: verificationChecksForm.aml,
     verificationChecks: [

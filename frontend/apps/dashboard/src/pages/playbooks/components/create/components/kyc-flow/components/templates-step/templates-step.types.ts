@@ -7,6 +7,6 @@ export enum OnboardingTemplate {
   CreditCard = 'credit-card',
 }
 
-export type KycTemplatesFormData = {
+export type TemplatesFormData = {
   template: OnboardingTemplate;
 };

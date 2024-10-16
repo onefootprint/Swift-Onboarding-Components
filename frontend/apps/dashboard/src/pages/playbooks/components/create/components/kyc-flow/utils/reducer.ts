@@ -1,9 +1,9 @@
-import type { KycFormData } from '../../person-data';
-import type { KycTemplatesFormData, OnboardingTemplate } from '../../step-kyc-templates';
-import type { KycVerificationChecksFormData } from '../../step-kyc-verification-checks';
 import type { NameFormData } from '../../step-name';
 import type { RequiredAuthMethodsFormData } from '../../step-required-auth-methods';
 import type { ResidencyFormData } from '../../step-residency';
+import type { DetailsFormData } from '../components/details-step';
+import type { OnboardingTemplate, TemplatesFormData } from '../components/templates-step';
+import type { VerificationChecksFormData } from '../components/verification-checks-step';
 import { defaultFormValues, templateValues } from './get-default-form-values';
 
 export type Step =
@@ -19,22 +19,22 @@ export type State = {
   step: Step;
   data: {
     nameForm: NameFormData;
-    templateForm: KycTemplatesFormData;
+    templateForm: TemplatesFormData;
     residencyForm: ResidencyFormData;
-    kycForm: KycFormData;
+    detailsForm: DetailsFormData;
     requiredAuthMethodsForm: RequiredAuthMethodsFormData;
-    verificationChecksForm: KycVerificationChecksFormData;
+    verificationChecksForm: VerificationChecksFormData;
   };
 };
 
 export type Action =
   | { type: 'updateStep'; payload: Step }
   | { type: 'updateNameData'; payload: Partial<NameFormData> }
-  | { type: 'updateTemplateData'; payload: Partial<KycTemplatesFormData> }
+  | { type: 'updateTemplateData'; payload: Partial<TemplatesFormData> }
   | { type: 'updateResidencyData'; payload: Partial<ResidencyFormData> }
-  | { type: 'updateKycData'; payload: Partial<KycFormData> }
+  | { type: 'updateDetailsData'; payload: Partial<DetailsFormData> }
   | { type: 'updateRequiredAuthMethodsData'; payload: Partial<RequiredAuthMethodsFormData> }
-  | { type: 'updateVerificationChecksData'; payload: Partial<KycVerificationChecksFormData> }
+  | { type: 'updateVerificationChecksData'; payload: Partial<VerificationChecksFormData> }
   | { type: 'navigateStep'; payload: string };
 
 export const initialState: State = {
@@ -89,13 +89,13 @@ export const reducer = (state: State, action: Action): State => {
           },
         },
       };
-    case 'updateKycData':
+    case 'updateDetailsData':
       return {
         ...state,
         data: {
           ...state.data,
-          kycForm: {
-            ...state.data.kycForm,
+          detailsForm: {
+            ...state.data.detailsForm,
             ...action.payload,
           },
         },

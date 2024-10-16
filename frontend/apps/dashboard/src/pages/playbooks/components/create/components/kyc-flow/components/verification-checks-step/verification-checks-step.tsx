@@ -4,12 +4,12 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import Header from '../header';
+import Header from '../../../header';
 import useMeta from './hooks/use-meta';
-import type { KycVerificationChecksFormData } from './kyc-verification-checks-step.types';
+import type { VerificationChecksFormData } from './verification-checks.types';
 
-export type StepVerificationChecksProps = {
-  defaultValues: KycVerificationChecksFormData;
+export type VerificationChecksStepProps = {
+  defaultValues: VerificationChecksFormData;
   meta: {
     allowInternationalResident: boolean;
     canEdit: boolean;
@@ -20,13 +20,13 @@ export type StepVerificationChecksProps = {
     isProdSentilinkEnabled: boolean;
   };
   onBack: () => void;
-  onSubmit: (formData: KycVerificationChecksFormData) => void;
+  onSubmit: (formData: VerificationChecksFormData) => void;
 };
 
-const StepVerificationChecks = ({ defaultValues, meta, onBack, onSubmit }: StepVerificationChecksProps) => {
+const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: VerificationChecksStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
   const { neuro, sentilink, kyc, aml } = useMeta(meta);
-  const { register, control, handleSubmit, setValue } = useForm<KycVerificationChecksFormData>({ defaultValues });
+  const { register, control, handleSubmit, setValue } = useForm<VerificationChecksFormData>({ defaultValues });
   const [isEnhancedAmlEnabled, ofac, pep, adverseMedia] = useWatch({
     control,
     name: ['aml.enhancedAml', 'aml.ofac', 'aml.pep', 'aml.adverseMedia'],
@@ -225,4 +225,4 @@ const SectionHeader = styled.header`
   `};
 `;
 
-export default StepVerificationChecks;
+export default VerificationChecksStep;

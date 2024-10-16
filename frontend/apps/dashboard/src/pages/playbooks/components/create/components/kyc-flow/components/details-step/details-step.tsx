@@ -1,29 +1,29 @@
 import { Stack } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import AdditionalDocs from '../additional-docs';
-import KycPerson from '../collect-kyc-person';
-import GovDocs from '../gov-docs';
-import Header from '../header';
-import Investor from '../investor';
-import type { KycTemplatesFormData } from '../step-kyc-templates';
-import type { ResidencyFormData } from '../step-residency';
-import type { KycFormData } from './kyc-data-step.types';
+import AdditionalDocs from '../../../additional-docs';
+import GovDocs from '../../../gov-docs';
+import Header from '../../../header';
+import Investor from '../../../investor';
+import type { ResidencyFormData } from '../../../step-residency';
+import Person from '../person';
+import type { TemplatesFormData } from '../templates-step';
+import type { DetailsFormData } from './details-step.types';
 
-export type KycDataStep = {
-  defaultValues: KycFormData;
+export type DetailsStep = {
+  defaultValues: DetailsFormData;
   onBack: () => void;
-  onSubmit: (data: KycFormData) => void;
+  onSubmit: (data: DetailsFormData) => void;
   meta: {
     canEdit: boolean;
     residencyForm: ResidencyFormData;
-    templateForm: KycTemplatesFormData;
+    templateForm: TemplatesFormData;
   };
 };
 
-const KycDataStep = ({ onSubmit, onBack, defaultValues, meta }: KycDataStep) => {
+const DetailsStep = ({ onSubmit, onBack, defaultValues, meta }: DetailsStep) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.settings-person' });
-  const form = useForm<KycFormData>({ defaultValues });
+  const form = useForm<DetailsFormData>({ defaultValues });
   const title = meta.canEdit ? t('title') : t('non-editable.title');
   const subtitle = meta.canEdit ? t('subtitle') : t('non-editable.subtitle');
 
@@ -40,7 +40,7 @@ const KycDataStep = ({ onSubmit, onBack, defaultValues, meta }: KycDataStep) => 
           }}
         >
           <Stack direction="column" gap={7}>
-            <KycPerson meta={meta} />
+            <Person meta={meta} />
             <GovDocs />
             <AdditionalDocs />
             <Investor />
@@ -51,4 +51,4 @@ const KycDataStep = ({ onSubmit, onBack, defaultValues, meta }: KycDataStep) => 
   );
 };
 
-export default KycDataStep;
+export default DetailsStep;

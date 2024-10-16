@@ -1,6 +1,6 @@
 import type { CollectedKycDataOption } from '@onefootprint/types';
 
-export type KycPersonFormData = {
+export type PersonFormData = {
   person: {
     address: boolean;
     dob: boolean;

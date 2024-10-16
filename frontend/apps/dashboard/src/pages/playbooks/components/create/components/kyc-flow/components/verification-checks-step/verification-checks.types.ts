@@ -6,7 +6,7 @@ export type Aml = {
   hasOptionSelected?: boolean;
 };
 
-export type KycVerificationChecksFormData = {
+export type VerificationChecksFormData = {
   aml: Aml;
   runKyc: boolean;
   isNeuroEnabled: boolean;

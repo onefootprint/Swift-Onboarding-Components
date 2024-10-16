@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import useMeta from '../../hooks/use-meta';
-import type { KycPersonFormData } from '../../kyc-person.types';
+import type { PersonFormData } from '../../person.types';
 
 type FormProps = {
   onClose: () => void;
@@ -16,7 +16,7 @@ type FormProps = {
 const Form = ({ onClose }: FormProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.person.form' });
-  const { register, control, setValue } = useFormContext<KycPersonFormData>();
+  const { register, control, setValue } = useFormContext<PersonFormData>();
   const { showNoPhoneFlow, hasSsnOptional, collectsSsn, hasUsTaxIdAcceptable } = useMeta();
   const data = useWatch({ control, name: 'person' });
   const [initialValues] = useState(() => {

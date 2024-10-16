@@ -1,8 +1,8 @@
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import DataCollection from '../../../data-collection';
-import type { ResidencyFormData } from '../../../step-residency';
+import DataCollection from '../../../../../data-collection';
+import type { ResidencyFormData } from '../../../../../step-residency';
 import useMeta from '../../hooks/use-meta';
 import CountryList from './components/country-list';
 

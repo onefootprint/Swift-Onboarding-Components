@@ -1,5 +1,5 @@
 import { CollectedKycDataOption, SupportedIdDocTypes } from '@onefootprint/types';
-import { OnboardingTemplate } from '../../step-kyc-templates';
+import { OnboardingTemplate } from '../components/templates-step';
 import type { State } from './reducer';
 
 export const defaultFormValues: State['data'] = {
@@ -15,7 +15,7 @@ export const defaultFormValues: State['data'] = {
     isCountryRestricted: false,
     countryList: [],
   },
-  kycForm: {
+  detailsForm: {
     person: {
       address: true,
       dob: true,
@@ -66,7 +66,7 @@ export const defaultFormValues: State['data'] = {
 export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> = {
   [OnboardingTemplate.Custom]: {
     residencyForm: defaultFormValues.residencyForm,
-    kycForm: defaultFormValues.kycForm,
+    detailsForm: defaultFormValues.detailsForm,
     requiredAuthMethodsForm: defaultFormValues.requiredAuthMethodsForm,
     verificationChecksForm: defaultFormValues.verificationChecksForm,
   },
@@ -77,10 +77,10 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
       isCountryRestricted: false,
       countryList: [],
     },
-    kycForm: {
-      ...defaultFormValues.kycForm,
+    detailsForm: {
+      ...defaultFormValues.detailsForm,
       person: {
-        ...defaultFormValues.kycForm.person,
+        ...defaultFormValues.detailsForm.person,
         usLegalStatus: true,
       },
     },
@@ -103,10 +103,10 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
       isCountryRestricted: false,
       countryList: [],
     },
-    kycForm: {
-      ...defaultFormValues.kycForm,
+    detailsForm: {
+      ...defaultFormValues.detailsForm,
       person: {
-        ...defaultFormValues.kycForm.person,
+        ...defaultFormValues.detailsForm.person,
         usLegalStatus: true,
       },
     },
@@ -124,8 +124,8 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
   },
   [OnboardingTemplate.TenantScreening]: {
     residencyForm: defaultFormValues.residencyForm,
-    kycForm: {
-      ...defaultFormValues.kycForm,
+    detailsForm: {
+      ...defaultFormValues.detailsForm,
       gov: {
         country: {},
         global: [
@@ -146,8 +146,8 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
   },
   [OnboardingTemplate.CarRental]: {
     residencyForm: defaultFormValues.residencyForm,
-    kycForm: {
-      ...defaultFormValues.kycForm,
+    detailsForm: {
+      ...defaultFormValues.detailsForm,
       gov: {
         country: {},
         global: [SupportedIdDocTypes.driversLicense],
@@ -160,8 +160,8 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
   },
   [OnboardingTemplate.CreditCard]: {
     residencyForm: defaultFormValues.residencyForm,
-    kycForm: {
-      ...defaultFormValues.kycForm,
+    detailsForm: {
+      ...defaultFormValues.detailsForm,
       gov: {
         country: {},
         global: [
