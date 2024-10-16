@@ -353,11 +353,6 @@ pub fn get_requirements_inner<'a, T: Copy>(
                     return false;
                 }
             }
-            if kind == OnboardingRequirementKind::CollectBusinessData && entity_info.is_secondary_bo {
-                // Omit the confirm screen for business data when the user filling out the form is not the
-                // primary BO
-                return false;
-            }
             true
         })
         .collect();
@@ -434,7 +429,7 @@ fn get_requirement_inner<T>(
         user_values,
         business_owners,
         auth_events,
-        is_secondary_bo: _,
+        is_secondary_bo,
     } = entity_info;
     let RequirementOpts {
         require_capture_on_stepup,
@@ -492,6 +487,12 @@ fn get_requirement_inner<T>(
         OnboardingRequirementKind::CollectBusinessData => obc
             .must_collect(DID::Business)
             .then(|| -> FpResult<_> {
+                if is_secondary_bo {
+                    // Omit collecting any new business data and showing the business confirm screen
+                    // when the user filling out the form is not the primary BO
+                    return Ok(None);
+                }
+
                 let RequirementProgress {
                     mut populated_attributes,
                     optional_attributes: _,
@@ -502,13 +503,24 @@ fn get_requirement_inner<T>(
                 let has_linked_bos = business_owners
                     .iter()
                     .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
-                let are_all_bos_complete = !business_owners.is_empty()
-                    && business_owners.iter().all(|bo| {
+                let are_all_bos_complete = {
+                    let is_not_empty = !business_owners.is_empty();
+                    let are_bos_populated = business_owners.iter().all(|bo| {
+                        // Maybe don't require phone and email for primary
                         let vd_exists = (BusinessOwnerInfo::USER_DIS.iter())
                             .all(|i| bo.data.iter().any(|(di, _)| di == i));
                         let ownership_stake_exists = bo.bo.ownership_stake.is_some();
-                        ownership_stake_exists && vd_exists
+                        if bo.has_linked_user() {
+                            // Once there's a user linked, this BO's data will be collected by a CollectData
+                            // requirement. We just have to make sure the ownership stake is set
+                            ownership_stake_exists
+                        } else {
+                            // If we haven't yet linked a user, we need phone / email to send a link to the BO
+                            ownership_stake_exists && vd_exists
+                        }
                     });
+                    is_not_empty && are_bos_populated
+                };
 
                 let bo_cdo = (obc.must_collect_data.iter())
                     .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
@@ -525,14 +537,15 @@ fn get_requirement_inner<T>(
                         populated_attributes.push(bo_cdo.clone());
                     }
                 }
-                Ok(OnboardingRequirement::CollectBusinessData {
+                Ok(Some(OnboardingRequirement::CollectBusinessData {
                     missing_attributes,
                     populated_attributes,
                     has_linked_bos,
-                })
+                }))
             })
             .transpose()?
             .into_iter()
+            .flatten()
             .collect(),
         // The below requirements we will never include when met
         // (kind of confusing in that we are checking in real-time if they've been satisifed)
