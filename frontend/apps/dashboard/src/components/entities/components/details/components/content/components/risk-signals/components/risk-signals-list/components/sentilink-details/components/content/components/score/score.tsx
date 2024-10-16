@@ -34,19 +34,23 @@ const Score = ({ score, reasonCodes, title }: ScoreProps) => {
       </Stack>
       <Stack direction="column" padding={5} gap={5}>
         {moreFraudyReasonCodes.length > 0 && (
-          <Stack direction="column" gap={3}>
+          <Stack direction="column" gap={4}>
             <RiskIndicator fraudLevel={SentilinkFraudLevel.moreFraudy} />
-            {moreFraudyReasonCodes.map(reasonCode => (
-              <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
-            ))}
+            <Stack direction="column" gap={5}>
+              {moreFraudyReasonCodes.map(reasonCode => (
+                <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
+              ))}
+            </Stack>
           </Stack>
         )}
         {lessFraudyReasonCodes.length > 0 && (
-          <Stack direction="column" gap={3}>
+          <Stack direction="column" gap={4}>
             <RiskIndicator fraudLevel={SentilinkFraudLevel.lessFraudy} />
-            {lessFraudyReasonCodes.map(reasonCode => (
-              <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
-            ))}
+            <Stack direction="column" gap={5}>
+              {lessFraudyReasonCodes.map(reasonCode => (
+                <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
+              ))}
+            </Stack>
           </Stack>
         )}
       </Stack>
