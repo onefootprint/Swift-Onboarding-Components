@@ -136,6 +136,7 @@ def test_synthetic(sandbox_tenant, must_collect_data):
             )
 
             assert sentilink_detail["synthetic"]["score"] > 800
+            assert sentilink_detail["synthetic"]["score_band"] == "high"
             synthetic_rs = sentilink_detail["synthetic"]["reason_codes"]
             assert len(synthetic_rs) == 3
             # check that we are displaying in human readable form
@@ -148,6 +149,7 @@ def test_synthetic(sandbox_tenant, must_collect_data):
 
             assert sentilink_detail["id_theft"]["score"] is not None
             assert len(sentilink_detail["id_theft"]["reason_codes"]) == 3
+            assert sentilink_detail["id_theft"]["score_band"] == "low"
             test_ran = True
         else:
             assert not rs["has_sentilink_detail"]

@@ -27716,11 +27716,20 @@
                             "score": {
                                 "type": "integer",
                                 "format": "int32"
+                            },
+                            "score_band": {
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high"
+                                ]
                             }
                         },
                         "required": [
                             "reason_codes",
-                            "score"
+                            "score",
+                            "score_band"
                         ]
                     },
                     "synthetic": {
@@ -27756,11 +27765,20 @@
                             "score": {
                                 "type": "integer",
                                 "format": "int32"
+                            },
+                            "score_band": {
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high"
+                                ]
                             }
                         },
                         "required": [
                             "reason_codes",
-                            "score"
+                            "score",
+                            "score_band"
                         ]
                     }
                 }

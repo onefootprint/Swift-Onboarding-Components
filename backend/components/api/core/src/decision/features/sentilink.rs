@@ -7,8 +7,8 @@ use newtypes::FootprintReasonCode as FRC;
 // 750-800 high risk
 // 400-700 medium
 // 400 low risk
-const SCORE_THRESHOLD_HIGH: i32 = 750;
-const SCORE_THRESHOLD_MEDIUM: i32 = 400;
+pub const SCORE_THRESHOLD_HIGH: i32 = 750;
+pub const SCORE_THRESHOLD_MEDIUM: i32 = 400;
 
 pub fn footprint_reason_codes(response: &ValidatedApplicationRiskResponse) -> Vec<FRC> {
     let synthetic_reason_code = if response.synthetic_score.score >= SCORE_THRESHOLD_HIGH {

@@ -9,6 +9,7 @@ pub struct SentilinkDetail {
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct SentilinkScoreDetail {
     pub score: i32,
+    pub score_band: ScoreBand,
     pub reason_codes: Vec<SentilinkReasonCode>,
 }
 
@@ -23,4 +24,13 @@ pub struct SentilinkReasonCode {
     pub direction: String,
     // A written explanation of the reason code. String length will not exceed 255 characters.
     pub explanation: String,
+}
+
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub enum ScoreBand {
+    Low,
+    Medium,
+    High,
 }

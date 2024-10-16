@@ -8,6 +8,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::CanDecrypt;
 use api_core::decision;
+use api_core::decision::features::sentilink;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
@@ -21,6 +22,7 @@ use api_core::FpResult;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
+use api_wire_types::ScoreBand;
 use api_wire_types::SentilinkDetail;
 use api_wire_types::SentilinkScoreDetail;
 use db::models::audit_event::AuditEvent;
@@ -318,15 +320,34 @@ async fn get_synthetic_reason_codes_for_risk_signal(
         .sentilink_synthetic_score
         .clone()
         .and_then(|s| s.score().ok())
+        .map(|sc| {
+            let band = sentilink_score_band_from_score(sc.score);
+            (sc, band)
+        })
         .map(SentilinkScoreDetail::from_db);
     let id_theft = response
         .sentilink_id_theft_score
         .clone()
         .and_then(|s| s.score().ok())
+        .map(|sc| {
+            let band = sentilink_score_band_from_score(sc.score);
+            (sc, band)
+        })
         .map(SentilinkScoreDetail::from_db);
 
     Ok(SentilinkDetail { synthetic, id_theft })
 }
+
+fn sentilink_score_band_from_score(score: i32) -> ScoreBand {
+    if score > sentilink::SCORE_THRESHOLD_HIGH {
+        ScoreBand::High
+    } else if score > sentilink::SCORE_THRESHOLD_MEDIUM {
+        ScoreBand::Medium
+    } else {
+        ScoreBand::Low
+    }
+}
+
 
 pub type HasSentilinkDetail = bool;
 async fn get_risk_signal_and_maybe_detail(
