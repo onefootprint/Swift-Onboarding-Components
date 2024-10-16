@@ -10,6 +10,7 @@ export type EntityOwnedBusinessInfo = {
   id: string;
   status: EntityStatus;
   name: string;
+  startTimestamp: string;
 };
 
 export enum EntityOwnedBusinessRequestStatus {
@@ -28,11 +29,14 @@ const useEntityOwnedBusinesses = (id: string) => {
       businessIds?.map(({ id: bid }) => ({
         queryKey: ['entity', bid, authHeaders],
         queryFn: () => getEntity(authHeaders, { id: bid }),
-        select: (response: GetEntityResponse): EntityOwnedBusinessInfo => ({
-          id: response.id,
-          status: response.status,
-          name: (response.data.find(attribute => attribute.identifier === BusinessDI.name)?.value as string) || '-',
-        }),
+        select: (response: GetEntityResponse): EntityOwnedBusinessInfo => {
+          return {
+            id: response.id,
+            status: response.status,
+            name: (response.data.find(attribute => attribute.identifier === BusinessDI.name)?.value as string) || '-',
+            startTimestamp: response.startTimestamp,
+          };
+        },
       })) || [],
   });
 

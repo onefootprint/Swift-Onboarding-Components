@@ -1,5 +1,6 @@
-import { IcoStore24 } from '@onefootprint/icons';
-import { Box, Text } from '@onefootprint/ui';
+import { IcoStore16 } from '@onefootprint/icons';
+import { Box, Stack, Text } from '@onefootprint/ui';
+import { format } from 'date-fns';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -8,6 +9,10 @@ import type { EntityOwnedBusinessInfo } from '@/entity/hooks/use-entity-owned-bu
 
 type OwnedBusinessesProps = {
   businesses?: EntityOwnedBusinessInfo[];
+};
+
+const formatDate = (date: string) => {
+  return format(new Date(date), 'MMM d, yyyy');
 };
 
 const OwnedBusinesses = ({ businesses }: OwnedBusinessesProps) => {
@@ -19,21 +24,34 @@ const OwnedBusinesses = ({ businesses }: OwnedBusinessesProps) => {
     return null;
   }
 
+  const sortedBusinesses = [...businesses].sort(
+    (a, b) => new Date(b.startTimestamp).getTime() - new Date(a.startTimestamp).getTime(),
+  );
   return (
     <Container aria-label="Businesses">
       <Box>
         <Header>
           <Title>
-            <IcoStore24 />
+            <IcoStore16 />
             <Text variant="label-3">{t('title')}</Text>
           </Title>
         </Header>
         <Content>
-          {businesses.map(business => (
-            <Field>
-              <Text variant="body-3" color="tertiary" tag="label" id={business.id}>
-                {business.name}
-              </Text>
+          {sortedBusinesses.map(business => (
+            <Field key={business.id}>
+              <Stack direction="column" gap={1}>
+                <Text variant="label-3" color="primary" tag="label" id={business.id}>
+                  {business.name}
+                </Text>
+                <Stack direction="row" gap={2} align="center">
+                  <Text variant="body-3" color="tertiary">
+                    {t('last-activity-at')}
+                  </Text>
+                  <Text variant="label-3" color="secondary">
+                    {formatDate(business.startTimestamp)}
+                  </Text>
+                </Stack>
+              </Stack>
               <Text color="accent" variant="label-3">
                 <Link target="_blank" href={`/businesses/${business.id}`}>
                   {t('link')}
@@ -66,6 +84,7 @@ const Header = styled.header`
     border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
     display: flex;
     justify-content: space-between;
+    height: 40px;
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `};
 `;
@@ -83,7 +102,7 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
+    padding: ${theme.spacing[5]};
   `};
 `;
 

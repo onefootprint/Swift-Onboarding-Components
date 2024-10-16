@@ -957,7 +957,8 @@
           "title": "ID documents & Selfie"
         },
         "businesses": {
-          "title": "Businesses",
+          "title": "Associated businesses",
+          "last-activity-at": "Onboarded on",
           "link": "View profile"
         }
       }
