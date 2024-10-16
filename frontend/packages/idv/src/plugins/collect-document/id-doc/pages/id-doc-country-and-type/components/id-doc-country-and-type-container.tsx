@@ -1,6 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import { getErrorMessage } from '@onefootprint/request';
 import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import type { CountrySelectOption, RadioSelectOptionFields } from '@onefootprint/ui';
@@ -30,6 +29,7 @@ type IdDocCountryAndTypeContainerProps = {
     docType: `${SupportedIdDocTypes}`,
   ) => void;
   onConsentSubmit: () => void;
+  userCountryCode?: CountryCode;
 };
 
 const { logError } = getLogger({ location: 'id-doc-country-and-type-container' });
@@ -39,29 +39,36 @@ const getRecordKeys = <T extends object>(object: T) => Object.keys(object) as (k
 const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
   onConsentSubmit,
+  userCountryCode,
 }: IdDocCountryAndTypeContainerProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.id-doc.pages.country-and-type-selection',
   });
   const [state] = useIdDocMachine();
+  const requestErrorToast = useIdvRequestErrorToast();
   const submitDocTypeMutation = useSubmitDocType();
   const { isPending: isDocTypeSubmissionLoading } = submitDocTypeMutation;
   const [consentVisible, setConsentVisible] = useState(false);
   const l10n = useL10nContext();
-  const { idDoc: defaultCountryDoc, sandboxOutcome, isConsentMissing, authToken, device, requirement } = state.context;
+  const {
+    idDoc: { country: selectedCountryCode, type: selectedDocType },
+    authToken,
+    device,
+    isConsentMissing,
+    requirement,
+    sandboxOutcome,
+  } = state.context;
+  const { type: deviceType } = device;
   const { supportedCountryAndDocTypes } = requirement.config;
-  const { country: prevDefaultCountry, type: defaultType } = defaultCountryDoc;
+
   const supportedCountries = new Set(getRecordKeys(supportedCountryAndDocTypes));
   const supportedCountryRecords = COUNTRIES.filter(country => supportedCountries.has(country.value));
-  const defaultSupportedCountry = getDefaultCountry(supportedCountries, supportedCountryRecords, prevDefaultCountry);
-  const { type: deviceType } = device;
-
-  const requestErrorToast = useIdvRequestErrorToast();
+  const defaultSupportedCountry = getDefaultCountry(supportedCountries, selectedCountryCode || userCountryCode);
   const [country, setCountry] = useState<CountryRecord>(defaultSupportedCountry);
 
-  const types: SupportedIdDocTypes[] = supportedCountryAndDocTypes[country.value] ?? [];
+  const types: SupportedIdDocTypes[] = supportedCountryAndDocTypes[country?.value] ?? [];
   const firstTypeFromOptions = types.length ? types[0] : SupportedIdDocTypes.passport;
-  const [docType, setDocType] = useState<`${SupportedIdDocTypes}`>(defaultType ?? firstTypeFromOptions);
+  const [docType, setDocType] = useState<`${SupportedIdDocTypes}`>(selectedDocType ?? firstTypeFromOptions);
 
   const handleCountryChange = (option: CountrySelectOption) => {
     const nextCountry = getCountryFromCode(option.value);
@@ -104,7 +111,7 @@ const IdDocCountryAndTypeContainer = ({
         },
         onError: err => {
           logError(
-            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(err)}`,
+            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error:`,
             err,
           );
           requestErrorToast(err);

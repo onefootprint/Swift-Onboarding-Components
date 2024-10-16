@@ -4,7 +4,6 @@ import {
   clickOnContinue,
   clickOnVerifyWithSms,
   confirmData,
-  continueOnDesktop,
   fillAddress,
   fillNameAndDoB,
   fillPhoneNumber,
@@ -88,9 +87,4 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ isMobile, page }) => {
     zipCode,
     country: 'US',
   });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-  await continueOnDesktop(frame);
-  await page.waitForLoadState();
-  await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
 });

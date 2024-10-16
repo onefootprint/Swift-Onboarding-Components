@@ -1,6 +1,6 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import type { CountryRecord } from '@onefootprint/global-constants';
-import { COUNTRIES } from '@onefootprint/global-constants';
+import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 
 export const getCountryFromCode = (countryCode?: CountryCode) => {
@@ -11,18 +11,16 @@ export const getCountryFromCode = (countryCode?: CountryCode) => {
 export const getCountryCodeFromLocale = (l?: SupportedLocale) =>
   l ? (l.slice(-2).toUpperCase() as CountryCode) : undefined;
 
-export const getDefaultCountry = (
-  supportedCountries: Set<CountryCode>,
-  supportedCountryRecords: CountryRecord[],
-  prevDefaultCountry?: CountryCode,
-) => {
-  let defaultCountry;
-  if (prevDefaultCountry && supportedCountries.has(prevDefaultCountry)) {
-    defaultCountry = getCountryFromCode(prevDefaultCountry);
+export const getDefaultCountry = (supportedCountries: Set<CountryCode>, countryCode?: CountryCode): CountryRecord => {
+  let country;
+
+  if (countryCode && supportedCountries.has(countryCode)) {
+    country = getCountryFromCode(countryCode);
   } else if (supportedCountries.has('US')) {
-    defaultCountry = getCountryFromCode('US');
+    country = getCountryFromCode('US');
+  } else if (supportedCountries.size > 0) {
+    country = getCountryFromCode(Array.from(supportedCountries)[0]);
   }
 
-  if (!defaultCountry) [defaultCountry] = supportedCountryRecords;
-  return defaultCountry;
+  return country || DEFAULT_COUNTRY;
 };
