@@ -9,6 +9,6 @@ const sentilinkReasonCodes = [
   'sentilink_identity_theft_low_risk',
 ];
 
-export const isSentilinkSignal = (riskSignal: RiskSignal) => {
+export default function isSentilinkSignal(riskSignal: RiskSignal) {
   return sentilinkReasonCodes.includes(riskSignal.reasonCode);
-};
+}

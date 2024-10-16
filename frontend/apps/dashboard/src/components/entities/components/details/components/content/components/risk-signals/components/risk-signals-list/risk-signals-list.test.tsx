@@ -1,13 +1,13 @@
 import { customRender, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 
 import RiskSignalsList from '.';
-import { withRiskSignals, withRiskSignalsError } from './risk-signals.test.config';
+import { withRiskSignalDetails, withRiskSignals, withRiskSignalsError } from './risk-signals-list.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
-describe.skip('<RiskSignals />', () => {
+describe('<RiskSignalsList />', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/entities');
     mockRouter.query = {
@@ -79,7 +79,7 @@ describe.skip('<RiskSignals />', () => {
     });
 
     describe('when clicking on the table row', () => {
-      it('should append risk_signal_id', async () => {
+      it.skip('should append risk_signal_id', async () => {
         await renderRiskSignalsAndWaitData();
         const tr = screen.getByRole('row', {
           name: 'sig_ryxauTlDX8hIm3wVRmm',
@@ -113,7 +113,7 @@ describe.skip('<RiskSignals />', () => {
       });
 
       describe('when there is a risk_signal_description', () => {
-        it('should display the text on the table search', async () => {
+        it.skip('should display the text on the table search', async () => {
           await renderRiskSignalsAndWaitData();
 
           const search = screen.getByDisplayValue('lorem');
@@ -166,7 +166,7 @@ describe.skip('<RiskSignals />', () => {
       });
 
       describe('when there are risk signal filters in the URL', () => {
-        it('should indicate the filters selected', async () => {
+        it.skip('should indicate the filters selected', async () => {
           await renderRiskSignalsAndWaitData();
 
           const high = screen.getByRole('button', { name: 'High' });
@@ -197,6 +197,52 @@ describe.skip('<RiskSignals />', () => {
           });
         });
       });
+    });
+  });
+
+  describe('when handling Sentilink risk signals', () => {
+    beforeAll(() => {
+      withRiskSignals();
+      withRiskSignalDetails();
+    });
+
+    it('should add is_sentilink query parameter when clicking on a Sentilink signal', async () => {
+      await renderRiskSignalsAndWaitData();
+      const sentilinkRow = screen.getByRole('row', { name: 'sig_sentilink123' });
+      await userEvent.click(sentilinkRow);
+      expect(mockRouter).toMatchObject({
+        query: {
+          risk_signal_id: 'sig_sentilink123',
+          is_sentilink: 'true',
+          id,
+        },
+      });
+    });
+
+    it('should remove both risk_signal_id and is_sentilink when pressing escape', async () => {
+      await renderRiskSignalsAndWaitData();
+      const sentilinkRow = screen.getByRole('row', { name: 'sig_sentilink123' });
+      await userEvent.click(sentilinkRow);
+      // we can't click away because everything is risk signals!
+      await userEvent.keyboard('{Escape}');
+      expect(mockRouter).toMatchObject({
+        query: {
+          id,
+        },
+      });
+    });
+
+    it('should not add is_sentilink when clicking on a non-Sentilink signal', async () => {
+      await renderRiskSignalsAndWaitData();
+      const nonSentilinkRow = screen.getByRole('row', { name: 'sig_ryxauTlDX8hIm3wVRmm' });
+      await userEvent.click(nonSentilinkRow);
+      expect(mockRouter).toMatchObject({
+        query: {
+          risk_signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
+          id,
+        },
+      });
+      expect(mockRouter.query).not.toHaveProperty('is_sentilink');
     });
   });
 });

@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import useCurrentEntityRiskSignals from '@/entity/hooks/use-current-entity-risk-signals';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
+import isSentilinkSignal from '../../utils/is-sentilink-signal';
 
 import Details from './components/details';
 import Filters from './components/filters';
@@ -27,7 +28,11 @@ const RiskSignalsList = () => {
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {
-    filters.push({ risk_signal_id: riskSignal.id });
+    if (isSentilinkSignal(riskSignal)) {
+      filters.push({ risk_signal_id: riskSignal.id, is_sentilink: 'true' });
+    } else {
+      filters.push({ risk_signal_id: riskSignal.id });
+    }
   };
 
   const handleSearchChange = (search: string) => {

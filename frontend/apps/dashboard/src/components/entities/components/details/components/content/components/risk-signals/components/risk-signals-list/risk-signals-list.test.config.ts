@@ -25,7 +25,32 @@ export const riskSignalsFixture: RiskSignal[] = [
     timestamp: '2022-10-24T21:56:12.682238Z',
     hasAmlHits: false,
   },
+  {
+    id: 'sig_sentilink123',
+    onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+    reasonCode: 'sentilink_synthetic_identity_medium_risk',
+    note: 'Sentilink synthetic identity risk',
+    description: 'The identity information provided has been flagged as potentially synthetic by Sentilink.',
+    severity: RiskSignalSeverity.Medium,
+    scopes: [RiskSignalAttribute.dob],
+    timestamp: '2022-10-24T22:00:00.000000Z',
+    hasAmlHits: false,
+  },
 ];
+
+export const withRiskSignalDetails = () => {
+  mockRequest({
+    method: 'get',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
+    response: riskSignalsFixture[0],
+  });
+
+  mockRequest({
+    method: 'get',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_sentilink123',
+    response: riskSignalsFixture[2],
+  });
+};
 
 export const withRiskSignals = () =>
   mockRequest({

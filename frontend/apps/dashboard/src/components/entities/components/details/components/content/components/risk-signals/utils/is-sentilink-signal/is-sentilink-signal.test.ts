@@ -1,4 +1,4 @@
-import { isSentilinkSignal } from './is-sentilink-signal';
+import isSentilinkSignal from './is-sentilink-signal';
 import { nonSentilinkRiskSignal, sentilinkRiskSignal } from './is-sentilink-signal.test.config';
 
 describe('isSentilinkSignal', () => {
