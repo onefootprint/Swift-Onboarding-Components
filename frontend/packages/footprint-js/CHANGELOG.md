@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.15.3
+
+### Patch Changes
+
+- b65042d851: Add more logging for iFrame
+
 ## 3.15.2
 
 ### Patch Changes
