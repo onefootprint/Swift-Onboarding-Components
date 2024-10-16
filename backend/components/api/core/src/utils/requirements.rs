@@ -517,7 +517,7 @@ fn get_requirement_inner<T>(
                     if !is_missing_bo && !are_all_bos_complete {
                         // This should never happen, just spot checking this logic before we stop writing
                         // KycedBos
-                        tracing::error!("All BOs not complete, but CDO is satisfied");
+                        tracing::info!("All BOs not complete, but CDO is satisfied");
                     }
                     if (has_linked_bos || are_all_bos_complete) && is_missing_bo {
                         // BOs linked manually via API meet the BeneficialOwners requirement
