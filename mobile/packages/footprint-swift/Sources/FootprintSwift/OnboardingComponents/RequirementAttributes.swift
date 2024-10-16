@@ -1,61 +1,64 @@
 import Foundation
 
 public struct Fields {
-    public var missing: [Components.Schemas.VaultDI] = []
-    public var optional: [Components.Schemas.VaultDI] = []
-    public var collected: [Components.Schemas.VaultDI] = []
+    public var missing: [VaultDI] = []
+    public var optional: [VaultDI] = []
+    public var collected: [VaultDI] = []
 }
 
 public struct Requirements {
-    public var all: [Components.Schemas.Requirement] = []
+    public var all: [Requirement] = []
     public var isCompleted: Bool = false
     public var isMissing: Bool = false
-    public var missing: [Components.Schemas.Requirement] = []
+    public var missing: [Requirement] = []
 }
 
 public struct RequirementAttributes {
     public let fields: Fields
     public let requirements: Requirements
     
-    public static func getRequirements(from onboardingStatus: Components.Schemas.OnboardingStatusResponse) -> RequirementAttributes {
+    public static func getRequirements(from onboardingStatus: OnboardingStatusResponse) -> RequirementAttributes {
         var fields = Fields()
         var requirements = Requirements()
-
-        requirements.all = onboardingStatus.all_requirements
-        requirements.missing = onboardingStatus.all_requirements.filter {
-            $0.value1?.is_met == false ||
-            $0.value2?.is_met == false || 
-            $0.value3?.is_met == false || 
-            $0.value4?.is_met == false || 
-            $0.value5?.is_met == false || 
-            $0.value6?.is_met == false || 
-            $0.value7?.is_met == false
+        
+        requirements.all = onboardingStatus.allRequirements
+        requirements.missing = onboardingStatus.allRequirements.filter {
+            switch $0 {
+            case .typeAuthorizeRequirement(let authorizeReq):
+                return authorizeReq.isMet == false
+            case .typeCollectDataRequirement(let dataReq):
+                return dataReq.isMet == false
+            case .typeCollectInvestorProfileRequirement(let investorReq):
+                return investorReq.isMet == false
+            case .typeDocumentRequirement(let docReq):
+                return docReq.isMet == false
+            case .typeProcessRequirement(let processReq):
+                return processReq.isMet == false
+            case .typeRegisterAuthMethodRequirement(let authMethodReq):
+                return authMethodReq.isMet == false
+            case .typeRegisterPasskeyRequirement(let passkeyReq):
+                return passkeyReq.isMet == false
+            }
         }
         requirements.isCompleted = requirements.missing.isEmpty
         requirements.isMissing = !requirements.isCompleted
-
-        let collectDataRequirement = onboardingStatus.all_requirements.first(where: { requirement in
-            requirement.value1?.kind == .collect_data
-        })
         
-        if let collectDataRequirement = collectDataRequirement?.value1 {
-            let optionalAttributes = collectDataRequirement.optional_attributes.flatMap { attribute in
-                if let rawValue = attribute.value1?.rawValue {
-                    return CdoToAllDisMap[rawValue] ?? []
-                }
-                return []
+        let collectDataRequirement: CollectDataRequirement? = onboardingStatus.allRequirements.compactMap { requirement in
+            if case let .typeCollectDataRequirement(collectDataReq) = requirement {
+                return collectDataReq
             }
-            let populatedAttributes = collectDataRequirement.populated_attributes.flatMap { attribute in
-                if let rawValue = attribute.value1?.rawValue {
-                    return CdoToAllDisMap[rawValue] ?? []
-                }
-                return []
+            return nil
+        }.first
+        
+        if let collectDataRequirement = collectDataRequirement {
+            let optionalAttributes = collectDataRequirement.optionalAttributes.flatMap { attribute in
+                return CdoToAllDisMap[attribute.rawValue] ?? []
             }
-            let missingAttributes = collectDataRequirement.missing_attributes.flatMap { attribute in
-                if let rawValue = attribute.value1?.rawValue {
-                    return CdoToAllDisMap[rawValue] ?? []
-                }
-                return []
+            let populatedAttributes = collectDataRequirement.populatedAttributes.flatMap { attribute in
+                return CdoToAllDisMap[attribute.rawValue] ?? []
+            }
+            let missingAttributes = collectDataRequirement.missingAttributes.flatMap { attribute in
+                return CdoToAllDisMap[attribute.rawValue] ?? []
             }
             let filteredMissingAttributes = missingAttributes.filter { attr in
                 if attr.rawValue == "id.address_line2" || attr.rawValue == "id.middle_name" {
@@ -64,60 +67,61 @@ public struct RequirementAttributes {
                 }
                 return true
             }
-
+            
             fields.optional.append(contentsOf: optionalAttributes)
             fields.collected.append(contentsOf: populatedAttributes)
             fields.missing.append(contentsOf: filteredMissingAttributes)
         }
-
+        
         return RequirementAttributes(
             fields: fields,
             requirements: requirements
         )
-    }     
+    }
 }
 
-let CdoToAllDisMap: [String: [Components.Schemas.VaultDI]] = [
-    Components.Schemas.CollectedKycAttribute.name.rawValue: [
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_first_name.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_middle_name.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_last_name.rawValue)!
+
+let CdoToAllDisMap: [String: [VaultDI]] = [
+    CollectedAttributes.name.rawValue: [
+        VaultDI(rawValue: VaultData.CodingKeys.idFirstName.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idMiddleName.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idLastName.rawValue)!
     ],
-    Components.Schemas.CollectedKycAttribute.dob.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_dob.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.ssn4.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_ssn4.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.ssn9.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_ssn9.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.us_tax_id.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_us_tax_id.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.full_address.rawValue: [
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_address_line1.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_address_line2.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_city.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_state.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_zip.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_country.rawValue)!
+    CollectedAttributes.dob.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idDob.rawValue)!],
+    CollectedAttributes.ssn4.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idSsn4.rawValue)!],
+    CollectedAttributes.ssn9.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idSsn9.rawValue)!],
+    CollectedAttributes.usTaxId.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idUsTaxId.rawValue)!],
+    CollectedAttributes.fullAddress.rawValue: [
+        VaultDI(rawValue: VaultData.CodingKeys.idAddressLine1.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idAddressLine2.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idCity.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idState.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idZip.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idCountry.rawValue)!
     ],
-    Components.Schemas.CollectedKycAttribute.email.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_email.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.phone_number.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_phone_number.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.nationality.rawValue: [Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_nationality.rawValue)!],
-    Components.Schemas.CollectedKycAttribute.us_legal_status.rawValue: [
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_us_legal_status.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_visa_kind.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_visa_expiration_date.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_citizenships.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultIdProps.CodingKeys.id_period_nationality.rawValue)!
+    CollectedAttributes.email.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idEmail.rawValue)!],
+    CollectedAttributes.phoneNumber.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idPhoneNumber.rawValue)!],
+    CollectedAttributes.nationality.rawValue: [VaultDI(rawValue: VaultData.CodingKeys.idNationality.rawValue)!],
+    CollectedAttributes.usLegalStatus.rawValue: [
+        VaultDI(rawValue: VaultData.CodingKeys.idUsLegalStatus.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idVisaKind.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idVisaExpirationDate.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idCitizenships.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.idNationality.rawValue)!
     ],
-    Components.Schemas.CollectedInvestorProfileAttribute.investor_profile.rawValue: [
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_employment_status.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_occupation.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_employer.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_annual_income.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_net_worth.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_investment_goals.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_risk_tolerance.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_declarations.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_brokerage_firm_employer.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_senior_executive_symbols.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_family_member_names.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_political_organization.rawValue)!,
-        Components.Schemas.VaultDI(rawValue: Components.Schemas.VaultInvestorProps.CodingKeys.investor_profile_period_funding_sources.rawValue)!
+    CollectedAttributes.investorProfile.rawValue: [
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileEmploymentStatus.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileOccupation.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileEmployer.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileAnnualIncome.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileNetWorth.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileInvestmentGoals.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileRiskTolerance.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileDeclarations.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileBrokerageFirmEmployer.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileSeniorExecutiveSymbols.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileFamilyMemberNames.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfilePoliticalOrganization.rawValue)!,
+        VaultDI(rawValue: VaultData.CodingKeys.investorProfileFundingSources.rawValue)!
     ]
 ]

@@ -1,6 +1,4 @@
 import Foundation
-import OpenAPIRuntime
-import OpenAPIURLSession
 
 extension ProviderError: LocalizedError {
     var errorDescription: String? {
@@ -17,7 +15,7 @@ enum ProviderError: Error {
 
 
 public final class FootprintProvider {
-    private var client: Client
+    private var client: OpenAPIClient
     private var configKey: String = ""
     private var authToken: String?
     private var verifiedAuthToken: String?
@@ -26,9 +24,9 @@ public final class FootprintProvider {
     private var authValidationToken: String? // the validation token generated after auth part, not process
     private var vaultData: VaultData?
     private var queries: FootprintQueries!
-    private var onboardingConfig: Components.Schemas.PublicOnboardingConfiguration?
-    private var signupChallengeResponse: Components.Schemas.SignupChallengeResponse?
-    private var loginChallengeResponse: Components.Schemas.LoginChallengeResponse?
+    private var onboardingConfig: PublicOnboardingConfiguration?
+    private var signupChallengeResponse: SignupChallengeResponse?
+    private var loginChallengeResponse: LoginChallengeResponse?
     private var requirements : RequirementAttributes?
     private var sandboxId: String?  = nil
     private var sandboxOutcome: SandboxOutcome?
@@ -42,15 +40,8 @@ public final class FootprintProvider {
     }()
     
     private init() {
-#if DEBUG
-        let serverURL = try! Servers.server2()
-#else
-        let serverURL = try! Servers.server1()
-#endif
-        self.client = Client(
-            serverURL: serverURL,
-            configuration: .init(dateTranscoder: .iso8601WithFractionalSeconds),
-            transport: URLSessionTransport()
+        self.client = OpenAPIClient(
+            basePath: FootprintSdkMetadata.apiBaseUrl
         )
         self.isReady = false
     }
@@ -74,7 +65,7 @@ public final class FootprintProvider {
             self.isReady = true
         }
         
-        if(self.onboardingConfig?.is_live == true){
+        if(self.onboardingConfig?.isLive == true){
             self.sandboxId = nil
             self.sandboxOutcome = nil
         }
@@ -87,7 +78,7 @@ public final class FootprintProvider {
             var overallOutcome = sandboxOutcome?.overallOutcome
             var documentOutcome = sandboxOutcome?.documentOutcome
             
-            let requiresDoc = self.onboardingConfig?.requires_id_doc ?? false
+            let requiresDoc = self.onboardingConfig?.requiresIdDoc ?? false
             if(requiresDoc && documentOutcome == nil){
                 documentOutcome = .pass
             }
@@ -106,12 +97,12 @@ public final class FootprintProvider {
             throw ProviderError.providerError("No onboarding config kind not found. Please make sure that the public key is correct.")
         }
         
-        var identifyScope = Components.Schemas.IdentifyRequest.scopePayload.onboarding
+        var identifyScope = IdentifyRequest.Scope.onboarding
         if obConfigKind == .auth {
-            identifyScope = Components.Schemas.IdentifyRequest.scopePayload.auth
+            identifyScope = IdentifyRequest.Scope.auth
         }
         
-        var identifyResponse: Components.Schemas.IdentifyResponse? = nil
+        var identifyResponse: IdentifyResponse? = nil
         do{
             identifyResponse = try await self.queries.identify(
                 authToken: authToken,
@@ -127,7 +118,7 @@ public final class FootprintProvider {
             throw ProviderError.providerError("Invalid auth token. Please provide a valid auth token.")
         }
         
-        guard let tokenScopes = identifyResponse.user?.token_scopes else {
+        guard let tokenScopes = identifyResponse.user?.tokenScopes else {
             self.authTokenStatus = .validWithInsufficientScope
             return AuthTokenStatus.validWithInsufficientScope
         }
@@ -148,17 +139,17 @@ public final class FootprintProvider {
         // Relevant code in FE: frontend/packages/idv/src/components/identify/components/init-auth-token/init-auth-token.tsx
         
         if(obConfigKind == .auth){
-            let validationToken = (try await self.queries.validateOnboarding(authToken: authToken)).validation_token
+            let validationToken = (try await self.queries.validateOnboarding(authToken: authToken)).validationToken
             self.authValidationToken = validationToken
             self.authTokenStatus = .validWithSufficientScope
             self.verifiedAuthToken = authToken
             return AuthTokenStatus.validWithSufficientScope
         }
         
-        let validationToken = (try await self.queries.getValidationToken(authToken: authToken)).validation_token
+        let validationToken = (try await self.queries.getValidationToken(authToken: authToken)).validationToken
         self.authValidationToken = validationToken
         
-        let updatedAuthToken = (try await self.queries.initOnboarding(authToken: authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)).auth_token
+        let updatedAuthToken = (try await self.queries.initOnboarding(authToken: authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)).authToken
         self.verifiedAuthToken = updatedAuthToken
         
         let requirements = try await self.queries.getOnboardingStatus(authToken: updatedAuthToken)
@@ -227,14 +218,14 @@ public final class FootprintProvider {
             throw ProviderError.providerError("No onboarding config found. Please make sure that the public key is correct.")
         }
         
-        guard let requiredAuthMethods = self.onboardingConfig?.required_auth_methods else {
+        guard let requiredAuthMethods = self.onboardingConfig?.requiredAuthMethods else {
             throw ProviderError.providerError("No required auth methods found in the onboarding config")
         }
         
-        var identifyScope = Components.Schemas.IdentifyRequest.scopePayload.onboarding
+        var identifyScope = IdentifyRequest.Scope.onboarding
         if let obConfigKind = self.onboardingConfig?.kind{
             if obConfigKind == .auth {
-                identifyScope = Components.Schemas.IdentifyRequest.scopePayload.auth
+                identifyScope = IdentifyRequest.Scope.auth
             }
         }
         
@@ -247,12 +238,12 @@ public final class FootprintProvider {
         )
         
         if let user = identifyResponse.user {
-            let hasVerifiedSource = user.auth_methods.contains { $0.is_verified }
+            let hasVerifiedSource = user.authMethods.contains { $0.isVerified }
             guard hasVerifiedSource else {
                 throw ProviderError.providerError("Cannot verify inline. No verified source found")
             }
-            let hasVerifiedPhone = user.auth_methods.contains { $0.kind == .phone && $0.is_verified }
-            let hasVerifiedEmail = user.auth_methods.contains { $0.kind == .email && $0.is_verified }
+            let hasVerifiedPhone = user.authMethods.contains { $0.kind == .phone && $0.isVerified }
+            let hasVerifiedEmail = user.authMethods.contains { $0.kind == .email && $0.isVerified }
             if requiredAuthMethods.contains(.phone) && !hasVerifiedPhone {
                 throw ProviderError.providerError("Inline OTP not supported - phone is required but has not been verified")
             }
@@ -270,7 +261,7 @@ public final class FootprintProvider {
             throw ProviderError.providerError("Cannot verify inline")
         }
         
-        let preferredAuthMethod = requiredAuthMethods.contains(.phone) ? Components.Schemas.SignupChallengeRequest.challenge_kindPayload.sms : Components.Schemas.SignupChallengeRequest.challenge_kindPayload.email
+        let preferredAuthMethod = requiredAuthMethods.contains(.phone) ? SignupChallengeRequest.ChallengeKind.sms : SignupChallengeRequest.ChallengeKind.email
         
         self.signupChallengeResponse = try await self.queries.getSignupChallenge(
             email: email,
@@ -282,7 +273,7 @@ public final class FootprintProvider {
     
     
     public func createEmailPhoneBasedChallenge(email: String? = nil, phoneNumber: String? = nil) async throws  {
-        if let requiredAuthMethods = self.onboardingConfig?.required_auth_methods {
+        if let requiredAuthMethods = self.onboardingConfig?.requiredAuthMethods {
             if requiredAuthMethods.isEmpty {
                 throw ProviderError.providerError("No required auth methods found in the onboarding config")
             }
@@ -317,7 +308,7 @@ public final class FootprintProvider {
             throw ProviderError.providerError("Invalid auth token. Please provide a valid auth token")
         }
         
-        if let requiredAuthMethods = self.onboardingConfig?.required_auth_methods {
+        if let requiredAuthMethods = self.onboardingConfig?.requiredAuthMethods {
             if requiredAuthMethods.isEmpty {
                 throw ProviderError.providerError("No required auth methods found in the onboarding config")
             }
@@ -330,8 +321,8 @@ public final class FootprintProvider {
     }
     
     public func verify(verificationCode: String) async throws -> Verify {
-        guard let challengeToken = self.loginChallengeResponse?.challenge_data.challenge_token ??  self.signupChallengeResponse?.challenge_data.challenge_token,
-              let challengeAuthToken = self.loginChallengeResponse?.challenge_data.token ?? self.signupChallengeResponse?.challenge_data.token else {
+        guard let challengeToken = self.loginChallengeResponse?.challengeData.challengeToken ??  self.signupChallengeResponse?.challengeData.challengeToken,
+              let challengeAuthToken = self.loginChallengeResponse?.challengeData.token ?? self.signupChallengeResponse?.challengeData.token else {
             throw NSError(domain: "SubmitOTPError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing challenge token or auth token"])
         }
         
@@ -344,18 +335,18 @@ public final class FootprintProvider {
             authToken: challengeAuthToken
         )
         var validationToken: String = ""
-        var updatedAuthToken: String = verifyResponse.auth_token
+        var updatedAuthToken: String = verifyResponse.authToken
         var updatedRequirements: RequirementAttributes? = nil
         var updatedVaultData: VaultData? = nil
         
         if obConfigKind == .auth {
-            validationToken = (try await self.queries.validateOnboarding(authToken: verifyResponse.auth_token)).validation_token
+            validationToken = (try await self.queries.validateOnboarding(authToken: verifyResponse.authToken)).validationToken
             self.verifiedAuthToken = updatedAuthToken
             self.authValidationToken = validationToken
         }else{
-            validationToken = (try await self.queries.getValidationToken(authToken: verifyResponse.auth_token)).validation_token
+            validationToken = (try await self.queries.getValidationToken(authToken: verifyResponse.authToken)).validationToken
             self.authValidationToken = validationToken
-            updatedAuthToken = (try await self.queries.initOnboarding(authToken: verifyResponse.auth_token, overallOutcome: self.sandboxOutcome?.overallOutcome)).auth_token
+            updatedAuthToken = (try await self.queries.initOnboarding(authToken: verifyResponse.authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)).authToken
             self.verifiedAuthToken = updatedAuthToken
             updatedRequirements = try await self.queries.getOnboardingStatus(authToken: updatedAuthToken)
             self.requirements = updatedRequirements
@@ -397,7 +388,7 @@ public final class FootprintProvider {
     }
     
     
-    public func process() async throws -> Components.Schemas.HostedValidateResponse {
+    public func process() async throws -> HostedValidateResponse {
         guard let obConfigKind = self.onboardingConfig?.kind else {
             throw NSError(domain: "ProcessError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing onboarding configuration kind"])
         }
@@ -450,7 +441,7 @@ public final class FootprintProvider {
         var onAuth: ((String, String) async throws -> Verify) = { authToken, vaultingToken in
             self.verifiedAuthToken = authToken
             self.vaultingToken = vaultingToken
-            let validationToken = (try await self.queries.getValidationToken(authToken: authToken)).validation_token
+            let validationToken = (try await self.queries.getValidationToken(authToken: authToken)).validationToken
             self.authValidationToken = validationToken
             let requirements = try await self.queries.getOnboardingStatus(authToken: authToken)
             self.requirements = requirements

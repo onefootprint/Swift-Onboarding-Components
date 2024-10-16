@@ -4226,9 +4226,9 @@
       "OnboardingResponse": {
         "type": "object",
         "properties": {
-            "auth_token": {
-                "type": "string"
-            },
+          "auth_token": {
+            "type": "string"
+          },
           "onboarding_config": {
             "description": "The public onboarding configuration",
             "type": "object",
@@ -4615,7 +4615,7 @@
           }
         },
         "required": [
-            "auth_token",
+          "auth_token",
           "onboarding_config"
         ]
       },
@@ -5496,14 +5496,7 @@
         ]
       },
       "RawUserDataRequest": {
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/VaultIdProps"
-          },
-          {
-            "$ref": "#/components/schemas/VaultInvestorProps"
-          }
-        ]
+        "$ref": "#/components/schemas/VaultData"
       },
       "SdkArgs": {
         "type": "string"
@@ -5801,8 +5794,8 @@
       "UserDecryptResponse": {
         "$ref": "#/components/schemas/RawUserDataRequest"
       },
-      "VaultIdProps": {
-        "title": "VaultIdProps",
+      "VaultData": {
+        "title": "VaultData",
         "x-stoplight": {
           "id": "uq84qpudiffq1"
         },
@@ -5888,12 +5881,7 @@
           },
           "id.zip": {
             "type": "string"
-          }
-        }
-      },
-      "VaultInvestorProps": {
-        "type": "object",
-        "properties": {
+          },
           "investor_profile.employment_status": {
             "type": "string",
             "enum": [
@@ -5997,44 +5985,19 @@
           }
         }
       },
-      "VaultCustomProps": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "string"
-        },
-        "propertyNames": {
-          "pattern": "^custom\\.[a-zA-Z0-9_]+$"
-        }
-      },
       "VaultBadRequestResponse": {
         "title": "VaultBadRequestResponse",
         "x-stoplight": {
           "id": "4j8q21t7xpgoj"
         },
-        "anyOf": [
+        "allOf": [
           {
             "type": "object",
             "properties": {
               "context": {
-                "x-stoplight": {
-                  "id": "40o2nwjmyngno"
-                },
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/VaultIdProps"
-                  },
-                  {
-                    "$ref": "#/components/schemas/VaultInvestorProps"
-                  },
-                  {
-                    "$ref": "#/components/schemas/VaultCustomProps"
-                  }
-                ]
+                "$ref": "#/components/schemas/VaultData"
               }
-            },
-            "required": [
-              "context"
-            ]
+            }
           },
           {
             "$ref": "#/components/schemas/ErrorResponse"
@@ -6080,7 +6043,7 @@
         ]
       },
       "Requirement": {
-        "anyOf": [
+        "oneOf": [
           {
             "$ref": "#/components/schemas/CollectDataRequirement"
           },
@@ -6288,17 +6251,7 @@
               "id": "943mbivrbh2np"
             },
             "items": {
-              "x-stoplight": {
-                "id": "i3cm3yk3ihlzn"
-              },
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/CollectedKycAttribute"
-                },
-                {
-                  "$ref": "#/components/schemas/CollectedInvestorProfileAttribute"
-                }
-              ]
+              "$ref": "#/components/schemas/CollectedAttributes"
             }
           },
           "optional_attributes": {
@@ -6307,17 +6260,7 @@
             },
             "type": "array",
             "items": {
-              "x-stoplight": {
-                "id": "p7k9q01obe870"
-              },
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/CollectedKycAttribute"
-                },
-                {
-                  "$ref": "#/components/schemas/CollectedInvestorProfileAttribute"
-                }
-              ]
+              "$ref": "#/components/schemas/CollectedAttributes"
             }
           },
           "populated_attributes": {
@@ -6326,17 +6269,7 @@
             },
             "type": "array",
             "items": {
-              "x-stoplight": {
-                "id": "wu174iujvb119"
-              },
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/CollectedKycAttribute"
-                },
-                {
-                  "$ref": "#/components/schemas/CollectedInvestorProfileAttribute"
-                }
-              ]
+              "$ref": "#/components/schemas/CollectedAttributes"
             }
           }
         },
@@ -6347,35 +6280,6 @@
           "optional_attributes",
           "populated_attributes"
         ]
-      },
-      "CollectedKycAttribute": {
-        "title": "CollectedKycAttribute",
-        "x-stoplight": {
-          "id": "qf0kav4341gn6"
-        },
-        "type": "string",
-        "enum": [
-          "name",
-          "dob",
-          "ssn4",
-          "ssn9",
-          "full_address",
-          "email",
-          "phone_number",
-          "nationality",
-          "us_legal_status",
-          "us_tax_id"
-        ]
-      },
-      "CollectedInvestorProfileAttribute": {
-        "type": "string",
-        "x-stoplight": {
-          "id": "1b9f366ab94a6"
-        },
-        "enum": [
-          "investor_profile"
-        ],
-        "title": "CollectedInvestorProfileAttribute"
       },
       "VaultDI": {
         "title": "VaultDI",
@@ -6421,6 +6325,26 @@
           "investor_profile.family_member_names",
           "investor_profile.political_organization",
           "investor_profile.funding_sources"
+        ]
+      },
+      "CollectedAttributes": {
+        "title": "CollectedAttributes",
+        "x-stoplight": {
+          "id": "cn0jdufe6clko"
+        },
+        "type": "string",
+        "enum": [
+          "name",
+          "dob",
+          "ssn4",
+          "ssn9",
+          "full_address",
+          "email",
+          "phone_number",
+          "nationality",
+          "us_legal_status",
+          "us_tax_id",
+          "investor_profile"
         ]
       }
     }
