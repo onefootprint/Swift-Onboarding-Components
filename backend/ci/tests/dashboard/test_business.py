@@ -58,7 +58,7 @@ def test_get_business_owners(sandbox_tenant, primary_bo):
         f"entities/{primary_bo.fp_bid}/business_owners", None, *sandbox_tenant.db_auths
     )
     assert len(body) == 1
-    assert body[0]["id"] == primary_bo.fp_id
+    assert body[0]["fp_id"] == primary_bo.fp_id
     assert body[0]["ownership_stake"] == 50
     assert body[0]["status"] == "pass"
     assert body[0]["kind"] == "primary"

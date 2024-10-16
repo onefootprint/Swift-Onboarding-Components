@@ -76,6 +76,12 @@ impl BusinessOwnerInfo {
     pub fn phone_number(&self) -> Option<&PiiString> {
         self.data.get(&IDK::PhoneNumber.into())
     }
+
+    /// Returns true if this BO already has a linked user. When true, the data for this BO comes
+    /// entirely from the linked user's vault
+    pub fn has_linked_user(&self) -> bool {
+        self.su.is_some()
+    }
 }
 
 impl TenantVw<Business> {

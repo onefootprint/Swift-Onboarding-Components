@@ -39,7 +39,7 @@ pub async fn generate_secondary_bo_links<'a>(
     let missing_kyc_secondary_bos = dbos
         .iter()
         .filter(|bo| bo.bo.kind == BusinessOwnerKind::Secondary)
-        .filter(|bo| bo.su.is_none())
+        .filter(|bo| !bo.has_linked_user())
         .collect_vec();
     if missing_kyc_secondary_bos.is_empty() {
         return Ok(vec![]);

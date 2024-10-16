@@ -24,7 +24,6 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
         });
         Self {
             status: bo.su.as_ref().map(|su| su.status),
-            id: bo.su.as_ref().map(|su| su.fp_id.clone()),
             fp_id: bo.su.map(|su| su.fp_id),
             ownership_stake: bo.bo.ownership_stake.map(|i| i as u32),
             kind: bo.bo.kind,
@@ -36,8 +35,8 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
 
 impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserWfAuthContext)> for api_wire_types::HostedBusinessOwner {
     fn from_db((bo, user_auth): (BusinessOwnerInfo, &'a CheckUserWfAuthContext)) -> Self {
+        let has_linked_user = bo.has_linked_user();
         let BusinessOwnerInfo { bo, su, data } = bo;
-        let has_linked_user = su.is_some();
         let is_authed_user = su.is_some_and(|su| su.id == user_auth.scoped_user.id);
         let populated_data = data.keys().cloned().collect();
         let decrypted_data = data
@@ -48,7 +47,8 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserWfAuthContext)> for api_wire_t
                     return true;
                 }
                 // For other properties (like phone and email), only render them if they are owned by the biz
-                // OR if the currently logged in user is this beneficial owner
+                // OR if the currently logged in user is this beneficial owner.
+                // This minimizes the amount of data that BOs can see about each other
                 !has_linked_user || is_authed_user
             })
             .collect();

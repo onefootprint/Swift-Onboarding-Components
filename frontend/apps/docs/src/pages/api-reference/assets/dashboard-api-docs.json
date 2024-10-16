@@ -25706,7 +25706,7 @@
             "PrivateBusinessOwner": {
                 "type": "object",
                 "properties": {
-                    "id": {
+                    "fp_id": {
                         "type": "string"
                     },
                     "kind": {
@@ -25715,6 +25715,9 @@
                             "Primary",
                             "Secondary"
                         ]
+                    },
+                    "name": {
+                        "type": "string"
                     },
                     "ownership_stake": {
                         "type": "integer",
@@ -25739,7 +25742,8 @@
                     }
                 },
                 "required": [
-                    "kind"
+                    "kind",
+                    "source"
                 ]
             },
             "PrivateOwnedBusiness": {

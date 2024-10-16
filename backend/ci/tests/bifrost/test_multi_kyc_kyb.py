@@ -206,12 +206,12 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     body = get(f"entities/{primary_bo.fp_bid}/business_owners", None, *tenant.db_auths)
     assert len(body) == 2
     assert body[0]["kind"] == "primary"
-    assert body[0]["id"] == primary_bo.fp_id
+    assert body[0]["fp_id"] == primary_bo.fp_id
     assert body[0]["status"] == "pass"
     assert body[0]["ownership_stake"] == 50
     assert body[0]["source"] == "hosted"
     assert body[1]["kind"] == "secondary"
-    assert body[1]["id"] == secondary_bo.fp_id
+    assert body[1]["fp_id"] == secondary_bo.fp_id
     assert body[1]["status"] == "pass"
     assert body[1]["ownership_stake"] == 30
     assert body[0]["source"] == "hosted"

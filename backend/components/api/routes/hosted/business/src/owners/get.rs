@@ -14,7 +14,7 @@ use paperclip::actix::{
 };
 
 #[api_v2_operation(
-    description = "Decrypt information about the business",
+    description = "Get information about the beneficial owners of this business",
     tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/business/owners")]

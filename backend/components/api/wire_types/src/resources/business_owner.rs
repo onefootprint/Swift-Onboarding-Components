@@ -10,7 +10,6 @@ use serde::Deserialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PrivateBusinessOwner {
-    pub id: Option<FpId>,
     pub fp_id: Option<FpId>,
     pub status: Option<OnboardingStatus>,
     pub ownership_stake: Option<u32>,
