@@ -1,1 +1,1 @@
-export { default } from './sort-reason-codes';
+export { sortReasonCodes } from './sort-reason-codes';

@@ -21,8 +21,41 @@ const reasonCode3: SentilinkReasonCode = {
   rank: 3,
 };
 
-const sortedReasonCodes: SentilinkReasonCode[] = [reasonCode1, reasonCode2, reasonCode3];
-const outOfOrderReasonCodes: SentilinkReasonCode[] = [reasonCode3, reasonCode1, reasonCode2];
-const singleReasonCode: SentilinkReasonCode[] = [reasonCode1];
+const sortedReasonCodesFixture: SentilinkReasonCode[] = [reasonCode1, reasonCode2, reasonCode3];
+const outOfOrderReasonCodesFixture: SentilinkReasonCode[] = [reasonCode3, reasonCode1, reasonCode2];
+const singleReasonCodeFixture: SentilinkReasonCode[] = [reasonCode1];
 
-export { sortedReasonCodes, outOfOrderReasonCodes, singleReasonCode };
+const mixedReasonCodesFixture: SentilinkReasonCode[] = [
+  {
+    code: 'code1',
+    direction: SentilinkFraudLevel.moreFraudy,
+    explanation: 'Explanation 1',
+    rank: 3,
+  },
+  {
+    code: 'code2',
+    direction: SentilinkFraudLevel.lessFraudy,
+    explanation: 'Explanation 2',
+    rank: 2,
+  },
+  {
+    code: 'code3',
+    direction: SentilinkFraudLevel.moreFraudy,
+    explanation: 'Explanation 3',
+    rank: 1,
+  },
+  {
+    code: 'code4',
+    direction: SentilinkFraudLevel.lessFraudy,
+    explanation: 'Explanation 4',
+    rank: 4,
+  },
+  {
+    code: 'code5',
+    direction: SentilinkFraudLevel.lessFraudy,
+    explanation: 'Explanation 5',
+    rank: 5,
+  },
+];
+
+export { sortedReasonCodesFixture, outOfOrderReasonCodesFixture, singleReasonCodeFixture, mixedReasonCodesFixture };

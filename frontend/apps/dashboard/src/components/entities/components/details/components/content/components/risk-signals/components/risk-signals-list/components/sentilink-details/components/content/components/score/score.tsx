@@ -2,7 +2,7 @@ import type { SentilinkReasonCode } from '@onefootprint/types';
 import { Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import ReasonCode from './components/reason-code';
-import sortReasonCodes from './utils/sort-reason-codes';
+import { sortReasonCodes } from './utils/sort-reason-codes';
 
 type ScoreProps = {
   score: number;
@@ -37,7 +37,7 @@ const Score = ({ score, reasonCodes, title }: ScoreProps) => {
           <Divider variant="secondary" />
         </Stack>
         <Stack direction="column" gap={5}>
-          {sortedReasonCodes.map(reasonCode => (
+          {sortedReasonCodes.map((reasonCode: SentilinkReasonCode) => (
             <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
           ))}
         </Stack>
