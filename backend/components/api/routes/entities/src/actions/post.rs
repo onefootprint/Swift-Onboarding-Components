@@ -44,7 +44,6 @@ pub async fn post(
     }
 
     let outcomes = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let outcomes = actions

@@ -72,7 +72,6 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     // Add in a rule for dob not matching which will step up to `step_up_kind`
     //
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let expr = RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                 field: FRC::DobCouldNotMatch,
@@ -242,7 +241,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
     // Add in a rule for dob not matching which will step up to id doc from KYC
     //
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let kyc_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {

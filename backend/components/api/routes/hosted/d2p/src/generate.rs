@@ -33,7 +33,6 @@ pub async fn handler(
     let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let limit_ttl = Duration::minutes(30);
             let args = NewUserSessionContext::default();

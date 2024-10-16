@@ -33,7 +33,6 @@ pub async fn list_for_tenant(
     let pagination = pagination.db_pagination(&state);
 
     let (lists, next_page, count, entries, list_ids_used_in_playbook) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (lists, next_page) = List::list(conn, &tenant_id, is_live, pagination)?;
             let count = List::count(conn, &tenant_id, is_live)?;

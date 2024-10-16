@@ -120,7 +120,6 @@ pub async fn rerun_machine(
     let force_no_selfie = force_no_selfie.unwrap_or_default();
 
     let (id_doc, dr, su, di, uvw, obc) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
@@ -185,7 +184,6 @@ async fn handle_forcing_failure(
     id: IncodeVerificationSessionId,
 ) -> FpResult<DocumentResponse> {
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
@@ -255,7 +253,6 @@ pub async fn adhoc_create_document_and_workflow(
     let doc_kind: DocumentRequestKind = document_type.into();
 
     let (vw, document_request, wf_id) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -310,7 +307,6 @@ pub async fn adhoc_create_document_and_workflow(
 
     // Create our identity document now
     let doc_id = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let args = NewDocumentArgs {
                 request_id: document_request.id,
@@ -354,7 +350,6 @@ pub async fn adhoc_upload_and_process(
 
     let (document_id, side) = args.into_inner();
     let (iddoc, wf, tenant_id) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (iddoc, doc_req) = Document::get(conn, &document_id)?;
             let wf = Workflow::get(conn, &doc_req.workflow_id)?;
@@ -413,7 +408,6 @@ pub async fn adhoc_document_process(
     let document_id = args.into_inner();
 
     let (wf, uvw, obc, seqno) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (_, doc_req) = Document::get(conn, &document_id)?;
             // authorize since this is a non-customer facing route
@@ -454,7 +448,6 @@ pub async fn adhoc_document_process(
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
     let unmet_requirements: Vec<_> = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let opts = RequirementOpts::default();
             let entity = EntityInfo {

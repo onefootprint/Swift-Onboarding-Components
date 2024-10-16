@@ -61,7 +61,6 @@ pub async fn post(
     let fp_ids = request.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<()> {
             for fp_id in fp_ids {
                 tracing::info!("Running test backfill for fp_id: {:?}", &fp_id);

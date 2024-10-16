@@ -33,7 +33,6 @@ pub async fn post(
     let actor: DbActor = auth.actor().into();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             if let Some(label) = label_kind {
@@ -62,7 +61,6 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let label = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultLabel::get_active(conn, &sv.id)?)

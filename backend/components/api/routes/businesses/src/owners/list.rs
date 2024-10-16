@@ -39,7 +39,6 @@ pub async fn get(
 
     let pagination = pagination.db_pagination(&state);
     let (bos, next_page) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sb = ScopedVault::get(conn, (&fp_bid, &tenant_id, is_live))?;
             let query = BusinessOwnerQuery {

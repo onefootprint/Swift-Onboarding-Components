@@ -31,7 +31,6 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let vw = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;

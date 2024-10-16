@@ -28,7 +28,6 @@ async fn test_backfill(state: &mut State) {
     // - User then goes back to the tenant and finishes onboarding
     let ff_client = state.feature_flag_client.clone();
     let data = state
-        .db_pool
         .db_transaction(move |conn| -> ApiResult<_> { Ok(create_test_data(conn, ff_client)) })
         .await
         .unwrap();
@@ -41,7 +40,6 @@ async fn test_backfill(state: &mut State) {
     let result = result.unwrap().into_iter().next().unwrap();
     assert_eq!(result.1.len(), 2);
     state
-        .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Build the modern views that only load DLs owned by this tenant. Make sure we added
             // all the proper DLs

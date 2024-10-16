@@ -28,7 +28,6 @@ async fn get_user_or_business_for_dr<T: Into<UncheckedDrIdentifier>>(
     };
     let doc_id = doc_id.into();
     let (user_auth, owner_vault_kind, biz_wf) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let kind = DocumentRequest::get_owner_kind(conn, doc_id)?;
             let biz_wf = user_auth.business_workflow(conn)?;

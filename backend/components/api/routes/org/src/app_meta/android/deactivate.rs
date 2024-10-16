@@ -26,7 +26,6 @@ pub async fn deactivate(
     let tenant_id = auth.tenant().id.clone();
     let meta_id = meta_id.into_inner();
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantAndroidAppMeta::deactivate(conn, &meta_id, &tenant_id) })
         .await?;
 

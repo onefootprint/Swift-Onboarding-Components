@@ -30,7 +30,6 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
 
     let list = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let filters = TenantIosAppFilters {
                 tenant_id,
@@ -73,7 +72,6 @@ pub async fn post(
         .seal_bytes(device_check_private_key.as_bytes())?;
 
     let new_tenant_ios_app_meta = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             TenantIosAppMeta::create(
                 conn,
@@ -121,7 +119,6 @@ async fn patch(
     }
 
     let result = state
-        .db_pool
         .db_transaction(move |conn| {
             TenantIosAppMeta::update(
                 conn,

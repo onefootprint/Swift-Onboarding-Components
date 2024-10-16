@@ -136,7 +136,6 @@ async fn get_inner(
     };
 
     let (uvw, svvn) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 

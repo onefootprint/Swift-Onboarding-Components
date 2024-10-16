@@ -84,7 +84,6 @@ pub async fn run_neuro_call(
 ) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
     let (vw, scoped_vault) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
             let scoped_vault = ScopedVault::get(conn, &svid)?;
@@ -184,7 +183,6 @@ pub async fn save_neuro_event(
     };
 
     state
-        .db_pool
         .db_query(move |conn| NeuroIdAnalyticsEvent::create(conn, event))
         .await?;
 
@@ -250,7 +248,6 @@ mod tests {
 
         // save vreq/vres and do DI setup
         let (_, vres) = state
-            .db_pool
             .db_transaction(move |conn| {
                 let di = DecisionIntent::get_or_create_for_workflow(
                     conn,
@@ -284,7 +281,6 @@ mod tests {
     async fn test_neuro_dupes(state: &mut State) {
         let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
         let tenant = state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 Ok(fixtures::tenant::create_with_keys(conn, pk, tenant_e_key))
             })
@@ -335,7 +331,6 @@ mod tests {
         // Tests
         //
         let (dupes1, dupes2, dupes3, dupes4) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let d1 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv1)?;
                 let d2 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv2)?;

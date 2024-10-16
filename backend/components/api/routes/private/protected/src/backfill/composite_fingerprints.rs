@@ -73,7 +73,6 @@ pub async fn post(
     } = request.into_inner();
 
     let (sv_ids, cursor) = state
-        .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv_ids = svs_to_backfill::table
                 .filter(svs_to_backfill::scoped_vault_id.gt(cursor))
@@ -127,7 +126,6 @@ async fn backfill_composite_fingerprints(
     dry_run: bool,
 ) -> ApiResult<ScopedVaultId> {
     let vw: TenantVw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
         .await?;
     let sv = vw.scoped_vault.clone();
@@ -139,7 +137,6 @@ async fn backfill_composite_fingerprints(
     let fps: HashMap<_, _> = fps.into_iter().collect();
 
     let result = state
-        .db_pool
         .db_transaction(move |conn| -> DryRunResult<_> {
             let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
 

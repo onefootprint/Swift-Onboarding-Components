@@ -44,7 +44,6 @@ pub async fn get(
 
     // gather relevant user data
     let (scoped_vault, rule_set_result, risk_signals, auth_events, annotations) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (auth_events, _) = AuthEvent::list(conn, &sv.id, None)?;

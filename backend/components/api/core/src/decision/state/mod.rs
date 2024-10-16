@@ -169,7 +169,6 @@ pub async fn run_incode_machine_and_workflow(
 ) -> FpResult<RunIncodeMachineAndWorkflowResult> {
     let wfid = ww.workflow_id.clone();
     let (ivs, seqno) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             // TODO this doesn't have to be a latest - there's only one active per workflow
             let ivs = IncodeVerificationSession::latest_for_workflow(conn, &wfid)?;

@@ -54,7 +54,6 @@ pub async fn post(
     let record_paths = distinct_record_paths.clone();
     let num_records = record_paths.len();
     let blobs = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let config = VaultDrConfig::get(conn, (&tenant_id, is_live))
                 .optional()?

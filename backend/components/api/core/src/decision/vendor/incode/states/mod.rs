@@ -109,7 +109,6 @@ pub async fn save_incode_fixtures(
 ) -> FpResult<()> {
     let suid = su_id.clone();
     let vw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &suid))
         .await?;
     let ocr_comparison_fields = if !obc.is_doc_first {
@@ -144,7 +143,6 @@ pub async fn save_incode_fixtures(
     let iddoc = id_doc.clone();
     let wfid = wf_id.clone();
     let (vres, doc_uploads) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let di =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wfid, DecisionIntentKind::DocScan)?;
@@ -203,7 +201,6 @@ pub async fn save_incode_fixtures(
     let suid = su_id.clone();
     let wfid = wf_id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             // Enter the complete state to save risk signals
             let args = CompleteArgs {

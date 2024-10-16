@@ -29,7 +29,6 @@ impl GenerateInvoices {
         info!(%billing_date, "generating invoices...",);
 
         let tenants = state
-            .db_pool
             .db_query(Tenant::list_billable)
             .await
             .map_err(|e| anyhow!("{}", e))?;

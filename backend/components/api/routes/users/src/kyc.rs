@@ -97,7 +97,6 @@ pub async fn post(
     };
 
     let (uvw, sv, seqno, vault_version) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
@@ -141,7 +140,6 @@ pub async fn post(
         && uvw.vault.is_created_via_api;
 
     let (wf, obc) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
@@ -249,7 +247,6 @@ pub async fn post(
         tracing::error!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
     let (wf, sv, mrs) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
             let mr_filters = ManualReviewFilters::get_active();

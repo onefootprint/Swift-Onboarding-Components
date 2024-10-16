@@ -62,7 +62,6 @@ pub async fn get(
         .ok_or(TenantError::NoDecryptionReasonProvided)?;
 
     let vw = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &scoped_vault.id)?;

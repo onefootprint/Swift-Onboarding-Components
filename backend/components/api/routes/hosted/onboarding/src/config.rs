@@ -60,7 +60,6 @@ pub fn get(
 
     // get other properties of our configuration relevant to rendering it
     let (appearance, client_config, sandbox_stepup_outcome_enabled) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let appearance = if let Some(appearance_id) = appearance_id {
                 Some(Appearance::get(conn, &appearance_id, &tenant_id)?)

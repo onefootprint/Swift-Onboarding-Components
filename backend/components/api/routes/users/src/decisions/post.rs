@@ -43,7 +43,6 @@ pub async fn post(
     let fpid = fp_id.clone();
     let tid = tenant_id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
             if !sv.status.is_terminal() {

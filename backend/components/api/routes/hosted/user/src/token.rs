@@ -45,7 +45,6 @@ pub async fn post(
 
     let session_key = state.session_sealing_key.clone();
     let (token, expires_at) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let aes = load_auth_events(conn, &user_auth.auth_events)?
                 .iter()

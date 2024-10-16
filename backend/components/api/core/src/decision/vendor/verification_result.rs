@@ -319,7 +319,6 @@ mod test {
         let sv_id = su.id.clone();
         let wf_id = wf.id.clone();
         let (vreq, vres) = state
-            .db_pool
             .db_transaction(move |conn| {
                 let di = DecisionIntent::get_or_create_for_workflow(
                     conn,

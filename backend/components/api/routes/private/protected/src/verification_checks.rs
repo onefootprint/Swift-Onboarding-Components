@@ -24,7 +24,6 @@ async fn update_verification_checks(
     let UpdateVerificationChecksRequest { add, delete } = request.into_inner();
 
     let updated_obc = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, &path.into_inner())?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;

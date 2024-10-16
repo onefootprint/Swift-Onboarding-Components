@@ -44,7 +44,6 @@ pub async fn create_list_entry(
 
     let tid = tenant_id.clone();
     let (tenant, list, existing_entries) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let t = Tenant::get(conn, &tid)?;
             let list = List::get(conn, &tid, is_live, &list_id)?;
@@ -75,7 +74,6 @@ pub async fn create_list_entry(
     let key = decrypted_list_key.clone();
     let insight = CreateInsightEvent::from(insights);
     let list_entries = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let canonicalized = entries
                 .into_iter()

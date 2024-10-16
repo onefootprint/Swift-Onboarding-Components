@@ -33,7 +33,6 @@ pub async fn get(
     let fp_id = request.into_inner();
 
     let signals = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(None))

@@ -76,7 +76,6 @@ async fn test_update_credentials(state: &mut State) {
 
     // No TVC, credentials should be the same
     let tenant_with_no_tvc = state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             Ok(db::tests::fixtures::tenant::create_with_keys(
                 conn,

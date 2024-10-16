@@ -29,7 +29,6 @@ pub async fn post(
     let proxy_config_id = proxy_config_id.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             ProxyConfig::deactivate(conn, proxy_config_id, tenant_id, is_live)
         })

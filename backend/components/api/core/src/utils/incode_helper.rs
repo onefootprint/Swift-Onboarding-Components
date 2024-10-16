@@ -137,7 +137,6 @@ pub async fn handle_incode_request(
         if next_side_to_collect.is_none() {
             let id_doc_id = identity_document_id.clone();
             state
-                .db_pool
                 .db_transaction(move |conn| -> FpResult<_> {
                     // mb lock??
                     let (iddoc, _) = Document::get(conn, &id_doc_id)?;

@@ -84,7 +84,6 @@ pub async fn evaluate_rule(
         end_timestamp,
     } = request.into_inner();
     let (current_rules, historical_results, adds, edits, lists_with_entries, vws, insight_events) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 

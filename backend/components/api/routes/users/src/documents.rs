@@ -31,7 +31,6 @@ pub async fn get(
 
     // get all completed id docs, sort by created_at asc
     let id_docs = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let id_docs: Vec<Document> = Document::list(conn, &sv.id)?

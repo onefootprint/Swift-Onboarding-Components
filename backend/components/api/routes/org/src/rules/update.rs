@@ -51,7 +51,6 @@ pub async fn multi_update_rules(
     let req = request.into_inner();
 
     let rules = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let update = validate_rules_request(conn, &tenant_id, is_live, req)?;
 

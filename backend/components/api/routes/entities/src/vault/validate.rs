@@ -117,7 +117,6 @@ async fn post_inner(
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;

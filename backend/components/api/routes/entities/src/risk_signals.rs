@@ -91,7 +91,6 @@ pub async fn get(
     let api_wire_types::GetHistoricalDataRequest { seqno } = version.into_inner();
 
     let signals = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(seqno))
@@ -209,7 +208,6 @@ pub async fn decrypt_aml_hits(
     // FirstName/LastName/Dob we would have sent to Incode
     let sv_id = vreq.scoped_vault_id.clone();
     let uvw = state
-        .db_pool
         .db_query(move |conn| {
             VaultWrapper::<Any>::build(
                 conn,
@@ -234,7 +232,6 @@ pub async fn decrypt_aml_hits(
     let principal: DbActor = auth.actor().into();
     let insight = CreateInsightEvent::from(insights);
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let reason = DECRYPT_AML_HITS_AUDIT_EVENT_REASON.to_owned();
@@ -278,7 +275,6 @@ pub async fn get_sentilink_detail(
     let (fp_id, risk_signal_id) = request.into_inner();
 
     let (vreq_id, vw) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
@@ -362,7 +358,6 @@ async fn get_risk_signal_and_maybe_detail(
     HasSentilinkDetail,
 )> {
     let (rs, vreq_vres_key_obc) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;

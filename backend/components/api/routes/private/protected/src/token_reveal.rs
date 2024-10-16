@@ -58,10 +58,7 @@ pub async fn post(
         (None, Some(hash)) => hash,
         _ => return Err(ValidationError("Must provide only one of token or hash").into()),
     };
-    let session = state
-        .db_pool
-        .db_query(move |conn| Session::get(conn, token_hash))
-        .await?;
+    let session = state.db_query(move |conn| Session::get(conn, token_hash)).await?;
 
     let Some(session) = session else {
         return Err(ApiCoreError::ResourceNotFound)?;

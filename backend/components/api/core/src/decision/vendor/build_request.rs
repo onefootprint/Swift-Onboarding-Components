@@ -173,7 +173,6 @@ pub async fn build_docv_data_from_identity_doc(
     identity_document_id: DocumentId,
 ) -> FpResult<DocVData> {
     let (doc, images, uvw) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (doc, dr) = Document::get(conn, &identity_document_id)?;
             let images = doc.images(conn, DocumentImageArgs::default())?;
@@ -220,7 +219,6 @@ pub async fn build_business_data_from_verification_request(
         ..
     } = request;
     let bvw: TenantVw<Business> = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant_version(conn, &sv_id, seqno))
         .await?;
 

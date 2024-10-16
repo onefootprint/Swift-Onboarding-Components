@@ -148,7 +148,6 @@ mod tests {
     #[test_state]
     async fn test_deser(state: &mut State) {
         let (vreq, private_key) = state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let uv = fixtures::vault::create_person(conn, true);
                 let t = fixtures::tenant::create(conn);

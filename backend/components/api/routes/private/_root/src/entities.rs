@@ -21,7 +21,6 @@ async fn get(
     let id = id.into_inner();
 
     let sv = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
             let sv = ScopedVault::get(conn, id)?;

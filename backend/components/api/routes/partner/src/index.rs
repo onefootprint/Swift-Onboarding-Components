@@ -29,7 +29,6 @@ pub async fn get(
 
     let domains = pt.domains.clone();
     let is_domain_already_claimed = state
-        .db_pool
         .db_query(move |conn| PartnerTenant::is_domain_already_claimed(conn, &domains))
         .await?;
 
@@ -73,7 +72,6 @@ pub async fn patch(
     };
 
     let updated_pt = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let pt = PartnerTenant::lock(conn, &pt_id)?;
 

@@ -56,7 +56,6 @@ pub async fn post(
     let updates = FingerprintedDataRequest::build(&state, updates, &sb_id).await?;
 
     let (bvw, link_id) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
 

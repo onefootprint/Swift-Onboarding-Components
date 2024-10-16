@@ -106,7 +106,6 @@ pub async fn post(
     }
 
     let (token, session) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant.id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;

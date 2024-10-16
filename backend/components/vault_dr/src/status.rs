@@ -16,7 +16,6 @@ pub struct BackupStatus {
 pub async fn get_backup_status(state: &State, config_id: &VaultDrConfigId) -> FpResult<BackupStatus> {
     let config_id = config_id.clone();
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let config = VaultDrConfig::get(conn, &config_id)?;
 

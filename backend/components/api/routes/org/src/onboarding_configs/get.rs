@@ -47,7 +47,6 @@ async fn get_list(
         kinds,
     };
     let (results, next_page, count) = state
-        .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let (results, next_page) = ObConfiguration::list(conn, &query, pagination)?;
             let count = ObConfiguration::count(conn, &query)?;
@@ -80,7 +79,6 @@ async fn get_detail(
     let ob_config_id = ob_config_id.into_inner();
 
     let (obc, actor, rs) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;

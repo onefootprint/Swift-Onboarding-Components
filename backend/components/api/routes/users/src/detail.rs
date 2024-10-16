@@ -30,7 +30,6 @@ pub async fn detail(
     let fp_id = fp_id.into_inner();
 
     let (sv, mrs, wfr) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let mr_filters = ManualReviewFilters::get_active();

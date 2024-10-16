@@ -45,7 +45,6 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let annotations = state
-        .db_pool
         .db_query(move |conn| Annotation::list(conn, fp_id, tenant_id, is_live, query.is_pinned))
         .await?;
     let annotations = annotations
@@ -80,7 +79,6 @@ async fn patch(
     let UpdateAnnotationRequest { is_pinned } = request.into_inner();
     let tenant_id = tenant.id.clone();
     let _result = state
-        .db_pool
         .db_query(move |conn| Annotation::update(conn, annotation_id, tenant_id, fp_id, is_live, is_pinned))
         .await?;
 
@@ -127,7 +125,6 @@ pub fn post(
     // function, ie MakeAnnotation::call(note,is_pinned,fp_id,auth_actor)   we can call this from
     // tests, from future spots where we want to create annotations (eg: decision engine)
     let annotation: AnnotationInfo = state
-        .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 

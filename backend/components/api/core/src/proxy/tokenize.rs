@@ -123,7 +123,6 @@ pub async fn vault_pii(
         }
 
         let sv = state
-            .db_pool
             .db_query(move |conn| ScopedVault::get(conn, (&fp_id, &tenant_id, is_live)))
             .await?;
 
@@ -152,7 +151,6 @@ pub async fn vault_pii(
 
         let actor = auth.actor();
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let vault = Vault::get(conn, &sv.id)?;
 
@@ -258,7 +256,6 @@ async fn encrypt_document(
     is_live: bool,
 ) -> FpResult<EncryptedDocumentToStore> {
     let (vault, scoped_vault) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vault = Vault::get(conn, &scoped_vault.id)?;

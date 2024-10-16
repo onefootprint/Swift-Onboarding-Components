@@ -136,7 +136,6 @@ pub async fn post_attestation(
     let is_live = auth.user().is_live;
     let v_id = auth.user().id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
             let attestation = match new_attestation {
                 NewDeviceAttestation::Apple(attestation) => attestation.create(conn.conn())?.into(),

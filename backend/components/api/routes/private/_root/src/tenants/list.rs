@@ -35,7 +35,6 @@ async fn get(
     };
 
     let (orgs, mut counts) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let orgs = Tenant::private_list(conn, filters)?;
             let counts = Tenant::private_user_counts(conn)?;

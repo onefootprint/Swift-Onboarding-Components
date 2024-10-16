@@ -52,7 +52,6 @@ pub async fn post(
 
     let auth_events = user_auth.auth_events.clone();
     let auth_events = state
-        .db_pool
         .db_query(move |conn| load_auth_events(conn, &auth_events))
         .await?;
     let allowed_challenge_kinds = auth_events

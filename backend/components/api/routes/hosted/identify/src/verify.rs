@@ -125,7 +125,6 @@ pub async fn post(
 
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uv_id = &user_auth.user_vault_id;
 
@@ -287,7 +286,6 @@ async fn get_prefill_data(
     let t_id = obc.tenant_id.clone();
     let uv_id = user_auth.user_vault_id.clone();
     let portable_vw = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let existing_sv = ScopedVault::get(conn, (&uv_id, &t_id)).optional()?;
             let portable_vw = existing_sv

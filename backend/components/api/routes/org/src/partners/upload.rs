@@ -53,7 +53,6 @@ pub async fn post(
     // Check permissions before uploading anything.
     let params = (tenant_id.clone(), partnership_id.clone(), request_id.clone());
     let document_id = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (tenant_id, partnership_id, request_id) = params;
             // Check that the authorized tenant owns the partnership.
@@ -92,7 +91,6 @@ pub async fn post(
     tracing::info!(s3_url = s3_url, partnership_id=%partnership_id, document_id=%request_id, filename=%filename, mime_type=%file.mime_type, "Uploaded compliance document to S3");
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             // We've already validated that the authorized user matches the partnership.
 

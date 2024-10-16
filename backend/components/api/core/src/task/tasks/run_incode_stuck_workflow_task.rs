@@ -26,7 +26,6 @@ impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
         let Self { state } = self;
         let RunIncodeStuckWorkflowArgs { workflow_id: wfid } = args;
         let (wf, seqno) = state
-            .db_pool
             .db_query(move |conn| -> DbResult<_> {
                 let wf = Workflow::get(conn, &wfid)?;
                 let seqno = DataLifetime::get_current_seqno(conn)?;

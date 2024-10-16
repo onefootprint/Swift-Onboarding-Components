@@ -123,7 +123,6 @@ where
     } = audit_event
     {
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let insight = insight.insert_with_conn(conn)?;
 
@@ -193,7 +192,6 @@ pub async fn bulk_decrypt_dls_unchecked(
         .collect_vec();
 
     let (sv_vaults, vault_data_by_dl, document_data_by_dl) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // Fetch Vaults and group by Scoped Vault ID.
             let sv_vaults = ScopedVault::bulk_get(conn, sv_ids.iter().collect_vec(), &tenant_id, is_live)?;

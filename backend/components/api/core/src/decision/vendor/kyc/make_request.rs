@@ -66,7 +66,6 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     let sv_id = sv_id.clone();
     let v_req: VerificationRequest = vreq.clone();
     let (vres, vendor_result) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let uv = Vault::get(conn, &sv_id)?;
             let vres = verification_result::save_vres(conn, &uv.public_key, &vendor_result, &v_req)?;
@@ -91,7 +90,6 @@ pub async fn make_idv_vendor_call_save_vreq(
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
     let vreq = state
-        .db_pool
         .db_query(move |conn| VerificationRequest::create(conn, (&sv_id, &di_id, vendor_api.into()).into()))
         .await?;
 

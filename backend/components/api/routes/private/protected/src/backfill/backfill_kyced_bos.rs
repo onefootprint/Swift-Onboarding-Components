@@ -53,7 +53,6 @@ pub async fn post(
     } = request.into_inner();
 
     let dls: Vec<_> = state
-        .db_pool
         .db_query(move |conn| {
             data_lifetime::table
                 .filter(data_lifetime::kind.eq(DI::Business(BDK::BeneficialOwners)))
@@ -78,7 +77,6 @@ pub async fn post(
         .into_iter()
         .map(|((dl, _, v), bos)| async {
             state
-                .db_pool
                 .db_transaction(move |conn| backfill_dl(conn, dl, v, bos))
                 .await
         })

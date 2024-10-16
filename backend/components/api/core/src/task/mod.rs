@@ -44,7 +44,6 @@ pub async fn poll_and_execute_tasks(
     kind: Option<TaskKind>,
 ) -> Result<Vec<Task>, DbError> {
     let tasks = state
-        .db_pool
         .db_transaction(move |conn| Task::poll(conn, limit, kind))
         .await?;
 
@@ -79,7 +78,6 @@ pub async fn poll_and_execute_tasks(
         let task_execution_update = TaskExecutionUpdate::new(new_task_status, task_error_str);
         let te_id = te.id.clone();
         state
-            .db_pool
             .db_transaction(move |conn| {
                 Task::update_running_task(conn, &task_id, new_task_status, &te_id, task_execution_update)
             })
@@ -141,7 +139,6 @@ mod task_tests {
     async fn basic_end_to_end(state: &mut State) {
         // Setup
         let tasks = state
-            .db_pool
             .db_query(move |conn| -> Result<Vec<Task>, DbError> {
                 Ok(vec![
                     Task::create(conn, Utc::now(), task_data("task1 yo"))?,

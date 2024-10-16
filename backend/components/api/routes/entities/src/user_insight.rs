@@ -29,7 +29,6 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
     let (behavior_events, latest_completed_wf, insight_event_for_latest_wf) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let behavior = NeuroIdAnalyticsEvent::list(conn, &sv.id)?;

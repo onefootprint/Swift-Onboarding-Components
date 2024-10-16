@@ -40,7 +40,6 @@ pub async fn get_dupes(
     let fp_id = request.into_inner();
 
     let (dupes, vws, neuro_dupes) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Load the dupes

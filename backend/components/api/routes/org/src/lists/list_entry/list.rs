@@ -35,7 +35,6 @@ pub async fn entries_for_list(
     let is_live = auth.is_live()?;
 
     let (tenant, list, entries) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;

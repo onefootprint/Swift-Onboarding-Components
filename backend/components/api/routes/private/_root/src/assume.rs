@@ -48,7 +48,6 @@ async fn post(
 
     let expires_at = auth.session().expires_at;
     let (tenant, token) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // Verify the tenant_id is real
             let tenant = Tenant::get(conn, &tenant_id)?;

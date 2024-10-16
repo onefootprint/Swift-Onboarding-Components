@@ -51,7 +51,6 @@ where
 
     // 0. first check if the migration is run to avoid grabbing an advisory lock
     let pre_flight_should_run = state
-        .db_pool
         .db_query(move |conn| -> DbResult<bool> {
             Ok(
                 db::models::custom_migration::CustomMigration::get_run_by_version(conn, &M::version())?
@@ -71,7 +70,6 @@ where
 
     // Run the migration inside a DB TXN
     let result = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
             // 1. take out the lock so no other servers can continue along the txn (we don't need to unlock it
             //    as it will be dropped after the txn)

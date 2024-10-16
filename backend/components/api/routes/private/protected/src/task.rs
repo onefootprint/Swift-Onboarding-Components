@@ -46,7 +46,6 @@ async fn create_task(
     let CreateTaskRequest { task_data } = request.into_inner();
 
     let task = state
-        .db_pool
         .db_query(move |conn| -> Result<Task, DbError> { Task::create(conn, Utc::now(), task_data) })
         .await?;
 

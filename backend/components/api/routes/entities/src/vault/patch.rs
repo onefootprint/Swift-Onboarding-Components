@@ -164,7 +164,6 @@ async fn patch_inner(
         let fp_id = fp_id.clone();
         let tenant_id = tenant_id.clone();
         let uvw = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
                 let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
@@ -191,7 +190,6 @@ async fn patch_inner(
     }
 
     let sv = state
-        .db_pool
         .db_query(move |conn| ScopedVault::get(conn, (&fp_id, &tenant_id, is_live)))
         .await?;
 
@@ -202,7 +200,6 @@ async fn patch_inner(
 
     let actor = auth.actor();
     let svv = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
 

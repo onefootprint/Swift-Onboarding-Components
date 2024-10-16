@@ -32,7 +32,6 @@ pub async fn post(
     let DecryptVresRequest { vres_id } = request.into_inner();
 
     let (vres, uv) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let (vreq, vres) = VerificationResult::get(conn, &vres_id)?;
             let uv = Vault::get(conn, &vreq.scoped_vault_id)?;

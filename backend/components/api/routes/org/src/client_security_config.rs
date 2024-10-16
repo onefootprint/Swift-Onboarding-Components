@@ -26,7 +26,6 @@ async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<Or
     let tenant_id = tenant.id.clone();
 
     let config = state
-        .db_pool
         .db_query(move |conn| TenantClientConfig::get(conn, &tenant_id, is_live))
         .await?
         .map(
@@ -83,7 +82,6 @@ async fn patch(
         allowed_origins,
         ..
     } = state
-        .db_pool
         .db_transaction(move |conn| {
             UpdateTenantClientConfig {
                 is_live,

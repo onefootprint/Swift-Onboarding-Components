@@ -21,7 +21,6 @@ pub enum BoOnboardingResult {
 pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOnboardingResult> {
     let wfid = biz_wf_id.clone();
     let (mut user_decisions, bvw, obc) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let biz_wf = Workflow::get(conn, &wfid)?;
             let user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id)?;

@@ -39,7 +39,6 @@ pub async fn post(
     let actor: DbActor = auth.actor().into();
 
     let tag = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -72,7 +71,6 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let tags = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultTag::get_active(conn, &sv.id)?)
@@ -97,7 +95,6 @@ pub async fn delete(
     let (fp_id, tag_id) = path.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultTag::deactivate(conn, &sv.id, &tag_id, actor)?)

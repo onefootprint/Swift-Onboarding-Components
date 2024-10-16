@@ -29,7 +29,6 @@ pub async fn post(
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             SocureDeviceSession::create(conn, device_session_id, wf_id)?;
 

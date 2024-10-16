@@ -29,7 +29,6 @@ pub async fn get(
     let fp_bid = fp_bid.into_inner();
 
     let (sv, mrs) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_bid, &tenant_id, is_live))?;
             let mr_filters = ManualReviewFilters::get_active();

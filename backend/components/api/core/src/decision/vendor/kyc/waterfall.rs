@@ -40,7 +40,6 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     let svid = di.scoped_vault_id.clone();
     let wf_id = wf.id.clone();
     let (tenant_id, vw, obc) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -67,7 +66,6 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
 
     let diid2 = di.id.clone();
     let waterfall_execution = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let wfe = WaterfallExecution::get_or_create(
                 conn,
@@ -105,7 +103,6 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         let eid2 = eid.clone();
         let v_api = waterfall_vendor_api.into();
         let step = state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let locked = WaterfallExecution::lock(conn, &eid)?;
                 let step = WaterfallExecution::create_step(locked, conn, v_api)?;
@@ -155,7 +152,6 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         // Update our WaterfallStep with the results
         let sr2 = step_result.clone();
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let locked = WaterfallExecution::lock(conn, &eid2)?;
                 let update = UpdateWaterfallStep::save_step_result(
@@ -222,7 +218,6 @@ async fn complete_waterfall_execution(
     let is_one_click = wf.is_one_click;
     let obc_id = obc_id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let locked = WaterfallExecution::lock(conn, &eid)?;
             if locked.completed_at.is_some() {

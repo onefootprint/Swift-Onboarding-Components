@@ -69,7 +69,6 @@ pub async fn post(
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // Check ownership of Playbook
             ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;

@@ -32,7 +32,6 @@ pub async fn get(
     let api_wire_types::GetOrgTenantTag { kind } = filters.into_inner();
 
     let list = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantTag::list(conn, &tenant_id, Some(kind), is_live) })
         .await?
         .into_iter()
@@ -64,7 +63,6 @@ pub async fn post(
     }
 
     let new_tag = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             TenantTag::create(conn, tenant_id, actor, kind, tag, is_live)
         })
@@ -89,7 +87,6 @@ pub async fn delete(
     let t_id = tag_id.into_inner();
 
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantTag::deactivate(conn, &tenant_id, &t_id, actor) })
         .await?;
 

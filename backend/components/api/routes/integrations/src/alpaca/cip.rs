@@ -130,7 +130,6 @@ pub async fn post(
     };
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id2, &tenant_id2, is_live))?;
             UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
@@ -170,7 +169,6 @@ pub async fn post_old(
     };
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id2, is_live))?;
             UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
@@ -243,7 +241,6 @@ pub(crate) async fn create_cip_request(
         insight,
         latest_identity_document_and_request,
     ) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let filters = OnboardingDecisionFilters {

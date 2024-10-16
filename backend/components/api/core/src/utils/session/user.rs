@@ -30,10 +30,7 @@ pub enum Expiry {
 impl AuthSession {
     pub async fn get(state: &State, auth_token: &SessionAuthToken) -> FpResult<Self> {
         let key = auth_token.id();
-        let session: Option<Session> = state
-            .db_pool
-            .db_query(move |conn| Session::get(conn, key))
-            .await?;
+        let session: Option<Session> = state.db_query(move |conn| Session::get(conn, key)).await?;
         let Some(session) = session else {
             return Err(ErrorWithCode::NoSessionFound.into());
         };
@@ -76,7 +73,6 @@ impl AuthSession {
         let data = data.into();
         let key = state.session_sealing_key.clone();
         let (auth_token, _) = state
-            .db_pool
             .db_query(move |conn| Self::create_sync(conn, &key, data, expires_in))
             .await?;
 

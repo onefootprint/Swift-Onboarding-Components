@@ -39,7 +39,6 @@ pub async fn get(
 
     let domains = tenant.domains.clone();
     let (is_domain_already_claimed, tenant_with_parent) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             Ok((
                 Tenant::is_domain_already_claimed(conn, &domains)?,
@@ -108,7 +107,6 @@ async fn patch(
         ..Default::default()
     };
     let updated_tenant = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::lock(conn, &tenant_id)?;
 

@@ -265,7 +265,6 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let wf_id = self.middesk_request.workflow_id;
 
         let (obc, _) = state
-            .db_pool
             .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
             .await?;
 
@@ -318,7 +317,6 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let di_id = self.state.create_business_vreq.decision_intent_id;
         let middesk_request_id = self.middesk_request.id.clone();
         let (udpated_middesk_request, business_update_webhook_vreq) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, vreq_id)?;
                 let _vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
@@ -536,7 +534,6 @@ impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(self, state: &State) -> FpResult<()> {
         let wfid = self.middesk_request.workflow_id.clone();
         let (v, sv, wf, seqno) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let (_, v) = Workflow::get_with_vault(conn, &wfid)?;
                 let (wf, sv) = Workflow::get_all(conn, &wfid)?;
@@ -592,7 +589,6 @@ impl MiddeskState<Complete> {
         let obc_id = wf.ob_configuration_id.clone();
         let wf_id = wf.id.clone();
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let billing_event_kind = if let Some(VerificationCheck::Kyb { ein_only }) =
@@ -682,7 +678,6 @@ pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Fp
         .ok_or(MiddeskError::ResponseMissingExpectedData("business_id".into()))?;
 
     let middesk_request = state
-        .db_pool
         .db_query(|conn| MiddeskRequest::get_by_business_id(conn, business_id))
         .await?;
     let mid_state = MiddeskStates::init(&state.db_pool, middesk_request).await?;

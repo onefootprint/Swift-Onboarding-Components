@@ -35,7 +35,6 @@ async fn post(
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
     let (key, role) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             Ok((key, role))

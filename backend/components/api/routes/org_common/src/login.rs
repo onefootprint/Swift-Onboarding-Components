@@ -85,7 +85,6 @@ where
     //
 
     let (user, matching_rolebindings) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let email = OrgMemberEmail::from_str(&profile2.email)?;
             // Get or create tenant user
@@ -129,7 +128,6 @@ where
         let user_id = user.id.clone();
         let org_id = t_pt.id().clone_into();
         let rb = state
-            .db_pool
             .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &org_id))
             .await?;
         (vec![(rb, t_pt)], created_new_tenant)
@@ -165,7 +163,6 @@ where
     //
 
     let login_result = state
-        .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
         .await?;
 
@@ -218,7 +215,6 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> FpResult<(Te
         // Check if tenant exists. If so, automatically add new tenant user
         let domain = domain.clone();
         let tenant = state
-            .db_pool
             .db_query(move |conn| Tenant::get_tenant_by_domain(conn, &domain))
             .await?;
         if let Some(tenant) = tenant {
@@ -250,7 +246,6 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> FpResult<(Te
         company_size: None,
     };
     let tenant = state
-        .db_pool
         .db_transaction(move |conn| Tenant::create(conn, new_tenant))
         .await?;
     Ok((tenant, true))
@@ -267,7 +262,6 @@ async fn find_or_create_partner_tenant(
         // user.
         let domain = domain.clone();
         let tenant = state
-            .db_pool
             .db_query(move |conn| PartnerTenant::get_by_domain(conn, domain.as_str()))
             .await?;
         if let Some(partner_tenant) = tenant {
@@ -290,7 +284,6 @@ async fn find_or_create_partner_tenant(
         website_url: None,
     };
     let partner_tenant = state
-        .db_pool
         .db_transaction(move |conn| PartnerTenant::create(conn, new_partner_tenant))
         .await?;
     Ok((partner_tenant, true))

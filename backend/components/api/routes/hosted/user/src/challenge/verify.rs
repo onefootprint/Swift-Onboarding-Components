@@ -106,7 +106,6 @@ pub async fn post(
     // Perform the action - register the email/phone/passkey
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let ie = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             let (event_kind, passkey_cred_id) =

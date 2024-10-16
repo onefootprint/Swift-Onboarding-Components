@@ -71,7 +71,6 @@ async fn post(
         auth_token,
         ro_auth_token,
     } = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             //
             // Get or create the partner tenant

@@ -42,7 +42,6 @@ async fn post(
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let (token, session) = state
-        .db_pool
         // Don't make this a transaction since we return errors from here but still want to save
         // the session in the database
         .db_query(move |conn| -> FpResult<_> {

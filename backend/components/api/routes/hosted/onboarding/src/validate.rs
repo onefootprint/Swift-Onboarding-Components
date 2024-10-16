@@ -59,7 +59,6 @@ pub async fn post(
             .ok_or(ValidationError("No scoped user associated with session"))?;
         let auth_events = user_auth.auth_events.clone();
         let reqs = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id)?;
                 let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &auth_events)?;

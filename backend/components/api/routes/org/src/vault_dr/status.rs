@@ -30,7 +30,6 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let maybe_config = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let maybe_config = VaultDrConfig::get(conn, (&tenant_id, is_live)).optional()?;
             Ok(maybe_config)

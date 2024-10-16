@@ -62,7 +62,6 @@ async fn get(
     };
 
     let results = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             use db::models::audit_event::AuditEvent;
             AuditEvent::filter(conn, params, (page_size + 1) as i64)

@@ -31,7 +31,6 @@ pub async fn post(
     tracing::info!(has_context=%skip_context.is_some(), "Skipping passkey register");
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
 

@@ -82,7 +82,6 @@ pub async fn run_curp_validation_check(
     let wf_id2 = wf_id.clone();
     let wf_id3 = wf_id.clone();
     let (vw, tenant_id, id_documents, sv) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
@@ -180,7 +179,6 @@ pub async fn run_curp_validation_check(
                         pre_vault(state, doc_kind, raw_response.clone(), is_live, &sv_id).await?;
 
                     state
-                        .db_pool
                         .db_transaction(move |conn| -> FpResult<_> {
                             // Vault the curp response
                             let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
@@ -390,7 +388,6 @@ async fn save_canned_response(
     let vault_data = pre_vault(state, id_doc_kind, canned_res.clone().into(), false, &sv_id).await?;
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let parsed = serde_json::from_value::<CurpValidationResponse>(canned_res.clone())?;
             let raw_response = PiiJsonValue::new(serde_json::to_value(&canned_res.clone())?);
@@ -488,7 +485,6 @@ async fn handle_curp_error(
             vres_id.clone(),
         )];
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
                     id: &wfid,

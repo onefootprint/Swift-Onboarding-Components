@@ -56,7 +56,6 @@ pub async fn post_validate(
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
             vw.validate_request(conn, updates, &DataRequestSource::HostedPatchVault(source.into()))?;
@@ -92,7 +91,6 @@ pub async fn patch(
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
 
@@ -127,7 +125,6 @@ pub async fn patch(
             let args = default_identity_doc_args(sv_id, true, &wf.id);
             // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
             state
-                .db_pool
                 .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
                 .await?;
         } else if address.is_us_including_territories() {
@@ -151,7 +148,6 @@ async fn handle_ssn_skipped(
     };
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
             let ssn_optional_and_missing = api_core::decision::features::user_input::ssn_optional_and_missing(&vw, &obc);

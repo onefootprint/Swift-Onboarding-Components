@@ -28,7 +28,6 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let businesses = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let businesses = BusinessOwner::list_businesses(conn, &su.vault_id, &tenant_id)?;

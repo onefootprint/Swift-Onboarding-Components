@@ -45,7 +45,6 @@ async fn proceed(
     } = request.into_inner();
 
     let (wf, seqno) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let wf = Workflow::get(conn, &wf_id)?;
             let seqno = DataLifetime::get_current_seqno(conn)?;

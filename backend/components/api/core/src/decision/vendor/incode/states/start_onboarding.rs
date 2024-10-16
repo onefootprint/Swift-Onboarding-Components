@@ -64,7 +64,6 @@ impl StartOnboarding {
             .map_err(into_fp_error)?;
 
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let ivs = IncodeVerificationSession::lock(conn, &incode_session.id)?;
                 let next_state = AddFront::new();

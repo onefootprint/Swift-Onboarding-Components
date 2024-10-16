@@ -104,7 +104,6 @@ pub async fn create_non_portable_vault(
 
     let actor = auth.actor();
     let (scoped_user, vault, new_version) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let idempotency_id = idempotency_id.0;
             let external_id = external_id.0;
@@ -174,7 +173,6 @@ pub async fn patch_vault(
 
     let UpdateEntityRequest { external_id } = request;
     let (sv, v) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let v = Vault::get(conn, &sv.vault_id)?;

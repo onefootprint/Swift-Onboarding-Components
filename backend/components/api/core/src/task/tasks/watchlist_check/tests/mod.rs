@@ -68,7 +68,6 @@ async fn create_user_and_task(
     idks: Vec<IDK>,
 ) -> (ScopedVault, Task) {
     let (sv, task) = state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let sv = match vault_kind {
                 VaultKind::NonPortable => {
@@ -118,7 +117,6 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
         raw_response: res.raw_response,
     });
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<VerificationResult> {
             let v = Vault::get(conn, &sv_id).unwrap();
             let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();

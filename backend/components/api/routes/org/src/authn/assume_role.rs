@@ -42,7 +42,6 @@ fn post(
 
     let sealing_key = state.session_sealing_key.clone();
     let (login_result, token) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let login_result = TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method)?;
             let session_data = TenantRbSession::create(&login_result, purpose);

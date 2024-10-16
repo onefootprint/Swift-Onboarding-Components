@@ -41,7 +41,6 @@ impl FingerprintedDataRequest {
     pub async fn build(state: &State, data: DataRequest, sv_id: &ScopedVaultId) -> FpResult<Self> {
         let sv_id = sv_id.clone();
         let vw = state
-            .db_pool
             .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sv_id))
             .await?;
 

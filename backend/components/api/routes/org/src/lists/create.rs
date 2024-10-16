@@ -47,7 +47,6 @@ pub async fn create_list(
     let db_actor: DbActor = actor.clone().into();
     let insight = CreateInsightEvent::from(insights);
     let (list, entries_count) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {

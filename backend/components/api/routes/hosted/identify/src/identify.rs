@@ -111,7 +111,6 @@ pub async fn post(
         let session = user_auth.update(args, vec![], scope.into(), None)?;
         let session_key = state.session_sealing_key.clone();
         let (auth_token, _) = state
-            .db_pool
             .db_query(move |conn| user_auth.create_derived(conn, &session_key, session, None))
             .await?;
         (auth_token, scopes)
@@ -181,7 +180,6 @@ pub(super) async fn create_identified_token(
         .and_then(|obc| obc.ob_session())
         .map(|obs| obs.trusted_metadata.allow_reonboard);
     let token = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scopes = vec![];
             let biz_info = ob_context

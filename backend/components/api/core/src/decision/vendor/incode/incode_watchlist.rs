@@ -89,7 +89,6 @@ async fn call_watchlist_result(
     let diid = di_id.clone();
     let vendor_api: VendorAPI = kind.clone().into();
     let vreq = state
-        .db_pool
         .db_query(move |conn| VerificationRequest::create(conn, (&svid, &diid, vendor_api).into()))
         .await?;
     let vreq_id = vreq.id.clone();
@@ -227,7 +226,6 @@ pub async fn run_watchlist_check(
     let svid = di.scoped_vault_id.clone();
     let obc_key = obc_key.clone();
     let (tenant_id, vw, obc) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -325,7 +323,6 @@ async fn save_canned_response(
     public_key: VaultPublicKey,
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let canned_res = idv::test_fixtures::incode_watchlist_result_response_no_hits();
             let parsed = serde_json::from_value::<WatchlistResultResponse>(canned_res.clone())?;

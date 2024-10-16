@@ -45,7 +45,6 @@ pub async fn get(
 
     let pagination = pagination.db_pagination(&state);
     let (wfs, next_page) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (wfs, next_page) = Workflow::list(conn, &sv.id, pagination)?;

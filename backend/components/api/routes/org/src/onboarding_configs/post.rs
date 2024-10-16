@@ -195,7 +195,6 @@ pub async fn post(
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, &tvc)?;
     let ff_client = state.ff_client.clone();
     let (obc, actor, rs) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;

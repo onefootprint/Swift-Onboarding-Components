@@ -24,7 +24,6 @@ pub async fn deactivate_list(
     let is_live = auth.is_live()?;
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let list = List::lock(conn, &tenant_id, is_live, &list_id)?;
             List::deactivate(conn, list)?;

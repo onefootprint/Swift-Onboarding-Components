@@ -83,7 +83,6 @@ impl<Type> VaultWrapper<Type> {
             PrefillKind::Onboarding(sv) => {
                 let sv_id = sv.id.clone();
                 let vw = state
-                    .db_pool
                     .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sv_id))
                     .await?;
                 Some(vw)
@@ -220,7 +219,6 @@ impl<Type> VaultWrapper<Type> {
             .filter_map(|di| self.get_lifetime(&di).map(|dl| (di, dl.id.clone())))
             .collect_vec();
         let new_ci = state
-            .db_pool
             .db_query(|conn| -> Result<_, _> {
                 old_ci_dls
                     .into_iter()

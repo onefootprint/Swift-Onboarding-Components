@@ -28,7 +28,6 @@ pub async fn create_samba_order(
     let CreateSambaOrderRequest { fp_id, data } = request.into_inner();
 
     let di = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, ScopedVaultIdentifier::SuperAdminView { identifier: &fp_id })?;
             // TODO: prevent people from re-running this over and over

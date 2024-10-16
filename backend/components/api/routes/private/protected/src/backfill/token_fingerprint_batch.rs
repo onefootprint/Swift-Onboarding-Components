@@ -58,7 +58,6 @@ pub async fn post(
         shard_config,
     } = request.into_inner();
     let svs = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             // Filter out deactivated scoped vaults - causes other utils to crash
             let svs: Vec<(ScopedVault, Vault)> = scoped_vault::table
@@ -97,7 +96,6 @@ pub async fn post(
 #[tracing::instrument(skip_all)]
 async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: Vault) -> FpResult<()> {
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
             ScopedVault::lock(conn, &sv.id)?;
             let results: Vec<(DbFingerprint, DataLifetime)> = fingerprint::table

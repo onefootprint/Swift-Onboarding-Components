@@ -79,7 +79,6 @@ pub async fn post(
         }
         let wf_id = wf.id.clone();
         state
-            .db_pool
             .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, fixture_result))
             .await?
     } else {
@@ -149,7 +148,6 @@ async fn run_kyb_if_needed(
     // Run KYB
     let tenant = user_auth.tenant().clone();
     let biz_wf = state
-        .db_pool
         .db_query(move |conn| user_auth.business_workflow(conn))
         .await?;
 
@@ -157,7 +155,6 @@ async fn run_kyb_if_needed(
         if let Some(r) = fixture_result {
             let wf_id = biz_wf.id.clone();
             state
-                .db_pool
                 .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, r))
                 .await?;
         }

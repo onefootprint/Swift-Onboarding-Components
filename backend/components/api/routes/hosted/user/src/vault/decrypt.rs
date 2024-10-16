@@ -39,7 +39,6 @@ pub async fn post(
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
     let uvw = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let id = user_auth.user_identifier();
             let args = VwArgs::from(&id);

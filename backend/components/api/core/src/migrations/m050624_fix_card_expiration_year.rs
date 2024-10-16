@@ -68,7 +68,6 @@ pub async fn fix_card_expiration_year(
     }
 
     let vw_dis: HashMap<_, _> = state
-        .db_pool
         .db_query(
             move |conn| -> ApiResult<_> {
                 let vw_dis = sv_seqnos
@@ -232,7 +231,6 @@ pub async fn fix_card_expiration_year(
             .clone();
 
         let (txn_updated, txn_would_update, txn_skipped) = state
-            .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let mut txn_updated: HashMap<FpId, Vec<DataIdentifier>> = HashMap::new();
                 let mut txn_would_update: HashMap<FpId, Vec<DataIdentifier>> = HashMap::new();

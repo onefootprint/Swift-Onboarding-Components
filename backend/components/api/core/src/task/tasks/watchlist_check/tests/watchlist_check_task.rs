@@ -270,7 +270,6 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
         ExistingSearchCase::VresOlderThan365Days => {
             let vres = save_existing_watchlist_check_vres(state, &sv.id).await;
             state
-                .db_pool
                 .db_query(move |conn| {
                     diesel::update(verification_result::table)
                         .filter(verification_result::id.eq(vres.id))
@@ -284,7 +283,6 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
         ExistingSearchCase::VaultDataChangedSinceVres(data_changed) => {
             let svid = sv.id.clone();
             state
-                .db_pool
                 .db_transaction(move |conn| -> DbResult<()> {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &svid).unwrap();
                     let data = match data_changed {

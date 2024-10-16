@@ -150,7 +150,6 @@ async fn post_upload_inner(
     };
 
     let (vault, scoped_vault) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vault = Vault::get(conn, &scoped_vault.id)?;
@@ -168,7 +167,6 @@ async fn post_upload_inner(
     // TODO make a timeline event here
     let actor = auth.actor();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
             let doc = NewDocument {

@@ -48,7 +48,6 @@ pub async fn post(
         };
 
         let db_res = state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let user_vault_id = user_auth.user_vault_id().clone();
                 let scoped_user_id = user_auth.scoped_user_id();

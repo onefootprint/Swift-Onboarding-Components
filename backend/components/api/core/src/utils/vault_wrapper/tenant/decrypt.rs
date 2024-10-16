@@ -49,7 +49,6 @@ impl<Type> TenantVw<Type> {
         let is_live = self.scoped_vault.is_live;
 
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 

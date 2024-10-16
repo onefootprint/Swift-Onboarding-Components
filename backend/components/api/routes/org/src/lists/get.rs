@@ -24,7 +24,6 @@ async fn get_detail(
     let is_live = auth.is_live()?;
 
     let (list, rules_using_list) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let rules_using_list = RuleInstance::list_using_list(conn, &list.id)?;

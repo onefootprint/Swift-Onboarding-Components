@@ -50,10 +50,7 @@ impl FromRequest for CheckSessionContext {
             let auth_token = SessionAuthToken::from(auth_token);
 
             let key = auth_token.id();
-            let session = state
-                .db_pool
-                .db_query(move |conn| Session::get(conn, key))
-                .await?;
+            let session = state.db_query(move |conn| Session::get(conn, key)).await?;
             let result = if let Some(session) = session {
                 if session.expires_at < Utc::now() {
                     Self::Expired

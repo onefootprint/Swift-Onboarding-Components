@@ -57,7 +57,6 @@ pub async fn post(
     };
 
     let (sv, auth_events, wf, biz_wf) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &sv_id)?;
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
@@ -137,7 +136,6 @@ pub async fn post(
     if let Some(wf_id) = wf_id {
         // After all validation has occurred, updated the session_validated_at on the workflow
         state
-            .db_pool
             .db_query(move |conn| Workflow::set_session_validated_at(conn, &wf_id))
             .await?;
     }

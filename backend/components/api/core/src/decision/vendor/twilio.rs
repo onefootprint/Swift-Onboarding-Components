@@ -85,7 +85,6 @@ pub async fn run_twilio_call(
     // TODO: Make this WF created
     let di_created = di._created_at;
     let (vw, seqno) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
             let seqno = DataLifetime::get_seqno_at(conn, di_created)?;

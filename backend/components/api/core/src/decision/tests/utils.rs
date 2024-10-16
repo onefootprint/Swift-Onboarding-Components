@@ -16,7 +16,6 @@ async fn test_handle_setup(state: &mut State) {
     //
     // create a live UV and ob_config
     let (tenant, vault, wf) = state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let (tenant, vault, _, wf) = fixtures::lib::create_user_and_onboarding(
                 conn,
@@ -43,7 +42,6 @@ async fn test_handle_setup(state: &mut State) {
     // create a live UV and ob_config
     // TODO: do we even need to make a new user here?
     let (tenant, vault, wf) = state
-        .db_pool
         .db_transaction(move |conn| -> db::DbResult<_> {
             let (tenant, vault, _, wf) = fixtures::lib::create_user_and_onboarding(
                 conn,

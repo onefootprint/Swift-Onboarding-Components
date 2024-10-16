@@ -43,7 +43,6 @@ pub async fn get(
     let pagination = pagination.db_pagination(&state);
 
     let (fingerprints, scoped_vaults, labels, tags, next_page) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (fingerprints, next_page) = Fingerprint::get_internal_dupes(conn, &scoped_vault, pagination)?;

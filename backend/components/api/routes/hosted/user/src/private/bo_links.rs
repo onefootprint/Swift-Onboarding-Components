@@ -33,7 +33,6 @@ pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiL
     let biz_wf_id = (user_auth.data.business_workflow_id())
         .ok_or(ValidationError("No business associated with the session"))?;
     let (biz_wf, bvw) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let biz_wf = Workflow::get(conn, &biz_wf_id)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;

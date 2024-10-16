@@ -57,7 +57,6 @@ pub async fn post(
 
     let tenant_id = tenant.id.clone();
     let pre_enrollment = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             Ok(VaultDrAwsPreEnrollment::get(conn, (&tenant_id, is_live))
                 .optional()?
@@ -84,7 +83,6 @@ pub async fn post(
 
     let tenant_id = tenant.id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let existing_config = VaultDrConfig::lock(conn, &tenant_id, is_live)?;
             if let Some(existing_config) = existing_config {

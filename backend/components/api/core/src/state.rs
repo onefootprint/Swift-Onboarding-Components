@@ -111,13 +111,14 @@ use webhooks::WebhookClient;
 use workos::ApiKey;
 use workos::WorkOs;
 
-#[derive(Clone)]
+#[derive(Clone, derive_more::Deref)]
 pub struct State {
     pub config: Config,
     pub aws_hmac_client: AwsHmacClient,
     pub workos_client: Arc<WorkOs>,
     pub sms_client: SmsClient,
     pub sendgrid_client: SendgridClient,
+    #[deref]
     pub db_pool: DbPool,
     pub enclave_client: EnclaveClient,
     pub challenge_sealing_key: ScopedSealingKey,

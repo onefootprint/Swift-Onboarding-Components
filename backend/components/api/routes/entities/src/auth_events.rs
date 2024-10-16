@@ -30,7 +30,6 @@ pub async fn get(
     let fp_id = request.into_inner();
 
     let events = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (events, _) = AuthEvent::list(conn, &sv.id, None)?;

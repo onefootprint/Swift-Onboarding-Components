@@ -44,7 +44,6 @@ pub async fn get(
     let api_wire_types::GetHistoricalDataRequest { seqno } = filters.into_inner();
 
     let (id_docs, api_docs) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let documents = Document::list(conn, &sv.id)?;

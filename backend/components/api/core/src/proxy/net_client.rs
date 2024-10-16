@@ -64,7 +64,6 @@ pub async fn proxy_request(
     };
 
     let log = state
-        .db_pool
         .db_query(move |conn| ProxyRequestLog::create_new(conn, log))
         .await?;
 
@@ -111,7 +110,6 @@ pub async fn proxy_request(
     };
 
     let _ = state
-        .db_pool
         .db_query(move |conn| log.finish_request(conn, log_finish))
         .await?;
 
@@ -132,7 +130,6 @@ async fn record_reqwest_error(log: ProxyRequestLog, state: &State, error: &reqwe
     };
 
     let _ = state
-        .db_pool
         .db_query(move |conn| log.finish_request(conn, update))
         .await?;
 

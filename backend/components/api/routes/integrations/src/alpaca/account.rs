@@ -132,7 +132,6 @@ async fn create_create_account_request(
     req: DeprecatedAlpacaCreateAccountRequest,
 ) -> FpResult<CreateAccountRequest> {
     let (uvw, doc) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<(TenantVw<Person>, _)> {
             let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
             let doc = Document::get_latest_complete_identity(conn, &sv.id)?;

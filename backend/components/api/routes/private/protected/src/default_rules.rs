@@ -19,7 +19,6 @@ pub async fn add_default_rules(
 ) -> ApiResponse<api_wire_types::Empty> {
     let ff_client = state.ff_client.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, &path.into_inner())?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;

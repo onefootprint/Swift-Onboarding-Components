@@ -52,7 +52,6 @@ pub async fn post(
         utils::vault_wrapper::seal_file_and_upload_to_s3(&state, &file, &di, user_auth.user(), su_id).await?;
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
             let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;

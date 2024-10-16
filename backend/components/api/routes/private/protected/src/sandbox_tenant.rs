@@ -51,7 +51,6 @@ pub async fn post(
     let sealing_key = state.session_sealing_key.clone();
     let expires_at = auth.clone().session().expires_at;
     let token = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             if Tenant::is_domain_already_claimed(conn, &domains)? {
                 return ValidationError("Tenant for this domain already exists").into();

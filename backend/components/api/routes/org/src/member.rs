@@ -34,7 +34,6 @@ async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<ap
     let tenant = auth.tenant().clone();
     let user_id = auth.actor().tenant_user_id()?.clone();
     let user = state
-        .db_pool
         .db_query(move |conn| TenantUser::get(conn, &user_id))
         .await?;
 
@@ -76,7 +75,6 @@ async fn patch(
         last_name,
     };
     let user = state
-        .db_pool
         .db_transaction(move |conn| TenantUser::update(conn, &user_id, user_update))
         .await?;
 

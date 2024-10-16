@@ -38,7 +38,6 @@ pub async fn put(
     };
 
     let updated_tenant = state
-        .db_pool
         .db_query(move |conn| Tenant::update(conn, &tenant_id, update_tenant))
         .await?;
 

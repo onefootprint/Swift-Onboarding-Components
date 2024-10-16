@@ -37,10 +37,7 @@ async fn get(
     let auth = auth.check_guard(Any)?;
     let tu_id = auth.actor().tenant_user_id()?.clone();
     let InProgressOnboardingsRequest { is_live } = request.into_inner();
-    let tenant_user = state
-        .db_pool
-        .db_query(move |conn| TenantUser::get(conn, &tu_id))
-        .await?;
+    let tenant_user = state.db_query(move |conn| TenantUser::get(conn, &tu_id)).await?;
 
     // Fingerprint the authenticated dashboard user's email in the same way we fingerprint data for
     // users going through onboarding
@@ -55,7 +52,6 @@ async fn get(
         .collect_vec();
 
     let workflows = state
-        .db_pool
         .db_query(move |conn| Workflow::get_in_progress(conn, &sh_datas, is_live))
         .await?;
 

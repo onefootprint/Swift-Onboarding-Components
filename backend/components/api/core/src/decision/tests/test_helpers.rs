@@ -55,7 +55,6 @@ pub async fn create_user_and_onboarding(
 ) {
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let tenant = if let Some(t) = reuse_tenant {
                 t
@@ -147,7 +146,6 @@ pub async fn create_kyc_user_and_wf(
         create_user_and_onboarding(state, obc_opts, fixture_result, false, reuse_tenant).await;
     let wf_id = wf.id.clone();
     let dr = state
-        .db_pool
         .db_query(move |conn| DocumentRequest::get(conn, &wf_id, DocumentRequestKind::Identity))
         .await
         .unwrap();

@@ -27,7 +27,6 @@ fn get(
     let actor = auth.actor();
     let tu_id = actor.tenant_user_id()?.clone();
     let tenants = state
-        .db_pool
         .db_transaction(move |conn| TenantRolebinding::list_by_user(conn, &tu_id))
         .await?
         .into_iter()

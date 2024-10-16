@@ -43,7 +43,6 @@ pub async fn delete(
     let tenant_id = auth.tenant().id.clone();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;

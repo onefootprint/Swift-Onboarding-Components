@@ -50,7 +50,6 @@ pub async fn post(
     // mark person and business wf as authorized
     let wf_id = user_auth.workflow().id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             Workflow::set_is_authorized(conn, &wf_id)?;
 

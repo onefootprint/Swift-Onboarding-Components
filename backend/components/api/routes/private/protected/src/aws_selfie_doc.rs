@@ -42,7 +42,6 @@ pub async fn post(
     } = request.into_inner();
 
     let uvw = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(
                 conn,

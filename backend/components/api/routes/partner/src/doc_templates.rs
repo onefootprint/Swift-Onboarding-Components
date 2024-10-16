@@ -35,7 +35,6 @@ pub async fn get(
     let pt_id = pt.id.clone();
 
     let (templates_with_latest_version, users) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let templates_with_latest_version =
                 ComplianceDocTemplate::list_active_with_latest_version(conn, &pt_id)?;
@@ -90,7 +89,6 @@ pub async fn post(
     let created_by_partner_tenant_user_id = auth.actor().tenant_user_id()?.clone();
 
     let models = state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let template = NewComplianceDocTemplate {
                 partner_tenant_id: &pt_id,
@@ -143,7 +141,6 @@ pub async fn put(
     let created_by_partner_tenant_user_id = auth.actor().tenant_user_id()?.clone();
 
     let models = state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             // Ensure the template is owned by the authorized partner tenant.
             let template = ComplianceDocTemplate::lock(conn, &template_id, &pt_id)?;
@@ -190,7 +187,6 @@ pub async fn delete(
     let template_id = template_id.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             ComplianceDocTemplate::deactivate(conn, &template_id, &pt_id)
         })

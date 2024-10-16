@@ -154,7 +154,6 @@ async fn get_identify_challenge_context(
     root_span.record("vault_id", existing_user_id.to_string());
     let v_id = existing_user_id.clone();
     let (tenant, sv) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // Add some log fields to the root span. Prefer info from the sv_id, otherwise look
             // through the obc

@@ -210,7 +210,6 @@ async fn test_run_kyc_waterfall(
 
     let sv_id = wf.scoped_vault_id.clone();
     let di = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let args = UpdateTenantVendorControlArgs {
                 idology_enabled: Some(idology_enabled.0),
@@ -357,7 +356,6 @@ async fn assert_expected_result_with_wfe(
 async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: VendorResult) {
     let vresid = vr.verification_result_id.clone();
     let (vreq, vres) = state
-        .db_pool
         .db_query(move |conn| VerificationResult::get(conn, &vresid))
         .await
         .unwrap();
@@ -387,7 +385,6 @@ async fn assert_waterfall_execution(
         ExpectedResult::SingularSuccessVendorResult(_) | ExpectedResult::ErrVendorRequestsFailed => {
             let diid = di_id.clone();
             let wfes = state
-                .db_pool
                 .db_query(move |conn| WaterfallExecution::list(conn, &diid))
                 .await
                 .unwrap();
@@ -401,7 +398,6 @@ async fn assert_waterfall_execution(
         ExpectedResult::ErrNotEnoughInformation => {
             let diid = di_id.clone();
             let wfes = state
-                .db_pool
                 .db_query(move |conn| WaterfallExecution::list(conn, &diid))
                 .await
                 .unwrap();
@@ -417,7 +413,6 @@ async fn assert_waterfall_execution_steps(
     wfe_id: WaterfallExecutionId,
 ) {
     let mut wfs = state
-        .db_pool
         .db_query(move |conn| WaterfallStep::list(conn, &wfe_id))
         .await
         .unwrap();

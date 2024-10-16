@@ -31,7 +31,6 @@ pub async fn get_latest_workflow_decision(
     let fp_id = request.into_inner();
 
     let result = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RuleSetResult::latest_workflow_decision(conn, &sv.id)
@@ -58,7 +57,6 @@ pub async fn get(
     let (fp_id, rsr_id) = request.into_inner();
 
     let rsr = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?; // permission check
             RuleSetResult::get(conn, &rsr_id)

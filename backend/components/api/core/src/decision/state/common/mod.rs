@@ -102,7 +102,6 @@ pub async fn run_kyc_vendor_calls(
 ) -> FpResult<VendorResult> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -128,7 +127,6 @@ pub async fn run_kyc_vendor_calls(
 pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> FpResult<Option<VendorResult>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -151,7 +149,6 @@ pub async fn run_application_risk(
 ) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, di, v) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -188,7 +185,6 @@ pub async fn run_neuro_check(
 ) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -227,7 +223,6 @@ pub async fn run_twilio_check(
 ) -> FpResult<Option<(LookupV2Response, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -251,7 +246,6 @@ pub async fn run_aml_call(
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let wfid = wf_id.clone();
     let (wf, obc, v, di) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -344,7 +338,6 @@ pub async fn maybe_generate_ocr_reason_codes(
 ) -> FpResult<Option<Vec<NewRiskSignalInfo>>> {
     let wfid = wf_id.clone();
     let (obc, _) = state
-        .db_pool
         .db_query(move |conn| ObConfiguration::get(conn, &wfid))
         .await?;
 

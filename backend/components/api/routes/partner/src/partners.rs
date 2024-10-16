@@ -27,7 +27,6 @@ pub async fn get(
     let pt_id = pt.id.clone();
 
     let (summaries, counts) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let summaries = ComplianceDocSummary::filter(conn, &pt_id, None, None)?;
             let tenant_ids: Vec<_> = summaries.values().map(|s| &s.tenant.id).collect();

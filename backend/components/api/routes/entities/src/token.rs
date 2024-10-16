@@ -53,7 +53,6 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
 
     let (res, vw) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su.id)?;

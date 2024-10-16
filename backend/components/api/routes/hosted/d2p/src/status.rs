@@ -25,7 +25,6 @@ pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiResp
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let session = state
-        .db_pool
         .db_query(move |conn| JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token))
         .await?
         .ok_or(HandoffError::HandoffSessionNotFound)?;
@@ -50,7 +49,6 @@ pub async fn post(
 
     let D2pUpdateStatusRequest { status } = request.into_inner();
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // TODO lock session
             let session = JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token)?

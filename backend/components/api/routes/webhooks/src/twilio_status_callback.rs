@@ -43,7 +43,6 @@ async fn handle_webhook(
     }
 
     state
-        .db_pool
         .db_query(move |conn| {
             TwilioMessageLog::update_or_create(
                 conn,

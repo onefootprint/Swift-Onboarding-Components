@@ -191,7 +191,6 @@ impl ProxyConfig {
         let is_live = auth.is_live()?;
 
         let (db_config, headers, secret_headers, server_certs, ingress_rules) = state
-            .db_pool
             .db_query(move |conn| {
                 db::models::proxy_config::ProxyConfig::find(conn, &tenant_id, is_live, proxy_id)
             })

@@ -29,7 +29,6 @@ pub async fn list_rules_for_playbook(
     let is_live = auth.is_live()?;
 
     let rules = state
-        .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id, IncludeRules::All)
         })

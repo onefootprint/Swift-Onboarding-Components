@@ -66,7 +66,6 @@ pub(super) async fn attest(
             package_name,
         };
         let metas = state
-            .db_pool
             .db_query(move |conn| -> DbResult<_> { TenantAndroidAppMeta::list(conn, filters) })
             .await?;
         metas.into_iter().next()
@@ -107,10 +106,7 @@ pub(super) async fn attest(
     };
 
     let sv_id = sv.id.clone();
-    let creds = state
-        .db_pool
-        .db_query(move |conn| Passkey::list(conn, &sv_id))
-        .await?;
+    let creds = state.db_query(move |conn| Passkey::list(conn, &sv_id)).await?;
 
     let new_attestation = attest_inner(&sv.vault_id, &verifier, challenge, attestation, creds).await?;
 

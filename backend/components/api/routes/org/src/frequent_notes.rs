@@ -31,7 +31,6 @@ pub async fn get(
     let api_wire_types::GetOrgFrequentNotes { kind } = filters.into_inner();
 
     let list = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::list(conn, &tenant_id, kind) })
         .await?
         .into_iter()
@@ -61,7 +60,6 @@ pub async fn post(
     }
 
     let new_freq_note = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             TenantFrequentNote::create(conn, tenant_id, actor, kind, content)
         })
@@ -85,7 +83,6 @@ pub async fn delete(
     let fn_id = frequent_note_id.into_inner();
 
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::deactivate(conn, &tenant_id, &fn_id) })
         .await?;
 

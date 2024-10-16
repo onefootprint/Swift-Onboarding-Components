@@ -53,7 +53,6 @@ async fn patch(
     } = request.into_inner();
     let tenant_id = tenant.id.clone();
     let (obc, actor, rs) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let update = ObConfigurationUpdate {
                 name,

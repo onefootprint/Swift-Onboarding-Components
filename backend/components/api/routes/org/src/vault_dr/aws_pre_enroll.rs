@@ -28,7 +28,6 @@ pub async fn post(
     let is_live = auth.is_live()?;
 
     let pre_enrollment = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let new_pre_enrollment = NewVaultDrAwsPreEnrollment {
                 tenant_id: &tenant.id,
@@ -59,7 +58,6 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let pre_enrollment = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             Ok(VaultDrAwsPreEnrollment::get(conn, (&tenant_id, is_live))?)
         })

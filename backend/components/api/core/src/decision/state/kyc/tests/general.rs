@@ -79,7 +79,6 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     .await;
 
     state
-        .db_pool
         .db_transaction(move |conn| {
             DbWorkflow::insert(
                 conn,
@@ -106,7 +105,6 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
 
 async fn get_wf(state: &State, wfid: WorkflowId) -> (DbWorkflow, Vec<WorkflowEvent>) {
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let wf = DbWorkflow::get(conn, &wfid)?;
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
@@ -342,7 +340,6 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
     // Rules Engine was run and a result saved and nothing catastrophic happened
     let _ = state
-        .db_pool
         .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &svid))
         .await
         .unwrap()
@@ -609,7 +606,6 @@ async fn redo_and_pass(
     let fixture_result = prior_wf.fixture_result;
     let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
-        .db_pool
         .db_transaction(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,

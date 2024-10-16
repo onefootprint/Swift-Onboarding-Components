@@ -46,7 +46,6 @@ pub async fn post(
     }
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sb = ScopedVault::lock(conn, (&fp_bid, &tenant_id, is_live))?;
             if sb.kind != VaultKind::Business {

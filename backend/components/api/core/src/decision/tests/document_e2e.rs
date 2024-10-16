@@ -152,7 +152,6 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         };
 
         state
-            .db_pool
             .db_query(move |conn| DocumentRequest::create(conn, args))
             .await
             .unwrap()
@@ -170,7 +169,6 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         device_type: None,
     };
     state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
 
@@ -338,7 +336,6 @@ async fn assertions(
         .await;
 
         state
-            .db_pool
             .db_query(move |conn| -> DbResult<_> {
                 let (id_doc, _) = Document::get(conn, &document_id)?;
                 assert_eq!(id_doc.status, DocumentStatus::Complete);
@@ -387,7 +384,6 @@ pub async fn assert_ivs_in_state(
     incode_session_state: IncodeVerificationSessionState,
 ) -> IncodeVerificationSession {
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &document_id)
                 .unwrap()

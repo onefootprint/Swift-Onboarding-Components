@@ -36,7 +36,6 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (api_key, role) = state
-        .db_pool
         .db_transaction(move |conn| {
             TenantApiKey::update(conn, id, tenant_id, is_live, None, None, None, Some(Utc::now()))
         })

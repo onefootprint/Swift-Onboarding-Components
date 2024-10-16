@@ -41,7 +41,6 @@ pub async fn get(
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let (results, next_page, count) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let filters = TenantRolebindingFilters {
                 org_id: (&authed_org_ident).into(),
@@ -90,7 +89,6 @@ pub async fn post(
     let email = OrgMemberEmail::try_from(email)?;
     let email2 = email.clone();
     let (inviter, user, rb, role) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let inviter = TenantUser::get(conn, &user_id)?;
             let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
@@ -136,7 +134,6 @@ pub async fn patch(
         ..Default::default()
     };
     let (user, rb, role) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
             let (user, _, role, _) = TenantRolebinding::get(conn, (&tu_id, org_ref))?;
@@ -170,7 +167,6 @@ pub async fn deactivate(
         ..TenantRolebindingUpdate::default()
     };
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
             TenantRolebinding::update(conn, (&tu_id, org_ref), update)?;

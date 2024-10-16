@@ -67,7 +67,6 @@ impl FromRequest for TenantApiKey {
             let sh_api_key = sk.fingerprint(state.as_ref()).await?;
 
             let (api_key, tenant, role) = state
-                .db_pool
                 .db_transaction(|conn| DbTenantApiKey::get_enabled(conn, sh_api_key))
                 .await
                 .map_err(|e| -> Self::Error {

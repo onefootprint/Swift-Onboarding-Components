@@ -82,7 +82,6 @@ pub async fn post(
     }
 
     let (bvw, sb, seqno) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
@@ -110,7 +109,6 @@ pub async fn post(
     let dbos = bvw.decrypt_business_owners(&state).await?;
     let tenant_id = auth.tenant().id.clone();
     let (biz_wf, obc) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
@@ -191,7 +189,6 @@ pub async fn post(
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     let (wf, sv, mrs) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf.id)?;
             let mr_filters = ManualReviewFilters::get_active();

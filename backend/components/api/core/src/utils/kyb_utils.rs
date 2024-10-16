@@ -62,7 +62,6 @@ pub async fn generate_secondary_bo_links<'a>(
         })
         .collect_vec();
     let tokens: Vec<_> = state
-        .db_pool
         .db_query(move |conn| {
             sessions_to_make
                 .into_iter()
@@ -194,7 +193,6 @@ pub async fn progress_business_workflow(
     }
 
     let (biz_wf, bvw) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // Refresh the wf since it may have changed above
             let biz_wf = Workflow::get(conn, &wf_id)?;

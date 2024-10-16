@@ -52,7 +52,6 @@ pub async fn post(
 #[tracing::instrument(skip_all)]
 async fn backfill_fingerprints(state: &State, sv_id: ScopedVaultId) -> FpResult<()> {
     let vw: TenantVw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
         .await?;
 
@@ -78,7 +77,6 @@ async fn backfill_fingerprints(state: &State, sv_id: ScopedVaultId) -> FpResult<
         .await?;
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
             let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
             // Don't need composite fingerprints here

@@ -161,7 +161,6 @@ type InputData = (V, T, Vec<(IDK, &'static str)>);
 async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: ExpectedDupes) {
     // create an obc for every tenant and create a T->OBC mapping
     let obc_map = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let obc_map: HashMap<T, ObConfiguration> = T::iter()
                 .map(|t| {
@@ -179,7 +178,6 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
     // of (V,T) -> SV
     let data2 = data.clone();
     let sv_map = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let mut vault_id_map: HashMap<V, VaultId> = HashMap::new();
             let sv_map: HashMap<(V, T), ScopedVault> = data2
@@ -211,7 +209,6 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
     // get_dupes for (V1, T1)
     let sv = sv_map.get(&(V::V1, T::T1)).unwrap().clone();
     let dupes = state
-        .db_pool
         .db_query(move |conn| Fingerprint::get_dupes(conn, &sv))
         .await
         .unwrap();
@@ -248,7 +245,6 @@ async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>)
 
     let sv_id = sv.id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id).unwrap();
             let source = DataRequestSource::HostedPatchVault(DataLifetimeSource::LikelyHosted.into());

@@ -34,7 +34,6 @@ pub async fn get(
     let (partnership_id, submission_id) = args.into_inner();
 
     let (sub, tenant_e_private_key) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // Check that the authorized partner tenant owns the partnership.
             let partnership = TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;

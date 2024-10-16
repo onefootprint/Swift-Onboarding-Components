@@ -43,7 +43,6 @@ pub async fn post_validate(
 
     let source = user_auth.user_session.dl_source();
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
             bvw.validate_request(conn, updates, &DataRequestSource::HostedPatchVault(source.into()))?;
@@ -76,7 +75,6 @@ pub async fn patch(
 
     let source = user_auth.user_session.dl_source();
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
             bvw.patch_data(conn, updates, DataRequestSource::HostedPatchVault(source.into()))?;

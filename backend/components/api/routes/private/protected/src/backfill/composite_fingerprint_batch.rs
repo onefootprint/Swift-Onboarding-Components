@@ -42,7 +42,6 @@ pub async fn post(
     } = request.into_inner();
 
     let sv_ids = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             // Filter out deactivated scoped vaults - causes other utils to crash
             let sv_ids = scoped_vault::table
@@ -81,7 +80,6 @@ pub async fn post(
 #[tracing::instrument(skip_all)]
 async fn backfill_composite_fingerprints(state: &State, sv_id: ScopedVaultId) -> FpResult<()> {
     let vw: TenantVw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
         .await?;
 
@@ -110,7 +108,6 @@ async fn backfill_composite_fingerprints(state: &State, sv_id: ScopedVaultId) ->
         .unzip();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
             let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
             let dis = vw.populated_dis();

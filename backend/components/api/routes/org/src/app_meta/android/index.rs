@@ -29,7 +29,6 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let list = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let filters = TenantAndroidAppFilters {
                 tenant_id,
@@ -75,7 +74,6 @@ pub async fn post(
         .seal_bytes(integrity_decryption_key.as_bytes())?;
 
     let new_tenant_android_app_meta = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             TenantAndroidAppMeta::create(
                 conn,
@@ -128,7 +126,6 @@ async fn patch(
     }
 
     let result = state
-        .db_pool
         .db_transaction(move |conn| {
             TenantAndroidAppMeta::update(
                 conn,

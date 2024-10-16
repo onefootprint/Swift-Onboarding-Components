@@ -47,7 +47,6 @@ pub async fn post(
 
     let id = user_auth.user_identifier();
     let vw = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let args = VwArgs::from(&id);
             let vw = VaultWrapper::<Any>::build(conn, args)?;
@@ -71,7 +70,6 @@ pub async fn post(
 
     let session_key = state.session_sealing_key.clone();
     let token = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let context = NewUserSessionContext {
                 kba: successful_kba,

@@ -32,7 +32,6 @@ pub async fn deactivate_list_entry(
 
     let insight = CreateInsightEvent::from(insights);
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             List::get(conn, &tenant_id, is_live, &list_id)?;
             let list_entry = ListEntry::lock(conn, &list_entry_id)?;

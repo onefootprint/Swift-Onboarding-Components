@@ -32,7 +32,6 @@ pub async fn run_sentilink_application_risk(
     let wf_id2 = wf_id.clone();
 
     let (vw, tenant_id, curr_seqno, ie) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();

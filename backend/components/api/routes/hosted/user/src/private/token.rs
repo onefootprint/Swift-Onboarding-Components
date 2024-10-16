@@ -27,7 +27,6 @@ pub async fn get(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiRe
     let user_auth = user_auth.into_inner();
     let sb_id = user_auth.data.scoped_business_id();
     let sb = state
-        .db_pool
         .db_query(move |conn| sb_id.map(|sb_id| ScopedVault::get(conn, &sb_id)).transpose())
         .await?;
 

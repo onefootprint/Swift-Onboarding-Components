@@ -65,7 +65,6 @@ pub async fn post(
         .ok_or(OnboardingError::NoObConfig)?;
     let wfr_id = user_auth.wfr_id.clone();
     let (scoped_user, ob_config, tenant, vw, wfr) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
@@ -103,7 +102,6 @@ pub async fn post(
         .get(VerificationCheckKind::NeuroId)
         .is_some();
     let auth_token = state
-        .db_pool
         .db_transaction(move |conn| -> Result<_, FpError> {
             // TODO: allow_reonboard here technically allows creating multiple Workflows per auth token. This
             // is harmless, but ideally we have idempotency protection here and only allow creating one

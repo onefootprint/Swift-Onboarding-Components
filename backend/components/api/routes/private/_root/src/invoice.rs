@@ -44,7 +44,6 @@ async fn post(
     // NOTE: be careful using this as it can clog up our single task queue.
     // We should make a separate task queue for lower-priority high latency operations
     state
-        .db_pool
         .db_query(move |conn| Task::create(conn, Utc::now(), task_data))
         .await?;
 

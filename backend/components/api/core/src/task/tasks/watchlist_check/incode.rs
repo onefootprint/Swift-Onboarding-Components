@@ -38,7 +38,6 @@ pub async fn complete_vendor_call(
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
     let (di, latest_watchlist_check_vres) = state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let di = DecisionIntent::get(conn, &di_id)?;
             let latest_watchlist_check_vres = VerificationResult::get_latest_successful_by_vendor_api(
@@ -131,7 +130,6 @@ async fn has_data_changed_since_vres(
     let svid = vreq.scoped_vault_id.clone();
     let seqno = vreq.uvw_snapshot_seqno;
     let uvw_for_vres = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::<Person>::build(conn, VwArgs::Historical(&svid, seqno)))
         .await?;
 

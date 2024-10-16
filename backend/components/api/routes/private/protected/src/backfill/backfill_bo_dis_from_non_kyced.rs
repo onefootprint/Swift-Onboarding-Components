@@ -63,7 +63,6 @@ pub async fn post(
     } = request.into_inner();
 
     let dls: Vec<_> = state
-        .db_pool
         .db_query(move |conn| {
             data_lifetime::table
                 .filter(data_lifetime::kind.eq(DI::Business(BDK::BeneficialOwners)))
@@ -92,7 +91,6 @@ pub async fn post(
         .map(|((dl, _, v), bos)| async {
             let sv_id = dl.scoped_vault_id.clone();
             let result = state
-                .db_pool
                 .db_transaction(move |conn| backfill_dl(conn, dl, v, bos))
                 .await;
             match result {

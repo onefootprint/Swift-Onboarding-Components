@@ -126,7 +126,6 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
     // Now add consent
     let wf_id = wf.id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
 
@@ -298,7 +297,6 @@ async fn test_adding_side_failures_front(state: &mut State, user_kind: UserKind)
 
     // ASSERTIONS
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &doc_id).unwrap().unwrap();
             let (iddoc, _) = Document::get(conn, &ivs.identity_document_id).unwrap();
@@ -388,7 +386,6 @@ async fn test_adding_side_failures_back(state: &mut State, user_kind: UserKind) 
 
     // ASSERTIONS
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &doc_id).unwrap().unwrap();
             let (iddoc, _) = Document::get(conn, &ivs.identity_document_id).unwrap();
@@ -496,7 +493,6 @@ async fn test_adding_side_failures_exceed_retries_back_and_front(state: &mut Sta
 
     // ASSERTIONS
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &doc_id).unwrap().unwrap();
             let (iddoc, _) = Document::get(conn, &ivs.identity_document_id).unwrap();
@@ -636,7 +632,6 @@ async fn test_adding_selfie_failures(state: &mut State, user_kind: UserKind) {
 
     // ASSERTIONS
     state
-        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &doc_id).unwrap().unwrap();
             let (iddoc, _) = Document::get(conn, &ivs.identity_document_id).unwrap();
@@ -715,7 +710,6 @@ async fn setup_document_test(
     mock_ff_client(state, test_case.user_kind.identity_doc_fixture(), t.id.clone());
     let wf_id = wf.id.clone();
     state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
 

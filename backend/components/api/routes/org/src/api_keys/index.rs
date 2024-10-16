@@ -60,7 +60,6 @@ pub async fn get(
     };
     let pagination = pagination.db_pagination(&state);
     let (keys_and_roles, next_page, count) = state
-        .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let (keys_and_roles, next_page) = TenantApiKey::list(conn, &query, pagination)?;
             let count = TenantApiKey::count(conn, &query)?;
@@ -110,7 +109,6 @@ pub async fn post(
     let e_key = secret_key.seal_to(&tenant.public_key)?;
     let CreateApiKeyRequest { name, role_id } = request.into_inner();
     let (api_key, role) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let api_key = TenantApiKey::create(conn, name, sh_key, e_key, tenant_id, is_live, role_id)?;
             let role = TenantRole::get(conn, &api_key.role_id)?;
@@ -160,7 +158,6 @@ pub async fn patch(
         role_id,
     } = request.into_inner();
     let (api_key, role) = state
-        .db_pool
         .db_transaction(move |conn| {
             TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id, None)
         })

@@ -36,7 +36,6 @@ pub async fn get(
     let pagination = pagination.db_pagination(&state);
 
     let (events, next_page, count) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (events, next_page) = AuthEvent::list(conn, &sv.id, Some(pagination))?;

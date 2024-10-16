@@ -41,7 +41,6 @@ fn post(
     let tu_id = actor.tenant_user_id()?.clone();
 
     let login_result = state
-        .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method))
         .await?;
 
@@ -61,7 +60,6 @@ fn post(
     };
     let session_sealing_key = state.session_sealing_key.clone();
     let token = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself

@@ -35,7 +35,6 @@ pub async fn run(
 ) -> ApiResult<Vec<(VaultId, Vec<ScopedVaultId>)>> {
     // Gather the vaults that have multiple scoped_vaults
     let vault_ids = state
-        .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let svs_with_prefill_data = data_lifetime::table
                 .filter(data_lifetime::source.eq(DataLifetimeSource::Prefill))
@@ -84,7 +83,6 @@ async fn backfill_portable_data_for_vault(
 ) -> ApiResult<Vec<ScopedVaultId>> {
     let s = state.clone();
     let result = state
-        .db_pool
         .db_transaction(move |conn| -> DryRunResult<_> {
             // Lock the vault and scoped vaults we will be updating
             vault::table

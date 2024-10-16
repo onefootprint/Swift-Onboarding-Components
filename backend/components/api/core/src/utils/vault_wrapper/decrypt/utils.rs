@@ -99,7 +99,6 @@ impl TenantVw<Business> {
         let tid = self.scoped_vault.tenant_id.clone();
         let seqno = self.seqno;
         let (linked_bos, vws) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let linked_bos = BusinessOwner::list_all(conn, &vid, &tid)?;
                 let vaults = linked_bos.iter().flat_map(|(_, x)| x.clone()).collect_vec();

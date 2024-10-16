@@ -22,7 +22,6 @@ pub async fn create_validation_token(
         .ok_or(AssertionError("No scoped user associated with auth session"))?;
     let biz_wf_id = user_auth.business_workflow_id();
     let validation_token = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             if user_auth.auth_events.is_empty() {
                 return Err(AssertionError("No auth events found for user").into());

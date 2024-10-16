@@ -106,7 +106,6 @@ async fn run_kyc_for_bo(
     let is_live = user_kind.is_live();
 
     state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let rule_instance_kinds = RuleInstance::list(conn, &t_id, is_live, &obc_id, IncludeRules::All)
                 .unwrap()
@@ -222,7 +221,6 @@ async fn run_kyc_for_bo(
 
     // Rules Engine was run and a result saved and nothing catastrophic happened
     let _ = state
-        .db_pool
         .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &svid))
         .await
         .unwrap()
@@ -347,7 +345,6 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
         WorkflowFixtureResult::ManualReview | WorkflowFixtureResult::Pass
     ) {
         let vw: VaultWrapper = state
-            .db_pool
             .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id)))
             .await
             .unwrap();
@@ -520,7 +517,6 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
 
     // check that middesk populated formation DIs
     let vw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id)))
         .await
         .unwrap();

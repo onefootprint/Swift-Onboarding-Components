@@ -101,7 +101,6 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     let expected_status = if doc_passed_with_review {
         // This is not a default rule, but we're testing it here
         state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
                 let rule = NewRule {
@@ -291,7 +290,6 @@ async fn collect_ad_hoc_document(
     let fixture_result = prior_wf.fixture_result;
     let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
-        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id.clone(),

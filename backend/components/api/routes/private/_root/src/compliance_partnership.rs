@@ -41,7 +41,6 @@ pub async fn post(
     auth.check_guard(FirmEmployeeGuard::Any)?;
 
     let partnership = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (np, is_new) = NewTenantCompliancePartnership {
                 tenant_id: &request.tenant_id.clone(),

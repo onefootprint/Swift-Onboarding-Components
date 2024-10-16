@@ -58,7 +58,6 @@ async fn make_vendor_call(
     let svid = sv_id.clone();
     let diid = di_id.clone();
     let vreq = state
-        .db_pool
         .db_query(move |conn| VerificationRequest::create(conn, (&svid, &diid, vendor_api).into()))
         .await?;
     let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
@@ -98,7 +97,6 @@ async fn make_vendor_call(
 
     let svid = sv_id.clone();
     let (res, vres) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let uv = Vault::get(conn, &svid)?;
             let vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;

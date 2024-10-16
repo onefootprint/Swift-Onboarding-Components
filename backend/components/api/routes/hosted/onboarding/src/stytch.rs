@@ -98,7 +98,6 @@ async fn post_inner(
         .unwrap_or(false);
 
     state
-        .db_pool
         .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> FpResult<_> {
             let di = DecisionIntent::create(
                 conn,

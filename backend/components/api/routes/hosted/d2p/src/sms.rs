@@ -45,7 +45,6 @@ pub async fn handler(
     let t_id = user_auth.tenant().map(|t| t.id.clone());
 
     let (uvw, ci) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let id = user_auth.user_identifier();
             let args = VwArgs::from(&id);

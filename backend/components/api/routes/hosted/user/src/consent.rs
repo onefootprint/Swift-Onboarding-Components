@@ -35,7 +35,6 @@ pub async fn post(
     } = request.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 

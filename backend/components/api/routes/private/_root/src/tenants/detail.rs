@@ -17,10 +17,7 @@ async fn get(
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let id = id.into_inner();
 
-    let tenant = state
-        .db_pool
-        .db_query(move |conn| Tenant::private_get(conn, &id))
-        .await?;
+    let tenant = state.db_query(move |conn| Tenant::private_get(conn, &id)).await?;
 
     let response = api_wire_types::PrivateTenantDetail::from_db(tenant);
     Ok(response)

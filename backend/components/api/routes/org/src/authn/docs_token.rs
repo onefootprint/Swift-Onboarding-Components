@@ -25,7 +25,6 @@ fn post(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<api_wir
     // The new token will expire at the same time as the existing token to prevent allowing
     // perpetually re-creating a new token for yourself
     let (token, _) = state
-        .db_pool
         .db_query(move |conn| AuthSession::create_sync(conn, &sealing_key, session_data, expires_at))
         .await?;
 

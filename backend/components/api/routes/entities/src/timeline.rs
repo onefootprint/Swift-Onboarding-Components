@@ -30,7 +30,6 @@ pub async fn get(
     let ListTimelineRequest { kinds } = filters.into_inner();
 
     let events = state
-        .db_pool
         .db_query(move |conn| UserTimeline::list(conn, (&fp_id, &tenant_id, is_live), kinds))
         .await?;
     let events = events

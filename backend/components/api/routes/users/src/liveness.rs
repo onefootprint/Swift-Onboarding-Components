@@ -27,7 +27,6 @@ pub async fn get(
     let fp_id = request.into_inner();
 
     let liveness_events = state
-        .db_pool
         .db_query(move |conn| LivenessEvent::get_for_scoped_user(conn, &fp_id, &tenant_id, is_live))
         .await?;
 

@@ -41,7 +41,6 @@ pub async fn get(
     let partnership_id = partnership_id.into_inner();
 
     let summary = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), None)?
                 .into_values()
@@ -79,7 +78,6 @@ pub async fn post(
     let requested_by_partner_tenant_user_id = auth.actor().tenant_user_id()?.clone();
 
     let (summary, doc_id) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             // Check that the authorized partner tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;

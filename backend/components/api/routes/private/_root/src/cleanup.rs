@@ -75,7 +75,6 @@ async fn post(
         }
         Request::Id(id) => {
             state
-                .db_pool
                 .db_query(move |conn| -> FpResult<_> {
                     let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
                     let sv = ScopedVault::get(conn, id)?;
@@ -90,7 +89,6 @@ async fn post(
     // against deleting data from non-test tenants below.
     let uvid = uv_id.clone();
     let uvw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uvid))
         .await?;
     let phone = uvw.decrypt_unchecked_parse(&state, IDK::PhoneNumber).await?;
@@ -102,7 +100,6 @@ async fn post(
 
     let ff_client = state.ff_client.clone();
     let num_deleted_rows = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<usize> {
             Vault::lock(conn, &uv_id)?;
 

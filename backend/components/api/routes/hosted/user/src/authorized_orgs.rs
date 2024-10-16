@@ -24,7 +24,6 @@ pub async fn get(
 
     // TODO this could return duplicate tenants if the user onboarded onto multiple OBCs
     let obs = state
-        .db_pool
         .db_query(move |conn| ScopedVault::list_authorized(conn, user_auth.user_vault_id()))
         .await?;
     let results = obs

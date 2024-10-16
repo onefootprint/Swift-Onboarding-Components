@@ -28,7 +28,6 @@ pub async fn patch(
     let UpdateListRequest { name, alias } = request.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
                 return Err(ValidationError("List with that name already exists").into());

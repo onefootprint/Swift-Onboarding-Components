@@ -130,7 +130,6 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let su_id = person_workflow.scoped_vault_id.clone();
     let sb_id = business_sv.clone();
     let (uvw, biz_info) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
             let biz_info = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
@@ -159,7 +158,6 @@ pub async fn get_requirements_for_person_and_maybe_business(
     };
 
     let requirements = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let entity = EntityInfo {
                 vw: &uvw,

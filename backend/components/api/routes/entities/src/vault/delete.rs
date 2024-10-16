@@ -145,7 +145,6 @@ async fn delete_inner(
     let tenant_id = tenant.id.clone();
 
     let (requested_fields_to_delete, deleted_dis, new_version) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;

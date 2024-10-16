@@ -35,7 +35,6 @@ pub async fn post(
     let requested_by_partner_tenant_user_id = auth.actor().tenant_user_id()?.clone();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             // Check that the authorized partner tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;

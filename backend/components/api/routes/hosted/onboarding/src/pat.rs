@@ -89,7 +89,6 @@ async fn authorize_privacy_pass(
     tracing::info!("verify pat success");
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 

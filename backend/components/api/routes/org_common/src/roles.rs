@@ -33,7 +33,6 @@ pub async fn get(
     let OrgRoleFilters { search, kind } = filters.into_inner();
 
     let (results, next_page, count) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let filters = TenantRoleListFilters {
                 org_ident: (&authed_org_ident).into(),
@@ -78,7 +77,6 @@ pub async fn post(
         }
     };
     let result = state
-        .db_pool
         .db_query(move |conn| TenantRole::create(conn, &authed_org_ident, &name, scopes, false, kind))
         .await?;
 
@@ -97,7 +95,6 @@ pub async fn patch(
 
     let api_wire_types::UpdateTenantRoleRequest { name, scopes } = request.into_inner();
     let result = state
-        .db_pool
         .db_transaction(move |conn| TenantRole::update(conn, &authed_org_ident, &role_id, name, scopes))
         .await?;
 
@@ -114,7 +111,6 @@ pub async fn deactivate(
     let authed_org_ident = auth.org_identifier().clone_into();
 
     let result = state
-        .db_pool
         .db_transaction(move |conn| TenantRole::deactivate(conn, &role_id, &authed_org_ident))
         .await?;
 

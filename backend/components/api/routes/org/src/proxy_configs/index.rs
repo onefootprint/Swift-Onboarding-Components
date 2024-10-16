@@ -40,7 +40,6 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let configs = state
-        .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let filters = ProxyConfigFilters {
                 status,
@@ -76,7 +75,6 @@ pub async fn get_detail(
     let proxy_config_id = proxy_config_id.into_inner();
 
     let config = state
-        .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             ProxyConfig::find(conn, &tenant_id, is_live, proxy_config_id)
         })
@@ -184,7 +182,6 @@ pub async fn post(
     };
 
     let config = state
-        .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> { ProxyConfig::create_new(conn, args) })
         .await?;
 
@@ -329,7 +326,6 @@ pub async fn patch(
     };
 
     let config = state
-        .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> { ProxyConfig::update(conn, args) })
         .await?;
 

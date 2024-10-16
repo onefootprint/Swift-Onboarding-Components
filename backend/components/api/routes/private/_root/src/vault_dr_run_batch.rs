@@ -55,7 +55,6 @@ pub async fn post(
     }
 
     let config = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let config = VaultDrConfig::get(conn, (&tenant_id, is_live))?;
             Ok(config)

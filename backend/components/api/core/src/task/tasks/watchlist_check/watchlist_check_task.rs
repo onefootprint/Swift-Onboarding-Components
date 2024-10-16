@@ -94,7 +94,6 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to
         //    be made
         let (tenant, sv, obc, uvw, wc) = state
-            .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be
                 // extra safe
@@ -183,7 +182,6 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         let vault_id = uvw.vault().id.clone();
         let wc_id = wc.id.clone();
         state
-            .db_pool
             .db_transaction(move |conn| -> DbResult<()> {
                 // not strictly necessarily since we aren't currently running multiple instances of a single
                 // Task concurrently, but doesnt hurt

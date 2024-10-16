@@ -26,7 +26,6 @@ pub async fn get(
     let user_auth = user_auth.check_guard(CanDecrypt::new(user_dis))?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
     let bvw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sb_id))
         .await?;
 

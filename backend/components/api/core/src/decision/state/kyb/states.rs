@@ -256,7 +256,6 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
     ) -> FpResult<Self::AsyncRes> {
         let wf_id = self.wf_id.clone();
         let (wf, v) = state
-            .db_pool
             .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wf_id))
             .await?;
         let fixture_result =
@@ -408,7 +407,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let wfid = self.wf_id.clone();
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;

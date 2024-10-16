@@ -58,7 +58,6 @@ impl FromRequest for PublicOnboardingContext {
             let key = newtypes::ObConfigurationKey::from(config_key?);
             let key2 = key.clone();
             let (ob_config, tenant) = state
-                .db_pool
                 .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })
                 .await
                 .map_err(|e| -> Self::Error {

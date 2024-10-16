@@ -171,7 +171,6 @@ pub async fn post(
     }
 
     let (token, session) = state
-        .db_pool
         .db_query(move |conn| -> FpResult<_> {
             // We'll check this later too, but worth at least doing a sanity check that the user
             // in question exists

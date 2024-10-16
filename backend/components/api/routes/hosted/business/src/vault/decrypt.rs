@@ -41,7 +41,6 @@ pub async fn post(
         .ok_or(ValidationError("No business associated with this session"))?;
 
     let bvw = state
-        .db_pool
         .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sb_id))
         .await?;
 

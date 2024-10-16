@@ -96,7 +96,6 @@ impl VaultDrWriter {
 
         let config_id_0 = config_id.clone();
         let (config, aws_pre_enrollment) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let config = VaultDrConfig::get(conn, &config_id_0)
                     .optional()?
@@ -168,7 +167,6 @@ impl VaultDrWriter {
         let blob_batch_size = self.knobs.blob_batch_size as usize;
 
         let (svv_batch, dls) = state
-            .db_pool
             .db_query(move |conn| -> DbResult<_> {
                 // TLA+ Spec: GetVaultVersionBatch
                 let svv_batch = get_scoped_vault_version_batch(
@@ -200,14 +198,12 @@ impl VaultDrWriter {
 
         // TLA+ Spec: CommitBlobBatch
         state
-            .db_pool
             .db_transaction(move |conn| VaultDrBlob::bulk_create(conn, new_blobs))
             .await?;
 
         // TLA+ Spec: GetCompleteVaultVersionBatch
         let config_id = self.config_id.clone();
         let complete_svvs = state
-            .db_pool
             .db_query(move |conn| -> DbResult<_> {
                 get_complete_svvs_for_svv_batch(conn, &config_id, &svv_batch)
             })
@@ -224,7 +220,6 @@ impl VaultDrWriter {
 
         let config_id = self.config_id.clone();
         state
-            .db_pool
             .db_transaction(move |conn| -> DbResult<_> {
                 VaultDrManifest::bulk_create(conn, new_manifests)?;
 
@@ -257,7 +252,6 @@ impl VaultDrWriter {
         let sv_ids = dls.iter().map(|dl| dl.scoped_vault_id.clone()).collect_vec();
 
         let (dls, sv_id_to_fp_id) = state
-            .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let sv_id_to_fp_id: HashMap<_, _> =
                     ScopedVault::bulk_get(conn, sv_ids.iter().collect_vec(), &tenant_id, is_live)?
@@ -502,7 +496,6 @@ impl VaultDrWriter {
     ) -> FpResult<Vec<NewVaultDrManifest>> {
         let tenant_id = self.tenant_id.clone();
         let tenant = state
-            .db_pool
             .db_query(move |conn| -> DbResult<_> { Tenant::get(conn, &tenant_id) })
             .await?;
 
@@ -658,7 +651,6 @@ impl VaultDrWriter {
 
         // For the chunk of SVVs, load the associated data to build manifests.
         let (scoped_vaults, svv_id_to_blobs) = state
-            .db_pool
             .db_query({
                 let svvs = svvs.clone();
                 move |conn| -> FpResult<_> {

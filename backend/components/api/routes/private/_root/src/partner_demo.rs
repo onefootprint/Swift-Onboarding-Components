@@ -96,7 +96,6 @@ pub async fn post(
     let (pt_public_key, pt_e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let (pt_id, partner_tenant_users, demo_tenants) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let pt = PartnerTenant::create(
                 conn,
