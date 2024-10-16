@@ -4,6 +4,7 @@ import useEntityId from 'src/components/entities/components/details/hooks/use-en
 import useRiskSignalsFilters from 'src/components/entities/components/details/hooks/use-risk-signals-filters';
 import useEntitySentilinkSignal from '../../hooks/use-entity-sentilink-signal';
 import Content from './components/content';
+import Loading from './components/loading';
 
 const SentilinkDetails = () => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details' });
@@ -19,7 +20,7 @@ const SentilinkDetails = () => {
     <Drawer open={isOpen} title={t('title')} onClickOutside={clear} onClose={clear}>
       <>
         {data && <Content data={data} />}
-        {isPending && <div>Loading...</div>}
+        {isPending && <Loading />}
         {error && <div>Error</div>}
         <Stack
           position="absolute"
