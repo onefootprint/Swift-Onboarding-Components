@@ -1190,6 +1190,10 @@
           "less_fraudy": "Less fraudy",
           "more-icon-aria-label": "Up arrow",
           "less-icon-aria-label": "Down arrow"
+        },
+        "score": {
+          "label": "Score",
+          "detected-reason-codes": "Detected reason codes"
         }
       }
     }

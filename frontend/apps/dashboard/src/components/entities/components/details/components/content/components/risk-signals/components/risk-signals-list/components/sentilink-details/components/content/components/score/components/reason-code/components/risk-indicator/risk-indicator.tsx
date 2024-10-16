@@ -11,7 +11,7 @@ export const RiskIndicator = ({ fraudLevel }: RiskIndicatorProps) => {
   });
 
   return (
-    <Stack gap={2} alignItems="center">
+    <Stack gap={2} alignItems="center" flexShrink={0} flexGrow={0}>
       {/* placeholder, we are waiting on some icons */}
       {fraudLevel === SentilinkFraudLevel.moreFraudy ? (
         <IcoArrowUp16 aria-label={t('more-icon-aria-label')} color="error" />
