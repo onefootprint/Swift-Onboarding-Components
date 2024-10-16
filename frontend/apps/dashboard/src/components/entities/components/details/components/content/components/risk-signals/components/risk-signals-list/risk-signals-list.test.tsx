@@ -1,7 +1,12 @@
 import { customRender, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 
 import RiskSignalsList from '.';
-import { withRiskSignalDetails, withRiskSignals, withRiskSignalsError } from './risk-signals-list.test.config';
+import {
+  withRiskSignalDetails,
+  withRiskSignals,
+  withRiskSignalsError,
+  withSentilinkRiskSignal,
+} from './risk-signals-list.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -204,6 +209,7 @@ describe('<RiskSignalsList />', () => {
     beforeAll(() => {
       withRiskSignals();
       withRiskSignalDetails();
+      withSentilinkRiskSignal();
     });
 
     it('should add is_sentilink query parameter when clicking on a Sentilink signal', async () => {

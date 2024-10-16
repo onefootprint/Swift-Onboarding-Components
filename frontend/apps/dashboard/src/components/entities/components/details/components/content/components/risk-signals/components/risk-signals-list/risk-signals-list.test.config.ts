@@ -68,3 +68,45 @@ export const withRiskSignalsError = () =>
       message: 'Something went wrong',
     },
   });
+
+export const withSentilinkRiskSignal = () =>
+  mockRequest({
+    method: 'post',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/sentilink/sig_sentilink123',
+    response: {
+      idTheft: {
+        reasonCodes: [
+          {
+            code: 'ID_THEFT_CODE_1',
+            direction: 'positive',
+            explanation: 'Explanation for ID theft code 1',
+            rank: 1,
+          },
+          {
+            code: 'ID_THEFT_CODE_2',
+            direction: 'negative',
+            explanation: 'Explanation for ID theft code 2',
+            rank: 2,
+          },
+        ],
+        score: 75,
+      },
+      synthetic: {
+        reasonCodes: [
+          {
+            code: 'SYNTHETIC_CODE_1',
+            direction: 'positive',
+            explanation: 'Explanation for synthetic code 1',
+            rank: 1,
+          },
+          {
+            code: 'SYNTHETIC_CODE_2',
+            direction: 'negative',
+            explanation: 'Explanation for synthetic code 2',
+            rank: 2,
+          },
+        ],
+        score: 60,
+      },
+    },
+  });

@@ -12,6 +12,7 @@ import isSentilinkSignal from '../../utils/is-sentilink-signal';
 
 import Filters from './components/filters';
 import Row from './components/row';
+import SentilinkDetails from './components/sentilink-details';
 import StandardDetails from './components/standard-details';
 
 const RiskSignalsList = () => {
@@ -55,6 +56,7 @@ const RiskSignalsList = () => {
         renderTr={renderTr}
       />
       <StandardDetails />
+      <SentilinkDetails />
     </Container>
   );
 };
