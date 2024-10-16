@@ -162,6 +162,7 @@ diesel::table! {
         created_at -> Timestamptz,
         source -> Text,
         ownership_stake -> Nullable<Int4>,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

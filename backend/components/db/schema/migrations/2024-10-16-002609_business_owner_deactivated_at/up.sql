@@ -1,0 +1,1 @@
+ALTER TABLE business_owner ADD COLUMN deactivated_at TIMESTAMPTZ;

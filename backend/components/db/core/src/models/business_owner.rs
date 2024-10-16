@@ -40,6 +40,7 @@ pub struct BusinessOwner {
     pub created_at: DateTime<Utc>,
     pub source: BusinessOwnerSource,
     pub ownership_stake: Option<i32>,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -160,6 +161,7 @@ impl BusinessOwner {
     ) -> DbResult<Vec<(Self, Option<UserData>)>> {
         let result = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))
+            .filter(business_owner::deactivated_at.is_null())
             .left_join(
                 scoped_vault::table
                     .on(scoped_vault::vault_id
@@ -181,6 +183,7 @@ impl BusinessOwner {
     ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
         let result = business_owner::table
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
+            .filter(business_owner::deactivated_at.is_null())
             .filter(business_owner::user_vault_id.eq(uv_id))
             // Only get the ScopedVault for the businesses that onboarded onto the
             // same ob config
@@ -203,6 +206,7 @@ impl BusinessOwner {
     ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
         let result = business_owner::table
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
+            .filter(business_owner::deactivated_at.is_null())
             .filter(business_owner::user_vault_id.eq(uv_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .order_by(business_owner::created_at.asc())
@@ -212,7 +216,9 @@ impl BusinessOwner {
 
     #[tracing::instrument("BusinessOwner::get", skip_all)]
     pub fn get<'a, T: Into<BoIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Self> {
-        let mut query = business_owner::table.into_boxed();
+        let mut query = business_owner::table
+            .filter(business_owner::deactivated_at.is_null())
+            .into_boxed();
         match id.into() {
             BoIdentifier::Id(id) => query = query.filter(business_owner::id.eq(id)),
             BoIdentifier::Vaults { uv_id, bv_id } => {
@@ -234,6 +240,7 @@ impl BusinessOwner {
     pub fn lock(conn: &mut TxnPgConn, id: &BoId) -> DbResult<Locked<Self>> {
         let result = business_owner::table
             .filter(business_owner::id.eq(id))
+            .filter(business_owner::deactivated_at.is_null())
             .for_no_key_update()
             .get_result(conn.conn())?;
         Ok(Locked::new(result))
@@ -251,6 +258,7 @@ impl BusinessOwner {
         let result = diesel::update(business_owner::table)
             .filter(business_owner::business_vault_id.eq(bv_id))
             .filter(business_owner::link_id.eq(link_id))
+            .filter(business_owner::deactivated_at.is_null())
             .set(business_owner::ownership_stake.eq(ownership_stake))
             .get_result::<Self>(conn.conn())?;
         Ok(result)
@@ -265,6 +273,26 @@ impl BusinessOwner {
         let result = diesel::update(business_owner::table)
             .filter(business_owner::id.eq(self.id))
             .set(business_owner::user_vault_id.eq(user_vault_id))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument("BusinessOwner::deactivate", skip_all)]
+    pub fn deactivate(conn: &mut PgConn, bo: Locked<Self>) -> DbResult<Self> {
+        // This should only happen inside of a Locked<Self>
+        if bo.user_vault_id.is_some() {
+            return ValidationError("This business owner is already linked to a user and cannot be deleted")
+                .into();
+        }
+        if bo.source == BusinessOwnerSource::Tenant {
+            return ValidationError("Cannot deactivate a business owner made by tenant").into();
+        }
+        if bo.kind == BusinessOwnerKind::Primary {
+            return ValidationError("Cannot deactivate a primary BO").into();
+        }
+        let result = diesel::update(business_owner::table)
+            .filter(business_owner::id.eq(&bo.id))
+            .set(business_owner::deactivated_at.eq(Utc::now()))
             .get_result(conn)?;
         Ok(result)
     }

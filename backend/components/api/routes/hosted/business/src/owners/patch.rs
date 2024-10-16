@@ -23,7 +23,7 @@ use paperclip::actix::patch;
 use std::collections::HashMap;
 
 #[api_v2_operation(
-    description = "Update a business owner's information",
+    description = "Update a business owner's information. Only works for owners that haven't already started onboarding.",
     tags(Businesses, Hosted)
 )]
 #[patch("/hosted/business/owners/{id}")]

@@ -99,12 +99,47 @@
             }
         },
         "/hosted/business/owners/{id}": {
+            "delete": {
+                "tags": [
+                    "Businesses",
+                    "Hosted"
+                ],
+                "description": "Delete a business owner. Only works for owners that haven't already started onboarding.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "Businesses",
                     "Hosted"
                 ],
-                "description": "Update a business owner's information",
+                "description": "Update a business owner's information. Only works for owners that haven't already started onboarding.",
                 "parameters": [
                     {
                         "in": "path",

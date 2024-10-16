@@ -1,5 +1,5 @@
 from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
-from tests.utils import get, patch, post
+from tests.utils import delete, get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.constants import BUSINESS_MODERN_BOS
 
@@ -13,6 +13,15 @@ def _assert_bo_data(bo, decrypted_fields, populated_fields, expected_data):
         assert bo["decrypted_data"][field] == expected_data[field]
     assert set(bo["decrypted_data"]) == set(decrypted_fields)
     assert set(bo["populated_data"]) == set(populated_fields)
+
+
+def _assert_decrypt_bo_data(link_id, fp_bid, tenant, expected_data):
+    dis = [f"business.beneficial_owners.{link_id}.{di}" for di in USER_BO_FIELDS]
+    data = dict(fields=dis, reason="Looking at BO data")
+    body = post(f"entities/{fp_bid}/vault/decrypt", data, *tenant.db_auths)
+    for field in USER_BO_FIELDS:
+        di = f"business.beneficial_owners.{link_id}.{field}"
+        assert body[di] == expected_data.get(field, None)
 
 
 def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
@@ -42,14 +51,9 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
 
     # Test decrypting the new business owner DIs
     secondary_link_id = secondary_bo["id"]
-    dis = [
-        f"business.beneficial_owners.{secondary_link_id}.{di}" for di in USER_BO_FIELDS
-    ]
-    data = dict(fields=dis, reason="Looking at BO data")
-    body = post(f"entities/{fp_bid}/vault/decrypt", data, *sandbox_tenant.db_auths)
-    for field in USER_BO_FIELDS:
-        di = f"business.beneficial_owners.{secondary_link_id}.{field}"
-        assert body[di] == SECONDARY_BO_DATA[field]
+    _assert_decrypt_bo_data(
+        secondary_link_id, fp_bid, sandbox_tenant, SECONDARY_BO_DATA
+    )
 
     #
     # Finish onboarding the secondary BO
@@ -79,11 +83,14 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     )
 
 
-def test_patch_business_owner(kyb_sandbox_ob_config):
-    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config, fixture_result="use_rules_outcome"
+    )
     bifrost.data.pop("business.kyced_beneficial_owners")
     bifrost.data.update(BUSINESS_MODERN_BOS)
     bifrost.handle_one_requirement("collect_business_data")
+    fp_bid = get("hosted/user/private/token", None, bifrost.auth_token)["fp_bid"]
 
     # Update the secondary BO
     body = get("hosted/business/owners", None, bifrost.auth_token)
@@ -100,6 +107,7 @@ def test_patch_business_owner(kyb_sandbox_ob_config):
     body = patch(
         f"hosted/business/owners/{link_id}", new_secondary_data, bifrost.auth_token
     )
+    _assert_bo_data(body, USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"])
 
     # Check the secondary BO was updated properly
     body = get("hosted/business/owners", None, bifrost.auth_token)
@@ -108,9 +116,21 @@ def test_patch_business_owner(kyb_sandbox_ob_config):
     _assert_bo_data(
         secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"]
     )
+    _assert_decrypt_bo_data(link_id, fp_bid, sandbox_tenant, new_secondary_data["data"])
+
+    # Delete the secondary BO
+    delete(f"hosted/business/owners/{link_id}", None, bifrost.auth_token)
+    body = get("hosted/business/owners", None, bifrost.auth_token)
+    assert len(body) == 1
+    assert body[0]["id"] != link_id
+    _assert_decrypt_bo_data(link_id, fp_bid, sandbox_tenant, {})
+
+    # Should be able to finish bifrost normally without waiting for the secondary BO
+    bifrost.run()
+    assert bifrost.validate_response["business"]["status"] != "incomplete"
 
 
-def test_patch_checking_bo_id(kyb_sandbox_ob_config):
+def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
     # Create a new user and an associated business_owner
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost.data.pop("business.kyced_beneficial_owners")
@@ -130,8 +150,14 @@ def test_patch_checking_bo_id(kyb_sandbox_ob_config):
     )
     assert body["message"] == "Data not found"
 
+    # And cannot delete the BO that we don't own
+    body = delete(
+        f"hosted/business/owners/{link_id}", None, bifrost.auth_token, status_code=404
+    )
+    assert body["message"] == "Data not found"
 
-def test_patch_cannot_update_linked(kyb_sandbox_ob_config):
+
+def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost.data.pop("business.kyced_beneficial_owners")
     bifrost.data.update(BUSINESS_MODERN_BOS)
@@ -145,10 +171,21 @@ def test_patch_cannot_update_linked(kyb_sandbox_ob_config):
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
     data = dict(ownership_stake=PRIMARY_OWNERSHIP_STAKE)
+
+    # Cannot update their data
     body = patch(
         f"hosted/business/owners/{link_id}", data, bifrost.auth_token, status_code=400
     )
     assert (
         body["message"]
         == "This business owner is already linked to a user and cannot be updated"
+    )
+
+    # And cannot delete them
+    body = delete(
+        f"hosted/business/owners/{link_id}", None, bifrost.auth_token, status_code=400
+    )
+    assert (
+        body["message"]
+        == "This business owner is already linked to a user and cannot be deleted"
     )

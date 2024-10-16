@@ -14,5 +14,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(vault::decrypt::post)
         .service(owners::get::get)
         .service(owners::patch::patch)
+        .service(owners::delete::delete)
         .service(owners::post::post);
 }
