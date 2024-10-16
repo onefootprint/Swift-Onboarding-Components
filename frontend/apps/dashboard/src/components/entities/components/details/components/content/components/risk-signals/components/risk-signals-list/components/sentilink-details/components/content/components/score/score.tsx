@@ -1,8 +1,9 @@
 import type { SentilinkReasonCode } from '@onefootprint/types';
-import { Divider, Stack, Text } from '@onefootprint/ui';
-import { useTranslation } from 'react-i18next';
+import { SentilinkFraudLevel } from '@onefootprint/types';
+import { Stack, Text } from '@onefootprint/ui';
 import ReasonCode from './components/reason-code';
-import { sortReasonCodes } from './utils/sort-reason-codes';
+import RiskIndicator from './components/risk-indicator';
+import { getLessFraudyReasonCodes, getMoreFraudyReasonCodes } from './utils/sort-reason-codes';
 
 type ScoreProps = {
   score: number;
@@ -11,8 +12,8 @@ type ScoreProps = {
 };
 
 const Score = ({ score, reasonCodes, title }: ScoreProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details.score' });
-  const sortedReasonCodes = sortReasonCodes(reasonCodes);
+  const moreFraudyReasonCodes = getMoreFraudyReasonCodes(reasonCodes);
+  const lessFraudyReasonCodes = getLessFraudyReasonCodes(reasonCodes);
 
   return (
     <Stack direction="column" borderColor="tertiary" borderWidth={1} borderRadius="default" borderStyle="solid">
@@ -31,16 +32,23 @@ const Score = ({ score, reasonCodes, title }: ScoreProps) => {
           {score}
         </Text>
       </Stack>
-      <Stack direction="column" padding={5} gap={4}>
-        <Stack direction="column" gap={3}>
-          <Text variant="label-3">{t('detected-reason-codes')}</Text>
-          <Divider variant="secondary" />
-        </Stack>
-        <Stack direction="column" gap={5}>
-          {sortedReasonCodes.map((reasonCode: SentilinkReasonCode) => (
-            <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
-          ))}
-        </Stack>
+      <Stack direction="column" padding={5} gap={5}>
+        {moreFraudyReasonCodes.length > 0 && (
+          <Stack direction="column" gap={3}>
+            <RiskIndicator fraudLevel={SentilinkFraudLevel.moreFraudy} />
+            {moreFraudyReasonCodes.map(reasonCode => (
+              <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
+            ))}
+          </Stack>
+        )}
+        {lessFraudyReasonCodes.length > 0 && (
+          <Stack direction="column" gap={3}>
+            <RiskIndicator fraudLevel={SentilinkFraudLevel.lessFraudy} />
+            {lessFraudyReasonCodes.map(reasonCode => (
+              <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
+            ))}
+          </Stack>
+        )}
       </Stack>
     </Stack>
   );

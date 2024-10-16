@@ -13,8 +13,5 @@ describe('<ReasonCode />', () => {
       'Whether the SSN is tied to a clump of SSNs empirically used for fraud',
     );
     expect(explanationElement).toBeInTheDocument();
-
-    const riskIndicatorElement = screen.getByLabelText('Up arrow');
-    expect(riskIndicatorElement).toBeInTheDocument();
   });
 });

@@ -1,1 +1,1 @@
-export { sortReasonCodes } from './sort-reason-codes';
+export { getMoreFraudyReasonCodes, getLessFraudyReasonCodes } from './sort-reason-codes';
