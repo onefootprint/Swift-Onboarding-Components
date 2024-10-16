@@ -184,7 +184,7 @@ const StepVerificationChecks = ({ defaultValues, meta, onBack, onSubmit }: StepV
                   control={control}
                   name="isNeuroEnabled"
                   render={({ field }) => (
-                    <Tooltip text={neuro.disabledText} disabled={neuro.disabled} position="bottom" alignment="start">
+                    <Tooltip text={neuro.disabledText} disabled={!neuro.disabled} position="bottom" alignment="start">
                       <Toggle
                         checked={field.value}
                         hint={t('fraud-checks.neuro.hint')}
