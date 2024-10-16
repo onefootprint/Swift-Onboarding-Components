@@ -1,5 +1,4 @@
 import { addSessionIdToQueryParam } from '@onefootprint/dev-tools';
-import Postmate from '@onefootprint/postmate';
 import { version } from '../../../package.json';
 import type { FormRef, Props } from '../../types/components';
 import { ComponentKind } from '../../types/components';
@@ -22,12 +21,11 @@ import { SdkKindByComponentKind } from '../request-utils/constants';
 import sendSdkArgs from '../request-utils/send-sdk-args';
 import getURL from '../url-utils';
 import { getWindowUrl } from '../url-utils';
+import { type ParentAPI, Postmate } from './postmate';
 import type { Iframe, OnDestroy, OnRenderSecondary } from './types';
 
-type ParentApi = Postmate.ParentAPI;
-
 const initIframe = (rawProps: Props): Iframe => {
-  let parentApi: ParentApi | null = null;
+  let parentApi: ParentAPI | null = null;
   let isRendered = false;
   let onDestroy: OnDestroy;
   let onRenderSecondary: OnRenderSecondary;
@@ -37,6 +35,8 @@ const initIframe = (rawProps: Props): Iframe => {
   const hasOverlay = variant === 'modal' || variant === 'drawer';
   const initId = getUniqueId();
   logInfo(SdkKindByComponentKind[props.kind], getPropsLog(props));
+
+  Postmate.sdkKind = SdkKindByComponentKind[props.kind];
 
   const handleError = (error: string, shouldDestroy?: boolean) => {
     const errorMessage = logError(SdkKindByComponentKind[props.kind], error);
@@ -122,7 +122,7 @@ const initIframe = (rawProps: Props): Iframe => {
           parentApi?.on(`${initId}:${formSaveComplete}`, resolve);
           parentApi?.on(`${initId}:${formSaveFailed}`, reject);
 
-          parentApi?.call(formSaved);
+          parentApi?.call(formSaved, undefined);
         });
       },
     };
@@ -131,6 +131,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
   const initializePostmate = async (container: HTMLElement, url: string) => {
     try {
+      // @ts-expect-error: Postmate is not typed properly
       parentApi = await new Postmate({
         classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`, 'fp-hide'],
         container,
@@ -246,7 +247,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
   const relayFromComponents = () => {
     if (parentApi) {
-      parentApi.call(PrivateEvent.relayFromComponents);
+      parentApi.call(PrivateEvent.relayFromComponents, undefined);
       showContainer(initId);
     }
   };

@@ -11,7 +11,7 @@ import { logInfo } from '../logger';
 import { getBootstrapData } from '../prop-utils';
 import { isAuthUpdateLoginMethods, isUpdateLoginMethods } from '../type-guards';
 import { API_BASE_URL, SDK_NAME, SDK_VERSION, SdkKind, SdkKindByComponentKind } from './constants';
-import transformKeys from './transform-keys';
+import transformKeys, { getNonEmptyKeys } from './transform-keys';
 
 const IS_BACKEND_ACCEPTING_AUTH_TOKEN = false;
 
@@ -111,9 +111,10 @@ export const getSdkArgsDataPayload = (props: Props): SendSdkArgsRequest['data'] 
 
 const sendSdkArgs = async (props: Props): Promise<SendSdkArgsResponse['token']> => {
   const kind = getSdkKind(props);
-  logInfo(kind, 'Sending SDK args');
-
   const data = getSdkArgsDataPayload(props);
+
+  logInfo(kind, `Sending SDK args: ${getNonEmptyKeys(data)}`);
+
   const response = await fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {

@@ -23,4 +23,22 @@ const fixKeys = (fn: Function) => (obj: unknown) => {
 
 const transformKeys = fixKeys(camelToSnakeCase);
 
+const getKeys = (o: Record<string, unknown>, prefix = ''): string[] => {
+  return Object.entries(o).flatMap(([key, value]) => {
+    const currentKey = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return getKeys(value as Record<string, unknown>, currentKey);
+    }
+    return value ? [currentKey] : [];
+  });
+};
+
+export const getNonEmptyKeys = (obj: Record<string, unknown>): string => {
+  if (!obj || typeof obj !== 'object') {
+    return '';
+  }
+
+  return getKeys(obj).join(', ');
+};
+
 export default transformKeys;
