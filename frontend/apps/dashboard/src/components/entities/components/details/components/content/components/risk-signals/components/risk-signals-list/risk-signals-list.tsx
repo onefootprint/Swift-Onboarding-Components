@@ -10,9 +10,9 @@ import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 import isSentilinkSignal from '../../utils/is-sentilink-signal';
 
-import Details from './components/details';
 import Filters from './components/filters';
 import Row from './components/row';
+import StandardDetails from './components/standard-details';
 
 const RiskSignalsList = () => {
   const { t } = useTranslation('entity-details', {
@@ -54,7 +54,7 @@ const RiskSignalsList = () => {
         renderSubActions={() => <Filters />}
         renderTr={renderTr}
       />
-      <Details />
+      <StandardDetails />
     </Container>
   );
 };

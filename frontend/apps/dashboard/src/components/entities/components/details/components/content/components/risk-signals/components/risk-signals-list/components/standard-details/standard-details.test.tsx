@@ -8,7 +8,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 
-import RiskSignalDetails from './details';
+import StandardDetails from './standard-details';
 import {
   amlDetailFixture,
   entityIdFixture,
@@ -19,11 +19,11 @@ import {
   withEntity,
   withRiskSignalDetails,
   withRiskSignalDetailsError,
-} from './details.test.config';
+} from './standard-details.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
-describe('<Details />', () => {
+describe('<StandardDetails />', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/users/details');
     mockRouter.query = {
@@ -34,12 +34,12 @@ describe('<Details />', () => {
     withData();
   });
 
-  const renderRiskSignalDetails = () => {
-    customRender(<RiskSignalDetails />);
+  const renderRiskSignalStandardDetails = () => {
+    customRender(<StandardDetails />);
   };
 
-  const renderRiskSignalDetailsAndWaitData = async () => {
-    renderRiskSignalDetails();
+  const renderRiskSignalStandardDetailsAndWaitData = async () => {
+    renderRiskSignalStandardDetails();
 
     await waitForElementToBeRemoved(() =>
       screen.queryByRole('progressbar', {
@@ -51,7 +51,7 @@ describe('<Details />', () => {
   describe('when the request fails', () => {
     it('should show an error message within the drawer', async () => {
       withRiskSignalDetailsError();
-      renderRiskSignalDetails();
+      renderRiskSignalStandardDetails();
 
       const loader = await screen.findByRole('progressbar', {
         name: 'Loading details...',
@@ -73,7 +73,7 @@ describe('<Details />', () => {
     describe('when there are no AML hits', () => {
       it('should show a loading and then the overview data', async () => {
         withRiskSignalDetails();
-        renderRiskSignalDetails();
+        renderRiskSignalStandardDetails();
 
         const loader = await screen.findByRole('progressbar', {
           name: 'Loading details...',
@@ -109,7 +109,7 @@ describe('<Details />', () => {
       });
 
       it('should initially be encrypted', async () => {
-        await renderRiskSignalDetailsAndWaitData();
+        await renderRiskSignalStandardDetailsAndWaitData();
 
         const decryptTitle = await screen.findByText('Protected details');
         expect(decryptTitle).toBeInTheDocument();
@@ -122,7 +122,7 @@ describe('<Details />', () => {
 
       it('should show the aml hits data after decryption', async () => {
         withDecryptRiskSignalAmlHits();
-        await renderRiskSignalDetailsAndWaitData();
+        await renderRiskSignalStandardDetailsAndWaitData();
 
         const decryptButton = await screen.findByRole('button', {
           name: 'Decrypt',
@@ -166,7 +166,7 @@ describe('<Details />', () => {
 
       it('should reveal all fields after clicking Show all', async () => {
         withDecryptRiskSignalAmlHits();
-        await renderRiskSignalDetailsAndWaitData();
+        await renderRiskSignalStandardDetailsAndWaitData();
 
         const decryptButton = await screen.findByRole('button', {
           name: 'Decrypt',
@@ -195,7 +195,7 @@ describe('<Details />', () => {
 
       it('should show aml media data after clicking See more', async () => {
         withDecryptRiskSignalAmlHits();
-        await renderRiskSignalDetailsAndWaitData();
+        await renderRiskSignalStandardDetailsAndWaitData();
 
         await waitFor(() => {
           const decryptButton = screen.getByRole('button', {

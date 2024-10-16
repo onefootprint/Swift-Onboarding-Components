@@ -12,7 +12,7 @@ import Content from './components/content';
 import Loading from './components/loading';
 import useRiskSignalDetails from './hooks/use-risk-signal-details';
 
-const Details = () => {
+const StandardDetails = () => {
   const { t } = useTranslation();
   const { t: entityT } = useTranslation('entity-details');
   const { query, clear } = useRiskSignalsFilters();
@@ -57,4 +57,4 @@ const Details = () => {
   );
 };
 
-export default Details;
+export default StandardDetails;
