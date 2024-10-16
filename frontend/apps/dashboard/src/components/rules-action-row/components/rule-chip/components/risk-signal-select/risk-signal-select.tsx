@@ -20,9 +20,7 @@ type RiskSignalSelectProps = {
 };
 
 const RiskSignalSelect = ({ value, onChange }: RiskSignalSelectProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'details.rules.action-row.risk-signals-select',
-  });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row.risk-signals-select' });
   const riskSignalsQuery = useRiskSignals();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');

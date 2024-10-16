@@ -10,7 +10,7 @@ type DocTypesAndCountriesProps = {
 };
 
 const DocTypesAndCountries = ({ documentTypesAndCountries, hasSelfie }: DocTypesAndCountriesProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
   const { global, countrySpecific } = documentTypesAndCountries;
 
   return (

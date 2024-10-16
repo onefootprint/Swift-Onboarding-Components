@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
-import CreateDialog from './components/create-dialog';
+import Create from './components/create';
 import Table from './components/table';
 import useFilters from './hooks/use-filters';
 import usePlaybooks from './hooks/use-playbooks';
@@ -83,7 +83,7 @@ const Playbooks = () => {
           />
         )}
       </Stack>
-      <CreateDialog open={dialogOpen} onClose={handleClose} onCreate={handleCreate} />
+      <Create open={dialogOpen} onClose={handleClose} onDone={handleCreate} />
     </Container>
   );
 };

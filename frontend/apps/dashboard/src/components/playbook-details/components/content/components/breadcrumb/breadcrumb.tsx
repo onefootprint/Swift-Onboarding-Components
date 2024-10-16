@@ -10,7 +10,7 @@ export type BreadcrumbProps = {
 };
 
 const Breadcrumb = ({ playbookName, isDisabled }: BreadcrumbProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.breadcrumb' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'breadcrumb' });
   const { asPath } = useRouter();
 
   return (

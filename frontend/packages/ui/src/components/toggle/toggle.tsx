@@ -116,19 +116,20 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             layout
           />
         </Button>
-        <Input
-          aria-hidden="true"
-          checked={isControlled ? checked : undefined}
-          defaultChecked={isControlled ? undefined : defaultChecked}
-          disabled={disabled}
-          id={id}
-          name={name}
-          onChange={onChange}
-          ref={mergeRefs([localRef, ref])}
-          required={required}
-          tabIndex={-1}
-          type="checkbox"
-        />
+        <span aria-hidden="true" style={{ display: 'none' }}>
+          <Input
+            checked={isControlled ? checked : undefined}
+            defaultChecked={isControlled ? undefined : defaultChecked}
+            disabled={disabled}
+            id={id}
+            name={name}
+            onChange={onChange}
+            ref={mergeRefs([localRef, ref])}
+            required={required}
+            tabIndex={-1}
+            type="checkbox"
+          />
+        </span>
       </ToggleContainer>
     );
   },
@@ -169,11 +170,11 @@ const Label = styled.label`
     cursor: pointer;
 
     &[data-size='compact'] {
-      ${createFontStyles('label-3')};
+      ${createFontStyles('body-3')};
     }
 
     &[data-size='default'] {
-      ${createFontStyles('label-2')};
+      ${createFontStyles('body-2')};
     }
   `}
 `;
@@ -214,7 +215,9 @@ const Button = styled(motion.button)<{
     }
 
     &:disabled {
+      cursor: initial;
       border-color: ${theme.borderColor[checked ? 'transparent' : 'tertiary']};
+
       ${
         checked &&
         css`

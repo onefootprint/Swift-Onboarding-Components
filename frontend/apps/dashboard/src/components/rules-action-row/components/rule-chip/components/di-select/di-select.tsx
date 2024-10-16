@@ -17,9 +17,7 @@ type DISelectProps = {
 };
 
 const DISelect = ({ defaultDI, listKind, onChange }: DISelectProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'details.rules.action-row.rule-chip.list',
-  });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row.rule-chip.list' });
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [selectedDI, setSelectedDI] = useState<DataIdentifier | undefined>(defaultDI);
@@ -71,8 +69,8 @@ const DISelect = ({ defaultDI, listKind, onChange }: DISelectProps) => {
             {listKind && matches.length > 0 && (
               <Note>
                 <Trans
-                  ns="playbooks"
-                  i18nKey="details.rules.action-row.rule-chip.list.field.validation-note"
+                  ns="playbook-details"
+                  i18nKey="rules.action-row.rule-chip.list.field.validation-note"
                   components={{
                     b: <Bold />,
                   }}

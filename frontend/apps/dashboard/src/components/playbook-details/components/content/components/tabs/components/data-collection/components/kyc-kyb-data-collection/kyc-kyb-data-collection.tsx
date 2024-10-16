@@ -13,7 +13,7 @@ export type KycKybDataCollectionProps = {
 };
 
 const KycKybDataCollection = ({ playbook }: KycKybDataCollectionProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
   const {
     kind,
     allowInternationalResidents,

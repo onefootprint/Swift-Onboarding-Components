@@ -11,7 +11,7 @@ type SingleItemProps = {
 };
 
 const SingleItem = ({ name, value }: SingleItemProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
 
   const singleItemMap: Record<SingleItemType, { title: string; enabled: string; disabled: string }> = {
     usResidents: {

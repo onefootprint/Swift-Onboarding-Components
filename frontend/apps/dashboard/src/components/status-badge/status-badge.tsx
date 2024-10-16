@@ -3,7 +3,7 @@ import type { EntityStatus } from '@onefootprint/types';
 import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import getBadgeVariantByStatus from '../entities/utils';
+import getBadgeVariantByStatus from 'src/utils/get-badge-variant-by-status';
 
 export type StatusBadgeProps = {
   status: EntityStatus;

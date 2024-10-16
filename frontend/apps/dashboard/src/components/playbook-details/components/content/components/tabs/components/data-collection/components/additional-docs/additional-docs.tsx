@@ -14,7 +14,7 @@ type AdditionalDocsProps = {
 };
 
 const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection.additional-docs' });
   const list = docs.map(doc => {
     if (doc.kind === DocumentRequestKind.ProofOfSsn) {
       return {
@@ -85,7 +85,7 @@ const PopoverContent = ({
   requiresHumanReview,
   uploadSettings,
 }: Omit<DocItemProps, 'label'>) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection.additional-docs' });
 
   const contentItems = [
     { condition: !!identifier, icon: <IcoCode216 />, text: identifier, variant: 'snippet-2' },
@@ -122,7 +122,7 @@ const PopoverContent = ({
 };
 
 const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSettings }: DocItemProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection.additional-docs' });
   return (
     <Stack gap={2} alignItems="center">
       <Text variant="body-2" color="secondary">

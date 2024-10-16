@@ -19,7 +19,7 @@ export type TabsProps = {
 type OptionsProps = { label: string; value: PlaybookTabs }[];
 
 const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details' });
+  const { t } = useTranslation('playbook-details');
   const { tab } = useGetQueryParam(tabsRouterSchema);
   const router = useRouter();
 

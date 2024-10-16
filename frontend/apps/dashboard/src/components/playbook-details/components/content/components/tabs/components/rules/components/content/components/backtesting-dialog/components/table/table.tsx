@@ -13,9 +13,7 @@ type TableProps = {
 };
 
 const Table = ({ data, isEmpty }: TableProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'details.rules.backtesting.affected',
-  });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.backtesting.affected' });
   const router = useRouter();
   const session = useSession();
   const columns = [

@@ -20,7 +20,7 @@ export type ContentProps = {
 const PAGE_SIZE = 10;
 
 const Content = ({ data, dateRange, onFilter }: ContentProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.rules.backtesting' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.backtesting' });
   const initialPage = useMemo(
     () => ({
       hasNextPage:

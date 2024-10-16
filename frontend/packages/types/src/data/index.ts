@@ -176,6 +176,8 @@ export type {
   KycCheck,
   AmlCheck,
   VerificationCheck,
+  NeuroCheck,
+  SentilinkCheck,
 } from './onboarding-config';
 export {
   OnboardingConfigKind,

@@ -42,10 +42,10 @@ describe('<VerificationChecks />', () => {
       renderVerificationChecks({ verificationChecks: [kybCheck()], skipKyc: true });
 
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
-      const full = within(kyb).getByText('Full KYB (data collection + verification checks).');
+      const full = within(kyb).getByText('Full KYB (data collection + verification checks)');
       expect(full).toBeInTheDocument();
 
-      const kycChecks = screen.getByText('KYC is not being conducted on beneficial owners.');
+      const kycChecks = screen.getByText('KYC is not being conducted on beneficial owners');
       expect(kycChecks).toBeInTheDocument();
     });
 
@@ -53,12 +53,12 @@ describe('<VerificationChecks />', () => {
       renderVerificationChecks({ verificationChecks: [kybCheck(true)] });
 
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
-      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only.');
+      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only');
       expect(einOnly).toBeInTheDocument();
 
       const kyc = screen.getByRole('group', { name: 'Know Your Customer (KYC)' });
       const primaryOnly = within(kyc).getByText(
-        'Only on business’ primary owner (the person who filled out the KYB form).',
+        'Only on business’ primary owner (the person who filled out the KYB form)',
       );
       expect(primaryOnly).toBeInTheDocument();
     });
@@ -70,11 +70,11 @@ describe('<VerificationChecks />', () => {
       });
 
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
-      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only.');
+      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only');
       expect(einOnly).toBeInTheDocument();
 
       const kyc = screen.getByRole('group', { name: 'Know Your Customer (KYC)' });
-      const full = within(kyc).getByText('On all business owners.');
+      const full = within(kyc).getByText('On all business owners');
       expect(full).toBeInTheDocument();
     });
   });
@@ -83,7 +83,7 @@ describe('<VerificationChecks />', () => {
     it('should show a fallback text when AML monitoring is disabled', () => {
       renderVerificationChecks({});
 
-      const noAMLChecks = screen.getByText('AML checks are not enabled.');
+      const noAMLChecks = screen.getByText('AML checks are not enabled');
       expect(noAMLChecks).toBeInTheDocument();
     });
 

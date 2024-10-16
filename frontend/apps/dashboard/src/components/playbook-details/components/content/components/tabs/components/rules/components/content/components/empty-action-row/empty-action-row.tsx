@@ -21,7 +21,7 @@ export type EmptyActionRowProps = {
 };
 
 const EmptyActionRow = ({ action, tempId, onEdit, onDelete }: EmptyActionRowProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.rules.action-row' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row' });
   const { data: lists } = useLists();
   const [expressions, setExpressions] = useState<(RiskSignalRuleField | ListRuleField)[]>([]);
 

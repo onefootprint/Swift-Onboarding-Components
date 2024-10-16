@@ -13,6 +13,7 @@ import type homeResource from '../config/locales/en/home.json';
 import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
 import type onboardingResource from '../config/locales/en/onboarding.json';
+import type playbookDetailsResource from '../config/locales/en/playbook-details.json';
 import type playbookResource from '../config/locales/en/playbooks.json';
 import type proxyConfigsResource from '../config/locales/en/proxy-configs.json';
 import type rolesResource from '../config/locales/en/roles.json';
@@ -33,6 +34,7 @@ declare module 'i18next' {
       'domain-restrictions': typeof domainRestrictionsResource;
       'entity-details': typeof entityDetails;
       'entity-documents': typeof entityDocuments;
+      'playbook-details': typeof playbookDetailsResource;
       'proxy-configs': typeof proxyConfigsResource;
       'security-logs': typeof securityLogsResource;
       'switch-org': typeof switchOrgresource;

@@ -552,7 +552,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(stepUpAddButton);
         await waitFor(() => {
-          const noRulesText = within(stepUpSection).queryByText('No rule has been configured.');
+          const noRulesText = within(stepUpSection).queryByText('No rule has been configured');
           expect(noRulesText).not.toBeInTheDocument();
         });
 
@@ -588,7 +588,7 @@ describe('<Rules />', () => {
         const passRows = within(passSection).getAllByRole('row');
         expect(passRows).toHaveLength(1);
 
-        expect(within(stepUpSection).getByText('No rule has been configured.')).toBeInTheDocument();
+        expect(within(stepUpSection).getByText('No rule has been configured')).toBeInTheDocument();
       });
     });
   });
@@ -606,7 +606,7 @@ describe('<Rules />', () => {
     it('should show an alert', async () => {
       await renderRules({ playbook: kybPlaybookFixture });
 
-      const alert = await screen.findByText('These rules apply to Business Owners and Businesses.');
+      const alert = await screen.findByText('These rules apply to Business Owners and Businesses');
       expect(alert).toBeInTheDocument();
     });
   });

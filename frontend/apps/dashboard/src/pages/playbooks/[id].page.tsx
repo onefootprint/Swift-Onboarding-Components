@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Details from '../../components/playbook-details';
 
 const PlaybookDetails = () => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details' });
+  const { t } = useTranslation('playbook-details');
 
   return (
     <>

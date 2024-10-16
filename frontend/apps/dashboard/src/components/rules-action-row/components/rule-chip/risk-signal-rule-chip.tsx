@@ -17,9 +17,7 @@ type RiskSignalRuleChipProps = {
 };
 
 const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }: RiskSignalRuleChipProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'details.rules.action-row.rule-chip',
-  });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row.rule-chip' });
   const [ruleExpression, setRuleExpression] = useState<RiskSignalRuleField>(defaultExpression);
 
   useEffect(() => {

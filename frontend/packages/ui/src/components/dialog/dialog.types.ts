@@ -6,6 +6,7 @@ export type DialogButton = {
   loadingAriaLabel?: string;
   onClick?: (dataSubmitted?: unknown) => void;
   type?: 'button' | 'submit' | 'reset';
+  id?: string;
 };
 
 export type DialogLinkButton = {

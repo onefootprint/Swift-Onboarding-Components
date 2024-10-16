@@ -15,7 +15,7 @@ export type OrgOnboardingConfigCreateRequest = {
   // eg: 'document.passport,id_card.regionality.selfie_required'.
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
-  optionalData: CollectedDataOption[];
+  optionalData?: CollectedDataOption[];
   isDocFirstFlow?: boolean;
   isNoPhoneFlow?: boolean;
   allowInternationalResidents?: boolean;
@@ -31,11 +31,11 @@ export type OrgOnboardingConfigCreateRequest = {
   cipKind?: string;
   documentsToCollect?: DocumentRequestConfig[];
   businessDocumentsToCollect?: DocumentRequestConfig[];
-  documentTypesAndCountries: DocumentTypesAndCountries;
+  documentTypesAndCountries?: DocumentTypesAndCountries;
   kind: OnboardingConfigKind;
   skipConfirm?: boolean;
   skipKyc?: boolean;
-  verificationChecks: VerificationCheck[] | null;
+  verificationChecks?: VerificationCheck[] | null;
   requiredAuthMethods?: AuthMethodKind[];
 };
 

@@ -22,7 +22,7 @@ describe('<KycKybDataCollection />', () => {
         },
       });
 
-      const note = screen.getByText('Residents from U.S. territories are allowed to be onboarded.');
+      const note = screen.getByText('Residents from U.S. territories are allowed to be onboarded');
       expect(note).toBeInTheDocument();
     });
   });

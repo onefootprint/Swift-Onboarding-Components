@@ -2,7 +2,7 @@ import { CollectedKybDataOption, type OnboardingConfig, OnboardingConfigKind } f
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Info from '../info';
-import { isAmlCheck, isKybCheck, isKycCheck } from './verification-checks.utils';
+import { isAmlCheck, isKybCheck, isKycCheck, isNeuroCheck, isSentilinkCheck } from './verification-checks.utils';
 
 export type VerificationChecksProps = {
   playbook: OnboardingConfig;
@@ -11,11 +11,13 @@ export type VerificationChecksProps = {
 const VerificationChecks = ({
   playbook: { kind, verificationChecks, mustCollectData, skipKyc },
 }: VerificationChecksProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.verification-checks' });
-
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'verification-checks' });
   const kyb = verificationChecks.find(isKybCheck);
   const kyc = verificationChecks.find(isKycCheck);
   const aml = verificationChecks.find(isAmlCheck);
+  const isNeuroEnabled = !!verificationChecks.find(isNeuroCheck);
+  const isSentilinkEnabled = !!verificationChecks.find(isSentilinkCheck);
+  const hasFraudChecks = isNeuroEnabled || isSentilinkEnabled;
 
   const kybText = (() => {
     if (kind === OnboardingConfigKind.kyc) return null;
@@ -60,6 +62,18 @@ const VerificationChecks = ({
           <Info.Item label={t('aml.none')} checked={false} />
         )}
       </Info.Group>
+      {kind === OnboardingConfigKind.kyc && (
+        <Info.Group title={t('fraud-checks.title')}>
+          {hasFraudChecks ? (
+            <>
+              <Info.Item label={t('fraud-checks.sentilink')} checked={isSentilinkEnabled} />
+              <Info.Item label={t('fraud-checks.neuro')} checked={isNeuroEnabled} />
+            </>
+          ) : (
+            <Info.Item label={t('fraud-checks.none')} checked={false} />
+          )}
+        </Info.Group>
+      )}
     </Stack>
   );
 };

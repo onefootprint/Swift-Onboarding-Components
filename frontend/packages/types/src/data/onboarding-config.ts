@@ -45,7 +45,17 @@ export type AmlCheck = {
   };
 };
 
-export type VerificationCheck = KycCheck | KybCheck | AmlCheck;
+export type SentilinkCheck = {
+  kind: 'sentilink';
+  data: {};
+};
+
+export type NeuroCheck = {
+  kind: 'neuro_id';
+  data: {};
+};
+
+export type VerificationCheck = KycCheck | KybCheck | AmlCheck | SentilinkCheck | NeuroCheck;
 
 // Used in the IDV context
 export type PublicOnboardingConfig = {

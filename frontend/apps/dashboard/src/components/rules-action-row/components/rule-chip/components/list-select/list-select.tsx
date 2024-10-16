@@ -17,9 +17,7 @@ type ListProps = {
 };
 
 const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'details.rules.action-row.rule-chip.list',
-  });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row.rule-chip.list' });
   const [isOpen, setIsOpen] = useState(false);
   const [selectedList, setSelectedList] = useState<List | undefined>(defaultList);
   const filteredLists = di ? lists?.filter(({ kind }) => listKindsForDataIdentifier(di).includes(kind)) : lists;
@@ -54,8 +52,8 @@ const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
             {di && filteredLists.length > 0 && (
               <Note>
                 <Trans
-                  ns="playbooks"
-                  i18nKey="details.rules.action-row.rule-chip.list.value.validation-note"
+                  ns="playbook-details"
+                  i18nKey="rules.action-row.rule-chip.list.value.validation-note"
                   components={{
                     b: <Bold />,
                   }}

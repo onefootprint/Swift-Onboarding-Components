@@ -75,7 +75,7 @@ describe('<BacktestingDialog />', () => {
 
         expect(screen.getByText('11 out of 14 total onboardings matched')).toBeInTheDocument();
         expect(
-          screen.getByText("If these rules existed in the selected period they would've affected 11 onboardings."),
+          screen.getByText("If these rules existed in the selected period they would've affected 11 onboardings"),
         ).toBeInTheDocument();
 
         Array.from({ length: 9 }, (_, i) => i + 1).forEach(num =>
@@ -116,7 +116,7 @@ describe('<BacktestingDialog />', () => {
         expect(within(originalSection).getByText('Original rule outcomes')).toBeInTheDocument();
         expect(
           within(originalSection).getByText(
-            'Rule outcomes based on existing rules at the time of the onboardings above.',
+            'Rule outcomes based on existing rules at the time of the onboardings above',
           ),
         ).toBeInTheDocument();
 
@@ -171,7 +171,7 @@ describe('<BacktestingDialog />', () => {
           within(correlationSection).getByText('Original rule outcomes to Backtested rule outcomes'),
         ).toBeInTheDocument();
         expect(
-          within(correlationSection).getByText('Correlation between original and backtested rule outcomes.'),
+          within(correlationSection).getByText('Correlation between original and backtested rule outcomes'),
         ).toBeInTheDocument();
 
         const passSection = within(correlationSection).getByRole('group', {
@@ -216,7 +216,7 @@ describe('<BacktestingDialog />', () => {
       it('should show a no onboardings affected message', async () => {
         await renderDialogAndWaitFinishLoading();
 
-        expect(screen.getByText("No onboardings would've been affected.")).toBeInTheDocument();
+        expect(screen.getByText("No onboardings would've been affected")).toBeInTheDocument();
         const prevPaginationButton = screen.queryByRole('button', {
           name: 'Previous',
         });
@@ -314,7 +314,7 @@ describe('<BacktestingDialog />', () => {
 
         expect(
           screen.getByText(
-            'This playbook did not have any onboardings during this time period. Please try a different date range.',
+            'This playbook did not have any onboardings during this time period. Please try a different date range',
           ),
         ).toBeInTheDocument();
       });

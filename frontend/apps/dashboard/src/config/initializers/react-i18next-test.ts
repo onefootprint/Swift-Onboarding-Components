@@ -14,6 +14,7 @@ import home from '../locales/en/home.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import onboarding from '../locales/en/onboarding.json';
+import playbookDetails from '../locales/en/playbook-details.json';
 import playbooks from '../locales/en/playbooks.json';
 import proxyConfigs from '../locales/en/proxy-configs.json';
 import roles from '../locales/en/roles.json';
@@ -32,6 +33,7 @@ i18next.use(initReactI18next).init({
       'domain-restrictions': domainRestrictions,
       'entity-details': entityDetails,
       'entity-documents': entityDocuments,
+      'playbook-details': playbookDetails,
       'proxy-configs': proxyConfigs,
       'security-logs': securityLogs,
       'switch-org': switchOrg,
@@ -66,6 +68,7 @@ i18next.use(initReactI18next).init({
     'internal',
     'lists',
     'onboarding',
+    'playbook-details',
     'playbooks',
     'proxy-configs',
     'roles',

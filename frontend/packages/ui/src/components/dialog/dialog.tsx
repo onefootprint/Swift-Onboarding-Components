@@ -82,6 +82,7 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
                     children
                   ) : (
                     <ScrollArea
+                      height="100%"
                       padding={noPadding ? 0 : 7}
                       hideTopLine
                       hideBottomLine={size === 'full-screen' || !hasFooter}

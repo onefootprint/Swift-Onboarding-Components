@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 type AuthOnlyProps = { playbook: OnboardingConfig };
 
 const AuthOnly = ({ playbook: { requiredAuthMethods, mustCollectData, allowUsTerritoryResidents } }: AuthOnlyProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
 
   return (
     <Container>

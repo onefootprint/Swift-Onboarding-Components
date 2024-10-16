@@ -21,7 +21,7 @@ export type BacktestingDialogProps = {
 };
 
 const BacktestingDialog = ({ open, playbookId, ruleEdits, isSaveLoading, onSave, onClose }: BacktestingDialogProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.rules.backtesting' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.backtesting' });
   const [data, setData] = useState<RuleBacktestingData | undefined>(undefined);
   const [error, setError] = useState<unknown | undefined>(undefined);
   const [dateRange, setDateRange] = useState<DateFilterRange>(DEFAULT_DATE_RANGE);

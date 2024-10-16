@@ -356,6 +356,8 @@ export type {
   AmlCheck,
   KybCheck,
   KycCheck,
+  NeuroCheck,
+  SentilinkCheck,
   OnboardingDecision,
   OnboardingDecisionEvent,
   OnboardingDecisionEventData,

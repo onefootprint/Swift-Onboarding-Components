@@ -14,6 +14,7 @@ import home from '../locales/en/home.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import onboarding from '../locales/en/onboarding.json';
+import playbookDetails from '../locales/en/playbook-details.json';
 import playbooks from '../locales/en/playbooks.json';
 import proxyConfigs from '../locales/en/proxy-configs.json';
 import roles from '../locales/en/roles.json';
@@ -33,9 +34,11 @@ const configureReactI18next = () => {
         'domain-restrictions': domainRestrictions,
         'entity-details': entityDetails,
         'entity-documents': entityDocuments,
+        'playbook-details': playbookDetails,
         'proxy-configs': proxyConfigs,
         'security-logs': securityLogs,
         'switch-org': switchOrg,
+        'user-details': userDetails,
         authentication,
         businesses,
         common,
@@ -48,15 +51,14 @@ const configureReactI18next = () => {
         settings,
         ui,
         users,
-        webhooks,
-        'user-details': userDetails,
+        webhooks: webhooks,
       },
     },
     lng: 'en',
     defaultNS: 'common',
     ns: [
       'api-keys',
-      'authentication',
+      'authetication',
       'business-details',
       'businesses',
       'common',
@@ -67,6 +69,7 @@ const configureReactI18next = () => {
       'internal',
       'lists',
       'onboarding',
+      'playbook-details',
       'playbooks',
       'proxy-configs',
       'roles',
@@ -74,9 +77,9 @@ const configureReactI18next = () => {
       'settings',
       'switch-org',
       'ui',
+      'user-details',
       'users',
       'webhooks',
-      'user-details',
     ],
     returnNull: false,
     interpolation: {

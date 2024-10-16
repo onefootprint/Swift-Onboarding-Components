@@ -9,7 +9,7 @@ type GlobalProps = {
 };
 
 const Global = ({ global = [], hasSelfie = false }: GlobalProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
   const getIdDocList = useIdDocList();
   const documentTypes = getIdDocList(global);
 

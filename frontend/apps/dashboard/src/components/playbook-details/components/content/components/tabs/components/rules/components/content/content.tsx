@@ -34,7 +34,7 @@ export type AddedRuleWithId = {
 
 const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDisableHeading }: ContentProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.rules' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules' });
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [addedRules, setAddedRules] = useState<AddedRuleWithId[]>([]);

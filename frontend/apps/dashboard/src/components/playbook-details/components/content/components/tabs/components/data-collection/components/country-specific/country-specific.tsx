@@ -10,7 +10,7 @@ type CountrySpecificProps = {
 };
 
 const CountrySpecific = ({ countrySpecific, hasSelfie }: CountrySpecificProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
 
   const sortedCountrySpecific = Object.entries(countrySpecific).sort(([a], [b]) => a.localeCompare(b));
   const countries = sortedCountrySpecific.map(([country]) => country as CountryCode);

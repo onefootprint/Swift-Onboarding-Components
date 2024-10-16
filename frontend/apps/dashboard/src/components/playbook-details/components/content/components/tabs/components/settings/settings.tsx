@@ -17,7 +17,7 @@ type LocalState = {
 };
 
 const Settings = ({ playbook }: PasskeysProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.settings' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'settings' });
   const [localState, setLocalState] = useState<LocalState>({
     promptForPasskey: playbook.promptForPasskey,
     allowReonboard: playbook.allowReonboard,

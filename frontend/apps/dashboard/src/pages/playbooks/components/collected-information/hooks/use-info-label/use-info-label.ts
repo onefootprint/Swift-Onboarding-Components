@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import type { Option, SsnOption } from '../../collected-information.types';
 
 const useInfoLabel = () => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.collected-data' });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'collected-data' });
   const map: Partial<Record<keyof Option, string>> = {
     name: t('name'),
     dob: t('dob'),

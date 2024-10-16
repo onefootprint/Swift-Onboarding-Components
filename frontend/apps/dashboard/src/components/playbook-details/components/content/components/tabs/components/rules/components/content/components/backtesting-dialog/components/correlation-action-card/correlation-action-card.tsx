@@ -20,8 +20,8 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
     <Container role="group" aria-label={`${sectionAction} correlation card`}>
       <Text variant="label-3" marginTop={4} marginBottom={5}>
         <Trans
-          ns="playbooks"
-          i18nKey="details.rules.backtesting.correlation.action-list"
+          ns="playbook-details"
+          i18nKey="rules.backtesting.correlation.action-list"
           components={{
             color: <ActionText variant="label-3" color={getActionVariant(sectionActionValue)} />,
           }}
@@ -31,8 +31,8 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
       <ActionRow data-is-last={false} role="row">
         <Text variant="body-3">
           <Trans
-            ns="playbooks"
-            i18nKey="details.rules.backtesting.correlation.same"
+            ns="playbook-details"
+            i18nKey="rules.backtesting.correlation.same"
             components={{
               color: <ActionText variant="body-3" color={getActionVariant(sectionActionValue)} />,
             }}
@@ -47,8 +47,8 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
           <ActionRow key={rowAction} data-is-last={index === rowActions.length - 1} role="row">
             <Text variant="body-3">
               <Trans
-                ns="playbooks"
-                i18nKey="details.rules.backtesting.correlation.changed"
+                ns="playbook-details"
+                i18nKey="rules.backtesting.correlation.changed"
                 components={{
                   color: <ActionText variant="body-3" color={getActionVariant(rowActionValue)} />,
                 }}

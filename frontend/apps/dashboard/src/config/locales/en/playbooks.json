@@ -7,6 +7,12 @@
   "create-button": "Create Playbook",
   "empty-description": "You haven't created any Playbooks just yet.",
   "cta-not-allowed": "You're not allowed to create Playbooks",
+  "kinds": {
+    "auth": "Auth",
+    "kyc": "KYC",
+    "kyb": "KYB",
+    "document": "ID Document"
+  },
   "table": {
     "aria-label": "Playbooks",
     "header": {
@@ -99,115 +105,6 @@
       }
     }
   },
-  "dialog": {
-    "title": "Create Playbook",
-    "stepper": {
-      "aria-label": "Progress indicator for Playbooks"
-    },
-    "feedback": {
-      "success": {
-        "title": "Success",
-        "description": "Playbook created successfully."
-      }
-    },
-    "who-to-onboard": {
-      "nav": "Playbook type",
-      "title": "What type of playbook would you like to create?",
-      "subtitle": "This helps us better recommend which data to collect.",
-      "auth-title": "Authentication",
-      "auth": {
-        "title": "Auth",
-        "description": "Authentication allows your users to create credentials to sign up/log in to your platform",
-        "disabled-tooltip": "You are not configured to create production Auth playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
-      },
-      "onboard-title": "Onboarding",
-      "kyc": {
-        "title": "Onboard people",
-        "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them.",
-        "disabled-tooltip": "You are not configured to create production KYC playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
-      },
-      "kyb": {
-        "title": "Onboard businesses and their beneficial owners",
-        "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with.",
-        "disabled-tooltip": "You are not configured to create production KYB playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
-      },
-      "data-collection-title": "Data collection",
-      "doc-only": {
-        "title": "Document only",
-        "description": "Users will upload and validate ID documents (passport, driver’s license, etc.), optionally collect a selfie to match the document, and custom documents like proof-of-address, proof-of-SSN, etc.",
-        "disabled-tooltip": "You are not configured to create production Document only playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
-      }
-    },
-    "onboarding-templates": {
-      "nav": "Templates",
-      "title": "Templates",
-      "subtitle": "Configure your own KYC settings or select a pre-defined template.",
-      "custom": {
-        "title": "Custom",
-        "description": "Configure your own KYC settings"
-      },
-      "brokerage-partner": {
-        "title": "Brokerage Partner",
-        "alpaca": {
-          "title": "Alpaca",
-          "description": "Satisfies Alpaca's KYC / AML policies and procedures"
-        },
-        "apex": {
-          "title": "Apex",
-          "description": "Satisfies Apex's KYC / AML policies and procedures"
-        }
-      },
-      "industries": {
-        "title": "Industries",
-        "tenant-screening": {
-          "title": "Tenant screening",
-          "description": "Optimized for verifying applications in the real estate industry"
-        },
-        "car-rental": {
-          "title": "Car rental",
-          "description": "Perfect for seamlessly verifying drivers"
-        },
-        "credit-card": {
-          "title": "Credit card",
-          "description": "Optimized for screening credit applicants"
-        }
-      }
-    },
-    "residency": {
-      "nav": "Residency",
-      "title": "Residency",
-      "subtitle": "Select the countries from which your users may onboard.",
-      "us-residents": "United States",
-      "non-us-residents": "Non U.S. residents",
-      "us-territories": "Allow residents from U.S. territories to be onboarded",
-      "other-countries": "Other countries",
-      "all-countries": {
-        "label": "All other countries",
-        "hint": "Except for embargoed or sanctioned countries"
-      },
-      "restrict": "Restrict onboarding to specific countries",
-      "countries": "Countries"
-    },
-    "data-to-collect": {
-      "nav": "Playbook details",
-      "personal-info-nav": "Personal information",
-      "otp-verifications-nav": "OTP verifications",
-      "business-nav": "Business information",
-      "bo-nav": "Business owners information"
-    },
-    "name-your-playbook": {
-      "nav": "Name your Playbook"
-    },
-    "verification-checks": {
-      "nav": "Verification checks"
-    }
-  },
-  "kinds": {
-    "auth": "Auth",
-    "kyc": "KYC",
-    "kyb": "KYB",
-    "document": "ID Document"
-  },
   "copy": {
     "title": "Copying playbook",
     "form": {
@@ -254,63 +151,51 @@
     }
   },
   "create": {
-    "name": {
-      "title": "Name your playbook",
-      "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
-      "form": {
-        "name": {
-          "label": "Playbook name"
-        },
-        "errors": {
-          "required": "Please name your Playbook"
-        }
+    "title": "Create Playbook",
+    "stepper": {
+      "aria-label": "Progress indicator for Playbooks",
+      "kind": "Playbook type",
+      "name": "Playbook name",
+      "details": "Playbook details",
+      "templates": "Templates",
+      "residency": "Residency",
+      "business": "Business details",
+      "bo": "Business owners details",
+      "personal": "Personal information",
+      "otp": "OTP configurations",
+      "verification-checks": "Verification checks"
+    },
+    "feedback": {
+      "success": {
+        "title": "Playbook Created",
+        "description": "Your new playbook has been successfully created."
       }
     },
-    "business": {
-      "business-info": {
-        "title": "Business information",
-        "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        "preview": {
-          "title": "Business information",
-          "basic-info": {
-            "title": "Basic information",
-            "name": "Legal business name",
-            "address": "Registered business address",
-            "tin": "TIN (EIN)",
-            "type": "Legal entity type",
-            "website": "Website",
-            "phone-number": "Phone number"
-          }
-        },
-        "form": {
-          "title": "Edit business information",
-          "address": {
-            "title": "Business address",
-            "label": "Request that users provide their business address"
-          },
-          "type": {
-            "title": "Legal entity type",
-            "label": "Request users to provide their business legal entity type"
-          },
-          "website": {
-            "title": "Website",
-            "label": "Request users to provide their business website"
-          },
-          "phone-number": {
-            "title": "Phone number",
-            "label": "Request that users provide their business phone number"
-          }
-        }
+    "kind": {
+      "title": "What type of playbook would you like to create?",
+      "subtitle": "This helps us better recommend which data to collect.",
+      "auth-title": "Authentication",
+      "auth": {
+        "title": "Auth",
+        "description": "Authentication allows your users to create credentials to sign up/log in to your platform",
+        "disabled-tooltip": "You are not configured to create production Auth playbooks. Use sandbox or contact us to enable this feature."
       },
-      "custom-docs": {
-        "title": "Additional documents",
-        "description": "Additional proofs that may help you analyze the user",
-        "form": {
-          "title": "Your custom document",
-          "custom": {
-            "label": "Custom"
-          }
-        }
+      "onboard-title": "Onboarding",
+      "kyc": {
+        "title": "Onboard people",
+        "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them.",
+        "disabled-tooltip": "You are not configured to create production KYC playbooks. Use sandbox or contact us to enable this feature."
+      },
+      "kyb": {
+        "title": "Onboard businesses and their beneficial owners",
+        "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with.",
+        "disabled-tooltip": "You are not configured to create production KYB playbooks. Use sandbox or contact us to enable this feature."
+      },
+      "data-collection-title": "Data collection",
+      "doc-only": {
+        "title": "Document only",
+        "description": "Users will upload and validate ID documents (passport, driver’s license, etc.), optionally collect a selfie to match the document, and custom documents like proof-of-address, proof-of-SSN, etc.",
+        "disabled-tooltip": "You are not configured to create production Document only playbooks. Use sandbox or contact us to enable this feature."
       }
     },
     "bo": {
@@ -339,6 +224,252 @@
           "email": "Email OTP",
           "error": "At least one verification is needed "
         }
+      }
+    },
+    "settings-person": {
+      "title": "Your Playbook recommendation",
+      "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+      "non-editable": {
+        "title": "Your Playbook",
+        "subtitle": "Here’s our recommended Playbook configuration."
+      }
+    },
+    "name": {
+      "title": "Name your playbook",
+      "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
+      "form": {
+        "name": {
+          "label": "Playbook name",
+          "errors": {
+            "required": "Please name your Playbook"
+          }
+        }
+      }
+    },
+    "kyc-templates": {
+      "title": "Templates",
+      "subtitle": "Configure your own KYC settings or select a pre-defined template.",
+      "custom": {
+        "title": "Custom",
+        "description": "Configure your own KYC settings"
+      },
+      "brokerage-partner": {
+        "title": "Brokerage Partner",
+        "alpaca": {
+          "title": "Alpaca",
+          "description": "Satisfies Alpaca's KYC / AML policies and procedures"
+        },
+        "apex": {
+          "title": "Apex",
+          "description": "Satisfies Apex's KYC / AML policies and procedures"
+        }
+      },
+      "industries": {
+        "title": "Industries",
+        "tenant-screening": {
+          "title": "Tenant screening",
+          "description": "Optimized for verifying applications in the real estate industry"
+        },
+        "car-rental": {
+          "title": "Car rental",
+          "description": "Perfect for seamlessly verifying drivers"
+        },
+        "credit-card": {
+          "title": "Credit card",
+          "description": "Optimized for screening credit applicants"
+        }
+      }
+    },
+    "residency": {
+      "title": "Residency",
+      "subtitle": "Select the countries from which your users may onboard.",
+      "cannot-edit": "This setting is locked based on your selected playbook template",
+      "us-residents": "United States",
+      "non-us-residents": "Non U.S. residents",
+      "us-territories": "Allow residents from U.S. territories to be onboarded",
+      "other-countries": "Other countries",
+      "all-countries": {
+        "label": "All other countries",
+        "hint": "Except for embargoed or sanctioned countries"
+      },
+      "restrict": "Restrict onboarding to specific countries",
+      "countries": "Countries"
+    },
+    "person": {
+      "preview": {
+        "title": {
+          "kyc": "Personal information",
+          "kyb": "Beneficial owners"
+        },
+        "edit": "Edit",
+        "collect-bo-info": "Collect beneficial owners’ information",
+        "basic-information": {
+          "title": "Basic information",
+          "name": "Full name",
+          "email": "Email",
+          "phone": "Phone number",
+          "dob": "Date of birth",
+          "address": "Address"
+        },
+        "us-residents": {
+          "title": "U.S. residents",
+          "itin": "Accept ITIN",
+          "legal-status": "Legal status in the U.S.",
+          "empty": "U.S. residents aren't allowed to be onboarded.",
+          "ssn": {
+            "label": "SSN",
+            "last-4": "Last 4",
+            "full": "Full",
+            "optional": "Optional"
+          }
+        },
+        "non-us-residents": {
+          "title": "Non U.S. residents",
+          "restrictions": "Restricted to these countries",
+          "all": "All nationalities are allowed to be onboarded (except for embargoed or sanctioned countries)",
+          "empty": "Non U.S. residents aren't allowed to be onboarded.",
+          "country-list": {
+            "and": "and",
+            "more": "{{count}} more"
+          }
+        },
+        "us-territories": {
+          "label": "Note",
+          "content": "Residents from U.S. territories are allowed to be onboarded."
+        }
+      },
+      "form": {
+        "title": {
+          "kyc": "Editing personal information",
+          "kyb": "Ediing beneficial owners"
+        },
+        "edit": "Edit",
+        "collect-bo": {
+          "label": "Collect beneficial owners' information"
+        },
+        "basic-information": {
+          "title": "Basic information"
+        },
+
+        "us-residents": {
+          "title": "U.S. residents",
+          "empty": "U.S. residents aren't allowed to be onboarded."
+        },
+        "non-us-residents": {
+          "title": "Non U.S. residents",
+          "empty": "Non U.S. residents aren't allowed to be onboarded."
+        },
+        "phone": {
+          "label": "Request users to provide their phone number",
+          "title": "Phone number"
+        },
+        "ssn": {
+          "title": "SSN",
+          "label": "Request users to provide their SSN",
+          "full": "Full",
+          "last4": "Last 4"
+        },
+        "ssn-optional": {
+          "label": "Allow users without an SSN to proceed with the verification",
+          "hint": "They will need to be manually reviewed by you."
+        },
+        "selfie": {
+          "label": "Request a selfie",
+          "hint": "You can optionally request users to take a selfie to validate the ID document requested."
+        },
+        "us-legal-status": {
+          "title": "Legal status",
+          "label": "Request users to provide their legal status in the U.S."
+        },
+        "us-territories": {
+          "label": "Note:",
+          "content": "Residents from U.S. territories are allowed to be onboarded."
+        },
+        "accept-itin-hint": "Users may use either their SSN or ITIN as part of the verification process.",
+        "accept-itin-label": "Accept ITIN"
+      }
+    },
+    "verification-checks": {
+      "title": "Verification checks",
+      "subtitle": "Configure which verification checks will be performed with the collected identity data.",
+      "cannot-edit": "This setting is locked based on your selected playbook template",
+      "aml": {
+        "title": "Anti-Money Laundering (AML)",
+        "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
+        "aml": {
+          "label": "Enhanced AML monitoring",
+          "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
+        },
+        "ofac": {
+          "label": "Office of Foreign Assets Control (OFAC)",
+          "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
+        },
+        "pep": {
+          "label": "Politically Exposed Person (PEP)",
+          "hint": "An individual who has been entrusted with a prominent public function"
+        },
+        "adverse-media": {
+          "label": "Adverse media",
+          "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
+        },
+        "footer": {
+          "label": "Note:",
+          "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+        },
+        "disabled": {
+          "missing-bos": "You must collect beneficial owners information to enable AML monitoring."
+        }
+      },
+      "kyc-checks": {
+        "title": "Know Your Customer (KYC)",
+        "disabled": {
+          "missing-bos": "You must collect beneficial owners' information to enable KYC checks.",
+          "must-collect-id-doc": "You must collect ID document information to disable KYC checks."
+        },
+        "toggle": {
+          "personal": {
+            "label": "Perform database checks with collected identity data",
+            "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+          },
+          "bo": {
+            "label": "Run KYC on beneficial owners",
+            "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+          }
+        },
+        "bo-options": {
+          "all-bos": "On all business owners",
+          "only-primary-bo": "Only on business' primary owner",
+          "only-primary-bo-hint": "The person who fills out this form"
+        }
+      },
+      "kyb-checks": {
+        "title": "Know Your Business (KYB)",
+        "toggle": {
+          "label": "Run KYB",
+          "hint": "If not enabled, we'll only collect the data and won't do any verification checks."
+        },
+        "full": {
+          "label": "Full KYB",
+          "disabled": "Running full KYB requires you to collect Business name, Business address and EIN, at least."
+        },
+        "ein": {
+          "label": "TIN (EIN) verification only",
+          "hint": "We'll only verify TIN (EIN) and business name."
+        }
+      },
+      "fraud-checks": {
+        "title": "Fraud checks",
+        "sentilink": {
+          "label": "Synthetic fraud with SentiLink",
+          "hint": "Synthetic fraud and ID theft scores",
+          "no-live-permission": "You are not configured to create production playbooks with SentiLink. Use sandbox or contact us to enable this feature."
+        },
+        "neuro": {
+          "label": "Behavioral fraud with Neuro-ID",
+          "hint": "Behavioral analysis and PIl familiarity, bot detection, and device and network intelligence",
+          "no-live-permission": "You are not configured to create production playbooks with Neuro-ID. Use sandbox or contact us to enable this feature."
+        },
+        "none": "No fraud checks are being conducted."
       }
     },
     "gov-docs": {
@@ -390,6 +521,22 @@
         }
       }
     },
+    "investor": {
+      "title": "Investor profile questions",
+      "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+      "add": "Add",
+      "remove": "Remove",
+      "done": "Done",
+      "questions": {
+        "employment-status": "What's your employment status and occupation?",
+        "annual-income": "What's your annual income?",
+        "net-worth": "What's your net worth?",
+        "funding-sources": "What’s the source of your account funding?",
+        "investment-goals": "What are your investment goals?",
+        "risk-tolerance": "How would you describe your risk tolerance?",
+        "immediate-family": "Do any of the following apply to you or your immediate family?"
+      }
+    },
     "custom-docs": {
       "title": "Custom",
       "description": "Specify extra documents required to meet specific onboarding criteria.",
@@ -431,43 +578,6 @@
         }
       }
     },
-    "investor": {
-      "title": "Investor profile questions",
-      "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
-      "add": "Add",
-      "remove": "Remove",
-      "done": "Done",
-      "questions": {
-        "employment-status": "What's your employment status and occupation?",
-        "annual-income": "What's your annual income?",
-        "net-worth": "What's your net worth?",
-        "funding-sources": "What’s the source of your account funding?",
-        "investment-goals": "What are your investment goals?",
-        "risk-tolerance": "How would you describe your risk tolerance?",
-        "immediate-family": "Do any of the following apply to you or your immediate family?"
-      }
-    },
-    "settings-doc-only": {
-      "title": "Requested documents",
-      "subtitle": "All selected documents will be presented as viable upload options for users to select from."
-    },
-    "settings-person": {
-      "title": {
-        "editable": "Your Playbook recommendation",
-        "non-editable": "Your Playbook"
-      },
-      "subtitle": {
-        "editable": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        "non-editable": "Here’s our recommended Playbook configuration.",
-        "templates": {
-          "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
-          "apex": "Here's your Playbook configuration based on Apex's CIP.",
-          "tenant-screening": "Here's your playbook configuration based on your selected template",
-          "car-rental": "Here's your playbook configuration based on your selected template",
-          "credit-card": "Here's your playbook configuration based on your selected template"
-        }
-      }
-    },
     "required-auth": {
       "title": "OTP (one-time-passcode) verifications",
       "subtitle": "Select the data to verify during onboarding.",
@@ -475,526 +585,53 @@
       "email": "Email OTP",
       "error": "At least one verification is needed"
     },
-    "person": {
-      "preview": {
-        "title": {
-          "kyc": "Personal information",
-          "kyb": "Beneficial owners"
-        },
-        "edit": "Edit",
-        "collect-bo-info": "Collect beneficial owners’ information",
-        "basic-information": {
-          "title": "Basic information",
-          "name": "Full name",
-          "email": "Email",
-          "phone": "Phone number",
-          "dob": "Date of birth",
-          "address": "Address"
-        },
 
-        "us-residents": {
-          "title": "U.S. residents",
-          "itin": "Accept ITIN",
-          "legal-status": "Legal status in the U.S.",
-          "empty": "U.S. residents aren't allowed to be onboarded.",
-          "ssn": {
-            "label": "SSN",
-            "last-4": "Last 4",
-            "full": "Full",
-            "optional": "Optional"
+    "business": {
+      "title": "Business information",
+      "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+      "data": {
+        "preview": {
+          "title": "Business information",
+          "basic-info": {
+            "title": "Basic information",
+            "name": "Legal business name",
+            "address": "Registered business address",
+            "tin": "TIN (EIN)",
+            "type": "Legal entity type",
+            "website": "Website",
+            "phone-number": "Phone number"
           }
         },
-        "non-us-residents": {
-          "title": "Non U.S. residents",
-          "restrictions": "Restricted to these countries",
-          "all": "All nationalities are allowed to be onboarded (except for embargoed or sanctioned countries)",
-          "empty": "Non U.S. residents aren't allowed to be onboarded.",
-          "country-list": {
-            "and": "and",
-            "more": "{{count}} more"
-          }
-        },
-        "us-territories": {
-          "label": "Note",
-          "content": "Residents from U.S. territories are allowed to be onboarded."
-        }
-      },
-      "form": {
-        "title": {
-          "kyc": "Editing personal information",
-          "kyb": "Editing beneficial owners"
-        },
-        "edit": "Edit",
-        "collect-bo": {
-          "label": "Collect beneficial owners' information"
-        },
-        "basic-information": {
-          "title": "Basic information"
-        },
-
-        "us-residents": {
-          "title": "U.S. residents",
-          "empty": "U.S. residents aren't allowed to be onboarded."
-        },
-        "non-us-residents": {
-          "title": "Non U.S. residents",
-          "empty": "Non U.S. residents aren't allowed to be onboarded."
-        },
-        "phone": {
-          "label": "Request users to provide their phone number",
-          "title": "Phone number"
-        },
-        "ssn": {
-          "title": "SSN",
-          "label": "Request users to provide their SSN",
-          "full": "Full",
-          "last4": "Last 4"
-        },
-        "ssn-optional": {
-          "label": "Allow users without an SSN to proceed with the verification",
-          "hint": "They will need to be manually reviewed by you."
-        },
-        "selfie": {
-          "label": "Request a selfie",
-          "hint": "You can optionally request users to take a selfie to validate the ID document requested."
-        },
-        "us-legal-status": {
-          "title": "Legal status",
-          "label": "Request users to provide their legal status in the U.S."
-        },
-        "us-territories": {
-          "label": "Note:",
-          "content": "Residents from U.S. territories are allowed to be onboarded."
-        },
-        "accept-itin-hint": "Users may use either their SSN or ITIN as part of the verification process.",
-        "accept-itin-label": "Accept ITIN"
-      }
-    },
-    "verification-checks": {
-      "title": "Verification checks",
-      "subtitle": "Configure which verification checks will be performed with the collected identity data.",
-      "aml": {
-        "title": "Anti-Money Laundering (AML)",
-        "recommended": "Recommended",
-        "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
-        "aml": {
-          "label": "Enhanced AML monitoring",
-          "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
-        },
-        "ofac": {
-          "label": "Office of Foreign Assets Control (OFAC)",
-          "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
-        },
-        "pep": {
-          "label": "Politically Exposed Person (PEP)",
-          "hint": "An individual who has been entrusted with a prominent public function"
-        },
-        "adverse-media": {
-          "label": "Adverse media",
-          "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
-        },
-        "footer": {
-          "label": "Note:",
-          "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
-        },
-        "disabled-tooltip": {
-          "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable AML monitoring."
-        }
-      },
-      "kyc-checks": {
-        "title": "Know Your Customer (KYC)",
-        "disabled-tooltip": {
-          "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable KYC checks.",
-          "must-collect-id-doc": "You must collect ID document information to disable KYC checks."
-        },
-        "toggle": {
-          "personal": {
-            "label": "Perform database checks with collected identity data",
-            "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
-          },
-          "business": {
-            "label": "Run KYC on beneficial owners",
-            "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
-          }
-        },
-        "bo-options": {
-          "all-bos": "On all business owners",
-          "only-primary-bo": "Only on business' primary owner",
-          "only-primary-bo-hint": "The person who fills out this form"
-        }
-      },
-      "kyb-checks": {
-        "title": "Know Your Business (KYB)",
-        "toggle": {
-          "label": "Run KYB",
-          "description": "If not enabled, we'll only collect the data and won't do any verification checks."
-        },
-        "full": {
-          "label": "Full KYB",
-          "disabled": "Running full KYB requires you to collect Business name, Business address and EIN, at least."
-        },
-        "ein": {
-          "label": "TIN (EIN) verification only",
-          "description": "We'll only verify TIN (EIN) and business name."
-        }
-      }
-    }
-  },
-  "details": {
-    "html-title": "Footprint | Playbook details",
-    "title": "Playbook details",
-    "breadcrumb": {
-      "title": "playbook details breadcrumb",
-      "playbooks": "Playbooks",
-      "users": "Users",
-      "user-details": "User details",
-      "playbook-details": "Playbook details"
-    },
-    "header": {
-      "edit-name": {
-        "cta": "Edit playbook name",
-        "cta-not-allowed": "You're not allowed to edit Playbooks",
         "form": {
-          "label": "Playbook name"
+          "title": "Edit business information",
+          "address": {
+            "title": "Business address",
+            "label": "Request that users provide their business address"
+          },
+          "type": {
+            "title": "Legal entity type",
+            "label": "Request users to provide their business legal entity type"
+          },
+          "website": {
+            "title": "Website",
+            "label": "Request users to provide their business website"
+          },
+          "phone-number": {
+            "title": "Phone number",
+            "label": "Request that users provide their business phone number"
+          }
         }
       },
-      "type": {
-        "label": "Type",
-        "kyc": "KYC",
-        "kyb": "KYB",
-        "auth": "Auth",
-        "document": "Document"
-      },
-      "name": "Playbook name",
-      "publishable-key": "Publishable key"
-    },
-    "tabs": {
-      "data-collection": "Data collection",
-      "verification-checks": "Verification checks",
-      "settings": "Settings",
-      "rules": "Rules"
-    },
-    "data-collection": {
-      "section-title": "Data collection",
-      "sign-up-information": "Sign up information",
-      "basic-information": "Basic information",
-      "otp": "OTP (One Time Password) verifications",
-      "sign-up": "Sign up information",
-      "sign-in": "Sign in methods",
-      "us-residents": {
-        "enabled": "U.S. residents are allowed to be onboarded",
-        "disabled": "U.S. residents aren't allowed to be onboarded",
-        "title": "U.S. residents",
-        "empty": "U.S. residents aren't allowed to be onboarded."
-      },
-      "non-us-residents": {
-        "title": "Non-U.S. residents",
-        "empty": "Non-U.S. residents aren't allowed to be onboarded.",
-        "enabled": "Non-U.S. residents are allowed to be onboarded",
-        "disabled": "Non-U.S. residents are not allowed to be onboarded"
-      },
-      "us-territories": {
-        "label": "Note:",
-        "content": "Residents from U.S. territories are allowed to be onboarded."
-      },
-      "id-doc-first": "Document scan will be used to autofill basic identity data",
-      "last4": "Last 4",
-      "full": "Full",
-      "full_optional": "Full (Optional)",
-      "last4_optional": "Last 4 (Optional)",
-      "investor_profile": {
-        "title": "Investor profile questions",
-        "enabled": "Investor profiling questions will be part of the onboarding process.",
-        "disabled": "Investor profiling questions will not be part of the onboarding process."
-      },
-      "kyb": {
-        "business": "Business information",
-        "basic_information": "Basic information",
-        "other": "Other",
-        "business_beneficial_owners": "Beneficial owners",
-        "entity-type": "Entity type",
-        "business_website": "Business website",
-        "business_phone": "Business phone"
-      },
-      "id-doc": {
-        "title": "ID document scan"
-      },
-      "gov-docs": {
-        "title": "Government-issued ID",
-        "selfie": "Selfie",
-        "global": {
-          "title": "Globally accepted government-issued ID",
-          "scans": "Globally accepted doc scans",
-          "empty": "No globally accepted doc scans configured"
-        },
-        "country-specific": {
-          "title": "Country-based accepted government-issued ID",
-          "scans": "Country-based accepted doc scans",
-          "none": "No country specific accepted doc scans configured"
-        },
-        "none": "None"
-      },
-      "additional-docs": {
-        "docs-to-collect": "Documents to collect",
-        "title-full": "Additional documents",
-        "title": "Additional docs",
-        "empty": "No additional docs docs are available for scanning.",
-        "poa": {
-          "title": "Proof of Address",
-          "description": "Official documents displaying the user's address."
-        },
-        "possn": {
-          "title": "Proof of SSN",
-          "description": "Scan of Social Security card or official document displaying your name and Social Security Number."
-        },
-        "requires-manual-review": "After upload, user will be marked for manual review.",
-        "more-details": "More details",
-        "collection-method": {
-          "prefer-upload": "Prefer upload",
-          "prefer-capture": "Prefer capture"
-        }
-      }
-    },
-    "settings": {
-      "passkeys": {
-        "title": "Passkey registration",
+      "custom-docs": {
+        "title": "Additional documents",
+        "description": "Additional proofs that may help you analyze the user",
         "form": {
-          "enable": {
-            "label": "Enable passkey registration",
-            "hint": "We use passkeys to validate your users’ identity without the need for a password."
+          "title": "Your custom document",
+          "custom": {
+            "label": "Custom"
           }
-        },
-        "about": {
-          "title": "More about passkeys on",
-          "ios": "iOS devices",
-          "android": "Android devices"
-        }
-      },
-      "allow-reonboard": {
-        "title": "Allow reonboarding",
-        "description": "If the user has already onboarded onto this playbook, allow them to onboard again. Please note repeat onboardings incur normal charges. You are responsible for all charges incurred from repeat users onboarding onto your platform multiple times."
-      },
-      "skip-confirm": {
-        "title": "Skip confirmation screen",
-        "description": "When enabled, users will not see the confirmation screen during the onboarding flow."
-      }
-    },
-    "rules": {
-      "title": "Rules",
-      "description": "Define the onboarding logic for your playbook.",
-      "empty-rules": "This playbook does not have rules.",
-      "cta-not-allowed": "You're not allowed to edit rules",
-      "kyb-alert": "These rules apply to Business Owners and Businesses.",
-      "edit-bar": {
-        "editing-rules": "Editing rules",
-        "tooltip": "Changes will only take effect if you click \"Save changes\"",
-        "test-changes": "Test changes"
-      },
-      "success-toast": {
-        "title": "Success!",
-        "description": "Changes saved."
-      },
-      "action-section": {
-        "fail": {
-          "title": "Fail",
-          "subtitle": "User will be marked as failed"
-        },
-        "manual-review": {
-          "title": "Fail + Manual review",
-          "subtitle": "User will be marked as failed and flagged for review"
-        },
-        "step-up": {
-          "title": "Step-up",
-          "subtitle": "User will be asked to scan or upload another document",
-          "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
-          "step-up-proof-of-address": "Proof of Address",
-          "step-up-identity": "Identity document"
-        },
-        "step-up-proof-of-address": {
-          "title": "Step-up: Proof of Address"
-        },
-        "step-up-identity": {
-          "title": "Step-up: Identity document"
-        },
-        "pass-with-manual-review": {
-          "title": "Pass + Manual review",
-          "subtitle": "User will be onboarded, but should be manually reviewed"
-        },
-        "add-rule": "Add rule",
-        "empty-rules": "No rule has been configured."
-      },
-      "action-row": {
-        "if": "if ",
-        "and": " and ",
-        "not": "not",
-        "add-risk-signal": "Add risk signal condition",
-        "add-list": "Add list condition",
-        "add-list-tooltip": "First create a list to add a list condition",
-        "delete": "Delete rule",
-        "empty-aria-label": "Empty rule",
-        "risk-signals-select": {
-          "title": "Risk signals",
-          "aria-label": "Open risk signals select",
-          "placeholder": "risk signal",
-          "delete": "Delete",
-          "search": "Search by name or description"
-        },
-        "rule-chip": {
-          "risk-signal": {
-            "field-placeholder": "risk signal",
-            "value-placeholder": "triggered"
-          },
-          "op": {
-            "trigger-aria-label": "Open ops",
-            "aria-label": "Rule ops",
-            "eq": "is",
-            "not_eq": "is not",
-            "is_in": "is",
-            "is_not_in": "is not"
-          },
-          "list": {
-            "field": {
-              "placeholder": "vault data",
-              "trigger-aria-label": "Open data identifiers",
-              "aria-label": "Rule data identifiers",
-              "search-placeholder": "Search vault data...",
-              "empty": "There is no vault data corresponding to this kind of list",
-              "search-empty": "No results",
-              "validation-note": "Showing options that match the type of list selected: <b>{{type}}</b>"
-            },
-            "in": "in",
-            "value": {
-              "placeholder": "list",
-              "trigger-aria-label": "Open lists",
-              "aria-label": "Rule lists",
-              "search-placeholder": "Search lists...",
-              "empty": "There are no lists corresponding to this kind of vault data",
-              "validation-note": "Showing options that match the type of data selected: <b>{{type}}</b>"
-            },
-            "empty-option": "Clear"
-          }
-        },
-        "pending-change": "Pending change",
-        "pending-deletion": "Pending deletion",
-        "delete-toast": {
-          "title": "Rule is pending deletion",
-          "description": "This will only take effect if you save your changes",
-          "undo": "Undo"
-        }
-      },
-      "backtesting": {
-        "title": "Review rule changes",
-        "save": "Save changes",
-        "affected": {
-          "heading": "{{count}} out of {{total}} total onboardings matched",
-          "description": "If these rules existed in the selected period they would've affected {{count}} onboardings.",
-          "aria-label": "Affected onboardings table",
-          "none-affected": "No onboardings would've been affected.",
-          "none-total": "This playbook did not have any onboardings during this time period. Please try a different date range.",
-          "header": {
-            "id": "Footprint ID",
-            "current-status": "Current onboarding status",
-            "historical-outcome": "Original rule outcome",
-            "backtested-outcome": "Backtested rule outcome",
-            "historical-tooltip": "Rule outcomes based on existing rules at the time of these onboardings",
-            "backtested-tooltip": "If the rules that are being tested existed at the time of these onboardings, rule outcomes may or may not have been different."
-          }
-        },
-        "historical": {
-          "heading": "Original rule outcomes",
-          "description": "Rule outcomes based on existing rules at the time of the onboardings above."
-        },
-        "backtested": {
-          "heading": "Backtested rule outcomes",
-          "description": "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:"
-        },
-        "correlation": {
-          "heading": "Original rule outcomes to Backtested rule outcomes",
-          "description": "Correlation between original and backtested rule outcomes.",
-          "action-list": "Rule outcomes that were originally <color>{{action}}</color> would:",
-          "same": "Still evaluate to <color>{{action}}</color>",
-          "changed": "Evaluate to <color>{{action}}</color> instead"
         }
       }
-    },
-    "verification-checks": {
-      "kyb": {
-        "title": "Know Your Business (KYB)",
-        "full": "Full KYB (data collection + verification checks).",
-        "ein-only": "TIN (EIN) and business name verification only.",
-        "none": "Only collecting the data (<b>no</b> verification checks).",
-        "kyc": {
-          "full": "On all business owners.",
-          "primary-only": "Only on business’ primary owner (the person who filled out the KYB form).",
-          "none": "KYC is not being conducted on beneficial owners."
-        }
-      },
-      "kyc": {
-        "title": "Know Your Customer (KYC)",
-        "full": "Database checks with collected identity data are being performed.",
-        "none": "Database checks with collected identity data are not being performed."
-      },
-      "aml": {
-        "title": "Anti-Money Laundering (AML)",
-        "none": "AML checks are not enabled.",
-        "ofac": "Office of Foreign Assets Control (OFAC)",
-        "pep": "Politically Exposed Person (PEP)",
-        "adverse-media": "Adverse media"
-      }
-    },
-    "collected-data": {
-      "and": "and",
-      "more": "more",
-      "none": "None",
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "optional": "(Optional)",
-      "optional-label": "Optional",
-      "email": "Email",
-      "phone-number": "Phone number",
-      "name": "Full name",
-      "dob": "Date of birth",
-      "us-legal-status": "Legal status in the U.S.",
-      "full-address": "Address",
-      "ssn-doc-scan-step-up": "Request ID Document scan if SSN skipped",
-      "id-doc-kind": "Globally accepted",
-      "countries-restrictions": "Restricted to these countries",
-      "selfie": "Selfie",
-      "drivers-license": "Driver's license",
-      "id-card": "Identity card",
-      "passport": "Passport",
-      "visa": "Visa",
-      "residence-document": "Residence card",
-      "voter-identification": "Voter identification",
-      "proof-of-address": "Proof of address",
-      "passport-card": "Passport card",
-      "permit": "Work permit",
-      "ssn": "SSN",
-      "ssn4": "Last 4",
-      "ssn9": "Full",
-      "ssn-4": "SSN (Last 4)",
-      "ssn-9": "SSN (Full)",
-      "address-display": "Address line, Zip code, City, State",
-      "enhanced-aml": "Enhanced AML monitoring",
-      "ofac": "Office of Foreign Assets Control (OFAC)",
-      "pep": "Politically Exposed Person (PEP)",
-      "adverse-media": "Adverse media",
-      "international-country-restrictions": "International country restrictions",
-      "business-address": "Registered business address",
-      "business-name": "Legal business name",
-      "business-tin": "Taxpayer Identification Number (TIN)",
-      "business": "Business",
-      "basic_information": "Basic information",
-      "other": "Other",
-      "business-beneficial-owners": "Collect beneficial owners’ information",
-      "business-type": "Legal entity type",
-      "business-website": "Business website",
-      "business-phone-number": "Business phone",
-      "country-specific-docs": "Country-specific documents",
-      "us-tax-id-acceptable": "Accept ITIN",
-      "email-address": "Email address",
-      "email-otp": "Email address",
-      "phone-otp": "Phone number"
     }
   }
 }

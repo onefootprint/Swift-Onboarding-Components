@@ -14,9 +14,7 @@ type OpSelectProps = {
 };
 
 const OpSelect = ({ defaultOp, onChange }: OpSelectProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'details.rules.action-row.rule-chip.op',
-  });
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row.rule-chip.op' });
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOp, setSelectedOp] = useState<RiskSignalRuleOp | ListRuleOp>(defaultOp);
   const isList = defaultOp === ListRuleOp.isIn || defaultOp === ListRuleOp.isNotIn;

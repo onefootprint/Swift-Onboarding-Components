@@ -13,6 +13,7 @@ const Footer = ({ linkButton, primaryButton, secondaryButton, size }: DialogFoot
       <ButtonsContainer $size={size} $isSingleButton={isSingleButton ?? false}>
         {secondaryButton && (
           <Button
+            id={secondaryButton.id}
             disabled={secondaryButton.disabled}
             form={secondaryButton.form}
             loading={secondaryButton.loading}
@@ -26,6 +27,7 @@ const Footer = ({ linkButton, primaryButton, secondaryButton, size }: DialogFoot
         )}
         {primaryButton && (
           <Button
+            id={primaryButton.id}
             disabled={primaryButton.disabled}
             form={primaryButton.form}
             loading={primaryButton.loading}
