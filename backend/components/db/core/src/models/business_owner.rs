@@ -1,5 +1,6 @@
 use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
+use crate::errors::ValidationError;
 use crate::DbError;
 use crate::DbResult;
 use crate::OffsetPaginatedResult;
@@ -88,6 +89,9 @@ impl BusinessOwner {
         bos: Vec<NewSecondaryBo>,
         business_vault_id: &VaultId,
     ) -> DbResult<Vec<Self>> {
+        if bos.iter().any(|bo| !(0..=100).contains(&bo.ownership_stake)) {
+            return ValidationError("Invalid ownership stake").into();
+        }
         let rows = bos
             .into_iter()
             .map(|bo| {
@@ -119,6 +123,9 @@ impl BusinessOwner {
         owner_vault_id: VaultId,
         ownership_stake: i32,
     ) -> DbResult<Self> {
+        if !(0..=100).contains(&ownership_stake) {
+            return ValidationError("Invalid ownership stake").into();
+        }
         let existing = business_owner::table
             .filter(business_owner::business_vault_id.eq(&sb.vault_id))
             .get_results::<Self>(conn.conn())?;
@@ -233,6 +240,9 @@ impl BusinessOwner {
         link_id: &BoLinkId,
         ownership_stake: i32,
     ) -> DbResult<Self> {
+        if !(0..=100).contains(&ownership_stake) {
+            return ValidationError("Invalid ownership stake").into();
+        }
         let result = diesel::update(business_owner::table)
             .filter(business_owner::business_vault_id.eq(bv_id))
             .filter(business_owner::link_id.eq(link_id))

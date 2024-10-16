@@ -26,7 +26,7 @@ use paperclip::actix::{
 use std::collections::HashMap;
 
 #[api_v2_operation(
-    description = "Decrypt information about the business",
+    description = "Add a new business owner with the provided data and ownership stake",
     tags(Businesses, Hosted)
 )]
 #[actix::post("/hosted/business/owners")]
