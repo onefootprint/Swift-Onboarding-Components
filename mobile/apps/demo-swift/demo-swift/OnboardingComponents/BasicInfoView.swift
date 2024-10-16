@@ -14,7 +14,7 @@ struct BasicInfoView: View {
     @State private var country: String = ""
     @State private var ssn: String = ""
     @State private var isLoading: Bool = false
-    @State private var errorMessage: String?  
+    @State private var errorMessage: String?
     @State private var showSuccessView: Bool = false
     @State private var vaultData: VaultData?
     
@@ -78,7 +78,7 @@ struct BasicInfoView: View {
                     GenericInputField(
                         text: $ssn,
                         placeholder: "SSN",
-                        keyboardType: .numberPad                    
+                        keyboardType: .numberPad
                     )
                     
                     Button(action: {
@@ -106,31 +106,37 @@ struct BasicInfoView: View {
                                 
                                 try await FootprintProvider.shared.vault(vaultData: vaultData)
                                 print("Vault data submitted successfully")
-                               let response = try await FootprintProvider.shared.process()                               
+                                let response = try await FootprintProvider.shared.process()
                                 showSuccessView = true
                                 print("Process submitted successfully : \(showSuccessView)")
-                               
+                                
                             } catch {
-                                print("Error: \(error)")
-                                if let footprintError = error as? FootprintError,
-                                   footprintError.domain == FootprintErrorDomain.process.rawValue {
-                                    do {
-                                        try await FootprintProvider.shared.handoff(
-                                            onCancel: {
-                                                print("Handoff was canceled by the user")
-                                                errorMessage = "Verification was canceled. Please try again."
-                                            },
-                                            onComplete: { validationToken in
-                                                print("Handoff completed successfully with token: \(validationToken)")
-                                                // You can add additional logic here if needed
-                                                showSuccessView = true
-                                            },                                           
-                                            onError: { error in
-                                                print("Error occurred during handoff: \(error)")
-                                                errorMessage = "An error occurred during verification. Please try again."
-                                            }
-                                        )
+                                if let footprintError = error as? FootprintError {
+                                    switch footprintError.kind {
+                                    case .inlineProcessNotSupported:
+                                        do {
+                                            try await FootprintProvider.shared.handoff(
+                                                onCancel: {
+                                                    print("Handoff was canceled by the user")
+                                                    errorMessage = "Verification was canceled. Please try again."
+                                                },
+                                                onComplete: { validationToken in
+                                                    print("Handoff completed successfully with token: \(validationToken)")
+                                                    // You can add additional logic here if needed
+                                                    showSuccessView = true
+                                                },
+                                                onError: { error in
+                                                    print("Error occurred during handoff: \(error)")
+                                                    errorMessage = "An error occurred during verification. Please try again."
+                                                }
+                                            )
+                                        }
+                                    case .vaultingError(let context):
+                                        print("Vaulting error - context: \(context), message: \(footprintError.message)")
+                                    default:
+                                        print("Error occurred: \(error)")
                                     }
+                                    
                                 }
                             }
                             isLoading = false

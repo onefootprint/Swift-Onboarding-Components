@@ -9,9 +9,47 @@ internal class FootprintQueries {
         self.configKey = configKey
     }
     
-    func getOnboardingConfig() async throws -> PublicOnboardingConfiguration {
-        return try await OnboardingAPI.getOnboardingConfig(xOnboardingConfigKey: self.configKey, openAPIClient: client)
+    func getQueryErrorMessage(errorResponse: ErrorResponse) -> String{
+        var message = ""
+        switch errorResponse {
+        case let .error(statusCode, data, response, underlyingError):
+            do {
+                if let jsonObject = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any] {
+                    message = jsonObject["message"] as? String ?? ""
+                }
+            }catch{
+                // Do nothing for now
+            }
+        }
+        return message
     }
+    
+    func getVaultErrorContext(errorResponse: ErrorResponse) -> [String: String]?{
+        var errContext: [String: String]? = nil
+        switch errorResponse {
+        case let .error(statusCode, data, response, underlyingError):
+            do {
+                if let jsonObject = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any], let context = jsonObject["context"] as? [String: String]{
+                    errContext = context
+                }
+            }catch{
+                // Do nothing for now
+            }
+        }
+        return errContext
+    }
+    
+    func getOnboardingConfig() async throws -> PublicOnboardingConfiguration {
+        do {
+            return try await OnboardingAPI.getOnboardingConfig(xOnboardingConfigKey: self.configKey, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .initializationError, message: "Get onboarding config request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .initializationError, message: "Get onboarding config request failed. \(error.localizedDescription)")
+        }
+    }
+
     
     func identify(email: String? = nil,
                   phoneNumber: String? = nil,
@@ -19,10 +57,16 @@ internal class FootprintQueries {
                   sandboxId: String? = nil,
                   scope:  IdentifyRequest.Scope = .onboarding
     ) async throws ->  IdentifyResponse {
-        
         let request = IdentifyRequest(email: email, phoneNumber: phoneNumber, scope: scope )
-        
-        return try await IdentifyAPI.identify(xOnboardingConfigKey: self.configKey, identifyRequest: request, openAPIClient: client)
+        do {
+            return try await IdentifyAPI.identify(xOnboardingConfigKey: self.configKey, identifyRequest: request, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .authError, message: "Identify request failed. \(errorMessage)")
+        }
+        catch{
+            throw FootprintError(kind: .authError, message: "Identify request failed. \(error.localizedDescription)")
+        }
     }
     
     func getSignupChallenge(email: String?, phoneNumber: String?,
@@ -35,30 +79,57 @@ internal class FootprintQueries {
             scope: SignupChallengeRequest.Scope.onboarding
         )
         
-        return try await IdentifyAPI.signupChallenge(
-            xOnboardingConfigKey: self.configKey,
-            signupChallengeRequest: request,
-            xSandboxId: sandboxId,
-            xFpIsComponentsSdk: true,
-            openAPIClient: client
-        )
+        do{
+            return try await IdentifyAPI.signupChallenge(
+                xOnboardingConfigKey: self.configKey,
+                signupChallengeRequest: request,
+                xSandboxId: sandboxId,
+                xFpIsComponentsSdk: true,
+                openAPIClient: client
+            )
+        }
+        catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .authError, message: "Signup challenge request failed. \(errorMessage)")
+        }catch {
+            throw FootprintError(kind: .authError, message: "Signup challenge request failed. \(error.localizedDescription)")
+        }
     }
     
     func getLoginChallenge(kind: LoginChallengeRequest.ChallengeKind? = LoginChallengeRequest.ChallengeKind.sms,
                            authToken: String) async throws -> LoginChallengeResponse {
         let request = LoginChallengeRequest(challengeKind: kind!)
-        
-        return try await IdentifyAPI.loginChallenge(xFpAuthorization: authToken, loginChallengeRequest: request, openAPIClient: client)
+        do {
+            return try await IdentifyAPI.loginChallenge(xFpAuthorization: authToken, loginChallengeRequest: request, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .authError, message: "Login challenge request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .authError, message: "Login challenge request failed. \(error.localizedDescription)")
+        }
     }
     
     func getValidationToken(authToken: String) async throws -> HostedValidateResponse {
-        return try await UserAPI.validationToken(xFpAuthorization: authToken, openAPIClient: client)
+        do {
+            return try await UserAPI.validationToken(xFpAuthorization: authToken, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .userError, message: "Validation token request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .userError, message: "Validation token request failed. \(error.localizedDescription)")
+        }
     }
     
     func createVaultingToken(authToken: String) async throws -> CreateUserTokenResponse {
         let request = CreateUserTokenRequest(requestedScope: .onboarding)
-        
-        return try await UserAPI.vaultingToken(xFpAuthorization: authToken, createUserTokenRequest: request, openAPIClient: client)
+        do{
+            return try await UserAPI.vaultingToken(xFpAuthorization: authToken, createUserTokenRequest: request, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .userError, message: "Create vaulting token request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .userError, message: "Create vaulting token request failed. \(error.localizedDescription)")
+        }
     }
     
     func verify(challenge: String, challengeToken: String, authToken: String) async throws -> IdentifyVerifyResponse {
@@ -67,8 +138,14 @@ internal class FootprintQueries {
             challengeToken: challengeToken,
             scope: .onboarding
         )
-        
-        return try await IdentifyAPI.verify(xFpAuthorization: authToken, xOnboardingConfigKey: self.configKey, identifyVerifyRequest: request, openAPIClient: client)
+        do {
+            return try await IdentifyAPI.verify(xFpAuthorization: authToken, xOnboardingConfigKey: self.configKey, identifyVerifyRequest: request, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .authError, message: "Verify request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .authError, message: "Verify request failed. \(error.localizedDescription)")
+        }
     }
     
     func initOnboarding(
@@ -76,17 +153,37 @@ internal class FootprintQueries {
         overallOutcome: OverallOutcome? = OverallOutcome.pass
     ) async throws -> OnboardingResponse {
         let request = PostOnboardingRequest(fixtureResult: PostOnboardingRequest.FixtureResult(rawValue: overallOutcome!.rawValue))
-        
-        return try await OnboardingAPI.onboarding(xFpAuthorization: authToken, postOnboardingRequest: request, openAPIClient: client)
+        do{
+            return try await OnboardingAPI.onboarding(xFpAuthorization: authToken, postOnboardingRequest: request, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .onboardingError, message: "Init onboarding request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .onboardingError, message: "Init onboarding request failed. \(error.localizedDescription)")
+        }
     }
     
     func getOnboardingStatus(authToken: String) async throws -> RequirementAttributes {
         let response = try await OnboardingAPI.onboardingStatus(xFpAuthorization: authToken, openAPIClient: client)
-        return try RequirementAttributes.getRequirements(from: response)
+        do {
+            return try RequirementAttributes.getRequirements(from: response)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .onboardingError, message: "Get onboarding status request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .onboardingError, message: "Get onboarding status request failed. \(error.localizedDescription)")
+        }
     }
     
     func validateOnboarding(authToken: String) async throws -> HostedValidateResponse {
-        return try await OnboardingAPI.validateOnboarding(xFpAuthorization: authToken, openAPIClient: client)
+        do{
+            return try await OnboardingAPI.validateOnboarding(xFpAuthorization: authToken, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .onboardingError, message: "Validate onboarding request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .onboardingError, message: "Validate onboarding request failed. \(error.localizedDescription)")
+        }
     }
     
     func decrypt(authToken: String, fields: [VaultDI]) async throws -> VaultData {
@@ -95,8 +192,14 @@ internal class FootprintQueries {
         }
         
         let request = UserDecryptRequest(fields: filteredFields)
-        
-        return try await VaultAPI.decryptUserVault(xFpAuthorization: authToken, userDecryptRequest: request, openAPIClient: client)
+        do {
+            return try await VaultAPI.decryptUserVault(xFpAuthorization: authToken, userDecryptRequest: request, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            throw FootprintError(kind: .decryptionError, message: "Decrypt request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .decryptionError, message: "Decrypt request failed. \(error.localizedDescription)")
+        }
     }
     
     func vault(
@@ -141,8 +244,15 @@ internal class FootprintQueries {
             investorProfilePoliticalOrganization: vaultData.investorProfilePoliticalOrganization,
             investorProfileBrokerageFirmEmployer: vaultData.investorProfileBrokerageFirmEmployer
         )
-        
-        return try await VaultAPI.vault(xFpAuthorization: authToken, body: VaultData, openAPIClient: client)
+        do{
+            return try await VaultAPI.vault(xFpAuthorization: authToken, body: VaultData, openAPIClient: client)
+        } catch let errorResponse as ErrorResponse {
+            let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
+            let errorContext = getVaultErrorContext(errorResponse: errorResponse)
+            throw FootprintError(kind: .vaultingError(context: errorContext), message: "Vault request failed. \(errorMessage)")
+        } catch {
+            throw FootprintError(kind: .vaultingError(context: nil), message: "Vault request failed. \(error.localizedDescription)")
+        }
     }
     
     func process(authToken: String,
@@ -153,7 +263,7 @@ internal class FootprintQueries {
         do{
             return try await OnboardingAPI.process(xFpAuthorization: authToken, processRequest: request, openAPIClient: client)
         } catch {
-            throw FootprintError.error(domain: .process, message: "Inline process not supported")
+            throw FootprintError(kind: .inlineProcessNotSupported, message: "Inline process is not supported. Please call the handoff function to complete the flow.")
         }
     }
 }

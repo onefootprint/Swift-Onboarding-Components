@@ -24,7 +24,8 @@ struct EmailAndPhoneView: View {
                             try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
 
                             shouldNavigateToNextView = true
-                        } catch {                          
+                        } catch {
+                            print("Error: \(error)")
                             shouldNavigateToNextView = false
                         }
                         isLoading = false
@@ -54,9 +55,11 @@ struct EmailAndPhoneView: View {
                     let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
                     try await FootprintProvider.shared.initialize(
                         configKey: "pb_test_QeSAeS8XHohiSpCOj2l4vd",
-                        sandboxId: "gC2hvdsN06Q53",
+//                        sandboxId: "gC2hvdsN06Q53",
                         sandboxOutcome: sandboxOutcome
                        )
+                }catch{
+                    print("Error: \(error)")
                 }
             }
         })
