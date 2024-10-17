@@ -8,6 +8,7 @@ use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::Business;
+use api_core::utils::vault_wrapper::BusinessOwnerInfo;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -23,6 +24,7 @@ use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::BoLinkId;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
@@ -42,10 +44,13 @@ pub async fn patch(
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
+    let is_live = user_auth.scoped_user.is_live;
+    let request = request.into_inner();
 
-    let mut reqs = vec![];
-    for r in request.into_inner() {
-        let req = match r {
+    // Create the FingerprintedDataRequests for each request
+    let mut ops = vec![];
+    for r in request {
+        let op = match r {
             BatchHostedBusinessOwnerRequest::Update(r) => BatchRequest::Update {
                 data: create_bo_fingerprinted_data_req(&state, r.data, &r.id, &user_auth).await?,
                 link_id: r.id,
@@ -60,19 +65,25 @@ pub async fn patch(
                 }
             }
         };
-        reqs.push(req);
+        ops.push(op);
     }
 
+    // Then, validate that this won't create multiple BOs with the same phone / email in prod
+    let bvw = state
+        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sb_id))
+        .await?;
+    let dbos = bvw.decrypt_business_owners(&state).await?;
+    verify_unique_phones_and_emails(dbos, &ops, is_live)?;
 
+    // Handle each request atomically
     let (bvw, link_ids, user_auth) = state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let link_ids = reqs
+            let link_ids = ops
                 .into_iter()
                 .map(|req| req.process(conn, &user_auth))
                 .collect::<FpResult<Vec<_>>>()?;
             // Reload the VW to get the updated BOs
-            let bvw = VaultWrapper::build_for_tenant(conn, &sb_id)?;
+            let bvw = VaultWrapper::build_for_tenant(conn, &bvw.scoped_vault.id)?;
             Ok((bvw, link_ids, user_auth))
         })
         .await?;
@@ -85,6 +96,41 @@ pub async fn patch(
         .map_ok(|bo| api_wire_types::HostedBusinessOwner::from_db((bo, &user_auth)))
         .collect::<Result<_, _>>()?;
     Ok(results)
+}
+
+/// Given the current BOs and the list of operations to apply, make sure that the end state of
+/// applying the operations does not leave any BOs with duplicate phone numbers or emails
+pub(super) fn verify_unique_phones_and_emails(
+    dbos: Vec<BusinessOwnerInfo>,
+    ops: &[BatchRequest],
+    is_live: bool,
+) -> FpResult<()> {
+    // TODO: I think this would be a little more invasive, but it might be nice to have this uniqueness
+    // checking built into FingerprintedDataRequest - it could fingerprint the existing phone/email of
+    // existing BOs and make sure there's no conflict. But hard for BOs that are already linked to a
+    // user...
+    let mut bo_phones: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.link_id, b.phone_number())).collect();
+    let mut bo_emails: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.link_id, b.email())).collect();
+    for op in ops {
+        let (l_id, data) = match &op {
+            BatchRequest::Update { link_id, data, .. } => (link_id, data),
+            BatchRequest::Create { link_id, data, .. } => (link_id, data),
+        };
+        // Overlay each of the requests on top of the existing BOs to get the final list of phones/emails
+        if let Some(phone) = data.get(&BDK::bo_data(l_id.clone(), IDK::PhoneNumber).into()) {
+            bo_phones.insert(l_id, Some(phone));
+        }
+        if let Some(email) = data.get(&BDK::bo_data(l_id.clone(), IDK::Email).into()) {
+            bo_emails.insert(l_id, Some(email));
+        }
+    }
+    if is_live && !bo_phones.values().all_unique() {
+        return ValidationError("Phone numbers of beneficial owners must be unique").into();
+    }
+    if is_live && !bo_emails.values().all_unique() {
+        return ValidationError("Emails of beneficial owners must be unique").into();
+    }
+    Ok(())
 }
 
 /// Given the RawUserDataRequest, transforms the user-specific DIs to instead be business-owner DIs
@@ -108,7 +154,7 @@ async fn create_bo_fingerprinted_data_req(
     Ok(updates)
 }
 
-pub enum BatchRequest {
+pub(super) enum BatchRequest {
     Update {
         link_id: BoLinkId,
         ownership_stake: Option<u32>,

@@ -32,7 +32,6 @@ pub async fn delete(
     let link_id = link_id.into_inner();
 
     state
-        .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
             let bo = BusinessOwner::get(conn, (&bvw.vault.id, &link_id))?;

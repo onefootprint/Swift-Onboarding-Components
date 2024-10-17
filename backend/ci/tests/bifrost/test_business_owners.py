@@ -1,4 +1,4 @@
-from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
+from tests.bifrost.test_multi_kyc_kyb import MULTI_KYC_KYB_CDOS, extract_bo_token
 from tests.utils import delete, get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.constants import BUSINESS_MODERN_BOS
