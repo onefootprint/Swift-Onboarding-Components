@@ -223,7 +223,11 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
 
             RiskSignal::bulk_add(conn, bo_rs, false, rsg.id)?;
         } else {
-            tracing::error!("Missing KYC reason codes in KYB workflow")
+            // If we are running KYC on BOs, we expect there will be risk signals and we should take a look at
+            // what's going on.
+            if !obc.verification_checks().skip_kyc() {
+                tracing::error!("Missing KYC reason codes in KYB workflow")
+            }
         }
 
 
