@@ -368,7 +368,8 @@ jobs:
         with:
           filters: |
             src:
-              - 'backend/**/vault_dr.*'
+              - 'backend/**/vault_dr*'
+              - 'backend/**/*vault_dr'
               - 'backend/**/*vault_dr*'
               - 'backend/**/vault_dr/**'
               - 'backend/**/footprint-dr/**'
