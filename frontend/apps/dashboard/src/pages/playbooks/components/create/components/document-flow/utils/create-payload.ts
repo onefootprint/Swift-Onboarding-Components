@@ -1,5 +1,5 @@
 import { OnboardingConfigKind, type OrgOnboardingConfigCreateRequest } from '@onefootprint/types';
-import { createAdditionalDocsPayload, createGovDocsPayload } from '../../../utils/create-payload';
+import { createAdditionalDocsPayload } from '../../../utils/create-payload';
 import type { NameFormData } from '../../name-step';
 import type { DocumentsDetailsFormData } from '../components/step-document-details';
 
@@ -18,9 +18,12 @@ const createPayload = (formData: NameFormData & DocumentsDetailsFormData): OrgOn
     kind: OnboardingConfigKind.document,
     canAccessData: createIdDocOnlyMustCollectDataPayload(formData),
     mustCollectData: createIdDocOnlyMustCollectDataPayload(formData),
-    verificationChecks: [],
-    ...createGovDocsPayload(formData.gov),
+    documentTypesAndCountries: {
+      countrySpecific: formData.gov.country,
+      global: formData.gov.global,
+    },
     ...createAdditionalDocsPayload(formData.docs),
+    verificationChecks: [],
   };
 };
 

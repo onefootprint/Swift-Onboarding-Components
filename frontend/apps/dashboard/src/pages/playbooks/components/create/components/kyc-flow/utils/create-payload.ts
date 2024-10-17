@@ -5,11 +5,7 @@ import {
   OnboardingConfigKind,
   type OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
-import {
-  createAdditionalDocsPayload,
-  createGovDocsPayload,
-  createRequiredAuthMethodsPayload,
-} from '../../../utils/create-payload';
+import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
 import type { NameFormData } from '../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
 import type { ResidencyFormData } from '../../residency-step';
@@ -37,8 +33,11 @@ const createPayload = ({
   return {
     name: nameForm.name,
     kind: OnboardingConfigKind.kyc,
+    documentTypesAndCountries: {
+      countrySpecific: detailsForm.gov.country,
+      global: detailsForm.gov.global,
+    },
     cipKind: templateForm.template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
-    ...createGovDocsPayload(detailsForm.gov),
     ...createResidencyPayload(residencyForm),
     ...createMustCollect(detailsForm),
     ...createAdditionalDocsPayload(detailsForm.docs),

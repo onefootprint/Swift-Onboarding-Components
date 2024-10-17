@@ -14,11 +14,7 @@ import type { BoFormData } from '../components/bo-step';
 import type { BusinessFormData } from '../components/business-step';
 import type { VerificationChecksFormData } from '../components/verification-checks-step';
 
-import {
-  createAdditionalDocsPayload,
-  createGovDocsPayload,
-  createRequiredAuthMethodsPayload,
-} from '../../../utils/create-payload';
+import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
 
 type KycFlowFormData = {
   nameForm: NameFormData;
@@ -61,10 +57,13 @@ const createPayload = ({
     allowUsResidents: true,
     allowUsTerritories: false,
     allowInternationalResidents: false,
+    documentTypesAndCountries: {
+      countrySpecific: boForm.gov.country,
+      global: boForm.gov.global,
+    },
     mustCollectData,
     canAccessData: mustCollectData,
     optionalData: personOptionalData,
-    ...createGovDocsPayload(boForm.gov),
     ...createAdditionalDocsPayload(boForm.docs),
     ...createBusinessDocumentsPayload(businessForm),
     ...createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
