@@ -1,11 +1,10 @@
 from tests.bifrost.test_multi_kyc_kyb import MULTI_KYC_KYB_CDOS, extract_bo_token
 from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
-from tests.constants import BUSINESS_MODERN_BOS
+from tests.constants import BUSINESS_SECONDARY_BOS
 
 USER_BO_FIELDS = ["id.first_name", "id.last_name", "id.phone_number", "id.email"]
-PRIMARY_OWNERSHIP_STAKE = BUSINESS_MODERN_BOS["business.primary_owner_stake"]
-SECONDARY_BO_DATA = BUSINESS_MODERN_BOS["business.secondary_beneficial_owners"][0]
+SECONDARY_BO_DATA = BUSINESS_SECONDARY_BOS["business.secondary_beneficial_owners"][0]
 
 
 def _assert_bo_data(bo, decrypted_fields, populated_fields, expected_data):
@@ -29,9 +28,9 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     This will test the flow using the new BO APIs as we develop them
     """
     primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    primary_bifrost.data.pop("business.kyced_beneficial_owners")
-    primary_bifrost.data.update(BUSINESS_MODERN_BOS)
+    primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = primary_bifrost.run()
+    primary_ownership_stake = primary_bifrost.data["business.primary_owner_stake"]
     fp_bid = primary_bo.fp_bid
 
     # Check the new business owners APIs
@@ -40,7 +39,7 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     # First BO is self
     assert primary_bo["has_linked_user"]
     assert primary_bo["is_authed_user"]
-    assert primary_bo["ownership_stake"] == PRIMARY_OWNERSHIP_STAKE
+    assert primary_bo["ownership_stake"] == primary_ownership_stake
     _assert_bo_data(primary_bo, USER_BO_FIELDS, USER_BO_FIELDS, primary_bifrost.data)
 
     # Secondary BO is incomplete, but has all data (from the business vault)
@@ -70,7 +69,7 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     # Can only see primary owner's first name and last name
     assert primary_bo["has_linked_user"]
     assert not primary_bo["is_authed_user"]
-    assert primary_bo["ownership_stake"] == PRIMARY_OWNERSHIP_STAKE
+    assert primary_bo["ownership_stake"] == primary_ownership_stake
     decrypted_fields = ["id.first_name", "id.last_name"]
     _assert_bo_data(primary_bo, decrypted_fields, USER_BO_FIELDS, primary_bifrost.data)
 
@@ -87,8 +86,7 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, fixture_result="use_rules_outcome"
     )
-    bifrost.data.pop("business.kyced_beneficial_owners")
-    bifrost.data.update(BUSINESS_MODERN_BOS)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     bifrost.handle_one_requirement("collect_business_data")
     fp_bid = get("hosted/user/private/token", None, bifrost.auth_token)["fp_bid"]
 
@@ -146,8 +144,7 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
 def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
     # Create a new user and an associated business_owner
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    bifrost.data.pop("business.kyced_beneficial_owners")
-    bifrost.data.update(BUSINESS_MODERN_BOS)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     bifrost.handle_one_requirement("collect_business_data")
 
     body = get("hosted/business/owners", None, bifrost.auth_token)
@@ -167,8 +164,7 @@ def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
 
 def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    bifrost.data.pop("business.kyced_beneficial_owners")
-    bifrost.data.update(BUSINESS_MODERN_BOS)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     bifrost.run()
 
     body = get("hosted/business/owners", None, bifrost.auth_token)
@@ -180,7 +176,7 @@ def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
     )
 
     # Cannot update their data
-    op = dict(op="update", id=link_id, ownership_stake=PRIMARY_OWNERSHIP_STAKE)
+    op = dict(op="update", id=link_id, ownership_stake=50)
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
@@ -201,8 +197,7 @@ def test_cannot_vault_bo_data_directly(kyb_sandbox_ob_config, sandbox_tenant):
     BO data can only be managed via the dedicated BO APIs. Make sure we can't vault it directly here
     """
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    bifrost.data.pop("business.kyced_beneficial_owners")
-    bifrost.data.update(BUSINESS_MODERN_BOS)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
 
     di = "business.beneficial_owners.bo_link_primary.id.first_name"
     data = {di: "Franklin"}

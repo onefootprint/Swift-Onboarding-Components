@@ -1,6 +1,6 @@
 import time
 import pytest
-from tests.constants import BUSINESS_MULTIPLE_BOS, FIXTURE_EMAIL2, FIXTURE_PHONE_NUMBER2
+from tests.constants import BUSINESS_SECONDARY_BOS
 from tests.headers import BusinessOwnerAuth, FpAuth, SandboxId
 from tests.identify_client import IdentifyClient
 from tests.utils import (
@@ -34,21 +34,16 @@ def test_onboard_secondary_bo_live_phone(
     kyb_sandbox_ob_config, twilio, live_phone_number
 ):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    bos = [
+    secondary_bos = [
         {
-            "first_name": "Piip",
-            "last_name": "Penguin",
-            "ownership_stake": 50,
-        },
-        {
-            "first_name": "Franklin",
-            "last_name": "Frog",
-            "email": "sandbox@onefootprint.com",
-            "phone_number": live_phone_number,
+            "id.first_name": "Franklin",
+            "id.last_name": "Frog",
+            "id.email": "sandbox@onefootprint.com",
+            "id.phone_number": live_phone_number,
             "ownership_stake": 30,
         },
     ]
-    bifrost.data["business.kyced_beneficial_owners"] = bos
+    bifrost.data["business.secondary_beneficial_owners"] = secondary_bos
     # We could get rate limited sending the SMS to the secondary BO in POST /hosted/onboarding/process
     primary_bo = try_until_success(lambda: bifrost.run(), 60, retry_interval_s=15)
     assert bifrost.validate_response["user"]["status"] == "pass"
@@ -64,10 +59,10 @@ def test_onboard_secondary_bo_live_phone(
     # the business and the BO that invited them
     business_name = primary_bo.client.data["business.name"]
     (sms_body, secondary_bo_token) = extract_bo_session_sms(
-        twilio, bos[1]["phone_number"], business_name
+        twilio, secondary_bos[0]["id.phone_number"], business_name
     )
-    assert bos[0]["first_name"] in sms_body
-    assert bos[0]["last_name"] in sms_body
+    assert bifrost.data["id.first_name"] in sms_body
+    assert bifrost.data["id.last_name"] in sms_body
     assert primary_bo.client.data["business.name"] in sms_body
 
     bifrost = BifrostClient.new_user(
@@ -80,7 +75,7 @@ def test_onboard_secondary_bo_live_phone(
 
 def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
@@ -95,13 +90,15 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     # Check the business information for the hosted bifrost flow associated with the secondary BO's
     # token
     body = get("hosted/business", None, secondary_bo_token)
-    bos = primary_bo.client.data["business.kyced_beneficial_owners"]
+    secondary_bos = primary_bo.client.data["business.secondary_beneficial_owners"]
     business_name = primary_bo.client.data["business.name"]
     assert body["name"] == business_name
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
-    assert body["invited"]["email"] == bos[1]["email"]
-    assert body["invited"]["phone_number"] == bos[1]["phone_number"].replace(" ", "")
+    assert body["invited"]["email"] == secondary_bos[0]["id.email"]
+    assert body["invited"]["phone_number"] == secondary_bos[0][
+        "id.phone_number"
+    ].replace(" ", "")
 
     # Send the secondary BO through KYC
     bifrost = BifrostClient.new_user(
@@ -190,7 +187,7 @@ def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data):
     )
 
     bifrost = BifrostClient.new_user(obc)
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     bifrost.run()
     assert any(r["kind"] == "collect_document" for r in bifrost.handled_requirements)
 
@@ -217,7 +214,7 @@ def test_kyb_with_sentilink_on_bos(sandbox_tenant, must_collect_data):
     )
 
     bifrost = BifrostClient.new_user(obc)
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     bifrost.run()
 
     secondary_bo_token = extract_bo_token(bifrost)
@@ -256,7 +253,7 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
     # Onboard the primary_bo onto the KYB sandbox config
     sandbox_id = primary_bo_kyc.client.sandbox_id
     bifrost = BifrostClient.inherit_user(kyb_sandbox_ob_config, sandbox_id)
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
         "collect_business_data",
@@ -303,7 +300,7 @@ def test_kyb_fail_kyc(
         fixture_result=primary_bo_result,
         kyb_fixture_result="use_rules_outcome",
     )
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert primary_bo.client.validate_response["user"]["status"] == primary_bo_result
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
@@ -341,7 +338,7 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
         fixture_result="fail",
         kyb_fixture_result="use_rules_outcome",
     )
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert primary_bo.client.validate_response["user"]["status"] == "fail"
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
@@ -353,7 +350,7 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost = BifrostClient.inherit_user(
         kyb_sandbox_ob_config, sandbox_id=bifrost.sandbox_id, fixture_result="pass"
     )
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo2 = bifrost.run()
     assert primary_bo2.client.validate_response["user"]["status"] == "pass"
     assert primary_bo2.fp_bid != primary_bo.fp_bid
@@ -391,7 +388,7 @@ def test_dont_proceed_on_nonterminal(kyb_sandbox_ob_config, sandbox_tenant):
         fixture_result="fail",
         kyb_fixture_result="use_rules_outcome",
     )
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert primary_bo.client.validate_response["user"]["status"] == "fail"
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"

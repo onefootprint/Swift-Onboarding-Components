@@ -1,11 +1,9 @@
 import pytest
-import typing
 from tests.dashboard.utils import latest_audit_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, patch
 from tests.constants import (
     BUSINESS_DATA,
-    BUSINESS_MULTIPLE_BOS,
     CDO_TO_DIS,
 )
 

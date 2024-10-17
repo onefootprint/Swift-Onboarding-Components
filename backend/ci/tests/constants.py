@@ -142,18 +142,11 @@ BUSINESS_DATA = {
     "business.zip": "94117",
     "business.country": "US",
     "business.tin": "121231234",
-    "business.kyced_beneficial_owners": [
-        {
-            "first_name": "Piip",
-            "last_name": "Penguin",
-            "ownership_stake": 50,
-        }
-    ],
+    "business.primary_owner_stake": 50,
 }
 
 # These aren't actual DIs - this are the same keys used to bootstrap beneficial owners
-BUSINESS_MODERN_BOS = {
-    "business.primary_owner_stake": 50,
+BUSINESS_SECONDARY_BOS = {
     "business.secondary_beneficial_owners": [
         {
             "id.first_name": "Franklin",
@@ -165,22 +158,6 @@ BUSINESS_MODERN_BOS = {
         }
     ],
 }
-
-
-BUSINESS_MULTIPLE_BOS = [
-    {
-        "first_name": "Piip",
-        "last_name": "Penguin",
-        "ownership_stake": 50,
-    },
-    {
-        "first_name": "Franklin",
-        "last_name": "Frog",
-        "email": "sandbox@onefootprint.com",
-        "phone_number": FIXTURE_PHONE_NUMBER2,
-        "ownership_stake": 30,
-    },
-]
 
 IP_DATA = {
     "investor_profile.employment_status": "employed",
@@ -245,7 +222,7 @@ CDO_TO_DIS = {
     ],
     "business_phone_number": ["business.phone_number"],
     "business_website": ["business.website"],
-    "business_kyced_beneficial_owners": ["business.kyced_beneficial_owners"],
+    "business_kyced_beneficial_owners": [],  # Managed separately by the BO APIs
     "business_corporation_type": ["business.corporation_type"],
     "investor_profile": [
         "investor_profile.employment_status",

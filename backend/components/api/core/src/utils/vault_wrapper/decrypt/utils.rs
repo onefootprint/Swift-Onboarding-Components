@@ -81,14 +81,10 @@ impl BusinessOwnerInfo {
 
 impl TenantVw<Business> {
     #[tracing::instrument(skip_all)]
-    /// A business owner may be defined either
-    /// - In the vault under the `business.beneficial_owners` or `business.kyced_beneficial_owners`
-    ///   DI (referred to as a "vaulted BO")
-    /// - In the database in the `business_owner` table (referred to as a "linked BO") OR
-    /// - Both
-    /// This ties together any vaulted BO data with any linked BO data.
-    /// NOTE: only vaults created via bifrost may have both vaulted and linked BOs. Vaults created
-    /// via API may have only one or the other
+    /// Every business owner is defined in the `business_owner` database table. A given BO's data
+    /// may be stored either in the business's vault under the `business.beneficial_owners.*` DIs or
+    /// in the underlying linked user's vault under the normal `id.*` DIs. This function decrypts
+    /// all business owner data according to the above rules.
     pub async fn decrypt_business_owners(&self, state: &State) -> FpResult<Vec<BusinessOwnerInfo>> {
         let vid = self.vault().id.clone();
         let tid = self.scoped_vault.tenant_id.clone();

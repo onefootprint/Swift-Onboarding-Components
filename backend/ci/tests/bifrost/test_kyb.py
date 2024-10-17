@@ -7,7 +7,7 @@ from tests.utils import (
     create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
-from tests.constants import BUSINESS_MULTIPLE_BOS, FIXTURE_PHONE_NUMBER
+from tests.constants import BUSINESS_SECONDARY_BOS, FIXTURE_PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")
@@ -61,38 +61,6 @@ def incomplete_bifrost(kyb_sandbox_ob_config, kyb_cdos):
                 "business.state": "CA",
                 "business.zip": "94117",
                 "business.country": "Blerp I am not a country",
-            },
-            400,
-        ),
-        (
-            {"business.kyced_beneficial_owners": []},
-            400,
-        ),
-        (
-            {
-                "business.kyced_beneficial_owners": [
-                    {
-                        "first_name": "Piip",
-                        "last_name": "Penguin",
-                        "email": "e@e.com",
-                        "phone_number": "+14155555555",
-                        "ownership_stake": 50,
-                    }
-                ]
-            },
-            200,
-        ),
-        (
-            {
-                "business.kyced_beneficial_owners": [
-                    {
-                        "first_name": "Piip",
-                        "last_name": "Penguin",
-                        "email": "e@e.com",
-                        "phone_number": "not a phone",
-                        "ownership_stake": 50,
-                    }
-                ]
             },
             400,
         ),
@@ -176,7 +144,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         obc, fixture_result=fixture_result, kyb_fixture_result="pass"
     )
 
-    bifrost.data["business.kyced_beneficial_owners"] = BUSINESS_MULTIPLE_BOS
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
     user = bifrost.run()
 
     # Just because we're not running it in this test
