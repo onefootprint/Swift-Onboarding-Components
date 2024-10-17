@@ -11,6 +11,7 @@ use api_core::decision;
 use api_core::decision::features::sentilink;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -274,7 +275,7 @@ pub async fn get_sentilink_detail(
     let is_live = read_auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
-    let (vreq_id, vw) = state
+    let (vreq_id, vw, rs) = state
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
@@ -284,9 +285,14 @@ pub async fn get_sentilink_detail(
                 VwArgs::Historical(&vreq.scoped_vault_id, vreq.uvw_snapshot_seqno),
             )?;
 
-            Ok((vreq.id, vw))
+            Ok((vreq.id, vw, rs))
         })
         .await?;
+
+    if !matches!(rs.vendor_api.into(), Vendor::Sentilink) {
+        return Err(ValidationError("Risk signal is not from sentilink").into());
+    }
+
 
     let detail = get_synthetic_reason_codes_for_risk_signal(&state, vreq_id, &vw).await?;
 

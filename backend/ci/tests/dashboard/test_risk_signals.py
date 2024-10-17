@@ -148,5 +148,11 @@ def test_synthetic(sandbox_tenant, must_collect_data):
             test_ran = True
         else:
             assert not rs["has_sentilink_detail"]
+            post(
+                f"entities/{user.fp_id}/sentilink/{risk_signal['id']}",
+                None,
+                *sandbox_tenant.db_auths,
+                status_code=400,
+            )
 
     assert test_ran
