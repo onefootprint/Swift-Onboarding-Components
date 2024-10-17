@@ -96,6 +96,7 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
     body = get("hosted/business/owners", None, bifrost.auth_token)
     link_id = body[1]["id"]
     new_secondary_data = {
+        "id": link_id,
         "data": {
             "id.first_name": "Frederick",
             "id.last_name": SECONDARY_BO_DATA["id.last_name"],
@@ -104,16 +105,13 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
         },
         "ownership_stake": 33,
     }
-    body = patch(
-        f"hosted/business/owners/{link_id}", new_secondary_data, bifrost.auth_token
-    )
-    _assert_bo_data(body, USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"])
+    op = dict(op="update", **new_secondary_data)
+    body = patch(f"hosted/business/owners", [op], bifrost.auth_token)
+    _assert_bo_data(body[0], USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"])
 
     # Make sure cannot update the second owner to sum up to more than 100%
-    data = dict(ownership_stake=51)
-    body = patch(
-        f"hosted/business/owners/{link_id}", data, bifrost.auth_token, status_code=400
-    )
+    op = dict(op="update", id=link_id, ownership_stake=51)
+    body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "Ownership stake cannot exceed 100% for all owners of this business"
@@ -152,12 +150,8 @@ def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
 
     # On a totally different user, we shouldn't be able to use the link_id from the other user
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    body = patch(
-        f"hosted/business/owners/{link_id}",
-        SECONDARY_BO_DATA,
-        bifrost.auth_token,
-        status_code=404,
-    )
+    op = dict(op="update", id=link_id, **SECONDARY_BO_DATA)
+    body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=404)
     assert body["message"] == "Data not found"
 
     # And cannot delete the BO that we don't own
@@ -180,12 +174,10 @@ def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
-    data = dict(ownership_stake=PRIMARY_OWNERSHIP_STAKE)
 
     # Cannot update their data
-    body = patch(
-        f"hosted/business/owners/{link_id}", data, bifrost.auth_token, status_code=400
-    )
+    op = dict(op="update", id=link_id, ownership_stake=PRIMARY_OWNERSHIP_STAKE)
+    body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "This business owner is already linked to a user and cannot be updated"

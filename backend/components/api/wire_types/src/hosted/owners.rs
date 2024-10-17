@@ -29,7 +29,19 @@ pub struct CreateHostedBusinessOwnerRequest {
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct UpdateHostedBusinessOwnerRequest {
+    pub id: BoLinkId,
     #[serde(default)]
     pub data: RawUserDataRequest,
     pub ownership_stake: Option<u32>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+#[serde(tag = "op")]
+#[serde(rename_all = "snake_case")]
+#[openapi(
+    example = r#"{"op": "update", "id": "123", "data": {"id.first_name": "John", "id.last_name": "Doe"}, "ownership_stake": 30}"#
+)]
+pub enum BatchHostedBusinessOwnerRequest {
+    Update(UpdateHostedBusinessOwnerRequest),
+    Create(CreateHostedBusinessOwnerRequest),
 }
