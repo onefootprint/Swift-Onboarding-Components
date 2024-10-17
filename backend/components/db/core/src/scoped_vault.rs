@@ -131,6 +131,7 @@ macro_rules! list_query {
         use db_schema::schema::watchlist_check;
         use db_schema::schema::workflow;
         use db_schema::schema::workflow_request;
+        use db_schema::schema::workflow_request_junction;
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
             .filter(scoped_vault::is_live.eq($params.is_live))
@@ -207,8 +208,9 @@ macro_rules! list_query {
         if let Some(has_outstanding_workflow_request) = $params.has_outstanding_workflow_request.as_ref() {
             let q_has_wfr = exists(
                 workflow_request::table
+                    .inner_join(workflow_request_junction::table)
                     .filter(workflow_request::deactivated_at.is_null())
-                    .filter(workflow_request::scoped_vault_id.eq(scoped_vault::id)),
+                    .filter(workflow_request_junction::scoped_vault_id.eq(scoped_vault::id)),
             );
             if *has_outstanding_workflow_request {
                 query = query.filter(q_has_wfr)

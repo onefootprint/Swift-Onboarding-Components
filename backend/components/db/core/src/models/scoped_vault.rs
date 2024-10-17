@@ -13,6 +13,7 @@ use super::workflow::Workflow;
 use super::workflow_request::WorkflowRequest;
 use crate::models::data_lifetime::DataLifetime;
 use crate::models::scoped_vault_tag::ScopedVaultTag;
+use crate::models::workflow_request_junction::WorkflowRequestJunction;
 use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
@@ -428,10 +429,11 @@ impl ScopedVault {
         use db_schema::schema::watchlist_check;
         use db_schema::schema::workflow;
         use db_schema::schema::workflow_request;
+        use db_schema::schema::workflow_request_junction;
         type ScopedVaultInfo = (
             ScopedVault,
             Option<WatchlistCheck>,
-            Option<WorkflowRequest>,
+            Option<(WorkflowRequest, WorkflowRequestJunction)>,
             Option<ScopedVaultLabel>,
         );
         let results: Vec<ScopedVaultInfo> = scoped_vault::table
@@ -442,9 +444,11 @@ impl ScopedVault {
                     .and(not(watchlist_check::completed_at.is_null()))),
             )
             .left_join(
-                workflow_request::table.on(workflow_request::scoped_vault_id
-                    .eq(scoped_vault::id)
-                    .and(workflow_request::deactivated_at.is_null())),
+                workflow_request::table
+                    .inner_join(workflow_request_junction::table)
+                    .on(workflow_request_junction::scoped_vault_id
+                        .eq(scoped_vault::id)
+                        .and(workflow_request::deactivated_at.is_null())),
             )
             .left_join(
                 scoped_vault_label::table.on(scoped_vault_label::scoped_vault_id
@@ -489,7 +493,8 @@ impl ScopedVault {
                 let manual_reviews = manual_reviews.remove(&sv_id).unwrap_or_default();
                 let workflows = workflows.remove(&sv_id).unwrap_or_default();
                 let tags = tags.remove(&sv_id).unwrap_or_default();
-                let entity = (i.0, i.1, i.2, i.3, manual_reviews, workflows, tags);
+                let wfr = i.2.map(|(wfr, _)| wfr);
+                let entity = (i.0, i.1, wfr, i.3, manual_reviews, workflows, tags);
                 (sv_id, entity)
             })
             .collect();

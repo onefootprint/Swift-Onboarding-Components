@@ -37,4 +37,12 @@ impl WorkflowRequestJunction {
             .get_result::<Self>(conn)?;
         Ok(result)
     }
+
+    pub fn get(conn: &mut PgConn, wfr_id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> DbResult<Self> {
+        let result = workflow_request_junction::table
+            .filter(workflow_request_junction::workflow_request_id.eq(wfr_id))
+            .filter(workflow_request_junction::scoped_vault_id.eq(sv_id))
+            .get_result::<Self>(conn)?;
+        Ok(result)
+    }
 }

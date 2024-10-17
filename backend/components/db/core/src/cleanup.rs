@@ -59,6 +59,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use db_schema::schema::workflow;
     use db_schema::schema::workflow_event;
     use db_schema::schema::workflow_request;
+    use db_schema::schema::workflow_request_junction;
     let mut deleted_rows = 0;
 
     // First, get any business vaults related to this user and delete them.
@@ -238,9 +239,20 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
-        deleted_rows += diesel::delete(workflow_request::table)
-            .filter(workflow_request::scoped_vault_id.eq_any(su_ids.clone()))
-            .execute(conn.conn())?;
+        // WFR junction
+        {
+            let wfr_ids = workflow_request_junction::table
+                .filter(workflow_request_junction::scoped_vault_id.eq_any(su_ids.clone()))
+                .select(workflow_request_junction::workflow_request_id);
+
+            deleted_rows += diesel::delete(workflow_request::table)
+                .filter(workflow_request::id.eq_any(wfr_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(workflow_request_junction::table)
+                .filter(workflow_request_junction::scoped_vault_id.eq_any(su_ids.clone()))
+                .execute(conn.conn())?;
+        }
 
         // Rule results
         {

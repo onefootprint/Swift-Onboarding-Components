@@ -22,6 +22,7 @@ use db::models::vault::Vault;
 use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
+use db::models::workflow_request_junction::WorkflowRequestJunction;
 use db::OffsetPagination;
 use db::TxnPgConn;
 use itertools::chain;
@@ -95,9 +96,13 @@ pub fn get_or_create_user_workflow(
         is_neuro_enabled,
     } = user_args;
 
-    if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
+    let wfr_junction = wfr
+        .as_ref()
+        .map(|wfr| WorkflowRequestJunction::get(conn, &wfr.id, &su.id))
+        .transpose()?;
+    if let Some(wf_id) = wfr_junction.and_then(|wfr| wfr.workflow_id) {
         // This request has already been used to make a Workflow. Return that workflow.
-        return Ok((wf_id.clone(), false));
+        return Ok((wf_id, false));
     }
     if let Some(wf_id) = existing_wf_id {
         // The auth token already has a workflow_id in it, no need to make a new one
@@ -146,10 +151,8 @@ pub fn get_or_create_user_workflow(
     }
 
     if let Some(wfr) = wfr {
-        if wfr.workflow_id.is_none() {
-            // If we're responding to a WorkflowRequest, save that we've created a WF for the request
-            WorkflowRequest::set_wf_id(conn, &wfr.id, &wf)?;
-        }
+        // If we're responding to a WorkflowRequest, save that we've created a WF for the request
+        WorkflowRequest::set_wf_id(conn, &wfr.id, &wf)?;
     }
 
     if is_new_wf {

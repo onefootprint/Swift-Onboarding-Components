@@ -9,6 +9,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::workflow_request;
 use db_schema::schema::workflow_request_junction;
+use diesel::dsl::exists;
 use diesel::prelude::*;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
@@ -27,11 +28,13 @@ pub struct WorkflowRequest {
     pub _updated_at: DateTime<Utc>,
     pub timestamp: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
-    pub scoped_vault_id: ScopedVaultId,
+    #[allow(unused)]
+    scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub created_by: DbActor,
     /// The workflow_id created for this WorkflowRequest
-    pub workflow_id: Option<WorkflowId>,
+    #[allow(unused)]
+    workflow_id: Option<WorkflowId>,
     /// Information on what kind of Workflow to create from this request
     pub config: WorkflowRequestConfig,
     /// The note sent to the user via SMS when the trigger is created
@@ -61,8 +64,10 @@ impl WorkflowRequest {
     #[tracing::instrument("WorkflowRequest::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> DbResult<Self> {
         let result = workflow_request::table
+            .inner_join(workflow_request_junction::table)
             .filter(workflow_request::id.eq(id))
-            .filter(workflow_request::scoped_vault_id.eq(sv_id))
+            .filter(workflow_request_junction::scoped_vault_id.eq(sv_id))
+            .select(workflow_request::all_columns)
             .get_result(conn)?;
         Ok(result)
     }
@@ -70,8 +75,10 @@ impl WorkflowRequest {
     #[tracing::instrument("WorkflowRequest::get", skip_all)]
     pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let result = workflow_request::table
-            .filter(workflow_request::scoped_vault_id.eq(sv_id))
+            .inner_join(workflow_request_junction::table)
+            .filter(workflow_request_junction::scoped_vault_id.eq(sv_id))
             .filter(workflow_request::deactivated_at.is_null())
+            .select(workflow_request::all_columns)
             .get_result(conn)
             .optional()?;
         Ok(result)
@@ -137,6 +144,7 @@ impl WorkflowRequest {
         diesel::update(workflow_request_junction::table)
             .filter(workflow_request_junction::workflow_request_id.eq(id))
             .filter(workflow_request_junction::scoped_vault_id.eq(&wf.scoped_vault_id))
+            .filter(workflow_request_junction::workflow_id.is_null())
             .set(workflow_request_junction::workflow_id.eq(&wf.id))
             .execute(conn.conn())?;
         Ok(())
@@ -149,7 +157,11 @@ impl WorkflowRequest {
         obc_id: Option<&ObConfigurationId>,
     ) -> DbResult<()> {
         let mut query = diesel::update(workflow_request::table)
-            .filter(workflow_request::scoped_vault_id.eq(sv_id))
+            .filter(exists(
+                workflow_request_junction::table
+                    .filter(workflow_request_junction::scoped_vault_id.eq(sv_id))
+                    .filter(workflow_request_junction::workflow_request_id.eq(workflow_request::id)),
+            ))
             .filter(workflow_request::deactivated_at.is_null())
             .into_boxed();
         if let Some(obc_id) = obc_id {
