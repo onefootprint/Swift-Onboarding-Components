@@ -1,6 +1,6 @@
 import time
 import pytest
-from tests.constants import BUSINESS_SECONDARY_BOS
+from tests.constants import BUSINESS_SECONDARY_BOS, FIXTURE_PHONE_NUMBER2
 from tests.headers import BusinessOwnerAuth, FpAuth, SandboxId
 from tests.identify_client import IdentifyClient
 from tests.utils import (
