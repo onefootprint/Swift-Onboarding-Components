@@ -1,11 +1,11 @@
 import { IcoPinMarker24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
-import { Box, Dialog, Stack, Text } from '@onefootprint/ui';
-import { useEffect, useRef } from 'react';
+import { Box, Dialog, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import GoogleMapsLoader from 'src/components/entities/utils/google-maps-loader';
 import styled from 'styled-components';
 import useInitializeStreetView from './utils/use-initialize-street-view';
+import useStreetViewPanorama from './utils/use-street-view-panorama';
 
 type StreetViewDialogProps = {
   onClose: () => void;
@@ -27,28 +27,27 @@ const StreetViewDialog = ({ onClose, open, addressValues }: StreetViewDialogProp
 
   const address = `${addressLine1}${addressLine2 ? ` ${addressLine2}` : ''} ${city} ${state} ${zip}`;
 
-  const { isSuccess, data: coordinates } = useInitializeStreetView(address);
-
-  const displayStreetView = async ({ coordinates }: { coordinates: { latitude: number; longitude: number } }) => {
-    await GoogleMapsLoader.importLibrary('core');
-    new google.maps.StreetViewPanorama(streetViewRef.current as HTMLElement, {
-      position: { lat: coordinates.latitude, lng: coordinates.longitude },
-      pov: { heading: 165, pitch: 0 },
-      zoom: 1,
-      disableDefaultUI: true,
-    });
-  };
-
-  useEffect(() => {
-    if (isSuccess && streetViewRef.current) {
-      displayStreetView({ coordinates });
-    }
-  }, [isSuccess, coordinates, addressValues]);
+  const { isSuccess, data: coordinates } = useInitializeStreetView(address, { enabled: open });
+  const { isFetching } = useStreetViewPanorama(coordinates, streetViewRef, open);
 
   return (
     <Dialog open={open} onClose={onClose} title={t('title')} size="full-screen" noPadding>
+      {isFetching && (
+        <Stack
+          position="absolute"
+          top={0}
+          left="50%"
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+          zIndex={1000}
+        >
+          <LoadingSpinner />
+        </Stack>
+      )}
       <Box position="relative" height="100%">
-        <StreetViewContainer ref={streetViewRef} />
+        <StreetViewContainer ref={streetViewRef} isFetching={isFetching} />
         {isSuccess && (
           <Stack
             position="absolute"
@@ -80,8 +79,9 @@ const StreetViewDialog = ({ onClose, open, addressValues }: StreetViewDialogProp
   );
 };
 
-const StreetViewContainer = styled.div`
-  ${({ theme }) => `
+const StreetViewContainer = styled.div<{ isFetching: boolean }>`
+  ${({ theme, isFetching }) => `
+    display: ${isFetching ? 'none' : 'block'};
     overflow: hidden;
     width: calc(100vw - ${theme.spacing[7]} * 2);
     height: calc(100vh - 44px - ${theme.spacing[7]} * 2);
