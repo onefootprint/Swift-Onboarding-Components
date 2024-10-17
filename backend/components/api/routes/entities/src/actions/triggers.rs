@@ -147,10 +147,10 @@ pub(super) fn apply_trigger_request(
     }
 
     let wfr_args = NewWorkflowRequestArgs {
-        scoped_vault_id: sv.id.clone(),
-        ob_configuration_id: obc.id.clone(),
-        created_by: actor.clone(),
-        config: trigger,
+        scoped_vault_id: &sv.id,
+        ob_configuration_id: &obc.id,
+        created_by: &actor,
+        config: &trigger,
         note,
     };
 

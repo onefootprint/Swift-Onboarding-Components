@@ -1,3 +1,6 @@
+use super::workflow::Workflow;
+use super::workflow_request_junction::NewWorkflowRequestJunctionRow;
+use super::workflow_request_junction::WorkflowRequestJunction;
 use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
@@ -5,10 +8,12 @@ use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::workflow_request;
+use db_schema::schema::workflow_request_junction;
 use diesel::prelude::*;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
+use newtypes::VaultKind;
 use newtypes::WorkflowId;
 use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowRequestId;
@@ -35,20 +40,20 @@ pub struct WorkflowRequest {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = workflow_request)]
-struct NewWorkflowRequestRow {
-    ob_configuration_id: ObConfigurationId,
-    scoped_vault_id: ScopedVaultId,
+struct NewWorkflowRequestRow<'a> {
+    ob_configuration_id: &'a ObConfigurationId,
+    scoped_vault_id: &'a ScopedVaultId,
     timestamp: DateTime<Utc>,
-    created_by: DbActor,
-    config: WorkflowRequestConfig,
+    created_by: &'a DbActor,
+    config: &'a WorkflowRequestConfig,
     note: Option<String>,
 }
 
-pub struct NewWorkflowRequestArgs {
-    pub ob_configuration_id: ObConfigurationId,
-    pub scoped_vault_id: ScopedVaultId,
-    pub created_by: DbActor,
-    pub config: WorkflowRequestConfig,
+pub struct NewWorkflowRequestArgs<'a> {
+    pub ob_configuration_id: &'a ObConfigurationId,
+    pub scoped_vault_id: &'a ScopedVaultId,
+    pub created_by: &'a DbActor,
+    pub config: &'a WorkflowRequestConfig,
     pub note: Option<String>,
 }
 
@@ -97,7 +102,7 @@ impl WorkflowRequest {
             note,
         } = args;
         // Deactivate old WorkflowRequests when making a new one
-        Self::deactivate(conn, &scoped_vault_id, None)?;
+        Self::deactivate(conn, scoped_vault_id, None)?;
         let new_row = NewWorkflowRequestRow {
             scoped_vault_id,
             ob_configuration_id,
@@ -108,20 +113,32 @@ impl WorkflowRequest {
         };
         let result = diesel::insert_into(workflow_request::table)
             .values(new_row)
-            .get_result(conn.conn())?;
+            .get_result::<Self>(conn.conn())?;
+        let workflow_request_junction = NewWorkflowRequestJunctionRow {
+            workflow_request_id: &result.id,
+            scoped_vault_id,
+            // TODO eventually create business junctions here
+            kind: VaultKind::Person,
+        };
+        WorkflowRequestJunction::create(conn, workflow_request_junction)?;
         Ok(result)
     }
 
     #[tracing::instrument("WorkflowRequest::set_wf_id", skip_all)]
-    pub fn set_wf_id(conn: &mut TxnPgConn, id: &WorkflowRequestId, wf_id: &WorkflowId) -> DbResult<()> {
+    pub fn set_wf_id(conn: &mut TxnPgConn, id: &WorkflowRequestId, wf: &Workflow) -> DbResult<()> {
         let results = diesel::update(workflow_request::table)
             .filter(workflow_request::id.eq(id))
             .filter(workflow_request::workflow_id.is_null())
-            .set(workflow_request::workflow_id.eq(wf_id))
+            .set(workflow_request::workflow_id.eq(&wf.id))
             .get_results::<Self>(conn.conn())?;
         if results.is_empty() {
             return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
+        diesel::update(workflow_request_junction::table)
+            .filter(workflow_request_junction::workflow_request_id.eq(id))
+            .filter(workflow_request_junction::scoped_vault_id.eq(&wf.scoped_vault_id))
+            .set(workflow_request_junction::workflow_id.eq(&wf.id))
+            .execute(conn.conn())?;
         Ok(())
     }
 

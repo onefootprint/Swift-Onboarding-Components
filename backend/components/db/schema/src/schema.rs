@@ -1828,6 +1828,20 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    workflow_request_junction (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        kind -> Text,
+        workflow_request_id -> Text,
+        scoped_vault_id -> Text,
+        workflow_id -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     zip_code (code) {
         code -> Text,
         city -> Text,
@@ -2021,6 +2035,8 @@ diesel::joinable!(workflow_event -> workflow (workflow_id));
 diesel::joinable!(workflow_request -> ob_configuration (ob_configuration_id));
 diesel::joinable!(workflow_request -> scoped_vault (scoped_vault_id));
 diesel::joinable!(workflow_request -> workflow (workflow_id));
+diesel::joinable!(workflow_request_junction -> scoped_vault (scoped_vault_id));
+diesel::joinable!(workflow_request_junction -> workflow_request (workflow_request_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     access_event,
@@ -2125,5 +2141,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     workflow,
     workflow_event,
     workflow_request,
+    workflow_request_junction,
     zip_code,
 );

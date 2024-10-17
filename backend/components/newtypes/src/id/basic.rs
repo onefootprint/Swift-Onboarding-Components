@@ -113,6 +113,11 @@ define_newtype_id!(DataLifetimeId, String, "Identifier for a data lifetime");
 define_newtype_id!(VdId, String, "Identifier for a UserVaultData");
 define_newtype_id!(WorkflowRequestId, String, "Identifier for a WorkflowRequest");
 define_newtype_id!(
+    WorkflowRequestJunctionId,
+    String,
+    "Identifier for a WorkflowRequestJunction"
+);
+define_newtype_id!(
     FingerprintVisitorId,
     String,
     "Identifier for a Fingerprint VisitorId"

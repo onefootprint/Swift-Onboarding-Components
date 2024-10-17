@@ -88,4 +88,5 @@ pub mod waterfall_step;
 pub mod workflow;
 pub mod workflow_event;
 pub mod workflow_request;
+pub mod workflow_request_junction;
 pub mod zip_code;

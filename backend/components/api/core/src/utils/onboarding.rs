@@ -148,7 +148,7 @@ pub fn get_or_create_user_workflow(
     if let Some(wfr) = wfr {
         if wfr.workflow_id.is_none() {
             // If we're responding to a WorkflowRequest, save that we've created a WF for the request
-            WorkflowRequest::set_wf_id(conn, &wfr.id, &wf.id)?;
+            WorkflowRequest::set_wf_id(conn, &wfr.id, &wf)?;
         }
     }
 
