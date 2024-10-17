@@ -7,7 +7,7 @@ import type { Fieldset } from '../../../../vault.types';
 import CorporationType from './components/corporation-type';
 
 const useFieldsets = (): Fieldset => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.business.vault' });
+  const { t } = useTranslation('business-details', { keyPrefix: 'vault' });
   return {
     basic: {
       title: t('basic.title'),

@@ -103,9 +103,7 @@ type FieldProps =
     };
 
 const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.business.vault.basic',
-  });
+  const { t } = useTranslation('business-details', { keyPrefix: 'vault.basic' });
   const { t: entityT } = useTranslation('entity-details', {
     keyPrefix: 'header-default.actions.edit-vault-drawer.fieldsets',
   });

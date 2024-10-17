@@ -40,7 +40,7 @@ const Vault = ({ entity }: VaultProps) => {
     <>
       <DecryptForm onSubmit={handleBeforeDecryptSubmit}>
         <VaultActions entity={entity} />
-        {context.kind === EntityKind.person ? <PersonVault /> : <BusinessVault />}
+        {context.kind === EntityKind.person ? <PersonVault entity={entity} /> : <BusinessVault entity={entity} />}
       </DecryptForm>
     </>
   );

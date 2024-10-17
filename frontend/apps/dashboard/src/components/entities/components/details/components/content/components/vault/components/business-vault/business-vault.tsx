@@ -1,10 +1,9 @@
-import { Grid } from '@onefootprint/ui';
-import styled from 'styled-components';
-
 import useBusinessOwners from '@/entity/hooks/use-business-owners';
 import { IcoBuilding16 } from '@onefootprint/icons';
 import { type Entity, hasEntityCustomData } from '@onefootprint/types';
+import { Grid } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
@@ -21,7 +20,7 @@ type BusinessVaultProps = {
 // https://github.com/onefootprint/monorepo/blob/f4357b95e964248abc155a6b243dec080dbf4d4b/backend/components/newtypes/src/reason_code/signal_attribute.rs
 // https://linear.app/footprint/issue/FP-3412/risk-signals-add-real-risk-signal-attributes
 const BusinessVault = ({ entity }: BusinessVaultProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.business.vault' });
+  const { t } = useTranslation('business-details', { keyPrefix: 'vault' });
   const { basic, address, custom } = useFieldsets();
   const { data: boData } = useBusinessOwners(entity.id);
   const hasBos = !!boData?.length;

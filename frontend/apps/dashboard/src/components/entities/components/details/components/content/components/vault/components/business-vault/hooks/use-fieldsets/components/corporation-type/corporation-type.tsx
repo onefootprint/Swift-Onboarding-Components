@@ -1,7 +1,6 @@
-import type { DataIdentifier, Entity } from '@onefootprint/types';
+import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import { BusinessDI, isVaultDataDecrypted } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { EncryptedCell } from 'src/components';
 
@@ -13,9 +12,24 @@ export type CorporationTypeType = {
 };
 
 const CorporationType = ({ di, entity }: CorporationTypeType) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.business.vault.basic.corporation-type',
+  const { t } = useTranslation('business-details', {
+    keyPrefix: 'vault.basic.corporation-type',
   });
+
+  const getCorporationTypeText = (value: VaultValue) => {
+    if (value === 'agent') return t('agent');
+    if (value === 'c_corporation') return t('c_corporation');
+    if (value === 's_corporation') return t('s_corporation');
+    if (value === 'b_corporation') return t('b_corporation');
+    if (value === 'llc') return t('llc');
+    if (value === 'llp') return t('llp');
+    if (value === 'non_profit') return t('non_profit');
+    if (value === 'partnership') return t('partnership');
+    if (value === 'sole_proprietorship') return t('sole_proprietorship');
+    if (value === 'trust') return t('trust');
+    return t('unknown');
+  };
+
   return entity.attributes.includes(BusinessDI.corporationType) ? (
     <Field
       di={di}
@@ -24,7 +38,7 @@ const CorporationType = ({ di, entity }: CorporationTypeType) => {
         if (isVaultDataDecrypted(value)) {
           return (
             <Text variant="body-3" color="primary">
-              {t(`${value}` as ParseKeys<'common'>)}
+              {getCorporationTypeText(value)}
             </Text>
           );
         }

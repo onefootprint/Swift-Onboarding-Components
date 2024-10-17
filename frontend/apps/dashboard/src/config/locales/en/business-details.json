@@ -13,6 +13,43 @@
       "request-info": "Request more information"
     }
   },
+  "vault": {
+    "basic": {
+      "select-corporation-type": "Select corporation type",
+      "title": "Basic data",
+      "corporation-type": {
+        "agent": "Agent",
+        "c_corporation": "C Corporation",
+        "s_corporation": "S Corporation",
+        "b_corporation": "B Corporation",
+        "llc": "LLC",
+        "llp": "LLP",
+        "non_profit": "Non-profit",
+        "partnership": "Partnership",
+        "sole_proprietorship": "Sole proprietorship",
+        "trust": "Trust",
+        "unknown": "Unknown"
+      }
+    },
+    "bos": {
+      "title": "Beneficial owners",
+      "link": "View profile",
+      "status": {
+        "awaiting-kyc": "Awaiting KYC"
+      },
+      "hint": {
+        "primary-with-stake": "Owns {{stake}}%  of the business & submitted the business information",
+        "primary-no-stake": "Submitted the business information",
+        "generic-stake": "Owns {{stake}}% of the business"
+      }
+    },
+    "address": {
+      "title": "Registered business address"
+    },
+    "custom": {
+      "title": "Custom business data"
+    }
+  },
   "request-more-info": {
     "title": "Request more information",
     "form": {

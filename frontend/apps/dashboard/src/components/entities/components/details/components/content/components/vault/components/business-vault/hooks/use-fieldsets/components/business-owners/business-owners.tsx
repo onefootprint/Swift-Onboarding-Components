@@ -1,7 +1,6 @@
-import type { Entity } from '@onefootprint/types';
-import { ErrorComponent } from 'src/components';
-
 import useBusinessOwners from '@/entity/hooks/use-business-owners';
+import type { Entity } from '@onefootprint/types';
+import ErrorComponent from 'src/components/error';
 import Content from './components/content';
 import Loading from './components/loading';
 
