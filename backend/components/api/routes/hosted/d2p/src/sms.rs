@@ -42,7 +42,7 @@ pub async fn handler(
     state: web::Data<State>,
 ) -> ApiResponse<D2pSmsResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
-    let t_id = user_auth.tenant().map(|t| t.id.clone());
+    let t_id = user_auth.tenant.as_ref().map(|t| t.id.clone());
 
     let (uvw, ci) = state
         .db_query(move |conn| -> FpResult<_> {

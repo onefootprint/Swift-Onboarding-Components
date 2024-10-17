@@ -1,4 +1,3 @@
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::types::ApiResponse;
@@ -49,19 +48,8 @@ pub async fn post(
 
         let db_res = state
             .db_transaction(move |conn| -> FpResult<_> {
-                let user_vault_id = user_auth.user_vault_id().clone();
-                let scoped_user_id = user_auth.scoped_user_id();
-
-                FingerprintVisitEvent::create(
-                    conn,
-                    visitor_id.clone().into(),
-                    request_id.into(),
-                    Some(user_vault_id.clone()),
-                    scoped_user_id.clone(),
-                    path,
-                    telemetry_headers.session_id.clone(),
-                    resp,
-                )?;
+                let uv_id = user_auth.user.id.clone();
+                let su_id = user_auth.su_id.clone();
 
                 // associate session_id with visitor_id and other identifiers in logs so we can see things in
                 // observe
@@ -70,10 +58,21 @@ pub async fn post(
                     // which is reserved for Datadog RUM.
                     fp_session_id=%format!("{:?}", telemetry_headers.session_id),
                     visitor_id=%visitor_id,
-                    user_vault_id=%user_vault_id,
-                    scoped_user_id=%format!("{:?}", scoped_user_id),
+                    user_vault_id=%uv_id,
+                    scoped_user_id=%format!("{:?}", su_id),
                     "fingerprint visit"
                 );
+
+                FingerprintVisitEvent::create(
+                    conn,
+                    visitor_id.clone().into(),
+                    request_id.into(),
+                    Some(uv_id),
+                    su_id,
+                    path,
+                    telemetry_headers.session_id.clone(),
+                    resp,
+                )?;
 
                 Ok(())
             })

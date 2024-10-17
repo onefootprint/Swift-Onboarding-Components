@@ -25,15 +25,15 @@ pub struct PrivateUserInfo {
 #[actix::get("/hosted/user/private/token")]
 pub async fn get(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiResponse<PrivateUserInfo> {
     let user_auth = user_auth.into_inner();
-    let sb_id = user_auth.data.scoped_business_id();
+    let sb_id = user_auth.data.sb_id.clone();
     let sb = state
         .db_query(move |conn| sb_id.map(|sb_id| ScopedVault::get(conn, &sb_id)).transpose())
         .await?;
 
     let result = PrivateUserInfo {
-        fp_id: user_auth.scoped_user().map(|sv| sv.fp_id.clone()),
+        fp_id: user_auth.scoped_user.as_ref().map(|sv| sv.fp_id.clone()),
         fp_bid: sb.map(|sb| sb.fp_id),
-        vault_id: user_auth.user_vault_id.clone(),
+        vault_id: user_auth.user.id.clone(),
     };
     Ok(result)
 }

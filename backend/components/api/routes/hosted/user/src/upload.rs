@@ -49,7 +49,7 @@ pub async fn post(
     let di = kind.into();
     let su_id = &user_auth.scoped_user.id;
     let (e_data_key, s3_url) =
-        utils::vault_wrapper::seal_file_and_upload_to_s3(&state, &file, &di, user_auth.user(), su_id).await?;
+        utils::vault_wrapper::seal_file_and_upload_to_s3(&state, &file, &di, &user_auth.user, su_id).await?;
 
     state
         .db_transaction(move |conn| -> FpResult<_> {

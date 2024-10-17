@@ -30,7 +30,7 @@ pub struct BoToken {
 #[actix::post("/hosted/user/private/bo_links")]
 pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiListResponse<BoToken> {
     let user_auth = user_auth.into_inner();
-    let biz_wf_id = (user_auth.data.business_workflow_id())
+    let biz_wf_id = (user_auth.data.biz_wf_id.clone())
         .ok_or(ValidationError("No business associated with the session"))?;
     let (biz_wf, bvw) = state
         .db_query(move |conn| -> FpResult<_> {

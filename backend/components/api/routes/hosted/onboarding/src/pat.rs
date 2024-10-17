@@ -1,7 +1,6 @@
 //! Private Access Tokens -- alternative to captcha for iOS 16 + macOS 13 devices
 //! https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-02.html
 
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::utils::headers::InsightHeaders;
 use crate::ApiResponse;
@@ -75,9 +74,8 @@ async fn authorize_privacy_pass(
     insight: InsightHeaders,
 ) -> ApiResponse<HttpResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let scoped_user_id = user_auth
-        .scoped_user_id()
-        .ok_or(AssertionError("User not initialized for privacy pass"))?;
+    let scoped_user_id =
+        (user_auth.su_id.clone()).ok_or(AssertionError("User not initialized for privacy pass"))?;
     let nonce = user_auth.auth_token.hash_bytes();
 
     let challenge = privacy_pass::TokenChallenge::new(state.config.rp_id.clone(), nonce);
@@ -107,7 +105,7 @@ async fn authorize_privacy_pass(
             let info = LivenessInfo {
                 id: liveness_event.id,
             };
-            UserTimeline::create(conn, info, user_auth.user_vault_id().clone(), scoped_user_id)?;
+            UserTimeline::create(conn, info, user_auth.user.id.clone(), scoped_user_id)?;
 
             Ok(())
         })

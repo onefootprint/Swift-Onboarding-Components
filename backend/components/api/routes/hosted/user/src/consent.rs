@@ -27,7 +27,7 @@ pub async fn post(
     request: Json<ConsentRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let wf_id = user_auth.workflow().clone();
+    let wf_id = user_auth.workflow.clone();
 
     let ConsentRequest {
         consent_language_text,

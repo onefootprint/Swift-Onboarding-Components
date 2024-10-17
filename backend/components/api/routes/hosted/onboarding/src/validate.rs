@@ -45,22 +45,18 @@ pub async fn post(
             return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
         }
 
-        let wf = user_wf_auth.workflow().clone();
+        let wf = user_wf_auth.workflow.clone();
         (Some(wf), user_wf_auth.data.user_session)
     } else {
         // We're generating a token after auth has finished
         let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
-        let obc = user_auth
-            .ob_config()
-            .ok_or(ValidationError("No playbook associated with session"))?
-            .clone();
-        let sv_id = user_auth
-            .scoped_user_id()
-            .ok_or(ValidationError("No scoped user associated with session"))?;
+        let obc = (user_auth.obc.clone()).ok_or(ValidationError("No playbook associated with session"))?;
+        let su_id =
+            (user_auth.su_id.clone()).ok_or(ValidationError("No scoped user associated with session"))?;
         let auth_events = user_auth.auth_events.clone();
         let reqs = state
             .db_query(move |conn| -> FpResult<_> {
-                let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id)?;
+                let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
                 let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &auth_events)?;
                 Ok(reqs)
             })

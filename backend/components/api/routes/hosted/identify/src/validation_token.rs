@@ -24,7 +24,7 @@ pub async fn post(
 ) -> ApiResponse<HostedValidateResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
 
-    if let Some(obc) = user_auth.ob_config() {
+    if let Some(obc) = user_auth.obc.as_ref() {
         if obc.kind == ObConfigurationKind::Auth {
             // The auth component doesn't need to fetch an identify validation token - it should
             // just fetch the normal validation token from /hosted/onboarding/validate

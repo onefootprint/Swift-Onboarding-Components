@@ -4,7 +4,6 @@ use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::user::CheckedUserAuthContext;
-use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
@@ -60,8 +59,7 @@ pub async fn post(
 ) -> ApiResponse<api_wire_types::UserChallengeVerifyResponse> {
     let user_auth = user_auth
         .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
-    let sv_id = user_auth
-        .scoped_user_id()
+    let sv_id = (user_auth.su_id.clone())
         .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
     let UserChallengeVerifyRequest {
         challenge_token,
@@ -116,7 +114,7 @@ pub async fn post(
                 .first()
                 .ok_or(AssertionError("No auth events found for user"))?;
             let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
-            let vault_id = user_auth.user_vault_id().clone();
+            let vault_id = user_auth.user.id.clone();
             let args = NewAuthEventArgs {
                 vault_id: vault_id.clone(),
                 scoped_vault_id: Some(sv_id.clone()),
@@ -182,7 +180,7 @@ impl Action {
         // this in identify/verify.
         // Then, send an email to the user's last verified CI any time their login methods change
         let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, sv_id)?;
-        let vault_id = user_auth.user_vault_id();
+        let vault_id = &user_auth.user.id;
         let (event_kind, passkey_cred_id) = match self {
             Self::ReplaceContactInfo { kind, data } => {
                 match action_kind {

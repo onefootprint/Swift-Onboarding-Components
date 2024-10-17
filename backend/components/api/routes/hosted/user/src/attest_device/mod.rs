@@ -117,7 +117,7 @@ pub async fn post_attestation(
         Android(NewGoogleDeviceAttestation),
     }
 
-    let t = auth.tenant();
+    let t = &auth.tenant;
     let sv = &auth.scoped_user;
     let new_attestation = match device_type {
         DeviceAttestationType::Ios => ios::attest(&state, t, sv, challenge, attestation, ios_bundle_id)
@@ -131,10 +131,10 @@ pub async fn post_attestation(
     };
 
     let sv_id = auth.scoped_user.id.clone();
-    let wf_id = auth.workflow().id.clone();
-    let vault_key = auth.user().public_key.clone();
-    let is_live = auth.user().is_live;
-    let v_id = auth.user().id.clone();
+    let wf_id = auth.workflow.id.clone();
+    let vault_key = auth.user.public_key.clone();
+    let is_live = auth.user.is_live;
+    let v_id = auth.user.id.clone();
     state
         .db_transaction(move |conn| -> FpResult<()> {
             let attestation = match new_attestation {

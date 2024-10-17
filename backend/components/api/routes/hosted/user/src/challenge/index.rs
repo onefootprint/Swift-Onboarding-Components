@@ -75,7 +75,7 @@ pub async fn post(
         return ValidationError(&format!("Token cannot initiate challenge of kind {}", kind)).into();
     }
 
-    let tenant = user_auth.tenant();
+    let tenant = user_auth.tenant.as_ref();
     let uv = user_auth.user.clone();
 
     let (rx, data, time_before_retry_s, biometric_challenge_json) = match kind {

@@ -72,9 +72,9 @@ pub async fn post(
     }
 
     // Update the fixture result on the workflow, if provided
-    let wf = user_auth.workflow();
+    let wf = &user_auth.workflow;
     let wf = if let Some(fixture_result) = fixture_result {
-        if user_auth.user().is_live {
+        if user_auth.user.is_live {
             return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
         }
         let wf_id = wf.id.clone();
@@ -146,7 +146,7 @@ async fn run_kyb_if_needed(
     seqno: DataLifetimeSeqno,
 ) -> FpResult<()> {
     // Run KYB
-    let tenant = user_auth.tenant().clone();
+    let tenant = user_auth.tenant.clone();
     let biz_wf = state
         .db_query(move |conn| user_auth.business_workflow(conn))
         .await?;

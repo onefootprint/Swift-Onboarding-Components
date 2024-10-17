@@ -1,5 +1,4 @@
 use super::ParsedUserSessionContext;
-use super::UserAuth;
 use super::UserSessionContext;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
@@ -11,15 +10,11 @@ use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
-use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::ScopedVaultId;
 use newtypes::UserAuthScope;
-use newtypes::VaultId;
 use newtypes::WorkflowGuard;
-use newtypes::WorkflowId;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -32,9 +27,10 @@ pub struct UserWfSession {
     #[deref]
     pub user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
-    pub(super) ob_config: ObConfiguration,
-    pub(super) tenant: Tenant,
-    pub(super) workflow: Workflow,
+    pub ob_config: ObConfiguration,
+    /// The tenant from the SV, not necessarily the tenant from the OBC, but should always be
+    pub tenant: Tenant,
+    pub workflow: Workflow,
 }
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -69,8 +65,8 @@ impl ExtractableAuthSession for ParsedUserWfSession {
             .clone()
             .ok_or(AuthError::MissingScopedUser)?;
 
-        let workflow_id = user_session.workflow_id().ok_or(AuthError::MissingWorkflow)?;
-        let workflow = Workflow::get(conn, &workflow_id)?;
+        let workflow_id = user_session.wf_id.as_ref().ok_or(AuthError::MissingWorkflow)?;
+        let workflow = Workflow::get(conn, workflow_id)?;
         let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
 
         // Get the obc and confirm it is active
@@ -89,7 +85,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("fp_id", &self.0.scoped_user.fp_id.to_string());
-        root_span.record("vault_id", &self.0.user_vault_id().to_string());
+        root_span.record("vault_id", &self.0.user.id.to_string());
         root_span.record("is_live", self.0.scoped_user.is_live);
         root_span.record("auth_method", "user_wf");
     }
@@ -119,38 +115,14 @@ impl UserWfAuthContext {
     }
 }
 
-impl CheckUserWfAuthContext {
-    pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        self.user_session.scoped_business_id()
-    }
-
-    pub fn business_workflow_id(&self) -> Option<WorkflowId> {
-        self.user_session.business_workflow_id()
-    }
-
+impl UserWfSession {
     /// Get the business workflow associated with this auth token, if any
     pub fn business_workflow(&self, conn: &mut PgConn) -> FpResult<Option<Workflow>> {
-        let Some(biz_wf_id) = self.business_workflow_id() else {
+        let Some(biz_wf_id) = self.biz_wf_id.as_ref() else {
             return Ok(None);
         };
-        let (wf, _) = Workflow::get_all(conn, &biz_wf_id)?;
+        let (wf, _) = Workflow::get_all(conn, biz_wf_id)?;
         Ok(Some(wf))
-    }
-}
-
-impl UserWfSession {
-    pub fn ob_config(&self) -> &ObConfiguration {
-        &self.ob_config
-    }
-
-    pub fn tenant(&self) -> &Tenant {
-        // Don't use the tenant from the user_session since that comes from the OBC.
-        // Always use the tenant from the SV
-        &self.tenant
-    }
-
-    pub fn workflow(&self) -> &Workflow {
-        &self.workflow
     }
 
     pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> FpResult<()> {
@@ -167,15 +139,5 @@ impl UserWfSession {
         } else {
             Ok(())
         }
-    }
-
-    pub fn user(&self) -> &Vault {
-        &self.user_session.user
-    }
-}
-
-impl UserAuth for UserWfSession {
-    fn user_vault_id(&self) -> &VaultId {
-        self.user_session.user_vault_id()
     }
 }

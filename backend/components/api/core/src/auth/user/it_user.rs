@@ -39,7 +39,7 @@ impl ExtractableAuthSession for ParsedItUserSession {
 
         // This auth extractor is only used for integration tests to be able to get an fp_id from an
         // incomplete session. NOTE: Do not remove these validations below.
-        if !user_session.0.tenant().is_some_and(|t| t.is_demo_tenant) {
+        if !user_session.0.tenant.as_ref().is_some_and(|t| t.is_demo_tenant) {
             return ValidationError("Can only use for demo tenants").into();
         }
         if user_session.0.user.is_live {

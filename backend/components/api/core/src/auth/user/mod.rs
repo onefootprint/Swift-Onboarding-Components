@@ -1,7 +1,6 @@
 use newtypes::AuthEventKind;
 use newtypes::RequestedTokenScope;
 pub use newtypes::UserAuthScope;
-use newtypes::VaultId;
 use std::collections::HashSet;
 
 mod session;
@@ -13,11 +12,6 @@ mod it_user;
 pub use it_user::*;
 mod user_biz_wf;
 pub use user_biz_wf::*;
-
-/// A helper trait to extract a user vault id on combined types
-pub trait UserAuth {
-    fn user_vault_id(&self) -> &VaultId;
-}
 
 /// Computes the list of scopes to be granted to an auth token for a user.
 /// - `auth_events`: the auths that this user has performed

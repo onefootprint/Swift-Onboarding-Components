@@ -64,10 +64,10 @@ pub struct GetRequirementsArgs {
 impl GetRequirementsArgs {
     pub fn from(value: &CheckUserWfAuthContext) -> FpResult<Self> {
         Ok(Self {
-            person_obc: value.ob_config().clone(),
-            person_workflow: value.workflow().clone(),
-            business_sv: value.scoped_business_id(),
-            biz_wf_id: value.business_workflow_id(),
+            person_obc: value.ob_config.clone(),
+            person_workflow: value.workflow.clone(),
+            business_sv: value.sb_id.clone(),
+            biz_wf_id: value.biz_wf_id.clone(),
             auth_events: value.user_session.auth_events.clone(),
             is_secondary_bo: value.user_session.is_secondary_bo(),
         })

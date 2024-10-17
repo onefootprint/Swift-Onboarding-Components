@@ -201,7 +201,7 @@ impl BatchRequest {
         user_auth: &CheckUserBizWfAuthContext,
     ) -> FpResult<Option<BoLinkId>> {
         let sb_id = user_auth.sb_id.clone();
-        let uv_id = &user_auth.user().id;
+        let uv_id = &user_auth.user.id;
         let source = user_auth.user_session.dl_source();
 
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;

@@ -5,7 +5,6 @@ use crate::auth::session::AllowSessionUpdate;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
-use crate::auth::user::UserAuth;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
@@ -24,13 +23,11 @@ use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
-use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
 use newtypes::VaultKind;
-use newtypes::WorkflowId;
 use paperclip::actix::Apiv2Security;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -38,9 +35,9 @@ use std::sync::Arc;
 #[derive(Debug, Clone, derive_more::Deref)]
 pub struct UserSessionContext {
     pub user: Vault,
-    pub(super) obc: Option<ObConfiguration>,
-    pub(super) tenant: Option<Tenant>,
-    pub(super) scoped_user: Option<ScopedVault>,
+    pub obc: Option<ObConfiguration>,
+    pub tenant: Option<Tenant>,
+    pub scoped_user: Option<ScopedVault>,
     #[deref]
     /// The underlying session data that's stored in the database
     pub session: UserSession,
@@ -50,6 +47,15 @@ impl UserSessionContext {
     pub fn did_use_passkey(&self, conn: &mut PgConn) -> FpResult<bool> {
         let aes = load_auth_events(conn, &self.auth_events)?;
         Ok(aes.iter().any(|(ae, _)| ae.kind == AuthEventKind::Passkey))
+    }
+
+    /// Returns the most specific identifier for this auth session - either the sv_id or v_id
+    pub fn user_identifier(&self) -> UserIdentifier {
+        if let Some(sv_id) = self.su_id.clone() {
+            UserIdentifier::ScopedVault(sv_id)
+        } else {
+            UserIdentifier::Vault(self.user.id.clone())
+        }
     }
 }
 
@@ -67,58 +73,9 @@ pub fn load_auth_events(
     Ok(aes)
 }
 
-impl UserAuth for UserSessionContext {
-    fn user_vault_id(&self) -> &VaultId {
-        &self.user.id
-    }
-}
-
 // Allow calling SessionContext<UserSessionContext>::update
 // TODO this is now the only place where we mutate sessions. Probably want to get rid of it
 impl AllowSessionUpdate for SessionContext<UserSessionContext> {}
-
-impl UserSessionContext {
-    pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
-        self.scoped_user.as_ref().map(|su| su.id.clone())
-    }
-
-    pub fn scoped_user(&self) -> Option<&ScopedVault> {
-        self.scoped_user.as_ref()
-    }
-
-    pub fn ob_configuration_id(&self) -> Option<ObConfigurationId> {
-        self.obc_id.clone()
-    }
-
-    pub fn workflow_id(&self) -> Option<WorkflowId> {
-        self.wf_id.clone()
-    }
-
-    pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        self.sb_id.clone()
-    }
-
-    pub fn business_workflow_id(&self) -> Option<WorkflowId> {
-        self.biz_wf_id.clone()
-    }
-
-    pub fn ob_config(&self) -> Option<&ObConfiguration> {
-        self.obc.as_ref()
-    }
-
-    pub fn tenant(&self) -> Option<&Tenant> {
-        self.tenant.as_ref()
-    }
-
-    /// Returns the most specific identifier for this auth session - either the sv_id or v_id
-    pub fn user_identifier(&self) -> UserIdentifier {
-        if let Some(sv_id) = self.scoped_user_id() {
-            UserIdentifier::ScopedVault(sv_id)
-        } else {
-            UserIdentifier::Vault(self.user_vault_id().clone())
-        }
-    }
-}
 
 #[derive(Debug, derive_more::From)]
 pub enum UserIdentifier {

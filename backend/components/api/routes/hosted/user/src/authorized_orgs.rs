@@ -1,4 +1,3 @@
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::utils::db2api::DbToApi;
@@ -24,7 +23,7 @@ pub async fn get(
 
     // TODO this could return duplicate tenants if the user onboarded onto multiple OBCs
     let obs = state
-        .db_query(move |conn| ScopedVault::list_authorized(conn, user_auth.user_vault_id()))
+        .db_query(move |conn| ScopedVault::list_authorized(conn, &user_auth.user.id))
         .await?;
     let results = obs
         .into_iter()

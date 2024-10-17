@@ -29,7 +29,7 @@ pub async fn post(
 
     let session_id = insights.session_id;
     let event = OnboardingTimelineInfo { event, session_id };
-    let v_id = user_auth.user().id.clone();
+    let v_id = user_auth.user.id.clone();
     let sv_id = user_auth.scoped_user.id.clone();
     state
         .db_transaction(move |conn| UserTimeline::create(conn, event, v_id, sv_id))

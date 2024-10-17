@@ -1,5 +1,4 @@
 use crate::auth::user::CheckedUserAuthContext;
-use crate::auth::user::UserAuth;
 use crate::config::Config;
 use crate::FpResult;
 use api_errors::AssertionError;
@@ -208,7 +207,7 @@ impl VerifyChallengeResult {
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
     ) -> FpResult<Passkey> {
-        let vault_id = user_auth.user_vault_id();
+        let vault_id = &user_auth.user.id;
         let Self {
             liveness_event_attributes,
             cred,
@@ -216,9 +215,7 @@ impl VerifyChallengeResult {
             attestation_data,
         } = self;
         let attestation_data = serde_cbor::to_vec(&attestation_data)?;
-        let su_id = user_auth
-            .scoped_user_id()
-            .ok_or(AssertionError("No scoped vault available"))?;
+        let su_id = (user_auth.su_id.clone()).ok_or(AssertionError("No scoped vault available"))?;
 
         if let Some(attributes) = liveness_event_attributes {
             // Create a liveness event and timeline event

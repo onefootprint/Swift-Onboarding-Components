@@ -24,7 +24,7 @@ async fn get_user_or_business_for_dr<T: Into<UncheckedDrIdentifier>>(
     doc_id: Option<T>,
 ) -> FpResult<(ScopedVaultId, WorkflowId)> {
     let Some(doc_id) = doc_id else {
-        return Ok((user_auth.scoped_user.id.clone(), user_auth.workflow().id.clone()));
+        return Ok((user_auth.scoped_user.id.clone(), user_auth.workflow.id.clone()));
     };
     let doc_id = doc_id.into();
     let (user_auth, owner_vault_kind, biz_wf) = state
@@ -38,11 +38,11 @@ async fn get_user_or_business_for_dr<T: Into<UncheckedDrIdentifier>>(
     let result = match owner_vault_kind {
         VaultKind::Person => {
             let su_id = user_auth.scoped_user.id.clone();
-            let wf_id = user_auth.workflow().id.clone();
+            let wf_id = user_auth.workflow.id.clone();
             (su_id, wf_id)
         }
         VaultKind::Business => {
-            let sb_id = user_auth.scoped_business_id();
+            let sb_id = user_auth.sb_id.clone();
             let biz_wf_id = biz_wf.map(|biz_wf| biz_wf.id);
             sb_id.zip(biz_wf_id).ok_or(ValidationError(
                 "Trying to upload a business document with no active business onboarding",

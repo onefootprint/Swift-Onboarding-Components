@@ -28,11 +28,11 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", user_auth.tenant().id.as_str()));
-    span.record("tenant_name", &format!("{:?}", user_auth.tenant().name.as_str()));
+    span.record("tenant_id", &format!("{:?}", user_auth.tenant.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", user_auth.tenant.name.as_str()));
     span.record("scoped_user_id", &format!("{}", user_auth.scoped_user.id));
-    span.record("ob_configuration_id", &format!("{}", user_auth.ob_config().id));
-    span.record("workflow_id", &format!("{}", user_auth.workflow().id));
+    span.record("ob_configuration_id", &format!("{}", user_auth.ob_config.id));
+    span.record("workflow_id", &format!("{}", user_auth.workflow.id));
 
     // Verify there are no unmet requirements
     let reqs = get_requirements_for_person_and_maybe_business(&state, GetRequirementsArgs::from(&user_auth)?)
@@ -48,7 +48,7 @@ pub async fn post(
     }
 
     // mark person and business wf as authorized
-    let wf_id = user_auth.workflow().id.clone();
+    let wf_id = user_auth.workflow.id.clone();
     state
         .db_transaction(move |conn| -> FpResult<_> {
             Workflow::set_is_authorized(conn, &wf_id)?;

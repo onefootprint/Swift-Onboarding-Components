@@ -48,7 +48,7 @@ pub async fn post_validate(
     let opts = ValidateArgs {
         ignore_luhn_validation: false,
         for_bifrost: true,
-        is_live: user_auth.user().is_live,
+        is_live: user_auth.user.is_live,
     };
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(request.into_inner(), opts)?;
     // No fingerprints to check speculatively
@@ -79,7 +79,7 @@ pub async fn patch(
 
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
         request.into_inner(),
-        ValidateArgs::for_bifrost(user_auth.user().is_live),
+        ValidateArgs::for_bifrost(user_auth.user.is_live),
     )?;
     let residential_address = updates
         .get(&IDK::Country.into())
@@ -113,8 +113,8 @@ pub async fn patch(
     // TODO these need to be atomic with the patch
     if let Some(address) = residential_address {
         // if we allow international and haven't requested a doc, we need to create a doc req
-        let obc = user_auth.ob_config();
-        let wf = user_auth.workflow();
+        let obc = &user_auth.ob_config;
+        let wf = &user_auth.workflow;
         let sv_id = &user_auth.scoped_user.id;
         if obc.allow_international_residents
             && obc.document_cdo().is_none()

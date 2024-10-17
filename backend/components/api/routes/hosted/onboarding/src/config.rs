@@ -46,8 +46,8 @@ pub fn get(
             // Also take in a user auth token that has the onboarding scope that identifies an ob
             // config
             let user_auth = user_auth.check_guard(Any)?;
-            let ob_config = user_auth.ob_config().ok_or(OnboardingError::NoObConfig)?.clone();
-            let tenant = user_auth.tenant().ok_or(OnboardingError::NoObConfig)?.clone();
+            let ob_config = user_auth.obc.clone().ok_or(OnboardingError::NoObConfig)?;
+            let tenant = user_auth.tenant.clone().ok_or(OnboardingError::NoObConfig)?;
             (tenant, ob_config)
         }
     };

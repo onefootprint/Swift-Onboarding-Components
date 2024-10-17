@@ -1,5 +1,4 @@
 use crate::auth::session::UpdateSession;
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
@@ -56,13 +55,10 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let request = request.into_inner().unwrap_or_default();
 
-    let scoped_user_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
-    let uv_id = user_auth.user_vault_id().clone();
+    let scoped_user_id = (user_auth.su_id.clone()).ok_or(AuthError::MissingScopedUser)?;
+    let uv_id = user_auth.user.id.clone();
     let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
-    let obc_id = user_auth
-        .ob_configuration_id()
-        .or(pk_obc_id)
-        .ok_or(OnboardingError::NoObConfig)?;
+    let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoObConfig)?;
     let wfr_id = user_auth.wfr_id.clone();
     let (scoped_user, ob_config, tenant, vw, wfr) = state
         .db_query(move |conn| -> FpResult<_> {
@@ -119,7 +115,7 @@ pub async fn post(
                 su: &scoped_user,
             };
             let args = CreateUserWfArgs {
-                existing_wf_id: user_auth.workflow_id(),
+                existing_wf_id: user_auth.wf_id.clone(),
                 seqno: vw.seqno,
                 fixture_result: request.fixture_result,
                 actor: None,
@@ -153,13 +149,10 @@ pub async fn post(
             // Update auth token with new identifiers
             let (biz_wf_id, sb_id) = biz_wf.map(|wf| (wf.id, wf.scoped_vault_id)).unzip();
             let args = NewUserSessionContext {
-                wf_id: user_auth.workflow_id().is_none().then_some(wf_id),
+                wf_id: user_auth.wf_id.is_none().then_some(wf_id),
                 biz_wf_id,
                 sb_id,
-                obc_id: user_auth
-                    .ob_configuration_id()
-                    .is_none()
-                    .then_some(obc.id.clone()),
+                obc_id: user_auth.obc_id.is_none().then_some(obc.id.clone()),
                 ..Default::default()
             };
             let session = user_auth.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;

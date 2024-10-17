@@ -130,7 +130,7 @@ async fn get_identify_challenge_context(
     tracing::info!(identifiers=?Csv(identifiers.iter().map(IdentifyIdKind::from).collect()), has_user_auth=%user_auth.is_some(), has_ob_context=%obc.is_some(), has_sandbox_id=%sandbox_id.is_some(), "Getting identify challenge context");
 
     // Get the OBC from either user auth or obc auth, preferring to extract from the auth token
-    let obc = (user_auth.as_ref().and_then(|ua| ua.ob_config()))
+    let obc = (user_auth.as_ref().and_then(|ua| ua.obc.as_ref()))
         .or(obc.as_ref().map(|ob| ob.ob_config()))
         .cloned();
     let t_id = obc.as_ref().map(|obc| &obc.tenant_id);
@@ -145,7 +145,7 @@ async fn get_identify_challenge_context(
             (vault.id, sv_id, matching_fps)
         }
         // Identified via auth token
-        (Some(auth), ids) if ids.is_empty() => (auth.user.clone().id, auth.scoped_user_id(), vec![]),
+        (Some(auth), ids) if ids.is_empty() => (auth.user.clone().id, auth.su_id.clone(), vec![]),
         // Require one of user_auth or identifier
         (_, _) => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
     };

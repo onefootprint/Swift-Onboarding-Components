@@ -28,8 +28,8 @@ pub async fn get(
     )
     .await?;
 
-    let ob_config = user_auth.ob_config().clone();
-    let tenant = user_auth.tenant().clone();
+    let ob_config = user_auth.ob_config.clone();
+    let tenant = user_auth.tenant.clone();
     let all_requirements = OrderedOnboardingRequirements::from_unordered(reqs, ob_config.is_doc_first);
     let ff_client = state.ff_client.clone();
     let ob_config = api_wire_types::PublicOnboardingConfiguration::from_db((

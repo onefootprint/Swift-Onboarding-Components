@@ -24,7 +24,7 @@ pub async fn post(
     request: Json<SocureDeviceSessionIdRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let wf_id = user_auth.workflow().id.clone();
+    let wf_id = user_auth.workflow.id.clone();
 
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();
 

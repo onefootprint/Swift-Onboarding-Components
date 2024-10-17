@@ -3,7 +3,6 @@ use crate::auth::user::UserAuthScope;
 use crate::types::ApiResponse;
 use crate::State;
 use actix_web::web::Json;
-use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserSessionContext;
 use api_core::auth::SessionContext;
 use api_core::decision;
@@ -81,15 +80,12 @@ async fn post_inner(
         },
     };
 
-    let uv_id = user_auth.user_vault_id().clone();
-    let sv_id = user_auth
-        .scoped_user_id()
-        .ok_or(AssertionError("auth missing scoped_user_id"))?;
-    let wf_id = user_auth.workflow_id();
+    let uv_id = user_auth.user.id.clone();
+    let su_id = (user_auth.su_id.clone()).ok_or(AssertionError("auth missing scoped_user_id"))?;
+    let wf_id = user_auth.wf_id.clone();
 
     // We want to only show a signal set of device signals from Stytch OR Neuro or else it's confusing
-    let should_hide_risk_signals = user_auth
-        .ob_config()
+    let should_hide_risk_signals = (user_auth.obc.as_ref())
         .map(|o| {
             o.verification_checks()
                 .get(VerificationCheckKind::NeuroId)
@@ -99,13 +95,9 @@ async fn post_inner(
 
     state
         .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> FpResult<_> {
-            let di = DecisionIntent::create(
-                conn,
-                DecisionIntentKind::DeviceFingerprint,
-                &sv_id,
-                wf_id.as_ref(),
-            )?;
-            let vreq = VerificationRequest::create(conn, (&sv_id, &di.id, VendorAPI::StytchLookup).into())?;
+            let wf_id = wf_id.as_ref();
+            let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceFingerprint, &su_id, wf_id)?;
+            let vreq = VerificationRequest::create(conn, (&su_id, &di.id, VendorAPI::StytchLookup).into())?;
             let uv = Vault::get(conn, &uv_id)?;
 
             match res {
@@ -117,7 +109,7 @@ async fn post_inner(
                         res,
                         &uv.public_key,
                         &uv_id,
-                        &sv_id,
+                        &su_id,
                         telemetry_headers,
                         should_hide_risk_signals,
                     )?;

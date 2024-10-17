@@ -37,7 +37,7 @@ pub async fn post(
     let insight = CreateInsightEvent::from(insight);
     let request = request.into_inner();
 
-    let tenant_id = user_auth.tenant().id.clone();
+    let tenant_id = user_auth.tenant.id.clone();
 
     let (sv_id, wf_id) = get_user_or_business_for_dr(&state, user_auth, request.request_id.clone()).await?;
 

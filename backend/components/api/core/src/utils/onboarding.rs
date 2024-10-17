@@ -193,10 +193,10 @@ pub fn get_or_create_business_wf(
         su,
     } = common_args;
 
-    if let Some(biz_wf_id) = user_auth.business_workflow_id() {
+    if let Some(biz_wf_id) = user_auth.biz_wf_id.as_ref() {
         // Either a duplicate call to `POST /hosted/onboarding`, or we're using a secondary beneficial owner
         // token and the business has already been created
-        let biz_wf = Workflow::get(conn, &biz_wf_id)?;
+        let biz_wf = Workflow::get(conn, biz_wf_id)?;
         return Ok(biz_wf);
     };
 
@@ -212,7 +212,7 @@ pub fn get_or_create_business_wf(
     let existing_businesses = (!force_create).then_some(BusinessOwner::list_businesses_for_playbook(
         conn, &uv.id, &obc.id,
     )?);
-    let sb_id = if let Some(sb_id) = user_auth.scoped_business_id() {
+    let sb_id = if let Some(sb_id) = user_auth.sb_id.clone() {
         // A scoped business has been attached to this session already, usually via user-specific
         // sessions.
         // Also via secondary beneficial owner tokens

@@ -25,13 +25,8 @@ pub async fn get(
     user_auth: UserAuthContext,
 ) -> ApiResponse<AuthRequirementsResponse> {
     let user_auth = user_auth.check_guard(api_core::auth::Any)?;
-    let obc = user_auth
-        .ob_config()
-        .ok_or(ValidationError("No playbook associated with this session"))?
-        .clone();
-    let sv_id = user_auth
-        .scoped_user_id()
-        .ok_or(ValidationError("No scoped user associated with session"))?;
+    let obc = (user_auth.obc.clone()).ok_or(ValidationError("No playbook associated with this session"))?;
+    let sv_id = (user_auth.su_id.clone()).ok_or(ValidationError("No scoped user associated with session"))?;
 
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {

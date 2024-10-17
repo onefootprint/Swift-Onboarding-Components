@@ -87,7 +87,7 @@ pub async fn post(
     let event_kind = AuthEventKind::from(&challenge_state.data);
 
     // Validate the playbook is consistent with the requested IdentifyScope
-    let obc = user_auth.ob_config();
+    let obc = user_auth.obc.as_ref();
     match scope {
         IdentifyScope::Auth if obc.is_some_and(|obc| obc.kind != ObConfigurationKind::Auth) => {
             // Playbook can be None in update_auth_methods flow
@@ -129,10 +129,10 @@ pub async fn post(
             let uv_id = &user_auth.user_vault_id;
 
             // Get or create the ScopedVault for non-my1fp flows
-            let su = if let Some(sv_id) = user_auth.scoped_user_id() {
-                let su = ScopedVault::get(conn, &sv_id)?;
+            let su = if let Some(su_id) = user_auth.su_id.as_ref() {
+                let su = ScopedVault::get(conn, su_id)?;
                 Some(su)
-            } else if let Some(obc) = user_auth.ob_config() {
+            } else if let Some(obc) = user_auth.obc.as_ref() {
                 // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
                 let uv = Vault::lock(conn, uv_id)?;
                 let (su, is_new_su) = ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?;
@@ -275,11 +275,11 @@ async fn get_prefill_data(
     state: &State,
     user_auth: &CheckedUserAuthContext,
 ) -> FpResult<Option<PrefillData>> {
-    let Some(obc) = user_auth.ob_config() else {
+    let Some(obc) = user_auth.obc.as_ref() else {
         // My1fp
         return Ok(None);
     };
-    if user_auth.scoped_user_id().is_some() {
+    if user_auth.su_id.is_some() {
         // ScopedVault already exists, no need to prefill
         return Ok(None);
     }
@@ -328,7 +328,7 @@ async fn on_otp_verify(
     s: PhoneEmailChallengeState,
     cik: ContactInfoKind,
 ) -> FpResult<VerifiedCredential> {
-    let data = if let Some(obc) = user_auth.ob_config() {
+    let data = if let Some(obc) = user_auth.obc.as_ref() {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
         let data = HashMap::from_iter([(cik.verified_di(), s.contact_info)]);
         // The vault should already have `id.phone_number` or `id.email`, let's not derive it here.

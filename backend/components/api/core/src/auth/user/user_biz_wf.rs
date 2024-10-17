@@ -1,5 +1,4 @@
 use super::ParsedUserWfSession;
-use super::UserAuth;
 use super::UserWfSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
@@ -13,7 +12,6 @@ use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::ScopedVaultId;
 use newtypes::UserAuthScope;
-use newtypes::VaultId;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -54,14 +52,9 @@ impl ExtractableAuthSession for ParsedUserBizWfSession {
         let user_wf_session =
             <ParsedUserWfSession as ExtractableAuthSession>::try_load_session(value, conn, ff_client, req)?.0;
 
-        let sb_id = user_wf_session
-            .scoped_business_id()
-            .clone()
-            .ok_or(AuthError::MissingBusiness)?;
+        let sb_id = user_wf_session.sb_id.clone().ok_or(AuthError::MissingBusiness)?;
 
-        let biz_wf_id = user_wf_session
-            .business_workflow_id()
-            .ok_or(AuthError::MissingBusinessWorkflow)?;
+        let biz_wf_id = (user_wf_session.biz_wf_id.clone()).ok_or(AuthError::MissingBusinessWorkflow)?;
         let biz_wf = Workflow::get(conn, &biz_wf_id)?;
 
         let onboarding_session = UserBizWfSession {
@@ -75,7 +68,7 @@ impl ExtractableAuthSession for ParsedUserBizWfSession {
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("fp_id", &self.0.scoped_user.fp_id.to_string());
-        root_span.record("vault_id", &self.0.user_vault_id().to_string());
+        root_span.record("vault_id", &self.0.user.id.to_string());
         root_span.record("is_live", self.0.scoped_user.is_live);
         root_span.record("auth_method", "user_wf");
     }
@@ -112,11 +105,5 @@ impl CheckUserBizWfAuthContext {
 
     pub fn biz_wf(&self) -> &Workflow {
         &self.biz_wf
-    }
-}
-
-impl UserAuth for UserBizWfSession {
-    fn user_vault_id(&self) -> &VaultId {
-        self.user_session.user_vault_id()
     }
 }
