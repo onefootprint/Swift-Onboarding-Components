@@ -305,18 +305,17 @@ begin
         \* Get a batch of DLs for the vv_batch that do not have corresponding blobs.
         GetDlBatch:
             with
-                \* We select only DLs created at the vv_batch seqnos since:
-                \* a) DLs created before a VV seqno would be captured by a prior VV
-                \* b) DLs created after a VV seqno would be captured by a later VV
-                \* c) There's no need to filter on deactivated_seqno, since
-                \*    deactivated_seqno >= created_seqno, so if a VV seqno equals
-                \*    the deactivated_seqno, the VV would be captured by a prior
-                \*    VV or the same VV.
+                \* Select DLs created at or before the vv_batch seqnos.
+                \* Normally, it's only necessary to select DLs equal to a
+                \* vv_batch seqno, but some backfills may create DLs retroactively
+                \* at an earlier vault version. We need to back up these
+                \* retroactively added DLs as well for the VV to be completely
+                \* complete in GetCompleteVaultVersionBatch.
                 dls_for_vv_batch_without_blobs = {
                     dl \in db_dls :
                       /\ (\E vv \in vv_batch :
                             /\ vv.vault = dl.vault
-                            /\ vv.seqno = dl.created_seqno
+                            /\ vv.seqno >= dl.created_seqno
                          )
                       /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
                 },
@@ -522,7 +521,7 @@ end process;
 end algorithm; *)
 
 
-\* BEGIN TRANSLATION (chksum(pcal) = "e4e139a4" /\ chksum(tla) = "2e1bbf2e")
+\* BEGIN TRANSLATION (chksum(pcal) = "b6fa4add" /\ chksum(tla) = "5aec3ab")
 \* Label Shutdown of process VaultApiInstance at line 247 col 9 changed to Shutdown_
 VARIABLES pc, seqno_sequence, num_requests_started, api_finished, next_dl_id, 
           next_vault_version_id, db_dls, db_vault_versions, db_blobs, 
@@ -738,7 +737,7 @@ GetDlBatch == /\ pc["vdr-worker"] = "GetDlBatch"
                                                            dl \in db_dls :
                                                              /\ (\E vv \in vv_batch :
                                                                    /\ vv.vault = dl.vault
-                                                                   /\ vv.seqno = dl.created_seqno
+                                                                   /\ vv.seqno >= dl.created_seqno
                                                                 )
                                                              /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
                                                        } IN

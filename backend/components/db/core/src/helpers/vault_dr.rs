@@ -155,13 +155,10 @@ pub fn get_dl_batch_for_svv_batch(
 
     let svv_ids = svv_batch.iter().map(|svv| &svv.id).collect_vec();
 
-    // We select only DLs created at the svv_batch seqnos since:
-    // a) DLs created before a SVV seqno would be captured by a prior SVV
-    // b) DLs created after a SVV seqno would be captured by a later SVV
-    // c) There's no need to filter on deactivated_seqno, since
-    //    deactivated_seqno >= created_seqno, so if a SVV seqno equals
-    //    the deactivated_seqno, the SVV would be captured by a prior
-    //    SVV or the same SVV.
+    // Select DLs created at or before the svv_batch seqnos. Normally, it's only necessary to
+    // select DLs equal to a svv_batch seqno, but some backfills may create DLs retroactively at an
+    // earlier scoped vault version. We need to back up these retroactively added DLs as well for
+    // the SVV to be completely complete in get_complete_svvs_for_svv_batch.
 
     let query = data_lifetime::table
         .inner_join(scoped_vault::table)
@@ -171,7 +168,7 @@ pub fn get_dl_batch_for_svv_batch(
             scoped_vault_version::table
                 .filter(scoped_vault_version::id.eq_any(svv_ids))
                 .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault::id))
-                .filter(scoped_vault_version::seqno.eq(data_lifetime::created_seqno)),
+                .filter(scoped_vault_version::seqno.ge(data_lifetime::created_seqno)),
         ))
         .filter(diesel::dsl::not(diesel::dsl::exists(
             vault_dr_blob::table
