@@ -140,12 +140,7 @@ def test_synthetic(sandbox_tenant, must_collect_data):
             synthetic_rs = sentilink_detail["synthetic"]["reason_codes"]
             assert len(synthetic_rs) == 3
             # check that we are displaying in human readable form
-            assert any(
-                [
-                    rs["code"] == "supplied_name_or_ssn_is_nonsense"
-                    for rs in synthetic_rs
-                ]
-            )
+            assert any([rs["code"] == "name_or_ssn_is_nonsense" for rs in synthetic_rs])
 
             assert sentilink_detail["id_theft"]["score"] is not None
             assert len(sentilink_detail["id_theft"]["reason_codes"]) == 3

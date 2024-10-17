@@ -1,6 +1,10 @@
 import time
 import pytest
-from tests.constants import BUSINESS_SECONDARY_BOS, FIXTURE_PHONE_NUMBER2
+from tests.constants import (
+    BUSINESS_SECONDARY_BOS,
+    FIXTURE_PHONE_NUMBER2,
+    FIXTURE_EMAIL2,
+)
 from tests.headers import BusinessOwnerAuth, FpAuth, SandboxId
 from tests.identify_client import IdentifyClient
 from tests.utils import (
@@ -338,21 +342,18 @@ def test_kyb_possible_bo_missing_reason_code(kyb_sandbox_ob_config, sandbox_tena
         fixture_result="pass",
         kyb_fixture_result="use_rules_outcome",
     )
-    bos = [
-        {
-            "first_name": "Piip",
-            "last_name": "Penguin",
-            "ownership_stake": 30,
-        },
-        {
-            "first_name": "Franklin",
-            "last_name": "Frog",
-            "email": "sandbox@onefootprint.com",
-            "phone_number": FIXTURE_PHONE_NUMBER2,
-            "ownership_stake": 30,
-        },
-    ]
-    bifrost.data["business.kyced_beneficial_owners"] = bos
+    secondary_bos = {
+        "business.secondary_beneficial_owners": [
+            {
+                "id.first_name": "Franklin",
+                "id.last_name": "Frog",
+                "id.email": FIXTURE_EMAIL2,
+                "id.phone_number": FIXTURE_PHONE_NUMBER2,
+                "ownership_stake": 10,
+            }
+        ],
+    }
+    bifrost.data.update(secondary_bos)
     primary_bo = bifrost.run()
     secondary_bo_token = extract_bo_token(bifrost)
 

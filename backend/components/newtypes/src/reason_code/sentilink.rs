@@ -1,87 +1,88 @@
 use std::str::FromStr;
 use strum::Display;
+use strum::EnumIter;
 use strum::EnumString;
 
-#[derive(EnumString, Display, Debug, Clone, PartialEq, Eq)]
+#[derive(EnumString, Display, Debug, Clone, PartialEq, Eq, EnumIter)]
 pub enum SentilinkHumanReadableScoreReasonCode {
     #[strum(serialize = "R000")]
-    #[strum(to_string = "supplied_name_or_ssn_is_nonsense")]
+    #[strum(to_string = "name_or_ssn_is_nonsense")]
     SuppliedNameOrSsnIsNonsense,
 
     #[strum(serialize = "R001")]
-    #[strum(to_string = "supplied_ssn_is_randomly_issued")]
+    #[strum(to_string = "ssn_is_randomly_issued")]
     SuppliedSsnIsRandomlyIssued,
 
     #[strum(serialize = "R002")]
-    #[strum(to_string = "supplied_ssn_might_belong_to_another_person_not_yet_credit_active")]
+    #[strum(to_string = "ssn_might_belong_to_inactive_person")]
     SuppliedSsnMightBelongToAnotherPersonNotYetCreditActive,
 
     #[strum(serialize = "R003")]
-    #[strum(to_string = "supplied_ssn_aligns_with_consumers_address_history")]
+    #[strum(to_string = "ssn_aligns_with_address_history")]
     SuppliedSsnAlignsWithConsumersAddressHistory,
 
     #[strum(serialize = "R004")]
-    #[strum(to_string = "supplied_ssn_aligns_with_consumers_dob")]
+    #[strum(to_string = "ssn_aligns_with_dob")]
     SuppliedSsnAlignsWithConsumersDob,
 
     #[strum(serialize = "R005")]
-    #[strum(to_string = "phone_aligns_with_consumers_history")]
+    #[strum(to_string = "phone_aligns_with_history")]
     PhoneAlignsWithConsumersHistory,
 
     #[strum(serialize = "R006")]
-    #[strum(to_string = "consumer_is_tied_to_itin")]
+    #[strum(to_string = "consumer_tied_to_itin")]
     ConsumerIsTiedToItin,
 
     #[strum(serialize = "R007")]
-    #[strum(to_string = "supplied_information_corresponds_to_deceased_individual")]
+    #[strum(to_string = "info_matches_deceased_individual")]
     SuppliedInformationCorrespondsToDeceasedIndividual,
 
     #[strum(serialize = "R008")]
-    #[strum(to_string = "ssn_tied_to_clump_of_ssns_used_for_fraud")]
+    #[strum(to_string = "ssn_tied_to_fraud_clump")]
     SsnTiedToClumpOfSsnsUsedForFraud,
 
     #[strum(serialize = "R009")]
-    #[strum(to_string = "consumer_tied_to_addresses_linked_to_synthetic_fraud")]
+    #[strum(to_string = "addresses_linked_to_synthetic_fraud")]
     ConsumerTiedToAddressesLinkedToSyntheticFraud,
 
     #[strum(serialize = "R010")]
-    #[strum(to_string = "depth_of_consumers_history_with_this_information")]
+    #[strum(to_string = "depth_of_consumer_history")]
     DepthOfConsumersHistoryWithThisInformation,
 
     #[strum(serialize = "R011")]
-    #[strum(to_string = "start_time_of_consumers_history_aligns_with_expected_start_time")]
+    #[strum(to_string = "history_start_time_aligns")]
     StartTimeOfConsumersHistoryAlignsWithExpectedStartTime,
 
     #[strum(serialize = "R012")]
-    #[strum(to_string = "consumer_tied_to_fraud_code_records")]
+    #[strum(to_string = "tied_to_fraud_code_records")]
     ConsumerTiedToFraudCodeRecords,
 
     #[strum(serialize = "R013")]
-    #[strum(to_string = "better_owner_for_ssn_exists")]
+    #[strum(to_string = "better_ssn_owner_exists")]
     BetterOwnerForSsnExists,
 
     #[strum(serialize = "R014")]
-    #[strum(to_string = "consumer_appears_to_have_better_ssn")]
+    #[strum(to_string = "consumer_has_better_ssn")]
     ConsumerAppearsToHaveBetterSsn,
 
     #[strum(serialize = "R015")]
-    #[strum(to_string = "supplied_information_matches_manifest_records")]
+    #[strum(to_string = "info_matches_manifest_records")]
     SuppliedInformationMatchesManifestRecords,
 
     #[strum(serialize = "R016")]
-    #[strum(to_string = "application_cluster_activity_in_sentilink_consortium_data")]
+    #[strum(to_string = "app_cluster_in_consortium_data")]
     ApplicationClusterActivityInSentilinkConsortiumData,
 
     #[strum(serialize = "R017")]
-    #[strum(to_string = "attributes_of_addresses_consumer_is_tied_to")]
+    #[strum(to_string = "attributes_of_tied_addresses")]
     AttributesOfAddressesConsumerIsTiedTo,
 
     #[strum(serialize = "R018")]
-    #[strum(to_string = "aspects_of_supplied_pii_correspond_to_bankruptcies")]
+    #[strum(to_string = "pii_corresponds_to_bankruptcies")]
     AspectsOfSuppliedPiiCorrespondToBankruptcies,
 
     #[strum(serialize = "R019")]
-    #[strum(to_string = "consumer_tied_to_security_freezes")]
+    #[strum(to_string = "tied_to_security_freezes")]
     ConsumerTiedToSecurityFreezes,
 
     #[strum(serialize = "R020")]
@@ -89,71 +90,71 @@ pub enum SentilinkHumanReadableScoreReasonCode {
     SsnMightBelongToAssociate,
 
     #[strum(serialize = "R021")]
-    #[strum(to_string = "supplied_phone_number_corresponds_to_risky_carrier_or_line_type")]
+    #[strum(to_string = "risky_phone_carrier_or_line_type")]
     SuppliedPhoneNumberCorrespondsToRiskyCarrierOrLineType,
 
     #[strum(serialize = "R022")]
-    #[strum(to_string = "email_domain_or_handle_structure_suspicious")]
+    #[strum(to_string = "suspicious_email_structure")]
     EmailDomainOrHandleStructureSuspicious,
 
     #[strum(serialize = "R023")]
-    #[strum(to_string = "address_consistent_with_consumers_history")]
+    #[strum(to_string = "address_consistent_with_history")]
     AddressConsistentWithConsumersHistory,
 
     #[strum(serialize = "R024")]
-    #[strum(to_string = "address_has_high_velocity_of_applications")]
+    #[strum(to_string = "high_velocity_address")]
     AddressHasHighVelocityOfApplications,
 
     #[strum(serialize = "R025")]
-    #[strum(to_string = "email_has_suspicious_application_activity")]
+    #[strum(to_string = "suspicious_email_activity")]
     EmailHasSuspiciousApplicationActivity,
 
     #[strum(serialize = "R026")]
-    #[strum(to_string = "applicant_appears_to_be_best_owner_of_email")]
+    #[strum(to_string = "applicant_is_best_email_owner")]
     ApplicantAppearsToBeBestOwnerOfEmail,
 
     #[strum(serialize = "R027")]
-    #[strum(to_string = "application_information_contains_mix_from_different_consumers")]
+    #[strum(to_string = "mixed_consumer_info")]
     ApplicationInformationContainsMixFromDifferentConsumers,
 
     #[strum(serialize = "R028")]
-    #[strum(to_string = "unusual_geographic_activity_associated_with_phone_number")]
+    #[strum(to_string = "unusual_phone_geo_activity")]
     UnusualGeographicActivityAssociatedWithPhoneNumber,
 
     #[strum(serialize = "R029")]
-    #[strum(to_string = "applicant_appears_to_be_best_owner_of_phone")]
+    #[strum(to_string = "applicant_is_best_phone_owner")]
     ApplicantAppearsToBeBestOwnerOfPhone,
 
     #[strum(serialize = "R030")]
-    #[strum(to_string = "phone_cluster_activity_in_sentilink_consortium_data")]
+    #[strum(to_string = "phone_cluster_in_consortium_data")]
     PhoneClusterActivityInSentilinkConsortiumData,
 
     #[strum(serialize = "R031")]
-    #[strum(to_string = "application_ip_address_from_risky_vpn")]
+    #[strum(to_string = "ip_from_risky_vpn")]
     ApplicationIpAddressFromRiskyVpn,
 
     #[strum(serialize = "R032")]
-    #[strum(to_string = "ip_address_aligns_with_applicants_physical_address_history")]
+    #[strum(to_string = "ip_aligns_with_address_history")]
     IpAddressAlignsWithApplicantsPhysicalAddressHistory,
 
     #[strum(serialize = "R033")]
-    #[strum(to_string = "applicant_has_suspicious_gap_in_history")]
+    #[strum(to_string = "suspicious_history_gap")]
     ApplicantHasSuspiciousGapInHistory,
 
     #[strum(serialize = "R034")]
-    #[strum(to_string = "length_of_email_history")]
+    #[strum(to_string = "email_history_length")]
     LengthOfEmailHistory,
 
     #[strum(serialize = "R035")]
-    #[strum(to_string = "ip_address_has_suspicious_application_activity")]
+    #[strum(to_string = "suspicious_ip_activity")]
     IpAddressHasSuspiciousApplicationActivity,
 
     #[strum(serialize = "R036")]
-    #[strum(to_string = "application_information_tied_to_associate")]
+    #[strum(to_string = "info_tied_to_associate")]
     ApplicationInformationTiedToAssociate,
 
     #[strum(serialize = "R037")]
-    #[strum(to_string = "ip_address_belongs_to_risky_isp_mobile_carrier")]
+    #[strum(to_string = "ip_from_risky_isp_or_carrier")]
     IpAddressBelongsToRiskyIspMobileCarrier,
 
     Other(String),
@@ -169,21 +170,22 @@ impl From<String> for SentilinkHumanReadableScoreReasonCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use strum::IntoEnumIterator;
     use test_case::test_case;
     #[test_case(
         "R036",
         SentilinkHumanReadableScoreReasonCode::ApplicationInformationTiedToAssociate,
-        "application_information_tied_to_associate"
+        "info_tied_to_associate"
     )]
     #[test_case(
         "R001",
         SentilinkHumanReadableScoreReasonCode::SuppliedSsnIsRandomlyIssued,
-        "supplied_ssn_is_randomly_issued"
+        "ssn_is_randomly_issued"
     )]
     #[test_case(
         "R027",
         SentilinkHumanReadableScoreReasonCode::ApplicationInformationContainsMixFromDifferentConsumers,
-        "application_information_contains_mix_from_different_consumers"
+        "mixed_consumer_info"
     )]
     fn test_deser(
         input_str: &str,
@@ -194,5 +196,15 @@ mod tests {
         assert_eq!(deser, expected_variant);
         let display_string = deser.to_string();
         assert_eq!(display_string, expected_display.to_string());
+    }
+
+    #[test]
+    fn test_human_readable_length() {
+        SentilinkHumanReadableScoreReasonCode::iter().for_each(|c| {
+            let readable = c.to_string();
+            if readable.len() > 35 {
+                panic!("{} is longer than 35 characters, which will cause display issues in the sentilink details page in dashboard", readable)
+            }
+        })
     }
 }
