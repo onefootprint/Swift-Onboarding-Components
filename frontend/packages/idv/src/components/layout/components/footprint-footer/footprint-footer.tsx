@@ -4,7 +4,7 @@ import { Stack, Text, media } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import useResizeObserver from 'use-resize-observer';
+import useResizeObserver from 'use-resize-observer'; // useResizeObserver is now available in usehooks-ts@2.13.0
 
 import Link from 'next/link';
 import { FOOTPRINT_FOOTER_ID } from '../../constants';

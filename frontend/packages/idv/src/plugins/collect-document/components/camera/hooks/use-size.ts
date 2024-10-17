@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react';
-import useResizeObserver from 'use-resize-observer';
+import useResizeObserver from 'use-resize-observer'; // useResizeObserver is now available in usehooks-ts@2.13.0
 
 // Used to track video element size as it gets mounted and/or resized.
 // This size will be used to create a matching sized canvas to copy the

@@ -64,7 +64,7 @@
     "ua-parser-js": "^1.0.38",
     "use-places-autocomplete": "^4.0.0",
     "use-resize-observer": "^9.1.0",
-    "usehooks-ts": "2.7.2",
+    "usehooks-ts": "2.16.0",
     "xstate": "^4.37.1"
   },
   "devDependencies": {
