@@ -1,7 +1,7 @@
 import { Box, Stack, Text } from '@onefootprint/ui';
 import type { StackProps } from '@onefootprint/ui/src/components/stack';
 import { useTranslation } from 'react-i18next';
-import type { CustomDoc } from '../collect-custom-docs-form';
+import type { CustomDoc } from '../custom-docs-form';
 
 type CustomDocsPreviewProps = StackProps & Pick<CustomDoc, 'name' | 'uploadSettings' | 'identifier'>;
 

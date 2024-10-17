@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import CustomDocsForm, { type CustomDoc } from '../../../../../../collect-custom-docs-form';
-import CustomDocsPreview from '../../../../../../collect-custom-docs-preview';
+import CustomDocsForm, { type CustomDoc } from '../../../../../../custom-docs-form';
+import CustomDocsPreview from '../../../../../../custom-docs-preview';
 import type { BusinessFormData } from '../../../business-step.types';
 
 type CustomProps = {

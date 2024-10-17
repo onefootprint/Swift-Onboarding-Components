@@ -2,7 +2,7 @@ import { IcoCheck24, IcoClose24 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import CustomDocsPreview from '../../collect-custom-docs-preview';
+import CustomDocsPreview from '../../custom-docs-preview';
 import useMeta from '../hooks/use-meta';
 
 const Preview = () => {

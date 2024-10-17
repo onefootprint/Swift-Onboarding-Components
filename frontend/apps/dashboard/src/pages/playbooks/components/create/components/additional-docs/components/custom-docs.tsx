@@ -3,8 +3,8 @@ import { Box, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import CustomDocsForm from '../../collect-custom-docs-form';
-import CustomDocsPreview from '../../collect-custom-docs-preview';
+import CustomDocsForm from '../../custom-docs-form';
+import CustomDocsPreview from '../../custom-docs-preview';
 import type { AdditionalDocsFormData, CustomDoc } from '../additional-docs.types';
 
 const CustomDocs = () => {

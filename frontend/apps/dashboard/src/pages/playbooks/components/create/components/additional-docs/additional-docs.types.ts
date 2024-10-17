@@ -1,4 +1,4 @@
-import type { CustomDoc } from '../collect-custom-docs-form';
+import type { CustomDoc } from '../custom-docs-form';
 
 export type AdditionalDocsFormData = {
   docs: {
