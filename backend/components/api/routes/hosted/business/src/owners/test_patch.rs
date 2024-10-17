@@ -1,13 +1,11 @@
 use super::patch::validate_collective_bos;
 use super::patch::BatchRequest;
 use api_core::utils::vault_wrapper::BusinessOwnerInfo;
-use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use chrono::Utc;
 use db::models::business_owner::BusinessOwner;
 use itertools::Itertools;
 use newtypes::BoId;
 use newtypes::BoLinkId;
-use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
 use newtypes::BusinessOwnerSource;
 use newtypes::DataIdentifier as DI;
@@ -103,12 +101,8 @@ fn test_verify_unique_phones_and_emails(
             let Some(data) = data else {
                 return BatchRequest::Delete { link_id };
             };
-            let data: HashMap<_, _> = data
-                .into_iter()
-                .map(|(k, v)| (BDK::bo_data(link_id.clone(), k).into(), PiiString::from(v)))
-                .collect();
+            let data: HashMap<_, _> = data.into_iter().map(|(k, v)| (k, PiiString::from(v))).collect();
             let data = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(is_live)).unwrap();
-            let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);
             if link_id == primary_link_id {
                 BatchRequest::Update {
                     link_id,

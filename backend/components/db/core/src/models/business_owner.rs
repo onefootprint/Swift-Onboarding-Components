@@ -267,7 +267,7 @@ impl BusinessOwner {
     #[tracing::instrument("BusinessOwner::add_user_vault_id", skip_all)]
     pub fn add_user_vault_id(self, conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>
-        if self.user_vault_id.is_some() {
+        if self.has_linked_user() {
             return Err(DbError::ValidationError("BO already has a user_vault_id".into()));
         }
         let result = diesel::update(business_owner::table)
@@ -280,7 +280,7 @@ impl BusinessOwner {
     #[tracing::instrument("BusinessOwner::deactivate", skip_all)]
     pub fn deactivate(conn: &mut PgConn, bo: Locked<Self>) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>
-        if bo.user_vault_id.is_some() {
+        if bo.has_linked_user() {
             return ValidationError("This owner is already linked to a user and cannot be deleted").into();
         }
         if bo.source == BusinessOwnerSource::Tenant {
@@ -294,6 +294,11 @@ impl BusinessOwner {
             .set(business_owner::deactivated_at.eq(Utc::now()))
             .get_result(conn)?;
         Ok(result)
+    }
+
+    /// Returns true if this BO already has a linked user.
+    pub fn has_linked_user(&self) -> bool {
+        self.user_vault_id.is_some()
     }
 }
 

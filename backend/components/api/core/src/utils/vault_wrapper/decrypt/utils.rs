@@ -44,8 +44,9 @@ impl<Type> VaultWrapper<Type> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_more::Deref)]
 pub struct BusinessOwnerInfo {
+    #[deref]
     pub bo: BusinessOwner,
     /// Only populated for users who have started onboarding their beneficial owner.
     /// When populated, all vault data comes from the linked scoped_user's vault.
@@ -75,12 +76,6 @@ impl BusinessOwnerInfo {
 
     pub fn phone_number(&self) -> Option<&PiiString> {
         self.data.get(&IDK::PhoneNumber.into())
-    }
-
-    /// Returns true if this BO already has a linked user. When true, the data for this BO comes
-    /// entirely from the linked user's vault
-    pub fn has_linked_user(&self) -> bool {
-        self.su.is_some()
     }
 }
 
