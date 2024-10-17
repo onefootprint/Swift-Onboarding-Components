@@ -12,27 +12,24 @@ use crate::FpResult;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
-use db::errors::FpOptionalExtension;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::session::Session;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
+use db::models::workflow_request_junction::WorkflowRequestJunction;
 use db::TxnPgConn;
 use newtypes::AuthMethodKind;
 use newtypes::DataIdentifier as DI;
-use newtypes::FpId;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKey;
+use newtypes::ScopedVaultId;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultKind;
-use newtypes::WorkflowRequestConfig;
 
 pub struct CreateTokenArgs<'a> {
     pub vw: &'a TenantVw<Any>,
-    pub fp_bid: Option<FpId>,
+    pub sb_id: Option<ScopedVaultId>,
     pub kind: TokenOperationKind,
     pub key: Option<ObConfigurationKey>,
     pub scopes: Vec<UserAuthScope>,
@@ -56,7 +53,7 @@ pub fn create_token(
 ) -> FpResult<CreateTokenResult> {
     let CreateTokenArgs {
         vw,
-        mut fp_bid,
+        mut sb_id,
         kind,
         key,
         scopes,
@@ -90,15 +87,11 @@ pub fn create_token(
             let wfr = WorkflowRequest::get_active(conn, &su.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
 
-            // TODO read wfr_junction after backfilled
-            if let WorkflowRequestConfig::Document {
-                fp_bid: Some(fp_bid_from_wfr),
-                ..
-            } = &wfr.config
-            {
-                // Extract the fp_bid from the existing WorkflowRequest
-                fp_bid = Some(fp_bid_from_wfr.clone());
-            };
+            let wfr_junctions = WorkflowRequestJunction::list(conn, &wfr.id)?;
+            sb_id = wfr_junctions
+                .into_iter()
+                .find(|j| j.kind == VaultKind::Business)
+                .map(|sb| sb.scoped_vault_id);
 
             // Do we want to replace the obc.id on the auth token?
             let obc_id = wfr.ob_configuration_id.clone();
@@ -127,22 +120,9 @@ pub fn create_token(
         ),
     };
 
-    let sb = if let Some(fp_bid) = fp_bid {
-        let id = ScopedVaultIdentifier::OwnedFpBid {
-            fp_bid: &fp_bid,
-            uv_id: &su.vault_id,
-        };
-        let sb = ScopedVault::get(conn, id)
-            .optional()?
-            .ok_or(ValidationError("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
-        Some(sb)
-    } else {
-        None
-    };
-
     let context = NewUserSessionContext {
         su_id: Some(su.id.clone()),
-        sb_id: sb.map(|sb| sb.id),
+        sb_id,
         obc_id,
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         allow_reonboard: Some(allow_reonboard),

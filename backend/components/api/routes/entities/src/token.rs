@@ -59,7 +59,7 @@ pub async fn post(
 
             let args = CreateTokenArgs {
                 vw: &vw,
-                fp_bid: None,
+                sb_id: None,
                 kind,
                 key,
                 scopes: vec![],

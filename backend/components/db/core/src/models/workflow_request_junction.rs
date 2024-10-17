@@ -62,4 +62,11 @@ impl WorkflowRequestJunction {
             .get_result::<Self>(conn)?;
         Ok(result)
     }
+
+    pub fn list(conn: &mut PgConn, wfr_id: &WorkflowRequestId) -> DbResult<Vec<Self>> {
+        let results = workflow_request_junction::table
+            .filter(workflow_request_junction::workflow_request_id.eq(wfr_id))
+            .get_results::<Self>(conn)?;
+        Ok(results)
+    }
 }

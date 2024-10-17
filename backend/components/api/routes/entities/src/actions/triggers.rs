@@ -166,7 +166,7 @@ pub(super) fn apply_trigger_request(
     let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su.id)?;
     let args = CreateTokenArgs {
         vw: &vw,
-        fp_bid: fp_bid.cloned(),
+        sb_id: sb.map(|sb| sb.id),
         kind: TokenOperationKind::Inherit,
         key: None,
         // No scopes or auth factors - require the user to re-auth when using this token

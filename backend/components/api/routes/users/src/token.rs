@@ -22,9 +22,11 @@ use api_wire_types::CreateTokenResponse;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use chrono::Utc;
+use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
@@ -110,6 +112,19 @@ pub async fn post(
             let su = ScopedVault::get(conn, (&fp_id, &tenant.id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
 
+            let sb = if let Some(fp_bid) = fp_bid {
+                let id = ScopedVaultIdentifier::OwnedFpBid {
+                    fp_bid: &fp_bid,
+                    uv_id: &su.vault_id,
+                };
+                let sb = ScopedVault::get(conn, id)
+                    .optional()?
+                    .ok_or(ValidationError("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
+                Some(sb)
+            } else {
+                None
+            };
+
             let third_party_auth_event = if use_third_party_auth {
                 // Trust that the tenant has authenticated this user already. Only certain tenants
                 // are permissioned to provide us with third-party auth.
@@ -186,7 +201,7 @@ pub async fn post(
                 vw: &vw,
                 kind,
                 key,
-                fp_bid,
+                sb_id: sb.map(|sb| sb.id),
                 scopes,
                 auth_events,
                 limit_auth_methods,
