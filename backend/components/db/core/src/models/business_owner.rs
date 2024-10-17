@@ -255,15 +255,6 @@ impl BusinessOwner {
         if !(0..=100).contains(&ownership_stake) {
             return ValidationError("Invalid ownership stake").into();
         }
-        let other_owners = business_owner::table
-            .filter(business_owner::business_vault_id.eq(bv_id))
-            .filter(business_owner::link_id.ne(link_id))
-            .filter(business_owner::deactivated_at.is_null())
-            .get_results::<Self>(conn.conn())?;
-        if other_owners.iter().flat_map(|bo| bo.ownership_stake).sum::<i32>() + ownership_stake > 100 {
-            return ValidationError("Ownership stake cannot exceed 100% for all owners of this business")
-                .into();
-        }
         let result = diesel::update(business_owner::table)
             .filter(business_owner::business_vault_id.eq(bv_id))
             .filter(business_owner::link_id.eq(link_id))
@@ -290,8 +281,7 @@ impl BusinessOwner {
     pub fn deactivate(conn: &mut PgConn, bo: Locked<Self>) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>
         if bo.user_vault_id.is_some() {
-            return ValidationError("This business owner is already linked to a user and cannot be deleted")
-                .into();
+            return ValidationError("This owner is already linked to a user and cannot be deleted").into();
         }
         if bo.source == BusinessOwnerSource::Tenant {
             return ValidationError("Cannot deactivate a business owner made by tenant").into();

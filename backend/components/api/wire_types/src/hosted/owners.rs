@@ -36,6 +36,11 @@ pub struct UpdateHostedBusinessOwnerRequest {
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct DeleteHostedBusinessOwnerRequest {
+    pub id: BoLinkId,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 #[serde(tag = "op")]
 #[serde(rename_all = "snake_case")]
 #[openapi(
@@ -44,4 +49,5 @@ pub struct UpdateHostedBusinessOwnerRequest {
 pub enum BatchHostedBusinessOwnerRequest {
     Update(UpdateHostedBusinessOwnerRequest),
     Create(CreateHostedBusinessOwnerRequest),
+    Delete(DeleteHostedBusinessOwnerRequest),
 }

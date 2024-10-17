@@ -1,5 +1,5 @@
 from tests.bifrost.test_multi_kyc_kyb import MULTI_KYC_KYB_CDOS, extract_bo_token
-from tests.utils import delete, get, patch, post
+from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.constants import BUSINESS_MODERN_BOS
 
@@ -94,40 +94,45 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
 
     # Update the secondary BO
     body = get("hosted/business/owners", None, bifrost.auth_token)
+    primary_link_id = body[0]["id"]
     link_id = body[1]["id"]
     new_secondary_data = {
-        "id": link_id,
-        "data": {
-            "id.first_name": "Frederick",
-            "id.last_name": SECONDARY_BO_DATA["id.last_name"],
-            "id.email": SECONDARY_BO_DATA["id.email"],
-            "id.phone_number": SECONDARY_BO_DATA["id.phone_number"],
-        },
-        "ownership_stake": 33,
+        "id.first_name": "Frederick",
+        "id.last_name": SECONDARY_BO_DATA["id.last_name"],
+        "id.email": SECONDARY_BO_DATA["id.email"],
+        "id.phone_number": SECONDARY_BO_DATA["id.phone_number"],
     }
-    op = dict(op="update", **new_secondary_data)
+    op = dict(op="update", id=link_id, data=new_secondary_data, ownership_stake=33)
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token)
-    _assert_bo_data(body[0], USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"])
+    _assert_bo_data(body[0], USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data)
 
     # Make sure cannot update the second owner to sum up to more than 100%
     op = dict(op="update", id=link_id, ownership_stake=51)
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
-        == "Ownership stake cannot exceed 100% for all owners of this business"
+        == "Cumulative ownership stake for all beneficial owners cannot exceed 100%"
     )
 
     # Check the secondary BO was updated properly
     body = get("hosted/business/owners", None, bifrost.auth_token)
     secondary_bo = body[1]
-    assert secondary_bo["ownership_stake"] == new_secondary_data["ownership_stake"]
-    _assert_bo_data(
-        secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"]
-    )
-    _assert_decrypt_bo_data(link_id, fp_bid, sandbox_tenant, new_secondary_data["data"])
+    assert secondary_bo["ownership_stake"] == 33
+    _assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data)
+    _assert_decrypt_bo_data(link_id, fp_bid, sandbox_tenant, new_secondary_data)
 
-    # Delete the secondary BO
-    delete(f"hosted/business/owners/{link_id}", None, bifrost.auth_token)
+    # Delete the secondary BO that was just added and add a new one. Should not fail 100% ownership stake validation
+    ops = [
+        dict(op="update", id=primary_link_id, ownership_stake=60),
+        dict(op="create", data=new_secondary_data, ownership_stake=40),
+        dict(op="delete", id=link_id),
+    ]
+    body = patch(f"hosted/business/owners", ops, bifrost.auth_token)
+    link_id = body[1]["id"]
+
+    # Delete the secondary BO that was just added
+    op = dict(op="delete", id=link_id)
+    patch(f"hosted/business/owners", [op], bifrost.auth_token)
     body = get("hosted/business/owners", None, bifrost.auth_token)
     assert len(body) == 1
     assert body[0]["id"] != link_id
@@ -155,9 +160,8 @@ def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
     assert body["message"] == "Data not found"
 
     # And cannot delete the BO that we don't own
-    body = delete(
-        f"hosted/business/owners/{link_id}", None, bifrost.auth_token, status_code=404
-    )
+    op = dict(op="delete", id=link_id)
+    body = patch("hosted/business/owners", [op], bifrost.auth_token, status_code=404)
     assert body["message"] == "Data not found"
 
 
@@ -180,14 +184,13 @@ def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
-        == "This business owner is already linked to a user and cannot be updated"
+        == "This owner is already linked to a user and cannot be updated"
     )
 
     # And cannot delete them
-    body = delete(
-        f"hosted/business/owners/{link_id}", None, bifrost.auth_token, status_code=400
-    )
+    op = dict(op="delete", id=link_id)
+    body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
-        == "This business owner is already linked to a user and cannot be deleted"
+        == "This owner is already linked to a user and cannot be deleted"
     )
