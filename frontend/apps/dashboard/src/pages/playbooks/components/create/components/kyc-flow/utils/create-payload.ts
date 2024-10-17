@@ -6,7 +6,6 @@ import {
   type OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
 import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
-import type { InvestorFormData } from '../../investor';
 import type { NameFormData } from '../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
 import type { ResidencyFormData } from '../../residency-step';
@@ -40,7 +39,7 @@ const createPayload = ({
     },
     cipKind: templateForm.template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
     ...createResidencyPayload(residencyForm),
-    ...createMustCollect(detailsForm.person, detailsForm.investor),
+    ...createMustCollect(detailsForm),
     ...createAdditionalDocsPayload(detailsForm.docs),
     ...createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
     ...createVerificationChecks(verificationChecksForm),
@@ -54,13 +53,21 @@ const requiredKycFields = [
   CollectedKycDataOption.address,
 ];
 
-const createMustCollect = (
-  { ssn, phoneNumber, usLegalStatus, usTaxIdAcceptable }: DetailsFormData['person'],
-  { collect: collectInvestorQuestion }: InvestorFormData['investor'],
-) => {
+const createMustCollect = ({ person, investor, gov }: DetailsFormData) => {
+  const { ssn, phoneNumber, usLegalStatus, usTaxIdAcceptable } = person;
+  const { collect: collectInvestorQuestion } = investor;
   const mustCollectData: CollectedDataOption[] = [...requiredKycFields];
   const optionalData: CollectedDataOption[] = [];
 
+  const { global = [], country, selfie } = gov;
+  const hasIdDocuments = global.length > 0 || Object.keys(country).length > 0;
+  if (hasIdDocuments) {
+    if (selfie) {
+      mustCollectData.push('document_and_selfie');
+    } else {
+      mustCollectData.push('document');
+    }
+  }
   if (phoneNumber) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }

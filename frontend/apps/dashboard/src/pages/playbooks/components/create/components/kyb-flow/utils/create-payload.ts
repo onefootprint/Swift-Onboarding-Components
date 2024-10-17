@@ -41,18 +41,13 @@ const createPayload = ({
   verificationChecksForm,
 }: KycFlowFormData): OrgOnboardingConfigCreateRequest => {
   const collectsBO = boForm.data.collect;
-  const { mustCollectData: personMustCollectData, optionalData: personOptionalData } = createPersonPayload(
-    boForm.data,
-    {
-      collectsBO,
-    },
-  );
+  const { mustCollectData: personMustCollectData, optionalData: personOptionalData } = createPersonPayload(boForm, {
+    collectsBO,
+  });
   const businessMustCollectData = createBusinessPayload(businessForm, {
     collectsBO,
     runKyc: verificationChecksForm.runKyc,
   });
-  console.log('personMustCollectData', personMustCollectData);
-  console.log('businessMustCollectData', businessMustCollectData);
 
   const mustCollectData = [...personMustCollectData, ...businessMustCollectData];
 
@@ -77,11 +72,12 @@ const createPayload = ({
 };
 
 const createPersonPayload = (
-  { ssn, phoneNumber, usLegalStatus, usTaxIdAcceptable }: BoFormData['data'],
+  { data, gov }: BoFormData,
   meta: {
     collectsBO: boolean;
   },
 ) => {
+  const { ssn, phoneNumber, usLegalStatus, usTaxIdAcceptable } = data;
   if (!meta.collectsBO) {
     return {
       mustCollectData: [],
@@ -90,6 +86,15 @@ const createPersonPayload = (
   }
   const mustCollectData: CollectedDataOption[] = [...requiredKycFields];
   const optionalData: CollectedDataOption[] = [];
+  const { global = [], country, selfie } = gov;
+  const hasIdDocuments = global.length > 0 || Object.keys(country).length > 0;
+  if (hasIdDocuments) {
+    if (selfie) {
+      mustCollectData.push('document_and_selfie');
+    } else {
+      mustCollectData.push('document');
+    }
+  }
   if (phoneNumber) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }
