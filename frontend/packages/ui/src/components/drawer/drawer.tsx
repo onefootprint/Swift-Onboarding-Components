@@ -71,7 +71,7 @@ const Drawer = ({
             {title}
           </Header>
           {headerComponent}
-          <Box padding={7} overflow="auto" maxWidth="100%">
+          <Box padding={7} overflow="auto" maxWidth="100%" flexGrow={1}>
             {children}
           </Box>
           <Footer linkButton={linkButton} secondaryButton={secondaryButton} primaryButton={primaryButton} />
@@ -110,8 +110,8 @@ const DrawerSurface = styled(RadixDialog.Content)`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
-    display: grid;
-    grid-template-rows: auto 1fr auto;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
     z-index: ${theme.zIndex.drawer};
