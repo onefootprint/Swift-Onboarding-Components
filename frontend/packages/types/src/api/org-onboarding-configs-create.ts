@@ -34,7 +34,6 @@ export type OrgOnboardingConfigCreateRequest = {
   documentTypesAndCountries?: DocumentTypesAndCountries;
   kind: OnboardingConfigKind;
   skipConfirm?: boolean;
-  skipKyc?: boolean;
   verificationChecks?: VerificationCheck[] | null;
   requiredAuthMethods?: AuthMethodKind[];
 };
