@@ -11,6 +11,8 @@ mod user_wf;
 pub use user_wf::*;
 mod it_user;
 pub use it_user::*;
+mod user_biz_wf;
+pub use user_biz_wf::*;
 
 /// A helper trait to extract a user vault id on combined types
 pub trait UserAuth {

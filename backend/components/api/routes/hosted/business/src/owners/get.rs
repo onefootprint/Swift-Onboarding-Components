@@ -1,6 +1,5 @@
 use crate::State;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::auth::AuthError;
+use api_core::auth::user::UserBizWfAuthContext;
 use api_core::auth::CanDecrypt;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
@@ -20,11 +19,11 @@ use paperclip::actix::{
 #[actix::get("/hosted/business/owners")]
 pub async fn get(
     state: web::Data<State>,
-    user_auth: UserWfAuthContext,
+    user_auth: UserBizWfAuthContext,
 ) -> ApiListResponse<api_wire_types::HostedBusinessOwner> {
     let user_dis = BusinessOwnerInfo::USER_DIS.to_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(user_dis))?;
-    let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
+    let sb_id = user_auth.sb_id().clone();
     let bvw = state
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sb_id))
         .await?;

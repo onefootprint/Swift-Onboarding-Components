@@ -1,8 +1,7 @@
 use actix_web::web;
-use api_core::auth::user::CheckUserWfAuthContext;
+use api_core::auth::user::CheckUserBizWfAuthContext;
 use api_core::auth::user::UserAuthScope;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::auth::AuthError;
+use api_core::auth::user::UserBizWfAuthContext;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
@@ -39,12 +38,12 @@ use std::collections::HashMap;
 #[patch("/hosted/business/owners")]
 pub async fn patch(
     state: web::Data<State>,
-    user_auth: UserWfAuthContext,
+    user_auth: UserBizWfAuthContext,
     request: web::Json<Vec<BatchHostedBusinessOwnerRequest>>,
 ) -> ApiListResponse<api_wire_types::HostedBusinessOwner> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-    let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
+    let sb_id = user_auth.sb_id.clone();
     let is_live = user_auth.scoped_user.is_live;
     let request = request.into_inner();
 
@@ -196,8 +195,12 @@ fn create_fingerprinted_data_request(
 
 
 impl BatchRequest {
-    fn process(self, conn: &mut TxnPgConn, user_auth: &CheckUserWfAuthContext) -> FpResult<Option<BoLinkId>> {
-        let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
+    fn process(
+        self,
+        conn: &mut TxnPgConn,
+        user_auth: &CheckUserBizWfAuthContext,
+    ) -> FpResult<Option<BoLinkId>> {
+        let sb_id = user_auth.sb_id.clone();
         let uv_id = &user_auth.user().id;
         let source = user_auth.user_session.dl_source();
 

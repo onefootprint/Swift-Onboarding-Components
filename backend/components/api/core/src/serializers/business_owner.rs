@@ -1,5 +1,5 @@
 use crate::auth::tenant::TenantAuth;
-use crate::auth::user::CheckUserWfAuthContext;
+use crate::auth::user::CheckUserBizWfAuthContext;
 use crate::auth::CanDecrypt;
 use crate::auth::IsGuardMet;
 use crate::utils::db2api::DbToApi;
@@ -33,8 +33,8 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
     }
 }
 
-impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserWfAuthContext)> for api_wire_types::HostedBusinessOwner {
-    fn from_db((bo, user_auth): (BusinessOwnerInfo, &'a CheckUserWfAuthContext)) -> Self {
+impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wire_types::HostedBusinessOwner {
+    fn from_db((bo, user_auth): (BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)) -> Self {
         let has_linked_user = bo.has_linked_user();
         let BusinessOwnerInfo { bo, su, data } = bo;
         let is_authed_user = su.is_some_and(|su| su.id == user_auth.scoped_user.id);

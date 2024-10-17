@@ -84,9 +84,12 @@ def test_put_business_vault(incomplete_bifrost, business_data, expected_status_c
 
 def test_put_business_vault_not_authorized(sandbox_tenant):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
-    auth_token = bifrost.auth_token
     # Can't hit PATCH /hosted/business/vault without a business vault
-    patch("hosted/business/vault", {}, auth_token, status_code=403)
+    body = patch("hosted/business/vault", {}, bifrost.auth_token, status_code=403)
+    assert (
+        body["message"]
+        == "Error loading session for header X-Fp-Authorization: Not allowed without business"
+    )
 
 
 def test_one_click_kyb(kyb_sandbox_ob_config):

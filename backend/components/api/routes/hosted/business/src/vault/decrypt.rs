@@ -1,10 +1,9 @@
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::user::UserAuthContext;
+use api_core::auth::user::UserBizWfAuthContext;
 use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
-use api_core::errors::ValidationError;
 use api_wire_types::BusinessDecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -32,13 +31,11 @@ pub struct UserDecryptRequest {
 pub async fn post(
     state: web::Data<State>,
     request: Json<UserDecryptRequest>,
-    user_auth: UserAuthContext,
+    user_auth: UserBizWfAuthContext,
 ) -> ApiResponse<BusinessDecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
-    let sb_id = user_auth
-        .scoped_business_id()
-        .ok_or(ValidationError("No business associated with this session"))?;
+    let sb_id = user_auth.sb_id().clone();
 
     let bvw = state
         .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sb_id))

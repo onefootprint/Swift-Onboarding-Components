@@ -27,13 +27,14 @@ use std::sync::Arc;
 /// onboarding session linked to a scoped user.
 /// We preload information for the scoped vault and onboarding that is commonly used by HTTP
 /// handlers
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_more::Deref)]
 pub struct UserWfSession {
+    #[deref]
     pub user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
-    ob_config: ObConfiguration,
-    tenant: Tenant,
-    workflow: Workflow,
+    pub(super) ob_config: ObConfiguration,
+    pub(super) tenant: Tenant,
+    pub(super) workflow: Workflow,
 }
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -44,7 +45,7 @@ pub struct UserWfSession {
     name = "X-Fp-Authorization",
     description = "Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions."
 )]
-pub struct ParsedUserWfSession(UserWfSession);
+pub struct ParsedUserWfSession(pub(super) UserWfSession);
 
 impl ExtractableAuthSession for ParsedUserWfSession {
     fn header_names() -> Vec<&'static str> {

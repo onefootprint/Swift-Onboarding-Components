@@ -75,24 +75,27 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
     # Run bifrost
     auth_token = IdentifyClient.from_token(auth_token).step_up()
 
+    bifrost2 = BifrostClient.raw_auth(
+        kyb_sandbox_ob_config, auth_token, bifrost.sandbox_id
+    )
+
     # Should be able to decrypt existing business information
     data = dict(fields=["business.dba", "business.address_line1"])
-    body = post("hosted/business/vault/decrypt", data, auth_token)
+    body = post("hosted/business/vault/decrypt", data, bifrost2.auth_token)
     assert body["business.dba"] == BUSINESS_DATA["business.dba"]
     assert body["business.address_line1"] == BUSINESS_DATA["business.address_line1"]
-
     # Cannot decrypt tin
     data = dict(fields=["business.tin", "business.name"])
-    body = post("hosted/business/vault/decrypt", data, auth_token, status_code=403)
+    body = post(
+        "hosted/business/vault/decrypt", data, bifrost2.auth_token, status_code=403
+    )
     assert (
         body["message"]
         == "Not allowed: required permission is missing: CanDecrypt<business.tin>"
     )
 
-    bifrost2 = BifrostClient.raw_auth(
-        kyb_sandbox_ob_config, auth_token, bifrost.sandbox_id
-    )
     user2 = bifrost2.run()
+
     assert set(i["kind"] for i in bifrost2.already_met_requirements) == {
         "collect_data",
         "collect_business_data",

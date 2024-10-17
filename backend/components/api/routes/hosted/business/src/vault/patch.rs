@@ -4,8 +4,7 @@ use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::auth::AuthError;
+use api_core::auth::user::UserBizWfAuthContext;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -27,12 +26,12 @@ use paperclip::actix::{
 #[actix::post("/hosted/business/vault/validate")]
 pub async fn post_validate(
     state: web::Data<State>,
-    user_auth: UserWfAuthContext,
+    user_auth: UserBizWfAuthContext,
     request: Json<RawBusinessDataRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-    let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
+    let sb_id = user_auth.sb_id().clone();
 
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
         request.into_inner(),
@@ -61,11 +60,11 @@ pub async fn post_validate(
 pub async fn patch(
     state: web::Data<State>,
     request: Json<RawBusinessDataRequest>,
-    user_auth: UserWfAuthContext,
+    user_auth: UserBizWfAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-    let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
+    let sb_id = user_auth.sb_id().clone();
 
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
         request.into_inner(),

@@ -1,3 +1,4 @@
+use api_errors::FpError;
 use api_errors::FpErrorCode;
 use api_errors::StatusCode;
 use thiserror::Error;
@@ -35,7 +36,7 @@ pub enum AuthError {
     #[error("Invalid {0}")]
     InvalidHeader(String),
     #[error("Error loading session for header {0}: {1}")]
-    ErrorLoadingSession(String, String),
+    ErrorLoadingSession(String, FpError),
     #[error("Invalid request body")]
     InvalidBody,
     #[error("Incorrect auth session type")]
@@ -52,6 +53,8 @@ pub enum AuthError {
     MissingBusiness,
     #[error("Not allowed without workflow")]
     MissingWorkflow,
+    #[error("Not allowed without business workflow")]
+    MissingBusinessWorkflow,
     #[error("Not allowed without scoped user")]
     MissingScopedUser,
     #[error("Not allowed: required permission is missing: {0}. Please review the permissions configured for your role in the Footprint dashboard.")]
@@ -85,7 +88,7 @@ impl api_errors::FpErrorTrait for AuthError {
             AuthError::ApiKeyUsedForObConfig => StatusCode::UNAUTHORIZED,
             AuthError::MissingHeader(_) => StatusCode::UNAUTHORIZED,
             AuthError::InvalidHeader(_) => StatusCode::UNAUTHORIZED,
-            AuthError::ErrorLoadingSession(_, _) => StatusCode::UNAUTHORIZED,
+            AuthError::ErrorLoadingSession(_, err) => err.status_code(), // Should we map to 401 here?
             AuthError::InvalidBody => StatusCode::UNAUTHORIZED,
             AuthError::SessionTypeError => StatusCode::UNAUTHORIZED,
             AuthError::SandboxRestricted => StatusCode::FORBIDDEN,
@@ -94,6 +97,7 @@ impl api_errors::FpErrorTrait for AuthError {
             AuthError::MissingUserPermission(_) => StatusCode::FORBIDDEN,
             AuthError::MissingBusiness => StatusCode::FORBIDDEN,
             AuthError::MissingWorkflow => StatusCode::FORBIDDEN,
+            AuthError::MissingBusinessWorkflow => StatusCode::FORBIDDEN,
             AuthError::MissingScopedUser => StatusCode::FORBIDDEN,
             AuthError::MissingTenantPermission(_) => StatusCode::FORBIDDEN,
             AuthError::MissingClientTokenPermission(_) => StatusCode::FORBIDDEN,
