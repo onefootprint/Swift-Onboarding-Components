@@ -9,6 +9,8 @@ use db_schema::schema::workflow_request;
 use db_schema::schema::workflow_request_junction;
 use diesel::dsl::exists;
 use diesel::prelude::*;
+use itertools::chain;
+use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
@@ -45,7 +47,8 @@ struct NewWorkflowRequestRow<'a> {
 
 pub struct NewWorkflowRequestArgs<'a> {
     pub ob_configuration_id: &'a ObConfigurationId,
-    pub scoped_vault_id: &'a ScopedVaultId,
+    pub su_id: &'a ScopedVaultId,
+    pub sb_id: Option<&'a ScopedVaultId>,
     pub created_by: &'a DbActor,
     pub config: &'a WorkflowRequestConfig,
     pub note: Option<String>,
@@ -93,14 +96,18 @@ impl WorkflowRequest {
     #[tracing::instrument("WorkflowRequest::create", skip_all)]
     pub fn create(conn: &mut TxnPgConn, args: NewWorkflowRequestArgs) -> DbResult<Self> {
         let NewWorkflowRequestArgs {
-            scoped_vault_id,
+            su_id,
+            sb_id,
             ob_configuration_id,
             created_by,
             config,
             note,
         } = args;
         // Deactivate old WorkflowRequests when making a new one
-        Self::deactivate(conn, scoped_vault_id, None)?;
+        Self::deactivate(conn, su_id, None)?;
+        if let Some(sb_id) = sb_id {
+            Self::deactivate(conn, sb_id, None)?;
+        }
         let new_row = NewWorkflowRequestRow {
             ob_configuration_id,
             timestamp: Utc::now(),
@@ -111,13 +118,22 @@ impl WorkflowRequest {
         let result = diesel::insert_into(workflow_request::table)
             .values(new_row)
             .get_result::<Self>(conn.conn())?;
-        let workflow_request_junction = NewWorkflowRequestJunctionRow {
-            workflow_request_id: &result.id,
-            scoped_vault_id,
-            // TODO eventually create business junctions here
-            kind: VaultKind::Person,
-        };
-        WorkflowRequestJunction::create(conn, workflow_request_junction)?;
+
+        // Link the new WorkflowRequest to the scoped user (and optionally scoped business)
+        let wfr_junctions = chain!(
+            Some(NewWorkflowRequestJunctionRow {
+                workflow_request_id: &result.id,
+                scoped_vault_id: su_id,
+                kind: VaultKind::Person,
+            }),
+            sb_id.map(|sb_id| NewWorkflowRequestJunctionRow {
+                workflow_request_id: &result.id,
+                scoped_vault_id: sb_id,
+                kind: VaultKind::Business,
+            })
+        )
+        .collect_vec();
+        WorkflowRequestJunction::bulk_create(conn, wfr_junctions)?;
         Ok(result)
     }
 

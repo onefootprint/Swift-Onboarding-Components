@@ -34,10 +34,10 @@ pub struct NewWorkflowRequestJunctionRow<'a> {
 }
 
 impl WorkflowRequestJunction {
-    pub fn create(conn: &mut PgConn, row: NewWorkflowRequestJunctionRow) -> DbResult<Self> {
+    pub fn bulk_create(conn: &mut PgConn, rows: Vec<NewWorkflowRequestJunctionRow>) -> DbResult<Vec<Self>> {
         let result = diesel::insert_into(workflow_request_junction::table)
-            .values(row)
-            .get_result::<Self>(conn)?;
+            .values(rows)
+            .get_results::<Self>(conn)?;
         Ok(result)
     }
 

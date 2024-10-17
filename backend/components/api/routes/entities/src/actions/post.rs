@@ -16,6 +16,7 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::EntityAction;
+use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -37,7 +38,7 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let actor = DbActor::from(auth.actor());
-    let EntityActionsRequest { actions } = request.into_inner();
+    let EntityActionsRequest { actions, fp_bid } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
     if actions.is_empty() {
         return ValidationError("Must provide at least one action").into();
@@ -46,12 +47,16 @@ pub async fn post(
     let outcomes = state
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            if sv.kind != VaultKind::Person {
+                return Err(ValidationError("Must be a person vault").into());
+            }
             let outcomes = actions
                 .into_iter()
                 .map(|a| -> FpResult<EntityActionPostCommit> {
                     let action = match a {
                         EntityAction::Trigger(t) => {
-                            apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
+                            apply_trigger_request(conn, t, &sv, actor.clone(), &session_key, fp_bid.as_ref())?
+                                .into()
                         }
                         EntityAction::ClearReview => clear_review(conn, &sv, actor.clone())?,
                         EntityAction::ManualDecision(d) => {

@@ -89,8 +89,8 @@ pub fn create_token(
             // Inherit the WorkflowRequest
             let wfr = WorkflowRequest::get_active(conn, &su.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
-            // Do we want to replace the obc.id on the auth token?
 
+            // TODO read wfr_junction after backfilled
             if let WorkflowRequestConfig::Document {
                 fp_bid: Some(fp_bid_from_wfr),
                 ..
@@ -100,6 +100,7 @@ pub fn create_token(
                 fp_bid = Some(fp_bid_from_wfr.clone());
             };
 
+            // Do we want to replace the obc.id on the auth token?
             let obc_id = wfr.ob_configuration_id.clone();
             (TokenCreationPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }

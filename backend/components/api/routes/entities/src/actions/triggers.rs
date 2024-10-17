@@ -15,10 +15,10 @@ use api_wire_types::EntityActionResponse;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
-use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::session::Session;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
@@ -30,6 +30,7 @@ use db::TxnPgConn;
 use newtypes::ApiKeyStatus;
 use newtypes::DbActor;
 use newtypes::DocumentRequestConfig;
+use newtypes::FpId;
 use newtypes::ObConfigurationKind;
 use newtypes::SessionAuthToken;
 use newtypes::TriggerRequest;
@@ -38,44 +39,23 @@ use newtypes::VaultKind;
 use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowTriggeredInfo;
 
-fn validate(
-    conn: &mut TxnPgConn,
-    trigger: &WorkflowRequestConfig,
-    scoped_vault: &ScopedVault,
-) -> FpResult<()> {
+fn validate(trigger: &WorkflowRequestConfig, sb: Option<&ScopedVault>) -> FpResult<()> {
     match trigger {
         WorkflowRequestConfig::Onboard { .. } => Ok(()),
         WorkflowRequestConfig::Document {
             configs,
-            fp_bid,
             business_configs,
+            fp_bid: _,
         } => {
             DocumentRequestConfig::validate(configs)?;
-            match (fp_bid, business_configs) {
-                (Some(fp_bid), business_configs) if !business_configs.is_empty() => {
-                    DocumentRequestConfig::validate(business_configs)?;
-                    if business_configs.iter().any(|c| !c.is_custom()) {
-                        return ValidationError("business_configs can only contain custom document requests")
-                            .into();
-                    }
-                    let sb = ScopedVault::get(conn, (fp_bid, &scoped_vault.tenant_id, scoped_vault.is_live))?;
-                    let bos = BusinessOwner::list_all(conn, &sb.vault_id, &scoped_vault.tenant_id)?;
-                    let is_bo = bos
-                        .iter()
-                        .flat_map(|(_, bo)| bo)
-                        .any(|(sv, _)| sv.id == scoped_vault.id);
-                    if !is_bo {
-                        return ValidationError(
-                            "Provided user is not a beneficial owner of the provided business",
-                        )
-                        .into();
-                    }
-                }
-                (None, business_configs) if business_configs.is_empty() => (),
-                (_, _) => {
-                    return ValidationError("fp_bid and business_configs must both be provided together")
-                        .into()
-                }
+            DocumentRequestConfig::validate(business_configs)?;
+            if business_configs.iter().any(|c| !c.is_custom()) {
+                return ValidationError("business_configs can only contain custom document requests").into();
+            }
+            let has_sb = sb.is_some();
+            let has_business_configs = !business_configs.is_empty();
+            if has_sb != has_business_configs {
+                return ValidationError("fp_bid and business_configs must both be provided together").into();
             }
 
             Ok(())
@@ -91,19 +71,29 @@ pub(super) struct TriggerRequestOutcome {
 pub(super) fn apply_trigger_request(
     conn: &mut TxnPgConn,
     request: TriggerRequest,
-    sv: &ScopedVault,
+    su: &ScopedVault,
     actor: DbActor,
     session_key: &ScopedSealingKey,
+    fp_bid: Option<&FpId>,
 ) -> FpResult<TriggerRequestOutcome> {
     let TriggerRequest { trigger, note } = request;
-    let fp_bid = match &trigger {
-        WorkflowRequestConfig::Document { fp_bid, .. } => fp_bid.clone(),
+
+    let fp_bid = fp_bid.or(match &trigger {
+        // TODO move fp_bid out of the workflow_request config here once the client has been updated
+        WorkflowRequestConfig::Document { fp_bid, .. } => fp_bid.as_ref(),
         _ => None,
-    };
+    });
+    let sb = fp_bid
+        .map(|fp_bid| {
+            let uv_id = &su.vault_id;
+            let id = ScopedVaultIdentifier::OwnedFpBid { fp_bid, uv_id };
+            ScopedVault::get(conn, id)
+        })
+        .transpose()?;
 
-    let vault = Vault::get(conn, &sv.id)?;
-    validate(conn, &trigger, sv)?;
+    validate(&trigger, sb.as_ref())?;
 
+    let vault = Vault::get(conn, &su.id)?;
     if vault.kind != VaultKind::Person {
         return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
     }
@@ -111,22 +101,22 @@ pub(super) fn apply_trigger_request(
     let obc = match &trigger {
         WorkflowRequestConfig::Onboard { playbook_id } => {
             // Trigger specifically requested the playbook onto which the user should onboard
-            let (obc, _) = ObConfiguration::get(conn, (playbook_id, &sv.tenant_id, sv.is_live))?;
+            let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
             obc
         }
         WorkflowRequestConfig::Document { .. } => {
             // For all other trigger kinds, just associate the last playbook with the WFR.
             // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
             // associated a playbook with these WFRs
-            if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &sv.id, false)? {
+            if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &su.id, false)? {
                 obc
             } else {
                 // This is a hack: these triggers all need a playbook associated to display various tenant
                 // information. Select the most recently created playbook to randomly associate with this
                 // workflow. Its rules will not be used...
                 let query = ObConfigurationQuery {
-                    tenant_id: sv.tenant_id.clone(),
-                    is_live: sv.is_live,
+                    tenant_id: su.tenant_id.clone(),
+                    is_live: su.is_live,
                     status: Some(ApiKeyStatus::Enabled),
                     kinds: Some(ObConfigurationKind::reonboardable()),
                     search: None,
@@ -147,7 +137,8 @@ pub(super) fn apply_trigger_request(
     }
 
     let wfr_args = NewWorkflowRequestArgs {
-        scoped_vault_id: &sv.id,
+        su_id: &su.id,
+        sb_id: sb.as_ref().map(|sb| &sb.id),
         ob_configuration_id: &obc.id,
         created_by: &actor,
         config: &trigger,
@@ -163,20 +154,19 @@ pub(super) fn apply_trigger_request(
         workflow_request_id: Some(wfr.id.clone()),
         actor,
     };
-    UserTimeline::create(conn, event.clone(), sv.vault_id.clone(), sv.id.clone())?;
+    UserTimeline::create(conn, event.clone(), su.vault_id.clone(), su.id.clone())?;
 
     // Create the same workflow request timeline event on the business to indicate that the workflow was
     // triggered
-    if let Some(fp_bid) = fp_bid.clone() {
-        let sb = ScopedVault::get(conn, (&fp_bid, &sv.tenant_id, sv.is_live))?;
+    if let Some(sb) = sb.as_ref() {
         UserTimeline::create(conn, event, sb.vault_id.clone(), sb.id.clone())?;
     }
 
     // Create an inherit token for the WFR
-    let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
+    let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su.id)?;
     let args = CreateTokenArgs {
         vw: &vw,
-        fp_bid,
+        fp_bid: fp_bid.cloned(),
         kind: TokenOperationKind::Inherit,
         key: None,
         // No scopes or auth factors - require the user to re-auth when using this token
@@ -187,7 +177,7 @@ pub(super) fn apply_trigger_request(
     };
     let CreateTokenResult { token, session, .. } = create_token(conn, session_key, args, Duration::days(3))?;
 
-    sv.create_webhook_task(conn, UserSpecificWebhookKind::InfoRequested)?;
+    su.create_webhook_task(conn, UserSpecificWebhookKind::InfoRequested)?;
 
     // Create an auth token for this workflow that we will send to the user
     let outcome = TriggerRequestOutcome { token, session };
