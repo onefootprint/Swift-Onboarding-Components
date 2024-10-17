@@ -2,13 +2,8 @@ import { IcoEmail16, IcoSmartphone216 } from '@onefootprint/icons';
 import { Box, Checkbox, InlineAlert, Stack, Text } from '@onefootprint/ui';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import Header from '../header';
-
-export type AuthDetailsFormData = {
-  email: boolean;
-  phone: boolean;
-  hasOptionSelected?: boolean;
-};
+import Header from '../../../header';
+import type { AuthDetailsFormData } from './auth-details-step.types';
 
 export type AuthDetailsStepProps = {
   defaultValues: AuthDetailsFormData;

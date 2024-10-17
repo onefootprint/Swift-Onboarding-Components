@@ -7,7 +7,7 @@ import { type UseFieldArrayProps, useFormContext, useWatch } from 'react-hook-fo
 import { useTranslation } from 'react-i18next';
 
 import type { AdditionalDocsFormData } from '../additional-docs';
-import type { BusinessFormData } from '../flow-kyb/components/business-step';
+import type { BusinessFormData } from '../kyb-flow/components/business-step';
 import type { CustomDoc } from './custom-docs-form.types';
 
 type CustomDocsFormProps = {

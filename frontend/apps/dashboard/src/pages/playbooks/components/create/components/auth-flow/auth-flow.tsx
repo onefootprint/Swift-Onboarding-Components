@@ -3,9 +3,9 @@ import { Stepper } from '@onefootprint/ui';
 import { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import useCreatePlaybook from '../../hooks/use-create-playbook';
-import AuthDetailsStep from '../step-auth-details';
-import NameStep from '../step-name';
+import NameStep from '../name-step';
 import StepperContainer from '../stepper-container';
+import AuthDetailsStep from './components/auth-details-step';
 import createPayload from './utils/create-payload';
 import { type Step, initialState, reducer } from './utils/reducer';
 
@@ -53,7 +53,7 @@ const AuthFlow = ({ onBack, onDone }: AuthFlowProps) => {
       )}
       {state.step === 'details' && (
         <AuthDetailsStep
-          defaultValues={state.data.detailsForm}
+          defaultValues={state.data.authDetailsForm}
           onBack={() => dispatch({ type: 'updateStep', payload: 'name' })}
           onSubmit={data => {
             dispatch({ type: 'updateDetailsData', payload: data });

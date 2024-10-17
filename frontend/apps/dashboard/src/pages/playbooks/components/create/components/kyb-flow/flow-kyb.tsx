@@ -11,8 +11,8 @@ import getStepperValue from './utils/get-stepper-value';
 import { initialState, reducer } from './utils/reducer';
 
 import useCreatePlaybook from '../../hooks/use-create-playbook';
-import NameStep from '../step-name';
-import RequiredAuthMethodsStep from '../step-required-auth-methods';
+import NameStep from '../name-step';
+import RequiredAuthMethodsStep from '../required-auth-methods-step';
 import StepperContainer from '../stepper-container';
 
 type FlowKyb = {

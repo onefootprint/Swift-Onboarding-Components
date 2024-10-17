@@ -1,7 +1,7 @@
 import { AuthMethodKind, type CustomDI, type DocumentRequestConfig, DocumentRequestKind } from '@onefootprint/types';
 import type { AdditionalDocsFormData } from '../components/additional-docs';
 
-import type { RequiredAuthMethodsFormData } from '../components/step-required-auth-methods';
+import type { RequiredAuthMethodsFormData } from '../components/required-auth-methods-step';
 
 export const createAdditionalDocsPayload = ({
   poa,

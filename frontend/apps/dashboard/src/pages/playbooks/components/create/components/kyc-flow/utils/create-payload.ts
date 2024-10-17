@@ -6,9 +6,9 @@ import {
   type OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
 import type { InvestorFormData } from '../../investor';
-import type { NameFormData } from '../../step-name';
-import type { RequiredAuthMethodsFormData } from '../../step-required-auth-methods';
-import type { ResidencyFormData } from '../../step-residency';
+import type { NameFormData } from '../../name-step';
+import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
+import type { ResidencyFormData } from '../../residency-step';
 import type { DetailsFormData } from '../components/details-step';
 
 import type { VerificationChecksFormData } from '../components/verification-checks-step';

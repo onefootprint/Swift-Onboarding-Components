@@ -1,4 +1,4 @@
-import type { NameFormData } from '../../step-name';
+import type { NameFormData } from '../../name-step';
 import type { DocumentsDetailsFormData } from '../components/step-document-details';
 
 export type Step = 'name' | 'details';

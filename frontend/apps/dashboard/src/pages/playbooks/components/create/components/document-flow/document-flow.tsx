@@ -4,7 +4,7 @@ import { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCreatePlaybook from '../../hooks/use-create-playbook';
-import NameStep from '../step-name';
+import NameStep from '../name-step';
 import StepperContainer from '../stepper-container';
 import DocumentDetailsStep from './components/step-document-details';
 import createPayload from './utils/create-payload';

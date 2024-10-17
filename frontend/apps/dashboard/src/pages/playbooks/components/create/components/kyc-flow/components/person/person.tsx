@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Panel from '../../../panel';
-import type { ResidencyFormData } from '../../../step-residency';
+import type { ResidencyFormData } from '../../../residency-step';
 import Cta from './components/cta';
 import Form from './components/form';
 import Preview from './components/preview';

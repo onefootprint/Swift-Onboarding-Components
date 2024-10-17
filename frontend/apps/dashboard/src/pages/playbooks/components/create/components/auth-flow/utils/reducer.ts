@@ -1,5 +1,5 @@
-import type { AuthDetailsFormData } from '../../step-auth-details';
-import type { NameFormData } from '../../step-name';
+import type { NameFormData } from '../../name-step';
+import type { AuthDetailsFormData } from '../components/auth-details-step';
 
 export type Step = 'name' | 'details';
 
@@ -7,7 +7,7 @@ export type State = {
   step: Step;
   data: {
     nameForm: NameFormData;
-    detailsForm: AuthDetailsFormData;
+    authDetailsForm: AuthDetailsFormData;
   };
 };
 
@@ -23,7 +23,7 @@ export const initialState: State = {
     nameForm: {
       name: '',
     },
-    detailsForm: {
+    authDetailsForm: {
       email: false,
       phone: true,
     },
@@ -50,8 +50,8 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         data: {
           ...state.data,
-          detailsForm: {
-            ...state.data.detailsForm,
+          authDetailsForm: {
+            ...state.data.authDetailsForm,
             ...action.payload,
           },
         },

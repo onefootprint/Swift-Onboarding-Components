@@ -4,13 +4,13 @@ import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import StepKind from './components/step-kind';
+import StepKind from './components/kind-step';
 import { DialogButtonsProvider, useDialogButtons } from './hooks/use-dialog-buttons';
 
-const AuthFlow = lazy(() => import('./components/flow-auth'));
-const DocumentFlow = lazy(() => import('./components/flow-document'));
+const AuthFlow = lazy(() => import('./components/auth-flow'));
+const DocumentFlow = lazy(() => import('./components/document-flow'));
 const KycFlow = lazy(() => import('./components/kyc-flow'));
-const KybFlow = lazy(() => import('./components/flow-kyb'));
+const KybFlow = lazy(() => import('./components/kyb-flow'));
 
 type Step = 'select-kind' | OnboardingConfigKind;
 

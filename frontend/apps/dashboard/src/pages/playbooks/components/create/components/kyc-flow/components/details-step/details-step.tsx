@@ -5,7 +5,7 @@ import AdditionalDocs from '../../../additional-docs';
 import GovDocs from '../../../gov-docs';
 import Header from '../../../header';
 import Investor from '../../../investor';
-import type { ResidencyFormData } from '../../../step-residency';
+import type { ResidencyFormData } from '../../../residency-step';
 import Person from '../person';
 import type { TemplatesFormData } from '../templates-step';
 import type { DetailsFormData } from './details-step.types';

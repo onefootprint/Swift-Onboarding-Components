@@ -8,8 +8,8 @@ import {
   OnboardingConfigKind,
   type OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
-import type { NameFormData } from '../../step-name';
-import type { RequiredAuthMethodsFormData } from '../../step-required-auth-methods';
+import type { NameFormData } from '../../name-step';
+import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
 import type { BoFormData } from '../components/bo-step';
 import type { BusinessFormData } from '../components/business-step';
 import type { VerificationChecksFormData } from '../components/verification-checks-step';
