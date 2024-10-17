@@ -12,6 +12,7 @@ import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';
 import SEO from '../../../../components/seo';
 import type { PostDetails } from '../../../../utils/ghost/types';
+import BookADemo from './components/book-a-demo';
 
 export type PostProps = {
   post: PostDetails;
@@ -58,6 +59,7 @@ const Post = ({ post }: PostProps) => {
               </Text>
             </header>
             <PostContent html={post.html} />
+            <BookADemo />
           </WritingLayout>
         </Container>
       </article>

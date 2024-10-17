@@ -17,6 +17,13 @@
         "documentation": "Documentation"
       }
     },
+    "demo": {
+      "title": "Ready to start?",
+      "description": "If you're looking to onboard customers quickly and securely store their sensitive data, we'd love to help. Schedule a call, reach out by email or stay up to date with the latest updates by following us on <linkedin/> and <x/>.",
+      "linkedin": "LinkedIn",
+      "x": "X",
+      "book-a-call": "Book a demo"
+    },
     "contact-us-dialog": {
       "title": "Book a demo",
       "description": "Let us know where to get back to you and we'll find some options to chat.",

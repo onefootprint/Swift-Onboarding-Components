@@ -126,7 +126,7 @@ const FormContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: ${theme.spacing[11]} 0;
+    margin: ${theme.spacing[10]} 0;
     text-align: center;
     padding: 0 ${theme.spacing[10]};
 

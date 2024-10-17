@@ -82,7 +82,6 @@ const Blog = ({ posts }: BlogProps) => {
     };
   }, []);
 
-  console.log(featuredPost);
   return (
     <>
       <SEO title={t('html-title')} description={t('html-description')} slug="/blog" />
