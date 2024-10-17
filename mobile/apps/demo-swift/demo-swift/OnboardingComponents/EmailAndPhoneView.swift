@@ -1,68 +1,102 @@
 import SwiftUI
 import FootprintSwift
-import Inject
 
-
-struct EmailAndPhoneView: View {
-    @ObserveInjection var inject
-    @State private var email: String = "sandbox@onefootprint.com"
-    @State private var phoneNumber: String = "+15555550100"
+struct EmailAndPhoneView: View {  
     @State private var shouldNavigateToNextView = false
-    @State private var isLoading = false
     
     var body: some View {
-        NavigationView {
-            VStack {
-                EmailInputField(email: $email, placeholder: "Enter your email", label: "Email")
-                    .padding()
-                PhoneInputField(phoneNumber: $phoneNumber, placeholder: "Enter your phone number", label: "Phone")
-                    .padding()
-                Button(action: {
-                    isLoading = true
-                    Task {
-                        do {
-                            try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
-
-                            shouldNavigateToNextView = true
-                        } catch {
-                            print("Error: \(error)")
-                            shouldNavigateToNextView = false
-                        }
-                        isLoading = false
-                    }
-                }) {
-                    if isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    } else {
-                        Text("Continue")
-                    }
+        FpForm(
+            onSubmit: {
+                Task {
+                    print("onSubmit: ")
+                    // Uncomment the following code when ready to implement the actual submission
+                    // do {
+                    //     try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
+                    //     shouldNavigateToNextView = true
+                    // } catch {
+                    //     print("Error: \(error)")
+                    //     shouldNavigateToNextView = false
+                    // }
                 }
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(isLoading ? Color.gray : Color.blue)
-                .cornerRadius(8)
-                .disabled(isLoading)
-                .padding()               
-                NavigationLink(destination: VerifyOTPView(), isActive: $shouldNavigateToNextView) { EmptyView() }
+            },
+            content: {
+                VStack(spacing: 20) {
+                    FpField(
+                        name: .idPeriodEmail,
+                        label: { FpLabel("Email", font: .subheadline, color: .secondary) },
+                        input: { 
+                            FpInput(placeholder: "Enter your email", keyboardType: .emailAddress, contentType: .emailAddress)
+                                .padding()
+                                .background(Color.gray.opacity(0.8))
+                                .cornerRadius(50)
+                        },
+                        error: { FpFieldError() }
+                    )
+                    
+                    FpField(
+                        name: .idPeriodPhoneNumber,
+                        label: { FpLabel("Phone Number", font: .subheadline, color: .secondary) },
+                        input: { 
+                            FpInput(placeholder: "Enter your phone number", keyboardType: .phonePad, contentType: .telephoneNumber)
+                                .padding()
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(10)
+                        },
+                        error: { FpFieldError() }
+                    )
+                }
+            },
+            submitButton: {
+                Text("Continue")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
             }
-        }
+        )
         .navigationTitle("Signup flow")
-        .onAppear(perform: {
+        .onAppear {
             Task {
                 do {
                     let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
                     try await FootprintProvider.shared.initialize(
                         configKey: "pb_test_QeSAeS8XHohiSpCOj2l4vd",
-//                        sandboxId: "gC2hvdsN06Q53",
                         sandboxOutcome: sandboxOutcome
-                       )
-                }catch{
+                    )
+                } catch {
                     print("Error: \(error)")
                 }
             }
-        })
-        .enableInjection()
+        }
+        .navigate(to: NextView(), when: $shouldNavigateToNextView)
+    }
+}
+
+struct NextView: View {
+    var body: some View {
+        Text("Next View")
+    }
+}
+
+extension View {
+    func navigate<NewView: View>(to view: NewView, when binding: Binding<Bool>) -> some View {
+        NavigationView {
+            ZStack {
+                self
+                    .navigationBarTitle("")
+                    .navigationBarHidden(true)
+
+                NavigationLink(
+                    destination: view
+                        .navigationBarTitle("")
+                        .navigationBarHidden(true),
+                    isActive: binding
+                ) {
+                    EmptyView()
+                }
+            }
+        }
+        .navigationViewStyle(.stack)
     }
 }

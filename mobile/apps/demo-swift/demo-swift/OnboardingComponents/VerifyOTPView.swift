@@ -61,7 +61,8 @@ struct VerifyOTPView: View {
         
         Task {
             do {
-               let response =  try await FootprintProvider.shared.verify(verificationCode: pin)               
+               let response =  try await FootprintProvider.shared.verify(verificationCode: pin)
+                            
                 DispatchQueue.main.async {
                     self.navigateToBasicInfo = true
                 }

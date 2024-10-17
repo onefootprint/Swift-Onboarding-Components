@@ -26,57 +26,47 @@ struct BasicInfoView: View {
                         .font(.title)
                         .fontWeight(.bold)
                     
-                    GenericInputField(
-                        text: $firstName,
+                    FpInput(                        
                         placeholder: "First Name"
                     )
                     
-                    GenericInputField(
-                        text: $middleName,
+                    FpInput(                        
                         placeholder: "Middle Name"
                     )
                     
-                    GenericInputField(
-                        text: $lastName,
+                    FpInput(                        
                         placeholder: "Last Name"
                     )
                     
                     DatePicker("Date of Birth", selection: $dateOfBirth, displayedComponents: .date)
                         .datePickerStyle(DefaultDatePickerStyle())
                     
-                    GenericInputField(
-                        text: $addressLine1,
+                    FpInput(                        
                         placeholder: "Address Line 1"
                     )
                     
-                    GenericInputField(
-                        text: $addressLine2,
+                    FpInput(                        
                         placeholder: "Address Line 2 (Optional)"
                     )
                     
-                    GenericInputField(
-                        text: $city,
+                    FpInput(                        
                         placeholder: "City"
                     )
                     
-                    GenericInputField(
-                        text: $state,
+                    FpInput(                        
                         placeholder: "State"
                     )
                     
-                    GenericInputField(
-                        text: $zipCode,
+                    FpInput(                        
                         placeholder: "Zip Code",
                         keyboardType: .numberPad
                     )
                     
-                    GenericInputField(
-                        text: $country,
+                    FpInput(                        
                         placeholder: "Country"
                     )
                     
-                    GenericInputField(
-                        text: $ssn,
+                    FpInput(                        
                         placeholder: "SSN",
                         keyboardType: .numberPad
                     )
