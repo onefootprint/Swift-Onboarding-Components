@@ -242,7 +242,7 @@
             "upload-new": "Upload new",
             "cta": "Choose file to upload",
             "or-drag": "or drag and drop",
-            "supported-formats": "Supported formats: PNG, JPG (max size 5MB)",
+            "supported-formats": "Supported formats: PNG, JPG, PDF (max size 5MB)",
             "errors": {
               "required": "Document is required"
             },
