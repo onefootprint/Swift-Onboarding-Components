@@ -376,7 +376,7 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     assert set(body["user"]["available_challenge_kinds"]) >= {"sms"}
 
     # Now, one-click onboard onto another tenant!
-    bifrost = BifrostClient.inherit_user(
+    bifrost = BifrostClient.login_user(
         foo_sandbox_tenant.default_ob_config, sandbox_id
     )
     foo_user = bifrost.run()

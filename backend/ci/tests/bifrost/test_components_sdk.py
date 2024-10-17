@@ -76,7 +76,7 @@ def test_components_sdk(sandbox_tenant):
         HttpError,
         match="Cannot create a new token from one issued for the components SDK",
     ) as e:
-        IdentifyClient.from_token(components_token).inherit()
+        IdentifyClient.from_token(components_token).login()
 
     data = dict(kind="email", action_kind="add_primary")
     body = post("hosted/user/challenge", data, components_token, status_code=403)
@@ -103,7 +103,7 @@ def test_components_sdk(sandbox_tenant):
     assert verified_phone["source"] == "hosted"
 
     # Ensure that we can log into the user we just created
-    IdentifyClient.from_user(user).inherit()
+    IdentifyClient.from_user(user).login()
 
 
 def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):

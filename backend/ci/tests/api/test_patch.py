@@ -314,5 +314,5 @@ def test_replace_verified_ci(sandbox_tenant, investor_profile_ob_config):
     assert phone["is_verified"]
 
     # Then, onboard this user onto a new playbook. This will log in using their unverified phone number
-    bifrost = BifrostClient.inherit_user(investor_profile_ob_config, bifrost.sandbox_id)
+    bifrost = BifrostClient.login_user(investor_profile_ob_config, bifrost.sandbox_id)
     bifrost.run()

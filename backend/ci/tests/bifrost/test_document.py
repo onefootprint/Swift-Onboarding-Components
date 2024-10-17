@@ -217,7 +217,7 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     assert not body, "Non-id doc playbook should not have any rules"
 
     # Onboard the user to the doc-only playbook
-    bifrost = BifrostClient.inherit_user(
+    bifrost = BifrostClient.login_user(
         doc_playbook, bifrost.sandbox_id, fixture_result="use_rules_outcome"
     )
     user2 = bifrost.run()

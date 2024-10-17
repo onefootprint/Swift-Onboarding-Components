@@ -94,7 +94,7 @@ def test_one_click_kyb(kyb_sandbox_ob_config):
     user = bifrost.run()
 
     sandbox_id = bifrost.sandbox_id
-    bifrost2 = BifrostClient.inherit_user(kyb_sandbox_ob_config, sandbox_id)
+    bifrost2 = BifrostClient.login_user(kyb_sandbox_ob_config, sandbox_id)
     user2 = bifrost2.run()
     assert user.fp_id == user2.fp_id
     assert user.fp_bid

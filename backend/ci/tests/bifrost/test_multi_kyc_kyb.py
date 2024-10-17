@@ -142,7 +142,7 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     sandbox_id = secondary_bo.client.sandbox_id
     IdentifyClient(
         kyb_sandbox_ob_config, sandbox_id, override_playbook_auth=secondary_bo_token
-    ).inherit()
+    ).login()
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
@@ -256,7 +256,7 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
 
     # Onboard the primary_bo onto the KYB sandbox config
     sandbox_id = primary_bo_kyc.client.sandbox_id
-    bifrost = BifrostClient.inherit_user(kyb_sandbox_ob_config, sandbox_id)
+    bifrost = BifrostClient.login_user(kyb_sandbox_ob_config, sandbox_id)
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
@@ -272,7 +272,7 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
 
     # Then, onboard the secondary_bo_kyc as a BO of primary_bo's business
     sandbox_id = secondary_bo_kyc.client.sandbox_id
-    bifrost = BifrostClient.inherit_user(
+    bifrost = BifrostClient.login_user(
         kyb_sandbox_ob_config,
         sandbox_id,
         override_ob_config_auth=secondary_bo_token,
@@ -396,7 +396,7 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     secondary_bo_token = extract_bo_token(bifrost)
 
     # Then, onboard the same user onto the same playbook and pass them this time. This creates a new business.
-    bifrost = BifrostClient.inherit_user(
+    bifrost = BifrostClient.login_user(
         kyb_sandbox_ob_config, sandbox_id=bifrost.sandbox_id, fixture_result="pass"
     )
     bifrost.data.update(BUSINESS_SECONDARY_BOS)

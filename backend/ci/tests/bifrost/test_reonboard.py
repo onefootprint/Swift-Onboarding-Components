@@ -8,7 +8,7 @@ from tests.utils import create_ob_config
 def test_reonboard(sandbox_tenant, sandbox_user):
     # User one-clicks onto same ob config
     sandbox_id = sandbox_user.client.sandbox_id
-    bifrost = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.login_user(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost.run()
     body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=403)
     assert body["message"] == "Workflow state does not allow add_data"
@@ -28,7 +28,7 @@ def test_abort_then_reonboard(sandbox_tenant, must_collect_data):
 
     # Start onboarding onto obc1, then deactivate it by onboarding onto obc2
     bifrost1 = BifrostClient.new_user(obc1)
-    bifrost2 = BifrostClient.inherit_user(obc2, bifrost1.sandbox_id)
+    bifrost2 = BifrostClient.login_user(obc2, bifrost1.sandbox_id)
 
     # Shouldn't be able to do anything with bifrost1's workflow/auth token
     body = patch("hosted/user/vault", dict(), bifrost1.auth_token, status_code=401)
@@ -38,7 +38,7 @@ def test_abort_then_reonboard(sandbox_tenant, must_collect_data):
     patch("hosted/user/vault", dict(), bifrost2.auth_token)
 
     # And, can re-start onboarding onto obc1 and run to completion
-    bifrost1 = BifrostClient.inherit_user(obc1, bifrost1.sandbox_id)
+    bifrost1 = BifrostClient.login_user(obc1, bifrost1.sandbox_id)
     bifrost1.run()
 
 
@@ -50,7 +50,7 @@ def test_allow_reonboard(sandbox_tenant, must_collect_data):
     bifrost1.run()
 
     # Second onboarding should not be a no-op, we should reonboard
-    bifrost2 = BifrostClient.inherit_user(allow_reonboard_obc, bifrost1.sandbox_id)
+    bifrost2 = BifrostClient.login_user(allow_reonboard_obc, bifrost1.sandbox_id)
     user = bifrost2.run()
     assert [r["kind"] for r in bifrost2.handled_requirements] == ["process"]
 
@@ -77,7 +77,7 @@ def test_allow_reonboard_kyb(sandbox_tenant, must_collect_data):
     bifrost1 = BifrostClient.new_user(allow_reonboard_obc)
     user1 = bifrost1.run()
 
-    bifrost2 = BifrostClient.inherit_user(allow_reonboard_obc, bifrost1.sandbox_id)
+    bifrost2 = BifrostClient.login_user(allow_reonboard_obc, bifrost1.sandbox_id)
     user2 = bifrost2.run()
     assert [r["kind"] for r in bifrost2.handled_requirements] == [
         "collect_business_data",
@@ -137,9 +137,7 @@ def test_allow_reonboard_ob_session_token(sandbox_tenant, must_collect_data):
     ob_token = PlaybookKey(body["token"])
 
     # Re-onboard onto the playbook, identified by PII
-    auth_token = IdentifyClient.from_user(
-        user, override_playbook_auth=ob_token
-    ).inherit()
+    auth_token = IdentifyClient.from_user(user, override_playbook_auth=ob_token).login()
     bifrost2 = BifrostClient.raw_auth(obc, auth_token, bifrost1.sandbox_id)
     bifrost2.run()
     assert [r["kind"] for r in bifrost2.handled_requirements] == ["process"]

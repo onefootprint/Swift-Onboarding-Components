@@ -41,7 +41,7 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
         assert body["message"] == error_message
 
     # Also test that a playbook with the auth scopes can't be used
-    token_for_auth = IdentifyClient.from_user(user, playbook=auth_playbook).inherit(
+    token_for_auth = IdentifyClient.from_user(user, playbook=auth_playbook).login(
         scope="auth"
     )
 
@@ -282,7 +282,7 @@ def test_replace_passkey(user_with_token):
     # Step up the token using a passkey
     auth_token = IdentifyClient.from_token(
         auth_token, webauthn=user.client.webauthn_device
-    ).inherit(kind="biometric", scope="auth")
+    ).login(kind="biometric", scope="auth")
 
     # Then can initiate replacing the paasskey
     body = post("hosted/user/challenge", data, auth_token)
@@ -298,13 +298,13 @@ def test_replace_passkey(user_with_token):
     body = post("hosted/user/challenge/verify", data, auth_token)
 
     # Make sure we can log in using the new passkey
-    auth_token = IdentifyClient.from_user(user, webauthn=webauthn_device).inherit(
+    auth_token = IdentifyClient.from_user(user, webauthn=webauthn_device).login(
         kind="biometric"
     )
 
     # Make sure we can't log in using the old passkey
     try:
-        auth_token = IdentifyClient.from_user(user).inherit(kind="biometric")
+        auth_token = IdentifyClient.from_user(user).login(kind="biometric")
         assert False, "Expected error"
     except HttpError as e:
         assert e.status_code == 400
@@ -339,7 +339,7 @@ def test_add_passkey(sandbox_tenant, auth_playbook):
     body = post("hosted/user/challenge/verify", data, auth_token)
 
     # Make sure we can log in using the new passkey
-    IdentifyClient.from_user(user, webauthn=webauthn_device).inherit(kind="biometric")
+    IdentifyClient.from_user(user, webauthn=webauthn_device).login(kind="biometric")
 
 
 def test_restrict_adding_email(sandbox_user, auth_playbook):

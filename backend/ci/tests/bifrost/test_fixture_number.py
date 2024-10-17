@@ -48,7 +48,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
         assert body["user"]
 
-    bifrost2 = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost2 = BifrostClient.login_user(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost2.run()
     assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "process",
@@ -70,7 +70,7 @@ def test_one_click_same_tenant_no_decryption_bleeding(sandbox_tenant, ob_config2
 
     # Now onboard onto second ob config. This ob config needs access to more data than is already
     # granted by the first ob config, so it cannot be automatically authorized
-    bifrost2 = BifrostClient.inherit_user(ob_config2, bifrost.sandbox_id)
+    bifrost2 = BifrostClient.login_user(ob_config2, bifrost.sandbox_id)
     bifrost2.run()
     assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "authorize",

@@ -35,7 +35,7 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
     assert all(not i["is_verified"] for i in body["user"]["auth_methods"])
 
     # Log into the user with an auth playbook, which will portablize it
-    IdentifyClient(auth_playbook, sandbox_id).inherit(scope="auth")
+    IdentifyClient(auth_playbook, sandbox_id).login(scope="auth")
 
     # After we mark this API-created vault as verified after logging into it, it should still be
     # visible via identify and should now have a verified auth method.
@@ -55,9 +55,7 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client
-    bifrost = BifrostClient.inherit_user(
-        foo_sandbox_tenant.default_ob_config, sandbox_id
-    )
+    bifrost = BifrostClient.login_user(foo_sandbox_tenant.default_ob_config, sandbox_id)
     user = bifrost.run()
 
     # Double check the data was prefilled
@@ -94,7 +92,7 @@ def test_portablize_nypid_via_kyc(sandbox_tenant, foo_sandbox_tenant):
     assert all(not i["is_verified"] for i in body["user"]["auth_methods"])
 
     # Inherit the user via identify flow
-    bifrost = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.login_user(sandbox_tenant.default_ob_config, sandbox_id)
 
     # After we mark this API-created vault as verified after logging into it, it should still be
     # visible via identify by any tenant and should now have a verified auth method.
@@ -131,9 +129,7 @@ def test_portablize_nypid_via_kyc(sandbox_tenant, foo_sandbox_tenant):
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client
-    bifrost = BifrostClient.inherit_user(
-        foo_sandbox_tenant.default_ob_config, sandbox_id
-    )
+    bifrost = BifrostClient.login_user(foo_sandbox_tenant.default_ob_config, sandbox_id)
     user = bifrost.run()
     # Double check the data was prefilled
     body = get(f"entities/{user.fp_id}", None, *foo_sandbox_tenant.db_auths)
@@ -160,7 +156,7 @@ def test_portablize_nypid_by_email_then_phone(sandbox_tenant, foo_sandbox_tenant
     post("users", NONPORTABLE_DATA, sandbox_tenant.s_sk, sandbox_id_h)
 
     # Inherit the user via email
-    auth = IdentifyClient(sandbox_tenant.default_ob_config, sandbox_id).inherit(
+    auth = IdentifyClient(sandbox_tenant.default_ob_config, sandbox_id).login(
         kind="email"
     )
 
@@ -179,9 +175,7 @@ def test_portablize_nypid_by_email_then_phone(sandbox_tenant, foo_sandbox_tenant
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client
-    bifrost = BifrostClient.inherit_user(
-        foo_sandbox_tenant.default_ob_config, sandbox_id
-    )
+    bifrost = BifrostClient.login_user(foo_sandbox_tenant.default_ob_config, sandbox_id)
     user = bifrost.run()
 
     # Double check the data was prefilled

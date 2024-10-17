@@ -151,13 +151,13 @@ class IdentifyClient:
         self._signup_challenge(scope)
         return self._verify(scope)
 
-    def inherit(self, kind="sms", scope="onboarding"):
+    def login(self, kind="sms", scope="onboarding"):
         self._login_challenge(kind, scope)
         return self._verify(scope)
 
     def step_up(self, kind="sms", scope="onboarding", assert_had_no_scopes=False):
         """
-        Just a wrapper around inherit, including some assertions that the new token has additional
+        Just a wrapper around login, including some assertions that the new token has additional
         scopes
         """
         assert self.auth_token, "Can only step up if had existing token"
@@ -171,7 +171,7 @@ class IdentifyClient:
             ], "Token expected to be only identified and have no scopes"
 
         # Perform the step up
-        new_token = self.inherit(kind=kind, scope=scope)
+        new_token = self.login(kind=kind, scope=scope)
 
         # Now, new token should have scopes
         if scope == "onboarding":

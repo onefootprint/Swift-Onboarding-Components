@@ -8,7 +8,7 @@ def bifrost_client_for(user, sandbox_tenant, obc):
     data = dict(kind="onboard", key=obc.key.value)
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
     token = FpAuth(body["token"])
-    token = IdentifyClient.from_token(token).inherit()
+    token = IdentifyClient.from_token(token).login()
     return BifrostClient.raw_auth(obc, token, user.client.sandbox_id)
 
 
@@ -60,7 +60,7 @@ def test_business_onboardings(sandbox_tenant, kyb_sandbox_ob_config):
     bifrost.run()
 
     # And then onboard the user and make a business while onboarding onto KYB playbook
-    bifrost = BifrostClient.inherit_user(kyb_sandbox_ob_config, bifrost.sandbox_id)
+    bifrost = BifrostClient.login_user(kyb_sandbox_ob_config, bifrost.sandbox_id)
     user = bifrost.run()
 
     body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)

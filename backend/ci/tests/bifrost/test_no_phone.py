@@ -87,7 +87,7 @@ def test_new_user(skip_phone_obc):
 
 
 def test_inherit_from_email(no_phone_user):
-    auth_token = IdentifyClient.from_user(no_phone_user).inherit(kind="email")
+    auth_token = IdentifyClient.from_user(no_phone_user).login(kind="email")
     # auth_token is valid and can be used to start onboarding
     post("hosted/onboarding", None, auth_token)
 

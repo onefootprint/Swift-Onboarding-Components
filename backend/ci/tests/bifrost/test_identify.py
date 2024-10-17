@@ -204,7 +204,7 @@ def test_identify_priority(
 
     for i, (tenant, obc, expected_vault_id, expected_fp_id) in enumerate(tests):
         # TODO test identifying on email
-        auth_token = IdentifyClient(obc, sandbox_id).inherit()
+        auth_token = IdentifyClient(obc, sandbox_id).login()
         body = get("hosted/user/private/token", None, auth_token)
         assert body["vault_id"] == expected_vault_id
 
@@ -233,7 +233,7 @@ def test_identify_with_non_portable_api_vault(
     body = post("users", vault_data, tenant.s_sk, sandbox_id_h)
     fp_id_c = body["id"]
 
-    auth_token = IdentifyClient(tenant_sandbox_obc, sandbox_id).inherit()
+    auth_token = IdentifyClient(tenant_sandbox_obc, sandbox_id).login()
     body = get("hosted/user/private/token", None, auth_token)
     assert body["fp_id"] == fp_id_c
 

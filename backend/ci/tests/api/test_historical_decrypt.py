@@ -28,7 +28,7 @@ def test_historical_decrypt_by_timestamp(sandbox_tenant):
     data = dict(kind="onboard", key=sandbox_tenant.default_ob_config.key.value)
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
     token = FpAuth(body["token"])
-    token = IdentifyClient.from_token(token).inherit()
+    token = IdentifyClient.from_token(token).login()
     bifrost2 = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config, token, bifrost1.sandbox_id
     )

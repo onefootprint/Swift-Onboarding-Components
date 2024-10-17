@@ -8,7 +8,7 @@ def bifrost_client_for(user, sandbox_tenant, obc, **kwargs):
     data = dict(kind="onboard", key=obc.key.value)
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
     token = FpAuth(body["token"])
-    token = IdentifyClient.from_token(token).inherit()
+    token = IdentifyClient.from_token(token).login()
     return BifrostClient.raw_auth(obc, token, user.client.sandbox_id, **kwargs)
 
 
@@ -40,7 +40,7 @@ def test_decisions(sandbox_tenant, must_collect_data):
     data = dict(actions=[action])
     res = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
     auth_token = FpAuth(res[0]["token"])
-    auth_token = IdentifyClient.from_token(auth_token).inherit()
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(obc2, auth_token, user.client.sandbox_id)
     bifrost.run()
 
@@ -88,7 +88,7 @@ def test_business_decisions(sandbox_tenant, kyb_sandbox_ob_config):
     bifrost.run()
 
     # And then onboard the user and make a business while onboarding onto KYB playbook
-    bifrost = BifrostClient.inherit_user(kyb_sandbox_ob_config, bifrost.sandbox_id)
+    bifrost = BifrostClient.login_user(kyb_sandbox_ob_config, bifrost.sandbox_id)
     user = bifrost.run()
 
     body = get(f"users/{user.fp_id}/decisions", None, sandbox_tenant.s_sk)

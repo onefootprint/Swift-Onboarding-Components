@@ -64,7 +64,7 @@ def test_skip_kyc_status_unchanged(sandbox_tenant, playbook, request):
     assert user.client.validate_response["user"]["status"] == "pass"
 
     # Then, onboard them onto a playbook with no rules.
-    bifrost = BifrostClient.inherit_user(
+    bifrost = BifrostClient.login_user(
         skip_kyc_playbook, bifrost.sandbox_id, fixture_result="use_rules_outcome"
     )
 

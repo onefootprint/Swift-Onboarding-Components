@@ -12,7 +12,7 @@ def auth_token(sandbox_user):
         sandbox_user,
         # Specifically don't provide any ob public key auth
         playbook=None,
-    ).inherit(scope="my1fp")
+    ).login(scope="my1fp")
     body = get("/hosted/user/token", None, auth_token)
     assert set(body["scopes"]) == {"basic_profile", "explicit_auth"}
     return auth_token

@@ -28,7 +28,7 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
     # Then onboard them onto foo_sandbox_tenant
     #
     sandbox_id = bifrost.sandbox_id
-    foo_bifrost = BifrostClient.inherit_user(
+    foo_bifrost = BifrostClient.login_user(
         foo_sandbox_tenant.default_ob_config, sandbox_id
     )
 
@@ -113,7 +113,7 @@ def test_prefill_passkeys(dual_onboarded_user, foo_sandbox_tenant):
         foo_sandbox_tenant.default_ob_config,
         bifrost.sandbox_id,
         webauthn=bifrost.webauthn_device,
-    ).inherit(kind="biometric")
+    ).login(kind="biometric")
 
 
 def test_prefill_phone_auth_method(dual_onboarded_user, foo_sandbox_tenant):
@@ -125,7 +125,7 @@ def test_prefill_phone_auth_method(dual_onboarded_user, foo_sandbox_tenant):
         foo_sandbox_tenant.default_ob_config,
         bifrost.sandbox_id,
         webauthn=bifrost.webauthn_device,
-    ).inherit(kind="sms")
+    ).login(kind="sms")
 
 
 def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
