@@ -27,13 +27,12 @@
     "@onefootprint/ui": "*",
     "@rive-app/react-canvas": "^3.0.35",
     "framer-motion": "^9.0.7",
-    "i18next-locales-sync": "^2.0.1",
-    "i18next": "^23.7.16",
+    "i18next": "^23.16.0",
     "next": "^14.2.12",
-    "react-i18next": "^14.0.0",
+    "react": "^18",
+    "react-i18next": "^15.0.3",
     "react-player": "^2.14.1",
     "react-wrap-balancer": "^1.1.0",
-    "react": "^18",
     "styled-components": "^6",
     "usehooks-ts": "2.16.0"
   },
@@ -41,6 +40,7 @@
     "@rive-app/react-canvas": "^3.0.35",
     "@types/react-dom": "^18",
     "copy-and-watch": "^0.1.6",
+    "i18next-locales-sync": "^2.1.0",
     "tsconfig": "*",
     "typescript": "^5.5.2"
   }

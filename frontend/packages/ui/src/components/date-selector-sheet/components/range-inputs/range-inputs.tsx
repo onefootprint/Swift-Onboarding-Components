@@ -110,7 +110,9 @@ const RangeInputs = ({
           <ErrorMessage>
             <IcoWarning16 color="error" />
             <Text variant="body-3" color="error">
-              {disableFutureDates ? t('components.date-range.error-past') : t('components.date-range.error-future')}
+              {disableFutureDates
+                ? (t('components.date-range.error-past') as string)
+                : (t('components.date-range.error-future') as string)}
             </Text>
           </ErrorMessage>
         ) : null}

@@ -63,14 +63,14 @@ const CodeBlock = ({
         </Text>
         {disableCopy ? null : (
           <CopyButton
-            ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
+            ariaLabel={ariaLabel ?? (t('components.code-block.aria-label-default') as string)}
             contentToCopy={children}
             size="compact"
             tooltip={{
               position: tooltip?.position ?? 'top',
-              text: tooltip?.text ?? t('components.code-block.tooltip-text-default'),
+              text: tooltip?.text ?? (t('components.code-block.tooltip-text-default') as string),
               textConfirmation:
-                tooltip?.textConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
+                tooltip?.textConfirmation ?? (t('components.code-inline.tooltip-text-confirmation-default') as string),
             }}
           />
         )}

@@ -114,10 +114,10 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
           </ScrollArea>
           <Footer>
             <Button onClick={close} variant="secondary">
-              {t('components.filters.popover.cancel')}
+              {t('components.filters.popover.cancel') as string}
             </Button>
             <Button form="filter-form" type="submit" variant="primary">
-              {t('components.filters.popover.apply')}
+              {t('components.filters.popover.apply') as string}
             </Button>
           </Footer>
         </Popover.Content>

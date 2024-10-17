@@ -62,7 +62,7 @@ const Toast = ({
         )}
       </Stack>
       <button
-        aria-label={closeAriaLabel ?? t('components.toast.close-aria-label-default')}
+        aria-label={closeAriaLabel ?? (t('components.toast.close-aria-label-default') as string)}
         onClick={handleClose}
         tabIndex={0}
         type="button"

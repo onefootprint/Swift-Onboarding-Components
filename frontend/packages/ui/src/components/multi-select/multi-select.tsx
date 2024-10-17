@@ -90,7 +90,7 @@ const MultiSelect = <Option extends OptionType, Group extends GroupBase<Option>>
     }
   };
 
-  const getNoOptionsMessage = () => emptyStateText ?? t('components.multi-select.empty-state-text-default');
+  const getNoOptionsMessage = () => emptyStateText ?? (t('components.multi-select.empty-state-text-default') as string);
 
   return (
     <Box>
@@ -126,7 +126,7 @@ const MultiSelect = <Option extends OptionType, Group extends GroupBase<Option>>
         onInputChange={onInputChange}
         openMenuOnFocus
         options={options}
-        placeholder={placeholder ?? t('components.multi-select.placeholder-default')}
+        placeholder={placeholder ?? (t('components.multi-select.placeholder-default') as string)}
         required={required}
         value={value}
         styles={{

@@ -75,9 +75,9 @@ const CopyButton = ({
   };
 
   const handleText = () => {
-    const tooltipText = tooltip.text ?? t('components.copy-button.tooltip-text-default');
+    const tooltipText = tooltip.text ?? (t('components.copy-button.tooltip-text-default') as string);
     const tooltipTextConfirmation =
-      tooltip.textConfirmation ?? t('components.copy-button.tooltip-text-confirmation-default');
+      tooltip.textConfirmation ?? (t('components.copy-button.tooltip-text-confirmation-default') as string);
     if (isMobile) {
       return tooltipTextConfirmation;
     }
@@ -99,7 +99,7 @@ const CopyButton = ({
     >
       {children ? (
         <Button
-          aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
+          aria-label={ariaLabel ?? (t('components.copy-button.aria-label-default') as string)}
           type="button"
           disabled={disable}
           onClick={handleClick}
@@ -108,7 +108,7 @@ const CopyButton = ({
         </Button>
       ) : (
         <IconButton
-          aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
+          aria-label={ariaLabel ?? (t('components.copy-button.aria-label-default') as string)}
           disabled={disable}
           onClick={handleClick}
           size={size}

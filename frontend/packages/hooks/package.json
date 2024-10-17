@@ -18,7 +18,6 @@
     "@types/react-dom": "^18",
     "react": "^18",
     "react-dom": "^18",
-    "react-i18next": "^14.0.0",
     "tsconfig": "*",
     "typescript": "^5.5.2"
   },

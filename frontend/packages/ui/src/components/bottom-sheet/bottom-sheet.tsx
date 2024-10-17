@@ -69,7 +69,7 @@ const BottomSheet = ({
           </RadixDialog.Title>
           <Stack maxHeight={componentMaxHeight} direction="column">
             <Header
-              closeAriaLabel={closeAriaLabel ?? t('components.bottom-sheet.close-aria-label-default')}
+              closeAriaLabel={closeAriaLabel ?? (t('components.bottom-sheet.close-aria-label-default') as string)}
               onClose={onClose}
               title={title}
             />

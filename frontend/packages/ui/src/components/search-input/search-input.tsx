@@ -51,7 +51,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     const renderSuffix = () =>
       value ? (
         <ClearButton
-          aria-label={clearButtonAriaLabel ?? t('components.search-input.clear-button-aria-label-default')}
+          aria-label={clearButtonAriaLabel ?? (t('components.search-input.clear-button-aria-label-default') as string)}
           onClick={handleClearInput}
         />
       ) : null;
@@ -61,7 +61,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         {...remainingProps}
         onChange={onChange}
         onChangeText={onChangeText}
-        placeholder={placeholder ?? t('components.search-input.placeholder-default')}
+        placeholder={placeholder ?? (t('components.search-input.placeholder-default') as string)}
         prefixComponent={<SearchIcon />}
         sx={{
           paddingLeft: 8,

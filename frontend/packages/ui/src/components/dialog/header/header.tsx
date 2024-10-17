@@ -22,7 +22,8 @@ interface HeaderProps {
 const DialogHeader = forwardRef<HTMLDivElement, HeaderProps>(({ title, onClose, icon }, ref) => {
   const { t } = useTranslation('ui');
   const IconComponent: Icon = icon?.component ?? IcoClose24;
-  const iconAriaLabel = icon?.ariaLabel ?? t('components.dialog.header-icon.aria-label-default');
+  // @ts-ignore: Type instantiation is excessively deep and possibly infinite
+  const iconAriaLabel = icon?.ariaLabel ?? (t('components.dialog.header-icon.aria-label-default') as string);
   const iconOnClick = icon?.onClick ?? onClose;
 
   return (

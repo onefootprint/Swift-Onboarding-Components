@@ -45,11 +45,12 @@ const CodeInline = ({
   return (
     <CopyButton
       contentToCopy={children}
-      ariaLabel={ariaLabel ?? t('components.code-inline.aria-label-default')}
+      ariaLabel={ariaLabel ?? (t('components.code-inline.aria-label-default') as string)}
       tooltip={{
         position: tooltip?.position ?? 'top',
-        text: tooltip?.text ?? t('components.code-inline.tooltip-text-default'),
-        textConfirmation: tooltip?.textConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
+        text: tooltip?.text ?? (t('components.code-inline.tooltip-text-default') as string),
+        textConfirmation:
+          tooltip?.textConfirmation ?? (t('components.code-inline.tooltip-text-confirmation-default') as string),
       }}
     >
       <CodeContent

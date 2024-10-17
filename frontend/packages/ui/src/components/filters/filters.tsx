@@ -25,7 +25,7 @@ const Filters = ({ controls, onChange = noop, onClear = noop }: FiltersProps) =>
       </Controls>
       {hasSelectedOptions && (
         <ClearFiltersContainer>
-          <LinkButton onClick={onClear}>{t('components.filters.clear-filters')}</LinkButton>
+          <LinkButton onClick={onClear}>{t('components.filters.clear-filters') as string}</LinkButton>
         </ClearFiltersContainer>
       )}
     </FilterContainer>

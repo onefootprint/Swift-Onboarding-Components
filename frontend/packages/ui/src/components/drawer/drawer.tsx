@@ -64,7 +64,7 @@ const Drawer = ({
       <RadixDialog.Portal>
         <DrawerSurface onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} aria-describedby={undefined}>
           <Header
-            closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}
+            closeAriaLabel={closeAriaLabel ?? (t('components.drawer.close-aria-label-default') as string)}
             closeIconComponent={CloseIconComponent}
             onClose={onClose}
           >

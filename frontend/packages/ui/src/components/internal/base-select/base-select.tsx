@@ -136,7 +136,8 @@ const BaseSelect = <Option extends BaseSelectOption>({
     closeDropdown();
   };
 
-  const localizedEmptyStateText = emptyStateText ?? t('components.internal.base-select.empty-state-text-default');
+  const localizedEmptyStateText =
+    emptyStateText ?? (t('components.internal.base-select.empty-state-text-default') as string);
   const renderEmptyState = useCallback(
     () => <EmptyState>{localizedEmptyStateText}</EmptyState>,
     [localizedEmptyStateText],
@@ -236,7 +237,9 @@ const BaseSelect = <Option extends BaseSelectOption>({
             onChange={handleChange}
             onMenuClose={closeDropdown}
             options={options}
-            placeholder={searchPlaceholder ?? t('components.internal.base-select.search-placeholder-default')}
+            placeholder={
+              searchPlaceholder ?? (t('components.internal.base-select.search-placeholder-default') as string)
+            }
             value={updatedValue}
           />
         </div>

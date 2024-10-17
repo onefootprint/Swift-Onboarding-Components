@@ -48,7 +48,7 @@ const CountrySelect = ({
   const localizedOptions = getCountriesWithLocalizedLabels();
 
   const currentValue = !value && locale ? localizedOptions.find(o => o.value === localeCountry) : value;
-  const placeholderText = placeholder ?? t('components.country-select.placeholder-default');
+  const placeholderText = placeholder ?? (t('components.country-select.placeholder-default') as string);
 
   const getLocalizedOption = (countryCode?: CountryCode) =>
     countryCode ? localizedOptions.find(o => o.value === countryCode) : null;

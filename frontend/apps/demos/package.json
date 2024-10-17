@@ -27,8 +27,7 @@
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "google-libphonenumber": "^3.2.32",
-    "i18next": "^23.7.16",
-    "i18next-locales-sync": "^2.0.1",
+    "i18next": "^23.16.0",
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.5.2",
@@ -36,7 +35,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
-    "react-i18next": "^14.0.0",
+    "react-i18next": "^15.0.3",
     "react-map-gl": "^7.1.7",
     "sonner": "^1.5.0",
     "styled-components": "^6",
@@ -48,6 +47,7 @@
     "@types/node": "^20",
     "@types/react-dom": "^18",
     "copy-and-watch": "^0.1.6",
+    "i18next-locales-sync": "^2.1.0",
     "tsconfig": "*",
     "typescript": "^5.5.2"
   }
