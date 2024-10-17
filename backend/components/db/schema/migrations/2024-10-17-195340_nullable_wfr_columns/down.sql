@@ -6,4 +6,6 @@ WHERE
     AND workflow_request_junction.kind = 'person'
     AND workflow_request.scoped_vault_id IS NULL
 ;
+COMMIT;
+BEGIN;
 ALTER TABLE workflow_request ALTER COLUMN scoped_vault_id SET NOT NULL;
