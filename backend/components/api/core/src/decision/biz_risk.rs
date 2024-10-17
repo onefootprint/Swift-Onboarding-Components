@@ -5,6 +5,7 @@ use crate::State;
 use api_errors::AssertionError;
 use api_errors::FpError;
 use api_errors::ValidationError;
+use db::models::business_owner::BusinessOwner;
 use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -14,11 +15,11 @@ use newtypes::WorkflowId;
 
 #[derive(Debug, derive_more::IsVariant)]
 pub enum BoOnboardingResult {
-    Ready(Vec<(Workflow, OnboardingDecision)>),
+    Ready(Vec<(Workflow, OnboardingDecision, BusinessOwner)>),
     NotReady(FpError),
 }
 
-pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOnboardingResult> {
+pub async fn get_bo_kyb_features(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOnboardingResult> {
     let wfid = biz_wf_id.clone();
     let (mut user_decisions, bvw, obc) = state
         .db_query(move |conn| -> FpResult<_> {
@@ -46,7 +47,7 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOn
                 // This is only for verrrrry legacy OBDs that could have an OBD in status `step_up`
                 return Err("Beneficial owner's onboarding isn't complete");
             }
-            Ok((wf, obd))
+            Ok((wf, obd, bo.bo.clone()))
         })
         .collect::<Result<Vec<_>, _>>();
     let user_decisions = match result {

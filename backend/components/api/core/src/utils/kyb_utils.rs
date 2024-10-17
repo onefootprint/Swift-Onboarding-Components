@@ -1,7 +1,7 @@
 use super::vault_wrapper::BusinessOwnerInfo;
 use crate::auth::session::onboarding::BoSession;
 use crate::config::LinkKind;
-use crate::decision::biz_risk::get_bo_obds;
+use crate::decision::biz_risk::get_bo_kyb_features;
 use crate::decision::state::Authorize;
 use crate::decision::state::BoKycCompleted;
 use crate::decision::state::DocCollected;
@@ -201,7 +201,7 @@ pub async fn progress_business_workflow(
         })
         .await?;
 
-    let obds = get_bo_obds(state, &biz_wf.id).await?;
+    let obds = get_bo_kyb_features(state, &biz_wf.id).await?;
 
     let is_waiting_for_bo_kyc = obds.is_not_ready();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");

@@ -327,6 +327,54 @@ def test_kyb_fail_kyc(
     ]
     assert len(bo_failed_rses) == 1
 
+    assert "beneficial_owner_possible_missing_bo" not in [
+        i["reason_code"] for i in body
+    ]
+
+
+def test_kyb_possible_bo_missing_reason_code(kyb_sandbox_ob_config, sandbox_tenant):
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        fixture_result="pass",
+        kyb_fixture_result="use_rules_outcome",
+    )
+    bos = [
+        {
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "ownership_stake": 30,
+        },
+        {
+            "first_name": "Franklin",
+            "last_name": "Frog",
+            "email": "sandbox@onefootprint.com",
+            "phone_number": FIXTURE_PHONE_NUMBER2,
+            "ownership_stake": 30,
+        },
+    ]
+    bifrost.data["business.kyced_beneficial_owners"] = bos
+    primary_bo = bifrost.run()
+    secondary_bo_token = extract_bo_token(bifrost)
+
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result="pass",
+    )
+    secondary_bo = bifrost.run()
+
+    body = get(
+        f"entities/{secondary_bo.fp_bid}/risk_signals", None, sandbox_tenant.s_sk
+    )
+
+    bo_failed_rses = next(
+        (i for i in body if i["reason_code"] == "beneficial_owner_possible_missing_bo"),
+        None,
+    )
+
+    assert bo_failed_rses is not None
+    assert bo_failed_rses["severity"] == "info"
+
 
 def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     """

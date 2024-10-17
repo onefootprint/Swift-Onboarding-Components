@@ -28,6 +28,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
+use db::models::business_owner::BusinessOwner;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
@@ -141,7 +142,7 @@ impl KybAwaitingBoKyc {
 
 #[async_trait]
 impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
-    type AsyncRes = Vec<(DbWorkflow, OnboardingDecision)>;
+    type AsyncRes = Vec<(DbWorkflow, OnboardingDecision, BusinessOwner)>;
 
     #[tracing::instrument(
         "KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::execute_async_idempotent_actions",
@@ -152,7 +153,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         _action: BoKycCompleted,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
-        let bo_obds = match decision::biz_risk::get_bo_obds(state, &self.wf_id).await? {
+        let bo_obds = match decision::biz_risk::get_bo_kyb_features(state, &self.wf_id).await? {
             BoOnboardingResult::Ready(bo_obds) => bo_obds,
             BoOnboardingResult::NotReady(err) => return Err(err),
         };
@@ -168,33 +169,63 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     ) -> FpResult<KybState> {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
         let bo_obds = async_res;
-        // TODO: this will be fixed in another stack https://github.com/onefootprint/monorepo/pull/12144
-        // Create the risk signal group. We'll add other risk signals into here
 
         let scope = RiskSignalGroupScope::WorkflowId {
             id: &wf.id,
             sv_id: &wf.scoped_vault_id,
         };
         let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
-
-        if let Some((wf, _)) = bo_obds.iter().find(|(_, obd)| obd.status == DecisionStatus::Fail) {
-            // Add risk signal for BO failing KYC
-            // TODO: one of these days we need to drop the non-null vres constraint
+        // we need to find a vendor_api and vres_id for risk signals. this is annoying and we should drop
+        // the not null constraint..
+        let bo_rs_for_risk_signals = if let Some((wf, _, _)) = bo_obds.first() {
             let rses = RiskSignal::latest_by_risk_signal_group_kind(
                 conn,
                 &wf.scoped_vault_id,
                 RiskSignalGroupKind::Kyc,
             )?;
-            if let Some(rs) = rses.into_iter().next() {
-                let bo_rs = (
+
+            rses.first().cloned()
+        } else {
+            None
+        };
+
+        // BO features
+        let bo_failed_kyc = bo_obds
+            .iter()
+            .any(|(_, obd, _)| obd.status == DecisionStatus::Fail);
+        let bo_ownership_total = bo_obds
+            .iter()
+            .filter_map(|(_, _, bo)| bo.ownership_stake)
+            .sum::<i32>();
+        // Per BSA/AML regulations, tenants performing KYB must verify all BOs that
+        // either 1) own 25% of the business or 2) exert significant control
+        //
+        // Here we try to give tenants a hint as to whether there's potentially another 25% owner that
+        // hasn't been submitted
+        let bo_ownership_check = (100 - bo_ownership_total) >= 25;
+
+        if let Some(rs) = bo_rs_for_risk_signals {
+            let bo_rs = vec![
+                bo_failed_kyc.then_some((
                     FootprintReasonCode::BeneficialOwnerFailedKyc,
                     rs.vendor_api,
+                    rs.verification_result_id.clone(),
+                )),
+                bo_ownership_check.then_some((
+                    FootprintReasonCode::BeneficialOwnerPossibleMissingBo,
+                    rs.vendor_api,
                     rs.verification_result_id,
-                );
+                )),
+            ]
+            .into_iter()
+            .flatten()
+            .collect();
 
-                RiskSignal::bulk_add(conn, vec![bo_rs], false, rsg.id)?;
-            };
+            RiskSignal::bulk_add(conn, bo_rs, false, rsg.id)?;
+        } else {
+            tracing::error!("Missing KYC reason codes in KYB workflow")
         }
+
 
         if obc.verification_checks().skip_kyb() {
             // Skip past KYB vendor calls and go straight to decisioning

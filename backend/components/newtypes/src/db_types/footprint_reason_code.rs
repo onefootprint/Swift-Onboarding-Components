@@ -1373,6 +1373,10 @@ footprint_reason_code_enum! {
         #[note = "Beneficial owner failed KYC", severity = SignalSeverity::High,  description = "One or more Benificial Owners failed KYC"]
         BeneficialOwnerFailedKyc,
 
+        #[scope = SignalScope::BeneficialOwners, additional_scopes = vec![], match_level = None]
+        #[note = "Possible missing BO", severity = SignalSeverity::Info,  description = "Beneficial ownership percentages do not sum to >75% indicating potentially a missing BO"]
+        BeneficialOwnerPossibleMissingBo,
+
         // ~~~~~~~~~ Secretary of State Filings ~~~~~~~~~~~
         // TODO match since I didn't understand these checks
         #[scope = SignalScope::BusinessName, additional_scopes = vec![SignalScope::BusinessAddress, SignalScope::BeneficialOwners], match_level = None]
@@ -1619,6 +1623,7 @@ impl FootprintReasonCode {
                 | Self::SentilinkIdentityTheftMediumRisk
                 | Self::SentilinkIdentityTheftLowRisk
                 | Self::BeneficialOwnerFailedKyc
+                | Self::BeneficialOwnerPossibleMissingBo
         )
     }
 
