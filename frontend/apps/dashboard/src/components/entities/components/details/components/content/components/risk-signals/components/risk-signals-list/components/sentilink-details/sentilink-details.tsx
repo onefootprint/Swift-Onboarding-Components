@@ -42,6 +42,7 @@ const SentilinkDetails = () => {
             {t('powered-by')}
           </Text>
         </Stack>
+        <Stack height="40px" />
       </>
     </Drawer>
   );

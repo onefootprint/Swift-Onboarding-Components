@@ -1,10 +1,10 @@
 import type { UIStates } from '@onefootprint/design-tokens';
 import type { SentilinkReasonCode } from '@onefootprint/types';
-import { SentilinkFraudLevel, SentilinkScoreBand } from '@onefootprint/types';
-import { Stack, Text } from '@onefootprint/ui';
+import { SentilinkScoreBand } from '@onefootprint/types';
+import { Divider, Stack, Text } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 import ReasonCode from './components/reason-code';
-import RiskIndicator from './components/risk-indicator';
-import { getLessFraudyReasonCodes, getMoreFraudyReasonCodes } from './utils/sort-reason-codes';
+import { sortReasonCodes } from './utils/sort-reason-codes/sort-reason-codes';
 
 type ScoreProps = {
   score: number;
@@ -20,8 +20,8 @@ const scoreToColor: Record<SentilinkScoreBand, keyof UIStates> = {
 };
 
 const Score = ({ score, scoreBand, reasonCodes, title }: ScoreProps) => {
-  const moreFraudyReasonCodes = getMoreFraudyReasonCodes(reasonCodes);
-  const lessFraudyReasonCodes = getLessFraudyReasonCodes(reasonCodes);
+  const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details.score' });
+  const sortedReasonCodes = sortReasonCodes(reasonCodes);
   const scoreColor = scoreToColor[scoreBand];
 
   return (
@@ -41,27 +41,16 @@ const Score = ({ score, scoreBand, reasonCodes, title }: ScoreProps) => {
           {score}
         </Text>
       </Stack>
-      <Stack direction="column" padding={5} gap={5}>
-        {moreFraudyReasonCodes.length > 0 && (
-          <Stack direction="column" gap={4}>
-            <RiskIndicator fraudLevel={SentilinkFraudLevel.moreFraudy} />
-            <Stack direction="column" gap={5}>
-              {moreFraudyReasonCodes.map(reasonCode => (
-                <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
-              ))}
-            </Stack>
-          </Stack>
-        )}
-        {lessFraudyReasonCodes.length > 0 && (
-          <Stack direction="column" gap={4}>
-            <RiskIndicator fraudLevel={SentilinkFraudLevel.lessFraudy} />
-            <Stack direction="column" gap={5}>
-              {lessFraudyReasonCodes.map(reasonCode => (
-                <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
-              ))}
-            </Stack>
-          </Stack>
-        )}
+      <Stack direction="column" padding={5} gap={4}>
+        <Stack direction="column" gap={3}>
+          <Text variant="label-3">{t('detected-reason-codes')}</Text>
+          <Divider variant="secondary" />
+        </Stack>
+        <Stack direction="column" gap={5}>
+          {sortedReasonCodes.map((reasonCode: SentilinkReasonCode) => (
+            <ReasonCode key={reasonCode.code} reasonCode={reasonCode} />
+          ))}
+        </Stack>
       </Stack>
     </Stack>
   );

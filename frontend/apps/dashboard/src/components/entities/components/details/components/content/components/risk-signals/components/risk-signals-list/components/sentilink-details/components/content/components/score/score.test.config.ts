@@ -20,22 +20,3 @@ export const reasonCodesFixture: SentilinkReasonCode[] = [
     rank: 3,
   },
 ];
-
-export const mixedReasonCodesFixture: SentilinkReasonCode[] = [
-  { code: 'LESS_1', explanation: 'Less fraudy 1', direction: SentilinkFraudLevel.lessFraudy, rank: 1 },
-  { code: 'LESS_2', explanation: 'Less fraudy 2', direction: SentilinkFraudLevel.lessFraudy, rank: 2 },
-  { code: 'MORE_1', explanation: 'More fraudy 1', direction: SentilinkFraudLevel.moreFraudy, rank: 3 },
-  { code: 'MORE_2', explanation: 'More fraudy 2', direction: SentilinkFraudLevel.moreFraudy, rank: 4 },
-];
-
-export const lessFraudyReasonCodesFixture: SentilinkReasonCode[] = [
-  { code: 'LESS_1', explanation: 'Less fraudy 1', direction: SentilinkFraudLevel.lessFraudy, rank: 1 },
-  { code: 'LESS_2', explanation: 'Less fraudy 2', direction: SentilinkFraudLevel.lessFraudy, rank: 2 },
-  { code: 'LESS_3', explanation: 'Less fraudy 3', direction: SentilinkFraudLevel.lessFraudy, rank: 3 },
-];
-
-export const moreFraudyReasonCodesFixture: SentilinkReasonCode[] = [
-  { code: 'MORE_1', explanation: 'More fraudy 1', direction: SentilinkFraudLevel.moreFraudy, rank: 1 },
-  { code: 'MORE_2', explanation: 'More fraudy 2', direction: SentilinkFraudLevel.moreFraudy, rank: 2 },
-  { code: 'MORE_3', explanation: 'More fraudy 3', direction: SentilinkFraudLevel.moreFraudy, rank: 3 },
-];
