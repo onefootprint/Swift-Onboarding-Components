@@ -14,7 +14,7 @@ import DesktopNavLink from './components/desktop-nav-link';
 import DesktopNavMenu from './components/desktop-nav-menu';
 import LogoCopyAssets from './components/logo-copy-assets';
 
-const ARTICLE_URL = '/blog/footprint-13m-series-a-led-by-qed';
+const ARTICLE_URL = '/blog/fraud-indemnification';
 
 type DesktopNavProps = {
   entries: NavEntry[];
