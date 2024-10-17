@@ -1,6 +1,8 @@
 use crate::impl_map_apiv2_schema;
 use crate::impl_request_type;
+use crate::BankDataKind;
 use crate::BusinessDataIdentifier;
+use crate::BusinessDataKind;
 use crate::CardDataKind;
 use crate::DataIdentifier;
 use crate::DataRequest;
@@ -12,6 +14,7 @@ use crate::PiiJsonValue;
 use crate::PiiValueKind;
 use crate::UserDataIdentifier;
 use crate::ValidateArgs;
+use crate::ValidationError;
 use either::Either;
 use itertools::Itertools;
 use std::collections::HashMap;
@@ -79,11 +82,14 @@ impl PatchDataRequest {
                         _ => None,
                     },
                     DataIdentifier::Bank(k) => match k.kind {
-                        crate::BankDataKind::Fingerprint => {
+                        BankDataKind::Fingerprint => {
                             Some(DiValidationError::CannotSpecifyDerivedEntry.into())
                         }
                         _ => None,
                     },
+                    DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(_, _)) => {
+                        Some(ValidationError("Cannot vault beneficial owner data via API").into())
+                    }
                     _ => None,
                 };
                 err.map(|err| (di.clone(), err))

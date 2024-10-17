@@ -19,12 +19,12 @@ use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::NewSecondaryBo;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::put_data_request::PatchDataRequest;
 use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::BoLinkId;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
 use newtypes::DataIdentifier as DI;
+use newtypes::DataRequest;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
@@ -178,10 +178,9 @@ async fn create_bo_fingerprinted_data_req(
         .into_iter()
         .map(|(k, v)| (BDK::bo_data(link_id.clone(), k).into(), v))
         .collect();
-    let PatchDataRequest { updates, .. } =
-        PatchDataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(is_live))?;
-    let updates = FingerprintedDataRequest::build(state, updates, &sb_id).await?;
-    Ok(updates)
+    let data = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(is_live))?;
+    let data = FingerprintedDataRequest::build(state, data, &sb_id).await?;
+    Ok(data)
 }
 
 pub(super) enum BatchRequest {

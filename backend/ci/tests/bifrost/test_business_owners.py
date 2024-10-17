@@ -194,3 +194,23 @@ def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
         body["message"]
         == "This owner is already linked to a user and cannot be deleted"
     )
+
+
+def test_cannot_vault_bo_data_directly(kyb_sandbox_ob_config, sandbox_tenant):
+    """
+    BO data can only be managed via the dedicated BO APIs. Make sure we can't vault it directly here
+    """
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data.pop("business.kyced_beneficial_owners")
+    bifrost.data.update(BUSINESS_MODERN_BOS)
+
+    di = "business.beneficial_owners.bo_link_primary.id.first_name"
+    data = {di: "Franklin"}
+    body = patch("hosted/business/vault", data, bifrost.auth_token, status_code=400)
+    assert body["context"][di] == "Cannot vault beneficial owner data via API"
+
+    user = bifrost.run()
+    patch(
+        f"entities/{user.fp_bid}/vault", data, *sandbox_tenant.db_auths, status_code=400
+    )
+    assert body["context"][di] == "Cannot vault beneficial owner data via API"
