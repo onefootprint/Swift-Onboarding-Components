@@ -82,9 +82,11 @@ const Container = styled.button<{ $size: IconButtonSize; $variant?: 'outline' | 
           }
 
           &:disabled {
+            pointer-events: none;
             background-color: ${button.variant.secondary.disabled.bg};
             border: ${theme.borderWidth[1]} solid ${button.variant.secondary.disabled.borderColor};
             box-shadow: ${button.variant.secondary.disabled.boxShadow};
+            
             svg {
               path {
                 fill: ${button.variant.secondary.disabled.color};

@@ -1,10 +1,12 @@
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
-import { Divider, Form, LinkButton, Stack, Text } from '@onefootprint/ui';
+import { type Entity, EntityStatus } from '@onefootprint/types';
+import { Divider, Form, InlineAlert, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormValues } from '../request-more-info.types';
 
 type RequestMoreInfoFormProps = {
+  entity: Entity;
   onSubmit: (data: FormValues) => void;
   businessOwners: {
     id: string;
@@ -13,7 +15,7 @@ type RequestMoreInfoFormProps = {
   }[];
 };
 
-const RequestMoreInfoForm = ({ onSubmit, businessOwners }: RequestMoreInfoFormProps) => {
+const RequestMoreInfoForm = ({ entity, onSubmit, businessOwners }: RequestMoreInfoFormProps) => {
   const { t } = useTranslation('business-details', { keyPrefix: 'request-more-info.form' });
   const {
     register,
@@ -26,6 +28,7 @@ const RequestMoreInfoForm = ({ onSubmit, businessOwners }: RequestMoreInfoFormPr
     },
   });
   const { fields, append, remove } = useFieldArray({ control, name: 'docs' });
+  const showStatusWarning = entity.status === EntityStatus.inProgress || entity.status === EntityStatus.incomplete;
 
   const handleAddMore = () => {
     append({ name: '', identifier: '', description: '' });
@@ -33,8 +36,13 @@ const RequestMoreInfoForm = ({ onSubmit, businessOwners }: RequestMoreInfoFormPr
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} id="request-more-info-form">
+      {showStatusWarning && (
+        <InlineAlert variant="warning" marginBottom={7}>
+          {t('warning')}
+        </InlineAlert>
+      )}
       <Text variant="body-3" marginBottom={7}>
-        {t('intro-text')}
+        {t('intro')}
       </Text>
       <Form.Field>
         <Form.Label>{t('beneficial-owner.label')}</Form.Label>

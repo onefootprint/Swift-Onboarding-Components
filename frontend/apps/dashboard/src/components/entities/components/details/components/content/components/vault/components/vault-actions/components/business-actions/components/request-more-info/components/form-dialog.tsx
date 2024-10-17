@@ -1,3 +1,4 @@
+import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 import { ActionRequestKind, DocumentRequestKind, TriggerKind, type TriggerResponse } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
@@ -16,6 +17,7 @@ export type FormDialogProps = {
 const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
   const { t } = useTranslation('business-details', { keyPrefix: 'request-more-info' });
   const entityId = useEntityId();
+  const entityQuery = useEntity(entityId);
   const bosQuery = useBusinessOwners(entityId);
   const submitMutation = useSubmitActions();
 
@@ -71,7 +73,9 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
         disabled: submitMutation.isPending,
       }}
     >
-      <Form onSubmit={handleSubmit} businessOwners={bosQuery.data ?? []} />
+      {entityQuery.data && bosQuery.data ? (
+        <Form onSubmit={handleSubmit} entity={entityQuery.data} businessOwners={bosQuery.data} />
+      ) : null}
     </Dialog>
   );
 };

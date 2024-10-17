@@ -53,7 +53,8 @@
   "request-more-info": {
     "title": "Request more information",
     "form": {
-      "intro-text": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document.",
+      "warning": "This business has an incomplete onboarding. Requesting a document from them will prevent the business from completing their onboarding",
+      "intro": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document.",
       "beneficial-owner": {
         "label": "Beneficial owner",
         "placeholder": "Select a beneficial owner"
