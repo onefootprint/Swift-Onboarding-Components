@@ -2,6 +2,7 @@ import { Drawer, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 import useRiskSignalsFilters from 'src/components/entities/components/details/hooks/use-risk-signals-filters';
+import ErrorComponent from 'src/components/error';
 import useEntitySentilinkSignal from '../../hooks/use-entity-sentilink-signal';
 import Content from './components/content';
 import Loading from './components/loading';
@@ -21,7 +22,7 @@ const SentilinkDetails = () => {
       <>
         {data && <Content data={data} />}
         {isPending && <Loading />}
-        {error && <div>Error</div>}
+        {error && <ErrorComponent error={error} />}
         <Stack
           position="absolute"
           left={0}
