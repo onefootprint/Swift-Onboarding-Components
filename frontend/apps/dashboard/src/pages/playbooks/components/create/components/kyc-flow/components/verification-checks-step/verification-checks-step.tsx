@@ -151,54 +151,53 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                 </>
               )}
             </Stack>
-            <>
-              <Divider variant="secondary" marginBlock={5} />
-              <SectionHeader>
-                <IcoBolt24 />
-                {t('fraud-checks.title')}
-              </SectionHeader>
-              <Stack gap={5} direction="column">
-                <Controller
-                  control={control}
-                  name="isSentilinkEnabled"
-                  render={({ field }) => (
-                    <Tooltip
-                      text={sentilink.disabledText}
-                      disabled={!sentilink.disabled}
-                      position="bottom"
-                      alignment="start"
-                    >
-                      <Toggle
-                        checked={field.value}
-                        hint={t('fraud-checks.sentilink.hint')}
-                        label={t('fraud-checks.sentilink.label')}
-                        onBlur={field.onBlur}
-                        onChange={field.onChange}
-                        size="compact"
-                        disabled={sentilink.disabled}
-                      />
-                    </Tooltip>
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name="isNeuroEnabled"
-                  render={({ field }) => (
-                    <Tooltip text={neuro.disabledText} disabled={!neuro.disabled} position="bottom" alignment="start">
-                      <Toggle
-                        checked={field.value}
-                        hint={t('fraud-checks.neuro.hint')}
-                        label={t('fraud-checks.neuro.label')}
-                        onBlur={field.onBlur}
-                        onChange={field.onChange}
-                        size="compact"
-                        disabled={neuro.disabled}
-                      />
-                    </Tooltip>
-                  )}
-                />
-              </Stack>
-            </>
+          </Section>
+          <Section>
+            <SectionHeader>
+              <IcoBolt24 />
+              {t('fraud-checks.title')}
+            </SectionHeader>
+            <Stack gap={5} direction="column">
+              <Controller
+                control={control}
+                name="isSentilinkEnabled"
+                render={({ field }) => (
+                  <Tooltip
+                    text={sentilink.disabledText}
+                    disabled={!sentilink.disabled}
+                    position="bottom"
+                    alignment="start"
+                  >
+                    <Toggle
+                      checked={field.value}
+                      hint={t('fraud-checks.sentilink.hint')}
+                      label={t('fraud-checks.sentilink.label')}
+                      onBlur={field.onBlur}
+                      onChange={field.onChange}
+                      size="compact"
+                      disabled={sentilink.disabled}
+                    />
+                  </Tooltip>
+                )}
+              />
+              <Controller
+                control={control}
+                name="isNeuroEnabled"
+                render={({ field }) => (
+                  <Tooltip text={neuro.disabledText} disabled={!neuro.disabled} position="bottom" alignment="start">
+                    <Toggle
+                      checked={field.value}
+                      hint={t('fraud-checks.neuro.hint')}
+                      label={t('fraud-checks.neuro.label')}
+                      onBlur={field.onBlur}
+                      onChange={field.onChange}
+                      size="compact"
+                      disabled={neuro.disabled}
+                    />
+                  </Tooltip>
+                )}
+              />
+            </Stack>
           </Section>
         </Stack>
       </Stack>
