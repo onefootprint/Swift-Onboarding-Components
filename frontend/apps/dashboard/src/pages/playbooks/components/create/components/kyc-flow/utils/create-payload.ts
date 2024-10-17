@@ -5,18 +5,18 @@ import {
   OnboardingConfigKind,
   type OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
+import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
 import type { InvestorFormData } from '../../investor';
 import type { NameFormData } from '../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
 import type { ResidencyFormData } from '../../residency-step';
 import type { DetailsFormData } from '../components/details-step';
-
+import { OnboardingTemplate, type TemplatesFormData } from '../components/templates-step';
 import type { VerificationChecksFormData } from '../components/verification-checks-step';
-
-import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
 
 type KycFlowFormData = {
   nameForm: NameFormData;
+  templateForm: TemplatesFormData;
   residencyForm: ResidencyFormData;
   detailsForm: DetailsFormData;
   requiredAuthMethodsForm: RequiredAuthMethodsFormData;
@@ -25,6 +25,7 @@ type KycFlowFormData = {
 
 const createPayload = ({
   nameForm,
+  templateForm,
   residencyForm,
   detailsForm,
   requiredAuthMethodsForm,
@@ -37,6 +38,7 @@ const createPayload = ({
       countrySpecific: detailsForm.gov.country,
       global: detailsForm.gov.global,
     },
+    cipKind: templateForm.template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
     ...createResidencyPayload(residencyForm),
     ...createMustCollect(detailsForm.person, detailsForm.investor),
     ...createAdditionalDocsPayload(detailsForm.docs),
