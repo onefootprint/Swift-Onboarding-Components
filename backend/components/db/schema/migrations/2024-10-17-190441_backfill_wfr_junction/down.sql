@@ -1,0 +1,1 @@
+TRUNCATE workflow_request_junction;
