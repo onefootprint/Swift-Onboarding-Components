@@ -1,6 +1,12 @@
-import { AuthMethodKind, type CustomDI, type DocumentRequestConfig, DocumentRequestKind } from '@onefootprint/types';
+import {
+  AuthMethodKind,
+  type CustomDI,
+  type DocumentRequestConfig,
+  DocumentRequestKind,
+  type DocumentTypesAndCountries,
+} from '@onefootprint/types';
 import type { AdditionalDocsFormData } from '../components/additional-docs';
-
+import type { GovDocsFormData } from '../components/gov-docs';
 import type { RequiredAuthMethodsFormData } from '../components/required-auth-methods-step';
 
 export const createAdditionalDocsPayload = ({
@@ -40,7 +46,7 @@ export const createAdditionalDocsPayload = ({
       });
     });
   }
-  return { documentsToCollect };
+  return documentsToCollect;
 };
 
 export const createRequiredAuthMethodsPayload = (formData: RequiredAuthMethodsFormData) => {
@@ -51,5 +57,15 @@ export const createRequiredAuthMethodsPayload = (formData: RequiredAuthMethodsFo
   if (formData.phone) {
     requiredAuthMethods.push(AuthMethodKind.phone);
   }
-  return { requiredAuthMethods };
+  return requiredAuthMethods;
+};
+
+export const createGovDocsPayload = (formData: GovDocsFormData['gov']): DocumentTypesAndCountries | null => {
+  if (formData.global.length === 0 && Object.keys(formData.country).length === 0) {
+    return null;
+  }
+  return {
+    countrySpecific: formData.country,
+    global: formData.global,
+  };
 };

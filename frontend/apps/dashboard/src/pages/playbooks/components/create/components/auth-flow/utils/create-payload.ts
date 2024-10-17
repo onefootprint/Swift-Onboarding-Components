@@ -16,7 +16,7 @@ const createAuthFlowPayload = ({
     canAccessData: ['phone_number', 'email'],
     mustCollectData: ['phone_number', 'email'],
     verificationChecks: [{ kind: 'kyc', data: {} }],
-    ...createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
+    requiredAuthMethods: createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
   };
 };
 

@@ -14,7 +14,11 @@ import type { BoFormData } from '../components/bo-step';
 import type { BusinessFormData } from '../components/business-step';
 import type { VerificationChecksFormData } from '../components/verification-checks-step';
 
-import { createAdditionalDocsPayload, createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
+import {
+  createAdditionalDocsPayload,
+  createGovDocsPayload,
+  createRequiredAuthMethodsPayload,
+} from '../../../utils/create-payload';
 
 type KycFlowFormData = {
   nameForm: NameFormData;
@@ -57,16 +61,13 @@ const createPayload = ({
     allowUsResidents: true,
     allowUsTerritories: false,
     allowInternationalResidents: false,
-    documentTypesAndCountries: {
-      countrySpecific: boForm.gov.country,
-      global: boForm.gov.global,
-    },
     mustCollectData,
     canAccessData: mustCollectData,
     optionalData: personOptionalData,
-    ...createAdditionalDocsPayload(boForm.docs),
-    ...createBusinessDocumentsPayload(businessForm),
-    ...createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
+    documentTypesAndCountries: createGovDocsPayload(boForm.gov),
+    documentsToCollect: createAdditionalDocsPayload(boForm.docs),
+    requiredAuthMethods: createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
+    businessDocumentsToCollect: createBusinessDocumentsPayload(businessForm),
     ...createVerificationChecksPayload(verificationChecksForm),
   };
 };
@@ -129,9 +130,7 @@ const createBusinessDocumentsPayload = (businessForm: BusinessFormData) => {
       },
     });
   });
-  return {
-    businessDocumentsToCollect: documentsToCollect,
-  };
+  return documentsToCollect;
 };
 
 const createBusinessPayload = (

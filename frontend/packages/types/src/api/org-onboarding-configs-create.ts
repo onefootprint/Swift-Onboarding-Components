@@ -31,7 +31,7 @@ export type OrgOnboardingConfigCreateRequest = {
   cipKind?: string;
   documentsToCollect?: DocumentRequestConfig[];
   businessDocumentsToCollect?: DocumentRequestConfig[];
-  documentTypesAndCountries?: DocumentTypesAndCountries;
+  documentTypesAndCountries?: DocumentTypesAndCountries | null;
   kind: OnboardingConfigKind;
   skipConfirm?: boolean;
   verificationChecks?: VerificationCheck[] | null;
