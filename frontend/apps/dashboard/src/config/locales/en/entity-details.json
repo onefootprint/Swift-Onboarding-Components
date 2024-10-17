@@ -1184,7 +1184,8 @@
     },
     "sentilink": {
       "details": {
-        "powered-by": "Powered by Sentilink",
+        "powered-by": "Powered by",
+        "sentilink": "Sentilink",
         "title": "Synthetic and ID Theft scores",
         "risk-indicator": {
           "more_fraudy": "More fraudy",

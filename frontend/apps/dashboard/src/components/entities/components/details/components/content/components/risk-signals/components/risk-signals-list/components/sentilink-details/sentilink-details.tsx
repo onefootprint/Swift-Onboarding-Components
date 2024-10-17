@@ -1,8 +1,10 @@
 import useEntityId from '@/entity/hooks/use-entity-id';
 import { Drawer, Stack, Text } from '@onefootprint/ui';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import useRiskSignalsFilters from 'src/components/entities/components/details/hooks/use-risk-signals-filters';
 import ErrorComponent from 'src/components/error';
+import styled from 'styled-components';
 import useEntitySentilinkSignal from '../../hooks/use-entity-sentilink-signal';
 import Content from './components/content';
 import Loading from './components/loading';
@@ -39,7 +41,10 @@ const SentilinkDetails = () => {
           borderTopWidth={1}
         >
           <Text variant="label-3" paddingRight={4}>
-            {t('powered-by')}
+            {t('powered-by')}{' '}
+            <StyledLink href="https://sentilink.com" target="_blank">
+              {t('sentilink')}
+            </StyledLink>
           </Text>
         </Stack>
         <Stack height="40px" />
@@ -47,5 +52,14 @@ const SentilinkDetails = () => {
     </Drawer>
   );
 };
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    && {
+      text-decoration: underline;
+      color: ${theme.color.primary};
+    }
+  `}
+`;
 
 export default SentilinkDetails;
