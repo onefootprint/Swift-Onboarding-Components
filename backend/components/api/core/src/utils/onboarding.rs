@@ -152,7 +152,7 @@ pub fn get_or_create_user_workflow(
 
     if let Some(wfr) = wfr {
         // If we're responding to a WorkflowRequest, save that we've created a WF for the request
-        WorkflowRequest::set_wf_id(conn, &wfr.id, &wf)?;
+        WorkflowRequestJunction::set_wf_id(conn, &wfr.id, &wf)?;
     }
 
     if is_new_wf {

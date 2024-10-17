@@ -1816,10 +1816,8 @@ diesel::table! {
         _updated_at -> Timestamptz,
         timestamp -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
-        scoped_vault_id -> Text,
         ob_configuration_id -> Text,
         created_by -> Jsonb,
-        workflow_id -> Nullable<Text>,
         config -> Jsonb,
         note -> Nullable<Text>,
     }
@@ -2033,8 +2031,6 @@ diesel::joinable!(workflow -> ob_configuration (ob_configuration_id));
 diesel::joinable!(workflow -> scoped_vault (scoped_vault_id));
 diesel::joinable!(workflow_event -> workflow (workflow_id));
 diesel::joinable!(workflow_request -> ob_configuration (ob_configuration_id));
-diesel::joinable!(workflow_request -> scoped_vault (scoped_vault_id));
-diesel::joinable!(workflow_request -> workflow (workflow_id));
 diesel::joinable!(workflow_request_junction -> scoped_vault (scoped_vault_id));
 diesel::joinable!(workflow_request_junction -> workflow_request (workflow_request_id));
 

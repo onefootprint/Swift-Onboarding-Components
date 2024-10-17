@@ -1,5 +1,8 @@
+use super::workflow::Workflow;
+use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
+use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::workflow_request_junction;
@@ -36,6 +39,20 @@ impl WorkflowRequestJunction {
             .values(row)
             .get_result::<Self>(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument("WorkflowRequestJunction::set_wf_id", skip_all)]
+    pub fn set_wf_id(conn: &mut TxnPgConn, id: &WorkflowRequestId, wf: &Workflow) -> DbResult<()> {
+        let results = diesel::update(workflow_request_junction::table)
+            .filter(workflow_request_junction::workflow_request_id.eq(id))
+            .filter(workflow_request_junction::scoped_vault_id.eq(&wf.scoped_vault_id))
+            .filter(workflow_request_junction::workflow_id.is_null())
+            .set(workflow_request_junction::workflow_id.eq(&wf.id))
+            .get_results::<WorkflowRequestJunction>(conn.conn())?;
+        if results.is_empty() {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
+        }
+        Ok(())
     }
 
     pub fn get(conn: &mut PgConn, wfr_id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> DbResult<Self> {

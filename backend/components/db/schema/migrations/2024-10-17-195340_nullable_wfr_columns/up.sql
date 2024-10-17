@@ -1,0 +1,1 @@
+ALTER TABLE workflow_request ALTER COLUMN scoped_vault_id DROP NOT NULL;
