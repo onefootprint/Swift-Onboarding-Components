@@ -1,7 +1,8 @@
-import { type GetEntitySentilinkSignalResponse, SentilinkFraudLevel } from '@onefootprint/types';
+import { type GetEntitySentilinkSignalResponse, SentilinkFraudLevel, SentilinkScoreBand } from '@onefootprint/types';
 
 export const sentilinkSignalFixture: GetEntitySentilinkSignalResponse = {
   idTheft: {
+    scoreBand: SentilinkScoreBand.high,
     reasonCodes: [
       {
         code: 'ID001',
@@ -13,6 +14,7 @@ export const sentilinkSignalFixture: GetEntitySentilinkSignalResponse = {
     score: 75,
   },
   synthetic: {
+    scoreBand: SentilinkScoreBand.high,
     reasonCodes: [
       {
         code: 'SY001',

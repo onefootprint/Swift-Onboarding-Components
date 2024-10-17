@@ -1,4 +1,4 @@
-import type { SentilinkReasonCode } from './../data/sentilink';
+import type { SentilinkReasonCode, SentilinkScoreBand } from './../data';
 
 export type GetEntitySentilinkSignalRequest = {
   entityId: string;
@@ -7,10 +7,13 @@ export type GetEntitySentilinkSignalRequest = {
 
 export type GetEntitySentilinkSignalResponse = {
   idTheft?: {
+    scoreBand: SentilinkScoreBand;
+
     reasonCodes: SentilinkReasonCode[];
     score: number;
   };
   synthetic?: {
+    scoreBand: SentilinkScoreBand;
     reasonCodes: SentilinkReasonCode[];
     score: number;
   };

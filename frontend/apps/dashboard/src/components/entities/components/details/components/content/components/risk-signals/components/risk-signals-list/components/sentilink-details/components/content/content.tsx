@@ -13,10 +13,22 @@ const Content = ({ data }: ContentProps) => {
 
   return (
     <Stack direction="column" gap={5}>
-      {synthetic && (
-        <Score score={synthetic.score} reasonCodes={synthetic.reasonCodes} title={t('score.synthetic-title')} />
-      )}
-      {idTheft && <Score score={idTheft.score} reasonCodes={idTheft.reasonCodes} title={t('score.id-theft-title')} />}
+      {synthetic ? (
+        <Score
+          score={synthetic.score}
+          scoreBand={synthetic.scoreBand}
+          reasonCodes={synthetic.reasonCodes}
+          title={t('score.synthetic-title')}
+        />
+      ) : null}
+      {idTheft ? (
+        <Score
+          score={idTheft.score}
+          scoreBand={idTheft.scoreBand}
+          reasonCodes={idTheft.reasonCodes}
+          title={t('score.id-theft-title')}
+        />
+      ) : null}
     </Stack>
   );
 };

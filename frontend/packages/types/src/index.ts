@@ -533,6 +533,7 @@ export {
   RuleResultGroup,
   SessionStatus,
   SentilinkFraudLevel,
+  SentilinkScoreBand,
   StepUpDocumentKind,
   SupportedIdDocTypes,
   supportedRoleKinds,

@@ -1,5 +1,6 @@
+import type { UIStates } from '@onefootprint/design-tokens';
 import type { SentilinkReasonCode } from '@onefootprint/types';
-import { SentilinkFraudLevel } from '@onefootprint/types';
+import { SentilinkFraudLevel, SentilinkScoreBand } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import ReasonCode from './components/reason-code';
 import RiskIndicator from './components/risk-indicator';
@@ -7,13 +8,21 @@ import { getLessFraudyReasonCodes, getMoreFraudyReasonCodes } from './utils/sort
 
 type ScoreProps = {
   score: number;
+  scoreBand: SentilinkScoreBand;
   reasonCodes: SentilinkReasonCode[];
   title: string;
 };
 
-const Score = ({ score, reasonCodes, title }: ScoreProps) => {
+const scoreToColor: Record<SentilinkScoreBand, keyof UIStates> = {
+  [SentilinkScoreBand.low]: 'success',
+  [SentilinkScoreBand.medium]: 'warning',
+  [SentilinkScoreBand.high]: 'error',
+};
+
+const Score = ({ score, scoreBand, reasonCodes, title }: ScoreProps) => {
   const moreFraudyReasonCodes = getMoreFraudyReasonCodes(reasonCodes);
   const lessFraudyReasonCodes = getLessFraudyReasonCodes(reasonCodes);
+  const scoreColor = scoreToColor[scoreBand];
 
   return (
     <Stack direction="column" borderColor="tertiary" borderWidth={1} borderRadius="default" borderStyle="solid">
@@ -28,7 +37,7 @@ const Score = ({ score, reasonCodes, title }: ScoreProps) => {
         <Text variant="label-1" color="secondary">
           {title}
         </Text>
-        <Text variant="heading-1" color={score >= 500 ? 'error' : 'success'}>
+        <Text variant="heading-1" color={scoreColor}>
           {score}
         </Text>
       </Stack>
