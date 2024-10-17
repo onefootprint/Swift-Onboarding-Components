@@ -18,17 +18,20 @@ const defaultQueryParams: SignalDetailsQueryParams = {
 
 const useRiskSignalsFilters = () => {
   const filters = useFilters<SignalDetailsQueryParams>(defaultQueryParams);
+  const isSentilink = queryToBoolean(filters.query.is_sentilink);
   const values = {
     description: filters.query.risk_signal_description,
     scope: queryToArray(filters.query.risk_signal_scope),
     severity: queryToArray(filters.query.risk_signal_severity),
-    is_sentilink: queryToBoolean(filters.query.is_sentilink),
+    riskSignalId: filters.query.risk_signal_id,
+    isSentilink,
+    sentilinkRiskSignalId: isSentilink ? filters.query.risk_signal_id : undefined,
   };
   const requestParams = {
     description: values.description,
     scope: queryToString(values.scope),
     severity: queryToString(values.severity),
-    is_sentilink: values.is_sentilink?.toString(),
+    is_sentilink: values.isSentilink?.toString(),
   };
   return {
     ...filters,

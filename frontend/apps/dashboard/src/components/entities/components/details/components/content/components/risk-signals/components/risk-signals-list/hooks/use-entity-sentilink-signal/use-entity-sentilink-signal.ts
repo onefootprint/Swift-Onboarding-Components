@@ -6,7 +6,7 @@ import type { AuthHeaders } from 'src/hooks/use-session';
 
 type UseEntitySentilinkSignalProps = {
   entityId: string;
-  riskSignalId: string;
+  riskSignalId?: string;
 };
 
 const getSentilinkSignal = async (payload: GetEntitySentilinkSignalRequest, authHeaders: AuthHeaders) => {
@@ -18,16 +18,13 @@ const getSentilinkSignal = async (payload: GetEntitySentilinkSignalRequest, auth
   return response;
 };
 
-const useEntitySentilinkSignal = ({ entityId, riskSignalId }: UseEntitySentilinkSignalProps) => {
+const useEntitySentilinkSignal = ({ entityId, riskSignalId = '' }: UseEntitySentilinkSignalProps) => {
   const { authHeaders } = useSession();
-
-  const sentilinkSignalQuery = useQuery({
+  return useQuery({
     queryKey: ['entity', entityId, 'sentilink', riskSignalId],
     queryFn: () => getSentilinkSignal({ entityId, riskSignalId }, authHeaders),
     enabled: !!riskSignalId,
   });
-
-  return sentilinkSignalQuery;
 };
 
 export default useEntitySentilinkSignal;

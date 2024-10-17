@@ -8,12 +8,12 @@ import Loading from './components/loading';
 
 const SentilinkDetails = () => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details' });
-  const { query, clear } = useRiskSignalsFilters();
-  const isOpen = !!query.risk_signal_id && !!query.is_sentilink && false; // placeholder - must disable standard details
+  const { query, values, clear } = useRiskSignalsFilters();
   const entityId = useEntityId();
+  const isOpen = !!query.risk_signal_id && !!query.is_sentilink && false; // placeholder - must disable standard details
   const { data, isPending, error } = useEntitySentilinkSignal({
     entityId,
-    riskSignalId: query.risk_signal_id || '',
+    riskSignalId: values.sentilinkRiskSignalId,
   });
 
   return (
