@@ -38,6 +38,7 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserWfAuthContext)> for api_wire_t
         let has_linked_user = bo.has_linked_user();
         let BusinessOwnerInfo { bo, su, data } = bo;
         let is_authed_user = su.is_some_and(|su| su.id == user_auth.scoped_user.id);
+        let is_mutable = !has_linked_user || is_authed_user;
         let populated_data = data.keys().cloned().collect();
         let decrypted_data = data
             .into_iter()
@@ -49,13 +50,14 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserWfAuthContext)> for api_wire_t
                 // For other properties (like phone and email), only render them if they are owned by the biz
                 // OR if the currently logged in user is this beneficial owner.
                 // This minimizes the amount of data that BOs can see about each other
-                !has_linked_user || is_authed_user
+                is_mutable
             })
             .collect();
         Self {
             id: bo.link_id,
             has_linked_user,
             is_authed_user,
+            is_mutable,
             populated_data,
             decrypted_data,
             ownership_stake: bo.ownership_stake.map(|s| s as u32),

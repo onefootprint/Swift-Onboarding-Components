@@ -109,6 +109,16 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
     )
     _assert_bo_data(body, USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data["data"])
 
+    # Make sure cannot update the second owner to sum up to more than 100%
+    data = dict(ownership_stake=51)
+    body = patch(
+        f"hosted/business/owners/{link_id}", data, bifrost.auth_token, status_code=400
+    )
+    assert (
+        body["message"]
+        == "Ownership stake cannot exceed 100% for all owners of this business"
+    )
+
     # Check the secondary BO was updated properly
     body = get("hosted/business/owners", None, bifrost.auth_token)
     secondary_bo = body[1]

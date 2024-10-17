@@ -255,6 +255,15 @@ impl BusinessOwner {
         if !(0..=100).contains(&ownership_stake) {
             return ValidationError("Invalid ownership stake").into();
         }
+        let other_owners = business_owner::table
+            .filter(business_owner::business_vault_id.eq(bv_id))
+            .filter(business_owner::link_id.ne(link_id))
+            .filter(business_owner::deactivated_at.is_null())
+            .get_results::<Self>(conn.conn())?;
+        if other_owners.iter().flat_map(|bo| bo.ownership_stake).sum::<i32>() + ownership_stake > 100 {
+            return ValidationError("Ownership stake cannot exceed 100% for all owners of this business")
+                .into();
+        }
         let result = diesel::update(business_owner::table)
             .filter(business_owner::business_vault_id.eq(bv_id))
             .filter(business_owner::link_id.eq(link_id))

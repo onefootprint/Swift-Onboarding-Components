@@ -14,6 +14,8 @@ pub struct HostedBusinessOwner {
     pub has_linked_user: bool,
     /// True if this beneficial owner represents the currently authed user.
     pub is_authed_user: bool,
+    /// True if this beneficial owner is editable by the currently authed user.
+    pub is_mutable: bool,
     pub decrypted_data: HashMap<DataIdentifier, PiiString>,
     pub populated_data: Vec<DataIdentifier>,
     pub ownership_stake: Option<u32>,
