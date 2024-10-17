@@ -1,6 +1,6 @@
+import useEntityId from '@/entity/hooks/use-entity-id';
 import { Drawer, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 import useRiskSignalsFilters from 'src/components/entities/components/details/hooks/use-risk-signals-filters';
 import ErrorComponent from 'src/components/error';
 import useEntitySentilinkSignal from '../../hooks/use-entity-sentilink-signal';
@@ -10,8 +10,8 @@ import Loading from './components/loading';
 const SentilinkDetails = () => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details' });
   const { query, values, clear } = useRiskSignalsFilters();
+  const isOpen = !!query.risk_signal_id && !!query.is_sentilink;
   const entityId = useEntityId();
-  const isOpen = !!query.risk_signal_id && !!query.is_sentilink && false; // placeholder - must disable standard details
   const { data, isPending, error } = useEntitySentilinkSignal({
     entityId,
     riskSignalId: values.sentilinkRiskSignalId,

@@ -16,7 +16,7 @@ const StandardDetails = () => {
   const { t } = useTranslation();
   const { t: entityT } = useTranslation('entity-details');
   const { query, clear } = useRiskSignalsFilters();
-  const isOpen = !!query.risk_signal_id;
+  const isOpen = !!query.risk_signal_id && !query.is_sentilink;
   const { data, isPending, error } = useRiskSignalDetails(query.risk_signal_id);
   const [amlMedia, setAmlMedia] = useState([] as AmlHitMedia[]);
 
