@@ -15,9 +15,11 @@ import useRiskSignalDetails from './hooks/use-risk-signal-details';
 const StandardDetails = () => {
   const { t } = useTranslation();
   const { t: entityT } = useTranslation('entity-details');
-  const { query, clear } = useRiskSignalsFilters();
+  const { query, values, clear } = useRiskSignalsFilters();
   const isOpen = !!query.risk_signal_id && !query.is_sentilink;
-  const { data, isPending, error } = useRiskSignalDetails(query.risk_signal_id);
+  const { data, isPending, error } = useRiskSignalDetails({
+    riskSignalId: !values.isSentilink ? values.riskSignalId : undefined,
+  });
   const [amlMedia, setAmlMedia] = useState([] as AmlHitMedia[]);
 
   const getDrawerTitle = () => {

@@ -15,7 +15,7 @@ const getRiskSignalDetails = async ({ authHeaders, entityId, riskSignalId }: Get
   return response;
 };
 
-const useRiskSignalDetails = (riskSignalId = '') => {
+const useRiskSignalDetails = ({ riskSignalId = '' }: { riskSignalId?: string; isSentilink?: boolean }) => {
   const { authHeaders } = useSession();
   const entityId = useEntityId();
 
