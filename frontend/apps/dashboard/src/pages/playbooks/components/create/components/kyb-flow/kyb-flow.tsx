@@ -15,12 +15,12 @@ import NameStep from '../name-step';
 import RequiredAuthMethodsStep from '../required-auth-methods-step';
 import StepperContainer from '../stepper-container';
 
-type FlowKyb = {
+type KybFlow = {
   onDone: () => void;
   onBack: () => void;
 };
 
-const FlowKyb = ({ onBack, onDone }: FlowKyb) => {
+const KybFlow = ({ onBack, onDone }: KybFlow) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.stepper' });
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
@@ -69,7 +69,7 @@ const FlowKyb = ({ onBack, onDone }: FlowKyb) => {
       {state.step === 'name' && (
         <NameStep
           defaultValues={state.data.nameForm}
-          meta={{ kind: OnboardingConfigKind.kyc }}
+          meta={{ kind: OnboardingConfigKind.kyb }}
           onBack={onBack}
           onSubmit={data => {
             dispatch({ type: 'updateNameData', payload: data });
@@ -137,4 +137,4 @@ const FlowKyb = ({ onBack, onDone }: FlowKyb) => {
   );
 };
 
-export default FlowKyb;
+export default KybFlow;
