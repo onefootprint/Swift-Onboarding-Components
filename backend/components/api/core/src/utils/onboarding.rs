@@ -198,6 +198,16 @@ pub fn get_or_create_business_wf(
         su,
     } = common_args;
 
+    let sb_id = user_auth.sb_id.as_ref();
+    let wfr_junction = sb_id
+        .zip(wfr.as_ref())
+        .map(|(sb_id, wfr)| WorkflowRequestJunction::get(conn, &wfr.id, sb_id))
+        .transpose()?;
+    if let Some(wf_id) = wfr_junction.and_then(|wfr| wfr.workflow_id) {
+        // This request has already been used to make a Workflow. Return that workflow.
+        return Ok(Workflow::get(conn, &wf_id)?);
+    }
+
     if let Some(biz_wf_id) = user_auth.biz_wf_id.as_ref() {
         // Either a duplicate call to `POST /hosted/onboarding`, or we're using a secondary beneficial owner
         // token and the business has already been created
