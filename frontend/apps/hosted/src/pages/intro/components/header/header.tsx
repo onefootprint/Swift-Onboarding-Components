@@ -1,22 +1,20 @@
 import { HeaderTitle } from '@onefootprint/idv';
-import { Avatar } from '@onefootprint/ui';
+import { Avatar, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import useIsKyb from 'src/pages/intro/utils/is-kyb';
-import styled, { css } from 'styled-components';
 
 const Header = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.intro.header' });
   const [state] = useHostedMachine();
   const { businessBoKycData, onboardingConfig } = state.context;
-  const isKyb = useIsKyb();
+  const isKyb = Boolean(onboardingConfig?.isKyb);
 
   const { name: businessName, inviter } = businessBoKycData || {};
   const otherBoName = [inviter?.firstName, inviter?.lastName].join(' ');
   const tenantName = onboardingConfig?.orgName ?? '';
 
   return (
-    <HeaderContainer>
+    <Stack flexDirection="column" alignItems="center" justifyContent="center" rowGap={5}>
       <Avatar name={tenantName} size="xlarge" src={onboardingConfig?.logoUrl} />
       {businessBoKycData ? (
         <HeaderTitle
@@ -34,18 +32,8 @@ const Header = () => {
           marginTop={4}
         />
       )}
-    </HeaderContainer>
+    </Stack>
   );
 };
-
-const HeaderContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[5]};
-    justify-content: center;
-    align-items: center;
-  `}
-`;
 
 export default Header;

@@ -1,14 +1,21 @@
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
-import { Box } from '@onefootprint/ui';
+import { Box, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 const Complete = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.complete' });
 
   return (
-    <Container>
+    <Stack
+      flexDirection="column"
+      position="relative"
+      width="100%"
+      height="100%"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+    >
       <NavigationHeader />
       <IcoCheckCircle40 color="success" />
       <Box marginBottom={4} />
@@ -21,18 +28,8 @@ const Complete = () => {
         zIndex={3}
       />
       <Box />
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  height: 100%;
-  width: 100%;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  position: relative;
-`;
 
 export default Complete;

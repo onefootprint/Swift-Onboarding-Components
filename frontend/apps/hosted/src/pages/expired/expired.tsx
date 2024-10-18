@@ -1,9 +1,8 @@
 import { HeaderTitle } from '@onefootprint/idv';
 import { HostedUrlType } from '@onefootprint/types';
-import { Button } from '@onefootprint/ui';
+import { Button, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import styled, { css } from 'styled-components';
 
 const Expired = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.expired' });
@@ -15,26 +14,15 @@ const Expired = () => {
   };
 
   return (
-    <Container>
+    <Stack flexDirection="column" justifyContent="center" alignItems="center" rowGap={7} paddingTop={8}>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       {urlType === HostedUrlType.onboardingConfigPublicKey && (
         <Button fullWidth onClick={handleClick}>
           {t('cta')}
         </Button>
       )}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[7]};
-    justify-content: center;
-    align-items: center;
-    padding-top: ${theme.spacing[8]};
-  `}
-`;
 
 export default Expired;
