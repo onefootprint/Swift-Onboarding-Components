@@ -1,1 +1,1 @@
-SELECT diesel_manage_updated_at('workflow_request_junction');
+DROP TRIGGER set_updated_at ON workflow_request_junction;
