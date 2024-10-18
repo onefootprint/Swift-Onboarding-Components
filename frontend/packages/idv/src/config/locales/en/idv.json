@@ -721,8 +721,16 @@
               }
             }
           },
+          "under-100": {
+            "title": "No other beneficial owner?",
+            "description": "The total business ownership doesn't add up to 100%. Do you want to proceed without adding other beneficial owners, or would you prefer to go back and add them?",
+            "input-label": "Why doesn't it add up to 100%?",
+            "input-placeholder": "Please explain...",
+            "secondary-cta": "Go back",
+            "primary-cta": "Yes, continue"
+          },
           "multi-kyc": "We need to verify all other beneficial owners’ identities. We’ll send them a text message with a link after you finish filling out your business verification.",
-          "add-more": "Add more",
+          "add-another": "Add another beneficial owner",
           "errors": {
             "invalid": "Please complete the fields above.",
             "ownership-stake-total": {

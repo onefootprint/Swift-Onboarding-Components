@@ -101,7 +101,7 @@ describe('<Form />', () => {
     const title = screen.getByText('Beneficial owner (You)');
     expect(title).toBeInTheDocument();
 
-    const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+    const addMoreButton = screen.getByRole('button', { name: 'Add another beneficial owner' });
     expect(addMoreButton).toBeInTheDocument();
     await userEvent.click(addMoreButton);
 
@@ -197,7 +197,7 @@ describe('<Form />', () => {
     it('shows show instructions about this flow', async () => {
       renderForm({ requireMultiKyc: true, canEdit: true });
 
-      const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+      const addMoreButton = screen.getByRole('button', { name: 'Add another beneficial owner' });
       expect(addMoreButton).toBeInTheDocument();
       await userEvent.click(addMoreButton);
 
@@ -215,7 +215,7 @@ describe('<Form />', () => {
     it("doesn't show email and phone fields for secondary BOs", async () => {
       renderForm({ requireMultiKyc: false, canEdit: true });
 
-      const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+      const addMoreButton = screen.getByRole('button', { name: 'Add another beneficial owner' });
       expect(addMoreButton).toBeInTheDocument();
       await userEvent.click(addMoreButton);
 
@@ -255,7 +255,7 @@ describe('<Form />', () => {
         const onSubmit = jest.fn();
         renderForm({ onSubmit, requireMultiKyc: true, canEdit: true });
 
-        const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+        const addMoreButton = screen.getByRole('button', { name: 'Add another beneficial owner' });
         expect(addMoreButton).toBeInTheDocument();
         await userEvent.click(addMoreButton);
 
@@ -279,7 +279,7 @@ describe('<Form />', () => {
         const onSubmit = jest.fn();
         renderForm({ onSubmit, requireMultiKyc: true, canEdit: true });
 
-        const addMoreButton = screen.getByRole('button', { name: 'Add more' });
+        const addMoreButton = screen.getByRole('button', { name: 'Add another beneficial owner' });
         await userEvent.click(addMoreButton);
 
         const firstNameFields = screen.getAllByLabelText('First name');

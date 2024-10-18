@@ -721,8 +721,16 @@
               }
             }
           },
+          "under-100": {
+            "title": "¿No hay otro propietario beneficiario?",
+            "description": "La participación total de los propietarios no suma 100%. ¿Quieres continuar sin agregar a otros propietarios, o prefieres regresar para añadirlos?",
+            "input-label": "¿Por qué no suma el 100%?",
+            "input-placeholder": "Por favor, explícanos un poco más...",
+            "secondary-cta": "Regresar",
+            "primary-cta": "Sí, continuar"
+          },
           "multi-kyc": "Necesitamos verificar las identidades de todos los demás propietarios. Les enviaremos un enlace por correo electrónico después de que termines de completar la verificación de tu empresa.",
-          "add-more": "Agregar más",
+          "add-another": "Agregar otro propietario",
           "errors": {
             "invalid": "Por favor, completa los campos anteriores.",
             "ownership-stake-total": {

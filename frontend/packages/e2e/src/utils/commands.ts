@@ -160,7 +160,7 @@ export const fillBeneficialOwners = async (
   await share0.clear();
   await share0.fill('50');
 
-  await frame.getByRole('button', { name: 'Add more' }).first().click();
+  await frame.getByRole('button', { name: 'Add another beneficial owner' }).first().click();
 
   await frame.locator('input[name="beneficialOwners.1.first_name"]').first().fill(payload.beneficialOwner1Name);
   await frame.locator('input[name="beneficialOwners.1.last_name"]').first().fill(payload.beneficialOwner1LastName);
