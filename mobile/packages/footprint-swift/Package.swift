@@ -12,15 +12,11 @@ let package = Package(
             name: "FootprintSwift",
             targets: ["FootprintSwift"]),
     ],
-    dependencies: [
-                .package(url: "https://github.com/Open-Bytes/SwiftUIFormValidator.git", .upToNextMajor(from: "1.0.0"))
-            ],
+    dependencies: [],
     targets: [
         .target(
             name: "FootprintSwift",
-            dependencies: [
-                            .product(name: "FormValidator", package: "SwiftUIFormValidator"),
-                        ],
+            dependencies: [],
             plugins: []),
         .testTarget(
             name: "FootprintSwiftTests",

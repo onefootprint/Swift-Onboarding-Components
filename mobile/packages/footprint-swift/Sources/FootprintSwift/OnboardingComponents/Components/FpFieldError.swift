@@ -1,66 +1,56 @@
 import SwiftUI
-import FormValidator
 
 public struct FpFieldError: View {
     let textColor: Color
     let font: Font
-    let errorMessage: String?
-    @EnvironmentObject var form: FormValidator
+    var message: String?
+    @EnvironmentObject var form: FormManager
     @Environment(\.fpFieldName) var fpFieldName: VaultDI?
-    @State private var hasError: Bool = false
+    private var errorMessage: String? {
+        switch fpFieldName {
+        case .idPeriodEmail:
+            if let err = form.errors["idEmail"] {
+                return message ?? err
+            } else {
+                return nil
+            }
+            
+        case .idPeriodPhoneNumber:
+            if let err = form.errors["idPhoneNumber"] {
+                return message ?? err
+            } else {
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
     
     public init(
         textColor: Color = .red,
         font: Font = .caption,
-        errorMessage: String? = nil
+        message: String? = nil
     ) {
         self.textColor = textColor
         self.font = font
-        self.errorMessage = errorMessage
+        self.message = message
     }
     
-    public var body: some View {
+    public var body: some View {            
         VStack(alignment: .leading, spacing: 4) {
-            if !hasError {
-                EmptyView()
-            } else if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .font(font)
-                    .foregroundColor(textColor)
-            } else if let fpFieldName = fpFieldName {
-                switch fpFieldName {
-                case .idPeriodEmail:
-                    ValidationMessageView(validation: form.emailValidation)
-                case .idPeriodPhoneNumber:
-                    ValidationMessageView(validation: form.phoneNumberValidation)
-                default:
-                    EmptyView()
-                }
+            if let errorMessage = errorMessage {
+                ValidationMessageView(errorMessage: errorMessage)
             }
         }
-        .onReceive(form.manager.$allValid) { isValid in
-            print("Is valid: \(isValid)")
-        }
-        .onReceive(form.manager.$allFilled) { isFilled in
-            print("Is all filled: \(isFilled)")
-        }
-        .onReceive(form.manager.$validationMessages) { messages in
-            print("Form validation messages: \(messages)")
-            hasError = !messages.isEmpty
-        }
     }
-        
 }
 
 private struct ValidationMessageView: View {
-    var validation: ValidationContainer
-    
+    var errorMessage: String
     
     var body: some View {
-        if    validation.validator.validate().isFailure {
-            Text(validation.validator.message())
-                .font(.caption)
-                .foregroundColor(.red)
-        }
+        Text(errorMessage)
+            .font(.caption)
+            .foregroundColor(.red)
     }
 }

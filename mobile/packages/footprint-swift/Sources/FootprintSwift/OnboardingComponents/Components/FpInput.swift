@@ -5,7 +5,7 @@ public struct FpInput: View {
     let keyboardType: UIKeyboardType
     let isSecure: Bool
     let contentType: UITextContentType?
-    @EnvironmentObject var form: FormValidator
+    @EnvironmentObject var form: FormManager
     @Environment(\.fpFieldName) var fpFieldName: VaultDI?
     
     public init(
@@ -26,9 +26,9 @@ public struct FpInput: View {
                 if let fieldName = fpFieldName {
                     switch fieldName {
                     case .idPeriodEmail:
-                        return form.email
+                        return form.idEmail
                     case .idPeriodPhoneNumber:
-                        return form.phoneNumber
+                        return form.idPhoneNumber
                     default:
                         return ""
                     }
@@ -41,9 +41,9 @@ public struct FpInput: View {
                     
                     switch fieldName {
                     case .idPeriodEmail:
-                        form.email = newValue
+                        form.setValue(newValue, forKey: "idEmail")
                     case .idPeriodPhoneNumber:
-                        form.phoneNumber = newValue
+                        form.setValue(newValue, forKey: "idPhoneNumber")
                     default:
                         break
                     }
@@ -52,7 +52,6 @@ public struct FpInput: View {
         )
         
         return TextField(placeholder, text: binding)
-            .validation(fpFieldName == .idPeriodEmail ? form.emailValidation : form.phoneNumberValidation)
             .keyboardType(keyboardType)
             .textContentType(contentType)
             .onAppear {

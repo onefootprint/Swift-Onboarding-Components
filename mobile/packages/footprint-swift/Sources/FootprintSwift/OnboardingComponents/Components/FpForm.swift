@@ -1,17 +1,18 @@
 import SwiftUI
 
 public struct FpForm<Content: View, SubmitButton: View>: View {
-    @StateObject var form = FormValidator()
+    @StateObject var form = FormManager()
+    @State private var isSubmitPressed = false
     let content: Content
     let spacing: CGFloat
     let alignment: HorizontalAlignment
-    let onSubmit: (() -> Void)?
+    let onSubmit: ((VaultData) -> Void)?
     let submitButtonBuilder: (() -> SubmitButton)?
     
     public init(
         spacing: CGFloat = 16,
         alignment: HorizontalAlignment = .leading,
-        onSubmit: (() -> Void)? = nil,
+        onSubmit: ((VaultData) -> Void)? = nil,
         @ViewBuilder content: () -> Content,
         @ViewBuilder submitButton: @escaping (() -> SubmitButton)
     ) {
@@ -23,37 +24,22 @@ public struct FpForm<Content: View, SubmitButton: View>: View {
     }
     
     public var body: some View {
-       
         VStack(alignment: alignment, spacing: spacing) {
             content
             if let onSubmit = onSubmit, let submitButtonBuilder = submitButtonBuilder {
                 submitButtonBuilder()
                     .onTapGesture {
-                         let valid = form.manager.triggerValidation()
+                        isSubmitPressed = true
+                        form.triggerValidation()
                         
-                    
-
-                         if valid {
-                             onSubmit()
-                         }
-                                                                                            
-                        
-                        // // Another way for checking validation.
-                        // print("Is all valid: \(form.manager.isAllValid())")
-                        
-                        // // Check if all fields have text. This is not validation check.
-                        // print("Is all filled: \(form.manager.isAllFilled())")
-                        
-                        // // Get an array with all validation messages.
-                        // print("All validation messages array: \(form.manager.validationMessages)")
-                        
-                        // // Get error messages as string, separated with a new line.
-                        // print("All validation messages string: \(form.manager.errorsDescription())")                                                
-                        
+                        if form.isValid{
+                            print("Email info:  \(form.idEmail)")
+                            print("Phone info: \(form.idPhoneNumber)")
+                            print("Vault data \(form.getVaultData())")
+                        }
                     }
             }
         }
         .environmentObject(form)
     }
 }
-

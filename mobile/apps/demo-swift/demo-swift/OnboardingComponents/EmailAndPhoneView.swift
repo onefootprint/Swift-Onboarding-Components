@@ -1,22 +1,22 @@
 import SwiftUI
 import FootprintSwift
 
-struct EmailAndPhoneView: View {  
+struct EmailAndPhoneView: View {
     @State private var shouldNavigateToNextView = false
     
-    var body: some View {
+    var body: some View {        
         FpForm(
-            onSubmit: {
+            onSubmit: { vaultData in
                 Task {
                     print("onSubmit: ")
-                    // Uncomment the following code when ready to implement the actual submission
-                    // do {
-                    //     try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: email, phoneNumber: phoneNumber)
-                    //     shouldNavigateToNextView = true
-                    // } catch {
-                    //     print("Error: \(error)")
-                    //     shouldNavigateToNextView = false
-                    // }
+                    print(vaultData)
+                    do {
+                        try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: vaultData.idEmail, phoneNumber: vaultData.idPhoneNumber)
+                        shouldNavigateToNextView = true
+                    } catch {
+                        print("Error: \(error)")
+                        shouldNavigateToNextView = false
+                    }
                 }
             },
             content: {
@@ -24,11 +24,11 @@ struct EmailAndPhoneView: View {
                     FpField(
                         name: .idPeriodEmail,
                         label: { FpLabel("Email", font: .subheadline, color: .secondary) },
-                        input: { 
+                        input: {
                             FpInput(placeholder: "Enter your email", keyboardType: .emailAddress, contentType: .emailAddress)
                                 .padding()
-                                .background(Color.gray.opacity(0.8))
-                                .cornerRadius(50)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(10)
                         },
                         error: { FpFieldError() }
                     )
@@ -36,7 +36,7 @@ struct EmailAndPhoneView: View {
                     FpField(
                         name: .idPeriodPhoneNumber,
                         label: { FpLabel("Phone Number", font: .subheadline, color: .secondary) },
-                        input: { 
+                        input: {
                             FpInput(placeholder: "Enter your phone number", keyboardType: .phonePad, contentType: .telephoneNumber)
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
@@ -53,8 +53,9 @@ struct EmailAndPhoneView: View {
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
-            }
-        )
+            }                
+        )        
+        .padding(.horizontal, 20)
         .navigationTitle("Signup flow")
         .onAppear {
             Task {
@@ -69,15 +70,11 @@ struct EmailAndPhoneView: View {
                 }
             }
         }
-        .navigate(to: NextView(), when: $shouldNavigateToNextView)
+        .navigate(to: VerifyOTPView(), when: $shouldNavigateToNextView)
     }
 }
 
-struct NextView: View {
-    var body: some View {
-        Text("Next View")
-    }
-}
+
 
 extension View {
     func navigate<NewView: View>(to view: NewView, when binding: Binding<Bool>) -> some View {
@@ -86,7 +83,7 @@ extension View {
                 self
                     .navigationBarTitle("")
                     .navigationBarHidden(true)
-
+                
                 NavigationLink(
                     destination: view
                         .navigationBarTitle("")
