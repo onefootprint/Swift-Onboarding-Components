@@ -13,6 +13,7 @@ export type SelectOption<T extends StringOrNumber = string> = {
   id: string;
   className?: string;
 };
+
 export type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   children?: React.ReactNode;
 };

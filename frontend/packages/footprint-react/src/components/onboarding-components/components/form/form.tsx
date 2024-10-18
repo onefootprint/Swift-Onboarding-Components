@@ -8,7 +8,7 @@ import type { FormValues } from '../../../../types';
 import useFormTransforms from '../../hooks/use-form-transforms';
 import flattenObject from '../../utils/flatten-object';
 
-type FormOptions = {
+export type FormOptions = {
   errors: FieldErrors<FormValues>;
   handleSubmit: () => void;
   setFocus: UseFormSetFocus<FormValues>;
