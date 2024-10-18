@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import useGetQueryParam from 'src/hooks/use-query-param';
 import DataCollection from './components/data-collection';
+import Information from './components/information';
 import Rules from './components/rules';
 import Settings from './components/settings';
 import VerificationChecks from './components/verification-checks';
@@ -34,6 +35,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
           { value: 'verification-checks', label: t('tabs.verification-checks') },
           { value: 'rules', label: t('tabs.rules') },
           { value: 'settings', label: t('tabs.settings') },
+          { value: 'information', label: t('tabs.information') },
         ];
 
   const handleChange = (tab: PlaybookTabs) => {
@@ -49,6 +51,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
       {tab === 'verification-checks' && <VerificationChecks playbook={playbook} />}
       {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
       {tab === 'settings' && <Settings playbook={playbook} />}
+      {tab === 'information' && <Information playbook={playbook} />}
     </Stack>
   );
 };

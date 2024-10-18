@@ -30,7 +30,8 @@
     "data-collection": "Data collection",
     "verification-checks": "Verification checks",
     "settings": "Settings",
-    "rules": "Rules"
+    "rules": "Rules",
+    "information": "Information"
   },
   "data-collection": {
     "section-title": "Data collection",
@@ -114,6 +115,14 @@
     }
   },
   "settings": {
+    "playbook-information": {
+      "playbook-name": "Playbook name",
+      "playbook-type": "Playbook type",
+      "playbook-id": "Playbook ID",
+      "playbook-key": "Playbook Key",
+      "created-at": "Created at",
+      "author": "Author"
+    },
     "passkeys": {
       "title": "Passkey registration",
       "form": {

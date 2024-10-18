@@ -17,7 +17,7 @@ export const playbookWithPasskeysFixture: OnboardingConfig = {
   allowUsTerritoryResidents: false,
   appearance: undefined,
   canAccessData: [],
-  createdAt: '',
+  createdAt: '2023-06-15T12:00:00Z',
   enhancedAml: {
     enhancedAml: false,
     ofac: false,

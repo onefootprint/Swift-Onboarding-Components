@@ -8,7 +8,7 @@ const playbooksConfigQuery = z.object({
   hide_disabled: z.string().optional(),
   show_filters: z.string().optional(),
 });
-const playbookTabsEnum = z.enum(['data', 'verification-checks', 'rules', 'settings']);
+const playbookTabsEnum = z.enum(['data', 'verification-checks', 'rules', 'settings', 'information']);
 
 export type PlaybookTabs = z.infer<typeof playbookTabsEnum>;
 export type PlaybooksConfigQuery = z.infer<typeof playbooksConfigQuery>;
