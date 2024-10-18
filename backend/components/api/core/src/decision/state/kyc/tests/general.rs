@@ -87,7 +87,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     scoped_vault_id: sv.id,
                     kind: (&s).into(),
                     state: s,
-                    config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+                    config: WorkflowConfig::Kyc(KycConfig {}),
                     fixture_result: None,
                     status: OnboardingStatus::Incomplete,
                     ob_configuration_id: obc.id,
@@ -609,7 +609,7 @@ async fn redo_and_pass(
         .db_transaction(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,
-                config: KycConfig { is_redo: true }.into(),
+                config: KycConfig {}.into(),
                 fixture_result,
                 ob_configuration_id: obc_id,
                 insight_event_id: None,

@@ -235,7 +235,7 @@ impl Workflow {
             }
             .into(),
             Some(WorkflowRequestConfig::Onboard { .. }) | None => match v.kind {
-                VaultKind::Person => KycConfig { is_redo: false }.into(),
+                VaultKind::Person => KycConfig {}.into(),
                 VaultKind::Business => KybConfig {}.into(),
             },
         };
@@ -659,7 +659,7 @@ mod tests {
     fn test(conn: &mut TestPgConn) {
         let state = KycState::VendorCalls;
         let wf_state: WorkflowState = state.into();
-        let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
+        let config = WorkflowConfig::Kyc(KycConfig {});
         let wf = Workflow::insert(
             conn,
             NewWorkflow {
@@ -681,16 +681,15 @@ mod tests {
         .unwrap();
         assert!(wf.kind == WorkflowKind::Kyc);
         assert!(wf.state == WorkflowState::Kyc(KycState::VendorCalls));
-        let WorkflowConfig::Kyc(KycConfig { is_redo }) = wf.config else {
+        let WorkflowConfig::Kyc(KycConfig {}) = wf.config else {
             panic!("Workflow config is not KycConfig");
         };
-        assert!(!is_redo);
     }
 
     #[db_test]
     fn test_update(conn: &mut TestPgConn) {
         let s: WorkflowState = KycState::VendorCalls.into();
-        let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
+        let config = WorkflowConfig::Kyc(KycConfig {});
         let wf = Workflow::insert(
             conn,
             NewWorkflow {

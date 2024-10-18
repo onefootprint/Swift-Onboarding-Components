@@ -30,10 +30,7 @@ impl WorkflowConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 
-pub struct KycConfig {
-    /// This isn't really used in many places anymore, can maybe rm
-    pub is_redo: bool,
-}
+pub struct KycConfig {}
 
 impl From<KycConfig> for WorkflowConfig {
     fn from(value: KycConfig) -> Self {
@@ -43,10 +40,7 @@ impl From<KycConfig> for WorkflowConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 
-pub struct AlpacaKycConfig {
-    /// This isn't really used in many places anymore, can maybe rm
-    pub is_redo: bool,
-}
+pub struct AlpacaKycConfig {}
 
 impl From<AlpacaKycConfig> for WorkflowConfig {
     fn from(value: AlpacaKycConfig) -> Self {
