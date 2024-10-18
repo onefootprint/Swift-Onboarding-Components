@@ -151,8 +151,10 @@ pub fn get_or_create_user_workflow(
     }
 
     if let Some(wfr) = wfr {
-        // If we're responding to a WorkflowRequest, save that we've created a WF for the request
-        WorkflowRequestJunction::set_wf_id(conn, &wfr.id, &wf)?;
+        let results = WorkflowRequestJunction::set_wf_id(conn, &wfr.id, &wf)?;
+        if results.is_empty() {
+            tracing::error!(wfr_id=%wfr.id, wf_id=%wf.id, "Expected to set workflow ID for WorkflowRequest but did not");
+        }
     }
 
     if is_new_wf {
@@ -272,6 +274,12 @@ pub fn get_or_create_business_wf(
             _ => &[],
         };
         create_doc_requests(conn, biz_doc_requests, &biz_wf)?;
+    }
+
+    if let Some(wfr) = wfr {
+        // Explicitly do not enforce that a WFR junction was updated. It's possible we just created a new
+        // business here
+        WorkflowRequestJunction::set_wf_id(conn, &wfr.id, &biz_wf)?;
     }
 
     Ok(biz_wf)
