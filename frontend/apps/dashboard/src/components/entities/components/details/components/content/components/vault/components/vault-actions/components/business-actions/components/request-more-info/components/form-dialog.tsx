@@ -28,6 +28,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
         actions: [
           {
             kind: ActionRequestKind.trigger,
+            fpBid: entityId,
             trigger: {
               kind: TriggerKind.Document,
               data: {
@@ -41,7 +42,6 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
                   },
                 })),
                 configs: [],
-                fpBid: entityId,
               },
             },
           },

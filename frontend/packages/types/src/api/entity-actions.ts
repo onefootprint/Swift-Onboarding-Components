@@ -18,6 +18,7 @@ export type ActionRequest =
   | {
       kind: ActionRequestKind.trigger;
       note?: string;
+      fpBid?: string;
       trigger: WorkflowRequestConfig;
     };
 
