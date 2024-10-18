@@ -38,7 +38,7 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let actor = DbActor::from(auth.actor());
-    let EntityActionsRequest { actions, fp_bid } = request.into_inner();
+    let EntityActionsRequest { actions } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
     if actions.is_empty() {
         return ValidationError("Must provide at least one action").into();
@@ -55,8 +55,7 @@ pub async fn post(
                 .map(|a| -> FpResult<EntityActionPostCommit> {
                     let action = match a {
                         EntityAction::Trigger(t) => {
-                            apply_trigger_request(conn, t, &sv, actor.clone(), &session_key, fp_bid.as_ref())?
-                                .into()
+                            apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
                         }
                         EntityAction::ClearReview => clear_review(conn, &sv, actor.clone())?,
                         EntityAction::ManualDecision(d) => {

@@ -30,7 +30,6 @@ use db::TxnPgConn;
 use newtypes::ApiKeyStatus;
 use newtypes::DbActor;
 use newtypes::DocumentRequestConfig;
-use newtypes::FpId;
 use newtypes::ObConfigurationKind;
 use newtypes::SessionAuthToken;
 use newtypes::TriggerRequest;
@@ -74,11 +73,14 @@ pub(super) fn apply_trigger_request(
     su: &ScopedVault,
     actor: DbActor,
     session_key: &ScopedSealingKey,
-    fp_bid: Option<&FpId>,
 ) -> FpResult<TriggerRequestOutcome> {
-    let TriggerRequest { trigger, note } = request;
+    let TriggerRequest {
+        trigger,
+        note,
+        fp_bid,
+    } = request;
 
-    let fp_bid = fp_bid.or(match &trigger {
+    let fp_bid = fp_bid.as_ref().or(match &trigger {
         // TODO move fp_bid out of the workflow_request config here once the client has been updated
         WorkflowRequestConfig::Document { fp_bid, .. } => fp_bid.as_ref(),
         _ => None,

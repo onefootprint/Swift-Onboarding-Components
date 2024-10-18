@@ -1,4 +1,5 @@
 use crate::DecisionStatus;
+use crate::FpId;
 use crate::WorkflowRequestConfig;
 use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
@@ -37,6 +38,7 @@ pub struct TriggerRequest {
     pub trigger: WorkflowRequestConfig,
     /// Optional note with more context on what we're asking the user to do
     pub note: Option<String>,
+    pub fp_bid: Option<FpId>,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
