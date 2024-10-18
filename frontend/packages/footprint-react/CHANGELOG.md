@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.7.3
+
+### Patch Changes
+
+- 93905a72c5: Export components types
+
 ## 7.7.1
 
 ### Patch Changes
