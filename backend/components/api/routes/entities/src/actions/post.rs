@@ -47,14 +47,15 @@ pub async fn post(
     let outcomes = state
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            if sv.kind != VaultKind::Person {
-                return Err(ValidationError("Must be a person vault").into());
-            }
+
             let outcomes = actions
                 .into_iter()
                 .map(|a| -> FpResult<EntityActionPostCommit> {
                     let action = match a {
                         EntityAction::Trigger(t) => {
+                            if sv.kind != VaultKind::Person {
+                                return Err(ValidationError("Must be a person vault").into());
+                            }
                             apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
                         }
                         EntityAction::ClearReview => clear_review(conn, &sv, actor.clone())?,
