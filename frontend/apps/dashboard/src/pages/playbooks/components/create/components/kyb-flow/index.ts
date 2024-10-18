@@ -1,1 +1,1 @@
-export { default } from './flow-kyb';
+export { default } from './kyb-flow';
