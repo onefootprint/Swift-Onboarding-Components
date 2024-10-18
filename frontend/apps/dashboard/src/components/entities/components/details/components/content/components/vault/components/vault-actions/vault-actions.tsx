@@ -1,4 +1,4 @@
-import { EntityKind, EntityStatus, RoleScopeKind } from '@onefootprint/types';
+import { EntityKind, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +51,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   };
 
   const renderIdleControls = () => {
-    const shouldRenderManualReview = entityData && entityData.status !== EntityStatus.none;
+    const shouldRenderManualReview = entityData && !!entityData.workflows.length;
     return (
       <Stack gap={3} align="center">
         {!isViewingHistorical && (
