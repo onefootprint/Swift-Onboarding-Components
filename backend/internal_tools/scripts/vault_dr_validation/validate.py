@@ -33,6 +33,13 @@ def fp_id_partitions():
     return ret
 
 
+def partition_for_fp_id(fp_id):
+    parts = fp_id.split("_")
+    prefix = "_".join(parts[:-1])
+    suffix = parts[-1]
+    return "{}_{}".format(prefix, suffix[:2])
+
+
 def footprint_dr(*args, capture=True):
     print("Running: footprint-dr", " ".join(args))
     if capture:
@@ -82,7 +89,7 @@ def vdr_list_all_records(partition, bucket, namespace):
         for line in lines:
             record = json.loads(line)
             fp_id = record["fp_id"]
-            if not fp_id.startswith(partition):
+            if partition_for_fp_id(fp_id) != partition:
                 return
             yield record
             cursor = fp_id
@@ -196,9 +203,7 @@ def validate_fp_id(args):
         vdr_data_for_version[version] = vdr_data
 
     for version, vdr_data in vdr_data_for_version.items():
-        validate_checkpoint = os.path.join(
-            data_dir, f"{fp_id}.{version}.validate.checkpoint"
-        )
+        validate_checkpoint = os.path.join(data_dir, f"{fp_id}.{version}.validated")
         if os.path.exists(validate_checkpoint):
             continue
 

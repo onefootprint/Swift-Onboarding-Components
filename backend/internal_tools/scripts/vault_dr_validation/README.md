@@ -21,6 +21,8 @@ WHERE
 	AND deactivated_at IS NULL;
 ```
 
+Write the key to a file and set the env var `FOOTPRINT_WRAPPED_RECOVERY_KEY_FILE` to that file.
+
 Note that the VDR org identities for all internal test tenants are the keys in the local `.env` secrets files.
 
 4. Run the validation script
