@@ -28,7 +28,6 @@ use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::CollectedDataOptionKind as CDOK;
-use newtypes::DataIdentifierDiscriminant;
 use newtypes::DbActor;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentCdoInfo;
@@ -748,14 +747,6 @@ impl ObConfiguration {
         self.can_access_data
             .iter()
             .any(|cdo| matches!(cdo, CDO::Document(_)))
-    }
-
-    /// Returns true if this ob config requires collecting any CDO with the provided DataIdentifier
-    /// kind
-    pub fn must_collect(&self, di_kind: DataIdentifierDiscriminant) -> bool {
-        self.must_collect_data
-            .iter()
-            .any(|cdo| cdo.parent().data_identifier_kind() == di_kind)
     }
 }
 

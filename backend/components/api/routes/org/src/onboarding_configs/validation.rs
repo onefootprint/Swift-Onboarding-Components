@@ -280,9 +280,7 @@ impl ObConfigurationArgsToValidate {
         let is_field_allowed = match self.kind {
             ObConfigurationKind::Auth => |cdo: &CDO| -> bool { matches!(cdo, CDO::Email | CDO::PhoneNumber) },
             ObConfigurationKind::Kyb => |_: &CDO| -> bool { true },
-            ObConfigurationKind::Kyc => {
-                |cdo: &CDO| -> bool { cdo.parent().data_identifier_kind() != DID::Business }
-            }
+            ObConfigurationKind::Kyc => |cdo: &CDO| -> bool { !cdo.matches(DID::Business) },
             ObConfigurationKind::Document => |cdo: &CDO| -> bool { matches!(cdo, CDO::Document(_)) },
         };
         let collected_disallowed_fields = self
@@ -311,10 +309,7 @@ impl ObConfigurationArgsToValidate {
                 || self
                     .must_collect_data
                     .contains(&CDO::BusinessKycedBeneficialOwners);
-            let collecting_kyc_data = self
-                .must_collect_data
-                .iter()
-                .any(|cdo| cdo.parent().data_identifier_kind() == DID::Id);
+            let collecting_kyc_data = self.must_collect_data.iter().any(|cdo| cdo.matches(DID::Id));
 
             if !self.verification_checks.skip_kyc() && !has_bo_cdo {
                 return ValidationError("Must skip KYC if not collecting BOs").into();

@@ -275,7 +275,10 @@ fn get_data_collection_progress<Type>(
     ob_config: &ObConfiguration,
     di_kind: DID,
     decrypted_values: &UserDecryptResultForReqs,
-) -> RequirementProgress {
+) -> Option<RequirementProgress> {
+    if !ob_config.must_collect_data.iter().any(|cdo| cdo.matches(di_kind)) {
+        return None;
+    }
     let mut populated_attributes = Vec::new();
     let mut missing_attributes = Vec::new();
     let mut optional_attributes = Vec::new();
@@ -300,12 +303,13 @@ fn get_data_collection_progress<Type>(
     let mut recollect_attributes = wf.config.recollect_attributes().to_vec();
     recollect_attributes.retain(|cdo| cdo.matches(di_kind));
 
-    RequirementProgress {
+    let progress = RequirementProgress {
         populated_attributes,
         missing_attributes,
         optional_attributes,
         recollect_attributes,
-    }
+    };
+    Some(progress)
 }
 
 // gets oustanding requirements for a Vault with respect to a specific OBC/WF
@@ -443,118 +447,109 @@ fn get_requirement_inner<T>(
             get_register_auth_method_requirements(conn, obc, vw, auth_events)?
         }
         OnboardingRequirementKind::CollectData => {
-            obc.must_collect(DID::Id)
-                .then(|| {
-                    let RequirementProgress {
-                        populated_attributes,
-                        missing_attributes,
-                        optional_attributes,
-                        recollect_attributes,
-                    } = get_data_collection_progress(vw, wf, obc, DID::Id, user_values);
-                    // if ob config needs to collect id data
-                    OnboardingRequirement::CollectData {
-                        missing_attributes,
-                        optional_attributes,
-                        populated_attributes,
-                        recollect_attributes,
-                    }
-                })
-                .into_iter()
-                .collect()
+            let Some(RequirementProgress {
+                populated_attributes,
+                missing_attributes,
+                optional_attributes,
+                recollect_attributes,
+            }) = get_data_collection_progress(vw, wf, obc, DID::Id, user_values)
+            else {
+                return Ok(vec![]);
+            };
+            // if ob config needs to collect id data
+            vec![OnboardingRequirement::CollectData {
+                missing_attributes,
+                optional_attributes,
+                populated_attributes,
+                recollect_attributes,
+            }]
         }
         OnboardingRequirementKind::CollectInvestorProfile => {
-            obc.must_collect(DID::InvestorProfile)
-                .then(|| -> FpResult<_> {
-                    let RequirementProgress {
-                        populated_attributes,
-                        missing_attributes,
-                        ..
-                    } = get_data_collection_progress(vw, wf, obc, DID::InvestorProfile, user_values);
-                    let declarations = user_values.get_di(IPK::Declarations).ok();
-                    let missing_document = if let Some(declarations) = declarations {
-                        let declarations: Vec<Declaration> = declarations.deserialize()?;
-                        // The finra compliance doc is missing if any of the declarations require a doc and we
-                        // don't yet have one on file
-                        declarations.iter().any(|d| d.requires_finra_compliance_doc())
-                            && !vw.has_field(&DocumentDiKind::FinraComplianceLetter.into())
-                    } else {
-                        false
-                    };
-                    Ok(OnboardingRequirement::CollectInvestorProfile {
-                        missing_attributes,
-                        populated_attributes,
-                        missing_document,
-                    })
-                })
-                .transpose()?
-                .into_iter()
-                .collect()
+            let Some(RequirementProgress {
+                populated_attributes,
+                missing_attributes,
+                ..
+            }) = get_data_collection_progress(vw, wf, obc, DID::InvestorProfile, user_values)
+            else {
+                return Ok(vec![]);
+            };
+            let declarations = user_values.get_di(IPK::Declarations).ok();
+            let missing_document = if let Some(declarations) = declarations {
+                let declarations: Vec<Declaration> = declarations.deserialize()?;
+                // The finra compliance doc is missing if any of the declarations require a doc and we
+                // don't yet have one on file
+                declarations.iter().any(|d| d.requires_finra_compliance_doc())
+                    && !vw.has_field(&DocumentDiKind::FinraComplianceLetter.into())
+            } else {
+                false
+            };
+            vec![OnboardingRequirement::CollectInvestorProfile {
+                missing_attributes,
+                populated_attributes,
+                missing_document,
+            }]
         }
-        OnboardingRequirementKind::CollectBusinessData => obc
-            .must_collect(DID::Business)
-            .then(|| -> FpResult<_> {
-                if is_secondary_bo {
-                    // Omit collecting any new business data and showing the business confirm screen
-                    // when the user filling out the form is not the primary BO
-                    return Ok(None);
-                }
+        OnboardingRequirementKind::CollectBusinessData => {
+            let Some(RequirementProgress {
+                mut populated_attributes,
+                optional_attributes: _,
+                mut missing_attributes,
+                recollect_attributes,
+            }) = get_data_collection_progress(vw, wf, obc, DID::Business, user_values)
+            else {
+                return Ok(vec![]);
+            };
 
-                let RequirementProgress {
-                    mut populated_attributes,
-                    optional_attributes: _,
-                    mut missing_attributes,
-                    recollect_attributes,
-                } = get_data_collection_progress(vw, wf, obc, DID::Business, user_values);
+            if is_secondary_bo {
+                // Omit collecting any new business data and showing the business confirm screen
+                // when the user filling out the form is not the primary BO
+                return Ok(vec![]);
+            }
 
-
-                let has_linked_bos = business_owners
-                    .iter()
-                    .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
-                let are_all_bos_complete = {
-                    let is_not_empty = !business_owners.is_empty();
-                    let are_bos_populated = business_owners.iter().all(|bo| {
-                        // Maybe don't require phone and email for primary
-                        let vd_exists = (BusinessOwnerInfo::USER_DIS.iter())
-                            .all(|i| bo.data.iter().any(|(di, _)| di == i));
-                        let ownership_stake_exists = bo.bo.ownership_stake.is_some();
-                        if bo.has_linked_user() {
-                            // Once there's a user linked, this BO's data will be collected by a CollectData
-                            // requirement. We just have to make sure the ownership stake is set
-                            ownership_stake_exists
-                        } else {
-                            // If we haven't yet linked a user, we need phone / email to send a link to the BO
-                            ownership_stake_exists && vd_exists
-                        }
-                    });
-                    is_not_empty && are_bos_populated
-                };
-
-                let bo_cdo = (obc.must_collect_data.iter())
-                    .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
-                if let Some(bo_cdo) = bo_cdo {
-                    let is_missing_bo = missing_attributes.contains(bo_cdo);
-                    if !is_missing_bo && !are_all_bos_complete {
-                        // This should never happen, just spot checking this logic before we stop writing
-                        // KycedBos
-                        tracing::info!("All BOs not complete, but CDO is satisfied");
+            let has_linked_bos = business_owners
+                .iter()
+                .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
+            let are_all_bos_complete = {
+                let is_not_empty = !business_owners.is_empty();
+                let are_bos_populated = business_owners.iter().all(|bo| {
+                    // Maybe don't require phone and email for primary
+                    let vd_exists =
+                        (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
+                    let ownership_stake_exists = bo.bo.ownership_stake.is_some();
+                    if bo.has_linked_user() {
+                        // Once there's a user linked, this BO's data will be collected by a CollectData
+                        // requirement. We just have to make sure the ownership stake is set
+                        ownership_stake_exists
+                    } else {
+                        // If we haven't yet linked a user, we need phone / email to send a link to the BO
+                        ownership_stake_exists && vd_exists
                     }
-                    if (has_linked_bos || are_all_bos_complete) && is_missing_bo {
-                        // BOs linked manually via API meet the BeneficialOwners requirement
-                        missing_attributes.retain(|missing_cdo| missing_cdo != bo_cdo);
-                        populated_attributes.push(bo_cdo.clone());
-                    }
+                });
+                is_not_empty && are_bos_populated
+            };
+
+            let bo_cdo = (obc.must_collect_data.iter())
+                .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
+            if let Some(bo_cdo) = bo_cdo {
+                let is_missing_bo = missing_attributes.contains(bo_cdo);
+                if !is_missing_bo && !are_all_bos_complete {
+                    // This should never happen, just spot checking this logic before we stop writing
+                    // KycedBos
+                    tracing::info!("All BOs not complete, but CDO is satisfied");
                 }
-                Ok(Some(OnboardingRequirement::CollectBusinessData {
-                    missing_attributes,
-                    populated_attributes,
-                    has_linked_bos,
-                    recollect_attributes,
-                }))
-            })
-            .transpose()?
-            .into_iter()
-            .flatten()
-            .collect(),
+                if (has_linked_bos || are_all_bos_complete) && is_missing_bo {
+                    // BOs linked manually via API meet the BeneficialOwners requirement
+                    missing_attributes.retain(|missing_cdo| missing_cdo != bo_cdo);
+                    populated_attributes.push(bo_cdo.clone());
+                }
+            }
+            vec![OnboardingRequirement::CollectBusinessData {
+                missing_attributes,
+                populated_attributes,
+                has_linked_bos,
+                recollect_attributes,
+            }]
+        }
         // The below requirements we will never include when met
         // (kind of confusing in that we are checking in real-time if they've been satisifed)
         OnboardingRequirementKind::RegisterPasskey => {

@@ -8,7 +8,7 @@ use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
-use newtypes::DataIdentifierDiscriminant;
+use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::VerificationCheckKind;
 use std::sync::Arc;
 
@@ -66,12 +66,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let can_make_real_doc_scan_calls_in_sandbox = (!ob_config.is_live)
             .then(|| ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)))
             .unwrap_or(false);
-        let is_kyb = must_collect_data
-            .iter()
-            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business);
-        let requires_id_doc = must_collect_data
-            .iter()
-            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
+        let is_kyb = must_collect_data.iter().any(|cdo| cdo.matches(DID::Business));
+        let requires_id_doc = must_collect_data.iter().any(|cdo| cdo.matches(DID::Document));
 
         Self {
             name,
