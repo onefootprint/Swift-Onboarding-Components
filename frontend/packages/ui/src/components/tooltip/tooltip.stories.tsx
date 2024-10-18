@@ -2,15 +2,16 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from 'styled-components';
 
+import { Radio } from '../../';
 import Tooltip from './tooltip';
 
 export default {
   title: 'Components/Tooltip',
   component: Tooltip,
   argTypes: {
-    content: {
+    text: {
       control: 'text',
-      description: 'Tooltip content',
+      description: 'Tooltip text',
       required: true,
     },
     position: {
@@ -40,22 +41,36 @@ export default {
       required: false,
     },
     onOpenChange: {
-      control: 'boolean',
-      description: 'Control open tooltip',
+      action: 'onOpenChange',
+      description: 'Callback when tooltip open state changes',
+    },
+    boundary: {
+      control: 'text',
+      description: 'Boundary element for collision detection',
       required: false,
     },
   },
-} as Meta;
+} as Meta<typeof Tooltip>;
 
-const Template: StoryFn = ({ position, alignment, content, children, disabled, open, onOpenChange }) => (
+const Template: StoryFn<typeof Tooltip> = ({
+  disabled,
+  text,
+  position,
+  alignment,
+  open,
+  onOpenChange,
+  collisionBoundary,
+  children,
+}) => (
   <Aligner>
     <Tooltip
+      disabled={disabled}
+      text={text}
       position={position}
       alignment={alignment}
-      text={content}
-      disabled={disabled}
       open={open}
       onOpenChange={onOpenChange}
+      collisionBoundary={collisionBoundary}
     >
       {children}
     </Tooltip>
@@ -64,15 +79,33 @@ const Template: StoryFn = ({ position, alignment, content, children, disabled, o
 
 export const Default = Template.bind({});
 Default.args = {
-  content: 'Tooltip content',
-  position: 'top',
-  alignment: 'center',
-  children: <IcoInfo16 />,
+  text: 'Tooltip content',
+  children: <IcoInfo16 color="primary" />,
+};
+
+export const Disabled = Template.bind({});
+Disabled.args = {
+  text: 'Tooltip content',
+  disabled: true,
+  children: <IcoInfo16 color="quaternary" />,
+};
+
+export const Mobile = Template.bind({});
+Mobile.args = {
+  text: 'Tooltip content',
+  children: <IcoInfo16 color="primary" />,
+};
+
+export const OnDisabledComponent = Template.bind({});
+OnDisabledComponent.args = {
+  text: 'Tooltip content',
+  children: <Radio disabled label="radio-label" />,
 };
 
 const Aligner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100vh;
 `;

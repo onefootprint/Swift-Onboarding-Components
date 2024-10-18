@@ -40,6 +40,7 @@ describe('<RequestMoreInfoDialog />', () => {
     mockRouter.query = {
       id: entityFixture.id,
     };
+    global.scrollTo = jest.fn();
   });
 
   it('should call close callback', async () => {
