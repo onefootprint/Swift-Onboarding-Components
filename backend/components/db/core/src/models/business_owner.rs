@@ -39,6 +39,8 @@ pub struct BusinessOwner {
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub source: BusinessOwnerSource,
+    // TODO it's a little funky that we don't have an edit log of this. Makes me think that this should be
+    // vault data
     pub ownership_stake: Option<i32>,
     pub deactivated_at: Option<DateTime<Utc>>,
 }
@@ -255,10 +257,10 @@ impl BusinessOwner {
         if !(0..=100).contains(&ownership_stake) {
             return ValidationError("Invalid ownership stake").into();
         }
+        let existing = Self::get(conn, (bv_id, link_id))?;
+        tracing::info!(id=%existing.id, old_stake=?existing.ownership_stake, new_stake=%ownership_stake, "Updating BO ownership stake");
         let result = diesel::update(business_owner::table)
-            .filter(business_owner::business_vault_id.eq(bv_id))
-            .filter(business_owner::link_id.eq(link_id))
-            .filter(business_owner::deactivated_at.is_null())
+            .filter(business_owner::id.eq(existing.id))
             .set(business_owner::ownership_stake.eq(ownership_stake))
             .get_result::<Self>(conn.conn())?;
         Ok(result)

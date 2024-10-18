@@ -201,7 +201,6 @@ impl BatchRequest {
         user_auth: &CheckUserBizWfAuthContext,
     ) -> FpResult<Option<BoLinkId>> {
         let sb_id = user_auth.sb_id.clone();
-        let uv_id = &user_auth.user.id;
         let source = user_auth.user_session.dl_source();
 
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
@@ -212,19 +211,15 @@ impl BatchRequest {
                 data,
             } => {
                 let bo = BusinessOwner::get(conn, (&bvw.vault.id, &link_id))?;
-                let is_authed_user = bo.user_vault_id.as_ref().is_some_and(|uv| uv == uv_id);
-                let has_linked_user = bo.has_linked_user();
-                if has_linked_user && !is_authed_user {
-                    return ValidationError("This owner is already linked to a user and cannot be updated")
-                        .into();
-                }
                 if let Some(stake) = ownership_stake {
                     BusinessOwner::update_ownership_stake(conn, &bvw.vault.id, &link_id, stake as i32)?;
                 }
                 if !data.is_empty() {
-                    if has_linked_user {
-                        return ValidationError("Cannot yet update data for a BO that is linked to a user")
-                            .into();
+                    if bo.has_linked_user() {
+                        return ValidationError(
+                            "This owner is already linked to a user and cannot be updated",
+                        )
+                        .into();
                     }
                     let data = create_fingerprinted_data_request(data, &link_id)?;
                     bvw.patch_data(conn, data, DataRequestSource::HostedPatchVault(source.into()))?;

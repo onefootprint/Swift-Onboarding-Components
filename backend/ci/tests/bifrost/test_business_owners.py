@@ -159,7 +159,7 @@ def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
     assert body["message"] == "Data not found"
 
 
-def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
+def test_updating_linked_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     bifrost.run()
@@ -172,8 +172,12 @@ def test_cannot_update_linked_bo(kyb_sandbox_ob_config):
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
 
-    # Cannot update their data
+    # Can update their ownership stake
     op = dict(op="update", id=link_id, ownership_stake=50)
+    patch(f"hosted/business/owners", [op], bifrost.auth_token)
+
+    # Cannot update their data
+    op = dict(op="update", id=link_id, data={"id.first_name": "Fred"})
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
