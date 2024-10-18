@@ -32,7 +32,7 @@ use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
 use newtypes::CollectedDataOption;
 use newtypes::DataCollectedInfo;
-use newtypes::DataIdentifier;
+use newtypes::DataIdentifier as DI;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::IdentityDataKind as IDK;
@@ -46,7 +46,7 @@ use newtypes::UserVaultUpdatedPayload;
 use newtypes::VaultId;
 use newtypes::WebhookEvent;
 
-type NewContactInfo = (DataIdentifier, ContactInfo);
+type NewContactInfo = (DI, ContactInfo);
 
 pub struct PatchDataResult {
     // None if the patch was a no-op.
@@ -68,7 +68,7 @@ pub struct PatchDataResultUpdates {
 }
 
 pub struct NewDocument {
-    pub kind: DataIdentifier,
+    pub kind: DI,
     pub mime_type: String,
     pub filename: String,
     pub e_data_key: SealedVaultDataKey,
@@ -207,6 +207,16 @@ impl<Type> WriteableVw<Type> {
             return Ok(());
         };
 
+        if self
+            .populated_dis()
+            .iter()
+            .any(|di| matches!(di, DI::Business(BDK::BeneficialOwnerData(_, _))))
+        {
+            tracing::error!(
+                "Cannot set business.kyced_beneficial_owners when modern BOs have already been set"
+            );
+        }
+
         // For now, duplicated so we can run these checks before this
         assert_allowed_for_sources(request, request_source)?;
 
@@ -264,7 +274,7 @@ impl<Type> WriteableVw<Type> {
     fn add_timeline_event(
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
-        keys: Vec<DataIdentifier>,
+        keys: Vec<DI>,
         actor: Option<AuthActor>,
         is_prefill: bool,
     ) -> FpResult<()> {
@@ -296,7 +306,7 @@ impl WriteableVw<Person> {
         &self,
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
-        kind: DataIdentifier,
+        kind: DI,
         mime_type: String,
         filename: String,
         e_data_key: SealedVaultDataKey,
@@ -372,7 +382,7 @@ impl WriteableVw<Person> {
 pub async fn seal_file_and_upload_to_s3(
     state: &State,
     file: &FileUpload,
-    kind: &DataIdentifier,
+    kind: &DI,
     vault: &Vault,
     scoped_vault_id: &ScopedVaultId,
 ) -> FpResult<(SealedVaultDataKey, S3Url)> {
@@ -403,7 +413,7 @@ fn hash_id<T: ToString>(id: &T) -> String {
     )
 }
 
-fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: &DataIdentifier) -> String {
+fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: &DI) -> String {
     format!(
         "docs/encrypted/{}/{}/{}/{}",
         hash_id(vault_id),
