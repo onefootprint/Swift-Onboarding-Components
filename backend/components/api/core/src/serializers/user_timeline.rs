@@ -99,7 +99,6 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                         }
                         WorkflowConfig::Document(ref c) => WorkflowRequestConfig::Document {
                             configs: c.configs.clone(),
-                            fp_bid: c.fp_bid.clone(),
                             business_configs: c.business_configs.clone(),
                         },
                     }

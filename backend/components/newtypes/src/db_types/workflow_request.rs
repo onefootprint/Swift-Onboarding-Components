@@ -1,5 +1,4 @@
 use crate::DocumentRequestConfig;
-use crate::FpId;
 use crate::ObConfigurationId;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -19,7 +18,6 @@ pub enum WorkflowRequestConfig {
     /// Upload a new document and re-run the decision engine
     Document {
         configs: Vec<DocumentRequestConfig>,
-        fp_bid: Option<FpId>,
         #[serde(default)]
         business_configs: Vec<DocumentRequestConfig>,
     },

@@ -44,7 +44,6 @@ fn validate(trigger: &WorkflowRequestConfig, sb: Option<&ScopedVault>) -> FpResu
         WorkflowRequestConfig::Document {
             configs,
             business_configs,
-            fp_bid: _,
         } => {
             DocumentRequestConfig::validate(configs)?;
             DocumentRequestConfig::validate(business_configs)?;
@@ -80,12 +79,8 @@ pub(super) fn apply_trigger_request(
         fp_bid,
     } = request;
 
-    let fp_bid = fp_bid.as_ref().or(match &trigger {
-        // TODO move fp_bid out of the workflow_request config here once the client has been updated
-        WorkflowRequestConfig::Document { fp_bid, .. } => fp_bid.as_ref(),
-        _ => None,
-    });
     let sb = fp_bid
+        .as_ref()
         .map(|fp_bid| {
             let uv_id = &su.vault_id;
             let id = ScopedVaultIdentifier::OwnedFpBid { fp_bid, uv_id };

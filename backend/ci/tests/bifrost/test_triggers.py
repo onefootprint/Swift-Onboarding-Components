@@ -7,8 +7,8 @@ from tests.utils import _gen_random_ssn, create_ob_config, post
 from tests.utils import get, patch
 
 
-def send_trigger(fp_id, sandbox_tenant, trigger):
-    action = dict(trigger=trigger, kind="trigger")
+def send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=None):
+    action = dict(trigger=trigger, kind="trigger", fp_bid=fp_bid)
     data = dict(actions=[action])
     post(f"entities/{fp_id}/actions", data, *sandbox_tenant.db_auths)
 
@@ -329,11 +329,10 @@ def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
         kind="document",
         data=dict(
             configs=[],
-            fp_bid=fp_bid,
             business_configs=document_configs,
         ),
     )
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid)
 
     # re-run Bifrost with the token from the link we sent to user
     def pre_run(bifrost):
