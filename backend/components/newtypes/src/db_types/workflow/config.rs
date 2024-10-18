@@ -1,4 +1,5 @@
 pub use super::*;
+use crate::CollectedDataOption;
 use crate::DocumentRequestConfig;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -26,11 +27,22 @@ impl WorkflowConfig {
             Self::Kyb(_) => WorkflowKind::Kyb,
         }
     }
+
+    pub fn recollect_attributes(&self) -> &[CollectedDataOption] {
+        match self {
+            Self::Kyc(config) => &config.recollect_attributes,
+            Self::AlpacaKyc(_) => &[],
+            Self::Document(_) => &[],
+            Self::Kyb(config) => &config.recollect_attributes,
+        }
+    }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-
-pub struct KycConfig {}
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct KycConfig {
+    #[serde(default)]
+    pub recollect_attributes: Vec<CollectedDataOption>,
+}
 
 impl From<KycConfig> for WorkflowConfig {
     fn from(value: KycConfig) -> Self {
@@ -61,8 +73,11 @@ impl From<DocumentConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct KybConfig {}
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct KybConfig {
+    #[serde(default)]
+    pub recollect_attributes: Vec<CollectedDataOption>,
+}
 
 impl From<KybConfig> for WorkflowConfig {
     fn from(value: KybConfig) -> Self {

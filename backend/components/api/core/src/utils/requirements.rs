@@ -197,6 +197,7 @@ struct RequirementProgress {
     populated_attributes: Vec<CDO>,
     missing_attributes: Vec<CDO>,
     optional_attributes: Vec<CDO>,
+    recollect_attributes: Vec<CDO>,
 }
 
 /// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
@@ -270,6 +271,7 @@ pub(crate) fn should_skip_us_only_cdos(cdo: &CDO, decrypted_values: &UserDecrypt
 
 fn get_data_collection_progress<Type>(
     vw: &VaultWrapper<Type>,
+    wf: &Workflow,
     ob_config: &ObConfiguration,
     di_kind: DID,
     decrypted_values: &UserDecryptResultForReqs,
@@ -283,7 +285,7 @@ fn get_data_collection_progress<Type>(
         .iter()
         .map(|cdo| (cdo, true))
         .chain(ob_config.optional_data.iter().map(|cdo| (cdo, false)))
-        .filter(|(cdo, _)| cdo.parent().data_identifier_kind() == di_kind)
+        .filter(|(cdo, _)| cdo.matches(di_kind))
         .for_each(|(cdo, must_collect)| {
             let has_all_dis = is_cdo_met(vw, cdo, decrypted_values);
             if has_all_dis {
@@ -295,10 +297,14 @@ fn get_data_collection_progress<Type>(
             }
         });
 
+    let mut recollect_attributes = wf.config.recollect_attributes().to_vec();
+    recollect_attributes.retain(|cdo| cdo.matches(di_kind));
+
     RequirementProgress {
         populated_attributes,
         missing_attributes,
         optional_attributes,
+        recollect_attributes,
     }
 }
 
@@ -443,12 +449,14 @@ fn get_requirement_inner<T>(
                         populated_attributes,
                         missing_attributes,
                         optional_attributes,
-                    } = get_data_collection_progress(vw, obc, DID::Id, user_values);
+                        recollect_attributes,
+                    } = get_data_collection_progress(vw, wf, obc, DID::Id, user_values);
                     // if ob config needs to collect id data
                     OnboardingRequirement::CollectData {
                         missing_attributes,
                         optional_attributes,
                         populated_attributes,
+                        recollect_attributes,
                     }
                 })
                 .into_iter()
@@ -459,9 +467,9 @@ fn get_requirement_inner<T>(
                 .then(|| -> FpResult<_> {
                     let RequirementProgress {
                         populated_attributes,
-                        optional_attributes: _,
                         missing_attributes,
-                    } = get_data_collection_progress(vw, obc, DID::InvestorProfile, user_values);
+                        ..
+                    } = get_data_collection_progress(vw, wf, obc, DID::InvestorProfile, user_values);
                     let declarations = user_values.get_di(IPK::Declarations).ok();
                     let missing_document = if let Some(declarations) = declarations {
                         let declarations: Vec<Declaration> = declarations.deserialize()?;
@@ -495,7 +503,8 @@ fn get_requirement_inner<T>(
                     mut populated_attributes,
                     optional_attributes: _,
                     mut missing_attributes,
-                } = get_data_collection_progress(vw, obc, DID::Business, user_values);
+                    recollect_attributes,
+                } = get_data_collection_progress(vw, wf, obc, DID::Business, user_values);
 
 
                 let has_linked_bos = business_owners
@@ -539,6 +548,7 @@ fn get_requirement_inner<T>(
                     missing_attributes,
                     populated_attributes,
                     has_linked_bos,
+                    recollect_attributes,
                 }))
             })
             .transpose()?

@@ -225,18 +225,24 @@ impl Workflow {
             }
         }
 
-        let config = match wfr.map(|wfr| &wfr.config) {
+        let config = match wfr.map(|wfr| wfr.config.clone()) {
             Some(WorkflowRequestConfig::Document {
                 configs,
                 business_configs,
             }) => DocumentConfig {
-                configs: configs.clone(),
-                business_configs: business_configs.clone(),
+                configs,
+                business_configs,
             }
             .into(),
-            Some(WorkflowRequestConfig::Onboard { .. }) | None => match v.kind {
-                VaultKind::Person => KycConfig {}.into(),
-                VaultKind::Business => KybConfig {}.into(),
+            Some(WorkflowRequestConfig::Onboard {
+                recollect_attributes, ..
+            }) => match v.kind {
+                VaultKind::Person => KycConfig { recollect_attributes }.into(),
+                VaultKind::Business => KybConfig { recollect_attributes }.into(),
+            },
+            None => match v.kind {
+                VaultKind::Person => KycConfig::default().into(),
+                VaultKind::Business => KybConfig::default().into(),
             },
         };
 
@@ -659,7 +665,7 @@ mod tests {
     fn test(conn: &mut TestPgConn) {
         let state = KycState::VendorCalls;
         let wf_state: WorkflowState = state.into();
-        let config = WorkflowConfig::Kyc(KycConfig {});
+        let config = WorkflowConfig::Kyc(KycConfig::default());
         let wf = Workflow::insert(
             conn,
             NewWorkflow {
@@ -681,7 +687,7 @@ mod tests {
         .unwrap();
         assert!(wf.kind == WorkflowKind::Kyc);
         assert!(wf.state == WorkflowState::Kyc(KycState::VendorCalls));
-        let WorkflowConfig::Kyc(KycConfig {}) = wf.config else {
+        let WorkflowConfig::Kyc(KycConfig { .. }) = wf.config else {
             panic!("Workflow config is not KycConfig");
         };
     }
@@ -689,7 +695,7 @@ mod tests {
     #[db_test]
     fn test_update(conn: &mut TestPgConn) {
         let s: WorkflowState = KycState::VendorCalls.into();
-        let config = WorkflowConfig::Kyc(KycConfig {});
+        let config = WorkflowConfig::Kyc(KycConfig::default());
         let wf = Workflow::insert(
             conn,
             NewWorkflow {

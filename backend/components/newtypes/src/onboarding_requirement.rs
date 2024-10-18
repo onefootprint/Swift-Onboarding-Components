@@ -29,6 +29,7 @@ pub enum OnboardingRequirement {
         missing_attributes: Vec<CollectedDataOption>,
         optional_attributes: Vec<CollectedDataOption>,
         populated_attributes: Vec<CollectedDataOption>,
+        recollect_attributes: Vec<CollectedDataOption>,
     },
     /// There is missing investor profile data that must be collected
     CollectInvestorProfile {
@@ -40,6 +41,7 @@ pub enum OnboardingRequirement {
     CollectBusinessData {
         missing_attributes: Vec<CollectedDataOption>,
         populated_attributes: Vec<CollectedDataOption>,
+        recollect_attributes: Vec<CollectedDataOption>,
         /// True if the tenant has already linked any BOs via API. This is mutually exclusive with
         /// collecting info from the user via bifrost.
         has_linked_bos: bool,
@@ -176,6 +178,7 @@ impl OnboardingRequirement {
                 missing_attributes,
                 optional_attributes: _,
                 populated_attributes: _,
+                recollect_attributes: _,
             } => missing_attributes.is_empty(),
             Self::CollectInvestorProfile {
                 missing_attributes,
@@ -186,6 +189,7 @@ impl OnboardingRequirement {
                 missing_attributes,
                 populated_attributes: _,
                 has_linked_bos: _,
+                recollect_attributes: _,
             } => missing_attributes.is_empty(),
             Self::Authorize {
                 fields_to_authorize: _,
@@ -212,6 +216,7 @@ impl OnboardingRequirement {
                 missing_attributes: cdos,
                 optional_attributes: _,
                 populated_attributes: _,
+                recollect_attributes: _,
             }
             | Self::CollectInvestorProfile {
                 missing_attributes: cdos,
@@ -222,6 +227,7 @@ impl OnboardingRequirement {
                 missing_attributes: cdos,
                 populated_attributes: _,
                 has_linked_bos: _,
+                recollect_attributes: _,
             } => format!(
                 "Missing {}. At a minimum, the following vault data must be provided: {}",
                 cdos.iter().map(|c| c.to_string()).join(", "),
@@ -252,6 +258,7 @@ impl OnboardingRequirement {
                 missing_attributes,
                 optional_attributes: _,
                 populated_attributes: _,
+                recollect_attributes: _,
             } => {
                 let missing = HashSet::from_iter(missing_attributes.iter());
                 missing.is_subset(&cdos)
@@ -316,12 +323,14 @@ mod test {
             OnboardingRequirement::CollectBusinessData {
                 missing_attributes: vec![],
                 populated_attributes: vec![],
+                recollect_attributes: vec![],
                 has_linked_bos: false,
             },
             OnboardingRequirement::CollectData {
                 missing_attributes: vec![],
                 optional_attributes: vec![],
                 populated_attributes: vec![],
+                recollect_attributes: vec![],
             },
             OnboardingRequirement::CollectInvestorProfile {
                 missing_attributes: vec![],

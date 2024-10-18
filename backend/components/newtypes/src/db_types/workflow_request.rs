@@ -1,3 +1,4 @@
+use crate::CollectedDataOption;
 use crate::DocumentRequestConfig;
 use crate::ObConfigurationId;
 use diesel::AsExpression;
@@ -14,7 +15,11 @@ use serde::Serialize;
 pub enum WorkflowRequestConfig {
     /// Allow onboarding onto the specific playbook.
     /// This allows editing data, re-verifies data, and then re-triggers decision engine
-    Onboard { playbook_id: ObConfigurationId },
+    Onboard {
+        playbook_id: ObConfigurationId,
+        #[serde(default)]
+        recollect_attributes: Vec<CollectedDataOption>,
+    },
     /// Upload a new document and re-run the decision engine
     Document {
         configs: Vec<DocumentRequestConfig>,

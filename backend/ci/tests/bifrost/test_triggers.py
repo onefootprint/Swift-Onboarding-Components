@@ -365,6 +365,36 @@ def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
     assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
+def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    sandbox_user = bifrost.run()
+
+    # Trigger onboarding onto KYB playbook, recollecting BOs
+    recollect_attributes = ["business_kyced_beneficial_owners"]
+    trigger = dict(
+        kind="onboard",
+        data=dict(
+            recollect_attributes=recollect_attributes,
+            playbook_id=kyb_sandbox_ob_config.id,
+        ),
+    )
+    fp_id = sandbox_user.fp_id
+    fp_bid = sandbox_user.fp_bid
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid)
+
+    def pre_run(bifrost):
+        # Check that recollect_attributes are propagated through
+        requirements = bifrost.get_status()["all_requirements"]
+        collect_biz_data = next(
+            i for i in requirements if i["kind"] == "collect_business_data"
+        )
+        assert collect_biz_data["recollect_attributes"] == recollect_attributes
+        collect_data = next(i for i in requirements if i["kind"] == "collect_data")
+        assert not collect_data["recollect_attributes"]
+
+    complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
+
+
 @pytest.mark.parametrize(
     "trigger",
     [

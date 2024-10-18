@@ -1,6 +1,7 @@
 use crate::BusinessDataKind as BDK;
 use crate::CollectedData;
 use crate::DataIdentifier;
+use crate::DataIdentifierDiscriminant;
 use crate::DocumentCdoInfo;
 use crate::DocumentDiKind as DK;
 use crate::IdentityDataKind as IDK;
@@ -158,6 +159,10 @@ impl CollectedDataOption {
             Self::UsLegalStatus => CollectedData::UsLegalStatus,
             Self::UsTaxId => CollectedData::UsTaxId,
         }
+    }
+
+    pub fn matches(&self, did: DataIdentifierDiscriminant) -> bool {
+        self.parent().data_identifier_kind() == did
     }
 
     /// Maps each CDO to the list of DataIdentifiers to be collected for the option

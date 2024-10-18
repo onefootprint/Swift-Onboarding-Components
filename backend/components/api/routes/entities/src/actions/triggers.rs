@@ -26,6 +26,7 @@ use db::models::workflow::Workflow;
 use db::models::workflow_request::NewWorkflowRequestArgs;
 use db::models::workflow_request::WorkflowRequest;
 use db::OffsetPagination;
+use db::PgConn;
 use db::TxnPgConn;
 use newtypes::ApiKeyStatus;
 use newtypes::DbActor;
@@ -38,9 +39,26 @@ use newtypes::VaultKind;
 use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowTriggeredInfo;
 
-fn validate(trigger: &WorkflowRequestConfig, sb: Option<&ScopedVault>) -> FpResult<()> {
+fn validate(
+    conn: &mut PgConn,
+    trigger: &WorkflowRequestConfig,
+    su: &ScopedVault,
+    sb: Option<&ScopedVault>,
+) -> FpResult<()> {
     match trigger {
-        WorkflowRequestConfig::Onboard { .. } => Ok(()),
+        WorkflowRequestConfig::Onboard {
+            playbook_id,
+            recollect_attributes: attrs,
+        } => {
+            if attrs.is_empty() {
+                return Ok(());
+            }
+            let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
+            if attrs.iter().any(|cdo| !obc.must_collect_data.contains(cdo)) {
+                return ValidationError("recollect_attributes must be a subset of the playbook's data")
+                    .into();
+            }
+        }
         WorkflowRequestConfig::Document {
             configs,
             business_configs,
@@ -55,10 +73,9 @@ fn validate(trigger: &WorkflowRequestConfig, sb: Option<&ScopedVault>) -> FpResu
             if has_sb != has_business_configs {
                 return ValidationError("fp_bid and business_configs must both be provided together").into();
             }
-
-            Ok(())
         }
     }
+    Ok(())
 }
 
 pub(super) struct TriggerRequestOutcome {
@@ -88,7 +105,7 @@ pub(super) fn apply_trigger_request(
         })
         .transpose()?;
 
-    validate(&trigger, sb.as_ref())?;
+    validate(conn, &trigger, su, sb.as_ref())?;
 
     let vault = Vault::get(conn, &su.id)?;
     if vault.kind != VaultKind::Person {
@@ -96,7 +113,7 @@ pub(super) fn apply_trigger_request(
     }
 
     let obc = match &trigger {
-        WorkflowRequestConfig::Onboard { playbook_id } => {
+        WorkflowRequestConfig::Onboard { playbook_id, .. } => {
             // Trigger specifically requested the playbook onto which the user should onboard
             let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
             obc
@@ -104,7 +121,7 @@ pub(super) fn apply_trigger_request(
         WorkflowRequestConfig::Document { .. } => {
             // For all other trigger kinds, just associate the last playbook with the WFR.
             // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
-            // associated a playbook with these WFRs
+            // associating a playbook with these WFRs
             if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &su.id, false)? {
                 obc
             } else {
