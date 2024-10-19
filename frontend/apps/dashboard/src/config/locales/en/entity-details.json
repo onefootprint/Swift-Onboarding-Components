@@ -273,8 +273,14 @@
       }
     },
     "manual-review": {
-      "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
-      "failed-needs-review": "This user could not be verified and needs to be manually reviewed."
+      "person": {
+        "verified": "Although this user is already verified, they need to be manually reviewed.",
+        "failed": "This user could not be verified and needs to be manually reviewed."
+      },
+      "business": {
+        "verified": "Although this business is already verified, it needs to be manually reviewed.",
+        "failed": "This business could not be verified and needs to be manually reviewed."
+      }
     }
   },
   "pinned-notes": {

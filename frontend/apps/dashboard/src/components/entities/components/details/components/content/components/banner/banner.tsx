@@ -1,6 +1,5 @@
-import { EntityStatus } from '@onefootprint/types';
+import { EntityKind, EntityStatus } from '@onefootprint/types';
 import { InlineAlert } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -13,6 +12,18 @@ type BannerProps = WithEntityProps & {
 
 const Banner = ({ entity, isDisabled }: BannerProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'banner' });
+  const isBusiness = entity.kind === EntityKind.business;
+
+  const getReviewText = (isBusiness: boolean, status: EntityStatus) => {
+    if (status === EntityStatus.failed) {
+      return isBusiness ? t('manual-review.business.failed') : t('manual-review.person.failed');
+    }
+    return isBusiness ? t('manual-review.business.verified') : t('manual-review.person.verified');
+  };
+
+  const getIncompleteText = (isBusiness: boolean) => {
+    return isBusiness ? t('incomplete.header.business') : t('incomplete.header.person');
+  };
 
   const handleClick = () => {
     const auditTrail = document.getElementById(AUDIT_TRAILS_ID);
@@ -29,9 +40,7 @@ const Banner = ({ entity, isDisabled }: BannerProps) => {
             onClick: handleClick,
           }}
         >
-          {entity.status === EntityStatus.failed
-            ? t('manual-review.failed-needs-review')
-            : t('manual-review.verified-needs-review')}
+          {getReviewText(isBusiness, entity.status)}
         </InlineAlert>
       </BannerContainer>
     );
@@ -47,7 +56,7 @@ const Banner = ({ entity, isDisabled }: BannerProps) => {
             onClick: handleClick,
           }}
         >
-          {t(`incomplete.header.${entity.kind}` as ParseKeys<'common'>)}
+          {getIncompleteText(isBusiness)}
         </InlineAlert>
       </BannerContainer>
     );
