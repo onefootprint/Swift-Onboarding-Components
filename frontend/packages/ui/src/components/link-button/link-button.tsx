@@ -35,8 +35,8 @@ export type LinkButtonProps = {
   $marginInline?: keyof Theme['spacing'];
   $marginBlock?: keyof Theme['spacing'];
   $marginBottom?: keyof Theme['spacing'];
-  $marginLeft?: keyof Theme['spacing'];
-  $marginRight?: keyof Theme['spacing'];
+  $marginLeft?: keyof Theme['spacing'] | 'auto';
+  $marginRight?: keyof Theme['spacing'] | 'auto';
   $marginTop?: keyof Theme['spacing'];
   $padding?: keyof Theme['spacing'];
   $paddingBottom?: keyof Theme['spacing'];
@@ -169,8 +169,8 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       margin-inline: ${$marginInline ? theme.spacing[$marginInline] : undefined};
       margin-block: ${$marginBlock ? theme.spacing[$marginBlock] : undefined};
       margin-bottom: ${$marginBottom ? theme.spacing[$marginBottom] : undefined};
-      margin-left: ${$marginLeft ? theme.spacing[$marginLeft] : undefined};
-      margin-right: ${$marginRight ? theme.spacing[$marginRight] : undefined};
+      margin-left: ${$marginLeft === 'auto' ? 'auto' : $marginLeft ? theme.spacing[$marginLeft] : undefined};
+      margin-right: ${$marginRight === 'auto' ? 'auto' : $marginRight ? theme.spacing[$marginRight] : undefined};
       margin-top: ${$marginTop ? theme.spacing[$marginTop] : undefined};
       padding: ${$padding ? theme.spacing[$padding] : '0'};
       padding-bottom: ${$paddingBottom ? theme.spacing[$paddingBottom] : undefined};
