@@ -8,6 +8,7 @@ import type { SupportedLocale } from '@onefootprint/types';
 import { useFormContext } from 'react-hook-form';
 import fieldContext from '../components/field-context';
 import { Context } from '../components/provider';
+import type { Translations } from '../constants/translations';
 import validateDob from '../utils/validate-dob';
 
 type FormAttributes = {
@@ -39,15 +40,15 @@ export type FormSelectProps = SelectProps & BaseProps;
 
 const useFieldProps = (): FormInputProps | FormSelectProps => {
   const [context] = useContext(Context);
-  const locale = context.locale;
+  const ctx = useContext(fieldContext);
   const {
     formState: { errors },
   } = useFormContext();
-  const ctx = useContext(fieldContext);
+  const { l10n } = context;
   if (!ctx.name) {
     throw new Error('Input must be used inside a Field component');
   }
-  const props = getProps(ctx.name, { locale });
+  const props = getProps(ctx.name, { locale: l10n.locale, translations: l10n.translations });
   if (!props) {
     throw new Error(`Field ${ctx.name} is not supported`);
   }
@@ -62,16 +63,16 @@ const useFieldProps = (): FormInputProps | FormSelectProps => {
   };
 };
 
-const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, Field> => ({
+const getPersonProps = (options: { locale: SupportedLocale; translations: Translations }): Record<string, Field> => ({
   phoneNumber: {
     autoComplete: 'tel',
     className: 'fp-phone-input',
     type: 'tel',
     validations: {
-      required: 'Phone is required',
+      required: options.translations.person.phoneNumber.required,
       validate: (value: string) => {
         if (!isPhoneNumber(value)) {
-          return 'Phone is invalid';
+          return options.translations.person.phoneNumber.invalid;
         }
         return true;
       },
@@ -81,10 +82,10 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
     autoComplete: 'email',
     className: 'fp-email-input',
     validations: {
-      required: 'Email is required',
+      required: options.translations.person.email.required,
       validate: (value: string) => {
         if (!isEmail(value)) {
-          return 'Email is invalid';
+          return options.translations.person.email.invalid;
         }
         return true;
       },
@@ -100,8 +101,8 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
       numericOnly: true,
     },
     validations: {
-      required: 'Date of birth is required',
-      validate: (value: string) => validateDob(value, options.locale),
+      required: options.translations.person.dob.required,
+      validate: (value: string) => validateDob(value, options.locale) || options.translations.person.dob.invalid,
     },
   },
   ssn4: {
@@ -113,10 +114,10 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
       blocks: [4],
     },
     validations: {
-      required: 'SSN is required',
+      required: options.translations.person.ssn4.required,
       validate: (value: string) => {
         if (!isSsn4(value)) {
-          return 'SSN is invalid';
+          return options.translations.person.ssn4.invalid;
         }
         return true;
       },
@@ -132,10 +133,10 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
       blocks: [3, 2, 4],
     },
     validations: {
-      required: 'SSN is required',
+      required: options.translations.person.ssn9.required,
       validate: (value: string) => {
         if (!isSsn9(value)) {
-          return 'SSN is invalid';
+          return options.translations.person.ssn9.invalid;
         }
         return true;
       },
@@ -145,10 +146,10 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
     autoComplete: 'given-name',
     className: 'fp-first-name-input',
     validations: {
-      required: 'First name is required',
+      required: options.translations.person.firstName.required,
       validate: (value: string) => {
         if (!isName(value)) {
-          return 'First name is invalid';
+          return options.translations.person.firstName.invalid;
         }
         return true;
       },
@@ -163,7 +164,7 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
           return true;
         }
         if (!isName(value)) {
-          return 'Middle name is invalid';
+          return options.translations.person.middleName.invalid;
         }
         return true;
       },
@@ -173,10 +174,10 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
     autoComplete: 'family-name',
     className: 'fp-last-name-input',
     validations: {
-      required: 'Last name is required',
+      required: options.translations.person.lastName.required,
       validate: (value: string) => {
         if (!isName(value)) {
-          return 'Last name is invalid';
+          return options.translations.person.lastName.invalid;
         }
         return true;
       },
@@ -184,26 +185,26 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
   },
 });
 
-const getCommonProps = (): Record<string, Field> => ({
+const getCommonProps = (translations: Translations): Record<string, Field> => ({
   country: {
     autoComplete: 'country-name',
     className: 'fp-countrt-input',
     validations: {
-      required: 'Country is required',
+      required: translations.person.country.required,
     },
   },
   city: {
     autoComplete: 'address-level2',
     className: 'fp-city-input',
     validations: {
-      required: 'City is required',
+      required: translations.person.city.required,
     },
   },
   addressLine1: {
     autoComplete: 'address-line1',
     className: 'fp-address-line1-input',
     validations: {
-      required: 'Address is required',
+      required: translations.person.addressLine1.required,
     },
   },
   addressLine2: {
@@ -214,14 +215,14 @@ const getCommonProps = (): Record<string, Field> => ({
   state: {
     className: 'fp-state-input',
     validations: {
-      required: 'State is required',
+      required: translations.person.state.required,
     },
   },
   zip: {
     autoComplete: 'postal-code',
     className: 'fp-zip-input',
     validations: {
-      required: 'Zip is required',
+      required: translations.person.zip.required,
     },
   },
   custom: {
@@ -232,11 +233,12 @@ const getCommonProps = (): Record<string, Field> => ({
 const getProps = (
   name: string,
   options: {
-    locale?: SupportedLocale;
+    locale: SupportedLocale;
+    translations: Translations;
   },
 ) => {
   const person = getPersonProps(options);
-  const common = getCommonProps();
+  const common = getCommonProps(options.translations);
 
   if (name === 'id.phone_number') {
     return person.phoneNumber;

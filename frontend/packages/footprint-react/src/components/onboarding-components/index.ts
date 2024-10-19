@@ -42,5 +42,7 @@ export const Fp = {
   Select,
 };
 
+export { default as translations, type Translations } from './constants/translations';
+
 export { default as useFootprint } from './hooks/use-footprint';
 export { default as AuthTokenStatus } from './types/auth-token-status';

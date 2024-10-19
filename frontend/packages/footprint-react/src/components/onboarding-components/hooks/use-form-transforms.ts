@@ -52,7 +52,7 @@ export const fromUSDateToISO8601Format = (date?: string | string[]): string | un
 
 const useFormTransforms = () => {
   const [context] = useContext(Context);
-  const locale = context.locale || 'en-US';
+  const { locale } = context.l10n;
 
   const input = (values?: FormValues) => {
     const transformedValues = { ...values };

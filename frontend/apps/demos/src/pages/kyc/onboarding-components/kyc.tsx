@@ -51,7 +51,18 @@ const Demo = () => {
   return (
     <>
       <GlobalStyles />
-      <Fp.Provider publicKey={publicKeyEnv}>
+      <Fp.Provider
+        publicKey={publicKeyEnv}
+        l10n={{
+          customTranslations: {
+            person: {
+              phoneNumber: {
+                required: 'lorem',
+              },
+            },
+          },
+        }}
+      >
         <Header>Onboarding</Header>
         <Container>
           <Stack marginTop={7} gap={8}>

@@ -1,31 +1,29 @@
 import isEqual from 'lodash/isEqual';
 import { useEffect, useRef } from 'react';
-import type { ProviderProps } from '../../provider';
-
-type Props = Omit<ProviderProps, 'children'>;
+import type { PropsUpdated } from '../../provider.types';
 
 const usePropsUpdated = ({
   props,
   onUpdate,
 }: {
-  props: Props;
-  onUpdate: (updatedProps: Partial<Props>) => void;
+  props: PropsUpdated;
+  onUpdate: (updatedProps: Partial<PropsUpdated>) => void;
 }) => {
-  const prevData = useRef<Props | null>(props);
+  const prevData = useRef<PropsUpdated | null>(props);
   const keysSortedInOrder = Object.keys(props).sort();
-  const depList = keysSortedInOrder.map(key => props[key as keyof Props]);
+  const depList = keysSortedInOrder.map(key => props[key as keyof PropsUpdated]);
 
   useEffect(() => {
     if (prevData.current) {
       const updatedProps = Object.entries(props).reduce(
         (acc, [key, value]) => {
-          if (prevData.current && !isEqual(prevData.current[key as keyof Props], value)) {
+          if (prevData.current && !isEqual(prevData.current[key as keyof PropsUpdated], value)) {
             // @ts-ignore-next-line
             acc[key] = value;
           }
           return acc;
         },
-        {} as Partial<Props>,
+        {} as Partial<PropsUpdated>,
       );
       if (Object.keys(updatedProps).length > 0) {
         onUpdate(updatedProps);
