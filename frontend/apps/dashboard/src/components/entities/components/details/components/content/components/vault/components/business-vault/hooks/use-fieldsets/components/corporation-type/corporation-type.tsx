@@ -3,6 +3,7 @@ import { BusinessDI, isVaultDataDecrypted } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import { EncryptedCell } from 'src/components';
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 
 import Field from '../../../../../field';
 
@@ -30,7 +31,7 @@ const CorporationType = ({ di, entity }: CorporationTypeType) => {
     return t('unknown');
   };
 
-  return entity.attributes.includes(BusinessDI.corporationType) ? (
+  return hasDataIdentifier(entity, BusinessDI.corporationType) ? (
     <Field
       di={di}
       entity={entity}

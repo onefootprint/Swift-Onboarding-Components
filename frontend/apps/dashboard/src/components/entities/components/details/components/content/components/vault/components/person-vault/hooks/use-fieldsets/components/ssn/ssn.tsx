@@ -3,6 +3,7 @@ import { IdDI, isVaultDataDecrypted, isVaultDataText } from '@onefootprint/types
 import { Text } from '@onefootprint/ui';
 import { EncryptedCell } from 'src/components';
 
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 import Field from '../../../../../field';
 import ssnFormatter from './utils/ssn-formatter';
 
@@ -12,7 +13,7 @@ export type SSNType = {
 };
 
 const SSN = ({ di, entity }: SSNType) =>
-  entity.attributes.includes(di) ? (
+  hasDataIdentifier(entity, di) ? (
     <Field
       di={di}
       entity={entity}

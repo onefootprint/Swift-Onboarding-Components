@@ -4,6 +4,7 @@ import { Flag, Text } from '@onefootprint/ui';
 import { EncryptedCell } from 'src/components';
 import styled, { css } from 'styled-components';
 
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 import Field from '../../../../../field';
 import checkCountryCode from '../utils/check-country-code';
 import getInitialCountry from '../utils/get-initial-country';
@@ -15,8 +16,8 @@ export type NationalityType = {
 
 const Nationality = ({ di, entity }: NationalityType) => {
   // Do not display Nationality if there is a legal status
-  const hasLegalStatusCountry = entity.attributes.includes(IdDI.usLegalStatus);
-  if (!entity.attributes.includes(IdDI.nationality) && !hasLegalStatusCountry) {
+  const hasLegalStatusCountry = hasDataIdentifier(entity, IdDI.usLegalStatus);
+  if (!hasDataIdentifier(entity, IdDI.nationality) && !hasLegalStatusCountry) {
     return null;
   }
 

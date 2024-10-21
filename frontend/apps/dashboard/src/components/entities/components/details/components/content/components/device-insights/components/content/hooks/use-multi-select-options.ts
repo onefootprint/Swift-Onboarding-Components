@@ -1,6 +1,7 @@
 import { type AuthEvent, BusinessDI, type Entity, IdDI, IdentifyScope } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 
 export enum MultiSelectOptionValue {
   businessAddress = 'businessAddress',
@@ -33,14 +34,14 @@ const useMultiSelectOptions = (entity: Entity, livenessData: AuthEvent[]) => {
     });
   }
 
-  const hasBusinessAddress = entity.attributes.includes(BusinessDI.addressLine1);
+  const hasBusinessAddress = hasDataIdentifier(entity, BusinessDI.addressLine1);
   if (hasBusinessAddress) {
     allOptions.push({
       value: MultiSelectOptionValue.businessAddress,
       label: t('select.business-address'),
     });
   }
-  const hasResidentialAddress = entity.attributes.includes(IdDI.addressLine1);
+  const hasResidentialAddress = hasDataIdentifier(entity, IdDI.addressLine1);
   if (hasResidentialAddress) {
     allOptions.push({
       value: MultiSelectOptionValue.residentialAddress,

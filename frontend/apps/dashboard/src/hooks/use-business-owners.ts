@@ -8,6 +8,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 
 const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOwnersRequest) => {
   const businessOwnersResponse = await request<GetBusinessOwnersResponse>({
@@ -33,7 +34,7 @@ const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOw
         attributes: entity.attributes,
         firstName: (entity.data.find(item => item.identifier === IdDI.firstName)?.value as string) || '',
         lastName: (entity.data.find(item => item.identifier === IdDI.lastName)?.transforms?.prefix_1 as string) || '',
-        hasPhone: entity.attributes.includes(IdDI.phoneNumber),
+        hasPhone: hasDataIdentifier(entity, IdDI.phoneNumber),
       };
     })
     .filter(entity => entity.firstName);
