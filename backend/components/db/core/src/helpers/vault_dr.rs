@@ -203,27 +203,32 @@ pub fn get_complete_svvs_for_svv_batch(
 
     let svv_ids = svv_batch.iter().map(|svv| &svv.id).collect_vec();
 
-    // Get SVVs from svv_batch such that:
-    //   All data_lifetimes present on the vault at or before the SVV
-    //   have a vault_dr_blob written for this config...
-    //
-    //   Equivalently (and easier to express in SQL): where there does not exist a data_lifetime
-    //   for the SVV with created_seqno <= svv.seqno that does not have a vault_dr_blob written for
-    //   this config...
-
-    let complete_svvs = scoped_vault_version::table
-        .filter(scoped_vault_version::id.eq_any(svv_ids))
+    // Get SVVs from svv_batch that are not complete (have associated DLs that do not have blobs).
+    // Then, filter those out. The query planner does better with this format than when expressed
+    // with two embedded NOT EXISTS subqueries.
+    let incomplete_svv_ids = scoped_vault_version::table
+        .inner_join(
+            data_lifetime::table.on(data_lifetime::scoped_vault_id.eq(scoped_vault_version::scoped_vault_id)),
+        )
+        .filter(scoped_vault_version::id.eq_any(&svv_ids))
+        .filter(data_lifetime::created_seqno.le(scoped_vault_version::seqno))
         .filter(diesel::dsl::not(diesel::dsl::exists(
-            data_lifetime::table
-                .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_version::scoped_vault_id))
-                .filter(data_lifetime::created_seqno.le(scoped_vault_version::seqno))
-                .filter(diesel::dsl::not(diesel::dsl::exists(
-                    vault_dr_blob::table
-                        .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
-                        .filter(vault_dr_blob::config_id.eq(config_id)),
-                ))),
+            vault_dr_blob::table
+                .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
+                .filter(vault_dr_blob::config_id.eq(config_id)),
         )))
-        .select(ScopedVaultVersion::as_select())
+        .select(scoped_vault_version::id)
+        .distinct();
+
+    let svv_alias = alias!(scoped_vault_version as svv_alias);
+    let complete_svvs = svv_alias
+        .filter(svv_alias.field(scoped_vault_version::id).eq_any(&svv_ids))
+        .filter(diesel::dsl::not(
+            svv_alias
+                .field(scoped_vault_version::id)
+                .eq_any(incomplete_svv_ids),
+        ))
+        .select(svv_alias.fields(scoped_vault_version::all_columns))
         .load(conn)?;
 
     Ok(complete_svvs)
