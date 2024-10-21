@@ -24,6 +24,7 @@ const BaseItem = styled(Box)<BaseItemProps>`
       color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
       cursor: pointer;
       border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[1]});
+      background-color: ${theme.backgroundColor.primary};
 
       ${
         layout === 'radio-item' &&

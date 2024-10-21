@@ -127,6 +127,17 @@
             "required": "Please enter a valid phone number"
           }
         }
+      },
+      "preferences": {
+        "title": "Preferences",
+        "theme": {
+          "label": "Theme",
+          "placeholder": "Select theme",
+          "options": {
+            "light": "Light",
+            "dark": "Dark"
+          }
+        }
       }
     },
     "members": {

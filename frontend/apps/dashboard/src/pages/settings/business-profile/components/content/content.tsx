@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import BusinessProfileInput from './components/business-profile-input';
 import HelpDialog from './components/help-dialog';
 import Logo from './components/logo';
+import ThemeSelector from './components/theme-selector';
 import type { ContentProps } from './content.types';
 
 type FormData = {
@@ -144,6 +145,10 @@ const Content = ({ organization }: ContentProps) => {
                   />
                 </Form.Field>
               </Stack>
+            </Stack>
+            <Stack direction="column" gap={5} style={{ maxWidth: '640px' }}>
+              <Text variant="heading-5">{t('preferences.title')}</Text>
+              <ThemeSelector />
             </Stack>
           </Stack>
         </Stack>

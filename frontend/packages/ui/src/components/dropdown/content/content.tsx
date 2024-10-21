@@ -51,7 +51,7 @@ const Container = styled(RadixDropdown.Content)<
 >`
   ${({ theme, $minWidth, $maxWidth, $width }) => css`
     position: relative;
-    background: ${theme.backgroundColor.primary};
+    background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};

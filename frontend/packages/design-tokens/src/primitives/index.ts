@@ -63,6 +63,7 @@ export {
   Purple200,
   Purple300,
   Purple400,
+  Purple450,
   Purple500,
   Purple600,
   Purple700,

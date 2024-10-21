@@ -71,6 +71,7 @@ export const Purple100 = '#ebe7fb';
 export const Purple200 = '#c3b6f3';
 export const Purple300 = '#9D8DEE';
 export const Purple400 = '#7A6AE1';
+export const Purple450 = '#6654c9';
 export const Purple500 = '#4a24db';
 export const Purple600 = '#3a1caa';
 export const Purple700 = '#29147a';
