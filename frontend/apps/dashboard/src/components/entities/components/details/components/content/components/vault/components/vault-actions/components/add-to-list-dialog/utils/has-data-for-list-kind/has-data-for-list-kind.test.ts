@@ -41,8 +41,7 @@ describe('hasDataForListKind', () => {
     expect(hasDataForListKind(ListKind.ipAddress, userEntity)).toBe(false);
 
     const businessEntity = {
-      data: [{ ...defaultAttribute, identifier: BusinessDI.phoneNumber }],
-      decryptableAttributes: [BusinessDI.phoneNumber],
+      data: [{ ...defaultAttribute, identifier: BusinessDI.phoneNumber, isDecryptable: true }],
       workflows: [],
     } as unknown as Entity;
 

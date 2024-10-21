@@ -1,43 +1,34 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { Entity } from '@onefootprint/types';
-import { BusinessDI, EntityKind, EntityStatus } from '@onefootprint/types';
+import { BusinessDI, DataKind, EntityKind, EntityStatus } from '@onefootprint/types';
+
+const defaultAttribute = {
+  source: 'user',
+  dataKind: DataKind.vaultData,
+  transforms: {},
+};
 
 export const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
   isIdentifiable: true,
   kind: EntityKind.business,
-  attributes: [
-    BusinessDI.addressLine1,
-    BusinessDI.beneficialOwners,
-    BusinessDI.city,
-    BusinessDI.country,
-    BusinessDI.name,
-    BusinessDI.phoneNumber,
-    BusinessDI.state,
-    BusinessDI.tin,
-    BusinessDI.tin,
-    BusinessDI.website,
-    BusinessDI.zip,
+  attributes: [],
+  decryptableAttributes: [],
+  data: [
+    { ...defaultAttribute, identifier: BusinessDI.addressLine1, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.beneficialOwners, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.city, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.country, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.name, isDecryptable: true, value: 'Acme Inc.' },
+    { ...defaultAttribute, identifier: BusinessDI.phoneNumber, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.state, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.tin, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.website, isDecryptable: true, value: null },
+    { ...defaultAttribute, identifier: BusinessDI.zip, isDecryptable: true, value: null },
   ],
-  decryptableAttributes: [
-    BusinessDI.addressLine1,
-    BusinessDI.beneficialOwners,
-    BusinessDI.city,
-    BusinessDI.country,
-    BusinessDI.name,
-    BusinessDI.phoneNumber,
-    BusinessDI.state,
-    BusinessDI.tin,
-    BusinessDI.tin,
-    BusinessDI.website,
-    BusinessDI.zip,
-  ],
-  data: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
-  decryptedAttributes: {
-    [BusinessDI.name]: 'Acme Inc.',
-  },
+  decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   requiresManualReview: false,

@@ -2,6 +2,7 @@ import { mockRequest } from '@onefootprint/test-utils';
 import {
   AuthMethodKind,
   CollectedKycDataOption,
+  DataKind,
   type Entity,
   EntityKind,
   EntityStatus,
@@ -11,14 +12,24 @@ import {
 } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
+const defaultAttribute = {
+  source: 'user',
+  dataKind: DataKind.vaultData,
+  transforms: {},
+};
+
 export const entitiesFixture: Entity[] = [
   {
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
     isIdentifiable: true,
     kind: EntityKind.person,
-    data: [],
-    attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
-    decryptableAttributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
+    data: [
+      { ...defaultAttribute, identifier: IdDI.firstName, isDecryptable: true, value: null },
+      { ...defaultAttribute, identifier: IdDI.lastName, isDecryptable: true, value: null },
+      { ...defaultAttribute, identifier: IdDI.email, isDecryptable: true, value: null },
+    ],
+    attributes: [],
+    decryptableAttributes: [],
     startTimestamp: '2023-03-27T14:43:47.444716Z',
     lastActivityAt: '2023-03-27T14:43:47.444716Z',
     workflows: [
@@ -53,9 +64,13 @@ export const entitiesFixture: Entity[] = [
     id: 'fp_id_tvfUNdGqmk2kJyyka9gX22',
     isIdentifiable: true,
     kind: EntityKind.person,
-    data: [],
-    attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
-    decryptableAttributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
+    data: [
+      { ...defaultAttribute, identifier: IdDI.firstName, isDecryptable: true, value: null },
+      { ...defaultAttribute, identifier: IdDI.lastName, isDecryptable: true, value: null },
+      { ...defaultAttribute, identifier: IdDI.email, isDecryptable: true, value: null },
+    ],
+    attributes: [],
+    decryptableAttributes: [],
     startTimestamp: '2023-10-19T03:38:23.521861Z',
     lastActivityAt: '2023-10-19T03:38:23.521861Z',
     workflows: [

@@ -4,18 +4,6 @@ import { DataKind, EntityKind, EntityStatus, IdDI, RiskSignalAttribute, RiskSign
 
 export const entityIdFixture = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
-const attributesFixture = [
-  IdDI.email,
-  IdDI.firstName,
-  IdDI.lastName,
-  IdDI.country,
-  IdDI.addressLine1,
-  IdDI.dob,
-  IdDI.state,
-  IdDI.city,
-  IdDI.zip,
-];
-
 const defaultAttribute = {
   isDecryptable: true,
   source: 'hosted',
@@ -31,26 +19,46 @@ export const entityFixture: Entity = {
   requiresManualReview: false,
   status: EntityStatus.pass,
   attributes: [],
-  data: attributesFixture.map(di => {
-    if (di === IdDI.lastName) {
-      return {
-        ...defaultAttribute,
-        identifier: IdDI.lastName,
-        transforms: { prefix_1: 'S' },
-      };
-    }
-    if (di === IdDI.firstName) {
-      return {
-        ...defaultAttribute,
-        identifier: IdDI.firstName,
-        value: 'John',
-      };
-    }
-    return {
+  data: [
+    {
       ...defaultAttribute,
-      identifier: di,
-    };
-  }),
+      identifier: IdDI.email,
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.firstName,
+      value: 'John',
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.lastName,
+      transforms: { prefix_1: 'S' },
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.country,
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.addressLine1,
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.dob,
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.state,
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.city,
+    },
+    {
+      ...defaultAttribute,
+      identifier: IdDI.zip,
+    },
+  ],
   decryptableAttributes: [],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   lastActivityAt: '2023-10-08T22:43:11.928846Z',

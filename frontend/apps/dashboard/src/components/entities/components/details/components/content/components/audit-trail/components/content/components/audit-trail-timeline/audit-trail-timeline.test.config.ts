@@ -3,6 +3,7 @@ import type { Entity, GetEntityRuleSetResultResponse, RuleResult, Timeline, Time
 import {
   ActorKind,
   CollectedKycDataOption,
+  DataKind,
   DecisionStatus,
   DocumentRequestKind,
   EntityKind,
@@ -24,12 +25,18 @@ import { WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline'
 export const entityIdFixure = 'fp_id_cDsFPmDwz784hdwovghMqt';
 export const obcIdFixture = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
 
+const defaultAttribute = {
+  source: 'user',
+  dataKind: DataKind.vaultData,
+  transforms: {},
+};
+
 export const entityFixture: Entity = {
   id: entityIdFixure,
   isIdentifiable: true,
   kind: EntityKind.person,
-  data: [],
-  attributes: [IdDI.phoneNumber],
+  data: [{ ...defaultAttribute, identifier: IdDI.phoneNumber, isDecryptable: true, value: null }],
+  attributes: [],
   decryptableAttributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
