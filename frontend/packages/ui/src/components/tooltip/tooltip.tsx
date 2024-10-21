@@ -5,9 +5,9 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import type React from 'react';
 import { isMobile } from 'react-device-detect';
 import styled, { css, keyframes } from 'styled-components';
-
 import { createFontStyles } from '../../utils/mixins';
 import Box from '../box';
+import Stack from '../stack';
 
 export type TooltipProps = TooltipPrimitive.TooltipProps & {
   children: React.ReactElement;
@@ -39,7 +39,7 @@ const Tooltip = ({
     return (
       <PopoverPrimitive.Root>
         <PopoverPrimitive.Trigger asChild aria-label={ariaLabel}>
-          <Box>{children}</Box>
+          <Stack>{children}</Stack>
         </PopoverPrimitive.Trigger>
         <PopoverPrimitive.Content asChild>
           <PopoverPrimitive.Content
@@ -60,7 +60,7 @@ const Tooltip = ({
     <TooltipPrimitive.Provider>
       <TooltipPrimitive.Root open={open} onOpenChange={onOpenChange} delayDuration={100}>
         <TooltipPrimitive.Trigger asChild aria-label={ariaLabel}>
-          <Box>{children}</Box>
+          <Stack>{children}</Stack>
         </TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           side={position}

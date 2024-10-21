@@ -1,7 +1,7 @@
 {
   "header-default": {
     "fraud-label": {
-      "aria-label": "Fraud label dropdown",
+      "add-aria-label": "Add fraud label",
       "add-label": "Add fraud label",
       "tooltip": "Labels offer a high-level assessment of a user and feedback to Footprint for enhancing risk systems. Each user can have one active label.",
       "labels": {

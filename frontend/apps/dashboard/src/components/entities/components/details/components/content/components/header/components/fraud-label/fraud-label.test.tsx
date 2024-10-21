@@ -12,7 +12,7 @@ const renderFraudLabel = () => {
 
 const renderLabelAndWaitFinishLoading = async () => {
   renderFraudLabel();
-  const dropdownTrigger = await screen.findByRole('button', { name: 'Fraud label dropdown' });
+  const dropdownTrigger = await screen.findByRole('button', { name: 'Add fraud label' });
   expect(dropdownTrigger).toBeInTheDocument();
 };
 
@@ -30,7 +30,7 @@ describe('<FraudLabel />', () => {
       renderFraudLabel();
 
       await waitFor(() => {
-        const dropdownTrigger = screen.queryByRole('button', { name: 'Fraud label dropdown' });
+        const dropdownTrigger = screen.queryByRole('button', { name: 'Add fraud label' });
         expect(dropdownTrigger).not.toBeInTheDocument();
       });
     });
@@ -58,7 +58,7 @@ describe('<FraudLabel />', () => {
       withEditLabel();
       await renderLabelAndWaitFinishLoading();
 
-      const dropdownTrigger = screen.getByRole('button', { name: 'Fraud label dropdown' });
+      const dropdownTrigger = screen.getByRole('button', { name: 'Add fraud label' });
       await userEvent.click(dropdownTrigger);
 
       const dropdownItems = await screen.findAllByRole('menuitem');
@@ -82,7 +82,7 @@ describe('<FraudLabel />', () => {
       withEditLabel();
       await renderLabelAndWaitFinishLoading();
 
-      const dropdownTrigger = screen.getByRole('button', { name: 'Fraud label dropdown' });
+      const dropdownTrigger = screen.getByRole('button', { name: 'Add fraud label' });
       await userEvent.click(dropdownTrigger);
 
       const dropdownItems = await screen.findAllByRole('menuitem');
@@ -101,7 +101,7 @@ describe('<FraudLabel />', () => {
       withEditLabel();
       await renderLabelAndWaitFinishLoading();
 
-      const dropdownTrigger = screen.getByRole('button', { name: 'Fraud label dropdown' });
+      const dropdownTrigger = screen.getByRole('button', { name: 'Add fraud label' });
       await userEvent.click(dropdownTrigger);
 
       const dropdownItems = await screen.findAllByRole('menuitem');
