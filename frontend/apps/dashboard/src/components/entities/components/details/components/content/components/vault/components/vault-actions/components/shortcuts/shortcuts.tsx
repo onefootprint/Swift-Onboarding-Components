@@ -45,6 +45,8 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const { data: entityData } = useCurrentEntity();
   const decryptControls = useDecryptControls();
   const { kind } = useEntityContext();
+  const kindText =
+    kind === EntityKind.person ? t('components.cmdk.review.kind.user') : t('components.cmdk.review.kind.business');
   const { hasPermission } = usePermissions();
   const canDecrypt = !!entity.decryptableAttributes.length;
 
@@ -124,16 +126,18 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
 
   const actions: ActionGroup[] = [
     {
-      title: t(`components.cmdk.review.${kind === EntityKind.business ? 'title-business' : 'title-user'}`),
+      title: t('components.cmdk.review.title', { kindText }),
       type: ActionType.REVIEW,
       actions: [
         {
           label:
             entityData && entityData.status === EntityStatus.failed
               ? t('components.cmdk.review.keep-as', {
+                  kindText,
                   status: t(`entity-statuses.${ReviewStatus.fail}`),
                 })
               : t('components.cmdk.review.mark-as', {
+                  kindText,
                   status: t(`entity-statuses.${ReviewStatus.fail}`),
                 }),
           value: 'failed',
@@ -145,9 +149,11 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           label:
             entityData && entityData.status === EntityStatus.pass
               ? t('components.cmdk.review.keep-as', {
+                  kindText,
                   status: t(`entity-statuses.${ReviewStatus.pass}`),
                 })
               : t('components.cmdk.review.mark-as', {
+                  kindText,
                   status: t(`entity-statuses.${ReviewStatus.pass}`),
                 }),
           value: 'verified',
@@ -231,6 +237,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
       {openDialog === CmdKDialog.requestMoreInfo && <RequestMoreInfoDialog open onClose={handleCloseDialog} />}
       {(openDialog === CmdKDialog.reviewPass || openDialog === CmdKDialog.reviewFail) && (
         <ManualReviewDialog
+          kind={kind}
           status={openDialog === CmdKDialog.reviewPass ? ReviewStatus.pass : ReviewStatus.fail}
           open
           onClose={handleCloseDialog}

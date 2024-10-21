@@ -531,12 +531,15 @@
         "decrypt-all": "Decrypt all fields"
       },
       "review": {
-        "title-user": "Review user",
-        "title-business": "Review business",
+        "title": "Review {{kindText}}",
         "mark-as-failed": "Mark as Fail",
         "mark-as-verified": "Mark as Pass",
-        "mark-as": "Mark user as {{status}}",
-        "keep-as": "Keep user as {{status}}",
+        "kind": {
+          "user": "user",
+          "business": "business"
+        },
+        "mark-as": "Mark {{kindText}} as {{status}}",
+        "keep-as": "Keep {{kindText}} as {{status}}",
         "status": {
           "fail": "Fail",
           "pass": "Pass"

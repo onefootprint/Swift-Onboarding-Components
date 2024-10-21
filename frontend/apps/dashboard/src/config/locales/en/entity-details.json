@@ -537,26 +537,29 @@
     }
   },
   "manual-review": {
+    "kind": {
+      "user": "user",
+      "business": "business"
+    },
     "status": {
       "pass": "Pass",
       "fail": "Fail"
     },
     "button": {
-      "review-person": "Review user",
-      "review-business": "Review business",
+      "review": "Review {{kindText}}",
       "mark-as-verified": "Mark as Pass",
       "mark-as-failed": "Mark as Fail"
     },
     "dropdown": {
-      "mark-as": "Mark user as {{status}}",
-      "keep-as": "Keep user as {{status}}"
+      "mark-as": "Mark {{kindText}} as {{status}}",
+      "keep-as": "Keep {{kindText}} as {{status}}"
     },
     "dialog": {
       "title": "Review",
       "complete": "Complete",
       "cancel": "Cancel",
       "form": {
-        "prompt": "Why are you marking this user as {{status}}?",
+        "prompt": "Why are you marking this {{kindText}} as {{status}}?",
         "placeholder": "Type here...",
         "disclaimer": "",
         "note": {

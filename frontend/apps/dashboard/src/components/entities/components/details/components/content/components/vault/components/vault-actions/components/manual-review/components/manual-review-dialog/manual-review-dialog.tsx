@@ -1,5 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { type ActionRequest, ActionRequestKind, OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
+import {
+  type ActionRequest,
+  ActionRequestKind,
+  EntityKind,
+  OrgFrequentNoteKind,
+  type ReviewStatus,
+} from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -12,10 +18,11 @@ import useSubmitActions from '../../../../hooks/use-submit-actions';
 export type ManualReviewDialogProps = {
   open: boolean;
   onClose: () => void;
+  kind: EntityKind;
   status: ReviewStatus;
 };
 
-const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) => {
+const ManualReviewDialog = ({ open, onClose, kind, status }: ManualReviewDialogProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'manual-review',
   });
@@ -72,7 +79,10 @@ const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) 
     >
       <ManualNoteEntryForm
         formId="manual-review-form"
-        prompt={t('dialog.form.prompt', { status: t(`status.${status}`) })}
+        prompt={t('dialog.form.prompt', {
+          kindText: kind === EntityKind.person ? t('kind.user') : t('kind.business'),
+          status: t(`status.${status}`),
+        })}
         placeholder={t('dialog.form.placeholder')}
         onSubmit={handleSubmit}
         frequentNoteKind={OrgFrequentNoteKind.ManualReview}

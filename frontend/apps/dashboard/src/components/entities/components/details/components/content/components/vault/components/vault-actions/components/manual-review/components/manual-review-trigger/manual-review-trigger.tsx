@@ -16,15 +16,14 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled, onOpenChange, o
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'manual-review',
   });
+  const kindText = kind === EntityKind.person ? t('kind.user') : t('kind.business');
   const pass = t(`status.${ReviewStatus.pass}` as ParseKeys<'common'>);
   const fail = t(`status.${ReviewStatus.fail}` as ParseKeys<'common'>);
 
   return (
     <Dropdown.Root open={open} onOpenChange={onOpenChange}>
       <Dropdown.Trigger asChild disabled={disabled}>
-        <Button size="compact">
-          {kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}
-        </Button>
+        <Button size="compact">{t('button.review', { kindText })}</Button>
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={12} minWidth="220px">
@@ -36,8 +35,8 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled, onOpenChange, o
             >
               <div>
                 {status === EntityStatus.pass
-                  ? t('dropdown.keep-as', { status: pass })
-                  : t('dropdown.mark-as', { status: pass })}
+                  ? t('dropdown.keep-as', { kindText, status: pass })
+                  : t('dropdown.mark-as', { kindText, status: pass })}
               </div>
             </Dropdown.Item>
             <Dropdown.Item
@@ -47,8 +46,8 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled, onOpenChange, o
             >
               <div>
                 {status === EntityStatus.failed
-                  ? t('dropdown.keep-as', { status: fail })
-                  : t('dropdown.mark-as', { status: fail })}
+                  ? t('dropdown.keep-as', { kindText, status: fail })
+                  : t('dropdown.mark-as', { kindText, status: fail })}
               </div>
             </Dropdown.Item>
           </Dropdown.Group>

@@ -1,5 +1,5 @@
 import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import { OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
+import { EntityKind, OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import type { ManualReviewDialogProps } from './manual-review-dialog';
@@ -26,8 +26,9 @@ describe('<ManualReviewDialog />', () => {
     open = defaultOptions.open,
     onClose = defaultOptions.onClose,
     status = defaultOptions.status,
+    kind = EntityKind.person,
   }: Partial<ManualReviewDialogProps>) =>
-    customRender(<ManualReviewDialog open={open} onClose={onClose} status={status} />);
+    customRender(<ManualReviewDialog open={open} onClose={onClose} status={status} kind={kind} />);
 
   describe('when clicking on the cancel button', () => {
     it('should call close callback', async () => {

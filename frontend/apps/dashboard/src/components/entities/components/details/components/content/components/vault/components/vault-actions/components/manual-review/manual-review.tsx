@@ -37,7 +37,9 @@ const ManualReview = ({ kind, status, disabled }: ManualReviewProps) => {
         onOpenChange={setDropdownOpen}
         open={dropdownOpen}
       />
-      {shouldShowDialog && <ManualReviewDialog status={reviewStatus} open={dialogOpen} onClose={handleCloseDialog} />}
+      {shouldShowDialog && (
+        <ManualReviewDialog kind={kind} status={reviewStatus} open={dialogOpen} onClose={handleCloseDialog} />
+      )}
     </>
   );
 };
