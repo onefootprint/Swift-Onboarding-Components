@@ -46,7 +46,7 @@ export const APP_CDN_WAF_RULES = [
         'x-footprint-secret-key',
         'x-footprint-dashboard-authorization',
       ],
-      action: countAction(),
+      action: rateLimitExceededAction(),
       priority: 5,
     }),
     sandboxApiIpRateLimitRule({
@@ -90,7 +90,7 @@ export const APP_CDN_WAF_RULES = [
       header: 'x-fp-authorization',
       limit: 1000,
       evaluationWindowSec: 60,
-      action: countAction(),
+      action: rateLimitExceededAction(),
       priority: 12,
     }),
 ];
