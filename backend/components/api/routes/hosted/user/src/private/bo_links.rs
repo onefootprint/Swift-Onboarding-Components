@@ -1,11 +1,9 @@
 use crate::auth::user::ItUserAuthContext;
+use api_core::decision::biz_risk::KybBoFeatures;
 use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::kyb_utils::generate_secondary_bo_links;
-use api_core::utils::vault_wrapper::Business;
-use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::web;
-use api_core::FpResult;
 use api_core::State;
 use db::models::workflow::Workflow;
 use newtypes::PiiString;
@@ -32,21 +30,17 @@ pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiL
     let user_auth = user_auth.into_inner();
     let biz_wf_id = (user_auth.data.biz_wf_id.clone())
         .ok_or(ValidationError("No business associated with the session"))?;
-    let (biz_wf, bvw) = state
-        .db_query(move |conn| -> FpResult<_> {
-            let biz_wf = Workflow::get(conn, &biz_wf_id)?;
-            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
-            Ok((biz_wf, bvw))
-        })
+    let biz_wf = state
+        .db_query(move |conn| Workflow::get(conn, &biz_wf_id))
         .await?;
 
-    let dbos = bvw.decrypt_business_owners(&state).await?;
-    let tokens = generate_secondary_bo_links(&state, &biz_wf, &dbos).await?;
+    let kyb_features = KybBoFeatures::build(&state, &biz_wf.id).await?;
+    let tokens = generate_secondary_bo_links(&state, &biz_wf, &kyb_features.bos).await?;
 
     let results = tokens
         .into_iter()
-        .map(|(bo_data, token)| {
-            let (first_name, last_name) = bo_data.clone().name().unzip();
+        .map(|(bo, token)| {
+            let (first_name, last_name) = (*bo).clone().name().unzip();
             BoToken {
                 token,
                 first_name,

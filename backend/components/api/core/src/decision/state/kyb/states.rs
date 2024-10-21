@@ -5,7 +5,8 @@ use super::KybDataCollection;
 use super::KybDecisioning;
 use super::KybState;
 use super::KybVendorCalls;
-use crate::decision::biz_risk::BoOnboardingResult;
+use crate::decision;
+use crate::decision::biz_risk::KybBoFeatures;
 use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::rule_engine::engine::VaultDataForRules;
@@ -20,20 +21,15 @@ use crate::decision::state::MakeVendorCalls;
 use crate::decision::state::OnAction;
 use crate::decision::state::WorkflowState;
 use crate::decision::utils::get_final_rules_outcome;
-use crate::decision::{
-    self,
-};
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
-use db::models::business_owner::BusinessOwner;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
@@ -142,7 +138,7 @@ impl KybAwaitingBoKyc {
 
 #[async_trait]
 impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
-    type AsyncRes = Vec<(DbWorkflow, OnboardingDecision, BusinessOwner)>;
+    type AsyncRes = KybBoFeatures;
 
     #[tracing::instrument(
         "KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::execute_async_idempotent_actions",
@@ -153,11 +149,8 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         _action: BoKycCompleted,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
-        let bo_obds = match decision::biz_risk::get_bo_kyb_features(state, &self.wf_id).await? {
-            BoOnboardingResult::Ready(bo_obds) => bo_obds,
-            BoOnboardingResult::NotReady(err) => return Err(err),
-        };
-        Ok(bo_obds)
+        let kyb_features = KybBoFeatures::build(state, &self.wf_id).await?;
+        Ok(kyb_features)
     }
 
     #[tracing::instrument("KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::on_commit", skip_all)]
@@ -168,7 +161,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-        let bo_obds = async_res;
+        let bo_obds = async_res.try_get_ready_results()?;
 
         let scope = RiskSignalGroupScope::WorkflowId {
             id: &wf.id,

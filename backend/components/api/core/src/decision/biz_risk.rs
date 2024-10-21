@@ -1,61 +1,87 @@
 use crate::utils::vault_wrapper::Business;
+use crate::utils::vault_wrapper::BusinessOwnerInfo;
+use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use api_errors::AssertionError;
-use api_errors::FpError;
 use api_errors::ValidationError;
-use db::models::business_owner::BusinessOwner;
 use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::workflow::Workflow;
+use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::WorkflowId;
 
-#[derive(Debug, derive_more::IsVariant)]
-pub enum BoOnboardingResult {
-    Ready(Vec<(Workflow, OnboardingDecision, BusinessOwner)>),
-    NotReady(FpError),
+#[derive(derive_more::Deref)]
+pub struct BoWithKycInfo(
+    pub Option<(Workflow, Option<OnboardingDecision>)>,
+    #[deref] pub BusinessOwnerInfo,
+);
+
+impl BoWithKycInfo {
+    /// Unpacks the BoWithDecision into its underlying Workflow and OnboardingDecision, if there is
+    /// a terminal OnboardingDecision for the BO.
+    /// If not, returns an error with context on what is missing.
+    pub fn try_get_ready_result(&self) -> FpResult<(&Workflow, &OnboardingDecision, &BusinessOwnerInfo)> {
+        let Self(wf_obd, bo) = self;
+        let (wf, obd) = wf_obd
+            .as_ref()
+            .ok_or(ValidationError("Beneficial owner hasn't started onboarding"))?;
+        let obd = obd
+            .as_ref()
+            .ok_or(ValidationError("Beneficial owner hasn't finished onboarding"))?;
+        if !OnboardingStatus::from(obd.status).is_terminal() {
+            // This is only for verrrrry legacy OBDs that could have an OBD in status `step_up`
+            return ValidationError("Beneficial owner's onboarding isn't complete").into();
+        }
+        Ok((wf, obd, bo))
+    }
+
+    pub fn has_kyc_result(&self) -> bool {
+        self.try_get_ready_result().is_ok()
+    }
 }
 
-pub async fn get_bo_kyb_features(state: &State, biz_wf_id: &WorkflowId) -> FpResult<BoOnboardingResult> {
-    let wfid = biz_wf_id.clone();
-    let (mut user_decisions, bvw, obc) = state
-        .db_query(move |conn| -> FpResult<_> {
-            let biz_wf = Workflow::get(conn, &wfid)?;
-            let user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id)?;
-            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
-            let (obc, _) = ObConfiguration::get(conn, &biz_wf.id)?;
-            Ok((user_decisions, bvw, obc))
-        })
-        .await?;
+pub struct KybBoFeatures {
+    pub bos: Vec<BoWithKycInfo>,
+    pub bvw: TenantVw<Business>,
+}
 
-    if obc.verification_checks().skip_kyc() {
-        return Ok(BoOnboardingResult::Ready(vec![]));
+impl KybBoFeatures {
+    pub async fn build(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Self> {
+        let wfid = biz_wf_id.clone();
+        let (mut user_decisions, bvw, obc) = state
+            .db_query(move |conn| -> FpResult<_> {
+                let biz_wf = Workflow::get(conn, &wfid)?;
+                let user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id)?;
+                let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
+                let (obc, _) = ObConfiguration::get(conn, &biz_wf.id)?;
+                Ok((user_decisions, bvw, obc))
+            })
+            .await?;
+
+        if obc.verification_checks().skip_kyc() {
+            return Ok(Self { bos: vec![], bvw });
+        }
+
+        let dbos = bvw.decrypt_business_owners(state).await?;
+        let bos = dbos
+            .into_iter()
+            .map(|bo| BoWithKycInfo(user_decisions.remove(&bo.bo.id), bo))
+            .collect_vec();
+        Ok(Self { bos, bvw })
     }
 
-    let dbos = bvw.decrypt_business_owners(state).await?;
-
-    let result = dbos
-        .iter()
-        .map(|bo| -> Result<_, &'static str> {
-            let (wf, obd) =
-                (user_decisions.remove(&bo.bo.id)).ok_or("Beneficial owner hasn't started onboarding")?;
-            let obd = obd.ok_or("Beneficial owner hasn't finished onboarding")?;
-            if !OnboardingStatus::from(obd.status).is_terminal() {
-                // This is only for verrrrry legacy OBDs that could have an OBD in status `step_up`
-                return Err("Beneficial owner's onboarding isn't complete");
-            }
-            Ok((wf, obd, bo.bo.clone()))
-        })
-        .collect::<Result<Vec<_>, _>>();
-    let user_decisions = match result {
-        Ok(user_decisions) => user_decisions,
-        Err(err) => return Ok(BoOnboardingResult::NotReady(ValidationError(err).into())),
-    };
-    if user_decisions.len() != dbos.len() {
-        return AssertionError("Number of user decisions does not match number of BOs").into();
+    /// Unpacks all BOs into their underlying Workflows and OnboardingDecisions.
+    /// If any BO is missing a terminal OnboardingDecision, returns an error with context.
+    pub fn try_get_ready_results(
+        &self,
+    ) -> FpResult<Vec<(&Workflow, &OnboardingDecision, &BusinessOwnerInfo)>> {
+        self.bos.iter().map(|bo| bo.try_get_ready_result()).collect()
     }
-    Ok(BoOnboardingResult::Ready(user_decisions))
+
+    pub fn all_bos_have_kyc_results(&self) -> bool {
+        self.try_get_ready_results().is_ok()
+    }
 }

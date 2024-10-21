@@ -1,7 +1,7 @@
-use super::vault_wrapper::BusinessOwnerInfo;
 use crate::auth::session::onboarding::BoSession;
 use crate::config::LinkKind;
-use crate::decision::biz_risk::get_bo_kyb_features;
+use crate::decision::biz_risk::BoWithKycInfo;
+use crate::decision::biz_risk::KybBoFeatures;
 use crate::decision::state::Authorize;
 use crate::decision::state::BoKycCompleted;
 use crate::decision::state::DocCollected;
@@ -11,9 +11,6 @@ use crate::errors::business::BusinessError;
 use crate::errors::ValidationError;
 use crate::utils::email::BoInviteEmailInfo;
 use crate::utils::session::AuthSession;
-use crate::utils::vault_wrapper::Business;
-use crate::utils::vault_wrapper::TenantVw;
-use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use db::models::tenant::Tenant;
@@ -29,17 +26,18 @@ use newtypes::PiiString;
 use newtypes::SessionAuthToken;
 use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
+use std::collections::HashMap;
 use std::pin::Pin;
 
 pub async fn generate_secondary_bo_links<'a>(
     state: &'a State,
     biz_wf: &'a Workflow,
-    dbos: &'a [BusinessOwnerInfo],
-) -> FpResult<Vec<(&'a BusinessOwnerInfo, SessionAuthToken)>> {
-    let missing_kyc_secondary_bos = dbos
+    bos: &'a [BoWithKycInfo],
+) -> FpResult<Vec<(&'a BoWithKycInfo, SessionAuthToken)>> {
+    let missing_kyc_secondary_bos = bos
         .iter()
         .filter(|bo| bo.bo.kind == BusinessOwnerKind::Secondary)
-        .filter(|bo| !bo.has_linked_user())
+        .filter(|bo| !bo.has_kyc_result())
         .collect_vec();
     if missing_kyc_secondary_bos.is_empty() {
         return Ok(vec![]);
@@ -61,7 +59,7 @@ pub async fn generate_secondary_bo_links<'a>(
             (bo.bo.link_id.clone(), session_data)
         })
         .collect_vec();
-    let tokens: Vec<_> = state
+    let mut tokens: HashMap<_, _> = state
         .db_query(move |conn| {
             sessions_to_make
                 .into_iter()
@@ -69,14 +67,13 @@ pub async fn generate_secondary_bo_links<'a>(
                 .collect()
         })
         .await?;
-    let tokens = tokens
+
+    let tokens = missing_kyc_secondary_bos
         .into_iter()
-        .map(|(l_id, token)| {
-            missing_kyc_secondary_bos
-                .iter()
-                .find(|bo| bo.bo.link_id == l_id)
+        .map(|bo| {
+            (tokens.remove(&bo.bo.link_id))
+                .map(|t| (bo, t))
                 .ok_or(BusinessError::LinkedBoNotFound)
-                .map(|bo_data| (*bo_data, token))
         })
         .collect::<Result<_, _>>()?;
     Ok(tokens)
@@ -87,17 +84,18 @@ pub async fn generate_secondary_bo_links<'a>(
 pub async fn send_missing_secondary_bo_links(
     state: &State,
     biz_wf: &Workflow,
-    bvw: &TenantVw<Business>,
+    kyb_features: KybBoFeatures,
     tenant: &Tenant,
 ) -> FpResult<()> {
-    let dbos = bvw.decrypt_business_owners(state).await?;
-    let tokens = generate_secondary_bo_links(state, biz_wf, &dbos).await?;
+    let KybBoFeatures { bos, bvw } = kyb_features;
+    let tokens = generate_secondary_bo_links(state, biz_wf, &bos).await?;
     // Generate a link for each business owner
-    let primary_bo = dbos
+    let BoWithKycInfo(_, primary_bo) = bos
         .iter()
         .find(|bo| bo.bo.kind == BusinessOwnerKind::Primary)
-        .ok_or(BusinessError::PrimaryBoNotFound)?
-        .clone();
+        .ok_or(BusinessError::PrimaryBoNotFound)?;
+    let primary_bo = primary_bo.clone();
+
     let (first_name, last_name) = primary_bo.name().ok_or(ValidationError("No name"))?;
     let inviter = PiiString::new(format!("{} {}", first_name.leak(), last_name.leak()));
     let business_name = bvw
@@ -192,22 +190,12 @@ pub async fn progress_business_workflow(
         return Ok(());
     }
 
-    let (biz_wf, bvw) = state
-        .db_query(move |conn| -> FpResult<_> {
-            // Refresh the wf since it may have changed above
-            let biz_wf = Workflow::get(conn, &wf_id)?;
-            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
-            Ok((biz_wf, bvw))
-        })
-        .await?;
-
-    let obds = get_bo_kyb_features(state, &biz_wf.id).await?;
-
-    let is_waiting_for_bo_kyc = obds.is_not_ready();
+    let biz_wf = state.db_query(move |conn| Workflow::get(conn, &wf_id)).await?;
+    let kyb_features = KybBoFeatures::build(state, &biz_wf.id).await?;
+    let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
-
     if is_waiting_for_bo_kyc {
-        send_missing_secondary_bo_links(state, &biz_wf, &bvw, tenant).await?;
+        send_missing_secondary_bo_links(state, &biz_wf, kyb_features, tenant).await?;
         return Ok(());
     }
 
