@@ -161,7 +161,7 @@ export const useRequestError = () => {
   };
 };
 
-const getRequestOptions = (
+export const getRequestOptions = (
   requestConfig: AxiosRequestConfig,
   extraOptions: { omitSessionId?: boolean; omitClientVersion?: boolean } = {},
 ) => {
@@ -182,7 +182,7 @@ const getRequestOptions = (
 // Disable transformation when the string matched or satisfied the condition.
 // https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const preservedKeys = (input: any) =>
+export const preservedKeys = (input: any) =>
   [...DataIdentifierKeys].includes(input) || input.startsWith('card') || isCountryCode(input);
 
 const request = <Response = unknown>(

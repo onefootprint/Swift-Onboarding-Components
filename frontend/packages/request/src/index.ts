@@ -13,4 +13,6 @@ export {
   isUnhandledError,
   requestWithoutCaseConverter,
   useRequestError,
+  getRequestOptions,
+  preservedKeys,
 } from './request';

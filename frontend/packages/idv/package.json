@@ -22,7 +22,8 @@
     "test:watch": "jest --watch",
     "test": "jest --passWithNoTests",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=9216 yarn tsc --noEmit",
-    "chromatic": "chromatic --exit-zero-on-changes --monorepo-root=../.."
+    "chromatic": "chromatic --exit-zero-on-changes --monorepo-root=../..",
+    "openapi-ts": "tsx src/config/openapi-ts --camelCaseKeys"
   },
   "dependencies": {
     "@datadog/browser-logs": "^5.18.0",
@@ -67,7 +68,8 @@
     "use-places-autocomplete": "^4.0.0",
     "use-resize-observer": "^9.1.0",
     "usehooks-ts": "2.16.0",
-    "xstate": "^4.37.1"
+    "xstate": "^4.37.1",
+    "@hey-api/client-axios": "^0.2.9"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.7.0",
@@ -97,7 +99,9 @@
     "ts-node": "^10.9.2",
     "tsconfig": "*",
     "typescript": "^5.5.2",
-    "webpack": "*"
+    "webpack": "*",
+    "@hey-api/openapi-ts": "^0.53.6",
+    "tsx": "^4.19.1"
   },
   "peerDependencies": {
     "next": "14.x",

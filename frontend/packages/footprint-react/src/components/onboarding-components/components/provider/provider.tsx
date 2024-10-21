@@ -1,10 +1,10 @@
 import { isAlphanumeric } from '@onefootprint/core';
 import type { SandboxOutcome } from '@onefootprint/footprint-js';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
 import merge from 'lodash/merge';
 import { createContext, useEffect, useMemo, useState } from 'react';
+import type { PublicOnboardingConfiguration } from '../../../../client';
+import { getOnboardingConfig as getOnboardingConfigReq } from '../../../../client/services.gen';
 import defaultTranslations from '../../constants/translations';
-import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 import type { ContextData, ProviderProps, UpdateContext } from './provider.types';
 
@@ -57,7 +57,7 @@ const Provider = ({
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
   const getSandboxProps = (
-    response: PublicOnboardingConfig,
+    response: PublicOnboardingConfiguration,
   ): { sandboxId?: string; sandboxOutcome?: SandboxOutcome } => {
     if (response.isLive) {
       if (sandboxId) throw new Error('sandboxId is not allowed for live environments');
@@ -88,13 +88,14 @@ const Provider = ({
 
   const getOnboardingConfig = async (pKey: string) => {
     try {
-      const response = await getOnboardingConfigReq(pKey);
-      if (response.kind !== 'kyc') throw new Error('Only kyc playbooks are supported');
-      const { sandboxId, sandboxOutcome } = getSandboxProps(response);
+      const { data } = await getOnboardingConfigReq({ headers: { 'X-Onboarding-Config-Key': pKey } });
+      if (!data) return;
+      if (data.kind !== 'kyc') throw new Error('Only kyc playbooks are supported');
+      const { sandboxId, sandboxOutcome } = getSandboxProps(data);
       setContext(prev => ({
         ...prev,
         isReady: true,
-        onboardingConfig: response,
+        onboardingConfig: data,
         sandboxId,
         sandboxOutcome,
       }));

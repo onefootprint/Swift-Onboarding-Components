@@ -15,10 +15,10 @@ public struct UserDecryptRequest: Codable, JSONEncodable, Hashable {
         case toAscii = "to_ascii"
         case prefixLessThanNGreaterThan = "prefix(<n>)"
         case suffixLessThanNGreaterThan = "suffix(<n>)"
-        case replaceQuoteLessThanFromGreaterThanQuoteCommaQuoteLessThanToGreaterThanQuote = "replace('<from>','<to>')"
-        case dateFormatQuoteLessThanFromFormatGreaterThanQuoteCommaQuoteLessThanToFormatGreaterThanQuote = "date_format('<from_format>','<to_format>')"
-        case hmacSha256QuoteLessThanKeyGreaterThanQuote = "hmac_sha256('<key>')"
-        case encryptQuoteLessThanAlgorithmGreaterThanQuoteCommaQuoteLessThanPublicKeyGreaterThanQuote = "encrypt('<algorithm>','<public_key>')"
+        case replaceLessThanFromGreaterThanCommaLessThanToGreaterThan = "replace(<from>,<to>)"
+        case dateFormatLessThanFromFormatGreaterThanCommaLessThanToFormatGreaterThan = "date_format(<from_format>,<to_format>)"
+        case hmacSha256LessThanKeyGreaterThan = "hmac_sha256(<key>)"
+        case encryptLessThanAlgorithmGreaterThanCommaLessThanPublicKeyGreaterThan = "encrypt(<algorithm>,<public_key>)"
     }
     /** List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,  `custom.bank_account` */
     public var fields: [VaultDI]?
