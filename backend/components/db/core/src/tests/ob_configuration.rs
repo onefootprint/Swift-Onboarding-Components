@@ -568,6 +568,29 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
     );
 }
 
+#[db_test]
+pub fn test_enhanced_aml_addition_of_am_lists_is_forwards_compatible(conn: &mut TestPgConn) {
+    let t = fixtures::tenant::create(conn);
+    let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+    assert_eq!(obc.enhanced_aml_for_test(), EnhancedAmlOption::No);
+    diesel::sql_query(format!(
+            "update ob_configuration set enhanced_aml={} where id = '{}';",
+            r#"'{"data": {"pep": false, "ofac": true, "adverse_media": true, "continuous_monitoring": true, "match_kind": "exact_name"}, "kind": "yes"}'"#, obc.id
+        ))
+        .execute(conn.conn())
+        .unwrap();
+    let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+    assert_eq!(
+        EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: false,
+            adverse_media: true,
+            continuous_monitoring: true,
+            adverse_media_lists: None
+        },
+        obc.enhanced_aml_for_test()
+    );
+}
 
 // TODO: update this test for verification checks
 #[db_test]
