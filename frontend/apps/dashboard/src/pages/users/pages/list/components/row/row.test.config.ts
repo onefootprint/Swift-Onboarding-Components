@@ -7,7 +7,6 @@ export const entityPassedFixture: Entity = {
   kind: EntityKind.person,
   data: [],
   attributes: [],
-  decryptableAttributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
   workflows: [

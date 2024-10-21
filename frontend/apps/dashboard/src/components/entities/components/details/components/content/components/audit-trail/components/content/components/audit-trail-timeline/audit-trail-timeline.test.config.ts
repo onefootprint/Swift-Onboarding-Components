@@ -37,7 +37,6 @@ export const entityFixture: Entity = {
   kind: EntityKind.person,
   data: [{ ...defaultAttribute, identifier: IdDI.phoneNumber, isDecryptable: true, value: null }],
   attributes: [],
-  decryptableAttributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
   requiresManualReview: false,

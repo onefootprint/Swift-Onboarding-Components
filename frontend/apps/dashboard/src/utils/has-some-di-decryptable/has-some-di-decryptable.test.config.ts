@@ -11,7 +11,6 @@ export const entityFixture: Entity = {
   isIdentifiable: true,
   kind: EntityKind.business,
   attributes: [],
-  decryptableAttributes: [],
   data: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',

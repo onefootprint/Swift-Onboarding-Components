@@ -23,7 +23,6 @@ export const entitiesFixture: Entity[] = [
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
     isIdentifiable: true,
     kind: EntityKind.business,
-    decryptableAttributes: [],
     attributes: [],
     data: [
       { ...defaultAttribute, identifier: BusinessDI.city, isDecryptable: true, value: null },

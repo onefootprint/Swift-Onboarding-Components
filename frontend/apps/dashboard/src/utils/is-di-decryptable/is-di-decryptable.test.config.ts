@@ -12,7 +12,6 @@ export const entityFixture: Entity = {
   isIdentifiable: true,
   kind: EntityKind.business,
   attributes: [],
-  decryptableAttributes: [],
   data: [
     { ...defaultAttribute, identifier: IdDI.email, isDecryptable: true },
     { ...defaultAttribute, identifier: IdDI.phoneNumber, isDecryptable: true },

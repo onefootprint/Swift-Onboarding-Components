@@ -20,7 +20,6 @@ const entityFixture: Entity = {
   status: EntityStatus.pass,
   workflows: [],
   requiresManualReview: false,
-  decryptableAttributes: [],
   decryptedAttributes: {},
   label: null,
 };

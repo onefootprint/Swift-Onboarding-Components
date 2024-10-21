@@ -35,7 +35,6 @@ const entityFixture: Entity = {
     },
   ],
   requiresManualReview: false,
-  decryptableAttributes: [],
   decryptedAttributes: {},
   label: null,
 };

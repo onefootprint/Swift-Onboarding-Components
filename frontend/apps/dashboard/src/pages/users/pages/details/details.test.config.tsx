@@ -33,7 +33,6 @@ export const entityFixture: Entity = {
   requiresManualReview: false,
   status: EntityStatus.pass,
   attributes: [],
-  decryptableAttributes: [],
   data: [
     { ...defaultAttribute, identifier: IdDI.phoneNumber },
     { ...defaultAttribute, identifier: IdDI.email },

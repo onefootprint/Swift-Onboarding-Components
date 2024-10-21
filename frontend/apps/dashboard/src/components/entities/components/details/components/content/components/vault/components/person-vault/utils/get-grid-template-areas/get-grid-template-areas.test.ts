@@ -20,7 +20,6 @@ describe('getGridTemplateAreas', () => {
       identifier: attribute,
     })),
     id: '123',
-    decryptableAttributes: [],
     isIdentifiable: true,
     kind: EntityKind.person,
     requiresManualReview: false,

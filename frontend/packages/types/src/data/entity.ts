@@ -68,7 +68,6 @@ export type Entity = {
 
   // TODO: deprecate these in favor of `data`
   attributes: DataIdentifier[];
-  decryptableAttributes: DataIdentifier[];
   decryptedAttributes: EntityVault;
 };
 

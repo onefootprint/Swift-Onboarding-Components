@@ -59,7 +59,6 @@ export const entityFixture: Entity = {
       identifier: IdDI.zip,
     },
   ],
-  decryptableAttributes: [],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   lastActivityAt: '2023-10-08T22:43:11.928846Z',
   workflows: [

@@ -142,7 +142,6 @@ export const entityFixture: Entity = {
   label: null,
   attributes: [],
   decryptedAttributes: {},
-  decryptableAttributes: [],
 };
 
 export const documentsFixture: Document[] = [
