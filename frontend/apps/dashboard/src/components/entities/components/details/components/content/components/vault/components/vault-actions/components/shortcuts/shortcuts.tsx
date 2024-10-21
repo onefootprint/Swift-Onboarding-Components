@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 
 import usePermissions from 'src/hooks/use-permissions';
+import hasSomeDiDecryptable from 'src/utils/has-some-di-decryptable';
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
 import EditVaultDrawer from '../edit-vault-drawer';
@@ -48,7 +49,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const kindText =
     kind === EntityKind.person ? t('components.cmdk.review.kind.user') : t('components.cmdk.review.kind.business');
   const { hasPermission } = usePermissions();
-  const canDecrypt = !!entity.decryptableAttributes.length;
+  const canDecrypt = hasSomeDiDecryptable(entity);
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { DECRYPT_VAULT_FORM_ID } from '@/entity/constants';
+import hasSomeDiDecryptable from 'src/utils/has-some-di-decryptable';
 import { useDecryptControls } from '../../../vault/components/vault-actions';
 import ReasonDialog from '../../../vault/components/vault-actions/components/reason-dialog';
 
@@ -13,7 +14,7 @@ const DecryptHistoricalButton = ({ entity }: DecryptHistoricalProps) => {
   const { t } = useTranslation('common');
   const { t: entityT } = useTranslation('entity-details');
   const decryptControls = useDecryptControls();
-  const canDecrypt = !!entity.decryptableAttributes.length;
+  const canDecrypt = hasSomeDiDecryptable(entity);
   const { data, update: updateVault } = useEntityVault(entity.id, entity);
   const entityVault = data?.vault;
 

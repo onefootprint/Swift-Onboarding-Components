@@ -14,6 +14,7 @@ import {
   isVaultDataDecrypted,
   isVaultDataEmpty,
 } from '@onefootprint/types';
+import hasSomeDiDecryptable from 'src/utils/has-some-di-decryptable';
 import Section from '../section';
 import Content from './components/content';
 import Decrypt from './components/decrypt';
@@ -27,7 +28,7 @@ const BusinessInsights = ({ entity }: BusinessInsightsProps) => {
   const entityId = useEntityId();
   const { data: vaultData } = useEntityVault(entityId, entity);
   const { data: timelineData } = useCurrentEntityTimeline();
-  const canDecrypt = !!entity.decryptableAttributes.length;
+  const canDecrypt = hasSomeDiDecryptable(entity);
 
   const isKybOnboardingComplete = (event: OnboardingDecisionEvent) => {
     return (

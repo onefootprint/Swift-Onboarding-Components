@@ -11,6 +11,7 @@ import { DECRYPT_VAULT_FORM_ID, HEADER_ACTIONS_SELECTOR } from '@/entity/constan
 import useCurrentEntity from '@/entity/hooks/use-current-entity';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
+import hasSomeDiDecryptable from 'src/utils/has-some-di-decryptable';
 import BusinessActions from './components/business-actions';
 import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
@@ -32,7 +33,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   const editControls = useEditControls();
   const isIdle = decryptControls.isIdle;
   const isInProgress = decryptControls.inProgress;
-  const canDecrypt = !!entity.decryptableAttributes.length;
+  const canDecrypt = hasSomeDiDecryptable(entity);
 
   const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
     if (e.key === 'Escape') {
