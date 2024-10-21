@@ -249,12 +249,12 @@ def validate_fp_id(args):
                     f.write("done: can_access_data caveat")
                 continue
 
-        assert (
-            api_data == vdr_data
-        ), f"VDR data and API data mismatch for {fp_id} at version {version}\nMismatch in API Data: {api_mismatch}\nMismatch in VDR Data: {vdr_mismatch}"
-
-        with open(validate_checkpoint, "w") as f:
-            f.write("done")
+            print(
+                f"VDR data and API data mismatch for {fp_id} at version {version}\nMismatch in API Data: {api_mismatch}\nMismatch in VDR Data: {vdr_mismatch}"
+            )
+        else:
+            with open(validate_checkpoint, "w") as f:
+                f.write("done")
 
 
 def main():

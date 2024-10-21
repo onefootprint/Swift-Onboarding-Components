@@ -16,6 +16,7 @@ use diesel::prelude::*;
 use diesel::QueryDsl;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
 use newtypes::FpId;
 use newtypes::ScopedVaultId;
 use newtypes::ScopedVaultVersionId;
@@ -235,7 +236,7 @@ pub fn get_complete_svvs_for_svv_batch(
 }
 
 
-#[derive(Debug, Clone, derive_more::From, derive_more::Into)]
+#[derive(Debug, Clone, derive_more::From, derive_more::Into, PartialEq, Eq)]
 pub struct VdrBlobKey(String);
 
 /// Returns a map from the given SVV IDs to the DIs and corresponding blob keys for the DLs active
@@ -246,41 +247,68 @@ pub fn bulk_get_vdr_blob_keys_active_at(
     config_id: &VaultDrConfigId,
     svv_ids: Vec<&ScopedVaultVersionId>,
 ) -> DbResult<HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>>> {
-    let svvid_di_blobkey: Vec<(ScopedVaultVersionId, (DataIdentifier, String))> = scoped_vault_version::table
-        .inner_join(
-            // Join with DLs that are active at the SVV's seqno.
-            data_lifetime::table.on(data_lifetime::scoped_vault_id
-                .eq(scoped_vault_version::scoped_vault_id)
-                .and(data_lifetime::created_seqno.le(scoped_vault_version::seqno))
-                .and(
-                    data_lifetime::deactivated_seqno
-                        .gt(scoped_vault_version::seqno.nullable())
-                        .or(data_lifetime::deactivated_seqno.is_null()),
-                )),
-        )
-        .inner_join(
-            // Join with blobs that are written for the active DLs.
-            vault_dr_blob::table.on(vault_dr_blob::data_lifetime_id
-                .eq(data_lifetime::id)
-                .and(vault_dr_blob::config_id.eq(config_id))),
-        )
-        .filter(scoped_vault_version::id.eq_any(&svv_ids))
-        .select((
-            scoped_vault_version::id,
-            (data_lifetime::kind, vault_dr_blob::bucket_path),
-        ))
-        .load(conn)?;
+    let svvid_blob_keys: Vec<(ScopedVaultVersionId, (DataIdentifier, DataLifetimeSeqno, String))> =
+        scoped_vault_version::table
+            .inner_join(
+                // Join with DLs that are active at the SVV's seqno.
+                data_lifetime::table.on(data_lifetime::scoped_vault_id
+                    .eq(scoped_vault_version::scoped_vault_id)
+                    .and(data_lifetime::created_seqno.le(scoped_vault_version::seqno))
+                    .and(
+                        data_lifetime::deactivated_seqno
+                            .gt(scoped_vault_version::seqno.nullable())
+                            .or(data_lifetime::deactivated_seqno.is_null()),
+                    )),
+            )
+            .inner_join(
+                // Join with blobs that are written for the active DLs.
+                vault_dr_blob::table.on(vault_dr_blob::data_lifetime_id
+                    .eq(data_lifetime::id)
+                    .and(vault_dr_blob::config_id.eq(config_id))),
+            )
+            .filter(scoped_vault_version::id.eq_any(&svv_ids))
+            .select((
+                scoped_vault_version::id,
+                (
+                    data_lifetime::kind,
+                    data_lifetime::created_seqno,
+                    vault_dr_blob::bucket_path,
+                ),
+            ))
+            .load(conn)?;
 
-    let mut grouped: HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>> = svvid_di_blobkey
+    let mut grouped: HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>> = svvid_blob_keys
         .into_iter()
         .into_group_map()
         .into_iter()
-        .map(|(svv_id, di_blobkey)| {
-            let di_to_blobkey = di_blobkey
+        .map(|(svv_id, di_created_seqno_blobkey)| {
+            let di_to_blobkeys = di_created_seqno_blobkey
                 .into_iter()
-                .map(|(di, blob_key)| (di, blob_key.into()))
+                .map(|(di, created_seqno, blob_key)| (di, (created_seqno, blob_key)))
+                .into_group_map();
+
+            // In most cases, there should only be one active DL (blob) for a given data identifier
+            // at this scoped vault version. This is enforced by the database constraint on the DL
+            // table `unique_active_data_lifetime_per_scoped_vault_kind`.
+            //
+            // However, some historical data prior to the introduction of this constraint has
+            // multiple active DLs at a given scoped vault version for a given DI. The vault
+            // wrapper handles this by giving precedence to the DL with the greatest seqno. To
+            // ensure VDR's data matches the API's view of the data, we do the same here.
+            let di_to_latest_blobkey = di_to_blobkeys
+                .into_iter()
+                .filter_map(|(di, created_seqno_blobkeys)| {
+                    let latest_blobkey = created_seqno_blobkeys
+                        .into_iter()
+                        .max_by_key(|(created_seqno, _)| *created_seqno)
+                        .map(|(_, blobkey)| blobkey)?; // This will always be Some(_) since the list
+                                                       // is a grouping.
+
+                    Some((di, VdrBlobKey(latest_blobkey)))
+                })
                 .collect();
-            (svv_id, di_to_blobkey)
+
+            (svv_id, di_to_latest_blobkey)
         })
         .collect();
 
@@ -402,8 +430,11 @@ mod tests {
     use itertools::Itertools;
     use macros::db_test;
     use newtypes::DataIdentifier;
+    use newtypes::DataLifetimeSeqno;
+    use newtypes::DataLifetimeSource;
     use newtypes::IdentityDataKind;
     use newtypes::ScopedVaultVersionNumber;
+    use newtypes::VaultId;
 
     #[derive(Debug, Clone, derive_more::Constructor)]
     struct ExpectedBatchSizes {
@@ -666,7 +697,11 @@ mod tests {
         }
     }
 
-    fn write_fake_blobs(conn: &mut TestPgConn, config_id: &VaultDrConfigId, dls: Vec<DataLifetime>) {
+    fn write_fake_blobs(
+        conn: &mut TestPgConn,
+        config_id: &VaultDrConfigId,
+        dls: Vec<DataLifetime>,
+    ) -> Vec<VaultDrBlob> {
         let new_blobs = dls
             .into_iter()
             .map(|dl| NewVaultDrBlob {
@@ -680,6 +715,184 @@ mod tests {
             })
             .collect_vec();
 
-        VaultDrBlob::bulk_create(conn, new_blobs).unwrap();
+        VaultDrBlob::bulk_create(conn, new_blobs).unwrap()
+    }
+
+    #[derive(Clone, Insertable)]
+    #[diesel(table_name = data_lifetime)]
+    struct NewUnsafeDataLifetime {
+        vault_id: VaultId,
+        scoped_vault_id: ScopedVaultId,
+        created_at: DateTime<Utc>,
+        created_seqno: DataLifetimeSeqno,
+        kind: DataIdentifier,
+        source: DataLifetimeSource,
+        deactivated_seqno: Option<DataLifetimeSeqno>,
+    }
+
+    #[db_test]
+    fn test_bulk_get_vdr_blob_keys_active_at_for_multiple_active_dls(conn: &mut TestPgConn) {
+        // Some historical data prior to the introduction of the constraint
+        // `unique_active_data_lifetime_per_scoped_vault_kind` has multiple active DLs at a given
+        // scoped vault version for a given DI. Test that bulk_get_vdr_blob_keys_active_at
+        // correctly disambiguates between DLs in this case.
+
+        let tenant_id = fixtures::tenant::create(conn).id;
+        let is_live = true;
+
+        let new_ape = NewVaultDrAwsPreEnrollment {
+            tenant_id: &tenant_id,
+            is_live,
+            aws_external_id: crypto::random::gen_rand_bytes(16).encode_hex::<String>().into(),
+        };
+        let ape = VaultDrAwsPreEnrollment::get_or_create(conn, new_ape).unwrap();
+        let new_vdr_config = NewVaultDrConfig {
+            created_at: Utc::now(),
+            tenant_id: &tenant_id,
+            is_live,
+            aws_pre_enrollment_id: &ape.id,
+            aws_account_id: "12345678".to_owned(),
+            aws_role_name: "my-role".to_owned(),
+            s3_bucket_name: "my-bucket".to_owned(),
+            recovery_public_key: "pub-key".to_owned(),
+            wrapped_recovery_key: "wrapped-recovery-key".to_owned(),
+            org_public_keys: vec!["org-pub-key".to_owned()],
+            bucket_path_namespace: "the-namespace".to_owned(),
+        };
+        let vdr_config = VaultDrConfig::create(conn, new_vdr_config).unwrap();
+
+        let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, is_live).id;
+        let v_id = fixtures::vault::create_person(conn, is_live).into_inner().id;
+        let sv = fixtures::scoped_vault::create(conn, &v_id, &ob_config_id);
+
+        let sv_txn1 = DataLifetime::new_sv_txn(conn, &sv).unwrap();
+        let svv1 = ScopedVaultVersion::get_or_create(conn, &sv_txn1).unwrap();
+
+        let sv_txn2 = DataLifetime::new_sv_txn(conn, &sv).unwrap();
+        let svv2 = ScopedVaultVersion::get_or_create(conn, &sv_txn2).unwrap();
+
+        let sv_txn3 = DataLifetime::new_sv_txn(conn, &sv).unwrap();
+        let svv3 = ScopedVaultVersion::get_or_create(conn, &sv_txn3).unwrap();
+
+        assert_eq!(svv1.version + 1.into(), svv2.version);
+        assert_eq!(svv2.version + 1.into(), svv3.version);
+
+        assert!(svv1.seqno < svv2.seqno);
+        assert!(svv2.seqno < svv3.seqno);
+
+        // We can't use model helpers since we have to construct a timeline that would violate the
+        // unique_active_data_lifetime_per_scoped_vault_kind constraint.
+        let new_dls = vec![
+            NewUnsafeDataLifetime {
+                vault_id: v_id.clone(),
+                scoped_vault_id: sv.id.clone(),
+                created_at: Utc::now(),
+                created_seqno: svv1.seqno,
+                kind: IdentityDataKind::Ssn9.into(),
+                source: DataLifetimeSource::LikelyHosted,
+                deactivated_seqno: Some(svv3.seqno),
+            },
+            NewUnsafeDataLifetime {
+                vault_id: v_id.clone(),
+                scoped_vault_id: sv.id.clone(),
+                created_at: Utc::now(),
+                created_seqno: svv1.seqno,
+                kind: IdentityDataKind::FirstName.into(),
+                source: DataLifetimeSource::LikelyHosted,
+                deactivated_seqno: None,
+            },
+            NewUnsafeDataLifetime {
+                vault_id: v_id.clone(),
+                scoped_vault_id: sv.id.clone(),
+                created_at: Utc::now(),
+                created_seqno: svv2.seqno,
+                kind: IdentityDataKind::Ssn9.into(),
+                source: DataLifetimeSource::LikelyHosted,
+                deactivated_seqno: Some(svv3.seqno),
+            },
+            NewUnsafeDataLifetime {
+                vault_id: v_id.clone(),
+                scoped_vault_id: sv.id.clone(),
+                created_at: Utc::now(),
+                created_seqno: svv3.seqno,
+                kind: IdentityDataKind::Ssn9.into(),
+                source: DataLifetimeSource::LikelyHosted,
+                deactivated_seqno: None,
+            },
+        ];
+
+        let num_ssn9_active_at_svv2 = new_dls
+            .iter()
+            .filter(|dl| {
+                dl.kind == IdentityDataKind::Ssn9.into()
+                    && dl.created_seqno <= svv2.seqno
+                    && dl
+                        .deactivated_seqno
+                        .map_or(true, |deactivated_seqno| deactivated_seqno > svv2.seqno)
+            })
+            .count();
+        // The constraint unique_active_data_lifetime_per_scoped_vault_kind would have prevented
+        // this timeline from being created using first-class models.
+        assert_eq!(num_ssn9_active_at_svv2, 2);
+
+        let dls: Vec<DataLifetime> = new_dls
+            .into_iter()
+            .map(|new_dl| {
+                diesel::insert_into(data_lifetime::table)
+                    .values(&new_dl)
+                    .get_result(conn.conn())
+                    .unwrap()
+            })
+            .collect();
+
+        let mut blobs = dls.into_iter().map(|dl| {
+            let blobs = write_fake_blobs(conn, &vdr_config.id, vec![dl]);
+            assert_eq!(blobs.len(), 1);
+            blobs.into_iter().next().unwrap()
+        });
+        let blob1 = blobs.next().unwrap();
+        let blob2 = blobs.next().unwrap();
+        let blob3 = blobs.next().unwrap();
+        let blob4 = blobs.next().unwrap();
+        assert!(blobs.next().is_none());
+
+        let result =
+            bulk_get_vdr_blob_keys_active_at(conn, &vdr_config.id, vec![&svv1.id, &svv2.id, &svv3.id])
+                .unwrap();
+        assert_eq!(
+            result,
+            HashMap::from([
+                (
+                    svv1.id.clone(),
+                    HashMap::from([
+                        (IdentityDataKind::Ssn9.into(), blob1.bucket_path.clone().into()),
+                        (
+                            IdentityDataKind::FirstName.into(),
+                            blob2.bucket_path.clone().into()
+                        ),
+                    ])
+                ),
+                (
+                    svv2.id.clone(),
+                    HashMap::from([
+                        (IdentityDataKind::Ssn9.into(), blob3.bucket_path.clone().into()),
+                        (
+                            IdentityDataKind::FirstName.into(),
+                            blob2.bucket_path.clone().into()
+                        ),
+                    ])
+                ),
+                (
+                    svv3.id.clone(),
+                    HashMap::from([
+                        (IdentityDataKind::Ssn9.into(), blob4.bucket_path.clone().into()),
+                        (
+                            IdentityDataKind::FirstName.into(),
+                            blob2.bucket_path.clone().into()
+                        ),
+                    ])
+                )
+            ])
+        );
     }
 }
