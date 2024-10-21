@@ -10,11 +10,11 @@ use crate::DataValidationError;
 use crate::DiValidationError;
 use crate::DocumentDiKind;
 use crate::NtResult;
+use crate::NtValidationError;
 use crate::PiiJsonValue;
 use crate::PiiValueKind;
 use crate::UserDataIdentifier;
 use crate::ValidateArgs;
-use crate::ValidationError;
 use either::Either;
 use itertools::Itertools;
 use std::collections::HashMap;
@@ -88,7 +88,7 @@ impl PatchDataRequest {
                         _ => None,
                     },
                     DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(_, _)) => {
-                        Some(ValidationError("Cannot vault beneficial owner data via API").into())
+                        Some(NtValidationError("Cannot vault beneficial owner data via API").into())
                     }
                     _ => None,
                 };

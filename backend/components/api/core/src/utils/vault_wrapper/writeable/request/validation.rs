@@ -335,7 +335,7 @@ impl<Type> TenantVw<Type> {
                 if has_linked_bos && request_has_vaulted_bos {
                     // We shouldn't allow BOs to be vaulted when the tenant has already linked BOs
                     // via API
-                    let err = newtypes::ValidationError("Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting").into();
+                    let err = newtypes::NtValidationError("Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting").into();
                     let errs = HashMap::from_iter([(BDK::BeneficialOwners.into(), err)]);
                     return Err(NtError::from(DataValidationError::FieldValidationError(errs)).into());
                 }

@@ -203,16 +203,16 @@ pub enum EnumDotNotationError {
 
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 400 validation error.
-pub struct ValidationError<'a>(pub &'a str);
+pub struct NtValidationError<'a>(pub &'a str);
 
-impl<'a> From<ValidationError<'a>> for Error {
-    fn from(value: ValidationError<'a>) -> Self {
+impl<'a> From<NtValidationError<'a>> for Error {
+    fn from(value: NtValidationError<'a>) -> Self {
         Self::ValidationError(value.0.to_string())
     }
 }
 
-impl<'a, T> From<ValidationError<'a>> for Result<T, Error> {
-    fn from(value: ValidationError<'a>) -> Self {
+impl<'a, T> From<NtValidationError<'a>> for Result<T, Error> {
+    fn from(value: NtValidationError<'a>) -> Self {
         Err(value.into())
     }
 }

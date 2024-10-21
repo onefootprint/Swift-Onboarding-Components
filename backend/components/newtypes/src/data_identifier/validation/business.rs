@@ -11,11 +11,11 @@ use crate::CleanAndValidate;
 use crate::DataIdentifier;
 use crate::DataIdentifierValue;
 use crate::NtResult;
+use crate::NtValidationError;
 use crate::PhoneNumber;
 use crate::PiiJsonValue;
 use crate::PiiString;
 use crate::ValidateArgs;
-use crate::ValidationError;
 use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
@@ -74,7 +74,7 @@ fn clean_and_validate_beneficial_owner_data(
 ) -> NtResult<PiiString> {
     let can_vault_bo_data = matches!(di, DataIdentifier::Id(_) | DataIdentifier::Custom(_));
     if !can_vault_bo_data {
-        return Err(ValidationError("Cannot vault this kind of beneficial owner data").into());
+        return Err(NtValidationError("Cannot vault this kind of beneficial owner data").into());
     }
     let DataIdentifierValue { value, .. } = di.clean_and_validate(input, args, all_data)?;
     Ok(value)

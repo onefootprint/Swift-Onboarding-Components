@@ -49,10 +49,10 @@ pub use self::validation::*;
 use crate::util::impl_enum_string_diesel;
 use crate::KvDataKey;
 use crate::NtResult;
+use crate::NtValidationError;
 use crate::PiiJsonValue;
 use crate::PiiString;
 use crate::ValidateArgs;
-use crate::ValidationError;
 use crate::VaultKind;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
@@ -242,7 +242,7 @@ impl CleanAndValidate for DataIdentifier {
         all_data: &AllData,
     ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         if value.is_string() && self.expected_json_format() {
-            return Err(ValidationError("Expected JSON format, received string").into());
+            return Err(NtValidationError("Expected JSON format, received string").into());
         }
         match self {
             Self::Id(s) => s.clean_and_validate(value, args, all_data).map(Into::into),

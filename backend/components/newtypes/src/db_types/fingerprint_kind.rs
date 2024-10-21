@@ -12,8 +12,8 @@ use crate::DataIdentifier;
 use crate::Fingerprint;
 use crate::FingerprintScope;
 use crate::IdentityDataKind as IDK;
+use crate::NtValidationError;
 use crate::TenantId;
-use crate::ValidationError;
 use diesel::deserialize::FromSqlRow;
 use diesel::expression::AsExpression;
 use diesel::sql_types::Text;
@@ -86,7 +86,7 @@ impl FromStr for FingerprintKind {
         if let Ok(kind) = DataIdentifier::from_str(s) {
             return Ok(Self::DI(kind));
         }
-        Err(ValidationError(&format!("Cannot parse FingerprintKind: {}", s)).into())
+        Err(NtValidationError(&format!("Cannot parse FingerprintKind: {}", s)).into())
     }
 }
 

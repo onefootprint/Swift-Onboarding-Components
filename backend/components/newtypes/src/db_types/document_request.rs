@@ -2,7 +2,7 @@ use crate::DataIdentifier;
 use crate::DocumentDiKind;
 use crate::DocumentUploadSettings;
 use crate::NtResult;
-use crate::ValidationError;
+use crate::NtValidationError;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -95,7 +95,7 @@ impl DocumentRequestConfig {
             .count()
             > 1
         {
-            return ValidationError("Can only collect one proof of address doc").into();
+            return NtValidationError("Can only collect one proof of address doc").into();
         }
 
         if configs
@@ -104,7 +104,7 @@ impl DocumentRequestConfig {
             .count()
             > 1
         {
-            return ValidationError("Can only collect one proof of SSN doc").into();
+            return NtValidationError("Can only collect one proof of SSN doc").into();
         }
 
         // Custom doc validation
@@ -119,20 +119,20 @@ impl DocumentRequestConfig {
 
         let num_identifiers = custom_docs.iter().map(|d| &d.identifier).unique().count();
         if num_identifiers != custom_docs.len() {
-            return ValidationError("Cannot specify the same identifier for multiple custom documents")
+            return NtValidationError("Cannot specify the same identifier for multiple custom documents")
                 .into();
         }
         if custom_docs
             .iter()
             .any(|d| !matches!(d.identifier, DataIdentifier::Document(DocumentDiKind::Custom(_))))
         {
-            return ValidationError(
+            return NtValidationError(
                 "Must use identifier starting with document.custom. for custom documents",
             )
             .into();
         }
         if custom_docs.iter().any(|d| d.name.is_empty()) {
-            return ValidationError("Custom document name cannot be empty").into();
+            return NtValidationError("Custom document name cannot be empty").into();
         }
 
         Ok(())
