@@ -55,6 +55,7 @@
     "match-sorter": "^6.3.1",
     "next": "^14.2.12",
     "next-themes": "^0.2.1",
+    "nuqs": "^1.20.0",
     "openpgp": "4.10.11",
     "react": "^18",
     "react-calendly": "^4.1.1",

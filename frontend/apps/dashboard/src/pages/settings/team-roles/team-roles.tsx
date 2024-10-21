@@ -1,6 +1,6 @@
-import { useQueryState } from '@onefootprint/hooks';
 import { Stack, Tabs, Text } from '@onefootprint/ui';
 import Head from 'next/head';
+import { parseAsString, useQueryState } from 'nuqs';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
 import SectionHeader from 'src/components/section-header';
@@ -19,7 +19,7 @@ enum TabName {
 const TeamRoles = () => {
   const { t } = useTranslation('settings', { keyPrefix: 'pages.team-roles' });
   const orgQuery = useOrg();
-  const [tab, setTab] = useQueryState<TabName>({ query: 'tab', defaultValue: TabName.members });
+  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault(TabName.members));
   const tabs = [
     { label: t('tabs.members'), value: TabName.members },
     { label: t('tabs.roles'), value: TabName.roles },
