@@ -10,6 +10,7 @@ import {
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
+import getDecryptableDIs from 'src/utils/get-decryptable-dis';
 import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { Event, State, useDecryptMachine } from '../../../../../decrypt-machine';
 import useDecryptFields from './hooks/use-decrypt-fields';
@@ -66,7 +67,8 @@ const useDecryptControls = () => {
     const documentKinds = getAllDecryptableDocuments();
     // The boDis are being deprecated, don't request to decrypt them
     const boDis = [BusinessDI.kycedBeneficialOwners as DataIdentifier, BusinessDI.beneficialOwners];
-    const attrs = entity?.decryptableAttributes?.filter(di => !boDis.includes(di));
+    const decryptableDIs = getDecryptableDIs(entity);
+    const attrs = decryptableDIs.filter(di => !boDis.includes(di));
     submitFields(attrs, documentKinds);
   };
 

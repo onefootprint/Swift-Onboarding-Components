@@ -8,6 +8,7 @@ import EditForm from './components/edit-form';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
+import getDecryptableDIs from 'src/utils/get-decryptable-dis';
 import { useEffectOnce } from 'usehooks-ts';
 import BusinessVaultFieldsets from './components/business-vault-fieldsets';
 import PersonVaultFieldsets from './components/person-vault-fieldsets';
@@ -51,10 +52,11 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
   };
 
   const handleDecryptAll = () => {
+    const dis = getDecryptableDIs(entity);
     decryptControls.decryptManually(
       {
         reason: 'Editing vault data',
-        dis: entity.decryptableAttributes,
+        dis,
         entityId: entity.id,
         vaultData: vaultData?.vault,
       },

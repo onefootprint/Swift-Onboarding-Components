@@ -3,6 +3,7 @@ import { LinkButton, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
+import getDecryptableDIs from 'src/utils/get-decryptable-dis';
 import { useDecryptControls } from '../../../../../vault/components/vault-actions';
 import useAddressFieldsProps from '../../hooks/use-address-fields-props';
 import CardBase from '../card-base';
@@ -41,7 +42,8 @@ const AddressCard = ({ id, type, entity, isSelected, onSelect, isPending }: Addr
     decryptControls.submitFields(dis, []);
   };
 
-  const decryptableSet = new Set(entity.decryptableAttributes);
+  const decryptableDIs = getDecryptableDIs(entity);
+  const decryptableSet = new Set(decryptableDIs);
 
   const encryptedFields = getAddressFieldsProps(type).filter(prop => !prop.isDecrypted);
   const decryptableFields = encryptedFields.filter(

@@ -1,6 +1,7 @@
 import type { Entity } from '@onefootprint/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
+import getDecryptableDIs from 'src/utils/get-decryptable-dis';
 import GoogleMapsLoader from '../../../../../../../../../utils/google-maps-loader';
 import AddressType from '../components/address-card/types';
 import useAddressFieldsProps from './use-address-fields-props';
@@ -55,7 +56,8 @@ const useAddressCoordinates = (entity: Entity, type: AddressType) => {
   };
 
   const addressProps = getAddressFieldsProps(type);
-  const decryptableSet = new Set(entity.decryptableAttributes);
+  const decryptableDIs = getDecryptableDIs(entity);
+  const decryptableSet = new Set(decryptableDIs);
   const encryptedFields = addressProps.filter(prop => !prop.isDecrypted);
   const decryptableFields = encryptedFields.filter(
     field => !field || (decryptableSet.has(field.name) && field.canDecrypt),

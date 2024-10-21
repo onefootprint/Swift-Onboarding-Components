@@ -5,6 +5,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
+import getDecryptableDIs from 'src/utils/get-decryptable-dis';
 
 export type VaultType = {
   vault: EntityVault;
@@ -101,7 +102,8 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
 
   const isAllDecrypted = (data: VaultType | undefined) => {
     if (!entity || !data) return false;
-    return entity.decryptableAttributes.every(di => isVaultDataDecrypted(data.vault[di]));
+    const decryptableDIs = getDecryptableDIs(entity);
+    return decryptableDIs.every(di => isVaultDataDecrypted(data.vault[di]));
   };
 
   const query = useQuery<VaultType>({
