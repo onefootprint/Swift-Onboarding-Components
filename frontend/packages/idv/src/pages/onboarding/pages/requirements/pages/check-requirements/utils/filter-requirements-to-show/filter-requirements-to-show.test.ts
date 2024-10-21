@@ -9,6 +9,7 @@ const collectKycDataRequirement: CollectKycDataRequirement = {
   missingAttributes: [],
   optionalAttributes: [],
   populatedAttributes: [CollectedKycDataOption.name],
+  recollectAttributes: [],
 };
 const authorizeRequirement: AuthorizeRequirement = {
   kind: OnboardingRequirementKind.authorize,

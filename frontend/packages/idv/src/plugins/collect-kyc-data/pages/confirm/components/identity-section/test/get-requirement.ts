@@ -17,6 +17,7 @@ const getRequirement = ({
   missingAttributes,
   populatedAttributes,
   optionalAttributes,
+  recollectAttributes: [],
 });
 
 export default getRequirement;

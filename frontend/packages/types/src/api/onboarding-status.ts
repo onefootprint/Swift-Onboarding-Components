@@ -29,7 +29,8 @@ export type CollectKybDataRequirement = {
   kind: OnboardingRequirementKind.collectKybData;
   isMet: boolean;
   missingAttributes: CollectedKybDataOption[];
-  populatedAttributes?: CollectedKybDataOption[];
+  populatedAttributes: CollectedKybDataOption[];
+  recollectAttributes: CollectedKybDataOption[];
   /** If true, the BOs have been linked via API and shouldn't be collected in Idv. */
   hasLinkedBos: boolean;
 };
@@ -39,6 +40,7 @@ export type CollectKycDataRequirement = {
   isMet: boolean;
   missingAttributes: CollectedKycDataOption[];
   populatedAttributes: CollectedKycDataOption[];
+  recollectAttributes: CollectedKybDataOption[];
   optionalAttributes: CollectedKycDataOption[];
 };
 
@@ -47,7 +49,7 @@ export type CollectInvestorProfileRequirement = {
   isMet: boolean;
   missingAttributes: CollectedInvestorProfileDataOption[];
   missingDocument?: boolean;
-  populatedAttributes?: CollectedInvestorProfileDataOption[];
+  populatedAttributes: CollectedInvestorProfileDataOption[];
 };
 
 export type DocumentRequirement<TConfig = DocumentRequirementConfig> = {

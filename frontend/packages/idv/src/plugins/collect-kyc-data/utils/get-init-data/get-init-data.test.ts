@@ -12,6 +12,7 @@ const getRequirement = (
   isMet: false,
   missingAttributes,
   optionalAttributes,
+  recollectAttributes: [],
   populatedAttributes,
 });
 

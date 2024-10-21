@@ -85,6 +85,7 @@ describe('<CollectKycData />', () => {
         missingAttributes: attributes ?? [],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
       },
       bootstrapUserData: {
         [IdDI.email]: {

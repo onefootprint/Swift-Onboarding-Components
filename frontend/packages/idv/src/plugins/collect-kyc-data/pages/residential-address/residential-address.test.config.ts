@@ -47,6 +47,7 @@ const getInitialContext = ({
     missingAttributes: [CollectedKycDataOption.address],
     populatedAttributes: [],
     optionalAttributes: [],
+    recollectAttributes: [],
   } as CollectKycDataRequirement,
   data: data ?? {},
   initialData: {},

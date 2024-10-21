@@ -1,7 +1,7 @@
 export {
   getBusinessDataFromContext,
-  isMissingAddressData,
-  isMissingBasicData,
-  isMissingBeneficialOwnersData,
-  isMissingRequiredData,
+  shouldShowAddressDataScreen,
+  shouldShowBasicDataScreen,
+  shouldShowBeneficialOwnersScreen,
+  isCollectingBusinessData,
 } from './attributes';

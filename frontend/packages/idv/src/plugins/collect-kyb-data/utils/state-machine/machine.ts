@@ -1,10 +1,10 @@
 import { type StateValue, assign, createMachine } from 'xstate';
 
 import {
-  isMissingAddressData,
-  isMissingBasicData,
-  isMissingBeneficialOwnersData,
-  isMissingRequiredData,
+  isCollectingBusinessData,
+  shouldShowAddressDataScreen,
+  shouldShowBasicDataScreen,
+  shouldShowBeneficialOwnersScreen,
 } from '../attributes';
 import type { MachineContext, MachineEvents } from './types';
 
@@ -16,19 +16,19 @@ type Screen = {
 const ORDERED_SCREENS: Screen[] = [
   {
     screen: 'introduction',
-    missingCheck: isMissingRequiredData,
+    missingCheck: isCollectingBusinessData,
   },
   {
     screen: 'basicData',
-    missingCheck: isMissingBasicData,
+    missingCheck: shouldShowBasicDataScreen,
   },
   {
     screen: 'businessAddress',
-    missingCheck: isMissingAddressData,
+    missingCheck: shouldShowAddressDataScreen,
   },
   {
     screen: 'beneficialOwners',
-    missingCheck: isMissingBeneficialOwnersData,
+    missingCheck: shouldShowBeneficialOwnersScreen,
   },
   {
     screen: 'confirm',

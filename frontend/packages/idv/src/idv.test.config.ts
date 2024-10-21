@@ -67,6 +67,7 @@ const RequirementsFixture: OnboardingRequirement[] = [
     missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
     populatedAttributes: [],
     optionalAttributes: [],
+    recollectAttributes: [],
   },
 ];
 

@@ -69,6 +69,7 @@ const collectKycDataRequirement: OnboardingRequirement = {
   missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
   populatedAttributes: [],
   optionalAttributes: [],
+  recollectAttributes: [],
 };
 
 export const idDocRequirement: OnboardingRequirement = {
@@ -304,6 +305,7 @@ describe('<Idv />', () => {
             missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
             populatedAttributes: [CollectedKycDataOption.name],
             optionalAttributes: [],
+            recollectAttributes: [],
           },
           TestAuthorizeRequirement,
         ]);
@@ -495,6 +497,7 @@ describe('<Idv />', () => {
         populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
         missingAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
       };
       const passkeyRequirement: OnboardingRequirement = {
         kind: OnboardingRequirementKind.registerPasskey,

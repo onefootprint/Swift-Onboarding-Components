@@ -39,6 +39,7 @@ describe('useSyncData', () => {
     missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.address],
     populatedAttributes: [CollectedKycDataOption.name],
     optionalAttributes: [CollectedKycDataOption.ssn4],
+    recollectAttributes: [],
   };
 
   const testInitialData: KycData = {};

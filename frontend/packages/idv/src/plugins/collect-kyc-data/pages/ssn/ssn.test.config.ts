@@ -48,6 +48,7 @@ export const getInitialContext = (data: KycData, ssnKind: 'ssn4' | 'ssn9' | 'us_
       missingAttributes: getMissingAttributes(),
       populatedAttributes: [],
       optionalAttributes: [],
+      recollectAttributes: [],
     } as CollectKycDataRequirement,
     data: data ?? {},
     initialData: {},

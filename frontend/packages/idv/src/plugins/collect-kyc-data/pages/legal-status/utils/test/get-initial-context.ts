@@ -29,6 +29,7 @@ const getInitialContext = ({ device, requirement, data }: GetInitialContextArgs 
       missingAttributes: [],
       populatedAttributes: [],
       optionalAttributes: [],
+      recollectAttributes: [],
     } as CollectKycDataRequirement),
   data: data ?? {},
   initialData: {},

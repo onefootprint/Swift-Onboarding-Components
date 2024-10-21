@@ -31,6 +31,7 @@ const createMachine = (
       missingAttributes,
       populatedAttributes: [],
       optionalAttributes: [],
+      recollectAttributes: [],
     },
     device: {
       type: deviceType ?? 'desktop',
@@ -1139,6 +1140,7 @@ describe('getDataCollectionScreensToShow', () => {
     isMet: false,
     kind: OnboardingRequirementKind.collectKycData,
     populatedAttributes: [],
+    recollectAttributes: [],
   };
 
   it('should return email', () => {

@@ -12,10 +12,10 @@ import {
   extractBoBootstrapValues,
   extractNonBoBootstrapValues,
   getBusinessDataFromContext,
-  isMissingAddressData,
-  isMissingBasicData,
-  isMissingBeneficialOwnersData,
-  isMissingRequiredData,
+  isCollectingBusinessData,
+  shouldShowAddressDataScreen,
+  shouldShowBasicDataScreen,
+  shouldShowBeneficialOwnersScreen,
 } from './attributes';
 
 const idvContext = {
@@ -32,6 +32,7 @@ const idvContext = {
 const getKybRequirement = (
   missing: CollectedKybDataOption[],
   populated: CollectedKybDataOption[] = [],
+  recollect: CollectedKybDataOption[] = [],
 ): CollectKybDataRequirement => {
   return {
     hasLinkedBos: false,
@@ -39,6 +40,7 @@ const getKybRequirement = (
     kind: OnboardingRequirementKind.collectKybData,
     missingAttributes: missing,
     populatedAttributes: populated,
+    recollectAttributes: recollect,
   };
 };
 
@@ -247,7 +249,7 @@ describe('getBusinessDataFromContext', () => {
   });
 });
 
-describe('isMissingRequiredData', () => {
+describe('isCollectingBusinessData', () => {
   it('should return true when some required attributes are missing', () => {
     const ctx = {
       kybRequirement: getKybRequirement([CollectedKybDataOption.name]),
@@ -258,7 +260,7 @@ describe('isMissingRequiredData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingRequiredData(ctx);
+    const result = isCollectingBusinessData(ctx);
     expect(result).toBe(true);
   });
 
@@ -272,7 +274,7 @@ describe('isMissingRequiredData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingRequiredData(ctx);
+    const result = isCollectingBusinessData(ctx);
     expect(result).toBe(false);
   });
 
@@ -307,7 +309,7 @@ describe('isMissingRequiredData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingRequiredData(ctx);
+    const result = isCollectingBusinessData(ctx);
     expect(result).toBe(true);
   });
 });
@@ -329,7 +331,7 @@ describe('isMissingBasicData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingBasicData(ctx);
+    const result = shouldShowBasicDataScreen(ctx);
     expect(result).toBe(true);
   });
 
@@ -351,7 +353,7 @@ describe('isMissingBasicData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingBasicData(ctx);
+    const result = shouldShowBasicDataScreen(ctx);
     expect(result).toBe(false);
   });
 });
@@ -374,7 +376,7 @@ describe('isMissingAddressData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingAddressData(ctx);
+    const result = shouldShowAddressDataScreen(ctx);
     expect(result).toBe(false);
   });
 
@@ -395,7 +397,7 @@ describe('isMissingAddressData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingAddressData(ctx);
+    const result = shouldShowAddressDataScreen(ctx);
     expect(result).toBe(false);
   });
 
@@ -416,7 +418,7 @@ describe('isMissingAddressData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingAddressData(ctx);
+    const result = shouldShowAddressDataScreen(ctx);
     expect(result).toBe(true);
   });
 
@@ -437,7 +439,28 @@ describe('isMissingAddressData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = isMissingAddressData(ctx);
+    const result = shouldShowAddressDataScreen(ctx);
+    expect(result).toBe(true);
+  });
+
+  it('should return true when in recollectAttributes', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.address], [], [CollectedKybDataOption.address]),
+      idvContext: idvContext,
+      bootstrapBusinessData: {},
+      bootstrapUserData: {},
+      data: {
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Apt 1',
+        [BusinessDI.city]: 'New York',
+        [BusinessDI.state]: 'NY',
+        [BusinessDI.zip]: '10001',
+        [BusinessDI.country]: 'US',
+      },
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    const result = shouldShowAddressDataScreen(ctx);
     expect(result).toBe(true);
   });
 });
@@ -461,7 +484,7 @@ describe('isMissingBeneficialOwnersData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
+    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(false);
   });
 
   it('should return true when part of beneficial owners is missing', () => {
@@ -480,7 +503,7 @@ describe('isMissingBeneficialOwnersData', () => {
     } satisfies MachineContext;
 
     // @ts-expect-error: ownership_stake was intentionally omitted
-    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
+    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(true);
   });
 
   it('should return false if kyced beneficial owners is populated', () => {
@@ -510,7 +533,7 @@ describe('isMissingBeneficialOwnersData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
+    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(false);
   });
 
   it('should return true if one of kyced beneficial owners is missing contact info', () => {
@@ -540,7 +563,7 @@ describe('isMissingBeneficialOwnersData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
+    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(true);
   });
 
   it('should return true when part of kyced beneficial owners is missing', () => {
@@ -559,7 +582,7 @@ describe('isMissingBeneficialOwnersData', () => {
     } satisfies MachineContext;
 
     // @ts-expect-error: ownership_stake was intentionally omitted
-    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
+    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(true);
   });
 
   it('should return false if all possible attributes are present', () => {
@@ -583,7 +606,7 @@ describe('isMissingBeneficialOwnersData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
+    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(false);
   });
 });
 

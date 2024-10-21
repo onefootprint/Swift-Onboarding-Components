@@ -22,6 +22,7 @@ const kycRequirement: CollectKycDataRequirement = {
   missingAttributes: [CollectedKycDataOption.name],
   populatedAttributes: [],
   optionalAttributes: [],
+  recollectAttributes: [],
 };
 
 const authorizeRequirement: AuthorizeRequirement = {

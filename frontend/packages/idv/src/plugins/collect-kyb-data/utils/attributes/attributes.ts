@@ -109,23 +109,23 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
   return omit(initialData, [BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake]);
 };
 
-const isMissingDataFromCollection = (ctx: MachineContext, cdos?: CollectedKybDataOption[]): boolean => {
+const shouldRecollect = (ctx: MachineContext, cdos: CollectedKybDataOption[]) => {
+  return ctx.kybRequirement.recollectAttributes.some(cdo => cdos.includes(cdo));
+};
+
+/** Given a list of CDOs, returns whether we are missing any underlying data for the CDOs. */
+const isMissingAnyData = (ctx: MachineContext, cdos: CollectedKybDataOption[]): boolean => {
   const data = getBusinessDataFromContext(ctx);
-  if (!Array.isArray(cdos)) return false;
-  return cdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]).some(di => !data[di]);
+  const missingCdos = ctx.kybRequirement.missingAttributes.filter(cdo => cdos.includes(cdo));
+  return missingCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]).some(di => !data[di]);
 };
 
-export const isMissingRequiredData = (ctx: MachineContext): boolean => {
-  return !ctx.kybRequirement ? false : isMissingDataFromCollection(ctx, ctx.kybRequirement.missingAttributes);
+export const isCollectingBusinessData = (ctx: MachineContext): boolean => {
+  const allAttributes = [...ctx.kybRequirement.populatedAttributes, ...ctx.kybRequirement.missingAttributes];
+  return isMissingAnyData(ctx, allAttributes) || shouldRecollect(ctx, allAttributes);
 };
 
-/**
- * Determines the intersection of the provided CDOs and the missing attributes from the KYB requirement.
- */
-const missingAttributes = (ctx: MachineContext, cdos: CollectedKybDataOption[]) =>
-  ctx.kybRequirement.missingAttributes.filter(cdo => cdos.includes(cdo));
-
-export const isMissingBasicData = (ctx: MachineContext): boolean => {
+export const shouldShowBasicDataScreen = (ctx: MachineContext): boolean => {
   const basicCdos = [
     CollectedKybDataOption.name,
     CollectedKybDataOption.tin,
@@ -133,34 +133,30 @@ export const isMissingBasicData = (ctx: MachineContext): boolean => {
     CollectedKybDataOption.phoneNumber,
     CollectedKybDataOption.website,
   ];
-  if (!ctx.kybRequirement) return false;
-  const missingCdos = missingAttributes(ctx, basicCdos);
-  return isMissingDataFromCollection(ctx, missingCdos);
+  return isMissingAnyData(ctx, basicCdos) || shouldRecollect(ctx, basicCdos);
 };
 
-export const isMissingAddressData = (ctx: MachineContext): boolean => {
-  if (!ctx.kybRequirement) return false;
-  const missingCdos = missingAttributes(ctx, [CollectedKybDataOption.address]);
-  return isMissingDataFromCollection(ctx, missingCdos);
+export const shouldShowAddressDataScreen = (ctx: MachineContext): boolean => {
+  const addressCdos = [CollectedKybDataOption.address];
+  return isMissingAnyData(ctx, addressCdos) || shouldRecollect(ctx, addressCdos);
 };
 
 const isMissingBoProp = (bo: BeneficialOwner) => !bo.first_name || !bo.last_name || !bo.ownership_stake;
 const isMissingBoPropWithContact = (bo: BeneficialOwner) => isMissingBoProp(bo) || !bo.phone_number || !bo.email;
 
-export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
-  if (!ctx.kybRequirement) return false;
+export const shouldShowBeneficialOwnersScreen = (ctx: MachineContext): boolean => {
   if (ctx.kybRequirement.hasLinkedBos) return false;
   const data = getBusinessDataFromContext(ctx);
   const boCdos = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
-  const missingCdos = missingAttributes(ctx, boCdos);
 
-  const requiredDis = missingCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]);
+  const missingBoCdos = ctx.kybRequirement.missingAttributes.filter(cdo => boCdos.includes(cdo));
+  const requiredDis = missingBoCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]);
 
   const isAnyPropMissing = requiredDis.includes(BusinessDI.kycedBeneficialOwners)
     ? isMissingBoPropWithContact
     : isMissingBoProp;
 
-  return requiredDis.some(di => {
+  const isMissingBos = requiredDis.some(di => {
     const collectedData = data[di];
     return (
       !collectedData ||
@@ -169,4 +165,6 @@ export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
       collectedData.some(isAnyPropMissing)
     );
   });
+
+  return isMissingBos || shouldRecollect(ctx, boCdos);
 };

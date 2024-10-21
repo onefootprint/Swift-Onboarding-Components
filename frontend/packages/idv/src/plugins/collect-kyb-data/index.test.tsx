@@ -85,6 +85,8 @@ describe.skip('<CollectKybData />', () => {
         isMet: false,
         missingAttributes: kybAttributes,
         hasLinkedBos: false,
+        populatedAttributes: [],
+        recollectAttributes: [],
       },
       kycRequirement: {
         kind: OnboardingRequirementKind.collectKycData,
@@ -92,6 +94,7 @@ describe.skip('<CollectKybData />', () => {
         missingAttributes: kycAttributes,
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
       },
       bootstrapBusinessData: {},
       bootstrapUserData: {

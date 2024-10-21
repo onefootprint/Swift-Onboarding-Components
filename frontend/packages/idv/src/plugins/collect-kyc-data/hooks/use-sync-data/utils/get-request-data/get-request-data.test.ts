@@ -24,6 +24,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.name],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -63,6 +64,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.address],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -97,6 +99,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.name],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -140,6 +143,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -166,6 +170,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -189,6 +194,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -243,6 +249,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.address, CollectedKycDataOption.name],
         populatedAttributes: [],
         optionalAttributes: [CollectedKycDataOption.ssn4],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -281,6 +288,7 @@ describe('getRequestData', () => {
         missingAttributes: [CollectedKycDataOption.name],
         populatedAttributes: [],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: false,
       },
     );
@@ -318,6 +326,7 @@ describe('getRequestData', () => {
           missingAttributes: [CollectedKycDataOption.address, CollectedKycDataOption.name],
           populatedAttributes: [],
           optionalAttributes: [CollectedKycDataOption.ssn4],
+          recollectAttributes: [],
           isMet: false,
         },
       ),
@@ -341,6 +350,7 @@ describe('getRequestData', () => {
           missingAttributes: [CollectedKycDataOption.name],
           populatedAttributes: [],
           optionalAttributes: [],
+          recollectAttributes: [],
           isMet: false,
         },
       ),
@@ -375,6 +385,7 @@ describe('getRequestData', () => {
           missingAttributes: [CollectedKycDataOption.address],
           populatedAttributes: [],
           optionalAttributes: [],
+          recollectAttributes: [],
           isMet: false,
         },
       ),
@@ -407,6 +418,7 @@ describe('getRequestData', () => {
           missingAttributes: [CollectedKycDataOption.address],
           populatedAttributes: [],
           optionalAttributes: [],
+          recollectAttributes: [],
           isMet: false,
         },
       ),
@@ -439,6 +451,7 @@ describe('getRequestData', () => {
           missingAttributes: [CollectedKycDataOption.address],
           populatedAttributes: [],
           optionalAttributes: [],
+          recollectAttributes: [],
           isMet: false,
         },
       ),
@@ -467,6 +480,7 @@ describe('getRequestData', () => {
         missingAttributes: [],
         populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: true,
       },
     );
@@ -496,6 +510,7 @@ describe('getRequestData', () => {
         missingAttributes: [],
         populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: true,
       },
     );
@@ -526,6 +541,7 @@ describe('getRequestData', () => {
         missingAttributes: [],
         populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
         optionalAttributes: [],
+        recollectAttributes: [],
         isMet: true,
       },
     );

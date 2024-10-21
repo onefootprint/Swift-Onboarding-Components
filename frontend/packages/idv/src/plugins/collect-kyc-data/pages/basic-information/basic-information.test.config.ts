@@ -37,6 +37,7 @@ export const getInitialContext = (data: KycData): InitMachineArgs => ({
     missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob],
     populatedAttributes: [],
     optionalAttributes: [],
+    recollectAttributes: [],
   } as CollectKycDataRequirement,
   data: data ?? {},
   initialData: {},
