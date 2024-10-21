@@ -25,7 +25,7 @@ const BookADemo = () => {
       overflow="hidden"
     >
       <Stack paddingRight={9} direction="column" gap={7}>
-        <Stack gap={5} direction="column" paddingRight={9}>
+        <Stack gap={5} direction="column">
           <Stack direction="row" gap={2} alignItems="center">
             <IcoSparkles24 />
             <Text variant="label-2">{t('title')}</Text>
