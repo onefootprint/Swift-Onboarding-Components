@@ -11,6 +11,7 @@ use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::BoId;
 use newtypes::BusinessWorkflowLinkId;
+use newtypes::BusinessWorkflowLinkSource;
 use newtypes::DbActor;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
@@ -24,6 +25,7 @@ pub struct BusinessWorkflowLink {
     pub business_owner_id: BoId,
     pub business_workflow_id: WorkflowId,
     pub user_workflow_id: WorkflowId,
+    pub source: BusinessWorkflowLinkSource,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -32,6 +34,7 @@ pub struct NewBusinessWorkflowLinkRow<'a> {
     pub business_owner_id: &'a BoId,
     pub business_workflow_id: &'a WorkflowId,
     pub user_workflow_id: &'a WorkflowId,
+    pub source: BusinessWorkflowLinkSource,
 }
 
 impl BusinessWorkflowLink {

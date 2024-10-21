@@ -176,6 +176,7 @@ diesel::table! {
         business_owner_id -> Text,
         business_workflow_id -> Text,
         user_workflow_id -> Text,
+        source -> Text,
     }
 }
 

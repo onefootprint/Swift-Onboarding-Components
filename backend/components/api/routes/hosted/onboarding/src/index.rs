@@ -30,6 +30,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
+use newtypes::BusinessWorkflowLinkSource;
 use newtypes::ObConfigurationKind;
 use newtypes::VerificationCheckKind;
 use newtypes::WorkflowRequestConfig;
@@ -141,6 +142,7 @@ pub async fn post(
                         business_owner_id: &bo.id,
                         business_workflow_id: &biz_wf.id,
                         user_workflow_id: &wf_id,
+                        source: BusinessWorkflowLinkSource::Hosted,
                     };
                     BusinessWorkflowLink::create(conn, new)?;
                 }
