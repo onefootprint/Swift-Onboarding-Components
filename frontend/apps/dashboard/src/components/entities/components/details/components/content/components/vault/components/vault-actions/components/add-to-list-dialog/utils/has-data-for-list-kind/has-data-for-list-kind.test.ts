@@ -1,15 +1,20 @@
-import type { Entity } from '@onefootprint/types';
-import { BusinessDI, IdDI, ListKind } from '@onefootprint/types';
+import type { Attribute, Entity } from '@onefootprint/types';
+import { BusinessDI, DataKind, EntityKind, IdDI, ListKind } from '@onefootprint/types';
 
 import hasDataForListKind from './has-data-for-list-kind';
 
 describe('hasDataForListKind', () => {
+  const defaultAttribute: Omit<Attribute, 'identifier'> = {
+    source: 'test',
+    dataKind: DataKind.vaultData,
+    value: 'test-value',
+    transforms: {},
+    isDecryptable: true,
+  };
+
   it('should return true for email address', () => {
     const entity = {
-      decryptedAttributes: {
-        [IdDI.email]: 'piip@onefootprint.com',
-      },
-      decryptableAttributes: [IdDI.email],
+      data: [{ ...defaultAttribute, identifier: IdDI.email, value: 'testemail@gmail.com' }],
       workflows: [],
     } as unknown as Entity;
 
@@ -23,10 +28,8 @@ describe('hasDataForListKind', () => {
 
   it('should return true for phone number', () => {
     const userEntity = {
-      decryptedAttributes: {
-        [IdDI.phoneNumber]: '+16504444440',
-      },
-      decryptableAttributes: [IdDI.phoneNumber],
+      kind: EntityKind.person,
+      data: [{ ...defaultAttribute, identifier: IdDI.phoneNumber, isDecryptable: true }],
       workflows: [],
     } as unknown as Entity;
 
@@ -38,9 +41,7 @@ describe('hasDataForListKind', () => {
     expect(hasDataForListKind(ListKind.ipAddress, userEntity)).toBe(false);
 
     const businessEntity = {
-      decryptedAttributes: {
-        [BusinessDI.phoneNumber]: '+16504444440',
-      },
+      data: [{ ...defaultAttribute, identifier: BusinessDI.phoneNumber }],
       decryptableAttributes: [BusinessDI.phoneNumber],
       workflows: [],
     } as unknown as Entity;
@@ -55,10 +56,7 @@ describe('hasDataForListKind', () => {
 
   it('should return true for ssn9', () => {
     const entity = {
-      decryptedAttributes: {
-        [IdDI.ssn9]: '123456789',
-      },
-      decryptableAttributes: [IdDI.ssn9],
+      data: [{ ...defaultAttribute, identifier: IdDI.ssn9, isDecryptable: true }],
       workflows: [],
     } as unknown as Entity;
 
@@ -72,8 +70,7 @@ describe('hasDataForListKind', () => {
 
   it('should return true for ip address', () => {
     const entity = {
-      decryptedAttributes: {},
-      decryptableAttributes: [],
+      data: [],
       workflows: [
         {
           insightEvent: [

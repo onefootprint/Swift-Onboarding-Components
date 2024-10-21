@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 
+import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { useDecryptControls } from '../components/vault-actions';
 
 const useField = (entity: Entity) => {
@@ -15,7 +16,7 @@ const useField = (entity: Entity) => {
 
   const showCheckbox = decryptControls.inProgress;
 
-  const canDecryptField = (di: DataIdentifier) => entity.decryptableAttributes.includes(di);
+  const canDecryptField = (di: DataIdentifier) => isDiDecryptable(entity, di);
 
   const canSelect = (di: DataIdentifier) => {
     const value = entityVaultWithTransforms.data?.vault[di];

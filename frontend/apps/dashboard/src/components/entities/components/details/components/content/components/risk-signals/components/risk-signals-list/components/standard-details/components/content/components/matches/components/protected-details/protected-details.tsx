@@ -3,6 +3,7 @@ import { IcoShield40 } from '@onefootprint/icons';
 import { type Entity, IdDI } from '@onefootprint/types';
 import { Box, Button, LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import isDiDecryptable from 'src/utils/is-di-decryptable';
 import styled, { css } from 'styled-components';
 
 type ProtectedDetailsProps = {
@@ -11,15 +12,13 @@ type ProtectedDetailsProps = {
   isPending: boolean;
 };
 
-const REQUIRED_DECRYPTABLE_ATTRS = [IdDI.firstName, IdDI.middleName, IdDI.lastName, IdDI.dob];
+const REQUIRED_DECRYPTABLE_ATTRS = [IdDI.firstName, IdDI.lastName, IdDI.dob];
 
 const ProtectedDetails = ({ entity, onClick, isPending }: ProtectedDetailsProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'risk-signals.details.matches.protected-details',
   });
-  const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(
-    di => !entity.attributes.includes(di) || entity.decryptableAttributes.includes(di),
-  );
+  const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(di => isDiDecryptable(entity, di));
 
   return (
     <ProtectedSection>

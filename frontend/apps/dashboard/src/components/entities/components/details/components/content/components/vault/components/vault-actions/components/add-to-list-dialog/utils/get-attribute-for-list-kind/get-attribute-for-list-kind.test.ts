@@ -1,69 +1,83 @@
-import type { Entity } from '@onefootprint/types';
-import { BusinessDI, EntityKind, IdDI, ListKind } from '@onefootprint/types';
+import type { Attribute, Entity } from '@onefootprint/types';
+import { BusinessDI, DataKind, EntityKind, IdDI, ListKind } from '@onefootprint/types';
 
-import getEntityDataForListKind from './get-attribute-for-list-kind';
+import getAttributeForListKind from './get-attribute-for-list-kind';
 
-describe('getEntityDataForListKind', () => {
+describe('getAttributeForListKind', () => {
+  const defaultAttribute: Omit<Attribute, 'identifier'> = {
+    source: 'test',
+    dataKind: DataKind.vaultData,
+    value: 'test-value',
+    transforms: {},
+    isDecryptable: true,
+  };
+
   it('should return email address', () => {
     const entity = {
       kind: EntityKind.person,
-      decryptableAttributes: [IdDI.email, IdDI.phoneNumber],
+      data: [
+        { ...defaultAttribute, identifier: IdDI.email },
+        { ...defaultAttribute, identifier: IdDI.phoneNumber },
+      ],
     } as Entity;
-    expect(getEntityDataForListKind(ListKind.emailAddress, entity)).toEqual(IdDI.email);
-    expect(getEntityDataForListKind(ListKind.emailDomain, entity)).toEqual(IdDI.email);
-    expect(getEntityDataForListKind(ListKind.phoneCountryCode, entity)).toEqual(IdDI.phoneNumber);
-    expect(getEntityDataForListKind(ListKind.phoneNumber, entity)).toEqual(IdDI.phoneNumber);
-    expect(getEntityDataForListKind(ListKind.ssn9, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.ipAddress, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailAddress, entity)).toEqual(IdDI.email);
+    expect(getAttributeForListKind(ListKind.emailDomain, entity)).toEqual(IdDI.email);
+    expect(getAttributeForListKind(ListKind.phoneCountryCode, entity)).toEqual(IdDI.phoneNumber);
+    expect(getAttributeForListKind(ListKind.phoneNumber, entity)).toEqual(IdDI.phoneNumber);
+    expect(getAttributeForListKind(ListKind.ssn9, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.ipAddress, entity)).toEqual(undefined);
   });
 
   it('should return phone number', () => {
     const businessEntity = {
       kind: EntityKind.business,
-      decryptableAttributes: [BusinessDI.phoneNumber],
+      data: [{ ...defaultAttribute, identifier: BusinessDI.phoneNumber }],
     } as Entity;
-    expect(getEntityDataForListKind(ListKind.emailAddress, businessEntity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.emailDomain, businessEntity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.phoneNumber, businessEntity)).toEqual(BusinessDI.phoneNumber);
-    expect(getEntityDataForListKind(ListKind.phoneCountryCode, businessEntity)).toEqual(BusinessDI.phoneNumber);
-    expect(getEntityDataForListKind(ListKind.ssn9, businessEntity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.ipAddress, businessEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailAddress, businessEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailDomain, businessEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.phoneNumber, businessEntity)).toEqual(BusinessDI.phoneNumber);
+    expect(getAttributeForListKind(ListKind.phoneCountryCode, businessEntity)).toEqual(BusinessDI.phoneNumber);
+    expect(getAttributeForListKind(ListKind.ssn9, businessEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.ipAddress, businessEntity)).toEqual(undefined);
 
     const userEntity = {
       kind: EntityKind.person,
-      decryptableAttributes: [IdDI.phoneNumber, IdDI.ssn9],
+      data: [
+        { ...defaultAttribute, identifier: IdDI.phoneNumber },
+        { ...defaultAttribute, identifier: IdDI.ssn9 },
+      ],
     } as Entity;
-    expect(getEntityDataForListKind(ListKind.emailAddress, userEntity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.emailDomain, userEntity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.phoneNumber, userEntity)).toEqual(IdDI.phoneNumber);
-    expect(getEntityDataForListKind(ListKind.phoneCountryCode, userEntity)).toEqual(IdDI.phoneNumber);
-    expect(getEntityDataForListKind(ListKind.ssn9, userEntity)).toEqual(IdDI.ssn9);
-    expect(getEntityDataForListKind(ListKind.ipAddress, userEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailAddress, userEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailDomain, userEntity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.phoneNumber, userEntity)).toEqual(IdDI.phoneNumber);
+    expect(getAttributeForListKind(ListKind.phoneCountryCode, userEntity)).toEqual(IdDI.phoneNumber);
+    expect(getAttributeForListKind(ListKind.ssn9, userEntity)).toEqual(IdDI.ssn9);
+    expect(getAttributeForListKind(ListKind.ipAddress, userEntity)).toEqual(undefined);
   });
 
   it('should return ssn9', () => {
     const entity = {
       kind: EntityKind.person,
-      decryptableAttributes: [IdDI.ssn9],
+      data: [{ ...defaultAttribute, identifier: IdDI.ssn9 }],
     } as Entity;
-    expect(getEntityDataForListKind(ListKind.emailAddress, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.emailDomain, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.phoneNumber, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.phoneCountryCode, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.ssn9, entity)).toEqual(IdDI.ssn9);
-    expect(getEntityDataForListKind(ListKind.ipAddress, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailAddress, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailDomain, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.phoneNumber, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.phoneCountryCode, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.ssn9, entity)).toEqual(IdDI.ssn9);
+    expect(getAttributeForListKind(ListKind.ipAddress, entity)).toEqual(undefined);
   });
 
-  it('should return ip addresses', () => {
+  it('should return undefined for ip addresses', () => {
     const entity = {
       kind: EntityKind.person,
-      decryptableAttributes: [IdDI.ssn9],
+      data: [{ ...defaultAttribute, identifier: IdDI.ssn9 }],
     } as Entity;
-    expect(getEntityDataForListKind(ListKind.emailAddress, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.emailDomain, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.phoneNumber, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.phoneCountryCode, entity)).toEqual(undefined);
-    expect(getEntityDataForListKind(ListKind.ssn9, entity)).toEqual(IdDI.ssn9);
-    expect(getEntityDataForListKind(ListKind.ipAddress, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailAddress, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.emailDomain, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.phoneNumber, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.phoneCountryCode, entity)).toEqual(undefined);
+    expect(getAttributeForListKind(ListKind.ssn9, entity)).toEqual(IdDI.ssn9);
+    expect(getAttributeForListKind(ListKind.ipAddress, entity)).toEqual(undefined);
   });
 });

@@ -10,6 +10,7 @@ import {
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
+import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { Event, State, useDecryptMachine } from '../../../../../decrypt-machine';
 import useDecryptFields from './hooks/use-decrypt-fields';
 
@@ -53,7 +54,7 @@ const useDecryptControls = () => {
 
   const getAllDecryptableDocuments = () => {
     const decryptableDocumentKinds = (documents || [])
-      .filter(d => d.uploads.map(u => u.identifier).every(di => entity?.decryptableAttributes.includes(di)))
+      .filter(d => d.uploads.map(u => u.identifier).every(di => isDiDecryptable(entity, di)))
       // Custom documents are currently handled in another section and are just decrypted by DI
       .filter(d => d.kind !== SupportedIdDocTypes.custom)
       .map(d => d.kind);

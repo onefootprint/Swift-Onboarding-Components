@@ -1,6 +1,7 @@
 import type { Entity } from '@onefootprint/types';
 import { BusinessDI, IdDI } from '@onefootprint/types';
 
+import isDiDecryptable from 'src/utils/is-di-decryptable';
 import useField from '../../../../vault/hooks/use-field';
 import AddressType from '../components/address-card/types';
 
@@ -20,7 +21,7 @@ const useAddressFieldsProps = (entity: Entity) => {
   const getProps = useField(entity);
 
   const getAddressDis = (type: AddressType) => {
-    const dis = attributesByType[type].filter(di => entity.decryptableAttributes.includes(di));
+    const dis = attributesByType[type].filter(di => isDiDecryptable(entity, di));
     const disSet = new Set(dis);
     const filteredAttributes = entity.data
       .filter(attr => disSet.has(attr.identifier as IdDI | BusinessDI))

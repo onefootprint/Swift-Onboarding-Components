@@ -1,25 +1,25 @@
 import type { Entity, InsightEvent } from '@onefootprint/types';
 import { BusinessDI, IdDI, ListKind } from '@onefootprint/types';
+import isDiDecryptable from 'src/utils/is-di-decryptable';
 
 const hasDataForListKind = (listKind?: ListKind, entity?: Entity) => {
   if (!entity || !listKind) {
     return false;
   }
-  const { decryptableAttributes } = entity;
 
   switch (listKind) {
     case ListKind.emailDomain:
     case ListKind.emailAddress: {
-      return decryptableAttributes.includes(IdDI.email);
+      return isDiDecryptable(entity, IdDI.email);
     }
 
     case ListKind.phoneCountryCode:
     case ListKind.phoneNumber: {
-      return decryptableAttributes.includes(IdDI.phoneNumber) || decryptableAttributes.includes(BusinessDI.phoneNumber);
+      return isDiDecryptable(entity, IdDI.phoneNumber) || isDiDecryptable(entity, BusinessDI.phoneNumber);
     }
 
     case ListKind.ssn9: {
-      return decryptableAttributes.includes(IdDI.ssn9);
+      return isDiDecryptable(entity, IdDI.ssn9);
     }
 
     case ListKind.ipAddress: {

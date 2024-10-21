@@ -16,44 +16,42 @@ const attributesFixture = [
   IdDI.zip,
 ];
 
+const defaultAttribute = {
+  isDecryptable: true,
+  source: 'hosted',
+  transforms: {},
+  dataKind: DataKind.vaultData,
+  value: null,
+};
+
 export const entityFixture: Entity = {
   id: entityIdFixture,
   isIdentifiable: true,
   kind: EntityKind.person,
   requiresManualReview: false,
   status: EntityStatus.pass,
-  attributes: attributesFixture,
+  attributes: [],
   data: attributesFixture.map(di => {
     if (di === IdDI.lastName) {
       return {
+        ...defaultAttribute,
         identifier: IdDI.lastName,
-        isDecryptable: true,
-        source: 'hosted',
         transforms: { prefix_1: 'S' },
-        dataKind: DataKind.vaultData,
-        value: null,
       };
     }
     if (di === IdDI.firstName) {
       return {
+        ...defaultAttribute,
         identifier: IdDI.firstName,
-        isDecryptable: true,
-        source: 'hosted',
-        transforms: {},
-        dataKind: DataKind.vaultData,
         value: 'John',
       };
     }
     return {
+      ...defaultAttribute,
       identifier: di,
-      isDecryptable: true,
-      source: 'hosted',
-      transforms: {},
-      dataKind: DataKind.vaultData,
-      value: null,
     };
   }),
-  decryptableAttributes: attributesFixture,
+  decryptableAttributes: [],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   lastActivityAt: '2023-10-08T22:43:11.928846Z',
   workflows: [

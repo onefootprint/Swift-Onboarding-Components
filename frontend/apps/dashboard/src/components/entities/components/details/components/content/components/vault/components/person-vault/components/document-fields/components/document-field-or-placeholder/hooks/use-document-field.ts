@@ -4,6 +4,7 @@ import useEntityVault from '@/entities/hooks/use-entity-vault';
 import useCurrentEntityDocuments from '@/entity/hooks/use-current-entity-documents';
 
 import { useTranslation } from 'react-i18next';
+import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { useDecryptControls } from '../../../../../../vault-actions';
 import { filterDocumentsByKind } from '../../../utils';
 
@@ -27,7 +28,7 @@ export const useDocumentField = (entity: Entity) => {
     return (documents || [])
       .filter(d => d.kind === docType)
       .flatMap(d => d.uploads)
-      .every(u => entity.decryptableAttributes.includes(u.identifier));
+      .every(u => isDiDecryptable(entity, u.identifier));
   };
 
   const getProps = (docType: SupportedIdDocTypes) => {
