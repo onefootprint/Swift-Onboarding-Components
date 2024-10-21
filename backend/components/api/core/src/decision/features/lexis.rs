@@ -6,6 +6,7 @@ use newtypes::FootprintReasonCode as FRC;
 use newtypes::LexisNAP;
 use newtypes::LexisNAS;
 use newtypes::NameAddress;
+use newtypes::NameAddressSsnSummary;
 use newtypes::RiskIndicatorCode;
 use serde::Serialize;
 use std::convert::Into;
@@ -24,6 +25,7 @@ const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 20;
 
 pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoForFRC) -> Vec<FRC> {
     let risk_indicator_codes = res.risk_indicator_codes();
+    let nas = res.name_address_ssn_summary();
     let match_logic = MatchLogicRiskIndicatorsOnly {};
     let match_frcs = IdentityAttributeMatch::new(match_logic, &res, user_info);
 
@@ -43,8 +45,15 @@ pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoF
             ssn_found_for_lex_id: _,
         } = ves;
 
-        if user_info.ssn && ssn_valid.map(|s| !s).unwrap_or(false) {
-            codes.push(FRC::SsnInputIsInvalid);
+        if user_info.ssn {
+            let ssn_valid = ssn_valid.unwrap_or(true);
+            let nas_nothing_found = matches!(nas, NameAddressSsnSummary::NothingFound);
+            match (ssn_valid, nas_nothing_found) {
+                // Lexis apparently defaults ssn_valid to false if NAS = 0
+                (_, true) => codes.push(FRC::SsnNotOnFile),
+                (false, _) => codes.push(FRC::SsnInputIsInvalid),
+                _ => (),
+            }
         }
         if ssn_deceased.unwrap_or(false) {
             codes.push(FRC::SubjectDeceased);
@@ -547,13 +556,13 @@ mod tests {
             SsnDoesNotMatch,
             PhoneLocatedDoesNotMatch,
             DobCouldNotMatch,
-            SsnInputIsInvalid,
             DriversLicenseNumberIsValid,
             IdFlagged,
             DobNotOnFile,
             PhoneNumberInputInvalid,
             PhoneLocatedAddressDoesNotMatch,
-            EmailNotFoundOnFile
+            EmailNotFoundOnFile,
+            SsnNotOnFile
         ])
     ]
     #[test_case(
