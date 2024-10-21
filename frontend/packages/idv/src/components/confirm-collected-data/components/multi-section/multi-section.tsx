@@ -1,7 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
-import { Divider, LinkButton, Text } from '@onefootprint/ui';
+import { Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import type { SectionProps } from '../section';
 import Section from '../section';
@@ -16,17 +15,28 @@ type MultiSectionProps = {
 };
 
 const MultiSection = ({ title, editLabel, onEdit, sections, IconComponent, testID }: MultiSectionProps) => (
-  <Container data-testid={testID}>
-    <Header>
-      <TitleContainer>
+  <Stack
+    data-testid={testID}
+    width="100%"
+    borderColor="tertiary"
+    flexDirection="column"
+    justifyContent="center"
+    alignItems="center"
+    padding={6}
+    borderRadius="default"
+    borderStyle="solid"
+    borderWidth={1}
+  >
+    <Stack width="100%" justifyContent="space-between" alignItems="center" marginBottom={7}>
+      <Stack flexDirection="row" justifyContent="center" alignItems="center">
         <IconComponent />
         <Text marginLeft={2} variant="label-2">
           {title}
         </Text>
-      </TitleContainer>
+      </Stack>
       {editLabel ? <LinkButton onClick={onEdit}>{editLabel}</LinkButton> : null}
-    </Header>
-    <Sections>
+    </Stack>
+    <Stack width="100%" flexDirection="column" justifyContent="center" alignItems="center" gap={7}>
       {sections.map((section: SectionProps, index: number) => (
         <React.Fragment key={section.title}>
           <Section
@@ -39,49 +49,8 @@ const MultiSection = ({ title, editLabel, onEdit, sections, IconComponent, testI
           {index !== sections.length - 1 && <Divider />}
         </React.Fragment>
       ))}
-    </Sections>
-  </Container>
+    </Stack>
+  </Stack>
 );
-
-const Sections = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    gap: ${theme.spacing[7]};
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  `}
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    padding: ${theme.spacing[6]};
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  `}
-`;
-
-const Header = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: ${theme.spacing[7]};
-  `}
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-`;
 
 export default MultiSection;
