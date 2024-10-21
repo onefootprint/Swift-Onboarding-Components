@@ -10,6 +10,7 @@ use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
 use crate::FpResult;
 use crate::State;
+use api_errors::ValidationError;
 use chrono::Utc;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::business_owner::BusinessOwner;
@@ -212,9 +213,10 @@ impl<Type> WriteableVw<Type> {
             .iter()
             .any(|di| matches!(di, DI::Business(BDK::BeneficialOwnerData(_, _))))
         {
-            tracing::error!(
-                "Cannot set business.kyced_beneficial_owners when modern BOs have already been set"
-            );
+            return ValidationError(
+                "Cannot set business.kyced_beneficial_owners when modern BOs have already been set",
+            )
+            .into();
         }
 
         // For now, duplicated so we can run these checks before this
