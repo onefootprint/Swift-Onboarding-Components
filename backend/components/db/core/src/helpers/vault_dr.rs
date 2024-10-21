@@ -102,6 +102,7 @@ pub fn get_scoped_vault_version_batch(
         .filter(scoped_vault_version::backed_up_by_vdr_config_id.is_null())
         .into_boxed();
     let mut batch_vdr_config_is_deactivated = base_batch_query
+        .filter(scoped_vault_version::backed_up_by_vdr_config_id.is_not_null())
         .filter(scoped_vault_version::backed_up_by_vdr_config_id.eq_any(deactivated_vdr_config_ids))
         .into_boxed();
 
@@ -156,6 +157,8 @@ pub fn get_dl_batch_for_svv_batch(
 
     let svv_ids = svv_batch.iter().map(|svv| &svv.id).collect_vec();
 
+    tracing::info!(?svv_ids, "get_dl_batch_for_svv_batch");
+
     // Select DLs created at or before the svv_batch seqnos. Normally, it's only necessary to
     // select DLs equal to a svv_batch seqno, but some backfills may create DLs retroactively at an
     // earlier scoped vault version. We need to back up these retroactively added DLs as well for
@@ -193,7 +196,9 @@ pub fn get_dl_batch_for_svv_batch(
     Ok(dls)
 }
 
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all, fields(
+    config_id = %config_id,
+))]
 pub fn get_complete_svvs_for_svv_batch(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
@@ -203,6 +208,8 @@ pub fn get_complete_svvs_for_svv_batch(
     // backend/formal_methods/vault_disaster_recovery/vdr.tla
 
     let svv_ids = svv_batch.iter().map(|svv| &svv.id).collect_vec();
+
+    tracing::info!(?svv_ids, "get_complete_svvs_for_svv_batch");
 
     // Get SVVs from svv_batch that are not complete (have associated DLs that do not have blobs).
     // Then, filter those out. The query planner does better with this format than when expressed
@@ -241,7 +248,9 @@ pub struct VdrBlobKey(String);
 
 /// Returns a map from the given SVV IDs to the DIs and corresponding blob keys for the DLs active
 /// at each SVV. If no DLs are active at an SVV for the vault, the map values will be empty.
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all, fields(
+    config_id = %config_id,
+))]
 pub fn bulk_get_vdr_blob_keys_active_at(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
