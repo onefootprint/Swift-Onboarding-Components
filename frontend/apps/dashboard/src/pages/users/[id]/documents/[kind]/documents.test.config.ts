@@ -141,7 +141,6 @@ export const entityFixture: Entity = {
   lastActivityAt: '2024-04-29T18:39:42.669015Z',
   label: null,
   attributes: [],
-  decryptedAttributes: {},
 };
 
 export const documentsFixture: Document[] = [

@@ -14,7 +14,6 @@ export const entitiesFixture: Entity[] = [
     attributes: [],
     startTimestamp: '2023-03-29T23:07:44.435194Z',
     lastActivityAt: '2023-03-27T14:43:47.444716Z',
-    decryptedAttributes: {},
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
     label: null,

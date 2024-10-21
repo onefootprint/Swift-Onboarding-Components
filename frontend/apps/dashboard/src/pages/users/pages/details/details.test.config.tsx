@@ -89,7 +89,6 @@ export const entityFixture: Entity = {
       },
     },
   ],
-  decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   label: null,

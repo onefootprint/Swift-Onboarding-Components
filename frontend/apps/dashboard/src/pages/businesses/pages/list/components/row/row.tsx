@@ -11,7 +11,7 @@ const Row = ({ entity }: RowProps) => {
   return (
     <>
       <td aria-label="field or placeholder">
-        <FieldOrPlaceholder data={entity.decryptedAttributes[BusinessDI.name]} />
+        <FieldOrPlaceholder data={entity.data.find(item => item.identifier === BusinessDI.name)?.value} />
       </td>
       <td>
         <CodeInline isPrivate truncate>

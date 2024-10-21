@@ -32,7 +32,6 @@ export const entityPassedFixture: Entity = {
   ],
   requiresManualReview: false,
   status: EntityStatus.pass,
-  decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   label: null,

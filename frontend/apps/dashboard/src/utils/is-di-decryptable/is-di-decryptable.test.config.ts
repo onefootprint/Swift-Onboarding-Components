@@ -44,9 +44,6 @@ export const entityFixture: Entity = {
   ],
   requiresManualReview: false,
   status: EntityStatus.pass,
-  decryptedAttributes: {
-    [BusinessDI.name]: 'Acme Inc.',
-  },
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   label: null,

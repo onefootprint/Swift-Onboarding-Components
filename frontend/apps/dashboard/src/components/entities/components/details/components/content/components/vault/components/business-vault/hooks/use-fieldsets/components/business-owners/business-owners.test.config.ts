@@ -27,7 +27,6 @@ export const entityFixture: Entity = {
   ],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
-  decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   requiresManualReview: false,

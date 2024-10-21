@@ -26,7 +26,6 @@ describe('getGridTemplateAreas', () => {
     startTimestamp: '2023-06-27',
     lastActivityAt: '2023-03-27T14:43:47.444716Z',
     status: EntityStatus.pass,
-    decryptedAttributes: {},
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
     label: null,
