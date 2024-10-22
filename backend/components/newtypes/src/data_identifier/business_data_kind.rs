@@ -36,6 +36,7 @@ pub enum BusinessDataKind {
     /// Note: this variant has a special serialization.
     /// Serializes any data identifier (mostly just identity data) for a given beneficial owner.
     BeneficialOwnerData(BoLinkId, Box<DataIdentifier>),
+    BeneficialOwnerExplanationMessage,
     CorporationType,
     FormationState,
     FormationDate,
@@ -75,6 +76,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::KycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BeneficialOwnerData(_, _) => CollectedData::BusinessBeneficialOwners,
+            Self::BeneficialOwnerExplanationMessage => return None,
             Self::CorporationType => CollectedData::BusinessCorporationType,
             Self::FormationDate | Self::FormationState => return None,
         };
@@ -118,6 +120,9 @@ impl TryFrom<BusinessDataKindDiscriminant> for BusinessDataKind {
             BusinessDataKindDiscriminant::Country => Self::Country,
             BusinessDataKindDiscriminant::BeneficialOwners => Self::BeneficialOwners,
             BusinessDataKindDiscriminant::KycedBeneficialOwners => Self::KycedBeneficialOwners,
+            BusinessDataKindDiscriminant::BeneficialOwnerExplanationMessage => {
+                Self::BeneficialOwnerExplanationMessage
+            }
             BusinessDataKindDiscriminant::CorporationType => Self::CorporationType,
             BusinessDataKindDiscriminant::FormationState => Self::FormationState,
             BusinessDataKindDiscriminant::FormationDate => Self::FormationDate,

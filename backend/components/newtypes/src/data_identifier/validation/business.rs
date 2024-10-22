@@ -50,6 +50,7 @@ impl CleanAndValidate for BDK {
             BDK::BeneficialOwnerData(_, di) => {
                 clean_and_validate_beneficial_owner_data(*di.clone(), args, value, all_data)?
             }
+            BDK::BeneficialOwnerExplanationMessage => value.as_string()?,
             BDK::CorporationType => utils::parse_enum::<CorporationType>(value.as_string()?)?,
             BDK::FormationState => {
                 utils::validate_state(value.as_string()?, all_data.get(&BDK::Country.into()))?

@@ -223,3 +223,30 @@ def test_business_docs(sandbox_tenant, must_collect_data):
     assert body[0]["status"] == "complete"
     assert body[0]["review_status"] == "pending_human_review"
     assert body[0]["uploads"][0]["identifier"] == "document.custom.trust_document"
+
+
+def test_kyb_ownership_stake_explanation(sandbox_tenant, kyb_sandbox_ob_config):
+    # If we make a BO with ownership stakes adding to <= 75%, we should be able to add an explanation
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data["business.primary_owner_stake"] = 50
+    bifrost.data["business.beneficial_owner_explanation_message"] = "I am the boss"
+    user = bifrost.run()
+
+    body = get(f"entities/{user.fp_bid}", None, *sandbox_tenant.db_auths)
+    d = next(
+        i
+        for i in body["data"]
+        if i["identifier"] == "business.beneficial_owner_explanation_message"
+    )
+    assert d["value"] == "I am the boss"
+
+    # But if the ownership stakes add up to > 75%, we should not be able to add an explanation
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data["business.primary_owner_stake"] = 76
+    bifrost.data["business.beneficial_owner_explanation_message"] = "I am the boss"
+    user = bifrost.run()
+    body = get(f"entities/{user.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert not any(
+        i["identifier"] == "business.beneficial_owner_explanation_message"
+        for i in body["data"]
+    )

@@ -27,6 +27,7 @@ impl DataIdentifier {
                     .collect_vec(),
                 DataIdentifierDiscriminant::Business => BusinessDataKind::non_bo_variants()
                     .into_iter()
+                    .filter(|bdk| !matches!(bdk, BusinessDataKind::BeneficialOwnerExplanationMessage))
                     .map(DataIdentifier::from)
                     .collect_vec(),
                 DataIdentifierDiscriminant::InvestorProfile => InvestorProfileKind::iter()

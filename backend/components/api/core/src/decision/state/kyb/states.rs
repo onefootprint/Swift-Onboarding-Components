@@ -39,6 +39,8 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
+use newtypes::BusinessDataKind as BDK;
+use newtypes::DataIdentifier as DI;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode;
@@ -223,6 +225,14 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             }
         }
 
+        if !bo_ownership_check {
+            // When a user fills out BOs with < 75% ownership, we allow them to provide an explanation
+            // of why the ownership stake doesn't add up.
+            // If the ownership stakes now do add up, we should clear out the explanation message.
+            let bvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
+            let dis = vec![DI::Business(BDK::BeneficialOwnerExplanationMessage)];
+            bvw.soft_delete_vault_data(conn, dis)?;
+        }
 
         if obc.verification_checks().skip_kyb() {
             // Skip past KYB vendor calls and go straight to decisioning

@@ -23,7 +23,9 @@ use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::SearchEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
+use itertools::chain;
 use itertools::Itertools;
+use newtypes::BusinessDataKind;
 use newtypes::CardDataKind;
 use newtypes::CardInfo;
 use newtypes::CountArgs;
@@ -183,15 +185,21 @@ pub async fn decrypt_visible_attrs(
                 .map(|di| di.into())
                 .collect_vec();
             // Always decrypt id.first_name and last initial
-            let targets = vec![
+            let name_dis = vec![
                 EnclaveDecryptOperation::new(IDK::FirstName.into(), vec![]),
                 EnclaveDecryptOperation::new(
                     IDK::LastName.into(),
                     vec![FilterFunction::Prefix(CountArgs { count: 1 })],
                 ),
-            ]
-            .into_iter()
-            .chain(card_dis)
+            ];
+            let bo_explanation =
+                vec![DataIdentifier::Business(BusinessDataKind::BeneficialOwnerExplanationMessage).into()];
+
+            let targets = chain!(
+                card_dis,
+                name_dis,
+                bo_explanation,
+            )
             // Filter out attributes that can't be decrypted
             .filter(|target| CanDecrypt::single(target.identifier.clone()).is_met(scopes))
             .filter(|target| vw.tenant_can_decrypt(target.identifier.clone()))
