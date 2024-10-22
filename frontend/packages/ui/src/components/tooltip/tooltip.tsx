@@ -60,7 +60,7 @@ const Tooltip = ({
     <TooltipPrimitive.Provider>
       <TooltipPrimitive.Root open={open} onOpenChange={onOpenChange} delayDuration={100}>
         <TooltipPrimitive.Trigger asChild aria-label={ariaLabel}>
-          <Stack>{children}</Stack>
+          <Stack align="center">{children}</Stack>
         </TooltipPrimitive.Trigger>
         <TooltipPrimitive.Content
           side={position}
