@@ -1,5 +1,6 @@
 'use client';
 
+import { Command as CommandRoot } from 'cmdk';
 import CommandContainer from './components/command-container';
 import CommandDiscover from './components/command-discover';
 import CommandEmpty from './components/command-empty';
@@ -11,6 +12,7 @@ import CommandSeparator from './components/command-separator';
 import CommandShortcut from './components/command-shortcut';
 
 const Command = {
+  Root: CommandRoot,
   Container: CommandContainer,
   Input: CommandInput,
   Shortcut: CommandShortcut,

@@ -1,14 +1,11 @@
-import { Combobox, ComboboxItem, ComboboxList, ComboboxProvider } from '@ariakit/react';
+import { IcoChevronDown16 } from '@onefootprint/icons';
 import type { DataIdentifier, ListKind } from '@onefootprint/types';
-import { createFontStyles, createOverlayBackground } from '@onefootprint/ui';
-import * as SelectPrimitive from '@radix-ui/react-select';
-import { matchSorter } from 'match-sorter';
-import { useEffect, useMemo, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+import { Command, Stack } from '@onefootprint/ui';
+import { SelectCustom } from '@onefootprint/ui';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import dataIdentifiersForListKind from '../../utils/data-identifiers-for-list-kind';
-import CustomTrigger from '../custom-trigger';
 
 type DISelectProps = {
   defaultDI?: DataIdentifier;
@@ -18,179 +15,63 @@ type DISelectProps = {
 
 const DISelect = ({ defaultDI, listKind, onChange }: DISelectProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'rules.action-row.rule-chip.list' });
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedDI, setSelectedDI] = useState<DataIdentifier | undefined>(defaultDI);
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
-  useEffect(() => {
-    setSelectedDI(defaultDI);
-  }, [defaultDI]);
-
-  const matches = useMemo(() => {
-    const options = dataIdentifiersForListKind(listKind);
-    if (!searchValue) return options;
-    return matchSorter(options, searchValue);
-  }, [searchValue, listKind]);
+  const options = useMemo(() => {
+    const dataIdentifiers = dataIdentifiersForListKind(listKind);
+    return dataIdentifiers.map(di => ({
+      value: di,
+      label: di,
+    }));
+  }, [listKind]);
 
   return (
-    <SelectPrimitive.Root
+    <SelectCustom.Root
       defaultValue={defaultDI}
       value={defaultDI}
       onValueChange={onChange}
-      open={isOpen}
-      onOpenChange={setIsOpen}
+      open={open}
+      onOpenChange={setOpen}
     >
-      <ComboboxProvider
-        open={isOpen}
-        setOpen={setIsOpen}
-        resetValueOnHide
-        includesBaseElement={false}
-        setValue={nextValue => {
-          setSearchValue(nextValue);
-        }}
-      >
-        <CustomTrigger
-          isOpen={isOpen}
-          ariaLabel={t('field.trigger-aria-label')}
-          color={selectedDI ? 'primary' : 'tertiary'}
-        >
-          {selectedDI || t('field.placeholder')}
-        </CustomTrigger>
-        <Content position="popper" sideOffset={4} align="end">
-          <Header>
-            <Search
-              autoSelect
-              placeholder={t('field.search-placeholder')}
-              onBlurCapture={event => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-            />
-            {listKind && matches.length > 0 && (
-              <Note>
-                <Trans
-                  ns="playbook-details"
-                  i18nKey="rules.action-row.rule-chip.list.field.validation-note"
-                  components={{
-                    b: <Bold />,
+      <SelectCustom.Trigger aria-label={t('field.trigger-aria-label')}>
+        <Stack direction="row" align="center" gap={1} cursor="pointer">
+          {defaultDI || t('field.placeholder')}
+          <Stack
+            align="center"
+            justify="center"
+            transform={open ? 'rotate(180deg)' : undefined}
+            transition="transform 0.1s ease-in-out"
+          >
+            <IcoChevronDown16 />
+          </Stack>
+        </Stack>
+      </SelectCustom.Trigger>
+      <SelectCustom.Content sideOffset={4} align="start" popper minWidth="max-content">
+        <Command.Root>
+          <Command.Input value={inputValue} onValueChange={setInputValue} />
+          <Command.List>
+            <Command.Empty>{t('field.search-empty')}</Command.Empty>
+            <Command.Group>
+              {options.map((option: { value: string; label: string }) => (
+                <Command.Item
+                  key={option.value}
+                  value={option.value}
+                  onSelect={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                    setInputValue('');
                   }}
-                  values={{ type: listKind }}
-                />
-              </Note>
-            )}
-          </Header>
-          {matches.length > 0 ? (
-            <ComboboxList role="listbox" aria-label={t('field.aria-label')}>
-              <DropdownInner>
-                {matches.map(di => (
-                  <ComboboxItem key={di} role="option" aria-label={di} onClick={() => onChange(di)}>
-                    <DropdownOption data-active-item={di === selectedDI}>{di}</DropdownOption>
-                  </ComboboxItem>
-                ))}
-              </DropdownInner>
-            </ComboboxList>
-          ) : (
-            <DropdownOption data-empty>
-              {dataIdentifiersForListKind(listKind).length ? t('field.search-empty') : t('field.empty')}
-            </DropdownOption>
-          )}
-        </Content>
-      </ComboboxProvider>
-    </SelectPrimitive.Root>
+                >
+                  {option.label}
+                </Command.Item>
+              ))}
+            </Command.Group>
+          </Command.List>
+        </Command.Root>
+      </SelectCustom.Content>
+    </SelectCustom.Root>
   );
 };
-
-const Header = styled.header`
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Search = styled(Combobox)`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    border: none;
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    color: ${theme.color.primary};
-    height: 40px;
-    outline: none;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-    width: 100%;
-
-    ::placeholder {
-      color: ${theme.color.tertiary};
-    }
-  `}
-`;
-
-const Note = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-4')};
-    background: ${theme.backgroundColor.secondary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    color: ${theme.color.primary};
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `}
-`;
-
-const Bold = styled.b`
-  ${createFontStyles('caption-3')};
-`;
-
-const Content = styled(SelectPrimitive.Content)`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    border: 1px solid ${theme.borderColor.tertiary};
-    box-shadow: ${theme.elevation[2]};
-    max-height: 350px;
-    overflow: auto;
-    width: 270px;
-    z-index: ${theme.zIndex.dropdown};
-  `}
-`;
-
-const DropdownInner = styled.div`
-  ${({ theme }) => css`
-    max-height: 350px;
-    padding: ${theme.spacing[2]} 0;
-    overflow: scroll;
-    display: flex;
-    flex-direction: column;
-    user-select: none;
-    border-radius: ${theme.borderRadius.default};
-  `};
-`;
-
-const DropdownOption = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[2]} ${theme.spacing[5]};
-    ${createFontStyles('caption-1')};
-    cursor: pointer;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @media (hover: hover) {
-      :hover {
-        ${createOverlayBackground('darken-1', 'primary')};
-      }
-    }
-
-    &[data-active-item='true'] {
-      ${createOverlayBackground('darken-1', 'primary')};
-    }
-
-    &[data-empty='true'] {
-      padding: ${theme.spacing[3]} ${theme.spacing[5]};
-      pointer-events: none;
-      color: ${theme.color.tertiary};
-    }
-  `};
-`;
 
 export default DISelect;

@@ -30,7 +30,7 @@ describe('<SessionSelector />', () => {
       activeDocumentVersion: '4',
       onActiveDocumentVersionChange: jest.fn(),
     });
-    const select = screen.getByRole('button');
+    const select = screen.getByRole('combobox');
     expect(screen.getByText('Session 4 (7/26/23, 12:00 AM)')).toBeInTheDocument();
     await userEvent.click(select);
     await waitFor(() => {

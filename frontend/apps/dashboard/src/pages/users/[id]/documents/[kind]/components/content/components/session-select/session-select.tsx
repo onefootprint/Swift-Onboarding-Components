@@ -1,6 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import type { Document } from '@onefootprint/types';
-import { SelectNew, Text } from '@onefootprint/ui';
+import { SelectCustom, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -25,17 +25,20 @@ const SessionSelect = ({ options, selected, onChange }: SessionSelectProps) => {
   return (
     <Header>
       <Text variant="label-1">{t('label')}</Text>
-      <SelectNew
-        onChange={onChange}
-        placeholder="Select"
-        options={options.map(doc => ({
-          label: getLabel(doc),
-          value: doc.startedAt || '',
-        }))}
-        size="compact"
-        value={selected.startedAt}
-        disabled={options.length === 1}
-      />
+      <SelectCustom.Root value={selected.startedAt} onValueChange={onChange}>
+        <SelectCustom.Input disabled={options.length === 1} size="compact">
+          {getLabel(selected)}
+        </SelectCustom.Input>
+        <SelectCustom.Content>
+          <SelectCustom.Group>
+            {options.map(doc => (
+              <SelectCustom.Item key={doc.startedAt} value={doc.startedAt || ''}>
+                <Text variant="body-3">{getLabel(doc)}</Text>
+              </SelectCustom.Item>
+            ))}
+          </SelectCustom.Group>
+        </SelectCustom.Content>
+      </SelectCustom.Root>
     </Header>
   );
 };

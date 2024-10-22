@@ -1,11 +1,12 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import type { ListRuleField, RiskSignalRuleField, RiskSignalRuleOp } from '@onefootprint/types';
-import { IconButton, Stack, Text } from '@onefootprint/ui';
+import { IconButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
+import EditContainer from './components/edit-container';
+import ExpressionContainer from './components/expression-container';
 import OpSelect from './components/op-select';
 import RiskSignalSelect from './components/risk-signal-select';
 
@@ -48,19 +49,17 @@ const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }
 
   return isEditing ? (
     <EditContainer>
-      <ExpressionContainer role="group" aria-label={ruleExpression.field} data-is-editing={isEditing}>
+      <ExpressionContainer role="group" aria-label={ruleExpression.field}>
         <RiskSignalSelect value={ruleExpression.field} onChange={handleFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
-        <Text variant="body-3" color="tertiary" paddingRight={3}>
+        <Text variant="body-3" color="tertiary">
           {t('risk-signal.value-placeholder')}
         </Text>
       </ExpressionContainer>
       {onDelete && (
-        <DeleteContainer>
-          <IconButton aria-label="Delete field" onClick={onDelete}>
-            <IcoCloseSmall16 color="tertiary" />
-          </IconButton>
-        </DeleteContainer>
+        <IconButton aria-label="Delete field" onClick={onDelete} size="compact">
+          <IcoCloseSmall16 color="tertiary" className="deleteIcon" />
+        </IconButton>
       )}
     </EditContainer>
   ) : (
@@ -77,48 +76,5 @@ const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }
     </ExpressionContainer>
   );
 };
-
-const ExpressionContainer = styled(Stack)`
-  ${({ theme }) => css`
-    height: fit-content;
-    min-width: fit-content;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[1]} ${theme.spacing[4]};
-    background-color: ${theme.backgroundColor.primary};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.full};
-
-    &[data-is-editing='true'] {
-      gap: ${theme.spacing[1]};
-      padding: ${theme.spacing[1]};
-    }
-  `}
-`;
-
-const EditContainer = styled(Stack)`
-  ${({ theme }) => css`
-    height: fit-content;
-    min-width: fit-content;
-    align-items: center;
-    border-radius: ${theme.borderRadius.full};
-    padding-right: ${theme.spacing[3]};
-    background-color: ${theme.backgroundColor.secondary};
-  `}
-`;
-
-const DeleteContainer = styled.div`
-  ${({ theme }) => css`
-    height: 16px;
-    width: 16px;
-    display: flex;
-    align-items: center;
-    margin-left: ${theme.spacing[1]};
-
-    > button:hover:enabled {
-      background: transparent;
-    }
-  `}
-`;
 
 export default RiskSignalRuleChip;

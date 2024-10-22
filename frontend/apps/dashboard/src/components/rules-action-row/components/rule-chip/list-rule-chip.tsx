@@ -1,12 +1,13 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import type { DataIdentifier, List, ListKind, ListRuleField, RiskSignalRuleField } from '@onefootprint/types';
-import { IconButton, Stack, Text } from '@onefootprint/ui';
+import { IconButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import DISelect from './components/di-select';
+import EditContainer from './components/edit-container';
+import ExpressionContainer from './components/expression-container';
 import ListSelect from './components/list-select';
 import OpSelect from './components/op-select';
 import dataIdentifiersForListKind from './utils/data-identifiers-for-list-kind';
@@ -102,11 +103,9 @@ const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onCh
         />
       </ExpressionContainer>
       {onDelete && (
-        <DeleteContainer>
-          <IconButton aria-label="Delete field" onClick={onDelete}>
-            <IcoCloseSmall16 color="tertiary" />
-          </IconButton>
-        </DeleteContainer>
+        <IconButton aria-label="Delete field" onClick={onDelete} size="compact">
+          <IcoCloseSmall16 color="tertiary" className="deleteIcon" />
+        </IconButton>
       )}
     </EditContainer>
   ) : (
@@ -126,48 +125,5 @@ const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onCh
     </ExpressionContainer>
   );
 };
-
-const ExpressionContainer = styled(Stack)`
-  ${({ theme }) => css`
-    height: fit-content;
-    min-width: fit-content;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[1]} ${theme.spacing[4]};
-    background-color: ${theme.backgroundColor.primary};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.full};
-
-    &[data-is-editing='true'] {
-      gap: ${theme.spacing[1]};
-      padding: ${theme.spacing[1]};
-    }
-  `}
-`;
-
-const EditContainer = styled(Stack)`
-  ${({ theme }) => css`
-    height: fit-content;
-    min-width: fit-content;
-    align-items: center;
-    border-radius: ${theme.borderRadius.full};
-    padding-right: ${theme.spacing[3]};
-    background-color: ${theme.backgroundColor.secondary};
-  `}
-`;
-
-const DeleteContainer = styled.div`
-  ${({ theme }) => css`
-    height: 16px;
-    width: 16px;
-    display: flex;
-    align-items: center;
-    margin-left: ${theme.spacing[1]};
-
-    > button:hover:enabled {
-      background: transparent;
-    }
-  `}
-`;
 
 export default ListRuleChip;

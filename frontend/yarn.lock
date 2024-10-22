@@ -29,27 +29,6 @@
     "@types/json-schema" "^7.0.15"
     js-yaml "^4.1.0"
 
-"@ariakit/core@0.3.10":
-  version "0.3.10"
-  resolved "https://registry.yarnpkg.com/@ariakit/core/-/core-0.3.10.tgz#5df18468c1b2488b8dd0dfeca820ea7484c2d66f"
-  integrity sha512-AcN+GSoVXuUOzKx5d3xPL3YsEHevh4PIO6QIt/mg/nRX1XQ6cvxQEiAjO/BJQm+/MVl7/VbuGBoTFjr0tPU6NQ==
-
-"@ariakit/react-core@0.3.12":
-  version "0.3.12"
-  resolved "https://registry.yarnpkg.com/@ariakit/react-core/-/react-core-0.3.12.tgz#a646bb1400a4f4345cfd6d9c88ed484fd1873757"
-  integrity sha512-w6P1A7TYb1fKUe9QbwaoTOWofl13g7TEuXdV4JyefJCQL1e9HQdEw9UL67I8aXRo8/cFHH94/z0N37t8hw5Ogg==
-  dependencies:
-    "@ariakit/core" "0.3.10"
-    "@floating-ui/dom" "^1.0.0"
-    use-sync-external-store "^1.2.0"
-
-"@ariakit/react@^0.3.12":
-  version "0.3.12"
-  resolved "https://registry.yarnpkg.com/@ariakit/react/-/react-0.3.12.tgz#d8e06b3ba4694fc5b590a0cab7be354277ce91a6"
-  integrity sha512-HxKMZZhWSkwwS/Sh9OdWyuNKQ2tjDAIQIy2KVI7IRa8ZQ6ze/4g3YLUHbfCxO7oDupXHfXaeZ4hWx8lP7l1U/g==
-  dependencies:
-    "@ariakit/react-core" "0.3.12"
-
 "@aws-crypto/crc32@5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@aws-crypto/crc32/-/crc32-5.2.0.tgz#cfcc22570949c98c6689cfcbd2d693d36cdae2e1"
@@ -3153,20 +3132,20 @@
   dependencies:
     "@floating-ui/core" "^0.7.3"
 
-"@floating-ui/dom@^1.0.0", "@floating-ui/dom@^1.5.1":
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.5.3.tgz#54e50efcb432c06c23cd33de2b575102005436fa"
-  integrity sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==
-  dependencies:
-    "@floating-ui/core" "^1.4.2"
-    "@floating-ui/utils" "^0.1.3"
-
 "@floating-ui/dom@^1.0.1":
   version "1.2.7"
   resolved "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.2.7.tgz"
   integrity sha512-DyqylONj1ZaBnzj+uBnVfzdjjCkFCL2aA9ESHLyUOGSqb03RpbLMImP1ekIQXYs4KLk9jAjJfZAU8hXfWSahEg==
   dependencies:
     "@floating-ui/core" "^1.2.6"
+
+"@floating-ui/dom@^1.5.1":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.5.3.tgz#54e50efcb432c06c23cd33de2b575102005436fa"
+  integrity sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==
+  dependencies:
+    "@floating-ui/core" "^1.4.2"
+    "@floating-ui/utils" "^0.1.3"
 
 "@floating-ui/react-dom@0.7.2":
   version "0.7.2"
@@ -6946,10 +6925,10 @@
   resolved "https://registry.yarnpkg.com/@storybook/preview-api/-/preview-api-8.2.9.tgz#e35ca783a1d98174e73223856397a9767766a737"
   integrity sha512-D8/t+a78OJqQAcT/ABa1C4YM/OaLGQ9IvCsp3Q9ruUqDCwuZBj8bG3D4477dlY4owX2ycC0rWYu3VvuK0EmJjA==
 
-"@storybook/react-docgen-typescript-plugin@1.0.6--canary.9.0c3f3b7.0":
-  version "1.0.6--canary.9.0c3f3b7.0"
-  resolved "https://registry.yarnpkg.com/@storybook/react-docgen-typescript-plugin/-/react-docgen-typescript-plugin-1.0.6--canary.9.0c3f3b7.0.tgz#7f10f3c641f32e4513a8b6ffb5036933e7059534"
-  integrity sha512-KUqXC3oa9JuQ0kZJLBhVdS4lOneKTOopnNBK4tUAgoxWQ3u/IjzdueZjFr7gyBrXMoU6duutk3RQR9u8ZpYJ4Q==
+"@storybook/react-docgen-typescript-plugin@1.0.6--canary.9.0c3f3b7.0", "@storybook/react-docgen-typescript-plugin@1.0.6--canary.9.cd77847.0":
+  version "1.0.6--canary.9.cd77847.0"
+  resolved "https://registry.yarnpkg.com/@storybook/react-docgen-typescript-plugin/-/react-docgen-typescript-plugin-1.0.6--canary.9.cd77847.0.tgz#35beed1bd0813569fc8852b372c92069fe74a448"
+  integrity sha512-I4oBYmnUCX5IsrZhg+ST72dubSIV4wdwY+SfqJiJ3NHvDpdb240ZjdHAmjIy/yJh5rh42Fl4jbG8Tr4SzwV53Q==
   dependencies:
     debug "^4.1.1"
     endent "^2.0.1"
@@ -15005,14 +14984,6 @@ markdown-to-jsx@^7.4.5:
   resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-7.5.0.tgz#42ece0c71e842560a7d8bd9f81e7a34515c72150"
   integrity sha512-RrBNcMHiFPcz/iqIj0n3wclzHXjwS7mzjBNWecKKVhNTIxQepIix6Il/wZCn2Cg5Y1ow2Qi84+eJrryFRWBEWw==
 
-match-sorter@^6.3.1:
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/match-sorter/-/match-sorter-6.3.1.tgz#98cc37fda756093424ddf3cbc62bfe9c75b92bda"
-  integrity sha512-mxybbo3pPNuA+ZuCUhm5bwNkXrJTbsk5VWbR5wiwz/GC6LIiegBGn2w3O08UG/jdbYLinw51fSQ5xNU1U3MgBw==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    remove-accents "0.4.2"
-
 md5.js@^1.3.4:
   version "1.3.5"
   resolved "https://registry.npmjs.org/md5.js/-/md5.js-1.3.5.tgz"
@@ -15935,17 +15906,12 @@ node-fetch@^2.1.2, node-fetch@^2.6.12, node-fetch@^2.6.9:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-fetch@^2.6.1, node-fetch@^2.6.7:
+node-fetch@^2.6.1, node-fetch@^2.6.7, node-fetch@~2.1.2:
   version "2.6.9"
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.9.tgz"
   integrity sha512-DJm/CJkZkRjKKj4Zi4BsKVZh3ValV5IR5s7LVZnW+6YMh0W1BfNA8XSs6DLMGYlId5F3KnA70uu2qepcR08Qqg==
   dependencies:
     whatwg-url "^5.0.0"
-
-node-fetch@~2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.1.2.tgz#ab884e8e7e57e38a944753cec706f788d1768bb5"
-  integrity sha512-IHLHYskTc2arMYsHZH82PVX8CSKT5lzb7AXeyO06QnjGDKtkv+pv3mEki6S7reB/x1QPo+YPxQRNEVgR5V/w3Q==
 
 node-gyp-build@^4.2.2:
   version "4.8.1"
@@ -17925,11 +17891,6 @@ remark-rehype@^11.0.0:
     mdast-util-to-hast "^13.0.0"
     unified "^11.0.0"
     vfile "^6.0.0"
-
-remove-accents@0.4.2:
-  version "0.4.2"
-  resolved "https://registry.npmjs.org/remove-accents/-/remove-accents-0.4.2.tgz"
-  integrity sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==
 
 renderkid@^3.0.0:
   version "3.0.0"
@@ -20667,10 +20628,18 @@ xml-parse-from-string@^1.0.0:
   resolved "https://registry.yarnpkg.com/xml-parse-from-string/-/xml-parse-from-string-1.0.1.tgz#a9029e929d3dbcded169f3c6e28238d95a5d5a28"
   integrity sha512-ErcKwJTF54uRzzNMXq2X5sMIy88zJvfN2DmdoQvy7PAFJ+tPRU6ydWuOKNMyfmOjdyBQTFREi60s0Y0SyI0G0g==
 
-xml2js@0.5.0, xml2js@^0.5.0:
+xml2js@0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.5.0.tgz#d9440631fbb2ed800203fad106f2724f62c493b7"
   integrity sha512-drPFnkQJik/O+uPKpqSgr22mpuFHqKdbS835iAQrUC73L2F5WkboIRd63ai/2Yg6I1jzifPFKH2NTK+cfglkIA==
+  dependencies:
+    sax ">=0.6.0"
+    xmlbuilder "~11.0.0"
+
+xml2js@^0.5.0, xml2js@^0.6.0:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.6.2.tgz#dd0b630083aa09c161e25a4d0901e2b2a929b499"
+  integrity sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==
   dependencies:
     sax ">=0.6.0"
     xmlbuilder "~11.0.0"

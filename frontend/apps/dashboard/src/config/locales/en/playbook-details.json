@@ -204,7 +204,9 @@
         "aria-label": "Open risk signals select",
         "placeholder": "risk signal",
         "delete": "Delete",
-        "search": "Search by name or description"
+        "search": "Search by name or description",
+        "no-results": "No results found",
+        "options-aria-label": "Risk signal options"
       },
       "rule-chip": {
         "risk-signal": {
@@ -221,17 +223,18 @@
         },
         "list": {
           "field": {
-            "placeholder": "vault data",
+            "placeholder": "Select vault data",
             "trigger-aria-label": "Open data identifiers",
             "aria-label": "Rule data identifiers",
             "search-placeholder": "Search vault data..",
             "empty": "There is no vault data corresponding to this kind of list",
             "search-empty": "No results",
-            "validation-note": "Showing options that match the type of list selected: <b>{{type}}</b>"
+            "validation-note": "Showing options that match the type of list selected: <b>{{type}}</b>",
+            "options-aria-label": "List options"
           },
           "in": "in",
           "value": {
-            "placeholder": "list",
+            "placeholder": "Select list",
             "trigger-aria-label": "Open lists",
             "aria-label": "Rule lists",
             "search-placeholder": "Search lists..",
