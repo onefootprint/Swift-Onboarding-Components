@@ -159,36 +159,42 @@ pub fn get_dl_batch_for_svv_batch(
 
     tracing::info!(?svv_ids, "get_dl_batch_for_svv_batch");
 
-    // Select DLs created at or before the svv_batch seqnos. Normally, it's only necessary to
-    // select DLs equal to a svv_batch seqno, but some backfills may create DLs retroactively at an
+    // Select DLs created at or before the svv_batch versions. Normally, it's only necessary to
+    // select DLs equal to a svv_batch seqnos, but some backfills may create DLs retroactively at an
     // earlier scoped vault version. We need to back up these retroactively added DLs as well for
     // the SVV to be completely complete in get_complete_svvs_for_svv_batch.
-
-    let query = data_lifetime::table
-        .inner_join(scoped_vault::table)
-        .filter(scoped_vault::tenant_id.eq(tenant_id))
-        .filter(scoped_vault::is_live.eq(is_live))
-        .filter(diesel::dsl::exists(
-            scoped_vault_version::table
-                .filter(scoped_vault_version::id.eq_any(svv_ids))
-                .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault::id))
-                .filter(scoped_vault_version::seqno.ge(data_lifetime::created_seqno)),
-        ))
-        .filter(diesel::dsl::not(diesel::dsl::exists(
-            vault_dr_blob::table
-                .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
-                .filter(vault_dr_blob::config_id.eq(config_id)),
-        )))
-        .into_boxed();
-
+    //
     // The sort order *doesn't* matter here since all blobs associated with the svv_batch must be
     // written before the manifests are eligible to be written. If the batch_size isn't large
     // enough to finish backing up all DLs associated with the svv_batch, then unfinished SVVs will
     // be present in the next batch, and the DL batch will continue to make progress.
     //
     // We sort by created_seqno for determinism, to assist with testing.
-    let dls = query
+
+    let svvs_for_same_sv = alias!(scoped_vault_version as svvs_for_same_sv);
+
+    let dls = scoped_vault_version::table
+        .inner_join(
+            svvs_for_same_sv.on(scoped_vault_version::scoped_vault_id
+                .eq(svvs_for_same_sv.fields(scoped_vault_version::scoped_vault_id))),
+        )
+        .inner_join(
+            data_lifetime::table.on(data_lifetime::scoped_vault_id.eq(scoped_vault_version::scoped_vault_id)),
+        )
+        .filter(scoped_vault_version::id.eq_any(&svv_ids))
+        .filter(
+            svvs_for_same_sv
+                .fields(scoped_vault_version::version)
+                .le(scoped_vault_version::version),
+        )
+        .filter(data_lifetime::created_seqno.eq(svvs_for_same_sv.fields(scoped_vault_version::seqno)))
+        .filter(diesel::dsl::not(diesel::dsl::exists(
+            vault_dr_blob::table
+                .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
+                .filter(vault_dr_blob::config_id.eq(config_id)),
+        )))
         .select(DataLifetime::as_select())
+        .distinct()
         .order(data_lifetime::created_seqno)
         .limit(batch_size as i64)
         .load(conn)?;
