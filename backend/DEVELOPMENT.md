@@ -345,3 +345,7 @@ Comment out `DISABLE_TRACES=1` in your `.env` file. Run the API server with `mak
 
 Navigate to the Jaeger web UI at http://localhost:16686/ to explore traces from your local process.
 
+
+## Running the local frontend against the local backend
+
+See the guide [here](https://www.notion.so/onefootprint/Setting-up-FE-to-run-against-local-backend-22c601c966a44546a670676ca92c3ed5?pvs=4)
