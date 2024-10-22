@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 import useSendTokenLinkMutation from '../../../hooks/use-send-token-link';
 import LinkDisplay from '../components/link-display';
 
@@ -21,7 +22,8 @@ const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) 
     keyPrefix: 'actions.request-more-info',
   });
   const entityId = useEntityId();
-  const userHasPhone = useEntity(entityId).data?.attributes?.includes(IdDI.phoneNumber);
+  const entity = useEntity(entityId)?.data;
+  const userHasPhone = hasDataIdentifier(entity, IdDI.phoneNumber);
 
   const component = <LinkDisplay linkData={linkData} />;
 

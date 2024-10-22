@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
+import hasDataIdentifier from 'src/utils/has-data-identifier';
 import useGenerateTokenRequest from '../../hooks/use-generate-token';
 import useSendTokenLinkMutation from '../../hooks/use-send-token-link';
 
@@ -25,7 +26,8 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
-  const userHasPhone = useEntity(entityId).data?.attributes?.includes(IdDI.phoneNumber);
+  const entity = useEntity(entityId)?.data;
+  const userHasPhone = hasDataIdentifier(entity, IdDI.phoneNumber);
 
   const handleClose = useCallback(() => {
     generateTokenMutation.reset();

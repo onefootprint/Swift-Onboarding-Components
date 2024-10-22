@@ -31,7 +31,7 @@ const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOw
     .map(({ data: entity }) => {
       return {
         id: entity.id,
-        attributes: entity.attributes,
+        attributes: entity.data.map(item => item.identifier),
         firstName: (entity.data.find(item => item.identifier === IdDI.firstName)?.value as string) || '',
         lastName: (entity.data.find(item => item.identifier === IdDI.lastName)?.transforms?.prefix_1 as string) || '',
         hasPhone: hasDataIdentifier(entity, IdDI.phoneNumber),

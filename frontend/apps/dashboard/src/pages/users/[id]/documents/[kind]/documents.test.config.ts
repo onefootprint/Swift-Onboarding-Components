@@ -140,7 +140,6 @@ export const entityFixture: Entity = {
   hasOutstandingWorkflowRequest: false,
   lastActivityAt: '2024-04-29T18:39:42.669015Z',
   label: null,
-  attributes: [],
 };
 
 export const documentsFixture: Document[] = [

@@ -65,9 +65,6 @@ export type Entity = {
   status: EntityStatus;
   watchlistCheck: WatchlistCheckEventData | null;
   workflows: EntityWorkflow[];
-
-  // TODO: deprecate these in favor of `data`
-  attributes: DataIdentifier[];
 };
 
 export enum WorkflowStatus {

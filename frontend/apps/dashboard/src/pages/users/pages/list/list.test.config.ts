@@ -28,7 +28,6 @@ export const entitiesFixture: Entity[] = [
       { ...defaultAttribute, identifier: IdDI.lastName, isDecryptable: true, value: null },
       { ...defaultAttribute, identifier: IdDI.email, isDecryptable: true, value: null },
     ],
-    attributes: [],
     startTimestamp: '2023-03-27T14:43:47.444716Z',
     lastActivityAt: '2023-03-27T14:43:47.444716Z',
     workflows: [
@@ -67,7 +66,6 @@ export const entitiesFixture: Entity[] = [
       { ...defaultAttribute, identifier: IdDI.lastName, isDecryptable: true, value: null },
       { ...defaultAttribute, identifier: IdDI.email, isDecryptable: true, value: null },
     ],
-    attributes: [],
     startTimestamp: '2023-10-19T03:38:23.521861Z',
     lastActivityAt: '2023-10-19T03:38:23.521861Z',
     workflows: [

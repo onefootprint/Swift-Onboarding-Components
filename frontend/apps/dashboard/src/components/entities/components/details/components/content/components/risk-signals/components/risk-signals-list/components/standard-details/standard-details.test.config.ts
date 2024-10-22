@@ -18,7 +18,6 @@ export const entityFixture: Entity = {
   kind: EntityKind.person,
   requiresManualReview: false,
   status: EntityStatus.pass,
-  attributes: [],
   data: [
     {
       ...defaultAttribute,

@@ -14,7 +14,6 @@ describe('getGridTemplateAreas', () => {
   };
 
   const createEntity = (attributes: DataIdentifier[]): Entity => ({
-    attributes: [],
     data: attributes.map(attribute => ({
       ...defaultAttribute,
       identifier: attribute,

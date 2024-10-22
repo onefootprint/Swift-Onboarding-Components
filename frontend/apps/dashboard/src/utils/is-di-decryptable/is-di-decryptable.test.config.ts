@@ -11,7 +11,6 @@ export const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
   isIdentifiable: true,
   kind: EntityKind.business,
-  attributes: [],
   data: [
     { ...defaultAttribute, identifier: IdDI.email, isDecryptable: true },
     { ...defaultAttribute, identifier: IdDI.phoneNumber, isDecryptable: true },

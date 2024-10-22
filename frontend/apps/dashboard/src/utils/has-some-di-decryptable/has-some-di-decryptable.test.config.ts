@@ -10,7 +10,6 @@ export const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
   isIdentifiable: true,
   kind: EntityKind.business,
-  attributes: [],
   data: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
