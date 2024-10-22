@@ -224,15 +224,14 @@ pub fn get_or_create_business_wf(
     // Get or create a new business vault
     //
 
-    let existing_businesses = (!force_create).then_some(BusinessOwner::list_businesses_for_playbook(
-        conn, &uv.id, &obc.id,
-    )?);
+    let existing_businesses =
+        (!force_create).then_some(BusinessOwner::list_owned_businesses(conn, &uv.id, &obc.id)?);
     let sb_id = if let Some(sb_id) = user_auth.sb_id.clone() {
         // A scoped business has been attached to this session already, usually via user-specific
         // sessions.
         // Also via secondary beneficial owner tokens
         sb_id
-    } else if let Some((_, sb)) = existing_businesses.into_iter().flatten().next() {
+    } else if let Some((_, sb)) = existing_businesses.into_iter().rev().flatten().next() {
         // If the user has already started onboarding their business onto this exact ob config AND we aren't
         // force creating a new workflow (which should also support force creating a new business), we
         // should locate the existing business.

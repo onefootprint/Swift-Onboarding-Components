@@ -163,12 +163,10 @@ impl BusinessOwner {
         Ok(result)
     }
 
-    #[tracing::instrument("BusinessOwner::list_all", skip_all)]
-    pub fn list_all(
+    #[tracing::instrument("BusinessOwner::list_owners", skip_all)]
+    pub fn list_owners(
         conn: &mut PgConn,
         bv_id: &VaultId,
-        // by ob config ID?
-        // we really want to just return workflows here
         tenant_id: &TenantId,
     ) -> DbResult<Vec<(Self, Option<UserData>)>> {
         let result = business_owner::table
@@ -186,43 +184,33 @@ impl BusinessOwner {
         Ok(result)
     }
 
-    /// List the set of businesses belonging to this user onboarded onto the provided ob config
-    #[tracing::instrument("BusinessOwner::list_businesses_for_playbook", skip_all)]
-    pub fn list_businesses_for_playbook(
-        conn: &mut PgConn,
-        uv_id: &VaultId,
-        ob_config_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
-        let result = business_owner::table
-            .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
-            .filter(business_owner::deactivated_at.is_null())
-            .filter(business_owner::user_vault_id.eq(uv_id))
-            // Only get the ScopedVault for the businesses that onboarded onto the
-            // same ob config
-            .filter(exists(
-                workflow::table
-                    .filter(workflow::scoped_vault_id.eq(scoped_vault::id))
-                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
-            ))
-            .order_by(scoped_vault::start_timestamp.desc())
-            .get_results(conn)?;
-        Ok(result)
-    }
-
     /// List the set of businesses belonging to this user
-    #[tracing::instrument("BusinessOwner::list_businesses", skip_all)]
-    pub fn list_businesses(
-        conn: &mut PgConn,
-        uv_id: &VaultId,
-        tenant_id: &TenantId,
+    #[tracing::instrument("BusinessOwner::list_owned_businesses", skip_all)]
+    pub fn list_owned_businesses<'a>(
+        conn: &'a mut PgConn,
+        uv_id: &'a VaultId,
+        id: impl Into<ListOwnedBusinessesIdentifier<'a>>,
     ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
-        let result = business_owner::table
+        let mut query = business_owner::table
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
             .filter(business_owner::deactivated_at.is_null())
             .filter(business_owner::user_vault_id.eq(uv_id))
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .order_by(business_owner::created_at.asc())
-            .get_results(conn)?;
+            .order_by(scoped_vault::start_timestamp.asc())
+            .into_boxed();
+
+        match id.into() {
+            ListOwnedBusinessesIdentifier::TenantId(tenant_id) => {
+                query = query.filter(scoped_vault::tenant_id.eq(tenant_id))
+            }
+            ListOwnedBusinessesIdentifier::ObConfigId(ob_config_id) => {
+                query = query.filter(exists(
+                    workflow::table
+                        .filter(workflow::scoped_vault_id.eq(scoped_vault::id))
+                        .filter(workflow::ob_configuration_id.eq(ob_config_id)),
+                ))
+            }
+        }
+        let result = query.get_results(conn)?;
         Ok(result)
     }
 
@@ -312,6 +300,12 @@ impl BusinessOwner {
     pub fn has_linked_user(&self) -> bool {
         self.user_vault_id.is_some()
     }
+}
+
+#[derive(derive_more::From)]
+pub enum ListOwnedBusinessesIdentifier<'a> {
+    TenantId(&'a TenantId),
+    ObConfigId(&'a ObConfigurationId),
 }
 
 #[derive(derive_more::From)]

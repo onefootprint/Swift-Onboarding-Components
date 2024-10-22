@@ -30,7 +30,7 @@ pub async fn get(
     let businesses = state
         .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let businesses = BusinessOwner::list_businesses(conn, &su.vault_id, &tenant_id)?;
+            let businesses = BusinessOwner::list_owned_businesses(conn, &su.vault_id, &tenant_id)?;
             Ok(businesses)
         })
         .await?;

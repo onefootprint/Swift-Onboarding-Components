@@ -91,7 +91,7 @@ impl TenantVw<Business> {
         let seqno = self.seqno;
         let (linked_bos, vws) = state
             .db_query(move |conn| -> FpResult<_> {
-                let linked_bos = BusinessOwner::list_all(conn, &vid, &tid)?;
+                let linked_bos = BusinessOwner::list_owners(conn, &vid, &tid)?;
                 let vaults = linked_bos.iter().flat_map(|(_, x)| x.clone()).collect_vec();
                 // Build VWs for each linked BO (at the same seqno that this VW was built at)
                 let vws = VaultWrapper::<Any>::multi_get_for_tenant(conn, vaults, Some(seqno))?;

@@ -328,7 +328,7 @@ impl<Type> TenantVw<Type> {
         if self.vault.kind == VaultKind::Business {
             if let Some(sv_id) = self.sv_id.as_ref() {
                 let sv = ScopedVault::get(conn, sv_id)?;
-                let bos = BusinessOwner::list_all(conn, &self.vault.id, &sv.tenant_id)?;
+                let bos = BusinessOwner::list_owners(conn, &self.vault.id, &sv.tenant_id)?;
                 let has_linked_bos = bos.iter().any(|(bo, _)| bo.source == BusinessOwnerSource::Tenant);
                 // TODO stop allowing vaulting this DI at all
                 let request_has_vaulted_bos = request.contains_key(&BDK::BeneficialOwners.into());
