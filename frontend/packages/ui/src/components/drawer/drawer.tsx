@@ -9,6 +9,7 @@ import styled, { css, keyframes } from 'styled-components';
 import { media } from '../../utils';
 import Box from '../box';
 import Overlay from '../overlay';
+import Stack from '../stack';
 import Footer from './components/footer';
 import Header from './components/header';
 
@@ -62,20 +63,27 @@ const Drawer = ({
   return (
     <RadixDialog.Root open={open} onOpenChange={handleOpenChange}>
       <RadixDialog.Portal>
-        <DrawerSurface onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} aria-describedby={undefined}>
-          <Header
-            closeAriaLabel={closeAriaLabel ?? (t('components.drawer.close-aria-label-default') as string)}
-            closeIconComponent={CloseIconComponent}
-            onClose={onClose}
-          >
-            {title}
-          </Header>
-          {headerComponent}
-          <Box padding={7} overflow="auto" maxWidth="100%" flexGrow={1}>
-            {children}
-          </Box>
-          <Footer linkButton={linkButton} secondaryButton={secondaryButton} primaryButton={primaryButton} />
-        </DrawerSurface>
+        <RadixDialog.Content
+          aria-describedby={undefined}
+          onEscapeKeyDown={onClose}
+          onPointerDownOutside={onClickOutside}
+          asChild
+        >
+          <DrawerSurface>
+            <Header
+              closeAriaLabel={closeAriaLabel ?? (t('components.drawer.close-aria-label-default') as string)}
+              closeIconComponent={CloseIconComponent}
+              onClose={onClose}
+            >
+              {title}
+            </Header>
+            {headerComponent}
+            <Box padding={7} overflow="auto" maxWidth="100%" flexGrow={1}>
+              {children}
+            </Box>
+            <Footer linkButton={linkButton} secondaryButton={secondaryButton} primaryButton={primaryButton} />
+          </DrawerSurface>
+        </RadixDialog.Content>
         <RadixDialog.Overlay asChild>
           <Overlay isVisible={open} />
         </RadixDialog.Overlay>
@@ -106,11 +114,10 @@ const slideOut = keyframes`
   }
 `;
 
-const DrawerSurface = styled(RadixDialog.Content)`
+const DrawerSurface = styled(Stack)`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
-    display: flex;
     flex-direction: column;
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
