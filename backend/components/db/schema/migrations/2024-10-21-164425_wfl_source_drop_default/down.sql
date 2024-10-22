@@ -1,0 +1,1 @@
+ALTER TABLE business_workflow_link ALTER COLUMN source SET DEFAULT 'hosted';

@@ -1,3 +1,4 @@
+use super::business_owner::BusinessOwner;
 use super::onboarding_decision::OnboardingDecision;
 use super::workflow::Workflow;
 use crate::DbResult;
@@ -5,7 +6,9 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::business_owner;
 use db_schema::schema::business_workflow_link;
+use db_schema::schema::workflow;
 use diesel::prelude::*;
 use diesel::Queryable;
 use itertools::Itertools;
@@ -13,6 +16,8 @@ use newtypes::BoId;
 use newtypes::BusinessWorkflowLinkId;
 use newtypes::BusinessWorkflowLinkSource;
 use newtypes::DbActor;
+use newtypes::ObConfigurationId;
+use newtypes::VaultId;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
 
@@ -38,11 +43,12 @@ pub struct NewBusinessWorkflowLinkRow<'a> {
 }
 
 impl BusinessWorkflowLink {
-    pub fn create(conn: &mut TxnPgConn, new: NewBusinessWorkflowLinkRow) -> DbResult<Self> {
-        let result = diesel::insert_into(business_workflow_link::table)
+    #[tracing::instrument("BusinessWorkflowLink::bulk_create", skip_all)]
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewBusinessWorkflowLinkRow>) -> DbResult<Vec<Self>> {
+        let results = diesel::insert_into(business_workflow_link::table)
             .values(new)
-            .get_result::<Self>(conn.conn())?;
-        Ok(result)
+            .get_results::<Self>(conn.conn())?;
+        Ok(results)
     }
 
     #[tracing::instrument("BusinessWorkflowLink::get_latest_user_decisions", skip_all)]
@@ -78,5 +84,26 @@ impl BusinessWorkflowLink {
             .collect();
 
         Ok(res)
+    }
+
+    /// Returns the latest BWFL per business owner for (1) workflows onto the provided playbook for
+    /// (2) the business owners of the provided business vault.
+    #[tracing::instrument("BusinessWorkflowLink::get_latest_complete_per_bo", skip_all)]
+    pub fn get_latest_complete_per_bo(
+        conn: &mut PgConn,
+        bv_id: &VaultId,
+        obc_id: &ObConfigurationId,
+    ) -> DbResult<Vec<(BusinessOwner, Workflow)>> {
+        let results = business_workflow_link::table
+            .inner_join(business_owner::table)
+            .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::user_workflow_id)))
+            .filter(business_owner::business_vault_id.eq(bv_id))
+            .filter(workflow::ob_configuration_id.eq(obc_id))
+            .filter(workflow::completed_at.is_not_null())
+            .order((business_owner::id, workflow::created_at.desc()))
+            .distinct_on(business_owner::id)
+            .select((business_owner::all_columns, workflow::all_columns))
+            .get_results::<(BusinessOwner, Workflow)>(conn)?;
+        Ok(results)
     }
 }

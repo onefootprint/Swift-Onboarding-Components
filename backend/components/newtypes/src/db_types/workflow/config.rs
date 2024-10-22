@@ -77,6 +77,8 @@ impl From<DocumentConfig> for WorkflowConfig {
 pub struct KybConfig {
     #[serde(default)]
     pub recollect_attributes: Vec<CollectedDataOption>,
+    #[serde(default)]
+    pub reuse_existing_bo_kyc: bool,
 }
 
 impl From<KybConfig> for WorkflowConfig {

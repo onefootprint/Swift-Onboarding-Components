@@ -235,10 +235,16 @@ impl Workflow {
             }
             .into(),
             Some(WorkflowRequestConfig::Onboard {
-                recollect_attributes, ..
+                recollect_attributes,
+                reuse_existing_bo_kyc,
+                ..
             }) => match v.kind {
                 VaultKind::Person => KycConfig { recollect_attributes }.into(),
-                VaultKind::Business => KybConfig { recollect_attributes }.into(),
+                VaultKind::Business => KybConfig {
+                    recollect_attributes,
+                    reuse_existing_bo_kyc,
+                }
+                .into(),
             },
             None => match v.kind {
                 VaultKind::Person => KycConfig::default().into(),

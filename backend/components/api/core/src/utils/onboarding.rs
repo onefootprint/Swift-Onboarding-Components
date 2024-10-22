@@ -11,6 +11,8 @@ use crate::FpResult;
 use api_errors::AssertionError;
 use api_errors::ValidationError;
 use db::models::business_owner::BusinessOwner;
+use db::models::business_workflow_link::BusinessWorkflowLink;
+use db::models::business_workflow_link::NewBusinessWorkflowLinkRow;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
@@ -27,10 +29,12 @@ use db::OffsetPagination;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
+use newtypes::BusinessWorkflowLinkSource;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::KybConfig;
 use newtypes::ObConfigurationKind;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
@@ -283,6 +287,33 @@ pub fn get_or_create_business_wf(
             _ => &[],
         };
         create_doc_requests(conn, biz_doc_requests, &biz_wf)?;
+
+        let reuse_existing_bo_kyc = match &biz_wf.config {
+            WorkflowConfig::Kyb(KybConfig {
+                reuse_existing_bo_kyc,
+                ..
+            }) => *reuse_existing_bo_kyc,
+            _ => false,
+        };
+        if reuse_existing_bo_kyc {
+            let sb = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
+            let latest_wf_per_bo =
+                BusinessWorkflowLink::get_latest_complete_per_bo(conn, &sb.vault_id, &obc.id)?;
+            // For all of the BOs except the current, link their previous complete workflows for this playbook
+            // to the current business workflow.
+            // This allows us to not require redoing KYC for the other BOs.
+            let new_wfls = latest_wf_per_bo
+                .iter()
+                .filter(|(_, wf)| wf.scoped_vault_id != su.id)
+                .map(|(bo, wf)| NewBusinessWorkflowLinkRow {
+                    business_owner_id: &bo.id,
+                    business_workflow_id: &biz_wf.id,
+                    user_workflow_id: &wf.id,
+                    source: BusinessWorkflowLinkSource::Reuse,
+                })
+                .collect();
+            BusinessWorkflowLink::bulk_create(conn, new_wfls)?;
+        }
     }
 
     if let Some(wfr) = wfr {

@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS business_workflow_link_user_workflow_id;

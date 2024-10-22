@@ -95,8 +95,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) | WorkflowConfig::Kyb(_) => {
                             WorkflowRequestConfig::Onboard {
                                 playbook_id: wf.ob_configuration_id.clone(),
-                                // Legacy triggers never had this field
+                                // Legacy triggers never had these fields
                                 recollect_attributes: vec![],
+                                reuse_existing_bo_kyc: false,
                             }
                         }
                         WorkflowConfig::Document(ref c) => WorkflowRequestConfig::Document {
@@ -108,8 +109,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     // And even more legacy triggers didn't have a workflow associated with them
                     WorkflowRequestConfig::Onboard {
                         playbook_id,
-                        // Legacy triggers never had this field
+                        // Legacy triggers never had these fields
                         recollect_attributes: vec![],
+                        reuse_existing_bo_kyc: false,
                     }
                 };
                 let request_is_active = wfr.as_ref().is_some_and(|wfr| wfr.deactivated_at.is_none());

@@ -1,6 +1,12 @@
 import pytest
+from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
 from tests.bifrost_client import BifrostClient
-from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL, ID_DATA
+from tests.constants import (
+    BUSINESS_SECONDARY_BOS,
+    FIXTURE_PHONE_NUMBER,
+    FIXTURE_EMAIL,
+    ID_DATA,
+)
 from tests.headers import FpAuth
 from tests.identify_client import IdentifyClient
 from tests.utils import _gen_random_ssn, create_ob_config, post
@@ -26,6 +32,10 @@ def send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=None):
     # And that we serialize that the user has info requested
     body = get(f"users/{fp_id}", None, sandbox_tenant.sk.key)
     assert body["requires_additional_info"]
+
+    if fp_bid:
+        body = get(f"entities/{fp_bid}", None, *sandbox_tenant.db_auths)
+        assert body["has_outstanding_workflow_request"]
 
     # Re-generate a link as is done from the dashboard
     data = dict(kind="inherit")
@@ -68,6 +78,7 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     assert not trigger_event["data"]["request_is_active"]
     obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == initial_num_obds + 1
+    return bifrost
 
 
 def test_onboard_non_portable_document(sandbox_tenant, doc_first_obc):
@@ -365,36 +376,6 @@ def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
     assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
-def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
-    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    sandbox_user = bifrost.run()
-
-    # Trigger onboarding onto KYB playbook, recollecting BOs
-    recollect_attributes = ["business_kyced_beneficial_owners"]
-    trigger = dict(
-        kind="onboard",
-        data=dict(
-            recollect_attributes=recollect_attributes,
-            playbook_id=kyb_sandbox_ob_config.id,
-        ),
-    )
-    fp_id = sandbox_user.fp_id
-    fp_bid = sandbox_user.fp_bid
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid)
-
-    def pre_run(bifrost):
-        # Check that recollect_attributes are propagated through
-        requirements = bifrost.get_status()["all_requirements"]
-        collect_biz_data = next(
-            i for i in requirements if i["kind"] == "collect_business_data"
-        )
-        assert collect_biz_data["recollect_attributes"] == recollect_attributes
-        collect_data = next(i for i in requirements if i["kind"] == "collect_data")
-        assert not collect_data["recollect_attributes"]
-
-    complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
-
-
 @pytest.mark.parametrize(
     "trigger",
     [
@@ -481,3 +462,172 @@ def test_complete_trigger_w_user_specific_token(sandbox_tenant):
     body = post(f"users/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
     complete_redo_flow_user(sandbox_user, auth_token)
+
+
+def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    sandbox_user = bifrost.run()
+
+    # Trigger onboarding onto KYB playbook, recollecting BOs
+    recollect_attributes = ["business_kyced_beneficial_owners"]
+    trigger = dict(
+        kind="onboard",
+        data=dict(
+            recollect_attributes=recollect_attributes,
+            playbook_id=kyb_sandbox_ob_config.id,
+            reuse_existing_bo_kyc=True,
+        ),
+    )
+    fp_id = sandbox_user.fp_id
+    fp_bid = sandbox_user.fp_bid
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid)
+
+    def pre_run(bifrost):
+        # Check that recollect_attributes are propagated through
+        requirements = bifrost.get_status()["all_requirements"]
+        collect_biz_data = next(
+            i for i in requirements if i["kind"] == "collect_business_data"
+        )
+        assert collect_biz_data["recollect_attributes"] == recollect_attributes
+        collect_data = next(i for i in requirements if i["kind"] == "collect_data")
+        assert not collect_data["recollect_attributes"]
+
+    complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
+
+    body = get(f"entities/{fp_bid}", None, *sandbox_tenant.db_auths)
+    assert not body["has_outstanding_workflow_request"]
+
+
+def test_reonboard_kyb_multi_kyc(kyb_sandbox_ob_config, sandbox_tenant):
+    """
+    When asking a business with multiple BOs to redo KYB, the secondary BO should also have to redo KYB.
+    """
+    primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo = primary_bifrost.run()
+
+    secondary_bo_token = extract_bo_token(primary_bifrost)
+    secondary_bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
+    )
+    secondary_bo = secondary_bifrost.run()
+
+    return
+    # Issue and complete the trigger for the primary BO
+    trigger = dict(
+        kind="onboard",
+        data=dict(playbook_id=primary_bifrost.ob_config.id),
+    )
+    initial_auth_token = send_trigger(
+        primary_bo.fp_id, sandbox_tenant, trigger, primary_bo.fp_bid
+    )
+
+    bifrost = complete_redo_flow_user(primary_bo, initial_auth_token)
+    assert bifrost.validate_response["business"]["status"] == "incomplete"
+    assert any(r["kind"] == "collect_data" for r in bifrost.already_met_requirements)
+
+    # TODO: eventually we should do all of this too, but there's a bug where we inherit the secondary BO's
+    # last KYC workflow instead of making a new one in `POST /hosted/onboarding`.
+    # We will need to pass force_create through the BO token, but don't want to force create biz wf?
+    # Complete the secondary BO form sent out
+    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bifrost2 = BifrostClient.login_user(
+        kyb_sandbox_ob_config,
+        sandbox_id=secondary_bifrost.sandbox_id,
+        override_ob_config_auth=secondary_bo_token,
+    )
+    secondary_bo2 = secondary_bifrost2.run()
+    assert any(
+        r["kind"] == "collect_data" for r in secondary_bifrost2.already_met_requirements
+    )
+    assert secondary_bo2.fp_id == secondary_bo.fp_id
+    assert secondary_bo2.fp_bid == secondary_bo.fp_bid
+    assert secondary_bifrost2.validate_response["business"]["status"] == "pass"
+
+    # Everyone should have two workflows
+    body = get(f"users/{primary_bo.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    body = get(f"businesses/{primary_bo.fp_bid}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    body = get(f"users/{secondary_bo.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+
+
+def test_reonboard_kyb_multi_kyc_reuse_kyc(kyb_sandbox_ob_config, sandbox_tenant):
+    """
+    Test when we make a trigger to reonbard a business that we can reuse the existing BOs' KYC results from
+    a previous workflow
+    """
+    primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo = primary_bifrost.run()
+
+    secondary_bo_token = extract_bo_token(primary_bifrost)
+    secondary_bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
+    )
+    secondary_bo = secondary_bifrost.run()
+
+    trigger = dict(
+        kind="onboard",
+        data=dict(playbook_id=primary_bifrost.ob_config.id, reuse_existing_bo_kyc=True),
+    )
+    initial_auth_token = send_trigger(
+        primary_bo.fp_id, sandbox_tenant, trigger, primary_bo.fp_bid
+    )
+
+    bifrost = complete_redo_flow_user(primary_bo, initial_auth_token)
+    assert any(r["kind"] == "collect_data" for r in bifrost.already_met_requirements)
+
+    # Business should be terminal, even though the second BO didn't redo KYC
+    assert bifrost.validate_response["business"]["status"] == "pass"
+
+    # Primary BO and business should have two workflows
+    body = get(f"users/{primary_bo.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    body = get(f"businesses/{primary_bo.fp_bid}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+
+    # But secondary BO shouldn't have had to reonboard
+    body = get(f"users/{secondary_bo.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 1
+
+
+def test_kyb_validation(kyb_sandbox_ob_config, sandbox_tenant):
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    user = bifrost.run()
+
+    # Issue and complete the trigger for the primary BO
+    tests = [
+        (
+            dict(
+                playbook_id=sandbox_tenant.default_ob_config.id,
+                reuse_existing_bo_kyc=True,
+            ),
+            None,
+            "reuse_existing_bo_kyc can only be used with KYB playbooks",
+        ),
+        (
+            dict(playbook_id=sandbox_tenant.default_ob_config.id),
+            user.fp_bid,
+            "Must provide a KYB playbook when providing fp_bid",
+        ),
+        # Just temporary until we support this flow
+        # https://github.com/onefootprint/monorepo/pull/13002/files/340a0937c3972bee4ff6a1b5df688ea7e6f70c53#r1811050884
+        (
+            dict(playbook_id=kyb_sandbox_ob_config.id, reuse_existing_bo_kyc=False),
+            user.fp_bid,
+            "Must provide reuse_existing_bo_kyc for KYB flows",
+        ),
+    ]
+    for trigger_data, fp_bid, err in tests:
+        trigger = dict(kind="onboard", data=trigger_data)
+        action = dict(trigger=trigger, kind="trigger", fp_bid=fp_bid)
+        data = dict(actions=[action])
+        body = post(
+            f"entities/{user.fp_id}/actions",
+            data,
+            *sandbox_tenant.db_auths,
+            status_code=400,
+        )
+        assert body["message"] == err

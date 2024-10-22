@@ -123,6 +123,8 @@ pub async fn post(
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,
             };
+            // TODO in order to support reuse_existing_bo_kyc = False here for redo KYB, we should kind of
+            // force create here when the secondary BO needs to redo KYC.
             let (wf_id, is_new_wf) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
             let kyb_fixture_result = request.kyb_fixture_result.or(request.fixture_result);
@@ -144,7 +146,7 @@ pub async fn post(
                         user_workflow_id: &wf_id,
                         source: BusinessWorkflowLinkSource::Hosted,
                     };
-                    BusinessWorkflowLink::create(conn, new)?;
+                    BusinessWorkflowLink::bulk_create(conn, vec![new])?;
                 }
             }
 

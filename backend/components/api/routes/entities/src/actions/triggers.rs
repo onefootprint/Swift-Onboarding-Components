@@ -45,18 +45,28 @@ fn validate(
     su: &ScopedVault,
     sb: Option<&ScopedVault>,
 ) -> FpResult<()> {
+    let has_sb = sb.is_some();
     match trigger {
         WorkflowRequestConfig::Onboard {
             playbook_id,
             recollect_attributes: attrs,
+            reuse_existing_bo_kyc,
         } => {
-            if attrs.is_empty() {
-                return Ok(());
-            }
             let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
             if attrs.iter().any(|cdo| !obc.must_collect_data.contains(cdo)) {
                 return ValidationError("recollect_attributes must be a subset of the playbook's data")
                     .into();
+            }
+            let is_kyb = obc.kind == ObConfigurationKind::Kyb;
+            if *reuse_existing_bo_kyc && !is_kyb {
+                return ValidationError("reuse_existing_bo_kyc can only be used with KYB playbooks").into();
+            }
+            if has_sb && !is_kyb {
+                return ValidationError("Must provide a KYB playbook when providing fp_bid").into();
+            }
+            // Temporary until we implement this
+            if has_sb && !*reuse_existing_bo_kyc {
+                return ValidationError("Must provide reuse_existing_bo_kyc for KYB flows").into();
             }
         }
         WorkflowRequestConfig::Document {
@@ -68,7 +78,6 @@ fn validate(
             if business_configs.iter().any(|c| !c.is_custom()) {
                 return ValidationError("business_configs can only contain custom document requests").into();
             }
-            let has_sb = sb.is_some();
             let has_business_configs = !business_configs.is_empty();
             if has_sb != has_business_configs {
                 return ValidationError("fp_bid and business_configs must both be provided together").into();

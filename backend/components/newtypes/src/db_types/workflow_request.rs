@@ -19,6 +19,11 @@ pub enum WorkflowRequestConfig {
         playbook_id: ObConfigurationId,
         #[serde(default)]
         recollect_attributes: Vec<CollectedDataOption>,
+        /// When true, reuses existing BOs' KYC results on the same playbook.
+        /// When false, requires the existing BOs to re-complete KYC.
+        /// Can only be true for KYB playbooks
+        #[serde(default)]
+        reuse_existing_bo_kyc: bool,
     },
     /// Upload a new document and re-run the decision engine
     Document {

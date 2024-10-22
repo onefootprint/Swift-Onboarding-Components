@@ -144,8 +144,9 @@ pub async fn post(
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
             tracing::info!(playbook_key=%obc.key, "Post /kyc with playbook");
-            if obc.kind != ObConfigurationKind::Kyc {
-                return Err(ValidationError("Must use playbook of kind KYC").into());
+            // We support using a KYB playbook since this will just run the KYC checks from the playbook
+            if !matches!(obc.kind, ObConfigurationKind::Kyc | ObConfigurationKind::Kyb) {
+                return Err(ValidationError("Invalid playbook kind").into());
             }
 
             if obc.collects_document() {
