@@ -225,6 +225,9 @@ pub enum AmlMatchKind {
     ExactNameAndDobYear,
     #[default]
     ExactName,
+    FuzzyHigh,
+    FuzzyMedium,
+    FuzzyLow,
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, PartialEq, Apiv2Schema)]

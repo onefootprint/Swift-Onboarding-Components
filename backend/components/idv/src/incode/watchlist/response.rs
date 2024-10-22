@@ -71,6 +71,9 @@ pub struct Filters {
 pub enum MatchKind {
     ExactNameAndDobYear,
     ExactName,
+    FuzzyHigh,
+    FuzzyMedium,
+    FuzzyLow,
 }
 
 impl From<AmlMatchKind> for MatchKind {
@@ -78,9 +81,14 @@ impl From<AmlMatchKind> for MatchKind {
         match value {
             AmlMatchKind::ExactNameAndDobYear => MatchKind::ExactNameAndDobYear,
             AmlMatchKind::ExactName => MatchKind::ExactName,
+            AmlMatchKind::FuzzyHigh => MatchKind::FuzzyHigh,
+            AmlMatchKind::FuzzyMedium => MatchKind::FuzzyMedium,
+            AmlMatchKind::FuzzyLow => MatchKind::FuzzyLow,
         }
     }
 }
+
+pub enum MatchType {}
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct Hit {
@@ -116,6 +124,41 @@ impl Hit {
                 name_matches && dob_matches
             }
             MatchKind::ExactName => name_matches,
+            MatchKind::FuzzyHigh => {
+                let match_kinds = [
+                    "name_exact".to_string(),
+                    "edit_distance".to_string(),
+                    "aka_exact".to_string(),
+                    "name_fuzzy".to_string(),
+                ];
+                match_types.iter().any(|mt| match_kinds.contains(mt))
+            }
+            MatchKind::FuzzyMedium => {
+                let match_kinds = [
+                    "name_exact".to_string(),
+                    "edit_distance".to_string(),
+                    "aka_exact".to_string(),
+                    "name_fuzzy".to_string(),
+                    "aka_fuzzy".to_string(),
+                    "equivalent_name".to_string(),
+                    "equivalent_aka".to_string(),
+                ];
+                match_types.iter().any(|mt| match_kinds.contains(mt))
+            }
+            MatchKind::FuzzyLow => {
+                let match_kinds = [
+                    "name_exact".to_string(),
+                    "edit_distance".to_string(),
+                    "aka_exact".to_string(),
+                    "name_fuzzy".to_string(),
+                    "aka_fuzzy".to_string(),
+                    "equivalent_name".to_string(),
+                    "equivalent_aka".to_string(),
+                    "phonetic_name".to_string(),
+                    "phonetic_aka".to_string(),
+                ];
+                match_types.iter().any(|mt| match_kinds.contains(mt))
+            }
         }
     }
 }
