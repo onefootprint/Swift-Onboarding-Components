@@ -25,6 +25,7 @@ use newtypes::BusinessOwnerKind;
 use newtypes::DataIdentifier as DI;
 use newtypes::DataRequest;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::Uuid;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
@@ -234,6 +235,8 @@ impl BatchRequest {
                 let bo = NewSecondaryBo {
                     link_id: link_id.clone(),
                     ownership_stake: ownership_stake as i32,
+                    // TODO provide in the API request
+                    uuid: Uuid::new_v4(),
                 };
                 BusinessOwner::bulk_create_secondary(conn, vec![bo], &bvw.vault.id)?;
                 let data = create_fingerprinted_data_request(data, &link_id)?;

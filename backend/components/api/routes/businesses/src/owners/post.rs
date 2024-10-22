@@ -71,7 +71,7 @@ pub async fn post(
                 return ValidationError(&err_str).into();
             }
 
-            let result = BusinessOwner::create(conn, sb, owner_su.vault_id, ownership_stake);
+            let result = BusinessOwner::create_tenant_api(conn, sb, owner_su.vault_id, ownership_stake);
             match result {
                 Ok(_) => (),
                 Err(DbError::UniqueConstraintViolation(_)) => {

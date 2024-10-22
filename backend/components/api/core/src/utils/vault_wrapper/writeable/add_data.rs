@@ -44,6 +44,7 @@ use newtypes::ScopedVaultVersionNumber;
 use newtypes::SealedVaultDataKey;
 use newtypes::UserVaultUpdateSource;
 use newtypes::UserVaultUpdatedPayload;
+use newtypes::Uuid;
 use newtypes::VaultId;
 use newtypes::WebhookEvent;
 
@@ -247,6 +248,7 @@ impl<Type> WriteableVw<Type> {
             .map(|bo| NewSecondaryBo {
                 link_id: bo.link_id.clone(),
                 ownership_stake: bo.ownership_stake as i32,
+                uuid: Uuid::new_v4(),
             })
             .collect_vec();
         BusinessOwner::bulk_create_secondary(conn, new_bos, &self.sv.vault_id)?;

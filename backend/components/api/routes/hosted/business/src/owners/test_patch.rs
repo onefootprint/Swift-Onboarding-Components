@@ -12,6 +12,7 @@ use newtypes::DataIdentifier as DI;
 use newtypes::DataRequest;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
+use newtypes::Uuid;
 use newtypes::ValidateArgs;
 use newtypes::VaultId;
 use std::collections::HashMap;
@@ -81,6 +82,7 @@ fn test_verify_unique_phones_and_emails(
     let dbo = BusinessOwnerInfo {
         bo: BusinessOwner {
             id: BoId::test_data("Flerp".into()),
+            uuid: Some(Uuid::new_v4()),
             user_vault_id: None,
             business_vault_id: VaultId::test_data("Blerp".into()),
             kind: BusinessOwnerKind::Primary,
