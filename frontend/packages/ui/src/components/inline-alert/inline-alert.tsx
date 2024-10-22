@@ -5,8 +5,9 @@ import type { BoxProps } from '../box';
 import Box from '../box';
 import Stack from '../stack';
 import Text from '../text';
-import type { InlineAlertVariant } from './inline-alert.types';
 import { createBackgroundStyles, createTextStyles, getIconForVariant } from './inline-alert.utils';
+
+export type InlineAlertVariant = 'error' | 'warning' | 'info' | 'neutral';
 
 export type InlineAlertProps = BoxProps & {
   variant: InlineAlertVariant;
@@ -21,12 +22,16 @@ const InlineAlert = ({ cta, children, variant = 'info', ...props }: InlineAlertP
 
   return (
     <InlineAlertContainer role="alert" $variant={variant} {...props}>
-      <Stack flex={0} marginTop={1}>
+      <IconContainer>
         <IconComponent color={variant} />
-      </Stack>
+      </IconContainer>
       <StyledText type={variant} variant="body-3">
         {children}
-        {cta && <Action onClick={cta.onClick}>{cta.label}</Action>}
+        {cta && (
+          <Action onClick={cta.onClick} $variant={variant}>
+            {cta.label}
+          </Action>
+        )}
       </StyledText>
     </InlineAlertContainer>
   );
@@ -45,38 +50,65 @@ const InlineAlertContainer = styled(Box)<{
   $variant: InlineAlertVariant;
 }>`
   ${({ theme, $variant }) => css`
-    ${createBackgroundStyles($variant)};
-    border-radius: ${theme.borderRadius.default};
     display: flex;
     flex-direction: row;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[3]};
     width: 100%;
+    padding: ${theme.spacing[3]};
+    gap: ${theme.spacing[3]};
+    border-radius: ${theme.borderRadius.default};
+    ${createBackgroundStyles($variant)};
+
+    ${
+      $variant === 'neutral' &&
+      css`
+        border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      `
+    }
   `};
 `;
 
-const Action = styled.button`
-  ${({ theme }) => css`
+const IconContainer = styled(Stack)`
+  ${({ theme }) => css`   
+    height: ${theme.typography['body-3'].lineHeight};
+    align-items: center;
+    flex: 0;
+  `}
+`;
+
+const Action = styled.button<{
+  $variant: InlineAlertVariant;
+}>`
+  ${({ theme, $variant }) => css`
     all: unset;
-    ${createFontStyles('label-3')};
+    display: inline;
+    margin-left: ${theme.spacing[2]};
     color: currentColor;
     background: unset;
     border: unset;
     cursor: pointer;
     text-decoration: underline;
-    display: inline;
-    margin-left: ${theme.spacing[2]};
+    ${createFontStyles('label-3')};
 
     &:active {
-      color: currentColor;
       opacity: 0.85;
     }
 
     @media (hover: hover) {
       &:hover {
-        color: currentColor;
         opacity: 0.7;
       }
+    }
+
+    &:active,
+    &:hover {
+      color: currentColor;
+    }
+
+    ${
+      $variant === 'neutral' &&
+      css`
+        color: ${theme.color.accent};
+      `
     }
   `}
 `;

@@ -23,6 +23,10 @@ export const inlineAlertVariantStyles: Record<
     backgroundColor: 'warning',
     color: 'warning',
   },
+  neutral: {
+    backgroundColor: 'tertiary',
+    color: 'tertiary',
+  },
 };
 
 export const getIconForVariant = (variant: InlineAlertVariant) => {

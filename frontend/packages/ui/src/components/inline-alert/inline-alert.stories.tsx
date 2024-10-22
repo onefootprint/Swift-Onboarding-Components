@@ -53,3 +53,24 @@ WithCta.args = {
     onClick: () => undefined,
   },
 };
+
+export const Neutral = Template.bind({});
+Neutral.args = {
+  children: 'Neutral message goes here.',
+  variant: 'neutral',
+  cta: {
+    label: 'Dismiss',
+    onClick: () => undefined,
+  },
+};
+
+export const VeryLong = Template.bind({});
+VeryLong.args = {
+  children:
+    'Aute duis nisi cillum ad sunt culpa do amet duis duis sunt magna qui. Elit cillum consequat et dolore nulla fugiat. Laborum occaecat magna laboris mollit id ea ex. Nulla pariatur laboris aliqua.',
+  variant: 'neutral',
+  cta: {
+    label: 'Dismiss',
+    onClick: () => undefined,
+  },
+};

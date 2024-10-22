@@ -1,1 +1,1 @@
-export type InlineAlertVariant = 'error' | 'warning' | 'info';
+export type InlineAlertVariant = 'error' | 'warning' | 'info' | 'neutral';
