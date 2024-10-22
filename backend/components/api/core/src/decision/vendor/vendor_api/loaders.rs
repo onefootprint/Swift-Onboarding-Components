@@ -129,7 +129,7 @@ mod tests {
     use db::models::verification_result::NewVerificationResult;
     use db::models::verification_result::VerificationResult;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-    use idv::test_fixtures::DocTestOpts;
+    use idv::test_incode_fixtures::DocTestOpts;
     use macros::test_state_case;
     use newtypes::vendor_api_struct::*;
     use newtypes::DecisionIntentId;
@@ -545,22 +545,22 @@ mod tests {
             VendorAPI::IncodeProcessId => todo!(),
             VendorAPI::IncodeFetchScores => {
                 let opts = DocTestOpts::default();
-                idv::test_fixtures::incode_fetch_scores_response(opts)
+                idv::test_incode_fixtures::incode_fetch_scores_response(opts)
             }
             VendorAPI::IncodeAddPrivacyConsent => todo!(),
             VendorAPI::IncodeAddMlConsent => todo!(),
-            VendorAPI::IncodeFetchOcr => idv::test_fixtures::incode_fetch_ocr_response(None),
+            VendorAPI::IncodeFetchOcr => idv::test_incode_fixtures::incode_fetch_ocr_response(None),
             VendorAPI::IncodeAddSelfie => todo!(),
             VendorAPI::IncodeWatchlistCheck => {
-                idv::test_fixtures::incode_watchlist_result_response_yes_hits()
+                idv::test_incode_fixtures::incode_watchlist_result_response_yes_hits()
             }
             VendorAPI::IncodeUpdatedWatchlistResult => {
                 // same response struct
-                idv::test_fixtures::incode_watchlist_result_response_yes_hits()
+                idv::test_incode_fixtures::incode_watchlist_result_response_yes_hits()
             }
             VendorAPI::IncodeGetOnboardingStatus => todo!(),
             VendorAPI::IncodeProcessFace => todo!(),
-            VendorAPI::IncodeCurpValidation => idv::test_fixtures::incode_curp_validation_good_curp(),
+            VendorAPI::IncodeCurpValidation => idv::test_incode_fixtures::incode_curp_validation_good_curp(),
             VendorAPI::IncodeGovernmentValidation => todo!(),
             VendorAPI::IncodeApproveSession => {
                 serde_json::json!({

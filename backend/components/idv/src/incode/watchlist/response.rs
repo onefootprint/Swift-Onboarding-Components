@@ -124,7 +124,7 @@ impl Hit {
                 name_matches && dob_matches
             }
             MatchKind::ExactName => name_matches,
-            MatchKind::FuzzyHigh => {
+            MatchKind::FuzzyLow => {
                 let match_kinds = [
                     "name_exact".to_string(),
                     "edit_distance".to_string(),
@@ -145,7 +145,7 @@ impl Hit {
                 ];
                 match_types.iter().any(|mt| match_kinds.contains(mt))
             }
-            MatchKind::FuzzyLow => {
+            MatchKind::FuzzyHigh => {
                 let match_kinds = [
                     "name_exact".to_string(),
                     "edit_distance".to_string(),
@@ -376,7 +376,7 @@ mod tests {
 
     #[test]
     pub fn test_deser() {
-        let raw_res = crate::test_fixtures::incode_watchlist_result_response_large();
+        let raw_res = crate::test_incode_fixtures::incode_watchlist_result_response_large();
 
         let parsed: WatchlistResultResponse = serde_json::from_value(raw_res).unwrap();
         assert_eq!("success".to_owned(), parsed.status.unwrap());
@@ -418,7 +418,7 @@ mod tests {
 
     #[test]
     pub fn test_leak_hit() {
-        let raw_res = crate::test_fixtures::incode_watchlist_result_response_yes_hits();
+        let raw_res = crate::test_incode_fixtures::incode_watchlist_result_response_yes_hits();
         let parsed: WatchlistResultResponse = serde_json::from_value(raw_res).unwrap();
 
         let hit = parsed.content.unwrap().data.unwrap().hits.unwrap()[0].clone();

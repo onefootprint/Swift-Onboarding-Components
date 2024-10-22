@@ -1,5 +1,5 @@
 // for test fixture vendor responses json
-#![recursion_limit = "256"]
+#![recursion_limit = "512"]
 use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::expectid::response::ExpectIDResponse;
@@ -44,6 +44,7 @@ pub mod sentilink;
 pub mod socure;
 pub mod stytch;
 pub mod test_fixtures;
+pub mod test_incode_fixtures;
 pub mod tests;
 pub mod twilio;
 

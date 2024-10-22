@@ -15,6 +15,7 @@ use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::footprint_http_client::FpVendorClientArgs;
 use crate::incode::error::Error as IncodeError;
 use newtypes::vendor_credentials::IncodeCredentials;
+use newtypes::AmlMatchKind;
 use newtypes::DocVData;
 use newtypes::DocumentKind;
 use newtypes::IdDocKind;
@@ -404,6 +405,7 @@ impl AuthenticatedIncodeClientAdapter {
         middle_name: Option<PiiString>,
         last_name: Option<PiiString>,
         dob_year: Option<PiiString>,
+        match_kind: AmlMatchKind,
     ) -> Result<serde_json::Value, IncodeError> {
         let url = self.client_adapter.api_url("omni/watchlist-result")?;
 
@@ -414,11 +416,19 @@ impl AuthenticatedIncodeClientAdapter {
             (Some(f), Some(m)) => Some(format!("{} {}", f.leak(), m.leak()).into()),
         };
 
+        let fuzziness = match match_kind {
+            AmlMatchKind::ExactNameAndDobYear => Some(0.1),
+            AmlMatchKind::ExactName => Some(0.1),
+            AmlMatchKind::FuzzyHigh => Some(1.0),
+            AmlMatchKind::FuzzyMedium => Some(0.7),
+            AmlMatchKind::FuzzyLow => Some(0.3),
+        };
+
         let request = WatchlistResultRequest {
             first_name,
             sur_name: last_name,
             birth_year: dob_year.map(|s| s.leak().parse::<f32>()).transpose()?,
-            fuzziness: Some(0.1),
+            fuzziness,
         };
 
         let response = footprint_http_client
@@ -573,6 +583,7 @@ mod tests {
     use crate::tests::fixtures::images::load_image_and_encode_as_b64;
     use newtypes::incode::IncodeStatus;
     use newtypes::vendor_credentials::IncodeCredentials;
+    use newtypes::AmlMatchKind;
     use newtypes::DocVData;
     use newtypes::IdDocKind;
     use newtypes::IncodeConfigurationId;
@@ -802,6 +813,7 @@ mod tests {
                 Some(PiiString::from("Billy")),
                 Some(PiiString::from("Boberto")),
                 None,
+                AmlMatchKind::default(),
             )
             .await
             .unwrap();
@@ -861,7 +873,10 @@ mod tests {
         let (fp_client, authenticated_client) = get_authed_client("65e241cbac19b78faa5d22e3", None).await;
 
         let raw_res = authenticated_client
-            .curp_validation(&fp_client, PiiString::from(crate::test_fixtures::TEST_CURP))
+            .curp_validation(
+                &fp_client,
+                PiiString::from(crate::test_incode_fixtures::TEST_CURP),
+            )
             .await
             .unwrap();
 

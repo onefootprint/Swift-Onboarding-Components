@@ -188,20 +188,19 @@ impl IncodeClientErrorCustomFailureReasons for CurpValidationResponse {
 mod tests {
     use super::CurpValidationResponse;
     use super::RenapoError;
-    use crate::test_fixtures;
+    use crate::test_incode_fixtures;
     use test_case::test_case;
 
     #[test]
     fn test_serialization() {
         use super::*;
-        use crate::test_fixtures;
         assert!(serde_json::from_value::<CurpValidationResponse>(
-            test_fixtures::incode_curp_validation_good_curp()
+            test_incode_fixtures::incode_curp_validation_good_curp()
         )
         .is_ok());
 
         assert!(serde_json::from_value::<CurpValidationResponse>(
-            test_fixtures::incode_curp_validation_bad_curp("01", "06")
+            test_incode_fixtures::incode_curp_validation_bad_curp("01", "06")
         )
         .is_ok());
     }
@@ -211,7 +210,7 @@ mod tests {
     #[test_case("99", "20" => RenapoError::ServiceNotAvailable)]
     fn test_error(tipo: &str, codigo: &str) -> RenapoError {
         let parsed = serde_json::from_value::<CurpValidationResponse>(
-            test_fixtures::incode_curp_validation_bad_curp(tipo, codigo),
+            test_incode_fixtures::incode_curp_validation_bad_curp(tipo, codigo),
         )
         .unwrap();
 

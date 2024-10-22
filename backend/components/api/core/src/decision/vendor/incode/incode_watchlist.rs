@@ -31,6 +31,7 @@ use idv::VendorResponse;
 use newtypes::vendor_api_struct::IncodeUpdatedWatchlistResult;
 use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
+use newtypes::AmlMatchKind;
 use newtypes::BillingEventKind as BEK;
 use newtypes::DecisionIntentId;
 use newtypes::EncryptedVaultPrivateKey;
@@ -44,6 +45,8 @@ use newtypes::PiiJsonValue;
 use newtypes::ScopedVaultId;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
 use newtypes::VerificationRequestId;
 use newtypes::VerificationResultId;
 
@@ -83,6 +86,7 @@ async fn call_watchlist_result(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
+    match_kind: AmlMatchKind,
     kind: WatchlistCheckKind,
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = sv_id.clone();
@@ -109,6 +113,7 @@ async fn call_watchlist_result(
                 .make_request(IncodeWatchlistCheckRequest {
                     credentials,
                     idv_data,
+                    match_kind,
                 })
                 .await;
             let vres_id = save_verification_result_for_watchlist_check(
@@ -167,6 +172,7 @@ pub async fn make_watchlist_result_call(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
+    match_kind: AmlMatchKind,
     kind: WatchlistCheckKind,
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
@@ -194,6 +200,7 @@ pub async fn make_watchlist_result_call(
         sv_id,
         di_id,
         user_vault_public_key,
+        match_kind,
         kind,
     )
     .await?;
@@ -262,12 +269,22 @@ pub async fn run_watchlist_check(
             .ff_client
             .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&obc.key))
     {
+        // Get the first configured match kind for an aml check.
+        let match_kind = if let Some(VerificationCheck::Aml { match_kind, .. }) =
+            obc.verification_checks().get(VerificationCheckKind::Aml)
+        {
+            match_kind
+        } else {
+            AmlMatchKind::default()
+        };
+
         make_watchlist_result_call(
             state,
             &tvc,
             &di.scoped_vault_id,
             &di.id,
             &vw.vault.public_key,
+            match_kind,
             kind,
         )
         .await //we return vres.id instead of vres just because we currently only get vres_id from
@@ -324,7 +341,7 @@ async fn save_canned_response(
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     state
         .db_transaction(move |conn| -> FpResult<_> {
-            let canned_res = idv::test_fixtures::incode_watchlist_result_response_no_hits();
+            let canned_res = idv::test_incode_fixtures::incode_watchlist_result_response_no_hits();
             let parsed = serde_json::from_value::<WatchlistResultResponse>(canned_res.clone())?;
 
             let (_vreq, vres) = verification_result::save_vreq_and_vres(

@@ -340,11 +340,9 @@ mod tests {
     use idv::incode::doc::response::FetchScoresResponse;
     use idv::incode::doc::response::OCRName;
     use idv::incode::doc::response::OcrDataConfidence;
-    use idv::test_fixtures::DocTestOpts;
-    use idv::test_fixtures::OcrTestOpts;
-    use idv::test_fixtures::{
-        self,
-    };
+    use idv::test_incode_fixtures;
+    use idv::test_incode_fixtures::DocTestOpts;
+    use idv::test_incode_fixtures::OcrTestOpts;
     use newtypes::incode::IncodeStatus::*;
     use newtypes::FootprintReasonCode::*;
     use newtypes::FootprintReasonCode::{
@@ -447,7 +445,7 @@ mod tests {
             dob,
             address: IncodeOcrAddress::default(),
         };
-        let raw = test_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
+        let raw = test_incode_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
 
         assert_have_same_elements(
@@ -592,10 +590,10 @@ mod tests {
         expected: Vec<FootprintReasonCode>,
         expect_selfie: bool,
     ) {
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(doc_opts);
+        let raw_response = idv::test_incode_fixtures::incode_fetch_scores_response(doc_opts);
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
 
-        let ocr_raw_response = idv::test_fixtures::incode_fetch_ocr_response(None);
+        let ocr_raw_response = idv::test_incode_fixtures::incode_fetch_ocr_response(None);
         let ocr_parsed: FetchOCRResponse = serde_json::from_value(ocr_raw_response).unwrap();
 
         assert_have_same_elements(
@@ -611,10 +609,10 @@ mod tests {
 
     #[test]
     fn test_summary_barcode_reason_code() {
-        let ocr_raw_response = idv::test_fixtures::incode_fetch_ocr_response(None);
+        let ocr_raw_response = idv::test_incode_fixtures::incode_fetch_ocr_response(None);
         let ocr_parsed: FetchOCRResponse = serde_json::from_value(ocr_raw_response).unwrap();
         // everything passes
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
+        let raw_response = idv::test_incode_fixtures::incode_fetch_scores_response(DocTestOpts::default());
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         let id_test_results = only_id_tests_for_ones_that_have_frcs_from_parsed(parsed.clone());
         id_test_results.iter().for_each(|(test, status)| {
@@ -627,7 +625,7 @@ mod tests {
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
 
         // partial fail
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {
+        let raw_response = idv::test_incode_fixtures::incode_fetch_scores_response(DocTestOpts {
             barcode_content: Fail,
             barcode: Ok,
             cross_checks: Ok,
@@ -640,7 +638,7 @@ mod tests {
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
         // read ok, but cross checks fail
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {
+        let raw_response = idv::test_incode_fixtures::incode_fetch_scores_response(DocTestOpts {
             barcode_content: Ok,
             barcode: Ok,
             cross_checks: Fail,
@@ -652,7 +650,7 @@ mod tests {
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
         // wasn't read
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {
+        let raw_response = idv::test_incode_fixtures::incode_fetch_scores_response(DocTestOpts {
             barcode_content: Fail,
             barcode: Fail,
             cross_checks: Fail,
@@ -802,8 +800,10 @@ mod tests {
         }
         => false)]
     fn test_ocr_was_successful(dk: IdDocKind, score_opts: DocTestOpts, ocr_res: FetchOCRResponse) -> bool {
-        let scores_res: FetchScoresResponse =
-            serde_json::from_value(idv::test_fixtures::incode_fetch_scores_response(score_opts)).unwrap();
+        let scores_res: FetchScoresResponse = serde_json::from_value(
+            idv::test_incode_fixtures::incode_fetch_scores_response(score_opts),
+        )
+        .unwrap();
         ocr_was_successful(&scores_res, &ocr_res, dk)
     }
 
@@ -820,8 +820,11 @@ mod tests {
         type_of_id: &str,
         expected: Vec<FootprintReasonCode>,
     ) {
-        let raw =
-            test_fixtures::incode_fetch_ocr_response_for_drivers_license(class, issuing_state, type_of_id);
+        let raw = test_incode_fixtures::incode_fetch_ocr_response_for_drivers_license(
+            class,
+            issuing_state,
+            type_of_id,
+        );
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
 
         assert_have_same_elements(

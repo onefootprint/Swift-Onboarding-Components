@@ -467,11 +467,11 @@ impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultRe
                 request.idv_data.middle_name,
                 request.idv_data.last_name,
                 dob_year,
+                request.match_kind,
             )
             .await?;
 
         let result = IncodeResponse::from_value(raw_response);
-
         Ok(result)
     }
 }

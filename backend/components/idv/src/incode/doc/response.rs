@@ -1,7 +1,7 @@
 use crate::incode::error::Error as IncodeError;
 use crate::incode::IncodeClientErrorCustomFailureReasons;
-use crate::test_fixtures::DocTestOpts;
-use crate::test_fixtures::{
+use crate::test_incode_fixtures::DocTestOpts;
+use crate::test_incode_fixtures::{
     self,
 };
 use chrono::NaiveDate;
@@ -287,7 +287,8 @@ impl FetchScoresResponse {
         } else {
             Ok(DocTestOpts::default())
         }?;
-        let resp: Self = serde_json::from_value(test_fixtures::incode_fetch_scores_response(doc_opts))?;
+        let resp: Self =
+            serde_json::from_value(test_incode_fixtures::incode_fetch_scores_response(doc_opts))?;
 
         Ok(resp)
     }
@@ -541,7 +542,9 @@ impl IncodeOcrFixtureResponseFields {
         let (curp, type_of_id) = {
             let (type_of_id, _) = doc_kind.into();
             let curp = match doc_kind {
-                IdDocKind::VoterIdentification | IdDocKind::Passport => Some(test_fixtures::TEST_CURP.into()),
+                IdDocKind::VoterIdentification | IdDocKind::Passport => {
+                    Some(test_incode_fixtures::TEST_CURP.into())
+                }
                 _ => None,
             };
 
@@ -964,8 +967,8 @@ mod tests {
     use crate::incode::doc::response::AddSelfieResponse;
     use crate::incode::doc::response::ProcessFaceResponse;
     use crate::incode::IncodeAPIResult;
-    use crate::test_fixtures::DocTestOpts;
-    use crate::test_fixtures::{
+    use crate::test_incode_fixtures::DocTestOpts;
+    use crate::test_incode_fixtures::{
         self,
     };
     use newtypes::incode::IncodeDocumentRestriction;
@@ -979,7 +982,7 @@ mod tests {
 
     #[test]
     pub fn test_parse_fetch_scores() {
-        let raw_response = test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
+        let raw_response = test_incode_fixtures::incode_fetch_scores_response(DocTestOpts::default());
 
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         assert_eq!(parsed.id_ocr_confidence().1.unwrap(), IncodeStatus::Ok);
@@ -1183,7 +1186,7 @@ mod tests {
 
     #[test]
     fn test_parse_ocr() {
-        let raw_response = test_fixtures::incode_fetch_ocr_response(None);
+        let raw_response = test_incode_fixtures::incode_fetch_ocr_response(None);
 
         let mut parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
         // serde_json doens't like i32, so add in the bday

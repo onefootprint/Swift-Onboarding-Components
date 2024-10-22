@@ -376,12 +376,16 @@ async fn save_canned_response(
 ) -> FpResult<VendorResult> {
     let canned_res = match identity_document_fixture {
         Some(decision) => match decision {
-            DocumentFixtureResult::Pass => idv::test_fixtures::incode_curp_validation_good_curp(),
-            DocumentFixtureResult::Fail => idv::test_fixtures::incode_curp_validation_bad_curp("01", "06"),
+            DocumentFixtureResult::Pass => idv::test_incode_fixtures::incode_curp_validation_good_curp(),
+            DocumentFixtureResult::Fail => {
+                idv::test_incode_fixtures::incode_curp_validation_bad_curp("01", "06")
+            }
             // shouldn't happen
-            DocumentFixtureResult::Real => idv::test_fixtures::incode_curp_validation_bad_curp("01", "06"),
+            DocumentFixtureResult::Real => {
+                idv::test_incode_fixtures::incode_curp_validation_bad_curp("01", "06")
+            }
         },
-        None => idv::test_fixtures::incode_curp_validation_good_curp(),
+        None => idv::test_incode_fixtures::incode_curp_validation_good_curp(),
     };
 
     // we're in sandbox

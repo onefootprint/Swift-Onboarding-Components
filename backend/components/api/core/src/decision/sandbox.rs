@@ -277,9 +277,9 @@ fn incode_watchlist_result_response_for_fixture(fixture_result: WorkflowFixtureR
     match fixture_result.decision_status() {
         // #manualreview
         (newtypes::DecisionStatus::Fail, true) => {
-            idv::test_fixtures::incode_watchlist_result_response_yes_hits()
+            idv::test_incode_fixtures::incode_watchlist_result_response_yes_hits()
         }
-        _ => idv::test_fixtures::incode_watchlist_result_response_no_hits(),
+        _ => idv::test_incode_fixtures::incode_watchlist_result_response_no_hits(),
     }
 }
 

@@ -257,9 +257,10 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
         .filter(|h| h.matches_by_criteria(match_kind))
         // CA's logic for determine hits/what it calls "name_exact" matches is still very low precision. In particular, this returns many hits where parts of the names are ordered differently in our search term vs the found hit or the found hit has additional names that the search term does not. Unclear what default settings most tenants would want here or how CA/Incode typically suggest mitigating these sorts of factors but for now as a quick patch we manually confirm here that our searched name exactly matches the found hit's name
         .filter(|h| h.doc.as_ref().and_then(|d| d.name.as_ref().map(|n|
-            match &search_term {
-                Some(st) => pii_strings_match_name_normalized(&st.clone().into(), &n.clone().into()),
-                None => {
+            match (&search_term, match_kind) {
+                (Some(_), MatchKind::FuzzyHigh) => true,
+                (Some(st), _) => pii_strings_match_name_normalized(&st.clone().into(), &n.clone().into()),
+                (None, _) => {
                     // if for some crazy reason the response doesn't have `search_term` (should never happen), we "fail open" by not filtering out any hits
                     tracing::error!("WatchlistResultResponse with missing `search_term`");
                     true
@@ -306,6 +307,10 @@ mod test {
     use idv::incode::watchlist::response::Data;
     use idv::incode::watchlist::response::Doc;
     use idv::incode::watchlist::response::Hit;
+    use idv::incode::IncodeResponse;
+    use idv::test_incode_fixtures::incode_watchlist_result_response_high_fuzzy_hits;
+    use idv::test_incode_fixtures::incode_watchlist_result_response_low_fuzzy_hits;
+    use idv::test_incode_fixtures::incode_watchlist_result_response_medium_fuzzy_hits;
     use newtypes::AmlMatchKind;
     use std::str::FromStr;
     use test_case::test_case;
@@ -366,9 +371,7 @@ mod test {
     #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::Narcotics]), match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
     #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName} => vec![FootprintReasonCode::AdverseMediaHit])]
     #[test_case(vec![vec!["sanction"], vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName} => vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaHit])]
-    #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-violent-crime"], vec!["adverse-media
-    ", "adverse-media-v2-other-serious
-    "]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::FinancialCrime,AdverseMediaListKind::Fraud]), match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-violent-crime"], vec!["adverse-media", "adverse-media-v2-other-serious"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::FinancialCrime,AdverseMediaListKind::Fraud]), match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
     fn test_reason_codes_from_watchlist_result_am_list_filtering(
         hits: Vec<Vec<&str>>,
         enhanced_aml: EnhancedAmlOption,
@@ -392,15 +395,15 @@ mod test {
     #[test_case("Bob Boberto", vec![("Boberto Bob", "sanction")], vec!["name_exact"], AmlMatchKind::ExactName => Vec::<FootprintReasonCode>::new())]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction")], vec!["name_exact"], AmlMatchKind::ExactName => Vec::<FootprintReasonCode>::new())]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::ExactName => vec![FootprintReasonCode::WatchlistHitPep])]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyHigh => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyHigh => vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::WatchlistHitPep])]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyMedium => vec![FootprintReasonCode::WatchlistHitPep])]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyLow => vec![FootprintReasonCode::WatchlistHitPep])]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy"], AmlMatchKind::FuzzyHigh => vec![FootprintReasonCode::WatchlistHitPep])]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["equivalent_name", "equivalent_aka"], AmlMatchKind::FuzzyHigh => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy"], AmlMatchKind::FuzzyLow => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["equivalent_name", "equivalent_aka"], AmlMatchKind::FuzzyLow => Vec::<FootprintReasonCode>::new())]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy", "aka_fuzzy", "equivalent_name", "equivalent_aka"], AmlMatchKind::FuzzyMedium => vec![FootprintReasonCode::WatchlistHitPep])]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["phonetic_name", "phonetic_aka"], AmlMatchKind::FuzzyMedium => Vec::<FootprintReasonCode>::new())]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy", "aka_fuzzy", "equivalent_name", "equivalent_aka", "phonetic_name", "phonetic_aka"], AmlMatchKind::FuzzyLow => vec![FootprintReasonCode::WatchlistHitPep])]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec![], AmlMatchKind::FuzzyLow => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy", "aka_fuzzy", "equivalent_name", "equivalent_aka", "phonetic_name", "phonetic_aka"], AmlMatchKind::FuzzyHigh => vec![FootprintReasonCode::WatchlistHitOfac,FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec![], AmlMatchKind::FuzzyHigh => Vec::<FootprintReasonCode>::new())]
     fn test_reason_codes_from_watchlist_result_exact_name_matching(
         search_term: &str,
         hit_name_types: Vec<(&str, &str)>,
@@ -428,6 +431,111 @@ mod test {
                 match_kind,
             },
         )
+    }
+
+    #[test]
+    fn test_reason_codes_from_watchlist_result_fuzzy_low_name_matching() {
+        let result: IncodeResponse<WatchlistResultResponse> =
+            IncodeResponse::from_value(incode_watchlist_result_response_low_fuzzy_hits());
+
+        assert!(matches!(result.result, idv::incode::IncodeAPIResult::Success(_)));
+        let res = match result.result {
+            idv::incode::IncodeAPIResult::Success(res) => res,
+            _ => {
+                return;
+            }
+        };
+
+        let codes = reason_codes_from_watchlist_result(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::FuzzyHigh,
+            },
+        );
+
+        assert_eq!(
+            codes,
+            vec![
+                FootprintReasonCode::AdverseMediaHit,
+                FootprintReasonCode::WatchlistHitPep,
+                FootprintReasonCode::WatchlistHitOfac
+            ]
+        );
+    }
+
+    #[test]
+    fn test_reason_codes_from_watchlist_result_fuzzy_medium_name_matching() {
+        let result: IncodeResponse<WatchlistResultResponse> =
+            IncodeResponse::from_value(incode_watchlist_result_response_medium_fuzzy_hits());
+
+        assert!(matches!(result.result, idv::incode::IncodeAPIResult::Success(_)));
+        let res = match result.result {
+            idv::incode::IncodeAPIResult::Success(res) => res,
+            _ => {
+                return;
+            }
+        };
+
+        let codes = reason_codes_from_watchlist_result(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::FuzzyMedium,
+            },
+        );
+
+        assert_eq!(
+            codes,
+            vec![
+                FootprintReasonCode::AdverseMediaHit,
+                FootprintReasonCode::WatchlistHitPep,
+                FootprintReasonCode::WatchlistHitOfac
+            ]
+        );
+    }
+
+    #[test]
+    fn test_reason_codes_from_watchlist_result_fuzzy_high_name_matching() {
+        let result: IncodeResponse<WatchlistResultResponse> =
+            IncodeResponse::from_value(incode_watchlist_result_response_high_fuzzy_hits());
+
+        assert!(matches!(result.result, idv::incode::IncodeAPIResult::Success(_)));
+        let res = match result.result {
+            idv::incode::IncodeAPIResult::Success(res) => res,
+            _ => {
+                return;
+            }
+        };
+
+        let codes = reason_codes_from_watchlist_result(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::FuzzyHigh,
+            },
+        );
+
+        assert_eq!(
+            codes,
+            vec![
+                FootprintReasonCode::AdverseMediaHit,
+                FootprintReasonCode::WatchlistHitPep,
+                FootprintReasonCode::WatchlistHitOfac
+            ]
+        );
     }
 
     struct TestHit<'a> {
