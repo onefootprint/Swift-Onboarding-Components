@@ -219,7 +219,9 @@ impl BusinessOwner {
         let mut query = business_owner::table
             .filter(business_owner::deactivated_at.is_null())
             .into_boxed();
-        match id.into() {
+
+        let id = id.into();
+        match id {
             BoIdentifier::Id(id) => query = query.filter(business_owner::id.eq(id)),
             BoIdentifier::Vaults { uv_id, bv_id } => {
                 query = query
@@ -231,8 +233,16 @@ impl BusinessOwner {
                     .filter(business_owner::business_vault_id.eq(bv_id))
                     .filter(business_owner::link_id.eq(link_id))
             }
+            // We'll check the business vault ID below
+            BoIdentifier::Uuid { uuid, .. } => query = query.filter(business_owner::uuid.eq(uuid)),
         }
-        let result = query.get_result(conn)?;
+        let result = query.get_result::<Self>(conn)?;
+
+        if let BoIdentifier::Uuid { bv_id, .. } = id {
+            if &result.business_vault_id != bv_id {
+                return ValidationError("Business owner with UUID belongs to different business").into();
+            }
+        }
         Ok(result)
     }
 
@@ -319,6 +329,10 @@ pub enum BoIdentifier<'a> {
     LinkId {
         bv_id: &'a VaultId,
         link_id: &'a BoLinkId,
+    },
+    Uuid {
+        bv_id: &'a VaultId,
+        uuid: &'a Uuid,
     },
 }
 

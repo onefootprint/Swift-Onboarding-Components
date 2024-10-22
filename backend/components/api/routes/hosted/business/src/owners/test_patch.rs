@@ -18,53 +18,53 @@ use newtypes::VaultId;
 use std::collections::HashMap;
 use test_case::test_case;
 
-type UpdateOp<'a> = (BoLinkId, Option<Vec<(DI, &'a str)>>);
+type UpdateOp<'a> = (BusinessOwnerKind, Option<Vec<(DI, &'a str)>>);
 
 #[test_case(vec![(DI::Id(IDK::PhoneNumber), "+15555550100")], vec![
     (
-        BoLinkId::generate(BusinessOwnerKind::Secondary),
+        BusinessOwnerKind::Secondary,
         Some(vec![(DI::Id(IDK::PhoneNumber), "+15555550100")].into_iter().collect()),
     ),
 ], false => true; "can_have_repeat_in_sandbox")]
 #[test_case(vec![(DI::Id(IDK::PhoneNumber), "+15555550100")], vec![
     (
-        BoLinkId::generate(BusinessOwnerKind::Secondary),
+        BusinessOwnerKind::Secondary,
         Some(vec![(DI::Id(IDK::PhoneNumber), "+15555550100")].into_iter().collect()),
     ),
 ], true => false; "cannot_have_repeat_phone_in_live")]
 #[test_case(vec![(DI::Id(IDK::Email), "test@example.com")], vec![
     (
-        BoLinkId::generate(BusinessOwnerKind::Secondary),
+        BusinessOwnerKind::Secondary,
         Some(vec![(DI::Id(IDK::Email), "test@example.com")].into_iter().collect()),
     ),
 ], true => false; "cannot_have_repeat_email_in_live")]
 #[test_case(vec![(DI::Id(IDK::Email), "unique_email@example.com")], vec![
     (
-        BoLinkId::generate(BusinessOwnerKind::Primary),
+        BusinessOwnerKind::Primary,
         Some(vec![(DI::Id(IDK::Email), "test@example.com")].into_iter().collect()),
     ),
     (
-        BoLinkId::generate(BusinessOwnerKind::Secondary),
+        BusinessOwnerKind::Secondary,
         Some(vec![(DI::Id(IDK::Email), "test@example.com")].into_iter().collect()),
     ),
 ], true => false; "cannot_have_repeat_email_in_updates")]
 #[test_case(vec![(DI::Id(IDK::Email), "test@example.com")], vec![
     (
-        BoLinkId::generate(BusinessOwnerKind::Primary),
+        BusinessOwnerKind::Primary,
         Some(vec![(DI::Id(IDK::FirstName), "Flerp")].into_iter().collect()),
     ),
     (
-        BoLinkId::generate(BusinessOwnerKind::Secondary),
+        BusinessOwnerKind::Secondary,
         Some(vec![(DI::Id(IDK::Email), "test@example.com")].into_iter().collect()),
     ),
 ], true => false; "cannot_have_repeat_email_with_primary_update")]
 #[test_case(vec![(DI::Id(IDK::Email), "test@example.com")], vec![
     (
-        BoLinkId::generate(BusinessOwnerKind::Primary),
+        BusinessOwnerKind::Primary,
         None, // Delete this BO
     ),
     (
-        BoLinkId::generate(BusinessOwnerKind::Secondary),
+        BusinessOwnerKind::Secondary,
         Some(vec![(DI::Id(IDK::Email), "test@example.com")].into_iter().collect()),
     ),
 ], true => true; "delete_bo")]
@@ -74,19 +74,19 @@ fn test_verify_unique_phones_and_emails(
     ops: Vec<UpdateOp>,
     is_live: bool,
 ) -> bool {
-    let primary_link_id = BoLinkId::generate(BusinessOwnerKind::Primary);
     let data = primary_data
         .into_iter()
         .map(|(k, v)| (k, PiiString::from(v)))
         .collect();
+    let primary_uuid = Uuid::new_v4();
     let dbo = BusinessOwnerInfo {
         bo: BusinessOwner {
             id: BoId::test_data("Flerp".into()),
-            uuid: Uuid::new_v4(),
+            uuid: primary_uuid,
             user_vault_id: None,
             business_vault_id: VaultId::test_data("Blerp".into()),
             kind: BusinessOwnerKind::Primary,
-            link_id: primary_link_id.clone(),
+            link_id: BoLinkId::generate(BusinessOwnerKind::Primary),
             _created_at: Utc::now(),
             _updated_at: Utc::now(),
             created_at: Utc::now(),
@@ -99,21 +99,25 @@ fn test_verify_unique_phones_and_emails(
     };
     let ops = ops
         .into_iter()
-        .map(|(link_id, data)| {
+        .map(|(bo_kind, data)| {
+            let uuid = match bo_kind {
+                BusinessOwnerKind::Primary => primary_uuid,
+                BusinessOwnerKind::Secondary => Uuid::new_v4(),
+            };
             let Some(data) = data else {
-                return BatchRequest::Delete { link_id };
+                return BatchRequest::Delete { uuid };
             };
             let data: HashMap<_, _> = data.into_iter().map(|(k, v)| (k, PiiString::from(v))).collect();
             let data = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(is_live)).unwrap();
-            if link_id == primary_link_id {
+            if bo_kind == BusinessOwnerKind::Primary {
                 BatchRequest::Update {
-                    link_id,
+                    uuid,
                     ownership_stake: Some(10),
                     data,
                 }
             } else {
                 BatchRequest::Create {
-                    link_id,
+                    uuid,
                     ownership_stake: 10,
                     data,
                 }

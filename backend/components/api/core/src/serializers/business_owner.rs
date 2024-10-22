@@ -54,7 +54,8 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wir
             })
             .collect();
         Self {
-            id: bo.link_id,
+            link_id: bo.link_id,
+            uuid: bo.uuid,
             has_linked_user,
             is_authed_user,
             is_mutable,

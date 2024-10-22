@@ -2,6 +2,7 @@ from tests.bifrost.test_multi_kyc_kyb import MULTI_KYC_KYB_CDOS, extract_bo_toke
 from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.constants import BUSINESS_SECONDARY_BOS
+from uuid import uuid4
 
 USER_BO_FIELDS = ["id.first_name", "id.last_name", "id.phone_number", "id.email"]
 SECONDARY_BO_DATA = BUSINESS_SECONDARY_BOS["business.secondary_beneficial_owners"][0]
@@ -46,7 +47,7 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     _assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, SECONDARY_BO_DATA)
 
     # Test decrypting the new business owner DIs
-    secondary_link_id = secondary_bo["id"]
+    secondary_link_id = secondary_bo["link_id"]
     _assert_decrypt_bo_data(
         secondary_link_id, fp_bid, sandbox_tenant, SECONDARY_BO_DATA
     )
@@ -89,20 +90,21 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
 
     # Update the secondary BO
     body = get("hosted/business/owners", None, bifrost.auth_token)
-    primary_link_id = body[0]["id"]
-    link_id = body[1]["id"]
+    primary_uuid = body[0]["uuid"]
+    uuid = body[1]["uuid"]
+    link_id = body[1]["link_id"]
     new_secondary_data = {
         "id.first_name": "Frederick",
         "id.last_name": SECONDARY_BO_DATA["id.last_name"],
         "id.email": SECONDARY_BO_DATA["id.email"],
         "id.phone_number": SECONDARY_BO_DATA["id.phone_number"],
     }
-    op = dict(op="update", id=link_id, data=new_secondary_data, ownership_stake=33)
+    op = dict(op="update", uuid=uuid, data=new_secondary_data, ownership_stake=33)
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token)
     _assert_bo_data(body[0], USER_BO_FIELDS, USER_BO_FIELDS, new_secondary_data)
 
     # Make sure cannot update the second owner to sum up to more than 100%
-    op = dict(op="update", id=link_id, ownership_stake=51)
+    op = dict(op="update", uuid=uuid, ownership_stake=51)
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
@@ -117,20 +119,26 @@ def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
     _assert_decrypt_bo_data(link_id, fp_bid, sandbox_tenant, new_secondary_data)
 
     # Delete the secondary BO that was just added and add a new one. Should not fail 100% ownership stake validation
+    secondary_uuid = str(uuid4())
     ops = [
-        dict(op="update", id=primary_link_id, ownership_stake=60),
-        dict(op="create", data=new_secondary_data, ownership_stake=40),
-        dict(op="delete", id=link_id),
+        dict(op="update", uuid=primary_uuid, ownership_stake=60),
+        dict(
+            op="create",
+            uuid=secondary_uuid,
+            data=new_secondary_data,
+            ownership_stake=40,
+        ),
+        dict(op="delete", uuid=uuid),
     ]
     body = patch(f"hosted/business/owners", ops, bifrost.auth_token)
-    link_id = body[1]["id"]
+    uuid = body[1]["uuid"]
 
     # Delete the secondary BO that was just added
-    op = dict(op="delete", id=link_id)
+    op = dict(op="delete", uuid=uuid)
     patch(f"hosted/business/owners", [op], bifrost.auth_token)
     body = get("hosted/business/owners", None, bifrost.auth_token)
     assert len(body) == 1
-    assert body[0]["id"] != link_id
+    assert body[0]["uuid"] != uuid
     _assert_decrypt_bo_data(link_id, fp_bid, sandbox_tenant, {})
 
     # Should be able to finish bifrost normally without waiting for the secondary BO
@@ -145,18 +153,18 @@ def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
     bifrost.handle_one_requirement("collect_business_data")
 
     body = get("hosted/business/owners", None, bifrost.auth_token)
-    link_id = body[1]["id"]
+    uuid = body[1]["uuid"]
 
-    # On a totally different user, we shouldn't be able to use the link_id from the other user
+    # On a totally different user, we shouldn't be able to use the uuid from the other user
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    op = dict(op="update", id=link_id, **SECONDARY_BO_DATA)
-    body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=404)
-    assert body["message"] == "Data not found"
+    op = dict(op="update", uuid=uuid, **SECONDARY_BO_DATA)
+    body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
+    assert body["message"] == "Business owner with UUID belongs to different business"
 
     # And cannot delete the BO that we don't own
-    op = dict(op="delete", id=link_id)
-    body = patch("hosted/business/owners", [op], bifrost.auth_token, status_code=404)
-    assert body["message"] == "Data not found"
+    op = dict(op="delete", uuid=uuid)
+    body = patch("hosted/business/owners", [op], bifrost.auth_token, status_code=400)
+    assert body["message"] == "Business owner with UUID belongs to different business"
 
 
 def test_updating_linked_bo(kyb_sandbox_ob_config):
@@ -165,7 +173,7 @@ def test_updating_linked_bo(kyb_sandbox_ob_config):
     bifrost.run()
 
     body = get("hosted/business/owners", None, bifrost.auth_token)
-    link_id = body[0]["id"]
+    uuid = body[0]["uuid"]
 
     secondary_bo_token = extract_bo_token(bifrost)
     bifrost = BifrostClient.new_user(
@@ -173,11 +181,11 @@ def test_updating_linked_bo(kyb_sandbox_ob_config):
     )
 
     # Can update their ownership stake
-    op = dict(op="update", id=link_id, ownership_stake=50)
+    op = dict(op="update", uuid=uuid, ownership_stake=50)
     patch(f"hosted/business/owners", [op], bifrost.auth_token)
 
     # Cannot update their data
-    op = dict(op="update", id=link_id, data={"id.first_name": "Fred"})
+    op = dict(op="update", uuid=uuid, data={"id.first_name": "Fred"})
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
@@ -185,7 +193,7 @@ def test_updating_linked_bo(kyb_sandbox_ob_config):
     )
 
     # And cannot delete them
-    op = dict(op="delete", id=link_id)
+    op = dict(op="delete", uuid=uuid)
     body = patch(f"hosted/business/owners", [op], bifrost.auth_token, status_code=400)
     assert (
         body["message"]
@@ -249,7 +257,7 @@ def test_onboard_legacy_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     _assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, SECONDARY_BO_DATA)
 
     # Test decrypting the new business owner DIs
-    secondary_link_id = secondary_bo["id"]
+    secondary_link_id = secondary_bo["link_id"]
     _assert_decrypt_bo_data(
         secondary_link_id, fp_bid, sandbox_tenant, SECONDARY_BO_DATA
     )

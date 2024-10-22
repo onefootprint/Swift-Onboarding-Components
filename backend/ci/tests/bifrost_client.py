@@ -24,6 +24,7 @@ from tests.utils import (
     override_webauthn_attestation,
     get_requirement_from_requirements,
 )
+from uuid import uuid4
 
 
 class BifrostClient:
@@ -271,6 +272,8 @@ class BifrostClient:
             # Set the primary owner's stake
             primary_owner_stake = self.data.get("business.primary_owner_stake", None)
             if primary_owner_stake:
+                body = get("hosted/business/owners", None, self.auth_token)
+                primary_uuid = next(i for i in body if i["is_authed_user"])["uuid"]
                 # Update primary owner data
                 data = {
                     "id.first_name": self.data["id.first_name"],
@@ -281,7 +284,7 @@ class BifrostClient:
                 ops.append(
                     dict(
                         op="update",
-                        id="bo_link_primary",
+                        uuid=primary_uuid,
                         ownership_stake=primary_owner_stake,
                     )
                 )
@@ -292,6 +295,7 @@ class BifrostClient:
                 secondary_owner = {**secondary_owner}
                 op = dict(
                     op="create",
+                    uuid=str(uuid4()),
                     ownership_stake=secondary_owner.pop("ownership_stake"),
                     data=secondary_owner,
                 )

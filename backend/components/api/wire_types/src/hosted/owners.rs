@@ -5,10 +5,12 @@ use newtypes::PiiString;
 use paperclip::actix::Apiv2Response;
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct HostedBusinessOwner {
-    pub id: BoLinkId,
+    pub link_id: BoLinkId,
+    pub uuid: Uuid,
     /// True if a user has already started onboarding as this beneficial owner. In this case, the
     /// data below comes directly from that user's vault.
     pub has_linked_user: bool,
@@ -23,13 +25,14 @@ pub struct HostedBusinessOwner {
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct CreateHostedBusinessOwnerRequest {
+    pub uuid: Uuid,
     pub data: RawUserDataRequest,
     pub ownership_stake: u32,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct UpdateHostedBusinessOwnerRequest {
-    pub id: BoLinkId,
+    pub uuid: Uuid,
     #[serde(default)]
     pub data: RawUserDataRequest,
     pub ownership_stake: Option<u32>,
@@ -37,14 +40,14 @@ pub struct UpdateHostedBusinessOwnerRequest {
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct DeleteHostedBusinessOwnerRequest {
-    pub id: BoLinkId,
+    pub uuid: Uuid,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 #[serde(tag = "op")]
 #[serde(rename_all = "snake_case")]
 #[openapi(
-    example = r#"{"op": "update", "id": "123", "data": {"id.first_name": "John", "id.last_name": "Doe"}, "ownership_stake": 30}"#
+    example = r#"{"op": "create", "uuid": "73b7e274-8080-44d6-b160-86cbc9877a00", "data": {"id.first_name": "John", "id.last_name": "Doe"}, "ownership_stake": 30}"#
 )]
 pub enum BatchHostedBusinessOwnerRequest {
     Update(UpdateHostedBusinessOwnerRequest),

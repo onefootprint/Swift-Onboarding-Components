@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS business_owner_unique_uuid_business_vault_id ON business_owner (uuid, business_vault_id);

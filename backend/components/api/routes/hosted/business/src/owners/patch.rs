@@ -55,15 +55,15 @@ pub async fn patch(
         let op = match r {
             BatchHostedBusinessOwnerRequest::Update(r) => BatchRequest::Update {
                 data: PatchDataRequest::clean_and_validate(r.data, args)?.updates,
-                link_id: r.id,
+                uuid: r.uuid,
                 ownership_stake: r.ownership_stake,
             },
             BatchHostedBusinessOwnerRequest::Create(r) => BatchRequest::Create {
                 data: PatchDataRequest::clean_and_validate(r.data, args)?.updates,
-                link_id: BoLinkId::generate(BusinessOwnerKind::Secondary),
+                uuid: r.uuid,
                 ownership_stake: r.ownership_stake,
             },
-            BatchHostedBusinessOwnerRequest::Delete(r) => BatchRequest::Delete { link_id: r.id },
+            BatchHostedBusinessOwnerRequest::Delete(r) => BatchRequest::Delete { uuid: r.uuid },
         };
         ops.push(op);
     }
@@ -111,40 +111,40 @@ pub(super) fn validate_collective_bos(
     // checking built into FingerprintedDataRequest - it could fingerprint the existing phone/email of
     // existing BOs and make sure there's no conflict. But hard for BOs that are already linked to a
     // user...
-    let mut bo_phones: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.link_id, b.phone_number())).collect();
-    let mut bo_emails: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.link_id, b.email())).collect();
+    let mut bo_phones: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.uuid, b.phone_number())).collect();
+    let mut bo_emails: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.uuid, b.email())).collect();
     let mut ownerships: HashMap<_, _> = dbos
         .iter()
-        .flat_map(|b| b.bo.ownership_stake.as_ref().map(|s| (&b.bo.link_id, *s as u32)))
+        .flat_map(|b| b.bo.ownership_stake.as_ref().map(|s| (&b.bo.uuid, *s as u32)))
         .collect();
     for op in ops {
-        let (l_id, data, ownership_stake) = match &op {
+        let (uuid, data, ownership_stake) = match &op {
             BatchRequest::Update {
-                link_id,
+                uuid,
                 data,
                 ownership_stake,
-            } => (link_id, data, ownership_stake.as_ref()),
+            } => (uuid, data, ownership_stake.as_ref()),
             BatchRequest::Create {
-                link_id,
+                uuid,
                 data,
                 ownership_stake,
-            } => (link_id, data, Some(ownership_stake)),
-            BatchRequest::Delete { link_id } => {
-                bo_phones.remove(&link_id);
-                bo_emails.remove(&link_id);
-                ownerships.remove(&link_id);
+            } => (uuid, data, Some(ownership_stake)),
+            BatchRequest::Delete { uuid } => {
+                bo_phones.remove(&uuid);
+                bo_emails.remove(&uuid);
+                ownerships.remove(&uuid);
                 continue;
             }
         };
         // Overlay each of the requests on top of the existing BOs to get the final list of phones/emails
         if let Some(phone) = data.get(&IDK::PhoneNumber.into()) {
-            bo_phones.insert(l_id, Some(phone));
+            bo_phones.insert(uuid, Some(phone));
         }
         if let Some(email) = data.get(&IDK::Email.into()) {
-            bo_emails.insert(l_id, Some(email));
+            bo_emails.insert(uuid, Some(email));
         }
         if let Some(ownership_stake) = ownership_stake {
-            ownerships.insert(l_id, *ownership_stake);
+            ownerships.insert(uuid, *ownership_stake);
         }
     }
     // Assert validations on the end state of all BOs after applying the operations
@@ -163,17 +163,17 @@ pub(super) fn validate_collective_bos(
 
 pub(super) enum BatchRequest {
     Update {
-        link_id: BoLinkId,
+        uuid: Uuid,
         ownership_stake: Option<u32>,
         data: DataRequest,
     },
     Create {
-        link_id: BoLinkId,
+        uuid: Uuid,
         ownership_stake: u32,
         data: DataRequest,
     },
     Delete {
-        link_id: BoLinkId,
+        uuid: Uuid,
     },
 }
 
@@ -205,15 +205,17 @@ impl BatchRequest {
         let source = user_auth.user_session.dl_source();
 
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
+        let bv_id = &bvw.vault.id;
         match self {
             Self::Update {
-                link_id,
+                uuid,
                 ownership_stake,
                 data,
             } => {
-                let bo = BusinessOwner::get(conn, (&bvw.vault.id, &link_id))?;
+                let bo = BusinessOwner::get(conn, (bv_id, &uuid))?;
+                // Update the existing BO
                 if let Some(stake) = ownership_stake {
-                    BusinessOwner::update_ownership_stake(conn, &bvw.vault.id, &link_id, stake as i32)?;
+                    BusinessOwner::update_ownership_stake(conn, bv_id, &bo.link_id, stake as i32)?;
                 }
                 if !data.is_empty() {
                     if bo.has_linked_user() {
@@ -222,29 +224,30 @@ impl BatchRequest {
                         )
                         .into();
                     }
-                    let data = create_fingerprinted_data_request(data, &link_id)?;
+                    let data = create_fingerprinted_data_request(data, &bo.link_id)?;
                     bvw.patch_data(conn, data, DataRequestSource::HostedPatchVault(source.into()))?;
                 }
-                Ok(Some(link_id))
+                Ok(Some(bo.link_id))
             }
             Self::Create {
-                link_id,
+                uuid,
                 ownership_stake,
                 data,
             } => {
+                // Create a new BO
+                let link_id = BoLinkId::generate(BusinessOwnerKind::Secondary);
                 let bo = NewSecondaryBo {
                     link_id: link_id.clone(),
                     ownership_stake: ownership_stake as i32,
-                    // TODO provide in the API request
-                    uuid: Uuid::new_v4(),
+                    uuid,
                 };
                 BusinessOwner::bulk_create_secondary(conn, vec![bo], &bvw.vault.id)?;
                 let data = create_fingerprinted_data_request(data, &link_id)?;
                 bvw.patch_data(conn, data, DataRequestSource::HostedPatchVault(source.into()))?;
                 Ok(Some(link_id))
             }
-            Self::Delete { link_id } => {
-                let bo = BusinessOwner::get(conn, (&bvw.vault.id, &link_id))?;
+            Self::Delete { uuid } => {
+                let bo = BusinessOwner::get(conn, (&bvw.vault.id, &uuid))?;
                 let bo = BusinessOwner::lock(conn, &bo.id)?;
 
                 // Delete all the vault data for this BO
