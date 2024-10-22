@@ -10229,6 +10229,13 @@
                             "enhanced_aml": {
                                 "type": "boolean"
                             },
+                            "match_kind": {
+                                "type": "string",
+                                "enum": [
+                                    "exact_name_and_dob_year",
+                                    "exact_name"
+                                ]
+                            },
                             "ofac": {
                                 "type": "boolean"
                             },
@@ -10239,6 +10246,7 @@
                         "required": [
                             "adverse_media",
                             "enhanced_aml",
+                            "match_kind",
                             "ofac",
                             "pep"
                         ]
@@ -12604,6 +12612,7 @@
                                                     "beneficial_owners_partial_match",
                                                     "beneficial_owners_do_not_match",
                                                     "beneficial_owner_failed_kyc",
+                                                    "beneficial_owner_possible_missing_bo",
                                                     "sos_active_filing_found",
                                                     "sos_filing_no_status",
                                                     "sos_filing_partially_active",
@@ -15224,6 +15233,7 @@
                                         "beneficial_owners_partial_match",
                                         "beneficial_owners_do_not_match",
                                         "beneficial_owner_failed_kyc",
+                                        "beneficial_owner_possible_missing_bo",
                                         "sos_active_filing_found",
                                         "sos_filing_no_status",
                                         "sos_filing_partially_active",
@@ -16402,6 +16412,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -16816,6 +16827,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -17230,6 +17242,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -17644,6 +17657,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -18058,6 +18072,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -18472,6 +18487,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -18886,6 +18902,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -19300,6 +19317,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -19714,6 +19732,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -20128,6 +20147,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -20542,6 +20562,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -20956,6 +20977,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -21370,6 +21392,7 @@
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
                                                 "beneficial_owner_failed_kyc",
+                                                "beneficial_owner_possible_missing_bo",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -22998,6 +23021,13 @@
                                         "enhanced_aml": {
                                             "type": "boolean"
                                         },
+                                        "match_kind": {
+                                            "type": "string",
+                                            "enum": [
+                                                "exact_name_and_dob_year",
+                                                "exact_name"
+                                            ]
+                                        },
                                         "ofac": {
                                             "type": "boolean"
                                         },
@@ -23008,6 +23038,7 @@
                                     "required": [
                                         "adverse_media",
                                         "enhanced_aml",
+                                        "match_kind",
                                         "ofac",
                                         "pep"
                                     ]
@@ -24029,6 +24060,13 @@
                             "enhanced_aml": {
                                 "type": "boolean"
                             },
+                            "match_kind": {
+                                "type": "string",
+                                "enum": [
+                                    "exact_name_and_dob_year",
+                                    "exact_name"
+                                ]
+                            },
                             "ofac": {
                                 "type": "boolean"
                             },
@@ -24039,6 +24077,7 @@
                         "required": [
                             "adverse_media",
                             "enhanced_aml",
+                            "match_kind",
                             "ofac",
                             "pep"
                         ]
@@ -26778,6 +26817,7 @@
                             "beneficial_owners_partial_match",
                             "beneficial_owners_do_not_match",
                             "beneficial_owner_failed_kyc",
+                            "beneficial_owner_possible_missing_bo",
                             "sos_active_filing_found",
                             "sos_filing_no_status",
                             "sos_filing_partially_active",
@@ -27215,6 +27255,7 @@
                             "beneficial_owners_partial_match",
                             "beneficial_owners_do_not_match",
                             "beneficial_owner_failed_kyc",
+                            "beneficial_owner_possible_missing_bo",
                             "sos_active_filing_found",
                             "sos_filing_no_status",
                             "sos_filing_partially_active",
