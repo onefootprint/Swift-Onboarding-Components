@@ -606,7 +606,7 @@ impl ObConfiguration {
     {
         let result = Self::get(conn, id)?;
         if result.0.status != ApiKeyStatus::Enabled {
-            return Err(DbError::ApiKeyDisabled);
+            return Err(DbError::PlaybookDisabled);
         }
         Ok(result)
     }

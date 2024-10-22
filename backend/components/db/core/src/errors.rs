@@ -70,6 +70,8 @@ pub enum DbError {
     ObjectNotFound,
     #[error("This API key is disabled")]
     ApiKeyDisabled,
+    #[error("This playbook is disabled")]
+    PlaybookDisabled,
     #[error("Playbook not found with this key. Make sure your credentials are for the correct environment.")]
     PlaybookNotFound,
     #[error("User is deactivated. Please contact your administor for assistance.")]
@@ -189,6 +191,7 @@ impl FpErrorTrait for DbError {
             Self::RelatedObjectNotFound => StatusCode::NOT_FOUND,
             Self::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
+            Self::PlaybookDisabled => StatusCode::UNAUTHORIZED,
             Self::PlaybookNotFound => StatusCode::BAD_REQUEST,
             Self::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
             Self::TenantRoleMismatch => StatusCode::UNAUTHORIZED,

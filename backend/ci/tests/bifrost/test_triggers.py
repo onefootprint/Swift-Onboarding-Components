@@ -272,10 +272,13 @@ def test_collect_document(document_configs, sandbox_tenant, expected_docs):
     assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
+@pytest.mark.flaky
 def test_collect_document_no_onboardings(sandbox_tenant):
     """
     Cover our horrid codepath that attaches a random playbook to WFRs for an ad-hoc document for users
-    who have never onboarded onto a playbook
+    who have never onboarded onto a playbook.
+    This test is inherently flaky because we choose a random playbook from the tenant - another test could
+    be deactivating that playbook
     """
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
