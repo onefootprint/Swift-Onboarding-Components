@@ -265,7 +265,7 @@ impl From<EnhancedAmlOption> for EnhancedAml {
                 ofac: false,
                 pep: false,
                 adverse_media: false,
-                match_kind: AmlMatchKind::ExactName, // TODO: Figure out whether this is necessary.
+                match_kind: AmlMatchKind::default(),
             },
             EnhancedAmlOption::Yes {
                 ofac,

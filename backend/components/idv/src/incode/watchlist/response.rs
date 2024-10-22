@@ -3,12 +3,16 @@ use crate::incode::IncodeClientErrorCustomFailureReasons;
 use chrono::DateTime;
 use chrono::Utc;
 use derive_more::Deref;
+use itertools::Itertools;
 use newtypes::AmlMatchKind;
 use newtypes::IncodeFailureReason;
 use newtypes::IncodeWatchlistResultRef;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::ScrubbedPiiString;
+use std::str::FromStr;
+use strum::Display;
+use strum::EnumString;
 
 impl IncodeClientErrorCustomFailureReasons for WatchlistResultResponse {
     fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
@@ -76,13 +80,36 @@ pub struct Hit {
     pub doc: Option<Doc>,
 }
 
+// Values can be found here: https://docs.complyadvantage.com/api-docs/?json#match-types-details
+#[derive(PartialEq, EnumString, Display)]
+#[strum(serialize_all = "snake_case")]
+pub enum MatchType {
+    NameExact,
+    EditDistance,
+    AkaExact,
+    NameFuzzy,
+    AkaFuzzy,
+    EquivalentName,
+    EquivalentAka,
+    PhoneticName,
+    PhoneticAka,
+    YearOfBirth,
+}
+
 impl Hit {
     pub fn matches_by_criteria(&self, match_kind: AmlMatchKind) -> bool {
-        let match_types = self.match_types.clone().unwrap_or_default();
-        let name_matches = match_types.contains(&"name_exact".to_string());
+        let match_types = self
+            .match_types
+            .clone()
+            .unwrap_or_default()
+            .iter()
+            .filter_map(|mt| MatchType::from_str(mt).ok())
+            .collect_vec();
+
+        let name_matches = match_types.contains(&MatchType::NameExact);
         match match_kind {
             AmlMatchKind::ExactNameAndDobYear => {
-                let dob_matches = if match_types.contains(&"year_of_birth".to_string()) {
+                let dob_matches = if match_types.contains(&MatchType::YearOfBirth) {
                     self.match_type_details
                         .clone()
                         .unwrap_or_default()
@@ -103,36 +130,36 @@ impl Hit {
             AmlMatchKind::ExactName => name_matches,
             AmlMatchKind::FuzzyLow => {
                 let match_kinds = [
-                    "name_exact".to_string(),
-                    "edit_distance".to_string(),
-                    "aka_exact".to_string(),
-                    "name_fuzzy".to_string(),
+                    MatchType::NameExact,
+                    MatchType::EditDistance,
+                    MatchType::AkaExact,
+                    MatchType::NameFuzzy,
                 ];
                 match_types.iter().any(|mt| match_kinds.contains(mt))
             }
             AmlMatchKind::FuzzyMedium => {
                 let match_kinds = [
-                    "name_exact".to_string(),
-                    "edit_distance".to_string(),
-                    "aka_exact".to_string(),
-                    "name_fuzzy".to_string(),
-                    "aka_fuzzy".to_string(),
-                    "equivalent_name".to_string(),
-                    "equivalent_aka".to_string(),
+                    MatchType::NameExact,
+                    MatchType::EditDistance,
+                    MatchType::AkaExact,
+                    MatchType::NameFuzzy,
+                    MatchType::AkaFuzzy,
+                    MatchType::EquivalentName,
+                    MatchType::EquivalentAka,
                 ];
                 match_types.iter().any(|mt| match_kinds.contains(mt))
             }
             AmlMatchKind::FuzzyHigh => {
                 let match_kinds = [
-                    "name_exact".to_string(),
-                    "edit_distance".to_string(),
-                    "aka_exact".to_string(),
-                    "name_fuzzy".to_string(),
-                    "aka_fuzzy".to_string(),
-                    "equivalent_name".to_string(),
-                    "equivalent_aka".to_string(),
-                    "phonetic_name".to_string(),
-                    "phonetic_aka".to_string(),
+                    MatchType::NameExact,
+                    MatchType::EditDistance,
+                    MatchType::AkaExact,
+                    MatchType::NameFuzzy,
+                    MatchType::AkaFuzzy,
+                    MatchType::EquivalentName,
+                    MatchType::EquivalentAka,
+                    MatchType::PhoneticName,
+                    MatchType::PhoneticAka,
                 ];
                 match_types.iter().any(|mt| match_kinds.contains(mt))
             }
