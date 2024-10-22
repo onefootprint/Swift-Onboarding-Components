@@ -386,21 +386,33 @@ mod test {
         reason_codes_from_watchlist_result(&res, &enhanced_aml)
     }
 
-    #[test_case("Bob Boberto", vec![("Bob Boberto", "sanction")] => vec![FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case("Bob Boberto", vec![("Bob Billy Boberto", "sanction")] => Vec::<FootprintReasonCode>::new())]
-    #[test_case("Bob Boberto", vec![("Boberto Bob", "sanction")] => Vec::<FootprintReasonCode>::new())]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction")] => Vec::<FootprintReasonCode>::new())]
-    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")] => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto", "sanction")], vec!["name_exact"], AmlMatchKind::ExactName => vec![FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case("Bob Boberto", vec![("Bob Billy Boberto", "sanction")], vec!["name_exact"], AmlMatchKind::ExactName => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy", "aka_fuzzy", "equivalent_name", "equivalent_aka"], AmlMatchKind::ExactName => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Boberto Bob", "sanction")], vec!["name_exact"], AmlMatchKind::ExactName => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction")], vec!["name_exact"], AmlMatchKind::ExactName => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::ExactName => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyHigh => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyMedium => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["name_exact"], AmlMatchKind::FuzzyLow => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy"], AmlMatchKind::FuzzyHigh => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["equivalent_name", "equivalent_aka"], AmlMatchKind::FuzzyHigh => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy", "aka_fuzzy", "equivalent_name", "equivalent_aka"], AmlMatchKind::FuzzyMedium => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["phonetic_name", "phonetic_aka"], AmlMatchKind::FuzzyMedium => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec!["aka_exact", "name_fuzzy", "aka_fuzzy", "equivalent_name", "equivalent_aka", "phonetic_name", "phonetic_aka"], AmlMatchKind::FuzzyLow => vec![FootprintReasonCode::WatchlistHitPep])]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")], vec![], AmlMatchKind::FuzzyLow => Vec::<FootprintReasonCode>::new())]
     fn test_reason_codes_from_watchlist_result_exact_name_matching(
         search_term: &str,
         hit_name_types: Vec<(&str, &str)>,
+        match_types: Vec<&str>,
+        match_kind: AmlMatchKind,
     ) -> Vec<FootprintReasonCode> {
         let hits = hit_name_types
             .into_iter()
             .map(|(name, typ)| TestHit {
                 score: 1.3,
                 types: vec![typ],
-                match_types: vec!["name_exact"],
+                match_types: match_types.clone(),
                 name,
             })
             .collect();
@@ -413,7 +425,7 @@ mod test {
                 adverse_media: true,
                 continuous_monitoring: true,
                 adverse_media_lists: None,
-                match_kind: AmlMatchKind::ExactName,
+                match_kind,
             },
         )
     }
