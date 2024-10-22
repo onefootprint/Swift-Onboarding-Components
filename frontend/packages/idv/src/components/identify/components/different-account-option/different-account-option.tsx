@@ -23,11 +23,11 @@ const DifferentAccountOption = () => {
     send({ type: 'loginWithDifferentAccount' });
   };
 
-  const { config, bootstrapData } = state.context;
+  const { config, bootstrapData, isComponentsSdk } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
   const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
-  const showLoginWithDifferentOption = config && !orgIds.has(config.orgId) && isBootstrap;
+  const showLoginWithDifferentOption = config && !orgIds.has(config.orgId) && isBootstrap && !isComponentsSdk;
 
   if (!showLoginWithDifferentOption) {
     return null;
