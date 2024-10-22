@@ -67,29 +67,6 @@ pub struct Filters {
     pub types: Option<Vec<String>>,
 }
 
-#[derive(strum::EnumString, Clone, Copy)]
-pub enum MatchKind {
-    ExactNameAndDobYear,
-    ExactName,
-    FuzzyHigh,
-    FuzzyMedium,
-    FuzzyLow,
-}
-
-impl From<AmlMatchKind> for MatchKind {
-    fn from(value: AmlMatchKind) -> Self {
-        match value {
-            AmlMatchKind::ExactNameAndDobYear => MatchKind::ExactNameAndDobYear,
-            AmlMatchKind::ExactName => MatchKind::ExactName,
-            AmlMatchKind::FuzzyHigh => MatchKind::FuzzyHigh,
-            AmlMatchKind::FuzzyMedium => MatchKind::FuzzyMedium,
-            AmlMatchKind::FuzzyLow => MatchKind::FuzzyLow,
-        }
-    }
-}
-
-pub enum MatchType {}
-
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct Hit {
     pub score: Option<f32>,
@@ -100,11 +77,11 @@ pub struct Hit {
 }
 
 impl Hit {
-    pub fn matches_by_criteria(&self, match_kind: MatchKind) -> bool {
+    pub fn matches_by_criteria(&self, match_kind: AmlMatchKind) -> bool {
         let match_types = self.match_types.clone().unwrap_or_default();
         let name_matches = match_types.contains(&"name_exact".to_string());
         match match_kind {
-            MatchKind::ExactNameAndDobYear => {
+            AmlMatchKind::ExactNameAndDobYear => {
                 let dob_matches = if match_types.contains(&"year_of_birth".to_string()) {
                     self.match_type_details
                         .clone()
@@ -123,8 +100,8 @@ impl Hit {
 
                 name_matches && dob_matches
             }
-            MatchKind::ExactName => name_matches,
-            MatchKind::FuzzyLow => {
+            AmlMatchKind::ExactName => name_matches,
+            AmlMatchKind::FuzzyLow => {
                 let match_kinds = [
                     "name_exact".to_string(),
                     "edit_distance".to_string(),
@@ -133,7 +110,7 @@ impl Hit {
                 ];
                 match_types.iter().any(|mt| match_kinds.contains(mt))
             }
-            MatchKind::FuzzyMedium => {
+            AmlMatchKind::FuzzyMedium => {
                 let match_kinds = [
                     "name_exact".to_string(),
                     "edit_distance".to_string(),
@@ -145,7 +122,7 @@ impl Hit {
                 ];
                 match_types.iter().any(|mt| match_kinds.contains(mt))
             }
-            MatchKind::FuzzyHigh => {
+            AmlMatchKind::FuzzyHigh => {
                 let match_kinds = [
                     "name_exact".to_string(),
                     "edit_distance".to_string(),
@@ -450,8 +427,8 @@ mod tests {
             match_type_details: Some(vec![mtd1]),
             doc: None,
         };
-        assert!(!h1.matches_by_criteria(MatchKind::ExactNameAndDobYear));
-        assert!(h1.matches_by_criteria(MatchKind::ExactName));
+        assert!(!h1.matches_by_criteria(AmlMatchKind::ExactNameAndDobYear));
+        assert!(h1.matches_by_criteria(AmlMatchKind::ExactName));
 
 
         // DOB + Name match
@@ -473,8 +450,8 @@ mod tests {
             match_type_details: Some(vec![mtd2]),
             doc: None,
         };
-        assert!(h2.matches_by_criteria(MatchKind::ExactNameAndDobYear));
-        assert!(h2.matches_by_criteria(MatchKind::ExactName));
+        assert!(h2.matches_by_criteria(AmlMatchKind::ExactNameAndDobYear));
+        assert!(h2.matches_by_criteria(AmlMatchKind::ExactName));
 
 
         // Name matches but year is fuzzy
@@ -499,8 +476,8 @@ mod tests {
             match_type_details: Some(vec![mtd3]),
             doc: None,
         };
-        assert!(!h3.matches_by_criteria(MatchKind::ExactNameAndDobYear));
-        assert!(h3.matches_by_criteria(MatchKind::ExactName));
+        assert!(!h3.matches_by_criteria(AmlMatchKind::ExactNameAndDobYear));
+        assert!(h3.matches_by_criteria(AmlMatchKind::ExactName));
 
         // nothing matches
         let sm4 = NameMatch {
@@ -522,7 +499,7 @@ mod tests {
             doc: None,
         };
 
-        assert!(!h4.matches_by_criteria(MatchKind::ExactNameAndDobYear));
-        assert!(!h4.matches_by_criteria(MatchKind::ExactName));
+        assert!(!h4.matches_by_criteria(AmlMatchKind::ExactNameAndDobYear));
+        assert!(!h4.matches_by_criteria(AmlMatchKind::ExactName));
     }
 }

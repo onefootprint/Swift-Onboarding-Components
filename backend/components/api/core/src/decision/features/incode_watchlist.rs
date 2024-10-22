@@ -1,10 +1,10 @@
 use super::incode_utils::pii_strings_match_name_normalized;
 use idv::incode::watchlist::response::Hit;
-use idv::incode::watchlist::response::MatchKind;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::vendor_reason_code_enum;
 use newtypes::AdverseMediaListKind;
+use newtypes::AmlMatchKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::FootprintReasonCode;
 use strum_macros::EnumString;
@@ -248,23 +248,23 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
         EnhancedAmlOption::No => {
             return vec![];
         }
-        EnhancedAmlOption::Yes { match_kind, .. } => MatchKind::from(*match_kind),
+        EnhancedAmlOption::Yes { match_kind, .. } => match_kind,
     };
 
     let watchlist_types = watchlist_types_for_enhanced_aml_opt(enhanced_aml);
     hits.into_iter()
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
-        .filter(|h| h.matches_by_criteria(match_kind))
+        .filter(|h| h.matches_by_criteria(*match_kind))
         // CA's logic for determine hits/what it calls "name_exact" matches is still very low precision. In particular, this returns many hits where parts of the names are ordered differently in our search term vs the found hit or the found hit has additional names that the search term does not. Unclear what default settings most tenants would want here or how CA/Incode typically suggest mitigating these sorts of factors but for now as a quick patch we manually confirm here that our searched name exactly matches the found hit's name
         .filter(|h| h.doc.as_ref().and_then(|d| d.name.as_ref().map(|n|
             match (&search_term, match_kind) {
-                (Some(_), MatchKind::FuzzyHigh) => true,
+                (Some(_), AmlMatchKind::FuzzyHigh) => true,
                 (Some(st), _) => pii_strings_match_name_normalized(&st.clone().into(), &n.clone().into()),
                 (None, _) => {
                     // if for some crazy reason the response doesn't have `search_term` (should never happen), we "fail open" by not filtering out any hits
                     tracing::error!("WatchlistResultResponse with missing `search_term`");
                     true
-                },
+                }
             }
         )).unwrap_or(false))
         .filter(|h| h.doc.as_ref().and_then(|d| d.types.as_ref().map(|ts| ts.iter().any(|t| IncodeWatchlistType::try_from(t.trim()).ok().map(|i| watchlist_types.contains(&i)).unwrap_or(false)))).unwrap_or(false))
