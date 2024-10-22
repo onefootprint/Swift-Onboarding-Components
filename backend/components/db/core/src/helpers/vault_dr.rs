@@ -138,6 +138,11 @@ pub fn get_scoped_vault_version_batch(
     Ok(svv_batch)
 }
 
+pub struct DataLifetimeCreatedAtSvvId {
+    pub dl: DataLifetime,
+    pub created_at_svv_id: ScopedVaultVersionId,
+}
+
 #[tracing::instrument(skip_all, fields(
     tenant_id = %tenant_id,
     is_live = %is_live,
@@ -151,7 +156,7 @@ pub fn get_dl_batch_for_svv_batch(
     config_id: &VaultDrConfigId,
     svv_batch: &[ScopedVaultVersion],
     batch_size: usize,
-) -> DbResult<Vec<DataLifetime>> {
+) -> DbResult<Vec<DataLifetimeCreatedAtSvvId>> {
     // Implementation is based on GetDlBatch in
     // backend/formal_methods/vault_disaster_recovery/vdr.tla
 
@@ -173,7 +178,7 @@ pub fn get_dl_batch_for_svv_batch(
 
     let svvs_for_same_sv = alias!(scoped_vault_version as svvs_for_same_sv);
 
-    let dls = scoped_vault_version::table
+    let result: Vec<(DataLifetime, ScopedVaultVersionId)> = scoped_vault_version::table
         .inner_join(
             svvs_for_same_sv.on(scoped_vault_version::scoped_vault_id
                 .eq(svvs_for_same_sv.fields(scoped_vault_version::scoped_vault_id))),
@@ -193,13 +198,24 @@ pub fn get_dl_batch_for_svv_batch(
                 .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
                 .filter(vault_dr_blob::config_id.eq(config_id)),
         )))
-        .select(DataLifetime::as_select())
+        .select((
+            DataLifetime::as_select(),
+            svvs_for_same_sv.fields(scoped_vault_version::id),
+        ))
         .distinct()
         .order(data_lifetime::created_seqno)
         .limit(batch_size as i64)
         .load(conn)?;
 
-    Ok(dls)
+    let result = result
+        .into_iter()
+        .map(|(dl, created_at_svv_id)| DataLifetimeCreatedAtSvvId {
+            dl,
+            created_at_svv_id,
+        })
+        .collect();
+
+    Ok(result)
 }
 
 #[tracing::instrument(skip_all, fields(
@@ -634,7 +650,7 @@ mod tests {
                     i
                 );
 
-                let got_dls = get_dl_batch_for_svv_batch(
+                let got_dl_batch = get_dl_batch_for_svv_batch(
                     conn,
                     &tenant_id,
                     is_live,
@@ -643,6 +659,8 @@ mod tests {
                     blob_batch_size,
                 )
                 .unwrap();
+                let got_dls = got_dl_batch.iter().map(|d| d.dl.clone()).collect_vec();
+
                 assert_eq!(got_dls.len(), expected_num_dls, "Run {}: DL batch size", i);
 
                 // We can't predict the DL IDs in the batch, since DLs created at the same
@@ -664,7 +682,7 @@ mod tests {
                     assert!(candidate_dl_ids_for_seqnos.contains(&dl.id));
                 }
 
-                write_fake_blobs(conn, &vdr_config.id, got_dls);
+                write_fake_blobs(conn, &vdr_config.id, got_dl_batch);
 
 
                 let got_complete_svvs =
@@ -715,19 +733,25 @@ mod tests {
     fn write_fake_blobs(
         conn: &mut TestPgConn,
         config_id: &VaultDrConfigId,
-        dls: Vec<DataLifetime>,
+        dls: Vec<DataLifetimeCreatedAtSvvId>,
     ) -> Vec<VaultDrBlob> {
         let new_blobs = dls
             .into_iter()
-            .map(|dl| NewVaultDrBlob {
-                config_id: config_id.clone(),
-                data_lifetime_id: dl.id,
-                dl_created_seqno: dl.created_seqno,
-                bucket_path: crypto::random::gen_rand_bytes(32).encode_hex(),
-                content_etag: "content-etag".to_owned(),
-                wrapped_record_key: "wrapped-record-key".into(),
-                content_length_bytes: 123,
-            })
+            .map(
+                |DataLifetimeCreatedAtSvvId {
+                     dl,
+                     created_at_svv_id,
+                 }| NewVaultDrBlob {
+                    config_id: config_id.clone(),
+                    data_lifetime_id: dl.id,
+                    dl_created_seqno: dl.created_seqno,
+                    bucket_path: crypto::random::gen_rand_bytes(32).encode_hex(),
+                    content_etag: "content-etag".to_owned(),
+                    wrapped_record_key: "wrapped-record-key".into(),
+                    content_length_bytes: 123,
+                    dl_created_at_svv_id: created_at_svv_id,
+                },
+            )
             .collect_vec();
 
         VaultDrBlob::bulk_create(conn, new_blobs).unwrap()
@@ -798,47 +822,59 @@ mod tests {
         // We can't use model helpers since we have to construct a timeline that would violate the
         // unique_active_data_lifetime_per_scoped_vault_kind constraint.
         let new_dls = vec![
-            NewUnsafeDataLifetime {
-                vault_id: v_id.clone(),
-                scoped_vault_id: sv.id.clone(),
-                created_at: Utc::now(),
-                created_seqno: svv1.seqno,
-                kind: IdentityDataKind::Ssn9.into(),
-                source: DataLifetimeSource::LikelyHosted,
-                deactivated_seqno: Some(svv3.seqno),
-            },
-            NewUnsafeDataLifetime {
-                vault_id: v_id.clone(),
-                scoped_vault_id: sv.id.clone(),
-                created_at: Utc::now(),
-                created_seqno: svv1.seqno,
-                kind: IdentityDataKind::FirstName.into(),
-                source: DataLifetimeSource::LikelyHosted,
-                deactivated_seqno: None,
-            },
-            NewUnsafeDataLifetime {
-                vault_id: v_id.clone(),
-                scoped_vault_id: sv.id.clone(),
-                created_at: Utc::now(),
-                created_seqno: svv2.seqno,
-                kind: IdentityDataKind::Ssn9.into(),
-                source: DataLifetimeSource::LikelyHosted,
-                deactivated_seqno: Some(svv3.seqno),
-            },
-            NewUnsafeDataLifetime {
-                vault_id: v_id.clone(),
-                scoped_vault_id: sv.id.clone(),
-                created_at: Utc::now(),
-                created_seqno: svv3.seqno,
-                kind: IdentityDataKind::Ssn9.into(),
-                source: DataLifetimeSource::LikelyHosted,
-                deactivated_seqno: None,
-            },
+            (
+                NewUnsafeDataLifetime {
+                    vault_id: v_id.clone(),
+                    scoped_vault_id: sv.id.clone(),
+                    created_at: Utc::now(),
+                    created_seqno: svv1.seqno,
+                    kind: IdentityDataKind::Ssn9.into(),
+                    source: DataLifetimeSource::LikelyHosted,
+                    deactivated_seqno: Some(svv3.seqno),
+                },
+                &svv1,
+            ),
+            (
+                NewUnsafeDataLifetime {
+                    vault_id: v_id.clone(),
+                    scoped_vault_id: sv.id.clone(),
+                    created_at: Utc::now(),
+                    created_seqno: svv1.seqno,
+                    kind: IdentityDataKind::FirstName.into(),
+                    source: DataLifetimeSource::LikelyHosted,
+                    deactivated_seqno: None,
+                },
+                &svv1,
+            ),
+            (
+                NewUnsafeDataLifetime {
+                    vault_id: v_id.clone(),
+                    scoped_vault_id: sv.id.clone(),
+                    created_at: Utc::now(),
+                    created_seqno: svv2.seqno,
+                    kind: IdentityDataKind::Ssn9.into(),
+                    source: DataLifetimeSource::LikelyHosted,
+                    deactivated_seqno: Some(svv3.seqno),
+                },
+                &svv2,
+            ),
+            (
+                NewUnsafeDataLifetime {
+                    vault_id: v_id.clone(),
+                    scoped_vault_id: sv.id.clone(),
+                    created_at: Utc::now(),
+                    created_seqno: svv3.seqno,
+                    kind: IdentityDataKind::Ssn9.into(),
+                    source: DataLifetimeSource::LikelyHosted,
+                    deactivated_seqno: None,
+                },
+                &svv3,
+            ),
         ];
 
         let num_ssn9_active_at_svv2 = new_dls
             .iter()
-            .filter(|dl| {
+            .filter(|(dl, _)| {
                 dl.kind == IdentityDataKind::Ssn9.into()
                     && dl.created_seqno <= svv2.seqno
                     && dl
@@ -850,18 +886,22 @@ mod tests {
         // this timeline from being created using first-class models.
         assert_eq!(num_ssn9_active_at_svv2, 2);
 
-        let dls: Vec<DataLifetime> = new_dls
+        let dl_batch: Vec<DataLifetimeCreatedAtSvvId> = new_dls
             .into_iter()
-            .map(|new_dl| {
-                diesel::insert_into(data_lifetime::table)
+            .map(|(new_dl, created_at_svv)| {
+                let dl = diesel::insert_into(data_lifetime::table)
                     .values(&new_dl)
                     .get_result(conn.conn())
-                    .unwrap()
+                    .unwrap();
+                DataLifetimeCreatedAtSvvId {
+                    dl,
+                    created_at_svv_id: created_at_svv.id.clone(),
+                }
             })
             .collect();
 
-        let mut blobs = dls.into_iter().map(|dl| {
-            let blobs = write_fake_blobs(conn, &vdr_config.id, vec![dl]);
+        let mut blobs = dl_batch.into_iter().map(|d| {
+            let blobs = write_fake_blobs(conn, &vdr_config.id, vec![d]);
             assert_eq!(blobs.len(), 1);
             blobs.into_iter().next().unwrap()
         });

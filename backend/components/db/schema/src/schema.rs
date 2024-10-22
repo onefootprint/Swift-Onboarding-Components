@@ -1618,6 +1618,7 @@ diesel::table! {
         content_etag -> Text,
         wrapped_record_key -> Text,
         content_length_bytes -> Int8,
+        dl_created_at_svv_id -> Nullable<Text>,
     }
 }
 
@@ -2010,6 +2011,7 @@ diesel::joinable!(user_timeline -> vault (vault_id));
 diesel::joinable!(vault_data -> data_lifetime (lifetime_id));
 diesel::joinable!(vault_dr_aws_pre_enrollment -> tenant (tenant_id));
 diesel::joinable!(vault_dr_blob -> data_lifetime (data_lifetime_id));
+diesel::joinable!(vault_dr_blob -> scoped_vault_version (dl_created_at_svv_id));
 diesel::joinable!(vault_dr_blob -> vault_dr_config (config_id));
 diesel::joinable!(vault_dr_config -> tenant (tenant_id));
 diesel::joinable!(vault_dr_config -> vault_dr_aws_pre_enrollment (aws_pre_enrollment_id));
