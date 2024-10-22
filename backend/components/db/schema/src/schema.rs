@@ -163,7 +163,7 @@ diesel::table! {
         source -> Text,
         ownership_stake -> Nullable<Int4>,
         deactivated_at -> Nullable<Timestamptz>,
-        uuid -> Nullable<Uuid>,
+        uuid -> Uuid,
     }
 }
 

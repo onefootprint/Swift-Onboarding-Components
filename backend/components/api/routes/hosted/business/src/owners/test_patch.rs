@@ -82,7 +82,7 @@ fn test_verify_unique_phones_and_emails(
     let dbo = BusinessOwnerInfo {
         bo: BusinessOwner {
             id: BoId::test_data("Flerp".into()),
-            uuid: Some(Uuid::new_v4()),
+            uuid: Uuid::new_v4(),
             user_vault_id: None,
             business_vault_id: VaultId::test_data("Blerp".into()),
             kind: BusinessOwnerKind::Primary,

@@ -1,0 +1,1 @@
+ALTER TABLE business_owner ALTER COLUMN uuid DROP NOT NULL;
