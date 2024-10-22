@@ -212,6 +212,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
                 adverse_media: true,
                 continuous_monitoring: true,
                 adverse_media_lists: None,
+                match_kind: newtypes::AmlMatchKind::ExactName,
             },
         ]),
         required_auth_methods: None,

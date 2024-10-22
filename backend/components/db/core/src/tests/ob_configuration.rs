@@ -10,6 +10,7 @@ use crate::tests::prelude::*;
 use macros::db_test;
 use macros::db_test_case;
 use newtypes::AdverseMediaListKind;
+use newtypes::AmlMatchKind;
 use newtypes::ApiKeyStatus;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption;
@@ -586,7 +587,8 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_forwards_compatible(conn: &mut 
             pep: false,
             adverse_media: true,
             continuous_monitoring: true,
-            adverse_media_lists: None
+            adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
         obc.enhanced_aml_for_test()
     );
@@ -611,7 +613,8 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
             pep: false,
             adverse_media: true,
             continuous_monitoring: true,
-            adverse_media_lists: None
+            adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
         obc.enhanced_aml_for_test()
     );
@@ -625,6 +628,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
             AdverseMediaListKind::FinancialCrime,
             AdverseMediaListKind::Fraud,
         ]),
+        match_kind: AmlMatchKind::ExactName,
     };
     let obc = fixtures::ob_configuration::create_with_opts(
         conn,
@@ -639,7 +643,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
     // since im gunna manually set this in PG for Composer, nice to explicitly test here too
     diesel::sql_query(format!(
             "update ob_configuration set enhanced_aml={} where id = '{}';",
-            r#"'{"data": {"pep": false, "ofac": true, "adverse_media": true, "continuous_monitoring": true, "adverse_media_lists": ["financial_crime", "fraud"]}, "kind": "yes"}'"#, obc.id
+            r#"'{"data": {"pep": false, "ofac": true, "adverse_media": true, "continuous_monitoring": true, "adverse_media_lists": ["financial_crime", "fraud"], "match_kind": "exact_name"}, "kind": "yes"}'"#, obc.id
         ))
         .execute(conn.conn())
         .unwrap();
@@ -654,6 +658,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
                 AdverseMediaListKind::FinancialCrime,
                 AdverseMediaListKind::Fraud,
             ]),
+            match_kind: AmlMatchKind::ExactName
         },
         obc.enhanced_aml_for_test()
     );

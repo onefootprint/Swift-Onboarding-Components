@@ -13,6 +13,7 @@ use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use macros::db_test;
+use newtypes::AmlMatchKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
@@ -148,6 +149,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
             adverse_media: false,
             continuous_monitoring: true,
             adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
     );
 
@@ -164,6 +166,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
             adverse_media: false,
             continuous_monitoring: true,
             adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
     );
 
@@ -180,6 +183,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
             adverse_media: false,
             continuous_monitoring: true,
             adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
     );
 
@@ -196,6 +200,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
             adverse_media: false,
             continuous_monitoring: true,
             adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
     );
 
@@ -212,6 +217,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
             adverse_media: false,
             continuous_monitoring: false,
             adverse_media_lists: None,
+            match_kind: AmlMatchKind::ExactName,
         },
     );
 

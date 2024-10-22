@@ -1,3 +1,4 @@
+use super::AmlMatchKind;
 use crate::AdverseMediaListKind;
 use crate::PhoneLookupAttributes;
 use diesel::AsExpression;
@@ -41,6 +42,8 @@ pub enum VerificationCheck {
         adverse_media: bool,
         continuous_monitoring: bool,
         adverse_media_lists: Option<Vec<AdverseMediaListKind>>,
+        #[serde(default)]
+        match_kind: AmlMatchKind,
     },
     CurpValidation {},
     // Run Document through incode. here to support doc collection only

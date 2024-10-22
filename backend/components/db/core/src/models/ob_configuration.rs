@@ -804,6 +804,7 @@ impl VerificationChecks {
                     adverse_media,
                     continuous_monitoring,
                     adverse_media_lists,
+                    match_kind,
                 } => {
                     let am_lists = if tenant_id.is_composer() {
                         Some(vec![
@@ -819,6 +820,7 @@ impl VerificationChecks {
                         adverse_media,
                         continuous_monitoring,
                         adverse_media_lists: am_lists,
+                        match_kind,
                     };
                     checks.push(aml_check);
                 }
@@ -907,12 +909,14 @@ impl VerificationChecks {
                 adverse_media,
                 continuous_monitoring,
                 adverse_media_lists,
+                match_kind,
             }) => EnhancedAmlOption::Yes {
                 ofac,
                 pep,
                 adverse_media,
                 continuous_monitoring,
                 adverse_media_lists,
+                match_kind,
             },
             _ => EnhancedAmlOption::No,
         }

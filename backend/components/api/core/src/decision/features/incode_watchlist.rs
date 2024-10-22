@@ -7,7 +7,6 @@ use newtypes::vendor_reason_code_enum;
 use newtypes::AdverseMediaListKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::FootprintReasonCode;
-use newtypes::TenantId;
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
@@ -197,6 +196,7 @@ fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec
             adverse_media,
             continuous_monitoring: _,
             adverse_media_lists: _,
+            match_kind: _,
         } => vec![
             adverse_media.then(|| {
                 enhanced_aml
@@ -231,11 +231,7 @@ fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec
     }
 }
 
-pub fn get_hits(
-    res: &WatchlistResultResponse,
-    enhanced_aml: &EnhancedAmlOption,
-    tenant_id: &TenantId,
-) -> Vec<Hit> {
+pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption) -> Vec<Hit> {
     let search_term = res
         .content
         .as_ref()
@@ -248,16 +244,14 @@ pub fn get_hits(
         .cloned()
         .unwrap_or_default();
 
-    let watchlist_types = watchlist_types_for_enhanced_aml_opt(enhanced_aml);
-
-    // TODO: bubble this up to configuration somewhere
-    // https://linear.app/footprint/issue/BE-392/enable-configuration-of-other-params
-    let match_kind = if tenant_id.is_wingspan() {
-        MatchKind::ExactNameAndDobYear
-    } else {
-        MatchKind::ExactName
+    let match_kind = match enhanced_aml {
+        EnhancedAmlOption::No => {
+            return vec![];
+        }
+        EnhancedAmlOption::Yes { match_kind, .. } => MatchKind::from(*match_kind),
     };
 
+    let watchlist_types = watchlist_types_for_enhanced_aml_opt(enhanced_aml);
     hits.into_iter()
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
         .filter(|h| h.matches_by_criteria(match_kind))
@@ -279,9 +273,8 @@ pub fn get_hits(
 pub fn reason_codes_from_watchlist_result(
     res: &WatchlistResultResponse,
     enhanced_aml: &EnhancedAmlOption,
-    tenant_id: &TenantId,
 ) -> Vec<FootprintReasonCode> {
-    let unique_types_for_valid_hits = get_hits(res, enhanced_aml, tenant_id)
+    let unique_types_for_valid_hits = get_hits(res, enhanced_aml)
         .into_iter()
         .flat_map(|h| h.doc.and_then(|d| d.types).unwrap_or_default())
         .unique()
@@ -300,6 +293,7 @@ pub fn reason_codes_from_watchlist_result(
                 adverse_media,
                 continuous_monitoring: _,
                 adverse_media_lists: _,
+                match_kind: _,
             } => (*ofac && r.is_watchlist()) || (*pep && r.is_pep()) || (*adverse_media && r.is_adverse_media()),
         })
         .collect::<Vec<_>>()
@@ -312,6 +306,7 @@ mod test {
     use idv::incode::watchlist::response::Data;
     use idv::incode::watchlist::response::Doc;
     use idv::incode::watchlist::response::Hit;
+    use newtypes::AmlMatchKind;
     use std::str::FromStr;
     use test_case::test_case;
 
@@ -351,7 +346,6 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
-        let t_id = TenantId::from_str("12").unwrap();
         reason_codes_from_watchlist_result(
             &res,
             &EnhancedAmlOption::Yes {
@@ -360,21 +354,21 @@ mod test {
                 adverse_media: true,
                 continuous_monitoring: true,
                 adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
             },
-            &t_id,
         )
     }
 
     #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::No => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None} => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None} => vec![FootprintReasonCode::AdverseMediaHit])]
-    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![])} => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::Narcotics])} => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None} => vec![FootprintReasonCode::AdverseMediaHit])]
-    #[test_case(vec![vec!["sanction"], vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None} => vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaHit])]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName} => vec![FootprintReasonCode::AdverseMediaHit])]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![]), match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::Narcotics]), match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName} => vec![FootprintReasonCode::AdverseMediaHit])]
+    #[test_case(vec![vec!["sanction"], vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName} => vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaHit])]
     #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-violent-crime"], vec!["adverse-media
     ", "adverse-media-v2-other-serious
-    "]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::FinancialCrime,AdverseMediaListKind::Fraud])} => Vec::<FootprintReasonCode>::new())]
+    "]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::FinancialCrime,AdverseMediaListKind::Fraud]), match_kind: AmlMatchKind::ExactName} => Vec::<FootprintReasonCode>::new())]
     fn test_reason_codes_from_watchlist_result_am_list_filtering(
         hits: Vec<Vec<&str>>,
         enhanced_aml: EnhancedAmlOption,
@@ -389,8 +383,7 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
-        let t_id = TenantId::from_str("12").unwrap();
-        reason_codes_from_watchlist_result(&res, &enhanced_aml, &t_id)
+        reason_codes_from_watchlist_result(&res, &enhanced_aml)
     }
 
     #[test_case("Bob Boberto", vec![("Bob Boberto", "sanction")] => vec![FootprintReasonCode::WatchlistHitOfac])]
@@ -412,7 +405,6 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res(search_term, hits);
-        let t_id = TenantId::from_str("12").unwrap();
         reason_codes_from_watchlist_result(
             &res,
             &EnhancedAmlOption::Yes {
@@ -421,8 +413,8 @@ mod test {
                 adverse_media: true,
                 continuous_monitoring: true,
                 adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
             },
-            &t_id,
         )
     }
 

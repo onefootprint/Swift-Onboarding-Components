@@ -10,6 +10,7 @@ use db::DbError;
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use macros::test_state_case;
+use newtypes::AmlMatchKind;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::OnboardingStatus;
@@ -337,5 +338,6 @@ fn enhanced_aml_option_yes() -> EnhancedAmlOption {
         adverse_media: true,
         continuous_monitoring: true,
         adverse_media_lists: None,
+        match_kind: AmlMatchKind::ExactName,
     }
 }

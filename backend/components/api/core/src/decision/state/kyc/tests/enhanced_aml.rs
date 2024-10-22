@@ -16,6 +16,7 @@ use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
 use macros::test_state_case;
+use newtypes::AmlMatchKind;
 use newtypes::DecisionStatus;
 use newtypes::EnhancedAmlOption;
 use newtypes::KycState;
@@ -41,12 +42,12 @@ enum RS {
 #[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![]), VR::NotExpected, (OnboardingStatus::Pass, RS::None))]
 #[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Ofac]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectId, vec![AmlKind::Ofac])))]
 #[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Pep]), VR::NotExpected, (OnboardingStatus::Pass, RS::Some(IdologyExpectId, vec![AmlKind::Pep])))]
-#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![]), (OnboardingStatus::Pass, RS::None))]
-#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac])))]
-#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac, AmlKind::Pep])))]
-#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![AmlKind::Ofac]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac, AmlKind::Pep])))]
-#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: false, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac])))]
-#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: false, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Pep]), (OnboardingStatus::Pass, RS::None))]
+#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, VR::Hits(vec![]), VR::Hits(vec![]), (OnboardingStatus::Pass, RS::None))]
+#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac])))]
+#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac, AmlKind::Pep])))]
+#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, VR::Hits(vec![AmlKind::Ofac]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac, AmlKind::Pep])))]
+#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: false, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac])))]
+#[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: false, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Pep]), (OnboardingStatus::Pass, RS::None))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test(
     state: &mut State,
@@ -82,6 +83,7 @@ async fn test(
                 adverse_media,
                 continuous_monitoring,
                 adverse_media_lists,
+                match_kind: AmlMatchKind::ExactName,
             },
             Some(VerificationCheck::Aml {
                 ofac: ofac_vc,
@@ -89,6 +91,7 @@ async fn test(
                 adverse_media: adverse_media_vc,
                 continuous_monitoring: continuous_monitoring_vc,
                 adverse_media_lists: adverse_media_lists_vc,
+                match_kind: AmlMatchKind::ExactName,
             }),
         ) => {
             assert_eq!(ofac, ofac_vc);

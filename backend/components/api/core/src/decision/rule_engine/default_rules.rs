@@ -223,6 +223,7 @@ pub fn default_rules_for_obc(
             adverse_media,
             continuous_monitoring: _,
             adverse_media_lists: _,
+            match_kind: _,
         } => {
             let mut rs = vec![];
             if ofac {
@@ -338,6 +339,7 @@ mod tests {
     use db::tests::prelude::*;
     use db::tests::MockFFClient;
     use macros::db_test_case;
+    use newtypes::AmlMatchKind;
     use newtypes::CountryRestriction;
     use newtypes::DocTypeRestriction;
     use newtypes::DocumentCdoInfo;
@@ -352,9 +354,9 @@ mod tests {
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], skip_kyc: true, ..Default::default()}, vec![]  ; "SSN but skip_kyc")]
     #[db_test_case(ObConfigurationOpts { optional_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)], vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "basic KYC with optional SSN")]
     #[db_test_case(ObConfigurationOpts { skip_kyc: true, ..Default::default()}, vec![]; "skip_kyc")]
-    #[db_test_case(ObConfigurationOpts { skip_kyc: true, enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml even with skip kyc")]
-    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml, all options")]
-    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: false, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview)]].concat() ; "enhanced_aml, subbset of options")]
+    #[db_test_case(ObConfigurationOpts { skip_kyc: true, enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml even with skip kyc")]
+    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml, all options")]
+    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: false, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview)]].concat() ; "enhanced_aml, subbset of options")]
     // non-Alpaca but must_collect_data contains DOC CDO
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, [base_doc_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "Doc CDO")]
     // doc only (indicated by `kind = Document`)

@@ -3,6 +3,7 @@ use crate::incode::IncodeClientErrorCustomFailureReasons;
 use chrono::DateTime;
 use chrono::Utc;
 use derive_more::Deref;
+use newtypes::AmlMatchKind;
 use newtypes::IncodeFailureReason;
 use newtypes::IncodeWatchlistResultRef;
 use newtypes::PiiJsonValue;
@@ -70,6 +71,15 @@ pub struct Filters {
 pub enum MatchKind {
     ExactNameAndDobYear,
     ExactName,
+}
+
+impl From<AmlMatchKind> for MatchKind {
+    fn from(value: AmlMatchKind) -> Self {
+        match value {
+            AmlMatchKind::ExactNameAndDobYear => MatchKind::ExactNameAndDobYear,
+            AmlMatchKind::ExactName => MatchKind::ExactName,
+        }
+    }
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]

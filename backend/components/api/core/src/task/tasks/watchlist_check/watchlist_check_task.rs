@@ -162,6 +162,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     adverse_media: _,
                     continuous_monitoring,
                     adverse_media_lists: _,
+                    match_kind: _,
                 }),
             ) => {
                 // logic that enqeues this Task should prevent this, but extra precaution

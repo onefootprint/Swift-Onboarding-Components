@@ -413,6 +413,7 @@ impl ObConfigurationArgsToValidate {
                 adverse_media,
                 continuous_monitoring: _,
                 adverse_media_lists: _,
+                match_kind: _,
             } => {
                 if !(ofac && pep && adverse_media) {
                     Err(TenantError::ValidationError(
@@ -550,6 +551,7 @@ impl ObConfigurationArgsToValidate {
                         adverse_media,
                         continuous_monitoring: _,
                         adverse_media_lists: _,
+                        match_kind: _,
                     } => {
                         if !(*adverse_media || *ofac || *pep) {
                             Err(TenantError::ValidationError(

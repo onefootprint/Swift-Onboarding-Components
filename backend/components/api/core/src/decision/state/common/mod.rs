@@ -381,7 +381,6 @@ pub fn get_aml_risk_signals_from_aml_call(
     let wc_reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
         watchlist_result_response,
         &obc.verification_checks().enhanced_aml(),
-        &obc.tenant_id,
     );
     wc_reason_codes
         .into_iter()

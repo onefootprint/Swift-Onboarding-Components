@@ -393,6 +393,7 @@ def test_config_create(sandbox_tenant):
                     ofac=True,
                     pep=True,
                     adverse_media=True,
+                    match_kind="exact_name",
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
@@ -418,6 +419,7 @@ def test_config_create(sandbox_tenant):
                     ofac=True,
                     pep=True,
                     adverse_media=True,
+                    match_kind="exact_name",
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
@@ -449,6 +451,7 @@ def test_config_create(sandbox_tenant):
                             pep=True,
                             adverse_media=True,
                             continuous_monitoring=True,
+                            match_kind="exact_name",
                         ),
                     ),
                 ],
@@ -476,6 +479,7 @@ def test_config_create(sandbox_tenant):
                     ofac=True,
                     pep=True,
                     adverse_media=True,
+                    match_kind="exact_name",
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
@@ -508,6 +512,7 @@ def test_config_create(sandbox_tenant):
                             pep=True,
                             adverse_media=True,
                             continuous_monitoring=True,
+                            match_kind="exact_name",
                         ),
                     ),
                 ],
@@ -534,6 +539,7 @@ def test_config_create(sandbox_tenant):
                     ofac=True,
                     pep=False,
                     adverse_media=False,
+                    match_kind="exact_name",
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
@@ -572,6 +578,7 @@ def test_config_create(sandbox_tenant):
                             pep=False,
                             adverse_media=False,
                             continuous_monitoring=False,
+                            match_kind="exact_name",
                         ),
                     ),
                 ],
@@ -598,6 +605,7 @@ def test_config_create(sandbox_tenant):
                     ofac=False,
                     pep=False,
                     adverse_media=False,
+                    match_kind="exact_name",
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
@@ -1053,6 +1061,17 @@ def test_verification_checks(
                 ofac=False,
                 pep=False,
                 adverse_media=False,
+                match_kind="exact_name",
+            ),
+            None,
+        ),
+        (
+            dict(
+                enhanced_aml=True,
+                ofac=True,
+                pep=True,
+                adverse_media=False,
+                match_kind="exact_name",
             ),
             None,
         ),
@@ -1071,6 +1090,7 @@ def test_verification_checks(
                 ofac=True,
                 pep=True,
                 adverse_media=False,
+                match_kind="exact_name",
             ),
             "Validation error: cannot set adverse_media, ofac, or pep if enhanced_aml = false",
         ),
@@ -1080,6 +1100,7 @@ def test_verification_checks(
                 ofac=False,
                 pep=False,
                 adverse_media=False,
+                match_kind="exact_name",
             ),
             "Validation error: at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true",
         ),
@@ -1102,6 +1123,10 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         status_code=200 if expected_error is None else 400,
     )
 
+    # Add the default match kind to enhanced AML after creating the ob_config to ensure it's set in assertions
+    if "match_kind" not in enhanced_aml:
+        enhanced_aml["match_kind"] = "exact_name"
+
     if expected_error:
         assert res["message"] == expected_error
     else:
@@ -1116,6 +1141,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
                 ofac=True,
                 pep=True,
                 adverse_media=False,
+                match_kind="exact_name",
             ),
             None,
         ),
@@ -1124,6 +1150,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
                 ofac=False,
                 pep=False,
                 adverse_media=False,
+                match_kind="exact_name",
             ),
             "Validation error: at least one of adverse_media, ofac, or pep must be set for AML verification check",
         ),
@@ -1142,6 +1169,7 @@ def test_enhanced_aml_with_verification_checks(
             adverse_media=enhanced_aml["adverse_media"],
             continuous_monitoring=True,
             adverse_media_lists=None,
+            match_kind="exact_name",
         ),
     )
     verification_checks = [dict(kind="kyc", data=dict()), aml_check]

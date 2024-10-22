@@ -665,7 +665,6 @@ fn watchlist(
     let leaked_hits = decision::features::incode_watchlist::get_hits(
         &watchlist_result_response,
         &obc.verification_checks().enhanced_aml(),
-        &obc.tenant_id,
     )
     .into_iter()
     .map(|h| h.leak());

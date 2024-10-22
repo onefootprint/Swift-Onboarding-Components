@@ -436,7 +436,7 @@ async fn get_aml_hits(
             .and_then(|d| d.share_url.clone());
 
         let enhanced_aml = &obc.verification_checks().enhanced_aml();
-        let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml, &obc.tenant_id)
+        let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml)
             .into_iter()
             .map(|h| h.leak());
 

@@ -139,6 +139,8 @@ pub enum EnhancedAmlOption {
         adverse_media: bool,
         continuous_monitoring: bool,
         adverse_media_lists: Option<Vec<AdverseMediaListKind>>,
+        #[serde(default)]
+        match_kind: AmlMatchKind,
     },
 }
 
@@ -152,6 +154,7 @@ impl EnhancedAmlOption {
                 adverse_media: _,
                 continuous_monitoring: _,
                 adverse_media_lists,
+                match_kind: _,
             } => adverse_media_lists
                 .clone()
                 .unwrap_or(AdverseMediaListKind::default_lists()),
@@ -197,12 +200,41 @@ impl AdverseMediaListKind {
     }
 }
 
+#[derive(
+    Eq,
+    PartialEq,
+    Debug,
+    Clone,
+    Copy,
+    Hash,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+    Default,
+    Display,
+    serde_with::DeserializeFromStr,
+    serde_with::SerializeDisplay,
+    Apiv2Schema,
+    macros::SerdeAttr,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum AmlMatchKind {
+    ExactNameAndDobYear,
+    #[default]
+    ExactName,
+}
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, PartialEq, Apiv2Schema)]
 pub struct EnhancedAml {
     pub enhanced_aml: bool,
     pub ofac: bool,
     pub pep: bool,
     pub adverse_media: bool,
+    #[serde(default)]
+    pub match_kind: AmlMatchKind,
 }
 
 impl From<EnhancedAml> for EnhancedAmlOption {
@@ -214,6 +246,7 @@ impl From<EnhancedAml> for EnhancedAmlOption {
                 adverse_media: value.adverse_media,
                 continuous_monitoring: true,
                 adverse_media_lists: value.adverse_media.then(AdverseMediaListKind::default_lists),
+                match_kind: value.match_kind,
             }
         } else {
             EnhancedAmlOption::No
@@ -229,6 +262,7 @@ impl From<EnhancedAmlOption> for EnhancedAml {
                 ofac: false,
                 pep: false,
                 adverse_media: false,
+                match_kind: AmlMatchKind::ExactName, // TODO: Figure out whether this is necessary.
             },
             EnhancedAmlOption::Yes {
                 ofac,
@@ -236,11 +270,13 @@ impl From<EnhancedAmlOption> for EnhancedAml {
                 adverse_media,
                 continuous_monitoring: _,
                 adverse_media_lists: _,
+                match_kind,
             } => EnhancedAml {
                 enhanced_aml: true,
                 ofac,
                 pep,
                 adverse_media,
+                match_kind,
             },
         }
     }
