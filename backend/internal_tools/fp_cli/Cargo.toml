@@ -7,8 +7,8 @@ description = "The Footprint command-line client"
 [dependencies]
 tokio = { workspace = true }
 api_wire_types = { path = "../../components/api/wire_types" }
-serde = {workspace = true }
-serde_json = {workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 reqwest = { workspace = true }
 thiserror = { workspace = true }
@@ -19,3 +19,6 @@ clap = { version = "4.2.1", features = ["derive"] }
 newtypes = { path = "../../components/newtypes" }
 itertools = { workspace = true }
 csv = "1.2.2"
+log = { workspace = true }
+pretty_env_logger = { workspace = true }
+chrono = { workspace = true }

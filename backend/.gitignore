@@ -23,3 +23,7 @@ fp_test_server_log_*
 
 # Python hypothesis output
 .hypothesis/
+
+*.csv
+*.json
+*.txt

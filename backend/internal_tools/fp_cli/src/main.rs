@@ -1,11 +1,23 @@
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use anyhow::bail;
+use backfill::BackfillArgs;
+use clap::Args;
+use clap::Parser;
+use clap::Subcommand;
+use clap::ValueEnum;
+use crypto::base64;
+use crypto::hex;
 use crypto::zeroize::Zeroize;
-use crypto::{base64, hex};
-use newtypes::{export_reason_codes, PiiString, VaultPublicKey};
-mod export_entity_results;
+use kyc::KycArgs;
+use newtypes::export_reason_codes;
+use newtypes::PiiString;
+use newtypes::VaultPublicKey;
+mod backfill;
+mod kyc;
+mod util;
+// mod export_entity_results;
 
 #[derive(Parser)]
-#[command(name = "MyApp")]
+#[command(name = "Footprint Utility")]
 #[command(author = "Footprint <support@onefootprint.com>")]
 #[command(version = "1.0")]
 #[command(about = "Footprint's command-line client", long_about = None)]
@@ -33,6 +45,10 @@ enum Commands {
         #[arg(long)]
         out_file: Option<std::path::PathBuf>,
     },
+    /// Backfill vault data for a customer
+    Backfill(BackfillArgs),
+    /// KYC
+    Kyc(KycArgs),
 }
 
 #[derive(Args)]
@@ -91,6 +107,7 @@ enum KeyForm {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    pretty_env_logger::init();
     let cli = Cli::parse();
     let out = match cli.command {
         Commands::Seal(args) => {
@@ -109,32 +126,36 @@ async fn main() -> anyhow::Result<()> {
             export_reason_codes();
             "export complete!".into()
         }
-        Commands::ExportEntityResults {
-            api_key,
-            page_size,
-            out_file,
-        } => {
-            let rows = export_entity_results::run(api_key, page_size).await?;
-            if let Some(out_file) = out_file {
-                let mut writer = csv::Writer::from_path(&out_file)?;
-                for row in rows {
-                    writer.serialize(row)?;
-                }
-                writer.flush()?;
-                format!("wrote results to {}\n", out_file.to_string_lossy())
-            } else {
-                let mut writer = csv::WriterBuilder::new().from_writer(vec![]);
-                for row in rows {
-                    writer.serialize(row)?;
-                }
-                writer.flush()?;
+        Commands::ExportEntityResults { .. } => {
+            bail!("not currently supported");
+            // let rows = export_entity_results::run(api_key, page_size).await?;
+            // if let Some(out_file) = out_file {
+            //     let mut writer = csv::Writer::from_path(&out_file)?;
+            //     for row in rows {
+            //         writer.serialize(row)?;
+            //     }
+            //     writer.flush()?;
+            //     format!("wrote results to {}\n", out_file.to_string_lossy())
+            // } else {
+            //     let mut writer = csv::WriterBuilder::new().from_writer(vec![]);
+            //     for row in rows {
+            //         writer.serialize(row)?;
+            //     }
+            //     writer.flush()?;
 
-                String::from_utf8(writer.into_inner()?)?
-            }
+            //     String::from_utf8(writer.into_inner()?)?
+            // }
+        }
+        Commands::Backfill(args) => {
+            backfill::backfill(args).await?;
+            "Done backfilling".into()
+        }
+        Commands::Kyc(args) => {
+            kyc::kyc(args).await?;
+            "Done running kyc".into()
         }
     };
     print!("{}", out);
-    eprintln!();
     Ok(())
 }
 

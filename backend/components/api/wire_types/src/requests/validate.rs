@@ -35,7 +35,7 @@ pub struct ValidateResponse {
     pub onboarding_configuration_id: Option<ObConfigurationId>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Response, macros::JsonResponder)]
 pub struct EntityValidateResponse {
     pub fp_id: FpId,
     pub requires_manual_review: bool,

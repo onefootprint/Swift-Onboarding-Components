@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use api_wire_types::{Entity, GetFieldValidationResponse, RiskSignal};
+use api_wire_types::{Entity, EntityStatus, GetFieldValidationResponse, RiskSignal};
 use itertools::Itertools;
 use newtypes::{FpId, MatchLevel, OnboardingStatus, SignalSeverity};
 use reqwest::{header::HeaderMap, Client};
@@ -21,7 +21,7 @@ pub struct CursorPaginatedResponse<T> {
 #[derive(Debug, Serialize)]
 pub struct UserRow {
     fp_id: FpId,
-    status: Option<OnboardingStatus>,
+    status: Option<EntityStatus>,
     name_match: Option<MatchLevel>,
     dob_match: Option<MatchLevel>,
     address_match: Option<MatchLevel>,
@@ -117,7 +117,7 @@ async fn build_user(client: Client, entity: Entity) -> anyhow::Result<UserRow> {
 
     Ok(UserRow {
         fp_id: entity.id,
-        status: entity.onboarding.map(|ob| ob.status),
+        status: Some(entity.status),
         name_match: validations.name.map(|m| m.match_level),
         dob_match: validations.dob.map(|m| m.match_level),
         address_match: validations.address.map(|m| m.match_level),
