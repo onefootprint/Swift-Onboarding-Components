@@ -20,9 +20,9 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateUserWfArgs;
-use api_core::utils::requirements::get_requirements_inner;
-use api_core::utils::requirements::EntityInfo;
+use api_core::utils::requirements::get_requirements_for_wf;
 use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::requirements::RequirementContext;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -203,16 +203,15 @@ pub async fn post(
             // /kyc endpoint currently does not properly handle IPK doc requirements!
             // Also does not check any requirements for the Business vault if this person is a primary BO for
             // a Business
-            let opts = RequirementOpts::default();
-            let entity = EntityInfo {
-                vw: &uvw,
-                wf: &wf,
+            let ctx = RequirementContext {
                 business_owners: &[],
                 user_values: &decrypted_values,
                 auth_events: &[],
                 is_secondary_bo: false,
+                obc: &obc,
+                opts: RequirementOpts::default(),
             };
-            let reqs = get_requirements_inner(conn, entity, &obc, opts)?;
+            let reqs = get_requirements_for_wf(conn, ctx, &wf, &uvw)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

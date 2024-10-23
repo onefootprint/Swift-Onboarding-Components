@@ -31,7 +31,7 @@ pub async fn get(
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id)?;
-            let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &user_auth.auth_events)?;
+            let reqs = get_register_auth_method_requirements(conn, &obc, &user_auth.auth_events, &vw)?;
             Ok(reqs)
         })
         .await?;

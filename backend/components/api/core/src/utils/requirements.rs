@@ -43,11 +43,11 @@ use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::KycState;
 use newtypes::LivenessSource;
 use newtypes::OnboardingRequirement;
-use newtypes::OnboardingRequirementKind;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::UsLegalStatus;
 use newtypes::WorkflowId;
+use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
 use std::str::FromStr;
 
@@ -143,11 +143,10 @@ pub async fn get_requirements_for_person_and_maybe_business(
         })
         .await?;
     let user_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
-    let biz_info = if let Some((bvw, biz_wf)) = biz_info {
-        let dbos = bvw.decrypt_business_owners(state).await?;
-        Some((bvw, biz_wf, dbos))
+    let business_owners = if let Some((bvw, _)) = biz_info.as_ref() {
+        bvw.decrypt_business_owners(state).await?
     } else {
-        None
+        vec![]
     };
 
     let require_capture_on_stepup = state
@@ -159,63 +158,39 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {
-            let entity = EntityInfo {
-                vw: &uvw,
-                wf: &person_workflow,
+            let ctx = RequirementContext {
                 user_values: &user_values,
-                business_owners: &[],
+                business_owners: &business_owners,
                 auth_events: &auth_events,
                 is_secondary_bo,
-            };
-            let person_requirements = get_requirements_inner(conn, entity, &person_obc, requirement_opts)?;
-
-            let business_requirements = if let Some((bvw, biz_wf, dbos)) = biz_info {
-                let entity = EntityInfo {
-                    vw: &bvw,
-                    wf: &biz_wf,
-                    user_values: &user_values,
-                    business_owners: &dbos,
-                    auth_events: &[],
-                    is_secondary_bo,
-                };
-                // Technically for this case, the business's OBC should be the same as the person's and
-                // it'd be a bit more clear to see business_obc here. But they should be same and this is
-                // the existing logic so may as well keep as is
-                get_requirements_inner(conn, entity, &person_obc, requirement_opts)?
-            } else {
-                vec![]
+                opts: requirement_opts,
+                // Technically for business reqs, the business's OBC should be the same as the person's.
+                // But they should be same and this is the existing logic so may as well keep as is
+                obc: &person_obc,
             };
 
-            Ok(chain!(business_requirements, person_requirements).collect_vec())
+            let mut requirements = get_requirements_for_wf(conn, ctx, &person_workflow, &uvw)?;
+            if let Some((bvw, biz_wf)) = biz_info {
+                requirements.extend(get_requirements_for_wf(conn, ctx, &biz_wf, &bvw)?);
+            }
+
+            tracing::info!(workflow_id=%person_workflow.id, requirements=%format!("{:?}", requirements), scoped_user_id=%person_workflow.scoped_vault_id, "get_requirements result");
+
+            Ok(requirements)
         })
         .await?;
 
     Ok(requirements)
 }
 
-// gets oustanding requirements for a Vault with respect to a specific OBC/WF
-#[tracing::instrument(skip_all)]
-pub fn get_requirements_inner<'a, T: Copy>(
-    conn: &'a mut PgConn,
-    entity_info: EntityInfo<'a, T>,
-    obc: &'a ObConfiguration,
-    opts: RequirementOpts,
-) -> FpResult<Vec<OnboardingRequirement>> {
-    let wf = &entity_info.wf;
-    // Depending on the workflow that we are running, we only want to show a subset of requirements
-    let relevant_requirement_kinds = wf.state.relevant_requirements();
-
-    // For each requirement kind that might be shown by this workflow, generate a requirement if
-    // necessary
-    let requirements = relevant_requirement_kinds
-        .into_iter()
-        .map(|k| get_requirement_inner(k, conn, entity_info, obc, opts))
-        .collect::<FpResult<Vec<_>>>()?;
-    let requirements = requirements.into_iter().flatten().collect();
-
-    tracing::info!(workflow_id=%wf.id, requirements=%format!("{:?}", requirements), scoped_user_id=%wf.scoped_vault_id, "get_requirements result");
-
-    Ok(requirements)
+#[derive(Clone, Copy)]
+pub struct RequirementContext<'a> {
+    pub user_values: &'a UserDecryptResultForReqs,
+    pub business_owners: &'a [BusinessOwnerInfo],
+    pub auth_events: &'a [AssociatedAuthEvent],
+    pub is_secondary_bo: bool,
+    pub obc: &'a ObConfiguration,
+    pub opts: RequirementOpts,
 }
 
 /// Omit the confirm screen for met requirements IF the workflow is already completed or the user is
@@ -230,7 +205,6 @@ fn omit_confirm_if_necessary(req: OnboardingRequirement, wf: &Workflow) -> Optio
     );
     (wf.completed_at.is_none() && !is_stepup).then_some(req)
 }
-
 struct RequirementProgress {
     populated_attributes: Vec<CDO>,
     missing_attributes: Vec<CDO>,
@@ -317,6 +291,7 @@ fn get_data_collection_progress<Type>(
     if !ob_config.must_collect_data.iter().any(|cdo| cdo.matches(di_kind)) {
         return None;
     }
+
     let relevant_attrs = |cdos: Vec<CDO>| cdos.into_iter().filter(move |cdo| cdo.matches(di_kind));
 
     // Kind of unintuitive: optional_data is not a subset of must_collect_data
@@ -348,8 +323,8 @@ fn get_data_collection_progress<Type>(
 pub fn get_register_auth_method_requirements<T>(
     conn: &mut PgConn,
     obc: &ObConfiguration,
-    vw: &TenantVw<T>,
     auth_events: &[AssociatedAuthEvent],
+    vw: &TenantVw<T>,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let auth_events = load_auth_events(conn, auth_events)?;
     if auth_events
@@ -385,30 +360,19 @@ pub fn get_register_auth_method_requirements<T>(
     Ok(requirements)
 }
 
-#[derive(Clone, Copy)]
-pub struct EntityInfo<'a, T> {
-    pub vw: &'a TenantVw<T>,
-    pub wf: &'a Workflow,
-    pub user_values: &'a UserDecryptResultForReqs,
-    pub business_owners: &'a [BusinessOwnerInfo],
-    pub auth_events: &'a [AssociatedAuthEvent],
-    pub is_secondary_bo: bool,
-}
-
 fn get_collect_kyc_data_requirement<T>(
+    ctx: RequirementContext,
     uvw: &VaultWrapper<T>,
     user_wf: &Workflow,
-    obc: &ObConfiguration,
-    user_values: &UserDecryptResultForReqs,
-) -> FpResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Option<OnboardingRequirement>> {
     let Some(RequirementProgress {
         populated_attributes,
         missing_attributes,
         optional_attributes,
         recollect_attributes,
-    }) = get_data_collection_progress(uvw, user_wf, obc, DID::Id, user_values)
+    }) = get_data_collection_progress(uvw, user_wf, ctx.obc, DID::Id, ctx.user_values)
     else {
-        return Ok(vec![]);
+        return Ok(None);
     };
     // if ob config needs to collect id data
     let req = OnboardingRequirement::CollectData {
@@ -418,22 +382,22 @@ fn get_collect_kyc_data_requirement<T>(
         recollect_attributes,
     };
     let req = omit_confirm_if_necessary(req, user_wf);
-    Ok(req.into_iter().collect())
+    Ok(req)
 }
 
 fn get_collect_investor_profile_requirement<T>(
+    ctx: RequirementContext,
     uvw: &VaultWrapper<T>,
     user_wf: &Workflow,
-    obc: &ObConfiguration,
-    user_values: &UserDecryptResultForReqs,
-) -> FpResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Option<OnboardingRequirement>> {
+    let user_values = ctx.user_values;
     let Some(RequirementProgress {
         populated_attributes,
         missing_attributes,
         ..
-    }) = get_data_collection_progress(uvw, user_wf, obc, DID::InvestorProfile, user_values)
+    }) = get_data_collection_progress(uvw, user_wf, ctx.obc, DID::InvestorProfile, user_values)
     else {
-        return Ok(vec![]);
+        return Ok(None);
     };
     let declarations = user_values.get_di(IPK::Declarations).ok();
     let missing_document = if let Some(declarations) = declarations {
@@ -451,39 +415,37 @@ fn get_collect_investor_profile_requirement<T>(
         missing_document,
     };
     let req = omit_confirm_if_necessary(req, user_wf);
-    Ok(req.into_iter().collect())
+    Ok(req)
 }
 
 fn get_collect_kyb_data_requirement<T>(
+    ctx: RequirementContext,
     bvw: &VaultWrapper<T>,
     biz_wf: &Workflow,
-    obc: &ObConfiguration,
-    is_secondary_bo: bool,
-    business_owners: &[BusinessOwnerInfo],
-) -> FpResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Option<OnboardingRequirement>> {
     let user_values = UserDecryptResultForReqs::empty();
     let Some(RequirementProgress {
         mut populated_attributes,
         optional_attributes: _,
         mut missing_attributes,
         recollect_attributes,
-    }) = get_data_collection_progress(bvw, biz_wf, obc, DID::Business, &user_values)
+    }) = get_data_collection_progress(bvw, biz_wf, ctx.obc, DID::Business, &user_values)
     else {
-        return Ok(vec![]);
+        return Ok(None);
     };
 
-    if is_secondary_bo {
+    if ctx.is_secondary_bo {
         // Omit collecting any new business data and showing the business confirm screen
         // when the user filling out the form is not the primary BO
-        return Ok(vec![]);
+        return Ok(None);
     }
 
-    let has_linked_bos = business_owners
+    let has_linked_bos = (ctx.business_owners)
         .iter()
         .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
     let are_all_bos_complete = {
-        let is_not_empty = !business_owners.is_empty();
-        let are_bos_populated = business_owners.iter().all(|bo| {
+        let is_not_empty = !ctx.business_owners.is_empty();
+        let are_bos_populated = ctx.business_owners.iter().all(|bo| {
             // Maybe don't require phone and email for primary
             let vd_exists =
                 (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
@@ -500,8 +462,8 @@ fn get_collect_kyb_data_requirement<T>(
         is_not_empty && are_bos_populated
     };
 
-    let bo_cdo =
-        (obc.must_collect_data.iter()).find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
+    let bo_cdo = (ctx.obc.must_collect_data.iter())
+        .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
     if let Some(bo_cdo) = bo_cdo {
         let is_missing_bo = missing_attributes.contains(bo_cdo);
         if !is_missing_bo && !are_all_bos_complete {
@@ -522,17 +484,17 @@ fn get_collect_kyb_data_requirement<T>(
         recollect_attributes,
     };
     let req = omit_confirm_if_necessary(req, biz_wf);
-    Ok(req.into_iter().collect())
+    Ok(req)
 }
 
 fn get_register_passkey_requirement(
     conn: &mut PgConn,
+    ctx: RequirementContext,
     user_wf: &Workflow,
-    obc: &ObConfiguration,
-) -> FpResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Option<OnboardingRequirement>> {
     // skip passkey registration on no-phone flows
-    if !obc.prompt_for_passkey {
-        return Ok(vec![]);
+    if !ctx.obc.prompt_for_passkey {
+        return Ok(None);
     }
     let credentials = Passkey::list(conn, &user_wf.scoped_vault_id)?;
 
@@ -544,23 +506,19 @@ fn get_register_passkey_requirement(
         .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
         .collect_vec();
 
-    let reqs = (liveness_skip_events.is_empty() && credentials.is_empty())
-        .then_some(OnboardingRequirement::RegisterPasskey)
-        .into_iter()
-        .collect();
-    Ok(reqs)
+    let req = (liveness_skip_events.is_empty() && credentials.is_empty())
+        .then_some(OnboardingRequirement::RegisterPasskey);
+    Ok(req)
 }
 
-fn get_collect_document_requirement(
+fn get_collect_document_requirements(
     conn: &mut PgConn,
+    ctx: RequirementContext,
     wf: &Workflow,
-    obc: &ObConfiguration,
-    opts: RequirementOpts,
-    user_values: &UserDecryptResultForReqs,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let RequirementOpts {
         require_capture_on_stepup,
-    } = opts;
+    } = ctx.opts;
     let document_requests = DocumentRequest::get_all(conn, &wf.id)?;
     let reqs = document_requests
         .into_iter()
@@ -586,14 +544,14 @@ fn get_collect_document_requirement(
                 DocumentRequestConfig::Custom(c) => c.upload_settings,
             };
 
-            let country = user_values
+            let country = (ctx.user_values)
                 .get(&IDK::Country.into())
                 .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
             let config = match dr.config {
                 DocumentRequestConfig::Identity { collect_selfie } => {
                     let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
                     let supported_country_and_doc_types =
-                        obc.supported_country_mapping_for_document(country).0;
+                        ctx.obc.supported_country_mapping_for_document(country).0;
                     CollectDocumentConfig::Identity {
                         should_collect_selfie: collect_selfie,
                         should_collect_consent: user_consent.is_none(),
@@ -623,12 +581,11 @@ fn get_collect_document_requirement(
 
 fn get_authorize_requirement<T>(
     conn: &mut PgConn,
+    ctx: RequirementContext,
     uvw: &TenantVw<T>,
     user_wf: &Workflow,
-    obc: &ObConfiguration,
-    user_values: &UserDecryptResultForReqs,
-) -> FpResult<Vec<OnboardingRequirement>> {
-    let (document_types, skipped_selfie) = if obc.can_access_document() {
+) -> FpResult<Option<OnboardingRequirement>> {
+    let (document_types, skipped_selfie) = if ctx.obc.can_access_document() {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like
         // to authorize all of them
         let docs = Document::list_by_wf_id(conn, &user_wf.id)?;
@@ -646,12 +603,11 @@ fn get_authorize_requirement<T>(
         (vec![], false)
     };
 
-    let collected_data = obc
-        .can_access_data
+    let collected_data = (ctx.obc.can_access_data)
         .iter()
         .filter(|cdo| {
             // Only include CDO's from optional_data if they were collected
-            if obc.optional_data.contains(cdo) {
+            if ctx.obc.optional_data.contains(cdo) {
                 cdo.required_data_identifiers().iter().all(|di| uvw.has_field(di))
             } else {
                 true
@@ -660,7 +616,7 @@ fn get_authorize_requirement<T>(
         .filter(|cdo| {
             !matches!(cdo, CDO::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))) || !skipped_selfie
         })
-        .filter(|cdo| !should_skip_us_only_cdos(cdo, user_values))
+        .filter(|cdo| !should_skip_us_only_cdos(cdo, ctx.user_values))
         .cloned()
         .collect();
 
@@ -668,56 +624,49 @@ fn get_authorize_requirement<T>(
         collected_data,
         document_types,
     };
-    Ok(vec![OnboardingRequirement::Authorize {
+    Ok(Some(OnboardingRequirement::Authorize {
         fields_to_authorize,
         authorized_at: user_wf.authorized_at,
-    }])
+    }))
 }
 
-/// Generates a requirement of the given kind `k`, if one exists.
-#[allow(clippy::too_many_arguments)]
-#[tracing::instrument("get_requirement_inner", skip_all, fields(kind = ?k))]
-fn get_requirement_inner<T>(
-    k: OnboardingRequirementKind,
+fn get_process_requirement(user_wf: &Workflow) -> Option<OnboardingRequirement> {
+    if user_wf.state.requires_user_input() {
+        Some(OnboardingRequirement::Process)
+    } else {
+        None
+    }
+}
+
+// gets oustanding requirements for a Vault with respect to a specific OBC/WF
+#[tracing::instrument(skip_all)]
+pub fn get_requirements_for_wf<T>(
     conn: &mut PgConn,
-    entity_info: EntityInfo<T>,
-    obc: &ObConfiguration,
-    opts: RequirementOpts,
+    ctx: RequirementContext,
+    wf: &Workflow,
+    vw: &TenantVw<T>,
 ) -> FpResult<Vec<OnboardingRequirement>> {
-    let EntityInfo {
-        vw,
-        wf,
-        user_values,
-        business_owners,
-        auth_events,
-        is_secondary_bo,
-    } = entity_info;
-    let reqs = match k {
-        OnboardingRequirementKind::RegisterAuthMethod => {
-            get_register_auth_method_requirements(conn, obc, vw, auth_events)?
-        }
-        OnboardingRequirementKind::CollectData => get_collect_kyc_data_requirement(vw, wf, obc, user_values)?,
-        OnboardingRequirementKind::CollectInvestorProfile => {
-            get_collect_investor_profile_requirement(vw, wf, obc, user_values)?
-        }
-        OnboardingRequirementKind::CollectBusinessData => {
-            get_collect_kyb_data_requirement(vw, wf, obc, is_secondary_bo, business_owners)?
-        }
-        // The below requirements we will never include when met
-        // (kind of confusing in that we are checking in real-time if they've been satisifed)
-        OnboardingRequirementKind::RegisterPasskey => get_register_passkey_requirement(conn, wf, obc)?,
-        OnboardingRequirementKind::CollectDocument => {
-            get_collect_document_requirement(conn, wf, obc, opts, user_values)?
-        }
-        OnboardingRequirementKind::Authorize => get_authorize_requirement(conn, vw, wf, obc, user_values)?,
-        OnboardingRequirementKind::Process => {
-            if wf.state.requires_user_input() {
-                // If the worfklow is in a state that requires user input, make a Process requirement
-                vec![OnboardingRequirement::Process]
-            } else {
-                vec![]
-            }
-        }
+    let requirements = match wf.kind {
+        WorkflowKind::AlpacaKyc | WorkflowKind::Kyc => chain!(
+            get_register_auth_method_requirements(conn, ctx.obc, ctx.auth_events, vw)?,
+            get_collect_kyc_data_requirement(ctx, vw, wf)?,
+            get_collect_investor_profile_requirement(ctx, vw, wf)?,
+            get_register_passkey_requirement(conn, ctx, wf)?,
+            get_collect_document_requirements(conn, ctx, wf)?,
+            get_authorize_requirement(conn, ctx, vw, wf)?,
+            get_process_requirement(wf),
+        )
+        .collect_vec(),
+        WorkflowKind::Kyb => chain!(
+            get_collect_kyb_data_requirement(ctx, vw, wf)?,
+            get_collect_document_requirements(conn, ctx, wf)?,
+        )
+        .collect_vec(),
+        WorkflowKind::Document => chain!(
+            get_collect_document_requirements(conn, ctx, wf)?,
+            get_process_requirement(wf),
+        )
+        .collect_vec(),
     };
-    Ok(reqs)
+    Ok(requirements)
 }

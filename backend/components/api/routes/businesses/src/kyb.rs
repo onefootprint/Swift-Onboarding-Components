@@ -12,8 +12,8 @@ use api_core::task;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::requirements::get_requirements_inner;
-use api_core::utils::requirements::EntityInfo;
+use api_core::utils::requirements::get_requirements_for_wf;
+use api_core::utils::requirements::RequirementContext;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::requirements::UserDecryptResultForReqs;
 use api_core::utils::vault_wrapper::Business;
@@ -148,16 +148,15 @@ pub async fn post(
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, allow_reonboard)?;
 
             // Check requirements for this Business vault w.r.t the OBC
-            let opts = RequirementOpts::default();
-            let entity = EntityInfo {
-                vw: &bvw,
-                wf: &biz_wf,
+            let ctx = RequirementContext {
                 user_values: &UserDecryptResultForReqs::empty(),
                 business_owners: &dbos,
                 auth_events: &[],
                 is_secondary_bo: false,
+                obc: &obc,
+                opts: RequirementOpts::default(),
             };
-            let reqs = get_requirements_inner(conn, entity, &obc, opts)?;
+            let reqs = get_requirements_for_wf(conn, ctx, &biz_wf, &bvw)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

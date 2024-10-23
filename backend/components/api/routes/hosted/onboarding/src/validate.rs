@@ -57,7 +57,7 @@ pub async fn post(
         let reqs = state
             .db_query(move |conn| -> FpResult<_> {
                 let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
-                let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &auth_events)?;
+                let reqs = get_register_auth_method_requirements(conn, &obc, &auth_events, &vw)?;
                 Ok(reqs)
             })
             .await?;
