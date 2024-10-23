@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css, keyframes } from 'styled-components';
 
 import { media } from '../../utils';
+import Box from '../box';
 import Overlay from '../overlay';
 import ScrollArea from '../scroll-area';
 import Stack from '../stack';
@@ -63,21 +64,23 @@ const BottomSheet = ({
   return (
     <RadixDialog.Root open={open} onOpenChange={onClose}>
       <RadixDialog.Portal container={portalRef.current || undefined}>
-        <Content role="dialog" onPointerDownOutside={onClose} aria-describedby={undefined}>
-          <RadixDialog.Title asChild>
-            <VisuallyHidden>{title}</VisuallyHidden>
-          </RadixDialog.Title>
-          <Stack maxHeight={componentMaxHeight} direction="column">
-            <Header
-              closeAriaLabel={closeAriaLabel ?? (t('components.bottom-sheet.close-aria-label-default') as string)}
-              onClose={onClose}
-              title={title}
-            />
-            <ScrollArea hideBottomLine padding={5} maxHeight={scrollAreaMaxHeight}>
-              {children}
-            </ScrollArea>
-          </Stack>
-        </Content>
+        <RadixDialog.Content onPointerDownOutside={onClose} aria-describedby={undefined} asChild>
+          <Content>
+            <RadixDialog.Title asChild>
+              <VisuallyHidden>{title}</VisuallyHidden>
+            </RadixDialog.Title>
+            <Stack maxHeight={componentMaxHeight} direction="column">
+              <Header
+                closeAriaLabel={closeAriaLabel ?? (t('components.bottom-sheet.close-aria-label-default') as string)}
+                onClose={onClose}
+                title={title}
+              />
+              <ScrollArea hideBottomLine padding={5} maxHeight={scrollAreaMaxHeight}>
+                {children}
+              </ScrollArea>
+            </Stack>
+          </Content>
+        </RadixDialog.Content>
         <RadixDialog.Overlay asChild>
           <Overlay isVisible={open} />
         </RadixDialog.Overlay>
@@ -108,7 +111,7 @@ const slideOut = keyframes`
   }
 `;
 
-const Content = styled(RadixDialog.Content)`
+const Content = styled(Box)`
   ${({ theme }) => css`
     position: fixed;
     left: 0;

@@ -326,6 +326,10 @@
       "item": {
         "aria-label-default": "Select"
       }
+    },
+    "picker": {
+      "placeholder-default": "Search...",
+      "aria-label-default": "Search options"
     }
   }
 }

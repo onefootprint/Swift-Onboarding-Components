@@ -1,7 +1,9 @@
 import { IcoClose24 } from '@onefootprint/icons';
 import * as RadixDialog from '@radix-ui/react-dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Box from '../../../../box';
@@ -38,6 +40,7 @@ const Picker = ({
   onChange,
   OptionComponent = Item,
 }: PickerProps) => {
+  const { t } = useTranslation('ui', { keyPrefix: 'components.picker' });
   const [search, setSearch] = useState('');
   const [hasScroll, setHasScroll] = useState(false);
 
@@ -65,43 +68,48 @@ const Picker = ({
         <RadixDialog.Overlay asChild>
           <Overlay isVisible={open} />
         </RadixDialog.Overlay>
-        <RadixDialogContent height={height} aria-describedby={undefined}>
-          <Header>
-            <RadixDialog.Close asChild>
-              <IconAligner>
-                <IconButton aria-label="close" variant="ghost" onClick={handleClose}>
-                  <IcoClose24 />
-                </IconButton>
-              </IconAligner>
-            </RadixDialog.Close>
-            <Text variant="label-2">Search...</Text>
-          </Header>
-          <Content>
-            <SearchContainer $hasScroll={hasScroll}>
-              <Input
-                placeholder={placeholder}
-                id={id}
-                onChangeText={setSearch}
-                onReset={() => setSearch('')}
-                tabIndex={0}
-                value={search}
-                data-dd-privacy="mask"
-              />
-            </SearchContainer>
-            <OptionsContainer $maxHeight={height - 100} onScroll={handleScroll}>
-              {filteredOptions?.length
-                ? filteredOptions.map(option => (
-                    <OptionComponent
-                      key={option.value}
-                      option={option}
-                      value={value}
-                      onSelect={() => onChange(option)}
-                    />
-                  ))
-                : renderEmptyState()}
-            </OptionsContainer>
-          </Content>
-        </RadixDialogContent>
+        <RadixDialog.Content aria-describedby={undefined} asChild>
+          <Container height={height}>
+            <Header>
+              <RadixDialog.Close asChild>
+                <IconAligner>
+                  <IconButton aria-label="close" variant="ghost" onClick={handleClose}>
+                    <IcoClose24 />
+                  </IconButton>
+                </IconAligner>
+              </RadixDialog.Close>
+              <Text variant="label-2">{t('placeholder-default')}</Text>
+              <RadixDialog.Title asChild>
+                <VisuallyHidden>{t('aria-label-default')}</VisuallyHidden>
+              </RadixDialog.Title>
+            </Header>
+            <Content>
+              <SearchContainer $hasScroll={hasScroll}>
+                <Input
+                  placeholder={placeholder}
+                  id={id}
+                  onChangeText={setSearch}
+                  onReset={() => setSearch('')}
+                  tabIndex={0}
+                  value={search}
+                  data-dd-privacy="mask"
+                />
+              </SearchContainer>
+              <OptionsContainer $maxHeight={height - 100} onScroll={handleScroll}>
+                {filteredOptions?.length
+                  ? filteredOptions.map(option => (
+                      <OptionComponent
+                        key={option.value}
+                        option={option}
+                        value={value}
+                        onSelect={() => onChange(option)}
+                      />
+                    ))
+                  : renderEmptyState()}
+              </OptionsContainer>
+            </Content>
+          </Container>
+        </RadixDialog.Content>
       </RadixDialog.Portal>
     </RadixDialog.Root>
   );
@@ -118,7 +126,7 @@ const IconAligner = styled(Box)`
   `}
 `;
 
-const RadixDialogContent = styled(RadixDialog.Content)<{ height: number }>`
+const Container = styled(Box)<{ height: number }>`
   ${({ theme, height }) => css`
     position: fixed;
     left: 0;

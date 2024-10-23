@@ -46,32 +46,39 @@ const DocViewer = ({ children, documentName, mimeType, src }: DocViewerProps) =>
       </Stack>
       <Dialog.Portal>
         <Overlay />
-        <Container onEscapeKeyDown={handleEscapeKeyDown} onPointerDownOutside={handleClose}>
-          <Header>
-            <Dialog.Close asChild>
-              <Box>
-                <IconButton aria-label="close" onClick={handleClose}>
-                  <IcoClose16 />
-                </IconButton>
-              </Box>
-            </Dialog.Close>
-            <Dialog.Title asChild>
-              <Text variant="label-2">{documentName}</Text>
-            </Dialog.Title>
-            <Box width="24px" height="24px" />
-          </Header>
-          {mimeType === 'application/pdf' ? (
-            <iframe title={documentName} src={src} width="100%" height="100%" />
-          ) : (
-            <StyledImage src={src} width={0} height={0} alt={documentName} />
-          )}
-        </Container>
+        <Dialog.Content
+          onEscapeKeyDown={handleEscapeKeyDown}
+          onPointerDownOutside={handleClose}
+          aria-describedby={undefined}
+          asChild
+        >
+          <Container>
+            <Header>
+              <Dialog.Close asChild>
+                <Box>
+                  <IconButton aria-label="close" onClick={handleClose}>
+                    <IcoClose16 />
+                  </IconButton>
+                </Box>
+              </Dialog.Close>
+              <Dialog.Title asChild>
+                <Text variant="label-2">{documentName}</Text>
+              </Dialog.Title>
+              <Box width="24px" height="24px" />
+            </Header>
+            {mimeType === 'application/pdf' ? (
+              <iframe title={documentName} src={src} width="100%" height="100%" />
+            ) : (
+              <StyledImage src={src} width={0} height={0} alt={documentName} />
+            )}
+          </Container>
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
 };
 
-const Container = styled(Dialog.Content)`
+const Container = styled(Stack)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
