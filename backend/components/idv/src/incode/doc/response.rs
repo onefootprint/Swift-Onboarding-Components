@@ -870,19 +870,32 @@ pub struct OCRAddress {
     pub postal_code: Option<ScrubbedPiiString>,
     pub city: Option<ScrubbedPiiString>,
     pub state: Option<ScrubbedPiiString>,
+    pub address_country_code: Option<ScrubbedPiiString>,
 }
 
 impl OCRAddress {
     // returns None if no state, returns Result if there's a state inside that we tried to parse
     pub fn normalized_state(&self) -> Option<Result<ScrubbedPiiString, strum::ParseError>> {
-        self.state.as_ref().map(|s| {
-            let parsed: Option<ScrubbedPiiString> = UsStateAndTerritories::from_raw_string(s.leak())
-                .ok()
-                .map(|s| s.to_string().into());
-            if let Some(p) = parsed {
-                Ok(p)
+        self.state.as_ref().map(|raw_state| {
+            let parsed_country_is_us = self
+                .address_country_code
+                .as_ref()
+                .and_then(|c| Iso3166ThreeDigitCountryCode::from_str(c.leak()).ok())
+                .map(|c| Iso3166TwoDigitCountryCode::from(c).is_us_including_territories())
+                .unwrap_or(true); // sometimes incode doesn't send country for US? annoying
+
+            if parsed_country_is_us {
+                let parsed: Option<ScrubbedPiiString> =
+                    UsStateAndTerritories::from_raw_string(raw_state.leak())
+                        .ok()
+                        .map(|s| s.to_string().into());
+                if let Some(p) = parsed {
+                    Ok(p)
+                } else {
+                    Err(strum::ParseError::VariantNotFound)
+                }
             } else {
-                Err(strum::ParseError::VariantNotFound)
+                Ok(raw_state.clone())
             }
         })
     }
@@ -967,6 +980,8 @@ mod tests {
     use crate::incode::doc::response::AddSelfieResponse;
     use crate::incode::doc::response::ProcessFaceResponse;
     use crate::incode::IncodeAPIResult;
+    use crate::test_incode_fixtures::incode_fetch_ocr_response;
+    use crate::test_incode_fixtures::incode_mx_ocr_response;
     use crate::test_incode_fixtures::DocTestOpts;
     use crate::test_incode_fixtures::{
         self,
@@ -1374,5 +1389,53 @@ mod tests {
     #[test_case("ZACATECAS" => "ZACATECAS"; "test for ZACATECAS (rand_suffix_340)")]
     fn test_normalize_issuing_state(s: &str) -> String {
         super::FetchOCRResponse::normalize_issuing_state(s.into())
+    }
+
+
+    #[test]
+    fn test_parse_ocr_state() {
+        let parsed: FetchOCRResponse = serde_json::from_value(incode_mx_ocr_response()).unwrap();
+        assert_eq!(
+            parsed
+                .checked_address_bean
+                .as_ref()
+                .and_then(|a| a.normalized_state())
+                .unwrap()
+                .unwrap()
+                .leak(),
+            "BC"
+        );
+        assert_eq!(
+            parsed
+                .address_fields
+                .as_ref()
+                .and_then(|a| a.normalized_state())
+                .unwrap()
+                .unwrap()
+                .leak(),
+            "B.C."
+        );
+
+        let parsed_us: FetchOCRResponse = serde_json::from_value(incode_fetch_ocr_response(None)).unwrap();
+        assert_eq!(
+            parsed_us
+                .checked_address_bean
+                .as_ref()
+                .and_then(|a| a.normalized_state())
+                .unwrap()
+                .unwrap()
+                .leak(),
+            "MA"
+        );
+        assert_eq!(
+            parsed_us
+                .address_fields
+                .as_ref()
+                .and_then(|a| a.normalized_state())
+                .unwrap()
+                .unwrap()
+                .leak(),
+            "MA"
+        );
     }
 }

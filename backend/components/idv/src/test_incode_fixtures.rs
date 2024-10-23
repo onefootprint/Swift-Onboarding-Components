@@ -11073,3 +11073,163 @@ pub fn incode_watchlist_result_response_high_fuzzy_hits() -> serde_json::Value {
         "status": "success"
     })
 }
+
+pub fn incode_mx_ocr_response() -> serde_json::Value {
+    serde_json::json!({
+        "name": {
+            "fullName": "BOB BOBIERTO BOB PALOMINOS",
+            "machineReadableFullName": "BOB BIERTO SALVA PALOMIN",
+            "firstName": "Bob Bobierto",
+            "givenName": "Bob Bobierto",
+            "givenNameMrz": "Bob SALVA",
+            "paternalLastName": "BONTO",
+            "maternalLastName": "BONGO",
+            "lastNameMrz": "BOBIERTO PALOMIN"
+        },
+        "address": "AV MEXICANA 481 FRACC LAS LOMITAS 22810 ENSENADA, B.C.",
+        "addressFields": {
+            "street": "AV MEXICANA 481",
+            "colony": "FRACC LAS LOMITAS",
+            "postalCode": "22810",
+            "city": "ENSENADA",
+            "state": "B.C.",
+            "stateCode": "02",
+            "addressCountryCode": "MEX"
+        },
+        "fullAddress": false,
+        "invalidAddress": false,
+        "checkedAddress": "Avenida Mexicana 481, Fraccionamiento Las Lomitas, 22810 Ensenada, BC, México",
+        "checkedAddressBean": {
+            "street": "Avenida Mexicana 481",
+            "colony": "Fraccionamiento Las Lomitas",
+            "postalCode": "11231",
+            "city": "Ensenada",
+            "state": "BC",
+            "stateName": "Baja California",
+            "addressCountryCode": "MEX",
+            "label": "Avenida Mexicana 481, Fraccionamiento Las Lomitas, 22810 Ensenada, BC, México",
+            "latitude": 31.88348,
+            "longitude": -116.58761,
+            "zipColonyOptions": [
+                {
+                    "colony": "Ejido Ruiz Cortines",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Las Lomitas",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Lomas y Jardines de Valle Verde",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Popular Valle Verde 1",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Lázaro Cárdenas 1",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Lázaro Cárdenas 2",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Luis Donaldo Colosio",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Margaritas",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "2 de Septiembre",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Arco iris",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Victoria",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Lomitas III",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Lomitas IV",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Villas del Cedro I",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Villas del Cedro II",
+                    "postalCode": "22810"
+                },
+                {
+                    "colony": "Villas del Cedro III",
+                    "postalCode": "22810"
+                }
+            ]
+        },
+        "exteriorNumber": "481",
+        "typeOfId": "VoterIdentification",
+        "documentFrontSubtype": "VOTER_IDENTIFICATION_CARD",
+        "documentBackSubtype": "VOTER_IDENTIFICATION_CARD",
+        "birthDate": 89095680,
+        "gender": "M",
+        "claveDeElector": "CLAVE12345",
+        "curp": "CURP980327HBCLLS04",
+        "numeroEmisionCredencial": "00",
+        "cic": "1234567",
+        "ocr": "123124123",
+        "expireAt": "1767139200000",
+        "expirationDate": 2025,
+        "issueDate": 2015,
+        "registrationDate": 2015,
+        "issuingCountry": "MEX",
+        "birthPlace": "BC",
+        "nationality": "MEX",
+        "nationalityMrz": "MEX",
+        "notExtracted": 0,
+        "notExtractedDetails": [],
+        "mrz1": "123123123",
+        "mrz2": "123123123<00<<32054<0",
+        "mrz3": "Monon<Bobierto<<Bob<Bobby",
+        "fullNameMrz": "Bob Boberto Bobierto",
+        "documentNumberCheckDigit": "5",
+        "dateOfBirthCheckDigit": "1",
+        "expirationDateCheckDigit": "4",
+        "additionalAttrs": [],
+        "ocrDataConfidence": {
+            "birthDateConfidence": 1.0,
+            "givenNameConfidence": 0.991,
+            "firstNameConfidence": 0.991,
+            "mothersSurnameConfidence": 1.0,
+            "fathersSurnameConfidence": 1.0,
+            "addressConfidence": 0.99466664,
+            "countryCodeConfidence": 1.0,
+            "genderConfidence": 1.0,
+            "issueDateConfidence": 1.0,
+            "expirationDateConfidence": 1.0,
+            "expireAtConfidence": 1.0,
+            "mrz1Confidence": 1.0,
+            "mrz2Confidence": 1.0,
+            "mrz3Confidence": 1.0,
+            "documentNumberConfidence": 1.0,
+            "backNumberConfidence": 1.0,
+            "personalNumberConfidence": 1.0,
+            "claveDeElectorConfidence": 1.0,
+            "numeroEmisionCredencialConfidence": 1.0,
+            "curpConfidence": 1.0,
+            "registrationDateConfidence": 1.0,
+            "nationalityConfidence": 1.0,
+            "nationalityMrzConfidence": 1.0
+        }
+    })
+}
