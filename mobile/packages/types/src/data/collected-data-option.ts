@@ -4,7 +4,8 @@ export type CollectedDataOption =
   | CollectedKybDataOption
   | CollectedKycDataOption
   | CollectedInvestorProfileDataOption
-  | CollectedDocumentDataOption;
+  | CollectedDocumentDataOption
+  | string; // Fixme: This "string" type makes the whole "CollectedDataOption" fallback to "string" (copying from frontend)
 
 export enum CollectedInvestorProfileDataOption {
   investorProfile = 'investor_profile',

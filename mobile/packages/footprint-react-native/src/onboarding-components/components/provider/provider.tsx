@@ -2,7 +2,7 @@ import type { ChallengeData, PublicOnboardingConfig } from '@onefootprint/types'
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import type { Appearance, SandboxOutcome, SupportedLocale } from '../../../types';
+import type { Appearance, FormValues, SandboxOutcome, SupportedLocale } from '../../../types';
 import { OverallOutcome, IdDocOutcome } from '../../../types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 import usePropsUpdated from './hooks/use-props-updated';
@@ -18,6 +18,8 @@ export type ContextData = {
   redirectUrl: string;
   sandboxId?: string;
   sandboxOutcome?: SandboxOutcome;
+  isReady?: boolean;
+  vaultData?: FormValues;
 
   vaultingToken?: string;
   verifiedAuthToken?: string;
@@ -74,33 +76,33 @@ const Provider = ({
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
-  const getSandboxProps = (response: PublicOnboardingConfig) => {
-    if (response.isLive && sandboxId) {
-      throw new Error('sandboxId is not allowed for live environments');
+  const getSandboxProps = (
+    response: PublicOnboardingConfig,
+  ): { sandboxId?: string; sandboxOutcome?: SandboxOutcome } => {
+    if (response.isLive) {
+      if (sandboxId) throw new Error('sandboxId is not allowed for live environments');
+      if (sandboxOutcome) throw new Error('sandboxOutcome is not allowed for live environments');
+      return {};
     }
-    if (response.isLive && sandboxOutcome) {
-      throw new Error('sandboxOutcome is not allowed for live environments');
-    }
+
     if (!response.requiresIdDoc && sandboxOutcome?.documentOutcome) {
       throw new Error('documentOutcome is not allowed for no-document verification flow');
     }
 
-    if (sandboxId && !isAlphanumeric(sandboxId)) {
-      throw new Error('sandboxId should only contain letters and numbers');
-    }
+    const createRandomSandboxId = () => {
+      return Math.random().toString(36).substring(2, 14);
+    };
 
-    if (response.isLive) {
-      return { sandboxId, sandboxOutcome };
-    }
-
-    const overallOutcome = sandboxOutcome?.overallOutcome ?? OverallOutcome.success;
-    const documentOutcome = response.requiresIdDoc
-      ? sandboxOutcome?.documentOutcome ?? IdDocOutcome.success
-      : undefined;
+    const isValid = (value?: string) => {
+      return !!value && isAlphanumeric(value);
+    };
 
     return {
-      sandboxId: sandboxId ?? Math.random().toString(36).substring(2, 14),
-      sandboxOutcome: { overallOutcome, documentOutcome },
+      sandboxId: isValid(sandboxId) ? sandboxId : createRandomSandboxId(),
+      sandboxOutcome: {
+        overallOutcome: sandboxOutcome?.overallOutcome ?? OverallOutcome.success,
+        documentOutcome: response.requiresIdDoc ? sandboxOutcome?.documentOutcome ?? IdDocOutcome.success : undefined,
+      },
     };
   };
 
@@ -116,11 +118,15 @@ const Provider = ({
       throw new Error('Public key is invalid');
     }
 
+    if (response.kind !== 'kyc') {
+      throw new Error('Only KYC playbooks are supported');
+    }
     const { sandboxId, sandboxOutcome } = getSandboxProps(response);
 
     setContext(prev => ({
       ...prev,
       onboardingConfig: response,
+      isReady: true,
       sandboxId,
       sandboxOutcome,
     }));

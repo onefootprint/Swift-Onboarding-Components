@@ -1,11 +1,14 @@
 import { useContext } from 'react';
 
-import { type FormValues, OnboardingStep } from '../../types';
+import { type FormValues, InlineProcessError, OnboardingStep } from '../../types';
 import { Context } from '../components/provider';
 import save from '../queries/save';
 import fp from '../utils/browser';
 import { formatBeforeSave } from '../utils/save-utils';
 import useOtp from './use-otp';
+import getRequirementsReq from '../queries/get-onboarding-status';
+import processReq from '../queries/process';
+import validateOnboarding from '../queries/validate-onboarding';
 
 const useFootprint = () => {
   const [context] = useContext(Context);
@@ -19,7 +22,7 @@ const useFootprint = () => {
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
     }
-    if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
+    if (onboardingConfig.kind !== 'kyc') {
       throw new Error('Unsupported onboardingConfig kind');
     }
     await save({
@@ -38,8 +41,12 @@ const useFootprint = () => {
     onError?: (error: unknown) => void;
     onCancel?: () => void;
   } = {}) => {
-    const { authToken, appearance, redirectUrl } = context;
-    if (!authToken) {
+    const { verifiedAuthToken, appearance, redirectUrl, isReady } = context;
+    if (!isReady) {
+      onError?.(new Error('Footprint provider is not ready. Please make sure that the publicKey is correct'));
+      return;
+    }
+    if (!verifiedAuthToken) {
       onError?.(new Error('No authToken found. Please authenticate first'));
       return;
     }
@@ -50,8 +57,9 @@ const useFootprint = () => {
 
     const component = fp.init({
       appearance,
-      authToken,
+      authToken: verifiedAuthToken,
       redirectUrl,
+      sandboxOutcome: context.sandboxOutcome,
       onComplete: (validationToken: string) => {
         onComplete?.(validationToken);
       },
@@ -66,15 +74,39 @@ const useFootprint = () => {
     component.render();
   };
 
+  const getRequirements = () => {
+    if (!context.verifiedAuthToken) {
+      throw new Error('No authToken found. Please authenticate first');
+    }
+    return getRequirementsReq({ authToken: context.verifiedAuthToken });
+  };
+
+  const process = async () => {
+    if (!context.verifiedAuthToken) {
+      throw new Error('No authToken found. Please authenticate first');
+    }
+    try {
+      await processReq({ token: context.verifiedAuthToken });
+    } catch (error: unknown) {
+      throw new InlineProcessError((error as Error).message || 'Something happened');
+    }
+    const { requirements } = await getRequirementsReq({ authToken: context.verifiedAuthToken });
+    requirements.all.forEach(req => {
+      if (!req.isMet) {
+        throw new InlineProcessError('Found a requirement not met. Handoff must be done');
+      }
+    });
+    const { validationToken } = await validateOnboarding({ authToken: context.verifiedAuthToken });
+    return { validationToken, requirements };
+  };
+
   return {
-    save: vault,
+    isReady: context.isReady,
+    vault,
     handoff,
-    launchIdentify: otp.launchIdentify,
-    verifyChallenge: otp.verify,
-    createEmailPhoneBasedChallenge: otp.createEmailPhoneBasedChallenge,
-    createAuthTokenBasedChallenge: otp.createAuthTokenBasedChallenge,
-    isReadyForAuth: otp.isReadyForAuth,
-    requiresAuth: otp.requiresAuth,
+    getRequirements,
+    process,
+    ...otp,
   };
 };
 

@@ -89,6 +89,13 @@ export class InlineOtpNotSupported extends Error {
   }
 }
 
+export class InlineProcessError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InlineProcessError';
+  }
+}
+
 export enum AuthTokenStatus {
   validWithSufficientScope = 'validWithSufficientScope',
   validWithInsufficientScope = 'validWithInsufficientScope',

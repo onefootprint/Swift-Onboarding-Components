@@ -205,75 +205,6 @@ const getCommonProps = (): Record<string, Field> => ({
   custom: {},
 });
 
-const getBusinessProps = (): Record<string, Field> => ({
-  name: {
-    validations: {
-      required: 'Business name cannot be empty or is invalid',
-    },
-  },
-  dba: {},
-  tin: {
-    keyboardType: 'number-pad',
-    returnKeyType: 'done',
-    maxLength: 10,
-    mask: [/\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/],
-    validations: {
-      required: 'TIN cannot be empty or is invalid',
-      pattern: {
-        value: /^\d{2}-\d{7}$/,
-        message: 'TIN must be in the format XX-XXXXXXX',
-      },
-    },
-  },
-  website: {
-    inputMode: 'url',
-    autoComplete: 'url',
-    autoCapitalize: 'none',
-    autoCorrect: false,
-    validations: {
-      required: 'Website cannot be empty',
-    },
-  },
-  phoneNumber: {
-    autoComplete: 'tel',
-    keyboardType: 'phone-pad',
-    returnKeyType: 'done',
-    mask: createNumberMask({
-      prefix: ['+'],
-      delimiter: '',
-      separator: '',
-      precision: 0,
-    }),
-    validations: {
-      required: 'Phone is required',
-      validate: (value: string) => {
-        if (!isMobilePhone(value)) {
-          return 'Phone is invalid';
-        }
-        return true;
-      },
-    },
-  },
-  corporationType: {
-    autoCapitalize: 'none',
-    validations: {
-      required: 'Corporation type is required',
-    },
-  },
-});
-
-const getBoProps = (): Record<string, Field> => ({
-  ownershipStake: {
-    keyboardType: 'number-pad',
-    returnKeyType: 'done',
-    inputMode: 'numeric',
-    validations: {
-      required: 'Stake is required',
-    },
-    transformValue: (value: string) => parseInt(value, 10),
-  },
-});
-
 const getProps = (
   name: string,
   options: {
@@ -282,8 +213,6 @@ const getProps = (
 ) => {
   const person = getPersonProps(options);
   const common = getCommonProps();
-  const business = getBusinessProps();
-  const bo = getBoProps();
 
   if (name === 'id.phone_number') {
     return person.phoneNumber;
@@ -327,46 +256,8 @@ const getProps = (
   if (name === 'id.zip' || name === 'business.zip') {
     return common.zip;
   }
-  if (name === 'business.name') {
-    return business.name;
-  }
   if (name.startsWith('custom')) {
     return common.custom;
-  }
-  if (name === 'business.dba') {
-    return business.dba;
-  }
-  if (name === 'business.tin') {
-    return business.tin;
-  }
-  if (name === 'business.website') {
-    return business.website;
-  }
-  if (name === 'business.phone_number') {
-    return business.phoneNumber;
-  }
-  if (name === 'business.corporation_type') {
-    return business.corporationType;
-  }
-  if (name.startsWith('business.beneficial_owners')) {
-    if (name.endsWith('first_name')) {
-      return person.firstName;
-    }
-    if (name.endsWith('middle_name')) {
-      return person.middleName;
-    }
-    if (name.endsWith('last_name')) {
-      return person.lastName;
-    }
-    if (name.endsWith('phone_number')) {
-      return person.phoneNumber;
-    }
-    if (name.endsWith('email')) {
-      return person.email;
-    }
-    if (name.endsWith('ownership_stake')) {
-      return bo.ownershipStake;
-    }
   }
   return null;
 };

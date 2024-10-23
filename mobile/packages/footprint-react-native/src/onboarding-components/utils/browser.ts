@@ -1,5 +1,4 @@
 import queryString from 'query-string';
-import { Platform } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
 import { type OnboardingProps, OnboardingStep } from '../../types';
@@ -8,11 +7,6 @@ import { logError, logWarn } from '../../utils/logger';
 import sendSdkArgs from '../../utils/send-sdk-args';
 
 const LOGGER_PREFIX = 'onboarding-components (RN)';
-
-const getDeepLink = () => {
-  const scheme = 'footprint';
-  return Platform.OS === 'android' ? `${scheme}://callback/` : `${scheme}://`;
-};
 
 const footprint = () => {
   let isOpen = false;
@@ -99,7 +93,7 @@ const footprint = () => {
       return;
     }
 
-    const deepLink = getDeepLink();
+    const deepLink = props.redirectUrl;
     const search = url.replace(deepLink, '');
     const urlParams = queryString.parse(search);
     if (urlParams.canceled) {
@@ -137,7 +131,7 @@ const footprint = () => {
   };
 
   const openWebView = async (props: OnboardingProps, token: string) => {
-    const deepLink = getDeepLink();
+    const deepLink = props.redirectUrl;
     const url = createUrl({
       appearance: props.appearance,
       l10n: props.l10n,

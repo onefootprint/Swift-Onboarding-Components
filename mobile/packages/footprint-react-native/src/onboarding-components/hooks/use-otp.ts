@@ -2,15 +2,16 @@ import { useContext } from 'react';
 
 import { OnboardingStep } from '../../types';
 import { Context } from '../components/provider';
-import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
+import { createChallenge, createVaultingToken, getValidationToken, verifyChallenge } from '../queries/challenge';
 import fp from '../utils/browser';
-import { AuthTokenStatus } from 'src/types/footprint';
+import { AuthTokenStatus, InlineOtpNotSupported } from 'src/types/footprint';
 import validateAuthToken from '../utils/validate-auth-token';
 import { AuthMethodKind } from '@onefootprint/types';
+import getOnboardingStatus from '../queries/get-onboarding-status';
+import decryptUserVaultReq from '../queries/decrypt-user-vault';
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
-  const isReadyForAuth = !!context.onboardingConfig;
   const { challengeData, didCallRequiresAuth } = context;
 
   const authTokenStatusToRequirement = (status: AuthTokenStatus): boolean => {
@@ -78,11 +79,15 @@ const useOtp = () => {
       onError,
       onCancel,
     }: {
-      onAuthenticated?: () => void;
+      onAuthenticated?: (response: Awaited<ReturnType<typeof getDataAfterVerify>>) => void;
       onError?: (error: unknown) => void;
       onCancel?: () => void;
     } = {},
   ) => {
+    if (!context.isReady) {
+      onError?.(new Error('Footprint provider is not ready. Please make sure that the publicKey is correct'));
+      return;
+    }
     if (context.authToken && (phoneNumber || email)) {
       onError?.(
         new Error(
@@ -130,9 +135,12 @@ const useOtp = () => {
         setContext(prev => ({
           ...prev,
           authToken,
+          verifiedAuthToken: authToken,
           vaultingToken,
         }));
-        onAuthenticated?.();
+        getDataAfterVerify(authToken).then(response => {
+          onAuthenticated?.(response);
+        });
       },
       onError: (error: unknown) => {
         onError?.(error);
@@ -162,6 +170,10 @@ const useOtp = () => {
     }
 
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+
+    if (requiredAuthMethods?.length && requiredAuthMethods.length > 1) {
+      throw new InlineOtpNotSupported('Multiple auth methods are not supported');
+    }
 
     // If we only have one auth method, we need to make sure that the user has provided the credential for the required method
     if (requiredAuthMethods?.length === 1) {
@@ -202,6 +214,11 @@ const useOtp = () => {
     }
 
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+
+    if (requiredAuthMethods?.length && requiredAuthMethods.length > 1) {
+      throw new InlineOtpNotSupported('Multiple auth methods are not supported');
+    }
+
     const response = await createChallenge(
       { authToken },
       {
@@ -234,6 +251,21 @@ const useOtp = () => {
       verifiedAuthToken: response.authToken,
       authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     }));
+    return getDataAfterVerify(response.authToken);
+  };
+
+  const getDataAfterVerify = async (authToken: string) => {
+    const [{ validationToken }, { requirements, fields }] = await Promise.all([
+      getValidationToken({ token: authToken }),
+      getOnboardingStatus({ authToken }),
+    ]);
+    const vaultData = await decryptUserVaultReq({
+      authToken,
+      fields: [...fields.collected, ...fields.missing, ...fields.optional],
+      locale: context.locale ?? 'en-US',
+    });
+    setContext(prev => ({ ...prev, vaultData }));
+    return { validationToken, requirements, vaultData, fields };
   };
 
   return {
@@ -242,7 +274,6 @@ const useOtp = () => {
     createAuthTokenBasedChallenge,
     verify,
     requiresAuth,
-    isReadyForAuth,
   };
 };
 
