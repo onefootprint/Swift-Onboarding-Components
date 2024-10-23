@@ -30,7 +30,7 @@ const steps = [
   },
 ];
 
-const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_2i5Sl82d7NQOnToRYrD2dx';
+const publicKey = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_2i5Sl82d7NQOnToRYrD2dx';
 
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
@@ -51,18 +51,7 @@ const Demo = () => {
   return (
     <>
       <GlobalStyles />
-      <Fp.Provider
-        publicKey={publicKeyEnv}
-        l10n={{
-          customTranslations: {
-            person: {
-              phoneNumber: {
-                required: 'lorem',
-              },
-            },
-          },
-        }}
-      >
+      <Fp.Provider publicKey={publicKey}>
         <Header>Onboarding</Header>
         <Container>
           <Stack marginTop={7} gap={8}>
@@ -70,8 +59,8 @@ const Demo = () => {
             <Box>
               {isIdentify && (
                 <Identify
-                  onDone={(nextStep = 1) => {
-                    setOption(steps[nextStep]);
+                  onDone={() => {
+                    setOption(steps[1]);
                   }}
                 />
               )}
@@ -108,7 +97,7 @@ const Demo = () => {
   );
 };
 
-const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
+const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
   const [showOtp, setShowOtp] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -142,9 +131,8 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
     setIsPending(true);
     try {
       const response = await fp.verify({ verificationCode });
-      const isBasicDataCompleted =
-        response.vaultData['id.first_name'] && response.vaultData['id.last_name'] && response.vaultData['id.dob'];
-      onDone(isBasicDataCompleted ? 2 : 1);
+      console.log(response);
+      onDone();
     } catch (error) {
       console.error('Error verifying pin:', error);
       // Handle the error appropriately

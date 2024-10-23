@@ -1,9 +1,9 @@
 import themes from '@onefootprint/design-tokens';
 import type { Decorator, Preview } from '@storybook/react';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import noop from 'lodash/noop';
 import Script from 'next/script';
 import { useEffect } from 'react';
-import { ThemeProvider } from 'styled-components';
 import { Layout as AppLayout } from '../src';
 import { L10nContextProvider } from '../src/components/l10n-provider';
 import { MachineProvider } from '../src/components/machine-provider';
@@ -39,7 +39,7 @@ const StoryDecorator: Decorator = (Story, context) => {
 
   return (
     <>
-      <ThemeProvider theme={themes.light}>
+      <DesignSystemProvider theme={themes.light}>
         <L10nContextProvider>
           <AppLayout
             onClose={noop}
@@ -56,7 +56,7 @@ const StoryDecorator: Decorator = (Story, context) => {
             </MachineProvider>
           </AppLayout>
         </L10nContextProvider>
-      </ThemeProvider>
+      </DesignSystemProvider>
       {GOOGLE_MAPS_SRC ? <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" /> : null}
     </>
   );

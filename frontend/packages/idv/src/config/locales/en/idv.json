@@ -672,6 +672,11 @@
       "beneficial-owners": {
         "title": "Who are the beneficial owners?",
         "subtitle": "List all individuals who own at least 25% of the business or have substantial control over it.",
+        "list": {
+          "title": "Current beneficial owners",
+          "owns-stake": "Owns {{stake}}% of the business",
+          "you": " (You)"
+        },
         "form": {
           "fields-header": {
             "beneficial-owner-you": "Beneficial owner (You)",
@@ -745,7 +750,10 @@
               "title": "Duplicate phone number",
               "description": "Please make sure that each beneficial owner has a unique phone number."
             }
-          }
+          },
+          "continue": "Continue",
+          "cancel": "Cancel",
+          "save": "Save"
         }
       },
       "confirm": {

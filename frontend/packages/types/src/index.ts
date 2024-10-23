@@ -286,6 +286,7 @@ export type {
   BusinessBoKycData,
   BusinessDIData,
   BusinessOwner,
+  BusinessOwner2,
   CardBrands,
   CardDI,
   ChallengeData,

@@ -1,3 +1,4 @@
+import type { DataIdentifier } from './di';
 import type { EntityStatus } from './entity';
 
 export type BusinessOwner = {
@@ -7,4 +8,14 @@ export type BusinessOwner = {
   status?: EntityStatus;
   source?: 'hosted' | 'tenant';
   name?: string;
+};
+
+export type BusinessOwner2 = {
+  id: string;
+  hasLinkedUser: boolean;
+  isAuthedUser: boolean;
+  isMutable: boolean;
+  ownershipStake: number;
+  decryptedData: Partial<Record<DataIdentifier, string>>;
+  populatedData: DataIdentifier[];
 };

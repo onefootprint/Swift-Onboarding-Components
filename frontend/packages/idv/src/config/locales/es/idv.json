@@ -672,6 +672,11 @@
       "beneficial-owners": {
         "title": "¿Quiénes son los propietarios?",
         "subtitle": "Enumera a todas las personas que poseen al menos el 25% del negocio o tienen un control sustancial sobre él.",
+        "list": {
+          "title": "Current beneficial owners",
+          "owns-stake": "Owns {{stake}}% of the business",
+          "you": " (You)"
+        },
         "form": {
           "fields-header": {
             "beneficial-owner-you": "Propietario (Tú)",
@@ -745,7 +750,8 @@
               "title": "Número de teléfono duplicado",
               "description": "Asegúrate de que cada propietario tenga un número de teléfono único."
             }
-          }
+          },
+          "cta": "Continue"
         }
       },
       "confirm": {
