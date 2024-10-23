@@ -106,4 +106,19 @@ impl BusinessWorkflowLink {
             .get_results::<(BusinessOwner, Workflow)>(conn)?;
         Ok(results)
     }
+
+    #[tracing::instrument("BusinessWorkflowLink::get_business_workflow_for_user_workflow", skip_all)]
+    pub fn get_business_workflow_for_user_workflow(
+        conn: &mut PgConn,
+        wf_id: &WorkflowId,
+    ) -> DbResult<Option<(BusinessOwner, Workflow)>> {
+        let result = business_workflow_link::table
+            .inner_join(business_owner::table)
+            .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::business_workflow_id)))
+            .filter(business_workflow_link::user_workflow_id.eq(wf_id))
+            .select((business_owner::all_columns, workflow::all_columns))
+            .first::<(BusinessOwner, Workflow)>(conn)
+            .optional()?;
+        Ok(result)
+    }
 }

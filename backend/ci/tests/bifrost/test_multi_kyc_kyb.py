@@ -389,6 +389,24 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     )
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
+    biz_timeline = get(
+        f"entities/{primary_bo.fp_bid}/timeline", None, *sandbox_tenant.db_auths
+    )
+    tl_events = [
+        i for i in biz_timeline if i["event"]["kind"] == "business_owner_completed_kyc"
+    ]
+    assert len(tl_events) == 1
+    tl_events[0]["event"]["data"]["fp_id"] == primary_bo.fp_id
+    primary_bo_timeline = get(
+        f"entities/{primary_bo.fp_id}/timeline", None, *sandbox_tenant.db_auths
+    )
+    tl_events = [
+        i
+        for i in primary_bo_timeline
+        if i["event"]["kind"] == "business_owner_completed_kyc"
+    ]
+    assert len(tl_events) == 0
+
     assert primary_bo.client.validate_response["user"]["status"] == "fail"
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
 
@@ -403,6 +421,14 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     primary_bo2 = bifrost.run()
     assert primary_bo2.client.validate_response["user"]["status"] == "pass"
     assert primary_bo2.fp_bid != primary_bo.fp_bid
+    timeline = get(
+        f"entities/{primary_bo2.fp_bid}/timeline", None, *sandbox_tenant.db_auths
+    )
+    tl_events = [
+        i for i in timeline if i["event"]["kind"] == "business_owner_completed_kyc"
+    ]
+    assert len(tl_events) == 1
+    tl_events[0]["event"]["data"]["fp_id"] == primary_bo2.fp_id
 
     # Make sure the initial business is still incomplete
     body = get(f"entities/{primary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
@@ -418,6 +444,16 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     secondary_bo = bifrost.run()
     assert secondary_bo.client.validate_response["user"]["status"] == "pass"
     assert secondary_bo.client.validate_response["business"]["status"] == "fail"
+    timeline = get(
+        f"entities/{secondary_bo.fp_bid}/timeline", None, *sandbox_tenant.db_auths
+    )
+    tl_bo_fp_ids = [
+        i["event"]["data"]["fp_id"]
+        for i in timeline
+        if i["event"]["kind"] == "business_owner_completed_kyc"
+    ]
+    assert len(tl_bo_fp_ids) == 2
+    assert set(tl_bo_fp_ids) == set([secondary_bo.fp_id, primary_bo.fp_id])
 
     # Make sure the second business that was created is still incomplete + unaffected
     body = get(f"entities/{primary_bo2.fp_bid}", None, *sandbox_tenant.db_auths)
