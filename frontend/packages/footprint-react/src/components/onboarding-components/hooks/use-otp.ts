@@ -1,6 +1,7 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { AuthMethodKind } from '@onefootprint/types';
 import { useContext } from 'react';
+import { InlineOtpNotSupported } from '../../../types';
 import { Context } from '../components/provider';
 import { createChallenge, createVaultingToken, getValidationToken, verifyChallenge } from '../queries/challenge';
 import decryptUserVaultReq from '../queries/decrypt-user-vault';
@@ -135,7 +136,7 @@ const useOtp = () => {
       },
       onRelayToComponents: async ({ authToken, vaultingToken }: { vaultingToken: string; authToken: string }) => {
         unlockBody();
-        setContext(prev => ({ ...prev, authToken, vaultingToken }));
+        setContext(prev => ({ ...prev, authToken, vaultingToken, verifiedAuthToken: authToken }));
         const result = await getDataAfterVerify(authToken);
         onAuthenticated?.(result);
       },
@@ -161,6 +162,10 @@ const useOtp = () => {
     }
 
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+
+    if (requiredAuthMethods && requiredAuthMethods.length > 1) {
+      throw new InlineOtpNotSupported('Multiple auth methods are not supported');
+    }
 
     // If we only have one auth method, we need to make sure that the user has provided the credential for the required method
     if (requiredAuthMethods?.length === 1) {
@@ -201,6 +206,10 @@ const useOtp = () => {
     }
 
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+    if (requiredAuthMethods && requiredAuthMethods.length > 1) {
+      throw new InlineOtpNotSupported('Multiple auth methods are not supported');
+    }
+
     const response = await createChallenge(
       { authToken },
       {

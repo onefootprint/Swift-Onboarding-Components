@@ -17,8 +17,8 @@ export const useFootprint = () => {
   const otp = useOtp();
 
   const vault = async (formValues: FormValues) => {
-    const { verifiedAuthToken, onboardingConfig } = context;
-    if (!verifiedAuthToken) {
+    const { vaultingToken, onboardingConfig } = context;
+    if (!vaultingToken) {
       throw new Error('No authToken found. Please authenticate first');
     }
     if (!onboardingConfig) {
@@ -26,7 +26,7 @@ export const useFootprint = () => {
     }
 
     const data = transformBeforeVault(formValues, { vaultValues: context.vaultData }) as FormValues;
-    await vaultReq({ data, bootstrapDis: [], authToken: verifiedAuthToken });
+    await vaultReq({ data, bootstrapDis: [], authToken: vaultingToken });
 
     setContext({
       ...context,
