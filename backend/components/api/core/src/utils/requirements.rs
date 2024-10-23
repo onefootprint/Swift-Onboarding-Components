@@ -210,45 +210,25 @@ pub fn get_requirements_inner<'a, T: Copy>(
     let requirements = relevant_requirement_kinds
         .into_iter()
         .map(|k| get_requirement_inner(k, conn, entity_info, obc, opts))
-        .collect::<FpResult<Vec<_>>>()?
-        .into_iter()
-        .flatten()
-        .filter(|r| {
-            if !r.is_met() {
-                // Always show an unmet requirement
-                return true;
-            }
-            // Sometimes we omit serializing met data collection requirements to the frontend, which
-            // functionally allows skipping the confirm screen
-            let kind = OnboardingRequirementKind::from(r);
-            let is_data_collection_step = matches!(
-                kind,
-                OnboardingRequirementKind::CollectData
-                    | OnboardingRequirementKind::CollectInvestorProfile
-                    | OnboardingRequirementKind::CollectBusinessData
-            );
-            let is_stepup = matches!(
-                wf.state,
-                WorkflowState::Kyc(KycState::DocCollection)
-                    | WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection)
-            );
-            if is_data_collection_step {
-                if wf.completed_at.is_some() {
-                    // Omit the confirm screen when the workflow is entirely completed
-                    return false;
-                }
-                if is_stepup {
-                    // Omit the confirm screen when an alpaca user is in step up
-                    return false;
-                }
-            }
-            true
-        })
-        .collect();
+        .collect::<FpResult<Vec<_>>>()?;
+    let requirements = requirements.into_iter().flatten().collect();
 
     tracing::info!(workflow_id=%wf.id, requirements=%format!("{:?}", requirements), scoped_user_id=%wf.scoped_vault_id, "get_requirements result");
 
     Ok(requirements)
+}
+
+/// Omit the confirm screen for met requirements IF the workflow is already completed or the user is
+/// an alpaca user in step up returning to an incomplete onboarding
+fn omit_confirm_if_necessary(req: OnboardingRequirement, wf: &Workflow) -> Option<OnboardingRequirement> {
+    if !req.is_met() {
+        return Some(req);
+    }
+    let is_stepup = matches!(
+        wf.state,
+        WorkflowState::Kyc(KycState::DocCollection) | WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection)
+    );
+    (wf.completed_at.is_none() && !is_stepup).then_some(req)
 }
 
 struct RequirementProgress {
@@ -436,12 +416,14 @@ fn get_collect_kyc_data_requirement<T>(
         return Ok(vec![]);
     };
     // if ob config needs to collect id data
-    Ok(vec![OnboardingRequirement::CollectData {
+    let req = OnboardingRequirement::CollectData {
         missing_attributes,
         optional_attributes,
         populated_attributes,
         recollect_attributes,
-    }])
+    };
+    let req = omit_confirm_if_necessary(req, user_wf);
+    Ok(req.into_iter().collect())
 }
 
 fn get_collect_investor_profile_requirement<T>(
@@ -468,11 +450,13 @@ fn get_collect_investor_profile_requirement<T>(
     } else {
         false
     };
-    Ok(vec![OnboardingRequirement::CollectInvestorProfile {
+    let req = OnboardingRequirement::CollectInvestorProfile {
         missing_attributes,
         populated_attributes,
         missing_document,
-    }])
+    };
+    let req = omit_confirm_if_necessary(req, user_wf);
+    Ok(req.into_iter().collect())
 }
 
 fn get_collect_kyb_data_requirement<T>(
@@ -536,12 +520,14 @@ fn get_collect_kyb_data_requirement<T>(
             populated_attributes.push(bo_cdo.clone());
         }
     }
-    Ok(vec![OnboardingRequirement::CollectBusinessData {
+    let req = OnboardingRequirement::CollectBusinessData {
         missing_attributes,
         populated_attributes,
         has_linked_bos,
         recollect_attributes,
-    }])
+    };
+    let req = omit_confirm_if_necessary(req, biz_wf);
+    Ok(req.into_iter().collect())
 }
 
 fn get_register_passkey_requirement(
