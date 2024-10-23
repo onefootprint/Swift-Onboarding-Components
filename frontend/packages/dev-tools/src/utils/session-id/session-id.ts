@@ -4,7 +4,7 @@ const isTest = process.env.NODE_ENV === 'test';
 const queryParamKey = 'xfpsessionid';
 
 // replaced the uuid lib with custom implementation as the package is not compatible with our UMD build of footprint-js
-const uuidv4 = () => {
+export const uuidv4 = () => {
   return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
     (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16),
   );
