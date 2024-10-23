@@ -2,7 +2,7 @@ import { Box, Divider, Shimmer, Stack } from '@onefootprint/ui';
 
 const Loading = () => (
   <Box tag="section" testID="entity-loading" paddingTop={7}>
-    <Box marginBottom={7}>
+    <Box marginBottom={5}>
       <Breadcrumb />
     </Box>
     <Box marginBottom={5}>
@@ -19,38 +19,24 @@ const Loading = () => (
 
 const Breadcrumb = () => (
   <Stack gap={3}>
-    <Shimmer height="20px" width="76px" />
-    <Shimmer height="20px" width="6px" />
-    <Shimmer height="20px" width="48px" />
+    <Shimmer height="24px" width="52px" />
+    <Shimmer height="24px" width="4px" />
+    <Shimmer height="24px" width="65px" />
   </Stack>
 );
 
 const Header = () => (
-  <Stack gap={2} direction="column">
-    <Stack align="center" direction="row" gap={3}>
-      <Box id="entity-kind">
-        <Shimmer height="28px" width="105px" />
-      </Box>
-      <Box id="entity-status">
-        <Shimmer height="24px" width="64px" borderRadius="xl" />
-      </Box>
+  <Stack justifyContent="space-between">
+    <Stack gap={3}>
+      <Shimmer height="28px" width="63px" />
+      <Shimmer height="28px" width="228px" />
+      <Shimmer height="28px" width="59px" />
+      <Shimmer height="28px" width="111px" />
     </Stack>
-    <Stack id="subheader" direction="row" gap={3} height="32px" justify="space-between">
-      <Stack align="center" direction="row" gap={3}>
-        <Box id="entity-timestamp">
-          <Shimmer height="20px" width="105px" />
-        </Box>
-        <Box>
-          <Shimmer height="3px" width="3px" />
-        </Box>
-        <Box id="entity-id">
-          <Shimmer height="26px" width="253px" />
-        </Box>
-      </Stack>
-      <Stack align="center" gap={3}>
-        <Shimmer height="32px" width="114px" />
-        <Shimmer height="32px" width="114px" />
-      </Stack>
+    <Stack justifyContent="flex-end" gap={3}>
+      <Shimmer height="28px" width="137px" />
+      <Shimmer height="28px" width="95px" />
+      <Shimmer height="28px" width="28px" />
     </Stack>
   </Stack>
 );
