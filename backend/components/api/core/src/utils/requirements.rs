@@ -317,34 +317,29 @@ fn get_data_collection_progress<Type>(
     if !ob_config.must_collect_data.iter().any(|cdo| cdo.matches(di_kind)) {
         return None;
     }
-    let mut populated_attributes = Vec::new();
-    let mut missing_attributes = Vec::new();
-    let mut optional_attributes = Vec::new();
+    let relevant_attrs = |cdos: Vec<CDO>| cdos.into_iter().filter(move |cdo| cdo.matches(di_kind));
 
-    ob_config
-        .must_collect_data
-        .iter()
-        .map(|cdo| (cdo, true))
-        .chain(ob_config.optional_data.iter().map(|cdo| (cdo, false)))
-        .filter(|(cdo, _)| cdo.matches(di_kind))
-        .for_each(|(cdo, must_collect)| {
-            let has_all_dis = is_cdo_met(vw, cdo, decrypted_values);
-            if has_all_dis {
-                populated_attributes.push(cdo.clone());
-            } else if must_collect {
-                missing_attributes.push(cdo.clone());
-            } else {
-                optional_attributes.push(cdo.clone());
-            }
-        });
-
-    let mut recollect_attributes = wf.config.recollect_attributes().to_vec();
-    recollect_attributes.retain(|cdo| cdo.matches(di_kind));
+    // Kind of unintuitive: optional_data is not a subset of must_collect_data
+    let all_attrs = chain!(
+        ob_config.must_collect_data.clone(),
+        ob_config.optional_data.clone()
+    )
+    .collect();
+    let populated_attributes = relevant_attrs(all_attrs)
+        .filter(|cdo| is_cdo_met(vw, cdo, decrypted_values))
+        .collect_vec();
+    let missing_required_attributes = relevant_attrs(ob_config.must_collect_data.clone())
+        .filter(|cdo| !is_cdo_met(vw, cdo, decrypted_values))
+        .collect_vec();
+    let missing_optional_attributes = relevant_attrs(ob_config.optional_data.clone())
+        .filter(|cdo| !is_cdo_met(vw, cdo, decrypted_values))
+        .collect_vec();
+    let recollect_attributes = relevant_attrs(wf.config.recollect_attributes().to_vec()).collect_vec();
 
     let progress = RequirementProgress {
         populated_attributes,
-        missing_attributes,
-        optional_attributes,
+        missing_attributes: missing_required_attributes,
+        optional_attributes: missing_optional_attributes,
         recollect_attributes,
     };
     Some(progress)
