@@ -21,7 +21,6 @@ use db::helpers::vault_dr::bulk_get_vdr_blob_keys_active_at;
 use db::helpers::vault_dr::get_complete_svvs_for_svv_batch;
 use db::helpers::vault_dr::get_dl_batch_for_svv_batch;
 use db::helpers::vault_dr::get_scoped_vault_version_batch;
-use db::helpers::vault_dr::DataLifetimeCreatedAtSvvId;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::IsLive;
 use db::models::scoped_vault::ScopedVault;
@@ -245,17 +244,14 @@ impl VaultDrWriter {
     async fn write_blob_batch_to_s3(
         &self,
         state: &State,
-        dl_batch: Vec<DataLifetimeCreatedAtSvvId>,
+        dls: Vec<DataLifetime>,
     ) -> FpResult<Vec<NewVaultDrBlob>> {
         let tenant_id = self.tenant_id.clone();
         let is_live = self.is_live;
 
-        let sv_ids = dl_batch
-            .iter()
-            .map(|d| d.dl.scoped_vault_id.clone())
-            .collect_vec();
+        let sv_ids = dls.iter().map(|dl| dl.scoped_vault_id.clone()).collect_vec();
 
-        let sv_id_to_fp_id = state
+        let (dls, sv_id_to_fp_id) = state
             .db_query(move |conn| -> FpResult<_> {
                 let sv_id_to_fp_id: HashMap<_, _> =
                     ScopedVault::bulk_get(conn, sv_ids.iter().collect_vec(), &tenant_id, is_live)?
@@ -263,16 +259,11 @@ impl VaultDrWriter {
                         .map(|(sv, _)| (sv.id, sv.fp_id))
                         .collect();
 
-                Ok(sv_id_to_fp_id)
+                Ok((dls, sv_id_to_fp_id))
             })
             .await?;
 
-        let mut created_at_svv_id_by_dl_id: HashMap<_, _> = dl_batch
-            .iter()
-            .map(|d| (d.dl.id.clone(), d.created_at_svv_id.clone()))
-            .collect();
-        let mut dls_by_id = dl_batch.into_iter().map(|d| (d.dl.id.clone(), d.dl)).collect();
-
+        let mut dls_by_id = dls.into_iter().map(|dl| (dl.id.clone(), dl)).collect();
         let pii_by_dl = bulk_decrypt_dls_unchecked(state, &self.tenant_id, self.is_live, &dls_by_id).await?;
 
         // Encrypt and write records to S3 in parallel tasks.
@@ -297,17 +288,8 @@ impl VaultDrWriter {
                     .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?
                     .clone();
 
-                let dl_created_at_svv_id = created_at_svv_id_by_dl_id
-                    .remove(&dl_id)
-                    .ok_or(AssertionError("Got DL ID not in created_at_svv_id_by_dl_id"))?
-                    .clone();
-
                 let writer = self.clone();
-                Ok(async move {
-                    writer
-                        .encrypt_and_write_record_to_s3(fp_id, dl, pii, dl_created_at_svv_id)
-                        .await
-                })
+                Ok(async move { writer.encrypt_and_write_record_to_s3(fp_id, dl, pii).await })
             })
             .collect::<FpResult<Vec<_>>>()?;
 
@@ -353,7 +335,6 @@ impl VaultDrWriter {
         fp_id: FpId,
         dl: DataLifetime,
         pii: MimeTypedPii,
-        dl_created_at_svv_id: ScopedVaultVersionId,
     ) -> FpResult<NewVaultDrBlob> {
         tracing::info!(
             config_id=%self.config_id,
@@ -368,9 +349,7 @@ impl VaultDrWriter {
         );
 
         let e_record = self.encrypt_record(pii).await?;
-        let new_blob = self
-            .write_blob_to_s3(fp_id, dl, e_record, dl_created_at_svv_id)
-            .await?;
+        let new_blob = self.write_blob_to_s3(fp_id, dl, e_record).await?;
 
         Ok(new_blob)
     }
@@ -417,7 +396,6 @@ impl VaultDrWriter {
         fp_id: FpId,
         dl: DataLifetime,
         e_record: EncryptedRecord,
-        dl_created_at_svv_id: ScopedVaultVersionId,
     ) -> FpResult<NewVaultDrBlob> {
         // To make blob S3 writes idempotent and blob keys 1:1 with each (VaultDrConfig,
         // DataLifetime) pair, the blob key doesn't depend on the non-deterministic encrypted
@@ -495,6 +473,7 @@ impl VaultDrWriter {
             .into());
         }
 
+
         let new_blob = NewVaultDrBlob {
             config_id: self.config_id.clone(),
             data_lifetime_id: dl.id,
@@ -503,7 +482,6 @@ impl VaultDrWriter {
             content_etag,
             wrapped_record_key: wrapped_record_key.into(),
             content_length_bytes: content_length as i64,
-            dl_created_at_svv_id,
         };
         Ok(new_blob)
     }
