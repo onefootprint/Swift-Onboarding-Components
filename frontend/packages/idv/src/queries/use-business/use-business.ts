@@ -12,7 +12,7 @@ const getBusinessRequest = async ({ obConfigAuth }: BusinessRequest) => {
 
   return data;
 };
-const useGetBusiness = (payload: BusinessRequest) => {
+const useBusiness = (payload: BusinessRequest) => {
   const query = useQuery({
     queryKey: ['get-business', payload],
     queryFn: () => getBusinessRequest(payload),
@@ -22,4 +22,4 @@ const useGetBusiness = (payload: BusinessRequest) => {
   return query;
 };
 
-export default useGetBusiness;
+export default useBusiness;

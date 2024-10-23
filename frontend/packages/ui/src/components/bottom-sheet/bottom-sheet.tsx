@@ -71,6 +71,7 @@ const BottomSheet = ({
             </RadixDialog.Title>
             <Stack maxHeight={componentMaxHeight} direction="column">
               <Header
+                // @ts-ignore - Type instantiation is excessively deep and possibly infinite
                 closeAriaLabel={closeAriaLabel ?? (t('components.bottom-sheet.close-aria-label-default') as string)}
                 onClose={onClose}
                 title={title}

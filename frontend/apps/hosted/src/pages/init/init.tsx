@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { Logger, getLogger, trackAction, useGetOnboardingConfig } from '@onefootprint/idv';
+import { Logger, getLogger, trackAction, useBusiness, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage, useRequestError } from '@onefootprint/request';
 import { Shimmer, Stack, media } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
-import useGetBusiness from './hooks/use-get-business';
 import useParseUrl from './hooks/use-url-params';
 
 const { logError, logInfo } = getLogger({ location: 'hosted-init' });
@@ -37,7 +36,7 @@ const Init = () => {
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const { getErrorCode } = useRequestError();
 
-  const queryGetBusiness = useGetBusiness({ obConfigAuth });
+  const queryGetBusiness = useBusiness({ obConfigAuth });
   const isGetBusinessLoading = queryGetBusiness.isFetching && queryGetBusiness.isPending;
   const businessBoKycData = queryGetBusiness.data;
 

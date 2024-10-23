@@ -41,11 +41,13 @@ export {
   useParseHandoffUrl,
 } from './hooks';
 export {
+  useBusiness,
   useGetD2PStatus,
   useGetOnboardingConfig,
   useGetOnboardingStatus,
   useOnboardingValidate,
   useUpdateD2PStatus,
+  type HostedBusinessOwner,
 } from './queries';
 export { default } from './idv';
 export type { IdvCompletePayload, IdvProps } from './types';
