@@ -204,6 +204,7 @@ export type {
 export { default as ReviewStatus } from './review-status';
 export type { RiskSignal } from './risk-signal';
 export { RiskSignalSeverity } from './risk-signal';
+export type { RiskSignalSeverityGrouping, RiskSignalsSummary } from './risk-signals-overview';
 export { BusinessNameKind } from './business-name';
 export { BusinessDetail } from './business-details';
 export type { RawBusinessName, BusinessName } from './business-name';

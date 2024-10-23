@@ -395,6 +395,8 @@ export type {
   EntityWatchlist,
   WatchlistHit,
   RawBusinessWatchlist,
+  RiskSignalSeverityGrouping,
+  RiskSignalsSummary,
   Role,
   Rolebinding,
   RoleScope,

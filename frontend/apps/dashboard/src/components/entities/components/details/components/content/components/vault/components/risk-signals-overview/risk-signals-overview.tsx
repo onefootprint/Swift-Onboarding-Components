@@ -3,10 +3,10 @@ import { ErrorComponent } from 'src/components';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
+import type { RiskSignalsSummary } from '@onefootprint/types';
+import useRiskSignalsOverview from 'src/components/entities/hooks/use-risk-signals-overview';
 import Content from './components/content';
 import Loading from './components/loading';
-import useRiskSignalsOverview from './hooks/use-risk-signals-overview';
-import type { RiskSignalsSummary } from './risk-signals-overview.types';
 
 export type RiskSignalsOverviewProps = {
   type: keyof RiskSignalsSummary;
