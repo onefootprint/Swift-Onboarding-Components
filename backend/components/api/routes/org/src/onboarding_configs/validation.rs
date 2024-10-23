@@ -544,7 +544,29 @@ impl ObConfigurationArgsToValidate {
                         } else {
                             Ok(())
                         }
-                    }
+                    },
+                    VerificationCheck::BusinessAml{ } => {
+                        let has_kyb_check = self.verification_checks
+                            .inner()
+                            .iter()
+                            .any(|vc| matches!(vc, VerificationCheck::Kyb { .. }));
+
+                        if !has_kyb_check {
+                            return Err(TenantError::ValidationError(
+                                "Cannot run Business AML without KYB".to_owned(),
+                            )
+                            .into());
+                        }
+
+                        if !matches!(&self.kind, &ObConfigurationKind::Kyb) {
+                            Err(TenantError::ValidationError(
+                                "Cannot run Business AML for non-KYB Playbooks".to_owned(),
+                            )
+                            .into())
+                        } else {
+                            Ok(())
+                        }
+                    },
                     VerificationCheck::Aml {
                         ofac,
                         pep,

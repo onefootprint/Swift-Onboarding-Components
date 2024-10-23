@@ -34,6 +34,7 @@ pub enum VerificationCheck {
     Kyb {
         ein_only: bool,
     },
+    BusinessAml {},
     // Run KYC
     Kyc {},
     Aml {

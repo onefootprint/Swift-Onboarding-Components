@@ -577,12 +577,6 @@ impl MiddeskState<Complete> {
             _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
         }?;
 
-        let risk_signals: Vec<NewRiskSignalInfo> =
-            decision::features::middesk::reason_codes(&business_response)
-                .into_iter()
-                .map(|rc| (rc, vendor_api, vres_id.clone()))
-                .collect();
-
         let derived_vault_data: MiddeskResponseDerivedVaultData =
             MiddeskResponseDerivedVaultData::create(state, &business_response, &sv).await?;
 
@@ -602,6 +596,23 @@ impl MiddeskState<Complete> {
                 } else {
                     Err(AssertionError("no kyb check configured"))
                 }?;
+
+                // TODO: uncomment this after migration to backfill business aml verification checks has been
+                // run.
+                /*
+                let has_aml_checks = obc
+                    .verification_checks()
+                    .get(VerificationCheckKind::BusinessAml)
+                    .is_some();
+                */
+
+                let has_aml_checks = true;
+                let risk_signals: Vec<NewRiskSignalInfo> =
+                    decision::features::middesk::reason_codes(&business_response, has_aml_checks)
+                        .into_iter()
+                        .map(|rc| (rc, vendor_api, vres_id.clone()))
+                        .collect();
+
                 let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
                     id: &wf_id,
                     sv_id: &sv.id,

@@ -1195,6 +1195,77 @@ def test_enhanced_aml_with_verification_checks(
         assert aml_check in res["verification_checks"]
 
 
+@pytest.mark.parametrize(
+    "playbook_kind,addl_check_kind,expected_error",
+    [
+        (
+            "kyb",
+            "kyb",
+            None,
+        ),
+        (
+            "kyb",
+            "kyc",
+            "Validation error: Cannot run Business AML without KYB",
+        ),
+        (
+            "kyc",
+            "kyb",
+            "Validation error: Cannot run Business AML for non-KYB Playbooks",
+        ),
+    ],
+)
+def test_business_aml_with_verification_checks(
+    sandbox_tenant,
+    must_collect_data,
+    playbook_kind,
+    addl_check_kind,
+    expected_error,
+):
+    # with verification checks
+    business_aml_check = dict(
+        kind="business_aml",
+        data=dict(),
+    )
+
+    verification_checks = [dict(kind="kyc", data=dict()), business_aml_check]
+    if addl_check_kind == "kyb":
+        verification_checks = verification_checks + [
+            dict(kind=addl_check_kind, data=dict(ein_only=False)),
+        ]
+
+    if playbook_kind == "kyb":
+        must_collect_data = must_collect_data + [
+            "business_name",
+            "business_tin",
+            "business_address",
+            "business_phone_number",
+            "business_website",
+            "business_kyced_beneficial_owners",
+        ]
+
+    data = dict(
+        name="Yo",
+        must_collect_data=must_collect_data,
+        optional_data=[],
+        can_access_data=must_collect_data,
+        kind=playbook_kind,
+        verification_checks=verification_checks,
+    )
+
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200 if expected_error is None else 400,
+    )
+
+    if expected_error:
+        assert res["message"] == expected_error
+    else:
+        assert business_aml_check in res["verification_checks"]
+
+
 def test_config_update(sandbox_tenant, ob_configuration):
     # Test failing to update
     new_name = "Updated ob config name"

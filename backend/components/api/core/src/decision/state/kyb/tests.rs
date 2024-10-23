@@ -82,7 +82,10 @@ async fn setup(
             must_collect_data: cdos.clone(),
             can_access_data: cdos,
             kind: ObConfigurationKind::Kyb,
-            verification_checks: Some(vec![VerificationCheck::Kyb { ein_only: false }]),
+            verification_checks: Some(vec![
+                VerificationCheck::Kyb { ein_only: false },
+                VerificationCheck::BusinessAml {},
+            ]),
             ..Default::default()
         },
         fixture_result,

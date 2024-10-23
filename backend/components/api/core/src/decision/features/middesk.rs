@@ -514,7 +514,7 @@ pub enum Error {
     MissingField(String),
 }
 
-pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReasonCode> {
+pub fn reason_codes(business_response: &BusinessResponse, has_aml_checks: bool) -> Vec<FootprintReasonCode> {
     business_response
         .review
         .as_ref()
@@ -524,7 +524,7 @@ pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReason
                 .filter_map(|t| {
                     let task_kind = TaskKind::try_from(t.clone());
                     match task_kind {
-                        Ok(tk) => Into::<Option<FootprintReasonCode>>::into(tk),
+                        Ok(tk) => Some(tk),
                         Err(Error::UnrecognizedTask(key, sub_label)) => {
                             tracing::info!(key, sub_label, "Unrecognized Middesk TaskKind");
                             None
@@ -535,9 +535,23 @@ pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReason
                         }
                     }
                 })
+                .filter_map(|tk| filter_aml_tasks(tk, has_aml_checks))
                 .collect::<Vec<FootprintReasonCode>>()
         })
         .unwrap_or_default()
+}
+
+fn filter_aml_tasks(tk: TaskKind, has_aml_checks: bool) -> Option<FootprintReasonCode> {
+    match tk.clone() {
+        TaskKind::Watchlist(_) => {
+            if has_aml_checks {
+                Into::<Option<FootprintReasonCode>>::into(tk)
+            } else {
+                None
+            }
+        }
+        _ => Into::<Option<FootprintReasonCode>>::into(tk),
+    }
 }
 
 // TODO: test
@@ -594,5 +608,13 @@ mod tests {
     #[test_case(TaskKind::AddressVerification(AddressVerificationTask::Unverified) => Some(FootprintReasonCode::BusinessAddressDoesNotMatch))]
     fn test_into_footprint_reason_code(tk: TaskKind) -> Option<FootprintReasonCode> {
         tk.into()
+    }
+
+    #[test_case(TaskKind::Watchlist(WatchlistTask::NoHits), true => Some(FootprintReasonCode::BusinessNameNoWatchlistHits))]
+    #[test_case(TaskKind::Watchlist(WatchlistTask::NoHits), false => None)]
+    #[test_case(TaskKind::Watchlist(WatchlistTask::Hits), true => Some(FootprintReasonCode::BusinessNameWatchlistHit))]
+    #[test_case(TaskKind::Watchlist(WatchlistTask::Hits), false => None)]
+    fn test_filter_aml_tasks(tk: TaskKind, has_aml_checks: bool) -> Option<FootprintReasonCode> {
+        filter_aml_tasks(tk, has_aml_checks)
     }
 }
