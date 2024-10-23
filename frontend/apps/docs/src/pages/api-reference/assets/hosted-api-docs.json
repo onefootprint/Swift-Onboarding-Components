@@ -174,7 +174,7 @@
                 },
                 "security": [
                     {
-                        "User Token": []
+                        "User Onboarding Token": []
                     }
                 ]
             }
@@ -213,6 +213,35 @@
                 "security": [
                     {
                         "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/businesses": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Hosted"
+                ],
+                "description": "Get information about the businesses owned by the authenticated user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/HostedBusinessList"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
                     }
                 ]
             }
@@ -3234,6 +3263,30 @@
                 "required": [
                     "invited",
                     "inviter",
+                    "name"
+                ]
+            },
+            "HostedBusinessList": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "is_incomplete": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "id",
+                    "is_incomplete",
                     "name"
                 ]
             },

@@ -190,12 +190,14 @@ impl BusinessOwner {
         conn: &'a mut PgConn,
         uv_id: &'a VaultId,
         id: impl Into<ListOwnedBusinessesIdentifier<'a>>,
-    ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
+    ) -> DbResult<Vec<(BusinessOwner, ScopedVault, Vault)>> {
         let mut query = business_owner::table
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
+            .inner_join(vault::table.on(scoped_vault::vault_id.eq(vault::id)))
             .filter(business_owner::deactivated_at.is_null())
             .filter(business_owner::user_vault_id.eq(uv_id))
-            .order_by(scoped_vault::start_timestamp.asc())
+            .order_by(scoped_vault::start_timestamp.desc())
+            .limit(100)
             .into_boxed();
 
         match id.into() {

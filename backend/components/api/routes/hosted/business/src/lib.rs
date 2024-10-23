@@ -1,6 +1,7 @@
 use paperclip::actix::web;
 
-mod index;
+mod detail;
+mod list;
 mod owners;
 mod vault;
 
@@ -8,7 +9,8 @@ use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
-        .service(index::get)
+        .service(list::get)
+        .service(detail::get)
         .service(vault::patch::post_validate)
         .service(vault::patch::patch)
         .service(vault::decrypt::post)

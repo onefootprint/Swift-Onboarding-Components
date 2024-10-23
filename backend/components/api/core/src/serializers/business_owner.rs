@@ -7,6 +7,7 @@ use crate::utils::vault_wrapper::BusinessOwnerInfo;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::UserData;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
 use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
@@ -66,8 +67,8 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wir
     }
 }
 
-impl DbToApi<(BusinessOwner, ScopedVault)> for api_wire_types::PrivateOwnedBusiness {
-    fn from_db((_, sb): (BusinessOwner, ScopedVault)) -> Self {
+impl DbToApi<(BusinessOwner, ScopedVault, Vault)> for api_wire_types::PrivateOwnedBusiness {
+    fn from_db((_, sb, _): (BusinessOwner, ScopedVault, Vault)) -> Self {
         let ScopedVault {
             fp_id: id, status, ..
         } = sb;

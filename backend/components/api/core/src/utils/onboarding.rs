@@ -235,7 +235,7 @@ pub fn get_or_create_business_wf(
         // sessions.
         // Also via secondary beneficial owner tokens
         sb_id
-    } else if let Some((_, sb)) = existing_businesses.into_iter().rev().flatten().next() {
+    } else if let Some((_, sb, _)) = existing_businesses.into_iter().flatten().next() {
         // If the user has already started onboarding their business onto this exact ob config AND we aren't
         // force creating a new workflow (which should also support force creating a new business), we
         // should locate the existing business.
