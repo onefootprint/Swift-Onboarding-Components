@@ -19,6 +19,7 @@ use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ExternalIntegrationKind;
+use newtypes::FpId;
 use newtypes::LabelKind;
 use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowSource;
@@ -57,6 +58,10 @@ pub enum UserTimelineEvent {
     ExternalIntegrationCalled(ExternalIntegrationCalled),
     StepUp(Vec<DocumentRequest>),
     OnboardingTimeline(OnboardingTimelineInfo),
+    BusinessOwnerCompletedKyc {
+        fp_id: FpId,
+        decision: TimelineOnboardingDecision,
+    },
 }
 
 #[derive(Debug, Clone, Serialize)]

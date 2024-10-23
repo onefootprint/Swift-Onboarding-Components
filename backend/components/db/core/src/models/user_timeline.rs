@@ -34,6 +34,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEvent;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::ExternalIntegrationInfo;
+use newtypes::FpId;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingTimelineInfo;
 use newtypes::ScopedVaultId;
@@ -102,6 +103,7 @@ pub enum SaturatedTimelineEvent {
     ExternalIntegrationCalled(ExternalIntegrationInfo),
     StepUp(Vec<DocumentRequest>),
     OnboardingTimeline(OnboardingTimelineInfo),
+    BusinessOwnerCompletedKyc((FpId, SaturatedOnboardingDecisionInfo)),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -162,6 +164,7 @@ impl UserTimeline {
         // Batch fetch any related metadata from the source-of-truth business objects
         let decision_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::OnboardingDecision(ref e) => Some(&e.id),
+            DbUserTimelineEvent::BusinessOwnerCompletedKyc(ref e) => Some(&e.onboarding_decision_id),
             _ => None,
         });
         let annotation_ids = results.iter().flat_map(|ut| match ut.event {
@@ -355,6 +358,14 @@ impl UserTimeline {
                     }
                     DbUserTimelineEvent::OnboardingTimeline(ref e) => {
                         SaturatedTimelineEvent::OnboardingTimeline(e.clone())
+                    }
+                    DbUserTimelineEvent::BusinessOwnerCompletedKyc(ref e) => {
+                        let obd = decisions
+                            .get(&e.onboarding_decision_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
+
+                        SaturatedTimelineEvent::BusinessOwnerCompletedKyc((e.fp_id.clone(), obd))
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))
