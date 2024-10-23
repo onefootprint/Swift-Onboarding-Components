@@ -220,8 +220,6 @@ pub struct VaultDrBlob {
     pub content_etag: String,
     pub wrapped_record_key: PiiString,
     pub content_length_bytes: i64,
-
-    pub dl_created_at_svv_id: Option<ScopedVaultVersionId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
