@@ -15,7 +15,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
 
     return (
       <RadixDropdown.Item {...props} onSelect={onSelect} asChild>
-        <BaseItem ref={ref} size={size} variant={variant} $height={height} layout="default">
+        <BaseItem ref={ref} size={size} variant={variant} $height={height} $layout="default">
           {IconLeft && <IconLeft color={variant === 'destructive' ? 'error' : undefined} />}
           <Stack direction="column" gap={1} flex={1} textDecoration="none">
             {children}

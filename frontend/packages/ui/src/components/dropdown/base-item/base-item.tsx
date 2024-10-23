@@ -5,7 +5,7 @@ import type { BaseItemProps } from '../dropdown.types';
 import { DROPDOWN_ITEM_SIZE } from '../dropdown.types';
 
 const BaseItem = styled(Box)<BaseItemProps>`
-  ${({ theme, variant = 'default', size = 'default', $height, layout = 'default' }) => {
+  ${({ theme, variant = 'default', size = 'default', $height, $layout = 'default' }) => {
     const getHeight = () => {
       if ($height === 'fit-content') return 'fit-content';
       if ($height) return $height;
@@ -15,7 +15,7 @@ const BaseItem = styled(Box)<BaseItemProps>`
     return css`
       ${createFontStyles('body-3')};
       position: relative;
-      display: ${layout === 'radio-item' ? 'grid' : 'flex'};
+      display: ${$layout === 'radio-item' ? 'grid' : 'flex'};
       align-items: center;
       width: 100%;
       height: ${getHeight()};
@@ -27,14 +27,14 @@ const BaseItem = styled(Box)<BaseItemProps>`
       background-color: ${theme.backgroundColor.primary};
 
       ${
-        layout === 'radio-item' &&
+        $layout === 'radio-item' &&
         css`
         grid-template-columns: 1fr ${theme.spacing[4]};
         grid-template-rows: 1fr;
       `
       }
       ${
-        layout !== 'radio-item' &&
+        $layout !== 'radio-item' &&
         css`
         flex-direction: row;
       `

@@ -1,5 +1,6 @@
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
 import type * as CSS from 'csstype';
+import { forwardRef } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import type { ContentProps } from '../dropdown.types';
 
@@ -27,20 +28,15 @@ const translateOut = keyframes`
   }
 `;
 
-const Content = ({
-  children,
-  minWidth = '200px',
-  maxWidth = '360px',
-  width,
-  sideOffset = 4,
-  ...props
-}: ContentProps) => {
-  return (
-    <Container sideOffset={sideOffset} $minWidth={minWidth} $maxWidth={maxWidth} $width={width} {...props}>
-      {children}
-    </Container>
-  );
-};
+const Content = forwardRef<HTMLDivElement, ContentProps>(
+  ({ children, minWidth = '200px', maxWidth = '360px', width, sideOffset = 4, ...props }, ref) => {
+    return (
+      <Container ref={ref} sideOffset={sideOffset} $minWidth={minWidth} $maxWidth={maxWidth} $width={width} {...props}>
+        {children}
+      </Container>
+    );
+  },
+);
 
 const Container = styled(RadixDropdown.Content)<
   Omit<ContentProps, 'maxWidth' | 'minWidth' | 'width'> & {

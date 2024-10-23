@@ -55,5 +55,5 @@ export type BaseItemProps = {
   $height?: CSS.Property.Height;
   variant?: 'default' | 'destructive';
   size?: 'default' | 'compact' | 'tiny';
-  layout?: 'default' | 'radio-item';
+  $layout?: 'default' | 'radio-item';
 };

@@ -1,5 +1,4 @@
 import { Grid, Stack } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
 import type React from 'react';
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
@@ -14,7 +13,7 @@ type DefaultLayoutProps = {
 };
 
 const DefaultLayout = ({ children }: DefaultLayoutProps) => (
-  <DefaultLayoutContainer animate={{ opacity: 1 }} exit={{ opacity: 0 }} initial={{ opacity: 0 }}>
+  <DefaultLayoutContainer>
     <Stack data-testid="private-default-layout" direction="column" align="center" justify="center">
       <AssumeBanner />
       <SandboxBanner />
@@ -29,8 +28,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => (
   </DefaultLayoutContainer>
 );
 
-const DefaultLayoutContainer = styled(motion.div)`
-  display: flex;
+const DefaultLayoutContainer = styled(Stack)`
   flex-direction: column;
   height: 100vh;
 `;

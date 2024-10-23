@@ -46,7 +46,7 @@
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
     "flat": "^5.0.2",
-    "framer-motion": "^9.0.1",
+    "framer-motion": "^11.11.9",
     "i18next": "^23.16.0",
     "launchdarkly-react-client-sdk": "^3.0.9",
     "lodash": "^4.17.21",

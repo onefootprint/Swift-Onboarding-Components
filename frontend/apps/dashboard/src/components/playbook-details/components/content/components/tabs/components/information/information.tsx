@@ -15,7 +15,6 @@ const formatDate = (date: string) => {
 
 const Information = ({ playbook }: InformationProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'settings' });
-  console.log(playbook);
 
   const fields = [
     {

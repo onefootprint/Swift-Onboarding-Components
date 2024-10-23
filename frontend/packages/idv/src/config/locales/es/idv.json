@@ -751,7 +751,9 @@
               "description": "Asegúrate de que cada propietario tenga un número de teléfono único."
             }
           },
-          "cta": "Continue"
+          "continue": "Continue",
+          "cancel": "Cancel",
+          "save": "Save"
         }
       },
       "confirm": {

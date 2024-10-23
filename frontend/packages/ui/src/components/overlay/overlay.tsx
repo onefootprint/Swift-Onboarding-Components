@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -7,26 +7,9 @@ type OverlayProps = {
   isConfirmation?: boolean;
 };
 
-const overlayVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-};
-
 const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
-  ({ isVisible = false, isConfirmation = false }: OverlayProps, ref) => (
-    <AnimatePresence>
-      {isVisible && (
-        <OverlayLayer
-          ref={ref}
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          $isConfirmation={isConfirmation}
-        />
-      )}
-    </AnimatePresence>
-  ),
+  ({ isVisible = false, isConfirmation = false }: OverlayProps, ref) =>
+    isVisible && <OverlayLayer ref={ref} $isConfirmation={isConfirmation} />,
 );
 
 const OverlayLayer = styled(motion.div)<{ $isConfirmation: boolean }>`
