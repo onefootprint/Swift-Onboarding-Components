@@ -145,6 +145,18 @@ const GlobalStyles = createGlobalStyle`
     box-shadow: rgba(0, 0, 0, 0.24) 0px 1px 2px 0px, rgba(200, 200, 200, 0.2) 0px -1px 1px inset, rgba(255, 255, 255, 0.2) 0px 1px 1px inset;
     transition: background-color 0.1s ease-in-out 0s;
   }
+
+  .fp-pin-input-container{
+    display: flex;
+    gap: 8px;
+    height: 30px;
+    margin-top: 16px;
+  }
+
+  .fp-pin-input-container input{
+    width: 50px;
+    text-align: center;
+  }
 `;
 
 export default GlobalStyles;

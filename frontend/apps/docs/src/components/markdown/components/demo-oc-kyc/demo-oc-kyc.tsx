@@ -1,6 +1,12 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { type FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
+import {
+  type FormValues,
+  Fp,
+  InlineOtpNotSupported,
+  InlineProcessError,
+  useFootprint,
+} from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
@@ -66,25 +72,60 @@ const Step3 = () => (
 
 const Step4 = () => {
   const fp = useFootprint();
+  const [showOtp, setShowOtp] = useState(false);
+  const [challengeKind, setChallengeKind] = useState<string>('');
 
-  const handleSubmit = (formValues: FormValues) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      {
-        onAuthenticated: () => {
-          console.log('done');
-        },
-      },
-    );
+  const handleCreateChallenge = async (formValues: FormValues) => {
+    const email = formValues['id.email'];
+    const phoneNumber = formValues['id.phone_number'];
+    try {
+      const method = await fp.createEmailPhoneBasedChallenge({ email, phoneNumber });
+      setChallengeKind(method);
+      console.log(method);
+      setShowOtp(true);
+    } catch (e) {
+      if (e instanceof InlineOtpNotSupported) {
+        await fp.launchIdentify(
+          { email, phoneNumber },
+          {
+            onAuthenticated() {
+              console.log('Authenticated');
+            },
+          },
+        );
+      }
+    }
   };
+
+  const handleSubmitPin = async (verificationCode: string) => {
+    try {
+      const response = await fp.verify({ verificationCode });
+      console.log(response);
+      console.log('Authenticated');
+    } catch (error) {
+      console.error('Error verifying pin:', error);
+    }
+  };
+
+  if (!fp.isReady) {
+    return <div>Loading...</div>;
+  }
+
+  if (showOtp) {
+    return (
+      <div>
+        <Styles />
+        <div>Verify your phone number</div>
+        <div>Enter the 6-digit code sent from {challengeKind}</div>
+        <Fp.PinInput onComplete={handleSubmitPin} autoFocus />
+      </div>
+    );
+  }
 
   return (
     <>
       <Styles />
-      <Fp.Form onSubmit={handleSubmit} className="fp-c-form">
+      <Fp.Form onSubmit={handleCreateChallenge} className="fp-c-form">
         <Fp.Field name="id.email" className="fp-c-field">
           <Fp.Label className="fp-c-label">Your email</Fp.Label>
           <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
@@ -106,35 +147,73 @@ const Step4 = () => {
 const Step5 = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
+  const [showOtp, setShowOtp] = useState(false);
+  const [challengeKind, setChallengeKind] = useState<string>('');
 
-  const handleSubmitIdentify = (formValues: FormValues) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      {
-        onAuthenticated: () => {
-          setStep('collect-data');
-        },
-      },
-    );
+  const handleCreateChallenge = async (formValues: FormValues) => {
+    const email = formValues['id.email'];
+    const phoneNumber = formValues['id.phone_number'];
+    try {
+      const method = await fp.createEmailPhoneBasedChallenge({ email, phoneNumber });
+      setChallengeKind(method);
+      console.log(method);
+      setShowOtp(true);
+    } catch (e) {
+      if (e instanceof InlineOtpNotSupported) {
+        await fp.launchIdentify(
+          { email, phoneNumber },
+          {
+            onAuthenticated() {
+              console.log('Authenticated');
+              setStep('collect-data');
+            },
+          },
+        );
+      }
+    }
+  };
+
+  const handleSubmitPin = async (verificationCode: string) => {
+    try {
+      const response = await fp.verify({ verificationCode });
+      console.log(response);
+      console.log('Authenticated');
+      setStep('collect-data');
+    } catch (error) {
+      console.error('Error verifying pin:', error);
+    }
   };
 
   const handleSubmitData = async (formValues: FormValues) => {
     try {
       await fp.vault(formValues);
-      console.log('done');
+      const remainingRequirements = await fp.getRequirements();
+      console.log('Saved data. Remaining requirements:', remainingRequirements);
     } catch (e) {
       console.log(e);
     }
   };
 
+  if (!fp.isReady) {
+    return <div>Loading...</div>;
+  }
+
+  if (showOtp && step === 'identify') {
+    return (
+      <div>
+        <Styles />
+        <div>Verify your phone number</div>
+        <div>Enter the 6-digit code sent from {challengeKind}</div>
+        <Fp.PinInput onComplete={handleSubmitPin} autoFocus />
+      </div>
+    );
+  }
+
   return (
     <>
       <Styles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={handleSubmitIdentify} className="fp-c-form">
+        <Fp.Form onSubmit={handleCreateChallenge} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
             <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
@@ -217,35 +296,77 @@ const Step5 = () => {
 const Step6 = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
+  const [showOtp, setShowOtp] = useState(false);
+  const [challengeKind, setChallengeKind] = useState<string>('');
 
-  const handleSubmitIdentify = (formValues: FormValues) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      {
-        onAuthenticated: () => {
-          setStep('collect-data');
-        },
-      },
-    );
+  const handleCreateChallenge = async (formValues: FormValues) => {
+    const email = formValues['id.email'];
+    const phoneNumber = formValues['id.phone_number'];
+    try {
+      const method = await fp.createEmailPhoneBasedChallenge({ email, phoneNumber });
+      setChallengeKind(method);
+      console.log(method);
+      setShowOtp(true);
+    } catch (e) {
+      if (e instanceof InlineOtpNotSupported) {
+        await fp.launchIdentify(
+          { email, phoneNumber },
+          {
+            onAuthenticated() {
+              console.log('Authenticated');
+              setStep('collect-data');
+            },
+          },
+        );
+      }
+    }
+  };
+
+  const handleSubmitPin = async (verificationCode: string) => {
+    try {
+      const response = await fp.verify({ verificationCode });
+      console.log(response);
+      console.log('Authenticated');
+      setStep('collect-data');
+    } catch (error) {
+      console.error('Error verifying pin:', error);
+    }
   };
 
   const handleSubmitData = async (formValues: FormValues) => {
     try {
       await fp.vault(formValues);
-      fp.handoff();
+      const remainingRequirements = await fp.getRequirements();
+      console.log('Saved data. Remaining requirements:', remainingRequirements);
+      const { validationToken } = await fp.process();
+      console.log('Validation token:', validationToken);
     } catch (e) {
-      console.log(e);
+      if (e instanceof InlineProcessError) {
+        fp.handoff({ onComplete: validationToken => console.log('Validation token:', validationToken) });
+      }
     }
   };
+
+  if (!fp.isReady) {
+    return <div>Loading...</div>;
+  }
+
+  if (showOtp && step === 'identify') {
+    return (
+      <div>
+        <Styles />
+        <div>Verify your phone number</div>
+        <div>Enter the 6-digit code sent from {challengeKind}</div>
+        <Fp.PinInput onComplete={handleSubmitPin} autoFocus />
+      </div>
+    );
+  }
 
   return (
     <>
       <Styles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={handleSubmitIdentify} className="fp-c-form">
+        <Fp.Form onSubmit={handleCreateChallenge} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
             <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
