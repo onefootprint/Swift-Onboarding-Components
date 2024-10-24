@@ -31,7 +31,7 @@ export type CollectKybDataRequirement = {
   missingAttributes: CollectedKybDataOption[];
   populatedAttributes: CollectedKybDataOption[];
   recollectAttributes: CollectedKybDataOption[];
-  /** If true, the BOs have been linked via API and shouldn't be collected in Idv. */
+  /** @deprecated If true, the BOs have been linked via API and shouldn't be collected in Idv. */
   hasLinkedBos: boolean;
 };
 
