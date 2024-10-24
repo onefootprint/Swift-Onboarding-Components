@@ -40,6 +40,15 @@ export type AuthorizedOrg = {
   logoUrl?: string;
   orgName: string;
 };
+export type BatchHostedBusinessOwnerRequest = string;
+export type BoToken = {
+  firstName?: string;
+  lastName?: string;
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  token: string;
+};
 /**
  * A key-value map with the corresponding decrypted values
  */
@@ -56,8 +65,6 @@ export type BusinessDecryptResponse = {
     | 'business.state'
     | 'business.zip'
     | 'business.country'
-    | 'business.beneficial_owners'
-    | 'business.kyced_beneficial_owners'
     | 'business.corporation_type'
     | 'business.formation_state'
     | 'business.formation_date'
@@ -78,8 +85,6 @@ export type __key_ =
   | 'business.state'
   | 'business.zip'
   | 'business.country'
-  | 'business.beneficial_owners'
-  | 'business.kyced_beneficial_owners'
   | 'business.corporation_type'
   | 'business.formation_state'
   | 'business.formation_date'
@@ -363,7 +368,7 @@ export type CreateDocumentRequest = {
     | 'ssn_card'
     | 'proof_of_address'
     | 'custom';
-  fixtureResult?: 'fail' | 'pass' | 'real';
+  fixtureResult?: 'Fail' | 'Pass' | 'Real';
   requestId?: string;
   skipSelfie?: boolean;
 };
@@ -630,7 +635,7 @@ export type document_type =
   | 'ssn_card'
   | 'proof_of_address'
   | 'custom';
-export type fixture_result = 'fail' | 'pass' | 'real';
+export type fixture_result = 'Fail' | 'Pass' | 'Real';
 export type CreateDocumentResponse = {
   id: string;
 };
@@ -799,10 +804,681 @@ export type GetDeviceAttestationChallengeRequest = {
 export type device_type2 = 'ios' | 'android';
 export type GetSdkArgsTokenResponse = {
   args: string;
+};
+export type GetUserTokenResponse = {
+  expiresAt: string;
+  scopes: Array<
+    'sign_up' | 'auth' | 'basic_profile' | 'sensitive_profile' | 'handoff' | 'vault_data' | 'explicit_auth'
+  >;
+};
+export type HostedBusiness = {
+  /**
+   * Information on the secondary BO that was pre-populated by the primary BO
+   */
+  invited: {
+    email: string;
+    phoneNumber: string;
+  };
+  /**
+   * The primary business owner that invited you to fill out a KYC form
+   */
+  inviter: {
+    firstName: string;
+    lastName: string;
+  };
+  name: string;
+};
+export type HostedBusinessList = {
+  createdAt: string;
+  id: string;
+  isIncomplete: boolean;
+  name: string;
+};
+export type HostedBusinessOwner = {
+  decryptedData: {
+    [key: string]: string;
+  };
+  /**
+   * True if a user has already started onboarding as this beneficial owner. In this case, the
+   * data below comes directly from that user's vault.
+   */
+  hasLinkedUser: boolean;
+  uuid: string;
+  /**
+   * True if this beneficial owner represents the currently authed user.
+   */
+  isAuthedUser: boolean;
+  /**
+   * True if this beneficial owner is editable by the currently authed user.
+   */
+  isMutable: boolean;
+  ownershipStake?: number;
+  populatedData: Array<
+    | 'id.first_name'
+    | 'id.middle_name'
+    | 'id.last_name'
+    | 'id.dob'
+    | 'id.ssn4'
+    | 'id.ssn9'
+    | 'id.address_line1'
+    | 'id.address_line2'
+    | 'id.city'
+    | 'id.state'
+    | 'id.zip'
+    | 'id.country'
+    | 'id.email'
+    | 'id.phone_number'
+    | 'id.us_legal_status'
+    | 'id.visa_kind'
+    | 'id.visa_expiration_date'
+    | 'id.nationality'
+    | 'id.citizenships'
+    | 'id.drivers_license_number'
+    | 'id.drivers_license_state'
+    | 'id.itin'
+    | 'id.us_tax_id'
+    | 'business.name'
+    | 'business.dba'
+    | 'business.website'
+    | 'business.phone_number'
+    | 'business.tin'
+    | 'business.address_line1'
+    | 'business.address_line2'
+    | 'business.city'
+    | 'business.state'
+    | 'business.zip'
+    | 'business.country'
+    | 'business.corporation_type'
+    | 'business.formation_state'
+    | 'business.formation_date'
+    | 'custom.*'
+    | 'investor_profile.employment_status'
+    | 'investor_profile.occupation'
+    | 'investor_profile.employer'
+    | 'investor_profile.annual_income'
+    | 'investor_profile.net_worth'
+    | 'investor_profile.investment_goals'
+    | 'investor_profile.risk_tolerance'
+    | 'investor_profile.declarations'
+    | 'investor_profile.brokerage_firm_employer'
+    | 'investor_profile.senior_executive_symbols'
+    | 'investor_profile.family_member_names'
+    | 'investor_profile.political_organization'
+    | 'investor_profile.funding_sources'
+    | 'document.id_card.front.image'
+    | 'document.id_card.front.mime_type'
+    | 'document.id_card.back.image'
+    | 'document.id_card.back.mime_type'
+    | 'document.id_card.selfie.image'
+    | 'document.id_card.selfie.mime_type'
+    | 'document.id_card.full_name'
+    | 'document.id_card.dob'
+    | 'document.id_card.gender'
+    | 'document.id_card.full_address'
+    | 'document.id_card.document_number'
+    | 'document.id_card.expires_at'
+    | 'document.id_card.issued_at'
+    | 'document.id_card.issuing_state'
+    | 'document.id_card.issuing_country'
+    | 'document.id_card.ref_number'
+    | 'document.id_card.nationality'
+    | 'document.id_card.curp'
+    | 'document.id_card.clave_de_elector'
+    | 'document.id_card.classified_document_type'
+    | 'document.id_card.curp_validation_response'
+    | 'document.drivers_license.front.image'
+    | 'document.drivers_license.front.mime_type'
+    | 'document.drivers_license.back.image'
+    | 'document.drivers_license.back.mime_type'
+    | 'document.drivers_license.selfie.image'
+    | 'document.drivers_license.selfie.mime_type'
+    | 'document.drivers_license.full_name'
+    | 'document.drivers_license.dob'
+    | 'document.drivers_license.gender'
+    | 'document.drivers_license.full_address'
+    | 'document.drivers_license.document_number'
+    | 'document.drivers_license.expires_at'
+    | 'document.drivers_license.issued_at'
+    | 'document.drivers_license.issuing_state'
+    | 'document.drivers_license.issuing_country'
+    | 'document.drivers_license.ref_number'
+    | 'document.drivers_license.nationality'
+    | 'document.drivers_license.curp'
+    | 'document.drivers_license.clave_de_elector'
+    | 'document.drivers_license.classified_document_type'
+    | 'document.drivers_license.curp_validation_response'
+    | 'document.passport.front.image'
+    | 'document.passport.front.mime_type'
+    | 'document.passport.back.image'
+    | 'document.passport.back.mime_type'
+    | 'document.passport.selfie.image'
+    | 'document.passport.selfie.mime_type'
+    | 'document.passport.full_name'
+    | 'document.passport.dob'
+    | 'document.passport.gender'
+    | 'document.passport.full_address'
+    | 'document.passport.document_number'
+    | 'document.passport.expires_at'
+    | 'document.passport.issued_at'
+    | 'document.passport.issuing_state'
+    | 'document.passport.issuing_country'
+    | 'document.passport.ref_number'
+    | 'document.passport.nationality'
+    | 'document.passport.curp'
+    | 'document.passport.clave_de_elector'
+    | 'document.passport.classified_document_type'
+    | 'document.passport.curp_validation_response'
+    | 'document.passport_card.front.image'
+    | 'document.passport_card.front.mime_type'
+    | 'document.passport_card.back.image'
+    | 'document.passport_card.back.mime_type'
+    | 'document.passport_card.selfie.image'
+    | 'document.passport_card.selfie.mime_type'
+    | 'document.passport_card.full_name'
+    | 'document.passport_card.dob'
+    | 'document.passport_card.gender'
+    | 'document.passport_card.full_address'
+    | 'document.passport_card.document_number'
+    | 'document.passport_card.expires_at'
+    | 'document.passport_card.issued_at'
+    | 'document.passport_card.issuing_state'
+    | 'document.passport_card.issuing_country'
+    | 'document.passport_card.ref_number'
+    | 'document.passport_card.nationality'
+    | 'document.passport_card.curp'
+    | 'document.passport_card.clave_de_elector'
+    | 'document.passport_card.classified_document_type'
+    | 'document.passport_card.curp_validation_response'
+    | 'document.permit.front.image'
+    | 'document.permit.front.mime_type'
+    | 'document.permit.back.image'
+    | 'document.permit.back.mime_type'
+    | 'document.permit.selfie.image'
+    | 'document.permit.selfie.mime_type'
+    | 'document.permit.full_name'
+    | 'document.permit.dob'
+    | 'document.permit.gender'
+    | 'document.permit.full_address'
+    | 'document.permit.document_number'
+    | 'document.permit.expires_at'
+    | 'document.permit.issued_at'
+    | 'document.permit.issuing_state'
+    | 'document.permit.issuing_country'
+    | 'document.permit.ref_number'
+    | 'document.permit.nationality'
+    | 'document.permit.curp'
+    | 'document.permit.clave_de_elector'
+    | 'document.permit.classified_document_type'
+    | 'document.permit.curp_validation_response'
+    | 'document.visa.front.image'
+    | 'document.visa.front.mime_type'
+    | 'document.visa.back.image'
+    | 'document.visa.back.mime_type'
+    | 'document.visa.selfie.image'
+    | 'document.visa.selfie.mime_type'
+    | 'document.visa.full_name'
+    | 'document.visa.dob'
+    | 'document.visa.gender'
+    | 'document.visa.full_address'
+    | 'document.visa.document_number'
+    | 'document.visa.expires_at'
+    | 'document.visa.issued_at'
+    | 'document.visa.issuing_state'
+    | 'document.visa.issuing_country'
+    | 'document.visa.ref_number'
+    | 'document.visa.nationality'
+    | 'document.visa.curp'
+    | 'document.visa.clave_de_elector'
+    | 'document.visa.classified_document_type'
+    | 'document.visa.curp_validation_response'
+    | 'document.residence_document.front.image'
+    | 'document.residence_document.front.mime_type'
+    | 'document.residence_document.back.image'
+    | 'document.residence_document.back.mime_type'
+    | 'document.residence_document.selfie.image'
+    | 'document.residence_document.selfie.mime_type'
+    | 'document.residence_document.full_name'
+    | 'document.residence_document.dob'
+    | 'document.residence_document.gender'
+    | 'document.residence_document.full_address'
+    | 'document.residence_document.document_number'
+    | 'document.residence_document.expires_at'
+    | 'document.residence_document.issued_at'
+    | 'document.residence_document.issuing_state'
+    | 'document.residence_document.issuing_country'
+    | 'document.residence_document.ref_number'
+    | 'document.residence_document.nationality'
+    | 'document.residence_document.curp'
+    | 'document.residence_document.clave_de_elector'
+    | 'document.residence_document.classified_document_type'
+    | 'document.residence_document.curp_validation_response'
+    | 'document.voter_identification.front.image'
+    | 'document.voter_identification.front.mime_type'
+    | 'document.voter_identification.back.image'
+    | 'document.voter_identification.back.mime_type'
+    | 'document.voter_identification.selfie.image'
+    | 'document.voter_identification.selfie.mime_type'
+    | 'document.voter_identification.full_name'
+    | 'document.voter_identification.dob'
+    | 'document.voter_identification.gender'
+    | 'document.voter_identification.full_address'
+    | 'document.voter_identification.document_number'
+    | 'document.voter_identification.expires_at'
+    | 'document.voter_identification.issued_at'
+    | 'document.voter_identification.issuing_state'
+    | 'document.voter_identification.issuing_country'
+    | 'document.voter_identification.ref_number'
+    | 'document.voter_identification.nationality'
+    | 'document.voter_identification.curp'
+    | 'document.voter_identification.clave_de_elector'
+    | 'document.voter_identification.classified_document_type'
+    | 'document.voter_identification.curp_validation_response'
+    | 'document.finra_compliance_letter'
+    | 'document.proof_of_address.image'
+    | 'document.ssn_card.image'
+    | 'document.custom.*'
+    | 'card.*.number'
+    | 'card.*.expiration'
+    | 'card.*.cvc'
+    | 'card.*.name'
+    | 'card.*.billing_address.zip'
+    | 'card.*.billing_address.country'
+    | 'card.*.expiration_month'
+    | 'card.*.expiration_year'
+    | 'card.*.number_last4'
+    | 'card.*.issuer'
+    | 'card.*.fingerprint'
+    | 'bank.*.name'
+    | 'bank.*.ach_routing_number'
+    | 'bank.*.ach_account_number'
+    | 'bank.*.ach_account_id'
+    | 'bank.*.account_type'
+    | 'bank.*.fingerprint'
+  >;
+};
+export type HostedValidateResponse = {
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  validationToken: string;
+};
+export type IdentifyChallengeResponse = {
+  challengeData: {
+    biometricChallengeJson?: string;
+    challengeKind: 'sms' | 'biometric' | 'email';
+    /**
+     * Encrypted, base64-encoded challenge information
+     */
+    challengeToken: string;
+    timeBeforeRetryS: number;
+    /**
+     * Auth token to pass to the verify call
+     */
+    token: string;
+  };
+  error?: string;
+};
+export type challenge_kind = 'sms' | 'biometric' | 'email';
+export type IdentifyRequest = {
+  email?: string;
+  /**
+   * TODO deprecate
+   */
+  identifier?: string;
+  phoneNumber?: string;
+  /**
+   * Determines which scopes the issued auth token will have. Request the correct scopes for your
+   * use case in order to get the least permissions required
+   */
+  scope: 'my1fp' | 'onboarding' | 'auth';
+};
+/**
+ * Determines which scopes the issued auth token will have. Request the correct scopes for your
+ * use case in order to get the least permissions required
+ */
+export type scope = 'my1fp' | 'onboarding' | 'auth';
+export type IdentifyResponse = {
+  /**
+   * All of the context on the identified user, if found
+   */
+  user?: {
+    authMethods: Array<{
+      isVerified: boolean;
+      kind: 'phone' | 'passkey' | 'email';
+    }>;
+    availableChallengeKinds: Array<'sms' | 'biometric' | 'email'>;
+    /**
+     * When true, allowed to create a new user via a signup challenge even when there's already an
+     * existing user with this contact info. Generally, a user can make a new vault IF they're not
+     * in a context logging into a tenant that they've already onboarded onto
+     */
+    canInitiateSignupChallenge: boolean;
+    /**
+     * Signals that one or more biometric credentials support syncing and may be available to use
+     * on desktop/other devices
+     */
+    hasSyncablePasskey: boolean;
+    isUnverified: boolean;
+    /**
+     * The list of DataIdentifiers whose fingerprints matched on the vault
+     */
+    matchingFps: Array<
+      | 'id.first_name'
+      | 'id.middle_name'
+      | 'id.last_name'
+      | 'id.dob'
+      | 'id.ssn4'
+      | 'id.ssn9'
+      | 'id.address_line1'
+      | 'id.address_line2'
+      | 'id.city'
+      | 'id.state'
+      | 'id.zip'
+      | 'id.country'
+      | 'id.email'
+      | 'id.phone_number'
+      | 'id.us_legal_status'
+      | 'id.visa_kind'
+      | 'id.visa_expiration_date'
+      | 'id.nationality'
+      | 'id.citizenships'
+      | 'id.drivers_license_number'
+      | 'id.drivers_license_state'
+      | 'id.itin'
+      | 'id.us_tax_id'
+      | 'business.name'
+      | 'business.dba'
+      | 'business.website'
+      | 'business.phone_number'
+      | 'business.tin'
+      | 'business.address_line1'
+      | 'business.address_line2'
+      | 'business.city'
+      | 'business.state'
+      | 'business.zip'
+      | 'business.country'
+      | 'business.corporation_type'
+      | 'business.formation_state'
+      | 'business.formation_date'
+      | 'custom.*'
+      | 'investor_profile.employment_status'
+      | 'investor_profile.occupation'
+      | 'investor_profile.employer'
+      | 'investor_profile.annual_income'
+      | 'investor_profile.net_worth'
+      | 'investor_profile.investment_goals'
+      | 'investor_profile.risk_tolerance'
+      | 'investor_profile.declarations'
+      | 'investor_profile.brokerage_firm_employer'
+      | 'investor_profile.senior_executive_symbols'
+      | 'investor_profile.family_member_names'
+      | 'investor_profile.political_organization'
+      | 'investor_profile.funding_sources'
+      | 'document.id_card.front.image'
+      | 'document.id_card.front.mime_type'
+      | 'document.id_card.back.image'
+      | 'document.id_card.back.mime_type'
+      | 'document.id_card.selfie.image'
+      | 'document.id_card.selfie.mime_type'
+      | 'document.id_card.full_name'
+      | 'document.id_card.dob'
+      | 'document.id_card.gender'
+      | 'document.id_card.full_address'
+      | 'document.id_card.document_number'
+      | 'document.id_card.expires_at'
+      | 'document.id_card.issued_at'
+      | 'document.id_card.issuing_state'
+      | 'document.id_card.issuing_country'
+      | 'document.id_card.ref_number'
+      | 'document.id_card.nationality'
+      | 'document.id_card.curp'
+      | 'document.id_card.clave_de_elector'
+      | 'document.id_card.classified_document_type'
+      | 'document.id_card.curp_validation_response'
+      | 'document.drivers_license.front.image'
+      | 'document.drivers_license.front.mime_type'
+      | 'document.drivers_license.back.image'
+      | 'document.drivers_license.back.mime_type'
+      | 'document.drivers_license.selfie.image'
+      | 'document.drivers_license.selfie.mime_type'
+      | 'document.drivers_license.full_name'
+      | 'document.drivers_license.dob'
+      | 'document.drivers_license.gender'
+      | 'document.drivers_license.full_address'
+      | 'document.drivers_license.document_number'
+      | 'document.drivers_license.expires_at'
+      | 'document.drivers_license.issued_at'
+      | 'document.drivers_license.issuing_state'
+      | 'document.drivers_license.issuing_country'
+      | 'document.drivers_license.ref_number'
+      | 'document.drivers_license.nationality'
+      | 'document.drivers_license.curp'
+      | 'document.drivers_license.clave_de_elector'
+      | 'document.drivers_license.classified_document_type'
+      | 'document.drivers_license.curp_validation_response'
+      | 'document.passport.front.image'
+      | 'document.passport.front.mime_type'
+      | 'document.passport.back.image'
+      | 'document.passport.back.mime_type'
+      | 'document.passport.selfie.image'
+      | 'document.passport.selfie.mime_type'
+      | 'document.passport.full_name'
+      | 'document.passport.dob'
+      | 'document.passport.gender'
+      | 'document.passport.full_address'
+      | 'document.passport.document_number'
+      | 'document.passport.expires_at'
+      | 'document.passport.issued_at'
+      | 'document.passport.issuing_state'
+      | 'document.passport.issuing_country'
+      | 'document.passport.ref_number'
+      | 'document.passport.nationality'
+      | 'document.passport.curp'
+      | 'document.passport.clave_de_elector'
+      | 'document.passport.classified_document_type'
+      | 'document.passport.curp_validation_response'
+      | 'document.passport_card.front.image'
+      | 'document.passport_card.front.mime_type'
+      | 'document.passport_card.back.image'
+      | 'document.passport_card.back.mime_type'
+      | 'document.passport_card.selfie.image'
+      | 'document.passport_card.selfie.mime_type'
+      | 'document.passport_card.full_name'
+      | 'document.passport_card.dob'
+      | 'document.passport_card.gender'
+      | 'document.passport_card.full_address'
+      | 'document.passport_card.document_number'
+      | 'document.passport_card.expires_at'
+      | 'document.passport_card.issued_at'
+      | 'document.passport_card.issuing_state'
+      | 'document.passport_card.issuing_country'
+      | 'document.passport_card.ref_number'
+      | 'document.passport_card.nationality'
+      | 'document.passport_card.curp'
+      | 'document.passport_card.clave_de_elector'
+      | 'document.passport_card.classified_document_type'
+      | 'document.passport_card.curp_validation_response'
+      | 'document.permit.front.image'
+      | 'document.permit.front.mime_type'
+      | 'document.permit.back.image'
+      | 'document.permit.back.mime_type'
+      | 'document.permit.selfie.image'
+      | 'document.permit.selfie.mime_type'
+      | 'document.permit.full_name'
+      | 'document.permit.dob'
+      | 'document.permit.gender'
+      | 'document.permit.full_address'
+      | 'document.permit.document_number'
+      | 'document.permit.expires_at'
+      | 'document.permit.issued_at'
+      | 'document.permit.issuing_state'
+      | 'document.permit.issuing_country'
+      | 'document.permit.ref_number'
+      | 'document.permit.nationality'
+      | 'document.permit.curp'
+      | 'document.permit.clave_de_elector'
+      | 'document.permit.classified_document_type'
+      | 'document.permit.curp_validation_response'
+      | 'document.visa.front.image'
+      | 'document.visa.front.mime_type'
+      | 'document.visa.back.image'
+      | 'document.visa.back.mime_type'
+      | 'document.visa.selfie.image'
+      | 'document.visa.selfie.mime_type'
+      | 'document.visa.full_name'
+      | 'document.visa.dob'
+      | 'document.visa.gender'
+      | 'document.visa.full_address'
+      | 'document.visa.document_number'
+      | 'document.visa.expires_at'
+      | 'document.visa.issued_at'
+      | 'document.visa.issuing_state'
+      | 'document.visa.issuing_country'
+      | 'document.visa.ref_number'
+      | 'document.visa.nationality'
+      | 'document.visa.curp'
+      | 'document.visa.clave_de_elector'
+      | 'document.visa.classified_document_type'
+      | 'document.visa.curp_validation_response'
+      | 'document.residence_document.front.image'
+      | 'document.residence_document.front.mime_type'
+      | 'document.residence_document.back.image'
+      | 'document.residence_document.back.mime_type'
+      | 'document.residence_document.selfie.image'
+      | 'document.residence_document.selfie.mime_type'
+      | 'document.residence_document.full_name'
+      | 'document.residence_document.dob'
+      | 'document.residence_document.gender'
+      | 'document.residence_document.full_address'
+      | 'document.residence_document.document_number'
+      | 'document.residence_document.expires_at'
+      | 'document.residence_document.issued_at'
+      | 'document.residence_document.issuing_state'
+      | 'document.residence_document.issuing_country'
+      | 'document.residence_document.ref_number'
+      | 'document.residence_document.nationality'
+      | 'document.residence_document.curp'
+      | 'document.residence_document.clave_de_elector'
+      | 'document.residence_document.classified_document_type'
+      | 'document.residence_document.curp_validation_response'
+      | 'document.voter_identification.front.image'
+      | 'document.voter_identification.front.mime_type'
+      | 'document.voter_identification.back.image'
+      | 'document.voter_identification.back.mime_type'
+      | 'document.voter_identification.selfie.image'
+      | 'document.voter_identification.selfie.mime_type'
+      | 'document.voter_identification.full_name'
+      | 'document.voter_identification.dob'
+      | 'document.voter_identification.gender'
+      | 'document.voter_identification.full_address'
+      | 'document.voter_identification.document_number'
+      | 'document.voter_identification.expires_at'
+      | 'document.voter_identification.issued_at'
+      | 'document.voter_identification.issuing_state'
+      | 'document.voter_identification.issuing_country'
+      | 'document.voter_identification.ref_number'
+      | 'document.voter_identification.nationality'
+      | 'document.voter_identification.curp'
+      | 'document.voter_identification.clave_de_elector'
+      | 'document.voter_identification.classified_document_type'
+      | 'document.voter_identification.curp_validation_response'
+      | 'document.finra_compliance_letter'
+      | 'document.proof_of_address.image'
+      | 'document.ssn_card.image'
+      | 'document.custom.*'
+      | 'card.*.number'
+      | 'card.*.expiration'
+      | 'card.*.cvc'
+      | 'card.*.name'
+      | 'card.*.billing_address.zip'
+      | 'card.*.billing_address.country'
+      | 'card.*.expiration_month'
+      | 'card.*.expiration_year'
+      | 'card.*.number_last4'
+      | 'card.*.issuer'
+      | 'card.*.fingerprint'
+      | 'bank.*.name'
+      | 'bank.*.ach_routing_number'
+      | 'bank.*.ach_account_number'
+      | 'bank.*.ach_account_id'
+      | 'bank.*.account_type'
+      | 'bank.*.fingerprint'
+    >;
+    /**
+     * Populated only when identifying a user via auth token that was created by the tenant
+     */
+    scrubbedEmail?: string;
+    scrubbedPhone?: string;
+    /**
+     * An cryptographically generated auth token to authenticate a session
+     */
+    token: string;
+    /**
+     * The scopes of the returned token
+     */
+    tokenScopes: Array<
+      'sign_up' | 'auth' | 'basic_profile' | 'sensitive_profile' | 'handoff' | 'vault_data' | 'explicit_auth'
+    >;
+  };
+};
+export type IdentifyVerifyRequest = {
+  challengeResponse: string;
+  /**
+   * Opaque challenge state token
+   */
+  challengeToken: string;
+  /**
+   * Determines which scopes the issued auth token will have. Request the correct scopes for your
+   * use case in order to get the least permissions required
+   */
+  scope: 'my1fp' | 'onboarding' | 'auth';
+};
+export type IdentifyVerifyResponse = {
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  authToken: string;
+};
+export type KbaResponse = {
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  token: string;
+};
+export type LiteIdentifyRequest = {
+  email?: string;
+  phoneNumber?: string;
+};
+export type LiteIdentifyResponse = {
+  userFound: boolean;
+};
+export type LogBody = {
+  logLevel?: string;
+  logMessage?: string;
+  /**
+   * Really SdkArgsKind, but prefer for this telemetry API to be unopinionated on validation
+   */
+  sdkKind?: string;
+  sdkName?: string;
+  sdkVersion?: string;
+  sessionId?: string;
+  tenantDomain?: string;
+};
+export type LoginChallengeRequest = {
+  challengeKind: 'sms' | 'biometric' | 'email';
+};
+export type NeuroIdentityIdResponse = {
+  id: string;
+};
+export type OnboardingResponse = {
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  authToken: string;
   /**
    * The public onboarding configuration
    */
-  obConfig?: {
+  onboardingConfig: {
     allowInternationalResidents: boolean;
     /**
      * allow list of origins permitted to host the embedded flow
@@ -835,6 +1511,7 @@ export type GetSdkArgsTokenResponse = {
      */
     requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
     requiresIdDoc: boolean;
+    skipConfirm: boolean;
     status: 'disabled' | 'enabled';
     supportEmail?: string;
     supportPhone?: string;
@@ -1094,698 +1771,15 @@ export type GetSdkArgsTokenResponse = {
 };
 export type kind2 = 'kyc' | 'kyb' | 'auth' | 'document';
 export type status2 = 'disabled' | 'enabled';
-export type GetUserTokenResponse = {
-  expiresAt: string;
-  scopes: Array<
-    'sign_up' | 'auth' | 'basic_profile' | 'sensitive_profile' | 'handoff' | 'vault_data' | 'explicit_auth'
-  >;
-};
-export type HostedBusiness = {
-  /**
-   * Information on the secondary BO that was pre-populated by the primary BO
-   */
-  invited: {
-    email: string;
-    phoneNumber: string;
-  };
-  /**
-   * The primary business owner that invited you to fill out a KYC form
-   */
-  inviter: {
-    firstName: string;
-    lastName: string;
-  };
-  name: string;
-};
-export type HostedValidateResponse = {
-  /**
-   * An cryptographically generated auth token to authenticate a session
-   */
-  validationToken: string;
-};
-export type IdentifyRequest = {
-  email?: string;
-  /**
-   * TODO deprecate
-   */
-  identifier?: string;
-  phoneNumber?: string;
-  /**
-   * Determines which scopes the issued auth token will have. Request the correct scopes for your
-   * use case in order to get the least permissions required
-   */
-  scope: 'my1fp' | 'onboarding' | 'auth';
-};
-/**
- * Determines which scopes the issued auth token will have. Request the correct scopes for your
- * use case in order to get the least permissions required
- */
-export type scope = 'my1fp' | 'onboarding' | 'auth';
-export type IdentifyResponse = {
-  /**
-   * All of the context on the identified user, if found
-   */
-  user?: {
-    authMethods: Array<{
-      isVerified: boolean;
-      kind: 'phone' | 'passkey' | 'email';
-    }>;
-    availableChallengeKinds: Array<'sms' | 'biometric' | 'email'>;
-    /**
-     * When true, allowed to create a new user via a signup challenge even when there's already an
-     * existing user with this contact info. Generally, a user can make a new vault IF they're not
-     * in a context logging into a tenant that they've already onboarded onto
-     */
-    canInitiateSignupChallenge: boolean;
-    /**
-     * Signals that one or more biometric credentials support syncing and may be available to use
-     * on desktop/other devices
-     */
-    hasSyncablePasskey: boolean;
-    isUnverified: boolean;
-    /**
-     * The list of DataIdentifiers whose fingerprints matched on the vault
-     */
-    matchingFps: Array<
-      | 'id.first_name'
-      | 'id.middle_name'
-      | 'id.last_name'
-      | 'id.dob'
-      | 'id.ssn4'
-      | 'id.ssn9'
-      | 'id.address_line1'
-      | 'id.address_line2'
-      | 'id.city'
-      | 'id.state'
-      | 'id.zip'
-      | 'id.country'
-      | 'id.email'
-      | 'id.phone_number'
-      | 'id.us_legal_status'
-      | 'id.visa_kind'
-      | 'id.visa_expiration_date'
-      | 'id.nationality'
-      | 'id.citizenships'
-      | 'id.drivers_license_number'
-      | 'id.drivers_license_state'
-      | 'id.itin'
-      | 'id.us_tax_id'
-      | 'business.name'
-      | 'business.dba'
-      | 'business.website'
-      | 'business.phone_number'
-      | 'business.tin'
-      | 'business.address_line1'
-      | 'business.address_line2'
-      | 'business.city'
-      | 'business.state'
-      | 'business.zip'
-      | 'business.country'
-      | 'business.beneficial_owners'
-      | 'business.kyced_beneficial_owners'
-      | 'business.corporation_type'
-      | 'business.formation_state'
-      | 'business.formation_date'
-      | 'custom.*'
-      | 'investor_profile.employment_status'
-      | 'investor_profile.occupation'
-      | 'investor_profile.employer'
-      | 'investor_profile.annual_income'
-      | 'investor_profile.net_worth'
-      | 'investor_profile.investment_goals'
-      | 'investor_profile.risk_tolerance'
-      | 'investor_profile.declarations'
-      | 'investor_profile.brokerage_firm_employer'
-      | 'investor_profile.senior_executive_symbols'
-      | 'investor_profile.family_member_names'
-      | 'investor_profile.political_organization'
-      | 'investor_profile.funding_sources'
-      | 'document.id_card.front.image'
-      | 'document.id_card.front.mime_type'
-      | 'document.id_card.back.image'
-      | 'document.id_card.back.mime_type'
-      | 'document.id_card.selfie.image'
-      | 'document.id_card.selfie.mime_type'
-      | 'document.id_card.full_name'
-      | 'document.id_card.dob'
-      | 'document.id_card.gender'
-      | 'document.id_card.full_address'
-      | 'document.id_card.document_number'
-      | 'document.id_card.expires_at'
-      | 'document.id_card.issued_at'
-      | 'document.id_card.issuing_state'
-      | 'document.id_card.issuing_country'
-      | 'document.id_card.ref_number'
-      | 'document.id_card.nationality'
-      | 'document.id_card.curp'
-      | 'document.id_card.classified_document_type'
-      | 'document.id_card.curp_validation_response'
-      | 'document.drivers_license.front.image'
-      | 'document.drivers_license.front.mime_type'
-      | 'document.drivers_license.back.image'
-      | 'document.drivers_license.back.mime_type'
-      | 'document.drivers_license.selfie.image'
-      | 'document.drivers_license.selfie.mime_type'
-      | 'document.drivers_license.full_name'
-      | 'document.drivers_license.dob'
-      | 'document.drivers_license.gender'
-      | 'document.drivers_license.full_address'
-      | 'document.drivers_license.document_number'
-      | 'document.drivers_license.expires_at'
-      | 'document.drivers_license.issued_at'
-      | 'document.drivers_license.issuing_state'
-      | 'document.drivers_license.issuing_country'
-      | 'document.drivers_license.ref_number'
-      | 'document.drivers_license.nationality'
-      | 'document.drivers_license.curp'
-      | 'document.drivers_license.classified_document_type'
-      | 'document.drivers_license.curp_validation_response'
-      | 'document.passport.front.image'
-      | 'document.passport.front.mime_type'
-      | 'document.passport.back.image'
-      | 'document.passport.back.mime_type'
-      | 'document.passport.selfie.image'
-      | 'document.passport.selfie.mime_type'
-      | 'document.passport.full_name'
-      | 'document.passport.dob'
-      | 'document.passport.gender'
-      | 'document.passport.full_address'
-      | 'document.passport.document_number'
-      | 'document.passport.expires_at'
-      | 'document.passport.issued_at'
-      | 'document.passport.issuing_state'
-      | 'document.passport.issuing_country'
-      | 'document.passport.ref_number'
-      | 'document.passport.nationality'
-      | 'document.passport.curp'
-      | 'document.passport.classified_document_type'
-      | 'document.passport.curp_validation_response'
-      | 'document.passport_card.front.image'
-      | 'document.passport_card.front.mime_type'
-      | 'document.passport_card.back.image'
-      | 'document.passport_card.back.mime_type'
-      | 'document.passport_card.selfie.image'
-      | 'document.passport_card.selfie.mime_type'
-      | 'document.passport_card.full_name'
-      | 'document.passport_card.dob'
-      | 'document.passport_card.gender'
-      | 'document.passport_card.full_address'
-      | 'document.passport_card.document_number'
-      | 'document.passport_card.expires_at'
-      | 'document.passport_card.issued_at'
-      | 'document.passport_card.issuing_state'
-      | 'document.passport_card.issuing_country'
-      | 'document.passport_card.ref_number'
-      | 'document.passport_card.nationality'
-      | 'document.passport_card.curp'
-      | 'document.passport_card.classified_document_type'
-      | 'document.passport_card.curp_validation_response'
-      | 'document.permit.front.image'
-      | 'document.permit.front.mime_type'
-      | 'document.permit.back.image'
-      | 'document.permit.back.mime_type'
-      | 'document.permit.selfie.image'
-      | 'document.permit.selfie.mime_type'
-      | 'document.permit.full_name'
-      | 'document.permit.dob'
-      | 'document.permit.gender'
-      | 'document.permit.full_address'
-      | 'document.permit.document_number'
-      | 'document.permit.expires_at'
-      | 'document.permit.issued_at'
-      | 'document.permit.issuing_state'
-      | 'document.permit.issuing_country'
-      | 'document.permit.ref_number'
-      | 'document.permit.nationality'
-      | 'document.permit.curp'
-      | 'document.permit.classified_document_type'
-      | 'document.permit.curp_validation_response'
-      | 'document.visa.front.image'
-      | 'document.visa.front.mime_type'
-      | 'document.visa.back.image'
-      | 'document.visa.back.mime_type'
-      | 'document.visa.selfie.image'
-      | 'document.visa.selfie.mime_type'
-      | 'document.visa.full_name'
-      | 'document.visa.dob'
-      | 'document.visa.gender'
-      | 'document.visa.full_address'
-      | 'document.visa.document_number'
-      | 'document.visa.expires_at'
-      | 'document.visa.issued_at'
-      | 'document.visa.issuing_state'
-      | 'document.visa.issuing_country'
-      | 'document.visa.ref_number'
-      | 'document.visa.nationality'
-      | 'document.visa.curp'
-      | 'document.visa.classified_document_type'
-      | 'document.visa.curp_validation_response'
-      | 'document.residence_document.front.image'
-      | 'document.residence_document.front.mime_type'
-      | 'document.residence_document.back.image'
-      | 'document.residence_document.back.mime_type'
-      | 'document.residence_document.selfie.image'
-      | 'document.residence_document.selfie.mime_type'
-      | 'document.residence_document.full_name'
-      | 'document.residence_document.dob'
-      | 'document.residence_document.gender'
-      | 'document.residence_document.full_address'
-      | 'document.residence_document.document_number'
-      | 'document.residence_document.expires_at'
-      | 'document.residence_document.issued_at'
-      | 'document.residence_document.issuing_state'
-      | 'document.residence_document.issuing_country'
-      | 'document.residence_document.ref_number'
-      | 'document.residence_document.nationality'
-      | 'document.residence_document.curp'
-      | 'document.residence_document.classified_document_type'
-      | 'document.residence_document.curp_validation_response'
-      | 'document.voter_identification.front.image'
-      | 'document.voter_identification.front.mime_type'
-      | 'document.voter_identification.back.image'
-      | 'document.voter_identification.back.mime_type'
-      | 'document.voter_identification.selfie.image'
-      | 'document.voter_identification.selfie.mime_type'
-      | 'document.voter_identification.full_name'
-      | 'document.voter_identification.dob'
-      | 'document.voter_identification.gender'
-      | 'document.voter_identification.full_address'
-      | 'document.voter_identification.document_number'
-      | 'document.voter_identification.expires_at'
-      | 'document.voter_identification.issued_at'
-      | 'document.voter_identification.issuing_state'
-      | 'document.voter_identification.issuing_country'
-      | 'document.voter_identification.ref_number'
-      | 'document.voter_identification.nationality'
-      | 'document.voter_identification.curp'
-      | 'document.voter_identification.classified_document_type'
-      | 'document.voter_identification.curp_validation_response'
-      | 'document.finra_compliance_letter'
-      | 'document.proof_of_address.image'
-      | 'document.ssn_card.image'
-      | 'document.custom.*'
-      | 'card.*.number'
-      | 'card.*.expiration'
-      | 'card.*.cvc'
-      | 'card.*.name'
-      | 'card.*.billing_address.zip'
-      | 'card.*.billing_address.country'
-      | 'card.*.expiration_month'
-      | 'card.*.expiration_year'
-      | 'card.*.number_last4'
-      | 'card.*.issuer'
-      | 'bank.*.name'
-      | 'bank.*.ach_routing_number'
-      | 'bank.*.ach_account_number'
-      | 'bank.*.ach_account_id'
-      | 'bank.*.account_type'
-    >;
-    /**
-     * Populated only when identifying a user via auth token that was created by the tenant
-     */
-    scrubbedEmail?: string;
-    scrubbedPhone?: string;
-    /**
-     * An cryptographically generated auth token to authenticate a session
-     */
-    token: string;
-    /**
-     * The scopes of the returned token
-     */
-    tokenScopes: Array<
-      'sign_up' | 'auth' | 'basic_profile' | 'sensitive_profile' | 'handoff' | 'vault_data' | 'explicit_auth'
-    >;
-  };
-};
-export type IdentifyVerifyRequest = {
-  challengeResponse: string;
-  /**
-   * Opaque challenge state token
-   */
-  challengeToken: string;
-  /**
-   * Determines which scopes the issued auth token will have. Request the correct scopes for your
-   * use case in order to get the least permissions required
-   */
-  scope: 'my1fp' | 'onboarding' | 'auth';
-};
-export type IdentifyVerifyResponse = {
-  /**
-   * An cryptographically generated auth token to authenticate a session
-   */
-  authToken: string;
-};
-export type KbaResponse = {
-  /**
-   * An cryptographically generated auth token to authenticate a session
-   */
-  token: string;
-};
-export type LiteIdentifyRequest = {
-  email?: string;
-  phoneNumber?: string;
-};
-export type LiteIdentifyResponse = {
-  userFound: boolean;
-};
-export type LogBody = {
-  logLevel?: string;
-  logMessage?: string;
-  /**
-   * Really SdkArgsKind, but prefer for this telemetry API to be unopinionated on validation
-   */
-  sdkKind?: string;
-  sdkName?: string;
-  sdkVersion?: string;
-  sessionId?: string;
-  tenantDomain?: string;
-};
-export type LoginChallengeRequest = {
-  challengeKind: 'sms' | 'biometric' | 'email';
-};
-export type challenge_kind = 'sms' | 'biometric' | 'email';
-export type LoginChallengeResponse = {
-  challengeData: {
-    biometricChallengeJson?: string;
-    challengeKind: 'sms' | 'biometric' | 'email';
-    /**
-     * Encrypted, base64-encoded challenge information
-     */
-    challengeToken: string;
-    timeBeforeRetryS: number;
-    /**
-     * Auth token to pass to the verify call
-     */
-    token: string;
-  };
-  error?: string;
-};
-export type NeuroIdentityIdResponse = {
-  id: string;
-};
-export type OnboardingResponse = {
-  authToken: string;
-  /**
-   * The public onboarding configuration
-   */
-  onboardingConfig: {
-    allowInternationalResidents: boolean;
-    /**
-     * allow list of origins permitted to host the embedded flow
-     */
-    allowedOrigins?: Array<string>;
-    appClipExperienceId: string;
-    appearance?: {
-      [key: string]: unknown;
-    };
-    canMakeRealDocScanCallsInSandbox: boolean;
-    docScanRequiredIfSsnSkipped?: boolean;
-    isAppClipEnabled: boolean;
-    isInstantAppEnabled: boolean;
-    isKyb: boolean;
-    isLive: boolean;
-    isNoPhoneFlow: boolean;
-    isStepupEnabled: boolean;
-    key: string;
-    kind: 'kyc' | 'kyb' | 'auth' | 'document';
-    logoUrl?: string;
-    name: string;
-    nidEnabled?: boolean;
-    orgId: string;
-    orgName: string;
-    privacyPolicyUrl?: string;
-    /**
-     * When non-null, the provided auth methods are required to be verified by the playbook. Null
-     * does not mean that no auth is required - it just means the playbook doesn't care which
-     * method is used.
-     */
-    requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
-    requiresIdDoc: boolean;
-    status: 'disabled' | 'enabled';
-    supportEmail?: string;
-    supportPhone?: string;
-    supportWebsite?: string;
-    supportedCountries: Array<
-      | 'TW'
-      | 'AF'
-      | 'AL'
-      | 'DZ'
-      | 'AS'
-      | 'AD'
-      | 'AO'
-      | 'AI'
-      | 'AQ'
-      | 'AG'
-      | 'AR'
-      | 'AM'
-      | 'AW'
-      | 'AU'
-      | 'AT'
-      | 'AZ'
-      | 'BS'
-      | 'BH'
-      | 'BD'
-      | 'BB'
-      | 'BY'
-      | 'BE'
-      | 'BZ'
-      | 'BJ'
-      | 'BM'
-      | 'BT'
-      | 'BO'
-      | 'BQ'
-      | 'BA'
-      | 'BW'
-      | 'BV'
-      | 'BR'
-      | 'IO'
-      | 'VG'
-      | 'BN'
-      | 'BG'
-      | 'BF'
-      | 'BI'
-      | 'CV'
-      | 'KH'
-      | 'CM'
-      | 'CA'
-      | 'KY'
-      | 'CF'
-      | 'TD'
-      | 'CL'
-      | 'CN'
-      | 'HK'
-      | 'MO'
-      | 'CX'
-      | 'CC'
-      | 'CO'
-      | 'KM'
-      | 'CG'
-      | 'CK'
-      | 'CR'
-      | 'HR'
-      | 'CU'
-      | 'CW'
-      | 'CY'
-      | 'CZ'
-      | 'CI'
-      | 'KP'
-      | 'CD'
-      | 'DK'
-      | 'DJ'
-      | 'DM'
-      | 'DO'
-      | 'EC'
-      | 'EG'
-      | 'SV'
-      | 'GQ'
-      | 'ER'
-      | 'EE'
-      | 'SZ'
-      | 'ET'
-      | 'FK'
-      | 'FO'
-      | 'FJ'
-      | 'FI'
-      | 'FR'
-      | 'GF'
-      | 'PF'
-      | 'TF'
-      | 'GA'
-      | 'GM'
-      | 'GE'
-      | 'DE'
-      | 'GH'
-      | 'GI'
-      | 'GR'
-      | 'GL'
-      | 'GD'
-      | 'GP'
-      | 'GU'
-      | 'GT'
-      | 'GG'
-      | 'GN'
-      | 'GW'
-      | 'GY'
-      | 'HT'
-      | 'HM'
-      | 'VA'
-      | 'HN'
-      | 'HU'
-      | 'IS'
-      | 'IN'
-      | 'ID'
-      | 'IR'
-      | 'IQ'
-      | 'IE'
-      | 'IM'
-      | 'IL'
-      | 'IT'
-      | 'JM'
-      | 'JP'
-      | 'JE'
-      | 'JO'
-      | 'KZ'
-      | 'KE'
-      | 'KI'
-      | 'KW'
-      | 'KG'
-      | 'LA'
-      | 'LV'
-      | 'LB'
-      | 'LS'
-      | 'LR'
-      | 'LY'
-      | 'LI'
-      | 'LT'
-      | 'LU'
-      | 'MG'
-      | 'MW'
-      | 'MY'
-      | 'MV'
-      | 'ML'
-      | 'MT'
-      | 'MH'
-      | 'MQ'
-      | 'MR'
-      | 'MU'
-      | 'YT'
-      | 'MX'
-      | 'FM'
-      | 'MC'
-      | 'MN'
-      | 'ME'
-      | 'MS'
-      | 'MA'
-      | 'MZ'
-      | 'MM'
-      | 'NA'
-      | 'NR'
-      | 'NP'
-      | 'NL'
-      | 'NC'
-      | 'NZ'
-      | 'NI'
-      | 'NE'
-      | 'NG'
-      | 'NU'
-      | 'NF'
-      | 'MP'
-      | 'NO'
-      | 'OM'
-      | 'PK'
-      | 'PW'
-      | 'PA'
-      | 'PG'
-      | 'PY'
-      | 'PE'
-      | 'PH'
-      | 'PN'
-      | 'PL'
-      | 'PT'
-      | 'PR'
-      | 'QA'
-      | 'KR'
-      | 'MD'
-      | 'RO'
-      | 'RU'
-      | 'RW'
-      | 'RE'
-      | 'BL'
-      | 'SH'
-      | 'KN'
-      | 'LC'
-      | 'MF'
-      | 'PM'
-      | 'VC'
-      | 'WS'
-      | 'SM'
-      | 'ST'
-      | 'SA'
-      | 'SN'
-      | 'RS'
-      | 'SC'
-      | 'SL'
-      | 'SG'
-      | 'SX'
-      | 'SK'
-      | 'SI'
-      | 'SB'
-      | 'SO'
-      | 'ZA'
-      | 'GS'
-      | 'SS'
-      | 'ES'
-      | 'LK'
-      | 'PS'
-      | 'SD'
-      | 'SR'
-      | 'SJ'
-      | 'SE'
-      | 'CH'
-      | 'SY'
-      | 'TJ'
-      | 'TH'
-      | 'MK'
-      | 'TL'
-      | 'TG'
-      | 'TK'
-      | 'TO'
-      | 'TT'
-      | 'TN'
-      | 'TR'
-      | 'TM'
-      | 'TC'
-      | 'TV'
-      | 'UG'
-      | 'UA'
-      | 'AE'
-      | 'GB'
-      | 'TZ'
-      | 'UM'
-      | 'VI'
-      | 'US'
-      | 'UY'
-      | 'UZ'
-      | 'VU'
-      | 'VE'
-      | 'VN'
-      | 'WF'
-      | 'EH'
-      | 'YE'
-      | 'ZM'
-      | 'ZW'
-      | 'AX'
-    >;
-  };
-};
 export type OnboardingSessionResponse = {
   bootstrapData: {
     [key: string]: unknown;
   };
-  key?: string;
 };
 export type OnboardingStatusResponse = {
-  allRequirements: Array<Requirement>;
+  allRequirements: Array<{
+    isMet: boolean;
+  }>;
   /**
    * The public onboarding configuration
    */
@@ -1822,6 +1816,7 @@ export type OnboardingStatusResponse = {
      */
     requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
     requiresIdDoc: boolean;
+    skipConfirm: boolean;
     status: 'disabled' | 'enabled';
     supportEmail?: string;
     supportPhone?: string;
@@ -2124,6 +2119,7 @@ export type PublicOnboardingConfiguration = {
    */
   requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
   requiresIdDoc: boolean;
+  skipConfirm: boolean;
   status: 'disabled' | 'enabled';
   supportEmail?: string;
   supportPhone?: string;
@@ -2393,8 +2389,6 @@ export type RawBusinessDataRequest = {
     | 'business.state'
     | 'business.zip'
     | 'business.country'
-    | 'business.beneficial_owners'
-    | 'business.kyced_beneficial_owners'
     | 'business.corporation_type'
     | 'business.formation_state'
     | 'business.formation_date'
@@ -2403,7 +2397,465 @@ export type RawBusinessDataRequest = {
     [key: string]: unknown;
   };
 };
-export type RawUserDataRequest = VaultData;
+export type RawUserDataRequest = {
+  '<key>':
+    | 'id.first_name'
+    | 'id.middle_name'
+    | 'id.last_name'
+    | 'id.dob'
+    | 'id.ssn4'
+    | 'id.ssn9'
+    | 'id.address_line1'
+    | 'id.address_line2'
+    | 'id.city'
+    | 'id.state'
+    | 'id.zip'
+    | 'id.country'
+    | 'id.email'
+    | 'id.phone_number'
+    | 'id.us_legal_status'
+    | 'id.visa_kind'
+    | 'id.visa_expiration_date'
+    | 'id.nationality'
+    | 'id.citizenships'
+    | 'id.drivers_license_number'
+    | 'id.drivers_license_state'
+    | 'id.itin'
+    | 'id.us_tax_id'
+    | 'custom.*'
+    | 'investor_profile.employment_status'
+    | 'investor_profile.occupation'
+    | 'investor_profile.employer'
+    | 'investor_profile.annual_income'
+    | 'investor_profile.net_worth'
+    | 'investor_profile.investment_goals'
+    | 'investor_profile.risk_tolerance'
+    | 'investor_profile.declarations'
+    | 'investor_profile.brokerage_firm_employer'
+    | 'investor_profile.senior_executive_symbols'
+    | 'investor_profile.family_member_names'
+    | 'investor_profile.political_organization'
+    | 'investor_profile.funding_sources'
+    | 'document.id_card.front.image'
+    | 'document.id_card.front.mime_type'
+    | 'document.id_card.back.image'
+    | 'document.id_card.back.mime_type'
+    | 'document.id_card.selfie.image'
+    | 'document.id_card.selfie.mime_type'
+    | 'document.id_card.full_name'
+    | 'document.id_card.dob'
+    | 'document.id_card.gender'
+    | 'document.id_card.full_address'
+    | 'document.id_card.document_number'
+    | 'document.id_card.expires_at'
+    | 'document.id_card.issued_at'
+    | 'document.id_card.issuing_state'
+    | 'document.id_card.issuing_country'
+    | 'document.id_card.ref_number'
+    | 'document.id_card.nationality'
+    | 'document.id_card.curp'
+    | 'document.id_card.clave_de_elector'
+    | 'document.id_card.classified_document_type'
+    | 'document.id_card.curp_validation_response'
+    | 'document.drivers_license.front.image'
+    | 'document.drivers_license.front.mime_type'
+    | 'document.drivers_license.back.image'
+    | 'document.drivers_license.back.mime_type'
+    | 'document.drivers_license.selfie.image'
+    | 'document.drivers_license.selfie.mime_type'
+    | 'document.drivers_license.full_name'
+    | 'document.drivers_license.dob'
+    | 'document.drivers_license.gender'
+    | 'document.drivers_license.full_address'
+    | 'document.drivers_license.document_number'
+    | 'document.drivers_license.expires_at'
+    | 'document.drivers_license.issued_at'
+    | 'document.drivers_license.issuing_state'
+    | 'document.drivers_license.issuing_country'
+    | 'document.drivers_license.ref_number'
+    | 'document.drivers_license.nationality'
+    | 'document.drivers_license.curp'
+    | 'document.drivers_license.clave_de_elector'
+    | 'document.drivers_license.classified_document_type'
+    | 'document.drivers_license.curp_validation_response'
+    | 'document.passport.front.image'
+    | 'document.passport.front.mime_type'
+    | 'document.passport.back.image'
+    | 'document.passport.back.mime_type'
+    | 'document.passport.selfie.image'
+    | 'document.passport.selfie.mime_type'
+    | 'document.passport.full_name'
+    | 'document.passport.dob'
+    | 'document.passport.gender'
+    | 'document.passport.full_address'
+    | 'document.passport.document_number'
+    | 'document.passport.expires_at'
+    | 'document.passport.issued_at'
+    | 'document.passport.issuing_state'
+    | 'document.passport.issuing_country'
+    | 'document.passport.ref_number'
+    | 'document.passport.nationality'
+    | 'document.passport.curp'
+    | 'document.passport.clave_de_elector'
+    | 'document.passport.classified_document_type'
+    | 'document.passport.curp_validation_response'
+    | 'document.passport_card.front.image'
+    | 'document.passport_card.front.mime_type'
+    | 'document.passport_card.back.image'
+    | 'document.passport_card.back.mime_type'
+    | 'document.passport_card.selfie.image'
+    | 'document.passport_card.selfie.mime_type'
+    | 'document.passport_card.full_name'
+    | 'document.passport_card.dob'
+    | 'document.passport_card.gender'
+    | 'document.passport_card.full_address'
+    | 'document.passport_card.document_number'
+    | 'document.passport_card.expires_at'
+    | 'document.passport_card.issued_at'
+    | 'document.passport_card.issuing_state'
+    | 'document.passport_card.issuing_country'
+    | 'document.passport_card.ref_number'
+    | 'document.passport_card.nationality'
+    | 'document.passport_card.curp'
+    | 'document.passport_card.clave_de_elector'
+    | 'document.passport_card.classified_document_type'
+    | 'document.passport_card.curp_validation_response'
+    | 'document.permit.front.image'
+    | 'document.permit.front.mime_type'
+    | 'document.permit.back.image'
+    | 'document.permit.back.mime_type'
+    | 'document.permit.selfie.image'
+    | 'document.permit.selfie.mime_type'
+    | 'document.permit.full_name'
+    | 'document.permit.dob'
+    | 'document.permit.gender'
+    | 'document.permit.full_address'
+    | 'document.permit.document_number'
+    | 'document.permit.expires_at'
+    | 'document.permit.issued_at'
+    | 'document.permit.issuing_state'
+    | 'document.permit.issuing_country'
+    | 'document.permit.ref_number'
+    | 'document.permit.nationality'
+    | 'document.permit.curp'
+    | 'document.permit.clave_de_elector'
+    | 'document.permit.classified_document_type'
+    | 'document.permit.curp_validation_response'
+    | 'document.visa.front.image'
+    | 'document.visa.front.mime_type'
+    | 'document.visa.back.image'
+    | 'document.visa.back.mime_type'
+    | 'document.visa.selfie.image'
+    | 'document.visa.selfie.mime_type'
+    | 'document.visa.full_name'
+    | 'document.visa.dob'
+    | 'document.visa.gender'
+    | 'document.visa.full_address'
+    | 'document.visa.document_number'
+    | 'document.visa.expires_at'
+    | 'document.visa.issued_at'
+    | 'document.visa.issuing_state'
+    | 'document.visa.issuing_country'
+    | 'document.visa.ref_number'
+    | 'document.visa.nationality'
+    | 'document.visa.curp'
+    | 'document.visa.clave_de_elector'
+    | 'document.visa.classified_document_type'
+    | 'document.visa.curp_validation_response'
+    | 'document.residence_document.front.image'
+    | 'document.residence_document.front.mime_type'
+    | 'document.residence_document.back.image'
+    | 'document.residence_document.back.mime_type'
+    | 'document.residence_document.selfie.image'
+    | 'document.residence_document.selfie.mime_type'
+    | 'document.residence_document.full_name'
+    | 'document.residence_document.dob'
+    | 'document.residence_document.gender'
+    | 'document.residence_document.full_address'
+    | 'document.residence_document.document_number'
+    | 'document.residence_document.expires_at'
+    | 'document.residence_document.issued_at'
+    | 'document.residence_document.issuing_state'
+    | 'document.residence_document.issuing_country'
+    | 'document.residence_document.ref_number'
+    | 'document.residence_document.nationality'
+    | 'document.residence_document.curp'
+    | 'document.residence_document.clave_de_elector'
+    | 'document.residence_document.classified_document_type'
+    | 'document.residence_document.curp_validation_response'
+    | 'document.voter_identification.front.image'
+    | 'document.voter_identification.front.mime_type'
+    | 'document.voter_identification.back.image'
+    | 'document.voter_identification.back.mime_type'
+    | 'document.voter_identification.selfie.image'
+    | 'document.voter_identification.selfie.mime_type'
+    | 'document.voter_identification.full_name'
+    | 'document.voter_identification.dob'
+    | 'document.voter_identification.gender'
+    | 'document.voter_identification.full_address'
+    | 'document.voter_identification.document_number'
+    | 'document.voter_identification.expires_at'
+    | 'document.voter_identification.issued_at'
+    | 'document.voter_identification.issuing_state'
+    | 'document.voter_identification.issuing_country'
+    | 'document.voter_identification.ref_number'
+    | 'document.voter_identification.nationality'
+    | 'document.voter_identification.curp'
+    | 'document.voter_identification.clave_de_elector'
+    | 'document.voter_identification.classified_document_type'
+    | 'document.voter_identification.curp_validation_response'
+    | 'document.finra_compliance_letter'
+    | 'document.proof_of_address.image'
+    | 'document.ssn_card.image'
+    | 'document.custom.*'
+    | 'card.*.number'
+    | 'card.*.expiration'
+    | 'card.*.cvc'
+    | 'card.*.name'
+    | 'card.*.billing_address.zip'
+    | 'card.*.billing_address.country'
+    | 'card.*.expiration_month'
+    | 'card.*.expiration_year'
+    | 'card.*.number_last4'
+    | 'card.*.issuer'
+    | 'card.*.fingerprint'
+    | 'bank.*.name'
+    | 'bank.*.ach_routing_number'
+    | 'bank.*.ach_account_number'
+    | 'bank.*.ach_account_id'
+    | 'bank.*.account_type'
+    | 'bank.*.fingerprint';
+  '<value>': {
+    [key: string]: unknown;
+  };
+};
+export type __key_2 =
+  | 'id.first_name'
+  | 'id.middle_name'
+  | 'id.last_name'
+  | 'id.dob'
+  | 'id.ssn4'
+  | 'id.ssn9'
+  | 'id.address_line1'
+  | 'id.address_line2'
+  | 'id.city'
+  | 'id.state'
+  | 'id.zip'
+  | 'id.country'
+  | 'id.email'
+  | 'id.phone_number'
+  | 'id.us_legal_status'
+  | 'id.visa_kind'
+  | 'id.visa_expiration_date'
+  | 'id.nationality'
+  | 'id.citizenships'
+  | 'id.drivers_license_number'
+  | 'id.drivers_license_state'
+  | 'id.itin'
+  | 'id.us_tax_id'
+  | 'custom.*'
+  | 'investor_profile.employment_status'
+  | 'investor_profile.occupation'
+  | 'investor_profile.employer'
+  | 'investor_profile.annual_income'
+  | 'investor_profile.net_worth'
+  | 'investor_profile.investment_goals'
+  | 'investor_profile.risk_tolerance'
+  | 'investor_profile.declarations'
+  | 'investor_profile.brokerage_firm_employer'
+  | 'investor_profile.senior_executive_symbols'
+  | 'investor_profile.family_member_names'
+  | 'investor_profile.political_organization'
+  | 'investor_profile.funding_sources'
+  | 'document.id_card.front.image'
+  | 'document.id_card.front.mime_type'
+  | 'document.id_card.back.image'
+  | 'document.id_card.back.mime_type'
+  | 'document.id_card.selfie.image'
+  | 'document.id_card.selfie.mime_type'
+  | 'document.id_card.full_name'
+  | 'document.id_card.dob'
+  | 'document.id_card.gender'
+  | 'document.id_card.full_address'
+  | 'document.id_card.document_number'
+  | 'document.id_card.expires_at'
+  | 'document.id_card.issued_at'
+  | 'document.id_card.issuing_state'
+  | 'document.id_card.issuing_country'
+  | 'document.id_card.ref_number'
+  | 'document.id_card.nationality'
+  | 'document.id_card.curp'
+  | 'document.id_card.clave_de_elector'
+  | 'document.id_card.classified_document_type'
+  | 'document.id_card.curp_validation_response'
+  | 'document.drivers_license.front.image'
+  | 'document.drivers_license.front.mime_type'
+  | 'document.drivers_license.back.image'
+  | 'document.drivers_license.back.mime_type'
+  | 'document.drivers_license.selfie.image'
+  | 'document.drivers_license.selfie.mime_type'
+  | 'document.drivers_license.full_name'
+  | 'document.drivers_license.dob'
+  | 'document.drivers_license.gender'
+  | 'document.drivers_license.full_address'
+  | 'document.drivers_license.document_number'
+  | 'document.drivers_license.expires_at'
+  | 'document.drivers_license.issued_at'
+  | 'document.drivers_license.issuing_state'
+  | 'document.drivers_license.issuing_country'
+  | 'document.drivers_license.ref_number'
+  | 'document.drivers_license.nationality'
+  | 'document.drivers_license.curp'
+  | 'document.drivers_license.clave_de_elector'
+  | 'document.drivers_license.classified_document_type'
+  | 'document.drivers_license.curp_validation_response'
+  | 'document.passport.front.image'
+  | 'document.passport.front.mime_type'
+  | 'document.passport.back.image'
+  | 'document.passport.back.mime_type'
+  | 'document.passport.selfie.image'
+  | 'document.passport.selfie.mime_type'
+  | 'document.passport.full_name'
+  | 'document.passport.dob'
+  | 'document.passport.gender'
+  | 'document.passport.full_address'
+  | 'document.passport.document_number'
+  | 'document.passport.expires_at'
+  | 'document.passport.issued_at'
+  | 'document.passport.issuing_state'
+  | 'document.passport.issuing_country'
+  | 'document.passport.ref_number'
+  | 'document.passport.nationality'
+  | 'document.passport.curp'
+  | 'document.passport.clave_de_elector'
+  | 'document.passport.classified_document_type'
+  | 'document.passport.curp_validation_response'
+  | 'document.passport_card.front.image'
+  | 'document.passport_card.front.mime_type'
+  | 'document.passport_card.back.image'
+  | 'document.passport_card.back.mime_type'
+  | 'document.passport_card.selfie.image'
+  | 'document.passport_card.selfie.mime_type'
+  | 'document.passport_card.full_name'
+  | 'document.passport_card.dob'
+  | 'document.passport_card.gender'
+  | 'document.passport_card.full_address'
+  | 'document.passport_card.document_number'
+  | 'document.passport_card.expires_at'
+  | 'document.passport_card.issued_at'
+  | 'document.passport_card.issuing_state'
+  | 'document.passport_card.issuing_country'
+  | 'document.passport_card.ref_number'
+  | 'document.passport_card.nationality'
+  | 'document.passport_card.curp'
+  | 'document.passport_card.clave_de_elector'
+  | 'document.passport_card.classified_document_type'
+  | 'document.passport_card.curp_validation_response'
+  | 'document.permit.front.image'
+  | 'document.permit.front.mime_type'
+  | 'document.permit.back.image'
+  | 'document.permit.back.mime_type'
+  | 'document.permit.selfie.image'
+  | 'document.permit.selfie.mime_type'
+  | 'document.permit.full_name'
+  | 'document.permit.dob'
+  | 'document.permit.gender'
+  | 'document.permit.full_address'
+  | 'document.permit.document_number'
+  | 'document.permit.expires_at'
+  | 'document.permit.issued_at'
+  | 'document.permit.issuing_state'
+  | 'document.permit.issuing_country'
+  | 'document.permit.ref_number'
+  | 'document.permit.nationality'
+  | 'document.permit.curp'
+  | 'document.permit.clave_de_elector'
+  | 'document.permit.classified_document_type'
+  | 'document.permit.curp_validation_response'
+  | 'document.visa.front.image'
+  | 'document.visa.front.mime_type'
+  | 'document.visa.back.image'
+  | 'document.visa.back.mime_type'
+  | 'document.visa.selfie.image'
+  | 'document.visa.selfie.mime_type'
+  | 'document.visa.full_name'
+  | 'document.visa.dob'
+  | 'document.visa.gender'
+  | 'document.visa.full_address'
+  | 'document.visa.document_number'
+  | 'document.visa.expires_at'
+  | 'document.visa.issued_at'
+  | 'document.visa.issuing_state'
+  | 'document.visa.issuing_country'
+  | 'document.visa.ref_number'
+  | 'document.visa.nationality'
+  | 'document.visa.curp'
+  | 'document.visa.clave_de_elector'
+  | 'document.visa.classified_document_type'
+  | 'document.visa.curp_validation_response'
+  | 'document.residence_document.front.image'
+  | 'document.residence_document.front.mime_type'
+  | 'document.residence_document.back.image'
+  | 'document.residence_document.back.mime_type'
+  | 'document.residence_document.selfie.image'
+  | 'document.residence_document.selfie.mime_type'
+  | 'document.residence_document.full_name'
+  | 'document.residence_document.dob'
+  | 'document.residence_document.gender'
+  | 'document.residence_document.full_address'
+  | 'document.residence_document.document_number'
+  | 'document.residence_document.expires_at'
+  | 'document.residence_document.issued_at'
+  | 'document.residence_document.issuing_state'
+  | 'document.residence_document.issuing_country'
+  | 'document.residence_document.ref_number'
+  | 'document.residence_document.nationality'
+  | 'document.residence_document.curp'
+  | 'document.residence_document.clave_de_elector'
+  | 'document.residence_document.classified_document_type'
+  | 'document.residence_document.curp_validation_response'
+  | 'document.voter_identification.front.image'
+  | 'document.voter_identification.front.mime_type'
+  | 'document.voter_identification.back.image'
+  | 'document.voter_identification.back.mime_type'
+  | 'document.voter_identification.selfie.image'
+  | 'document.voter_identification.selfie.mime_type'
+  | 'document.voter_identification.full_name'
+  | 'document.voter_identification.dob'
+  | 'document.voter_identification.gender'
+  | 'document.voter_identification.full_address'
+  | 'document.voter_identification.document_number'
+  | 'document.voter_identification.expires_at'
+  | 'document.voter_identification.issued_at'
+  | 'document.voter_identification.issuing_state'
+  | 'document.voter_identification.issuing_country'
+  | 'document.voter_identification.ref_number'
+  | 'document.voter_identification.nationality'
+  | 'document.voter_identification.curp'
+  | 'document.voter_identification.clave_de_elector'
+  | 'document.voter_identification.classified_document_type'
+  | 'document.voter_identification.curp_validation_response'
+  | 'document.finra_compliance_letter'
+  | 'document.proof_of_address.image'
+  | 'document.ssn_card.image'
+  | 'document.custom.*'
+  | 'card.*.number'
+  | 'card.*.expiration'
+  | 'card.*.cvc'
+  | 'card.*.name'
+  | 'card.*.billing_address.zip'
+  | 'card.*.billing_address.country'
+  | 'card.*.expiration_month'
+  | 'card.*.expiration_year'
+  | 'card.*.number_last4'
+  | 'card.*.issuer'
+  | 'card.*.fingerprint'
+  | 'bank.*.name'
+  | 'bank.*.ach_routing_number'
+  | 'bank.*.ach_account_number'
+  | 'bank.*.ach_account_id'
+  | 'bank.*.account_type'
+  | 'bank.*.fingerprint';
 export type SdkArgs = string;
 export type SignupChallengeRequest = {
   challengeKind: 'sms' | 'biometric' | 'email';
@@ -2416,22 +2868,6 @@ export type SignupChallengeRequest = {
     value: string;
   };
   scope: 'my1fp' | 'onboarding' | 'auth';
-};
-export type SignupChallengeResponse = {
-  challengeData: {
-    biometricChallengeJson?: string;
-    challengeKind: 'sms' | 'biometric' | 'email';
-    /**
-     * Encrypted, base64-encoded challenge information
-     */
-    challengeToken: string;
-    timeBeforeRetryS: number;
-    /**
-     * Auth token to pass to the verify call
-     */
-    token: string;
-  };
-  error?: string;
 };
 export type SkipPasskeyRegisterRequest = {
   context?: {
@@ -2499,16 +2935,249 @@ export type UserChallengeVerifyRequest = {
    */
   challengeToken: string;
 };
+export type UserChallengeVerifyResponse = {
+  /**
+   * The new token issued after completing the challenge
+   */
+  authToken: string;
+};
 export type UserDecryptRequest = {
   /**
    * List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
    * `custom.bank_account`
    */
-  fields?: Array<VaultDI>;
+  fields?: Array<
+    | 'id.first_name'
+    | 'id.middle_name'
+    | 'id.last_name'
+    | 'id.dob'
+    | 'id.ssn4'
+    | 'id.ssn9'
+    | 'id.address_line1'
+    | 'id.address_line2'
+    | 'id.city'
+    | 'id.state'
+    | 'id.zip'
+    | 'id.country'
+    | 'id.email'
+    | 'id.phone_number'
+    | 'id.us_legal_status'
+    | 'id.visa_kind'
+    | 'id.visa_expiration_date'
+    | 'id.nationality'
+    | 'id.citizenships'
+    | 'id.drivers_license_number'
+    | 'id.drivers_license_state'
+    | 'id.itin'
+    | 'id.us_tax_id'
+    | 'custom.*'
+    | 'investor_profile.employment_status'
+    | 'investor_profile.occupation'
+    | 'investor_profile.employer'
+    | 'investor_profile.annual_income'
+    | 'investor_profile.net_worth'
+    | 'investor_profile.investment_goals'
+    | 'investor_profile.risk_tolerance'
+    | 'investor_profile.declarations'
+    | 'investor_profile.brokerage_firm_employer'
+    | 'investor_profile.senior_executive_symbols'
+    | 'investor_profile.family_member_names'
+    | 'investor_profile.political_organization'
+    | 'investor_profile.funding_sources'
+    | 'document.id_card.front.image'
+    | 'document.id_card.front.mime_type'
+    | 'document.id_card.back.image'
+    | 'document.id_card.back.mime_type'
+    | 'document.id_card.selfie.image'
+    | 'document.id_card.selfie.mime_type'
+    | 'document.id_card.full_name'
+    | 'document.id_card.dob'
+    | 'document.id_card.gender'
+    | 'document.id_card.full_address'
+    | 'document.id_card.document_number'
+    | 'document.id_card.expires_at'
+    | 'document.id_card.issued_at'
+    | 'document.id_card.issuing_state'
+    | 'document.id_card.issuing_country'
+    | 'document.id_card.ref_number'
+    | 'document.id_card.nationality'
+    | 'document.id_card.curp'
+    | 'document.id_card.clave_de_elector'
+    | 'document.id_card.classified_document_type'
+    | 'document.id_card.curp_validation_response'
+    | 'document.drivers_license.front.image'
+    | 'document.drivers_license.front.mime_type'
+    | 'document.drivers_license.back.image'
+    | 'document.drivers_license.back.mime_type'
+    | 'document.drivers_license.selfie.image'
+    | 'document.drivers_license.selfie.mime_type'
+    | 'document.drivers_license.full_name'
+    | 'document.drivers_license.dob'
+    | 'document.drivers_license.gender'
+    | 'document.drivers_license.full_address'
+    | 'document.drivers_license.document_number'
+    | 'document.drivers_license.expires_at'
+    | 'document.drivers_license.issued_at'
+    | 'document.drivers_license.issuing_state'
+    | 'document.drivers_license.issuing_country'
+    | 'document.drivers_license.ref_number'
+    | 'document.drivers_license.nationality'
+    | 'document.drivers_license.curp'
+    | 'document.drivers_license.clave_de_elector'
+    | 'document.drivers_license.classified_document_type'
+    | 'document.drivers_license.curp_validation_response'
+    | 'document.passport.front.image'
+    | 'document.passport.front.mime_type'
+    | 'document.passport.back.image'
+    | 'document.passport.back.mime_type'
+    | 'document.passport.selfie.image'
+    | 'document.passport.selfie.mime_type'
+    | 'document.passport.full_name'
+    | 'document.passport.dob'
+    | 'document.passport.gender'
+    | 'document.passport.full_address'
+    | 'document.passport.document_number'
+    | 'document.passport.expires_at'
+    | 'document.passport.issued_at'
+    | 'document.passport.issuing_state'
+    | 'document.passport.issuing_country'
+    | 'document.passport.ref_number'
+    | 'document.passport.nationality'
+    | 'document.passport.curp'
+    | 'document.passport.clave_de_elector'
+    | 'document.passport.classified_document_type'
+    | 'document.passport.curp_validation_response'
+    | 'document.passport_card.front.image'
+    | 'document.passport_card.front.mime_type'
+    | 'document.passport_card.back.image'
+    | 'document.passport_card.back.mime_type'
+    | 'document.passport_card.selfie.image'
+    | 'document.passport_card.selfie.mime_type'
+    | 'document.passport_card.full_name'
+    | 'document.passport_card.dob'
+    | 'document.passport_card.gender'
+    | 'document.passport_card.full_address'
+    | 'document.passport_card.document_number'
+    | 'document.passport_card.expires_at'
+    | 'document.passport_card.issued_at'
+    | 'document.passport_card.issuing_state'
+    | 'document.passport_card.issuing_country'
+    | 'document.passport_card.ref_number'
+    | 'document.passport_card.nationality'
+    | 'document.passport_card.curp'
+    | 'document.passport_card.clave_de_elector'
+    | 'document.passport_card.classified_document_type'
+    | 'document.passport_card.curp_validation_response'
+    | 'document.permit.front.image'
+    | 'document.permit.front.mime_type'
+    | 'document.permit.back.image'
+    | 'document.permit.back.mime_type'
+    | 'document.permit.selfie.image'
+    | 'document.permit.selfie.mime_type'
+    | 'document.permit.full_name'
+    | 'document.permit.dob'
+    | 'document.permit.gender'
+    | 'document.permit.full_address'
+    | 'document.permit.document_number'
+    | 'document.permit.expires_at'
+    | 'document.permit.issued_at'
+    | 'document.permit.issuing_state'
+    | 'document.permit.issuing_country'
+    | 'document.permit.ref_number'
+    | 'document.permit.nationality'
+    | 'document.permit.curp'
+    | 'document.permit.clave_de_elector'
+    | 'document.permit.classified_document_type'
+    | 'document.permit.curp_validation_response'
+    | 'document.visa.front.image'
+    | 'document.visa.front.mime_type'
+    | 'document.visa.back.image'
+    | 'document.visa.back.mime_type'
+    | 'document.visa.selfie.image'
+    | 'document.visa.selfie.mime_type'
+    | 'document.visa.full_name'
+    | 'document.visa.dob'
+    | 'document.visa.gender'
+    | 'document.visa.full_address'
+    | 'document.visa.document_number'
+    | 'document.visa.expires_at'
+    | 'document.visa.issued_at'
+    | 'document.visa.issuing_state'
+    | 'document.visa.issuing_country'
+    | 'document.visa.ref_number'
+    | 'document.visa.nationality'
+    | 'document.visa.curp'
+    | 'document.visa.clave_de_elector'
+    | 'document.visa.classified_document_type'
+    | 'document.visa.curp_validation_response'
+    | 'document.residence_document.front.image'
+    | 'document.residence_document.front.mime_type'
+    | 'document.residence_document.back.image'
+    | 'document.residence_document.back.mime_type'
+    | 'document.residence_document.selfie.image'
+    | 'document.residence_document.selfie.mime_type'
+    | 'document.residence_document.full_name'
+    | 'document.residence_document.dob'
+    | 'document.residence_document.gender'
+    | 'document.residence_document.full_address'
+    | 'document.residence_document.document_number'
+    | 'document.residence_document.expires_at'
+    | 'document.residence_document.issued_at'
+    | 'document.residence_document.issuing_state'
+    | 'document.residence_document.issuing_country'
+    | 'document.residence_document.ref_number'
+    | 'document.residence_document.nationality'
+    | 'document.residence_document.curp'
+    | 'document.residence_document.clave_de_elector'
+    | 'document.residence_document.classified_document_type'
+    | 'document.residence_document.curp_validation_response'
+    | 'document.voter_identification.front.image'
+    | 'document.voter_identification.front.mime_type'
+    | 'document.voter_identification.back.image'
+    | 'document.voter_identification.back.mime_type'
+    | 'document.voter_identification.selfie.image'
+    | 'document.voter_identification.selfie.mime_type'
+    | 'document.voter_identification.full_name'
+    | 'document.voter_identification.dob'
+    | 'document.voter_identification.gender'
+    | 'document.voter_identification.full_address'
+    | 'document.voter_identification.document_number'
+    | 'document.voter_identification.expires_at'
+    | 'document.voter_identification.issued_at'
+    | 'document.voter_identification.issuing_state'
+    | 'document.voter_identification.issuing_country'
+    | 'document.voter_identification.ref_number'
+    | 'document.voter_identification.nationality'
+    | 'document.voter_identification.curp'
+    | 'document.voter_identification.clave_de_elector'
+    | 'document.voter_identification.classified_document_type'
+    | 'document.voter_identification.curp_validation_response'
+    | 'document.finra_compliance_letter'
+    | 'document.proof_of_address.image'
+    | 'document.ssn_card.image'
+    | 'document.custom.*'
+    | 'card.*.number'
+    | 'card.*.expiration'
+    | 'card.*.cvc'
+    | 'card.*.name'
+    | 'card.*.billing_address.zip'
+    | 'card.*.billing_address.country'
+    | 'card.*.expiration_month'
+    | 'card.*.expiration_year'
+    | 'card.*.number_last4'
+    | 'card.*.issuer'
+    | 'card.*.fingerprint'
+    | 'bank.*.name'
+    | 'bank.*.ach_routing_number'
+    | 'bank.*.ach_account_number'
+    | 'bank.*.ach_account_id'
+    | 'bank.*.account_type'
+    | 'bank.*.fingerprint'
+  >;
   /**
    * Reason for the data decryption. This will be logged
    */
-  reason?: string;
+  reason: string;
   /**
    * A list of filter and transform functions to apply to each decrypted datum.
    * Omit or leave empty to apply no transforms.
@@ -2531,223 +3200,254 @@ export type UserDecryptRequest = {
    */
   versionAt?: string;
 };
-export type UserDecryptResponse = VaultData;
-export type VaultData = {
-  'id.address_line1'?: string;
-  'id.address_line2'?: string;
-  /**
-   * Array of 2 letter country codes
-   */
-  'id.citizenships'?: Array<string>;
-  'id.city'?: string;
-  /**
-   * 2 letter country code
-   */
-  'id.country'?: string;
-  'id.dob'?: string;
-  'id.drivers_license_number'?: string;
-  'id.drivers_license_state'?: string;
-  'id.email'?: string;
-  'id.first_name'?: string;
-  'id.itin'?: string;
-  'id.last_name'?: string;
-  'id.middle_name'?: string;
-  /**
-   * 2 letter country code
-   */
-  'id.nationality'?: string;
-  'id.phone_number'?: string;
-  'id.ssn4'?: string;
-  'id.ssn9'?: string;
-  'id.state'?: string;
-  'id.us_legal_status'?: string;
-  'id.us_tax_id'?: string;
-  'id.visa_expiration_date'?: string;
-  'id.visa_kind'?: string;
-  'id.zip'?: string;
-  'investor_profile.employment_status'?: 'employed' | 'unemployed' | 'student' | 'retired';
-  'investor_profile.occupation'?: string;
-  'investor_profile.employer'?: string;
-  'investor_profile.annual_income'?:
-    | 'le25k'
-    | 'gt25k_le50k'
-    | 'gt50k_le100k'
-    | 'gt100k_le200k'
-    | 'gt200k_le300k'
-    | 'gt300k_le500k'
-    | 'gt500k_le1200k';
-  'investor_profile.net_worth'?:
-    | 'le50k'
-    | 'gt50k_le100k'
-    | 'gt100k_le200k'
-    | 'gt200k_le500k'
-    | 'gt500k_le1m'
-    | 'gt1m_le5m'
-    | 'gt5m';
-  'investor_profile.funding_sources'?:
-    | 'employment_income'
-    | 'investments'
-    | 'inheritance'
-    | 'business_income'
-    | 'savings'
-    | 'family';
-  'investor_profile.investment_goals'?: Array<
-    'growth' | 'income' | 'preserve_capital' | 'speculation' | 'diversification' | 'other'
-  >;
-  'investor_profile.risk_tolerance'?: 'conservative' | 'moderate' | 'aggressive';
-  'investor_profile.declarations'?: Array<'affiliated_with_us_broker' | 'senior_executive' | 'senior_political_figure'>;
-  'investor_profile.senior_executive_symbols'?: Array<string>;
-  'investor_profile.family_member_names'?: Array<string>;
-  'investor_profile.political_organization'?: string;
-  'investor_profile.brokerage_firm_employer'?: string;
+/**
+ * A key-value map with the corresponding decrypted values
+ */
+export type UserDecryptResponse = {
+  '<key>':
+    | 'id.first_name'
+    | 'id.middle_name'
+    | 'id.last_name'
+    | 'id.dob'
+    | 'id.ssn4'
+    | 'id.ssn9'
+    | 'id.address_line1'
+    | 'id.address_line2'
+    | 'id.city'
+    | 'id.state'
+    | 'id.zip'
+    | 'id.country'
+    | 'id.email'
+    | 'id.phone_number'
+    | 'id.us_legal_status'
+    | 'id.visa_kind'
+    | 'id.visa_expiration_date'
+    | 'id.nationality'
+    | 'id.citizenships'
+    | 'id.drivers_license_number'
+    | 'id.drivers_license_state'
+    | 'id.itin'
+    | 'id.us_tax_id'
+    | 'custom.*'
+    | 'investor_profile.employment_status'
+    | 'investor_profile.occupation'
+    | 'investor_profile.employer'
+    | 'investor_profile.annual_income'
+    | 'investor_profile.net_worth'
+    | 'investor_profile.investment_goals'
+    | 'investor_profile.risk_tolerance'
+    | 'investor_profile.declarations'
+    | 'investor_profile.brokerage_firm_employer'
+    | 'investor_profile.senior_executive_symbols'
+    | 'investor_profile.family_member_names'
+    | 'investor_profile.political_organization'
+    | 'investor_profile.funding_sources'
+    | 'document.id_card.front.image'
+    | 'document.id_card.front.mime_type'
+    | 'document.id_card.back.image'
+    | 'document.id_card.back.mime_type'
+    | 'document.id_card.selfie.image'
+    | 'document.id_card.selfie.mime_type'
+    | 'document.id_card.full_name'
+    | 'document.id_card.dob'
+    | 'document.id_card.gender'
+    | 'document.id_card.full_address'
+    | 'document.id_card.document_number'
+    | 'document.id_card.expires_at'
+    | 'document.id_card.issued_at'
+    | 'document.id_card.issuing_state'
+    | 'document.id_card.issuing_country'
+    | 'document.id_card.ref_number'
+    | 'document.id_card.nationality'
+    | 'document.id_card.curp'
+    | 'document.id_card.clave_de_elector'
+    | 'document.id_card.classified_document_type'
+    | 'document.id_card.curp_validation_response'
+    | 'document.drivers_license.front.image'
+    | 'document.drivers_license.front.mime_type'
+    | 'document.drivers_license.back.image'
+    | 'document.drivers_license.back.mime_type'
+    | 'document.drivers_license.selfie.image'
+    | 'document.drivers_license.selfie.mime_type'
+    | 'document.drivers_license.full_name'
+    | 'document.drivers_license.dob'
+    | 'document.drivers_license.gender'
+    | 'document.drivers_license.full_address'
+    | 'document.drivers_license.document_number'
+    | 'document.drivers_license.expires_at'
+    | 'document.drivers_license.issued_at'
+    | 'document.drivers_license.issuing_state'
+    | 'document.drivers_license.issuing_country'
+    | 'document.drivers_license.ref_number'
+    | 'document.drivers_license.nationality'
+    | 'document.drivers_license.curp'
+    | 'document.drivers_license.clave_de_elector'
+    | 'document.drivers_license.classified_document_type'
+    | 'document.drivers_license.curp_validation_response'
+    | 'document.passport.front.image'
+    | 'document.passport.front.mime_type'
+    | 'document.passport.back.image'
+    | 'document.passport.back.mime_type'
+    | 'document.passport.selfie.image'
+    | 'document.passport.selfie.mime_type'
+    | 'document.passport.full_name'
+    | 'document.passport.dob'
+    | 'document.passport.gender'
+    | 'document.passport.full_address'
+    | 'document.passport.document_number'
+    | 'document.passport.expires_at'
+    | 'document.passport.issued_at'
+    | 'document.passport.issuing_state'
+    | 'document.passport.issuing_country'
+    | 'document.passport.ref_number'
+    | 'document.passport.nationality'
+    | 'document.passport.curp'
+    | 'document.passport.clave_de_elector'
+    | 'document.passport.classified_document_type'
+    | 'document.passport.curp_validation_response'
+    | 'document.passport_card.front.image'
+    | 'document.passport_card.front.mime_type'
+    | 'document.passport_card.back.image'
+    | 'document.passport_card.back.mime_type'
+    | 'document.passport_card.selfie.image'
+    | 'document.passport_card.selfie.mime_type'
+    | 'document.passport_card.full_name'
+    | 'document.passport_card.dob'
+    | 'document.passport_card.gender'
+    | 'document.passport_card.full_address'
+    | 'document.passport_card.document_number'
+    | 'document.passport_card.expires_at'
+    | 'document.passport_card.issued_at'
+    | 'document.passport_card.issuing_state'
+    | 'document.passport_card.issuing_country'
+    | 'document.passport_card.ref_number'
+    | 'document.passport_card.nationality'
+    | 'document.passport_card.curp'
+    | 'document.passport_card.clave_de_elector'
+    | 'document.passport_card.classified_document_type'
+    | 'document.passport_card.curp_validation_response'
+    | 'document.permit.front.image'
+    | 'document.permit.front.mime_type'
+    | 'document.permit.back.image'
+    | 'document.permit.back.mime_type'
+    | 'document.permit.selfie.image'
+    | 'document.permit.selfie.mime_type'
+    | 'document.permit.full_name'
+    | 'document.permit.dob'
+    | 'document.permit.gender'
+    | 'document.permit.full_address'
+    | 'document.permit.document_number'
+    | 'document.permit.expires_at'
+    | 'document.permit.issued_at'
+    | 'document.permit.issuing_state'
+    | 'document.permit.issuing_country'
+    | 'document.permit.ref_number'
+    | 'document.permit.nationality'
+    | 'document.permit.curp'
+    | 'document.permit.clave_de_elector'
+    | 'document.permit.classified_document_type'
+    | 'document.permit.curp_validation_response'
+    | 'document.visa.front.image'
+    | 'document.visa.front.mime_type'
+    | 'document.visa.back.image'
+    | 'document.visa.back.mime_type'
+    | 'document.visa.selfie.image'
+    | 'document.visa.selfie.mime_type'
+    | 'document.visa.full_name'
+    | 'document.visa.dob'
+    | 'document.visa.gender'
+    | 'document.visa.full_address'
+    | 'document.visa.document_number'
+    | 'document.visa.expires_at'
+    | 'document.visa.issued_at'
+    | 'document.visa.issuing_state'
+    | 'document.visa.issuing_country'
+    | 'document.visa.ref_number'
+    | 'document.visa.nationality'
+    | 'document.visa.curp'
+    | 'document.visa.clave_de_elector'
+    | 'document.visa.classified_document_type'
+    | 'document.visa.curp_validation_response'
+    | 'document.residence_document.front.image'
+    | 'document.residence_document.front.mime_type'
+    | 'document.residence_document.back.image'
+    | 'document.residence_document.back.mime_type'
+    | 'document.residence_document.selfie.image'
+    | 'document.residence_document.selfie.mime_type'
+    | 'document.residence_document.full_name'
+    | 'document.residence_document.dob'
+    | 'document.residence_document.gender'
+    | 'document.residence_document.full_address'
+    | 'document.residence_document.document_number'
+    | 'document.residence_document.expires_at'
+    | 'document.residence_document.issued_at'
+    | 'document.residence_document.issuing_state'
+    | 'document.residence_document.issuing_country'
+    | 'document.residence_document.ref_number'
+    | 'document.residence_document.nationality'
+    | 'document.residence_document.curp'
+    | 'document.residence_document.clave_de_elector'
+    | 'document.residence_document.classified_document_type'
+    | 'document.residence_document.curp_validation_response'
+    | 'document.voter_identification.front.image'
+    | 'document.voter_identification.front.mime_type'
+    | 'document.voter_identification.back.image'
+    | 'document.voter_identification.back.mime_type'
+    | 'document.voter_identification.selfie.image'
+    | 'document.voter_identification.selfie.mime_type'
+    | 'document.voter_identification.full_name'
+    | 'document.voter_identification.dob'
+    | 'document.voter_identification.gender'
+    | 'document.voter_identification.full_address'
+    | 'document.voter_identification.document_number'
+    | 'document.voter_identification.expires_at'
+    | 'document.voter_identification.issued_at'
+    | 'document.voter_identification.issuing_state'
+    | 'document.voter_identification.issuing_country'
+    | 'document.voter_identification.ref_number'
+    | 'document.voter_identification.nationality'
+    | 'document.voter_identification.curp'
+    | 'document.voter_identification.clave_de_elector'
+    | 'document.voter_identification.classified_document_type'
+    | 'document.voter_identification.curp_validation_response'
+    | 'document.finra_compliance_letter'
+    | 'document.proof_of_address.image'
+    | 'document.ssn_card.image'
+    | 'document.custom.*'
+    | 'card.*.number'
+    | 'card.*.expiration'
+    | 'card.*.cvc'
+    | 'card.*.name'
+    | 'card.*.billing_address.zip'
+    | 'card.*.billing_address.country'
+    | 'card.*.expiration_month'
+    | 'card.*.expiration_year'
+    | 'card.*.number_last4'
+    | 'card.*.issuer'
+    | 'card.*.fingerprint'
+    | 'bank.*.name'
+    | 'bank.*.ach_routing_number'
+    | 'bank.*.ach_account_number'
+    | 'bank.*.ach_account_id'
+    | 'bank.*.account_type'
+    | 'bank.*.fingerprint';
+  '<value>': {
+    [key: string]: unknown;
+  };
 };
-export type investor_profile_employment_status = 'employed' | 'unemployed' | 'student' | 'retired';
-export type investor_profile_annual_income =
-  | 'le25k'
-  | 'gt25k_le50k'
-  | 'gt50k_le100k'
-  | 'gt100k_le200k'
-  | 'gt200k_le300k'
-  | 'gt300k_le500k'
-  | 'gt500k_le1200k';
-export type investor_profile_net_worth =
-  | 'le50k'
-  | 'gt50k_le100k'
-  | 'gt100k_le200k'
-  | 'gt200k_le500k'
-  | 'gt500k_le1m'
-  | 'gt1m_le5m'
-  | 'gt5m';
-export type investor_profile_funding_sources =
-  | 'employment_income'
-  | 'investments'
-  | 'inheritance'
-  | 'business_income'
-  | 'savings'
-  | 'family';
-export type investor_profile_risk_tolerance = 'conservative' | 'moderate' | 'aggressive';
-export type VaultBadRequestResponse = {
-  context?: VaultData;
-} & ErrorResponse;
-export type ErrorResponse = {
-  code?: string;
-  debug: string;
-  message: string;
-  supportId: string;
-};
-export type Requirement =
-  | CollectDataRequirement
-  | RegisterAuthMethodRequirement
-  | RegisterPasskeyRequirement
-  | DocumentRequirement
-  | AuthorizeRequirement
-  | ProcessRequirement
-  | CollectInvestorProfileRequirement;
-export type RegisterAuthMethodRequirement = {
-  kind: 'register_auth_method';
-  isMet: boolean;
-  authMethodKind: 'phone' | 'email' | 'passkey';
-};
-export type kind3 = 'register_auth_method';
-export type auth_method_kind = 'phone' | 'email' | 'passkey';
-export type CollectInvestorProfileRequirement = {
-  kind: 'investor_profile';
-  isMet: boolean;
-  missingAttributes: Array<'investor_profile'>;
-};
-export type kind4 = 'investor_profile';
-export type RegisterPasskeyRequirement = {
-  kind: 'liveness';
-  isMet: boolean;
-};
-export type kind5 = 'liveness';
-export type AuthorizeRequirement = {
-  kind: 'authorize';
-  isMet: boolean;
-  fieldsToAuthorize: AuthorizeFields;
-};
-export type kind6 = 'authorize';
-export type ProcessRequirement = {
-  kind: 'process';
-  isMet: boolean;
-};
-export type kind7 = 'process';
-export type AuthorizeFields = {
-  [key: string]: unknown;
-};
-export type DocumentRequirement = {
-  kind: 'collect_document';
-  isMet: boolean;
-  documentRequestId: string;
-  uploadSettings: 'prefer_capture' | 'prefer_upload' | 'captureOnlyOnMobile';
-  config: DocumentRequirementConfig;
-};
-export type kind8 = 'collect_document';
-export type upload_settings = 'prefer_capture' | 'prefer_upload' | 'captureOnlyOnMobile';
-export type DocumentRequirementConfig = {
-  [key: string]: unknown;
-};
-export type CollectDataRequirement = {
-  kind: 'collect_data';
-  isMet: boolean;
-  missingAttributes: Array<CollectedAttributes>;
-  optionalAttributes: Array<CollectedAttributes>;
-  populatedAttributes: Array<CollectedAttributes>;
-};
-export type kind9 = 'collect_data';
-export type VaultDI =
-  | 'id.first_name'
-  | 'id.middle_name'
-  | 'id.last_name'
-  | 'id.dob'
-  | 'id.ssn4'
-  | 'id.ssn9'
-  | 'id.address_line1'
-  | 'id.address_line2'
-  | 'id.city'
-  | 'id.state'
-  | 'id.zip'
-  | 'id.country'
-  | 'id.email'
-  | 'id.phone_number'
-  | 'id.us_legal_status'
-  | 'id.visa_kind'
-  | 'id.visa_expiration_date'
-  | 'id.nationality'
-  | 'id.citizenships'
-  | 'id.drivers_license_number'
-  | 'id.drivers_license_state'
-  | 'id.itin'
-  | 'id.us_tax_id'
-  | 'custom.*'
-  | 'investor_profile.employment_status'
-  | 'investor_profile.occupation'
-  | 'investor_profile.employer'
-  | 'investor_profile.annual_income'
-  | 'investor_profile.net_worth'
-  | 'investor_profile.investment_goals'
-  | 'investor_profile.risk_tolerance'
-  | 'investor_profile.declarations'
-  | 'investor_profile.brokerage_firm_employer'
-  | 'investor_profile.senior_executive_symbols'
-  | 'investor_profile.family_member_names'
-  | 'investor_profile.political_organization'
-  | 'investor_profile.funding_sources';
-export type CollectedAttributes =
-  | 'name'
-  | 'dob'
-  | 'ssn4'
-  | 'ssn9'
-  | 'full_address'
-  | 'email'
-  | 'phone_number'
-  | 'nationality'
-  | 'us_legal_status'
-  | 'us_tax_id'
-  | 'investor_profile';
 export type GetHostedBusinessResponse = HostedBusiness;
 export type GetHostedBusinessError = unknown;
+export type GetHostedBusinessOwnersResponse = Array<HostedBusinessOwner>;
+export type GetHostedBusinessOwnersError = unknown;
+export type PatchHostedBusinessOwnersData = {
+  body: Array<BatchHostedBusinessOwnerRequest>;
+};
+export type PatchHostedBusinessOwnersResponse = Array<HostedBusinessOwner>;
+export type PatchHostedBusinessOwnersError = unknown;
 export type PatchHostedBusinessVaultData = {
+  /**
+   * Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+   */
   body: RawBusinessDataRequest;
 };
 export type PatchHostedBusinessVaultResponse = Empty;
@@ -2758,10 +3458,15 @@ export type PostHostedBusinessVaultDecryptData = {
 export type PostHostedBusinessVaultDecryptResponse = BusinessDecryptResponse;
 export type PostHostedBusinessVaultDecryptError = unknown;
 export type PostHostedBusinessVaultValidateData = {
+  /**
+   * Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+   */
   body: RawBusinessDataRequest;
 };
 export type PostHostedBusinessVaultValidateResponse = Empty;
 export type PostHostedBusinessVaultValidateError = unknown;
+export type GetHostedBusinessesResponse = Array<HostedBusinessList>;
+export type GetHostedBusinessesError = unknown;
 export type GetHostedCheckSessionResponse = CheckSessionResponse;
 export type GetHostedCheckSessionError = unknown;
 export type PostHostedDocumentsData = {
@@ -2784,22 +3489,23 @@ export type PostHostedDocumentsByIdUploadBySideData = {
 };
 export type PostHostedDocumentsByIdUploadBySideResponse = Empty;
 export type PostHostedDocumentsByIdUploadBySideError = unknown;
-export type IdentifyData = {
+export type PostHostedIdentifyData = {
   body: IdentifyRequest;
-  headers: {
-    'X-Fp-Authorization'?: string;
-    'X-Onboarding-Config-Key': string;
+  headers?: {
     /**
      * When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
      *
      */
-    'X-Sandbox-Id'?: string;
+    'x-sandbox-id'?: string;
   };
 };
-export type IdentifyResponse2 = IdentifyResponse;
-export type IdentifyError = unknown;
+export type PostHostedIdentifyResponse = IdentifyResponse;
+export type PostHostedIdentifyError = unknown;
 export type PostHostedIdentifyKbaData = {
-  body: VaultData;
+  /**
+   * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+   */
+  body: RawUserDataRequest;
 };
 export type PostHostedIdentifyKbaResponse = KbaResponse;
 export type PostHostedIdentifyKbaError = unknown;
@@ -2808,64 +3514,43 @@ export type PostHostedIdentifyLiteData = {
 };
 export type PostHostedIdentifyLiteResponse = LiteIdentifyResponse;
 export type PostHostedIdentifyLiteError = unknown;
-export type LoginChallengeData = {
+export type PostHostedIdentifyLoginChallengeData = {
   body: LoginChallengeRequest;
-  headers: {
-    'X-Fp-Authorization': string;
-  };
 };
-export type LoginChallengeResponse2 = LoginChallengeResponse;
-export type LoginChallengeError = unknown;
-export type SignupChallengeData = {
+export type PostHostedIdentifyLoginChallengeResponse = IdentifyChallengeResponse;
+export type PostHostedIdentifyLoginChallengeError = unknown;
+export type PostHostedIdentifySignupChallengeData = {
   body: SignupChallengeRequest;
-  headers: {
+  headers?: {
     /**
      * When a non-empty value is provided, indicates that the request is originating from the components SDK
      */
-    'X-Fp-Is-Components-Sdk'?: boolean;
-    'X-Onboarding-Config-Key': string;
+    'x-fp-is-components-sdk'?: boolean;
     /**
      * When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
      *
      */
-    'X-Sandbox-Id'?: string;
+    'x-sandbox-id'?: string;
   };
 };
-export type SignupChallengeResponse2 = SignupChallengeResponse;
-export type SignupChallengeError = unknown;
-export type ValidationTokenData = {
-  headers: {
-    'X-Fp-Authorization': string;
-  };
-};
-export type ValidationTokenResponse = HostedValidateResponse;
-export type ValidationTokenError = unknown;
-export type VerifyData = {
+export type PostHostedIdentifySignupChallengeResponse = IdentifyChallengeResponse;
+export type PostHostedIdentifySignupChallengeError = unknown;
+export type PostHostedIdentifyValidationTokenResponse = HostedValidateResponse;
+export type PostHostedIdentifyValidationTokenError = unknown;
+export type PostHostedIdentifyVerifyData = {
   body: IdentifyVerifyRequest;
-  headers: {
-    'X-Fp-Authorization': string;
-    'X-Onboarding-Config-Key': string;
-  };
 };
-export type VerifyResponse = IdentifyVerifyResponse;
-export type VerifyError = unknown;
-export type OnboardingData = {
+export type PostHostedIdentifyVerifyResponse = IdentifyVerifyResponse;
+export type PostHostedIdentifyVerifyError = unknown;
+export type PostHostedOnboardingData = {
   body?: PostOnboardingRequest;
-  headers: {
-    'X-Fp-Authorization': string;
-  };
 };
-export type OnboardingResponse2 = OnboardingResponse;
-export type OnboardingError = unknown;
+export type PostHostedOnboardingResponse = OnboardingResponse;
+export type PostHostedOnboardingError = unknown;
 export type PostHostedOnboardingAuthorizeResponse = Empty;
 export type PostHostedOnboardingAuthorizeError = unknown;
-export type GetOnboardingConfigData = {
-  headers: {
-    'X-Onboarding-Config-Key': string;
-  };
-};
-export type GetOnboardingConfigResponse = PublicOnboardingConfiguration;
-export type GetOnboardingConfigError = unknown;
+export type GetHostedOnboardingConfigResponse = PublicOnboardingConfiguration;
+export type GetHostedOnboardingConfigError = unknown;
 export type HostedOnboardingD2pGenerateData = {
   body: D2pGenerateRequest;
 };
@@ -2890,16 +3575,11 @@ export type PostHostedOnboardingFpResponse = Empty;
 export type PostHostedOnboardingFpError = unknown;
 export type GetHostedOnboardingNidResponse = NeuroIdentityIdResponse;
 export type GetHostedOnboardingNidError = unknown;
-export type GetHostedOnboardingPrivacyPassResponse = unknown;
-export type GetHostedOnboardingPrivacyPassError = unknown;
-export type ProcessData = {
+export type PostHostedOnboardingProcessData = {
   body?: ProcessRequest;
-  headers: {
-    'X-Fp-Authorization': string;
-  };
 };
-export type ProcessResponse = Empty;
-export type ProcessError = ErrorResponse;
+export type PostHostedOnboardingProcessResponse = Empty;
+export type PostHostedOnboardingProcessError = unknown;
 export type PostHostedOnboardingSdsData = {
   body: SocureDeviceSessionIdRequest;
 };
@@ -2912,13 +3592,8 @@ export type PostHostedOnboardingSkipPasskeyRegisterData = {
 };
 export type PostHostedOnboardingSkipPasskeyRegisterResponse = Empty;
 export type PostHostedOnboardingSkipPasskeyRegisterError = unknown;
-export type OnboardingStatusData = {
-  headers: {
-    'X-Fp-Authorization': string;
-  };
-};
-export type OnboardingStatusResponse2 = OnboardingStatusResponse;
-export type OnboardingStatusError = unknown;
+export type GetHostedOnboardingStatusResponse = OnboardingStatusResponse;
+export type GetHostedOnboardingStatusError = unknown;
 export type PostHostedOnboardingTelData = {
   body: StytchTelemetryRequest;
 };
@@ -2929,13 +3604,8 @@ export type PostHostedOnboardingTimelineData = {
 };
 export type PostHostedOnboardingTimelineResponse = Empty;
 export type PostHostedOnboardingTimelineError = unknown;
-export type ValidateOnboardingData = {
-  headers: {
-    'X-Fp-Authorization': string;
-  };
-};
-export type ValidateOnboardingResponse = HostedValidateResponse;
-export type ValidateOnboardingError = unknown;
+export type PostHostedOnboardingValidateResponse = HostedValidateResponse;
+export type PostHostedOnboardingValidateError = unknown;
 export type PostHostedUserAttestDeviceData = {
   body: CreateDeviceAttestationRequest;
 };
@@ -2960,7 +3630,7 @@ export type PostHostedUserChallengeError = unknown;
 export type PostHostedUserChallengeVerifyData = {
   body: UserChallengeVerifyRequest;
 };
-export type PostHostedUserChallengeVerifyResponse = Empty;
+export type PostHostedUserChallengeVerifyResponse = UserChallengeVerifyResponse;
 export type PostHostedUserChallengeVerifyError = unknown;
 export type PostHostedUserConsentData = {
   body: ConsentRequest;
@@ -2992,18 +3662,15 @@ export type PostHostedUserEmailVerifyData = {
 };
 export type PostHostedUserEmailVerifyResponse = Empty;
 export type PostHostedUserEmailVerifyError = unknown;
-export type GetHostedUserPrivateInfoResponse = unknown;
-export type GetHostedUserPrivateInfoError = unknown;
+export type PostHostedUserPrivateBoLinksResponse = Array<BoToken>;
+export type PostHostedUserPrivateBoLinksError = unknown;
 export type GetHostedUserTokenResponse = GetUserTokenResponse;
 export type GetHostedUserTokenError = unknown;
-export type VaultingTokenData = {
+export type PostHostedUserTokensData = {
   body: CreateUserTokenRequest;
-  headers: {
-    'X-Fp-Authorization': string;
-  };
 };
-export type VaultingTokenResponse = CreateUserTokenResponse;
-export type VaultingTokenError = unknown;
+export type PostHostedUserTokensResponse = CreateUserTokenResponse;
+export type PostHostedUserTokensError = unknown;
 export type PostHostedUserUploadByDocumentIdentifierData = {
   path: {
     documentIdentifier:
@@ -3041,8 +3708,6 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'business.state'
       | 'business.zip'
       | 'business.country'
-      | 'business.beneficial_owners'
-      | 'business.kyced_beneficial_owners'
       | 'business.corporation_type'
       | 'business.formation_state'
       | 'business.formation_date'
@@ -3078,6 +3743,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.id_card.ref_number'
       | 'document.id_card.nationality'
       | 'document.id_card.curp'
+      | 'document.id_card.clave_de_elector'
       | 'document.id_card.classified_document_type'
       | 'document.id_card.curp_validation_response'
       | 'document.drivers_license.front.image'
@@ -3098,6 +3764,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.drivers_license.ref_number'
       | 'document.drivers_license.nationality'
       | 'document.drivers_license.curp'
+      | 'document.drivers_license.clave_de_elector'
       | 'document.drivers_license.classified_document_type'
       | 'document.drivers_license.curp_validation_response'
       | 'document.passport.front.image'
@@ -3118,6 +3785,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.passport.ref_number'
       | 'document.passport.nationality'
       | 'document.passport.curp'
+      | 'document.passport.clave_de_elector'
       | 'document.passport.classified_document_type'
       | 'document.passport.curp_validation_response'
       | 'document.passport_card.front.image'
@@ -3138,6 +3806,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.passport_card.ref_number'
       | 'document.passport_card.nationality'
       | 'document.passport_card.curp'
+      | 'document.passport_card.clave_de_elector'
       | 'document.passport_card.classified_document_type'
       | 'document.passport_card.curp_validation_response'
       | 'document.permit.front.image'
@@ -3158,6 +3827,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.permit.ref_number'
       | 'document.permit.nationality'
       | 'document.permit.curp'
+      | 'document.permit.clave_de_elector'
       | 'document.permit.classified_document_type'
       | 'document.permit.curp_validation_response'
       | 'document.visa.front.image'
@@ -3178,6 +3848,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.visa.ref_number'
       | 'document.visa.nationality'
       | 'document.visa.curp'
+      | 'document.visa.clave_de_elector'
       | 'document.visa.classified_document_type'
       | 'document.visa.curp_validation_response'
       | 'document.residence_document.front.image'
@@ -3198,6 +3869,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.residence_document.ref_number'
       | 'document.residence_document.nationality'
       | 'document.residence_document.curp'
+      | 'document.residence_document.clave_de_elector'
       | 'document.residence_document.classified_document_type'
       | 'document.residence_document.curp_validation_response'
       | 'document.voter_identification.front.image'
@@ -3218,6 +3890,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.voter_identification.ref_number'
       | 'document.voter_identification.nationality'
       | 'document.voter_identification.curp'
+      | 'document.voter_identification.clave_de_elector'
       | 'document.voter_identification.classified_document_type'
       | 'document.voter_identification.curp_validation_response'
       | 'document.finra_compliance_letter'
@@ -3234,33 +3907,35 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'card.*.expiration_year'
       | 'card.*.number_last4'
       | 'card.*.issuer'
+      | 'card.*.fingerprint'
       | 'bank.*.name'
       | 'bank.*.ach_routing_number'
       | 'bank.*.ach_account_number'
       | 'bank.*.ach_account_id'
-      | 'bank.*.account_type';
+      | 'bank.*.account_type'
+      | 'bank.*.fingerprint';
   };
 };
 export type PostHostedUserUploadByDocumentIdentifierResponse = Empty;
 export type PostHostedUserUploadByDocumentIdentifierError = unknown;
-export type VaultData2 = {
-  body: VaultData;
-  headers: {
-    'X-Fp-Authorization': string;
-  };
+export type PatchHostedUserVaultData = {
+  /**
+   * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+   */
+  body: RawUserDataRequest;
 };
-export type VaultResponse = Empty;
-export type VaultError = VaultBadRequestResponse;
-export type DecryptUserVaultData = {
+export type PatchHostedUserVaultResponse = Empty;
+export type PatchHostedUserVaultError = unknown;
+export type PostHostedUserVaultDecryptData = {
   body: UserDecryptRequest;
-  headers: {
-    'X-Fp-Authorization': string;
-  };
 };
-export type DecryptUserVaultResponse = VaultData;
-export type DecryptUserVaultError = unknown;
+export type PostHostedUserVaultDecryptResponse = UserDecryptResponse;
+export type PostHostedUserVaultDecryptError = unknown;
 export type PostHostedUserVaultValidateData = {
-  body: VaultData;
+  /**
+   * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+   */
+  body: RawUserDataRequest;
 };
 export type PostHostedUserVaultValidateResponse = Empty;
 export type PostHostedUserVaultValidateError = unknown;

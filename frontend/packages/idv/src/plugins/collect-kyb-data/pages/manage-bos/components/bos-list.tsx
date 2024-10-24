@@ -1,5 +1,6 @@
 import { IcoUsers24 } from '@onefootprint/icons';
-import { type BusinessOwner2, IdDI } from '@onefootprint/types';
+import type { HostedBusinessOwner } from '@onefootprint/services';
+import { IdDI } from '@onefootprint/types';
 import { Box, Button, Form, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -7,8 +8,8 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 export type BosListProps = {
-  bos: BusinessOwner2[];
-  currentBo: BusinessOwner2;
+  existingBos: HostedBusinessOwner[];
+  currentBo: HostedBusinessOwner;
   onSubmit: (data: EditFormValues) => void;
 };
 
@@ -18,14 +19,14 @@ type EditFormValues = {
   ownershipStake: number;
 };
 
-const BosList = ({ bos, onSubmit, currentBo }: BosListProps) => {
+const BosList = ({ existingBos, onSubmit, currentBo }: BosListProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.list' });
-  const [editingBo, setEditingBo] = useState<BusinessOwner2 | null>(null);
+  const [editingBo, setEditingBo] = useState<HostedBusinessOwner | null>(null);
 
   return (
     <>
-      {bos.length > 0 ? (
-        <Box borderRadius="sm" borderColor="tertiary" borderStyle="solid" borderWidth={1} marginTop={5}>
+      {existingBos.length > 0 ? (
+        <Box borderRadius="sm" borderColor="tertiary" borderStyle="solid" borderWidth={1}>
           <Stack alignItems="center">
             <Stack paddingBlock={4} paddingInline={5} gap={3} alignItems="center" flexGrow={1}>
               <IcoUsers24 />
@@ -33,13 +34,13 @@ const BosList = ({ bos, onSubmit, currentBo }: BosListProps) => {
             </Stack>
           </Stack>
           <List>
-            {bos.map(bo => {
+            {existingBos.map(bo => {
               const name = `${bo.decryptedData[IdDI.firstName]} ${bo.decryptedData[IdDI.lastName]}`.trim();
-              const isCurrentBo = bo.id === currentBo.id;
-              const isEditing = editingBo?.id === bo.id;
+              const isCurrentBo = bo.uuid === currentBo.uuid;
+              const isEditing = editingBo?.uuid === bo.uuid;
 
               return (
-                <li key={bo.id}>
+                <li key={bo.uuid}>
                   {isEditing ? (
                     <EditForm
                       bo={bo}
@@ -55,7 +56,7 @@ const BosList = ({ bos, onSubmit, currentBo }: BosListProps) => {
                     <Item
                       name={name}
                       isCurrentBo={isCurrentBo}
-                      ownershipStake={bo.ownershipStake}
+                      ownershipStake={bo.ownershipStake || 0}
                       onEdit={() => setEditingBo(bo)}
                     />
                   )}
@@ -70,7 +71,7 @@ const BosList = ({ bos, onSubmit, currentBo }: BosListProps) => {
 };
 
 type EditFormProps = {
-  bo: BusinessOwner2;
+  bo: HostedBusinessOwner;
   onSubmit: (data: EditFormValues) => void;
   onCancel: () => void;
 };

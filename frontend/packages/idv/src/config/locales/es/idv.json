@@ -669,6 +669,10 @@
           }
         }
       },
+      "manage-bos": {
+        "title": "Agregar propietarios beneficiarios",
+        "subtitle": "Enumera a todas las personas que poseen al menos el 25% del negocio o que tienen un control sustancial sobre él. Escribe los nombres y apellidos exactamente como aparecen en la identificación emitida por el gobierno de cada persona."
+      },
       "beneficial-owners": {
         "title": "¿Quiénes son los propietarios?",
         "subtitle": "Enumera a todas las personas que poseen al menos el 25% del negocio o tienen un control sustancial sobre él.",

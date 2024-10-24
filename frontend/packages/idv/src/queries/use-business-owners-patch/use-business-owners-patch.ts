@@ -1,10 +1,9 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
+import type { HostedBusinessOwner } from '@onefootprint/services';
 import { IdDI } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import partition from 'lodash/partition';
-import type { VaultData } from '../../client/types.gen';
-import type { HostedBusinessOwner } from '../use-business-owners';
 
 export type BusinessOwnerData = {
   [IdDI.firstName]: string;
@@ -48,7 +47,7 @@ export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operat
       operation =>
         operation.data &&
         Object.entries(operation.data).some(
-          ([di, value]) => value && boDetailsByUuid[operation.uuid]?.decryptedData?.[di as keyof VaultData] !== value,
+          ([di, value]) => value && boDetailsByUuid[operation.uuid]?.decryptedData?.[di] !== value,
         ),
     );
 

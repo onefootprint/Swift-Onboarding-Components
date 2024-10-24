@@ -1,5 +1,6 @@
+import type { HostedBusinessOwner } from '@onefootprint/services';
 import { fn } from '@onefootprint/storybook-utils';
-import { type BusinessOwner2, IdDI } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import type { Meta, StoryFn } from '@storybook/react';
 import BosForm, { type BosFormProps } from './components/bos-form';
@@ -34,9 +35,9 @@ const Template: StoryFn<BeneficialOwnersProps> = ({ listProps, formProps }) => {
   );
 };
 
-const mockBos: BusinessOwner2[] = [
+const mockBos: HostedBusinessOwner[] = [
   {
-    id: 'bo_link_primary',
+    uuid: 'bo_link_primary',
     hasLinkedUser: true,
     isAuthedUser: true,
     isMutable: true,
@@ -50,7 +51,7 @@ const mockBos: BusinessOwner2[] = [
     ownershipStake: 40,
   },
   {
-    id: 'bo_link_secondary',
+    uuid: 'bo_link_secondary',
     hasLinkedUser: false,
     isAuthedUser: false,
     isMutable: true,
@@ -67,7 +68,7 @@ const mockBos: BusinessOwner2[] = [
 
 export const Default: StoryFn<BeneficialOwnersProps> = () => {
   const listProps: BosListProps = {
-    bos: mockBos,
+    existingBos: mockBos,
     currentBo: mockBos[0],
     onSubmit: console.log,
   };
@@ -89,7 +90,7 @@ export default {
       onSubmit: fn(),
     },
     listProps: {
-      bos: mockBos,
+      existingBos: mockBos,
       currentBo: mockBos[0],
       onSubmit: fn(),
     },

@@ -295,7 +295,6 @@ export type {
   BusinessInsights,
   BusinessName,
   BusinessOwner,
-  BusinessOwner2,
   BusinessPerson,
   BusinessWatchlist,
   CardBrands,

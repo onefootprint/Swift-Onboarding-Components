@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { useLogStateMachine } from '../../../../hooks';
 import { getLogger, trackAction } from '../../../../utils/logger';
+import Loading from '../../components/loading';
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import BasicData from '../basic-data';
 import BeneficialOwnerKyc from '../beneficial-owner-kyc';
@@ -10,7 +11,6 @@ import BusinessAddress from '../business-address';
 import BusinessFieldsLoader from '../business-fields-loader';
 import Confirm from '../confirm';
 import Introduction from '../introduction';
-import Loading from '../loading';
 import ManageBos from '../manage-bos';
 
 type RouterProps = { onDone: () => void };

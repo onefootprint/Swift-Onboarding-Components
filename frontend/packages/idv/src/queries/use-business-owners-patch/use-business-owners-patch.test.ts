@@ -1,5 +1,5 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type { HostedBusinessOwner } from '../use-business-owners';
+import type { HostedBusinessOwner } from '@onefootprint/services';
 import { patchBusinessOwnersRequest } from './use-business-owners-patch';
 
 // Mock the request functions

@@ -1,0 +1,20 @@
+{
+  "name": "@onefootprint/services",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./output/index.ts",
+  "types": "./output/index.ts",
+  "license": "MIT",
+  "files": ["dist/**"],
+  "scripts": {
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "lint:ci": "biome ci src",
+    "lint": "biome check src --fix --unsafe",
+    "typecheck": "yarn tsc --noEmit",
+    "generate": "tsx src/config/openapi-ts --camelCaseKeys"
+  },
+  "devDependencies": {
+    "tsconfig": "*",
+    "typescript": "^5.5.2"
+  }
+}

@@ -43,7 +43,6 @@ export {
 export {
   type BusinessOwnerData,
   type BusinessOwnerPatchOperation,
-  type HostedBusinessOwner,
   useBusiness,
   useBusinessOwners,
   useBusinessOwnersPatch,

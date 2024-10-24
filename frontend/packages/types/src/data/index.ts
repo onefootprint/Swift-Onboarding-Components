@@ -35,7 +35,7 @@ export type {
   BusinessDIData,
   ValueTypeForBusinessDI,
 } from './business-di-data';
-export type { BusinessOwner, BusinessOwner2 } from './business-owner';
+export type { BusinessOwner } from './business-owner';
 export type { CardBrands } from './card-brands';
 export { default as CdoToAllDisMap } from './cdo-to-di-map';
 export type { ChallengeData } from './challenge-data';

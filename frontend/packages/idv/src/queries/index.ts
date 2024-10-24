@@ -1,6 +1,6 @@
 export { default as useBusiness } from './use-business';
 export { default as useBusinessData } from './use-business-data';
-export { default as useBusinessOwners, type HostedBusinessOwner } from './use-business-owners';
+export { default as useBusinessOwners } from './use-business-owners';
 export {
   default as useBusinessOwnersPatch,
   type BusinessOwnerData,

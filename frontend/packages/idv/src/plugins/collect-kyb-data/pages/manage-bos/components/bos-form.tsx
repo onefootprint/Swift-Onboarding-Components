@@ -1,7 +1,6 @@
-import { isEmail } from '@onefootprint/core';
-import { isPhoneNumber } from '@onefootprint/core';
+import { isEmail, isPhoneNumber } from '@onefootprint/core';
 import { IcoPlusSmall24, IcoUserCircle24 } from '@onefootprint/icons';
-import type { BusinessOwner2 } from '@onefootprint/types';
+import type { HostedBusinessOwner } from '@onefootprint/services';
 import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +10,7 @@ import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, isOwnershipStakeInvalid }
 type FormData = { bos: NewBusinessOwner[] };
 
 export type BosFormProps = {
-  existingBos: BusinessOwner2[];
+  existingBos: HostedBusinessOwner[];
   onSubmit: (bos: NewBusinessOwner[]) => void;
 };
 
