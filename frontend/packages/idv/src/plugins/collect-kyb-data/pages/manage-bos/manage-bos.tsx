@@ -27,7 +27,6 @@ const ManageBos = () => {
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <BosList
           existingBos={businessOwnersQuery.data}
-          currentBo={businessOwnersQuery.data[0]}
           onSubmit={() => {
             // TODO: Implement submit logic
           }}

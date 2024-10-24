@@ -9,7 +9,6 @@ import styled, { css } from 'styled-components';
 
 export type BosListProps = {
   existingBos: HostedBusinessOwner[];
-  currentBo: HostedBusinessOwner;
   onSubmit: (data: EditFormValues) => void;
 };
 
@@ -19,9 +18,10 @@ type EditFormValues = {
   ownershipStake: number;
 };
 
-const BosList = ({ existingBos, onSubmit, currentBo }: BosListProps) => {
+const BosList = ({ existingBos, onSubmit }: BosListProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.list' });
   const [editingBo, setEditingBo] = useState<HostedBusinessOwner | null>(null);
+  const authedUser = existingBos.find(bo => bo.isAuthedUser);
 
   return (
     <>
@@ -36,7 +36,7 @@ const BosList = ({ existingBos, onSubmit, currentBo }: BosListProps) => {
           <List>
             {existingBos.map(bo => {
               const name = `${bo.decryptedData[IdDI.firstName]} ${bo.decryptedData[IdDI.lastName]}`.trim();
-              const isCurrentBo = bo.uuid === currentBo.uuid;
+              const isCurrentBo = bo.uuid === authedUser?.uuid;
               const isEditing = editingBo?.uuid === bo.uuid;
 
               return (

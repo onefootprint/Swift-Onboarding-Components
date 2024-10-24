@@ -69,7 +69,6 @@ const mockBos: HostedBusinessOwner[] = [
 export const Default: StoryFn<BeneficialOwnersProps> = () => {
   const listProps: BosListProps = {
     existingBos: mockBos,
-    currentBo: mockBos[0],
     onSubmit: console.log,
   };
 
@@ -91,7 +90,6 @@ export default {
     },
     listProps: {
       existingBos: mockBos,
-      currentBo: mockBos[0],
       onSubmit: fn(),
     },
   },
