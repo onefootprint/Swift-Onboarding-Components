@@ -26,14 +26,14 @@ In this guide, we'll show you how to integrate Footprint's Onboarding Components
 
 ### 2.1 Installation
 
-Onboarding components are available through a beta version of the `@onefootprint/footprint-react-native` package. To install it, run:
+Onboarding components are available through the latest version of the `@onefootprint/footprint-react-native` package. To install it, run:
 
 ```terminal
 # With NPM
-npm install @onefootprint/footprint-react-native@beta
+npm install @onefootprint/footprint-react-native
 
 # With yarn
-yarn add @onefootprint/footprint-react-native@beta
+yarn add @onefootprint/footprint-react-native
 ```
 
 ### 2.2 Get a public key
@@ -42,19 +42,57 @@ yarn add @onefootprint/footprint-react-native@beta
 - Use an existing playbook or create a new one.
 - Obtain the Publishable Key, e.g., `pb_test_LRfe5D3dZnWSf5vOGSeCFk`.
 
-## 3. Add Footprint Provider
+## 3. Initialization
 
-To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. Then, pass the `publicKey`.
+### 3.1 Add Footprint Provider
 
-```tsx filename="app.tsx" highlight="5,6,7"
+To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. You must the required props `publicKey` and `redirectUrl`.
+
+```tsx filename="demo.tsx" highlight="5,6,7,8,9,10,11"
+import React from "react";
 import { Fp } from "@onefootprint/footprint-react-native";
 
 const Demo = () => {
   return (
-    <Fp.Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
-      <h2>Hello World</h2>
+    <Fp.Provider
+      publicKey="pb_test_92S2cMhzjLU1MBMPC5hnhk"
+      redirectUrl="footprint://"
+    >
+      // Child components
     </Fp.Provider>
   );
+};
+
+export default Demo;
+```
+
+### 3.2 Waiting for SDK to be ready
+
+The SDK functionalities can only be used when the SDK is ready.`fp.isReady` function below is used to wait for SDK to be ready before rendering any components.
+
+```tsx filename="demo.tsx" highlight="10, 15, 16, 17, 18, 19, 20, 21, 22, 23"
+import { Fp, useFootprint } from "@onefootprint/footprint-react-native";
+import { Text } from "react-native";
+
+const Demo = () => {
+  return (
+    <Fp.Provider
+      publicKey="pb_test_92S2cMhzjLU1MBMPC5hnhk"
+      redirectUrl="footprint://"
+    >
+      <OnboardingComponents />
+    </Fp.Provider>
+  );
+};
+
+const OnboardingComponents = () => {
+  const fp = useFootprint();
+
+  if (!fp.isReady) {
+    return <Text>Loading...</Text>;
+  }
+
+  return <Text>Footprint is ready</Text>;
 };
 
 export default Demo;
@@ -64,472 +102,742 @@ export default Demo;
 
 ### 4.1. Create a form
 
-With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. We need to create a form with the user's email and phone number. Our components are raw, meaning that you have to define a `style` to match your application's design.
+You can now start using Onboarding components. Let's start by identifying the user. We need to create a form with the user's email and phone number. Our components are raw, meaning that you have to define a `style` to match your application's design.
 
-```jsx filename="app.tsx" highlight="14,15,16,17,18,19,20,21,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"
-import { Fp } from "@onefootprint/footprint-react";
-import { Button } from "react-native";
+```tsx filename="demo.tsx" highlight="32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77"
+import React from "react";
+import { Fp, useFootprint } from "@onefootprint/footprint-react-native";
+import { Button, Text, View } from "react-native";
 
 const Demo = () => {
   return (
-    <Fp.Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
-      <Identify />
+    <Fp.Provider
+      publicKey="pb_test_92S2cMhzjLU1MBMPC5hnhk"
+      redirectUrl="footprint://"
+    >
+      <OnboardingComponents />
     </Fp.Provider>
   );
 };
 
-const Identify = () => {
-  return (
-    <Fp.Form onSubmit={handleCreate} style={styles.form}>
-      {({ handleSubmit, errors }) => (
-        <>
-          <Fp.Field name="id.email">
-            <Label>Email</Label>
-            <Fp.Input placeholder="Email" returnKeyType="next" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Label>Phone number</Label>
-            <Fp.Input placeholder="Phone number" returnKeyType="done" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Button title="Submit" />
-        </>
-      )}
-    </Fp.Form>
-  );
-};
-```
-
-## 4.2. OTP
-
-Once the user submits the data, we should identify the user. This the part where the user needs to verify their identify using OTP or Passkeys. Because this part is more complex, we delegate this part to Footprint: you just need to call fp.launchIdentify():
-
-```jsx filename="app.tsx" highlight="21,22,23,24,25,26,27,28,29,30,31"
-import { Fp } from '@onefootprint/footprint-react';
-import { Button } from 'react-native';
-
-const Demo = () => {
-  const [step, setStep] = useStep('identify');
-
-  return (
-    <Fp.Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
-      {step === 'identify' && <onAuthenticated onDone={() => {}} />}
-    </Fp.Provider>
-  );
-};
-
-type IdentifyProps = {
-  onAuthenticated: () => void;
-};
-
-const Identify = ({ onAuthenticated }: IdentifyProps) => {
+const OnboardingComponents = () => {
   const fp = useFootprint();
 
-  const handleSubmit = (formValues: Di) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      {
-        onAuthenticated,
-      },
-    );
-  };
+  if (!fp.isReady) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
-    <Fp.Form onSubmit={handleCreate} style={styles.form}>
-      {({handleSubmit, errors}) => (
-        <>
-          <Fp.Field name="id.email">
-            <Label>Email</Label>
-            <Fp.Input
-              placeholder="Email"
-              returnKeyType="next"
-            />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Label>Phone number</Label>
-            <Fp.Input
-              placeholder="Phone number"
-              returnKeyType="done"
-            />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Button onPress={handleSubmit} title="Submit" />
-        </>
-      )}
-    </Fp.Form>
+    <Identify
+      onDone={() => {
+        console.log("Identify done");
+      }}
+    />
   );
 };
+
+const Identify = ({ onDone }: { onDone: () => void }) => {
+  return (
+    <View>
+      <Text>Footprint Auth Demo</Text>
+      <Text>Enter your email and phone number</Text>
+
+      <Fp.Form onSubmit={() => console.log("onSubmit called")}>
+        {({ handleSubmit, setValue, errors }) => {
+          console.log("form errors", errors);
+          return (
+            <View>
+              <Fp.Field name="id.email">
+                {({ error }) => {
+                  // Note: you can pass the children directly if you don't need the error
+                  // the phone number field is an example of this
+                  return (
+                    <>
+                      <Text
+                        style={{ marginBottom: 10 }}
+                        nativeID="labelUsername"
+                      >
+                        Email
+                      </Text>
+                      <Fp.Input placeholder="Email" />
+                      <Fp.FieldErrors />
+                    </>
+                  );
+                }}
+              </Fp.Field>
+              <Fp.Field name="id.phone_number">
+                <Fp.Input placeholder="Phone" />
+                <Fp.FieldErrors />
+              </Fp.Field>
+              <Button
+                title="Submit"
+                onPress={() => {
+                  handleSubmit();
+                }}
+              />
+            </View>
+          );
+        }}
+      </Fp.Form>
+    </View>
+  );
+};
+
+export default Demo;
 ```
+
+### 4.2. OTP
+
+Once the user submits the data, we should identify the user. This the part where the user needs to verify their identify using OTP. Here is how an example code looks like:
+
+```tsx filename="demo.tsx" highlight="38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 117"
+import React, { useState } from "react";
+import {
+  type FormValues,
+  Fp,
+  InlineOtpNotSupported,
+  useFootprint,
+} from "@onefootprint/footprint-react-native";
+import { Button, Text, View } from "react-native";
+
+const Demo = () => {
+  return (
+    <Fp.Provider
+      publicKey="pb_test_92S2cMhzjLU1MBMPC5hnhk"
+      redirectUrl="footprint://"
+    >
+      <OnboardingComponents />
+    </Fp.Provider>
+  );
+};
+
+const OnboardingComponents = () => {
+  const fp = useFootprint();
+
+  if (!fp.isReady) {
+    return <Text>Loading...</Text>;
+  }
+
+  return (
+    <Identify
+      onDone={() => {
+        console.log("Identify done");
+      }}
+    />
+  );
+};
+
+const Identify = ({ onDone }: { onDone: () => void }) => {
+  const fp = useFootprint();
+  const [challengeKind, setChallengeKind] = useState<string>();
+
+  const handleCreateChallenge = (formValues: FormValues) => {
+    console.log("Submitting", formValues);
+    fp.createEmailPhoneBasedChallenge({
+      email: formValues["id.email"],
+      phoneNumber: formValues["id.phone_number"],
+    })
+      .then((result) => {
+        console.log("createEmailPhoneBasedChallenge", result);
+        setChallengeKind(result);
+      })
+      .catch((error) => {
+        console.log("createEmailPhoneBasedChallenge error", error);
+        if (error instanceof InlineOtpNotSupported) {
+          fp.launchIdentify(
+            {
+              email: formValues["id.email"],
+              phoneNumber: formValues["id.phone_number"],
+            },
+            {
+              onAuthenticated: (result) => {
+                console.log("onAuthenticated", result);
+                onDone();
+              },
+              onError(error) {
+                console.log("onError", error);
+              },
+            }
+          );
+        }
+      });
+  };
+
+  const verifyChallenge = (otp: string) => {
+    fp.verify({
+      verificationCode: otp,
+    })
+      .then((result) => {
+        console.log("verifyChallenge", result);
+        onDone();
+      })
+      .catch((error) => {
+        console.log("verifyChallenge error", error);
+      });
+  };
+
+  if (challengeKind) {
+    return (
+      <View>
+        <Text
+          style={{
+            marginBottom: 10,
+          }}
+        >
+          Verify challenge
+        </Text>
+        <Fp.Otp
+          onComplete={verifyChallenge}
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: 5,
+            borderColor: "gray",
+            borderWidth: 1,
+            padding: 8,
+            margin: 2,
+          }}
+        />
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      <Text>Footprint Auth Demo</Text>
+      <Text>Enter your email and phone number</Text>
+
+      <Fp.Form onSubmit={handleCreateChallenge}>
+        {({ handleSubmit, setValue, errors }) => {
+          console.log("form errors", errors);
+          return (
+            <View>
+              <Fp.Field name="id.email">
+                {({ error }) => {
+                  // Note: you can pass the children directly if you don't need the error
+                  // the phone number field is an example of this
+                  return (
+                    <>
+                      <Text
+                        style={{ marginBottom: 10 }}
+                        nativeID="labelUsername"
+                      >
+                        Email
+                      </Text>
+                      <Fp.Input placeholder="Email" />
+                      <Fp.FieldErrors />
+                    </>
+                  );
+                }}
+              </Fp.Field>
+              <Fp.Field name="id.phone_number">
+                <Fp.Input placeholder="Phone" />
+                <Fp.FieldErrors />
+              </Fp.Field>
+              <Button
+                title="Submit"
+                onPress={() => {
+                  handleSubmit();
+                }}
+              />
+            </View>
+          );
+        }}
+      </Fp.Form>
+    </View>
+  );
+};
+
+export default Demo;
+```
+
+Let’s dissect the code.
+
+- The `handleCreateChallenge()` function (lines 41-71) creates an OTP challenge. This is the first step of inline OTP. Our SDK allows you to identify user both inline or using a hosted webview. You can open the hosted webview-based identification flow calling `fp.launchIdentify()` function. However, we recommend using hosted flow only when inline OTP is not supported. We provide 2 helper functions for creating challenge that return the challenge kind (sms or email) on success:
+  - `fp.createAuthTokenBasedChallenge()` (not shown in the example above) that doesn’t take argument to create a challenge using auth token you provided in the provider before. Note, if you provided an auth token, you must call this function to create a challenge and you can’t create a challenge using email/phone. Additionally, some auth tokens don’t require re-auth. Therefore, you must call `fp.requiresAuth()` before creating a challenge using auth token - we recommend you call this function only once on mount. `fp.requiresAuth()` returns a boolean indicating whether you need to re-auth or not. If it returns `false` , you can skip the auth step entirely.
+  - `fp.createEmailPhoneBasedChallenge()` allows you to create a challenge using email/phone as arguments. You don’t need to call `fp.requiresAuth()` if you use this option. You can’t use this option if you provided an auth token in your provider.
+- Lines 86-110 renders pin-input UI if the challenge was created successfully to input the OTP pin. We provide a handy `Fp.OTP` that you can use if you want. This component is also customizable using your own style.
+- The `verifyChallenge` (lines 73-84) calls the `fp.verify()` function to verify the pin code. Upon successful verification, `fp.verify()` returns a bunch of useful information such and onboarding requirements, existing vault data, required fields, etc.
 
 ## 5. Collecting user's data
 
-```jsx filename="app.tsx" highlight="9,10,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175"
-import { Fp } from '@onefootprint/footprint-react';
-import { Button } from 'react-native';
+Once the authentication is done, we can start data collection.
+
+```tsx filename="demo.tsx" highlight="157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 23, 30, 33"
+import React, { useState } from "react";
+import {
+  type FormValues,
+  Fp,
+  InlineOtpNotSupported,
+  useFootprint,
+} from "@onefootprint/footprint-react-native";
+import { Button, Text, View } from "react-native";
 
 const Demo = () => {
-  const [step, setStep] = useStep('identify');
-
   return (
-    <Fp.Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
-      {step === 'identify' && <onAuthenticated onDone={() => setStep('collect-data')} />}
-      {step === 'collect-data' && <CollectData onDone={() => {}} />}
+    <Fp.Provider
+      publicKey="pb_test_92S2cMhzjLU1MBMPC5hnhk"
+      redirectUrl="footprint://"
+    >
+      <OnboardingComponents />
     </Fp.Provider>
   );
 };
 
-type IdentifyProps = {
-  onAuthenticated: () => void;
+const OnboardingComponents = () => {
+  const fp = useFootprint();
+  const [step, setStep] = useState<"identify" | "data-collections">("identify");
+
+  if (!fp.isReady) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (step === "identify") {
+    return <Identify onDone={() => setStep("data-collections")} />;
+  }
+
+  return <BasicInformation onDone={() => {}} />;
 };
 
-const Identify = ({ onAuthenticated }: IdentifyProps) => {
+const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
+  const [challengeKind, setChallengeKind] = useState<string>();
 
-  const handleSubmit = (formValues: Di) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      {
-        onAuthenticated,
-      },
-    );
+  const handleCreateChallenge = (formValues: FormValues) => {
+    console.log("Submitting", formValues);
+    fp.createEmailPhoneBasedChallenge({
+      email: formValues["id.email"],
+      phoneNumber: formValues["id.phone_number"],
+    })
+      .then((result) => {
+        console.log("createEmailPhoneBasedChallenge", result);
+        setChallengeKind(result);
+      })
+      .catch((error) => {
+        console.log("createEmailPhoneBasedChallenge error", error);
+        if (error instanceof InlineOtpNotSupported) {
+          fp.launchIdentify(
+            {
+              email: formValues["id.email"],
+              phoneNumber: formValues["id.phone_number"],
+            },
+            {
+              onAuthenticated: (result) => {
+                console.log("onAuthenticated", result);
+                onDone();
+              },
+              onError(error) {
+                console.log("onError", error);
+              },
+            }
+          );
+        }
+      });
   };
 
+  const verifyChallenge = (otp: string) => {
+    fp.verify({
+      verificationCode: otp,
+    })
+      .then((result) => {
+        console.log("verifyChallenge", result);
+        onDone();
+      })
+      .catch((error) => {
+        console.log("verifyChallenge error", error);
+      });
+  };
+
+  if (challengeKind) {
+    return (
+      <View>
+        <Text
+          style={{
+            marginBottom: 10,
+          }}
+        >
+          Verify challenge
+        </Text>
+        <Fp.Otp
+          onComplete={verifyChallenge}
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: 5,
+            borderColor: "gray",
+            borderWidth: 1,
+            padding: 8,
+            margin: 2,
+          }}
+        />
+      </View>
+    );
+  }
+
   return (
-    <Fp.Form onSubmit={handleCreate} style={styles.form}>
-      {({handleSubmit, errors}) => (
-        <>
-          <Fp.Field name="id.email">
-            <Label>Email</Label>
-            <Fp.Input
-              placeholder="Email"
-              returnKeyType="next"
-            />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Label>Phone number</Label>
-            <Fp.Input
-              placeholder="Phone number"
-              returnKeyType="done"
-            />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Button onPress={handleSubmit} title="Submit" />
-        </>
-      )}
-    </Fp.Form>
+    <View>
+      <Text>Footprint Auth Demo</Text>
+      <Text>Enter your email and phone number</Text>
+
+      <Fp.Form onSubmit={handleCreateChallenge}>
+        {({ handleSubmit, setValue, errors }) => {
+          console.log("form errors", errors);
+          return (
+            <View>
+              <Fp.Field name="id.email">
+                {({ error }) => {
+                  // Note: you can pass the children directly if you don't need the error
+                  // the phone number field is an example of this
+                  return (
+                    <>
+                      <Text
+                        style={{ marginBottom: 10 }}
+                        nativeID="labelUsername"
+                      >
+                        Email
+                      </Text>
+                      <Fp.Input placeholder="Email" />
+                      <Fp.FieldErrors />
+                    </>
+                  );
+                }}
+              </Fp.Field>
+              <Fp.Field name="id.phone_number">
+                <Fp.Input placeholder="Phone" />
+                <Fp.FieldErrors />
+              </Fp.Field>
+              <Button
+                title="Submit"
+                onPress={() => {
+                  handleSubmit();
+                }}
+              />
+            </View>
+          );
+        }}
+      </Fp.Form>
+    </View>
   );
 };
 
-const CollectData = ({ onDone }: { onDone: () => void }) => {
+const BasicInformation = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
-  const [pending, setPending] = useState<null | string>(null)
 
-  const handleSubmit = async (formValues: FormValues) => {
-    setPending('saving');
-    try {
-      await fp.vault(formValues);
-      fp.handoff({ onComplete: onDone })
-    } catch (e) {
-      console.log('Error', e);
-    } finally {
-      setPending(null);
-    }
+  const handleSubmit = (data: FormValues) => {
+    console.log("Submitting", data);
+    fp.vault(data)
+      .then(() => {
+        fp.getRequirements().then((requirements) => {
+          console.log("remaining requirements", requirements);
+        });
+        onDone();
+      })
+      .catch((error) => {
+        console.log("vaulting error", error);
+      });
   };
 
   return (
-    <SafeAreaView>
-      <Fp.Form onSubmit={handleSubmit} style={styles.form}>
-        {({handleSubmit, errors}) => (
-          <>
+    <View>
+      <Fp.Form onSubmit={handleSubmit}>
+        {({ handleSubmit }) => (
+          <View>
             <Fp.Field name="id.first_name">
-              <Label>First name</Label>
-              <Fp.Input
-                hasError={!!errors['id.first_name']}
-                placeholder="Jane"
-              />
+              <Text style={{ marginBottom: 10 }}>First Name</Text>
+              <Fp.Input placeholder="First Name" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.middle_name">
-              <Label>Middle name (optional)</Label>
-              <Fp.Input
-                hasError={!!errors['id.middle_name']}
-                placeholder="Sue"
-              />
+              <Text style={{ marginBottom: 10 }}>Middle Name</Text>
+              <Fp.Input placeholder="Middle Name" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.last_name">
-              <Label>Last name</Label>
-              <Fp.Input
-                hasError={!!errors['id.last_name']}
-                placeholder="Doe"
-              />
+              <Text style={{ marginBottom: 10 }}>Last Name</Text>
+              <Fp.Input placeholder="Last Name" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.dob">
-              <Label>DOB</Label>
-              <Fp.Input
-                hasError={!!errors['id.dob']}
-                placeholder="MM/DD/YYYY"
-              />
+              <Text style={{ marginBottom: 10 }}>Date of Birth</Text>
+              <Fp.Input placeholder="Date of Birth" />
+              <Fp.FieldErrors />
+            </Fp.Field>
+            <Fp.Field name="id.ssn4">
+              <Text style={{ marginBottom: 10 }}>SSN-4</Text>
+              <Fp.Input placeholder="SSN" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.ssn9">
-              <Label>SSN (Full)</Label>
-              <Fp.Input
-                hasError={!!errors['id.ssn9']}
-                placeholder="XXX-XX-XXXX"
-              />
+              <Text style={{ marginBottom: 10 }}>SSN-9</Text>
+              <Fp.Input placeholder="SSN" />
               <Fp.FieldErrors />
             </Fp.Field>
-            <Fp.Field name="id.address_line1">
-              <Label>Address line 1</Label>
-              <Fp.Input
-                hasError={!!errors['id.address_line1']}
-                placeholder="Address Line 1"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.address_line2">
-              <Label>Address line 2</Label>
-              <Fp.Input
-                hasError={!!errors['id.address_line2']}
-                placeholder="Address Line 2"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.country">
-              <Label>Country</Label>
-              <Fp.Input
-                hasError={!!errors['id.country']}
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.city">
-              <Label>City</Label>
-              <Fp.Input
-                hasError={!!errors['id.city']}
-                placeholder="City"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.state">
-              <Label>State</Label>
-              <Fp.Input
-                hasError={!!errors['id.state']}
-                placeholder="State"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.zip">
-              <Label>Zip</Label>
-              <Fp.Input
-                hasError={!!errors['id.zip']}
-                placeholder="Zip code"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Button onPress={handleSubmit} loading={pending === 'saving'}>
-              Continue
-            </Button>
-          </>
+            <Button
+              title="Submit"
+              onPress={() => {
+                handleSubmit();
+              }}
+            />
+          </View>
         )}
       </Fp.Form>
-    </SafeAreaView>
+    </View>
   );
 };
+
+export default Demo;
 ```
+
+Inside `handleSubmit()` , we call `fp.vault()` that saves the data. Additionally, we call `fp.getRequirements()` that tells you the current state of the onboarding - what fields have been collected, what needs to be collected, etc. Here, we are simply logging that information for the purpose of simplicity. However, you can use this information to conditionally render the fields.
 
 ## 6. Finalizing the onboarding
 
-With all the data collected, we need to now init Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token.
+With all the data collected, we need finalize the onboarding. Similar to identify, we provide an inline and a hosted option. The inline option can be completed calling `fp.process()` . However, inline process isn’t always supported in which case we can fallback to hosted version calling `fp.handoff()` . Hosted version will collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token.
 
-```jsx filename="app.tsx" highlight="10,69"
-import { Fp } from '@onefootprint/footprint-react';
-import { Button } from 'react-native';
+```tsx filename="demo.tsx" highlight="37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51"
+import React, { useState } from "react";
+import {
+  type FormValues,
+  Fp,
+  InlineOtpNotSupported,
+  InlineProcessError,
+  useFootprint,
+} from "@onefootprint/footprint-react-native";
+import { Button, Text, View } from "react-native";
 
 const Demo = () => {
-  const [step, setStep] = useStep('identify');
-
   return (
-    <Fp.Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
-      {step === 'identify' && <onAuthenticated onDone={() => setStep('collect-data')} />}
-      {step === 'collect-data' && <CollectData onDone={(validationToken) => console.log(validationToken)} />}
+    <Fp.Provider
+      publicKey="pb_test_92S2cMhzjLU1MBMPC5hnhk"
+      redirectUrl="footprint://"
+    >
+      <OnboardingComponents />
     </Fp.Provider>
   );
 };
 
-type IdentifyProps = {
-  onAuthenticated: () => void;
-};
-
-const Identify = ({ onAuthenticated }: IdentifyProps) => {
+const OnboardingComponents = () => {
   const fp = useFootprint();
+  const [step, setStep] = useState<"identify" | "data-collections">("identify");
 
-  const handleSubmit = (formValues: Di) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      {
-        onAuthenticated,
-      },
-    );
-  };
+  if (!fp.isReady) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (step === "identify") {
+    return <Identify onDone={() => setStep("data-collections")} />;
+  }
 
   return (
-    <Fp.Form onSubmit={handleCreate} style={styles.form}>
-      {({handleSubmit, errors}) => (
-        <>
-          <Fp.Field name="id.email">
-            <Label>Email</Label>
-            <Fp.Input
-              placeholder="Email"
-              returnKeyType="next"
-            />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Label>Phone number</Label>
-            <Fp.Input
-              placeholder="Phone number"
-              returnKeyType="done"
-            />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Button onPress={handleSubmit} title="Submit" />
-        </>
-      )}
-    </Fp.Form>
+    <BasicInformation
+      onDone={() => {
+        fp.process()
+          .then((result) => {
+            console.log(result.validationToken);
+          })
+          .catch((error) => {
+            if (error instanceof InlineProcessError) {
+              fp.handoff({
+                onComplete: (validationToken) => {
+                  console.log(validationToken);
+                },
+              });
+            } else {
+              console.log("process error", error);
+            }
+          });
+      }}
+    />
   );
 };
 
-const CollectData = ({ onDone }: { onDone: () => void }) => {
+const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
-  const [pending, setPending] = useState<null | string>(null)
+  const [challengeKind, setChallengeKind] = useState<string>();
 
-  const handleSubmit = async (formValues: FormValues) => {
-    setPending('saving');
-    try {
-      await fp.vault(formValues);
-      fp.handoff({ onComplete: onDone })
-    } catch (e) {
-      console.log('Error', e);
-    } finally {
-      setPending(null);
-    }
+  const handleCreateChallenge = (formValues: FormValues) => {
+    console.log("Submitting", formValues);
+    fp.createEmailPhoneBasedChallenge({
+      email: formValues["id.email"],
+      phoneNumber: formValues["id.phone_number"],
+    })
+      .then((result) => {
+        console.log("createEmailPhoneBasedChallenge", result);
+        setChallengeKind(result);
+      })
+      .catch((error) => {
+        console.log("createEmailPhoneBasedChallenge error", error);
+        if (error instanceof InlineOtpNotSupported) {
+          fp.launchIdentify(
+            {
+              email: formValues["id.email"],
+              phoneNumber: formValues["id.phone_number"],
+            },
+            {
+              onAuthenticated: (result) => {
+                console.log("onAuthenticated", result);
+                onDone();
+              },
+              onError(error) {
+                console.log("onError", error);
+              },
+            }
+          );
+        }
+      });
+  };
+
+  const verifyChallenge = (otp: string) => {
+    fp.verify({
+      verificationCode: otp,
+    })
+      .then((result) => {
+        console.log("verifyChallenge", result);
+        onDone();
+      })
+      .catch((error) => {
+        console.log("verifyChallenge error", error);
+      });
+  };
+
+  if (challengeKind) {
+    return (
+      <View>
+        <Text
+          style={{
+            marginBottom: 10,
+          }}
+        >
+          Verify challenge
+        </Text>
+        <Fp.Otp
+          onComplete={verifyChallenge}
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: 5,
+            borderColor: "gray",
+            borderWidth: 1,
+            padding: 8,
+            margin: 2,
+          }}
+        />
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      <Text>Footprint Auth Demo</Text>
+      <Text>Enter your email and phone number</Text>
+
+      <Fp.Form onSubmit={handleCreateChallenge}>
+        {({ handleSubmit, setValue, errors }) => {
+          console.log("form errors", errors);
+          return (
+            <View>
+              <Fp.Field name="id.email">
+                {({ error }) => {
+                  // Note: you can pass the children directly if you don't need the error
+                  // the phone number field is an example of this
+                  return (
+                    <>
+                      <Text
+                        style={{ marginBottom: 10 }}
+                        nativeID="labelUsername"
+                      >
+                        Email
+                      </Text>
+                      <Fp.Input placeholder="Email" />
+                      <Fp.FieldErrors />
+                    </>
+                  );
+                }}
+              </Fp.Field>
+              <Fp.Field name="id.phone_number">
+                <Fp.Input placeholder="Phone" />
+                <Fp.FieldErrors />
+              </Fp.Field>
+              <Button
+                title="Submit"
+                onPress={() => {
+                  handleSubmit();
+                }}
+              />
+            </View>
+          );
+        }}
+      </Fp.Form>
+    </View>
+  );
+};
+
+const BasicInformation = ({ onDone }: { onDone: () => void }) => {
+  const fp = useFootprint();
+
+  const handleSubmit = (data: FormValues) => {
+    console.log("Submitting", data);
+    fp.vault(data)
+      .then(() => {
+        fp.getRequirements().then((requirements) => {
+          console.log("remaining requirements", requirements);
+        });
+        onDone();
+      })
+      .catch((error) => {
+        console.log("vaulting error", error);
+      });
   };
 
   return (
-    <SafeAreaView>
-      <Fp.Form onSubmit={handleSubmit} style={styles.form}>
-        {({handleSubmit, errors}) => (
-          <>
+    <View>
+      <Fp.Form onSubmit={handleSubmit}>
+        {({ handleSubmit }) => (
+          <View>
             <Fp.Field name="id.first_name">
-              <Label>First name</Label>
-              <Fp.Input
-                hasError={!!errors['id.first_name']}
-                placeholder="Jane"
-              />
+              <Text style={{ marginBottom: 10 }}>First Name</Text>
+              <Fp.Input placeholder="First Name" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.middle_name">
-              <Label>Middle name (optional)</Label>
-              <Fp.Input
-                hasError={!!errors['id.middle_name']}
-                placeholder="Sue"
-              />
+              <Text style={{ marginBottom: 10 }}>Middle Name</Text>
+              <Fp.Input placeholder="Middle Name" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.last_name">
-              <Label>Last name</Label>
-              <Fp.Input
-                hasError={!!errors['id.last_name']}
-                placeholder="Doe"
-              />
+              <Text style={{ marginBottom: 10 }}>Last Name</Text>
+              <Fp.Input placeholder="Last Name" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.dob">
-              <Label>DOB</Label>
-              <Fp.Input
-                hasError={!!errors['id.dob']}
-                placeholder="MM/DD/YYYY"
-              />
+              <Text style={{ marginBottom: 10 }}>Date of Birth</Text>
+              <Fp.Input placeholder="Date of Birth" />
+              <Fp.FieldErrors />
+            </Fp.Field>
+            <Fp.Field name="id.ssn4">
+              <Text style={{ marginBottom: 10 }}>SSN-4</Text>
+              <Fp.Input placeholder="SSN" />
               <Fp.FieldErrors />
             </Fp.Field>
             <Fp.Field name="id.ssn9">
-              <Label>SSN (Full)</Label>
-              <Fp.Input
-                hasError={!!errors['id.ssn9']}
-                placeholder="XXX-XX-XXXX"
-              />
+              <Text style={{ marginBottom: 10 }}>SSN-9</Text>
+              <Fp.Input placeholder="SSN" />
               <Fp.FieldErrors />
             </Fp.Field>
-            <Fp.Field name="id.address_line1">
-              <Label>Address line 1</Label>
-              <Fp.Input
-                hasError={!!errors['id.address_line1']}
-                placeholder="Address Line 1"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.address_line2">
-              <Label>Address line 2</Label>
-              <Fp.Input
-                hasError={!!errors['id.address_line2']}
-                placeholder="Address Line 2"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.country">
-              <Label>Country</Label>
-              <Fp.Input
-                hasError={!!errors['id.country']}
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.city">
-              <Label>City</Label>
-              <Fp.Input
-                hasError={!!errors['id.city']}
-                placeholder="City"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.state">
-              <Label>State</Label>
-              <Fp.Input
-                hasError={!!errors['id.state']}
-                placeholder="State"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Fp.Field name="id.zip">
-              <Label>Zip</Label>
-              <Fp.Input
-                hasError={!!errors['id.zip']}
-                placeholder="Zip code"
-              />
-              <Fp.FieldErrors />
-            </Fp.Field>
-            <Button onPress={handleSubmit} loading={pending === 'saving'}>
-              Continue
-            </Button>
-          </>
+            <Button
+              title="Submit"
+              onPress={() => {
+                handleSubmit();
+              }}
+            />
+          </View>
         )}
       </Fp.Form>
-    </SafeAreaView>
+    </View>
   );
 };
+
+export default Demo;
 ```
 
 Once the user completes the flow, you'll receive the `validationToken` through the onComplete callback. Post this token to your backend for further processing.
