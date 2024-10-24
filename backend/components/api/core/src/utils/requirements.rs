@@ -33,6 +33,7 @@ use newtypes::ContactInfoKind;
 use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::Declaration;
 use newtypes::DocumentCdoInfo;
+use newtypes::DocumentConfig;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentRequestConfig;
 use newtypes::DocumentStatus;
@@ -42,10 +43,12 @@ use newtypes::InvestorProfileKind as IPK;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::KycState;
 use newtypes::LivenessSource;
+use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::UsLegalStatus;
+use newtypes::WorkflowConfig;
 use newtypes::WorkflowId;
 use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
@@ -55,7 +58,7 @@ use std::str::FromStr;
 pub struct GetRequirementsArgs {
     pub person_obc: ObConfiguration,
     pub person_workflow: Workflow,
-    pub business_sv: Option<ScopedVaultId>,
+    pub sb_id: Option<ScopedVaultId>,
     pub biz_wf_id: Option<WorkflowId>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     pub is_secondary_bo: bool,
@@ -66,7 +69,7 @@ impl GetRequirementsArgs {
         Ok(Self {
             person_obc: value.ob_config.clone(),
             person_workflow: value.workflow.clone(),
-            business_sv: value.sb_id.clone(),
+            sb_id: value.sb_id.clone(),
             biz_wf_id: value.biz_wf_id.clone(),
             auth_events: value.user_session.auth_events.clone(),
             is_secondary_bo: value.user_session.is_secondary_bo(),
@@ -121,29 +124,29 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let GetRequirementsArgs {
         person_obc,
         person_workflow,
-        business_sv,
+        sb_id,
         biz_wf_id,
         auth_events,
         is_secondary_bo,
     } = args;
 
+    let has_sb_id = sb_id.is_some();
     let su_id = person_workflow.scoped_vault_id.clone();
-    let sb_id = business_sv.clone();
-    let (uvw, biz_info) = state
+    let (uvw, biz_wf_info) = state
         .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
-            let biz_info = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
+            let biz_wf_info = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
                 let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sb_id)?;
                 let (biz_wf, _) = Workflow::get_all(conn, &biz_wf_id)?;
                 Some((bvw, biz_wf))
             } else {
                 None
             };
-            Ok((uvw, biz_info))
+            Ok((uvw, biz_wf_info))
         })
         .await?;
     let user_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
-    let business_owners = if let Some((bvw, _)) = biz_info.as_ref() {
+    let business_owners = if let Some((bvw, _)) = biz_wf_info.as_ref() {
         bvw.decrypt_business_owners(state).await?
     } else {
         vec![]
@@ -170,8 +173,19 @@ pub async fn get_requirements_for_person_and_maybe_business(
             };
 
             let mut requirements = get_requirements_for_wf(conn, ctx, &person_workflow, &uvw)?;
-            if let Some((bvw, biz_wf)) = biz_info {
-                requirements.extend(get_requirements_for_wf(conn, ctx, &biz_wf, &bvw)?);
+
+            let collecting_biz_doc = match person_workflow.config {
+                WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => !business_configs.is_empty(),
+                _ => false,
+            };
+            let requires_kyb = person_obc.kind == ObConfigurationKind::Kyb || collecting_biz_doc;
+            if requires_kyb {
+                if let Some((bvw, biz_wf)) = biz_wf_info {
+                    requirements.extend(get_requirements_for_wf(conn, ctx, &biz_wf, &bvw)?);
+                } else {
+                    // If there's no business workflow, add requirement to create one
+                    requirements.push(get_create_business_workflow_requirement(has_sb_id));
+                }
             }
 
             tracing::info!(workflow_id=%person_workflow.id, requirements=%format!("{:?}", requirements), scoped_user_id=%person_workflow.scoped_vault_id, "get_requirements result");
@@ -390,16 +404,15 @@ fn get_collect_investor_profile_requirement<T>(
     uvw: &VaultWrapper<T>,
     user_wf: &Workflow,
 ) -> FpResult<Option<OnboardingRequirement>> {
-    let user_values = ctx.user_values;
     let Some(RequirementProgress {
         populated_attributes,
         missing_attributes,
         ..
-    }) = get_data_collection_progress(uvw, user_wf, ctx.obc, DID::InvestorProfile, user_values)
+    }) = get_data_collection_progress(uvw, user_wf, ctx.obc, DID::InvestorProfile, ctx.user_values)
     else {
         return Ok(None);
     };
-    let declarations = user_values.get_di(IPK::Declarations).ok();
+    let declarations = ctx.user_values.get_di(IPK::Declarations).ok();
     let missing_document = if let Some(declarations) = declarations {
         let declarations: Vec<Declaration> = declarations.deserialize()?;
         // The finra compliance doc is missing if any of the declarations require a doc and we
@@ -418,18 +431,23 @@ fn get_collect_investor_profile_requirement<T>(
     Ok(req)
 }
 
+fn get_create_business_workflow_requirement(has_sb_id: bool) -> OnboardingRequirement {
+    OnboardingRequirement::CreateBusinessOnboarding {
+        requires_business_selection: !has_sb_id,
+    }
+}
+
 fn get_collect_kyb_data_requirement<T>(
     ctx: RequirementContext,
     bvw: &VaultWrapper<T>,
     biz_wf: &Workflow,
 ) -> FpResult<Option<OnboardingRequirement>> {
-    let user_values = UserDecryptResultForReqs::empty();
     let Some(RequirementProgress {
         mut populated_attributes,
         optional_attributes: _,
         mut missing_attributes,
         recollect_attributes,
-    }) = get_data_collection_progress(bvw, biz_wf, ctx.obc, DID::Business, &user_values)
+    }) = get_data_collection_progress(bvw, biz_wf, ctx.obc, DID::Business, ctx.user_values)
     else {
         return Ok(None);
     };

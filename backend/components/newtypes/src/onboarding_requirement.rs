@@ -37,6 +37,14 @@ pub enum OnboardingRequirement {
         populated_attributes: Vec<CollectedDataOption>,
         missing_document: bool,
     },
+    /// The flow requires a business, and one hasn't yet been created / selected
+    CreateBusinessOnboarding {
+        /// When true, requires either selecting an existing business, or will create a new one upon
+        /// `POST /hosted/business/onboarding`.
+        /// When false, there's already a business associated with this session, so we can
+        /// immediately call `POST /hosted/business/onboarding`.
+        requires_business_selection: bool,
+    },
     /// There is missing business data that must be collected
     CollectBusinessData {
         missing_attributes: Vec<CollectedDataOption>,
@@ -44,6 +52,7 @@ pub enum OnboardingRequirement {
         recollect_attributes: Vec<CollectedDataOption>,
         /// True if the tenant has already linked any BOs via API. This is mutually exclusive with
         /// collecting info from the user via bifrost.
+        /// TODO: can deprecate this after new BOs flow
         has_linked_bos: bool,
     },
     /// Register a passkey
@@ -144,13 +153,14 @@ impl OnboardingRequirement {
             Self::RegisterPasskey if is_doc_first => 1,
             Self::CollectDocument { config, .. } if is_doc_first && config.is_identity() => 2,
 
-            Self::CollectBusinessData { .. } => 3,
-            Self::CollectData { .. } => 4,
-            Self::CollectInvestorProfile { .. } => 5,
-            Self::RegisterPasskey => 6,
-            Self::CollectDocument { .. } => 7,
-            Self::Authorize { .. } => 8,
-            Self::Process => 9,
+            Self::CreateBusinessOnboarding { .. } => 3,
+            Self::CollectBusinessData { .. } => 4,
+            Self::CollectData { .. } => 5,
+            Self::CollectInvestorProfile { .. } => 6,
+            Self::RegisterPasskey => 7,
+            Self::CollectDocument { .. } => 8,
+            Self::Authorize { .. } => 9,
+            Self::Process => 10,
         };
 
         let document_priority = self.collect_document_config().map(|c| c.document_priority());
@@ -185,6 +195,9 @@ impl OnboardingRequirement {
                 missing_document,
                 populated_attributes: _,
             } => missing_attributes.is_empty() && !missing_document,
+            Self::CreateBusinessOnboarding {
+                requires_business_selection,
+            } => !requires_business_selection,
             Self::CollectBusinessData {
                 missing_attributes,
                 populated_attributes: _,
@@ -236,6 +249,9 @@ impl OnboardingRequirement {
                     .map(|c| c.to_string())
                     .join(", ")
             ),
+            Self::CreateBusinessOnboarding {
+                requires_business_selection: _,
+            } => "Missing business onboarding".into(),
             Self::Authorize {
                 fields_to_authorize: _,
                 authorized_at: _,
@@ -320,6 +336,9 @@ mod test {
             OnboardingRequirement::RegisterAuthMethod {
                 auth_method_kind: AuthMethodKind::Email,
             },
+            OnboardingRequirement::CreateBusinessOnboarding {
+                requires_business_selection: true,
+            },
             OnboardingRequirement::CollectBusinessData {
                 missing_attributes: vec![],
                 populated_attributes: vec![],
@@ -347,6 +366,7 @@ mod test {
             },
             OnboardingRequirement::Process,
         ];
+
 
         // add doc reqs in
         for dr_kind in DocumentRequestKind::iter() {
@@ -399,6 +419,7 @@ mod test {
         let mut next_req = || requirements.pop().unwrap();
 
         assert!(next_req().is_register_auth_method());
+        assert!(next_req().is_create_business_onboarding());
         assert!(next_req().is_collect_business_data());
         assert!(next_req().is_collect_data());
         assert!(next_req().is_collect_investor_profile());
@@ -435,6 +456,7 @@ mod test {
             .collect_document_config()
             .is_some_and(|c| c.is_identity()));
 
+        assert!(next_req().is_create_business_onboarding());
         assert!(next_req().is_collect_business_data());
         assert!(next_req().is_collect_data());
         assert!(next_req().is_collect_investor_profile());
