@@ -280,9 +280,12 @@ pub enum EmploymentStatus {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum Agreements {
-    CustomerAgreement, //	Customer agreement
-    CryptoAgreement,   //	Crypto agreement
-    AccountAgreement,  //   Account agreement
+    CustomerAgreement,          // Customer agreement
+    CryptoAgreement,            // Crypto agreement
+    AccountAgreement,           // Account agreement
+    MarginAgreement,            // Margin agreement
+    OptionsAgreement,           // Options agreement
+    CustodialCustomerAgreement, // Custodial customer agreement
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]

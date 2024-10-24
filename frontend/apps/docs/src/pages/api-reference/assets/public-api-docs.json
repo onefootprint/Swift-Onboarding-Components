@@ -3920,7 +3920,10 @@
                                     "enum": [
                                         "customer_agreement",
                                         "crypto_agreement",
-                                        "account_agreement"
+                                        "account_agreement",
+                                        "margin_agreement",
+                                        "options_agreement",
+                                        "custodial_customer_agreement"
                                     ]
                                 },
                                 "ip_address": {
