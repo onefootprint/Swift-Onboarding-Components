@@ -2425,8 +2425,8 @@
             },
             "BatchHostedBusinessOwnerRequest": {
                 "example": {
-                    "op": "update",
-                    "id": "123",
+                    "op": "create",
+                    "uuid": "73b7e274-8080-44d6-b160-86cbc9877a00",
                     "data": {
                         "id.first_name": "John",
                         "id.last_name": "Doe"
@@ -3300,9 +3300,6 @@
                         "description": "True if a user has already started onboarding as this beneficial owner. In this case, the\n data below comes directly from that user's vault.",
                         "type": "boolean"
                     },
-                    "id": {
-                        "type": "string"
-                    },
                     "is_authed_user": {
                         "description": "True if this beneficial owner represents the currently authed user.",
                         "type": "boolean"
@@ -3310,6 +3307,9 @@
                     "is_mutable": {
                         "description": "True if this beneficial owner is editable by the currently authed user.",
                         "type": "boolean"
+                    },
+                    "link_id": {
+                        "type": "string"
                     },
                     "ownership_stake": {
                         "type": "integer",
@@ -3563,15 +3563,20 @@
                                 "bank.*.fingerprint"
                             ]
                         }
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
                     }
                 },
                 "required": [
                     "decrypted_data",
                     "has_linked_user",
-                    "id",
                     "is_authed_user",
                     "is_mutable",
-                    "populated_data"
+                    "link_id",
+                    "populated_data",
+                    "uuid"
                 ]
             },
             "HostedValidateResponse": {
@@ -6137,10 +6142,10 @@
                                 "to_ascii",
                                 "prefix(<n>)",
                                 "suffix(<n>)",
-                                "replace(<from>,<to>)",
-                                "date_format(<from_format>,<to_format>)",
-                                "hmac_sha256(<key>)",
-                                "encrypt(<algorithm>,<public_key>)"
+                                "replace('<from>','<to>')",
+                                "date_format('<from_format>','<to_format>')",
+                                "hmac_sha256('<key>')",
+                                "encrypt('<algorithm>','<public_key>')"
                             ]
                         }
                     },

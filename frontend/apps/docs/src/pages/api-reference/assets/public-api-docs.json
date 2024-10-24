@@ -3919,7 +3919,8 @@
                                     "type": "string",
                                     "enum": [
                                         "customer_agreement",
-                                        "crypto_agreement"
+                                        "crypto_agreement",
+                                        "account_agreement"
                                     ]
                                 },
                                 "ip_address": {

@@ -2279,7 +2279,8 @@
                                     "LabelAdded",
                                     "ExternalIntegrationCalled",
                                     "StepUp",
-                                    "OnboardingTimeline"
+                                    "OnboardingTimeline",
+                                    "BusinessOwnerCompletedKyc"
                                 ]
                             }
                         },

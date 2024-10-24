@@ -189,7 +189,14 @@ def test_alpaca_cip(
                     tz=datetime.timezone.utc
                 ).isoformat(),
                 "ip_address": "127.0.0.1",
-            }
+            },
+            {
+                "agreement": "account_agreement",
+                "signed_at": datetime.datetime.now(
+                    tz=datetime.timezone.utc
+                ).isoformat(),
+                "ip_address": "127.0.0.1",
+            },
         ],
     }
 

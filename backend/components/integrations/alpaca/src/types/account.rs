@@ -282,6 +282,7 @@ pub enum EmploymentStatus {
 pub enum Agreements {
     CustomerAgreement, //	Customer agreement
     CryptoAgreement,   //	Crypto agreement
+    AccountAgreement,  //   Account agreement
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
