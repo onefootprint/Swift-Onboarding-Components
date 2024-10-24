@@ -66,6 +66,7 @@ export type MachineEvents =
   | { type: 'confirmed' }
   | { type: 'introductionCompleted' }
   | { type: 'navigatedToPrevPage' }
+  | { type: 'manageBosCompleted' }
   | { type: 'setStakeExplanationDialogConfirmed'; payload: boolean }
   | { type: 'stepUpAuthTokenCompleted'; payload: string }
   | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData }

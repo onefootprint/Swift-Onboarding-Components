@@ -13,7 +13,7 @@ import type { NewBusinessOwner } from './manage-bos.types';
 
 const ManageBos = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.manage-bos' });
-  const [state] = useCollectKybDataMachine();
+  const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
   } = state.context;
@@ -53,6 +53,7 @@ const ManageBos = () => {
           ownershipStake,
         })),
       });
+      send({ type: 'manageBosCompleted' });
     } catch (error) {
       showRequestErrorToast(error);
     }

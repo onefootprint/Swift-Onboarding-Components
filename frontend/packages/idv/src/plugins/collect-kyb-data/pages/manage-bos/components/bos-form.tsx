@@ -1,5 +1,5 @@
 import { isEmail, isPhoneNumber } from '@onefootprint/core';
-import { uuid4 } from '@onefootprint/dev-tools';
+import { uuidv4 } from '@onefootprint/dev-tools';
 import { IcoPlusSmall24, IcoUserCircle24 } from '@onefootprint/icons';
 import type { HostedBusinessOwner } from '@onefootprint/services';
 import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
@@ -91,9 +91,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
             >
               <Stack paddingTop={5} paddingBottom={5} gap={3} alignItems="center">
                 <IcoUserCircle24 />
-                <Text variant="label-3">
-                  {idx === 0 ? t('fields-header.beneficial-owner-you') : t('fields-header.beneficial-owner-other')}
-                </Text>
+                <Text variant="label-3">{t('fields-header.beneficial-owner')}</Text>
                 <LinkButton $marginLeft="auto" onClick={() => remove(idx)}>
                   {t('fields-header.remove')}
                 </LinkButton>
@@ -216,7 +214,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
 
 const getEmptyBo = () => {
   return {
-    uuid: uuid4(),
+    uuid: uuidv4(),
     firstName: '',
     lastName: '',
     email: '',

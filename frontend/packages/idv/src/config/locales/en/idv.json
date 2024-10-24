@@ -683,6 +683,7 @@
         },
         "form": {
           "fields-header": {
+            "beneficial-owner": "Beneficial owner",
             "beneficial-owner-you": "Beneficial owner (You)",
             "beneficial-owner-other": "Beneficial owner (Other)",
             "remove": "Remove"

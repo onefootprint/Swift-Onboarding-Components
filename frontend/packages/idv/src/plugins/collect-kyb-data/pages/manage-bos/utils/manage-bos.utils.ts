@@ -24,9 +24,11 @@ export const hasDuplicatedPhoneNumber = (
   existingOwners: HostedBusinessOwner[],
   newOwners: NewBusinessOwner[],
 ): boolean => {
+  const removeSpecialChars = (phone: string) => phone.replace(/\D/g, '');
+
   const allPhoneNumbers = [
-    ...existingOwners.map(owner => owner.decryptedData[IdDI.phoneNumber]).filter(Boolean),
-    ...newOwners.map(owner => owner.phoneNumber).filter(Boolean),
+    ...existingOwners.map(owner => removeSpecialChars(owner.decryptedData[IdDI.phoneNumber])).filter(Boolean),
+    ...newOwners.map(owner => removeSpecialChars(owner.phoneNumber)).filter(Boolean),
   ];
   return allPhoneNumbers.length > 0 && new Set(allPhoneNumbers).size !== allPhoneNumbers.length;
 };

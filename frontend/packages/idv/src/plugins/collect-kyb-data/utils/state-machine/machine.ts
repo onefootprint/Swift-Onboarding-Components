@@ -152,7 +152,11 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             navigatedToPrevPage: prevScreenTransitions('businessAddress'),
           },
         },
-        manageBos: {},
+        manageBos: {
+          on: {
+            manageBosCompleted: [{ target: 'completed' }],
+          },
+        },
         beneficialOwners: {
           on: {
             beneficialOwnersSubmitted: nextScreenTransitions('beneficialOwners').map(config => ({
