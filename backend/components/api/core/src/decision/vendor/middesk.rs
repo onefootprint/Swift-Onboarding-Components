@@ -597,16 +597,11 @@ impl MiddeskState<Complete> {
                     Err(AssertionError("no kyb check configured"))
                 }?;
 
-                // TODO: uncomment this after migration to backfill business aml verification checks has been
-                // run.
-                /*
                 let has_aml_checks = obc
                     .verification_checks()
                     .get(VerificationCheckKind::BusinessAml)
                     .is_some();
-                */
 
-                let has_aml_checks = true;
                 let risk_signals: Vec<NewRiskSignalInfo> =
                     decision::features::middesk::reason_codes(&business_response, has_aml_checks)
                         .into_iter()
