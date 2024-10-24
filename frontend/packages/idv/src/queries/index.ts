@@ -1,7 +1,11 @@
 export { default as useBusiness } from './use-business';
 export { default as useBusinessData } from './use-business-data';
 export { default as useBusinessOwners, type HostedBusinessOwner } from './use-business-owners';
-export { default as useBusinessOwnersPatch } from './use-business-owners-patch';
+export {
+  default as useBusinessOwnersPatch,
+  type BusinessOwnerData,
+  type BusinessOwnerPatchOperation,
+} from './use-business-owners-patch';
 export { default as useD2PGenerate } from './use-d2p-generate';
 export { default as useD2PSms } from './use-d2p-sms';
 export { default as useDecryptBusiness } from './use-decrypt-business';

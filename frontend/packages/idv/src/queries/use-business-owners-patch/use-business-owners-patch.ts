@@ -6,7 +6,7 @@ import partition from 'lodash/partition';
 import type { VaultData } from '../../client/types.gen';
 import type { HostedBusinessOwner } from '../use-business-owners';
 
-type BusinessOwnerData = {
+export type BusinessOwnerData = {
   [IdDI.firstName]: string;
   [IdDI.middleName]?: string;
   [IdDI.lastName]: string;
@@ -16,7 +16,7 @@ type BusinessOwnerData = {
 type CreateBoOperation = { op: 'create'; uuid: string; data: BusinessOwnerData; ownership_stake: number };
 type UpdateBoOperation = { op: 'update'; uuid: string; data: Partial<BusinessOwnerData>; ownership_stake: number };
 type DeleteBoOperation = { op: 'delete'; uuid: string };
-type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation | DeleteBoOperation;
+export type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation | DeleteBoOperation;
 
 type Request = {
   authToken: string;
