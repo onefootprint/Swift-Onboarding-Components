@@ -29,6 +29,7 @@ export interface Typegen0 {
     | 'confirm'
     | 'introduction'
     | 'loadFromVault'
+    | 'manageBos'
     | 'router';
   tags: never;
 }

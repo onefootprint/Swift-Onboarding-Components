@@ -78,6 +78,16 @@ describe('Collect KYB Data Machine Tests', () => {
     return machine;
   };
 
+  it('shows page when recollect attributes are present', () => {
+    const attrs = [CollectedKybDataOption.kycedBeneficialOwners];
+    const machine = createMachine([], [], attrs, attrs);
+
+    let { state } = machine;
+    expect(state.value).toEqual('loadFromVault');
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+    expect(state.value).toEqual('manageBos');
+  });
+
   it('visits all pages when all attributes are missing', () => {
     const machine = createMachine(
       [
@@ -292,64 +302,6 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.done).toEqual(true);
   });
 
-  it('shows page when recollect attributes are present', () => {
-    const attrs = [
-      // CollectedKybDataOption.name,
-      // CollectedKybDataOption.tin,
-      CollectedKybDataOption.address,
-      CollectedKybDataOption.kycedBeneficialOwners,
-    ];
-    const machine = createMachine([], [], attrs, attrs);
-
-    let { state } = machine;
-    expect(state.value).toEqual('loadFromVault');
-
-    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
-    expect(state.value).toEqual('introduction');
-
-    state = machine.send('introductionCompleted');
-    expect(state.value).toEqual('businessAddress');
-
-    state = machine.send('businessAddressSubmitted', {
-      payload: {
-        [BusinessDI.addressLine1]: '123 Main St',
-        [BusinessDI.addressLine2]: 'Apt 1',
-        [BusinessDI.city]: 'New York',
-        [BusinessDI.state]: 'NY',
-        [BusinessDI.country]: 'USA',
-        [BusinessDI.zip]: '023123',
-      },
-    });
-    expect(state.value).toEqual('beneficialOwners');
-
-    state = machine.send({
-      type: 'beneficialOwnersSubmitted',
-      payload: {
-        data: {
-          [BusinessDI.kycedBeneficialOwners]: [
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'John',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-              [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-              [BeneficialOwnerDataAttribute.phoneNumber]: '+15555550100',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-            },
-          ],
-        },
-        vaultBusinessData: {} as BeneficialOwnersData,
-      },
-    });
-    expect(state.value).toEqual('confirm');
-
-    state = machine.send({ type: 'confirmed' });
-    expect(state.value).toEqual('beneficialOwnerKyc');
-
-    state = machine.send({ type: 'beneficialOwnerKycSubmitted' });
-    expect(state.value).toEqual('completed');
-
-    expect(state.done).toEqual(true);
-  });
-
   describe('Confirm flow', () => {
     it('Can edit from confirm state', () => {
       const machine = createMachine(
@@ -553,7 +505,7 @@ describe('Collect KYB Data Machine Tests', () => {
 });
 
 describe('nextScreenTransitions', () => {
-  const Targets = ['introduction', 'basicData', 'businessAddress', 'beneficialOwners', 'confirm'];
+  const Targets = ['introduction', 'basicData', 'businessAddress', 'manageBos', 'beneficialOwners', 'confirm'];
 
   it('should return same targets when loadFromVault', () => {
     const result = nextScreenTransitions('loadFromVault');

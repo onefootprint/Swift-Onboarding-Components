@@ -5,6 +5,7 @@ import {
   shouldShowAddressDataScreen,
   shouldShowBasicDataScreen,
   shouldShowBeneficialOwnersScreen,
+  shouldShowManageBosScreen,
 } from '../attributes';
 import type { MachineContext, MachineEvents } from './types';
 
@@ -25,6 +26,10 @@ const ORDERED_SCREENS: Screen[] = [
   {
     screen: 'businessAddress',
     missingCheck: shouldShowAddressDataScreen,
+  },
+  {
+    screen: 'manageBos',
+    missingCheck: shouldShowManageBosScreen,
   },
   {
     screen: 'beneficialOwners',
@@ -142,6 +147,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             navigatedToPrevPage: prevScreenTransitions('businessAddress'),
           },
         },
+        manageBos: {},
         beneficialOwners: {
           on: {
             beneficialOwnersSubmitted: nextScreenTransitions('beneficialOwners').map(config => ({

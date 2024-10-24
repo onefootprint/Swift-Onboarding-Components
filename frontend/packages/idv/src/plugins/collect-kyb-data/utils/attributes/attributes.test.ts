@@ -16,6 +16,7 @@ import {
   shouldShowAddressDataScreen,
   shouldShowBasicDataScreen,
   shouldShowBeneficialOwnersScreen,
+  shouldShowManageBosScreen,
 } from './attributes';
 
 const idvContext = {
@@ -29,11 +30,15 @@ const idvContext = {
   authToken: 'string',
 } satisfies CommonIdvContext;
 
-const getKybRequirement = (
-  missing: CollectedKybDataOption[],
-  populated: CollectedKybDataOption[] = [],
-  recollect: CollectedKybDataOption[] = [],
-): CollectKybDataRequirement => {
+const getKybRequirement = ({
+  missing = [],
+  populated = [],
+  recollect = [],
+}: {
+  missing?: CollectedKybDataOption[];
+  populated?: CollectedKybDataOption[];
+  recollect?: CollectedKybDataOption[];
+}): CollectKybDataRequirement => {
   return {
     hasLinkedBos: false,
     isMet: false,
@@ -144,7 +149,7 @@ describe('extractNonBoBootstrapValues', () => {
 describe('getBusinessDataFromContext', () => {
   it('should build kyced_beneficial_owners from bootstrapUserData', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -162,7 +167,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should build business.beneficial_owners from bootstrapUserData', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -180,7 +185,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should respect the data already in the context', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -200,7 +205,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should merge bootstrapBusinessData and data properties', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.name, CollectedKybDataOption.website]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name, CollectedKybDataOption.website] }),
       idvContext: idvContext,
       bootstrapBusinessData: {
         'business.name': { value: 'Acme Inc', isBootstrap: true },
@@ -224,7 +229,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should not override data properties with bootstrapBusinessData', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.name, CollectedKybDataOption.website]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name, CollectedKybDataOption.website] }),
       idvContext: idvContext,
       bootstrapBusinessData: { 'business.name': { value: 'Bootstrapped name', isBootstrap: true } },
       bootstrapUserData: {},
@@ -237,7 +242,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should return an empty object when there is no data', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.name, CollectedKybDataOption.website]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name, CollectedKybDataOption.website] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -252,7 +257,7 @@ describe('getBusinessDataFromContext', () => {
 describe('isCollectingBusinessData', () => {
   it('should return true when some required attributes are missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.name]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -266,7 +271,7 @@ describe('isCollectingBusinessData', () => {
 
   it('should return false when some required attributes are present', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.name]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -280,10 +285,14 @@ describe('isCollectingBusinessData', () => {
 
   it('should be true if TIN is missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement(
-        [CollectedKybDataOption.tin],
-        [CollectedKybDataOption.name, CollectedKybDataOption.kycedBeneficialOwners, CollectedKybDataOption.address],
-      ),
+      kybRequirement: getKybRequirement({
+        missing: [CollectedKybDataOption.tin],
+        populated: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.kycedBeneficialOwners,
+          CollectedKybDataOption.address,
+        ],
+      }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -317,13 +326,15 @@ describe('isCollectingBusinessData', () => {
 describe('isMissingBasicData', () => {
   it('should return true when all basic data attributes are missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([
-        CollectedKybDataOption.name,
-        CollectedKybDataOption.tin,
-        CollectedKybDataOption.corporationType,
-        CollectedKybDataOption.phoneNumber,
-        CollectedKybDataOption.website,
-      ]),
+      kybRequirement: getKybRequirement({
+        missing: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.tin,
+          CollectedKybDataOption.corporationType,
+          CollectedKybDataOption.phoneNumber,
+          CollectedKybDataOption.website,
+        ],
+      }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -337,11 +348,9 @@ describe('isMissingBasicData', () => {
 
   it('should return false when required attributes are present', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([
-        CollectedKybDataOption.name,
-        CollectedKybDataOption.tin,
-        CollectedKybDataOption.website,
-      ]),
+      kybRequirement: getKybRequirement({
+        missing: [CollectedKybDataOption.name, CollectedKybDataOption.tin, CollectedKybDataOption.website],
+      }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -361,7 +370,7 @@ describe('isMissingBasicData', () => {
 describe('isMissingAddressData', () => {
   it('should return false when there are no missing address attributes', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.address] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -382,7 +391,7 @@ describe('isMissingAddressData', () => {
 
   it('should return false when optional addressLine2 is missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.address] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -403,7 +412,7 @@ describe('isMissingAddressData', () => {
 
   it('should return true when there is a missing address attribute', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.address] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -424,7 +433,7 @@ describe('isMissingAddressData', () => {
 
   it('should return true when country is missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.address] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -445,7 +454,10 @@ describe('isMissingAddressData', () => {
 
   it('should return true when in recollectAttributes', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.address], [], [CollectedKybDataOption.address]),
+      kybRequirement: getKybRequirement({
+        missing: [CollectedKybDataOption.address],
+        recollect: [CollectedKybDataOption.address],
+      }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -468,7 +480,7 @@ describe('isMissingAddressData', () => {
 describe('isMissingBeneficialOwnersData', () => {
   it('should return false if beneficial owners is populated', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -489,7 +501,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return true when part of beneficial owners is missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -508,7 +520,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return false if kyced beneficial owners is populated', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -538,7 +550,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return true if one of kyced beneficial owners is missing contact info', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -568,7 +580,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return true when part of kyced beneficial owners is missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -587,7 +599,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return false if all possible attributes are present', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -613,7 +625,7 @@ describe('isMissingBeneficialOwnersData', () => {
 describe('extractBoBootstrapValues', () => {
   it('should return an empty object when business.kyced_beneficial_owners is not populated', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {
         // @ts-expect-error: business.kyced_beneficial_owners type was removed from the bootstrap business data
@@ -631,7 +643,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('should return an empty object when business.beneficial_owners is populated', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {
         // @ts-expect-error: business.beneficial_owners type was removed from the bootstrap business data
@@ -649,7 +661,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('should return an empty object when missingAttributes is empty', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([]),
+      kybRequirement: getKybRequirement({}),
       idvContext: idvContext,
       bootstrapBusinessData: {
         [BusinessDI.name]: { value: 'Acme Inc', isBootstrap: true },
@@ -666,7 +678,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('should return an object with business.kyced_beneficial_owners when kycedBeneficialOwners is required', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -694,7 +706,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('should return an object with business.beneficial_owners when beneficialOwners is required', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -720,7 +732,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('should ignore email and phoneNumber in business.beneficial_owners', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {
         'business.secondary_owners': {
@@ -754,7 +766,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('should consider email and phoneNumber in business.kyced_beneficial_owners', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {
         'business.secondary_owners': {
@@ -794,7 +806,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('constructs primary BO using id.xxx data and business.primary_owner_stake', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapUserData: {
         'id.phone_number': { value: '+15555550100', isBootstrap: true },
@@ -825,7 +837,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('constructs primary BO id.xxx data', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapUserData: {
         'id.phone_number': { value: '+15555550100', isBootstrap: true },
@@ -853,7 +865,7 @@ describe('extractBoBootstrapValues', () => {
 
   it('constructs primary BO and secondary BOs', () => {
     const ctx = {
-      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapUserData: {
         'id.phone_number': { value: '+15555550100', isBootstrap: true },
@@ -897,5 +909,51 @@ describe('extractBoBootstrapValues', () => {
         },
       ],
     });
+  });
+});
+
+describe('shouldShowManageBosScreen', () => {
+  it('should return true when kycedBeneficialOwners needs to be recollected', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement({
+        missing: [],
+        populated: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.tin,
+          CollectedKybDataOption.address,
+          CollectedKybDataOption.kycedBeneficialOwners,
+        ],
+        recollect: [CollectedKybDataOption.kycedBeneficialOwners],
+      }),
+      idvContext: idvContext,
+      bootstrapBusinessData: {},
+      bootstrapUserData: {},
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    expect(shouldShowManageBosScreen(ctx)).toBe(true);
+  });
+
+  it('should false true when kycedBeneficialOwners does not need to recollected', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement({
+        missing: [],
+        populated: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.tin,
+          CollectedKybDataOption.address,
+          CollectedKybDataOption.kycedBeneficialOwners,
+        ],
+        recollect: [],
+      }),
+      idvContext: idvContext,
+      bootstrapBusinessData: {},
+      bootstrapUserData: {},
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    expect(shouldShowManageBosScreen(ctx)).toBe(false);
   });
 });

@@ -11,6 +11,7 @@ import BusinessFieldsLoader from '../business-fields-loader';
 import Confirm from '../confirm';
 import Introduction from '../introduction';
 import Loading from '../loading';
+import ManageBos from '../manage-bos';
 
 type RouterProps = { onDone: () => void };
 
@@ -53,6 +54,9 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('businessAddress')) {
     return <BusinessAddress />;
+  }
+  if (state.matches('manageBos')) {
+    return <ManageBos />;
   }
   if (state.matches('beneficialOwners')) {
     return <BeneficialOwners />;

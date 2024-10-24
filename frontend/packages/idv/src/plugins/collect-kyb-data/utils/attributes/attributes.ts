@@ -122,7 +122,7 @@ const isMissingAnyData = (ctx: MachineContext, cdos: CollectedKybDataOption[]): 
 
 export const isCollectingBusinessData = (ctx: MachineContext): boolean => {
   const allAttributes = [...ctx.kybRequirement.populatedAttributes, ...ctx.kybRequirement.missingAttributes];
-  return isMissingAnyData(ctx, allAttributes) || shouldRecollect(ctx, allAttributes);
+  return isMissingAnyData(ctx, allAttributes);
 };
 
 export const shouldShowBasicDataScreen = (ctx: MachineContext): boolean => {
@@ -166,5 +166,10 @@ export const shouldShowBeneficialOwnersScreen = (ctx: MachineContext): boolean =
     );
   });
 
-  return isMissingBos || shouldRecollect(ctx, boCdos);
+  return isMissingBos;
+};
+
+export const shouldShowManageBosScreen = (ctx: MachineContext): boolean => {
+  const boCdos = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
+  return shouldRecollect(ctx, boCdos);
 };
