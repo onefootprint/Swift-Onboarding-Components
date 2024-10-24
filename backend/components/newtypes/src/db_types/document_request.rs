@@ -1,3 +1,4 @@
+use super::DocumentAndCountryConfiguration;
 use crate::DataIdentifier;
 use crate::DocumentDiKind;
 use crate::DocumentUploadSettings;
@@ -46,6 +47,8 @@ use strum_macros::EnumString;
 pub enum DocumentRequestConfig {
     Identity {
         collect_selfie: bool,
+        #[serde(default)]
+        document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     },
     ProofOfSsn {
         #[serde(default = "yes")]

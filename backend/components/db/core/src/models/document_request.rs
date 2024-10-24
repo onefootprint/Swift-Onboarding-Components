@@ -185,7 +185,7 @@ pub enum UncheckedDrIdentifier {
 impl DocumentRequest {
     pub fn should_collect_selfie(&self) -> bool {
         match &self.config {
-            DocumentRequestConfig::Identity { collect_selfie } => *collect_selfie,
+            DocumentRequestConfig::Identity { collect_selfie, .. } => *collect_selfie,
             _ => false,
         }
     }

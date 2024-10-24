@@ -134,6 +134,7 @@ mod tests {
     use newtypes::vendor_api_struct::*;
     use newtypes::DecisionIntentId;
     use newtypes::DecisionIntentKind;
+    use newtypes::DocumentAndCountryConfiguration;
     use newtypes::DocumentId;
     use newtypes::DocumentKind;
     use newtypes::DocumentRequestConfig;
@@ -189,6 +190,7 @@ mod tests {
                         rule_set_result_id: None,
                         config: DocumentRequestConfig::Identity {
                             collect_selfie: false,
+                            document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
                         },
                     };
 

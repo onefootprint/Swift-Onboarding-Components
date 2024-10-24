@@ -140,7 +140,7 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
 }
 
 #[test_case(vec![] => true)]
-#[test_case(vec![DocumentRequestConfig::Identity{ collect_selfie: true }] => false)]
+#[test_case(vec![DocumentRequestConfig::Identity{ collect_selfie: true, document_types_and_countries: None}] => false)]
 #[test_case(vec![DocumentRequestConfig::ProofOfAddress {requires_human_review: true}, DocumentRequestConfig::ProofOfSsn {requires_human_review: true}, DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None, requires_human_review: true, upload_settings: DocumentUploadSettings::PreferCapture}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.bye").unwrap(), name: "Bye".to_owned(), description: None, requires_human_review: true, upload_settings: DocumentUploadSettings::PreferCapture})] => true; "proofofssn-proofofaddress-multiple-custom")]
 #[test_case(vec![DocumentRequestConfig::ProofOfAddress {requires_human_review: true}, DocumentRequestConfig::ProofOfAddress {requires_human_review: true}] => false)]
 #[test_case(vec![DocumentRequestConfig::ProofOfSsn {requires_human_review: true}, DocumentRequestConfig::ProofOfSsn {requires_human_review: true}] => false)]

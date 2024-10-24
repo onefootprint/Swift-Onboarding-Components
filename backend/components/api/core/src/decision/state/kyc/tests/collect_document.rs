@@ -44,6 +44,7 @@ use newtypes::CountryRestriction;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::DocTypeRestriction;
+use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentCdoInfo;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
@@ -296,6 +297,7 @@ async fn collect_ad_hoc_document(
                 config: DocumentConfig {
                     configs: vec![DocumentRequestConfig::Identity {
                         collect_selfie: false,
+                        document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
                     }],
                     business_configs: vec![],
                 }

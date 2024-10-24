@@ -17,6 +17,7 @@ use db::models::ob_configuration::ObConfiguration;
 use newtypes::put_data_request::PatchDataRequest;
 use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::DataLifetimeSource;
+use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentRequestConfig;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::Iso3166TwoDigitCountryCode;
@@ -122,7 +123,8 @@ pub async fn patch(
         {
             tracing::info!(scoped_vault_id=%sv_id, wf_id=%wf.id, "creating doc request for international onboarding");
 
-            let args = default_identity_doc_args(sv_id, true, &wf.id);
+            let args =
+                default_identity_doc_args(sv_id, true, &wf.id, obc.document_types_and_countries.clone());
             // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
             state
                 .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
@@ -153,7 +155,7 @@ async fn handle_ssn_skipped(
             let ssn_optional_and_missing = api_core::decision::features::user_input::ssn_optional_and_missing(&vw, &obc);
 
             if ssn_optional_and_missing {
-                let doc_req_args = default_identity_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id);
+                let doc_req_args = default_identity_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id, obc.document_types_and_countries.clone());
 
                 tracing::info!(scoped_vault_id=%sv_id, wf_id=%workflow_id, "creating doc request for ssn skipped");
                 DocumentRequest::get_or_create(conn, doc_req_args)?;
@@ -170,6 +172,7 @@ fn default_identity_doc_args(
     sv_id: &ScopedVaultId,
     should_collect_selfie: bool,
     workflow_id: &WorkflowId,
+    document_types_and_countries: Option<DocumentAndCountryConfiguration>,
 ) -> NewDocumentRequestArgs {
     NewDocumentRequestArgs {
         scoped_vault_id: sv_id.clone(),
@@ -177,6 +180,7 @@ fn default_identity_doc_args(
         rule_set_result_id: None,
         config: DocumentRequestConfig::Identity {
             collect_selfie: should_collect_selfie,
+            document_types_and_countries,
         },
     }
 }

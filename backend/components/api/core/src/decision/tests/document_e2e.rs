@@ -35,6 +35,7 @@ use macros::test_state_case;
 use newtypes::CollectedDataOption;
 use newtypes::CountryRestriction;
 use newtypes::DocTypeRestriction;
+use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentCdoInfo;
 use newtypes::DocumentFixtureResult;
 use newtypes::DocumentId;
@@ -134,6 +135,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         let config = match doc_kind {
             DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
                 collect_selfie: false,
+                document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
             },
             DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {
                 requires_human_review: true,

@@ -26,7 +26,7 @@ impl SupportedDocumentAndCountryMappingForBifrost {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq, Default)]
 pub struct CountrySpecificDocumentMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>);
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq)]
@@ -50,6 +50,16 @@ impl DocumentAndCountryConfiguration {
         mapping.extend(self.country_specific.0.clone());
 
         SupportedDocumentAndCountryMappingForBifrost(mapping)
+    }
+}
+
+// Default is to accept all documents from all countries
+impl Default for DocumentAndCountryConfiguration {
+    fn default() -> Self {
+        Self {
+            global: IdDocKind::iter().collect(),
+            country_specific: CountrySpecificDocumentMapping::default(),
+        }
     }
 }
 

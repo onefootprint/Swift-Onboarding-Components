@@ -62,6 +62,7 @@ use mockall::predicate::always;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::DecisionIntentKind;
+use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentKind;
 use newtypes::DocumentRequestConfig;
 use newtypes::DocumentRequestKind;
@@ -616,6 +617,7 @@ pub async fn mock_incode_doc_collection(
                 // document rules in decisioning
                 let config = DocumentRequestConfig::Identity {
                     collect_selfie: false,
+                    document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
                 };
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: scoped_vault_id.clone(),

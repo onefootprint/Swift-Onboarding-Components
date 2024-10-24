@@ -163,12 +163,14 @@ pub fn get_or_create_user_workflow(
 
     if is_new_wf {
         let wf = Workflow::get(conn, &wf.id)?;
+        let document_types_and_countries = obc.document_types_and_countries.clone();
         let user_doc_requests = match &wf.config {
             WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => chain!(
                 // Identity documents are generally still represented in CDOs. We could migrate them
                 // to `obc.documents_to_collect` one day
                 obc.document_cdo().map(|cdo| DocumentRequestConfig::Identity {
                     collect_selfie: cdo.selfie() == Selfie::RequireSelfie,
+                    document_types_and_countries,
                 }),
                 obc.documents_to_collect.clone().unwrap_or_default(),
             )

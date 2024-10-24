@@ -1,3 +1,4 @@
+use super::DocumentAndCountryConfiguration;
 use crate::util::impl_enum_str_diesel;
 use crate::util::impl_enum_string_diesel;
 use crate::DecisionStatus;
@@ -108,7 +109,9 @@ impl StepUpKind {
             .into_iter()
             .filter_map(|kind| match kind {
                 DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
-                    collect_selfie: true, // TODO: should come from config
+                    collect_selfie: true, // TODO: should come from config,
+                    // 2024-10-21 This is the default at the moment, but will be configurable in the future
+                    document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
                 }),
                 DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {
                     requires_human_review: true,

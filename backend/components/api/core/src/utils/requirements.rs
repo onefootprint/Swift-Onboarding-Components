@@ -548,7 +548,7 @@ fn get_collect_document_requirements(
                 .get(&IDK::Country.into())
                 .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
             let config = match dr.config {
-                DocumentRequestConfig::Identity { collect_selfie } => {
+                DocumentRequestConfig::Identity { collect_selfie, .. } => {
                     let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
                     let supported_country_and_doc_types =
                         ctx.obc.supported_country_mapping_for_document(country).0;
