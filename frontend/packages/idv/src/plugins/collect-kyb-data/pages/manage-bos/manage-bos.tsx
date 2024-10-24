@@ -1,4 +1,3 @@
-import { uuidv4 } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IdDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
@@ -42,9 +41,9 @@ const ManageBos = () => {
       await bosMutation.mutateAsync({
         authToken,
         currentBos: bosQuery.data,
-        operations: formValues.map(({ firstName, lastName, email, phoneNumber, ownershipStake }) => ({
+        operations: formValues.map(({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
           op: 'create',
-          uuid: uuidv4(),
+          uuid,
           data: {
             [IdDI.firstName]: firstName,
             [IdDI.lastName]: lastName,

@@ -1,4 +1,5 @@
 export type NewBusinessOwner = {
+  uuid: string;
   firstName: string;
   lastName: string;
   ownershipStake: number;

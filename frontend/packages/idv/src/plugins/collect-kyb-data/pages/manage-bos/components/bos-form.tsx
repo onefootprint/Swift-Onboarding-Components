@@ -1,4 +1,5 @@
 import { isEmail, isPhoneNumber } from '@onefootprint/core';
+import { uuid4 } from '@onefootprint/dev-tools';
 import { IcoPlusSmall24, IcoUserCircle24 } from '@onefootprint/icons';
 import type { HostedBusinessOwner } from '@onefootprint/services';
 import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
@@ -24,7 +25,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
-      bos: [emptyBo],
+      bos: [getEmptyBo()],
     },
   });
   const { append, fields, remove } = useFieldArray({ name: 'bos', control });
@@ -32,7 +33,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
   const isStakeInvalid = isOwnershipStakeInvalid(existingBos, newBos);
 
   const handleAdd = () => {
-    append(emptyBo);
+    append(getEmptyBo());
   };
 
   const onSubmitFormData = (formData: FormData) => {
@@ -213,12 +214,14 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
   );
 };
 
-const emptyBo = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  phoneNumber: '',
-  ownershipStake: 0,
+const getEmptyBo = () => {
+  return {
+    uuid: uuid4(),
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    ownershipStake: 0,
+  };
 };
-
 export default BosForm;
