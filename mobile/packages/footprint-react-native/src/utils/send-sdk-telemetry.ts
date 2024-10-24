@@ -12,7 +12,7 @@ type SdkTelemetryRequest = {
   sessionId?: string;
 };
 
-const sendSdkTelemetry = (message: string, level: 'error' | 'warn', domain?: string) => {
+const sendSdkTelemetry = (message: string, level: 'error' | 'warn' | 'info', domain?: string) => {
   const body: SdkTelemetryRequest = {
     tenantDomain: domain,
     sdkKind: SDK_KIND,

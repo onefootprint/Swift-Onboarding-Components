@@ -3,7 +3,7 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
 import type { ComponentProps } from './types';
 import createUrl from './utils/create-url';
-import { logError, logWarn } from './utils/logger';
+import { logError, logInfo, logWarn } from './utils/logger';
 import sendSdkArgs from './utils/send-sdk-args';
 
 const footprint = () => {
@@ -31,8 +31,7 @@ const footprint = () => {
       return;
     }
     isOpen = true;
-
-    const token = await sendSdkArgs({
+    const sdkArgs = {
       publicKey: props.publicKey,
       authToken: props.authToken,
       bootstrapData: props.bootstrapData,
@@ -40,7 +39,9 @@ const footprint = () => {
       l10n: props.l10n,
       sandboxId: props.sandboxId,
       sandboxOutcome: props.sandboxOutcome,
-    });
+    };
+    logInfo(`Sending SDK args to Footprint's server. Public key is ${props.publicKey}.`);
+    const token = await sendSdkArgs(sdkArgs);
     if (!token) {
       handleError(props, 'Unable to get SDK args token.');
       return;
@@ -50,6 +51,7 @@ const footprint = () => {
       const result = await openWebView(props, token);
       if (result.type !== 'success') {
         // Triggered if user closes the web browser
+        logWarn('User closed the web view.');
         handleCancel(props);
       } else {
         handleWebViewUrlChange(props, result.url);
@@ -76,6 +78,7 @@ const footprint = () => {
       handleCancel(props);
       return;
     }
+    logInfo('Handling URL redirection');
 
     const deepLink = props.redirectUrl;
     const search = url.replace(deepLink, '');
@@ -102,8 +105,10 @@ const footprint = () => {
       redirectUrl: deepLink,
       token,
     });
+    logInfo("Opening Footprint's web view");
     const isAvailable = await InAppBrowser.isAvailable();
     if (!isAvailable) {
+      logError('InAppBrowser is not available.');
       throw new Error('InAppBrowser is not available.');
     }
     const result = await InAppBrowser.openAuth(url, deepLink, {

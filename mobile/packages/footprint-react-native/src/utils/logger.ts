@@ -62,3 +62,22 @@ export const logWarn = (error: unknown) => {
 
   return warnMessageWithPrefix;
 };
+
+export const logInfo = (error: unknown) => {
+  const message = getStringMessage(error);
+  const warnMessageWithPrefix = `${messagePrefix}: ${message}`;
+  if (debugMode) {
+    console.log(warnMessageWithPrefix);
+  } else {
+    Linking.getInitialURL()
+      .then(tenantDomain => {
+        sendSdkTelemetry(message, 'info', tenantDomain ?? '');
+      })
+      .catch(() => {
+        // Ignore any errors and send without tenant domain
+        sendSdkTelemetry(message, 'info');
+      });
+  }
+
+  return warnMessageWithPrefix;
+};

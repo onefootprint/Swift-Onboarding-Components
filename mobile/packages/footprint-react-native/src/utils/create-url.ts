@@ -21,7 +21,7 @@ const encode = (obj?: Record<string, unknown>): string => {
 };
 
 const createComponentUrl = () => {
-  return 'https://id.onefootprint.com';
+  return 'https://id2.onefootprint.com';
 };
 
 const createSearchParams = ({
