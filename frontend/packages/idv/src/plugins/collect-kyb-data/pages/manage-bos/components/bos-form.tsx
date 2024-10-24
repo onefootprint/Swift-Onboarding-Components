@@ -21,7 +21,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
       bos: [emptyBo],
@@ -200,12 +200,12 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
             iconPosition="left"
             variant="label-2"
             onClick={handleAdd}
-            disabled={isStakeInvalid}
+            disabled={isStakeInvalid || isSubmitting}
           >
             {t('add-another')}
           </LinkButton>
         </Stack>
-        <Button size="large" type="submit">
+        <Button size="large" type="submit" loading={isSubmitting}>
           {t('continue')}
         </Button>
       </Stack>

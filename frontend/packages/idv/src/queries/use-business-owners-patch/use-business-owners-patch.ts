@@ -33,8 +33,10 @@ export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operat
   /** Get business owner details by id */
   const boDetailsByUuid = Object.fromEntries(currentBos.map(({ uuid, ...props }) => [uuid, props]));
 
-  /** Split operations into update and non-update operations */
-  const [updateOperations, nonUpdateOperations] = partition(operations, op => op.op === 'update');
+  /** Split operations into create, update, and delete operations */
+  const createOperations = operations.filter(op => op.op === 'create');
+  const updateOperations = operations.filter(op => op.op === 'update');
+  const deleteOperations = operations.filter(op => op.op === 'delete');
 
   /** Filter out updates for immutable owners */
   const mutableUpdates = updateOperations.filter(op => boDetailsByUuid[op.uuid]?.isMutable);
@@ -76,8 +78,15 @@ export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operat
 
   /** Update non-linked users */
   const bulkPayload = [
-    ...nonUpdateOperations,
-    ...updateOperationsWithoutLinkedUser,
+    ...deleteOperations,
+    ...createOperations.map(({ ownershipStake, ...operation }) => ({
+      ...operation,
+      ownership_stake: ownershipStake,
+    })),
+    ...updateOperationsWithoutLinkedUser.map(({ ownershipStake, ...operation }) => ({
+      ...operation,
+      ownership_stake: ownershipStake,
+    })),
     ...updateOperationsWithLinkedUser
       .filter(operation => boDetailsByUuid[operation.uuid]?.ownershipStake !== operation.ownershipStake)
       .map(operation => ({

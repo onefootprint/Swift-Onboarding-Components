@@ -1,3 +1,6 @@
+import { uuidv4 } from '@onefootprint/dev-tools';
+import { useRequestErrorToast } from '@onefootprint/hooks';
+import { IdDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -16,6 +19,7 @@ const ManageBos = () => {
   } = state.context;
   const bosQuery = useBusinessOwners({ authToken });
   const bosMutation = useBusinessOwnersPatch();
+  const showRequestErrorToast = useRequestErrorToast();
 
   if (bosQuery.isPending) {
     return <Loading />;
@@ -29,18 +33,42 @@ const ManageBos = () => {
         <BosList
           existingBos={bosQuery.data}
           onSubmit={async ({ uuid, ownershipStake }) => {
-            await bosMutation.mutateAsync({
-              authToken,
-              currentBos: bosQuery.data,
-              operations: [{ op: 'update', uuid, ownershipStake, data: {} }],
-            });
+            try {
+              await bosMutation.mutateAsync({
+                authToken,
+                currentBos: bosQuery.data,
+                operations: [{ op: 'update', uuid, ownershipStake, data: {} }],
+              });
+            } catch (e) {
+              showRequestErrorToast(e);
+            }
             await bosQuery.refetch();
           }}
         />
         <BosForm
           existingBos={bosQuery.data}
-          onSubmit={() => {
-            // TODO: Implement submit logic
+          onSubmit={async formValues => {
+            try {
+              await bosMutation.mutateAsync({
+                authToken,
+                currentBos: bosQuery.data,
+                operations: formValues.map(({ firstName, lastName, email, phoneNumber, ownershipStake }) => {
+                  return {
+                    op: 'create',
+                    uuid: uuidv4(),
+                    data: {
+                      [IdDI.firstName]: firstName,
+                      [IdDI.lastName]: lastName,
+                      [IdDI.email]: email,
+                      [IdDI.phoneNumber]: phoneNumber,
+                    },
+                    ownershipStake,
+                  };
+                }),
+              });
+            } catch (e) {
+              showRequestErrorToast(e);
+            }
           }}
         />
       </Stack>

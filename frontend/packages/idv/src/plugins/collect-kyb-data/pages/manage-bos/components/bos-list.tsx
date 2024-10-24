@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoUsers24 } from '@onefootprint/icons';
 import type { HostedBusinessOwner } from '@onefootprint/services';
 import { IdDI } from '@onefootprint/types';
@@ -22,16 +21,11 @@ type EditFormValues = {
 const BosList = ({ existingBos, onSubmit }: BosListProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.list' });
   const [editingBo, setEditingBo] = useState<HostedBusinessOwner | null>(null);
-  const showRequestErrorToast = useRequestErrorToast();
   const authedUser = existingBos.find(bo => bo.isAuthedUser);
 
   const handleSubmit = (bo: HostedBusinessOwner) => async (formValues: EditFormValues) => {
-    try {
-      await onSubmit({ uuid: bo.uuid, ownershipStake: formValues.ownershipStake });
-      setEditingBo(null);
-    } catch (e) {
-      showRequestErrorToast(e);
-    }
+    await onSubmit({ uuid: bo.uuid, ownershipStake: formValues.ownershipStake });
+    setEditingBo(null);
   };
 
   return (

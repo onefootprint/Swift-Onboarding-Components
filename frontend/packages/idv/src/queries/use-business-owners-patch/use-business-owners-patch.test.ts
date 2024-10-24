@@ -69,7 +69,20 @@ describe('patchBusinessOwnersRequest', () => {
       method: 'PATCH',
       headers: { 'X-Fp-Authorization': mockAuthToken },
       url: '/hosted/business/owners',
-      data: operations,
+      data: [
+        { op: 'delete' as const, uuid: '1' },
+        {
+          op: 'create' as const,
+          uuid: '2',
+          data: {
+            'id.first_name': 'New',
+            'id.last_name': 'Owner',
+            'id.email': 'newowner@example.com',
+            'id.phone_number': '1234567890',
+          },
+          ownership_stake: 25,
+        },
+      ],
     });
   });
 
@@ -84,7 +97,7 @@ describe('patchBusinessOwnersRequest', () => {
       method: 'PATCH',
       headers: { 'X-Fp-Authorization': mockAuthToken },
       url: '/hosted/business/owners',
-      data: operations,
+      data: [{ op: 'update' as const, uuid: '1', data: { 'id.first_name': 'Johnny' }, ownership_stake: 60 }],
     });
   });
 
@@ -176,7 +189,21 @@ describe('patchBusinessOwnersRequest', () => {
       method: 'PATCH',
       headers: { 'X-Fp-Authorization': mockAuthToken },
       url: '/hosted/business/owners',
-      data: operations,
+      data: [
+        { op: 'delete' as const, uuid: '3' },
+        {
+          op: 'create' as const,
+          uuid: '222',
+          data: {
+            'id.first_name': 'New',
+            'id.last_name': 'Owner',
+            'id.email': 'newowner@example.com',
+            'id.phone_number': '1234567890',
+          },
+          ownership_stake: 20,
+        },
+        { op: 'update' as const, uuid: '1', data: { 'id.first_name': 'Johnny' }, ownership_stake: 40 },
+      ],
     });
   });
 });
