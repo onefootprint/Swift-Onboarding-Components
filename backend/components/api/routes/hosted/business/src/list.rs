@@ -55,10 +55,10 @@ pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiList
 
     let results = bos
         .into_iter()
-        .filter_map(|(_, sb, _)| -> Option<_> {
+        .filter_map(|(bo, sb, _)| -> Option<_> {
             let name = results.remove(&sb.id)?.remove(&BDK::Name.into())?;
             let name = name.to_piistring().ok()?;
-            Some((sb, name))
+            Some((bo, sb, name))
         })
         .map(HostedBusinessList::from_db)
         .collect();

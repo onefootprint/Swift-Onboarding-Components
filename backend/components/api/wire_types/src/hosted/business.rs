@@ -1,6 +1,6 @@
 use crate::*;
+use newtypes::BoId;
 use newtypes::PiiString;
-use newtypes::ScopedVaultId;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct HostedBusiness {
@@ -11,7 +11,7 @@ pub struct HostedBusiness {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct HostedBusinessList {
-    pub id: ScopedVaultId,
+    pub id: BoId,
     pub name: PiiString,
     pub created_at: DateTime<Utc>,
     pub is_incomplete: bool,
