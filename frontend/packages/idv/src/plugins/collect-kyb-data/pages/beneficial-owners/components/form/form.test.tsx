@@ -148,6 +148,7 @@ describe('<Form />', () => {
           [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
         },
         {
+          _uuid: '', // TODO: this will be implemented in the next PR
           [BeneficialOwnerDataAttribute.firstName]: 'Lily',
           [BeneficialOwnerDataAttribute.middleName]: undefined,
           [BeneficialOwnerDataAttribute.lastName]: 'Smith',

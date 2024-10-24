@@ -1,5 +1,9 @@
 import type { BeneficialOwner } from '@onefootprint/types';
 
-export type FormData = {
-  beneficialOwners: BeneficialOwner[];
+export type BeneficialOwnerWithMetadata = BeneficialOwner & {
+  _uuid: string;
+  _isAuthedUser?: boolean;
+  _isMutable?: boolean;
 };
+
+export type FormData = { beneficialOwners: BeneficialOwnerWithMetadata[] };
