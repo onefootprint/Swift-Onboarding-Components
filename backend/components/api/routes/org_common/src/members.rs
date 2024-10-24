@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::InsightHeaders;
 use api_core::utils::magic_link::create_magic_link;
 use api_core::FpResult;
 use api_core::State;
@@ -22,6 +23,7 @@ use newtypes::OrgMemberEmail;
 use newtypes::TenantUserId;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
+
 
 pub async fn get(
     state: web::Data<State>,
@@ -66,6 +68,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
@@ -115,6 +118,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
@@ -150,6 +154,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();

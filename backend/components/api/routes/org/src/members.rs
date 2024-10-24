@@ -2,6 +2,7 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
+use api_core::utils::headers::InsightHeaders;
 use api_core::State;
 use api_route_org_common::members as members_common;
 use api_wire_types::OrgMemberFilters;
@@ -12,6 +13,7 @@ use paperclip::actix::patch;
 use paperclip::actix::post;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
+
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),
@@ -36,8 +38,9 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
     auth: TenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationMember> {
-    members_common::post(state, request, auth.into()).await
+    members_common::post(state, request, auth.into(), insight).await
 }
 
 #[api_v2_operation(
@@ -50,8 +53,9 @@ async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationMember> {
-    members_common::patch(state, request, tu_id, auth.into()).await
+    members_common::patch(state, request, tu_id, auth.into(), insight).await
 }
 
 #[api_v2_operation(
@@ -63,6 +67,7 @@ async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
-    members_common::deactivate(state, tu_id, auth.into()).await
+    members_common::deactivate(state, tu_id, auth.into(), insight).await
 }
