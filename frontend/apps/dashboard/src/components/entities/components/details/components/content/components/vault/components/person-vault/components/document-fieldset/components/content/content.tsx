@@ -1,8 +1,7 @@
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import { getErrorMessage } from '@onefootprint/request';
-import { Stack } from '@onefootprint/ui';
-
 import type { Entity } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import useUploadsWithDocuments from '../../hooks/use-uploads-with-documents';
 import UploadItem from '../upload-item';
 
@@ -18,9 +17,9 @@ const Content = ({ entity }: ContentProps) => {
     <>
       {error && getErrorMessage(error)}
       {uploadsWithDocuments && (
-        <Stack direction="column" gap={3}>
+        <Stack direction="column" gap={4}>
           {uploadsWithDocuments.map(upload => (
-            <UploadItem key={upload.documentId} upload={upload} />
+            <UploadItem key={upload.documentId} entity={entity} upload={upload} />
           ))}
         </Stack>
       )}

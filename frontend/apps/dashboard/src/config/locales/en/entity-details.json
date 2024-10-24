@@ -350,6 +350,8 @@
       }
     },
     "documents": {
+      "title": "Documents",
+      "see-details": "See details",
       "status": {
         "upload_failed": "Upload failed",
         "upload_incomplete": "Upload pending",
