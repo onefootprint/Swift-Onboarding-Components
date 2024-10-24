@@ -68,10 +68,7 @@ impl DataRequest {
         map: HashMap<DataIdentifier, PiiString>,
         args: ValidateArgs,
     ) -> NtResult<Self> {
-        let map = map
-            .into_iter()
-            .map(|(k, v)| (k, PiiJsonValue::from_piistring(v)))
-            .collect();
+        let map = map.into_iter().map(|(k, v)| (k, PiiJsonValue::from(v))).collect();
         Self::clean_and_validate(map, args)
     }
 

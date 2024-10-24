@@ -789,11 +789,11 @@ impl MiddeskResponseDerivedVaultData {
         let data = vec![
             formation
                 .and_then(|f| f.formation_state.clone())
-                .map(|state| PiiJsonValue::from_piistring(PiiString::from(state)))
+                .map(PiiJsonValue::new_string)
                 .map(|state| (DataIdentifier::Business(BusinessDataKind::FormationState), state)),
             formation
                 .and_then(|f| f.formation_date.clone())
-                .map(|date| PiiJsonValue::from_piistring(PiiString::from(date)))
+                .map(PiiJsonValue::new_string)
                 .map(|date| (DataIdentifier::Business(BusinessDataKind::FormationDate), date)),
         ]
         .into_iter()

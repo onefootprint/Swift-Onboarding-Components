@@ -129,7 +129,7 @@ impl DecryptUncheckedResult<Pii> {
                         } else {
                             PiiString::try_from(b)?
                         };
-                        PiiJsonValue::from_piistring(v_string)
+                        PiiJsonValue::from(v_string)
                     }
                 };
                 Ok((k, pii))

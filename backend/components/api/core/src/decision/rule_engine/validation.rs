@@ -99,7 +99,7 @@ pub fn validate_rule_expression(
                     }
                     let all_data = AllData::new();
                     field.clone().clean_and_validate(
-                        PiiJsonValue::from_piistring(value.clone()),
+                        PiiJsonValue::from(value.clone()),
                         ValidateArgs {
                             for_bifrost: false,
                             ignore_luhn_validation: true,

@@ -66,11 +66,6 @@ impl PiiJsonValue {
         Ok(result)
     }
 
-    /// Creates a variant that is Value::String from a PiiString
-    pub fn from_piistring(value: PiiString) -> Self {
-        Self(serde_json::Value::String(value.0))
-    }
-
     /// Utility to serialize the value a PiiString.
     /// This is unique in that it returns a PiiString if self is a Value::String, otherwise
     /// it uses serde to serialize the value into a PiiString
@@ -184,6 +179,13 @@ where
     S: serde::Serializer,
 {
     s.serialize_str("<SCRUBBED Value>")
+}
+
+impl From<PiiString> for PiiJsonValue {
+    fn from(s: PiiString) -> Self {
+        // No parsing, just creates a String variant of PiiJsonValue with the provided contents
+        Self(serde_json::Value::String(s.0))
+    }
 }
 
 

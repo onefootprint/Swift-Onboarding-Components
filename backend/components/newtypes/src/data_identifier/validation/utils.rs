@@ -79,7 +79,7 @@ pub(super) fn validate_state(
     value: PiiString,
     provided_country: Option<&PiiJsonValue>,
 ) -> VResult<PiiString> {
-    let us = PiiJsonValue::from_piistring(PiiString::new(Iso3166TwoDigitCountryCode::US.to_string()));
+    let us = PiiJsonValue::new_string(Iso3166TwoDigitCountryCode::US.to_string());
 
     // if country is US we require state to be 50 states + US territories
     if provided_country == Some(&us) {

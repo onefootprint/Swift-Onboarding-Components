@@ -110,7 +110,7 @@ pub(super) async fn compute_ocr_data<'a>(
         .into_iter()
         .map(|pif| {
             let di = DocumentDiKind::OcrData(dk.0, pif.odk).into();
-            let v = PiiJsonValue::from_piistring(pif.value);
+            let v = PiiJsonValue::from(pif.value);
             (di, v)
         })
         .collect_vec();
@@ -214,7 +214,7 @@ fn doc_first_id_data(
     ]
     .into_iter()
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
-    .map(|(k, v)| (k, PiiJsonValue::from_piistring(v)))
+    .map(|(k, v)| (k, PiiJsonValue::from(v)))
     .collect::<HashMap<_, _>>();
 
     let raw_data = all_data.clone();

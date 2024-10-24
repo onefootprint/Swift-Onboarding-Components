@@ -459,7 +459,7 @@ impl<Type> WriteableVw<Type> {
     ) -> FpResult<Vec<(DataIdentifier, ContactInfo)>> {
         let data = data
             .into_iter()
-            .map(|(k, v)| (k, PiiJsonValue::from_piistring(v)))
+            .map(|(k, v)| (k, PiiJsonValue::from(v)))
             .collect();
         self.patch_data_test(conn, data, create_fingerprints)
     }
