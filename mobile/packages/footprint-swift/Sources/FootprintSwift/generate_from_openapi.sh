@@ -4,7 +4,7 @@
 ORIGINAL_SPEC_FILE="../../../../../scripts/openapi/hosted-openapi.json"
 SPEC_FILE="./openapi.json"
 OUTPUT_DIR="./generated"
-FINAL_DIR="./Client"
+FINAL_DIR="./OnboardingComponents/Client"
 
 # Copy the OpenAPI spec file
 cp "$ORIGINAL_SPEC_FILE" "$SPEC_FILE"

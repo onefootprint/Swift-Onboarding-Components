@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'FootprintSwift'
-    s.version          = '2.0.2-alpha'
+    s.version          = '2.0.3-alpha'
     s.summary          = 'FootprintSwift SDK for iOS'
     s.description      = <<-DESC
     Footprint-powered onboarding flows to your application
@@ -13,9 +13,15 @@ Pod::Spec.new do |s|
     s.ios.deployment_target = '14.0'
     s.swift_version = '5.9'
     
-    s.source_files = 'Sources/FootprintSwift/**/*'
-    
-    s.test_spec 'Tests' do |test_spec|
-      test_spec.source_files = 'Tests/FootprintSwiftTests/**/*'
+     # Subspec for Hosted
+    s.subspec 'Hosted' do |a|
+        a.source_files = 'Sources/FootprintSwift/Hosted/**/*.{swift}', 'Sources/FootprintSwift/Shared/**/*.{swift}'
     end
+
+    # Subspec for OnboardingComponents
+    s.subspec 'OnboardingComponents' do |b|
+        b.source_files = 'Sources/FootprintSwift/**/*.{swift}'
+    end
+    
+     
   end
