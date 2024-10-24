@@ -2,6 +2,7 @@ use crate::types::ApiResponse;
 use crate::types::OffsetPaginationRequest;
 use crate::State;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
+use api_core::utils::headers::InsightHeaders;
 use api_route_org_common::roles as roles_common;
 use api_wire_types::OrgRoleFilters;
 use newtypes::TenantRoleId;
@@ -34,8 +35,9 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantRoleRequest>,
     auth: PartnerTenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
-    roles_common::post(state, request, auth.into()).await
+    roles_common::post(state, request, auth.into(), insight).await
 }
 
 #[api_v2_operation(
@@ -48,8 +50,9 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: PartnerTenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
-    roles_common::patch(state, request, role_id, auth.into()).await
+    roles_common::patch(state, request, role_id, auth.into(), insight).await
 }
 
 #[api_v2_operation(
@@ -61,6 +64,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: PartnerTenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
-    roles_common::deactivate(state, role_id, auth.into()).await
+    roles_common::deactivate(state, role_id, auth.into(), insight).await
 }

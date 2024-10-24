@@ -6,6 +6,7 @@ use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgRoleFilters;
@@ -58,6 +59,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantRoleRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
@@ -89,6 +91,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantOrPartnerTenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
@@ -106,6 +109,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantOrPartnerTenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
