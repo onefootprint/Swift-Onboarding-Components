@@ -12,10 +12,14 @@ export type BusinessOwnerData = {
   [IdDI.email]: string;
   [IdDI.phoneNumber]: string;
 };
-type CreateBoOperation = { op: 'create'; uuid: string; data: BusinessOwnerData; ownership_stake: number };
-type UpdateBoOperation = { op: 'update'; uuid: string; data: Partial<BusinessOwnerData>; ownership_stake: number };
+
+type CreateBoOperation = { op: 'create'; uuid: string; data: BusinessOwnerData; ownershipStake: number };
+
+type UpdateBoOperation = { op: 'update'; uuid: string; data: Partial<BusinessOwnerData>; ownershipStake: number };
+
 type DeleteBoOperation = { op: 'delete'; uuid: string };
-export type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation | DeleteBoOperation;
+
+type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation | DeleteBoOperation;
 
 type Request = {
   authToken: string;
@@ -75,11 +79,11 @@ export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operat
     ...nonUpdateOperations,
     ...updateOperationsWithoutLinkedUser,
     ...updateOperationsWithLinkedUser
-      .filter(operation => boDetailsByUuid[operation.uuid]?.ownershipStake !== operation.ownership_stake)
+      .filter(operation => boDetailsByUuid[operation.uuid]?.ownershipStake !== operation.ownershipStake)
       .map(operation => ({
         op: 'update',
         uuid: operation.uuid,
-        ownership_stake: operation.ownership_stake,
+        ownership_stake: operation.ownershipStake,
       })),
   ];
 
@@ -101,5 +105,7 @@ const useBusinessOwnersPatch = () =>
   useMutation({
     mutationFn: patchBusinessOwnersRequest,
   });
+
+export type { BusinessOwnerPatchOperation };
 
 export default useBusinessOwnersPatch;

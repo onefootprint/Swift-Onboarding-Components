@@ -1,7 +1,7 @@
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import { useBusinessOwners } from '../../../../queries';
+import { useBusinessOwners, useBusinessOwnersPatch } from '../../../../queries';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import BosForm from './components/bos-form';
@@ -14,25 +14,31 @@ const ManageBos = () => {
   const {
     idvContext: { authToken },
   } = state.context;
-  const businessOwnersQuery = useBusinessOwners({ authToken });
+  const bosQuery = useBusinessOwners({ authToken });
+  const bosMutation = useBusinessOwnersPatch();
 
-  if (businessOwnersQuery.isPending) {
+  if (bosQuery.isPending) {
     return <Loading />;
   }
 
-  if (businessOwnersQuery.data) {
+  if (bosQuery.data) {
     return (
       <Stack direction="column" gap={5}>
         <CollectKybDataNavigationHeader />
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <BosList
-          existingBos={businessOwnersQuery.data}
-          onSubmit={() => {
-            // TODO: Implement submit logic
+          existingBos={bosQuery.data}
+          onSubmit={async ({ uuid, ownershipStake }) => {
+            await bosMutation.mutateAsync({
+              authToken,
+              currentBos: bosQuery.data,
+              operations: [{ op: 'update', uuid, ownershipStake, data: {} }],
+            });
+            await bosQuery.refetch();
           }}
         />
         <BosForm
-          existingBos={businessOwnersQuery.data}
+          existingBos={bosQuery.data}
           onSubmit={() => {
             // TODO: Implement submit logic
           }}

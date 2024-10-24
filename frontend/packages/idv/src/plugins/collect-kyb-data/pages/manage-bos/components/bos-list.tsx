@@ -1,3 +1,4 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoUsers24 } from '@onefootprint/icons';
 import type { HostedBusinessOwner } from '@onefootprint/services';
 import { IdDI } from '@onefootprint/types';
@@ -9,7 +10,7 @@ import styled, { css } from 'styled-components';
 
 export type BosListProps = {
   existingBos: HostedBusinessOwner[];
-  onSubmit: (data: EditFormValues) => void;
+  onSubmit: (payload: { uuid: string; ownershipStake: number }) => void;
 };
 
 type EditFormValues = {
@@ -21,7 +22,17 @@ type EditFormValues = {
 const BosList = ({ existingBos, onSubmit }: BosListProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.list' });
   const [editingBo, setEditingBo] = useState<HostedBusinessOwner | null>(null);
+  const showRequestErrorToast = useRequestErrorToast();
   const authedUser = existingBos.find(bo => bo.isAuthedUser);
+
+  const handleSubmit = (bo: HostedBusinessOwner) => async (formValues: EditFormValues) => {
+    try {
+      await onSubmit({ uuid: bo.uuid, ownershipStake: formValues.ownershipStake });
+      setEditingBo(null);
+    } catch (e) {
+      showRequestErrorToast(e);
+    }
+  };
 
   return (
     <>
@@ -44,10 +55,7 @@ const BosList = ({ existingBos, onSubmit }: BosListProps) => {
                   {isEditing ? (
                     <EditForm
                       bo={bo}
-                      onSubmit={formData => {
-                        setEditingBo(null);
-                        onSubmit(formData);
-                      }}
+                      onSubmit={handleSubmit(bo)}
                       onCancel={() => {
                         setEditingBo(null);
                       }}
@@ -72,7 +80,7 @@ const BosList = ({ existingBos, onSubmit }: BosListProps) => {
 
 type EditFormProps = {
   bo: HostedBusinessOwner;
-  onSubmit: (data: EditFormValues) => void;
+  onSubmit: (formValues: EditFormValues) => void;
   onCancel: () => void;
 };
 
@@ -81,7 +89,7 @@ const EditForm = ({ bo, onSubmit, onCancel }: EditFormProps) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<EditFormValues>({
     defaultValues: {
       firstName: bo.decryptedData[IdDI.firstName],
@@ -90,12 +98,8 @@ const EditForm = ({ bo, onSubmit, onCancel }: EditFormProps) => {
     },
   });
 
-  const onSubmitForm = (data: EditFormValues) => {
-    onSubmit({ ...bo, ...data });
-  };
-
   return (
-    <form onSubmit={handleSubmit(onSubmitForm)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack direction="column" gap={6}>
         <Form.Field>
           <Form.Label>{t('fields.first-name.label')}</Form.Label>
@@ -119,6 +123,7 @@ const EditForm = ({ bo, onSubmit, onCancel }: EditFormProps) => {
         <Form.Field>
           <Form.Label>{t('fields.ownership-stake.label')}</Form.Label>
           <Form.Input
+            autoFocus
             type="number"
             data-dd-privacy="mask"
             data-dd-action-name="Ownership stake input"
@@ -136,10 +141,12 @@ const EditForm = ({ bo, onSubmit, onCancel }: EditFormProps) => {
           <Form.Errors>{errors.ownershipStake?.message}</Form.Errors>
         </Form.Field>
         <Stack direction="row" justifyContent="flex-end" gap={3}>
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel} disabled={isSubmitting}>
             {t('cancel')}
           </Button>
-          <Button type="submit">{t('save')}</Button>
+          <Button type="submit" loading={isSubmitting}>
+            {t('save')}
+          </Button>
         </Stack>
       </Stack>
     </form>

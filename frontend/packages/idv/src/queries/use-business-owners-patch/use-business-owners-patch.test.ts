@@ -57,7 +57,7 @@ describe('patchBusinessOwnersRequest', () => {
           'id.email': 'newowner@example.com',
           'id.phone_number': '1234567890',
         },
-        ownership_stake: 25,
+        ownershipStake: 25,
       },
     ];
 
@@ -74,7 +74,7 @@ describe('patchBusinessOwnersRequest', () => {
   });
 
   it('should handle update operations for non-linked users', async () => {
-    const operations = [{ op: 'update' as const, uuid: '1', data: { 'id.first_name': 'Johnny' }, ownership_stake: 60 }];
+    const operations = [{ op: 'update' as const, uuid: '1', data: { 'id.first_name': 'Johnny' }, ownershipStake: 60 }];
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
 
@@ -94,7 +94,7 @@ describe('patchBusinessOwnersRequest', () => {
         op: 'update' as const,
         uuid: '2',
         data: { 'id.first_name': 'Janet' },
-        ownership_stake: 55,
+        ownershipStake: 55,
       },
     ];
 
@@ -118,7 +118,7 @@ describe('patchBusinessOwnersRequest', () => {
   });
 
   it('should not update immutable owners', async () => {
-    const operations = [{ op: 'update' as const, uuid: '3', data: { 'id.first_name': 'Robert' }, ownership_stake: 10 }];
+    const operations = [{ op: 'update' as const, uuid: '3', data: { 'id.first_name': 'Robert' }, ownershipStake: 10 }];
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
 
@@ -129,8 +129,8 @@ describe('patchBusinessOwnersRequest', () => {
 
   it('should throw an error when trying to update multiple linked users', async () => {
     const operations = [
-      { op: 'update' as const, uuid: '2', data: { 'id.first_name': 'Janet' }, ownership_stake: 55 },
-      { op: 'update' as const, uuid: '4', data: { 'id.first_name': 'Mike' }, ownership_stake: 45 },
+      { op: 'update' as const, uuid: '2', data: { 'id.first_name': 'Janet' }, ownershipStake: 55 },
+      { op: 'update' as const, uuid: '4', data: { 'id.first_name': 'Mike' }, ownershipStake: 45 },
     ];
 
     const mockCurrentBosMultipleLinked: HostedBusinessOwner[] = [
@@ -162,10 +162,10 @@ describe('patchBusinessOwnersRequest', () => {
           'id.email': 'newowner@example.com',
           'id.phone_number': '1234567890',
         },
-        ownership_stake: 20,
+        ownershipStake: 20,
       },
       { op: 'delete' as const, uuid: '3' },
-      { op: 'update' as const, uuid: '1', data: { 'id.first_name': 'Johnny' }, ownership_stake: 40 },
+      { op: 'update' as const, uuid: '1', data: { 'id.first_name': 'Johnny' }, ownershipStake: 40 },
     ];
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
