@@ -8,3 +8,4 @@ vscode-target
 .env
 *.pem
 formal_methods
+internal_tools/scripts/vault_dr_validation/

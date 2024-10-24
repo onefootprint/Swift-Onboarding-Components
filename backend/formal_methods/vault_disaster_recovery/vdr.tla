@@ -314,8 +314,12 @@ begin
                 dls_for_vv_batch_without_blobs = {
                     dl \in db_dls :
                       /\ (\E vv \in vv_batch :
-                            /\ vv.vault = dl.vault
-                            /\ vv.seqno >= dl.created_seqno
+                            (\E other_vv \in db_vault_versions :
+                                /\ other_vv.vault = vv.vault
+                                /\ other_vv.version <= vv.version
+                                /\ dl.vault = other_vv.vault
+                                /\ dl.created_seqno = other_vv.seqno
+                            )
                          )
                       /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
                 },
@@ -372,17 +376,20 @@ begin
             \*   All data_lifetimes present on the vault at or before the VV
             \*   have a vault_dr_blob written for this config...
             \*
-            \*   Equivalently (and easier to express in SQL): where there does not exist a
-            \*   data_lifetime for the vault with created_seqno <= vv.seqno that does not have a
-            \*   vault_dr_blob written for this config...
+            \*   Equivalently (and easier to express in SQL): where there does not exist an un-backed-up DL
+            \*   that is created at another SVV with the same or older version for the same scoped vaults.
 
             complete_vv_batch := {
                 vv \in vv_batch :
-                    ~(\E dl \in db_dls :
-                         /\ dl.vault = vv.vault
-                         /\ dl.created_seqno <= vv.seqno
-                         /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
-                     )
+                    ~(\E other_vv \in db_vault_versions :  
+                        /\ other_vv.vault = vv.vault
+                        /\ other_vv.version <= vv.version
+                        /\ (\E dl \in db_dls : 
+                              /\ dl.vault = other_vv.vault
+                              /\ dl.created_seqno = other_vv.seqno
+                              /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
+                           )
+                    )
             };
 
             \* Crashing here isn't interesting since we haven't written anything new.
@@ -521,11 +528,11 @@ end process;
 end algorithm; *)
 
 
-\* BEGIN TRANSLATION (chksum(pcal) = "b6fa4add" /\ chksum(tla) = "5aec3ab")
+\* BEGIN TRANSLATION (chksum(pcal) = "76d51183" /\ chksum(tla) = "dbf10285")
 \* Label Shutdown of process VaultApiInstance at line 247 col 9 changed to Shutdown_
-VARIABLES pc, seqno_sequence, num_requests_started, api_finished, next_dl_id, 
+VARIABLES seqno_sequence, num_requests_started, api_finished, next_dl_id, 
           next_vault_version_id, db_dls, db_vault_versions, db_blobs, 
-          s3_blobs, s3_manifests
+          s3_blobs, s3_manifests, pc
 
 (* define statement *)
 TypeInvariant ==
@@ -579,9 +586,9 @@ VARIABLES request, next_seqno, api_finished_at_start_of_batch, vv_batch,
           dl_batch, complete_vv_batch, dls_for_complete_vv_batch, 
           s3_manifest_batch
 
-vars == << pc, seqno_sequence, num_requests_started, api_finished, next_dl_id, 
+vars == << seqno_sequence, num_requests_started, api_finished, next_dl_id, 
            next_vault_version_id, db_dls, db_vault_versions, db_blobs, 
-           s3_blobs, s3_manifests, request, next_seqno, 
+           s3_blobs, s3_manifests, pc, request, next_seqno, 
            api_finished_at_start_of_batch, vv_batch, dl_batch, 
            complete_vv_batch, dls_for_complete_vv_batch, s3_manifest_batch >>
 
@@ -736,8 +743,12 @@ GetDlBatch == /\ pc["vdr-worker"] = "GetDlBatch"
               /\ LET dls_for_vv_batch_without_blobs ==                                  {
                                                            dl \in db_dls :
                                                              /\ (\E vv \in vv_batch :
-                                                                   /\ vv.vault = dl.vault
-                                                                   /\ vv.seqno >= dl.created_seqno
+                                                                   (\E other_vv \in db_vault_versions :
+                                                                       /\ other_vv.vault = vv.vault
+                                                                       /\ other_vv.version <= vv.version
+                                                                       /\ dl.vault = other_vv.vault
+                                                                       /\ dl.created_seqno = other_vv.seqno
+                                                                   )
                                                                 )
                                                              /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
                                                        } IN
@@ -791,11 +802,15 @@ CommitBlobBatch == /\ pc["vdr-worker"] = "CommitBlobBatch"
 GetCompleteVaultVersionBatch == /\ pc["vdr-worker"] = "GetCompleteVaultVersionBatch"
                                 /\ complete_vv_batch' =                      {
                                                             vv \in vv_batch :
-                                                                ~(\E dl \in db_dls :
-                                                                     /\ dl.vault = vv.vault
-                                                                     /\ dl.created_seqno <= vv.seqno
-                                                                     /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
-                                                                 )
+                                                                ~(\E other_vv \in db_vault_versions :
+                                                                    /\ other_vv.vault = vv.vault
+                                                                    /\ other_vv.version <= vv.version
+                                                                    /\ (\E dl \in db_dls :
+                                                                          /\ dl.vault = other_vv.vault
+                                                                          /\ dl.created_seqno = other_vv.seqno
+                                                                          /\ ~(BlobForDl(dl, VdrConfig1) \in db_blobs)
+                                                                       )
+                                                                )
                                                         }
                                 /\ pc' = [pc EXCEPT !["vdr-worker"] = "GetDlsForCompleteVaultVersionBatch"]
                                 /\ UNCHANGED << seqno_sequence, 
