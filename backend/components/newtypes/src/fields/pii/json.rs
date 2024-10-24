@@ -5,7 +5,6 @@ use crate::VaultDataFormat;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
-use std::str::FromStr;
 
 /// Wrapper to hide PII around serde_json::Value that contains all variants of values
 #[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -50,11 +49,6 @@ impl PiiJsonValue {
     /// vault
     pub fn is_string(&self) -> bool {
         matches!(self.0, serde_json::Value::String(_))
-    }
-
-    /// Creates a variant that is Value::String
-    pub fn string(value: &str) -> Self {
-        Self(serde_json::Value::String(value.to_owned()))
     }
 
     /// Utility to deserialize the value into T.
@@ -103,9 +97,9 @@ impl PiiString {
         match serialization {
             VaultDataFormat::String => PiiJsonValue(serde_json::Value::String(self.0)),
             VaultDataFormat::Json => {
-                PiiJsonValue::try_from(&self)
-                // If the value isn't json serializable, just return it as a string
-                .unwrap_or(PiiJsonValue(serde_json::Value::String(self.0)))
+                // Try to JSON deserialize the string value. If the value isn't a JSON-serialized string, just
+                // return it as a string
+                PiiJsonValue::parse_from_str(self.leak()).unwrap_or(PiiJsonValue::new_string(self.0))
             }
         }
     }
@@ -120,6 +114,11 @@ impl PiiJsonValue {
         Self(serde_json::Value::String(value))
     }
 
+    /// Creates a variant that is Value::String
+    pub fn string(value: &str) -> Self {
+        Self(serde_json::Value::String(value.to_owned()))
+    }
+
     pub fn leak(&self) -> &serde_json::Value {
         &self.0
     }
@@ -131,6 +130,14 @@ impl PiiJsonValue {
     // this will error if value has non-string keys
     pub fn leak_to_vec(&self) -> Result<Vec<u8>, serde_json::Error> {
         serde_json::to_vec(self.leak())
+    }
+
+    pub fn parse_from_pii_bytes(bytes: PiiBytes) -> Result<Self, serde_json::Error> {
+        serde_json::from_slice(&bytes.0).map(Self::new)
+    }
+
+    pub fn parse_from_str(value: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(value).map(Self::new)
     }
 }
 
@@ -149,48 +156,6 @@ impl Debug for PiiJsonValue {
             .finish()
     }
 }
-
-// used in the decrypt path
-impl TryFrom<Vec<u8>> for PiiJsonValue {
-    type Error = serde_json::Error;
-
-    fn try_from(vec: Vec<u8>) -> Result<Self, Self::Error> {
-        serde_json::from_slice(vec.as_slice()).map(Self::new)
-    }
-}
-
-impl<'a> TryFrom<&'a PiiJsonValue> for PiiString {
-    type Error = serde_json::Error;
-
-    fn try_from(v: &'a PiiJsonValue) -> Result<Self, Self::Error> {
-        serde_json::ser::to_string(v.leak()).map(PiiString::new)
-    }
-}
-
-impl<'a> TryFrom<&'a PiiString> for PiiJsonValue {
-    type Error = serde_json::Error;
-
-    fn try_from(value: &'a PiiString) -> Result<Self, Self::Error> {
-        serde_json::from_str(value.leak()).map(Self::new)
-    }
-}
-
-impl FromStr for PiiJsonValue {
-    type Err = serde_json::Error;
-
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        serde_json::from_str(value).map(Self::new)
-    }
-}
-
-impl TryFrom<PiiBytes> for PiiJsonValue {
-    type Error = serde_json::Error;
-
-    fn try_from(value: PiiBytes) -> Result<Self, Self::Error> {
-        Self::try_from(value.into_leak())
-    }
-}
-
 
 /// This struct is used to scrub a PiiJsonValue
 #[derive(Clone, serde::Serialize, serde::Deserialize, Default, derive_more::Deref, PartialEq, Eq)]

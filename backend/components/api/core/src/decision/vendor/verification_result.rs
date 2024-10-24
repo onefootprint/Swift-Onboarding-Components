@@ -139,7 +139,7 @@ pub async fn decrypt_verification_result_response(
         .batch_decrypt_to_piibytes(sealed_data)
         .await?
         .into_iter()
-        .map(|b| PiiJsonValue::try_from(b).map_err(FpError::from))
+        .map(|b| PiiJsonValue::parse_from_pii_bytes(b).map_err(FpError::from))
         .collect()
 }
 

@@ -670,15 +670,15 @@ pub mod tests {
         let vault_data: HashMap<DataIdentifier, PiiJsonValue> = HashMap::from([
             (
                 DataIdentifier::Id(IdentityDataKind::FirstName),
-                "\"Bob\"".parse().unwrap(),
+                PiiJsonValue::string("Bob"),
             ),
             (
                 DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations),
-                "[\"affiliated_with_us_broker\"]".parse().unwrap(),
+                PiiJsonValue::parse_from_str("[\"affiliated_with_us_broker\"]").unwrap(),
             ),
             (
                 DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals),
-                "[\"buy_a_home\", \"speculation\"]".parse().unwrap(),
+                PiiJsonValue::parse_from_str("[\"buy_a_home\", \"speculation\"]").unwrap(),
             ),
         ]);
         let vd = VaultDataForRules::new(vault_data);
