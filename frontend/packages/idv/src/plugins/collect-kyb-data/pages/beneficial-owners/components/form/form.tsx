@@ -66,7 +66,6 @@ const Form = ({
       [BeneficialOwnerDataAttribute.email]: '',
       [BeneficialOwnerDataAttribute.phoneNumber]: '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
-      _uuid: '', // will be implemented in the next PR
     });
   };
 
