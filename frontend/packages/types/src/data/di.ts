@@ -17,6 +17,7 @@ export enum BusinessDI {
   zip = 'business.zip',
   formationState = 'business.formation_state',
   formationDate = 'business.formation_date',
+  beneficialOwnerExplanationMessage = 'business.beneficial_owner_explanation_message',
 }
 
 export enum InvestorProfileDI {

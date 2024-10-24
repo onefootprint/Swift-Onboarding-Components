@@ -1,6 +1,7 @@
 import type { BeneficialOwner } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cloneDeep } from 'lodash';
@@ -11,7 +12,9 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { omitNullAndUndefined } from '../../utils/utils';
 import BeneficialOwnersForm from './components/form';
+import NoOtherBosDialog from './components/no-other-bos';
 import useCheckDuplicateContacts from './hooks/check-duplicate-contacts';
+import { getTotalOwnershipStake } from './utils';
 
 type BeneficialOwnersProps = {
   ctaLabel?: string;
@@ -21,7 +24,7 @@ type BeneficialOwnersProps = {
 };
 
 const OnlyValidateDataWithoutSaving = true;
-const { logError } = getLogger({ location: 'kyb-beneficial-owners' });
+const { logError, logWarn } = getLogger({ location: 'kyb-beneficial-owners' });
 
 const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
@@ -32,15 +35,25 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     bootstrapUserData,
     vaultBusinessData,
     config,
+    isStakeExplanationDialogConfirmed,
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
+  const [isNoOtherBosDialogOpen, setIsNoOtherBosDialogOpen] = useState(false);
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners' });
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
   const canEdit = !vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
 
+  const handleNoOtherBosDialogClose = () => setIsNoOtherBosDialogOpen(false);
+
   const handleSubmit = (beneficialOwnersRaw: BeneficialOwner[]) => {
     const beneficialOwners = beneficialOwnersRaw.map(omitNullAndUndefined);
+    const totalOwnershipStake = getTotalOwnershipStake(beneficialOwners);
+
+    if (totalOwnershipStake < 100 && !isStakeExplanationDialogConfirmed) {
+      setIsNoOtherBosDialogOpen(true);
+      return;
+    }
 
     if (config?.isLive) {
       // Check that no two beneficial owners have the same email or phone number, when not sandbox
@@ -78,6 +91,26 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     });
   };
 
+  const handleStakeExplanationDialogConfirm = (note: string) => {
+    if (!authToken || mutation.isPending) return;
+    mutation.mutate(
+      {
+        authToken,
+        data: { [BusinessDI.beneficialOwnerExplanationMessage]: note },
+      },
+      {
+        onError: (error: unknown) => {
+          logWarn('Error sending business stake explanation message', error);
+        },
+        onSettled() {
+          /** Don't block if we fail to save the note */
+          send({ type: 'setStakeExplanationDialogConfirmed', payload: true });
+          setIsNoOtherBosDialogOpen(false);
+        },
+      },
+    );
+  };
+
   const defaultData = requireMultiKyc ? data?.[BusinessDI.kycedBeneficialOwners] : data?.[BusinessDI.beneficialOwners];
   const defaultValues = cloneDeep(defaultData) ?? [
     {
@@ -108,6 +141,12 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
         onSubmit={handleSubmit}
         requireMultiKyc={requireMultiKyc}
         canEdit={canEdit}
+      />
+      <NoOtherBosDialog
+        isOpen={isNoOtherBosDialogOpen}
+        isLoading={mutation.isPending}
+        onClose={handleNoOtherBosDialogClose}
+        onSubmit={handleStakeExplanationDialogConfirm}
       />
     </Stack>
   );

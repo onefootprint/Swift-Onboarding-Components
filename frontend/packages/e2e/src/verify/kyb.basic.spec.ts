@@ -63,7 +63,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('KYB basic #ci', async ({ page, isMobile }) => {
+test('KYB basic stake sum 100% #ci', async ({ page, isMobile }) => {
   test.slow(); // ~48.9s
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test

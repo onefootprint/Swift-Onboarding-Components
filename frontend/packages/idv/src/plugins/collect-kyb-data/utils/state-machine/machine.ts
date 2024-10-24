@@ -110,6 +110,11 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         /** Whether the user can skip the confirm screen */
         isConfirmScreenVisible: !initialContext.config?.skipConfirm,
       },
+      on: {
+        setStakeExplanationDialogConfirmed: {
+          actions: ['assignStakeExplanationDialogConfirmed'],
+        },
+      },
       states: {
         loadFromVault: {
           on: {
@@ -206,6 +211,10 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         assignAuthToken: assign((ctx, { payload }) => ({
           ...ctx,
           authToken: payload,
+        })),
+        assignStakeExplanationDialogConfirmed: assign((ctx, { payload }) => ({
+          ...ctx,
+          isStakeExplanationDialogConfirmed: payload,
         })),
       },
     },

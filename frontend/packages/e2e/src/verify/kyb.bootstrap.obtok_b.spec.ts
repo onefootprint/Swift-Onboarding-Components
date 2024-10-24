@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from '../utils/commands';
+import {
+  clickOnContinue,
+  clickOnYes,
+  selectOutcomeOptional,
+  verifyAppIframeClick,
+  verifyPhoneNumber,
+} from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
@@ -86,7 +92,7 @@ test('KYB pbtok_ session with id.xxx and business.xxx #ci', async ({ page, isMob
   await page.waitForLoadState();
 
   const whoAreBOsH2 = frame.getByText('Who are the beneficial owners?').first();
-  await whoAreBOsH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
+  await whoAreBOsH2.waitFor({ state: 'attached', timeout }).catch(() => false);
 
   expect(await frame.locator('input[name="beneficialOwners.0.first_name"]').first().inputValue()).toBe('Owner');
   expect(await frame.locator('input[name="beneficialOwners.0.last_name"]').first().inputValue()).toBe('Zod');
@@ -99,8 +105,21 @@ test('KYB pbtok_ session with id.xxx and business.xxx #ci', async ({ page, isMob
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  const modalSumStakeLessThan100 = frame.getByLabel("Why doesn't it add up to 100%?").first();
+  await modalSumStakeLessThan100
+    .waitFor({ state: 'attached', timeout })
+    .then(() => modalSumStakeLessThan100.fill('e2e test'));
+
+  await clickOnYes(frame);
+  await page.waitForLoadState();
+
+  await modalSumStakeLessThan100.waitFor({ state: 'detached', timeout });
+
+  await clickOnContinue(frame);
+  await page.waitForLoadState();
+
   const confirmH2 = frame.getByText('Confirm your business data').first();
-  await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+  await confirmH2.waitFor({ state: 'attached', timeout }).catch(() => false);
 
   await expect(frame.getByText('Business name').first()).toBeAttached();
 

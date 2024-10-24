@@ -48,6 +48,7 @@ export type MachineContext = {
   vaultBusinessData?: Readonly<BusinessDIData>;
   dataCollectionScreensToShow: StateValue[];
   isConfirmScreenVisible?: boolean;
+  isStakeExplanationDialogConfirmed?: boolean;
 };
 
 export type MachineEvents =
@@ -65,6 +66,7 @@ export type MachineEvents =
   | { type: 'confirmed' }
   | { type: 'introductionCompleted' }
   | { type: 'navigatedToPrevPage' }
+  | { type: 'setStakeExplanationDialogConfirmed'; payload: boolean }
   | { type: 'stepUpAuthTokenCompleted'; payload: string }
   | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData }
   | {

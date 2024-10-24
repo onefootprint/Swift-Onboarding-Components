@@ -15,6 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignAuthToken: 'stepUpAuthTokenCompleted';
     assignData: 'basicDataSubmitted' | 'businessAddressSubmitted' | 'stepUpDecryptionCompleted';
+    assignStakeExplanationDialogConfirmed: 'setStakeExplanationDialogConfirmed';
     assignVaultData: 'beneficialOwnersSubmitted' | 'businessDataLoadSuccess';
   };
   eventsCausingDelays: {};

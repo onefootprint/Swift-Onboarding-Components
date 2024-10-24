@@ -15,7 +15,8 @@ export type BootstrapIgnoredBusinessDI =
   | BusinessDI.beneficialOwners
   | BusinessDI.kycedBeneficialOwners
   | BusinessDI.formationState
-  | BusinessDI.formationDate;
+  | BusinessDI.formationDate
+  | BusinessDI.beneficialOwnerExplanationMessage;
 
 // TODO: expand in the future with InvestorProfileBootstrapData
 export type IdvBootstrapData = IdDIData & Omit<BusinessDIData, BootstrapIgnoredBusinessDI> & BusinessBootstrapOnlyProps;

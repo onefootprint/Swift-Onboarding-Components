@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { useL10nContext } from '../../../../../../components/l10n-provider';
+import { getTotalOwnershipStake } from '../../utils';
 import AddButton from './components/add-button';
 import FormInvalidError from './components/error';
 import Fields from './components/fields';
@@ -73,10 +74,7 @@ const Form = ({
   };
 
   const onSubmitFormData = (formData: FormData) => {
-    const totalOwnershipStake = formData.beneficialOwners
-      .map(bo => Number(bo[BeneficialOwnerDataAttribute.ownershipStake]))
-      .reduce((acc, curr) => acc + curr, 0);
-
+    const totalOwnershipStake = getTotalOwnershipStake(formData.beneficialOwners);
     if (totalOwnershipStake > 100) {
       toast.show({
         title: t('errors.ownership-stake-total.title'),

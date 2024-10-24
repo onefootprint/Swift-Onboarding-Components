@@ -736,7 +736,8 @@
             "input-label": "Why doesn't it add up to 100%?",
             "input-placeholder": "Please explain...",
             "secondary-cta": "Go back",
-            "primary-cta": "Yes, continue"
+            "primary-cta": "Yes, continue",
+            "required": "Explanation is required"
           },
           "multi-kyc": "We need to verify all other beneficial owners’ identities. We’ll send them a text message with a link after you finish filling out your business verification.",
           "add-another": "Add another beneficial owner",

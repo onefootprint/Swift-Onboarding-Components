@@ -732,7 +732,8 @@
             "input-label": "¿Por qué no suma el 100%?",
             "input-placeholder": "Por favor, explícanos un poco más...",
             "secondary-cta": "Regresar",
-            "primary-cta": "Sí, continuar"
+            "primary-cta": "Sí, continuar",
+            "required": "Explicación es requerida"
           },
           "multi-kyc": "Necesitamos verificar las identidades de todos los demás propietarios. Les enviaremos un enlace por correo electrónico después de que termines de completar la verificación de tu empresa.",
           "add-another": "Agregar otro propietario",
