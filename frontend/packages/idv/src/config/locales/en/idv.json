@@ -742,6 +742,7 @@
           "multi-kyc": "We need to verify all other beneficial owners’ identities. We’ll send them a text message with a link after you finish filling out your business verification.",
           "add-another": "Add another beneficial owner",
           "errors": {
+            "an-error-occurred": "An error occurred",
             "invalid": "Please complete the fields above.",
             "ownership-stake-total": {
               "title": "Ownership stake total exceeds 100%",
