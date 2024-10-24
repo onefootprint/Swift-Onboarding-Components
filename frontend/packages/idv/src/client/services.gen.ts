@@ -162,7 +162,7 @@ import type {
 
 const options = getRequestOptions({});
 const axiosInstance = applyCaseMiddleware(axios.create(), { preservedKeys });
-const client = createClient(
+export const client = createClient(
   createConfig({
     ...options,
     // @ts-ignore

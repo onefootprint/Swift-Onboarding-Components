@@ -38,7 +38,7 @@
     "tsconfig": "*",
     "tsup": "^6.5.0",
     "typescript": "^5.5.2",
-    "@hey-api/openapi-ts": "^0.53.6",
+    "@hey-api/openapi-ts": "^0.53.11",
     "tsx": "^4.19.1"
   },
   "dependencies": {
@@ -48,7 +48,7 @@
     "i18next": "^23.16.0",
     "lodash": "^4.17.21",
     "react-hook-form": "^7.52.2",
-    "@hey-api/client-fetch": "^0.4.0"
+    "@hey-api/client-fetch": "^0.4.2"
   },
   "peerDependencies": {
     "@onefootprint/footprint-js": ">=3.15.2",

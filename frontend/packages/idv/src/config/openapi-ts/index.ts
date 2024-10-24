@@ -33,6 +33,7 @@ const create = async () => {
     input: path.resolve('../../../scripts/openapi/hosted-openapi.json'),
     output: clientDir,
     schemas: false,
+    plugins: ['@tanstack/react-query'],
   });
 
   if (shouldCamelCaseKeys) {

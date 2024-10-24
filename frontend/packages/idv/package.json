@@ -100,7 +100,7 @@
     "tsconfig": "*",
     "typescript": "^5.5.2",
     "webpack": "*",
-    "@hey-api/openapi-ts": "^0.53.6",
+    "@hey-api/openapi-ts": "^0.53.11",
     "tsx": "^4.19.1"
   },
   "peerDependencies": {
