@@ -10,6 +10,7 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import BosForm from './components/bos-form';
 import BosList from './components/bos-list';
 import Loading from './components/loading';
+import type { NewBusinessOwner } from './manage-bos.types';
 
 const ManageBos = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.manage-bos' });
@@ -21,6 +22,43 @@ const ManageBos = () => {
   const bosMutation = useBusinessOwnersPatch();
   const showRequestErrorToast = useRequestErrorToast();
 
+  const handleBosListSubmit = async ({ uuid, ownershipStake }: { uuid: string; ownershipStake: number }) => {
+    if (!bosQuery.data || !authToken) throw new Error('Business owners data or authentication token is missing.');
+    try {
+      await bosMutation.mutateAsync({
+        authToken,
+        currentBos: bosQuery.data,
+        operations: [{ op: 'update', uuid, ownershipStake, data: {} }],
+      });
+      await bosQuery.refetch();
+    } catch (error) {
+      showRequestErrorToast(error);
+    }
+  };
+
+  const handleBosFormSubmit = async (formValues: NewBusinessOwner[]) => {
+    if (!bosQuery.data || !authToken) throw new Error('Business owners data or authentication token is missing.');
+    try {
+      await bosMutation.mutateAsync({
+        authToken,
+        currentBos: bosQuery.data,
+        operations: formValues.map(({ firstName, lastName, email, phoneNumber, ownershipStake }) => ({
+          op: 'create',
+          uuid: uuidv4(),
+          data: {
+            [IdDI.firstName]: firstName,
+            [IdDI.lastName]: lastName,
+            [IdDI.email]: email,
+            [IdDI.phoneNumber]: phoneNumber,
+          },
+          ownershipStake,
+        })),
+      });
+    } catch (error) {
+      showRequestErrorToast(error);
+    }
+  };
+
   if (bosQuery.isPending) {
     return <Loading />;
   }
@@ -30,47 +68,8 @@ const ManageBos = () => {
       <Stack direction="column" gap={5}>
         <CollectKybDataNavigationHeader />
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <BosList
-          existingBos={bosQuery.data}
-          onSubmit={async ({ uuid, ownershipStake }) => {
-            try {
-              await bosMutation.mutateAsync({
-                authToken,
-                currentBos: bosQuery.data,
-                operations: [{ op: 'update', uuid, ownershipStake, data: {} }],
-              });
-            } catch (e) {
-              showRequestErrorToast(e);
-            }
-            await bosQuery.refetch();
-          }}
-        />
-        <BosForm
-          existingBos={bosQuery.data}
-          onSubmit={async formValues => {
-            try {
-              await bosMutation.mutateAsync({
-                authToken,
-                currentBos: bosQuery.data,
-                operations: formValues.map(({ firstName, lastName, email, phoneNumber, ownershipStake }) => {
-                  return {
-                    op: 'create',
-                    uuid: uuidv4(),
-                    data: {
-                      [IdDI.firstName]: firstName,
-                      [IdDI.lastName]: lastName,
-                      [IdDI.email]: email,
-                      [IdDI.phoneNumber]: phoneNumber,
-                    },
-                    ownershipStake,
-                  };
-                }),
-              });
-            } catch (e) {
-              showRequestErrorToast(e);
-            }
-          }}
-        />
+        <BosList existingBos={bosQuery.data} onSubmit={handleBosListSubmit} />
+        <BosForm existingBos={bosQuery.data} onSubmit={handleBosFormSubmit} />
       </Stack>
     );
   }
