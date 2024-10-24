@@ -1,5 +1,4 @@
 use super::DocumentAndCountryConfiguration;
-use crate::util::impl_enum_str_diesel;
 use crate::util::impl_enum_string_diesel;
 use crate::DecisionStatus;
 use crate::DocumentRequestConfig;
@@ -7,14 +6,18 @@ use crate::DocumentRequestKind;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
+use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use paperclip::v2::models::DataType;
+use serde::Deserialize;
+use serde::Serialize;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use strum::AsRefStr;
 use strum::IntoEnumIterator;
 use strum::ParseError;
 use strum_macros::Display;
+use strum_macros::EnumDiscriminants;
 use strum_macros::EnumIter;
 use strum_macros::EnumString;
 
@@ -59,6 +62,15 @@ impl RuleAction {
         .into_iter()
         .chain(StepUpKind::iter().map(RuleAction::StepUp))
         .collect()
+    }
+
+    pub fn to_rule_action(&self) -> RuleActionConfig {
+        match self {
+            RuleAction::PassWithManualReview => RuleActionConfig::PassWithManualReview {},
+            RuleAction::ManualReview => RuleActionConfig::ManualReview {},
+            RuleAction::StepUp(step_up_kind) => RuleActionConfig::StepUp(step_up_kind.to_doc_configs()),
+            RuleAction::Fail => RuleActionConfig::Fail {},
+        }
     }
 }
 
@@ -201,65 +213,6 @@ impl RuleAction {
     }
 }
 
-#[derive(
-    Display,
-    SerializeDisplay,
-    DeserializeFromStr,
-    Debug,
-    Clone,
-    Eq,
-    PartialEq,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    AsRefStr,
-    Hash,
-)]
-#[strum(serialize_all = "snake_case")]
-#[diesel(sql_type = Text)]
-pub enum RuleName {
-    IdNotLocated,
-    IdFlagged,
-    SubjectDeceased,
-    AddressInputIsPoBox,
-    CoppaAlert,
-    SsnDoesNotMatch,
-    AddressDoesNotMatch,
-    NameDoesNotMatch,
-    DobDoesNotMatch,
-    SsnInputIsInvalid,
-    SsnLocatedIsInvalid,
-    SsnIssuedPriorToDob,
-    SsnNotProvided,
-    WatchlistHit,
-    WatchlistHitStepUp,
-    PepHit,
-    AdverseMediaHit,
-    ThinFile,
-    AddressLocatedIsWarm,
-    AddressLocatedIsHighRiskAddress,
-    MultipleRecordsFound,
-    DocumentNotVerified,
-    SelfieIsNotLive,
-    SelfieDoesNotMatch,
-    DocumentUploadFailed,
-    DocumentCollectionErrored,
-    Test(String),
-    BusinessWatchlistHit,
-    NoTinMatch,
-    NoBusinessNameMatch,
-    NoBusinessAddressMatch,
-    BoNonPassingKyc,
-    DocumentWasLearnerPermit,
-    DocumentExpired,
-    DocumentCollected,
-    DocumentAddressDoesntMatch,
-    DocumentDobDoesntMatch,
-    DocumentNameDoesntMatch,
-}
-
-impl_enum_str_diesel!(RuleName);
-
 #[derive(Debug, Eq, PartialEq, Display, Hash, Clone, Copy, AsExpression, FromSqlRow, EnumString)]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
@@ -299,6 +252,28 @@ pub enum RuleInstanceKind {
 }
 
 crate::util::impl_enum_string_diesel!(RuleInstanceKind);
+
+
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Apiv2Schema, EnumDiscriminants)]
+#[strum_discriminants(name(RuleActionDiscriminant))] // TODO: rename
+#[strum_discriminants(derive(
+    serde_with::SerializeDisplay,
+    strum_macros::Display,
+    EnumString,
+    Hash,
+    strum::EnumIter
+))]
+#[strum_discriminants(vis(pub))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind", content = "config")]
+pub enum RuleActionConfig {
+    /// ORDERING MATTERS!!!
+    PassWithManualReview {},
+    ManualReview {},
+    StepUp(Vec<DocumentRequestConfig>),
+    Fail {},
+}
 
 #[cfg(test)]
 mod tests {

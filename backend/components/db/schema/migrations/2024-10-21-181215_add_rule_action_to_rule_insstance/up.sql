@@ -1,0 +1,1 @@
+ALTER TABLE rule_instance ADD COLUMN rule_action JSONB; -- TODO: make non-null

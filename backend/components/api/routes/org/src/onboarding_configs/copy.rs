@@ -131,6 +131,8 @@ fn copy_rule(r: RuleInstance) -> CreateRule {
         name,
         rule_expression,
         action,
+        // TODO: update to use this
+        rule_action: _,
         is_shadow,
 
         // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new

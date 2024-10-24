@@ -23,6 +23,7 @@ use newtypes::ListId;
 use newtypes::Locked;
 use newtypes::ObConfigurationId;
 use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use newtypes::RuleExpression;
 use newtypes::RuleId;
 use newtypes::RuleInstanceId;
@@ -59,6 +60,7 @@ pub struct RuleInstance {
     pub action: RuleAction,
     pub is_shadow: bool, // not yet used
     pub kind: RuleInstanceKind,
+    pub rule_action: Option<RuleActionConfig>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -72,6 +74,7 @@ pub struct NewRuleInstance<'a> {
     pub name: Option<String>,
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
+    pub rule_action: Option<RuleActionConfig>,
     pub is_shadow: bool,
     // These two would only be set when inserting a new rule_instance, when a Rule is being deleted
     pub deactivated_at: Option<DateTime<Utc>>,
@@ -212,6 +215,7 @@ impl RuleInstance {
                 actor,
                 name: r.name,
                 rule_expression: r.rule_expression,
+                rule_action: Some(r.action.to_rule_action()),
                 action: r.action,
                 is_shadow: false,
                 deactivated_at: None,
@@ -270,6 +274,7 @@ impl RuleInstance {
                 name: update.name.unwrap_or(existing.name),
                 rule_expression: update.rule_expression.unwrap_or(existing.rule_expression),
                 action: existing.action,
+                rule_action: existing.rule_action,
                 is_shadow: update.is_shadow.unwrap_or(existing.is_shadow),
                 deactivated_at: update.deactivate.then_some(now),
                 deactivated_seqno: update.deactivate.then_some(seqno), /* when we delete rules, we write a

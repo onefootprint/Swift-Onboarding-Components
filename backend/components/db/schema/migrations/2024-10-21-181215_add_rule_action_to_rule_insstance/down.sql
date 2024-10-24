@@ -1,0 +1,1 @@
+ALTER TABLE rule_instance DROP COLUMN IF EXISTS action_config;
