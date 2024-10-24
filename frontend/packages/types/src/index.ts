@@ -541,6 +541,7 @@ export {
   supportedRoleKinds,
   TimelineEventKind,
   UploadSource,
+  DocumentReviewStatus,
   UserInsightsUnit,
   UsLegalStatus,
   Vendor,

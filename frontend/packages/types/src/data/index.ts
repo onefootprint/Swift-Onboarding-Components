@@ -84,7 +84,7 @@ export type {
 } from './document-request-config';
 export { DocumentRequestKind } from './document-request-config';
 export type { Document, DocumentUpload } from './document-type';
-export { RawJsonKinds, UploadSource } from './document-type';
+export { RawJsonKinds, UploadSource, DocumentReviewStatus } from './document-type';
 export type {
   DuplicateDataItem,
   OtherTenantsDuplicateDataSummary,

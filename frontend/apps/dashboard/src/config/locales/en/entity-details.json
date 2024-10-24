@@ -349,6 +349,17 @@
         "aria": "Select between cards and bank accounts"
       }
     },
+    "documents": {
+      "status": {
+        "upload_failed": "Upload failed",
+        "upload_incomplete": "Upload pending",
+        "uploaded_via_api": "Uploaded manually",
+        "pending_machine_review": "Pending",
+        "reviewed_by_machine": "Processed",
+        "pending_human_review": "Review required",
+        "reviewed_by_human": "Reviewed"
+      }
+    },
     "document": {
       "see-details": "See details",
       "cannot-edit": "Can't be edited",
