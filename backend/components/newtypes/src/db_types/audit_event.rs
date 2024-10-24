@@ -9,6 +9,7 @@ use crate::ObConfigurationId;
 use crate::ScopedVaultId;
 use crate::TenantApiKeyId;
 use crate::TenantRoleId;
+use crate::TenantScope;
 use crate::TenantUserId;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
@@ -70,7 +71,11 @@ pub enum AuditEventDetail {
     RemoveOrgMember,
     CreateOrg,
     UpdateOrgSettings,
-    CreateOrgRole,
+    CreateOrgRole {
+        is_live: bool,
+        scopes: Vec<TenantScope>,
+        tenant_role_id: TenantRoleId,
+    },
     UpdateOrgRole,
     CreateListEntry {
         is_live: bool,
@@ -251,7 +256,23 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
             AuditEventDetail::RemoveOrgMember => todo!(),
             AuditEventDetail::CreateOrg => todo!(),
             AuditEventDetail::UpdateOrgSettings => todo!(),
-            AuditEventDetail::CreateOrgRole => todo!(),
+            AuditEventDetail::CreateOrgRole {
+                is_live,
+                scopes,
+                tenant_role_id,
+            } => Self {
+                metadata: AuditEventMetadata::CreateOrgRole { scopes },
+                scoped_vault_id: None,
+                ob_configuration_id: None,
+                document_data_id: None,
+                tenant_api_key_id: None,
+                tenant_user_id: None,
+                tenant_role_id: Some(tenant_role_id),
+                is_live: Some(is_live),
+                list_entry_creation_id: None,
+                list_entry_id: None,
+                list_id: None,
+            },
             AuditEventDetail::UpdateOrgRole => todo!(),
         }
     }
@@ -328,7 +349,9 @@ pub enum AuditEventMetadata {
     RemoveOrgMember,
     CreateOrg,
     UpdateOrgSettings,
-    CreateOrgRole,
+    CreateOrgRole {
+        scopes: Vec<TenantScope>,
+    },
     UpdateOrgRole,
     CreateListEntry,
     DeleteListEntry,

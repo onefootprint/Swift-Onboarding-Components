@@ -8,6 +8,8 @@ use newtypes::ListEntryCreationId;
 use newtypes::ListEntryId;
 use newtypes::ListId;
 use newtypes::TenantId;
+use newtypes::TenantRoleId;
+use newtypes::TenantScope;
 use strum_macros::Display;
 
 /// Describes an event relevant to security as seen by tenants.
@@ -74,7 +76,10 @@ pub enum AuditEventDetail {
     RemoveOrgMember,
     CreateOrg,
     UpdateOrgSettings,
-    CreateOrgRole,
+    CreateOrgRole {
+        scopes: Vec<TenantScope>,
+        tenant_role_id: TenantRoleId,
+    },
     UpdateOrgRole,
     CreateListEntry {
         list_id: ListId,

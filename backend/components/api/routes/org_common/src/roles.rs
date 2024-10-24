@@ -10,8 +10,13 @@ use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgRoleFilters;
+use db::models::audit_event::AuditEvent;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_role::TenantRoleListFilters;
+use newtypes::AuditEventDetail;
+use newtypes::OrgIdentifier;
 use newtypes::TenantRoleId;
 use newtypes::TenantRoleKind;
 use newtypes::TenantRoleKindDiscriminant;
@@ -59,11 +64,12 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantRoleRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;
+    let db_actor = auth.actor().clone();
 
     let api_wire_types::CreateTenantRoleRequest { name, scopes, kind } = request.into_inner();
 
@@ -78,12 +84,33 @@ pub async fn post(
             TenantRoleKind::CompliancePartnerDashboardUser
         }
     };
-    let result = state
-        .db_query(move |conn| TenantRole::create(conn, &authed_org_ident, &name, scopes, false, kind))
-        .await?;
 
-    let result = api_wire_types::OrganizationRole::from_db(result);
-    Ok(result)
+    let result = state
+        .db_transaction(move |conn| -> FpResult<_> {
+            let new_tenant_role =
+                TenantRole::create(conn, &authed_org_ident, &name, scopes.clone(), false, kind)?;
+
+            let detail = AuditEventDetail::CreateOrgRole {
+                scopes,
+                is_live,
+                tenant_role_id: new_tenant_role.id.clone(),
+            };
+
+            // we will only create audit events for tenant roles - we'll skip partner roles
+            if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident {
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                let audit_event = NewAuditEvent {
+                    principal_actor: db_actor.into(),
+                    insight_event_id,
+                    tenant_id,
+                    detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
+            Ok(new_tenant_role)
+        })
+        .await?;
+    Ok(api_wire_types::OrganizationRole::from_db(result))
 }
 
 pub async fn patch(

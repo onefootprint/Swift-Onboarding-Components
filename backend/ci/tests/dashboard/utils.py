@@ -7,6 +7,16 @@ def latest_audit_event_for(fp_id, tenant):
     return audit_events[0]
 
 
+def latest_audit_event_by_role(tenant, name, **kwargs):
+    data = dict(names=[name])
+    audit_events = get("org/audit_events", data, *tenant.db_auths)
+    return next(
+        event
+        for event in audit_events["data"]
+        if all(event["detail"]["data"].get(k, None) == v for (k, v) in kwargs.items())
+    )
+
+
 def update_rules(
     obc_id,
     expected_rule_set_version,

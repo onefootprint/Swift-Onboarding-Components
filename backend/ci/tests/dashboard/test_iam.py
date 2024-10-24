@@ -9,6 +9,7 @@ from tests.utils import (
     patch,
     _gen_random_n_digit_number,
 )
+from tests.dashboard.utils import latest_audit_event_by_role
 
 
 @pytest.fixture(scope="session")
@@ -439,6 +440,7 @@ def test_deactivate_role_and_user(sandbox_tenant, run_id):
     body = get("org/roles", dict(page_size=100), *sandbox_tenant.db_auths)
     assert role_id not in set(r["id"] for r in body["data"])
 
+
 def test_partner_tenant_scopes(run_id, sandbox_tenant, admin_role):
     suffix = _gen_random_n_digit_number(10)
 
@@ -477,3 +479,13 @@ def test_partner_tenant_scopes(run_id, sandbox_tenant, admin_role):
         kind="compliance_partner_dashboard_user",
     )
     post("org/roles", role_data, *sandbox_tenant.db_auths, status_code=400)
+
+
+def test_audit_event(sandbox_tenant, limited_role):
+    # Check that an audit event is created when a role is created
+    latest_audit_event_by_role(
+        tenant=sandbox_tenant,
+        name="create_org_role",
+        tenant_role_id=limited_role["id"],
+        scopes=limited_role["scopes"],
+    )
