@@ -1044,6 +1044,7 @@ diesel::table! {
         kind -> Text,
         action_triggered -> Nullable<Text>,
         allowed_actions -> Nullable<Array<Nullable<Text>>>,
+        rule_action_triggered -> Nullable<Jsonb>,
     }
 }
 

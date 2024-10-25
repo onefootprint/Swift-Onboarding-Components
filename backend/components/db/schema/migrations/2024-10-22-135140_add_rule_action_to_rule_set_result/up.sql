@@ -1,0 +1,1 @@
+ALTER TABLE rule_set_result ADD COLUMN rule_action_triggered JSONB; 

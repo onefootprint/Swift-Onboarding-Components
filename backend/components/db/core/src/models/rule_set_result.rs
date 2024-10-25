@@ -26,6 +26,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::ObConfigurationId;
 use newtypes::RiskSignalId;
 use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use newtypes::RuleInstanceId;
 use newtypes::RuleSetResultId;
 use newtypes::RuleSetResultKind;
@@ -63,6 +64,8 @@ pub struct RuleSetResult {
     // non-backfilled cases.
     #[diesel(deserialize_as = OptionalNonNullVec<RuleAction>)]
     pub allowed_actions: Option<Vec<RuleAction>>,
+    // TODO: backfill
+    pub rule_action_triggered: Option<RuleActionConfig>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -75,6 +78,7 @@ struct NewRuleSetResult {
     pub workflow_id: Option<WorkflowId>,
     pub kind: RuleSetResultKind,
     pub action_triggered: Option<RuleAction>,
+    pub rule_action_triggered: Option<RuleActionConfig>,
     pub allowed_actions: Option<Vec<RuleAction>>,
 }
 
@@ -85,6 +89,7 @@ pub struct NewRuleSetResultArgs<'a> {
     pub workflow_id: Option<&'a WorkflowId>,
     pub kind: RuleSetResultKind,
     pub action_triggered: Option<RuleAction>,
+    pub rule_action_triggered: Option<RuleActionConfig>,
     pub rule_results: Vec<NewRuleResultArgs<'a>>,
     pub risk_signal_ids: Vec<&'a RiskSignalId>,
     pub allowed_actions: Vec<RuleAction>,
@@ -117,6 +122,7 @@ impl RuleSetResult {
             workflow_id: args.workflow_id.cloned(),
             kind: args.kind,
             action_triggered: args.action_triggered,
+            rule_action_triggered: args.rule_action_triggered,
             allowed_actions: Some(args.allowed_actions),
         };
 
@@ -357,6 +363,7 @@ mod tests {
                 result: i % 2 == 0,
             })
             .collect_vec();
+        let action = RuleAction::ManualReview;
         let (rule_set_result, rule_results) = RuleSetResult::create(
             conn,
             NewRuleSetResultArgs {
@@ -364,7 +371,8 @@ mod tests {
                 scoped_vault_id: &sv.id,
                 workflow_id: None,
                 kind: RuleSetResultKind::Adhoc,
-                action_triggered: Some(RuleAction::ManualReview),
+                action_triggered: Some(action),
+                rule_action_triggered: Some(action.to_rule_action()),
                 rule_results: new_rule_results.clone(),
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
                 allowed_actions: vec![],
@@ -471,6 +479,7 @@ mod tests {
         wf_id: &WorkflowId,
         risk_signals: &[RiskSignal],
     ) -> RuleSetResult {
+        let action = RuleAction::Fail;
         let (rule_set_result, _) = RuleSetResult::create(
             conn,
             NewRuleSetResultArgs {
@@ -478,7 +487,8 @@ mod tests {
                 scoped_vault_id: sv_id,
                 workflow_id: Some(wf_id),
                 kind: RuleSetResultKind::WorkflowDecision,
-                action_triggered: Some(RuleAction::Fail),
+                action_triggered: Some(action),
+                rule_action_triggered: Some(action.to_rule_action()),
                 rule_results: vec![],
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
                 allowed_actions: vec![],

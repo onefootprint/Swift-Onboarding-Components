@@ -273,6 +273,7 @@ pub fn evaluate_rules(
             scoped_vault_id: sv_id,
             workflow_id: wf_id,
             kind,
+            rule_action_triggered: action_triggered.clone(),
             action_triggered: action_triggered.map(|a| a.into()),
             // TODO: Add rule_action_triggered here... but need backwards compat for display
             rule_results: rule_results
