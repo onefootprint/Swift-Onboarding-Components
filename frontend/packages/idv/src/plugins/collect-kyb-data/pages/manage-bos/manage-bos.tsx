@@ -27,7 +27,7 @@ const ManageBos = () => {
       await bosMutation.mutateAsync({
         authToken,
         currentBos: bosQuery.data,
-        operations: [{ op: 'update', uuid, ownershipStake, data: {} }],
+        operations: [{ uuid, ownershipStake, data: {} }],
       });
       await bosQuery.refetch();
     } catch (error) {
@@ -42,7 +42,6 @@ const ManageBos = () => {
         authToken,
         currentBos: bosQuery.data,
         operations: formValues.map(({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
-          op: 'create',
           uuid,
           data: {
             [IdDI.firstName]: firstName,

@@ -13,13 +13,11 @@ export type BusinessOwnerData = {
   [IdDI.phoneNumber]: string;
 };
 
-type CreateBoOperation = { op: 'create'; uuid: string; data: BusinessOwnerData; ownershipStake: number };
+type CreateBoOperation = { uuid: string; data: BusinessOwnerData; ownershipStake: number };
 
-type UpdateBoOperation = { op: 'update'; uuid: string; data: Partial<BusinessOwnerData>; ownershipStake: number };
+type UpdateBoOperation = { uuid: string; data: Partial<BusinessOwnerData>; ownershipStake: number };
 
-type DeleteBoOperation = { op: 'delete'; uuid: string };
-
-type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation | DeleteBoOperation;
+type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation;
 
 type Request = {
   authToken: string;
@@ -31,35 +29,28 @@ type Response = HostedBusinessOwner[];
 
 export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operations }: Request) => {
   /** Get business owner details by id */
-  const boDetailsByUuid = Object.fromEntries(currentBos.map(({ uuid, ...props }) => [uuid, props]));
+  const existingBosByUuid = Object.fromEntries(currentBos.map(({ uuid, ...props }) => [uuid, props]));
 
-  /** Split operations into create, update, and delete operations */
-  const createOperations = operations.filter(op => op.op === 'create');
-  const updateOperations = operations.filter(op => op.op === 'update');
-  const deleteOperations = operations.filter(op => op.op === 'delete');
-
-  /** Filter out updates for immutable owners */
-  const mutableUpdates = updateOperations.filter(op => boDetailsByUuid[op.uuid]?.isMutable);
+  /** Split operations into create and update operations */
+  const [updateOperations, createOperations] = partition(operations, op => !!existingBosByUuid[op.uuid]);
 
   /** Split update operations into those with and without linked users */
-  const [updateOperationsWithLinkedUser, updateOperationsWithoutLinkedUser] = partition(
-    mutableUpdates,
-    op => boDetailsByUuid[op.uuid]?.hasLinkedUser,
+  const [updateOperationsForAuthedUser, updateOperationsForOtherUsers] = partition(
+    updateOperations,
+    op => existingBosByUuid[op.uuid]?.isAuthedUser,
   );
 
-  /** Update linked users, if necessary */
-  if (updateOperationsWithLinkedUser.length > 0) {
-    const linkedUserDataChangeOperations = updateOperationsWithLinkedUser.filter(
-      operation =>
-        operation.data &&
-        Object.entries(operation.data).some(
-          ([di, value]) => value && boDetailsByUuid[operation.uuid]?.decryptedData?.[di] !== value,
-        ),
-    );
-
-    if (linkedUserDataChangeOperations.length > 1) {
-      throw new Error('Cannot update multiple linked users at once');
+  /** Update current user's vault info, if necessary */
+  if (updateOperationsForAuthedUser.length > 0) {
+    if (updateOperationsForAuthedUser.length > 1) {
+      throw new Error('Cannot be more than one authed user to update');
     }
+
+    const linkedUserDataChangeOperations = updateOperationsForAuthedUser.filter(operation =>
+      Object.entries(operation.data).some(
+        ([di, value]) => value && existingBosByUuid[operation.uuid]?.decryptedData?.[di] !== value,
+      ),
+    );
 
     if (linkedUserDataChangeOperations.length === 1) {
       try {
@@ -78,17 +69,18 @@ export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operat
 
   /** Update non-linked users */
   const bulkPayload = [
-    ...deleteOperations,
-    ...createOperations.map(({ ownershipStake, ...operation }) => ({
-      ...operation,
+    ...createOperations.map(({ ownershipStake, ...restOfOp }) => ({
+      op: 'create',
+      ...restOfOp,
       ownership_stake: ownershipStake,
     })),
-    ...updateOperationsWithoutLinkedUser.map(({ ownershipStake, ...operation }) => ({
-      ...operation,
+    ...updateOperationsForOtherUsers.map(({ ownershipStake, ...restOfOp }) => ({
+      op: 'update',
+      ...restOfOp,
       ownership_stake: ownershipStake,
     })),
-    ...updateOperationsWithLinkedUser
-      .filter(operation => boDetailsByUuid[operation.uuid]?.ownershipStake !== operation.ownershipStake)
+    ...updateOperationsForAuthedUser
+      .filter(operation => existingBosByUuid[operation.uuid]?.ownershipStake !== operation.ownershipStake)
       .map(operation => ({
         op: 'update',
         uuid: operation.uuid,
