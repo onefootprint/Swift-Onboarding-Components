@@ -60,7 +60,7 @@ pub struct RuleInstance {
     pub action: RuleAction,
     pub is_shadow: bool, // not yet used
     pub kind: RuleInstanceKind,
-    pub rule_action: Option<RuleActionConfig>,
+    pub rule_action: RuleActionConfig,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -74,7 +74,7 @@ pub struct NewRuleInstance<'a> {
     pub name: Option<String>,
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
-    pub rule_action: Option<RuleActionConfig>,
+    pub rule_action: RuleActionConfig,
     pub is_shadow: bool,
     // These two would only be set when inserting a new rule_instance, when a Rule is being deleted
     pub deactivated_at: Option<DateTime<Utc>>,
@@ -215,7 +215,7 @@ impl RuleInstance {
                 actor,
                 name: r.name,
                 rule_expression: r.rule_expression,
-                rule_action: Some(r.action.to_rule_action()),
+                rule_action: r.action.to_rule_action(),
                 action: r.action,
                 is_shadow: false,
                 deactivated_at: None,

@@ -982,7 +982,7 @@ diesel::table! {
         action -> Text,
         is_shadow -> Bool,
         kind -> Text,
-        rule_action -> Nullable<Jsonb>,
+        rule_action -> Jsonb,
     }
 }
 
