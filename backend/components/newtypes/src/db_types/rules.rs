@@ -261,7 +261,9 @@ crate::util::impl_enum_string_diesel!(RuleInstanceKind);
     strum_macros::Display,
     EnumString,
     Hash,
-    strum::EnumIter
+    strum::EnumIter,
+    PartialOrd,
+    Ord,
 ))]
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
@@ -273,6 +275,32 @@ pub enum RuleActionConfig {
     ManualReview {},
     StepUp(Vec<DocumentRequestConfig>),
     Fail {},
+}
+
+impl PartialOrd for RuleActionConfig {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for RuleActionConfig {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        let self_discr: RuleActionDiscriminant = self.into();
+        let other_discr: RuleActionDiscriminant = other.into();
+
+        self_discr.cmp(&other_discr)
+    }
+}
+
+impl Eq for RuleActionConfig {}
+
+impl PartialEq for RuleActionConfig {
+    fn eq(&self, other: &Self) -> bool {
+        let self_discr: RuleActionDiscriminant = self.into();
+        let other_discr: RuleActionDiscriminant = other.into();
+
+        self_discr == other_discr
+    }
 }
 
 #[cfg(test)]
@@ -336,6 +364,17 @@ mod tests {
     #[test_case(RuleAction::identity_stepup(), RuleAction::ManualReview => Ordering::Greater)]
     #[test_case(RuleAction::Fail, RuleAction::identity_stepup() => Ordering::Greater)]
     fn test_ra_cmp(ra1: RuleAction, ra2: RuleAction) -> Ordering {
+        ra1.cmp(&ra2)
+    }
+
+
+    #[test_case(RuleActionConfig::StepUp(vec![DocumentRequestConfig::Identity {collect_selfie: true, document_types_and_countries: None}]), RuleActionConfig::StepUp(vec![DocumentRequestConfig::ProofOfAddress {requires_human_review: false}]) => Ordering::Equal)]
+    #[test_case(RuleActionConfig::Fail {}, RuleActionConfig::StepUp(vec![DocumentRequestConfig::Identity {collect_selfie: true, document_types_and_countries: None}]) => Ordering::Greater)]
+    #[test_case(RuleActionConfig::Fail {}, RuleActionConfig::ManualReview {} => Ordering::Greater)]
+    #[test_case(RuleActionConfig::Fail {}, RuleActionConfig::PassWithManualReview {} => Ordering::Greater)]
+    #[test_case(RuleActionConfig::ManualReview {}, RuleActionConfig::PassWithManualReview {} => Ordering::Greater)]
+    #[test_case(RuleActionConfig::StepUp(vec![DocumentRequestConfig::Identity {collect_selfie: true, document_types_and_countries: None}]), RuleActionConfig::ManualReview {} => Ordering::Greater)]
+    fn test_rac_cmp(ra1: RuleActionConfig, ra2: RuleActionConfig) -> Ordering {
         ra1.cmp(&ra2)
     }
 
