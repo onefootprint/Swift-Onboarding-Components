@@ -11,6 +11,7 @@ impl DbToApi<RuleInstance> for api_wire_types::Rule {
             name,
             rule_expression,
             action,
+            rule_action,
             is_shadow,
             kind,
             ..
@@ -24,6 +25,7 @@ impl DbToApi<RuleInstance> for api_wire_types::Rule {
             action,
             is_shadow,
             kind,
+            rule_action,
         }
     }
 }
@@ -36,6 +38,7 @@ impl DbToApi<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> for api_wire_type
             created_at,
             ob_configuration_id,
             action_triggered,
+            rule_action_triggered,
             ..
         } = rule_set_result;
 
@@ -43,6 +46,7 @@ impl DbToApi<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> for api_wire_type
             created_at,
             ob_configuration_id,
             action_triggered,
+            rule_action_triggered,
             rule_results: rule_results
                 .into_iter()
                 .map(api_wire_types::RuleResult::from_db)

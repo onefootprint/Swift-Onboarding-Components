@@ -4,6 +4,7 @@ use newtypes::ListId;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
 use newtypes::RuleId;
@@ -28,6 +29,7 @@ pub struct Rule {
     pub name: Option<String>,
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
+    pub rule_action: RuleActionConfig,
     pub is_shadow: bool,
     pub kind: RuleInstanceKind,
 }
@@ -39,6 +41,7 @@ pub struct RuleSetResult {
     // As of 2023-01-31, FE is still on legacy serialization of `step_up`, so we convert from internal RA to
     // RSRA
     pub action_triggered: Option<RuleAction>,
+    pub rule_action_triggered: Option<RuleActionConfig>,
     pub rule_results: Vec<RuleResult>,
 }
 
