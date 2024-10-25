@@ -42,7 +42,6 @@ export {
 } from './hooks';
 export {
   type BusinessOwnerData,
-  type BusinessOwnerPatchOperation,
   useBusiness,
   useBusinessOwners,
   useBusinessOwnersPatch,

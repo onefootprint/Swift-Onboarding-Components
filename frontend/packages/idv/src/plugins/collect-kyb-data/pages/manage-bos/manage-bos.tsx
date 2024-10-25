@@ -27,7 +27,8 @@ const ManageBos = () => {
       await bosMutation.mutateAsync({
         authToken,
         currentBos: bosQuery.data,
-        operations: [{ uuid, ownershipStake, data: {} }],
+        updateOrCreateOperations: [{ uuid, ownershipStake, data: {} }],
+        deleteOperations: [],
       });
       await bosQuery.refetch();
     } catch (error) {
@@ -41,16 +42,19 @@ const ManageBos = () => {
       await bosMutation.mutateAsync({
         authToken,
         currentBos: bosQuery.data,
-        operations: formValues.map(({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
-          uuid,
-          data: {
-            [IdDI.firstName]: firstName,
-            [IdDI.lastName]: lastName,
-            [IdDI.email]: email,
-            [IdDI.phoneNumber]: phoneNumber,
-          },
-          ownershipStake,
-        })),
+        updateOrCreateOperations: formValues.map(
+          ({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
+            uuid,
+            data: {
+              [IdDI.firstName]: firstName,
+              [IdDI.lastName]: lastName,
+              [IdDI.email]: email,
+              [IdDI.phoneNumber]: phoneNumber,
+            },
+            ownershipStake,
+          }),
+        ),
+        deleteOperations: [],
       });
       send({ type: 'manageBosCompleted' });
     } catch (error) {

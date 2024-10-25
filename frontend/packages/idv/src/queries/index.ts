@@ -4,7 +4,6 @@ export { default as useBusinessOwners } from './use-business-owners';
 export {
   default as useBusinessOwnersPatch,
   type BusinessOwnerData,
-  type BusinessOwnerPatchOperation,
 } from './use-business-owners-patch';
 export { default as useD2PGenerate } from './use-d2p-generate';
 export { default as useD2PSms } from './use-d2p-sms';

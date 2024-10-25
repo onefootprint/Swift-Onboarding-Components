@@ -13,26 +13,28 @@ export type BusinessOwnerData = {
   [IdDI.phoneNumber]: string;
 };
 
-type CreateBoOperation = { uuid: string; data: BusinessOwnerData; ownershipStake: number };
-
-type UpdateBoOperation = { uuid: string; data: Partial<BusinessOwnerData>; ownershipStake: number };
-
-type BusinessOwnerPatchOperation = CreateBoOperation | UpdateBoOperation;
+type UpdateOrCreateBoOperation = { uuid: string; data: Partial<BusinessOwnerData>; ownershipStake: number };
 
 type Request = {
   authToken: string;
   currentBos: HostedBusinessOwner[];
-  operations: BusinessOwnerPatchOperation[];
+  updateOrCreateOperations: UpdateOrCreateBoOperation[];
+  deleteOperations: string[];
 };
 
 type Response = HostedBusinessOwner[];
 
-export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operations }: Request) => {
+export const patchBusinessOwnersRequest = async ({
+  authToken,
+  currentBos,
+  updateOrCreateOperations,
+  deleteOperations,
+}: Request) => {
   /** Get business owner details by id */
   const existingBosByUuid = Object.fromEntries(currentBos.map(({ uuid, ...props }) => [uuid, props]));
 
-  /** Split operations into create and update operations */
-  const [updateOperations, createOperations] = partition(operations, op => !!existingBosByUuid[op.uuid]);
+  /** Split updateOrCreateOperations into create and update operations */
+  const [updateOperations, createOperations] = partition(updateOrCreateOperations, op => !!existingBosByUuid[op.uuid]);
 
   /** Split update operations into those with and without linked users */
   const [updateOperationsForAuthedUser, updateOperationsForOtherUsers] = partition(
@@ -86,6 +88,10 @@ export const patchBusinessOwnersRequest = async ({ authToken, currentBos, operat
         uuid: operation.uuid,
         ownership_stake: operation.ownershipStake,
       })),
+    ...deleteOperations.map(uuid => ({
+      op: 'delete',
+      uuid,
+    })),
   ];
 
   if (bulkPayload.length === 0) {
@@ -106,7 +112,5 @@ const useBusinessOwnersPatch = () =>
   useMutation({
     mutationFn: patchBusinessOwnersRequest,
   });
-
-export type { BusinessOwnerPatchOperation };
 
 export default useBusinessOwnersPatch;

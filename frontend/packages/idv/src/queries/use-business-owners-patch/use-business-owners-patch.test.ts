@@ -45,8 +45,8 @@ describe('patchBusinessOwnersRequest', () => {
     jest.clearAllMocks();
   });
 
-  it('should handle create operation', async () => {
-    const operations = [
+  it('should handle create and delete operation', async () => {
+    const updateOrCreateOperations = [
       {
         uuid: '4',
         data: {
@@ -58,10 +58,16 @@ describe('patchBusinessOwnersRequest', () => {
         ownershipStake: 25,
       },
     ];
+    const deleteOperations = ['7'];
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
 
-    await patchBusinessOwnersRequest({ authToken: mockAuthToken, currentBos: mockCurrentBos, operations });
+    await patchBusinessOwnersRequest({
+      authToken: mockAuthToken,
+      currentBos: mockCurrentBos,
+      updateOrCreateOperations,
+      deleteOperations,
+    });
 
     expect(requestWithoutCaseConverter).toHaveBeenCalledWith({
       method: 'PATCH',
@@ -79,16 +85,25 @@ describe('patchBusinessOwnersRequest', () => {
           },
           ownership_stake: 25,
         },
+        {
+          op: 'delete' as const,
+          uuid: '7',
+        },
       ],
     });
   });
 
-  it('should handle update operations for non-linked users', async () => {
-    const operations = [{ uuid: '1', data: { 'id.first_name': 'Johnny' }, ownershipStake: 60 }];
+  it('should handle update updateOrCreateOperations for non-linked users', async () => {
+    const updateOrCreateOperations = [{ uuid: '1', data: { 'id.first_name': 'Johnny' }, ownershipStake: 60 }];
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
 
-    await patchBusinessOwnersRequest({ authToken: mockAuthToken, currentBos: mockCurrentBos, operations });
+    await patchBusinessOwnersRequest({
+      authToken: mockAuthToken,
+      currentBos: mockCurrentBos,
+      updateOrCreateOperations,
+      deleteOperations: [],
+    });
 
     expect(requestWithoutCaseConverter).toHaveBeenCalledWith({
       method: 'PATCH',
@@ -99,7 +114,7 @@ describe('patchBusinessOwnersRequest', () => {
   });
 
   it('should update linked users when necessary', async () => {
-    const operations = [
+    const updateOrCreateOperations = [
       {
         uuid: '2',
         data: { 'id.first_name': 'Janet' },
@@ -109,7 +124,12 @@ describe('patchBusinessOwnersRequest', () => {
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
 
-    await patchBusinessOwnersRequest({ authToken: mockAuthToken, currentBos: mockCurrentBos, operations });
+    await patchBusinessOwnersRequest({
+      authToken: mockAuthToken,
+      currentBos: mockCurrentBos,
+      updateOrCreateOperations,
+      deleteOperations: [],
+    });
 
     expect(requestWithoutCaseConverter).toHaveBeenCalledTimes(2);
     expect(requestWithoutCaseConverter).toHaveBeenNthCalledWith(1, {
@@ -126,8 +146,8 @@ describe('patchBusinessOwnersRequest', () => {
     });
   });
 
-  it('should handle mixed operations', async () => {
-    const operations = [
+  it('should handle mixed updateOrCreateOperations', async () => {
+    const updateOrCreateOperations = [
       {
         uuid: '222',
         data: {
@@ -143,7 +163,12 @@ describe('patchBusinessOwnersRequest', () => {
 
     (requestWithoutCaseConverter as jest.Mock).mockResolvedValue({ data: [] });
 
-    await patchBusinessOwnersRequest({ authToken: mockAuthToken, currentBos: mockCurrentBos, operations });
+    await patchBusinessOwnersRequest({
+      authToken: mockAuthToken,
+      currentBos: mockCurrentBos,
+      updateOrCreateOperations,
+      deleteOperations: [],
+    });
 
     expect(requestWithoutCaseConverter).toHaveBeenCalledWith({
       method: 'PATCH',
