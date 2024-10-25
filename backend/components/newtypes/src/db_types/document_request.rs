@@ -18,9 +18,21 @@ use strum::EnumDiscriminants;
 use strum::EnumIter;
 use strum_macros::Display;
 use strum_macros::EnumString;
+/// Represents a unique "key" for a DocumentRequestConfig
+#[derive(derive_more::From, Clone, Eq, PartialEq, Debug)]
+pub struct DocumentRequestConfigIdentifier(pub String);
 
 #[derive(
-    Debug, Clone, Serialize, Deserialize, AsJsonb, EnumDiscriminants, Apiv2Schema, derive_more::IsVariant,
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    AsJsonb,
+    EnumDiscriminants,
+    Apiv2Schema,
+    derive_more::IsVariant,
+    PartialEq,
+    Eq,
 )]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
@@ -61,7 +73,22 @@ pub enum DocumentRequestConfig {
     Custom(CustomDocumentConfig),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr)]
+impl DocumentRequestConfig {
+    pub fn identifier(&self) -> DocumentRequestConfigIdentifier {
+        let s = match self {
+            c @ DocumentRequestConfig::Identity { .. }
+            | c @ DocumentRequestConfig::ProofOfSsn { .. }
+            | c @ DocumentRequestConfig::ProofOfAddress { .. } => DocumentRequestKind::from(c).to_string(),
+            DocumentRequestConfig::Custom(custom_document_config) => {
+                custom_document_config.identifier.to_string()
+            }
+        };
+
+        s.into()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub struct CustomDocumentConfig {
     /// Custom document identifier under which the document will be vaulted

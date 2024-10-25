@@ -74,7 +74,7 @@ pub fn evaluate_workflow_decision<'a>(
     let doc_collected = doc_reqs
         .iter()
         .any(|dr| matches!(dr.kind, DocumentRequestKind::Identity));
-    let rule_eval_config = RuleEvalConfig::new(doc_reqs.into_iter().map(|dr| dr.kind).collect());
+    let rule_eval_config = RuleEvalConfig::new(doc_reqs.into_iter().map(|dr| dr.config.clone()).collect());
 
     if doc_collected
         && !risk_signals
@@ -273,7 +273,8 @@ pub fn evaluate_rules(
             scoped_vault_id: sv_id,
             workflow_id: wf_id,
             kind,
-            action_triggered,
+            action_triggered: action_triggered.map(|a| a.into()),
+            // TODO: Add rule_action_triggered here... but need backwards compat for display
             rule_results: rule_results
                 .iter()
                 .map(|(ri, e)| NewRuleResultArgs {
@@ -282,7 +283,8 @@ pub fn evaluate_rules(
                 })
                 .collect_vec(),
             risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
-            allowed_actions: rule_eval_config.allowed_rule_actions.clone(),
+            // TODO: update this
+            allowed_actions: vec![],
         },
     )?;
 
@@ -304,7 +306,7 @@ mod tests {
     use newtypes::BooleanOperator as BO;
     use newtypes::DbActor;
     use newtypes::DecisionIntentKind;
-    use newtypes::DocumentRequestKind;
+    use newtypes::DocumentRequestConfig;
     use newtypes::FootprintReasonCode as FRC;
     use newtypes::Locked;
     use newtypes::RiskSignalGroupKind;
@@ -393,7 +395,10 @@ mod tests {
 
         // Eval
         let docs_collected = if doc_collected {
-            vec![DocumentRequestKind::Identity]
+            vec![DocumentRequestConfig::Identity {
+                collect_selfie: true,
+                document_types_and_countries: None,
+            }]
         } else {
             vec![]
         };

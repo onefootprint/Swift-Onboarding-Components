@@ -2,7 +2,6 @@ use super::DocumentAndCountryConfiguration;
 use crate::util::impl_enum_string_diesel;
 use crate::DecisionStatus;
 use crate::DocumentRequestConfig;
-use crate::DocumentRequestKind;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -98,42 +97,44 @@ pub enum StepUpKind {
     ProofOfAddress,
     IdentityProofOfSsn,
     IdentityProofOfSsnProofOfAddress,
+    // Temporary
+    Custom,
 }
 
 impl StepUpKind {
     pub fn to_doc_configs(&self) -> Vec<DocumentRequestConfig> {
-        let doc_kinds = match self {
-            StepUpKind::Identity => vec![DocumentRequestKind::Identity],
-            StepUpKind::ProofOfAddress => vec![DocumentRequestKind::ProofOfAddress],
-            StepUpKind::IdentityProofOfSsn => {
-                vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfSsn]
-            }
-            StepUpKind::IdentityProofOfSsnProofOfAddress => {
-                vec![
-                    DocumentRequestKind::Identity,
-                    DocumentRequestKind::ProofOfSsn,
-                    DocumentRequestKind::ProofOfAddress,
-                ]
-            }
-        };
-
-        doc_kinds
-            .into_iter()
-            .filter_map(|kind| match kind {
-                DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
-                    collect_selfie: true, // TODO: should come from config,
-                    // 2024-10-21 This is the default at the moment, but will be configurable in the future
+        match self {
+            StepUpKind::Identity => vec![DocumentRequestConfig::Identity {
+                collect_selfie: true, // TODO: should come from config
+                document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
+            }],
+            StepUpKind::ProofOfAddress => vec![DocumentRequestConfig::ProofOfAddress {
+                requires_human_review: true,
+            }],
+            StepUpKind::IdentityProofOfSsn => vec![
+                DocumentRequestConfig::Identity {
+                    collect_selfie: true, // TODO: should come from config
                     document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
-                }),
-                DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {
+                },
+                DocumentRequestConfig::ProofOfSsn {
                     requires_human_review: true,
-                }),
-                DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {
+                },
+            ],
+            StepUpKind::IdentityProofOfSsnProofOfAddress => vec![
+                DocumentRequestConfig::Identity {
+                    collect_selfie: true, // TODO: should come from config
+                    document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
+                },
+                DocumentRequestConfig::ProofOfAddress {
                     requires_human_review: true,
-                }),
-                DocumentRequestKind::Custom => None,
-            })
-            .collect()
+                },
+                DocumentRequestConfig::ProofOfSsn {
+                    requires_human_review: true,
+                },
+            ],
+            // Not used, temporary
+            StepUpKind::Custom => vec![],
+        }
     }
 }
 
@@ -303,9 +304,40 @@ impl PartialEq for RuleActionConfig {
     }
 }
 
+impl From<RuleActionConfig> for RuleAction {
+    fn from(value: RuleActionConfig) -> Self {
+        match value {
+            RuleActionConfig::PassWithManualReview {} => RuleAction::PassWithManualReview,
+            RuleActionConfig::ManualReview {} => RuleAction::ManualReview,
+            RuleActionConfig::StepUp(doc_requests) => {
+                let action = derive_step_up_kind_from_doc_configs(doc_requests);
+                RuleAction::StepUp(action)
+            }
+            RuleActionConfig::Fail {} => RuleAction::Fail,
+        }
+    }
+}
+
+// From a list of document requests, back into what the action was
+fn derive_step_up_kind_from_doc_configs(doc_requests: Vec<DocumentRequestConfig>) -> StepUpKind {
+    StepUpKind::iter()
+        .find(|suk| have_same_elements(suk.to_doc_configs(), doc_requests.clone()))
+        .unwrap_or(StepUpKind::Custom)
+}
+
+fn have_same_elements<T>(l: Vec<T>, r: Vec<T>) -> bool
+where
+    T: Eq,
+{
+    l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::CustomDocumentConfig;
+    use crate::DataIdentifier;
+    use crate::DocumentUploadSettings;
     use std::cmp::Ordering;
     use std::str::FromStr;
     use test_case::test_case;
@@ -339,21 +371,6 @@ mod tests {
         )
     }
 
-    #[test]
-    fn test_all_rule_actions() {
-        // If this fails, please do 3 things:
-        // 1) Make sure you are adding the right ordering
-        // 2) add new RuleAction to `all_rule_actions`. <-- Use this in application code
-        // 3) Please don't use RuleAction::iter()!!!
-        let ra_iter_len = RuleAction::iter().len() - 1; // -1 because this includes StepUpKind::default already
-        let suk_iter_len = StepUpKind::iter().len();
-        let all_action_len = RuleAction::all_rule_actions().len();
-        let expected = ra_iter_len + suk_iter_len;
-
-        assert_eq!(all_action_len, 7);
-        assert_eq!(all_action_len, expected);
-    }
-
     // We take the max for rule eval
     #[test_case(RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress), RuleAction::StepUp(StepUpKind::IdentityProofOfSsn) => Ordering::Greater)]
     #[test_case(RuleAction::StepUp(StepUpKind::IdentityProofOfSsn), RuleAction::StepUp(StepUpKind::ProofOfAddress) => Ordering::Greater)]
@@ -382,5 +399,47 @@ mod tests {
     #[test_case(RuleInstanceKind::Business, RuleInstanceKind::Any => Ordering::Less)]
     fn test_rik_cmp(ra1: RuleInstanceKind, ra2: RuleInstanceKind) -> Ordering {
         ra1.cmp(&ra2)
+    }
+
+    #[test_case(vec![
+        DocumentRequestConfig::Identity {
+            collect_selfie: true,
+            document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
+        }
+    ] => StepUpKind::Identity)]
+    #[test_case(vec![
+        DocumentRequestConfig::Identity {
+            collect_selfie: true,
+            document_types_and_countries: Some(DocumentAndCountryConfiguration::default()),
+        },
+        DocumentRequestConfig::ProofOfSsn {
+            requires_human_review: true,
+        }
+    ] => StepUpKind::IdentityProofOfSsn)]
+    #[test_case(vec![
+        DocumentRequestConfig::Identity {
+            collect_selfie: true,
+            document_types_and_countries:  Some(DocumentAndCountryConfiguration::default()),
+        },
+        DocumentRequestConfig::ProofOfSsn {
+            requires_human_review: true,
+        },
+        DocumentRequestConfig::ProofOfAddress {
+            requires_human_review: true,
+        }
+    ] => StepUpKind::IdentityProofOfSsnProofOfAddress)]
+    #[test_case(vec![
+        DocumentRequestConfig::ProofOfSsn {
+            requires_human_review: true,
+        },
+        DocumentRequestConfig::ProofOfAddress {
+            requires_human_review: true,
+        }
+    ] => StepUpKind::Custom)]
+    #[test_case(vec![
+        DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None, requires_human_review: true, upload_settings: DocumentUploadSettings::PreferCapture})
+    ] => StepUpKind::Custom)]
+    fn test_derive_step_up_kind_from_doc_configs(doc_configs: Vec<DocumentRequestConfig>) -> StepUpKind {
+        derive_step_up_kind_from_doc_configs(doc_configs)
     }
 }

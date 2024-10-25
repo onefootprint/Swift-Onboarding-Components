@@ -367,7 +367,7 @@ mod tests {
                 action_triggered: Some(RuleAction::ManualReview),
                 rule_results: new_rule_results.clone(),
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
-                allowed_actions: RuleAction::all_rule_actions(),
+                allowed_actions: vec![],
             },
         )
         .unwrap();
@@ -377,7 +377,6 @@ mod tests {
         assert_eq!(None, rule_set_result.workflow_id);
         assert_eq!(RuleSetResultKind::Adhoc, rule_set_result.kind);
         assert_eq!(Some(RuleAction::ManualReview), rule_set_result.action_triggered);
-        assert!(!rule_set_result.allowed_actions.unwrap().is_empty());
 
         assert_have_same_elements(
             new_rule_results
@@ -482,7 +481,7 @@ mod tests {
                 action_triggered: Some(RuleAction::Fail),
                 rule_results: vec![],
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
-                allowed_actions: RuleAction::all_rule_actions(),
+                allowed_actions: vec![],
             },
         )
         .unwrap();

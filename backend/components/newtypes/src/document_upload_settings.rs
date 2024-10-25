@@ -11,6 +11,8 @@ use strum::EnumString;
     EnumString,
     macros::SerdeAttr,
     Apiv2Schema,
+    PartialEq,
+    Eq,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

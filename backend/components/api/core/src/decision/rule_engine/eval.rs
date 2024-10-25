@@ -11,7 +11,8 @@ use newtypes::BusinessDataKind;
 use newtypes::DataIdentifier;
 use newtypes::DeviceInsightField;
 use newtypes::DeviceInsightOperation;
-use newtypes::DocumentRequestKind;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentRequestConfigIdentifier;
 use newtypes::Equals;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind;
@@ -22,13 +23,12 @@ use newtypes::ListKind;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
-use newtypes::StepUpKind;
 use newtypes::VaultOperation;
 use std::collections::HashMap;
 use std::str::FromStr;
-use strum::IntoEnumIterator;
 
 /// Trait that represents a Rule
 pub trait HasRule<A: Ord + PartialOrd> {
@@ -64,23 +64,23 @@ impl HasRule<RuleAction> for Rule {
 }
 
 impl IsActionAllowed<RuleAction> for Rule {
-    fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool {
-        rule_config.action_is_allowed(&self.action())
+    fn is_action_allowed(&self, _rule_config: &RuleEvalConfig) -> bool {
+        true
     }
 }
 
 /// Rule instance impl
-impl HasRule<RuleAction> for RuleInstance {
+impl HasRule<RuleActionConfig> for RuleInstance {
     fn expression(&self) -> RuleExpression {
         self.rule_expression.clone()
     }
 
-    fn action(&self) -> RuleAction {
-        self.action
+    fn action(&self) -> RuleActionConfig {
+        self.rule_action.clone()
     }
 }
 
-impl IsActionAllowed<RuleAction> for RuleInstance {
+impl IsActionAllowed<RuleActionConfig> for RuleInstance {
     fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool {
         rule_config.action_is_allowed(&self.action())
     }
@@ -88,50 +88,37 @@ impl IsActionAllowed<RuleAction> for RuleInstance {
 
 // Interface to help map from what we've collected (documents) to the appropriate rules we should
 // evaluate
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct RuleEvalConfig {
-    pub allowed_rule_actions: Vec<RuleAction>,
+    pub document_request_identifiers_already_collected: Vec<DocumentRequestConfigIdentifier>,
 }
 impl RuleEvalConfig {
-    pub fn new(doc_kinds_collected: Vec<DocumentRequestKind>) -> Self {
-        let excluded_rule_actions = Self::excluded_rule_actions(doc_kinds_collected);
-        let allowed_rule_actions = RuleAction::all_rule_actions()
-            .into_iter()
-            .filter(|ra| !excluded_rule_actions.contains(ra))
+    pub fn new(doc_configs_already_collected: Vec<DocumentRequestConfig>) -> Self {
+        let document_request_identifiers_already_collected = doc_configs_already_collected
+            .iter()
+            .map(|dr| dr.identifier())
             .collect();
-
-        Self { allowed_rule_actions }
+        Self {
+            document_request_identifiers_already_collected,
+        }
     }
 
     // convenience method for use in rule eval
-    pub fn action_is_allowed(&self, ra: &RuleAction) -> bool {
-        self.allowed_rule_actions.contains(ra)
-    }
+    pub fn action_is_allowed(&self, ra: &RuleActionConfig) -> bool {
+        match ra {
+            RuleActionConfig::StepUp(doc_reqs_from_rule) => {
+                // we allow the rule only if non of the docs in the rule have been collected already...
+                // maybe we can relax this in the future?
+                let rule_doc_configs = doc_reqs_from_rule.iter().map(|dr| dr.identifier()).collect_vec();
 
-    // see what eligible risk actions we can take from a set of documents we already collected
-    fn excluded_rule_actions(doc_kinds_collected: Vec<DocumentRequestKind>) -> Vec<RuleAction> {
-        StepUpKind::iter()
-            .filter(|suk| {
-                let doc_kinds_from_suk = suk
-                    .to_doc_configs()
-                    .into_iter()
-                    .map(DocumentRequestKind::from)
-                    .collect_vec();
-                // only allow stepups to doc kinds we haven't collected yet
-                doc_kinds_collected
+                rule_doc_configs
                     .iter()
-                    .any(|ex| doc_kinds_from_suk.contains(ex))
-            })
-            .map(RuleAction::StepUp)
-            .collect()
-    }
-}
-
-impl Default for RuleEvalConfig {
-    fn default() -> Self {
-        let allowed_rule_actions = RuleAction::all_rule_actions();
-
-        Self { allowed_rule_actions }
+                    .all(|dr| !self.document_request_identifiers_already_collected.contains(dr))
+            }
+            RuleActionConfig::PassWithManualReview {}
+            | RuleActionConfig::ManualReview {}
+            | RuleActionConfig::Fail {} => true,
+        }
     }
 }
 
@@ -381,6 +368,7 @@ pub mod tests {
     use newtypes::RuleAction as RA;
     use newtypes::RuleExpression as RE;
     use newtypes::RuleExpressionCondition as REC;
+    use newtypes::StepUpKind;
     use std::collections::HashMap;
     use test_case::test_case;
 
@@ -398,20 +386,33 @@ pub mod tests {
     }
     impl IsActionAllowed<RA> for TRule {
         fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool {
-            rule_config.action_is_allowed(&self.action())
+            rule_config.action_is_allowed(&self.action().to_rule_action())
         }
     }
 
-    fn id_doc_collected() -> Vec<DocumentRequestKind> {
-        vec![DocumentRequestKind::Identity]
+    fn id_doc_collected() -> Vec<DocumentRequestConfig> {
+        vec![DocumentRequestConfig::Identity {
+            collect_selfie: true,
+            document_types_and_countries: None,
+        }]
     }
 
-    fn poa_doc_collected() -> Vec<DocumentRequestKind> {
-        vec![DocumentRequestKind::ProofOfAddress]
+    fn poa_doc_collected() -> Vec<DocumentRequestConfig> {
+        vec![DocumentRequestConfig::ProofOfAddress {
+            requires_human_review: true,
+        }]
     }
 
-    fn id_poa_collected() -> Vec<DocumentRequestKind> {
-        vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfAddress]
+    fn id_poa_collected() -> Vec<DocumentRequestConfig> {
+        vec![
+            DocumentRequestConfig::Identity {
+                collect_selfie: true,
+                document_types_and_countries: None,
+            },
+            DocumentRequestConfig::ProofOfAddress {
+                requires_human_review: true,
+            },
+        ]
     }
 
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
@@ -523,7 +524,7 @@ pub mod tests {
     pub fn test_evaluate_rule_set(
         rules: Vec<TRule>,
         input: Vec<FRC>,
-        docs_collected: Vec<DocumentRequestKind>,
+        docs_collected: Vec<DocumentRequestConfig>,
     ) -> (Vec<bool>, Option<RuleAction>) {
         let config = RuleEvalConfig::new(docs_collected);
         let (rule_results, action) = evaluate_rule_set(
@@ -627,43 +628,6 @@ pub mod tests {
         evaluate_condition(&cond, &input, &VaultDataForRules::empty(), &[], &HashMap::new()).unwrap()
     }
 
-    #[test_case(
-        vec![DocumentRequestKind::Identity],
-        vec![
-            RA::StepUp(StepUpKind::Identity),
-            RA::StepUp(StepUpKind::IdentityProofOfSsn),
-            RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress)
-        ])]
-    #[test_case(
-        vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfAddress],
-        vec![
-            RA::StepUp(StepUpKind::Identity),
-            RA::StepUp(StepUpKind::IdentityProofOfSsn),
-            RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
-            RA::StepUp(StepUpKind::ProofOfAddress),
-        ])]
-    #[test_case(vec![], vec![])]
-    #[test_case(
-        vec![DocumentRequestKind::ProofOfSsn],
-        vec![
-            RA::StepUp(StepUpKind::IdentityProofOfSsn),
-            RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
-        ])]
-    fn test_rule_eval_config(
-        doc_kinds: Vec<DocumentRequestKind>,
-        expected_disallowed_rule_actions: Vec<RuleAction>,
-    ) {
-        let rc = RuleEvalConfig::new(doc_kinds);
-        expected_disallowed_rule_actions
-            .iter()
-            .for_each(|a| assert!(!rc.action_is_allowed(a)));
-
-        // check all others are allowed
-        RuleAction::all_rule_actions()
-            .iter()
-            .filter(|ra| !expected_disallowed_rule_actions.contains(ra))
-            .for_each(|a| assert!(rc.action_is_allowed(a)));
-    }
 
     #[test]
     pub fn test_basic_vault_data_setup() {
