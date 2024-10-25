@@ -52,12 +52,43 @@
   },
   "request-more-info": {
     "title": "Request more information",
-    "form": {
+    "next": "Next",
+    "cancel": "Cancel",
+    "kind-form": {
       "warning": "This business has an incomplete onboarding. Requesting a document from them will prevent the business from completing their onboarding",
-      "intro": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document.",
-      "beneficial-owner": {
+      "upload-doc": {
+        "label": "Ask beneficial owner to upload a document",
+        "instructions": "Select a beneficial owner who will receive a link to upload a document on behalf of the business. Only the beneficial owner you select here will be able to upload the requested document."
+      },
+      "add-bo": {
+        "label": "Request additional beneficial owners",
+        "hint": "A beneficial owner is anyone who has substantial control of or owns at least 25% of the business.",
+        "instructions": "Select a beneficial owner who will receive a link to fill out the additional beneficial owner information. Only the beneficial owner you select here will be able to complete the form."
+      }
+    },
+    "add-bo-form": {
+      "bo": {
         "label": "Beneficial owner",
-        "placeholder": "Select a beneficial owner"
+        "placeholder": "Select a beneficial owner",
+        "errors": {
+          "required": "Please select a beneficial owner"
+        }
+      },
+      "playbook": {
+        "label": "Playbook",
+        "placeholder": "Select a playbook",
+        "errors": {
+          "required": "Please select a playbook"
+        }
+      }
+    },
+    "upload-docs-form": {
+      "bo": {
+        "label": "Beneficial owner",
+        "placeholder": "Select a beneficial owner",
+        "errors": {
+          "required": "Please select a beneficial owner"
+        }
       },
       "document": {
         "name": {
@@ -84,9 +115,7 @@
       "note": {
         "label": "Note for the beneficial owner (optional)",
         "placeholder": "We'd need you to check if there's a typo in the address information you provided..."
-      },
-      "next": "Next",
-      "cancel": "Cancel"
+      }
     },
     "confirmation": {
       "title": "Link generated!",

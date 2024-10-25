@@ -5,8 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-import useFilters from '../use-filters';
-
 type GetPlaybooksRequest = {
   authHeaders: AuthHeaders;
   kinds?: OnboardingConfigKind[];
@@ -30,12 +28,10 @@ type UsePlaybookOptionsArgs = {
 
 const usePlaybookOptions = ({ kinds }: UsePlaybookOptionsArgs) => {
   const { authHeaders, isLive } = useSession();
-  const { isReady } = useFilters();
 
   return useQuery({
-    queryKey: ['insights', 'playbooks', isLive],
+    queryKey: ['playbooksOptions', isLive],
     queryFn: () => getPlaybooks({ authHeaders, kinds }),
-    enabled: isReady,
     select: response =>
       response.data?.map(({ id, name }) => ({
         label: name,

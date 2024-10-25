@@ -1,4 +1,8 @@
-export type FormValues = {
+export type AddBoFormValues = {
+  boId: string;
+};
+
+export type UploadDocsFormValues = {
   boId: string;
   note: string;
   docs: Doc[];

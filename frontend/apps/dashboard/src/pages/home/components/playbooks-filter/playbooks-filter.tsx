@@ -1,9 +1,9 @@
 import { SelectCustom, Shimmer } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import usePlaybookOptions from 'src/hooks/use-playbook-options';
 
 import ALL_PLAYBOOKS_ID from '../../constants';
 import useFilters from '../../hooks/use-filters';
-import usePlaybookOptions from '../../hooks/use-playbook-options';
 
 const PlaybooksFilter = () => {
   const { t } = useTranslation('home', {

@@ -2,7 +2,7 @@ import { Checkbox, LinkButton, Stack } from '@onefootprint/ui';
 import { useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import usePlaybookOptions from 'src/pages/home/hooks/use-playbook-options';
+import usePlaybookOptions from 'src/hooks/use-playbook-options';
 
 import type { FormData } from '../../drawer-filter.type';
 import ErrorComponent from './components/error';

@@ -1,4 +1,5 @@
 import type { DocumentRequestConfig, ReviewStatus } from '../data';
+import type { CollectedKybDataOption } from '../data';
 
 export type EntityActionsRequest = {
   entityId: string;
@@ -33,6 +34,9 @@ export type WorkflowRequestConfig =
       kind: TriggerKind.Onboard;
       data: {
         playbookId: string;
+        // Only KYB is supported for now, but we should support kyc too in the future
+        recollectAttributes?: CollectedKybDataOption[];
+        reuseExistingBoKyc?: boolean;
       };
     }
   | {

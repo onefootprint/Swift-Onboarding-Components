@@ -1,12 +1,20 @@
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
-import { ActionRequestKind, DocumentRequestKind, TriggerKind, type TriggerResponse } from '@onefootprint/types';
+import {
+  ActionRequestKind,
+  CollectedKybDataOption,
+  DocumentRequestKind,
+  TriggerKind,
+  type TriggerResponse,
+} from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useBusinessOwners from 'src/hooks/use-business-owners';
 import useSubmitActions from 'src/hooks/use-submit-actions';
-import type { FormValues } from '../request-more-info.types';
-import Form from './form';
+import type { AddBoFormValues, UploadDocsFormValues } from '../request-more-info.types';
+import AddBoForm from './add-bo-form';
+import KindForm from './kind-form';
+import UploadDocsForm from './upload-docs-form';
 
 export type FormDialogProps = {
   open: boolean;
@@ -21,8 +29,15 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
   const bosQuery = useBusinessOwners(entityId);
   const submitMutation = useSubmitActions();
 
-  const handleSubmit = (formValues: FormValues) => {
-    submitMutation.mutate(
+  const getBo = (boId: string) => {
+    if (!bosQuery.data) throw new Error('Business owners data is not available');
+    const bo = bosQuery.data.find(({ id }) => id === boId);
+    if (!bo) throw new Error(`Business owner with ID ${boId} not found`);
+    return bo;
+  };
+
+  const handleUploadDocsSubmit = (formValues: UploadDocsFormValues) => {
+    return submitMutation.mutate(
       {
         entityId: formValues.boId,
         actions: [
@@ -49,7 +64,40 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
       },
       {
         onSuccess: (response, request) => {
-          onSubmit({ bo: { id: request.entityId, hasPhone: true }, action: response[0] });
+          const bo = getBo(request.entityId);
+          onSubmit({ bo: { id: bo.id, hasPhone: bo.hasPhone }, action: response[0] });
+        },
+      },
+    );
+  };
+
+  const handleAddBoSubmit = (formValues: AddBoFormValues) => {
+    const sortDataDescending = (a: { createdAt: string }, b: { createdAt: string }) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    const mostRecentWorkflow = entityQuery.data?.workflows.sort(sortDataDescending)[0];
+    if (!mostRecentWorkflow) throw new Error('Most recent workflow not found');
+    return submitMutation.mutate(
+      {
+        entityId: formValues.boId,
+        actions: [
+          {
+            kind: ActionRequestKind.trigger,
+            fpBid: entityId,
+            trigger: {
+              kind: TriggerKind.Onboard,
+              data: {
+                playbookId: mostRecentWorkflow.playbookId,
+                recollectAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
+                reuseExistingBoKyc: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        onSuccess: (response, request) => {
+          const bo = getBo(request.entityId);
+          onSubmit({ bo: { id: bo.id, hasPhone: bo.hasPhone }, action: response[0] });
         },
       },
     );
@@ -62,19 +110,26 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
       onClose={onClose}
       title={t('title')}
       primaryButton={{
-        label: t('form.next'),
+        label: t('next'),
         type: 'submit',
         form: 'request-more-info-form',
         loading: submitMutation.isPending,
       }}
       secondaryButton={{
-        label: t('form.cancel'),
+        label: t('cancel'),
         onClick: onClose,
         disabled: submitMutation.isPending,
       }}
     >
       {entityQuery.data && bosQuery.data ? (
-        <Form onSubmit={handleSubmit} entity={entityQuery.data} businessOwners={bosQuery.data} />
+        <KindForm entity={entityQuery.data}>
+          {requestType => {
+            if (requestType === 'uploadDocument') {
+              return <UploadDocsForm onSubmit={handleUploadDocsSubmit} businessOwners={bosQuery.data} />;
+            }
+            return <AddBoForm onSubmit={handleAddBoSubmit} businessOwners={bosQuery.data} />;
+          }}
+        </KindForm>
       ) : null}
     </Dialog>
   );
