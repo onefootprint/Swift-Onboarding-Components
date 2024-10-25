@@ -1,8 +1,8 @@
 use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
-use crate::rules::validate_rules_request;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
+use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;

@@ -1,8 +1,15 @@
 use crate::errors::AssertionError;
 use crate::errors::ValidationError;
 use crate::FpResult;
+use api_wire_types::MultiUpdateRuleRequest;
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
+use db::models::rule_instance::MultiRuleUpdate;
+use db::models::rule_instance::NewRule;
+use db::models::rule_instance::RuleInstanceUpdate;
+use db::PgConn;
+use itertools::chain;
+use itertools::Itertools;
 use newtypes::AllData;
 use newtypes::BankDataKind;
 use newtypes::BusinessDataKind;
@@ -18,9 +25,11 @@ use newtypes::PiiJsonValue;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
 use newtypes::RuleInstanceKind;
+use newtypes::TenantId;
 use newtypes::ValidateArgs;
 use newtypes::VaultOperation;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 // We only support quality rules for DIs that are not sensitive (low cardinality and un-interesting
 // even when correlated with other non-sensitive DIs). This helps avoid leaking sensitive data or
@@ -237,6 +246,109 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
         RuleInstanceKind::Person
     }
 }
+
+
+pub fn validate_rules_request(
+    conn: &mut PgConn,
+    tenant_id: &TenantId,
+    is_live: bool,
+    req: MultiUpdateRuleRequest,
+) -> FpResult<MultiRuleUpdate> {
+    let MultiUpdateRuleRequest {
+        expected_rule_set_version,
+        add,
+        edit,
+        delete,
+    } = req;
+
+    let list_ids: Vec<ListId> = chain(
+        add.iter()
+            .flatten()
+            .flat_map(|rule| rule.rule_expression.list_ids()),
+        edit.iter()
+            .flatten()
+            .flat_map(|rule| rule.rule_expression.list_ids()),
+    )
+    .collect();
+    let lists = List::bulk_get(conn, tenant_id, is_live, &list_ids)?;
+
+    let new_rules = add
+        .unwrap_or_default()
+        .into_iter()
+        .map(|r| -> FpResult<_> {
+            let (rule_expression, rule_instance_kind) =
+                validate_rule_expression(r.rule_expression, &lists, is_live)?;
+
+            let (action, rule_action) = match r.rule_action {
+                api_wire_types::RuleActionMigration::Legacy(rule_action) => {
+                    (rule_action, rule_action.to_rule_action())
+                }
+                api_wire_types::RuleActionMigration::New(rule_action_config) => {
+                    (rule_action_config.clone().into(), rule_action_config)
+                }
+            };
+            Ok(NewRule {
+                rule_expression,
+                kind: rule_instance_kind,
+                action,
+                rule_action,
+                name: r.name,
+                is_shadow: r.is_shadow,
+            })
+        })
+        .collect::<FpResult<Vec<_>>>()?;
+
+    // check that the same rule isn't being edited and deleted
+    let edit_rule_ids: HashSet<_> = edit
+        .as_ref()
+        .map(|v| v.iter().map(|e| e.rule_id.clone()).collect())
+        .unwrap_or_default();
+    let delete_rule_ids: HashSet<_> = delete
+        .as_ref()
+        .map(|v| v.iter().cloned().collect())
+        .unwrap_or_default();
+    let overlap = edit_rule_ids.intersection(&delete_rule_ids).collect_vec();
+    if !overlap.is_empty()
+        || edit_rule_ids.len() != edit.as_ref().map(|e| e.len()).unwrap_or(0)
+        || delete_rule_ids.len() != delete.as_ref().map(|e| e.len()).unwrap_or(0)
+    {
+        return Err(ValidationError("Cannot perform multiple edits on the same rule").into());
+    }
+
+    let edit_updates = edit
+        .unwrap_or_default()
+        .into_iter()
+        .map(|e| {
+            let (rule_expression, kind) = validate_rule_expression(e.rule_expression, &lists, is_live)?;
+            Ok(RuleInstanceUpdate::update(
+                e.rule_id,
+                None,
+                Some(rule_expression.clone()),
+                None,
+                Some(kind),
+            ))
+        })
+        .collect::<FpResult<Vec<_>>>()?;
+
+    let delete_updates = delete
+        .unwrap_or_default()
+        .into_iter()
+        .map(RuleInstanceUpdate::delete)
+        .collect_vec();
+
+    let all_updates = edit_updates.into_iter().chain(delete_updates).collect_vec();
+
+    if new_rules.is_empty() && all_updates.is_empty() {
+        return Err(ValidationError("At least one update must be provided").into());
+    }
+
+    Ok(MultiRuleUpdate {
+        expected_rule_set_version: Some(expected_rule_set_version),
+        new_rules,
+        updates: all_updates,
+    })
+}
+
 
 #[cfg(test)]
 mod tests {

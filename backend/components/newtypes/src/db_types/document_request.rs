@@ -86,6 +86,21 @@ impl DocumentRequestConfig {
 
         s.into()
     }
+
+    pub fn requires_human_review(&self) -> bool {
+        match self {
+            DocumentRequestConfig::Identity { .. } => false,
+            DocumentRequestConfig::ProofOfSsn {
+                requires_human_review,
+            } => *requires_human_review,
+            DocumentRequestConfig::ProofOfAddress {
+                requires_human_review,
+            } => *requires_human_review,
+            DocumentRequestConfig::Custom(custom_document_config) => {
+                custom_document_config.requires_human_review
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr, PartialEq, Eq)]

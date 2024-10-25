@@ -12,7 +12,7 @@ from tests.utils import (
 
 
 @pytest.mark.parametrize(
-    "data,error",
+    "data,error,is_new_serialization",
     [
         (
             dict(
@@ -23,16 +23,18 @@ from tests.utils import (
                 rule_action="pass_with_manual_review",
             ),
             None,
+            False,
         ),
         (
             dict(
                 name="My awesome rule",
                 rule_expression=[
-                    {"field": "name_does_not_match", "op": "eq", "value": True}
+                    {"field": "dob_yob_not_available", "op": "eq", "value": True}
                 ],
                 rule_action="step_up.identity",
             ),
             None,
+            False,
         ),
         (
             dict(
@@ -43,6 +45,7 @@ from tests.utils import (
                 rule_action="manual_review",
             ),
             None,
+            False,
         ),
         (
             dict(
@@ -53,6 +56,7 @@ from tests.utils import (
                 rule_action="fail",
             ),
             None,
+            False,
         ),
         (
             dict(
@@ -63,6 +67,7 @@ from tests.utils import (
                 rule_action="fail",
             ),
             None,
+            False,
         ),
         # mixing business rules and person rules
         (
@@ -75,10 +80,155 @@ from tests.utils import (
                 rule_action="fail",
             ),
             "Cannot make a rule expression that includes both Person and Business signals",
+            False,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "name_does_not_match", "op": "eq", "value": True}
+                ],
+                rule_action=dict(
+                    kind="step_up",
+                    config=[
+                        dict(
+                            kind="custom",
+                            data=dict(
+                                name="test",
+                                identifier="document.custom.test",
+                                description="Hi there!",
+                                upload_settings="prefer_upload",
+                                requires_human_review=False,
+                            ),
+                        )
+                    ],
+                ),
+            ),
+            None,
+            True,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "dob_mob_not_available", "op": "eq", "value": True}
+                ],
+                rule_action=dict(
+                    kind="step_up",
+                    config=[
+                        dict(
+                            kind="identity",
+                            data=dict(
+                                collect_selfie=True, document_types_and_countries=None
+                            ),
+                        )
+                    ],
+                ),
+            ),
+            None,
+            True,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "ssn_not_available", "op": "eq", "value": True}
+                ],
+                rule_action=dict(
+                    kind="step_up",
+                    config=[
+                        dict(
+                            kind="identity",
+                            data=dict(
+                                collect_selfie=True,
+                                document_types_and_countries={
+                                    "global": ["drivers_license", "passport"],
+                                    "country_specific": {},
+                                },
+                            ),
+                        )
+                    ],
+                ),
+            ),
+            None,
+            True,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {
+                        "field": "address_located_is_not_standard_college",
+                        "op": "eq",
+                        "value": True,
+                    }
+                ],
+                rule_action=dict(
+                    kind="step_up",
+                    config=[
+                        dict(
+                            kind="proof_of_address",
+                            data=dict(requires_human_review=False),
+                        ),
+                        dict(
+                            kind="proof_of_ssn", data=dict(requires_human_review=False)
+                        ),
+                        dict(
+                            kind="custom",
+                            data=dict(
+                                name="test",
+                                identifier="document.custom.test",
+                                description="Hi there!",
+                                upload_settings="prefer_upload",
+                                requires_human_review=False,
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+            None,
+            True,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {
+                        "field": "address_located_is_not_standard_prison",
+                        "op": "eq",
+                        "value": True,
+                    }
+                ],
+                rule_action=dict(kind="fail", config=dict()),
+            ),
+            None,
+            True,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "address_risk_alert", "op": "eq", "value": True}
+                ],
+                rule_action=dict(kind="manual_review", config=dict()),
+            ),
+            None,
+            True,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "address_alert_stability", "op": "eq", "value": True}
+                ],
+                rule_action=dict(kind="pass_with_manual_review", config=dict()),
+            ),
+            None,
+            True,
         ),
     ],
 )
-def test_create(sandbox_tenant, data, error):
+def test_create(sandbox_tenant, data, error, is_new_serialization):
     obc1 = get(
         f"org/onboarding_configs/{sandbox_tenant.default_ob_config.id}",
         None,
@@ -103,7 +253,10 @@ def test_create(sandbox_tenant, data, error):
     assert rule["name"] == data["name"]
     assert rule["rule_expression"] == data["rule_expression"]
     assert rule["is_shadow"] == False
-    assert rule["action"] == data["rule_action"]
+    if is_new_serialization:
+        assert rule["rule_action"] == data["rule_action"]
+    else:
+        assert rule["action"] == data["rule_action"]
     assert rule["kind"] == "person"
 
     # OBC has rule_set.version and it has incremented from rule change

@@ -1,3 +1,5 @@
+use crate::decision::document::route_handler::complete_non_identity_document;
+use crate::decision::document::route_handler::handle_document_create;
 use crate::decision::tests::test_helpers::FixtureData;
 use crate::decision::tests::test_helpers::{
     self,
@@ -8,6 +10,7 @@ use crate::decision::vendor::{
 };
 use crate::FpResult;
 use crate::State;
+use api_wire_types::CreateDocumentRequest;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -73,6 +76,7 @@ use newtypes::OnboardingStatus;
 use newtypes::PiiJsonValue;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
@@ -685,4 +689,54 @@ pub async fn mock_incode_doc_collection(
 
 pub async fn get_current_seqno(state: &State) -> DataLifetimeSeqno {
     state.db_query(DataLifetime::get_current_seqno).await.unwrap()
+}
+
+
+pub async fn mock_custom_doc_collection(
+    state: &State,
+    doc_requests: Vec<DocumentRequest>,
+    tenant_id: TenantId,
+    sv_id: ScopedVaultId,
+    wf_id: WorkflowId,
+) {
+    let requests: Vec<DocumentRequest> = doc_requests
+        .into_iter()
+        .filter(|dr| !matches!(dr.kind, DocumentRequestKind::Identity))
+        .collect();
+
+    for dr in requests {
+        let document_kind = match dr.kind {
+            DocumentRequestKind::Identity => panic!("unsupported doc type"),
+            DocumentRequestKind::ProofOfSsn => DocumentKind::SsnCard,
+            DocumentRequestKind::ProofOfAddress => DocumentKind::ProofOfAddress,
+            DocumentRequestKind::Custom => DocumentKind::Custom,
+        };
+        let req = CreateDocumentRequest {
+            document_type: document_kind,
+            country_code: None,
+            fixture_result: None,
+            skip_selfie: None,
+            device_type: None,
+            request_id: Some(dr.id.clone()),
+        };
+        let doc_id = handle_document_create(
+            state,
+            req,
+            tenant_id.clone(),
+            sv_id.clone(),
+            wf_id.clone(),
+            CreateInsightEvent::default(),
+        )
+        .await
+        .unwrap();
+        let (id_doc, _) = state
+            .db_pool
+            .db_query(move |conn| Document::get(conn, &doc_id))
+            .await
+            .unwrap();
+
+        complete_non_identity_document(state, dr, id_doc, sv_id.clone())
+            .await
+            .unwrap();
+    }
 }
