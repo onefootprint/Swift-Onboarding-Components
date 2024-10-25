@@ -24,8 +24,8 @@ config:
       schedule: cron(0 17 * * ? *)
     db:
       deletionProtection: false
-      maxAcus: 16
-      minAcus: 2
+      maxAcus: 32
+      minAcus: 4
     domain:
       assets: i-dev.onefp.net
       base: dev.onefootprint.com
