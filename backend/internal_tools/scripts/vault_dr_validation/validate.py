@@ -1,34 +1,48 @@
 #!/usr/bin/env python3
 
+import modal
+import asyncio
 import functools
 import hashlib
 import base64
 import json
 import subprocess
-import requests
-from requests.auth import HTTPBasicAuth
 import os
 import tempfile
 import multiprocessing as mp
 import string
-import tqdm
+import random
 
-API_URL = os.environ.get("FOOTPRINT_API_ROOT", "https://api.onefootprint.com")
-API_KEY = os.environ["FOOTPRINT_API_KEY"]
-WRAPPED_RECOVERY_KEY_FILE = os.environ["FOOTPRINT_WRAPPED_RECOVERY_KEY_FILE"]
-MODE = "--sandbox" if API_KEY.startswith("sk_test_") else "--live"
+FP_ID_ALPHABET = string.ascii_lowercase + string.digits
 
-session = requests.Session()
-session.auth = HTTPBasicAuth(API_KEY, "")
+app = modal.App("vault-dr-validation")
 
-fp_id_alphabet = string.ascii_lowercase + string.digits
+image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .pip_install("tqdm==4.66.4", "requests==2.31.0", "boto3==1.34.126")
+    .apt_install("wget")
+    .run_commands(
+        "wget -O /tmp/footprint-dr.tar.gz https://github.com/onefootprint/footprint-dr-releases/releases/download/0.3.0/footprint-dr-0.3.0-x86_64-unknown-linux-musl.tar.gz",
+        "tar -xvf /tmp/footprint-dr.tar.gz -C /usr/local/bin",
+    )
+)
+
+secrets = [
+    modal.Secret.from_name("vdr-validation-dev"),
+]
+
+with image.imports():
+    import boto3
+    import tqdm.asyncio
+    import requests
+    from requests.auth import HTTPBasicAuth
 
 
 def fp_id_partitions():
     ret = []
     for prefix in ["fp_id_", "fp_id_test_", "fp_bid_", "fp_bid_test_"]:
-        for c1 in fp_id_alphabet:
-            for c2 in fp_id_alphabet:
+        for c1 in FP_ID_ALPHABET:
+            for c2 in FP_ID_ALPHABET:
                 ret.append(prefix + c1 + c2)
     return ret
 
@@ -41,21 +55,36 @@ def partition_for_fp_id(fp_id):
 
 
 def footprint_dr(*args, capture=True):
+    sts_client = boto3.client("sts")
+    creds = sts_client.assume_role(
+        RoleArn="arn:aws:iam::992382496642:role/fp-vault-data-read-only",
+        RoleSessionName="modal_vault_dr_validation",
+    )["Credentials"]
+    creds_env = {
+        "AWS_ACCESS_KEY_ID": creds["AccessKeyId"],
+        "AWS_SECRET_ACCESS_KEY": creds["SecretAccessKey"],
+        "AWS_SESSION_TOKEN": creds["SessionToken"],
+    }
+
     print("Running: footprint-dr", " ".join(args))
     if capture:
         return subprocess.check_output(
             ["footprint-dr", *args],
-            env=os.environ,
+            env=os.environ | creds_env,
             text=True,
         )
     else:
-        subprocess.run(["footprint-dr", *args], env=os.environ)
+        subprocess.run(["footprint-dr", *args], env=os.environ | creds_env, check=True)
 
 
+def mode_flag():
+    api_key = os.environ["FOOTPRINT_API_KEY"]
+    return "--sandbox" if api_key.startswith("sk_test_") else "--live"
+
+
+@app.function(image=image, secrets=secrets)
 def get_bucket_namespace():
-    status = footprint_dr("status", MODE)
-    print(status)
-
+    status = footprint_dr("status", mode_flag())
     status_lines = status.splitlines()
 
     bucket_line = next(line for line in status_lines if "S3 Bucket Name:" in line)
@@ -72,7 +101,7 @@ def vdr_list_all_records(partition, bucket, namespace):
         cursor_args = ["--fp-id-gt", cursor] if cursor else []
         out = footprint_dr(
             "list-records",
-            MODE,
+            mode_flag(),
             "--bucket",
             bucket,
             "--namespace",
@@ -95,15 +124,38 @@ def vdr_list_all_records(partition, bucket, namespace):
             cursor = fp_id
 
 
-def vdr_download_all_records(args):
-    partition, bucket, namespace, data_dir = args
-    vdr_records_file = os.path.join(data_dir, f"vdr_records.{partition}.jsonl")
-    if os.path.exists(vdr_records_file):
-        print(f"VDR records already downloaded to {vdr_records_file}")
-        return vdr_records_file
+def api_root():
+    return os.environ["FOOTPRINT_API_ROOT"]
 
-    vdr_records_file_tmp = os.path.join(data_dir, f"vdr_records.{partition}.jsonl.tmp")
-    with open(vdr_records_file_tmp, "w") as f:
+
+@functools.cache
+def get_vault_fields_via_api(fp_id, version):
+    resp = requests.get(
+        f"{api_root()}/users/{fp_id}/vault",
+        headers={"x-fp-vault-version": str(version)},
+        auth=HTTPBasicAuth(os.environ["FOOTPRINT_API_KEY"], ""),
+    )
+    resp.raise_for_status()
+    return list(resp.json().keys())
+
+
+def decrypt_via_api(fp_id, version, fields):
+    resp = requests.post(
+        f"{api_root()}/users/{fp_id}/vault/decrypt",
+        headers={
+            "x-fp-vault-version": str(version),
+        },
+        json={"fields": fields, "reason": "VDR validation"},
+        auth=HTTPBasicAuth(os.environ["FOOTPRINT_API_KEY"], ""),
+    )
+    if resp.status_code != 200:
+        raise Exception(f"Failed to decrypt: {resp.text}")
+    return resp.json()
+
+
+def vdr_download_all_records(partition, bucket, namespace):
+    vdr_records_file = os.path.join(f"/tmp/vdr_records.{partition}.jsonl")
+    with open(vdr_records_file, "w") as f:
         for latest_record in vdr_list_all_records(partition, bucket, namespace):
             fp_id = latest_record["fp_id"]
 
@@ -128,41 +180,7 @@ def vdr_download_all_records(args):
                 }
                 json.dump(record, f)
                 f.write("\n")
-
-    os.rename(vdr_records_file_tmp, vdr_records_file)
     return vdr_records_file
-
-
-@functools.cache
-def get_vault_fields_via_api(fp_id, version):
-    resp = session.get(
-        f"{API_URL}/users/{fp_id}/vault", headers={"x-fp-vault-version": str(version)}
-    )
-    resp.raise_for_status()
-    return list(resp.json().keys())
-
-
-def decrypt_via_api(fp_id, version, fields):
-    resp = session.post(
-        f"{API_URL}/users/{fp_id}/vault/decrypt",
-        headers={
-            "x-fp-vault-version": str(version),
-        },
-        json={"fields": fields, "reason": "VDR validation"},
-    )
-    if resp.status_code != 200:
-        raise Exception(f"Failed to decrypt: {resp.text}")
-    return resp.json()
-
-
-def get_org_identity():
-    with open("../../../.env", "r") as env_file:
-        lines = env_file.readlines()
-        private_key_line = next(
-            line for line in lines if line.startswith("VDR_AGE_PRIVATE_KEY_1=")
-        )
-        private_key = private_key_line.split("=")[1].strip()
-        return private_key
 
 
 def listdir(path):
@@ -173,13 +191,11 @@ def listdir(path):
     return out
 
 
-def validate_fp_id(args):
-    fp_id, decrypt_dir, data_dir = args
-
+def validate_fp_id(fp_id, data_dir):
     vdr_data_for_version = {}
     di_is_document = {}
 
-    version_dir = os.path.join(decrypt_dir, fp_id)
+    version_dir = os.path.join(data_dir, fp_id)
     for version in listdir(version_dir):
         vdr_data = {}
 
@@ -203,10 +219,6 @@ def validate_fp_id(args):
         vdr_data_for_version[version] = vdr_data
 
     for version, vdr_data in vdr_data_for_version.items():
-        validate_checkpoint = os.path.join(data_dir, f"{fp_id}.{version}.validated")
-        if os.path.exists(validate_checkpoint):
-            continue
-
         fields = get_vault_fields_via_api(fp_id, version)
 
         api_data = decrypt_via_api(fp_id, version, fields)
@@ -242,80 +254,108 @@ def validate_fp_id(args):
             if mismatch_api_dis == mismatch_vdr_dis and all(
                 v is None for di, v in api_mismatch
             ):
-                print(
-                    "Assuming mismatch due to OBC can_access_data restriction:", fp_id
-                )
-                with open(validate_checkpoint, "w") as f:
-                    f.write("done: can_access_data caveat")
+                # Assuming mismatch due to OBC can_access_data restriction
                 continue
 
-            print(
-                f"VDR data and API data mismatch for {fp_id} at version {version}\nMismatch in API Data: {api_mismatch}\nMismatch in VDR Data: {vdr_mismatch}"
-            )
-        else:
-            with open(validate_checkpoint, "w") as f:
-                f.write("done")
+            return f"VDR data and API data mismatch for {fp_id} at version {version}. Mismatch in API Data: {api_mismatch}. Mismatch in VDR Data: {vdr_mismatch}"
+
+    return None
 
 
-def main():
-    bucket, namespace = get_bucket_namespace()
+@app.function(
+    image=image,
+    secrets=secrets,
+    cpu=4,
+    memory=1024,
+    timeout=3600,
+)
+def validate_partition(partition, bucket, namespace):
+    org_identity_file = f"/tmp/org_identity_{partition}"
+    with open(org_identity_file, "w") as f:
+        f.write(os.environ["VDR_ORG_IDENTITY"])
 
-    org_identity_file = tempfile.NamedTemporaryFile()
-    org_identity_file.write(get_org_identity().encode())
-    org_identity_file.flush()
+    wrapped_recovery_key_file = f"/tmp/wrapped_recovery_key_{partition}"
+    with open(wrapped_recovery_key_file, "w") as f:
+        f.write(os.environ["FOOTPRINT_WRAPPED_RECOVERY_KEY"])
 
-    data_dir = "data"
-    decrypt_dir = os.path.join(data_dir, "vdr_decrypt")
-    os.makedirs(decrypt_dir, exist_ok=True)
+    data_dir = f"/tmp/data_{partition}"
+    os.makedirs(data_dir)
 
-    pool = mp.Pool()
+    records_file = vdr_download_all_records(partition, bucket, namespace)
 
-    print("Downloading all VDR records")
+    footprint_dr(
+        "decrypt",
+        mode_flag(),
+        "--org-identity",
+        org_identity_file,
+        "--output-dir",
+        data_dir,
+        "--records",
+        records_file,
+        "--wrapped-recovery-key",
+        wrapped_recovery_key_file,
+        "--bucket",
+        bucket,
+        "--namespace",
+        namespace,
+        capture=False,
+    )
+
+    fp_ids = listdir(data_dir)
+    for fp_id in fp_ids:
+        error = validate_fp_id(fp_id, data_dir)
+        if error:
+            return (partition, error)
+
+    return (partition, "OKAY")
+
+
+@app.local_entrypoint()
+async def main():
+    bucket, namespace = get_bucket_namespace.remote()
+
     partitions = fp_id_partitions()
 
-    records_files = []
-    for file in tqdm.tqdm(
-        pool.imap_unordered(
-            vdr_download_all_records,
-            [(p, bucket, namespace, data_dir) for p in partitions],
-        ),
+    validation_results_file = "validation_results.json"
+
+    if os.path.exists(validation_results_file):
+        with open(validation_results_file, "r") as f:
+            validation_results = json.load(f)
+    else:
+        validation_results = {}
+
+    for partition, result in validation_results.items():
+        print(partition, "=>", result)
+
+    partitions = [p for p in partitions if p not in validation_results]
+
+    # Modal limits the number of enqueued function calls, so to avoid hitting
+    # resource exhaustion errors, we have to limit our own calling concurrency.
+    semaphore = asyncio.Semaphore(64)
+
+    async def limited_task(partition):
+        async with semaphore:
+            try:
+                return await validate_partition.remote.aio(partition, bucket, namespace)
+            except subprocess.CalledProcessError as e:
+                print(e)
+                return (partition, None)
+
+    tasks = [limited_task(p) for p in partitions]
+    for result in tqdm.asyncio.tqdm.as_completed(
+        tasks,
         total=len(partitions),
-        desc="Downloading",
+        desc="Validating partitions",
     ):
-        print("Downloaded records to", file)
-        records_files.append(file)
+        partition, result = await result
+        print(partition, "=>", result)
+        if result is None:
+            # Transient error
+            continue
 
-    for records_file in tqdm.tqdm(records_files, desc="Decrypting"):
-        decrypt_checkpoint = f"{records_file}.decrypted.checkpoint"
-        if os.path.exists(decrypt_checkpoint):
-            print("Already decrypted records in", records_file)
-        else:
-            footprint_dr(
-                "decrypt",
-                MODE,
-                "--org-identity",
-                org_identity_file.name,
-                "--output-dir",
-                decrypt_dir,
-                "--records",
-                records_file,
-                "--wrapped-recovery-key",
-                WRAPPED_RECOVERY_KEY_FILE,
-                capture=False,
-            )
-            with open(decrypt_checkpoint, "w") as f:
-                f.write("done")
+        validation_results[partition] = result
 
-    fp_ids = listdir(decrypt_dir)
-    for _ in tqdm.tqdm(
-        pool.imap_unordered(
-            validate_fp_id, [(fp_id, decrypt_dir, data_dir) for fp_id in fp_ids]
-        ),
-        total=len(fp_ids),
-        desc="Validating",
-    ):
-        pass
-
-
-if __name__ == "__main__":
-    main()
+        tmp_file = "validation_results.tmp.json"
+        with open(tmp_file, "w") as f:
+            f.write(json.dumps(validation_results))
+        os.rename(tmp_file, validation_results_file)

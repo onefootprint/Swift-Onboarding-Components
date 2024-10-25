@@ -4,35 +4,11 @@ This script compares vault data as reported by VDR and the `footprint-dr` CLI to
 
 The script also serves as internal documentation of how to use `footprint-dr` for bulk operations (e.g. pagination, parallelized decryptions, etc).
 
-To run on a test tenant:
+Set up Modal with the `onefootprint` GitHub org: https://modal.com/docs/guide
 
-1. Fetch an API key for the desired tenant. Login with `footprint-dr login` or set the `FOOTPRINT_API_KEY` env var.
-2. Set the `FOOTPRINT_API_ROOT` env var to the desired endpoint, if it's not prod.
-3. For the desired test tenant, fetch the wrapped recovery key from the DB:
-
-```sql
-SELECT
-	wrapped_recovery_key
-FROM
-	vault_dr_config
-WHERE
-	tenant_id = '_private_it_org_2'
-	AND is_live = FALSE
-	AND deactivated_at IS NULL;
+Run the validation script:
+```
+modal run validate.py
 ```
 
-Write the key to a file and set the env var `FOOTPRINT_WRAPPED_RECOVERY_KEY_FILE` to that file.
-
-Note that the VDR org identities for all internal test tenants are the keys in the local `.env` secrets files.
-
-4. Run the validation script
-
-```bash
-export AWS_PROFILE=cross-account # Account ID 992382496642
-aws sso login
-source ~/.virtualenvs/fpc/bin/activate                                                                                                                                                                                                                                                        130 ↵
-cd backend/internal_tools/scripts/vault_dr_validation
-./validate.py
-```
-
-Data will be checkpointed into the `data` directory. Delete that directory if you change tenants.
+Results will accumulate in `validation_results.json` so the validation is resumable. Delete this file if you want to restart. Transient errors are not retried, and you may need to re-run the validation to pick up skipped partitions that had transient errors.
