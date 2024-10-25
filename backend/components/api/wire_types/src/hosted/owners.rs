@@ -1,10 +1,9 @@
+use crate::ModernUserDecryptResponse;
 use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::BoLinkId;
 use newtypes::DataIdentifier;
-use newtypes::PiiString;
 use paperclip::actix::Apiv2Response;
 use paperclip::actix::Apiv2Schema;
-use std::collections::HashMap;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
@@ -18,7 +17,7 @@ pub struct HostedBusinessOwner {
     pub is_authed_user: bool,
     /// True if this beneficial owner is editable by the currently authed user.
     pub is_mutable: bool,
-    pub decrypted_data: HashMap<DataIdentifier, PiiString>,
+    pub decrypted_data: ModernUserDecryptResponse,
     pub populated_data: Vec<DataIdentifier>,
     pub ownership_stake: Option<u32>,
 }

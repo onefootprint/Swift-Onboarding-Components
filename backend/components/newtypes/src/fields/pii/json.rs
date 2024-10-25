@@ -188,6 +188,12 @@ impl From<PiiString> for PiiJsonValue {
     }
 }
 
+impl From<PiiString> for Option<PiiJsonValue> {
+    fn from(s: PiiString) -> Self {
+        Some(PiiJsonValue::from(s))
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

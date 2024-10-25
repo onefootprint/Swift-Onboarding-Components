@@ -360,7 +360,7 @@ pub(super) async fn post_inner(
         .into_iter()
         .collect::<HashMap<_, _>>();
 
-    let mut results = HashMap::new();
+    let mut results = DecryptResponse::new();
     for (v, targets) in version_to_targets {
         let mut v_results = decrypted_results.remove(&v).unwrap_or_default();
         // Is this step necessary? Every key is present in the response if it was in the request?

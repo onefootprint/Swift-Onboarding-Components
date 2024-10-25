@@ -35,6 +35,37 @@ pub mod declare_map_container {
     }
 
     #[macro_export]
+    macro_rules! impl_modern_map_apiv2_schema {
+        ($name: ident <$k: ty, $v: ty>, $description: tt, $json: tt) => {
+            impl paperclip::v2::schema::Apiv2Schema for $name {
+                fn name() -> Option<String> {
+                    Some(stringify!($name).to_string())
+                }
+
+                fn description() -> &'static str {
+                    $description
+                }
+
+                fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+                    use paperclip::v2::models::DataType;
+                    use paperclip::v2::models::DefaultSchemaRaw;
+                    let mut schema = DefaultSchemaRaw {
+                        name: Self::name(),
+                        example: Some(serde_json::json!($json)),
+                        data_type: Some(DataType::Object),
+                        ..Default::default()
+                    };
+                    for key in <$k>::raw_schema().enum_.iter() {
+                        let key = key.as_str().unwrap().to_string();
+                        (schema.properties).insert(key, Box::new(<$v>::raw_schema()));
+                    }
+                    schema
+                }
+            }
+        };
+    }
+
+    #[macro_export]
     macro_rules! impl_response_type {
         ($name: tt) => {
             // Need special implementation of OperationModifier for responses

@@ -17,7 +17,6 @@ use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
 };
-use std::collections::HashMap;
 use std::collections::HashSet;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
@@ -51,10 +50,9 @@ pub async fn post(
         .decrypt_unchecked_value(&state.enclave_client, &fields)
         .await?;
     // Is this step necessary? Every key is present in the response if it was in the request?
-    let results: HashMap<_, _> = fields
+    let results = fields
         .into_iter()
         .map(|di| (VDI::new(di.clone()), results.remove(&di.into())))
         .collect();
-    let out = UserDecryptResponse(results);
-    Ok(out)
+    Ok(results)
 }

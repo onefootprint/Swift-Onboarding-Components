@@ -19,6 +19,12 @@ impl VersionedDataIdentifier {
     }
 }
 
+impl From<DataIdentifier> for VersionedDataIdentifier {
+    fn from(di: DataIdentifier) -> Self {
+        Self::new(di)
+    }
+}
+
 // For now, we don't want to expose VersionedDI in the api docs, so just pass through to the DI
 // implementation
 impl paperclip::v2::schema::Apiv2Schema for VersionedDataIdentifier {

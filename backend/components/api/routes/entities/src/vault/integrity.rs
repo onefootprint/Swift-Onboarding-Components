@@ -7,6 +7,7 @@ use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
+use api_wire_types::DecryptResponse;
 use macros::route_alias;
 use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
@@ -18,15 +19,12 @@ use newtypes::PiiBytes;
 use newtypes::PiiJsonValue;
 use newtypes::UserDataIdentifier;
 use newtypes::VersionedDataIdentifier;
+use paperclip::actix;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{
-    self,
-};
 use serde::Deserialize;
-use std::collections::HashMap;
 use std::collections::HashSet;
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
@@ -40,7 +38,7 @@ pub struct IntegrityRequest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
-pub struct IntegrityResponse(HashMap<VersionedDataIdentifier, Option<PiiJsonValue>>);
+pub struct IntegrityResponse(DecryptResponse);
 
 impl_map_apiv2_schema!(
     IntegrityResponse<UserDataIdentifier, Option<PiiJsonValue>>,
