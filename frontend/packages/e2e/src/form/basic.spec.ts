@@ -57,6 +57,18 @@ test.describe('/components/form', () => {
       },
     });
 
+    await frame.getByText('United States of America').first().click();
+    await frame.getByText('Afghanistan').first().click();
+    await frame.getByLabel('Zip Code').fill('123ABC');
+
+    expect(await frame.getByLabel('Zip Code').first().inputValue()).toBe('123ABC');
+
+    await frame.getByText('Afghanistan').first().click();
+    await frame.getByText('United States of America').first().click();
+    await frame.getByLabel('Zip Code').fill('12345');
+
+    expect(await frame.getByLabel('Zip Code').first().inputValue()).toBe('12345');
+
     // Cancel the form if not already cancelled
     await clickOnCancel(frame);
     await clickOnYes(frame);

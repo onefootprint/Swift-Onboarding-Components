@@ -3,7 +3,7 @@ import { TextInput } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import useInputValidations from './hooks/use-input-validations';
+import getInputValidations from './input-validations';
 
 type ZipFieldProps = {
   countryCode: CountryCode;
@@ -13,13 +13,10 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
   const {
     register,
     formState: { errors },
-    getValues,
+    watch,
   } = useFormContext();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.secure-form.address.form.zip',
-  });
-  const { zipcode } = useInputValidations(countryCode);
-  const isCountryUS = countryCode === 'US';
+  const { t } = useTranslation('common', { keyPrefix: 'pages.secure-form.address.form.zip' });
+  const { zipcode } = getInputValidations(countryCode);
 
   return (
     <TextInput
@@ -32,12 +29,10 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
       maxLength={zipcode.maxLength}
       minLength={zipcode.minLength}
       placeholder={t('placeholder')}
-      value={getValues('zip')}
+      value={watch('zip')}
       {...register('zip', {
         required: true,
-        validate: isCountryUS
-          ? (value: string) => (zipcode.pattern ? zipcode.pattern.test(value) : undefined)
-          : undefined,
+        pattern: zipcode.pattern,
       })}
     />
   );
