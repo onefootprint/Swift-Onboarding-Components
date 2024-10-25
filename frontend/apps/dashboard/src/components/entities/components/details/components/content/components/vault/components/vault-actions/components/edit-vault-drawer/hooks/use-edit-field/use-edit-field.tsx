@@ -71,6 +71,7 @@ const useEditField = (entity: Entity) => {
       BusinessDI.name,
       BusinessDI.doingBusinessAs,
       BusinessDI.website,
+      BusinessDI.phoneNumber,
       BusinessDI.tin,
       BusinessDI.corporationType,
       BusinessDI.addressLine1,

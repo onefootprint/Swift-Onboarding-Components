@@ -3,6 +3,7 @@ import {
   isDobInTheFuture,
   isDobTooOld,
   isDobTooYoung,
+  isPhoneNumber,
   isSSN9Flexible,
   isSsn4,
   isTin,
@@ -629,6 +630,19 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
         validate: (value: string) => {
           if (!isURL(value ?? '')) {
             return previousValue ? entityT('errors.website.invalid') : true;
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === BusinessDI.phoneNumber) {
+    return {
+      inputOptions: {
+        placeholder: entityT('placeholders.phone-number'),
+        validate: (value: string) => {
+          if (value && !isPhoneNumber(value)) {
+            return previousValue ? entityT('errors.phone-number.pattern') : true;
           }
           return true;
         },

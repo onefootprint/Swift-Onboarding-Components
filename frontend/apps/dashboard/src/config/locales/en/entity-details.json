@@ -50,6 +50,7 @@
             "doing-business-as": "Acme Bank",
             "tin": "12-3456789",
             "website": "https://www.acmebank.com",
+            "phone-number": "+1555550100",
             "formation-date": "YYYY-MM-DD",
             "occupation": "Software Engineer",
             "employer": "Acme Bank"
