@@ -203,6 +203,7 @@ mod test {
             should_commit: true,
             create_manual_review: false,
             action,
+            rule_action: action.map(|a| a.to_rule_action()),
         }
     }
 

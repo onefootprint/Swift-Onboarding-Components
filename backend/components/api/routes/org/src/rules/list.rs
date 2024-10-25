@@ -8,6 +8,8 @@ use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::DbError;
 use newtypes::ObConfigurationId;
+use newtypes::RuleAction;
+use newtypes::StepUpKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -33,6 +35,12 @@ pub async fn list_rules_for_playbook(
             RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id, IncludeRules::All)
         })
         .await?;
+    let rules = rules
+    .into_iter()
+    // TODO: we cannot show these in the dashboard without errors
+    .filter(|ri| ri.action != RuleAction::StepUp(StepUpKind::Custom))
+    .map(api_wire_types::Rule::from_db)
+    .collect();
 
-    Ok(rules.into_iter().map(api_wire_types::Rule::from_db).collect())
+    Ok(rules)
 }

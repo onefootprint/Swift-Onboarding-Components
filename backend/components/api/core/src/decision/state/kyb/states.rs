@@ -517,6 +517,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                     .map(|r| r.should_create_review())
                     .unwrap_or(false),
                 action: rsr.action_triggered,
+                rule_action: rsr.rule_action_triggered,
             };
             (decision, Some(rsr.id))
         } else {

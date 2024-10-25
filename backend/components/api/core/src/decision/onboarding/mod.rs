@@ -1,4 +1,5 @@
 use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use serde::Serialize;
 
 #[derive(PartialEq, Eq, Debug, Clone, Serialize)]
@@ -10,6 +11,7 @@ pub enum RulesOutcome {
         should_commit: bool,
         create_manual_review: bool,
         action: Option<RuleAction>,
+        rule_action: Option<RuleActionConfig>,
     },
     RulesNotExecuted,
 }

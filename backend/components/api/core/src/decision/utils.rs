@@ -96,6 +96,7 @@ pub(super) fn get_final_rules_outcome(
         should_commit: decision_status == DecisionStatus::Pass,
         create_manual_review,
         action,
+        rule_action: action.map(|a| a.to_rule_action()),
     }
 }
 

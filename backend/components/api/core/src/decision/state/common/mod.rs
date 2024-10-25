@@ -59,7 +59,7 @@ use newtypes::OnboardingStatus;
 use newtypes::PiiBytes;
 use newtypes::PiiString;
 use newtypes::ReviewReason;
-use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use newtypes::RuleExpressionCondition;
 use newtypes::RuleSetResultId;
 use newtypes::ScopedVaultId;
@@ -301,12 +301,11 @@ pub fn handle_rules_output(
     review_reasons: Vec<ReviewReason>,
 ) -> FpResult<DecisionOutput> {
     if let RulesOutcome::RulesExecuted {
-        action: Some(RuleAction::StepUp(suk)),
+        rule_action: Some(RuleActionConfig::StepUp(step_up_configs)),
         ..
     } = rules_output
     {
-        let doc_reqs = suk
-            .to_doc_configs()
+        let doc_reqs = step_up_configs
             .into_iter()
             .map(|config| NewDocumentRequestArgs {
                 scoped_vault_id: wf.scoped_vault_id.clone(),
