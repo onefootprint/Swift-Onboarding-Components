@@ -13,12 +13,13 @@ export type UploadItemProps = {
   entity: Entity;
   upload: UploadWithDocument;
   vault: EntityVault;
+  onDecrypt: (documentKind: SupportedIdDocTypes) => void;
 };
 
-const UploadItem = ({ entity, upload }: UploadItemProps) => {
+const UploadItem = ({ entity, upload, vault }: UploadItemProps) => {
   const { t } = useTranslation('entity-details');
   const { register } = useFormContext();
-  const field = useUploadField(entity)(upload);
+  const field = useUploadField(entity, vault)(upload);
   const filters = useDocumentsFilters();
 
   const { timestamp, identifier, document, documentId } = upload;
@@ -33,7 +34,7 @@ const UploadItem = ({ entity, upload }: UploadItemProps) => {
     <>
       <Stack justify="space-between">
         {field.showCheckbox ? (
-          <Tooltip disabled={field.canDecrypt} position="right" text={t('decrypt.not-allowed')}>
+          <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')}>
             <Checkbox
               checked={field.isChecked || undefined}
               {...register(`documents.${document.kind}`)}

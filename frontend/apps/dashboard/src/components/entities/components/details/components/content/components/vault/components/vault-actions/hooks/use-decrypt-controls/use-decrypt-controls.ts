@@ -138,6 +138,32 @@ const useDecryptControls = () => {
     }, DECRYPT_MANUALLY_TIMEOUT);
   };
 
+  const decryptToViewDocumentDetails = (
+    payload: {
+      documents: SupportedIdDocTypes[];
+      entityId: string;
+      vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
+    },
+    callbacks?: {
+      onSuccess?: (response: EntityVault) => void;
+      onError?: (error: unknown) => void;
+    },
+  ) => {
+    const { documents, entityId, vaultData = {} } = payload;
+    decryptFields(
+      { reason: 'Viewing document details', dis: [], documents, entityId, vaultData },
+      {
+        onSuccess: results => {
+          callbacks?.onSuccess?.(results);
+        },
+        onError: (error: unknown) => {
+          showRequestErrorToast(error);
+          callbacks?.onError?.(error);
+        },
+      },
+    );
+  };
+
   return {
     submitReason,
     context,
@@ -152,6 +178,7 @@ const useDecryptControls = () => {
     inProgressDecryptingAll,
     decrypt,
     decryptManually,
+    decryptToViewDocumentDetails,
   };
 };
 

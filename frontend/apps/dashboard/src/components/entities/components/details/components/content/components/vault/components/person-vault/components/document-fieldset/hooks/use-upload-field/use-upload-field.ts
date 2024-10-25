@@ -1,28 +1,26 @@
-import { type DataIdentifier, type Entity, isVaultDataDecrypted } from '@onefootprint/types';
+import { type DataIdentifier, type Entity, type EntityVault, isVaultDataDecrypted } from '@onefootprint/types';
 
-import useEntityVault from '@/entities/hooks/use-entity-vault';
 import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { useDecryptControls } from '../../../../../vault-actions';
 import type { UploadWithDocument } from '../../types';
 
-export const isUploadDecrypted = (entity: Entity, upload: UploadWithDocument) => {
-  const entityVaultWithTransforms = useEntityVault(entity.id, entity);
+export const isUploadDecrypted = (vault: EntityVault, upload: UploadWithDocument) => {
   const di = `${upload.identifier}:${upload.version}` as DataIdentifier;
-  return isVaultDataDecrypted(entityVaultWithTransforms.data?.vault?.[di]);
+  return isVaultDataDecrypted(vault[di]);
 };
 
-export const useUploadField = (entity: Entity) => {
+export const useUploadField = (entity: Entity, vault: EntityVault) => {
   const decryptControls = useDecryptControls();
 
   const getProps = (upload: UploadWithDocument) => {
-    const canDecrypt = isDiDecryptable(entity, upload.identifier);
-    const isDecrypted = isUploadDecrypted(entity, upload);
+    const isDecryptable = isDiDecryptable(entity, upload.identifier);
+    const isDecrypted = isUploadDecrypted(vault, upload);
     return {
-      canDecrypt,
+      isDecryptable,
       isDecrypted,
       showCheckbox: decryptControls.inProgress,
       isChecked: isDecrypted || decryptControls.inProgressDecryptingAll,
-      disabled: !canDecrypt || isDecrypted,
+      disabled: !isDecryptable || isDecrypted,
     };
   };
 

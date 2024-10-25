@@ -363,6 +363,12 @@
       },
       "details": {
         "license-and-selfie": "Driver's license & Selfie",
+        "decrypt": {
+          "message-start": "This document is encrypted. ",
+          "decrypt-cta": "Decrypt",
+          "message-end": "to view these details.",
+          "not-allowed": "You're not allowed to decrypt data"
+        },
         "encrypted": "This document is encrypted. Exit and decrypt to see details.",
         "status": {
           "success": "Success",

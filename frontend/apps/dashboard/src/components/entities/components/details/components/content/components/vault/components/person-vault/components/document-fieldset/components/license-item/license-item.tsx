@@ -1,5 +1,5 @@
 import { IcoLock16 } from '@onefootprint/icons';
-import type { Document, Entity, EntityVault } from '@onefootprint/types';
+import type { Document, Entity, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Checkbox, LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -10,13 +10,14 @@ import ItemLabel from '../item-label';
 export type LicenseItemProps = {
   document: Document;
   entity: Entity;
+  onDecrypt: (documentKind: SupportedIdDocTypes) => void;
   vault: EntityVault;
 };
 
-const LicenseItem = ({ document, entity }: LicenseItemProps) => {
+const LicenseItem = ({ document, entity, vault }: LicenseItemProps) => {
   const { t } = useTranslation('entity-details');
   const { register } = useFormContext();
-  const field = useDocumentField(entity)(document);
+  const field = useDocumentField(entity, vault)(document);
   const filters = useDocumentsFilters();
 
   const { startedAt, kind } = document;
@@ -30,7 +31,7 @@ const LicenseItem = ({ document, entity }: LicenseItemProps) => {
     <>
       <Stack justify="space-between">
         {field.showCheckbox ? (
-          <Tooltip disabled={field.canDecrypt} position="right" text={t('decrypt.not-allowed')}>
+          <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')}>
             <Checkbox
               checked={field.isChecked || undefined}
               {...register(`documents.${kind}`)}
