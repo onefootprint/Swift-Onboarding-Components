@@ -360,6 +360,14 @@
         "reviewed_by_machine": "Processed",
         "pending_human_review": "Review required",
         "reviewed_by_human": "Reviewed"
+      },
+      "details": {
+        "license-and-selfie": "Driver's license & Selfie",
+        "encrypted": "This document is encrypted. Exit and decrypt to see details.",
+        "status": {
+          "success": "Success",
+          "failed": "Failed"
+        }
       }
     },
     "document": {

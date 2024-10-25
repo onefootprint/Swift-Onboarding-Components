@@ -1,29 +1,26 @@
 import { IcoLock16 } from '@onefootprint/icons';
-import { type Entity, type EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
+import type { Document, Entity, EntityVault } from '@onefootprint/types';
 import { Checkbox, LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import useIdDocText from 'src/hooks/use-id-doc-text';
+import useDocumentField from '../../hooks/use-document-field';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
-import useUploadField from '../../hooks/use-upload-field';
-import type { UploadWithDocument } from '../../types';
 import ItemLabel from '../item-label';
 
-export type UploadItemProps = {
+export type LicenseItemProps = {
+  document: Document;
   entity: Entity;
-  upload: UploadWithDocument;
   vault: EntityVault;
 };
 
-const UploadItem = ({ entity, upload }: UploadItemProps) => {
+const LicenseItem = ({ document, entity }: LicenseItemProps) => {
   const { t } = useTranslation('entity-details');
   const { register } = useFormContext();
-  const field = useUploadField(entity)(upload);
+  const field = useDocumentField(entity)(document);
   const filters = useDocumentsFilters();
 
-  const { timestamp, identifier, document, documentId } = upload;
-  const getDocText = useIdDocText();
-  const title = document.kind === SupportedIdDocTypes.custom ? identifier : getDocText(document.kind);
+  const { startedAt, kind } = document;
+  const documentId = startedAt ? `${kind}-${startedAt}` : kind;
 
   const handleClick = () => {
     filters.push({ document_id: documentId });
@@ -36,13 +33,23 @@ const UploadItem = ({ entity, upload }: UploadItemProps) => {
           <Tooltip disabled={field.canDecrypt} position="right" text={t('decrypt.not-allowed')}>
             <Checkbox
               checked={field.isChecked || undefined}
-              {...register(`documents.${document.kind}`)}
-              label={<ItemLabel document={document} timestamp={timestamp} title={title} />}
+              {...register(`documents.${kind}`)}
+              label={
+                <ItemLabel
+                  document={document}
+                  timestamp={startedAt || ''}
+                  title={t('fieldset.documents.details.license-and-selfie')}
+                />
+              }
               disabled={field.disabled}
             />
           </Tooltip>
         ) : (
-          <ItemLabel document={document} timestamp={timestamp} title={title} />
+          <ItemLabel
+            document={document}
+            timestamp={startedAt || ''}
+            title={t('fieldset.documents.details.license-and-selfie')}
+          />
         )}
         {field.isDecrypted ? (
           <LinkButton onClick={handleClick}>{t('fieldset.documents.see-details')}</LinkButton>
@@ -57,4 +64,4 @@ const UploadItem = ({ entity, upload }: UploadItemProps) => {
   );
 };
 
-export default UploadItem;
+export default LicenseItem;

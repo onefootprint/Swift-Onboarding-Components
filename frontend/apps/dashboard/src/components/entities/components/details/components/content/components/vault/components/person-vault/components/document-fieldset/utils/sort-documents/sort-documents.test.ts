@@ -1,5 +1,6 @@
-import { IdDocStatus, UploadSource } from '@onefootprint/types';
-import sortDocumentsByStartedAt from './sort-documents';
+import { DocumentDI } from '@onefootprint/types/src/data/di';
+import { IdDocImageTypes } from '@onefootprint/types/src/data/id-doc-type';
+import sortDocumentsAndUploads from './sort-documents';
 import {
   documentsWithUploads,
   driversLicenseDocument1,
@@ -12,34 +13,141 @@ import {
 
 describe('sortDocuments', () => {
   it('should sort simple documents correctly', () => {
-    expect(sortDocumentsByStartedAt(simpleDocuments)).toEqual([
+    expect(sortDocumentsAndUploads(simpleDocuments)).toEqual([
       {
-        status: IdDocStatus.complete,
-        startedAt: '2020-01-27T14:43:47.444716Z',
+        ...driversLicenseDocument1,
+        uploads: [],
       },
       {
-        completedVersion: 1,
-        uploadSource: UploadSource.Mobile,
-        startedAt: '2023-03-27T14:43:47.444716Z',
+        ...idCardDocument1,
+        uploads: [],
       },
       {
-        startedAt: '2023-10-27T14:43:47.444716Z',
+        ...incompleteDriversLicense,
+        uploads: [],
       },
       {
-        completedVersion: 3,
-        startedAt: '2024-09-27T14:43:47.444716Z',
+        ...idCardDocument2,
+        uploads: [],
       },
-      {},
+      {
+        ...driversLicenseDocument2,
+        uploads: [],
+      },
     ]);
   });
 
   it('should sort documents with uploads correctly', () => {
-    expect(sortDocumentsByStartedAt(documentsWithUploads)).toEqual([
-      driversLicenseDocument2,
+    expect(sortDocumentsAndUploads(documentsWithUploads)).toEqual([
+      {
+        ...driversLicenseDocument1,
+        uploads: [
+          {
+            version: 450,
+            failureReasons: [],
+            side: IdDocImageTypes.front,
+            timestamp: '2020-08-09T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseFront,
+          },
+          {
+            version: 460,
+            failureReasons: [],
+            side: IdDocImageTypes.back,
+            timestamp: '2020-02-11T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseBack,
+          },
+          {
+            version: 470,
+            failureReasons: [],
+            side: IdDocImageTypes.selfie,
+            timestamp: '2020-01-22T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseSelfie,
+          },
+        ],
+      },
+      {
+        ...idCardDocument1,
+        uploads: [
+          {
+            version: 123,
+            failureReasons: [],
+            side: IdDocImageTypes.front,
+            timestamp: '2020-01-01T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestIdCardFront,
+          },
+          {
+            version: 125,
+            failureReasons: [],
+            side: IdDocImageTypes.back,
+            timestamp: '2020-01-01T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestIdCardBack,
+          },
+          {
+            version: 124,
+            failureReasons: [],
+            side: IdDocImageTypes.selfie,
+            timestamp: '2020-01-01T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestIdCardSelfie,
+          },
+        ],
+      },
+      {
+        ...incompleteDriversLicense,
+        uploads: [
+          {
+            version: 789,
+            failureReasons: [],
+            side: IdDocImageTypes.front,
+            timestamp: '2024-08-11T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseFront,
+          },
+          {
+            version: 790,
+            failureReasons: [],
+            side: IdDocImageTypes.back,
+            timestamp: '2019-01-12T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseBack,
+          },
+        ],
+      },
       idCardDocument2,
-      incompleteDriversLicense,
-      idCardDocument1,
-      driversLicenseDocument1,
+      {
+        ...driversLicenseDocument2,
+        uploads: [
+          {
+            version: 789,
+            failureReasons: [],
+            side: IdDocImageTypes.front,
+            timestamp: '2022-01-05T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseFront,
+          },
+          {
+            version: 791,
+            failureReasons: [],
+            side: IdDocImageTypes.selfie,
+            timestamp: '2011-04-24T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseSelfie,
+          },
+          {
+            version: 790,
+            failureReasons: [],
+            side: IdDocImageTypes.back,
+            timestamp: '2009-11-01T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseBack,
+          },
+        ],
+      },
     ]);
   });
 });

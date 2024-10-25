@@ -7,26 +7,6 @@ import {
   UploadSource,
 } from '@onefootprint/types';
 
-export const simpleDocuments = [
-  {
-    completedVersion: 1,
-    uploadSource: UploadSource.Mobile,
-    startedAt: '2023-03-27T14:43:47.444716Z',
-  },
-  {
-    completedVersion: 3,
-    startedAt: '2024-09-27T14:43:47.444716Z',
-  },
-  {
-    startedAt: '2023-10-27T14:43:47.444716Z',
-  },
-  {
-    status: IdDocStatus.complete,
-    startedAt: '2020-01-27T14:43:47.444716Z',
-  },
-  {},
-] as Document[];
-
 export const idCardDocument1: Document = {
   completedVersion: 3,
   kind: SupportedIdDocTypes.idCard,
@@ -72,28 +52,12 @@ export const idCardDocument2: Document = {
   uploadSource: UploadSource.Mobile,
   uploads: [
     {
-      version: 250,
-      failureReasons: [],
-      side: IdDocImageTypes.front,
-      timestamp: '2021-10-01T00:00:00.000Z',
-      isExtraCompressed: false,
-      identifier: DocumentDI.latestIdCardFront,
-    },
-    {
       version: 260,
       failureReasons: [],
       side: IdDocImageTypes.back,
       timestamp: '2023-01-01T00:00:00.000Z',
       isExtraCompressed: false,
       identifier: DocumentDI.latestIdCardBack,
-    },
-    {
-      version: 270,
-      failureReasons: [],
-      side: IdDocImageTypes.selfie,
-      timestamp: '2020-06-01T00:00:00.000Z',
-      isExtraCompressed: false,
-      identifier: DocumentDI.latestIdCardSelfie,
     },
   ],
   documentScore: 70,
@@ -183,20 +147,20 @@ export const incompleteDriversLicense: Document = {
   uploadSource: UploadSource.Mobile,
   uploads: [
     {
-      version: 789,
-      failureReasons: [],
-      side: IdDocImageTypes.front,
-      timestamp: '2024-08-11T00:00:00.000Z',
-      isExtraCompressed: false,
-      identifier: DocumentDI.latestDriversLicenseFront,
-    },
-    {
       version: 790,
       failureReasons: [],
       side: IdDocImageTypes.back,
       timestamp: '2019-01-12T00:00:00.000Z',
       isExtraCompressed: false,
       identifier: DocumentDI.latestDriversLicenseBack,
+    },
+    {
+      version: 789,
+      failureReasons: [],
+      side: IdDocImageTypes.front,
+      timestamp: '2024-08-11T00:00:00.000Z',
+      isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseFront,
     },
   ],
   documentScore: null,
@@ -211,3 +175,5 @@ export const documentsWithUploads = [
   driversLicenseDocument2,
   incompleteDriversLicense,
 ] as Document[];
+
+export const simpleDocuments = documentsWithUploads.map(document => ({ ...document, uploads: [] }));

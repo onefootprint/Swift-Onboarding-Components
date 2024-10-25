@@ -11,7 +11,7 @@ export const isUploadDecrypted = (entity: Entity, upload: UploadWithDocument) =>
   return isVaultDataDecrypted(entityVaultWithTransforms.data?.vault?.[di]);
 };
 
-export const useDocumentField = (entity: Entity) => {
+export const useUploadField = (entity: Entity) => {
   const decryptControls = useDecryptControls();
 
   const getProps = (upload: UploadWithDocument) => {
@@ -29,4 +29,4 @@ export const useDocumentField = (entity: Entity) => {
   return getProps;
 };
 
-export default useDocumentField;
+export default useUploadField;
