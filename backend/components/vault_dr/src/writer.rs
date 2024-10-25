@@ -25,7 +25,6 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::IsLive;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_version::ScopedVaultVersion;
-use db::models::tenant::Tenant;
 use db::models::vault_dr::NewVaultDrBlob;
 use db::models::vault_dr::NewVaultDrManifest;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
@@ -494,17 +493,6 @@ impl VaultDrWriter {
         state: &State,
         svvs: Vec<ScopedVaultVersion>,
     ) -> FpResult<Vec<NewVaultDrManifest>> {
-        let tenant_id = self.tenant_id.clone();
-        let tenant = state
-            .db_query(move |conn| -> DbResult<_> { Tenant::get(conn, &tenant_id) })
-            .await?;
-
-        // Only write manifests for demo tenants for now until we update the client to test the
-        // feature end-to-end. That way, we can easily clean up bugs without involving customers.
-        if !tenant.is_demo_tenant {
-            return Ok(vec![]);
-        }
-
         // Determine which SVVs should have a manifest.latest.json written in this batch.
         let sv_id_to_latest_svv_in_batch = svvs
             .iter()
