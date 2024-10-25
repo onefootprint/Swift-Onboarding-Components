@@ -387,6 +387,7 @@ mod tests {
             .map(|r| NewRule {
                 rule_expression: r.0,
                 action: r.1,
+                rule_action: r.1.to_rule_action(),
                 name: None,
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,

@@ -310,25 +310,29 @@ mod tests {
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
 
+        let action = RuleAction::Fail;
         let rules = vec![
             NewRule {
                 name: None,
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
-                action: RuleAction::Fail,
+                action,
+                rule_action: action.to_rule_action(),
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
             },
             NewRule {
                 name: None,
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
-                action: RuleAction::Fail,
+                action,
+                rule_action: action.to_rule_action(),
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
             },
             NewRule {
                 name: None,
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
-                action: RuleAction::Fail,
+                action,
+                rule_action: action.to_rule_action(),
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
             },

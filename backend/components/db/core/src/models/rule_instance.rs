@@ -86,6 +86,7 @@ pub struct NewRuleInstance<'a> {
 pub struct NewRule {
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
+    pub rule_action: RuleActionConfig,
     pub name: Option<String>,
     pub kind: RuleInstanceKind,
     pub is_shadow: bool,
@@ -215,7 +216,7 @@ impl RuleInstance {
                 actor,
                 name: r.name,
                 rule_expression: r.rule_expression,
-                rule_action: r.action.to_rule_action(),
+                rule_action: r.rule_action,
                 action: r.action,
                 is_shadow: false,
                 deactivated_at: None,
@@ -473,6 +474,7 @@ mod tests {
             name: None,
             rule_expression: expression.clone(),
             action,
+            rule_action: action.to_rule_action(),
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
@@ -501,36 +503,42 @@ mod tests {
             ObConfigurationOpts { ..Default::default() },
         );
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
-
+        let r1_a = RuleAction::ManualReview;
         let r1 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                 field: FRC::DocumentOcrDobDoesNotMatch,
                 op: BooleanOperator::Equals,
                 value: true,
             }]),
-            action: RuleAction::ManualReview,
+            action: r1_a,
+            rule_action: r1_a.to_rule_action(),
             name: None,
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
+        let r2_a = RuleAction::Fail;
         let r2 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                 field: FRC::SubjectDeceased,
                 op: BooleanOperator::Equals,
                 value: true,
             }]),
-            action: RuleAction::Fail,
+            action: r2_a,
+            rule_action: r2_a.to_rule_action(),
             name: None,
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
+
+        let r3_a = RuleAction::Fail;
         let r3 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                 field: FRC::DeviceHighRisk,
                 op: BooleanOperator::Equals,
                 value: true,
             }]),
-            action: RuleAction::Fail,
+            action: r3_a,
+            rule_action: r3_a.to_rule_action(),
             name: None,
             kind: RuleInstanceKind::Person,
             is_shadow: false,
@@ -560,6 +568,7 @@ mod tests {
         let list2 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
 
         // r1 references both list1 and list2
+        let r1_a = RuleAction::ManualReview;
         let r1 = NewRule {
             rule_expression: RuleExpression(vec![
                 REC::VaultData(VaultOperation::IsIn {
@@ -573,12 +582,14 @@ mod tests {
                     value: list2.id.clone(),
                 }),
             ]),
-            action: RuleAction::ManualReview,
+            action: r1_a,
+            rule_action: r1_a.to_rule_action(),
             name: None,
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         // r2 references list2
+        let r2_a = RuleAction::Fail;
         let r2 = NewRule {
             rule_expression: RuleExpression(vec![
                 REC::VaultData(VaultOperation::IsIn {
@@ -594,19 +605,22 @@ mod tests {
                     value: list2.id.clone(),
                 }),
             ]),
-            action: RuleAction::Fail,
+            action: r2_a,
+            rule_action: r2_a.to_rule_action(),
             name: None,
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         // r3 references no list
+        let r3_a = RuleAction::Fail;
         let r3 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                 field: FRC::DeviceHighRisk,
                 op: BooleanOperator::Equals,
                 value: true,
             }]),
-            action: RuleAction::Fail,
+            action: r3_a,
+            rule_action: r3_a.to_rule_action(),
             name: None,
             kind: RuleInstanceKind::Person,
             is_shadow: false,
@@ -638,6 +652,7 @@ mod tests {
             name: Some("name1".to_owned()),
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: RuleAction::Fail,
+            rule_action: RuleAction::Fail.to_rule_action(),
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
@@ -721,6 +736,7 @@ mod tests {
                     .map(|_| NewRule {
                         rule_expression: tests::fixtures::rule::example_rule_expression(),
                         action: RuleAction::Fail,
+                        rule_action: RuleAction::Fail.to_rule_action(),
                         name: None,
                         kind: RuleInstanceKind::Person,
                         is_shadow: false,
@@ -758,6 +774,7 @@ mod tests {
                     .map(|_| NewRule {
                         rule_expression: tests::fixtures::rule::example_rule_expression(),
                         action: RuleAction::ManualReview,
+                        rule_action: RuleAction::ManualReview.to_rule_action(),
                         name: None,
                         kind: RuleInstanceKind::Person,
                         is_shadow: false,
@@ -849,10 +866,12 @@ mod tests {
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
+        let r1_a = RuleAction::StepUp(StepUpKind::Identity);
         let rule1 = NewRule {
             name: Some("name1".to_owned()),
             rule_expression: tests::fixtures::rule::example_rule_expression(),
-            action: RuleAction::StepUp(StepUpKind::Identity),
+            action: r1_a,
+            rule_action: r1_a.to_rule_action(),
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
@@ -864,10 +883,12 @@ mod tests {
         let reloaded_rule1 = RuleInstance::get(conn, &rule1.rule_id).unwrap();
         assert_eq!(reloaded_rule1.action, RuleAction::StepUp(StepUpKind::Identity));
 
+        let r2_a = RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress);
         let rule2 = NewRule {
             name: Some("name1".to_owned()),
             rule_expression: tests::fixtures::rule::example_rule_expression(),
-            action: RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
+            action: r2_a,
+            rule_action: r2_a.to_rule_action(),
             kind: RuleInstanceKind::Person,
             is_shadow: false,
         };

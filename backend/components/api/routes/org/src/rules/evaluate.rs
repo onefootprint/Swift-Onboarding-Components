@@ -106,9 +106,17 @@ pub async fn evaluate_rule(
                 .into_iter()
                 .flatten()
                 .map(|rule| -> FpResult<_> {
+                    let (action, _) = match rule.rule_action {
+                        api_wire_types::RuleActionMigration::Legacy(rule_action) => {
+                            (rule_action, rule_action.to_rule_action())
+                        }
+                        api_wire_types::RuleActionMigration::New(rule_action_config) => {
+                            (rule_action_config.clone().into(), rule_action_config)
+                        }
+                    };
                     Ok((
                         validate_rule_expression(rule.rule_expression, &lists, is_live)?,
-                        rule.rule_action,
+                        action,
                     ))
                 })
                 .collect::<FpResult<_>>()?;

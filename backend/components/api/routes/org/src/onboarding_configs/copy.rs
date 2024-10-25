@@ -130,9 +130,8 @@ fn copy_rule(r: RuleInstance) -> CreateRule {
     let RuleInstance {
         name,
         rule_expression,
-        action,
-        // TODO: update to use this
-        rule_action: _,
+        action: _,
+        rule_action,
         is_shadow,
 
         // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
@@ -149,9 +148,10 @@ fn copy_rule(r: RuleInstance) -> CreateRule {
         actor: _,
         kind: _,
     } = r;
+
     CreateRule {
         name,
-        rule_action: action,
+        rule_action: api_wire_types::RuleActionMigration::New(rule_action),
         rule_expression: UnvalidatedRuleExpression(rule_expression.0),
         is_shadow,
     }

@@ -104,13 +104,15 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
         state
             .db_transaction(move |conn| -> FpResult<_> {
                 let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
+                let action = RuleAction::PassWithManualReview;
                 let rule = NewRule {
                     rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                         field: FootprintReasonCode::DocumentIsPermitOrProvisionalLicense,
                         op: BooleanOperator::Equals,
                         value: true,
                     }]),
-                    action: RuleAction::PassWithManualReview,
+                    action,
+                    rule_action: action.to_rule_action(),
                     name: None,
                     kind: RuleInstanceKind::Person,
                     is_shadow: false,

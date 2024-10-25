@@ -1,20 +1,8 @@
 use crate::*;
 use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
 use newtypes::RuleId;
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct CreateRuleRequest {
-    pub name: Option<String>,
-    pub rule_expression: UnvalidatedRuleExpression,
-    pub action: RuleAction,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct UpdateRuleRequest {
-    pub name: Option<Option<String>>,
-    pub rule_expression: Option<UnvalidatedRuleExpression>,
-    pub is_shadow: Option<bool>,
-}
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct MultiUpdateRuleRequest {
@@ -28,14 +16,22 @@ pub struct MultiUpdateRuleRequest {
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RuleActionMigration {
+    Legacy(RuleAction),
+    New(RuleActionConfig),
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateRule {
     #[serde(default)]
     pub name: Option<String>,
     pub rule_expression: UnvalidatedRuleExpression,
-    pub rule_action: RuleAction,
+    pub rule_action: RuleActionMigration,
     #[serde(default)]
     pub is_shadow: bool,
 }
+
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct EditRule {

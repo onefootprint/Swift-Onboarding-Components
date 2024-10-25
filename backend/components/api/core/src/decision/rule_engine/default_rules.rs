@@ -306,6 +306,7 @@ pub fn save_default_rules_for_obc(
             .map(|(e, a, kind)| NewRule {
                 rule_expression: e,
                 action: a,
+                rule_action: a.to_rule_action(),
                 name: None,
                 kind,
                 is_shadow: false,

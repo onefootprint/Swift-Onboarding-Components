@@ -112,10 +112,20 @@ pub(crate) fn validate_rules_request(
         .map(|r| -> FpResult<_> {
             let (rule_expression, rule_instance_kind) =
                 validate_rule_expression(r.rule_expression, &lists, is_live)?;
+
+            let (action, rule_action) = match r.rule_action {
+                api_wire_types::RuleActionMigration::Legacy(rule_action) => {
+                    (rule_action, rule_action.to_rule_action())
+                }
+                api_wire_types::RuleActionMigration::New(rule_action_config) => {
+                    (rule_action_config.clone().into(), rule_action_config)
+                }
+            };
             Ok(NewRule {
                 rule_expression,
                 kind: rule_instance_kind,
-                action: r.rule_action,
+                action,
+                rule_action,
                 name: r.name,
                 is_shadow: r.is_shadow,
             })

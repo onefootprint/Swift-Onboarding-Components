@@ -79,9 +79,11 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
                 value: true,
             }]);
             let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
+            let action = RuleAction::StepUp(step_up_kind);
             let rule = NewRule {
                 rule_expression: expr,
-                action: RuleAction::StepUp(step_up_kind),
+                action,
+                rule_action: action.to_rule_action(),
                 name: None,
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
@@ -242,13 +244,15 @@ async fn test_multi_stage_step_up(state: &mut State) {
     //
     state
         .db_transaction(move |conn| -> FpResult<_> {
+            let action = RuleAction::StepUp(identity_stepup);
             let kyc_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                     field: FRC::DobCouldNotMatch,
                     op: BooleanOperator::Equals,
                     value: true,
                 }]),
-                action: RuleAction::StepUp(identity_stepup),
+                action,
+                rule_action: action.to_rule_action(),
                 name: None,
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
@@ -256,25 +260,29 @@ async fn test_multi_stage_step_up(state: &mut State) {
 
             // here we rely on the ordering of RuleActions to choose StepUp the first time, then
             // the next time, we'll be ineligible to stepup because we already collected a doc
+            let poa_action = RuleAction::StepUp(proof_of_address_stepup);
             let poa_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                     field: FRC::DocumentOcrDobDoesNotMatch,
                     op: BooleanOperator::Equals,
                     value: true,
                 }]),
-                action: RuleAction::StepUp(proof_of_address_stepup),
+                action: poa_action,
+                rule_action: poa_action.to_rule_action(),
                 name: None,
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
             };
 
+            let poa_review_action = RuleAction::ManualReview;
             let poa_review_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                     field: FRC::DocumentOcrDobDoesNotMatch,
                     op: BooleanOperator::Equals,
                     value: true,
                 }]),
-                action: RuleAction::ManualReview,
+                action: poa_review_action,
+                rule_action: poa_review_action.to_rule_action(),
                 name: None,
                 kind: RuleInstanceKind::Person,
                 is_shadow: false,
