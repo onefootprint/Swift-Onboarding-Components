@@ -28,6 +28,7 @@ pub struct BoToken {
 #[actix::post("/hosted/user/private/bo_links")]
 pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiListResponse<BoToken> {
     let user_auth = user_auth.into_inner();
+    let su = user_auth.scoped_user.as_ref();
     let biz_wf_id = (user_auth.data.biz_wf_id.clone())
         .ok_or(ValidationError("No business associated with the session"))?;
     let biz_wf = state
@@ -35,7 +36,7 @@ pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiL
         .await?;
 
     let kyb_features = KybBoFeatures::build(&state, &biz_wf.id).await?;
-    let tokens = generate_secondary_bo_links(&state, &biz_wf, &kyb_features.bos).await?;
+    let tokens = generate_secondary_bo_links(&state, su, &biz_wf, &kyb_features.bos).await?;
 
     let results = tokens
         .into_iter()

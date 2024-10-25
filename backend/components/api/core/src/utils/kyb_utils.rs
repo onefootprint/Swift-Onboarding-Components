@@ -13,6 +13,7 @@ use crate::utils::email::BoInviteEmailInfo;
 use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crate::State;
+use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
@@ -24,6 +25,7 @@ use newtypes::KybState;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
+use newtypes::WorkflowId;
 use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
 use std::collections::HashMap;
@@ -31,13 +33,15 @@ use std::pin::Pin;
 
 pub async fn generate_secondary_bo_links<'a>(
     state: &'a State,
+    su: Option<&'a ScopedVault>,
     biz_wf: &'a Workflow,
     bos: &'a [BoWithKycInfo],
 ) -> FpResult<Vec<(&'a BoWithKycInfo, SessionAuthToken)>> {
     let missing_kyc_secondary_bos = bos
         .iter()
-        .filter(|bo| bo.bo.kind == BusinessOwnerKind::Secondary)
         .filter(|bo| !bo.has_kyc_result())
+        // Don't send link to self
+        .filter(|bo| !su.zip(bo.1.user_vault_id.as_ref()).is_some_and(|(su, bo_uv_id)| &su.vault_id == bo_uv_id))
         .collect_vec();
     if missing_kyc_secondary_bos.is_empty() {
         return Ok(vec![]);
@@ -81,14 +85,15 @@ pub async fn generate_secondary_bo_links<'a>(
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
 #[tracing::instrument(skip_all)]
-pub async fn send_missing_secondary_bo_links(
+async fn send_missing_secondary_bo_links(
     state: &State,
+    su: Option<&ScopedVault>,
     biz_wf: &Workflow,
     kyb_features: KybBoFeatures,
     tenant: &Tenant,
 ) -> FpResult<()> {
     let KybBoFeatures { bos, bvw } = kyb_features;
-    let tokens = generate_secondary_bo_links(state, biz_wf, &bos).await?;
+    let tokens = generate_secondary_bo_links(state, su, biz_wf, &bos).await?;
     // Generate a link for each business owner
     let BoWithKycInfo(_, primary_bo) = bos
         .iter()
@@ -155,11 +160,14 @@ pub async fn send_missing_secondary_bo_links(
 #[tracing::instrument(skip(state))]
 pub async fn progress_business_workflow(
     state: &State,
+    su: Option<&ScopedVault>,
     tenant: &Tenant,
-    biz_wf: Workflow,
+    biz_wf_id: WorkflowId,
     seqno: DataLifetimeSeqno,
 ) -> FpResult<()> {
-    let wf_id = biz_wf.id.clone();
+    let biz_wf = state
+        .db_query(move |conn| Workflow::get(conn, &biz_wf_id))
+        .await?;
     let action = match biz_wf.state {
         // First see if we have to run authorize
         WorkflowState::Kyb(KybState::DataCollection) => Some(WorkflowActions::Authorize(Authorize { seqno })),
@@ -190,12 +198,15 @@ pub async fn progress_business_workflow(
         return Ok(());
     }
 
-    let biz_wf = state.db_query(move |conn| Workflow::get(conn, &wf_id)).await?;
+    // Refresh the workflow
+    let biz_wf = state
+        .db_query(move |conn| Workflow::get(conn, &biz_wf.id))
+        .await?;
     let kyb_features = KybBoFeatures::build(state, &biz_wf.id).await?;
     let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
     if is_waiting_for_bo_kyc {
-        send_missing_secondary_bo_links(state, &biz_wf, kyb_features, tenant).await?;
+        send_missing_secondary_bo_links(state, su, &biz_wf, kyb_features, tenant).await?;
         return Ok(());
     }
 

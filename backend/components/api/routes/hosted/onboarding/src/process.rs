@@ -147,21 +147,17 @@ async fn run_kyb_if_needed(
     fixture_result: Option<WorkflowFixtureResult>,
     seqno: DataLifetimeSeqno,
 ) -> FpResult<()> {
-    // Run KYB
-    let tenant = user_auth.tenant.clone();
-    let biz_wf = state
-        .db_query(move |conn| user_auth.business_workflow(conn))
-        .await?;
-
-    if let Some(biz_wf) = biz_wf {
+    if let Some(biz_wf_id) = user_auth.biz_wf_id.clone() {
         if let Some(r) = fixture_result {
-            let wf_id = biz_wf.id.clone();
+            let wf_id = biz_wf_id.clone();
             state
                 .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, r))
                 .await?;
         }
 
-        api_core::utils::kyb_utils::progress_business_workflow(state, &tenant, biz_wf, seqno).await?;
+        let su = Some(&user_auth.scoped_user);
+        let tenant = user_auth.tenant.clone();
+        api_core::utils::kyb_utils::progress_business_workflow(state, su, &tenant, biz_wf_id, seqno).await?;
     }
     Ok(())
 }
