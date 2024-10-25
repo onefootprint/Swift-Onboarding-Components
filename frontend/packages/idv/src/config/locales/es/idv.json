@@ -731,7 +731,7 @@
               }
             }
           },
-          "under-100": {
+          "missing-bos-confirmation": {
             "title": "Propietarios faltantes",
             "description": "Necesitamos recoger información sobre todos los propietarios que posean al menos el 25% de la empresa. ¿Quieres continuar sin agregar a otros propietarios, o prefieres regresar para añadirlos?",
             "input-label": "Parece que faltan propietarios",
