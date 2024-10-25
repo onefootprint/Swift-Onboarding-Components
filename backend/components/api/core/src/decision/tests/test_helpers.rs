@@ -91,11 +91,10 @@ pub async fn create_user_and_onboarding(
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,
             };
-            let (wf_id, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
+            let (wf, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
             // Make sure the workflow is authorized since it would be authorized in prod by the time it's
             // used here
-            let wf = Workflow::get(conn, &wf_id)?;
             assert!(wf.authorized_at.is_some());
 
             let biz_wf = if create_business {

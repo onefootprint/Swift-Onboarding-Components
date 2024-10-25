@@ -1,3 +1,4 @@
+use super::AuthSessionData;
 use super::ExtractableAuthSession;
 use super::GetSessionForUpdate;
 use crate::auth::tenant::InvalidateAuth;
@@ -13,7 +14,9 @@ use actix_web::web;
 use actix_web::FromRequest;
 use async_trait::async_trait;
 use chrono::DateTime;
+use chrono::Duration;
 use chrono::Utc;
+use crypto::aead::ScopedSealingKey;
 use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
@@ -78,6 +81,26 @@ impl<T: Apiv2Schema> OperationModifier for SessionContext<T> {}
 impl<T> SessionContext<T> {
     pub fn expires_at(&self) -> DateTime<Utc> {
         self.session.expires_at
+    }
+
+    /// Creates a new auth token with an expiry derived off of the current auth token.
+    /// This function guarantees that we won't create a derived token that expires after the source
+    /// token.
+    pub fn create_derived(
+        &self,
+        conn: &mut db::PgConn,
+        session_key: &ScopedSealingKey,
+        session: AuthSessionData,
+        max_duration: Option<Duration>,
+    ) -> FpResult<(SessionAuthToken, DateTime<Utc>)> {
+        let current_expires_at = self.expires_at();
+        let expires_at = if let Some(duration) = max_duration {
+            current_expires_at.min(Utc::now() + duration)
+        } else {
+            current_expires_at
+        };
+        let (token, session) = AuthSession::create_sync(conn, session_key, session, expires_at)?;
+        Ok((token, session.expires_at))
     }
 }
 

@@ -1,4 +1,6 @@
-from tests.bifrost.test_multi_kyc_kyb import MULTI_KYC_KYB_CDOS, extract_bo_token
+from tests.headers import FpAuth
+from tests.identify_client import IdentifyClient
+from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
 from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.constants import BUSINESS_SECONDARY_BOS
@@ -167,20 +169,40 @@ def test_can_only_update_owned_bos(kyb_sandbox_ob_config):
     assert body["message"] == "Business owner with UUID belongs to different business"
 
 
-def test_updating_linked_bo(kyb_sandbox_ob_config):
+def test_updating_linked_bo(kyb_sandbox_ob_config, sandbox_tenant):
+    # Create a business with 2 BOs
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
-    bifrost.run()
-
-    body = get("hosted/business/owners", None, bifrost.auth_token)
-    uuid = body[0]["uuid"]
+    user = bifrost.run()
 
     secondary_bo_token = extract_bo_token(bifrost)
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
+    bifrost.run()
 
-    # Can update their ownership stake
+    # Create a trigger to re-onboard the business
+    trigger = dict(
+        kind="onboard",
+        data=dict(playbook_id=bifrost.ob_config.id, reuse_existing_bo_kyc=True),
+    )
+    action = dict(trigger=trigger, kind="trigger", fp_bid=user.fp_bid)
+    data = dict(actions=[action])
+    body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+    auth_token = FpAuth(body[0]["token"])
+
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(
+        kyb_sandbox_ob_config, auth_token, user.client.sandbox_id
+    )
+
+    body = get("hosted/business/owners", None, bifrost.auth_token)
+    bo = next(bo for bo in body if not bo["is_authed_user"])
+    uuid = bo["uuid"]
+
+    # Can update a linked BO's ownership
     op = dict(op="update", uuid=uuid, ownership_stake=50)
     patch(f"hosted/business/owners", [op], bifrost.auth_token)
 

@@ -1,4 +1,6 @@
 import pytest
+from tests.bifrost.test_triggers import send_trigger
+from tests.identify_client import IdentifyClient
 from tests.utils import (
     get,
     patch,
@@ -19,6 +21,14 @@ def incomplete_bifrost(kyb_sandbox_ob_config, kyb_cdos):
     )
     assert set(business_requirement["missing_attributes"]) == set(kyb_cdos)
     return bifrost
+
+
+@pytest.fixture(scope="session")
+def allow_reonboard_kyb_playbook(sandbox_tenant, must_collect_data, kyb_cdos):
+    cdos = must_collect_data + kyb_cdos
+    return create_ob_config(
+        sandbox_tenant, "Allow-reonboard KYB", cdos, kind="kyb", allow_reonboard=True
+    )
 
 
 @pytest.mark.parametrize(
@@ -250,3 +260,136 @@ def test_kyb_ownership_stake_explanation(sandbox_tenant, kyb_sandbox_ob_config):
         i["identifier"] == "business.beneficial_owner_explanation_message"
         for i in body["data"]
     )
+
+
+def test_kyb_select_existing_business(sandbox_tenant, kyb_sandbox_ob_config):
+    """
+    Test selecting an existing business in onboarding
+    """
+    # Make a user with biz1
+    bifrost1 = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost1.data["business.name"] = "Biz 1"
+    user1 = bifrost1.run()
+    user1_info = get("hosted/user/private/token", None, bifrost1.auth_token)
+
+    # Log into the same user and make biz2
+    bifrost2 = BifrostClient.login_user(
+        kyb_sandbox_ob_config, bifrost1.sandbox_id, omit_business_creation=True
+    )
+    bifrost2.data["business.name"] = "Biz 2"
+    bifrost2.handle_create_business_onboarding()
+    bifrost2.handle_one_requirement("collect_business_data")
+    user2_info = get("hosted/user/private/token", None, bifrost2.auth_token)
+    fp_bid2 = user2_info["fp_bid"]
+    body = get(f"businesses/{fp_bid2}/onboardings", None, sandbox_tenant.s_sk)
+    assert not body["data"]
+
+    assert (
+        user1_info["wf_id"] == user2_info["wf_id"]
+    ), "Feature (maybe bug) - we reuse the user workflow"
+
+    # Inspect the list of businesses to select from
+    body = get(f"hosted/businesses", None, bifrost1.auth_token)
+    assert len(body) == 2
+    biz_id2 = body[0]["id"]
+    assert body[0]["name"] == "Biz 2"
+    assert body[0]["is_incomplete"]
+    biz_id1 = body[1]["id"]
+    assert body[1]["name"] == "Biz 1"
+    assert not body[1]["is_incomplete"]
+
+    def onboard_and_select(biz_id, fp_bid, token_info):
+        bifrost = BifrostClient.login_user(
+            kyb_sandbox_ob_config, bifrost1.sandbox_id, omit_business_creation=True
+        )
+        req = bifrost.get_requirement("create_business_onboarding")
+        assert req["requires_business_selection"]
+        bifrost.handle_create_business_onboarding(biz_id)
+
+        user_second_run = bifrost.run()
+        assert user_second_run.fp_id == user1.fp_id
+        assert user_second_run.fp_bid == fp_bid
+        assert bifrost.validate_response["user"]["status"] == "pass"
+        assert bifrost.validate_response["business"]["status"] == "pass"
+        assert not any(
+            i["kind"] == "collect_business_data" for i in bifrost.handled_requirements
+        )
+        # Should have inherited the same user and business workflows
+        info = get("hosted/user/private/token", None, bifrost1.auth_token)
+        assert info["wf_id"] == token_info["wf_id"]
+        assert info["biz_wf_id"] == token_info["biz_wf_id"]
+
+        body = get(f"businesses/{user1.fp_bid}/onboardings", None, sandbox_tenant.s_sk)
+        assert len(body["data"]) == 1
+        return bifrost
+
+    # Go through the flow again, select Biz 1 which is already complete. This should no-op
+    bifrost = onboard_and_select(biz_id1, user1.fp_bid, user1_info)
+    assert not any(
+        i["kind"] == "collect_business_data" for i in bifrost.handled_requirements
+    ), "No biz data requirement since the workflow is complete"
+
+    # Go through the flow again, select Biz 2 which is incomplete. This should inherit the old workflow
+    bifrost = onboard_and_select(biz_id2, fp_bid2, user1_info)
+    assert any(
+        i["kind"] == "collect_business_data" for i in bifrost.already_met_requirements
+    ), "Completed biz data requirement for the incomplete workflow"
+
+    # After all of this, there should only be one user workflow
+    body = get(f"users/{user1.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 1
+
+
+def test_kyb_must_own_existing_business(kyb_sandbox_ob_config):
+    bifrost1 = BifrostClient.new_user(
+        kyb_sandbox_ob_config, omit_business_creation=True
+    )
+    bifrost1.data["business.name"] = "Biz 1"
+    bifrost1.run()
+    biz_id1 = get("hosted/businesses", None, bifrost1.auth_token)[0]["id"]
+
+    bifrost2 = BifrostClient.new_user(
+        kyb_sandbox_ob_config, omit_business_creation=True
+    )
+    data = dict(inherit_business_id=biz_id1)
+    body = post(
+        "hosted/business/onboarding", data, bifrost2.auth_token, status_code=400
+    )
+    assert body["message"] == "Could not find the requested business owned by the user."
+
+
+def test_cannot_select_business_for_redo(kyb_sandbox_ob_config, sandbox_tenant):
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data["business.name"] = "Biz 1"
+    user = bifrost.run()
+    biz_id1 = get("hosted/businesses", None, bifrost.auth_token)[0]["id"]
+
+    trigger = dict(
+        kind="onboard",
+        data=dict(playbook_id=bifrost.ob_config.id, reuse_existing_bo_kyc=True),
+    )
+    auth_token = send_trigger(user.fp_id, sandbox_tenant, trigger, user.fp_bid)
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+
+    # Create an onboarding session to reonboard a business
+    bifrost = BifrostClient.raw_auth(
+        kyb_sandbox_ob_config,
+        auth_token,
+        bifrost.sandbox_id,
+        omit_business_creation=True,
+    )
+
+    # Should not be able to provide a business ID, since the session already has a business attached
+    data = dict(inherit_business_id=biz_id1)
+    body = post("hosted/business/onboarding", data, bifrost.auth_token, status_code=400)
+    assert (
+        body["message"]
+        == "Cannot provide business ID when a scoped business is already attached"
+    )
+
+    # But should be able to call POST /hosted/onboarding without a business ID
+    bifrost.handle_one_requirement("create_business_onboarding")
+    fp_bid = get("hosted/user/private/token", None, bifrost.auth_token)["fp_bid"]
+    assert fp_bid == user.fp_bid

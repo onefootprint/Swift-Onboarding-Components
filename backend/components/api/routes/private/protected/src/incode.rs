@@ -282,12 +282,12 @@ pub async fn adhoc_create_document_and_workflow(
                 fixture_result: None,
             };
 
-            let (wf_id, _) = get_or_create_user_workflow(conn, common_args, args)?;
+            let (wf, _) = get_or_create_user_workflow(conn, common_args, args)?;
             let document_request =
-                DocumentRequest::get(conn, &wf_id, DocumentRequestIdentifier::Kind(doc_kind))?
+                DocumentRequest::get(conn, &wf.id, DocumentRequestIdentifier::Kind(doc_kind))?
                     .ok_or(AssertionError("No document request found"))?;
 
-            Ok((uvw, document_request, wf_id))
+            Ok((uvw, document_request, wf.id))
         })
         .await?;
 

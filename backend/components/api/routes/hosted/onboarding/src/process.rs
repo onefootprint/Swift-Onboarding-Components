@@ -91,6 +91,8 @@ pub async fn post(
     // in order to make it proceed
     // First run the Authorize action since this generates a requirement for Bifrost.
     let (ww, _) = match ww.state {
+        // No-op if the workflow is already complete
+        _ if wf.completed_at.is_some() => (ww, None),
         WorkflowKind::Kyc(KycState::DataCollection(_)) => {
             ww.action(&state, WorkflowActions::Authorize(Authorize { seqno }))
                 .await?

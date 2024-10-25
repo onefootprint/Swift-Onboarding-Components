@@ -196,8 +196,8 @@ impl OnboardingRequirement {
                 populated_attributes: _,
             } => missing_attributes.is_empty() && !missing_document,
             Self::CreateBusinessOnboarding {
-                requires_business_selection,
-            } => !requires_business_selection,
+                requires_business_selection: _,
+            } => false,
             Self::CollectBusinessData {
                 missing_attributes,
                 populated_attributes: _,

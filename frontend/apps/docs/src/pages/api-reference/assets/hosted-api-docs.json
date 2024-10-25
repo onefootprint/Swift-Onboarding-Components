@@ -35,6 +35,42 @@
                 ]
             }
         },
+        "/hosted/business/onboarding": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "Hosted"
+                ],
+                "description": "Gets or creates the business Onboarding, optionally accepting an existing business. You can select an existing business from the results of `GET /hosted/businesses`.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostBusinessOnboardingRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BusinessOnboardingResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/business/owners": {
             "get": {
                 "tags": [
@@ -2488,6 +2524,18 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "BusinessOnboardingResponse": {
+                "type": "object",
+                "properties": {
+                    "auth_token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "auth_token"
                 ]
             },
             "CheckSessionResponse": {
@@ -4955,6 +5003,25 @@
                     "ob_configuration"
                 ]
             },
+            "PostBusinessOnboardingRequest": {
+                "type": "object",
+                "properties": {
+                    "inherit_business_id": {
+                        "description": "Can only be provided if there isn't already a business associated with this session.\n The identifier of an existing scoped business, if we want to inherit an existing business.\n If null and there isn't already a business associated with this session, creates a new\n business.",
+                        "type": "string"
+                    },
+                    "kyb_fixture_result": {
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review",
+                            "step_up",
+                            "use_rules_outcome"
+                        ]
+                    }
+                }
+            },
             "PostOnboardingRequest": {
                 "type": "object",
                 "properties": {
@@ -4977,8 +5044,15 @@
                             "step_up",
                             "use_rules_outcome"
                         ]
+                    },
+                    "omit_business_creation": {
+                        "description": "For newer clients - we will eventually make this the default ????",
+                        "type": "boolean"
                     }
-                }
+                },
+                "required": [
+                    "omit_business_creation"
+                ]
             },
             "ProcessRequest": {
                 "type": "object",

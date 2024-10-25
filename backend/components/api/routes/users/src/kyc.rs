@@ -182,14 +182,14 @@ pub async fn post(
                 // can't run neuro if using this path
                 is_neuro_enabled: false,
             };
-            let (wf_id, is_new_ob) = get_or_create_user_workflow(conn, common_args, args)?;
+            let (wf, is_new_ob) = get_or_create_user_workflow(conn, common_args, args)?;
             if !is_new_ob {
                 return Err(TfError::AlreadyOnboardedToPlaybook.into());
             }
 
             // TODO: consolidate with /authorize code
-            Workflow::set_is_authorized(conn, &wf_id)?;
-            let wf = Workflow::get(conn, &wf_id)?;
+            Workflow::set_is_authorized(conn, &wf.id)?;
+            let wf = Workflow::get(conn, &wf.id)?;
 
             let _ = NewLivenessEvent {
                 scoped_vault_id: sv.id,

@@ -205,7 +205,6 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, kyb_cdos):
         sandbox_tenant,
         "Business config",
         must_collect_data + kyb_cdos,
-        must_collect_data + kyb_cdos,
         kind="kyb",
         verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
     )

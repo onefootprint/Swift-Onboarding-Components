@@ -69,9 +69,10 @@ class BifrostClient:
         sandbox_id,
         override_phone=None,
         override_email=None,
-        provide_playbook_auth=False,
         fixture_result=None,
         kyb_fixture_result=None,
+        provide_playbook_auth=False,
+        omit_business_creation=False,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
@@ -142,7 +143,9 @@ class BifrostClient:
         assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])
 
         # Initialize the onboarding
-        self.initialize_onboarding(provide_playbook_auth)
+        self.initialize_onboarding(
+            provide_playbook_auth, omit_business_creation=omit_business_creation
+        )
 
     @property
     def decrypted_data(self):
@@ -160,13 +163,14 @@ class BifrostClient:
             # Could add other derived entries here
         }
 
-    def initialize_onboarding(self, provide_playbook_auth):
+    def initialize_onboarding(self, provide_playbook_auth, **kwargs):
         auths = [self.auth_token]
         if provide_playbook_auth:
             auths.append(self.ob_config.key)
         body = dict(
             fixture_result=self.fixture_result,
             kyb_fixture_result=self.kyb_fixture_result,
+            **kwargs,
         )
         if not self.fixture_result:
             # For backwards compatibility
@@ -222,6 +226,8 @@ class BifrostClient:
         elif requirement["kind"] == "collect_investor_profile":
             self.handle_collect_user(requirement)
             self.handle_ip_doc()
+        elif requirement["kind"] == "create_business_onboarding":
+            self.handle_create_business_onboarding()
         elif requirement["kind"] == "collect_business_data":
             self.handle_collect_business(requirement)
         elif requirement["kind"] == "collect_document":
@@ -253,6 +259,11 @@ class BifrostClient:
         post("/hosted/user/vault/validate", data, self.auth_token)
         patch("/hosted/user/vault", data, self.auth_token)
 
+    def handle_create_business_onboarding(self, inherit_business_id=None):
+        data = dict(inherit_business_id=inherit_business_id)
+        body = post("/hosted/business/onboarding", data, self.auth_token)
+        self.auth_token = FpAuth(body["auth_token"])
+
     def handle_collect_business(self, requirement):
         """
         PATCH data in the vault to satisfy the provided requirement.
@@ -273,13 +284,8 @@ class BifrostClient:
             primary_owner_stake = self.data.get("business.primary_owner_stake", None)
             if primary_owner_stake:
                 body = get("hosted/business/owners", None, self.auth_token)
-                primary_uuid = next(i for i in body if i["is_authed_user"])["uuid"]
-                # Update primary owner data
-                data = {
-                    "id.first_name": self.data["id.first_name"],
-                    "id.last_name": self.data["id.last_name"],
-                }
-                patch("/hosted/user/vault", data, self.auth_token)
+                primary_owner = next(i for i in body if i["is_authed_user"])
+                primary_uuid = primary_owner["uuid"]
                 # The id of the primary BO is always hardcoded
                 ops.append(
                     dict(
@@ -288,6 +294,14 @@ class BifrostClient:
                         ownership_stake=primary_owner_stake,
                     )
                 )
+
+                if not "id.first_name" in primary_owner["populated_data"]:
+                    # Update primary owner data
+                    data = {
+                        "id.first_name": self.data["id.first_name"],
+                        "id.last_name": self.data["id.last_name"],
+                    }
+                    patch("/hosted/user/vault", data, self.auth_token)
 
             # Create any secondary owners
             secondary_owners = self.data.get("business.secondary_beneficial_owners", [])

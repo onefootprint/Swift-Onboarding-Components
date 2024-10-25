@@ -43,7 +43,7 @@ pub async fn patch(
     request: web::Json<Vec<BatchHostedBusinessOwnerRequest>>,
 ) -> ApiListResponse<api_wire_types::HostedBusinessOwner> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
+    user_auth.check_biz_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.sb_id.clone();
     let is_live = user_auth.scoped_user.is_live;
     let request = request.into_inner();

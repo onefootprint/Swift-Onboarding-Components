@@ -1,3 +1,4 @@
+use super::check_workflow_guard;
 use super::ParsedUserWfSession;
 use super::UserWfSession;
 use crate::auth::session::AuthSessionData;
@@ -12,6 +13,7 @@ use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::ScopedVaultId;
 use newtypes::UserAuthScope;
+use newtypes::WorkflowGuard;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -105,5 +107,11 @@ impl CheckUserBizWfAuthContext {
 
     pub fn biz_wf(&self) -> &Workflow {
         &self.biz_wf
+    }
+}
+
+impl UserBizWfSession {
+    pub fn check_biz_workflow_guard(&self, guard: WorkflowGuard) -> FpResult<()> {
+        check_workflow_guard(&self.biz_wf, guard)
     }
 }

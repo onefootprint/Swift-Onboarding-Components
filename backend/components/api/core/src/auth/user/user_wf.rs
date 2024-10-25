@@ -1,5 +1,6 @@
 use super::ParsedUserSessionContext;
 use super::UserSessionContext;
+use crate::auth::session::AllowSessionUpdate;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
@@ -126,18 +127,26 @@ impl UserWfSession {
     }
 
     pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> FpResult<()> {
-        // TODO we ideally want this to happen inside a locked transaction with the refreshed
-        // workflow state, otherwise this could be stale
-        // TODO to solve ^, maybe we add this check to the write path on the VW. I believe
-        // everything checking this makes a new DataLifetime
-        if self.workflow.deactivated_at.is_some() {
-            return Err(AuthError::WorkflowDeactivated(guard).into());
-        }
-        let allowed_guards = self.workflow.state.allowed_guards();
-        if !allowed_guards.contains(&guard) {
-            Err(AuthError::MissingWorkflowGuard(guard).into())
-        } else {
-            Ok(())
-        }
+        check_workflow_guard(&self.workflow, guard)
     }
 }
+
+pub(super) fn check_workflow_guard(wf: &Workflow, guard: WorkflowGuard) -> FpResult<()> {
+    // TODO we ideally want this to happen inside a locked transaction with the refreshed
+    // workflow state, otherwise this could be stale
+    // TODO to solve ^, maybe we add this check to the write path on the VW. I believe
+    // everything checking this makes a new DataLifetime
+    if wf.deactivated_at.is_some() {
+        return Err(AuthError::WorkflowDeactivated(guard).into());
+    }
+    let allowed_guards = wf.state.allowed_guards();
+    if !allowed_guards.contains(&guard) {
+        Err(AuthError::MissingWorkflowGuard(guard).into())
+    } else {
+        Ok(())
+    }
+}
+
+// Allow calling SessionContext<UserWfSession>::update
+// TODO this is now the only place where we mutate sessions. Probably want to get rid of it
+impl AllowSessionUpdate for SessionContext<UserWfSession> {}

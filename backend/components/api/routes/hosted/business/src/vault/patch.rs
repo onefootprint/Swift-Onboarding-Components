@@ -30,7 +30,7 @@ pub async fn post_validate(
     request: Json<RawBusinessDataRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
+    user_auth.check_biz_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.sb_id().clone();
 
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
@@ -63,7 +63,7 @@ pub async fn patch(
     user_auth: UserBizWfAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
+    user_auth.check_biz_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.sb_id().clone();
 
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(

@@ -30,6 +30,7 @@ use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use itertools::Itertools;
+use newtypes::BoId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::ExternalId;
@@ -148,6 +149,12 @@ pub enum ScopedVaultIdentifier<'a> {
     OwnedFpBid {
         fp_bid: &'a FpId,
         uv_id: &'a VaultId,
+    },
+    #[from(ignore)]
+    OwnedBusiness {
+        bo_id: &'a BoId,
+        uv_id: &'a VaultId,
+        t_id: &'a TenantId,
     },
     Tenant {
         v_id: &'a VaultId,
@@ -370,6 +377,16 @@ impl ScopedVault {
                     .filter(scoped_vault::fp_id.eq(fp_bid))
                     .filter(scoped_vault::kind.eq(VaultKind::Business))
                     .filter(scoped_vault::vault_id.eq_any(bv_ids))
+            }
+            ScopedVaultIdentifier::OwnedBusiness { bo_id, uv_id, t_id } => {
+                let bv_ids = business_owner::table
+                    .filter(business_owner::user_vault_id.eq(uv_id))
+                    .filter(business_owner::id.eq(bo_id))
+                    .select(business_owner::business_vault_id);
+                query = query
+                    .filter(scoped_vault::kind.eq(VaultKind::Business))
+                    .filter(scoped_vault::vault_id.eq_any(bv_ids))
+                    .filter(scoped_vault::tenant_id.eq(t_id))
             }
             ScopedVaultIdentifier::Tenant { v_id, t_id } => {
                 query = query

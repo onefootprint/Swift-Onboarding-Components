@@ -678,6 +678,7 @@ pub fn get_requirements_for_wf<T>(
         WorkflowKind::Kyb => chain!(
             get_collect_kyb_data_requirement(ctx, vw, wf)?,
             get_collect_document_requirements(conn, ctx, wf)?,
+            get_process_requirement(wf),
         )
         .collect_vec(),
         WorkflowKind::Document => chain!(

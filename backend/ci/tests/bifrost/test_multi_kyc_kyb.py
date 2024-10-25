@@ -15,19 +15,10 @@ from tests.utils import (
 )
 from tests.bifrost_client import BifrostClient
 
-MULTI_KYC_KYB_CDOS = [
-    "business_name",
-    "business_tin",
-    "business_address",
-    "business_phone_number",
-    "business_website",
-    "business_kyced_beneficial_owners",
-]
-
 
 @pytest.fixture(scope="session")
-def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data):
-    cdos = must_collect_data + MULTI_KYC_KYB_CDOS
+def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, kyb_cdos):
+    cdos = must_collect_data + kyb_cdos
     return create_ob_config(
         sandbox_tenant, "Multi-KYC KYB config", cdos, kind="kyb", allow_reonboard=True
     )
@@ -172,11 +163,11 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     assert body["message"] == "This business owner has already started KYC"
 
 
-def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data):
+def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data, kyb_cdos):
     obc = create_ob_config(
         sandbox_tenant,
         "Multi-KYC Business config with docs",
-        must_collect_data + MULTI_KYC_KYB_CDOS,
+        must_collect_data + kyb_cdos,
         kind="kyb",
         business_documents_to_collect=[
             dict(
@@ -205,11 +196,11 @@ def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data):
     )
 
 
-def test_kyb_with_sentilink_on_bos(sandbox_tenant, must_collect_data):
+def test_kyb_with_sentilink_on_bos(sandbox_tenant, must_collect_data, kyb_cdos):
     obc = create_ob_config(
         sandbox_tenant,
         "Multi-KYC Business config with sentilink",
-        must_collect_data + MULTI_KYC_KYB_CDOS,
+        must_collect_data + kyb_cdos,
         kind="kyb",
         verification_checks=[
             dict(kind="kyb", data=dict(ein_only=False)),

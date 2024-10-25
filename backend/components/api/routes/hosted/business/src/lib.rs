@@ -2,6 +2,7 @@ use paperclip::actix::web;
 
 mod detail;
 mod list;
+mod onboarding;
 mod owners;
 mod vault;
 
@@ -11,6 +12,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(list::get)
         .service(detail::get)
+        .service(onboarding::post)
         .service(vault::patch::post_validate)
         .service(vault::patch::patch)
         .service(vault::decrypt::post)

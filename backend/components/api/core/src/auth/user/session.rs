@@ -8,12 +8,7 @@ use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
-use crate::utils::session::AuthSession;
 use crate::FpResult;
-use chrono::DateTime;
-use chrono::Duration;
-use chrono::Utc;
-use crypto::aead::ScopedSealingKey;
 use db::models::auth_event::AuthEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -24,7 +19,6 @@ use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::ScopedVaultId;
-use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
 use newtypes::VaultKind;
@@ -186,27 +180,5 @@ impl UserAuthContext {
         } else {
             Err(AuthError::MissingUserPermission(requested_permission_str))
         }
-    }
-}
-
-impl CheckedUserAuthContext {
-    /// Creates a new auth token with an expiry derived off of the current auth token.
-    /// This function guarantees that we won't create a derived token that expires after the source
-    /// token.
-    pub fn create_derived(
-        &self,
-        conn: &mut db::PgConn,
-        session_key: &ScopedSealingKey,
-        session: AuthSessionData,
-        max_duration: Option<Duration>,
-    ) -> FpResult<(SessionAuthToken, DateTime<Utc>)> {
-        let current_expires_at = self.expires_at();
-        let expires_at = if let Some(duration) = max_duration {
-            current_expires_at.min(Utc::now() + duration)
-        } else {
-            current_expires_at
-        };
-        let (token, session) = AuthSession::create_sync(conn, session_key, session, expires_at)?;
-        Ok((token, session.expires_at))
     }
 }

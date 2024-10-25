@@ -4,12 +4,14 @@ use super::vault_wrapper::TenantVw;
 use super::vault_wrapper::VaultWrapper;
 use super::vault_wrapper::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::auth::user::CheckedUserAuthContext;
+use crate::auth::user::UserSessionContext;
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
 use crate::FpResult;
 use api_errors::AssertionError;
 use api_errors::ValidationError;
+use db::errors::FpOptionalExtension;
+use db::models::business_owner::BoIdentifier;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::business_workflow_link::NewBusinessWorkflowLinkRow;
@@ -19,6 +21,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::IsNew;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::models::workflow::OnboardingWorkflowArgs;
@@ -29,6 +32,7 @@ use db::OffsetPagination;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
+use newtypes::BoId;
 use newtypes::BusinessWorkflowLinkSource;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentConfig;
@@ -82,7 +86,7 @@ pub fn get_or_create_user_workflow(
     conn: &mut TxnPgConn,
     common_args: CommonWfArgs,
     user_args: CreateUserWfArgs,
-) -> FpResult<(WorkflowId, IsNew)> {
+) -> FpResult<(Workflow, IsNew)> {
     let CommonWfArgs {
         obc,
         insight_event,
@@ -106,11 +110,13 @@ pub fn get_or_create_user_workflow(
         .transpose()?;
     if let Some(wf_id) = wfr_junction.and_then(|wfr| wfr.workflow_id) {
         // This request has already been used to make a Workflow. Return that workflow.
-        return Ok((wf_id, false));
+        let wf = Workflow::get(conn, &wf_id)?;
+        return Ok((wf, false));
     }
     if let Some(wf_id) = existing_wf_id {
         // The auth token already has a workflow_id in it, no need to make a new one
-        return Ok((wf_id, false));
+        let wf = Workflow::get(conn, &wf_id)?;
+        return Ok((wf, false));
     }
 
     //
@@ -182,19 +188,100 @@ pub fn get_or_create_user_workflow(
         };
         create_doc_requests(conn, &user_doc_requests, &wf)?;
     }
-    Ok((wf.id, is_new_wf))
+    Ok((wf, is_new_wf))
 }
 
-#[tracing::instrument("get_or_create_business_workflow", skip_all)]
-pub fn get_or_create_business_wf(
+pub struct CreateBusinessWfArgs<'a> {
+    pub user_auth: &'a UserSessionContext,
+    pub fixture_result: Option<WorkflowFixtureResult>,
+    pub inherit_business_id: InheritBusinessId,
+}
+
+pub enum InheritBusinessId {
+    /// If `force_create` is true, make a new business. Otherwise, inherit the most recently
+    /// completed business.
+    Legacy,
+    /// Inherit the provided business, otherwise create a new business
+    Modern(Option<BoId>),
+}
+
+fn get_or_create_business(
     conn: &mut TxnPgConn,
-    common_args: CommonWfArgs,
-    // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's
-    // but could one day
+    user_auth: &UserSessionContext,
+    obc: &ObConfiguration,
+    inherit_business_id: InheritBusinessId,
     new_biz_keypair: VaultKeyPair,
-    user_auth: &CheckedUserAuthContext,
-    fixture_result: Option<WorkflowFixtureResult>,
-) -> FpResult<Workflow> {
+    force_create: bool,
+) -> FpResult<ScopedVaultId> {
+    if let Some(sb_id) = user_auth.sb_id.clone() {
+        // A scoped business has been attached to this session already. This happens in secondary beneficial
+        // owner tokens or in user-specific sessions with an `fp_bid`
+        if matches!(inherit_business_id, InheritBusinessId::Modern(Some(_))) {
+            return ValidationError("Cannot provide business ID when a scoped business is already attached")
+                .into();
+        }
+        return Ok(sb_id);
+    }
+
+    if user_auth.is_secondary_bo() {
+        return AssertionError("Secondary BO should already have associated business").into();
+    }
+
+    let uv_id = &user_auth.user.id;
+    match inherit_business_id {
+        InheritBusinessId::Legacy => {
+            // TODO: deprecate this codepath
+            let existing_businesses =
+                (!force_create).then_some(BusinessOwner::list_owned_businesses(conn, uv_id, &obc.id)?);
+            if let Some((_, sb, _)) = existing_businesses.into_iter().flatten().next() {
+                // If the user has already started onboarding their business onto this exact ob config AND we
+                // aren't force creating a new workflow (which should also support force
+                // creating a new business), we should locate the existing business.
+                // This supports inheriting in-progress business onboaridngs and short-circuiting when a user
+                // has already onboarded onto a playbook.
+                return Ok(sb.id);
+            }
+        }
+        InheritBusinessId::Modern(Some(inherit_business_id)) => {
+            // The user has selected an existing business from the list of owned businesses
+            let id = ScopedVaultIdentifier::OwnedBusiness {
+                bo_id: &inherit_business_id,
+                uv_id,
+                t_id: &obc.tenant_id,
+            };
+            let sb = ScopedVault::get(conn, id).optional()?.ok_or(ValidationError(
+                "Could not find the requested business owned by the user.",
+            ))?;
+            return Ok(sb.id);
+        }
+        InheritBusinessId::Modern(None) => {}
+    }
+
+    // Otherwise, make a new business vault and scoped vault owned by the currently authed user
+    let (public_key, e_private_key) = new_biz_keypair;
+    let args = NewVaultArgs {
+        public_key,
+        e_private_key,
+        is_live: user_auth.user.is_live,
+        kind: VaultKind::Business,
+        is_fixture: false,
+        sandbox_id: user_auth.user.sandbox_id.clone(), // Use the same sandbox ID for business vault
+        is_created_via_api: false,
+        duplicate_of_id: None,
+    };
+    let business_vault = Vault::create(conn, args)?;
+    BusinessOwner::create_primary(conn, user_auth.user.id.clone(), business_vault.id.clone())?;
+    let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
+    Ok(sb.id)
+}
+
+#[tracing::instrument("get_or_create_business_wf", skip_all)]
+pub fn get_or_create_business_wf<'a>(
+    conn: &'a mut TxnPgConn,
+    common_args: CommonWfArgs,
+    kp: VaultKeyPair,
+    args: CreateBusinessWfArgs<'a>,
+) -> FpResult<(Workflow, IsNew)> {
     let CommonWfArgs {
         obc,
         insight_event,
@@ -203,6 +290,11 @@ pub fn get_or_create_business_wf(
         force_create,
         su,
     } = common_args;
+    let CreateBusinessWfArgs {
+        user_auth,
+        fixture_result,
+        inherit_business_id,
+    } = args;
 
     let sb_id = user_auth.sb_id.as_ref();
     let wfr_junction = sb_id
@@ -211,59 +303,25 @@ pub fn get_or_create_business_wf(
         .transpose()?;
     if let Some(wf_id) = wfr_junction.and_then(|wfr| wfr.workflow_id) {
         // This request has already been used to make a Workflow. Return that workflow.
-        return Ok(Workflow::get(conn, &wf_id)?);
+        let wf = Workflow::get(conn, &wf_id)?;
+        return Ok((wf, false));
     }
 
     if let Some(biz_wf_id) = user_auth.biz_wf_id.as_ref() {
         // Either a duplicate call to `POST /hosted/onboarding`, or we're using a secondary beneficial owner
         // token and the business has already been created
         let biz_wf = Workflow::get(conn, biz_wf_id)?;
-        return Ok(biz_wf);
+        return Ok((biz_wf, false));
     };
 
-    let uv = Vault::lock(conn, &su.vault_id)?;
     if obc.kind != ObConfigurationKind::Kyb {
         return ValidationError("Cannot onboard a business to a non-KYB playbook").into();
     }
 
-    //
-    // Get or create a new business vault
-    //
+    Vault::lock(conn, &su.vault_id)?;
+    let sb_id = get_or_create_business(conn, user_auth, obc, inherit_business_id, kp, force_create)?;
+    ScopedVault::lock(conn, &sb_id)?;
 
-    let existing_businesses =
-        (!force_create).then_some(BusinessOwner::list_owned_businesses(conn, &uv.id, &obc.id)?);
-    let sb_id = if let Some(sb_id) = user_auth.sb_id.clone() {
-        // A scoped business has been attached to this session already, usually via user-specific
-        // sessions.
-        // Also via secondary beneficial owner tokens
-        sb_id
-    } else if let Some((_, sb, _)) = existing_businesses.into_iter().flatten().next() {
-        // If the user has already started onboarding their business onto this exact ob config AND we aren't
-        // force creating a new workflow (which should also support force creating a new business), we
-        // should locate the existing business.
-        // This supports inheriting in-progress business onboaridngs and short-circuiting when a user has
-        // already onboarded onto a playbook.
-        sb.id
-    } else if !user_auth.is_secondary_bo() {
-        let (public_key, e_private_key) = new_biz_keypair;
-        // Otherwise, make a new business vault and scoped vault owned by the currently authed user
-        let args = NewVaultArgs {
-            public_key,
-            e_private_key,
-            is_live: uv.is_live,
-            kind: VaultKind::Business,
-            is_fixture: false,
-            sandbox_id: uv.sandbox_id.clone(), // Use the same sandbox ID for business vault
-            is_created_via_api: false,
-            duplicate_of_id: None,
-        };
-        let business_vault = Vault::create(conn, args)?;
-        BusinessOwner::create_primary(conn, uv.id.clone(), business_vault.id.clone())?;
-        let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
-        sb.id
-    } else {
-        return AssertionError("Secondary BO should already have associated business").into();
-    };
 
     //
     // Get or create a new business workflow
@@ -283,6 +341,7 @@ pub fn get_or_create_business_wf(
     let (biz_wf, is_new_wf) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
 
     if is_new_wf {
+        // Create the business document requests
         let biz_doc_requests = match &biz_wf.config {
             WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => business_configs.as_slice(),
             WorkflowConfig::Kyb(_) => &obc.business_documents_to_collect,
@@ -290,6 +349,8 @@ pub fn get_or_create_business_wf(
         };
         create_doc_requests(conn, biz_doc_requests, &biz_wf)?;
 
+        // If we're reusing existing BO KYC, link the previous workflows for this BO to the new business
+        // workflow
         let reuse_existing_bo_kyc = match &biz_wf.config {
             WorkflowConfig::Kyb(KybConfig {
                 reuse_existing_bo_kyc,
@@ -324,7 +385,29 @@ pub fn get_or_create_business_wf(
         WorkflowRequestJunction::set_wf_id(conn, &wfr.id, &biz_wf)?;
     }
 
-    Ok(biz_wf)
+    Ok((biz_wf, is_new_wf))
+}
+
+pub fn create_biz_wfl(conn: &mut TxnPgConn, biz_wf: &Workflow, user_wf: &Workflow) -> FpResult<()> {
+    let sb = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
+    let su = ScopedVault::get(conn, &user_wf.scoped_vault_id)?;
+    if sb.kind != VaultKind::Business || su.kind != VaultKind::Person {
+        return AssertionError("Invalid scoped vaults for business workflow link").into();
+    }
+
+    let bo_id = BoIdentifier::Vaults {
+        uv_id: &su.vault_id,
+        bv_id: &sb.vault_id,
+    };
+    let bo = BusinessOwner::get(conn, bo_id)?;
+    let new = NewBusinessWorkflowLinkRow {
+        business_owner_id: &bo.id,
+        business_workflow_id: &biz_wf.id,
+        user_workflow_id: &user_wf.id,
+        source: BusinessWorkflowLinkSource::Hosted,
+    };
+    BusinessWorkflowLink::bulk_create(conn, vec![new])?;
+    Ok(())
 }
 
 fn create_doc_requests(
