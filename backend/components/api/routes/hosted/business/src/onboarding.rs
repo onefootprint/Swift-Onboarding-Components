@@ -37,6 +37,7 @@ pub async fn post(
     let PostBusinessOnboardingRequest {
         kyb_fixture_result,
         inherit_business_id,
+        use_legacy_inherit_logic,
     } = request.into_inner();
 
     let maybe_new_biz_keypair = state.enclave_client.generate_sealed_keypair().await?;
@@ -61,10 +62,15 @@ pub async fn post(
                 force_create,
                 su: &user_auth.scoped_user,
             };
+            let inherit_business_id = if use_legacy_inherit_logic {
+                InheritBusinessId::Legacy
+            } else {
+                InheritBusinessId::Modern(inherit_business_id)
+            };
             let args = CreateBusinessWfArgs {
                 user_auth: &user_auth,
                 fixture_result: kyb_fixture_result,
-                inherit_business_id: InheritBusinessId::Modern(inherit_business_id),
+                inherit_business_id,
             };
             let (biz_wf, is_new_wf) =
                 get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
