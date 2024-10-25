@@ -25,7 +25,7 @@ struct EmailAndPhoneView: View {
                         name: .idPeriodEmail,
                         label: { FpLabel("Email", font: .subheadline, color: .secondary) },
                         input: {
-                            FpInput(placeholder: "Enter your email", keyboardType: .emailAddress, contentType: .emailAddress)
+                            FpInput(placeholder: "Enter your email")
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(10)
@@ -37,7 +37,7 @@ struct EmailAndPhoneView: View {
                         name: .idPeriodPhoneNumber,
                         label: { FpLabel("Phone Number", font: .subheadline, color: .secondary) },
                         input: {
-                            FpInput(placeholder: "Enter your phone number", keyboardType: .phonePad, contentType: .telephoneNumber)
+                            FpInput(placeholder: "Enter your phone number")
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(10)

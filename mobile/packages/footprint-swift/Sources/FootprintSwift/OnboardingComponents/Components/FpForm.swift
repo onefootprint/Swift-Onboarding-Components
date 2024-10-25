@@ -31,11 +31,13 @@ public struct FpForm<Content: View, SubmitButton: View>: View {
                     .onTapGesture {
                         isSubmitPressed = true
                         form.triggerValidation()
+                        print(form.isValid)
                         
                         if form.isValid{
                             print("Email info:  \(form.idEmail)")
                             print("Phone info: \(form.idPhoneNumber)")
                             print("Vault data \(form.getVaultData())")
+                            onSubmit(form.getVaultData())
                         }
                     }
             }

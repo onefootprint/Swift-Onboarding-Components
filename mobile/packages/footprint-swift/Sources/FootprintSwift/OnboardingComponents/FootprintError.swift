@@ -10,6 +10,7 @@ public struct FootprintError: Error {
         case inlineOtpNotSupported
         case notAllowed
         case webviewError
+        case uiError
     }
     
     public let kind: ErrorKind

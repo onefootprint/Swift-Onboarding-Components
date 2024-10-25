@@ -21,79 +21,12 @@ struct BasicInfoView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 24) {
-                    Text("Basic Information")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    FpInput(                        
-                        placeholder: "First Name"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "Middle Name"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "Last Name"
-                    )
-                    
-                    DatePicker("Date of Birth", selection: $dateOfBirth, displayedComponents: .date)
-                        .datePickerStyle(DefaultDatePickerStyle())
-                    
-                    FpInput(                        
-                        placeholder: "Address Line 1"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "Address Line 2 (Optional)"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "City"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "State"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "Zip Code",
-                        keyboardType: .numberPad
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "Country"
-                    )
-                    
-                    FpInput(                        
-                        placeholder: "SSN",
-                        keyboardType: .numberPad
-                    )
-                    
-                    Button(action: {
+                FpForm(
+                    onSubmit: { vaultData in
                         isLoading = true
                         errorMessage = nil
                         Task {
                             do {
-                                let dateFormatter = DateFormatter()
-                                dateFormatter.dateFormat = "yyyy-MM-dd"
-                                let dobString = dateFormatter.string(from: dateOfBirth)
-                                
-                                let vaultData = VaultData(
-                                    idAddressLine1: addressLine1,
-                                    idAddressLine2: addressLine2,
-                                    idCity: city,
-                                    idCountry: country,
-                                    idDob: dobString,
-                                    idFirstName: firstName,
-                                    idLastName: lastName,
-                                    idMiddleName: middleName,
-                                    idSsn9: ssn,
-                                    idState: state,
-                                    idZip: zipCode
-                                )
-                                
                                 try await FootprintProvider.shared.vault(vaultData: vaultData)
                                 print("Vault data submitted successfully")
                                 let response = try await FootprintProvider.shared.process()
@@ -131,30 +64,152 @@ struct BasicInfoView: View {
                             }
                             isLoading = false
                         }
-                    }) {
-                        if isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        } else {
-                            Text("Continue")
+                    },
+                    content: {
+                        VStack(spacing: 20) {
+                            FpField(
+                                name: .idPeriodFirstName,
+                                label: { FpLabel("First name", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your first name")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodMiddleName,
+                                label: { FpLabel("Middle name", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your middle name")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+                            
+                            FpField(
+                                name: .idPeriodLastName,
+                                label: { FpLabel("Last name", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your last name")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodDob,
+                                label: { FpLabel("Date of birth", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your date of birth")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodAddressLine1,
+                                label: { FpLabel("Address line 1", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your address line 1")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodAddressLine2,
+                                label: { FpLabel("Address line 2", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your address line 2")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodCity,
+                                label: { FpLabel("City", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your city")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodState,
+                                label: { FpLabel("State", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your state")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodZip,
+                                label: { FpLabel("Zip code", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your zip code")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodCountry,
+                                label: { FpLabel("Country", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your country")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
+
+                            FpField(
+                                name: .idPeriodSsn9,
+                                label: { FpLabel("SSN", font: .subheadline, color: .secondary) },
+                                input: {
+                                    FpInput(placeholder: "Enter your SSN")
+                                        .padding()
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                },
+                                error: { FpFieldError() }
+                            )
                         }
-                    }
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(isLoading ? Color.gray : Color.blue)
-                    .cornerRadius(10)
-                    .disabled(isLoading)
-                    
-                    if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
+                    },
+                    submitButton: {
+                        Text("Continue")
+                            .foregroundColor(.white)
                             .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(isLoading ? Color.gray : Color.blue)
+                            .cornerRadius(10)
+                            .disabled(isLoading)
                     }
-                    
-                    Spacer()
-                }
-                .padding()
+                )
             }
             .navigationBarHidden(true)
             .background(

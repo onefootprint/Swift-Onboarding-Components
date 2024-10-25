@@ -16,7 +16,10 @@ public final class FootprintProvider {
     private var requirements : RequirementAttributes?
     private var sandboxId: String?  = nil
     private var sandboxOutcome: SandboxOutcome?
-    private var l10n: FootprintL10n?
+    internal var l10n: FootprintL10n = .init(
+        locale: .enUS,
+        language: .english
+    )
     private var appearance: FootprintAppearance?
     private(set) var isReady: Bool
     
@@ -40,7 +43,9 @@ public final class FootprintProvider {
                            l10n: FootprintL10n? = nil,
                            appearance: FootprintAppearance? = nil
     ) async throws {
-        self.l10n = l10n
+        if let l10n {
+            self.l10n = l10n
+        }
         self.appearance = appearance
         self.configKey = configKey
         self.authToken = authToken
@@ -352,8 +357,9 @@ public final class FootprintProvider {
             throw FootprintError(kind: .onboardingError, message: "Missing requirements")
         }
         
-        return try await self.queries.decrypt(authToken: authToken,
+        var vaultData = try await self.queries.decrypt(authToken: authToken,
                                               fields: requirements.fields.collected + requirements.fields.missing + requirements.fields.optional)
+        return try formatAfterDecryption(vaultData, locale: l10n.locale)
     }
     
     
@@ -370,7 +376,7 @@ public final class FootprintProvider {
             throw FootprintError(kind: .userError, message: "Missing vaulting token")
         }
         
-        try await self.queries.vault(authToken: authToken, vaultData: vaultData)
+        try await self.queries.vault(authToken: authToken, vaultData: formatBeforeSave(vaultData, locale: l10n.locale))
     }
     
     
@@ -466,7 +472,7 @@ public final class FootprintProvider {
             onError: onError
         )
         do {
-           try await Footprint.initialize(with: config)
+            try await Footprint.initialize(with: config)
         } catch {
             throw FootprintError(kind: .webviewError, message: "Failed to initialize Footprint webview: \(error.localizedDescription)")
         }

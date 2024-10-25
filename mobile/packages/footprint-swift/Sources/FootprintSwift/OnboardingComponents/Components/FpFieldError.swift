@@ -7,21 +7,14 @@ public struct FpFieldError: View {
     @EnvironmentObject var form: FormManager
     @Environment(\.fpFieldName) var fpFieldName: VaultDI?
     private var errorMessage: String? {
-        switch fpFieldName {
-        case .idPeriodEmail:
-            if let err = form.errors["idEmail"] {
+        if let fpFieldName {
+            let err = form.getErrorByVaultDI(fieldName: fpFieldName)
+            if let err {
                 return message ?? err
             } else {
                 return nil
             }
-            
-        case .idPeriodPhoneNumber:
-            if let err = form.errors["idPhoneNumber"] {
-                return message ?? err
-            } else {
-                return nil
-            }
-        default:
+        }else{
             return nil
         }
     }

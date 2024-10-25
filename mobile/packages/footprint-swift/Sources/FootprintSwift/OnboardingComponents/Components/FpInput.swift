@@ -2,58 +2,53 @@ import SwiftUI
 
 public struct FpInput: View {
     let placeholder: String
-    let keyboardType: UIKeyboardType
     let isSecure: Bool
-    let contentType: UITextContentType?
     @EnvironmentObject var form: FormManager
     @Environment(\.fpFieldName) var fpFieldName: VaultDI?
     
     public init(
         placeholder: String,
-        keyboardType: UIKeyboardType = .default,
-        isSecure: Bool = false,
-        contentType: UITextContentType? = nil
+        isSecure: Bool = false
     ) {
         self.placeholder = placeholder
-        self.keyboardType = keyboardType
         self.isSecure = isSecure
-        self.contentType = contentType
     }
     
     public var body: some View {
+        var fpInputProps: FootprintInputProps = .init()
+        if let fieldName = fpFieldName{
+            fpInputProps = getInputProps(fieldName: fieldName)
+            form.addToFieldsUsed(fieldName)
+        }
         let binding = Binding<String>(
             get: {
-                if let fieldName = fpFieldName {
-                    switch fieldName {
-                    case .idPeriodEmail:
-                        return form.idEmail
-                    case .idPeriodPhoneNumber:
-                        return form.idPhoneNumber
-                    default:
-                        return ""
-                    }
-                }
-                return ""
+                guard let fieldName = fpFieldName else { return "" }
+                let value = form.getValueByVaultDi(fieldName) ?? ""
+                return value
             },
             set: { newValue in
-                if let fieldName = fpFieldName {
-                    print("Setting new value: \(newValue) in \(fieldName)")
-                    
-                    switch fieldName {
-                    case .idPeriodEmail:
-                        form.setValue(newValue, forKey: "idEmail")
-                    case .idPeriodPhoneNumber:
-                        form.setValue(newValue, forKey: "idPhoneNumber")
-                    default:
-                        break
-                    }
-                }
+                guard let fieldName = fpFieldName else { return }
+                form.setValueByVaultDI(newValue, forDi: fieldName)
             }
         )
         
         return TextField(placeholder, text: binding)
-            .keyboardType(keyboardType)
-            .textContentType(contentType)
+            .keyboardType(fpInputProps.keyboardType ?? .default)
+            .textContentType(fpInputProps.textContentType)
+            .onChange(of: binding.wrappedValue){newValue in
+                guard let fieldName = fpFieldName else { return }
+                var refinedValue = newValue
+                if let format = fpInputProps.format {
+                    if !refinedValue.isEmpty {
+                        refinedValue = format(refinedValue)
+                    }
+                }
+                if let maxLengthLimit = fpInputProps.maxLength {
+                    refinedValue = String(refinedValue.prefix(maxLengthLimit))
+                    print(refinedValue)
+                }
+                binding.wrappedValue = refinedValue
+            }
             .onAppear {
                 print("FpInput: fpFieldName =", fpFieldName ?? "nil")
             }
