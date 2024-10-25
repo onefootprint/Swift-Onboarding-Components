@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useDocumentField from '../../hooks/use-document-field';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
 import ItemLabel from '../item-label';
+import LicenseDetails from '../license-details';
 
 export type LicenseItemProps = {
   document: Document;
@@ -14,14 +15,14 @@ export type LicenseItemProps = {
   vault: EntityVault;
 };
 
-const LicenseItem = ({ document, entity, vault }: LicenseItemProps) => {
+const LicenseItem = ({ document, entity, vault, onDecrypt }: LicenseItemProps) => {
   const { t } = useTranslation('entity-details');
   const { register } = useFormContext();
   const field = useDocumentField(entity, vault)(document);
-  const filters = useDocumentsFilters();
-
   const { startedAt, kind } = document;
   const documentId = startedAt ? `${kind}-${startedAt}` : kind;
+  const filters = useDocumentsFilters();
+  const open = filters.query.document_id === documentId;
 
   const handleClick = () => {
     filters.push({ document_id: documentId });
@@ -61,6 +62,15 @@ const LicenseItem = ({ document, entity, vault }: LicenseItemProps) => {
           </Stack>
         )}
       </Stack>
+      {open && (
+        <LicenseDetails
+          isDecryptable={field.isDecryptable}
+          document={document}
+          open={open}
+          onDecrypt={onDecrypt}
+          vault={vault}
+        />
+      )}
     </>
   );
 };
