@@ -38,12 +38,12 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     bootstrapUserData,
     vaultBusinessData,
     config,
-    isStakeExplanationDialogConfirmed,
   } = state.context;
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
   const [isNoOtherBosDialogOpen, setIsNoOtherBosDialogOpen] = useState(false);
+  const [showedMissingBosDialog, setShowedMissingBosDialog] = useState(false);
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners' });
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
   const canEdit = !vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
@@ -54,7 +54,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     const beneficialOwners = beneficialOwnersRaw.map(omitNullAndUndefined);
     const totalOwnershipStake = getTotalOwnershipStake(beneficialOwners);
 
-    if (totalOwnershipStake < MISSING_BOS_CONFIRMATION_THRESHOLD && !isStakeExplanationDialogConfirmed) {
+    if (totalOwnershipStake < MISSING_BOS_CONFIRMATION_THRESHOLD && !showedMissingBosDialog) {
       setIsNoOtherBosDialogOpen(true);
       return;
     }
@@ -97,6 +97,19 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
 
   const handleStakeExplanationDialogConfirm = (note: string) => {
     if (!authToken || mutation.isPending) return;
+    const onComplete = () => {
+      setIsNoOtherBosDialogOpen(false);
+      setShowedMissingBosDialog(true);
+      window.setTimeout(() => {
+        submitButtonRef.current?.click();
+      }, 200);
+    };
+
+    if (!note) {
+      onComplete();
+      return;
+    }
+
     mutation.mutate(
       {
         authToken,
@@ -106,14 +119,8 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
         onError: (error: unknown) => {
           logWarn('Error sending business stake explanation message', error);
         },
-        onSettled() {
-          /** Don't block if we fail to save the note */
-          send({ type: 'setStakeExplanationDialogConfirmed', payload: true });
-          setIsNoOtherBosDialogOpen(false);
-          window.setTimeout(() => {
-            submitButtonRef.current?.click();
-          }, 200);
-        },
+        /** Don't block if we fail to save the note */
+        onSettled: onComplete,
       },
     );
   };

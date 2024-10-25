@@ -48,7 +48,6 @@ export type MachineContext = {
   vaultBusinessData?: Readonly<BusinessDIData>;
   dataCollectionScreensToShow: StateValue[];
   isConfirmScreenVisible?: boolean;
-  isStakeExplanationDialogConfirmed?: boolean;
 };
 
 export type MachineEvents =

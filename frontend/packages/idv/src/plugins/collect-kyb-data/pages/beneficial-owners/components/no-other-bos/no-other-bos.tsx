@@ -21,9 +21,7 @@ const NoOtherBosDialog = ({ isLoading, isOpen, onClose, onSubmit }: NoOtherBosPr
   } = methods;
 
   const onSubmitFormData = ({ note }: { note: string }) => {
-    if (note) {
-      onSubmit(note);
-    }
+    onSubmit(note);
     reset();
   };
 
@@ -61,7 +59,7 @@ const NoOtherBosDialog = ({ isLoading, isOpen, onClose, onSubmit }: NoOtherBosPr
             <TextArea
               id="no-other-bos-note"
               placeholder={t('missing-bos-confirmation.input-placeholder')}
-              {...register('note', { required: t('missing-bos-confirmation.required') })}
+              {...register('note', { required: false })}
             />
             <Form.Errors>{errors.note?.message}</Form.Errors>
           </Form.Field>
