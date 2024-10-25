@@ -25,5 +25,3 @@ fp_test_server_log_*
 .hypothesis/
 
 *.csv
-*.json
-*.txt
