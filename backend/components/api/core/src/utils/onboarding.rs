@@ -388,7 +388,11 @@ pub fn get_or_create_business_wf<'a>(
     Ok((biz_wf, is_new_wf))
 }
 
-pub fn create_biz_wfl(conn: &mut TxnPgConn, biz_wf: &Workflow, user_wf: &Workflow) -> FpResult<()> {
+pub fn create_biz_wfl_if_not_exists(
+    conn: &mut TxnPgConn,
+    biz_wf: &Workflow,
+    user_wf: &Workflow,
+) -> FpResult<()> {
     let sb = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
     let su = ScopedVault::get(conn, &user_wf.scoped_vault_id)?;
     if sb.kind != VaultKind::Business || su.kind != VaultKind::Person {
@@ -400,13 +404,21 @@ pub fn create_biz_wfl(conn: &mut TxnPgConn, biz_wf: &Workflow, user_wf: &Workflo
         bv_id: &sb.vault_id,
     };
     let bo = BusinessOwner::get(conn, bo_id)?;
-    let new = NewBusinessWorkflowLinkRow {
-        business_owner_id: &bo.id,
-        business_workflow_id: &biz_wf.id,
-        user_workflow_id: &user_wf.id,
-        source: BusinessWorkflowLinkSource::Hosted,
-    };
-    BusinessWorkflowLink::bulk_create(conn, vec![new])?;
+
+    let existing_link = BusinessWorkflowLink::get(conn, &bo.id, &biz_wf.id).optional()?;
+    if let Some(l) = existing_link.as_ref() {
+        let user_wf_id_matches = l.user_workflow_id == user_wf.id;
+        tracing::info!(bo_id=%bo.id, user_wf_id=%user_wf.id, biz_wf_id=%biz_wf.id, %user_wf_id_matches, "Existing bwfl for this BO");
+    }
+    if !existing_link.is_some_and(|l| l.user_workflow_id == user_wf.id) {
+        let new = NewBusinessWorkflowLinkRow {
+            business_owner_id: &bo.id,
+            business_workflow_id: &biz_wf.id,
+            user_workflow_id: &user_wf.id,
+            source: BusinessWorkflowLinkSource::Hosted,
+        };
+        BusinessWorkflowLink::bulk_create(conn, vec![new])?;
+    }
     Ok(())
 }
 

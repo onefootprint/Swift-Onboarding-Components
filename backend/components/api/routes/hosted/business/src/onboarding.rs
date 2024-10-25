@@ -7,7 +7,7 @@ use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ApiResponse;
-use api_core::utils::onboarding::create_biz_wfl;
+use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
 use api_core::utils::onboarding::get_or_create_business_wf;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateBusinessWfArgs;
@@ -72,14 +72,13 @@ pub async fn post(
                 fixture_result: kyb_fixture_result,
                 inherit_business_id,
             };
-            let (biz_wf, is_new_wf) =
-                get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
+            let (biz_wf, _) = get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
 
-            if is_new_wf {
-                // Note: we might tie a completed user workflow from a previous onboarding to a new business
-                // workflow here, if the user is adding a second business.
-                create_biz_wfl(conn, &biz_wf, &user_auth.workflow)?;
-            }
+            // Regardless of whether the business workflow is new, we might need to tie this user workflow
+            // to it.
+            // Note: we might tie a completed user workflow from a previous onboarding to a new business
+            // workflow here, if the user is adding a second business.
+            create_biz_wfl_if_not_exists(conn, &biz_wf, &user_auth.workflow)?;
 
             // Update auth token with new identifiers
             let args = NewUserSessionContext {

@@ -12,7 +12,7 @@ use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::onboarding::create_biz_wfl;
+use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
 use api_core::utils::onboarding::get_or_create_business_wf;
 use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
@@ -28,6 +28,7 @@ use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use newtypes::ObConfigurationKind;
 use newtypes::VerificationCheckKind;
@@ -55,6 +56,11 @@ pub async fn post(
     let PostOnboardingRequest {
         fixture_result,
         kyb_fixture_result,
+        // Modern clients will send `omit_business_creation` and will create business workflows
+        // separately.
+        // But we still need to fetch the existing bwfl for the secondary BO flow
+        // TODO: once all clients are updated, we can remove all business logic in this API. Should
+        // probably rename it to `POST /hosted/user/onboarding` after that
         omit_business_creation,
     } = request.into_inner().unwrap_or_default();
 
@@ -81,11 +87,7 @@ pub async fn post(
         _ => false,
     };
 
-    // Modern clients will send `omit_business_creation` and will create business workflows separately.
-    // TODO: once all clients are updated, we can remove all business logic in this API.
-    // Should probably rename it to `POST /hosted/user/onboarding` after that
-    let should_get_or_create_biz_wf =
-        (ob_config.kind == ObConfigurationKind::Kyb || collecting_biz_doc) && !omit_business_creation;
+    let should_get_or_create_biz_wf = ob_config.kind == ObConfigurationKind::Kyb || collecting_biz_doc;
     let maybe_new_biz_keypair = if should_get_or_create_biz_wf {
         // Have to pre-generate the keypair since this is async
         Some(state.enclave_client.generate_sealed_keypair().await?)
@@ -131,7 +133,7 @@ pub async fn post(
             };
             // TODO in order to support reuse_existing_bo_kyc = False here for redo KYB, we should kind of
             // force create here when the secondary BO needs to redo KYC.
-            let (user_wf, is_new_user_wf) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
+            let (user_wf, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
             let kyb_fixture_result = kyb_fixture_result.or(fixture_result);
             let args = CreateBusinessWfArgs {
@@ -139,20 +141,24 @@ pub async fn post(
                 fixture_result: kyb_fixture_result,
                 inherit_business_id: InheritBusinessId::Legacy,
             };
-            let biz_wf = maybe_new_biz_keypair
-                .map(|kp| get_or_create_business_wf(conn, common_args, kp, args))
-                .transpose()?;
+            let biz_wf = if !omit_business_creation {
+                maybe_new_biz_keypair
+                    .map(|kp| get_or_create_business_wf(conn, common_args, kp, args).map(|(wf, _)| wf))
+                    .transpose()?
+            } else {
+                (user_auth.biz_wf_id.as_ref())
+                    .map(|id| Workflow::get(conn, id))
+                    .transpose()?
+            };
 
-            if is_new_user_wf {
-                // NOTE: need to keep this, even after we stop making biz workflows here, for the secondary BO
-                // case
-                if let Some((biz_wf, _)) = biz_wf.as_ref() {
-                    create_biz_wfl(conn, biz_wf, &user_wf)?;
-                }
+            // Even though we aren't creating business workflows here, we need to keep this to associate
+            // new user workflows with existing business workflows
+            if let Some(biz_wf) = biz_wf.as_ref() {
+                create_biz_wfl_if_not_exists(conn, biz_wf, &user_wf)?;
             }
 
             // Update auth token with new identifiers
-            let (biz_wf_id, sb_id) = biz_wf.map(|(wf, _)| (wf.id, wf.scoped_vault_id)).unzip();
+            let (biz_wf_id, sb_id) = biz_wf.map(|wf| (wf.id, wf.scoped_vault_id)).unzip();
             let args = NewUserSessionContext {
                 wf_id: user_auth.wf_id.is_none().then_some(user_wf.id),
                 biz_wf_id,

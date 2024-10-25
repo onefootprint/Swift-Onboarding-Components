@@ -51,6 +51,15 @@ impl BusinessWorkflowLink {
         Ok(results)
     }
 
+    #[tracing::instrument("BusinessWorkflowLink::get", skip_all)]
+    pub fn get(conn: &mut PgConn, bo_id: &BoId, biz_wf_id: &WorkflowId) -> DbResult<Self> {
+        let result = business_workflow_link::table
+            .filter(business_workflow_link::business_owner_id.eq(bo_id))
+            .filter(business_workflow_link::business_workflow_id.eq(biz_wf_id))
+            .get_result::<Self>(conn)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("BusinessWorkflowLink::get_latest_user_decisions", skip_all)]
     /// Returns the user workflows and decisions that are constituent of the business workflow's
     /// decision.
