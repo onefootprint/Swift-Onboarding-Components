@@ -732,9 +732,9 @@
             }
           },
           "under-100": {
-            "title": "¿No hay otro propietario beneficiario?",
-            "description": "La participación total de los propietarios no suma 100%. ¿Quieres continuar sin agregar a otros propietarios, o prefieres regresar para añadirlos?",
-            "input-label": "¿Por qué no suma el 100%?",
+            "title": "Propietarios faltantes",
+            "description": "Necesitamos recoger información sobre todos los propietarios que posean al menos el 25% de la empresa. ¿Quieres continuar sin agregar a otros propietarios, o prefieres regresar para añadirlos?",
+            "input-label": "Parece que faltan propietarios",
             "input-placeholder": "Por favor, explícanos un poco más...",
             "secondary-cta": "Regresar",
             "primary-cta": "Sí, continuar",

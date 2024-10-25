@@ -23,6 +23,9 @@ type BeneficialOwnersProps = {
   onComplete?: () => void;
 };
 
+/** If the ownership stake of provided BOs sums to < 76%, we'll show a confirmation dialog */
+const MISSING_BOS_CONFIRMATION_THRESHOLD = 76;
+
 const OnlyValidateDataWithoutSaving = true;
 const { logError, logWarn } = getLogger({ location: 'kyb-beneficial-owners' });
 
@@ -51,7 +54,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     const beneficialOwners = beneficialOwnersRaw.map(omitNullAndUndefined);
     const totalOwnershipStake = getTotalOwnershipStake(beneficialOwners);
 
-    if (totalOwnershipStake < 100 && !isStakeExplanationDialogConfirmed) {
+    if (totalOwnershipStake < MISSING_BOS_CONFIRMATION_THRESHOLD && !isStakeExplanationDialogConfirmed) {
       setIsNoOtherBosDialogOpen(true);
       return;
     }

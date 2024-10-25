@@ -36,32 +36,32 @@ const NoOtherBosDialog = ({ isLoading, isOpen, onClose, onSubmit }: NoOtherBosPr
   return (
     <Dialog
       isConfirmation
-      title={t('under-100.title')}
+      title={t('missing-bos-confirmation.title')}
       open={isOpen}
       onClose={isLoading ? noop : handleOnClose}
       secondaryButton={{
-        label: t('under-100.secondary-cta'),
+        label: t('missing-bos-confirmation.secondary-cta'),
         loading: isLoading,
         onClick: handleOnClose,
       }}
       primaryButton={{
         type: 'submit',
         form: 'no-other-bos-form',
-        label: t('under-100.primary-cta'),
+        label: t('missing-bos-confirmation.primary-cta'),
         loading: isLoading,
       }}
     >
       <form id="no-other-bos-form" onSubmit={handleSubmit(onSubmitFormData)}>
         <Stack direction="column" gap={7}>
           <Text variant="body-2" textAlign="center">
-            {t('under-100.description')}
+            {t('missing-bos-confirmation.description')}
           </Text>
           <Form.Field>
-            <Form.Label htmlFor="no-other-bos-note">{t('under-100.input-label')}</Form.Label>
+            <Form.Label htmlFor="no-other-bos-note">{t('missing-bos-confirmation.input-label')}</Form.Label>
             <TextArea
               id="no-other-bos-note"
-              placeholder={t('under-100.input-placeholder')}
-              {...register('note', { required: t('under-100.required') })}
+              placeholder={t('missing-bos-confirmation.input-placeholder')}
+              {...register('note', { required: t('missing-bos-confirmation.required') })}
             />
             <Form.Errors>{errors.note?.message}</Form.Errors>
           </Form.Field>

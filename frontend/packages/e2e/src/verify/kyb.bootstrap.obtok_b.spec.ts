@@ -105,15 +105,13 @@ test('KYB pbtok_ session with id.xxx and business.xxx #ci', async ({ page, isMob
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  const modalSumStakeLessThan100 = frame.getByLabel("Why doesn't it add up to 100%?").first();
-  await modalSumStakeLessThan100
-    .waitFor({ state: 'attached', timeout })
-    .then(() => modalSumStakeLessThan100.fill('e2e test'));
+  const modalMissingBos = frame.getByLabel('It appears that there are missing beneficial owners.').first();
+  await modalMissingBos.waitFor({ state: 'attached', timeout }).then(() => modalMissingBos.fill('e2e test'));
 
   await clickOnYes(frame);
   await page.waitForLoadState();
 
-  await modalSumStakeLessThan100.waitFor({ state: 'detached', timeout });
+  await modalMissingBos.waitFor({ state: 'detached', timeout });
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout }).catch(() => false);

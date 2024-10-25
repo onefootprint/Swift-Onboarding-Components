@@ -731,10 +731,10 @@
               }
             }
           },
-          "under-100": {
-            "title": "No other beneficial owner?",
-            "description": "The total business ownership doesn't add up to 100%. Do you want to proceed without adding other beneficial owners, or would you prefer to go back and add them?",
-            "input-label": "Why doesn't it add up to 100%?",
+          "missing-bos-confirmation": {
+            "title": "Missing beneficial owners",
+            "description": "In order to properly verify your business, we must collect all beneficial owners who own 25% or more of the business. Do you want to proceed without adding other beneficial owners, or would you prefer to go back and add them?",
+            "input-label": "It appears that there are missing beneficial owners.",
             "input-placeholder": "Please explain...",
             "secondary-cta": "Go back",
             "primary-cta": "Yes, continue",
