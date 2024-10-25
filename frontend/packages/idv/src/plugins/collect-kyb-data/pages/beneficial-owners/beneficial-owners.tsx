@@ -1,7 +1,7 @@
 import type { BeneficialOwner } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cloneDeep } from 'lodash';
@@ -37,6 +37,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     config,
     isStakeExplanationDialogConfirmed,
   } = state.context;
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
   const [isNoOtherBosDialogOpen, setIsNoOtherBosDialogOpen] = useState(false);
@@ -106,6 +107,9 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
           /** Don't block if we fail to save the note */
           send({ type: 'setStakeExplanationDialogConfirmed', payload: true });
           setIsNoOtherBosDialogOpen(false);
+          window.setTimeout(() => {
+            submitButtonRef.current?.click();
+          }, 200);
         },
       },
     );
@@ -132,6 +136,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
         </>
       )}
       <BeneficialOwnersForm
+        submitButtonRef={submitButtonRef}
         config={config}
         ctaLabel={ctaLabel}
         defaultValues={defaultValues}

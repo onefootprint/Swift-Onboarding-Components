@@ -23,6 +23,7 @@ export type FormProps = {
   onSubmit: (data: BeneficialOwner[]) => void;
   requireMultiKyc?: boolean;
   canEdit?: boolean;
+  submitButtonRef?: React.RefObject<HTMLButtonElement>;
 };
 
 const Form = ({
@@ -35,6 +36,7 @@ const Form = ({
   onSubmit,
   requireMultiKyc,
   canEdit,
+  submitButtonRef,
 }: FormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
@@ -142,6 +144,7 @@ const Form = ({
           isLoading={isLoading}
           ctaLabel={ctaLabel}
           submitButtonTestID="kyb-bo"
+          submitButtonRef={submitButtonRef}
         />
       </Grid.Container>
     </FormProvider>

@@ -7,6 +7,7 @@ type EditableFormButtonContainerProps = {
   isLoading: boolean;
   ctaLabel?: string;
   submitButtonTestID?: string;
+  submitButtonRef?: React.RefObject<HTMLButtonElement>;
 };
 
 const EditableFormButtonContainer = ({
@@ -14,6 +15,7 @@ const EditableFormButtonContainer = ({
   isLoading,
   ctaLabel,
   submitButtonTestID,
+  submitButtonRef,
 }: EditableFormButtonContainerProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'global.components.cta' });
   const actionContext = submitButtonTestID || 'editable-form';
@@ -34,6 +36,7 @@ const EditableFormButtonContainer = ({
           type="submit"
           loading={isLoading}
           testID={submitButtonTestID}
+          ref={submitButtonRef}
           data-dd-action-name={`${actionContext}:save`}
         >
           {t('save')}
@@ -49,6 +52,7 @@ const EditableFormButtonContainer = ({
       size="large"
       loading={isLoading}
       testID={submitButtonTestID}
+      ref={submitButtonRef}
       data-dd-action-name={`${actionContext}:continue`}
     >
       {ctaLabel ?? t('continue')}

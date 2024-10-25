@@ -115,9 +115,6 @@ test('KYB pbtok_ session with id.xxx and business.xxx #ci', async ({ page, isMob
 
   await modalSumStakeLessThan100.waitFor({ state: 'detached', timeout });
 
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout }).catch(() => false);
 
