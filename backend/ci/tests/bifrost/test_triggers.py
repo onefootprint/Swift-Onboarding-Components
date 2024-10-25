@@ -1,3 +1,4 @@
+from uuid import uuid4
 import pytest
 from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
 from tests.bifrost_client import BifrostClient
@@ -585,15 +586,74 @@ def test_reonboard_kyb_multi_kyc_reuse_kyc(kyb_sandbox_ob_config, sandbox_tenant
     # Business should be terminal, even though the second BO didn't redo KYC
     assert bifrost.validate_response["business"]["status"] == "pass"
 
-    # Primary BO and business should have two workflows
-    body = get(f"users/{primary_bo.fp_id}/onboardings", None, sandbox_tenant.s_sk)
-    assert len(body["data"]) == 2
-    body = get(f"businesses/{primary_bo.fp_bid}/onboardings", None, sandbox_tenant.s_sk)
-    assert len(body["data"]) == 2
+    tests = [
+        # Primary BO and business should have two workflows
+        (primary_bo.fp_id, 2),
+        (primary_bo.fp_bid, 2),
+        # But secondary BO shouldn't have had to reonboard
+        (secondary_bo.fp_id, 1),
+    ]
+    for fp_id, expected_num_onboardings in tests:
+        body = get(f"users/{fp_id}/onboardings", None, sandbox_tenant.s_sk)
+        assert len(body["data"]) == expected_num_onboardings
 
-    # But secondary BO shouldn't have had to reonboard
-    body = get(f"users/{secondary_bo.fp_id}/onboardings", None, sandbox_tenant.s_sk)
-    assert len(body["data"]) == 1
+
+def test_request_additional_bos(kyb_sandbox_ob_config, sandbox_tenant):
+    # Make a user with two businesses
+    bifrost1 = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost1.data.update(BUSINESS_SECONDARY_BOS)
+    bo1 = bifrost1.run()
+
+    secondary_bo_token = extract_bo_token(bifrost1)
+    bifrost2 = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
+    )
+    bo2 = bifrost2.run()
+
+    # Then request the business to add additional BOs
+    trigger = dict(
+        kind="onboard",
+        data=dict(
+            playbook_id=bifrost1.ob_config.id,
+            reuse_existing_bo_kyc=True,
+            recollect_attributes=["business_kyced_beneficial_owners"],
+        ),
+    )
+    initial_auth_token = send_trigger(bo1.fp_id, sandbox_tenant, trigger, bo1.fp_bid)
+
+    def pre_run(bifrost):
+        # Add a third BO
+        data = {**BUSINESS_SECONDARY_BOS["business.secondary_beneficial_owners"][0]}
+        data.pop("ownership_stake")
+        op = dict(op="create", uuid=str(uuid4()), ownership_stake=10, data=data)
+        patch("/hosted/business/owners", [op], bifrost.auth_token)
+
+    bifrost = complete_redo_flow_user(bo1, initial_auth_token, pre_run)
+    # Business should be incomplete while we wait for the new BO to complete KYC
+    assert bifrost.validate_response["business"]["status"] == "incomplete"
+
+    # Complete the third BO's KYC
+    bo_token = extract_bo_token(bifrost)
+    bifrost3 = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=bo_token
+    )
+    bo3 = bifrost3.run()
+    assert bifrost3.validate_response["business"]["status"] == "pass"
+    assert bifrost3.validate_response["user"]["status"] == "pass"
+    assert bo3.fp_bid == bo1.fp_bid
+
+    tests = [
+        # Primary BO and business should have two workflows
+        (bo1.fp_id, 2),
+        (bo1.fp_bid, 2),
+        # But secondary BO shouldn't have had to reonboard
+        (bo2.fp_id, 1),
+        # Third BO should have one onboarding
+        (bo3.fp_id, 1),
+    ]
+    for fp_id, expected_num_onboardings in tests:
+        body = get(f"users/{fp_id}/onboardings", None, sandbox_tenant.s_sk)
+        assert len(body["data"]) == expected_num_onboardings
 
 
 def test_kyb_validation(kyb_sandbox_ob_config, sandbox_tenant):
