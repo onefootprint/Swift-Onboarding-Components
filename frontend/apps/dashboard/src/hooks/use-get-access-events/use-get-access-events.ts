@@ -5,7 +5,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-import useSecurityLogsFilters from './use-security-logs-filters';
+import useSecurityLogsFilters from '../use-security-logs-filters';
 
 const getAccessEventsRequest = async (params: GetAccessEventsRequest, authHeaders: AuthHeaders) => {
   const response = await request<PaginatedRequestResponse<GetAccessEventsResponse>>({

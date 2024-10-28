@@ -7,12 +7,12 @@ import Timeline from 'src/components/timeline';
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 
+import useGetAccessEvents from '../../hooks/use-get-access-events/use-get-access-events';
+import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
 import Dot from './components/dot';
 import SecurityLogBody from './components/security-log-body';
 import SecurityLogHeader from './components/security-log-header';
 import SecurityLogsFilters from './components/security-logs-filters';
-import useGetAccessEvents from './hooks/use-get-access-events';
-import useSecurityLogsFilters from './hooks/use-security-logs-filters';
 
 const SecurityLogs = () => {
   const { t } = useTranslation('security-logs');

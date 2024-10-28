@@ -3,7 +3,7 @@ import { Filters } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
+import useSecurityLogsFilters from '../../../../hooks/use-security-logs-filters';
 
 const SecurityLogsFilters = () => {
   const { t: allT } = useTranslation('common');
