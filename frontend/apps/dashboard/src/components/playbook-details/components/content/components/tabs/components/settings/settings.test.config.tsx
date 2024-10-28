@@ -18,12 +18,6 @@ export const playbookWithPasskeysFixture: OnboardingConfig = {
   appearance: undefined,
   canAccessData: [],
   createdAt: '2023-06-15T12:00:00Z',
-  enhancedAml: {
-    enhancedAml: false,
-    ofac: false,
-    pep: false,
-    adverseMedia: false,
-  },
   id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
   internationalCountryRestrictions: null,
   isDocFirstFlow: false,

@@ -101,12 +101,6 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
       kind: 'organization',
       member: 'Jane doe',
     },
-    enhancedAml: {
-      enhancedAml: false,
-      ofac: false,
-      pep: false,
-      adverseMedia: false,
-    },
     kind: OnboardingConfigKind.kyc,
     ruleSet: {
       version: 1,

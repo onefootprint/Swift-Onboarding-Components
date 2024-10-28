@@ -41,7 +41,18 @@ export type AmlCheck = {
     pep: boolean;
     adverseMedia: boolean;
     continuousMonitoring: boolean;
-    adverseMediaLists: string[];
+    adverseMediaLists: Array<
+      | 'financial_crime'
+      | 'violent_crime'
+      | 'sexual_crime'
+      | 'cyber_crime'
+      | 'terrorism'
+      | 'fraud'
+      | 'narcotics'
+      | 'general_serious'
+      | 'general_minor'
+    >;
+    matchKind: 'fuzzy_low' | 'fuzzy_medium' | 'fuzzy_high' | 'exact_name' | 'exact_name_and_dob_year';
   };
 };
 
@@ -55,7 +66,12 @@ export type NeuroCheck = {
   data: {};
 };
 
-export type VerificationCheck = KycCheck | KybCheck | AmlCheck | SentilinkCheck | NeuroCheck;
+export type BusinessAmlCheck = {
+  kind: 'business_aml';
+  data: {};
+};
+
+export type VerificationCheck = KycCheck | KybCheck | AmlCheck | SentilinkCheck | NeuroCheck | BusinessAmlCheck;
 
 // Used in the IDV context
 export type PublicOnboardingConfig = {
@@ -107,13 +123,7 @@ export type OnboardingConfig = {
   allowUsTerritoryResidents: boolean;
   supportedCountries?: CountryCode[];
   isDocFirstFlow: boolean;
-  enhancedAml: {
-    enhancedAml: boolean;
-    ofac: boolean;
-    pep: boolean;
-    adverseMedia: boolean;
-  };
-  skipKyc: boolean;
+  skipKyc?: boolean;
   kind: OnboardingConfigKind;
   author: {
     kind: string;

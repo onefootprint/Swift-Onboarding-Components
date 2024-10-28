@@ -1,4 +1,12 @@
-import type { AmlCheck, KybCheck, KycCheck, NeuroCheck, SentilinkCheck, VerificationCheck } from '@onefootprint/types';
+import type {
+  AmlCheck,
+  BusinessAmlCheck,
+  KybCheck,
+  KycCheck,
+  NeuroCheck,
+  SentilinkCheck,
+  VerificationCheck,
+} from '@onefootprint/types';
 
 export const isKybCheck = (check: VerificationCheck): check is KybCheck => {
   return check.kind === 'kyb';
@@ -6,6 +14,10 @@ export const isKybCheck = (check: VerificationCheck): check is KybCheck => {
 
 export const isKycCheck = (check: VerificationCheck): check is KycCheck => {
   return check.kind === 'kyc';
+};
+
+export const isBusinessAml = (check: VerificationCheck): check is BusinessAmlCheck => {
+  return check.kind === 'business_aml';
 };
 
 export const isAmlCheck = (check: VerificationCheck): check is AmlCheck => {

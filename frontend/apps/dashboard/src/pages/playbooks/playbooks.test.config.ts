@@ -46,12 +46,6 @@ export const playbooksFixture: OnboardingConfig[] = [
       member: 'John Doe (john.doe@acme.com)',
     },
     skipKyc: false,
-    enhancedAml: {
-      enhancedAml: false,
-      ofac: false,
-      pep: false,
-      adverseMedia: false,
-    },
     kind: OnboardingConfigKind.kyc,
     ruleSet: {
       version: 1,
@@ -84,12 +78,6 @@ export const playbooksFixture: OnboardingConfig[] = [
       member: 'Jane Doe (jane.doe@acme.com)',
     },
     skipKyc: false,
-    enhancedAml: {
-      enhancedAml: false,
-      ofac: false,
-      pep: false,
-      adverseMedia: false,
-    },
     kind: OnboardingConfigKind.kyb,
     ruleSet: {
       version: 1,
@@ -122,12 +110,6 @@ export const playbooksFixture: OnboardingConfig[] = [
       member: 'Jane Doe (jane.doe@acme.com)',
     },
     skipKyc: false,
-    enhancedAml: {
-      enhancedAml: false,
-      ofac: false,
-      pep: false,
-      adverseMedia: false,
-    },
     kind: OnboardingConfigKind.auth,
     ruleSet: {
       version: 1,

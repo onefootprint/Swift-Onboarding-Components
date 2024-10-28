@@ -49,12 +49,6 @@ export const onboardingConfigFixture: OnboardingConfig = {
     member: 'John Doe (john.doe@acme.com)',
   },
   skipKyc: false,
-  enhancedAml: {
-    enhancedAml: false,
-    ofac: false,
-    pep: false,
-    adverseMedia: false,
-  },
   kind: OnboardingConfigKind.kyb,
   ruleSet: {
     version: 1,

@@ -1,15 +1,5 @@
 import { IcoBuilding24, IcoIdCard24, IcoShield24 } from '@onefootprint/icons';
-import {
-  Checkbox,
-  Divider,
-  InlineAlert,
-  Radio,
-  Stack,
-  Text,
-  Toggle,
-  Tooltip,
-  createFontStyles,
-} from '@onefootprint/ui';
+import { Divider, Radio, Stack, Toggle, Tooltip, createFontStyles } from '@onefootprint/ui';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -31,23 +21,11 @@ export type VerificationChecksStepProps = {
 const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: VerificationChecksStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
   const { aml, kyc, kybKind } = useMeta(meta);
-  const { register, control, handleSubmit, setValue } = useForm<VerificationChecksFormData>({ defaultValues });
-  const [isEnhancedAmlEnabled, ofac, pep, adverseMedia, runKyb] = useWatch({
+  const { register, control, handleSubmit } = useForm<VerificationChecksFormData>({ defaultValues });
+  const [runKyb] = useWatch({
     control,
-    name: ['aml.enhancedAml', 'aml.ofac', 'aml.pep', 'aml.adverseMedia', 'runKyb'],
+    name: ['runKyb'],
   });
-  const noAmlOptionSelected = !ofac && !pep && !adverseMedia;
-  const showAmlError = isEnhancedAmlEnabled && noAmlOptionSelected;
-
-  const handleAmlToggle = (checked: boolean) => {
-    if (!checked) {
-      setValue('aml.enhancedAml', false);
-      setValue('aml.ofac', false);
-      setValue('aml.pep', false);
-      setValue('aml.adverseMedia', false);
-      setValue('aml.hasOptionSelected', undefined);
-    }
-  };
 
   return (
     <form
@@ -127,7 +105,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
             />
           </Section>
           <Section>
-            <SectionHeader>
+            <SectionHeader marginBottom={5}>
               <IcoShield24 />
               {t('aml.title')}
             </SectionHeader>
@@ -141,55 +119,18 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                       <Toggle
                         checked={field.value}
                         disabled={aml.disabled}
-                        hint={t('aml.aml.hint')}
-                        label={t('aml.aml.label')}
+                        hint={t('aml.screening.ofac.hint')}
+                        label={t('aml.screening.ofac.label')}
                         size="compact"
                         onChange={event => {
                           const checked = event.target.checked;
                           field.onChange(checked);
-                          handleAmlToggle(checked);
                         }}
                       />
                     </Tooltip>
                   )}
                 />
-                {isEnhancedAmlEnabled && (
-                  <>
-                    <Divider variant="secondary" />
-                    <Checkbox
-                      label={t('aml.ofac.label')}
-                      hint={t('aml.ofac.hint')}
-                      disabled={aml.disabled}
-                      {...register('aml.ofac')}
-                    />
-                    <Checkbox
-                      label={t('aml.pep.label')}
-                      hint={t('aml.pep.hint')}
-                      disabled={aml.disabled}
-                      {...register('aml.pep')}
-                    />
-                    <Checkbox
-                      label={t('aml.adverse-media.label')}
-                      hint={t('aml.adverse-media.hint')}
-                      disabled={aml.disabled}
-                      {...register('aml.adverseMedia')}
-                    />
-                    <Divider variant="secondary" />
-                    <Text variant="body-3" color="tertiary">
-                      <Text variant="body-3" color="primary" tag="span">
-                        {t('aml.footer.label')}{' '}
-                      </Text>
-                      {t('aml.footer.content')}
-                    </Text>
-                  </>
-                )}
               </Stack>
-              {showAmlError && (
-                <>
-                  <input type="hidden" {...register('aml.hasOptionSelected', { required: true })} />
-                  <InlineAlert variant="warning">{t('aml.missing-selection')}</InlineAlert>
-                </>
-              )}
             </Stack>
           </Section>
         </Stack>
@@ -206,7 +147,7 @@ const Section = styled.section`
   `};
 `;
 
-const SectionHeader = styled.header`
+const SectionHeader = styled(Stack)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
     color: ${theme.color.primary};

@@ -74,12 +74,7 @@ export const reducer = (state: State, action: Action): State => {
           verificationChecksForm: {
             ...state.data.verificationChecksForm,
             runKyc: !!action.payload.data?.collect,
-            aml: {
-              enhancedAml: false,
-              ofac: false,
-              pep: false,
-              adverseMedia: false,
-            },
+            aml: defaultFormValues.verificationChecksForm.aml,
           },
         },
       };

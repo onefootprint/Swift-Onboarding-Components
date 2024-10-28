@@ -400,21 +400,66 @@
           "label": "Enhanced AML monitoring",
           "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
         },
-        "ofac": {
-          "label": "Office of Foreign Assets Control (OFAC)",
-          "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
+        "screening": {
+          "title": "Screening types",
+          "ofac": {
+            "label": "Office of Foreign Assets Control (OFAC)",
+            "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
+          },
+          "pep": {
+            "label": "Politically Exposed Person (PEP)",
+            "hint": "An individual who has been entrusted with a prominent public function"
+          },
+          "adverse-media": {
+            "label": "Adverse media",
+            "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities",
+            "financial-crime": "Financial crime",
+            "violent-crime": "Violent crime",
+            "sexual-crime": "Sexual crime",
+            "cyber-crime": "Cyber crime",
+            "terrorism": "Terrorism",
+            "fraud": "Fraud",
+            "narcotics": "Narcotics",
+            "general-serious": "General (serious)",
+            "general-minor": "General (minor)"
+          },
+          "footer": {
+            "label": "Note:",
+            "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+          }
         },
-        "pep": {
-          "label": "Politically Exposed Person (PEP)",
-          "hint": "An individual who has been entrusted with a prominent public function"
-        },
-        "adverse-media": {
-          "label": "Adverse media",
-          "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
-        },
-        "footer": {
-          "label": "Note:",
-          "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+        "matching-method": {
+          "title": "Matching method",
+          "fuzzy": {
+            "label": "Fuzzy matching",
+            "hint": "Allows for slight variations in the data, such as spelling errors or minor differences in formatting"
+          },
+          "exact": {
+            "label": "Exact matching",
+            "hint": "Requires the input data to exactly match the database entry"
+          },
+          "fuzzy-levels": {
+            "low": {
+              "label": "Low: Not fuzzy",
+              "hint": "Matches slight variations"
+            },
+            "medium": {
+              "label": "Medium: Somewhat fuzzy",
+              "hint": "Allows moderate variations"
+            },
+            "high": {
+              "label": "High: Very fuzzy",
+              "hint": "Matches broader variations"
+            }
+          },
+          "exact-levels": {
+            "name": {
+              "label": "Exact Name"
+            },
+            "name-and-dob": {
+              "label": "Exact Name + Date of Birth"
+            }
+          }
         },
         "disabled": {
           "missing-bos": "You must collect beneficial owners information to enable AML monitoring."

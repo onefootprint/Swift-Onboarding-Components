@@ -20,10 +20,11 @@ const Group = ({ title, children }: GroupProps) => {
 
 type ItemProps = {
   label: string;
+  hint?: string;
   checked?: boolean;
 };
 
-const Item = ({ label, checked }: ItemProps) => {
+const Item = ({ label, hint, checked }: ItemProps) => {
   return (
     <Stack
       aria-label={label}
@@ -38,6 +39,11 @@ const Item = ({ label, checked }: ItemProps) => {
       <Text variant="body-2" color="secondary">
         {label}
       </Text>
+      {hint && (
+        <Text variant="body-2" color="tertiary">
+          {hint}
+        </Text>
+      )}
     </Stack>
   );
 };

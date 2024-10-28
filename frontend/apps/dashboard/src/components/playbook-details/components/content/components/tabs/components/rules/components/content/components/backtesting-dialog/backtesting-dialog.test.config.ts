@@ -42,12 +42,6 @@ export const kycPlaybookFixture: OnboardingConfig = {
     member: 'John Doe (john.doe@acme.com)',
   },
   skipKyc: false,
-  enhancedAml: {
-    enhancedAml: false,
-    ofac: false,
-    pep: false,
-    adverseMedia: false,
-  },
   kind: OnboardingConfigKind.kyc,
   ruleSet: {
     version: 1,

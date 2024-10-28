@@ -161,7 +161,6 @@ const createBusinessPayload = (
 
 const createVerificationChecksPayload = (verificationChecksForm: VerificationChecksFormData) => {
   return {
-    enhancedAml: verificationChecksForm.aml,
     verificationChecks: [
       ...(verificationChecksForm.runKyb
         ? [
@@ -174,6 +173,7 @@ const createVerificationChecksPayload = (verificationChecksForm: VerificationChe
           ]
         : []),
       ...(verificationChecksForm.runKyc ? [{ kind: 'kyc', data: {} }] : []),
+      ...(verificationChecksForm.aml.enhancedAml ? [{ kind: 'business_aml', data: {} }] : []),
     ],
   };
 };

@@ -54,10 +54,6 @@ export const defaultFormValues: State['data'] = {
   verificationChecksForm: {
     aml: {
       enhancedAml: false,
-      ofac: false,
-      pep: false,
-      adverseMedia: false,
-      hasOptionSelected: false,
     },
     runKyb: true,
     runKyc: true,

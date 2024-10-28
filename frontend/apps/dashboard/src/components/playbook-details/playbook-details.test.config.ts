@@ -16,12 +16,6 @@ export const playbookDetailsFixture: OnboardingConfig = {
   appearance: undefined,
   canAccessData: [],
   createdAt: '',
-  enhancedAml: {
-    enhancedAml: false,
-    ofac: false,
-    pep: false,
-    adverseMedia: false,
-  },
   id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
   internationalCountryRestrictions: null,
   isDocFirstFlow: false,

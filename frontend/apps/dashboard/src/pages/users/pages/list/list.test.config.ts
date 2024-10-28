@@ -133,12 +133,6 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     isDocFirstFlow: false,
     allowUsResidents: true,
     internationalCountryRestrictions: null,
-    enhancedAml: {
-      enhancedAml: false,
-      ofac: false,
-      pep: false,
-      adverseMedia: false,
-    },
     kind: OnboardingConfigKind.kyc,
     ruleSet: {
       version: 1,

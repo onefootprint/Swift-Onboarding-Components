@@ -9,8 +9,8 @@ import RequiredAuthMethodsStep from '../required-auth-methods-step';
 import ResidencyStep from '../residency-step';
 import StepperContainer from '../stepper-container';
 import PersonStep from './components/details-step';
-import Templates, { OnboardingTemplate } from './components/templates-step';
-import KycVerificationChecksStep from './components/verification-checks-step';
+import TemplatesStep, { OnboardingTemplate } from './components/templates-step';
+import VerificationChecksStep from './components/verification-checks-step';
 import createPayload from './utils/create-payload';
 import getStepperValue from './utils/get-stepper-value';
 import { initialState, reducer } from './utils/reducer';
@@ -83,7 +83,7 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
         />
       )}
       {state.step === 'templates' && (
-        <Templates
+        <TemplatesStep
           defaultValues={state.data.templateForm}
           onBack={() => {
             dispatch({ type: 'updateStep', payload: 'name' });
@@ -139,7 +139,7 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
         />
       )}
       {state.step === 'verificationChecks' && (
-        <KycVerificationChecksStep
+        <VerificationChecksStep
           defaultValues={state.data.verificationChecksForm}
           meta={{
             canEdit: isTemplateEditable,

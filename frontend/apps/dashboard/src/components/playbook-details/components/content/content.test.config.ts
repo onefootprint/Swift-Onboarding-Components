@@ -17,12 +17,6 @@ const basePlaybook: OnboardingConfig = {
   internationalCountryRestrictions: null,
   allowUsTerritoryResidents: true,
   isDocFirstFlow: false,
-  enhancedAml: {
-    enhancedAml: true,
-    ofac: true,
-    pep: false,
-    adverseMedia: false,
-  },
   skipKyc: false,
   kind: OnboardingConfigKind.kyc,
   author: {

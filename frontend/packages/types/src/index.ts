@@ -349,6 +349,7 @@ export type {
   KybCheck,
   KycBootstrapData,
   KycCheck,
+  BusinessAmlCheck,
   L10n,
   LabelAddedEvent,
   LabelAddedEventData,

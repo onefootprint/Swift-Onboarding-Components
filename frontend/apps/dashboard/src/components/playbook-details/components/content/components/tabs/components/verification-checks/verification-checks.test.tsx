@@ -1,7 +1,7 @@
 import { customRender, screen, within } from '@onefootprint/test-utils';
-import type { CollectedDataOption, VerificationCheck } from '@onefootprint/types';
+import { type CollectedDataOption, OnboardingConfigKind, type VerificationCheck } from '@onefootprint/types';
 import VerificationChecks from './verification-checks';
-import { amlCheck, kybCheck, onboardingConfigFixture } from './verification-checks.test.config';
+import { amlCheck, onboardingConfigFixture } from './verification-checks.test.config';
 
 describe('<VerificationChecks />', () => {
   const defaultValues = {
@@ -22,25 +22,31 @@ describe('<VerificationChecks />', () => {
   };
   const renderVerificationChecks = ({
     verificationChecks = defaultValues.verificationChecks,
-    skipKyc = defaultValues.skipKyc,
     mustCollectData = defaultValues.mustCollectData,
-  }: { verificationChecks?: VerificationCheck[]; skipKyc?: boolean; mustCollectData?: CollectedDataOption[] }) => {
+    kind = OnboardingConfigKind.kyc,
+  }: {
+    verificationChecks?: VerificationCheck[];
+    mustCollectData?: CollectedDataOption[];
+    kind?: OnboardingConfigKind;
+  }) => {
     return customRender(
       <VerificationChecks
         playbook={{
           ...onboardingConfigFixture,
           mustCollectData,
-          skipKyc,
           verificationChecks,
+          kind,
         }}
       />,
     );
   };
 
-  describe('KYB and KYC checks', () => {
+  describe('KYB AML checks', () => {
     it('should show the correct text when full KYB is enabled and KYC checks are disabled', () => {
-      renderVerificationChecks({ verificationChecks: [kybCheck()], skipKyc: true });
-
+      renderVerificationChecks({
+        verificationChecks: [{ kind: 'kyb', data: { einOnly: false } }],
+        kind: OnboardingConfigKind.kyb,
+      });
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
       const full = within(kyb).getByText('Full KYB (data collection + verification checks)');
       expect(full).toBeInTheDocument();
@@ -50,7 +56,13 @@ describe('<VerificationChecks />', () => {
     });
 
     it('should show the correct text when EIN-only KYB is enabled and primary-only KYC checks are enabled', () => {
-      renderVerificationChecks({ verificationChecks: [kybCheck(true)] });
+      renderVerificationChecks({
+        verificationChecks: [
+          { kind: 'kyb', data: { einOnly: true } },
+          { kind: 'kyc', data: {} },
+        ],
+        kind: OnboardingConfigKind.kyb,
+      });
 
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
       const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only');
@@ -65,8 +77,12 @@ describe('<VerificationChecks />', () => {
 
     it('should show the correct text when EIN-only KYB is enabled and full KYC checks are enabled', () => {
       renderVerificationChecks({
-        verificationChecks: [kybCheck(true)],
+        verificationChecks: [
+          { kind: 'kyb', data: { einOnly: true } },
+          { kind: 'kyc', data: {} },
+        ],
         mustCollectData: ['business_kyced_beneficial_owners'],
+        kind: OnboardingConfigKind.kyb,
       });
 
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
@@ -79,7 +95,7 @@ describe('<VerificationChecks />', () => {
     });
   });
 
-  describe('AML checks', () => {
+  describe('KYC AML checks', () => {
     it('should show a fallback text when AML monitoring is disabled', () => {
       renderVerificationChecks({});
 

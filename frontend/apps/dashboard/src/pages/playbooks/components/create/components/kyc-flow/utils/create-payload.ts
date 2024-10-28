@@ -114,11 +114,30 @@ const createResidencyPayload = (residencyForm: ResidencyFormData) => {
 
 const createVerificationChecks = (verificationChecksForm: VerificationChecksFormData) => {
   return {
-    enhancedAml: verificationChecksForm.aml,
     verificationChecks: [
       ...(verificationChecksForm.isNeuroEnabled ? [{ kind: 'neuro_id', data: {} }] : []),
       ...(verificationChecksForm.isSentilinkEnabled ? [{ kind: 'sentilink', data: {} }] : []),
       ...(verificationChecksForm.runKyc ? [{ kind: 'kyc', data: {} }] : []),
+      ...(verificationChecksForm.aml.enhancedAml
+        ? [
+            {
+              kind: 'aml',
+              data: {
+                continuousMonitoring: true,
+                ofac: verificationChecksForm.aml.ofac,
+                pep: verificationChecksForm.aml.pep,
+                adverseMedia: verificationChecksForm.aml.adverseMedia,
+                adverseMediaLists: Object.entries(verificationChecksForm.aml.adverseMediaList)
+                  .filter(([_, value]) => value)
+                  .map(([key]) => key),
+                matchKind:
+                  verificationChecksForm.aml.matchingMethod.kind === 'fuzzy'
+                    ? verificationChecksForm.aml.matchingMethod.fuzzyLevel
+                    : verificationChecksForm.aml.matchingMethod.exactLevel,
+              },
+            },
+          ]
+        : []),
     ],
   };
 };

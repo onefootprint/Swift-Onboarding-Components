@@ -1,71 +1,69 @@
 import {
   type AmlCheck,
   AuthMethodKind,
-  type KybCheck,
   type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 
 export const onboardingConfigFixture: OnboardingConfig = {
-  id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
-  name: 'KYB',
-  key: 'pb_test_u29z2AvnfqhGKpIb4f0raa',
+  id: 'ob_config_id_sIrGC9qX1sdg6IH66kxwEd',
+  name: 'Acme Inc. KYC (10/28/24)',
+  key: 'pb_test_yfpnuqlV6oISBTVcaesYtO',
   isLive: false,
-  createdAt: '2024-01-02T20:12:20.301907Z',
-  status: OnboardingConfigStatus.enabled,
-  mustCollectData: [
-    'email',
-    'name',
-    'dob',
-    'full_address',
-    'ssn9',
-    'phone_number',
-    'business_name',
-    'business_address',
-    'business_tin',
-    'business_beneficial_owners',
-  ],
+  createdAt: '2024-10-28T21:23:05.360166Z',
+  mustCollectData: ['email', 'name', 'dob', 'full_address', 'phone_number', 'ssn9'],
   optionalData: [],
-  canAccessData: [
-    'email',
-    'phone_number',
-    'name',
-    'dob',
-    'full_address',
-    'ssn9',
-    'business_name',
-    'business_address',
-    'business_tin',
-    'business_beneficial_owners',
-  ],
+  canAccessData: ['email', 'name', 'dob', 'full_address', 'phone_number', 'ssn9'],
   allowInternationalResidents: false,
   internationalCountryRestrictions: null,
   allowUsResidents: true,
   allowUsTerritoryResidents: false,
   isNoPhoneFlow: false,
   isDocFirstFlow: false,
+  skipConfirm: false,
   author: {
     kind: 'organization',
-    member: 'John Doe (john.doe@acme.com)',
+    member: 'Rafael Motta (rafael@onefootprint.com)',
   },
-  skipKyc: false,
-  enhancedAml: {
-    enhancedAml: false,
-    ofac: false,
-    pep: false,
-    adverseMedia: false,
-  },
-  kind: OnboardingConfigKind.kyb,
+  kind: OnboardingConfigKind.kyc,
+  isRulesEnabled: true,
   ruleSet: {
     version: 1,
   },
-  documentsToCollect: null,
+  status: OnboardingConfigStatus.enabled,
+  documentsToCollect: [],
+  businessDocumentsToCollect: [],
+  verificationChecks: [
+    {
+      kind: 'kyc',
+      data: {},
+    },
+    {
+      kind: 'aml',
+      data: {
+        ofac: true,
+        pep: true,
+        adverseMedia: true,
+        continuousMonitoring: true,
+        adverseMediaLists: [
+          'financial_crime',
+          'violent_crime',
+          'sexual_crime',
+          'cyber_crime',
+          'terrorism',
+          'fraud',
+          'narcotics',
+          'general_serious',
+          'general_minor',
+        ],
+        matchKind: 'fuzzy_low',
+      },
+    },
+  ],
+  requiredAuthMethods: [AuthMethodKind.phone],
   promptForPasskey: true,
   allowReonboard: false,
-  businessDocumentsToCollect: [],
-  requiredAuthMethods: [AuthMethodKind.phone],
-  verificationChecks: [],
 };
 
 export const amlCheck = ({
@@ -80,8 +78,4 @@ export const amlCheck = ({
   pep?: boolean;
 }) => {
   return { kind: 'aml', data: { adverseMedia, ofac, pep, continuousMonitoring } } as AmlCheck;
-};
-
-export const kybCheck = (einOnly: boolean = false) => {
-  return { kind: 'kyb', data: { einOnly } } as KybCheck;
 };

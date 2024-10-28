@@ -172,6 +172,7 @@ export type {
   DocumentTypesAndCountries,
   OnboardingConfig,
   PublicOnboardingConfig,
+  BusinessAmlCheck,
   KybCheck,
   KycCheck,
   AmlCheck,

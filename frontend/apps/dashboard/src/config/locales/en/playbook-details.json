@@ -305,11 +305,40 @@
       "none": "Database checks with collected identity data are not being performed"
     },
     "aml": {
-      "title": "Anti-Money Laundering (AML)",
-      "none": "AML checks are not enabled",
+      "title": "Anti-Money Laundering (AML)"
+    },
+    "screening": {
+      "title": "Screening types",
       "ofac": "Office of Foreign Assets Control (OFAC)",
       "pep": "Politically Exposed Person (PEP)",
-      "adverse-media": "Adverse media"
+      "adverse-media": "Adverse media",
+      "adverse-media-list": {
+        "financial-crime": "Financial crime",
+        "violent-crime": "Violent crime",
+        "sexual-crime": "Sexual crime",
+        "cyber-crime": "Cyber crime",
+        "terrorism": "Terrorism",
+        "fraud": "Fraud",
+        "narcotics": "Narcotics",
+        "general-serious": "General (serious)",
+        "general-minor": "General (minor)"
+      },
+      "none": "AML checks are not enabled"
+    },
+    "matching-method": {
+      "title": "Matching method",
+      "exact": {
+        "title": "Exact matching: ",
+        "name": "Name",
+        "name-dob": "Name + Date of Birth"
+      },
+      "fuzzy": {
+        "title": "Fuzzy matching: ",
+        "low": "Low: Not fuzzy",
+        "medium": "Medium: Somewhat fuzzy",
+        "high": "High: Very fuzzy"
+      },
+      "none": "No matching methods are enabled"
     },
     "fraud-checks": {
       "title": "Fraud checks",

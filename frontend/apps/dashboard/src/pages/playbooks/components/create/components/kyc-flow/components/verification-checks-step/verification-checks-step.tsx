@@ -1,5 +1,15 @@
-import { IcoBolt24, IcoIdCard24, IcoShield24 } from '@onefootprint/icons';
-import { Checkbox, Divider, InlineAlert, Stack, Text, Toggle, Tooltip, createFontStyles } from '@onefootprint/ui';
+import { IcoBolt24, IcoCrosshair24, IcoIdCard24, IcoLayer0124, IcoShield24 } from '@onefootprint/icons';
+import {
+  Checkbox,
+  Divider,
+  InlineAlert,
+  Radio,
+  Stack,
+  Text,
+  Toggle,
+  Tooltip,
+  createFontStyles,
+} from '@onefootprint/ui';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -27,21 +37,35 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
   const { neuro, sentilink, kyc, aml } = useMeta(meta);
   const { register, control, handleSubmit, setValue } = useForm<VerificationChecksFormData>({ defaultValues });
-  const [isEnhancedAmlEnabled, ofac, pep, adverseMedia] = useWatch({
+  const [isEnhancedAmlEnabled, ofac, pep, adverseMedia, matchingMethod] = useWatch({
     control,
-    name: ['aml.enhancedAml', 'aml.ofac', 'aml.pep', 'aml.adverseMedia'],
+    name: ['aml.enhancedAml', 'aml.ofac', 'aml.pep', 'aml.adverseMedia', 'aml.matchingMethod'],
   });
   const noAmlOptionSelected = !ofac && !pep && !adverseMedia;
   const showAmlError = isEnhancedAmlEnabled && noAmlOptionSelected;
 
   const handleAmlToggle = (checked: boolean) => {
-    if (!checked) {
-      setValue('aml.enhancedAml', false);
-      setValue('aml.ofac', false);
-      setValue('aml.pep', false);
-      setValue('aml.adverseMedia', false);
-      setValue('aml.hasOptionSelected', undefined);
-    }
+    setValue('aml.enhancedAml', checked);
+    setValue('aml.ofac', checked);
+    setValue('aml.pep', checked);
+    setValue('aml.adverseMedia', checked);
+    setValue('aml.hasOptionSelected', undefined);
+    setValue('aml.adverseMediaList', {
+      financial_crime: checked,
+      violent_crime: checked,
+      sexual_crime: checked,
+      cyber_crime: checked,
+      terrorism: checked,
+      fraud: checked,
+      narcotics: checked,
+      general_serious: checked,
+      general_minor: checked,
+    });
+    setValue('aml.matchingMethod', {
+      kind: 'fuzzy',
+      fuzzyLevel: 'fuzzy_low',
+      exactLevel: 'exact_name',
+    });
   };
 
   return (
@@ -58,7 +82,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
         <Stack direction="column" gap={5} marginBottom={8}>
           {kyc.showSkip ? (
             <Section>
-              <SectionHeader>
+              <SectionHeader marginBottom={5}>
                 <IcoIdCard24 />
                 {t('kyc-checks.title')}
               </SectionHeader>
@@ -87,7 +111,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
             </Section>
           ) : null}
           <Section>
-            <SectionHeader>
+            <SectionHeader marginBottom={5}>
               <IcoShield24 />
               {t('aml.title')}
             </SectionHeader>
@@ -116,30 +140,146 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                 {isEnhancedAmlEnabled && (
                   <>
                     <Divider variant="secondary" />
+                    <SectionHeader>
+                      <IcoCrosshair24 />
+                      {t('aml.screening.title')}
+                    </SectionHeader>
                     <Checkbox
-                      label={t('aml.ofac.label')}
-                      hint={t('aml.ofac.hint')}
+                      label={t('aml.screening.ofac.label')}
+                      hint={t('aml.screening.ofac.hint')}
                       disabled={aml.disabled}
                       {...register('aml.ofac')}
                     />
                     <Checkbox
-                      label={t('aml.pep.label')}
-                      hint={t('aml.pep.hint')}
+                      label={t('aml.screening.pep.label')}
+                      hint={t('aml.screening.pep.hint')}
                       disabled={aml.disabled}
                       {...register('aml.pep')}
                     />
                     <Checkbox
-                      label={t('aml.adverse-media.label')}
-                      hint={t('aml.adverse-media.hint')}
+                      label={t('aml.screening.adverse-media.label')}
+                      hint={t('aml.screening.adverse-media.hint')}
                       disabled={aml.disabled}
-                      {...register('aml.adverseMedia')}
+                      {...register('aml.adverseMedia', {
+                        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                          const checked = event.target.checked;
+                          setValue('aml.adverseMediaList', {
+                            financial_crime: checked,
+                            violent_crime: checked,
+                            sexual_crime: checked,
+                            cyber_crime: checked,
+                            terrorism: checked,
+                            fraud: checked,
+                            narcotics: checked,
+                            general_serious: checked,
+                            general_minor: checked,
+                          });
+                        },
+                      })}
                     />
+                    {adverseMedia ? (
+                      <Stack direction="column" gap={3} marginLeft={7}>
+                        <Checkbox
+                          {...register('aml.adverseMediaList.financial_crime')}
+                          label={t('aml.screening.adverse-media.financial-crime')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.violent_crime')}
+                          label={t('aml.screening.adverse-media.violent-crime')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.sexual_crime')}
+                          label={t('aml.screening.adverse-media.sexual-crime')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.cyber_crime')}
+                          label={t('aml.screening.adverse-media.cyber-crime')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.terrorism')}
+                          label={t('aml.screening.adverse-media.terrorism')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.fraud')}
+                          label={t('aml.screening.adverse-media.fraud')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.narcotics')}
+                          label={t('aml.screening.adverse-media.narcotics')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.general_serious')}
+                          label={t('aml.screening.adverse-media.general-serious')}
+                        />
+                        <Checkbox
+                          {...register('aml.adverseMediaList.general_minor')}
+                          label={t('aml.screening.adverse-media.general-minor')}
+                        />
+                      </Stack>
+                    ) : null}
+                    <Divider variant="secondary" />
+                    <Stack direction="column">
+                      <SectionHeader marginBottom={5}>
+                        <IcoLayer0124 />
+                        {t('aml.matching-method.title')}
+                      </SectionHeader>
+                      <Stack direction="column" gap={4}>
+                        <Radio
+                          {...register('aml.matchingMethod.kind')}
+                          value="fuzzy"
+                          label={t('aml.matching-method.fuzzy.label')}
+                          hint={t('aml.matching-method.fuzzy.hint')}
+                        />
+                        {matchingMethod.kind === 'fuzzy' ? (
+                          <Stack direction="column" gap={4} marginLeft={7}>
+                            <Radio
+                              {...register('aml.matchingMethod.fuzzyLevel')}
+                              value="fuzzy_low"
+                              label={t('aml.matching-method.fuzzy-levels.low.label')}
+                              hint={t('aml.matching-method.fuzzy-levels.low.hint')}
+                            />
+                            <Radio
+                              {...register('aml.matchingMethod.fuzzyLevel')}
+                              value="fuzzy_medium"
+                              label={t('aml.matching-method.fuzzy-levels.medium.label')}
+                              hint={t('aml.matching-method.fuzzy-levels.medium.hint')}
+                            />
+                            <Radio
+                              {...register('aml.matchingMethod.fuzzyLevel')}
+                              value="fuzzy_high"
+                              label={t('aml.matching-method.fuzzy-levels.high.label')}
+                              hint={t('aml.matching-method.fuzzy-levels.high.hint')}
+                            />
+                          </Stack>
+                        ) : null}
+                        <Radio
+                          {...register('aml.matchingMethod.kind')}
+                          value="exact"
+                          label={t('aml.matching-method.exact.label')}
+                          hint={t('aml.matching-method.fuzzy.hint')}
+                        />
+                        {matchingMethod.kind === 'exact' ? (
+                          <Stack direction="column" gap={4} marginLeft={7}>
+                            <Radio
+                              {...register('aml.matchingMethod.exactLevel')}
+                              value="exact_name"
+                              label={t('aml.matching-method.exact-levels.name.label')}
+                            />
+                            <Radio
+                              {...register('aml.matchingMethod.exactLevel')}
+                              value="exact_name_and_dob_year"
+                              label={t('aml.matching-method.exact-levels.name-and-dob.label')}
+                            />
+                          </Stack>
+                        ) : null}
+                      </Stack>
+                    </Stack>
                     <Divider variant="secondary" />
                     <Text variant="body-3" color="tertiary">
                       <Text variant="body-3" color="primary" tag="span">
-                        {t('aml.footer.label')}{' '}
+                        {t('aml.screening.footer.label')}{' '}
                       </Text>
-                      {t('aml.footer.content')}
+                      {t('aml.screening.footer.content')}
                     </Text>
                   </>
                 )}
@@ -153,7 +293,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
             </Stack>
           </Section>
           <Section>
-            <SectionHeader>
+            <SectionHeader marginBottom={5}>
               <IcoBolt24 />
               {t('fraud-checks.title')}
             </SectionHeader>
@@ -213,14 +353,12 @@ const Section = styled.section`
   `};
 `;
 
-const SectionHeader = styled.header`
+const SectionHeader = styled(Stack)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
     color: ${theme.color.primary};
-    display: flex;
     align-items: center;
     gap: ${theme.spacing[2]};
-    margin-bottom: ${theme.spacing[5]};
   `};
 `;
 
