@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import type { ManageBosFormData, NewBusinessOwner } from '../manage-bos.types';
 import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, sumTotalOwnershipStake } from '../utils/manage-bos.utils';
 
-export type MutableBosFormProps = {
+export type BosFormProps = {
   existingBos: HostedBusinessOwner[];
   onSubmit: (formData: ManageBosFormData) => void;
   // If there is bootstrap data or existing BOs, we can use them to pre-populate the form.
@@ -17,7 +17,7 @@ export type MutableBosFormProps = {
 };
 
 /** Renders a form for editing the mutable beneficial owners of a business or adding new beneficial owners. */
-const MutableBosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: MutableBosFormProps) => {
+const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
 
@@ -262,4 +262,4 @@ const getEmptyBo = () => {
     ownershipStake: undefined,
   };
 };
-export default MutableBosForm;
+export default BosForm;

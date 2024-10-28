@@ -6,9 +6,9 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import { useBusinessOwners, useBusinessOwnersPatch } from '../../../../queries';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
-import ImmutableBosList from './components/immutable-bos-list';
+import BosForm from './components/bos-form';
+import BosList from './components/bos-list';
 import Loading from './components/loading';
-import MutableBosForm from './components/mutable-bos-form';
 import useConfirmMissingBoDialog from './hooks/use-confirm-missing-bo-dialog';
 import type { ManageBosFormData } from './manage-bos.types';
 import getDefaultFormValues from './utils/get-default-form-values';
@@ -88,8 +88,8 @@ const ManageBos = () => {
       <Stack direction="column" gap={5}>
         <CollectKybDataNavigationHeader />
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <ImmutableBosList immutableBos={immutableBos} onSubmit={handleBosListSubmit} />
-        <MutableBosForm
+        <BosList immutableBos={immutableBos} onSubmit={handleBosListSubmit} />
+        <BosForm
           existingBos={bosQuery.data}
           onSubmit={handleBosFormSubmit}
           defaultFormValues={getDefaultFormValues(bosQuery.data, bootstrapBusinessData, bootstrapUserData)}

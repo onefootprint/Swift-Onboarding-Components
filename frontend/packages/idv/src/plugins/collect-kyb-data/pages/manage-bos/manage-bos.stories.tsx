@@ -3,8 +3,8 @@ import { fn } from '@onefootprint/storybook-utils';
 import { IdDI } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import type { Meta, StoryFn } from '@storybook/react';
-import ImmutableBosList, { type ImmutableBosListProps } from './components/immutable-bos-list';
-import MutableBosForm, { type MutableBosFormProps } from './components/mutable-bos-form';
+import BosForm, { type BosFormProps } from './components/bos-form';
+import BosList, { type BosListProps } from './components/bos-list';
 import getDefaultFormValues from './utils/get-default-form-values';
 
 const DefaultHeader = () => {
@@ -22,16 +22,16 @@ const DefaultHeader = () => {
 };
 
 type BeneficialOwnersProps = {
-  listProps: ImmutableBosListProps;
-  formProps: MutableBosFormProps;
+  listProps: BosListProps;
+  formProps: BosFormProps;
 };
 
 const Template: StoryFn<BeneficialOwnersProps> = ({ listProps, formProps }) => {
   return (
     <>
       <DefaultHeader />
-      <ImmutableBosList {...listProps} />
-      <MutableBosForm {...formProps} />
+      <BosList {...listProps} />
+      <BosForm {...formProps} />
     </>
   );
 };
@@ -71,12 +71,12 @@ const mockBos: HostedBusinessOwner[] = [
 const immutableBos = mockBos.filter(bo => !bo.isMutable);
 
 export const Default: StoryFn<BeneficialOwnersProps> = () => {
-  const listProps: ImmutableBosListProps = {
+  const listProps: BosListProps = {
     immutableBos,
     onSubmit: console.log,
   };
 
-  const formProps: MutableBosFormProps = {
+  const formProps: BosFormProps = {
     existingBos: mockBos,
     onSubmit: console.log,
     defaultFormValues: getDefaultFormValues(mockBos, {}, {}),

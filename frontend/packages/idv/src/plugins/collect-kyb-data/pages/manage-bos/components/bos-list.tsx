@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-export type ImmutableBosListProps = {
+export type BosListProps = {
   immutableBos: HostedBusinessOwner[];
   onSubmit: (payload: { uuid: string; ownershipStake: number }) => void;
 };
@@ -19,7 +19,7 @@ type EditFormValues = {
 };
 
 /** Renders a list of immutable beneficial owners and allows editing only their ownership stake. */
-const ImmutableBosList = ({ immutableBos, onSubmit }: ImmutableBosListProps) => {
+const BosList = ({ immutableBos, onSubmit }: BosListProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.list' });
   const [editingBo, setEditingBo] = useState<HostedBusinessOwner | null>(null);
 
@@ -189,4 +189,4 @@ const List = styled.ul`
   `}
 `;
 
-export default ImmutableBosList;
+export default BosList;
