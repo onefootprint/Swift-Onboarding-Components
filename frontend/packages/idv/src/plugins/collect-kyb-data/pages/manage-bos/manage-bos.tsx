@@ -9,7 +9,7 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import BosForm from './components/bos-form';
 import BosList from './components/bos-list';
 import Loading from './components/loading';
-import type { NewBusinessOwner } from './manage-bos.types';
+import type { ManageBosFormData } from './manage-bos.types';
 
 const ManageBos = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.manage-bos' });
@@ -36,24 +36,22 @@ const ManageBos = () => {
     }
   };
 
-  const handleBosFormSubmit = async (formValues: NewBusinessOwner[]) => {
+  const handleBosFormSubmit = async ({ bos }: ManageBosFormData) => {
     if (!bosQuery.data || !authToken) throw new Error('Business owners data or authentication token is missing.');
     try {
       await bosMutation.mutateAsync({
         authToken,
         currentBos: bosQuery.data,
-        updateOrCreateOperations: formValues.map(
-          ({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
-            uuid,
-            data: {
-              [IdDI.firstName]: firstName,
-              [IdDI.lastName]: lastName,
-              [IdDI.email]: email,
-              [IdDI.phoneNumber]: phoneNumber,
-            },
-            ownershipStake,
-          }),
-        ),
+        updateOrCreateOperations: bos.map(({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
+          uuid,
+          data: {
+            [IdDI.firstName]: firstName,
+            [IdDI.lastName]: lastName,
+            [IdDI.email]: email,
+            [IdDI.phoneNumber]: phoneNumber,
+          },
+          ownershipStake,
+        })),
         deleteOperations: [],
       });
       send({ type: 'manageBosCompleted' });

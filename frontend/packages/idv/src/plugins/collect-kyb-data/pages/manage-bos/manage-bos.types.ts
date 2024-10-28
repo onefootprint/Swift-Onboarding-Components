@@ -6,3 +6,8 @@ export type NewBusinessOwner = {
   email: string;
   phoneNumber: string;
 };
+
+export type ManageBosFormData = {
+  bos: NewBusinessOwner[];
+  bosToDelete: string[];
+};

@@ -5,14 +5,12 @@ import type { HostedBusinessOwner } from '@onefootprint/services';
 import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type { NewBusinessOwner } from '../manage-bos.types';
+import type { ManageBosFormData } from '../manage-bos.types';
 import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, isOwnershipStakeInvalid } from '../utils/manage-bos.utils';
-
-type FormData = { bos: NewBusinessOwner[] };
 
 export type BosFormProps = {
   existingBos: HostedBusinessOwner[];
-  onSubmit: (bos: NewBusinessOwner[]) => void;
+  onSubmit: (data: ManageBosFormData) => void;
 };
 
 const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
@@ -23,20 +21,21 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({
+  } = useForm<ManageBosFormData>({
     defaultValues: {
       bos: [getEmptyBo()],
+      bosToDelete: [],
     },
   });
   const { append, fields, remove } = useFieldArray({ name: 'bos', control });
   const newBos = useWatch({ control, name: 'bos' });
-  const isStakeInvalid = isOwnershipStakeInvalid(existingBos, newBos);
+  const isStakeInvalid = isOwnershipStakeInvalid(existingBos, { bos: newBos, bosToDelete: [] });
 
   const handleAdd = () => {
     append(getEmptyBo());
   };
 
-  const onSubmitFormData = (formData: FormData) => {
+  const onSubmitFormData = (formData: ManageBosFormData) => {
     if (isStakeInvalid) {
       toast.show({
         title: t('errors.ownership-stake-total.title'),
@@ -46,7 +45,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
       return;
     }
 
-    if (hasDuplicatedEmail(existingBos, formData.bos)) {
+    if (hasDuplicatedEmail(existingBos, formData)) {
       toast.show({
         title: t('errors.duplicate-email.title'),
         description: t('errors.duplicate-email.description'),
@@ -55,7 +54,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
       return;
     }
 
-    if (hasDuplicatedPhoneNumber(existingBos, formData.bos)) {
+    if (hasDuplicatedPhoneNumber(existingBos, formData)) {
       toast.show({
         title: t('errors.duplicate-phone-number.title'),
         description: t('errors.duplicate-phone-number.description'),
@@ -64,7 +63,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
       return;
     }
 
-    onSubmit(formData.bos);
+    onSubmit(formData);
   };
 
   return (
