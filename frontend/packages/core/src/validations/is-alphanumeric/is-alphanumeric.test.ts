@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import isAlphanumeric from './is-alphanumeric';
 
 describe('isAlphanumeric', () => {

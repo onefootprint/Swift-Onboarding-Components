@@ -1,4 +1,7 @@
 FROM mcr.microsoft.com/playwright:v1.43.0-jammy
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 WORKDIR /e2e
 
@@ -55,6 +58,6 @@ ENV E2E_YIELDSTREET $E2E_YIELDSTREET
 
 COPY --link ./packages/e2e /e2e
 
-RUN yarn install --pure-lockfile --link-duplicates
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
 
 CMD npx playwright test --workers=8 -g "#ci"

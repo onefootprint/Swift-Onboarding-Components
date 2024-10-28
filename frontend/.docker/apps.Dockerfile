@@ -1,7 +1,7 @@
 FROM node:20-slim
-# ENV PNPM_HOME="/pnpm"
-# ENV PATH="$PNPM_HOME:$PATH"
-# RUN corepack enable
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 RUN apt-get update && apt-get install -y jq git
 
 WORKDIR /frontend
@@ -27,7 +27,8 @@ COPY --link ./apps/auth /frontend/apps/auth
 COPY --link ./apps/bifrost /frontend/apps/bifrost
 COPY --link ./packages /frontend/packages
 COPY --link package.json /frontend
-COPY --link yarn.lock /frontend
+COPY --link pnpm-lock.yaml /frontend
+COPY --link pnpm-workspace.yaml /frontend
 
 RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/demos/package.json
 RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/components/package.json
@@ -36,8 +37,8 @@ RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend
 RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/auth/package.json
 RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/bifrost/package.json
 
-RUN yarn install --pure-lockfile
-RUN yarn turbo run build --filter=bifrost... --filter=handoff... --filter=auth... --filter=components... --filter=demos... --filter=hosted...
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm turbo run build --filter=bifrost... --filter=handoff... --filter=auth... --filter=components... --filter=demos... --filter=hosted...
 
 EXPOSE 3000
 EXPOSE 3002
@@ -46,4 +47,4 @@ EXPOSE 3005
 EXPOSE 3010
 EXPOSE 3011
 
-CMD yarn turbo run start --filter=bifrost... --filter=handoff... --filter=auth... --filter=components... --filter=demos... --filter=hosted...
+CMD pnpm turbo run start --filter=bifrost... --filter=handoff... --filter=auth... --filter=components... --filter=demos... --filter=hosted...

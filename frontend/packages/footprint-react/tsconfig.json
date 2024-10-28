@@ -3,6 +3,6 @@
   "include": ["."],
   "exclude": ["dist", "build", "node_modules", "src/config/openapi-ts"],
   "compilerOptions": {
-    "types": ["bun-types", "google.maps"]
+    "types": ["bun-types"]
   }
 }

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import isURL, { isURLWithProtocol } from './is-url';
 
 describe('isURL', () => {

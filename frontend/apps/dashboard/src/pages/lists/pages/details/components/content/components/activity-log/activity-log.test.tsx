@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import ActivityLog from './activity-log';
 import { withListDetails, withListTimeline, withListTimelineError } from './activity-log.test.config';

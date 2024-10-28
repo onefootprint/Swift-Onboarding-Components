@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import SentilinkDetails from './sentilink-details';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));

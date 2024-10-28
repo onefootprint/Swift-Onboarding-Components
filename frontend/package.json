@@ -2,11 +2,8 @@
   "name": "footprint",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build:packages": "turbo run build --filter=./packages/*",
     "build:storybook": "turbo run build:storybook",
     "build": "turbo run build",
@@ -16,7 +13,7 @@
     "dev": "turbo run dev --parallel --concurrency 50 --continue",
     "lint:ci": "turbo run lint:ci",
     "lint": "turbo run lint",
-    "predev": "yarn install && yarn build:packages",
+    "predev": "pnpm install && pnpm build:packages",
     "preset:dot-env": "npx vercel login footprint",
     "pull:env": "npx vercel link -y --scope footprint && npx vercel env pull",
     "release": "changeset publish",
@@ -52,14 +49,11 @@
     }
   },
   "resolutions": {
-    "**/jimp/**/xml2js": "^0.6.0",
-    "**/face-api.js/@tensorflow/tfjs-core/node-fetch": "^2.6.7",
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0",
     "@types/react": "^18"
   },
   "engines": {
-    "npm": ">=7.0.0",
     "node": ">= 18.0.0"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "pnpm@8.15.9"
 }

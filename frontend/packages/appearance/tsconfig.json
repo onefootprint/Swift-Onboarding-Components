@@ -3,6 +3,6 @@
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
-    "types": ["bun-types", "google.maps", "jest"]
+    "types": ["bun-types", "jest", "google.maps"]
   }
 }

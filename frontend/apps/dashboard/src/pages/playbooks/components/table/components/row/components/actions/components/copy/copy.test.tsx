@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import { asAdminUser, asAdminUserRestrictedToSandbox } from 'src/config/tests';
 
 import type { CopyProps } from './copy';

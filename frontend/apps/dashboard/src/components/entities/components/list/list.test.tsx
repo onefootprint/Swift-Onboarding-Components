@@ -1,5 +1,6 @@
-import { customRender, filterEvents, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, filterEvents, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import { EntityKind } from '@onefootprint/types';
+import mockRouter from 'next-router-mock';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Table from '../table';

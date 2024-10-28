@@ -1,4 +1,5 @@
-import { customRenderHook, mockRouter } from '@onefootprint/test-utils';
+import { customRenderHook } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import useParseHandoffUrl from './use-parse-handoff-url';
 

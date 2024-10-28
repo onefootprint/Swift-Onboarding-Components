@@ -1,8 +1,11 @@
-import { expect, userEvent, within } from '@onefootprint/storybook-utils';
 import type { Meta, StoryObj } from '@storybook/react';
+import * as storybook from '@storybook/test';
+import { expect, within } from '@storybook/test';
 import { useState } from 'react';
 import Box from '../box';
 import SelectCustom from './select-custom';
+
+const userEvent = storybook.userEvent.setup({ delay: 100 });
 
 const meta: Meta<typeof SelectCustom.Root> = {
   title: 'Components/SelectCustom',

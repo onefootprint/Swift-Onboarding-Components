@@ -1,6 +1,8 @@
 import '../../config/initializers/i18next-test';
 
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { customRender } from '../../utils/test-utils';
 
 import noop from 'lodash/noop';
 import type { TabsProps } from './tabs';

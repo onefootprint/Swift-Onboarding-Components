@@ -1,7 +1,9 @@
 import '../../config/initializers/i18next-test';
 
 import { IcoAndroid16, IcoApple16 } from '@onefootprint/icons';
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { customRender } from '../../utils/test-utils';
 
 import type { RadioSelectProps } from './radio-select';
 import RadioSelect from './radio-select';

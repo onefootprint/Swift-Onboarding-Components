@@ -1,6 +1,7 @@
 import '../../../../config/initializers/i18next-test';
 
-import { customRender, mockRouter, screen, userEvent } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import type * as React from 'react';
 
 import { Layout } from '../../../layout';

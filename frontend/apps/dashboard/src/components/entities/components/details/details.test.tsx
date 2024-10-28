@@ -1,5 +1,6 @@
-import { customRender, mockRouter, screen, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor, within } from '@onefootprint/test-utils';
 import { BusinessDI, EntityKind } from '@onefootprint/types';
+import mockRouter from 'next-router-mock';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { HEADER_ACTIONS_ID } from '@/entity/constants';

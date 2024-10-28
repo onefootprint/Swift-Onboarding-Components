@@ -1,4 +1,4 @@
-import { type RiskSignal, RiskSignalSeverity } from '@onefootprint/types';
+import { type RiskSignal, RiskSignalSeverity } from './risk-signal';
 
 export type RiskSignalSeverityGrouping = {
   [RiskSignalSeverity.Low]: RiskSignal[];

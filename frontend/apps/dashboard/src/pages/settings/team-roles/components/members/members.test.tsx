@@ -1,7 +1,6 @@
 import {
   MockDate,
   customRender,
-  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -9,6 +8,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
+import mockRouter from 'next-router-mock';
 
 import Members from './members';
 import {

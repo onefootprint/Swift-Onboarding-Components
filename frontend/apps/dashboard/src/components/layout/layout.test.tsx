@@ -1,4 +1,5 @@
-import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
+import { customRender, screen } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { useStore } from '../../hooks/use-session';

@@ -1,6 +1,7 @@
 import '../../config/initializers/i18next-test';
 
-import { customRender, screen } from '@onefootprint/test-utils';
+import { screen } from '@testing-library/react';
+import { customRender } from '../../utils/test-utils';
 
 import type { AvatarProps } from './avatar';
 import Avatar from './avatar';

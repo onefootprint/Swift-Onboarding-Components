@@ -1,13 +1,13 @@
 {
   "extends": "tsconfig/nextjs.json",
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "./src/config/locales/**/*", "./src/@types/**/*"],
   "include": ["next-env.d.ts", "./src/**/*"],
   "files": [],
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "dist",
     "baseUrl": ".",
-    "types": ["google.maps", "jest", "../../styled.d.ts", "bun-types"],
+    "types": ["google.maps", "jest", "../../styled.d.ts"],
     "paths": {
       "src/*": ["./src/*"],
       "@/proxy-configs/*": ["src/pages/proxy-configs/*"],

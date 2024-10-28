@@ -18,13 +18,9 @@
   },
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "generate:styles": "node ./src/scripts/generate-styles.js",
-    "generate:tokens": "node ./src/scripts/generate-tokens.js",
-    "generate": "yarn generate:tokens && yarn generate:styles",
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe",
-    "postgenerate": "yarn lint",
-    "typecheck": "yarn tsc --noEmit"
+    "typecheck": "pnpm tsc --noEmit"
   },
   "devDependencies": {
     "csstype": "^3.1.2",

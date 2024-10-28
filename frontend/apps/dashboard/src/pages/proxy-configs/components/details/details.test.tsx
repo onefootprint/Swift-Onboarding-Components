@@ -1,12 +1,5 @@
-import {
-  createFileSaverSpy,
-  customRender,
-  mockRouter,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createFileSaverSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 
 import Details from './details';
 import { proxyConfigDetailsFixture, withProxyConfigDetails, withProxyConfigDetailsError } from './details.test.config';

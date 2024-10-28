@@ -1,6 +1,8 @@
 import '../../config/initializers/i18next-test';
 
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { customRender } from '../../utils/test-utils';
 
 import type { PinInputProps } from './pin-input';
 import PinInput from './pin-input';

@@ -1,6 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/react';
 import { uniqueId } from 'lodash';
-import Image from 'next/image';
 import { useState } from 'react';
 import Button from '../button';
 import Stack from '../stack';
@@ -153,9 +152,7 @@ FullScreenNoScrollNoPadding.args = {
   size: 'full-screen',
   noPadding: true,
   noScroll: true,
-  children: (
-    <Image src="https://picsum.photos/seed/picsum/200/300" alt="Random image" layout="fill" objectFit="cover" />
-  ),
+  children: <img src="https://picsum.photos/seed/picsum/200/300" aria-label="Random image" />,
 };
 
 export const OverflowingContent = Template.bind({});

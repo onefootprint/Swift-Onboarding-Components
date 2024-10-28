@@ -1,9 +1,10 @@
 import themes from '@onefootprint/design-tokens';
-import { mockRouter, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import { render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import mockRouter from 'next-router-mock';
 import React from 'react';
 import { Layout } from 'src/components/layout';
 

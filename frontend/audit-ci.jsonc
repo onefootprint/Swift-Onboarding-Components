@@ -3,6 +3,6 @@
   "moderate": false,
   "high": true,
   "report-type": "summary",
-  "package-manager": "yarn",
+  "package-manager": "pnpm",
   "allowlist": []
 }

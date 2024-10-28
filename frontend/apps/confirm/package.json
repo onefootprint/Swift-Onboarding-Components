@@ -3,28 +3,28 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build:analyze": "ANALYZE=true yarn build",
+    "build:analyze": "ANALYZE=true pnpm build",
     "build": "next build",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev": "yarn i18n:copy-watch & next dev -p 3006",
+    "dev": "pnpm i18n:copy-watch & next dev -p 3006",
     "i18n:clean": "rm -rf ./public/locales/",
     "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
     "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -lng en -dep ui,request",
-    "i18n:copy": "yarn i18n:copy-en",
+    "i18n:copy": "pnpm i18n:copy-en",
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3006",
-    "typecheck": "yarn tsc --noEmit"
+    "typecheck": "pnpm tsc --noEmit"
   },
   "dependencies": {
-    "@onefootprint/design-tokens": "*",
-    "@onefootprint/global-constants": "*",
-    "@onefootprint/hooks": "*",
-    "@onefootprint/icons": "*",
-    "@onefootprint/request": "*",
-    "@onefootprint/types": "*",
-    "@onefootprint/ui": "*",
+    "@onefootprint/design-tokens": "workspace:*",
+    "@onefootprint/global-constants": "workspace:*",
+    "@onefootprint/hooks": "workspace:*",
+    "@onefootprint/icons": "workspace:*",
+    "@onefootprint/request": "workspace:*",
+    "@onefootprint/types": "workspace:*",
+    "@onefootprint/ui": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
     "axios": "^1.7.4",
     "axios-case-converter": "^1.1.0",
@@ -37,12 +37,14 @@
     "styled-components": "^6"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.55.11",
     "@types/lodash": "^4.14.194",
     "@types/node": "^20",
     "@types/react-dom": "^18",
+    "@types/react": "^18",
     "copy-and-watch": "^0.1.6",
     "i18next-locales-sync": "^2.1.0",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "typescript": "^5.5.2"
   }
 }
