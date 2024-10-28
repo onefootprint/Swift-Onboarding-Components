@@ -256,7 +256,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                           {...register('aml.matchingMethod.kind')}
                           value="exact"
                           label={t('aml.matching-method.exact.label')}
-                          hint={t('aml.matching-method.fuzzy.hint')}
+                          hint={t('aml.matching-method.exact.hint')}
                         />
                         {matchingMethod.kind === 'exact' ? (
                           <Stack direction="column" gap={4} marginLeft={7}>
