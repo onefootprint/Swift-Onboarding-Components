@@ -1,7 +1,10 @@
+import type { AccessEvent } from '@onefootprint/types';
 import { SearchInput, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
+import useGetAccessEvents from 'src/hooks/use-get-access-events';
 import useSession from 'src/hooks/use-session';
+import Timeline from './components/timeline';
 
 const SecurityLogsPrivate = () => {
   const { t } = useTranslation('security-logs');
@@ -12,6 +15,11 @@ const SecurityLogsPrivate = () => {
   if (!user?.isFirmEmployee) {
     return <div>Private page</div>;
   }
+
+  const getAccessEvents = useGetAccessEvents();
+  const accessEvents: AccessEvent[] =
+    getAccessEvents.data?.pages.reduce<AccessEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
+    [];
 
   return (
     <>
@@ -28,6 +36,7 @@ const SecurityLogsPrivate = () => {
         size="compact"
         placeholder={t('filters.search')}
       />
+      <Timeline accessEvents={accessEvents} />
     </>
   );
 };
