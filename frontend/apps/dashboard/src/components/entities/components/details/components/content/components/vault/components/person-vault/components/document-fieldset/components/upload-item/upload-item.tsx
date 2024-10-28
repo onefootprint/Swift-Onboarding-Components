@@ -8,6 +8,7 @@ import useDocumentsFilters from '../../hooks/use-documents-filters';
 import useUploadField from '../../hooks/use-upload-field';
 import type { UploadWithDocument } from '../../types';
 import ItemLabel from '../item-label';
+import UploadDetails from '../upload-details';
 
 export type UploadItemProps = {
   entity: Entity;
@@ -16,15 +17,15 @@ export type UploadItemProps = {
   onDecrypt: (documentKind: SupportedIdDocTypes) => void;
 };
 
-const UploadItem = ({ entity, upload, vault }: UploadItemProps) => {
+const UploadItem = ({ entity, upload, vault, onDecrypt }: UploadItemProps) => {
   const { t } = useTranslation('entity-details');
   const { register } = useFormContext();
   const field = useUploadField(entity, vault)(upload);
-  const filters = useDocumentsFilters();
-
   const { timestamp, identifier, document, documentId } = upload;
   const getDocText = useIdDocText();
   const title = document.kind === SupportedIdDocTypes.custom ? identifier : getDocText(document.kind);
+  const filters = useDocumentsFilters();
+  const open = filters.query.document_id === documentId;
 
   const handleClick = () => {
     filters.push({ document_id: documentId });
@@ -54,6 +55,16 @@ const UploadItem = ({ entity, upload, vault }: UploadItemProps) => {
           </Stack>
         )}
       </Stack>
+      {open && (
+        <UploadDetails
+          isDecryptable={field.isDecryptable}
+          open={open}
+          title={title}
+          upload={upload}
+          vault={vault}
+          onDecrypt={onDecrypt}
+        />
+      )}
     </>
   );
 };
