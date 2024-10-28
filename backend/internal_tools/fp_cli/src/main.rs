@@ -1,4 +1,3 @@
-use anyhow::bail;
 use backfill::BackfillArgs;
 use clap::Args;
 use clap::Parser;
@@ -7,14 +6,15 @@ use clap::ValueEnum;
 use crypto::base64;
 use crypto::hex;
 use crypto::zeroize::Zeroize;
+use export::ExportArgs;
 use kyc::KycArgs;
 use newtypes::export_reason_codes;
 use newtypes::PiiString;
 use newtypes::VaultPublicKey;
 mod backfill;
+mod export;
 mod kyc;
 mod util;
-// mod export_entity_results;
 
 #[derive(Parser)]
 #[command(name = "Footprint Utility")]
@@ -35,16 +35,7 @@ enum Commands {
     /// Export footprint's reason codes in a friendly format
     ExportFootprintReasonCode,
     /// Fetch users and export there results (no pii)
-    ExportEntityResults {
-        /// api key to use
-        #[arg(long)]
-        api_key: String,
-        /// page size
-        #[arg(short, long, default_value = "64")]
-        page_size: usize,
-        #[arg(long)]
-        out_file: Option<std::path::PathBuf>,
-    },
+    ExportEntities(ExportArgs),
     /// Backfill vault data for a customer
     Backfill(BackfillArgs),
     /// KYC
@@ -126,25 +117,9 @@ async fn main() -> anyhow::Result<()> {
             export_reason_codes();
             "export complete!".into()
         }
-        Commands::ExportEntityResults { .. } => {
-            bail!("not currently supported");
-            // let rows = export_entity_results::run(api_key, page_size).await?;
-            // if let Some(out_file) = out_file {
-            //     let mut writer = csv::Writer::from_path(&out_file)?;
-            //     for row in rows {
-            //         writer.serialize(row)?;
-            //     }
-            //     writer.flush()?;
-            //     format!("wrote results to {}\n", out_file.to_string_lossy())
-            // } else {
-            //     let mut writer = csv::WriterBuilder::new().from_writer(vec![]);
-            //     for row in rows {
-            //         writer.serialize(row)?;
-            //     }
-            //     writer.flush()?;
-
-            //     String::from_utf8(writer.into_inner()?)?
-            // }
+        Commands::ExportEntities(args) => {
+            export::export_entities(args).await?;
+            "export complete!".into()
         }
         Commands::Backfill(args) => {
             backfill::backfill(args).await?;

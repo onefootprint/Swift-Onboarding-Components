@@ -6,7 +6,7 @@ use newtypes::SignalScope;
 use newtypes::SignalSeverity;
 
 /// RiskSignal information, including severity, impacted scopes, and more.
-#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]
 pub struct RiskSignal {
     pub id: RiskSignalId,
     pub onboarding_decision_id: Option<OnboardingDecisionId>, // TODO: remove this ??

@@ -34,6 +34,13 @@ impl OutputFile {
         self.tx.send(line.to_string())?;
         Ok(())
     }
+
+    pub fn write_all<S: ToString>(&self, lines: Vec<S>) -> anyhow::Result<()> {
+        for line in lines {
+            self.write(line)?;
+        }
+        Ok(())
+    }
 }
 
 pub async fn output_file(file: Option<String>) -> anyhow::Result<OutputFile> {
