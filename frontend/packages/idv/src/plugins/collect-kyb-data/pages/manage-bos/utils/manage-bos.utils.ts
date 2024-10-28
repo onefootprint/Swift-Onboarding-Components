@@ -11,15 +11,15 @@ const overlayUpdates = (existingOwners: HostedBusinessOwner[], { bos, bosToDelet
   return allOwnersByUuid;
 };
 
-export const isOwnershipStakeInvalid = (
+export const sumTotalOwnershipStake = (
   existingOwners: HostedBusinessOwner[],
   { bos, bosToDelete }: ManageBosFormData,
-): boolean => {
+): number => {
   const allOwnersByUuid = overlayUpdates(existingOwners, { bos, bosToDelete });
   const totalStake = Object.values(allOwnersByUuid)
     .map(bo => bo.ownershipStake ?? 0)
     .reduce((sum, stake) => sum + stake, 0);
-  return totalStake > 100;
+  return totalStake;
 };
 
 // TODO it's fine to have duplicates in sandbox

@@ -1,16 +1,16 @@
 import type { Meta, StoryFn } from '@storybook/react';
-import NoOtherBosDialog from './no-other-bos';
+import ConfirmMissingBoDialog from './confirm-missing-bo-dialog';
 
 const Template: StoryFn = () => {
   const onClose = () => console.log('onClose');
   const onSubmit = () => console.log('onSubmit');
 
-  return <NoOtherBosDialog isOpen={true} onClose={onClose} onSubmit={onSubmit} />;
+  return <ConfirmMissingBoDialog isOpen={true} onClose={onClose} onSubmit={onSubmit} />;
 };
 
 export default {
-  component: NoOtherBosDialog,
+  component: ConfirmMissingBoDialog,
   title: 'NoOtherBosDialog',
-} satisfies Meta<typeof NoOtherBosDialog>;
+} satisfies Meta<typeof ConfirmMissingBoDialog>;
 
 export const Default: StoryFn = () => <Template />;

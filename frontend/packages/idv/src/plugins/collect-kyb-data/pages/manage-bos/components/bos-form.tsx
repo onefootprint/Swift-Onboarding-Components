@@ -6,7 +6,7 @@ import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } 
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { ManageBosFormData } from '../manage-bos.types';
-import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, isOwnershipStakeInvalid } from '../utils/manage-bos.utils';
+import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, sumTotalOwnershipStake } from '../utils/manage-bos.utils';
 
 export type BosFormProps = {
   existingBos: HostedBusinessOwner[];
@@ -29,7 +29,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
   });
   const { append, fields, remove } = useFieldArray({ name: 'bos', control });
   const newBos = useWatch({ control, name: 'bos' });
-  const isStakeInvalid = isOwnershipStakeInvalid(existingBos, { bos: newBos, bosToDelete: [] });
+  const isStakeInvalid = sumTotalOwnershipStake(existingBos, { bos: newBos, bosToDelete: [] }) > 100;
 
   const handleAdd = () => {
     append(getEmptyBo());

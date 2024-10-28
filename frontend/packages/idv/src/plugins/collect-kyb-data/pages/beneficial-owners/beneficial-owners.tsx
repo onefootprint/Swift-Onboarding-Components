@@ -1,7 +1,7 @@
 import type { BeneficialOwner } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cloneDeep } from 'lodash';
@@ -11,8 +11,8 @@ import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-na
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { omitNullAndUndefined } from '../../utils/utils';
+import useConfirmMissingBoDialog from '../manage-bos/hooks/use-confirm-missing-bo-dialog';
 import BeneficialOwnersForm from './components/form';
-import NoOtherBosDialog from './components/no-other-bos';
 import useCheckDuplicateContacts from './hooks/check-duplicate-contacts';
 import { getTotalOwnershipStake } from './utils';
 
@@ -27,7 +27,7 @@ type BeneficialOwnersProps = {
 const MISSING_BOS_CONFIRMATION_THRESHOLD = 76;
 
 const OnlyValidateDataWithoutSaving = true;
-const { logError, logWarn } = getLogger({ location: 'kyb-beneficial-owners' });
+const { logError } = getLogger({ location: 'kyb-beneficial-owners' });
 
 const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
@@ -42,21 +42,21 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
-  const [isNoOtherBosDialogOpen, setIsNoOtherBosDialogOpen] = useState(false);
-  const [showedMissingBosDialog, setShowedMissingBosDialog] = useState(false);
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners' });
+  const { showConfirmationModal, ConfirmMissingBoDialog } = useConfirmMissingBoDialog({ authToken });
+
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
   const canEdit = !vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
 
-  const handleNoOtherBosDialogClose = () => setIsNoOtherBosDialogOpen(false);
-
-  const handleSubmit = (beneficialOwnersRaw: BeneficialOwner[]) => {
+  const handleSubmit = async (beneficialOwnersRaw: BeneficialOwner[]) => {
     const beneficialOwners = beneficialOwnersRaw.map(omitNullAndUndefined);
     const totalOwnershipStake = getTotalOwnershipStake(beneficialOwners);
 
-    if (totalOwnershipStake < MISSING_BOS_CONFIRMATION_THRESHOLD && !showedMissingBosDialog) {
-      setIsNoOtherBosDialogOpen(true);
-      return;
+    if (totalOwnershipStake < MISSING_BOS_CONFIRMATION_THRESHOLD) {
+      const shouldContinue = await showConfirmationModal();
+      if (!shouldContinue) {
+        return;
+      }
     }
 
     if (config?.isLive) {
@@ -95,36 +95,6 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     });
   };
 
-  const handleStakeExplanationDialogConfirm = (note: string) => {
-    if (!authToken || mutation.isPending) return;
-    const onComplete = () => {
-      setIsNoOtherBosDialogOpen(false);
-      setShowedMissingBosDialog(true);
-      window.setTimeout(() => {
-        submitButtonRef.current?.click();
-      }, 200);
-    };
-
-    if (!note) {
-      onComplete();
-      return;
-    }
-
-    mutation.mutate(
-      {
-        authToken,
-        data: { [BusinessDI.beneficialOwnerExplanationMessage]: note },
-      },
-      {
-        onError: (error: unknown) => {
-          logWarn('Error sending business stake explanation message', error);
-        },
-        /** Don't block if we fail to save the note */
-        onSettled: onComplete,
-      },
-    );
-  };
-
   const defaultData = requireMultiKyc ? data?.[BusinessDI.kycedBeneficialOwners] : data?.[BusinessDI.beneficialOwners];
   const defaultValues = cloneDeep(defaultData) ?? [
     {
@@ -157,12 +127,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
         requireMultiKyc={requireMultiKyc}
         canEdit={canEdit}
       />
-      <NoOtherBosDialog
-        isOpen={isNoOtherBosDialogOpen}
-        isLoading={mutation.isPending}
-        onClose={handleNoOtherBosDialogClose}
-        onSubmit={handleStakeExplanationDialogConfirm}
-      />
+      <ConfirmMissingBoDialog />
     </Stack>
   );
 };

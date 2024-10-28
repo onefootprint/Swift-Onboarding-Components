@@ -3,14 +3,14 @@ import noop from 'lodash/noop';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-type NoOtherBosProps = {
+type ConfirmMissingBoDialogProps = {
   isLoading?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (note: string) => void;
 };
 
-const NoOtherBosDialog = ({ isLoading, isOpen, onClose, onSubmit }: NoOtherBosProps) => {
+const ConfirmMissingBoDialog = ({ isLoading, isOpen, onClose, onSubmit }: ConfirmMissingBoDialogProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const methods = useForm<{ note: string }>({ defaultValues: { note: '' } });
   const {
@@ -69,4 +69,4 @@ const NoOtherBosDialog = ({ isLoading, isOpen, onClose, onSubmit }: NoOtherBosPr
   );
 };
 
-export default NoOtherBosDialog;
+export default ConfirmMissingBoDialog;

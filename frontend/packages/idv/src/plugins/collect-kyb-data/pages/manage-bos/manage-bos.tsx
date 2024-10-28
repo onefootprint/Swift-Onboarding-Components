@@ -9,7 +9,11 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import BosForm from './components/bos-form';
 import BosList from './components/bos-list';
 import Loading from './components/loading';
+import useConfirmMissingBoDialog from './hooks/use-confirm-missing-bo-dialog';
 import type { ManageBosFormData } from './manage-bos.types';
+import { sumTotalOwnershipStake } from './utils/manage-bos.utils';
+
+const MISSING_BOS_CONFIRMATION_THRESHOLD = 76;
 
 const ManageBos = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.manage-bos' });
@@ -20,6 +24,7 @@ const ManageBos = () => {
   const bosQuery = useBusinessOwners({ authToken });
   const bosMutation = useBusinessOwnersPatch();
   const showRequestErrorToast = useRequestErrorToast();
+  const { showConfirmationModal, ConfirmMissingBoDialog } = useConfirmMissingBoDialog({ authToken });
 
   const handleBosListSubmit = async ({ uuid, ownershipStake }: { uuid: string; ownershipStake: number }) => {
     if (!bosQuery.data || !authToken) throw new Error('Business owners data or authentication token is missing.');
@@ -36,7 +41,15 @@ const ManageBos = () => {
     }
   };
 
-  const handleBosFormSubmit = async ({ bos }: ManageBosFormData) => {
+  const handleBosFormSubmit = async ({ bos, bosToDelete }: ManageBosFormData) => {
+    const totalOwnershipStake = sumTotalOwnershipStake(bosQuery.data ?? [], { bos, bosToDelete });
+    if (totalOwnershipStake < MISSING_BOS_CONFIRMATION_THRESHOLD) {
+      const shouldContinue = await showConfirmationModal();
+      if (!shouldContinue) {
+        return;
+      }
+    }
+
     if (!bosQuery.data || !authToken) throw new Error('Business owners data or authentication token is missing.');
     try {
       await bosMutation.mutateAsync({
@@ -71,6 +84,7 @@ const ManageBos = () => {
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <BosList existingBos={bosQuery.data} onSubmit={handleBosListSubmit} />
         <BosForm existingBos={bosQuery.data} onSubmit={handleBosFormSubmit} />
+        <ConfirmMissingBoDialog />
       </Stack>
     );
   }
