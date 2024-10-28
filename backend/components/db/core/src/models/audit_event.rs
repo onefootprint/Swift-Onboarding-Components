@@ -142,8 +142,8 @@ pub struct FilterQueryParams {
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub names: Vec<AuditEventName>,
     pub targets: Vec<DataIdentifier>,
-    pub is_live: Option<bool>,
     pub list_id: Option<ListId>,
+    pub is_live: Option<bool>,
 }
 
 #[derive(Debug)]

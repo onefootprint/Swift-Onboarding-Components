@@ -7,6 +7,7 @@ use newtypes::FpId;
 use newtypes::ListEntryCreationId;
 use newtypes::ListEntryId;
 use newtypes::ListId;
+use newtypes::OrgMemberEmail;
 use newtypes::TenantId;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
@@ -70,7 +71,12 @@ pub enum AuditEventDetail {
     CreateOrgApiKey,
     DecryptOrgApiKey,
     UpdateOrgApiKey,
-    InviteOrgMember,
+    InviteOrgMember {
+        email: OrgMemberEmail,
+        first_name: Option<String>,
+        last_name: Option<String>,
+        tenant_role_id: TenantRoleId,
+    },
     UpdateOrgMember,
     LoginOrgMember,
     RemoveOrgMember,

@@ -78,7 +78,18 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             AuditEventMetadata::CreateOrgApiKey => AuditEventDetail::CreateOrgApiKey,
             AuditEventMetadata::DecryptOrgApiKey => AuditEventDetail::DecryptOrgApiKey,
             AuditEventMetadata::UpdateOrgApiKey => AuditEventDetail::UpdateOrgApiKey,
-            AuditEventMetadata::InviteOrgMember => AuditEventDetail::InviteOrgMember,
+            AuditEventMetadata::InviteOrgMember {
+                email,
+                first_name,
+                last_name,
+            } => AuditEventDetail::InviteOrgMember {
+                email,
+                first_name,
+                last_name,
+                tenant_role_id: tenant_role
+                    .ok_or(AssertionError("tenant role is not available for this event"))?
+                    .id,
+            },
             AuditEventMetadata::UpdateOrgMember => AuditEventDetail::UpdateOrgMember,
             AuditEventMetadata::LoginOrgMember => AuditEventDetail::LoginOrgMember,
             AuditEventMetadata::RemoveOrgMember => AuditEventDetail::RemoveOrgMember,

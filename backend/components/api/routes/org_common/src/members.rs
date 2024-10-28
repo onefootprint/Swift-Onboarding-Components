@@ -14,10 +14,15 @@ use api_core::State;
 use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
 use db::helpers::TenantOrPartnerTenantRef;
+use db::models::audit_event::AuditEvent;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_rolebinding::TenantRolebindingFilters;
 use db::models::tenant_rolebinding::TenantRolebindingUpdate;
 use db::models::tenant_user::TenantUser;
+use newtypes::AuditEventDetail;
+use newtypes::OrgIdentifier;
 use newtypes::OrgIdentifierRef;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantUserId;
@@ -68,7 +73,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
@@ -94,8 +99,31 @@ pub async fn post(
     let (inviter, user, rb, role) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let inviter = TenantUser::get(conn, &user_id)?;
-            let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
+            let user = TenantUser::get_and_update_or_create(
+                conn,
+                email2.clone(),
+                first_name.clone(),
+                last_name.clone(),
+            )?;
             let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, &authed_org_ident)?;
+
+            if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident {
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                let detail = AuditEventDetail::InviteOrgMember {
+                    email: email2,
+                    first_name,
+                    last_name,
+                    tenant_role_id: role.id.clone(),
+                };
+                let audit_event = NewAuditEvent {
+                    principal_actor: actor.into(),
+                    insight_event_id,
+                    tenant_id,
+                    detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
+
             Ok((inviter, user, rb, role))
         })
         .await?;

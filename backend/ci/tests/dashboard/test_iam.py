@@ -9,7 +9,7 @@ from tests.utils import (
     patch,
     _gen_random_n_digit_number,
 )
-from tests.dashboard.utils import latest_audit_event_by_role
+from tests.dashboard.utils import has_audit_event_with_details
 
 
 @pytest.fixture(scope="session")
@@ -481,11 +481,32 @@ def test_partner_tenant_scopes(run_id, sandbox_tenant, admin_role):
     post("org/roles", role_data, *sandbox_tenant.db_auths, status_code=400)
 
 
-def test_audit_event(sandbox_tenant, limited_role):
-    # Check that an audit event is created when a role is created
-    latest_audit_event_by_role(
+def test_role_creation_audit_event(sandbox_tenant, limited_role):
+    has_audit_event_with_details(
         tenant=sandbox_tenant,
         name="create_org_role",
         tenant_role_id=limited_role["id"],
         scopes=limited_role["scopes"],
+    )
+
+
+def test_member_invitation_audit_event(run_id, sandbox_tenant, admin_role):
+    email = f"test.{run_id}@gmail.com"
+    first_name = "Pip"
+    last_name = "The Warrior"
+    create_tenant_user(
+        sandbox_tenant,
+        admin_role,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+    )
+    has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="invite_org_member",
+        tenant_role_id=admin_role["id"],
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        # don't check for scopes because object comparison
     )

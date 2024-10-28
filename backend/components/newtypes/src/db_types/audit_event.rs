@@ -6,6 +6,7 @@ use crate::ListEntryCreationId;
 use crate::ListEntryId;
 use crate::ListId;
 use crate::ObConfigurationId;
+use crate::OrgMemberEmail;
 use crate::ScopedVaultId;
 use crate::TenantApiKeyId;
 use crate::TenantRoleId;
@@ -65,7 +66,12 @@ pub enum AuditEventDetail {
     CreateOrgAPIKey,
     DecryptOrgAPIKey,
     UpdateOrgAPIKey,
-    InviteOrgMember,
+    InviteOrgMember {
+        email: OrgMemberEmail,
+        first_name: Option<String>,
+        last_name: Option<String>,
+        tenant_role_id: TenantRoleId,
+    },
     UpdateOrgMember,
     LoginOrgMember,
     RemoveOrgMember,
@@ -250,7 +256,28 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
             AuditEventDetail::CreateOrgAPIKey => todo!(),
             AuditEventDetail::DecryptOrgAPIKey => todo!(),
             AuditEventDetail::UpdateOrgAPIKey => todo!(),
-            AuditEventDetail::InviteOrgMember => todo!(),
+            AuditEventDetail::InviteOrgMember {
+                email,
+                tenant_role_id,
+                first_name,
+                last_name,
+            } => Self {
+                metadata: AuditEventMetadata::InviteOrgMember {
+                    email,
+                    first_name,
+                    last_name,
+                },
+                scoped_vault_id: None,
+                ob_configuration_id: None,
+                document_data_id: None,
+                tenant_api_key_id: None,
+                tenant_user_id: None,
+                tenant_role_id: Some(tenant_role_id),
+                is_live: None,
+                list_entry_creation_id: None,
+                list_entry_id: None,
+                list_id: None,
+            },
             AuditEventDetail::UpdateOrgMember => todo!(),
             AuditEventDetail::LoginOrgMember => todo!(),
             AuditEventDetail::RemoveOrgMember => todo!(),
@@ -343,7 +370,11 @@ pub enum AuditEventMetadata {
     CreateOrgApiKey,
     DecryptOrgApiKey,
     UpdateOrgApiKey,
-    InviteOrgMember,
+    InviteOrgMember {
+        email: OrgMemberEmail,
+        first_name: Option<String>,
+        last_name: Option<String>,
+    },
     UpdateOrgMember,
     LoginOrgMember,
     RemoveOrgMember,
