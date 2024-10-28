@@ -59,7 +59,7 @@ async fn timeline(
         cursor: cursor.map(|c| (c.timestamp, c.id.clone())),
         tenant_id: tenant_id.clone(),
         names: LIST_AUDIT_EVENT_NAMES.to_vec(),
-        is_live,
+        is_live: Some(is_live),
         list_id: Some(list_id.clone()),
         ..Default::default()
     };

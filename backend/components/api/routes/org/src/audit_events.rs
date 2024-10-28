@@ -57,7 +57,7 @@ async fn get(
         timestamp_gte,
         names: names.map(Vec::<AuditEventName>::from).unwrap_or_default(),
         targets: targets.map(Vec::<DataIdentifier>::from).unwrap_or_default(),
-        is_live: auth.is_live()?,
+        is_live: Some(auth.is_live()?),
         list_id,
     };
 
