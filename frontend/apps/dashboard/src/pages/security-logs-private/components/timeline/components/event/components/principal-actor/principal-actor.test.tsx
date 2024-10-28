@@ -4,7 +4,7 @@ import { principalWithNameFixture, principalWithoutNameFixture } from './princip
 
 describe('<PrincipalActor />', () => {
   it('displays the principal name when available', () => {
-    customRender(<PrincipalActor principal={principalWithNameFixture} />);
+    customRender(<PrincipalActor principal={principalWithNameFixture} insightEvent={undefined} />);
 
     const linkButton = screen.getByRole('link', { name: 'John Doe' });
     expect(linkButton).toBeInTheDocument();
@@ -12,7 +12,7 @@ describe('<PrincipalActor />', () => {
   });
 
   it('displays "A user" when principal name is not available', () => {
-    customRender(<PrincipalActor principal={principalWithoutNameFixture} />);
+    customRender(<PrincipalActor principal={principalWithoutNameFixture} insightEvent={undefined} />);
 
     const linkButton = screen.getByRole('link', { name: 'A user' });
     expect(linkButton).toBeInTheDocument();

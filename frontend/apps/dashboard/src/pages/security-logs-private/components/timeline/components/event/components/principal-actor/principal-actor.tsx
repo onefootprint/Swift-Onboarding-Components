@@ -2,20 +2,21 @@ import type { AccessEvent } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import InsightEvent from './components/insight-event';
+import InsightEventDisplay from './components/insight-event-display';
 
 type PrincipalActorProps = {
   principal: AccessEvent['principal'];
+  insightEvent: AccessEvent['insightEvent'];
 };
 
-const PrincipalActor = ({ principal }: PrincipalActorProps) => {
+const PrincipalActor = ({ principal, insightEvent }: PrincipalActorProps) => {
   const { t } = useTranslation('security-logs');
 
   return (
     <Container>
       <LinkButton href={`/users/${principal.id}`}>{principal.name ?? t('principal-actor.a-user')}</LinkButton>
       <InsightEventWrapper>
-        <InsightEvent />
+        <InsightEventDisplay insightEvent={insightEvent} />
       </InsightEventWrapper>
     </Container>
   );

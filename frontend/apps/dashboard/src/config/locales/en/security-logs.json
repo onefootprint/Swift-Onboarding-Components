@@ -38,7 +38,16 @@
   "principal-actor": {
     "a-user": "A user",
     "insight-event": {
-      "aria-label": "Insight event card"
+      "aria-label": "Insight event card",
+      "title": "User insights",
+      "labels": {
+        "timestamp": "Timestamp",
+        "region": "Region",
+        "country": "Country",
+        "postal-code": "Zip code",
+        "ip-address": "IP address",
+        "user-agent": "Device/OS"
+      }
     }
   },
   "body": {

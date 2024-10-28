@@ -3,11 +3,11 @@ import DateTime from './components/date-time';
 import PrincipalActor from './components/principal-actor';
 
 const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
-  const { principal, timestamp } = accessEvent;
+  const { principal, timestamp, insightEvent } = accessEvent;
   return (
     <div>
       <DateTime timestamp={timestamp} />
-      <PrincipalActor principal={principal} />
+      <PrincipalActor principal={principal} insightEvent={insightEvent} />
     </div>
   );
 };
