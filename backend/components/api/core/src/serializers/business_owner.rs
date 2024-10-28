@@ -63,6 +63,7 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wir
             populated_data,
             decrypted_data,
             ownership_stake: bo.ownership_stake.map(|s| s as u32),
+            created_at: bo.created_at,
         }
     }
 }

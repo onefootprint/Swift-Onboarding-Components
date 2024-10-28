@@ -689,7 +689,8 @@
             "remove": "Remove"
           },
           "fields": {
-            "primary-bo-name-hint": "Spell your first, middle and last names exactly as shown on your government-issued ID",
+            "primary-bo-name-hint": "Spell your first, middle, and last names exactly as shown on your government-issued ID",
+            "primary-bo-name-hint-new": "Spell your first and last names exactly as shown on your government-issued ID",
             "primary-bo-name-hint-readonly": "Can not change already saved beneficial owners data",
             "first-name": {
               "label": "First name",
@@ -789,7 +790,7 @@
         "beneficial-owners": {
           "title": "Beneficial owners",
           "beneficial-owner-you": "Beneficial owner (You)",
-          "beneficial-owner-other": "Beneficial owner (Other)",
+          "beneficial-owner": "Beneficial owner",
           "first-name": "First name",
           "middle-name": "Middle name",
           "last-name": "Last name",

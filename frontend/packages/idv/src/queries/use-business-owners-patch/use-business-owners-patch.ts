@@ -13,7 +13,7 @@ export type BusinessOwnerData = {
   [IdDI.phoneNumber]: string;
 };
 
-type UpdateOrCreateBoOperation = { uuid: string; data: Partial<BusinessOwnerData>; ownershipStake: number };
+type UpdateOrCreateBoOperation = { uuid: string; data: Partial<BusinessOwnerData>; ownershipStake?: number };
 
 type Request = {
   authToken: string;
@@ -48,12 +48,17 @@ export const patchBusinessOwnersRequest = async ({
       throw new Error('Cannot be more than one authed user to update');
     }
 
-    const linkedUserDataChangeOperations = updateOperationsForAuthedUser.filter(operation =>
-      Object.entries(operation.data).some(
-        // @ts-ignore
-        ([di, value]) => value && existingBosByUuid[operation.uuid]?.decryptedData?.[di] !== value,
-      ),
-    );
+    const linkedUserDataChangeOperations = updateOperationsForAuthedUser
+      .map(({ data, ...operation }) => ({
+        ...operation,
+        data: Object.fromEntries(Object.entries(data).filter(([di]) => di !== IdDI.email && di !== IdDI.phoneNumber)),
+      }))
+      .filter(operation =>
+        Object.entries(operation.data).some(
+          // @ts-ignore
+          ([di, value]) => value && existingBosByUuid[operation.uuid]?.decryptedData?.[di] !== value,
+        ),
+      );
 
     if (linkedUserDataChangeOperations.length === 1) {
       try {

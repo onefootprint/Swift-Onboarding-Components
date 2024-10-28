@@ -3,8 +3,9 @@ import { fn } from '@onefootprint/storybook-utils';
 import { IdDI } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import type { Meta, StoryFn } from '@storybook/react';
-import BosForm, { type BosFormProps } from './components/bos-form';
-import BosList, { type BosListProps } from './components/bos-list';
+import ImmutableBosList, { type ImmutableBosListProps } from './components/immutable-bos-list';
+import MutableBosForm, { type MutableBosFormProps } from './components/mutable-bos-form';
+import getDefaultFormValues from './utils/get-default-form-values';
 
 const DefaultHeader = () => {
   return (
@@ -21,16 +22,16 @@ const DefaultHeader = () => {
 };
 
 type BeneficialOwnersProps = {
-  listProps: BosListProps;
-  formProps: BosFormProps;
+  listProps: ImmutableBosListProps;
+  formProps: MutableBosFormProps;
 };
 
 const Template: StoryFn<BeneficialOwnersProps> = ({ listProps, formProps }) => {
   return (
     <>
       <DefaultHeader />
-      <BosList {...listProps} />
-      <BosForm {...formProps} />
+      <ImmutableBosList {...listProps} />
+      <MutableBosForm {...formProps} />
     </>
   );
 };
@@ -67,16 +68,19 @@ const mockBos: HostedBusinessOwner[] = [
     linkId: 'bo_link_secondary',
   },
 ];
+const immutableBos = mockBos.filter(bo => !bo.isMutable);
 
 export const Default: StoryFn<BeneficialOwnersProps> = () => {
-  const listProps: BosListProps = {
-    existingBos: mockBos,
+  const listProps: ImmutableBosListProps = {
+    immutableBos,
     onSubmit: console.log,
   };
 
-  const formProps: BosFormProps = {
+  const formProps: MutableBosFormProps = {
     existingBos: mockBos,
     onSubmit: console.log,
+    defaultFormValues: getDefaultFormValues(mockBos, {}, {}),
+    isLive: true,
   };
 
   return <Template listProps={listProps} formProps={formProps} />;
@@ -89,9 +93,11 @@ export default {
     formProps: {
       existingBos: mockBos,
       onSubmit: fn(),
+      defaultFormValues: getDefaultFormValues(mockBos, {}, {}),
+      isLive: true,
     },
     listProps: {
-      existingBos: mockBos,
+      immutableBos,
       onSubmit: fn(),
     },
   },

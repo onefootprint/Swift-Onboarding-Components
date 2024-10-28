@@ -141,35 +141,13 @@ export const shouldShowAddressDataScreen = (ctx: MachineContext): boolean => {
   return isMissingAnyData(ctx, addressCdos) || shouldRecollect(ctx, addressCdos);
 };
 
-const isMissingBoProp = (bo: BeneficialOwner) => !bo.first_name || !bo.last_name || !bo.ownership_stake;
-const isMissingBoPropWithContact = (bo: BeneficialOwner) => isMissingBoProp(bo) || !bo.phone_number || !bo.email;
-
-export const shouldShowBeneficialOwnersScreen = (ctx: MachineContext): boolean => {
-  if (ctx.kybRequirement.hasLinkedBos) return false;
-  const data = getBusinessDataFromContext(ctx);
-  const boCdos = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
-
-  const missingBoCdos = ctx.kybRequirement.missingAttributes.filter(cdo => boCdos.includes(cdo));
-  const requiredDis = missingBoCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]);
-
-  const isAnyPropMissing = requiredDis.includes(BusinessDI.kycedBeneficialOwners)
-    ? isMissingBoPropWithContact
-    : isMissingBoProp;
-
-  const isMissingBos = requiredDis.some(di => {
-    const collectedData = data[di];
-    return (
-      !collectedData ||
-      !Array.isArray(collectedData) ||
-      collectedData.length === 0 ||
-      collectedData.some(isAnyPropMissing)
-    );
-  });
-
-  return isMissingBos;
-};
-
 export const shouldShowManageBosScreen = (ctx: MachineContext): boolean => {
-  const boCdos = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
-  return shouldRecollect(ctx, boCdos);
+  // Since there's some complex logic around saving BOs, let's always show the BOs screen, even if they are bootstrapped.
+  // TODO: one day, we can just vault the BOs at the beginning of the flow and rely on the backend logic
+  // to tell us if anything is missing.
+  // This might be a better general approcah for all bootstrap data - vault it at the beginning of the flow
+  // and then re-fetch the requirement to see what's missing
+  const boCdos = [CollectedKybDataOption.kycedBeneficialOwners];
+  const isMissingBos = ctx.kybRequirement.missingAttributes.some(cdo => boCdos.includes(cdo));
+  return isMissingBos || shouldRecollect(ctx, boCdos);
 };

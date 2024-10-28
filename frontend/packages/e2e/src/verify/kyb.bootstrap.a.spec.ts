@@ -80,6 +80,12 @@ test('KYB bootstrapping id.xxx, business.primary_owner_stake and business.second
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
+  // For now, we will show the BOs screen even when they are bootstrapped.
+  // Once we support editing on the confirm screen, we should just jump straight to the confirm screen.
+  const addBosH2 = frame.getByText('Add beneficial owners').first();
+  await addBosH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+  await clickOnContinue(frame);
+
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 

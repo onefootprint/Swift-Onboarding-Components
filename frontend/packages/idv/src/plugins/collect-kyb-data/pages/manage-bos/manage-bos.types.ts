@@ -2,7 +2,7 @@ export type NewBusinessOwner = {
   uuid: string;
   firstName: string;
   lastName: string;
-  ownershipStake: number;
+  ownershipStake?: number;
   email: string;
   phoneNumber: string;
 };

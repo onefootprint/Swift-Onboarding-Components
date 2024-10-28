@@ -154,19 +154,19 @@ export const fillBeneficialOwners = async (
     userLastName: string;
   },
 ) => {
-  await frame.locator('input[name="beneficialOwners.0.first_name"]').first().fill(payload.userFirstName);
-  await frame.locator('input[name="beneficialOwners.0.last_name"]').first().fill(payload.userLastName);
-  const share0 = frame.locator('input[name="beneficialOwners.0.ownership_stake"]').first();
+  await frame.locator('input[name="bos.0.firstName"]').first().fill(payload.userFirstName);
+  await frame.locator('input[name="bos.0.lastName"]').first().fill(payload.userLastName);
+  const share0 = frame.locator('input[name="bos.0.ownershipStake"]').first();
   await share0.clear();
   await share0.fill('50');
 
   await frame.getByRole('button', { name: 'Add another beneficial owner' }).first().click();
 
-  await frame.locator('input[name="beneficialOwners.1.first_name"]').first().fill(payload.beneficialOwner1Name);
-  await frame.locator('input[name="beneficialOwners.1.last_name"]').first().fill(payload.beneficialOwner1LastName);
-  await frame.locator('input[name="beneficialOwners.1.email"]').first().fill(payload.beneficialOwner1Email);
-  await frame.locator('input[name="beneficialOwners.1.phone_number"]').first().fill(payload.beneficialOwner1Phone);
-  const share1 = frame.locator('input[name="beneficialOwners.1.ownership_stake"]').first();
+  await frame.locator('input[name="bos.1.firstName"]').first().fill(payload.beneficialOwner1Name);
+  await frame.locator('input[name="bos.1.lastName"]').first().fill(payload.beneficialOwner1LastName);
+  await frame.locator('input[name="bos.1.email"]').first().fill(payload.beneficialOwner1Email);
+  await frame.locator('input[name="bos.1.phoneNumber"]').first().fill(payload.beneficialOwner1Phone);
+  const share1 = frame.locator('input[name="bos.1.ownershipStake"]').first();
   await share1.clear();
   await share1.fill('50');
 };

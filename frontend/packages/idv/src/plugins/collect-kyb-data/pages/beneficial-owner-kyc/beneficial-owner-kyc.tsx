@@ -1,20 +1,17 @@
-import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 
+import { useBusinessOwners } from '../../../../queries';
 import CollectKycData from '../../../collect-kyc-data';
+import Loading from '../../components/loading';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const toDImetadata = (value?: string) => (value ? { value, isBootstrap: false } : undefined);
 
 const BeneficialOwnerKyc = () => {
   const [state, send] = useCollectKybDataMachine();
-  const {
-    bootstrapUserData,
-    config,
-    data,
-    idvContext,
-    kybRequirement: { missingAttributes, hasLinkedBos },
-    kycRequirement,
-  } = state.context;
+  const { bootstrapUserData, config, idvContext, kycRequirement } = state.context;
+  const bosQuery = useBusinessOwners({ authToken: idvContext.authToken });
+
   if (!config || !kycRequirement) {
     throw new Error('Missing collect-kyc-data props in kyb');
   }
@@ -23,23 +20,24 @@ const BeneficialOwnerKyc = () => {
     send({ type: 'beneficialOwnerKycSubmitted' });
   };
 
-  const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
-  const primaryBeneficialOwner = requireMultiKyc
-    ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
-    : data?.[BusinessDI.beneficialOwners]?.[0];
-  const kycUserData = { ...bootstrapUserData };
+  if (bosQuery.isPending || bosQuery.isFetching) {
+    return <Loading />;
+  }
 
-  if (primaryBeneficialOwner) {
-    kycUserData[IdDI.firstName] = toDImetadata(primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName]);
-    kycUserData[IdDI.middleName] = toDImetadata(primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName]);
-    kycUserData[IdDI.lastName] = toDImetadata(primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName]);
+  const primaryBo = bosQuery.data?.find(bo => bo.isAuthedUser);
+  const kycUserData = { ...bootstrapUserData };
+  if (primaryBo) {
+    kycUserData[IdDI.firstName] = toDImetadata(primaryBo.decryptedData[IdDI.firstName]);
+    kycUserData[IdDI.lastName] = toDImetadata(primaryBo.decryptedData[IdDI.lastName]);
   }
 
   return (
     <CollectKycData
       idvContext={idvContext}
       context={{
-        disabledFields: hasLinkedBos ? [] : [IdDI.firstName, IdDI.middleName, IdDI.lastName],
+        // TODO: eventually we can disable editing first and last name as they were already provided on the BO
+        // screen. Handling of middle name is a little annoying.
+        // So maybe i don't actually mind leaving these name fields editable
         bootstrapUserData: kycUserData,
         requirement: kycRequirement,
         config,

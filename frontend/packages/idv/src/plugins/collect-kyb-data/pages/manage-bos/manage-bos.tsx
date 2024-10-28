@@ -6,11 +6,12 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import { useBusinessOwners, useBusinessOwnersPatch } from '../../../../queries';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
-import BosForm from './components/bos-form';
-import BosList from './components/bos-list';
+import ImmutableBosList from './components/immutable-bos-list';
 import Loading from './components/loading';
+import MutableBosForm from './components/mutable-bos-form';
 import useConfirmMissingBoDialog from './hooks/use-confirm-missing-bo-dialog';
 import type { ManageBosFormData } from './manage-bos.types';
+import getDefaultFormValues from './utils/get-default-form-values';
 import { sumTotalOwnershipStake } from './utils/manage-bos.utils';
 
 const MISSING_BOS_CONFIRMATION_THRESHOLD = 76;
@@ -20,6 +21,9 @@ const ManageBos = () => {
   const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
+    bootstrapBusinessData,
+    bootstrapUserData,
+    config,
   } = state.context;
   const bosQuery = useBusinessOwners({ authToken });
   const bosMutation = useBusinessOwnersPatch();
@@ -65,7 +69,7 @@ const ManageBos = () => {
           },
           ownershipStake,
         })),
-        deleteOperations: [],
+        deleteOperations: bosToDelete,
       });
       send({ type: 'manageBosCompleted' });
     } catch (error) {
@@ -77,13 +81,20 @@ const ManageBos = () => {
     return <Loading />;
   }
 
+  const immutableBos = bosQuery.data?.filter(bo => !bo.isMutable) || [];
+
   if (bosQuery.data) {
     return (
       <Stack direction="column" gap={5}>
         <CollectKybDataNavigationHeader />
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <BosList existingBos={bosQuery.data} onSubmit={handleBosListSubmit} />
-        <BosForm existingBos={bosQuery.data} onSubmit={handleBosFormSubmit} />
+        <ImmutableBosList immutableBos={immutableBos} onSubmit={handleBosListSubmit} />
+        <MutableBosForm
+          existingBos={bosQuery.data}
+          onSubmit={handleBosFormSubmit}
+          defaultFormValues={getDefaultFormValues(bosQuery.data, bootstrapBusinessData, bootstrapUserData)}
+          isLive={!!config?.isLive}
+        />
         <ConfirmMissingBoDialog />
       </Stack>
     );

@@ -31,9 +31,12 @@ pub async fn get(
     let dbos = bvw.decrypt_business_owners(&state).await?;
     let results = dbos
         .into_iter()
-        .sorted_by_key(|bo| (bo.bo.kind, bo.bo.ownership_stake, bo.bo.link_id.clone()))
         .map(|bo| (bo, &user_auth))
         .map(api_wire_types::HostedBusinessOwner::from_db)
+        // Match the ordering as displayed on the frontend, for convenience.
+        // TODO: this will most certainly change soon
+        // Immutable first, then self, then by created date desc
+        .sorted_by_key(|bo| (bo.is_mutable, !bo.is_authed_user, bo.created_at))
         .collect();
     Ok(results)
 }

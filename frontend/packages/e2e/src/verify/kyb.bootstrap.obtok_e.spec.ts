@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from '../utils/commands';
 
+const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB_KYCED_BO || 'pb_test_eWuI7QxglTuuVclccyfAk4'; // KYC all BOs
 const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
@@ -12,8 +13,8 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   // Create a session
   const session = await page.evaluate(
-    async ([secretKey, pbKey]) => {
-      const response = await fetch('https://api.dev.onefootprint.com/onboarding/session', {
+    async ([secretKey, pbKey, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
           'X-Footprint-Secret-Key': secretKey,
@@ -58,7 +59,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey],
+    [fpSKey, pbKey, backendUrl],
   );
 
   expect(session).toHaveProperty('token');
@@ -92,6 +93,12 @@ test('KYB pbtok_ happy path #ci', async ({ page, isMobile }) => {
 
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
+
+  // For now, we will show the BOs screen even when they are bootstrapped.
+  // Once we support editing on the confirm screen, we should just jump straight to the confirm screen.
+  const addBosH2 = frame.getByText('Add beneficial owners').first();
+  await addBosH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+  await clickOnContinue(frame);
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);

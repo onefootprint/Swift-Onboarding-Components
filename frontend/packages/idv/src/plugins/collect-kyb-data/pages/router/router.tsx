@@ -6,7 +6,6 @@ import Loading from '../../components/loading';
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import BasicData from '../basic-data';
 import BeneficialOwnerKyc from '../beneficial-owner-kyc';
-import BeneficialOwners from '../beneficial-owners';
 import BusinessAddress from '../business-address';
 import BusinessFieldsLoader from '../business-fields-loader';
 import Confirm from '../confirm';
@@ -57,9 +56,6 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('manageBos')) {
     return <ManageBos />;
-  }
-  if (state.matches('beneficialOwners')) {
-    return <BeneficialOwners />;
   }
   if (state.matches('confirm')) {
     return <Confirm />;

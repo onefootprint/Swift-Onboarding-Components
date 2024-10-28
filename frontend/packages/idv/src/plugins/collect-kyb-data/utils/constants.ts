@@ -30,7 +30,6 @@ export const BusinessFields: Exclude<`${BusinessDI}`, 'business.tin'>[] = [
   'business.dba',
   'business.formation_date',
   'business.formation_state',
-  'business.kyced_beneficial_owners',
   'business.name',
   'business.phone_number',
   'business.state',

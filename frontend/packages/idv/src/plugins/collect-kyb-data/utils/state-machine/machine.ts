@@ -4,7 +4,6 @@ import {
   isCollectingBusinessData,
   shouldShowAddressDataScreen,
   shouldShowBasicDataScreen,
-  shouldShowBeneficialOwnersScreen,
   shouldShowManageBosScreen,
 } from '../attributes';
 import type { MachineContext, MachineEvents } from './types';
@@ -30,10 +29,6 @@ const ORDERED_SCREENS: Screen[] = [
   {
     screen: 'manageBos',
     missingCheck: shouldShowManageBosScreen,
-  },
-  {
-    screen: 'beneficialOwners',
-    missingCheck: shouldShowBeneficialOwnersScreen,
   },
   {
     screen: 'confirm',
@@ -149,16 +144,8 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         },
         manageBos: {
           on: {
-            manageBosCompleted: [{ target: 'completed' }],
-          },
-        },
-        beneficialOwners: {
-          on: {
-            beneficialOwnersSubmitted: nextScreenTransitions('beneficialOwners').map(config => ({
-              ...config,
-              actions: ['assignVaultData'],
-            })),
-            navigatedToPrevPage: prevScreenTransitions('beneficialOwners'),
+            manageBosCompleted: nextScreenTransitions('manageBos'),
+            navigatedToPrevPage: prevScreenTransitions('manageBos'),
           },
         },
         confirm: {

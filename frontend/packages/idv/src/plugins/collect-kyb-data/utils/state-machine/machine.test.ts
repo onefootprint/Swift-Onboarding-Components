@@ -1,6 +1,5 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
-  BeneficialOwnerDataAttribute,
   BusinessDI,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -11,7 +10,7 @@ import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks';
 import createCollectKybDataMachine, { nextScreenTransitions, getDataCollectionScreensToShow } from './machine';
-import type { BeneficialOwnersData, MachineContext } from './types';
+import type { MachineContext } from './types';
 
 const TestOnboardingConfig: PublicOnboardingConfig = {
   isLive: true,
@@ -94,7 +93,7 @@ describe('Collect KYB Data Machine Tests', () => {
         CollectedKybDataOption.name,
         CollectedKybDataOption.tin,
         CollectedKybDataOption.address,
-        CollectedKybDataOption.beneficialOwners,
+        CollectedKybDataOption.kycedBeneficialOwners,
       ],
       [CollectedKycDataOption.name, CollectedKycDataOption.address],
     );
@@ -151,47 +150,13 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.context.data[BusinessDI.state]).toEqual('NY');
     expect(state.context.data[BusinessDI.country]).toEqual('USA');
     expect(state.context.data[BusinessDI.zip]).toEqual('023123');
-    expect(state.value).toEqual('beneficialOwners');
+    expect(state.value).toEqual('manageBos');
 
-    state = machine.send('beneficialOwnersSubmitted', {
-      payload: {
-        data: {
-          [BusinessDI.beneficialOwners]: [
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'John',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-              [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-            },
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'Jane',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-              [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-            },
-          ],
-        },
-        vaultBusinessData: {} as BeneficialOwnersData,
-      },
-    });
-    expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([
-      {
-        [BeneficialOwnerDataAttribute.firstName]: 'John',
-        [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-        [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-        [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-      },
-      {
-        [BeneficialOwnerDataAttribute.firstName]: 'Jane',
-        [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-        [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
-        [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-      },
-    ]);
+    state = machine.send('manageBosCompleted', {});
     expect(state.value).toEqual('confirm');
     state = machine.send({ type: 'navigatedToPrevPage' });
 
-    expect(state.value).toEqual('beneficialOwners');
+    expect(state.value).toEqual('manageBos');
     state = machine.send({ type: 'navigatedToPrevPage' });
 
     expect(state.value).toEqual('businessAddress');
@@ -209,14 +174,8 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('businessAddress');
     state = machine.send('businessAddressSubmitted', {});
 
-    expect(state.value).toEqual('beneficialOwners');
-    state = machine.send({
-      type: 'beneficialOwnersSubmitted',
-      payload: {
-        data: {} as BeneficialOwnersData,
-        vaultBusinessData: {} as BeneficialOwnersData,
-      },
-    });
+    expect(state.value).toEqual('manageBos');
+    state = machine.send('manageBosCompleted');
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'confirmed' });
@@ -309,7 +268,7 @@ describe('Collect KYB Data Machine Tests', () => {
           CollectedKybDataOption.name,
           CollectedKybDataOption.tin,
           CollectedKybDataOption.address,
-          CollectedKybDataOption.beneficialOwners,
+          CollectedKybDataOption.kycedBeneficialOwners,
         ],
         [],
       );
@@ -336,27 +295,7 @@ describe('Collect KYB Data Machine Tests', () => {
           [BusinessDI.zip]: '023123',
         },
       });
-      state = machine.send('beneficialOwnersSubmitted', {
-        payload: {
-          data: {
-            [BusinessDI.beneficialOwners]: [
-              {
-                [BeneficialOwnerDataAttribute.firstName]: 'John',
-                [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-                [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-                [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-              },
-              {
-                [BeneficialOwnerDataAttribute.firstName]: 'Jane',
-                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-                [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
-                [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-              },
-            ],
-          },
-          vaultBusinessData: {} as BeneficialOwnersData,
-        },
-      });
+      state = machine.send('manageBosCompleted');
 
       expect(state.value).toEqual('confirm');
 
@@ -396,46 +335,7 @@ describe('Collect KYB Data Machine Tests', () => {
       expect(state.context.data[BusinessDI.zip]).toEqual('023123');
       expect(state.value).toEqual('confirm');
 
-      state = machine.send({
-        type: 'beneficialOwnersSubmitted',
-        payload: {
-          data: {
-            [BusinessDI.beneficialOwners]: [
-              {
-                [BeneficialOwnerDataAttribute.firstName]: 'Jake',
-                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-                [BeneficialOwnerDataAttribute.email]: 'jake@gmail.com',
-                [BeneficialOwnerDataAttribute.ownershipStake]: 20,
-                [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-              },
-              {
-                [BeneficialOwnerDataAttribute.firstName]: 'Lilly',
-                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-                [BeneficialOwnerDataAttribute.email]: 'lilly@gmail.com',
-                [BeneficialOwnerDataAttribute.ownershipStake]: 40,
-                [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-              },
-            ],
-          },
-          vaultBusinessData: {} as BeneficialOwnersData,
-        },
-      });
-      expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([
-        {
-          [BeneficialOwnerDataAttribute.firstName]: 'Jake',
-          [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-          [BeneficialOwnerDataAttribute.email]: 'jake@gmail.com',
-          [BeneficialOwnerDataAttribute.ownershipStake]: 20,
-          [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-        },
-        {
-          [BeneficialOwnerDataAttribute.firstName]: 'Lilly',
-          [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-          [BeneficialOwnerDataAttribute.email]: 'lilly@gmail.com',
-          [BeneficialOwnerDataAttribute.ownershipStake]: 40,
-          [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-        },
-      ]);
+      state = machine.send('manageBosCompleted');
       expect(state.value).toEqual('confirm');
     });
 
@@ -445,7 +345,7 @@ describe('Collect KYB Data Machine Tests', () => {
           CollectedKybDataOption.name,
           CollectedKybDataOption.tin,
           CollectedKybDataOption.address,
-          CollectedKybDataOption.beneficialOwners,
+          CollectedKybDataOption.kycedBeneficialOwners,
         ],
         [],
         [],
@@ -476,27 +376,7 @@ describe('Collect KYB Data Machine Tests', () => {
           [BusinessDI.zip]: '023123',
         },
       });
-      state = machine.send('beneficialOwnersSubmitted', {
-        payload: {
-          data: {
-            [BusinessDI.beneficialOwners]: [
-              {
-                [BeneficialOwnerDataAttribute.firstName]: 'John',
-                [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-                [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-                [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-              },
-              {
-                [BeneficialOwnerDataAttribute.firstName]: 'Jane',
-                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-                [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
-                [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-              },
-            ],
-          },
-          vaultBusinessData: {} as BeneficialOwnersData,
-        },
-      });
+      state = machine.send('manageBosCompleted');
 
       expect(state.value).toEqual('confirm');
       expect(state.context.isConfirmScreenVisible).toEqual(false);
@@ -505,7 +385,7 @@ describe('Collect KYB Data Machine Tests', () => {
 });
 
 describe('nextScreenTransitions', () => {
-  const Targets = ['introduction', 'basicData', 'businessAddress', 'manageBos', 'beneficialOwners', 'confirm'];
+  const Targets = ['introduction', 'basicData', 'businessAddress', 'manageBos', 'confirm'];
 
   it('should return same targets when loadFromVault', () => {
     const result = nextScreenTransitions('loadFromVault');
@@ -527,8 +407,8 @@ describe('nextScreenTransitions', () => {
     expect(result.map(x => x.target)).toEqual(Targets);
   });
 
-  it('should return same targets when beneficialOwners', () => {
-    const result = nextScreenTransitions('beneficialOwners');
+  it('should return same targets when manageBos', () => {
+    const result = nextScreenTransitions('manageBos');
     expect(result.map(x => x.target)).toEqual(Targets);
   });
 
@@ -640,19 +520,7 @@ describe('getDataCollectionScreensToShow', () => {
     expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'businessAddress', 'confirm']);
   });
 
-  it('should return introduction, beneficialOwners, confirm 1/2', () => {
-    const ctx = {
-      ...baseCtx,
-      kybRequirement: {
-        ...baseCtx.kybRequirement,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-      },
-    } as MachineContext;
-
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'beneficialOwners', 'confirm']);
-  });
-
-  it('should return introduction, beneficialOwners, confirm 2/2', () => {
+  it('should return introduction, manageBos, confirm 1/2', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -661,7 +529,19 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'beneficialOwners', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'manageBos', 'confirm']);
+  });
+
+  it('should return introduction, manageBos, confirm 2/2', () => {
+    const ctx = {
+      ...baseCtx,
+      kybRequirement: {
+        ...baseCtx.kybRequirement,
+        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
+      },
+    } as MachineContext;
+
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'manageBos', 'confirm']);
   });
 
   it('should return confirm', () => {

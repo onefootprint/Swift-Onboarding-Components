@@ -11,7 +11,7 @@ export type SectionAction = {
 };
 
 export type SectionProps = {
-  title: string;
+  title?: string;
   actions?: SectionAction[];
   IconComponent?: Icon;
   content: React.ReactNode;
@@ -24,27 +24,29 @@ const Section = ({ title, IconComponent, actions, content, testID, noBorder = fa
 
   return (
     <Container data-testid={testID} $noBorder={noBorder}>
-      <Header>
-        <TitleContainer>
-          {IconComponent && <IconComponent />}
-          <Text marginLeft={IconComponent ? 2 : undefined} variant="label-2">
-            {title}
-          </Text>
-        </TitleContainer>
-        {hasActions && (
-          <ActionsContainer>
-            {actions?.map(({ label, onClick, isLoading, actionTestID }) =>
-              isLoading ? (
-                <LoadingSpinner key={label} size={16} />
-              ) : (
-                <LinkButton key={label} onClick={onClick} disabled={isLoading} testID={actionTestID}>
-                  {label}
-                </LinkButton>
-              ),
-            )}
-          </ActionsContainer>
-        )}
-      </Header>
+      {title && (
+        <Header>
+          <TitleContainer>
+            {IconComponent && <IconComponent />}
+            <Text marginLeft={IconComponent ? 2 : undefined} variant="label-2">
+              {title}
+            </Text>
+          </TitleContainer>
+          {hasActions && (
+            <ActionsContainer>
+              {actions?.map(({ label, onClick, isLoading, actionTestID }) =>
+                isLoading ? (
+                  <LoadingSpinner key={label} size={16} />
+                ) : (
+                  <LinkButton key={label} onClick={onClick} disabled={isLoading} testID={actionTestID}>
+                    {label}
+                  </LinkButton>
+                ),
+              )}
+            </ActionsContainer>
+          )}
+        </Header>
+      )}
       <FullWidthDiv>{content}</FullWidthDiv>
     </Container>
   );

@@ -8,6 +8,7 @@ import {
   verifyPhoneNumber,
 } from '../utils/commands';
 
+const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB_KYCED_BO || 'pb_test_eWuI7QxglTuuVclccyfAk4'; // KYC all BOs
 const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
@@ -18,8 +19,8 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   // Create a session
   const session = await page.evaluate(
-    async ([secretKey, pbKey]) => {
-      const response = await fetch('https://api.dev.onefootprint.com/onboarding/session', {
+    async ([secretKey, pbKey, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
           'X-Footprint-Secret-Key': secretKey,
@@ -52,7 +53,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey],
+    [fpSKey, pbKey, backendUrl],
   );
 
   expect(session).toHaveProperty('token');
@@ -84,22 +85,22 @@ test('KYB pbtok_ with kyced bo until the end of the flow #ci', async ({ page, is
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  const whoAreBOsH2 = frame.getByText('Who are the beneficial owners?').first();
+  const whoAreBOsH2 = frame.getByText('Add beneficial owners').first();
   await whoAreBOsH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 
-  expect(await frame.locator('input[name="beneficialOwners.0.first_name"]').first().inputValue()).toBe('Alex');
-  expect(await frame.locator('input[name="beneficialOwners.0.last_name"]').first().inputValue()).toBe('Anderson');
-  expect(await frame.locator('input[name="beneficialOwners.0.ownership_stake"]').first().inputValue()).toBe('73');
+  expect(await frame.locator('input[name="bos.0.firstName"]').first().inputValue()).toBe('Alex');
+  expect(await frame.locator('input[name="bos.0.lastName"]').first().inputValue()).toBe('Anderson');
+  expect(await frame.locator('input[name="bos.0.ownershipStake"]').first().inputValue()).toBe('73');
 
-  expect(await frame.locator('input[name="beneficialOwners.1.first_name"]').first().inputValue()).toBe('Bob');
-  expect(await frame.locator('input[name="beneficialOwners.1.last_name"]').first().inputValue()).toBe('Boberto');
-  expect(await frame.locator('input[name="beneficialOwners.1.ownership_stake"]').first().inputValue()).toBe('27');
+  expect(await frame.locator('input[name="bos.1.firstName"]').first().inputValue()).toBe('Bob');
+  expect(await frame.locator('input[name="bos.1.lastName"]').first().inputValue()).toBe('Boberto');
+  expect(await frame.locator('input[name="bos.1.ownershipStake"]').first().inputValue()).toBe('27');
 
-  expect(await frame.locator('input[name="beneficialOwners.1.email"]').first().inputValue()).toBeFalsy();
-  expect(await frame.locator('input[name="beneficialOwners.1.phone_number"]').first().inputValue()).toBeFalsy();
+  expect(await frame.locator('input[name="bos.1.email"]').first().inputValue()).toBeFalsy();
+  expect(await frame.locator('input[name="bos.1.phoneNumber"]').first().inputValue()).toBeFalsy();
 
-  await frame.locator('input[name="beneficialOwners.1.email"]').first().fill('secondary@onefootprint.com');
-  await frame.locator('input[name="beneficialOwners.1.phone_number"]').first().fill('5555550100');
+  await frame.locator('input[name="bos.1.email"]').first().fill('secondary@onefootprint.com');
+  await frame.locator('input[name="bos.1.phoneNumber"]').first().fill('5555550100');
 
   await clickOnContinue(frame);
   await page.waitForLoadState();

@@ -1,4 +1,6 @@
 use crate::ModernUserDecryptResponse;
+use chrono::DateTime;
+use chrono::Utc;
 use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::BoLinkId;
 use newtypes::DataIdentifier;
@@ -20,6 +22,7 @@ pub struct HostedBusinessOwner {
     pub decrypted_data: ModernUserDecryptResponse,
     pub populated_data: Vec<DataIdentifier>,
     pub ownership_stake: Option<u32>,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]

@@ -690,6 +690,7 @@
           },
           "fields": {
             "primary-bo-name-hint": "Escribe tus nombres y apellidos tal como aparecen en tu identificación emitida por el gobierno",
+            "primary-bo-name-hint-new": "Escribe tus nombres y apellidos tal como aparecen en tu identificación emitida por el gobierno",
             "primary-bo-name-hint-readonly": "No se pueden cambiar los datos de los beneficiarios finales ya guardados.",
             "first-name": {
               "label": "Nombre",
@@ -789,7 +790,7 @@
         "beneficial-owners": {
           "title": "Propietarios beneficiosos",
           "beneficial-owner-you": "Propietario (Tú)",
-          "beneficial-owner-other": "Propietario (Otro)",
+          "beneficial-owner": "Propietario",
           "first-name": "Nombre",
           "middle-name": "Segundo nombre",
           "last-name": "Apellido(s)",

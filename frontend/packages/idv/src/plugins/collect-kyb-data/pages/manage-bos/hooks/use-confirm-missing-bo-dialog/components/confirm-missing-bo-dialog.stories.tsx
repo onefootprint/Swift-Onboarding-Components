@@ -10,7 +10,7 @@ const Template: StoryFn = () => {
 
 export default {
   component: ConfirmMissingBoDialog,
-  title: 'NoOtherBosDialog',
+  title: 'ConfirmMissingBoDialog',
 } satisfies Meta<typeof ConfirmMissingBoDialog>;
 
 export const Default: StoryFn = () => <Template />;

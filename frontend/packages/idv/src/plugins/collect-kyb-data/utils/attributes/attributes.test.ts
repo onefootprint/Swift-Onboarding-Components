@@ -15,7 +15,6 @@ import {
   isCollectingBusinessData,
   shouldShowAddressDataScreen,
   shouldShowBasicDataScreen,
-  shouldShowBeneficialOwnersScreen,
   shouldShowManageBosScreen,
 } from './attributes';
 
@@ -477,148 +476,31 @@ describe('isMissingAddressData', () => {
   });
 });
 
-describe('isMissingBeneficialOwnersData', () => {
-  it('should return false if beneficial owners is populated', () => {
+describe('shouldShowManageBosScreen', () => {
+  it('should return true when beneficial owners are missing', () => {
     const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
-      data: {
-        [BusinessDI.beneficialOwners]: [
-          {
-            first_name: 'John',
-            last_name: 'Doe',
-            ownership_stake: 50,
-          },
-        ],
-      },
+      data: {},
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(false);
-  });
-
-  it('should return true when part of beneficial owners is missing', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: {
-        [BusinessDI.beneficialOwners]: [
-          // @ts-expect-error: ownership_stake was intentionally omitted
-          { first_name: 'John', last_name: 'Doe' },
-        ],
-      },
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    // @ts-expect-error: ownership_stake was intentionally omitted
-    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(true);
+    expect(shouldShowManageBosScreen(ctx)).toBe(true);
   });
 
   it('should return false if kyced beneficial owners is populated', () => {
     const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
+      kybRequirement: getKybRequirement({ populated: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
-      data: {
-        [BusinessDI.kycedBeneficialOwners]: [
-          {
-            first_name: 'John',
-            last_name: 'Doe',
-            ownership_stake: 50,
-            email: 'j@j.com',
-            phone_number: '+12025550179',
-          },
-          {
-            first_name: 'John',
-            last_name: 'Doe',
-            ownership_stake: 50,
-            email: 'j@j.com',
-            phone_number: '+12025550179',
-          },
-        ],
-      },
+      data: {},
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(false);
-  });
-
-  it('should return true if one of kyced beneficial owners is missing contact info', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: {
-        [BusinessDI.kycedBeneficialOwners]: [
-          {
-            first_name: 'John',
-            last_name: 'Doe',
-            ownership_stake: 50,
-            email: 'j@j.com',
-            phone_number: '+12025550179',
-          },
-          {
-            first_name: 'John',
-            last_name: 'Doe',
-            ownership_stake: 50,
-            email: 'j@j.com',
-            // phone_number: '+12025550179', <- intentionally comment out
-          },
-        ],
-      },
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(true);
-  });
-
-  it('should return true when part of kyced beneficial owners is missing', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: {
-        [BusinessDI.kycedBeneficialOwners]: [
-          // @ts-expect-error: ownership_stake was intentionally omitted
-          { first_name: 'John', last_name: 'Doe' },
-        ],
-      },
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    // @ts-expect-error: ownership_stake was intentionally omitted
-    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(true);
-  });
-
-  it('should return false if all possible attributes are present', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: {
-        [BusinessDI.kycedBeneficialOwners]: [
-          {
-            first_name: 'first',
-            middle_name: 'middle',
-            last_name: 'last',
-            ownership_stake: 10,
-            email: 'email@onefootprint.com',
-            phone_number: '+15555550100',
-          },
-        ],
-      },
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    expect(shouldShowBeneficialOwnersScreen(ctx)).toBe(false);
+    expect(shouldShowManageBosScreen(ctx)).toBe(false);
   });
 });
 

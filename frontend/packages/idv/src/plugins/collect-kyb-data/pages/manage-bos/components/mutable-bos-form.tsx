@@ -2,34 +2,48 @@ import { isEmail, isPhoneNumber } from '@onefootprint/core';
 import { uuidv4 } from '@onefootprint/dev-tools';
 import { IcoPlusSmall24, IcoUserCircle24 } from '@onefootprint/icons';
 import type { HostedBusinessOwner } from '@onefootprint/request-types';
-import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
+import { Button, Divider, Form, InlineAlert, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type { ManageBosFormData } from '../manage-bos.types';
+import type { ManageBosFormData, NewBusinessOwner } from '../manage-bos.types';
 import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, sumTotalOwnershipStake } from '../utils/manage-bos.utils';
 
-export type BosFormProps = {
+export type MutableBosFormProps = {
   existingBos: HostedBusinessOwner[];
-  onSubmit: (data: ManageBosFormData) => void;
+  onSubmit: (formData: ManageBosFormData) => void;
+  // If there is bootstrap data or existing BOs, we can use them to pre-populate the form.
+  defaultFormValues: NewBusinessOwner[];
+  isLive: boolean;
 };
 
-const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
+/** Renders a form for editing the mutable beneficial owners of a business or adding new beneficial owners. */
+const MutableBosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: MutableBosFormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
+
   const {
     register,
     control,
     handleSubmit,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ManageBosFormData>({
     defaultValues: {
-      bos: [getEmptyBo()],
+      bos: defaultFormValues,
       bosToDelete: [],
     },
   });
   const { append, fields, remove } = useFieldArray({ name: 'bos', control });
   const newBos = useWatch({ control, name: 'bos' });
-  const isStakeInvalid = sumTotalOwnershipStake(existingBos, { bos: newBos, bosToDelete: [] }) > 100;
+  const bosToDelete = useWatch({ control, name: 'bosToDelete' });
+
+  const isStakeInvalid = sumTotalOwnershipStake(existingBos, { bos: newBos, bosToDelete }) > 100;
+
+  const addBoToDelete = (uuid: string) => {
+    const currentBosToDelete = getValues('bosToDelete') || [];
+    setValue('bosToDelete', [...currentBosToDelete, uuid]);
+  };
 
   const handleAdd = () => {
     append(getEmptyBo());
@@ -45,7 +59,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
       return;
     }
 
-    if (hasDuplicatedEmail(existingBos, formData)) {
+    if (isLive && hasDuplicatedEmail(existingBos, formData)) {
       toast.show({
         title: t('errors.duplicate-email.title'),
         description: t('errors.duplicate-email.description'),
@@ -54,7 +68,7 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
       return;
     }
 
-    if (hasDuplicatedPhoneNumber(existingBos, formData)) {
+    if (isLive && hasDuplicatedPhoneNumber(existingBos, formData)) {
       toast.show({
         title: t('errors.duplicate-phone-number.title'),
         description: t('errors.duplicate-phone-number.description'),
@@ -70,11 +84,23 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
     <form onSubmit={handleSubmit(onSubmitFormData)}>
       <Stack direction="column" width="100%">
         {fields.map((field, idx) => {
+          const backendBo = existingBos.find(bo => bo.uuid === field.uuid);
+          const isAuthedUser = backendBo?.isAuthedUser;
+
           const firstNameErrors = errors.bos?.[idx]?.firstName;
           const lastNameErrors = errors.bos?.[idx]?.lastName;
           const emailErrors = errors.bos?.[idx]?.email;
           const phoneNumberErrors = errors.bos?.[idx]?.phoneNumber;
           const ownershipStakeErrors = errors.bos?.[idx]?.ownershipStake;
+
+          const handleRemoveClick = () => {
+            remove(idx);
+            if (backendBo) {
+              // If the BO already exists on the backend, we need to send a delete operation to the backend.
+              // Otherwise, it's sufficient to just remove it from the form.
+              addBoToDelete(backendBo.uuid);
+            }
+          };
 
           return (
             <Stack
@@ -90,12 +116,23 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
             >
               <Stack paddingTop={5} paddingBottom={5} gap={3} alignItems="center">
                 <IcoUserCircle24 />
-                <Text variant="label-3">{t('fields-header.beneficial-owner')}</Text>
-                <LinkButton $marginLeft="auto" onClick={() => remove(idx)}>
-                  {t('fields-header.remove')}
-                </LinkButton>
+                <Text variant="label-3">
+                  {isAuthedUser ? t('fields-header.beneficial-owner-you') : t('fields-header.beneficial-owner')}
+                </Text>
+                {!isAuthedUser && (
+                  <LinkButton $marginLeft="auto" onClick={handleRemoveClick}>
+                    {t('fields-header.remove')}
+                  </LinkButton>
+                )}
               </Stack>
               <Stack direction="column" gap={6}>
+                {isAuthedUser && (
+                  <InlineAlert variant="info">
+                    <Text variant="body-2" color="info">
+                      {t('fields.primary-bo-name-hint-new')}
+                    </Text>
+                  </InlineAlert>
+                )}
                 <Form.Field>
                   <Form.Label>{t('fields.first-name.label')}</Form.Label>
                   <Form.Input
@@ -123,45 +160,49 @@ const BosForm = ({ existingBos, onSubmit }: BosFormProps) => {
                   />
                   <Form.Errors>{lastNameErrors}</Form.Errors>
                 </Form.Field>
-                <Form.Field>
-                  <Form.Label>{t('fields.email.label')}</Form.Label>
-                  <Form.Input
-                    data-dd-action-name="Email input"
-                    data-dd-privacy="mask"
-                    placeholder={t('fields.email.placeholder')}
-                    type="email"
-                    hasError={!!emailErrors}
-                    {...register(`bos.${idx}.email`, {
-                      required: t('fields.email.errors.required'),
-                      validate: value => (!isEmail(value) ? t('fields.email.errors.required') : undefined),
-                    })}
-                  />
-                  <Form.Errors>{emailErrors}</Form.Errors>
-                </Form.Field>
-                <Controller
-                  control={control}
-                  name={`bos.${idx}.phoneNumber`}
-                  rules={{
-                    required: { value: true, message: t('fields.phone.errors.required') },
-                    validate: value => {
-                      const isInvalid = !isPhoneNumber(value);
-                      return isInvalid ? t('fields.phone.errors.invalid') : undefined;
-                    },
-                  }}
-                  render={({ field: { name, onBlur, onChange, value }, fieldState: { error } }) => (
-                    <PhoneInput
+                {!isAuthedUser && (
+                  <Form.Field>
+                    <Form.Label>{t('fields.email.label')}</Form.Label>
+                    <Form.Input
+                      data-dd-action-name="Email input"
                       data-dd-privacy="mask"
-                      data-dd-action-name="Phone input"
-                      hasError={!!error}
-                      hint={error ? phoneNumberErrors?.message : undefined}
-                      label={t('fields.phone.label')}
-                      name={name}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      value={value}
+                      placeholder={t('fields.email.placeholder')}
+                      type="email"
+                      hasError={!!emailErrors}
+                      {...register(`bos.${idx}.email`, {
+                        required: t('fields.email.errors.required'),
+                        validate: value => (!isEmail(value) ? t('fields.email.errors.required') : undefined),
+                      })}
                     />
-                  )}
-                />
+                    <Form.Errors>{emailErrors}</Form.Errors>
+                  </Form.Field>
+                )}
+                {!isAuthedUser && (
+                  <Controller
+                    control={control}
+                    name={`bos.${idx}.phoneNumber`}
+                    rules={{
+                      required: { value: true, message: t('fields.phone.errors.required') },
+                      validate: value => {
+                        const isInvalid = !isPhoneNumber(value);
+                        return isInvalid ? t('fields.phone.errors.invalid') : undefined;
+                      },
+                    }}
+                    render={({ field: { name, onBlur, onChange, value }, fieldState: { error } }) => (
+                      <PhoneInput
+                        data-dd-privacy="mask"
+                        data-dd-action-name="Phone input"
+                        hasError={!!error}
+                        hint={error ? phoneNumberErrors?.message : undefined}
+                        label={t('fields.phone.label')}
+                        name={name}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        value={value}
+                      />
+                    )}
+                  />
+                )}
                 <Form.Field>
                   <Form.Label>{t('fields.ownership-stake.label')}</Form.Label>
                   <Form.Input
@@ -218,7 +259,7 @@ const getEmptyBo = () => {
     lastName: '',
     email: '',
     phoneNumber: '',
-    ownershipStake: 0,
+    ownershipStake: undefined,
   };
 };
-export default BosForm;
+export default MutableBosForm;

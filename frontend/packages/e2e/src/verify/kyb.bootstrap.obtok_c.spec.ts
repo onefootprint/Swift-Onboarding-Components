@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from '../utils/commands';
 
+const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
 const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
@@ -12,8 +13,8 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   // Create a session
   const session = await page.evaluate(
-    async ([secretKey, pbKey]) => {
-      const response = await fetch('https://api.dev.onefootprint.com/onboarding/session', {
+    async ([secretKey, pbKey, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
           'X-Footprint-Secret-Key': secretKey,
@@ -69,7 +70,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey],
+    [fpSKey, pbKey, backendUrl],
   );
 
   expect(session).toHaveProperty('token');
@@ -101,24 +102,20 @@ test('KYB pbtok_ session with id.xxx, business.xxx and business.secondary_owners
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  const whoAreBOsH2 = frame.getByText('Who are the beneficial owners?').first();
+  const whoAreBOsH2 = frame.getByText('Add beneficial owners').first();
   await whoAreBOsH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 
-  expect(await frame.locator('input[name="beneficialOwners.0.first_name"]').first().inputValue()).toBe('Owner');
-  expect(await frame.locator('input[name="beneficialOwners.0.last_name"]').first().inputValue()).toBe('Zod');
-  expect(await frame.locator('input[name="beneficialOwners.0.ownership_stake"]').first().inputValue()).toBeFalsy();
+  expect(await frame.locator('input[name="bos.0.firstName"]').first().inputValue()).toBe('Owner');
+  expect(await frame.locator('input[name="bos.0.lastName"]').first().inputValue()).toBe('Zod');
+  expect(await frame.locator('input[name="bos.0.ownershipStake"]').first().inputValue()).toBeFalsy();
 
-  expect(await frame.locator('input[name="beneficialOwners.1.first_name"]').first().inputValue()).toBe('Secondary-a');
-  expect(await frame.locator('input[name="beneficialOwners.1.last_name"]').first().inputValue()).toBe('Last-name-a');
-  expect(await frame.locator('input[name="beneficialOwners.1.email"]').first().inputValue()).toBe(
-    'secondary-a@onefootprint.com',
-  );
-  expect(await frame.locator('input[name="beneficialOwners.1.ownership_stake"]').first().inputValue()).toBe('10');
+  expect(await frame.locator('input[name="bos.1.firstName"]').first().inputValue()).toBe('Secondary-a');
+  expect(await frame.locator('input[name="bos.1.lastName"]').first().inputValue()).toBe('Last-name-a');
+  expect(await frame.locator('input[name="bos.1.email"]').first().inputValue()).toBe('secondary-a@onefootprint.com');
+  expect(await frame.locator('input[name="bos.1.ownershipStake"]').first().inputValue()).toBe('10');
 
-  expect(await frame.locator('input[name="beneficialOwners.2.first_name"]').first().inputValue()).toBe('Secondary-b');
-  expect(await frame.locator('input[name="beneficialOwners.2.last_name"]').first().inputValue()).toBe('Last-name-b');
-  expect(await frame.locator('input[name="beneficialOwners.2.ownership_stake"]').first().inputValue()).toBeFalsy();
-  expect(await frame.locator('input[name="beneficialOwners.2.email"]').first().inputValue()).toBe(
-    'secondary-b@onefootprint.com',
-  );
+  expect(await frame.locator('input[name="bos.2.firstName"]').first().inputValue()).toBe('Secondary-b');
+  expect(await frame.locator('input[name="bos.2.lastName"]').first().inputValue()).toBe('Last-name-b');
+  expect(await frame.locator('input[name="bos.2.ownershipStake"]').first().inputValue()).toBeFalsy();
+  expect(await frame.locator('input[name="bos.2.email"]').first().inputValue()).toBe('secondary-b@onefootprint.com');
 });

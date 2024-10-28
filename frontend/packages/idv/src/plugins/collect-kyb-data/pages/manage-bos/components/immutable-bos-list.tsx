@@ -7,8 +7,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-export type BosListProps = {
-  existingBos: HostedBusinessOwner[];
+export type ImmutableBosListProps = {
+  immutableBos: HostedBusinessOwner[];
   onSubmit: (payload: { uuid: string; ownershipStake: number }) => void;
 };
 
@@ -18,10 +18,10 @@ type EditFormValues = {
   ownershipStake: number;
 };
 
-const BosList = ({ existingBos, onSubmit }: BosListProps) => {
+/** Renders a list of immutable beneficial owners and allows editing only their ownership stake. */
+const ImmutableBosList = ({ immutableBos, onSubmit }: ImmutableBosListProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.list' });
   const [editingBo, setEditingBo] = useState<HostedBusinessOwner | null>(null);
-  const authedUser = existingBos.find(bo => bo.isAuthedUser);
 
   const handleSubmit = (bo: HostedBusinessOwner) => async (formValues: EditFormValues) => {
     await onSubmit({ uuid: bo.uuid, ownershipStake: formValues.ownershipStake });
@@ -30,7 +30,7 @@ const BosList = ({ existingBos, onSubmit }: BosListProps) => {
 
   return (
     <>
-      {existingBos.length > 0 ? (
+      {immutableBos.length > 0 ? (
         <Box borderRadius="sm" borderColor="tertiary" borderStyle="solid" borderWidth={1}>
           <Stack alignItems="center">
             <Stack paddingBlock={4} paddingInline={5} gap={3} alignItems="center" flexGrow={1}>
@@ -39,9 +39,9 @@ const BosList = ({ existingBos, onSubmit }: BosListProps) => {
             </Stack>
           </Stack>
           <List>
-            {existingBos.map(bo => {
+            {immutableBos.map(bo => {
               const name = `${bo.decryptedData[IdDI.firstName]} ${bo.decryptedData[IdDI.lastName]}`.trim();
-              const isCurrentBo = bo.uuid === authedUser?.uuid;
+              const isCurrentBo = bo.isAuthedUser;
               const isEditing = editingBo?.uuid === bo.uuid;
 
               return (
@@ -189,4 +189,4 @@ const List = styled.ul`
   `}
 `;
 
-export default BosList;
+export default ImmutableBosList;

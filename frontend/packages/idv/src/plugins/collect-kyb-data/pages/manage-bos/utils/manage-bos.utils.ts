@@ -22,7 +22,6 @@ export const sumTotalOwnershipStake = (
   return totalStake;
 };
 
-// TODO it's fine to have duplicates in sandbox
 export const hasDuplicatedEmail = (
   existingOwners: HostedBusinessOwner[],
   { bos, bosToDelete }: ManageBosFormData,
