@@ -35,6 +35,9 @@
       "label": "Date"
     }
   },
+  "principal-actor": {
+    "a-user": "A user"
+  },
   "body": {
     "footprint-token": "Footprint Token",
     "metadata": "Metadata",
