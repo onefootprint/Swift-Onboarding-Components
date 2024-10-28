@@ -2,7 +2,6 @@ import { type Entity, EntityStatus } from '@onefootprint/types';
 import { InlineAlert, Radio, Stack, Text } from '@onefootprint/ui';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import useSession from 'src/hooks/use-session';
 
 type RequestType = 'uploadDocument' | 'addBo';
 
@@ -16,12 +15,9 @@ const KindForm = ({ children, entity }: KindFormProps) => {
   const { register, control } = useForm<{ requestType: RequestType }>({
     defaultValues: { requestType: 'uploadDocument' },
   });
-  const {
-    data: { user },
-  } = useSession();
   const requestType = useWatch({ control, name: 'requestType' });
   const showStatusWarning = entity.status === EntityStatus.inProgress || entity.status === EntityStatus.incomplete;
-  const showRequestBosOption = !!entity.workflows.length && user?.isFirmEmployee;
+  const showRequestBosOption = !!entity.workflows.length;
 
   return (
     <>
