@@ -36,7 +36,10 @@
     }
   },
   "principal-actor": {
-    "a-user": "A user"
+    "a-user": "A user",
+    "insight-event": {
+      "aria-label": "Insight event card"
+    }
   },
   "body": {
     "footprint-token": "Footprint Token",
