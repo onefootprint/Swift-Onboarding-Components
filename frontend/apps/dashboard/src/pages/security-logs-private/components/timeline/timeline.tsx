@@ -1,10 +1,11 @@
 import type { AccessEvent } from '@onefootprint/types';
+import Event from './components/event';
 
 const Timeline = ({ accessEvents }: { accessEvents: AccessEvent[] }) => {
   return (
     <div>
       {accessEvents.map(accessEvent => (
-        <div key={accessEvent.id}>{JSON.stringify(accessEvent)}</div>
+        <Event key={accessEvent.id} accessEvent={accessEvent} />
       ))}
     </div>
   );
