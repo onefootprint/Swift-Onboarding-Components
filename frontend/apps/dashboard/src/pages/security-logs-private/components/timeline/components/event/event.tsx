@@ -5,7 +5,6 @@ const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
   return (
     <div>
       <DateTime timestamp={accessEvent.timestamp} />
-      <div>{accessEvent.id}</div>
     </div>
   );
 };
