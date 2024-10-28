@@ -17,6 +17,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
     headers,
     data: {
       fixtureResult,
+      omitBusinessCreation: true,
     },
   });
   return response.data;

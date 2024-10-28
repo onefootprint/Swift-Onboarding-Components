@@ -9,7 +9,6 @@ import BeneficialOwnerKyc from '../beneficial-owner-kyc';
 import BusinessAddress from '../business-address';
 import BusinessFieldsLoader from '../business-fields-loader';
 import Confirm from '../confirm';
-import Introduction from '../introduction';
 import ManageBos from '../manage-bos';
 
 type RouterProps = { onDone: () => void };
@@ -32,9 +31,6 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches('introduction')) {
-    return <Introduction />;
-  }
   if (state.matches('loadFromVault')) {
     return (
       <BusinessFieldsLoader

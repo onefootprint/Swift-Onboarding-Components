@@ -12,7 +12,6 @@ import {
   extractBoBootstrapValues,
   extractNonBoBootstrapValues,
   getBusinessDataFromContext,
-  isCollectingBusinessData,
   shouldShowAddressDataScreen,
   shouldShowBasicDataScreen,
   shouldShowManageBosScreen,
@@ -250,75 +249,6 @@ describe('getBusinessDataFromContext', () => {
     } satisfies MachineContext;
 
     expect(getBusinessDataFromContext(ctx)).toEqual({});
-  });
-});
-
-describe('isCollectingBusinessData', () => {
-  it('should return true when some required attributes are missing', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name] }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: {},
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    const result = isCollectingBusinessData(ctx);
-    expect(result).toBe(true);
-  });
-
-  it('should return false when some required attributes are present', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.name] }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: { [BusinessDI.name]: 'Acme' },
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    const result = isCollectingBusinessData(ctx);
-    expect(result).toBe(false);
-  });
-
-  it('should be true if TIN is missing', () => {
-    const ctx = {
-      kybRequirement: getKybRequirement({
-        missing: [CollectedKybDataOption.tin],
-        populated: [
-          CollectedKybDataOption.name,
-          CollectedKybDataOption.kycedBeneficialOwners,
-          CollectedKybDataOption.address,
-        ],
-      }),
-      idvContext: idvContext,
-      bootstrapBusinessData: {},
-      bootstrapUserData: {},
-      data: {
-        'business.address_line1': '300 Park Avenue',
-        'business.city': 'New York',
-        'business.country': 'US',
-        'business.name': 'Piper',
-        'business.state': 'NY',
-        'business.zip': '10022',
-        'business.kyced_beneficial_owners': [
-          {
-            email: undefined,
-            first_name: 'asd',
-            last_name: 'asd',
-            // @ts-expect-error: Object literal may only specify known properties, and 'link_id' does not exist in type 'BeneficialOwner'.
-            link_id: 'bo_link_primary',
-            ownership_stake: 100,
-            phone_number: '+1234',
-          },
-        ],
-      },
-      dataCollectionScreensToShow: [],
-    } satisfies MachineContext;
-
-    const result = isCollectingBusinessData(ctx);
-    expect(result).toBe(true);
   });
 });
 

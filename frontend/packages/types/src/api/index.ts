@@ -186,13 +186,19 @@ export type {
   LoginChallengeRequest,
   LoginChallengeResponse,
 } from './login-challenge';
-export type { OnboardingRequest, OnboardingResponse } from './onboarding';
+export type {
+  OnboardingRequest,
+  OnboardingResponse,
+  BusinessOnboardingRequest,
+  BusinessOnboardingResponse,
+} from './onboarding';
 export type { OnboardingAuthorizeRequest } from './onboarding-authorize';
 export type { OnboardingProcessRequest } from './onboarding-process';
 export type {
   AuthorizeFields,
   AuthorizeRequirement,
   CollectInvestorProfileRequirement,
+  CreateBusinessOnboardingRequirement,
   CollectKybDataRequirement,
   CollectKycDataRequirement,
   CustomDocumentRequirementConfig,

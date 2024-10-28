@@ -30,6 +30,7 @@ export interface Typegen0 {
   matchesStates:
     | 'authorize'
     | 'checkRequirements'
+    | 'createBusinessOnboarding'
     | 'error'
     | 'idDoc'
     | 'init'

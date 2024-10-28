@@ -3,7 +3,9 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const CollectKybDataNavigationHeader = () => {
   const [state, send] = useCollectKybDataMachine();
-  const shouldShowCloseButton = state.matches('introduction') || state.matches('manageBos');
+  const { dataCollectionScreensToShow } = state.context;
+  const currentPageIdx = dataCollectionScreensToShow.indexOf(state.value);
+  const shouldShowCloseButton = currentPageIdx === 0;
 
   const handleBackButtonClick = () => {
     send('navigatedToPrevPage');

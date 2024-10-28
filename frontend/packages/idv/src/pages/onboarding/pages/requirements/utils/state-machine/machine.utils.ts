@@ -19,6 +19,7 @@ const isTransfer = (c: MachineContext): boolean => Boolean(c?.idvContext?.isTran
 
 const isAuthorize = (x: unknown) => x === OnboardingRequirementKind.authorize;
 const isCollectKyb = (x: unknown) => x === OnboardingRequirementKind.collectKybData;
+const isCreateBusinessOnboarding = (x: unknown) => x === OnboardingRequirementKind.createBusinessOnboarding;
 const isCollectKyc = (x: unknown) => x === OnboardingRequirementKind.collectKycData;
 const isCollectDoc = (x: unknown) => x === OnboardingRequirementKind.document;
 const isInvProfile = (x: unknown) => x === OnboardingRequirementKind.investorProfile;
@@ -26,6 +27,8 @@ const isRegisterPasskey = (x: unknown) => x === OnboardingRequirementKind.regist
 const isProcess = (x: unknown) => x === OnboardingRequirementKind.process;
 
 const shouldRunCollectInvestorProfile = (ctx: MachineContext) => !isTransfer(ctx) && isInvProfile(getFirstKind(ctx));
+const shouldRunCreateBusinessOnboarding = (ctx: MachineContext) =>
+  !isTransfer(ctx) && isCreateBusinessOnboarding(getFirstKind(ctx));
 const shouldRunCollectKybData = (ctx: MachineContext) => !isTransfer(ctx) && isCollectKyb(getFirstKind(ctx));
 const shouldRunCollectKycData = (ctx: MachineContext) => !isTransfer(ctx) && isCollectKyc(getFirstKind(ctx));
 const shouldRunLiveness = (ctx: MachineContext) => isRegisterPasskey(getFirstKind(ctx));
@@ -70,6 +73,7 @@ export const RequirementCompletedTransition: TransitionsConfig<MachineContext, M
  * The ordering of these targets actually dictates the order in which requirements are handled by the frontend
  */
 export const NextRequirementTargets: TransitionConfig<MachineContext, MachineEvents>[] = [
+  { target: 'createBusinessOnboarding', cond: context => shouldRunCreateBusinessOnboarding(context) },
   { target: 'kybData', cond: context => shouldRunCollectKybData(context) },
   { target: 'kycData', cond: context => shouldRunCollectKycData(context) },
   { target: 'investorProfile', cond: context => shouldRunCollectInvestorProfile(context) },

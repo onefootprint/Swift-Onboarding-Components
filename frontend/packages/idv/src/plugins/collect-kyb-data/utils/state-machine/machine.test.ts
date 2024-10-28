@@ -102,14 +102,6 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('loadFromVault');
     state = machine.send('businessDataLoadError');
 
-    expect(state.value).toEqual('introduction');
-    state = machine.send('introductionCompleted');
-    expect(state.value).toEqual('basicData');
-
-    state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('introduction');
-
-    state = machine.send('introductionCompleted');
     expect(state.value).toEqual('basicData');
 
     state = machine.send('basicDataSubmitted', {
@@ -123,12 +115,6 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('businessAddress');
 
     state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('basicData');
-
-    state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('introduction');
-
-    state = machine.send('introductionCompleted');
     expect(state.value).toEqual('basicData');
 
     state = machine.send('basicDataSubmitted', {});
@@ -164,9 +150,6 @@ describe('Collect KYB Data Machine Tests', () => {
 
     expect(state.value).toEqual('basicData');
     state = machine.send({ type: 'navigatedToPrevPage' });
-
-    expect(state.value).toEqual('introduction');
-    state = machine.send('introductionCompleted');
 
     expect(state.value).toEqual('basicData');
     state = machine.send('basicDataSubmitted', {});
@@ -211,15 +194,7 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('loadFromVault');
 
     state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
-    expect(state.value).toEqual('introduction');
 
-    state = machine.send('introductionCompleted');
-    expect(state.value).toEqual('businessAddress');
-
-    state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('introduction');
-
-    state = machine.send('introductionCompleted');
     expect(state.value).toEqual('businessAddress');
 
     state = machine.send('businessAddressSubmitted', {
@@ -242,12 +217,6 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('businessAddress');
-
-    state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('introduction');
-
-    state = machine.send('introductionCompleted');
     expect(state.value).toEqual('businessAddress');
 
     state = machine.send('businessAddressSubmitted', {});
@@ -278,7 +247,6 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
 
       // Collect all fields first
-      state = machine.send('introductionCompleted');
       state = machine.send('basicDataSubmitted', {
         payload: {
           [BusinessDI.name]: 'Acme Inc.',
@@ -359,7 +327,6 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
 
       // Collect all fields first
-      state = machine.send('introductionCompleted');
       state = machine.send('basicDataSubmitted', {
         payload: {
           [BusinessDI.name]: 'Acme Inc.',
@@ -385,15 +352,10 @@ describe('Collect KYB Data Machine Tests', () => {
 });
 
 describe('nextScreenTransitions', () => {
-  const Targets = ['introduction', 'basicData', 'businessAddress', 'manageBos', 'confirm'];
+  const Targets = ['basicData', 'businessAddress', 'manageBos', 'confirm'];
 
   it('should return same targets when loadFromVault', () => {
     const result = nextScreenTransitions('loadFromVault');
-    expect(result.map(x => x.target)).toEqual(Targets);
-  });
-
-  it('should return same targets when introduction', () => {
-    const result = nextScreenTransitions('introduction');
     expect(result.map(x => x.target)).toEqual(Targets);
   });
 
@@ -448,7 +410,7 @@ describe('getDataCollectionScreensToShow', () => {
     isConfirmScreenVisible: true,
   };
 
-  it('should return introduction, basicData, confirm 1/5', () => {
+  it('should return basicData, confirm 1/5', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -457,10 +419,10 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['basicData', 'confirm']);
   });
 
-  it('should return introduction, basicData, confirm 2/5', () => {
+  it('should return basicData, confirm 2/5', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -469,10 +431,10 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['basicData', 'confirm']);
   });
 
-  it('should return introduction, basicData, confirm 3/5', () => {
+  it('should return basicData, confirm 3/5', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -481,10 +443,10 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['basicData', 'confirm']);
   });
 
-  it('should return introduction, basicData, confirm 4/5', () => {
+  it('should return basicData, confirm 4/5', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -493,10 +455,10 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['basicData', 'confirm']);
   });
 
-  it('should return introduction, basicData, confirm 5/5', () => {
+  it('should return basicData, confirm 5/5', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -505,10 +467,10 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'basicData', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['basicData', 'confirm']);
   });
 
-  it('should return introduction, businessAddress, confirm', () => {
+  it('should return businessAddress, confirm', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -517,10 +479,10 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'businessAddress', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['businessAddress', 'confirm']);
   });
 
-  it('should return introduction, manageBos, confirm 1/2', () => {
+  it('should return manageBos, confirm', () => {
     const ctx = {
       ...baseCtx,
       kybRequirement: {
@@ -529,19 +491,7 @@ describe('getDataCollectionScreensToShow', () => {
       },
     } as MachineContext;
 
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'manageBos', 'confirm']);
-  });
-
-  it('should return introduction, manageBos, confirm 2/2', () => {
-    const ctx = {
-      ...baseCtx,
-      kybRequirement: {
-        ...baseCtx.kybRequirement,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-      },
-    } as MachineContext;
-
-    expect(getDataCollectionScreensToShow(ctx)).toEqual(['introduction', 'manageBos', 'confirm']);
+    expect(getDataCollectionScreensToShow(ctx)).toEqual(['manageBos', 'confirm']);
   });
 
   it('should return confirm', () => {

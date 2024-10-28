@@ -80,6 +80,11 @@ test('KYB bootstrapping id.xxx, business.primary_owner_stake and business.second
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
+  const letsKYB = frame.getByText("Let's get to know your business!").first();
+  await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
+  await clickOnContinue(frame);
+  await page.waitForLoadState();
+
   // For now, we will show the BOs screen even when they are bootstrapped.
   // Once we support editing on the confirm screen, we should just jump straight to the confirm screen.
   const addBosH2 = frame.getByText('Add beneficial owners').first();

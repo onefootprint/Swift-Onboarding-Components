@@ -100,6 +100,10 @@ const createOnboardingRequirementsMachine = ({
           always: NextRequirementTargets,
           exit: ['setRequirementRouterVisited'], // The first time (and every time after) leaving router, mark data collection as started
         },
+        createBusinessOnboarding: {
+          exit: ['markLastHandledRequirement'],
+          on: RequirementCompletedTransition,
+        },
         kybData: {
           // Since we also collect KYC data inside the KYB plugin, mark KYC data collected
           exit: ['setKycDataCollected', 'setKybDataCollected', 'markLastHandledRequirement'],

@@ -12,6 +12,7 @@ import {
   Liveness,
   Transfer,
 } from '../../../../../../plugins';
+import CreateBusinessOnboarding from '../../../../../../plugins/create-business-onboarding';
 import { getLogger } from '../../../../../../utils/logger';
 import ErrorComponent from '../../../../components/error';
 import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
@@ -31,13 +32,14 @@ const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     idvContext,
-    onboardingContext: { bootstrapData, config, idDocOutcome },
+    onboardingContext: { bootstrapData, config, idDocOutcome, overallOutcome },
     isKycDataCollected,
     requirements,
     isTransferFromDesktopToMobileDisabled,
   } = state.context;
   const { orgId } = config;
   const isDone = state.matches('success');
+  const createBusinessOnboarding = getRequirement(requirements, OnboardingRequirementKind.createBusinessOnboarding);
   const kyb = getRequirement(requirements, OnboardingRequirementKind.collectKybData);
   const kyc = getRequirement(requirements, OnboardingRequirementKind.collectKycData);
   const liveness = getRequirement(requirements, OnboardingRequirementKind.registerPasskey);
@@ -65,6 +67,18 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('checkRequirements')) {
     return <CheckRequirements />;
+  }
+  if (state.matches('createBusinessOnboarding') && createBusinessOnboarding) {
+    return (
+      <CreateBusinessOnboarding
+        idvContext={idvContext}
+        context={{
+          requirement: createBusinessOnboarding,
+          overallOutcome,
+        }}
+        onDone={handleRequirementCompleted}
+      />
+    );
   }
   if (state.matches('kybData') && kyb) {
     return (

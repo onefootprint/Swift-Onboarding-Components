@@ -120,11 +120,6 @@ const isMissingAnyData = (ctx: MachineContext, cdos: CollectedKybDataOption[]): 
   return missingCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]).some(di => !data[di]);
 };
 
-export const isCollectingBusinessData = (ctx: MachineContext): boolean => {
-  const allAttributes = [...ctx.kybRequirement.populatedAttributes, ...ctx.kybRequirement.missingAttributes];
-  return isMissingAnyData(ctx, allAttributes);
-};
-
 export const shouldShowBasicDataScreen = (ctx: MachineContext): boolean => {
   const basicCdos = [
     CollectedKybDataOption.name,

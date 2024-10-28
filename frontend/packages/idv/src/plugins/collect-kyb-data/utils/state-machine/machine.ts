@@ -1,11 +1,6 @@
 import { type StateValue, assign, createMachine } from 'xstate';
 
-import {
-  isCollectingBusinessData,
-  shouldShowAddressDataScreen,
-  shouldShowBasicDataScreen,
-  shouldShowManageBosScreen,
-} from '../attributes';
+import { shouldShowAddressDataScreen, shouldShowBasicDataScreen, shouldShowManageBosScreen } from '../attributes';
 import type { MachineContext, MachineEvents } from './types';
 
 type Screen = {
@@ -14,10 +9,6 @@ type Screen = {
 };
 
 const ORDERED_SCREENS: Screen[] = [
-  {
-    screen: 'introduction',
-    missingCheck: isCollectingBusinessData,
-  },
   {
     screen: 'basicData',
     missingCheck: shouldShowBasicDataScreen,
@@ -55,7 +46,7 @@ export const nextScreenTransitions = (currentScreen: StateValue) => {
 
   return ORDERED_SCREENS.map(s => ({
     target: s.screen as string,
-    actions: s.screen === 'introduction' ? [] : ['assignData'],
+    actions: ['assignData'],
     cond: (ctx: MachineContext) => {
       return (
         // The requirement from the backend says there's info to collect on this screen
@@ -124,11 +115,6 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               target: 'completed',
             },
           ],
-        },
-        introduction: {
-          on: {
-            introductionCompleted: nextScreenTransitions('introduction'),
-          },
         },
         basicData: {
           on: {

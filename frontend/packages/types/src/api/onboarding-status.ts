@@ -14,6 +14,7 @@ export enum OnboardingRequirementKind {
   document = 'collect_document',
   collectKycData = 'collect_data',
   collectKybData = 'collect_business_data',
+  createBusinessOnboarding = 'create_business_onboarding',
   investorProfile = 'collect_investor_profile',
   authorize = 'authorize',
   process = 'process',
@@ -23,6 +24,11 @@ export type RegisterAuthMethodRequirement = {
   kind: OnboardingRequirementKind.registerAuthMethod;
   isMet: boolean;
   authMethodKind: AuthMethodKind;
+};
+
+export type CreateBusinessOnboardingRequirement = {
+  kind: OnboardingRequirementKind.createBusinessOnboarding;
+  requiresBusinessSelection: boolean;
 };
 
 export type CollectKybDataRequirement = {

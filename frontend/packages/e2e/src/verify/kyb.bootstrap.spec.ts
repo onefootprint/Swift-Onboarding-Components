@@ -100,6 +100,11 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
+  const letsKYB = frame.getByText("Let's get to know your business!").first();
+  await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
+  await clickOnContinue(frame);
+  await page.waitForLoadState();
+
   await fillBeneficialOwners(frame, {
     beneficialOwner1Email,
     beneficialOwner1LastName,

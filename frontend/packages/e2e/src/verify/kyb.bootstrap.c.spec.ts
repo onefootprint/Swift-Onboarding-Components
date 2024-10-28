@@ -96,6 +96,11 @@ test('KYB bootstrapping only business.primary_owner_stake and business.secondary
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
+  const letsKYB = frame.getByText("Let's get to know your business!").first();
+  await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
+  await clickOnContinue(frame);
+  await page.waitForLoadState();
+
   const whoAreBOsH2 = frame.getByText('Add beneficial owners').first();
   await whoAreBOsH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 
