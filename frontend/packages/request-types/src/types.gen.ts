@@ -73,7 +73,7 @@ export type BusinessDecryptResponse = {
     [key: string]: unknown;
   };
 };
-export type __key_ =
+export type _key_ =
   | 'business.name'
   | 'business.dba'
   | 'business.website'
@@ -89,6 +89,12 @@ export type __key_ =
   | 'business.formation_state'
   | 'business.formation_date'
   | 'custom.*';
+export type BusinessOnboardingResponse = {
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  authToken: string;
+};
 export type CheckSessionResponse = 'active' | 'expired' | 'unknown';
 export type ConsentRequest = {
   consentLanguageText: string;
@@ -836,14 +842,238 @@ export type HostedBusinessList = {
 };
 export type HostedBusinessOwner = {
   decryptedData: {
-    [key: string]: string;
+    'bank.*.account_type'?: string;
+    'bank.*.ach_account_id'?: string;
+    'bank.*.ach_account_number'?: string;
+    'bank.*.ach_routing_number'?: string;
+    'bank.*.fingerprint'?: string;
+    'bank.*.name'?: string;
+    'card.*.billing_address.country'?: string;
+    'card.*.billing_address.zip'?: string;
+    'card.*.cvc'?: string;
+    'card.*.expiration'?: string;
+    'card.*.expiration_month'?: string;
+    'card.*.expiration_year'?: string;
+    'card.*.fingerprint'?: string;
+    'card.*.issuer'?: string;
+    'card.*.name'?: string;
+    'card.*.number'?: string;
+    'card.*.number_last4'?: string;
+    'custom.*'?: string;
+    'document.custom.*'?: string;
+    'document.drivers_license.back.image'?: string;
+    'document.drivers_license.back.mime_type'?: string;
+    'document.drivers_license.classified_document_type'?: string;
+    'document.drivers_license.clave_de_elector'?: string;
+    'document.drivers_license.curp'?: string;
+    'document.drivers_license.curp_validation_response'?: string;
+    'document.drivers_license.dob'?: string;
+    'document.drivers_license.document_number'?: string;
+    'document.drivers_license.expires_at'?: string;
+    'document.drivers_license.front.image'?: string;
+    'document.drivers_license.front.mime_type'?: string;
+    'document.drivers_license.full_address'?: string;
+    'document.drivers_license.full_name'?: string;
+    'document.drivers_license.gender'?: string;
+    'document.drivers_license.issued_at'?: string;
+    'document.drivers_license.issuing_country'?: string;
+    'document.drivers_license.issuing_state'?: string;
+    'document.drivers_license.nationality'?: string;
+    'document.drivers_license.ref_number'?: string;
+    'document.drivers_license.selfie.image'?: string;
+    'document.drivers_license.selfie.mime_type'?: string;
+    'document.finra_compliance_letter'?: string;
+    'document.id_card.back.image'?: string;
+    'document.id_card.back.mime_type'?: string;
+    'document.id_card.classified_document_type'?: string;
+    'document.id_card.clave_de_elector'?: string;
+    'document.id_card.curp'?: string;
+    'document.id_card.curp_validation_response'?: string;
+    'document.id_card.dob'?: string;
+    'document.id_card.document_number'?: string;
+    'document.id_card.expires_at'?: string;
+    'document.id_card.front.image'?: string;
+    'document.id_card.front.mime_type'?: string;
+    'document.id_card.full_address'?: string;
+    'document.id_card.full_name'?: string;
+    'document.id_card.gender'?: string;
+    'document.id_card.issued_at'?: string;
+    'document.id_card.issuing_country'?: string;
+    'document.id_card.issuing_state'?: string;
+    'document.id_card.nationality'?: string;
+    'document.id_card.ref_number'?: string;
+    'document.id_card.selfie.image'?: string;
+    'document.id_card.selfie.mime_type'?: string;
+    'document.passport.back.image'?: string;
+    'document.passport.back.mime_type'?: string;
+    'document.passport.classified_document_type'?: string;
+    'document.passport.clave_de_elector'?: string;
+    'document.passport.curp'?: string;
+    'document.passport.curp_validation_response'?: string;
+    'document.passport.dob'?: string;
+    'document.passport.document_number'?: string;
+    'document.passport.expires_at'?: string;
+    'document.passport.front.image'?: string;
+    'document.passport.front.mime_type'?: string;
+    'document.passport.full_address'?: string;
+    'document.passport.full_name'?: string;
+    'document.passport.gender'?: string;
+    'document.passport.issued_at'?: string;
+    'document.passport.issuing_country'?: string;
+    'document.passport.issuing_state'?: string;
+    'document.passport.nationality'?: string;
+    'document.passport.ref_number'?: string;
+    'document.passport.selfie.image'?: string;
+    'document.passport.selfie.mime_type'?: string;
+    'document.passport_card.back.image'?: string;
+    'document.passport_card.back.mime_type'?: string;
+    'document.passport_card.classified_document_type'?: string;
+    'document.passport_card.clave_de_elector'?: string;
+    'document.passport_card.curp'?: string;
+    'document.passport_card.curp_validation_response'?: string;
+    'document.passport_card.dob'?: string;
+    'document.passport_card.document_number'?: string;
+    'document.passport_card.expires_at'?: string;
+    'document.passport_card.front.image'?: string;
+    'document.passport_card.front.mime_type'?: string;
+    'document.passport_card.full_address'?: string;
+    'document.passport_card.full_name'?: string;
+    'document.passport_card.gender'?: string;
+    'document.passport_card.issued_at'?: string;
+    'document.passport_card.issuing_country'?: string;
+    'document.passport_card.issuing_state'?: string;
+    'document.passport_card.nationality'?: string;
+    'document.passport_card.ref_number'?: string;
+    'document.passport_card.selfie.image'?: string;
+    'document.passport_card.selfie.mime_type'?: string;
+    'document.permit.back.image'?: string;
+    'document.permit.back.mime_type'?: string;
+    'document.permit.classified_document_type'?: string;
+    'document.permit.clave_de_elector'?: string;
+    'document.permit.curp'?: string;
+    'document.permit.curp_validation_response'?: string;
+    'document.permit.dob'?: string;
+    'document.permit.document_number'?: string;
+    'document.permit.expires_at'?: string;
+    'document.permit.front.image'?: string;
+    'document.permit.front.mime_type'?: string;
+    'document.permit.full_address'?: string;
+    'document.permit.full_name'?: string;
+    'document.permit.gender'?: string;
+    'document.permit.issued_at'?: string;
+    'document.permit.issuing_country'?: string;
+    'document.permit.issuing_state'?: string;
+    'document.permit.nationality'?: string;
+    'document.permit.ref_number'?: string;
+    'document.permit.selfie.image'?: string;
+    'document.permit.selfie.mime_type'?: string;
+    'document.proof_of_address.image'?: string;
+    'document.residence_document.back.image'?: string;
+    'document.residence_document.back.mime_type'?: string;
+    'document.residence_document.classified_document_type'?: string;
+    'document.residence_document.clave_de_elector'?: string;
+    'document.residence_document.curp'?: string;
+    'document.residence_document.curp_validation_response'?: string;
+    'document.residence_document.dob'?: string;
+    'document.residence_document.document_number'?: string;
+    'document.residence_document.expires_at'?: string;
+    'document.residence_document.front.image'?: string;
+    'document.residence_document.front.mime_type'?: string;
+    'document.residence_document.full_address'?: string;
+    'document.residence_document.full_name'?: string;
+    'document.residence_document.gender'?: string;
+    'document.residence_document.issued_at'?: string;
+    'document.residence_document.issuing_country'?: string;
+    'document.residence_document.issuing_state'?: string;
+    'document.residence_document.nationality'?: string;
+    'document.residence_document.ref_number'?: string;
+    'document.residence_document.selfie.image'?: string;
+    'document.residence_document.selfie.mime_type'?: string;
+    'document.ssn_card.image'?: string;
+    'document.visa.back.image'?: string;
+    'document.visa.back.mime_type'?: string;
+    'document.visa.classified_document_type'?: string;
+    'document.visa.clave_de_elector'?: string;
+    'document.visa.curp'?: string;
+    'document.visa.curp_validation_response'?: string;
+    'document.visa.dob'?: string;
+    'document.visa.document_number'?: string;
+    'document.visa.expires_at'?: string;
+    'document.visa.front.image'?: string;
+    'document.visa.front.mime_type'?: string;
+    'document.visa.full_address'?: string;
+    'document.visa.full_name'?: string;
+    'document.visa.gender'?: string;
+    'document.visa.issued_at'?: string;
+    'document.visa.issuing_country'?: string;
+    'document.visa.issuing_state'?: string;
+    'document.visa.nationality'?: string;
+    'document.visa.ref_number'?: string;
+    'document.visa.selfie.image'?: string;
+    'document.visa.selfie.mime_type'?: string;
+    'document.voter_identification.back.image'?: string;
+    'document.voter_identification.back.mime_type'?: string;
+    'document.voter_identification.classified_document_type'?: string;
+    'document.voter_identification.clave_de_elector'?: string;
+    'document.voter_identification.curp'?: string;
+    'document.voter_identification.curp_validation_response'?: string;
+    'document.voter_identification.dob'?: string;
+    'document.voter_identification.document_number'?: string;
+    'document.voter_identification.expires_at'?: string;
+    'document.voter_identification.front.image'?: string;
+    'document.voter_identification.front.mime_type'?: string;
+    'document.voter_identification.full_address'?: string;
+    'document.voter_identification.full_name'?: string;
+    'document.voter_identification.gender'?: string;
+    'document.voter_identification.issued_at'?: string;
+    'document.voter_identification.issuing_country'?: string;
+    'document.voter_identification.issuing_state'?: string;
+    'document.voter_identification.nationality'?: string;
+    'document.voter_identification.ref_number'?: string;
+    'document.voter_identification.selfie.image'?: string;
+    'document.voter_identification.selfie.mime_type'?: string;
+    'id.address_line1'?: string;
+    'id.address_line2'?: string;
+    'id.citizenships'?: string;
+    'id.city'?: string;
+    'id.country'?: string;
+    'id.dob'?: string;
+    'id.drivers_license_number'?: string;
+    'id.drivers_license_state'?: string;
+    'id.email'?: string;
+    'id.first_name'?: string;
+    'id.itin'?: string;
+    'id.last_name'?: string;
+    'id.middle_name'?: string;
+    'id.nationality'?: string;
+    'id.phone_number'?: string;
+    'id.ssn4'?: string;
+    'id.ssn9'?: string;
+    'id.state'?: string;
+    'id.us_legal_status'?: string;
+    'id.us_tax_id'?: string;
+    'id.visa_expiration_date'?: string;
+    'id.visa_kind'?: string;
+    'id.zip'?: string;
+    'investor_profile.annual_income'?: string;
+    'investor_profile.brokerage_firm_employer'?: string;
+    'investor_profile.declarations'?: string;
+    'investor_profile.employer'?: string;
+    'investor_profile.employment_status'?: string;
+    'investor_profile.family_member_names'?: string;
+    'investor_profile.funding_sources'?: string;
+    'investor_profile.investment_goals'?: string;
+    'investor_profile.net_worth'?: string;
+    'investor_profile.occupation'?: string;
+    'investor_profile.political_organization'?: string;
+    'investor_profile.risk_tolerance'?: string;
+    'investor_profile.senior_executive_symbols'?: string;
   };
   /**
    * True if a user has already started onboarding as this beneficial owner. In this case, the
    * data below comes directly from that user's vault.
    */
   hasLinkedUser: boolean;
-  uuid: string;
   /**
    * True if this beneficial owner represents the currently authed user.
    */
@@ -852,6 +1082,7 @@ export type HostedBusinessOwner = {
    * True if this beneficial owner is editable by the currently authed user.
    */
   isMutable: boolean;
+  linkId: string;
   ownershipStake?: number;
   populatedData: Array<
     | 'id.first_name'
@@ -1095,6 +1326,7 @@ export type HostedBusinessOwner = {
     | 'bank.*.account_type'
     | 'bank.*.fingerprint'
   >;
+  uuid: string;
 };
 export type HostedValidateResponse = {
   /**
@@ -2074,12 +2306,26 @@ export type OnboardingStatusResponse = {
     >;
   };
 };
+export type PostBusinessOnboardingRequest = {
+  /**
+   * Can only be provided if there isn't already a business associated with this session.
+   * The identifier of an existing scoped business, if we want to inherit an existing business.
+   * If null and there isn't already a business associated with this session, creates a new
+   * business.
+   */
+  inheritBusinessId?: string;
+  kybFixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
+};
+export type kyb_fixture_result = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type PostOnboardingRequest = {
   fixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
   kybFixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
+  /**
+   * For newer clients - we will eventually make this the default ????
+   */
+  omitBusinessCreation: boolean;
 };
 export type fixture_result2 = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
-export type kyb_fixture_result = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type ProcessRequest = {
   fixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 };
@@ -2629,7 +2875,7 @@ export type RawUserDataRequest = {
     [key: string]: unknown;
   };
 };
-export type __key_2 =
+export type _key_2 =
   | 'id.first_name'
   | 'id.middle_name'
   | 'id.last_name'
@@ -3437,6 +3683,11 @@ export type UserDecryptResponse = {
 };
 export type GetHostedBusinessResponse = HostedBusiness;
 export type GetHostedBusinessError = unknown;
+export type PostHostedBusinessOnboardingData = {
+  body: PostBusinessOnboardingRequest;
+};
+export type PostHostedBusinessOnboardingResponse = BusinessOnboardingResponse;
+export type PostHostedBusinessOnboardingError = unknown;
 export type GetHostedBusinessOwnersResponse = Array<HostedBusinessOwner>;
 export type GetHostedBusinessOwnersError = unknown;
 export type PatchHostedBusinessOwnersData = {
@@ -3951,3 +4202,619 @@ export type PostOrgSdkTelemetryData = {
 };
 export type PostOrgSdkTelemetryResponse = Empty;
 export type PostOrgSdkTelemetryError = unknown;
+export type $OpenApiTs = {
+  '/hosted/business': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': HostedBusiness;
+      };
+    };
+  };
+  '/hosted/business/onboarding': {
+    post: {
+      req: PostHostedBusinessOnboardingData;
+      res: {
+        /**
+         * OK
+         */
+        '200': BusinessOnboardingResponse;
+      };
+    };
+  };
+  '/hosted/business/owners': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<HostedBusinessOwner>;
+      };
+    };
+    patch: {
+      req: PatchHostedBusinessOwnersData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<HostedBusinessOwner>;
+      };
+    };
+  };
+  '/hosted/business/vault': {
+    patch: {
+      req: PatchHostedBusinessVaultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/business/vault/decrypt': {
+    post: {
+      req: PostHostedBusinessVaultDecryptData;
+      res: {
+        /**
+         * OK
+         */
+        '200': BusinessDecryptResponse;
+      };
+    };
+  };
+  '/hosted/business/vault/validate': {
+    post: {
+      req: PostHostedBusinessVaultValidateData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/businesses': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<HostedBusinessList>;
+      };
+    };
+  };
+  '/hosted/check_session': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': CheckSessionResponse;
+      };
+    };
+  };
+  '/hosted/documents': {
+    post: {
+      req: PostHostedDocumentsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': CreateDocumentResponse;
+      };
+    };
+  };
+  '/hosted/documents/{id}/process': {
+    post: {
+      req: PostHostedDocumentsByIdProcessData;
+      res: {
+        /**
+         * OK
+         */
+        '200': DocumentResponse;
+      };
+    };
+  };
+  '/hosted/documents/{id}/upload/{side}': {
+    post: {
+      req: PostHostedDocumentsByIdUploadBySideData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/identify': {
+    post: {
+      req: PostHostedIdentifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyResponse;
+      };
+    };
+  };
+  '/hosted/identify/kba': {
+    post: {
+      req: PostHostedIdentifyKbaData;
+      res: {
+        /**
+         * OK
+         */
+        '200': KbaResponse;
+      };
+    };
+  };
+  '/hosted/identify/lite': {
+    post: {
+      req: PostHostedIdentifyLiteData;
+      res: {
+        /**
+         * OK
+         */
+        '200': LiteIdentifyResponse;
+      };
+    };
+  };
+  '/hosted/identify/login_challenge': {
+    post: {
+      req: PostHostedIdentifyLoginChallengeData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyChallengeResponse;
+      };
+    };
+  };
+  '/hosted/identify/signup_challenge': {
+    post: {
+      req: PostHostedIdentifySignupChallengeData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyChallengeResponse;
+      };
+    };
+  };
+  '/hosted/identify/validation_token': {
+    post: {
+      res: {
+        /**
+         * OK
+         */
+        '200': HostedValidateResponse;
+      };
+    };
+  };
+  '/hosted/identify/verify': {
+    post: {
+      req: PostHostedIdentifyVerifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyVerifyResponse;
+      };
+    };
+  };
+  '/hosted/onboarding': {
+    post: {
+      req: PostHostedOnboardingData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingResponse;
+      };
+    };
+  };
+  '/hosted/onboarding/authorize': {
+    post: {
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/config': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': PublicOnboardingConfiguration;
+      };
+    };
+  };
+  '/hosted/onboarding/d2p/generate': {
+    post: {
+      req: HostedOnboardingD2pGenerateData;
+      res: {
+        /**
+         * OK
+         */
+        '200': D2pGenerateResponse;
+      };
+    };
+  };
+  '/hosted/onboarding/d2p/sms': {
+    post: {
+      req: HostedOnboardingD2pSmsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': D2pSmsResponse;
+      };
+    };
+  };
+  '/hosted/onboarding/d2p/status': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': D2pStatusResponse;
+      };
+    };
+    post: {
+      req: HostedOnboardingD2pStatusPostData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/fp': {
+    post: {
+      req: PostHostedOnboardingFpData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/nid': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': NeuroIdentityIdResponse;
+      };
+    };
+  };
+  '/hosted/onboarding/process': {
+    post: {
+      req: PostHostedOnboardingProcessData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/sds': {
+    post: {
+      req: PostHostedOnboardingSdsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/session': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingSessionResponse;
+      };
+    };
+  };
+  '/hosted/onboarding/skip_passkey_register': {
+    post: {
+      req: PostHostedOnboardingSkipPasskeyRegisterData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/status': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingStatusResponse;
+      };
+    };
+  };
+  '/hosted/onboarding/tel': {
+    post: {
+      req: PostHostedOnboardingTelData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/timeline': {
+    post: {
+      req: PostHostedOnboardingTimelineData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/onboarding/validate': {
+    post: {
+      res: {
+        /**
+         * OK
+         */
+        '200': HostedValidateResponse;
+      };
+    };
+  };
+  '/hosted/user/attest_device': {
+    post: {
+      req: PostHostedUserAttestDeviceData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/attest_device/challenge': {
+    post: {
+      req: PostHostedUserAttestDeviceChallengeData;
+      res: {
+        /**
+         * OK
+         */
+        '200': DeviceAttestationChallengeResponse;
+      };
+    };
+  };
+  '/hosted/user/auth_methods': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<AuthMethod>;
+      };
+    };
+  };
+  '/hosted/user/auth_requirements': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': AuthRequirementsResponse;
+      };
+    };
+  };
+  '/hosted/user/authorized_orgs': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<AuthorizedOrg>;
+      };
+    };
+  };
+  '/hosted/user/challenge': {
+    post: {
+      req: PostHostedUserChallengeData;
+      res: {
+        /**
+         * OK
+         */
+        '200': UserChallengeResponse;
+      };
+    };
+  };
+  '/hosted/user/challenge/verify': {
+    post: {
+      req: PostHostedUserChallengeVerifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': UserChallengeVerifyResponse;
+      };
+    };
+  };
+  '/hosted/user/consent': {
+    post: {
+      req: PostHostedUserConsentData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/documents': {
+    post: {
+      req: PostHostedUserDocumentsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': CreateDocumentResponse;
+      };
+    };
+  };
+  '/hosted/user/documents/{id}/process': {
+    post: {
+      req: PostHostedUserDocumentsByIdProcessData;
+      res: {
+        /**
+         * OK
+         */
+        '200': DocumentResponse;
+      };
+    };
+  };
+  '/hosted/user/documents/{id}/upload/{side}': {
+    post: {
+      req: PostHostedUserDocumentsByIdUploadBySideData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/email/verify': {
+    post: {
+      req: PostHostedUserEmailVerifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/private/bo_links': {
+    post: {
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<BoToken>;
+      };
+    };
+  };
+  '/hosted/user/token': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': GetUserTokenResponse;
+      };
+    };
+  };
+  '/hosted/user/tokens': {
+    post: {
+      req: PostHostedUserTokensData;
+      res: {
+        /**
+         * OK
+         */
+        '200': CreateUserTokenResponse;
+      };
+    };
+  };
+  '/hosted/user/upload/{document_identifier}': {
+    post: {
+      req: PostHostedUserUploadByDocumentIdentifierData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/vault': {
+    patch: {
+      req: PatchHostedUserVaultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/vault/decrypt': {
+    post: {
+      req: PostHostedUserVaultDecryptData;
+      res: {
+        /**
+         * OK
+         */
+        '200': UserDecryptResponse;
+      };
+    };
+  };
+  '/hosted/user/vault/validate': {
+    post: {
+      req: PostHostedUserVaultValidateData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/org/sdk_args': {
+    get: {
+      res: {
+        /**
+         * OK
+         */
+        '200': GetSdkArgsTokenResponse;
+      };
+    };
+    post: {
+      req: PostOrgSdkArgsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': CreateSdkArgsTokenResponse;
+      };
+    };
+  };
+  '/org/sdk_telemetry': {
+    post: {
+      req: PostOrgSdkTelemetryData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+};

@@ -39,8 +39,9 @@
     "@onefootprint/icons": "workspace:*",
     "@onefootprint/postmate": "2.1.2",
     "@onefootprint/request": "workspace:*",
-    "@onefootprint/services": "workspace:*",
     "@onefootprint/types": "workspace:*",
+    "@onefootprint/request-types": "workspace:*",
+    "@onefootprint/axios": "workspace:*",
     "@onefootprint/ui": "workspace:*",
     "@radix-ui/react-select": "^2.0.0",
     "@tanstack/react-query": "^5.56.2",
@@ -70,7 +71,6 @@
     "use-resize-observer": "^9.1.0",
     "usehooks-ts": "2.16.0",
     "xstate": "^4.37.1",
-    "@hey-api/client-axios": "^0.2.9",
     "react": "^18",
     "react-dom": "^18"
   },

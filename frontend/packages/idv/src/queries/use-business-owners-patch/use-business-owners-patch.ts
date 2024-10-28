@@ -1,5 +1,5 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type { HostedBusinessOwner } from '@onefootprint/services';
+import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { IdDI } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
@@ -50,6 +50,7 @@ export const patchBusinessOwnersRequest = async ({
 
     const linkedUserDataChangeOperations = updateOperationsForAuthedUser.filter(operation =>
       Object.entries(operation.data).some(
+        // @ts-ignore
         ([di, value]) => value && existingBosByUuid[operation.uuid]?.decryptedData?.[di] !== value,
       ),
     );

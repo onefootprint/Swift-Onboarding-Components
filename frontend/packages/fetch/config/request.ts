@@ -1,4 +1,3 @@
-import { API_BASE_URL, CLIENT_VERSION } from '../config/constants';
 import { keysToSnakeCase } from './transform-data';
 
 type Options = Request & {
@@ -20,14 +19,13 @@ function convertToRecordString(input: Record<string, unknown>): Record<string, s
 }
 
 export async function request(options: Options) {
-  const { baseURL = API_BASE_URL, url, headers, params, data, disableCaseConverter, ...otherOptions } = options;
+  const { baseURL, url, headers, params, data, disableCaseConverter, ...otherOptions } = options;
 
   const snakeCaseData = data ? keysToSnakeCase(data, disableCaseConverter) : undefined;
   const snakeCaseParams = params ? keysToSnakeCase(params, disableCaseConverter) : {};
   const queryParams = new URLSearchParams(convertToRecordString(snakeCaseParams));
   const requestHeaders = new Headers({
     'Content-Type': 'application/json',
-    'x-fp-client-version': CLIENT_VERSION,
     Accept: 'application/json',
   });
 

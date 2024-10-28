@@ -1,5 +1,5 @@
 import { IcoUsers24 } from '@onefootprint/icons';
-import type { HostedBusinessOwner } from '@onefootprint/services';
+import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { IdDI } from '@onefootprint/types';
 import { Box, Button, Form, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';

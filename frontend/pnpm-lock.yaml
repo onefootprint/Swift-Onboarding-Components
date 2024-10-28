@@ -1644,6 +1644,37 @@ importers:
         specifier: ^5.5.2
         version: 5.5.2
 
+  packages/axios:
+    dependencies:
+      '@hey-api/client-axios':
+        specifier: ^0.2.9
+        version: 0.2.9(axios@1.7.7)
+      '@onefootprint/request':
+        specifier: workspace:*
+        version: link:../request
+      '@onefootprint/request-types':
+        specifier: workspace:*
+        version: link:../request-types
+      '@tanstack/react-query':
+        specifier: ^5.56.2
+        version: 5.56.2(react@18.3.1)
+      axios:
+        specifier: ^1.7.7
+        version: 1.7.7
+      axios-case-converter:
+        specifier: ^1.1.1
+        version: 1.1.1(axios@1.7.7)
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.12.14
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+
   packages/core:
     dependencies:
       date-fns:
@@ -1718,6 +1749,28 @@ importers:
         specifier: ^5.5.2
         version: 5.5.2
 
+  packages/fetch:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: ^0.4.2
+        version: 0.4.2
+      '@onefootprint/request-types':
+        specifier: workspace:*
+        version: link:../request-types
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/lodash':
+        specifier: ^4.17.12
+        version: 4.17.12
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+
   packages/footprint-js:
     dependencies:
       '@onefootprint/dev-tools':
@@ -1745,9 +1798,12 @@ importers:
 
   packages/footprint-react:
     dependencies:
-      '@hey-api/client-fetch':
-        specifier: ^0.4.2
-        version: 0.4.2
+      '@onefootprint/fetch':
+        specifier: workspace:*
+        version: link:../fetch
+      '@onefootprint/request-types':
+        specifier: workspace:*
+        version: link:../request-types
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -1770,9 +1826,6 @@ importers:
       '@happy-dom/global-registrator':
         specifier: ^13.3.8
         version: 13.10.1
-      '@hey-api/openapi-ts':
-        specifier: ^0.53.11
-        version: 0.53.12(typescript@5.5.2)
       '@onefootprint/core':
         specifier: workspace:*
         version: link:../core
@@ -1934,15 +1987,15 @@ importers:
       '@formkit/auto-animate':
         specifier: ^1.0.0-beta.6
         version: 1.0.0-beta.6
-      '@hey-api/client-axios':
-        specifier: ^0.2.9
-        version: 0.2.9(axios@1.7.7)
       '@juggle/resize-observer':
         specifier: ^3.4.0
         version: 3.4.0
       '@onefootprint/appearance':
         specifier: workspace:*
         version: link:../appearance
+      '@onefootprint/axios':
+        specifier: workspace:*
+        version: link:../axios
       '@onefootprint/core':
         specifier: workspace:*
         version: link:../core
@@ -1970,9 +2023,9 @@ importers:
       '@onefootprint/request':
         specifier: workspace:*
         version: link:../request
-      '@onefootprint/services':
+      '@onefootprint/request-types':
         specifier: workspace:*
-        version: link:../services
+        version: link:../request-types
       '@onefootprint/types':
         specifier: workspace:*
         version: link:../types
@@ -2213,7 +2266,7 @@ importers:
         specifier: ^5.5.2
         version: 5.5.2
 
-  packages/services:
+  packages/request-types:
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: ^0.53.11
@@ -10809,7 +10862,7 @@ packages:
       '@storybook/csf': 0.1.11
       '@storybook/global': 5.0.0
       '@storybook/icons': 1.2.10(react-dom@18.3.1)(react@18.3.1)
-      '@types/lodash': 4.14.202
+      '@types/lodash': 4.17.12
       color-convert: 2.0.1
       dequal: 2.0.3
       lodash: 4.17.21
@@ -12304,6 +12357,10 @@ packages:
     resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
     dev: true
 
+  /@types/lodash@4.17.12:
+    resolution: {integrity: sha512-sviUmCE8AYdaF/KIHLDJBQgeYzPBI0vf/17NaYehBJfYD1j6/L95Slh07NlyK2iNyBNaEkb3En2jRt+a8y3xZQ==}
+    dev: true
+
   /@types/long@4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
     dev: true
@@ -13207,6 +13264,18 @@ packages:
       header-case: 2.0.4
       snake-case: 3.0.4
       tslib: 2.6.2
+
+  /axios-case-converter@1.1.1(axios@1.7.7):
+    resolution: {integrity: sha512-v13pB7cYryh/7f4TKxN/gniD2hwqPQcjip29Hk3J9iwsnA37Rht2Hkn5VyrxynxlKdMNSIfGk6I9D6G28oTRyQ==}
+    peerDependencies:
+      axios: '>=1.0.0 <2.0.0'
+    dependencies:
+      axios: 1.7.7
+      camel-case: 4.1.2
+      header-case: 2.0.4
+      snake-case: 3.0.4
+      tslib: 2.6.2
+    dev: false
 
   /axios@1.7.7:
     resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
@@ -16418,7 +16487,7 @@ packages:
       defu: 6.1.4
       node-fetch-native: 1.6.4
       nypm: 0.3.11
-      ohash: 1.1.3
+      ohash: 1.1.4
       pathe: 1.1.2
       tar: 6.2.1
     dev: true
@@ -20101,10 +20170,6 @@ packages:
 
   /objectorarray@1.0.5:
     resolution: {integrity: sha512-eJJDYkhJFFbBBAxeh8xW+weHlkI28n2ZdQV/J/DNfWfSKlGEf2xcfAbZTv3riEXHAhL9SVOTs2pRmXiSTf78xg==}
-    dev: true
-
-  /ohash@1.1.3:
-    resolution: {integrity: sha512-zuHHiGTYTA1sYJ/wZN+t5HKZaH23i4yI1HMwbuXm24Nid7Dv0KcuRlKoNKS9UNfAVSBlnGLcuQrnOKWOZoEGaw==}
     dev: true
 
   /ohash@1.1.4:

@@ -1,4 +1,4 @@
-import type { HostedBusinessOwner } from '@onefootprint/services';
+import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { IdDI } from '@onefootprint/types';
 import type { ManageBosFormData } from '../manage-bos.types';
 
@@ -40,7 +40,7 @@ export const hasDuplicatedPhoneNumber = (
   existingOwners: HostedBusinessOwner[],
   { bos, bosToDelete }: ManageBosFormData,
 ): boolean => {
-  const removeSpecialChars = (phone: string) => phone.replace(/\D/g, '');
+  const removeSpecialChars = (phone?: string) => phone?.replace(/\D/g, '');
 
   const existingOwnersAfterDelete = existingOwners.filter(bo => !bosToDelete.includes(bo.uuid));
   const allPhoneNumbersByUuid = {

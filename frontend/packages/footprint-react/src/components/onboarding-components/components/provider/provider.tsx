@@ -1,9 +1,9 @@
 import { isAlphanumeric } from '@onefootprint/core';
+import { getHostedOnboardingConfig as getOnboardingConfigReq } from '@onefootprint/fetch';
 import type { SandboxOutcome } from '@onefootprint/footprint-js';
+import type { PublicOnboardingConfiguration } from '@onefootprint/request-types';
 import merge from 'lodash/merge';
 import { createContext, useEffect, useMemo, useState } from 'react';
-import type { PublicOnboardingConfiguration } from '../../../../client';
-import { getOnboardingConfig as getOnboardingConfigReq } from '../../../../client/services.gen';
 import defaultTranslations from '../../constants/translations';
 import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 import type { ContextData, ProviderProps, UpdateContext } from './provider.types';

@@ -22,8 +22,7 @@
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
     "test": "bun test --bail",
-    "typecheck": "pnpm tsc --noEmit",
-    "openapi-ts": "tsx src/config/openapi-ts --camelCaseKeys"
+    "typecheck": "pnpm tsc --noEmit"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^13.3.8",
@@ -43,7 +42,6 @@
     "tsconfig": "workspace:*",
     "tsup": "^6.5.0",
     "typescript": "^5.5.2",
-    "@hey-api/openapi-ts": "^0.53.11",
     "tsx": "^4.19.1"
   },
   "dependencies": {
@@ -53,7 +51,8 @@
     "i18next": "^23.16.0",
     "lodash": "^4.17.21",
     "react-hook-form": "^7.52.2",
-    "@hey-api/client-fetch": "^0.4.2"
+    "@onefootprint/fetch": "workspace:*",
+    "@onefootprint/request-types": "workspace:*"
   },
   "peerDependencies": {
     "@onefootprint/footprint-js": ">=3.15.2",

@@ -1,7 +1,7 @@
 import { isEmail, isPhoneNumber } from '@onefootprint/core';
 import { uuidv4 } from '@onefootprint/dev-tools';
 import { IcoPlusSmall24, IcoUserCircle24 } from '@onefootprint/icons';
-import type { HostedBusinessOwner } from '@onefootprint/services';
+import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { Button, Divider, Form, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

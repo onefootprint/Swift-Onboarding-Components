@@ -27,6 +27,9 @@ export const client = createClient(
   // Add new imports after the first import statement
   content = content.replace(/(import .+ from '@hey-api\/client-axios';)/, `$1${newImports}`);
 
+  // Replace the import from './types.gen' with '@onefootprint/request-types'
+  content = content.replace(/from '\.\/types\.gen';/, "from '@onefootprint/request-types';");
+
   // Replace the existing client creation with the new configuration
   content = content.replace(/export const client = createClient\(createConfig\(\)\);/, newClientConfig);
 

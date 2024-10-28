@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import type { GetHostedBusinessOwnersResponse } from '@onefootprint/services';
+import type { GetHostedBusinessOwnersResponse } from '@onefootprint/request-types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 

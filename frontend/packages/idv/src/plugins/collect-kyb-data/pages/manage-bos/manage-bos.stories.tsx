@@ -1,4 +1,4 @@
-import type { HostedBusinessOwner } from '@onefootprint/services';
+import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { fn } from '@onefootprint/storybook-utils';
 import { IdDI } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
@@ -49,6 +49,7 @@ const mockBos: HostedBusinessOwner[] = [
     },
     populatedData: [IdDI.firstName, IdDI.lastName, IdDI.phoneNumber, IdDI.email],
     ownershipStake: 40,
+    linkId: 'bo_link_primary',
   },
   {
     uuid: 'bo_link_secondary',
@@ -63,6 +64,7 @@ const mockBos: HostedBusinessOwner[] = [
     },
     populatedData: [IdDI.firstName, IdDI.lastName, IdDI.phoneNumber, IdDI.email],
     ownershipStake: 35,
+    linkId: 'bo_link_secondary',
   },
 ];
 

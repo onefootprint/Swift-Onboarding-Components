@@ -141,6 +141,9 @@
     },
     "chromatic": {
       "dependsOn": ["^build:storybook"]
+    },
+    "generate:openapi": {
+      "cache": false
     }
   }
 }

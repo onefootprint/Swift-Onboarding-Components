@@ -1,0 +1,22 @@
+{
+  "name": "@onefootprint/request-types",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "files": ["dist/**"],
+  "scripts": {
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "lint:ci": "biome ci src",
+    "lint": "biome check src --fix --unsafe",
+    "typecheck": "pnpm tsc --noEmit",
+    "generate:openapi": "tsx config"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.53.11",
+    "@types/node": "^20",
+    "tsconfig": "workspace:*",
+    "typescript": "^5.5.2"
+  }
+}

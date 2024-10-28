@@ -1,5 +1,5 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type { HostedBusinessOwner } from '@onefootprint/services';
+import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { patchBusinessOwnersRequest } from './use-business-owners-patch';
 
 // Mock the request functions
@@ -20,6 +20,7 @@ describe('patchBusinessOwnersRequest', () => {
       decryptedData: { 'id.first_name': 'John', 'id.last_name': 'Doe' },
       isAuthedUser: false,
       populatedData: [],
+      linkId: '',
     },
     {
       uuid: '2',
@@ -29,6 +30,7 @@ describe('patchBusinessOwnersRequest', () => {
       decryptedData: { 'id.first_name': 'Jane', 'id.last_name': 'Smith' },
       isAuthedUser: true,
       populatedData: [],
+      linkId: '',
     },
     {
       uuid: '3',
@@ -38,6 +40,7 @@ describe('patchBusinessOwnersRequest', () => {
       decryptedData: { 'id.first_name': 'Bob', 'id.last_name': 'Johnson' },
       isAuthedUser: false,
       populatedData: [],
+      linkId: '',
     },
   ];
 

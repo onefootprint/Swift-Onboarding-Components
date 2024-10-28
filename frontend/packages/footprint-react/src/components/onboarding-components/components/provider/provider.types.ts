@@ -1,8 +1,8 @@
 import type { FootprintAppearance, FootprintComponent, SandboxOutcome } from '@onefootprint/footprint-js';
+import type { PublicOnboardingConfiguration } from '@onefootprint/request-types';
 import type { ChallengeData } from '@onefootprint/types';
 import type React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import type { PublicOnboardingConfiguration } from '../../../../client';
 import type { FormValues } from '../../../../types';
 import type { Translations } from '../../constants/translations';
 import type AuthTokenStatus from '../../types/auth-token-status';

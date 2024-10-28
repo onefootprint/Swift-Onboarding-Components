@@ -25,7 +25,8 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "upload:sourcemaps": "turbo run upload:sourcemaps",
-    "version": "changeset version"
+    "version": "changeset version",
+    "generate:openapi": "turbo run generate:openapi"
   },
   "dependencies": {},
   "devDependencies": {
