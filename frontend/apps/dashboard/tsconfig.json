@@ -1,6 +1,6 @@
 {
   "extends": "tsconfig/nextjs.json",
-  "exclude": ["node_modules", "./src/config/locales/**/*", "./src/@types/**/*"],
+  "exclude": ["node_modules", "./src/@types/**/*"],
   "include": ["next-env.d.ts", "./src/**/*"],
   "files": [],
   "compilerOptions": {
