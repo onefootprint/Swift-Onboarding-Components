@@ -794,19 +794,6 @@ impl VerificationChecks {
             true
         };
 
-        // TODO: remove once client starts providing BusinessAml as optional with KYB.
-        let has_kyb_checks = checks
-            .iter()
-            .any(|vc| matches!(vc, VerificationCheck::Kyb { ein_only: _ }));
-
-        let has_biz_aml_checks = checks
-            .iter()
-            .any(|vc| matches!(vc, VerificationCheck::BusinessAml {}));
-
-        if has_kyb_checks && !has_biz_aml_checks {
-            checks.push(VerificationCheck::BusinessAml {});
-        }
-
         let enhanced_aml_migrated = if let Some(enhanced) = enhanced_aml {
             match enhanced {
                 EnhancedAmlOption::No => (),
