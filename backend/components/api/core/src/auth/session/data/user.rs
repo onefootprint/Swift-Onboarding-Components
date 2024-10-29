@@ -342,6 +342,7 @@ impl UserSession {
             // Legacy token that doesn't have the metadata field
             OnboardingSessionTrustedMetadata {
                 allow_reonboard: true,
+                ..Default::default()
             }
         } else {
             self.metadata.clone()

@@ -6,6 +6,7 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
 use api_core::utils::onboarding::get_or_create_business_wf;
@@ -63,7 +64,14 @@ pub async fn post(
                 force_create,
                 su: &user_auth.scoped_user,
             };
-            let inherit_business_id = if use_legacy_inherit_logic {
+            let external_id = user_auth.data.metadata().business_external_id;
+            let inherit_business_id = if external_id.is_some() {
+                if inherit_business_id.is_some() {
+                    return ValidationError("Cannot select a business when business_external_id is set")
+                        .into();
+                }
+                InheritBusinessId::Modern(None)
+            } else if use_legacy_inherit_logic {
                 InheritBusinessId::Legacy
             } else {
                 InheritBusinessId::Modern(inherit_business_id)
@@ -72,6 +80,7 @@ pub async fn post(
                 user_auth: &user_auth,
                 fixture_result: kyb_fixture_result,
                 inherit_business_id,
+                external_id: external_id.as_ref(),
             };
             let (biz_wf, _) = get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
 

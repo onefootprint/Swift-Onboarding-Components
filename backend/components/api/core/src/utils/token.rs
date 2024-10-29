@@ -121,7 +121,10 @@ pub fn create_token(
         ),
     };
 
-    let metadata = OnboardingSessionTrustedMetadata { allow_reonboard };
+    let metadata = OnboardingSessionTrustedMetadata {
+        allow_reonboard,
+        ..Default::default()
+    };
     let context = NewUserSessionContext {
         su_id: Some(su.id.clone()),
         sb_id,

@@ -39,6 +39,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::ExternalId;
 use newtypes::KybConfig;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingStatus;
@@ -197,6 +198,7 @@ pub struct CreateBusinessWfArgs<'a> {
     pub user_auth: &'a UserSessionContext,
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub inherit_business_id: InheritBusinessId,
+    pub external_id: Option<&'a ExternalId>,
 }
 
 pub enum InheritBusinessId {
@@ -213,6 +215,7 @@ fn get_or_create_business(
     obc: &ObConfiguration,
     inherit_business_id: InheritBusinessId,
     new_biz_keypair: VaultKeyPair,
+    external_id: Option<&ExternalId>,
     force_create: bool,
 ) -> FpResult<ScopedVaultId> {
     if let Some(sb_id) = user_auth.sb_id.clone() {
@@ -276,10 +279,22 @@ fn get_or_create_business(
         is_active: true,
         status: OnboardingStatus::None,
         tenant_id: &obc.tenant_id,
-        external_id: None, // TODO eventually pass this in
+        external_id,
     };
-    let (sb, bv, _) = ScopedVault::get_or_create_by_external_id(conn, vault_args, sv_args, None)?;
-    BusinessOwner::create_primary(conn, user_auth.user.id.clone(), bv.id)?;
+    let (sb, bv, is_new) = ScopedVault::get_or_create_by_external_id(conn, vault_args, sv_args, None)?;
+    if is_new {
+        BusinessOwner::create_primary(conn, user_auth.user.id.clone(), bv.id)?;
+    } else {
+        // Make sure that the business is owned by the authed user
+        let id = BoIdentifier::Vaults {
+            uv_id: &user_auth.user.id,
+            bv_id: &bv.id,
+        };
+        let existing_bo = BusinessOwner::get(conn, id).optional()?;
+        if existing_bo.is_none() {
+            return ValidationError("The business is not owned by the authed user").into();
+        }
+    }
     Ok(sb.id)
 }
 
@@ -301,7 +316,8 @@ pub fn get_or_create_business_wf<'a>(
     let CreateBusinessWfArgs {
         user_auth,
         fixture_result,
-        inherit_business_id,
+        inherit_business_id: biz_id,
+        external_id,
     } = args;
 
     let sb_id = user_auth.sb_id.as_ref();
@@ -327,7 +343,7 @@ pub fn get_or_create_business_wf<'a>(
     }
 
     Vault::lock(conn, &su.vault_id)?;
-    let sb_id = get_or_create_business(conn, user_auth, obc, inherit_business_id, kp, force_create)?;
+    let sb_id = get_or_create_business(conn, user_auth, obc, biz_id, kp, external_id, force_create)?;
     ScopedVault::lock(conn, &sb_id)?;
 
 

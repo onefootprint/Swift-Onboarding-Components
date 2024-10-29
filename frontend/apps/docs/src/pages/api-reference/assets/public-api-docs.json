@@ -5420,6 +5420,10 @@
                         "description": "Optionally, any user or business bootstrap data that you would like to pass into the\n onboarding flow.\n For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).",
                         "type": "object"
                     },
+                    "business_external_id": {
+                        "description": "When using a KYB playbook, optionally this business's identifier in your own database.\n If a business with this external ID owned by the identified user already exists within the\n Footprint ecosystem, we will select it. If not, we will create a new business with this\n as its `external_id`.\n NOTE: the identified user must already own the business with this external ID or they will\n receive an error during onboarding.",
+                        "type": "string"
+                    },
                     "key": {
                         "description": "The playbook key that should be used for the onboarding.",
                         "type": "string"

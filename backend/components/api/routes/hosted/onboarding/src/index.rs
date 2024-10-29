@@ -135,11 +135,13 @@ pub async fn post(
             // force create here when the secondary BO needs to redo KYC.
             let (user_wf, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
+            // TODO deprecate this
             let kyb_fixture_result = kyb_fixture_result.or(fixture_result);
             let args = CreateBusinessWfArgs {
                 user_auth: &user_auth,
                 fixture_result: kyb_fixture_result,
                 inherit_business_id: InheritBusinessId::Legacy,
+                external_id: None,
             };
             let biz_wf = if !omit_business_creation {
                 maybe_new_biz_keypair

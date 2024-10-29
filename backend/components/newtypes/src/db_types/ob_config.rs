@@ -55,6 +55,7 @@ impl_enum_str_diesel!(ApiKeyStatus);
     Apiv2Schema,
     macros::SerdeAttr,
     EnumIter,
+    derive_more::IsVariant,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

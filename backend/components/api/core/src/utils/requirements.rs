@@ -126,6 +126,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let is_secondary_bo = user_auth.user_session.is_secondary_bo();
     let auth_events = user_auth.user_session.auth_events.clone();
     let person_workflow = user_auth.workflow.clone();
+    let has_business_external_id = user_auth.metadata().business_external_id.is_some();
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {
             let ctx = RequirementContext {
@@ -151,7 +152,10 @@ pub async fn get_requirements_for_person_and_maybe_business(
                     requirements.extend(get_requirements_for_wf(conn, ctx, &biz_wf, &bvw)?);
                 } else {
                     // If there's no business workflow, add requirement to create one
-                    requirements.push(get_create_business_workflow_requirement(has_sb_id));
+                    let req = OnboardingRequirement::CreateBusinessOnboarding {
+                        requires_business_selection: !has_sb_id && !has_business_external_id,
+                    };
+                    requirements.push(req);
                 }
             }
 
@@ -396,12 +400,6 @@ fn get_collect_investor_profile_requirement<T>(
     };
     let req = omit_confirm_if_necessary(req, user_wf);
     Ok(req)
-}
-
-fn get_create_business_workflow_requirement(has_sb_id: bool) -> OnboardingRequirement {
-    OnboardingRequirement::CreateBusinessOnboarding {
-        requires_business_selection: !has_sb_id,
-    }
 }
 
 fn get_collect_kyb_data_requirement<T>(

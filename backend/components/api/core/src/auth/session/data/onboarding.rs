@@ -1,5 +1,6 @@
 use super::sdk_args::UserDataV1;
 use newtypes::BoId;
+use newtypes::ExternalId;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKey;
 use newtypes::TenantId;
@@ -29,6 +30,7 @@ pub struct OnboardingSession {
 /// directly from the tenant.
 pub struct OnboardingSessionTrustedMetadata {
     pub allow_reonboard: bool,
+    pub business_external_id: Option<ExternalId>,
 }
 
 /// A business-owner specific session. This is issued when sending out links to each owner of a
