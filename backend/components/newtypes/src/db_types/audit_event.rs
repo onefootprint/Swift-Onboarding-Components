@@ -93,25 +93,35 @@ pub enum AuditEventDetail {
         list_id: ListId,
         list_entry_id: ListEntryId,
     },
+    CreatePlaybook,
+    DisablePlaybook,
+    ManuallyReviewEntity,
+    EditPlaybook,
+    DeactivateOrgRole,
 }
 
-/// Represents a projection of AuditEventDetail onto a common schema.
-#[derive(Debug, Clone)]
-pub struct CommonAuditEventDetail {
-    pub metadata: AuditEventMetadata,
 
+#[derive(Debug, Clone, Default)]
+pub struct AuditEventOptionalArgs {
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub document_data_id: Option<DocumentDataId>,
     pub tenant_api_key_id: Option<TenantApiKeyId>,
     pub tenant_user_id: Option<TenantUserId>,
     pub tenant_role_id: Option<TenantRoleId>,
-
     pub is_live: Option<bool>,
     pub list_entry_creation_id: Option<ListEntryCreationId>,
     pub list_entry_id: Option<ListEntryId>,
     pub list_id: Option<ListId>,
 }
+
+/// Represents a projection of AuditEventDetail onto a common schema.
+#[derive(Debug, Clone)]
+pub struct CommonAuditEventDetail {
+    pub metadata: AuditEventMetadata,
+    pub args: AuditEventOptionalArgs,
+}
+
 
 impl From<AuditEventDetail> for CommonAuditEventDetail {
     fn from(value: AuditEventDetail) -> Self {
@@ -124,16 +134,11 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 metadata: AuditEventMetadata::CreateUser {
                     fields: created_fields,
                 },
-                scoped_vault_id: Some(scoped_vault_id),
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    scoped_vault_id: Some(scoped_vault_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::UpdateUserData {
                 is_live,
@@ -143,16 +148,11 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 metadata: AuditEventMetadata::UpdateUserData {
                     fields: updated_fields,
                 },
-                scoped_vault_id: Some(scoped_vault_id),
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    scoped_vault_id: Some(scoped_vault_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::DeleteUserData {
                 is_live,
@@ -162,16 +162,11 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 metadata: AuditEventMetadata::DeleteUserData {
                     fields: deleted_fields,
                 },
-                scoped_vault_id: Some(scoped_vault_id),
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    scoped_vault_id: Some(scoped_vault_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::DecryptUserData {
                 is_live,
@@ -185,32 +180,22 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     context,
                     fields: decrypted_fields,
                 },
-                scoped_vault_id: Some(scoped_vault_id),
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    scoped_vault_id: Some(scoped_vault_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::DeleteUser {
                 is_live,
                 scoped_vault_id,
             } => Self {
                 metadata: AuditEventMetadata::DeleteUser,
-                scoped_vault_id: Some(scoped_vault_id),
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    scoped_vault_id: Some(scoped_vault_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::CreateListEntry {
                 is_live,
@@ -218,16 +203,12 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 list_entry_creation_id,
             } => Self {
                 metadata: AuditEventMetadata::CreateListEntry,
-                scoped_vault_id: None,
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: Some(list_entry_creation_id),
-                list_entry_id: None,
-                list_id: Some(list_id),
+                args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
+                    list_entry_creation_id: Some(list_entry_creation_id),
+                    list_id: Some(list_id),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::DeleteListEntry {
                 is_live,
@@ -235,16 +216,12 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 list_entry_id,
             } => Self {
                 metadata: AuditEventMetadata::DeleteListEntry,
-                scoped_vault_id: None,
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: None,
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: Some(list_entry_id),
-                list_id: Some(list_id),
+                args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
+                    list_entry_id: Some(list_entry_id),
+                    list_id: Some(list_id),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::CreateUserAnnotation => todo!(),
             AuditEventDetail::CompleteUserCheckLiveness => todo!(),
@@ -267,16 +244,10 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     first_name,
                     last_name,
                 },
-                scoped_vault_id: None,
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: Some(tenant_role_id),
-                is_live: None,
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    tenant_role_id: Some(tenant_role_id),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::UpdateOrgMember => todo!(),
             AuditEventDetail::LoginOrgMember => todo!(),
@@ -289,18 +260,18 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_role_id,
             } => Self {
                 metadata: AuditEventMetadata::CreateOrgRole { scopes },
-                scoped_vault_id: None,
-                ob_configuration_id: None,
-                document_data_id: None,
-                tenant_api_key_id: None,
-                tenant_user_id: None,
-                tenant_role_id: Some(tenant_role_id),
-                is_live: Some(is_live),
-                list_entry_creation_id: None,
-                list_entry_id: None,
-                list_id: None,
+                args: AuditEventOptionalArgs {
+                    tenant_role_id: Some(tenant_role_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
             },
             AuditEventDetail::UpdateOrgRole => todo!(),
+            AuditEventDetail::CreatePlaybook => todo!(),
+            AuditEventDetail::DisablePlaybook => todo!(),
+            AuditEventDetail::EditPlaybook => todo!(),
+            AuditEventDetail::ManuallyReviewEntity => todo!(),
+            AuditEventDetail::DeactivateOrgRole => todo!(),
         }
     }
 }
@@ -386,6 +357,11 @@ pub enum AuditEventMetadata {
     UpdateOrgRole,
     CreateListEntry,
     DeleteListEntry,
+    CreatePlaybook,
+    DisablePlaybook,
+    ManuallyReviewEntity,
+    EditPlaybook,
+    DeactivateOrgRole,
 }
 
 impl_enum_str_diesel!(AuditEventName);

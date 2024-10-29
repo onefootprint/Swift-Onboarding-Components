@@ -120,6 +120,11 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     .ok_or(AssertionError("list_entry is not available for this event"))?
                     .id,
             },
+            AuditEventMetadata::CreatePlaybook => AuditEventDetail::CreatePlaybook,
+            AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook,
+            AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
+            AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
+            AuditEventMetadata::DeactivateOrgRole => AuditEventDetail::DeactivateOrgRole,
         };
 
         Ok(api_wire_types::AuditEvent {

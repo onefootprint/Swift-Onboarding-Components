@@ -11,13 +11,10 @@ def has_audit_event_with_details(tenant, name, **kwargs):
     data = dict(names=[name])
     audit_events = get("org/audit_events", data, *tenant.db_auths)
     # ok to print, will only actually log if the test fails
-    print(audit_events)
-    filtered_events = [event for event in audit_events["data"] if event["name"] == name]
-    return next(
-        event
-        for event in filtered_events
-        if all(event["detail"]["data"].get(k, None) == v for (k, v) in kwargs.items())
-    )
+    assert any(
+        all(event["detail"]["data"].get(k, None) == v for (k, v) in kwargs.items())
+        for event in audit_events["data"]
+    ), f"Cannot find event with provided properties. Events: {audit_events}"
 
 
 def update_rules(

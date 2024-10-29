@@ -208,19 +208,7 @@ impl AuditEvent {
                     insight_event_id,
                     detail,
                 } = event;
-                let CommonAuditEventDetail {
-                    metadata,
-                    scoped_vault_id,
-                    ob_configuration_id,
-                    document_data_id,
-                    tenant_api_key_id,
-                    tenant_user_id,
-                    tenant_role_id,
-                    is_live,
-                    list_entry_creation_id,
-                    list_entry_id,
-                    list_id,
-                } = detail.into();
+                let CommonAuditEventDetail { metadata, args } = detail.into();
                 NewAuditEventRow {
                     id,
                     timestamp: Utc::now(),
@@ -229,16 +217,16 @@ impl AuditEvent {
                     principal_actor,
                     insight_event_id,
                     metadata,
-                    scoped_vault_id,
-                    ob_configuration_id,
-                    document_data_id,
-                    tenant_api_key_id,
-                    tenant_user_id,
-                    tenant_role_id,
-                    is_live,
-                    list_entry_creation_id,
-                    list_entry_id,
-                    list_id,
+                    scoped_vault_id: args.scoped_vault_id,
+                    ob_configuration_id: args.ob_configuration_id,
+                    document_data_id: args.document_data_id,
+                    tenant_api_key_id: args.tenant_api_key_id,
+                    tenant_user_id: args.tenant_user_id,
+                    tenant_role_id: args.tenant_role_id,
+                    is_live: args.is_live,
+                    list_entry_creation_id: args.list_entry_creation_id,
+                    list_entry_id: args.list_entry_id,
+                    list_id: args.list_id,
                 }
             })
             .collect_vec();

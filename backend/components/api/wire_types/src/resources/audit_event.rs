@@ -95,4 +95,9 @@ pub enum AuditEventDetail {
         list_id: ListId,
         list_entry_id: ListEntryId,
     },
+    CreatePlaybook,
+    DisablePlaybook,
+    ManuallyReviewEntity,
+    EditPlaybook,
+    DeactivateOrgRole,
 }
