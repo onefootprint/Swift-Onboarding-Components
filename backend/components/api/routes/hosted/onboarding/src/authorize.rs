@@ -6,7 +6,6 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
-use api_core::utils::requirements::GetRequirementsArgs;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
@@ -35,8 +34,7 @@ pub async fn post(
     span.record("workflow_id", &format!("{}", user_auth.workflow.id));
 
     // Verify there are no unmet requirements
-    let reqs = get_requirements_for_person_and_maybe_business(&state, GetRequirementsArgs::from(&user_auth)?)
-        .await?;
+    let reqs = get_requirements_for_person_and_maybe_business(&state, &user_auth).await?;
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())

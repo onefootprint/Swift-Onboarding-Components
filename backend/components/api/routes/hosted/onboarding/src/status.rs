@@ -3,7 +3,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ApiResponse;
-use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
 use newtypes::OrderedOnboardingRequirements;
 use paperclip::actix::api_v2_operation;
@@ -22,11 +22,7 @@ pub async fn get(
     user_auth: UserWfAuthContext,
 ) -> ApiResponse<OnboardingStatusResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
-        &state,
-        GetRequirementsArgs::from(&user_auth)?,
-    )
-    .await?;
+    let reqs = get_requirements_for_person_and_maybe_business(&state, &user_auth).await?;
 
     let ob_config = user_auth.ob_config.clone();
     let tenant = user_auth.tenant.clone();

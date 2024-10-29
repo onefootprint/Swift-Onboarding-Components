@@ -8,7 +8,6 @@ use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
-use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
@@ -38,8 +37,7 @@ pub async fn post(
         let user_wf_auth = user_wf_auth.check_guard(UserAuthScope::SignUp)?;
 
         // Verify there are no unmet requirements
-        let args = GetRequirementsArgs::from(&user_wf_auth)?;
-        let reqs = get_requirements_for_person_and_maybe_business(&state, args).await?;
+        let reqs = get_requirements_for_person_and_maybe_business(&state, &user_wf_auth).await?;
         let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
         if !unmet_reqs.is_empty() {
             return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());

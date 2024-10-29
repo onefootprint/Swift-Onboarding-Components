@@ -16,7 +16,7 @@ use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::workflow::WorkflowError;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
-use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::timeouts::ResponseDeadline;
 use api_core::FpResult;
 use api_wire_types::ProcessRequest;
@@ -56,11 +56,7 @@ pub async fn post(
     tracing::info!(fixture_result_provided=?fixture_result.is_some(), "Fixture result provided in process");
 
     // Verify there are no unmet requirements
-    let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
-        &state,
-        GetRequirementsArgs::from(&user_auth)?,
-    )
-    .await?;
+    let reqs = get_requirements_for_person_and_maybe_business(&state, &user_auth).await?;
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())

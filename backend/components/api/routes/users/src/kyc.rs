@@ -21,9 +21,9 @@ use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::requirements::get_requirements_for_wf;
-use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementContext;
 use api_core::utils::requirements::RequirementOpts;
+use api_core::utils::requirements::UserDecryptResultForReqs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
@@ -128,7 +128,7 @@ pub async fn post(
         return Err(TenantError::ValidationError("Cannot trigger KYC on non-US addresses".into()).into());
     }
 
-    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
+    let decrypted_values = UserDecryptResultForReqs::get_decrypted_values(&state, &uvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
     let actor = auth.actor();

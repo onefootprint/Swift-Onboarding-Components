@@ -22,9 +22,9 @@ use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::requirements::get_requirements_for_wf;
-use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementContext;
 use api_core::utils::requirements::RequirementOpts;
+use api_core::utils::requirements::UserDecryptResultForReqs;
 use api_core::utils::timeouts::ResponseDeadline;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -445,7 +445,7 @@ pub async fn adhoc_document_process(
         return Err(AssertionError("adhoc document process workflow in wrong state").into());
     }
     // log unmet reqs for debugging
-    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
+    let decrypted_values = UserDecryptResultForReqs::get_decrypted_values(&state, &uvw).await?;
 
     let unmet_requirements: Vec<_> = state
         .db_query(move |conn| -> FpResult<_> {

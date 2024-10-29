@@ -45,60 +45,30 @@ use newtypes::KycState;
 use newtypes::LivenessSource;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
-use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::UsLegalStatus;
 use newtypes::WorkflowConfig;
-use newtypes::WorkflowId;
 use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
 use std::str::FromStr;
-
-#[derive(Clone)]
-pub struct GetRequirementsArgs {
-    pub person_obc: ObConfiguration,
-    pub person_workflow: Workflow,
-    pub sb_id: Option<ScopedVaultId>,
-    pub biz_wf_id: Option<WorkflowId>,
-    pub auth_events: Vec<AssociatedAuthEvent>,
-    pub is_secondary_bo: bool,
-}
-
-impl GetRequirementsArgs {
-    pub fn from(value: &CheckUserWfAuthContext) -> FpResult<Self> {
-        Ok(Self {
-            person_obc: value.ob_config.clone(),
-            person_workflow: value.workflow.clone(),
-            sb_id: value.sb_id.clone(),
-            biz_wf_id: value.biz_wf_id.clone(),
-            auth_events: value.user_session.auth_events.clone(),
-            is_secondary_bo: value.user_session.is_secondary_bo(),
-        })
-    }
-}
 
 /// Wrapper type around DecryptUncheckedResult that is guaranteed to have all the IDKs we need for
 /// requirement checking
 #[derive(derive_more::Deref)]
 pub struct UserDecryptResultForReqs(#[deref] DecryptUncheckedResult);
 
-impl GetRequirementsArgs {
+impl UserDecryptResultForReqs {
     /// Fetch various values from the vault that may conditionally affect requirements
-    pub async fn get_decrypted_values(
-        state: &State,
-        vw: &VaultWrapper<Any>,
-    ) -> FpResult<UserDecryptResultForReqs> {
+    pub async fn get_decrypted_values(state: &State, vw: &VaultWrapper<Any>) -> FpResult<Self> {
         let values = vec![
             IPK::Declarations.into(),
             IDK::UsLegalStatus.into(),
             IDK::Country.into(),
         ];
         let decrypted_values = vw.decrypt_unchecked(&state.enclave_client, &values).await?;
-        Ok(UserDecryptResultForReqs(decrypted_values))
+        Ok(Self(decrypted_values))
     }
-}
 
-impl UserDecryptResultForReqs {
     /// Auth playbooks don't require complex checking of what's populated
     pub fn empty() -> Self {
         Self(DecryptUncheckedResult::default())
@@ -118,20 +88,13 @@ pub struct RequirementOpts {
 /// requirements, but will only return some met requirements
 pub async fn get_requirements_for_person_and_maybe_business(
     state: &State,
-    args: GetRequirementsArgs,
+    user_auth: &CheckUserWfAuthContext,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
-    let GetRequirementsArgs {
-        person_obc,
-        person_workflow,
-        sb_id,
-        biz_wf_id,
-        auth_events,
-        is_secondary_bo,
-    } = args;
-
-    let has_sb_id = sb_id.is_some();
-    let su_id = person_workflow.scoped_vault_id.clone();
+    let person_obc = user_auth.ob_config.clone();
+    let su_id = user_auth.scoped_user.id.clone();
+    let sb_id = user_auth.sb_id.clone();
+    let biz_wf_id = user_auth.biz_wf_id.clone();
     let (uvw, biz_wf_info) = state
         .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
@@ -145,7 +108,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
             Ok((uvw, biz_wf_info))
         })
         .await?;
-    let user_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
+    let user_values = UserDecryptResultForReqs::get_decrypted_values(state, &uvw).await?;
     let business_owners = if let Some((bvw, _)) = biz_wf_info.as_ref() {
         bvw.decrypt_business_owners(state).await?
     } else {
@@ -159,6 +122,10 @@ pub async fn get_requirements_for_person_and_maybe_business(
         require_capture_on_stepup: Some(require_capture_on_stepup),
     };
 
+    let has_sb_id = user_auth.sb_id.is_some();
+    let is_secondary_bo = user_auth.user_session.is_secondary_bo();
+    let auth_events = user_auth.user_session.auth_events.clone();
+    let person_workflow = user_auth.workflow.clone();
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {
             let ctx = RequirementContext {
