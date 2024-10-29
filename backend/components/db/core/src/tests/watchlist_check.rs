@@ -259,7 +259,6 @@ fn make_vault(
                 vault_id: uv.id.clone(),
                 logic_git_hash: "".to_string(),
                 status: DecisionStatus::Pass,
-                result_ids: vec![],
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno: DataLifetimeSeqno::from(0),

@@ -27,7 +27,6 @@ use newtypes::ManualReviewKind;
 use newtypes::OnboardingStatus;
 use newtypes::ReviewReason;
 use newtypes::RuleSetResultId;
-use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
 use newtypes::WorkflowSource;
 
@@ -41,7 +40,6 @@ use newtypes::WorkflowSource;
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
     wf_id: &WorkflowId,
-    verification_result_ids: Vec<VerificationResultId>,
     rules_outcome: RulesOutcome,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
@@ -111,7 +109,6 @@ pub fn save_final_decision(
         logic_git_hash: crate::GIT_HASH.to_string(),
         status,
         failed_for_doc_review,
-        result_ids: verification_result_ids,
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,

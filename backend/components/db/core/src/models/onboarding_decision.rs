@@ -16,7 +16,6 @@ use chrono::Utc;
 use db_schema::schema::manual_review;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::onboarding_decision;
-use db_schema::schema::onboarding_decision_verification_result_junction;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -32,7 +31,6 @@ use newtypes::OnboardingDecisionInfo;
 use newtypes::RuleSetResultId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
 
@@ -73,20 +71,11 @@ struct NewOnboardingDecisionRow {
     rule_set_result_id: Option<RuleSetResultId>,
     failed_for_doc_review: FailedForDocReview,
 }
-
-#[derive(Debug, Clone, Insertable)]
-#[diesel(table_name = onboarding_decision_verification_result_junction)]
-pub struct OnboardingDecisionJunction {
-    pub verification_result_id: VerificationResultId,
-    pub onboarding_decision_id: OnboardingDecisionId,
-}
-
 #[derive(Debug)]
 pub struct NewDecisionArgs {
     pub vault_id: VaultId,
     pub logic_git_hash: String,
     pub status: DecisionStatus,
-    pub result_ids: Vec<VerificationResultId>,
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
     pub seqno: DataLifetimeSeqno,
@@ -116,7 +105,6 @@ impl OnboardingDecision {
             vault_id,
             logic_git_hash,
             status,
-            result_ids,
             annotation_id,
             actor,
             seqno,
@@ -145,18 +133,6 @@ impl OnboardingDecision {
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)
             .get_result::<Self>(conn.conn())?;
-
-        // Create junction rows that join the decision to the results that created them
-        let junction_rows: Vec<_> = result_ids
-            .into_iter()
-            .map(|id| OnboardingDecisionJunction {
-                onboarding_decision_id: result.id.clone(),
-                verification_result_id: id,
-            })
-            .collect();
-        diesel::insert_into(onboarding_decision_verification_result_junction::table)
-            .values(junction_rows)
-            .execute(conn.conn())?;
 
         // Create UserTimeline event for the decision
         let decision_info = OnboardingDecisionInfo {

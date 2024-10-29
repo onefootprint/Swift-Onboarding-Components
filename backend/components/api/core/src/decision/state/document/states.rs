@@ -1,6 +1,5 @@
 use super::DocumentState;
 use super::MakeDecision;
-use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
 use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::state::actions::DocCollected;
@@ -26,6 +25,7 @@ pub struct DocumentDataCollection {
 
 #[derive(Clone)]
 pub struct DocumentDecisioning {
+    #[allow(unused)]
     sv_id: ScopedVaultId,
 }
 
@@ -122,17 +122,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         _: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> FpResult<DocumentState> {
-        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
-        let vres_ids = risk_signals.verification_result_ids();
-
-        risk::save_final_decision(
-            conn,
-            &wf.id,
-            vres_ids,
-            RulesOutcome::RulesNotExecuted,
-            None,
-            vec![],
-        )?;
+        risk::save_final_decision(conn, &wf.id, RulesOutcome::RulesNotExecuted, None, vec![])?;
         Ok(DocumentState::from(DocumentComplete))
     }
 }

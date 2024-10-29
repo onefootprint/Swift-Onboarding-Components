@@ -15,7 +15,6 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
-use newtypes::VerificationResultId;
 use std::collections::HashMap;
 
 pub struct ParsedFootprintReasonCodes {
@@ -90,6 +89,7 @@ pub fn parse_reason_codes(
     }
 }
 
+// TODO: remove this and just use RiskSignal::latest_by_risk_signal_group_kinds
 pub fn fetch_latest_risk_signals_map(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
@@ -137,14 +137,4 @@ pub struct RiskSignalsForDecision {
     pub kyb: Option<Vec<NewRiskSignalInfo>>,
     pub aml: Option<Vec<NewRiskSignalInfo>>,
     pub risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
-}
-
-impl RiskSignalsForDecision {
-    pub fn verification_result_ids(&self) -> Vec<VerificationResultId> {
-        self.risk_signals
-            .values()
-            .flatten()
-            .map(|rs| rs.verification_result_id.clone())
-            .collect()
-    }
 }

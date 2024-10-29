@@ -453,7 +453,6 @@ mod tests {
                 vault_id: sv.vault_id.clone(),
                 logic_git_hash: "".to_string(),
                 status: decision_status,
-                result_ids: vec![],
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno: DataLifetimeSeqno::from(0),

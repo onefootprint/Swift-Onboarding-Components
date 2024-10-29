@@ -295,7 +295,6 @@ pub fn handle_rules_output(
     conn: &mut TxnPgConn,
     wf: Locked<Workflow>,
     v_id: VaultId,
-    vres_ids: Vec<VerificationResultId>,
     rules_output: RulesOutcome,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
@@ -325,7 +324,7 @@ pub fn handle_rules_output(
         Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Incomplete)?;
         Ok(DecisionOutput::NonTerminal)
     } else {
-        risk::save_final_decision(conn, &wf.id, vres_ids, rules_output, rsr_id, review_reasons)?;
+        risk::save_final_decision(conn, &wf.id, rules_output, rsr_id, review_reasons)?;
         Ok(DecisionOutput::Terminal)
     }
 }

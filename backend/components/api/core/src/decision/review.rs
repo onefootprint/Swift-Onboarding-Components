@@ -77,8 +77,6 @@ pub fn save_review_decision(
         actor,
         seqno,
         manual_reviews: mrs_to_clear,
-        // Not necessary for manual decisions
-        result_ids: vec![],
         rule_set_result_id: None,
         failed_for_doc_review: false,
     };

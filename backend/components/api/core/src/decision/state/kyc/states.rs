@@ -560,7 +560,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
-        let vres_ids = risk_signals.verification_result_ids();
 
         // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision
         // instead of the decision from these real Rules
@@ -589,7 +588,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let decision = get_final_rules_outcome(fixture_result, decision);
 
-        let output = common::handle_rules_output(conn, wf, v.id, vres_ids, decision, rsr_id, review_reasons)?;
+        let output = common::handle_rules_output(conn, wf, v.id, decision, rsr_id, review_reasons)?;
         match output {
             DecisionOutput::Terminal => Ok(KycState::from(KycComplete)),
             DecisionOutput::NonTerminal => Ok(KycState::from(KycDocCollection {

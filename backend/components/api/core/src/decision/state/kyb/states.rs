@@ -481,13 +481,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
         let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
-        let kyb_rsg = rsfd.kyb.unwrap_or_default();
-
-        let vres_ids = kyb_rsg
-            .iter()
-            .map(|(_, _, vres_id)| vres_id.clone())
-            .unique()
-            .collect();
 
         let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
 
@@ -530,7 +523,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         // or no, because this only applies to business entities? then where are we saving the
         // decision / applying step up for the user entity?
         // or yes, but it just no-ops?
-        risk::save_final_decision(conn, &wf.id, vres_ids, decision, rsr_id, vec![])?;
+        risk::save_final_decision(conn, &wf.id, decision, rsr_id, vec![])?;
 
         Ok(KybState::from(KybComplete {}))
     }
