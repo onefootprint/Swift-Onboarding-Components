@@ -270,7 +270,7 @@
     "incomplete": {
       "header": {
         "person": "User dropped off before providing all information.",
-        "business": "All business information was not collected."
+        "business": "Some business information has not been collected."
       }
     },
     "manual-review": {
@@ -914,7 +914,7 @@
       "abandoned-event": {
         "title": {
           "person": "User dropped off before providing all information.",
-          "business": "All business information was not collected."
+          "business": "Some business information has not been collected."
         }
       },
       "watchlist-check-event": {
