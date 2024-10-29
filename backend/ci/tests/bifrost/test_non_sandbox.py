@@ -167,8 +167,9 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     assert len(body) > 0
 
     # Should be idempotent if we authorize again
+    num_already_handled_reqs = len(bifrost.handled_requirements)
     bifrost.run()
-    assert not bifrost.handled_requirements
+    assert len(bifrost.handled_requirements) == num_already_handled_reqs
 
     # Identify lite should return a response here
     for data in [

@@ -190,7 +190,6 @@ class BifrostClient:
         Handle all onboarding requirements.
         If `kind` is provided, will only handle the requested requirement
         """
-        self.handled_requirements = []
         body = self.get_status()
         self.already_met_requirements = [
             r for r in body["all_requirements"] if r["is_met"]
@@ -208,7 +207,6 @@ class BifrostClient:
             if next_requirement == last_handled_requirement:
                 raise RepeatRequirement(next_requirement)
 
-            self.handled_requirements.append(next_requirement)
             self.handle_requirement(next_requirement)
             last_handled_requirement = next_requirement
             body = self.get_status()
@@ -244,6 +242,7 @@ class BifrostClient:
         else:
             kind = requirement["kind"]
             assert False, f"Unknown requirement {kind}"
+        self.handled_requirements.append(requirement)
 
     def handle_collect_user(self, requirement):
         """
