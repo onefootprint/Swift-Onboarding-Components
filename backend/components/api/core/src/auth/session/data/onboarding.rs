@@ -22,9 +22,11 @@ pub struct OnboardingSession {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default)]
-/// Metadata that should not be serialized to the client in the normal `/hosted/onboarding/session`
-/// flow. This metadata is generally only read in contexts that accept `ObSessionAuth`
-/// where we need guarantees that its value has not been spoofed by the client.
+/// Metadata provided when a tenant creates an onboarding session token via secret API key.
+/// This metadata is not serialized directly to the client in the normal
+/// `/hosted/onboarding/session` flow. Instead, it is stored directly into the created user auth
+/// session. As such, its values are guaranteed to not be spoofed by the client and were passed
+/// directly from the tenant.
 pub struct OnboardingSessionTrustedMetadata {
     pub allow_reonboard: bool,
 }

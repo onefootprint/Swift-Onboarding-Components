@@ -1,3 +1,4 @@
+use super::onboarding::OnboardingSessionTrustedMetadata;
 use super::AuthSessionData;
 use crate::errors::user::UserError;
 use crate::errors::ValidationError;
@@ -55,7 +56,9 @@ pub struct UserSession {
     pub kba: Vec<DataIdentifier>,
     /// When true, allows the user to make a Workflow for a playbook they've already started
     /// onboarding onto
-    pub allow_reonboard: bool,
+    allow_reonboard: bool,
+    #[serde(default)]
+    metadata: OnboardingSessionTrustedMetadata,
 }
 
 #[derive(Default)]
@@ -69,7 +72,7 @@ pub struct NewUserSessionContext {
     pub biz_wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
     pub kba: Vec<DataIdentifier>,
-    pub allow_reonboard: Option<bool>,
+    pub metadata: Option<OnboardingSessionTrustedMetadata>,
 }
 
 /// Enumerate all the possible places in which a user auth token can be created.
@@ -205,8 +208,9 @@ impl UserSession {
             biz_wf_id,
             wfr_id,
             kba,
-            allow_reonboard,
+            metadata,
         } = context;
+        let metadata = metadata.unwrap_or_default();
         let session = AuthSessionData::User(Self {
             user_vault_id,
             purposes,
@@ -220,7 +224,8 @@ impl UserSession {
             scopes,
             auth_events,
             kba,
-            allow_reonboard: allow_reonboard.unwrap_or(false),
+            allow_reonboard: metadata.allow_reonboard,
+            metadata,
         });
         Ok(session)
     }
@@ -236,6 +241,7 @@ impl UserSession {
         let old = self.clone();
         // Merge context, scopes, and auth factors and create a new session with these merged fields
         let context = NewUserSessionContext {
+            metadata: new_ctx.metadata.or(Some(old.metadata())),
             su_id: new_ctx.su_id.or(old.su_id),
             sb_id: new_ctx.sb_id.or(old.sb_id),
             bo_id: new_ctx.bo_id.or(old.bo_id),
@@ -244,7 +250,6 @@ impl UserSession {
             biz_wf_id: new_ctx.biz_wf_id.or(old.biz_wf_id),
             wfr_id: new_ctx.wfr_id.or(old.wfr_id),
             kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
-            allow_reonboard: new_ctx.allow_reonboard.or(Some(old.allow_reonboard)),
         };
         let scopes = old.scopes.into_iter().chain(new_scopes).unique().collect();
         let auth_events = old.auth_events.into_iter().chain(new_auth_event).collect();
@@ -266,6 +271,7 @@ impl UserSession {
         self.validate_not_derived_from_components()?;
         let old = self.clone();
         let context = NewUserSessionContext {
+            metadata: Some(old.metadata()),
             su_id: old.su_id,
             sb_id: old.sb_id,
             bo_id: old.bo_id,
@@ -274,7 +280,6 @@ impl UserSession {
             biz_wf_id: old.biz_wf_id,
             wfr_id: old.wfr_id,
             kba: old.kba,
-            allow_reonboard: Some(old.allow_reonboard),
         };
         if new_scopes.iter().any(|s| !old.scopes.contains(s)) {
             // The only use case of this today is to request a token with _fewer_ scopes.
@@ -329,6 +334,18 @@ impl UserSession {
         self.purposes
             .iter()
             .any(|p| matches!(p, TokenCreationPurpose::SecondaryBo))
+    }
+
+    pub fn metadata(&self) -> OnboardingSessionTrustedMetadata {
+        // TODO remove this after deprecating allow_reonboard
+        if self.allow_reonboard {
+            // Legacy token that doesn't have the metadata field
+            OnboardingSessionTrustedMetadata {
+                allow_reonboard: true,
+            }
+        } else {
+            self.metadata.clone()
+        }
     }
 }
 

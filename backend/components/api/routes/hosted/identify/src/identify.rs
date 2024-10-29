@@ -99,12 +99,11 @@ pub async fn post(
     let (token, token_scopes) = if let Some(user_auth) = user_auth {
         // If the user was identified by an auth token, mutate the existing auth token with any metadata
         // from the onboarding session token
-        let allow_reonboard = ob_context
-            .as_ref()
+        let metadata = (ob_context.as_ref())
             .and_then(|obc| obc.ob_session())
-            .map(|obs| obs.trusted_metadata.allow_reonboard);
+            .map(|obs| obs.trusted_metadata.clone());
         let args = NewUserSessionContext {
-            allow_reonboard,
+            metadata,
             ..Default::default()
         };
         let scopes = user_auth.scopes.clone();
@@ -175,10 +174,9 @@ pub(super) async fn create_identified_token(
 ) -> FpResult<(SessionAuthToken, Vec<UserAuthScope>)> {
     let session_key = state.session_sealing_key.clone();
     // Add metadata from the onboarding session token
-    let allow_reonboard = ob_context
-        .as_ref()
+    let metadata = (ob_context.as_ref())
         .and_then(|obc| obc.ob_session())
-        .map(|obs| obs.trusted_metadata.allow_reonboard);
+        .map(|obs| obs.trusted_metadata.clone());
     let token = state
         .db_query(move |conn| -> FpResult<_> {
             let scopes = vec![];
@@ -205,7 +203,7 @@ pub(super) async fn create_identified_token(
                 bo_id,
                 biz_wf_id,
                 obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
-                allow_reonboard,
+                metadata,
                 ..Default::default()
             };
             let args = NewUserSessionArgs {

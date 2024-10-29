@@ -1,6 +1,7 @@
 use super::session::AuthSession;
 use super::vault_wrapper::Any;
 use super::vault_wrapper::TenantVw;
+use crate::auth::session::onboarding::OnboardingSessionTrustedMetadata;
 use crate::auth::session::user::AssociatedAuthEvent;
 use crate::auth::session::user::NewUserSessionArgs;
 use crate::auth::session::user::NewUserSessionContext;
@@ -120,12 +121,13 @@ pub fn create_token(
         ),
     };
 
+    let metadata = OnboardingSessionTrustedMetadata { allow_reonboard };
     let context = NewUserSessionContext {
         su_id: Some(su.id.clone()),
         sb_id,
         obc_id,
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
-        allow_reonboard: Some(allow_reonboard),
+        metadata: Some(metadata),
         ..Default::default()
     };
     let args = NewUserSessionArgs {

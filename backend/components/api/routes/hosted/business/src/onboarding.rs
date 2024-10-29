@@ -53,7 +53,8 @@ pub async fn post(
             // TODO: how should force_create on the playbook work when inheriting a business?
             // maybe we won't really need the playbook setting anymore - the default behavior will support
             // making a _new_ business, but we never allow reonboarding a business just via playbook key
-            let force_create = user_auth.data.allow_reonboard || user_auth.ob_config.allow_reonboard;
+            let force_create =
+                user_auth.data.metadata().allow_reonboard || user_auth.ob_config.allow_reonboard;
             let common_args = CommonWfArgs {
                 obc: &user_auth.ob_config,
                 insight_event: Some(insight_event),
