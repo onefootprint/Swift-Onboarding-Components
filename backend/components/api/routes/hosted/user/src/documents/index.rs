@@ -9,7 +9,6 @@ use api_wire_types::CreateDocumentRequest;
 use api_wire_types::CreateDocumentResponse;
 use db::models::insight_event::CreateInsightEvent;
 use macros::route_alias;
-use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -33,7 +32,6 @@ pub async fn post(
     insight: InsightHeaders,
 ) -> ApiResponse<CreateDocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let insight = CreateInsightEvent::from(insight);
     let request = request.into_inner();
 

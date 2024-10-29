@@ -131,7 +131,7 @@ impl UserWfSession {
     }
 }
 
-pub(super) fn check_workflow_guard(wf: &Workflow, guard: WorkflowGuard) -> FpResult<()> {
+pub fn check_workflow_guard(wf: &Workflow, guard: WorkflowGuard) -> FpResult<()> {
     // TODO we ideally want this to happen inside a locked transaction with the refreshed
     // workflow state, otherwise this could be stale
     // TODO to solve ^, maybe we add this check to the write path on the VW. I believe

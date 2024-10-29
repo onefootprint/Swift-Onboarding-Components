@@ -11,7 +11,6 @@ use api_core::utils::file_upload::handle_file_upload;
 use macros::route_alias;
 use newtypes::DocumentId;
 use newtypes::DocumentSide;
-use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -50,7 +49,6 @@ pub async fn post(
 
     let (document_id, side) = args.into_inner();
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
 
     let (sv_id, wf_id) = get_user_or_business_for_dr(&state, user_auth, Some(document_id.clone())).await?;
 

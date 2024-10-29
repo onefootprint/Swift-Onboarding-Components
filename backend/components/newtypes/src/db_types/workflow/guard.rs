@@ -15,10 +15,11 @@ impl WorkflowState {
             Self::Kyc(KycState::DocCollection)
             | Self::AlpacaKyc(AlpacaKycState::DocCollection)
             | Self::Kyc(KycState::DataCollection)
+            | Self::Kyb(KybState::DataCollection)
+            | Self::Kyb(KybState::DocCollection)
             | Self::AlpacaKyc(AlpacaKycState::DataCollection) => {
                 vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
             }
-            Self::Kyb(KybState::DataCollection) => vec![WorkflowGuard::AddData],
             Self::Document(DocumentState::DataCollection) => {
                 // Needed to upload the barcode
                 vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
@@ -37,6 +38,7 @@ impl WorkflowState {
             | Self::Kyb(KybState::AwaitingBoKyc)
             | Self::Kyb(KybState::VendorCalls)
             | Self::Kyb(KybState::Decisioning)
+            | Self::Kyb(KybState::StepUpDecisioning)
             | Self::Kyb(KybState::Complete) => vec![],
         }
     }
@@ -46,6 +48,7 @@ impl WorkflowState {
         match self {
             Self::Kyc(KycState::DataCollection)
             | Self::Kyc(KycState::DocCollection)
+            | Self::Kyb(KybState::DocCollection)
             | Self::AlpacaKyc(AlpacaKycState::DataCollection)
             | Self::AlpacaKyc(AlpacaKycState::DocCollection)
             | Self::Document(DocumentState::DataCollection)
@@ -64,6 +67,7 @@ impl WorkflowState {
             | Self::Kyb(KybState::VendorCalls)
             | Self::Kyb(KybState::AwaitingAsyncVendors)
             | Self::Kyb(KybState::Decisioning)
+            | Self::Kyb(KybState::StepUpDecisioning)
             | Self::Kyb(KybState::Complete) => false,
         }
     }

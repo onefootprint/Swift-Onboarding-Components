@@ -73,6 +73,7 @@ class BifrostClient:
         kyb_fixture_result=None,
         provide_playbook_auth=False,
         omit_business_creation=False,
+        vault_barcode_with_doc=True,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
@@ -116,7 +117,7 @@ class BifrostClient:
             "id.phone_number": phone_number,
             "id.email": email,
         }
-        self.vault_barcode_with_doc = True
+        self.vault_barcode_with_doc = vault_barcode_with_doc
 
         # After running bifrost, this will be the list of requirements satisfied
         self.handled_requirements = []

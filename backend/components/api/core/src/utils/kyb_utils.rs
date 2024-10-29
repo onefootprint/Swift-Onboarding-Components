@@ -171,6 +171,7 @@ pub async fn progress_business_workflow(
     let action = match biz_wf.state {
         // First see if we have to run authorize
         WorkflowState::Kyb(KybState::DataCollection) => Some(WorkflowActions::Authorize(Authorize { seqno })),
+        WorkflowState::Kyb(KybState::DocCollection) => Some(WorkflowActions::DocCollected(DocCollected)),
         // Handle the case where a document is being uploaded
         WorkflowState::Document(newtypes::DocumentState::DataCollection) => {
             Some(WorkflowActions::DocCollected(DocCollected {}))
@@ -203,7 +204,10 @@ pub async fn progress_business_workflow(
         .db_query(move |conn| Workflow::get(conn, &biz_wf.id))
         .await?;
     let kyb_features = KybBoFeatures::build(state, &biz_wf.id).await?;
-    let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
+    // Check if we're still waiting for BOs OR for the business to finish uploading a required document
+    // before sending out links
+    let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results()
+        && !matches!(biz_wf.state, WorkflowState::Kyb(KybState::DocCollection));
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
     if is_waiting_for_bo_kyc {
         send_missing_secondary_bo_links(state, su, &biz_wf, kyb_features, tenant).await?;

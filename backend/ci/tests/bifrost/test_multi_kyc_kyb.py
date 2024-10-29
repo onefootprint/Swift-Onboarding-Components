@@ -6,6 +6,7 @@ from tests.constants import (
     FIXTURE_EMAIL2,
 )
 from tests.headers import BusinessOwnerAuth, FpAuth, SandboxId
+from tests.dashboard.utils import update_rules
 from tests.identify_client import IdentifyClient
 from tests.utils import (
     get,
@@ -491,6 +492,128 @@ def test_dont_proceed_on_nonterminal(kyb_sandbox_ob_config, sandbox_tenant):
 
     body = get(f"entities/{primary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
     assert body["status"] == "in_progress"
+
+
+def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        fixture_result="pass",
+        kyb_fixture_result="use_rules_outcome",
+        vault_barcode_with_doc=False,
+    )
+
+    # Add a rule for BO
+    bo_missing_rule = dict(
+        name="Missing BO Rule",
+        rule_expression=[
+            {
+                "field": "beneficial_owner_possible_missing_bo",
+                "op": "eq",
+                "value": True,
+            }
+        ],
+        rule_action=dict(
+            kind="step_up",
+            config=[
+                dict(
+                    kind="custom",
+                    data=dict(
+                        name="test",
+                        identifier="document.custom.operating_agreement",
+                        description="Operate this agreement",
+                        upload_settings="prefer_upload",
+                        requires_human_review=False,
+                    ),
+                )
+            ],
+        ),
+    )
+    obc1 = get(
+        f"org/onboarding_configs/{bifrost.ob_config.id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    update_rules(
+        obc1["id"],
+        obc1["rule_set"]["version"],
+        *sandbox_tenant.db_auths,
+        add=[bo_missing_rule],
+    )
+
+    # Generate a stepup risk signal for missing BO
+    secondary_bos = {
+        "business.secondary_beneficial_owners": [
+            {
+                "id.first_name": "Franklin",
+                "id.last_name": "Frog",
+                "id.email": FIXTURE_EMAIL2,
+                "id.phone_number": FIXTURE_PHONE_NUMBER2,
+                "ownership_stake": 10,
+            }
+        ],
+    }
+    bifrost.data.update(secondary_bos)
+    doc_req = bifrost.get_requirement("collect_document")
+    # No doc req until we proceed the biz_wf in /process at the end of the primary BO KYC
+    assert doc_req is None
+
+    # Handle a bunch of bifrost requirements
+    bifrost.handle_one_requirement("collect_business_data")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
+    bifrost.handle_one_requirement("process")
+
+    # now there's a document requirement for the business
+    doc_req = bifrost.get_requirement("collect_document")
+    # We have a custom doc stepup
+    assert doc_req["config"]["identifier"] == "document.custom.operating_agreement"
+
+    primary_bo = bifrost.run()
+    # the BO KYC is done
+    body = get(f"entities/{primary_bo.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "pass"
+    # but the business is still in progress
+    body = get(f"entities/{primary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "in_progress"
+    # and still not in review
+    assert not body["requires_manual_review"]
+    # Inspect the business timeline
+    timeline = get(
+        f"entities/{primary_bo.fp_bid}/timeline", None, *sandbox_tenant.db_auths
+    )
+    stepup_event = [i for i in timeline if i["event"]["kind"] == "step_up"].pop()
+    rsr = get(
+        f"entities/{primary_bo.fp_bid}/rule_set_result/{stepup_event['event']['data'][0]['rule_set_result_id']}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    assert rsr["rule_action_triggered"]["kind"] == "step_up"
+    rule_results = rsr.get("rule_results", [])
+    true_rules = [rule for rule in rule_results if rule.get("result")]
+    # TODO: need to filter to only run stepup rules in KybStepupDecisioning then can uncomment these
+    # assert len(true_rules) == 1
+    # assert true_rules[0]['rule']['rule_expression'][0]['field'] == 'beneficial_owner_possible_missing_bo'
+
+    # We uploaded a doc
+    doc_uploaded = [i for i in timeline if i["event"]["kind"] == "document_uploaded"]
+    assert len(doc_uploaded) == 1
+
+    secondary_bo_token = extract_bo_token(bifrost)
+
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result="pass",
+    )
+    secondary_bo = bifrost.run()
+    assert (
+        get(f"entities/{secondary_bo.fp_id}", None, *sandbox_tenant.db_auths)["status"]
+        == "pass"
+    )
+
+    body = get(f"entities/{secondary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "fail"
+    assert body["requires_manual_review"]
 
 
 def extract_bo_session_sms(twilio, phone_number, business_name):

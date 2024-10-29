@@ -9,7 +9,10 @@ from tests.utils import (
     create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
-from tests.constants import BUSINESS_SECONDARY_BOS, FIXTURE_PHONE_NUMBER
+from tests.constants import (
+    BUSINESS_SECONDARY_BOS,
+    FIXTURE_PHONE_NUMBER,
+)
 
 
 @pytest.fixture(scope="session")

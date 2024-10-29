@@ -1,3 +1,4 @@
+use api_core::auth::user::check_workflow_guard;
 use api_core::auth::user::UserWfSession;
 use api_core::auth::SessionContext;
 use api_core::errors::ValidationError;
@@ -8,6 +9,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::document_request::UncheckedDrIdentifier;
 use newtypes::ScopedVaultId;
 use newtypes::VaultKind;
+use newtypes::WorkflowGuard;
 use newtypes::WorkflowId;
 
 pub mod index;
@@ -31,22 +33,30 @@ async fn get_user_or_business_for_dr<T: Into<UncheckedDrIdentifier>>(
         .db_query(move |conn| -> FpResult<_> {
             let kind = DocumentRequest::get_owner_kind(conn, doc_id)?;
             let biz_wf = user_auth.business_workflow(conn)?;
+
             Ok((user_auth, kind, biz_wf))
         })
         .await?;
 
     let result = match owner_vault_kind {
         VaultKind::Person => {
+            user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
             let su_id = user_auth.scoped_user.id.clone();
             let wf_id = user_auth.workflow.id.clone();
             (su_id, wf_id)
         }
         VaultKind::Business => {
             let sb_id = user_auth.sb_id.clone();
-            let biz_wf_id = biz_wf.map(|biz_wf| biz_wf.id);
-            sb_id.zip(biz_wf_id).ok_or(ValidationError(
-                "Trying to upload a business document with no active business onboarding",
-            ))?
+            match sb_id.zip(biz_wf) {
+                Some((sb_id, biz_wf)) => {
+                    check_workflow_guard(&biz_wf, WorkflowGuard::AddDocument)?;
+
+                    Ok((sb_id, biz_wf.id))
+                }
+                None => Err(ValidationError(
+                    "Trying to upload a business document with no active business onboarding",
+                )),
+            }?
         }
     };
     Ok(result)

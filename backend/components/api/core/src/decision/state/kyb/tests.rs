@@ -246,7 +246,7 @@ async fn authorize(state: &mut State) {
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowKind::Kyb(kyb::KybState::AwaitingBoKyc(_))
+        WorkflowKind::Kyb(kyb::KybState::StepUpDecisioning(_))
     ));
 }
 
@@ -264,6 +264,14 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
     let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize { seqno }))
+        .await
+        .unwrap();
+    assert!(matches!(
+        ww.state,
+        WorkflowKind::Kyb(kyb::KybState::StepUpDecisioning(_))
+    ));
+    let (ww, _) = ww
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 
@@ -385,8 +393,14 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
         .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
-    let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::Kyb(KybState::AwaitingBoKyc), wf.state);
+    assert!(matches!(
+        ww.state,
+        WorkflowKind::Kyb(kyb::KybState::StepUpDecisioning(_))
+    ));
+    let (ww, _) = ww
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
+        .await
+        .unwrap();
     run_kyc_for_bo(state, &person_wf, t1, obc1, UserKind::Live).await;
 
     let mut mock_ff_client = MockFFClient::new();
@@ -434,8 +448,10 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
         WorkflowKind::Kyb(kyb::KybState::AwaitingAsyncVendors(_))
     ));
 
-    let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingAsyncVendors), wf.state);
+    // Only "Possible BO missing RS"
+    assert_eq!(rs.len(), 1);
 
     // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB
     // workflow

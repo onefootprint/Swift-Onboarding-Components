@@ -68,16 +68,41 @@ impl KybDecisioning {
 }
 
 #[derive(Clone)]
+pub struct KybStepUpDecisioning {
+    wf_id: WorkflowId,
+    t_id: TenantId,
+    include_rules: IncludeRules,
+}
+
+impl KybStepUpDecisioning {
+    pub fn new(wf_id: WorkflowId, t_id: TenantId) -> Self {
+        Self {
+            wf_id,
+            t_id,
+            include_rules: IncludeRules::Kind(RuleInstanceKind::Business),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct KybDocCollection {
+    wf_id: WorkflowId,
+    t_id: TenantId,
+}
+
+#[derive(Clone)]
 pub struct KybComplete;
 
 #[derive(Clone)]
 #[enum_dispatch(WorkflowState)]
 pub enum KybState {
     DataCollection(KybDataCollection),
+    StepUpDecisioning(KybStepUpDecisioning),
     AwaitingBoKyc(KybAwaitingBoKyc),
     VendorCalls(KybVendorCalls),
     AwaitingAsyncVendors(KybAwaitingAsyncVendors),
     Decisioning(KybDecisioning),
+    DocCollection(KybDocCollection),
     Complete(KybComplete),
 }
 
@@ -105,7 +130,13 @@ impl KybState {
                     .await
                     .map(KybState::from)
             }
+            newtypes::KybState::StepUpDecisioning => KybStepUpDecisioning::init(state, workflow, c, seqno)
+                .await
+                .map(KybState::from),
             newtypes::KybState::Decisioning => KybDecisioning::init(state, workflow, c, seqno)
+                .await
+                .map(KybState::from),
+            newtypes::KybState::DocCollection => KybDocCollection::init(state, workflow, c, seqno)
                 .await
                 .map(KybState::from),
             newtypes::KybState::Complete => KybComplete::init(state, workflow, c, seqno)
@@ -129,6 +160,12 @@ impl Workflow for KybState {
     ) -> FpResult<WorkflowKind> {
         let new_state = match (self, action) {
             (Self::DataCollection(s), WorkflowActions::Authorize(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::StepUpDecisioning(s), WorkflowActions::MakeDecision(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::DocCollection(s), WorkflowActions::DocCollected(a)) => {
                 s.do_action(state, a, workflow_id).await?
             }
             (Self::AwaitingBoKyc(s), WorkflowActions::BoKycCompleted(a)) => {

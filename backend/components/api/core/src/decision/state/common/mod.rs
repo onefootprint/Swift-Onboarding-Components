@@ -52,6 +52,7 @@ use newtypes::CipKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DecisionIntentKind;
 use newtypes::DeviceInsightOperation;
+use newtypes::DocumentRequestConfig;
 use newtypes::FootprintReasonCode;
 use newtypes::ListId;
 use newtypes::Locked;
@@ -304,30 +305,45 @@ pub fn handle_rules_output(
         ..
     } = rules_output
     {
-        let doc_reqs = step_up_configs
-            .into_iter()
-            .map(|config| NewDocumentRequestArgs {
-                scoped_vault_id: wf.scoped_vault_id.clone(),
-                workflow_id: wf.id.clone(),
-                rule_set_result_id: rsr_id.clone(),
-                config,
-            })
-            .collect();
-        let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
-        let stepup_info = StepUpInfo {
-            document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
-        };
-        // Leave a timeline event showing step up was requested
-        UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
-
-        // Move the workflow back into an Incomplete state to show we are waiting for data from user
-        Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Incomplete)?;
+        handle_stepup(conn, wf, v_id, step_up_configs, rsr_id.clone())?;
         Ok(DecisionOutput::NonTerminal)
     } else {
         risk::save_final_decision(conn, &wf.id, rules_output, rsr_id, review_reasons)?;
         Ok(DecisionOutput::Terminal)
     }
 }
+
+#[tracing::instrument(skip(conn))]
+#[allow(clippy::too_many_arguments)]
+pub fn handle_stepup(
+    conn: &mut TxnPgConn,
+    wf: Locked<Workflow>,
+    v_id: VaultId,
+    step_up_configs: Vec<DocumentRequestConfig>,
+    rsr_id: Option<RuleSetResultId>,
+) -> FpResult<()> {
+    let doc_reqs = step_up_configs
+        .into_iter()
+        .map(|config| NewDocumentRequestArgs {
+            scoped_vault_id: wf.scoped_vault_id.clone(),
+            workflow_id: wf.id.clone(),
+            rule_set_result_id: rsr_id.clone(),
+            config,
+        })
+        .collect();
+    let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
+    let stepup_info = StepUpInfo {
+        document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
+    };
+    // Leave a timeline event showing step up was requested
+    UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
+
+    // Move the workflow back into an Incomplete state to show we are waiting for data from user
+    Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Incomplete)?;
+
+    Ok(())
+}
+
 
 pub async fn maybe_generate_ocr_reason_codes(
     state: &State,

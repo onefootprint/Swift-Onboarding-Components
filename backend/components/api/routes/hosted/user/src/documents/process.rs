@@ -11,7 +11,6 @@ use api_core::State;
 use api_wire_types::DocumentResponse;
 use macros::route_alias;
 use newtypes::DocumentId;
-use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -36,7 +35,6 @@ pub async fn post(
     http_request: HttpRequest,
 ) -> ApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let t_id = user_auth.scoped_user.tenant_id.clone();
     let doc_id = doc_id.into_inner();
 

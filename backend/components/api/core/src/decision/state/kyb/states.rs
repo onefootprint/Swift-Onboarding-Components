@@ -3,7 +3,9 @@ use super::KybAwaitingBoKyc;
 use super::KybComplete;
 use super::KybDataCollection;
 use super::KybDecisioning;
+use super::KybDocCollection;
 use super::KybState;
+use super::KybStepUpDecisioning;
 use super::KybVendorCalls;
 use crate::decision;
 use crate::decision::biz_risk::KybBoFeatures;
@@ -14,8 +16,10 @@ use crate::decision::rule_engine::eval::RuleEvalConfig;
 use crate::decision::state::actions::Authorize;
 use crate::decision::state::actions::WorkflowActions;
 use crate::decision::state::common;
+use crate::decision::state::common::handle_stepup;
 use crate::decision::state::AsyncVendorCallsCompleted;
 use crate::decision::state::BoKycCompleted;
+use crate::decision::state::DocCollected;
 use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeVendorCalls;
 use crate::decision::state::OnAction;
@@ -26,6 +30,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
+use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
@@ -50,6 +55,7 @@ use newtypes::ListId;
 use newtypes::Locked;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
+use newtypes::RuleActionConfig;
 use newtypes::RuleSetResultKind;
 use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
@@ -131,10 +137,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         }
 
 
-        Ok(KybState::from(KybAwaitingBoKyc {
-            wf_id: self.wf_id,
-            t_id: self.t_id,
-        }))
+        Ok(KybState::from(KybStepUpDecisioning::new(self.wf_id, self.t_id)))
     }
 }
 
@@ -249,6 +252,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             }
         }
 
+        // TODO: move this?
         if !bo_ownership_check {
             // When a user fills out BOs with < 75% ownership, we allow them to provide an explanation
             // of why the ownership stake doesn't add up.
@@ -502,6 +506,206 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
+        let doc_req_configs = DocumentRequest::get_all(conn, &self.wf_id)?
+            .into_iter()
+            .map(|dr| dr.config)
+            .collect_vec();
+
+        let sv = ScopedVault::get(conn, &self.wf_id)?;
+        let kyb_rs: Vec<RiskSignal> =
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &wf.scoped_vault_id, AtSeqno(None))?
+                .into_iter()
+                .map(|(_, rs)| rs)
+                .collect();
+
+        // TODO: Consider pulling in additional insight events?
+        let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
+            .into_iter()
+            .collect();
+
+        // TODO should we be using evaluate_workflow_decision?
+        let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
+            conn,
+            &sv.id,
+            &obc,
+            Some(&self.wf_id),
+            RuleSetResultKind::WorkflowDecision,
+            &kyb_rs,
+            &vault_data_for_rules,
+            &insight_events,
+            &lists_for_rules,
+            &RuleEvalConfig::new(doc_req_configs),
+            self.include_rules,
+        )? {
+            let decision = RulesOutcome::RulesExecuted {
+                should_commit: false, // never commit business data for now
+                create_manual_review: rsr
+                    .action_triggered
+                    .map(|r| r.should_create_review())
+                    .unwrap_or(false),
+                action: rsr.action_triggered,
+                rule_action: rsr.rule_action_triggered,
+            };
+            (decision, Some(rsr.id))
+        } else {
+            (RulesOutcome::RulesNotExecuted, None)
+        };
+
+        // TODO: enable stepups here
+        let decision = get_final_rules_outcome(fixture_result, decision);
+
+        // TODO should we use common::save_decision as well in order to handle step-ups in KYB?
+        // or no, because this only applies to business entities? then where are we saving the
+        // decision / applying step up for the user entity?
+        // or yes, but it just no-ops?
+        risk::save_final_decision(conn, &wf.id, decision, rsr_id, vec![])?;
+
+        Ok(KybState::from(KybComplete {}))
+    }
+}
+
+impl WorkflowState for KybDecisioning {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KybState::Decisioning)
+    }
+
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeDecision(MakeDecision { seqno }))
+    }
+}
+
+/////////////////////
+/// DocCollection
+/// ////////////////
+impl KybDocCollection {
+    #[tracing::instrument("KybDocCollection::init", skip_all)]
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(KybDocCollection {
+            wf_id: workflow.id,
+            t_id: sv.tenant_id,
+        })
+    }
+}
+
+#[async_trait]
+impl OnAction<DocCollected, KybState> for KybDocCollection {
+    type AsyncRes = ();
+
+    #[tracing::instrument(
+        "OnAction<DocCollected, KybState>::execute_async_idempotent_actions",
+        skip_all
+    )]
+    async fn execute_async_idempotent_actions(
+        &self,
+        _action: DocCollected,
+        _state: &State,
+    ) -> FpResult<Self::AsyncRes> {
+        Ok(())
+    }
+
+    #[tracing::instrument("OnAction<DocCollected, KybState>::on_commit", skip_all)]
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        _async_res: Self::AsyncRes,
+        _conn: &mut db::TxnPgConn,
+    ) -> FpResult<KybState> {
+        // After collecting a business document from a stepup, we can move to waiting for BOs to complete
+        Ok(KybState::from(KybAwaitingBoKyc {
+            wf_id: self.wf_id,
+            t_id: self.t_id,
+        }))
+    }
+}
+
+impl WorkflowState for KybDocCollection {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KybState::DocCollection)
+    }
+
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        None
+    }
+}
+
+
+/////////////////////
+/// Step Up Decisioning
+/// ////////////////
+impl KybStepUpDecisioning {
+    #[tracing::instrument("KybStepUpDecisioning::init", skip_all)]
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(KybStepUpDecisioning::new(workflow.id, sv.tenant_id))
+    }
+}
+
+#[async_trait]
+impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
+    type AsyncRes = (
+        Arc<dyn FeatureFlagClient>,
+        VaultDataForRules,
+        HashMap<ListId, ListWithDecryptedEntries>,
+    );
+
+    #[tracing::instrument(
+        "KybDecisioning#OnAction<MakeDecision, KybState>::execute_async_idempotent_actions",
+        skip_all
+    )]
+    async fn execute_async_idempotent_actions(
+        &self,
+        action: MakeDecision,
+        state: &State,
+    ) -> FpResult<Self::AsyncRes> {
+        let wfid = self.wf_id.clone();
+        let rule_kind = self.include_rules;
+        let (tenant, rules, vw, lists) = state
+            .db_query(move |conn| -> FpResult<_> {
+                let wf = DbWorkflow::get(conn, &wfid)?;
+                let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
+                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
+
+                // TODO: should technically pass this seqno to RuleSetResult to store in pg instead
+                // of pulling a new seqno inside the RSR write itself
+                let vw =
+                    VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, action.seqno)?;
+
+                let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
+
+                Ok((tenant, rules, vw, lists))
+            })
+            .await?;
+
+        let rule_exprs = rules.iter().map(|r| &r.rule_expression).collect_vec();
+        let vault_data_for_rules = VaultDataForRules::decrypt_for_rules(state, vw, &rule_exprs).await?;
+        let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
+        Ok((state.ff_client.clone(), vault_data_for_rules, lists_for_rules))
+    }
+
+    #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> FpResult<KybState> {
+        let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
+        let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
+        let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
         let kyb_rs: Vec<RiskSignal> =
@@ -530,11 +734,8 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             self.include_rules,
         )? {
             let decision = RulesOutcome::RulesExecuted {
-                should_commit: false, // never commit business data for now
-                create_manual_review: rsr
-                    .action_triggered
-                    .map(|r| r.should_create_review())
-                    .unwrap_or(false),
+                should_commit: false,        // never commit business data for now
+                create_manual_review: false, // This will never result in a review
                 action: rsr.action_triggered,
                 rule_action: rsr.rule_action_triggered,
             };
@@ -544,20 +745,28 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         };
 
         let decision = get_final_rules_outcome(fixture_result, decision);
-
-        // TODO should we use common::save_decision as well in order to handle step-ups in KYB?
-        // or no, because this only applies to business entities? then where are we saving the
-        // decision / applying step up for the user entity?
-        // or yes, but it just no-ops?
-        risk::save_final_decision(conn, &wf.id, decision, rsr_id, vec![])?;
-
-        Ok(KybState::from(KybComplete {}))
+        if let RulesOutcome::RulesExecuted {
+            rule_action: Some(RuleActionConfig::StepUp(step_up_configs)),
+            ..
+        } = decision
+        {
+            handle_stepup(conn, wf, sv.vault_id, step_up_configs, rsr_id)?;
+            Ok(KybState::from(KybDocCollection {
+                wf_id: self.wf_id,
+                t_id: self.t_id,
+            }))
+        } else {
+            Ok(KybState::from(KybAwaitingBoKyc {
+                wf_id: self.wf_id,
+                t_id: self.t_id,
+            }))
+        }
     }
 }
 
-impl WorkflowState for KybDecisioning {
+impl WorkflowState for KybStepUpDecisioning {
     fn name(&self) -> newtypes::WorkflowState {
-        newtypes::WorkflowState::from(newtypes::KybState::Decisioning)
+        newtypes::WorkflowState::from(newtypes::KybState::StepUpDecisioning)
     }
 
     fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
