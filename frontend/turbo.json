@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "cache": false,
-      "dependsOn": ["^build", "i18n:build"],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**", "storybook-static/**"],
       "env": [
         "API_BASE_URL",
@@ -77,10 +77,10 @@
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build", "i18n:copy-en"]
+      "dependsOn": ["^build"]
     },
     "test:ci": {
-      "dependsOn": ["^build", "i18n:copy-en"]
+      "dependsOn": ["^build"]
     },
     "test:ci:bun": {
       "cache": false,
@@ -100,34 +100,13 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["i18n:build"]
+      "dependsOn": []
     },
     "clean": {
       "cache": false,
-      "dependsOn": ["i18n:clean"]
+      "dependsOn": []
     },
     "set:dot-env": {
-      "cache": false
-    },
-    "i18n:sync": {
-      "outputs": ["src/config/locales/**"]
-    },
-    "i18n:copy": {
-      "outputs": ["public/locales/**"]
-    },
-    "i18n:copy-en": {
-      "outputs": ["public/locales/**"]
-    },
-    "i18n:copy-watch": {
-      "outputs": ["public/locales/**"]
-    },
-    "i18n:build": {
-      "dependsOn": ["i18n:sync", "i18n:copy"]
-    },
-    "i18n:dev": {
-      "dependsOn": ["i18n:sync", "i18n:copy-watch"]
-    },
-    "i18n:clean": {
       "cache": false
     },
     "build:storybook": {

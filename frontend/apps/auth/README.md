@@ -35,25 +35,12 @@ http://localhost:3011/user?variant=modal#tok_TOKEN
 3. **clean**
 
    - Description: Removes various generated and temporary directories and files, including Turbo, Next.js, node_modules, and localization files.
-   - Command: `rm -rf .turbo && rm -rf .next && rm -rf node_modules && rm -rf ./public/locales/`
+   - Command: `rm -rf .turbo && rm -rf .next && rm -rf node_modules`
 
 4. **dev**
 
    - Description: Initiates the i18n watch process and starts the Next.js development server on port 3011.
-   - Command: `pnpm i18n:copy-watch & next dev -p 3011`
-
-
-6. **i18n:copy-en**
-
-   - Description: Copies English localization files from specific directories to the project's localization directory.
-
-7. **i18n:copy**
-
-   - Description: Copies localization files from specific directories to the project's localization directory.
-
-8. **i18n:copy-watch**
-
-   - Description: Initiates watch processes for both English and Spanish localization files.
+   - Command: `next dev -p 3011`
 
 9. **lint:ci**
 

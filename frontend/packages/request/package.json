@@ -7,11 +7,6 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "i18n:clean": "rm -rf ./public/locales/",
-    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en",
-    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch",
-    "i18n:copy": "../../scripts/i18n/i18n-copy.sh",
-    "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe",
     "test:ci:hidden": "jest --ci --bail --runInBand",
@@ -28,7 +23,6 @@
     "axios": "^1.7.4",
     "axios-case-converter": "^1.1.0",
     "i18next-locales-sync": "^2.1.0",
-    "copy-and-watch": "^0.1.6",
     "tsconfig": "workspace:*",
     "typescript": "^5.5.2"
   },

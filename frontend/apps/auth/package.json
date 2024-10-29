@@ -49,7 +49,6 @@
     "@types/react-dom": "^18",
     "@types/react": "^18.2.48",
     "bun-types": "^1",
-    "copy-and-watch": "^0.1.6",
     "encoding": "^0.1.13",
     "i18next-locales-sync": "^2.1.0",
     "tsconfig": "workspace:*",

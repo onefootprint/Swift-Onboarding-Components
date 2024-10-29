@@ -7,9 +7,6 @@
     "build:analyze": "ANALYZE=true pnpm build",
     "build": "next build",
     "dev": "next dev -p 3012",
-    "i18n:clean": "rm -rf ./public/locales/",
-    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui",
-    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep ui",
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
@@ -46,7 +43,6 @@
     "@types/node": "^20",
     "@types/react-dom": "^18",
     "@types/react": "^18",
-    "copy-and-watch": "^0.1.6",
     "bun-types": "^1",
     "msw": "^2.2.13",
     "typescript": "^5.5.2"
