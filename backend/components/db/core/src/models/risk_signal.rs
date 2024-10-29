@@ -33,7 +33,8 @@ pub struct RiskSignal {
     pub deactivated_at: Option<DateTime<Utc>>, // Currently unused!
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub verification_result_id: VerificationResultId,
+    // Option means a risk signal was generated outside of a vendor call context
+    pub verification_result_id: Option<VerificationResultId>,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: RiskSignalGroupId,
@@ -48,7 +49,7 @@ pub struct NewRiskSignal {
     pub onboarding_decision_id: Option<OnboardingDecisionId>,
     pub reason_code: FootprintReasonCode,
     pub created_at: DateTime<Utc>,
-    pub verification_result_id: VerificationResultId,
+    pub verification_result_id: Option<VerificationResultId>,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: RiskSignalGroupId,
@@ -56,6 +57,35 @@ pub struct NewRiskSignal {
 }
 
 pub type NewRiskSignalInfo = (FootprintReasonCode, VendorAPI, VerificationResultId);
+pub type NewNonVendorRiskSignalInfo = (FootprintReasonCode, VendorAPI, Option<VerificationResultId>);
+
+pub struct NewRiskSignalArgs {
+    pub reason_code: FootprintReasonCode,
+    pub verification_result_id: Option<VerificationResultId>,
+    pub vendor_api: VendorAPI,
+}
+
+impl From<NewRiskSignalInfo> for NewRiskSignalArgs {
+    fn from(val: NewRiskSignalInfo) -> NewRiskSignalArgs {
+        let (reason_code, vendor_api, vres_id) = val;
+        NewRiskSignalArgs {
+            reason_code,
+            verification_result_id: Some(vres_id),
+            vendor_api,
+        }
+    }
+}
+
+impl From<NewNonVendorRiskSignalInfo> for NewRiskSignalArgs {
+    fn from(val: NewNonVendorRiskSignalInfo) -> NewRiskSignalArgs {
+        let (reason_code, vendor_api, vres_id) = val;
+        NewRiskSignalArgs {
+            reason_code,
+            verification_result_id: vres_id,
+            vendor_api,
+        }
+    }
+}
 
 #[derive(derive_more::Deref)]
 pub struct AtSeqno(pub Option<DataLifetimeSeqno>);
@@ -80,25 +110,31 @@ impl RiskSignal {
 
     #[tracing::instrument("RiskSignal::bulk_add", skip_all)]
     /// Add the provided risk signals to an existing RiskSignalGroup
-    pub fn bulk_add(
+    pub fn bulk_add<T>(
         conn: &mut TxnPgConn,
-        signals: Vec<NewRiskSignalInfo>,
+        signals: Vec<T>,
         hidden: bool,
         rsg_id: RiskSignalGroupId,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>>
+    where
+        T: Into<NewRiskSignalArgs> + Clone + Eq + PartialEq + std::hash::Hash,
+    {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_risk_signals: Vec<NewRiskSignal> = signals
             .into_iter()
             .unique()
-            .map(|(reason_code, vendor_api, vres_id)| NewRiskSignal {
-                onboarding_decision_id: None,
-                reason_code,
-                created_at: Utc::now(),
-                verification_result_id: vres_id,
-                hidden,
-                vendor_api,
-                risk_signal_group_id: rsg_id.clone(),
-                seqno,
+            .map(|info| {
+                let args: NewRiskSignalArgs = info.into();
+                NewRiskSignal {
+                    onboarding_decision_id: None,
+                    reason_code: args.reason_code,
+                    created_at: Utc::now(),
+                    verification_result_id: args.verification_result_id,
+                    hidden,
+                    vendor_api: args.vendor_api,
+                    risk_signal_group_id: rsg_id.clone(),
+                    seqno,
+                }
             })
             .collect();
 
@@ -218,7 +254,6 @@ impl RiskSignal {
         Ok(rows_updated)
     }
 }
-
 
 #[cfg(test)]
 mod tests {

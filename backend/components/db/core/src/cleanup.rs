@@ -289,7 +289,9 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(risk_signal::table)
-                .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
+                .filter(
+                    risk_signal::verification_result_id.eq_any(verification_result_ids.clone().nullable()),
+                )
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(risk_signal_group::table)
@@ -297,7 +299,9 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(risk_signal::table)
-                .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
+                .filter(
+                    risk_signal::verification_result_id.eq_any(verification_result_ids.clone().nullable()),
+                )
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(verification_result::table)

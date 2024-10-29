@@ -279,7 +279,12 @@ pub async fn get_sentilink_detail(
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
-            let (vreq, _) = VerificationResult::get(conn, &rs.verification_result_id)?;
+            let (vreq, _) = VerificationResult::get(
+                conn,
+                &rs.verification_result_id
+                    .clone()
+                    .ok_or(AssertionError("missing vres_id"))?,
+            )?;
             let vw = VaultWrapper::<Any>::build(
                 conn,
                 VwArgs::Historical(&vreq.scoped_vault_id, vreq.uvw_snapshot_seqno),
@@ -370,7 +375,12 @@ async fn get_risk_signal_and_maybe_detail(
             let vreq_vres_key = if rs.reason_code.is_aml() {
                 // we only need to read the vres if it was an Aml risk signal and we need to populate the
                 // `aml` portion of the response
-                let (vreq, vres) = VerificationResult::get(conn, &rs.verification_result_id)?;
+                let (vreq, vres) = VerificationResult::get(
+                    conn,
+                    &rs.verification_result_id
+                        .clone()
+                        .ok_or(AssertionError("missing vres_id"))?,
+                )?;
                 let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &vreq.scoped_vault_id)?;
                 if let Some(obc) = obc {
                     let v = Vault::get(conn, (&fp_id, &tenant_id, is_live))?;

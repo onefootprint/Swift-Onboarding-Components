@@ -1,0 +1,1 @@
+ALTER TABLE risk_signal ALTER COLUMN verification_result_id DROP NOT NULL;
