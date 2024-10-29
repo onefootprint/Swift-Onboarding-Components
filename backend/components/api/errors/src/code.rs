@@ -1,3 +1,7 @@
+use crate::FpError;
+use crate::FpErrorTrait;
+use http::StatusCode;
+
 #[derive(
     Debug, Copy, Clone, Eq, PartialEq, strum::EnumIter, strum::Display, serde_with::SerializeDisplay,
 )]
@@ -67,6 +71,8 @@ pub enum FpErrorCode {
     FileTooSmall,
     #[strum(serialize = "E123")]
     MissingAuthHeader,
+    #[strum(serialize = "E124")]
+    BusinessNotOwnedByUser,
 
     // Tenant-facing errors
     #[strum(serialize = "T120")]
@@ -114,6 +120,7 @@ impl FpErrorCode {
             Self::FileUploadTimeout => true,
             Self::FileTooSmall => true,
             Self::MissingAuthHeader => true,
+            Self::BusinessNotOwnedByUser => true,
 
             // Tenant-facing errors
             Self::VaultDataValidationError => true,
@@ -136,5 +143,41 @@ mod tests {
         let codes = FpErrorCode::iter().map(|e| e.to_string()).unique().count();
         let total = FpErrorCode::iter().count();
         assert_eq!(codes, total, "Duplicate or missing error codes");
+    }
+}
+
+#[derive(Debug)]
+/// Shorthand for an error with an FpErrorCode
+pub struct BadRequestWithCode(pub &'static str, pub FpErrorCode);
+
+impl FpErrorTrait for BadRequestWithCode {
+    fn code(&self) -> Option<FpErrorCode> {
+        Some(self.1)
+    }
+
+    fn status_code(&self) -> StatusCode {
+        StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.0.to_string()
+    }
+}
+
+impl std::fmt::Display for BadRequestWithCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl std::error::Error for BadRequestWithCode {
+    fn source(&self) -> std::option::Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
+}
+
+impl<T, E: From<FpError>> From<BadRequestWithCode> for Result<T, E> {
+    fn from(value: BadRequestWithCode) -> Self {
+        Err(E::from(FpError(Box::new(value))))
     }
 }

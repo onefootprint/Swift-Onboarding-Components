@@ -129,3 +129,4 @@ def test_business_external_id_must_own(sandbox_tenant, kyb_sandbox_ob_config):
     except HttpError as e:
         assert e.status_code == 400
         assert e.json()["message"] == "The business is not owned by the authed user"
+        assert e.json()["code"] == "E124"

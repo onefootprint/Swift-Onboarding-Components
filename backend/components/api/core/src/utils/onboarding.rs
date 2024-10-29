@@ -9,6 +9,8 @@ use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
 use crate::FpResult;
 use api_errors::AssertionError;
+use api_errors::BadRequestWithCode;
+use api_errors::FpErrorCode;
 use api_errors::ValidationError;
 use db::errors::FpOptionalExtension;
 use db::models::business_owner::BoIdentifier;
@@ -292,7 +294,11 @@ fn get_or_create_business(
         };
         let existing_bo = BusinessOwner::get(conn, id).optional()?;
         if existing_bo.is_none() {
-            return ValidationError("The business is not owned by the authed user").into();
+            return BadRequestWithCode(
+                "The business is not owned by the authed user",
+                FpErrorCode::BusinessNotOwnedByUser,
+            )
+            .into();
         }
     }
     Ok(sb.id)
