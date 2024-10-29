@@ -1,5 +1,5 @@
 use crate::utils::db2api::DbToApi;
-use api_wire_types::business::HostedBusinessList;
+use api_wire_types::business::HostedBusiness;
 use db::models::business_owner::BusinessOwner;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
@@ -17,12 +17,13 @@ impl DbToApi<(ScopedVault, Vec<ManualReview>)> for api_wire_types::Business {
     }
 }
 
-impl DbToApi<(BusinessOwner, ScopedVault, PiiString)> for HostedBusinessList {
+impl DbToApi<(BusinessOwner, ScopedVault, PiiString)> for HostedBusiness {
     fn from_db((bo, sb, name): (BusinessOwner, ScopedVault, PiiString)) -> Self {
         Self {
             id: bo.id,
             name,
             created_at: sb.start_timestamp,
+            last_activity_at: sb.last_activity_at,
             is_incomplete: sb.status == OnboardingStatus::Incomplete,
         }
     }

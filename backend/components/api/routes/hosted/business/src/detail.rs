@@ -5,7 +5,7 @@ use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
 use api_core::errors::ValidationError;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::hosted::business::HostedBusiness;
+use api_wire_types::hosted::business::HostedBusinessDetail;
 use api_wire_types::hosted::business::Invited;
 use api_wire_types::hosted::business::Inviter;
 use db::models::workflow::Workflow;
@@ -22,7 +22,7 @@ use paperclip::actix::{
     tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/business")]
-pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse<HostedBusiness> {
+pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse<HostedBusinessDetail> {
     let bv_id = bo_auth.bo.business_vault_id.clone();
     let ob_config_id = bo_auth.ob_config.id.clone();
     let bvw = state
@@ -62,7 +62,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     let business_name = bvw
         .get_p_data(&BDK::Name.into())
         .ok_or(ValidationError("No business name"))?;
-    let result = HostedBusiness {
+    let result = HostedBusinessDetail {
         name: business_name.clone(),
         inviter,
         invited,

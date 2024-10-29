@@ -3,17 +3,18 @@ use newtypes::BoId;
 use newtypes::PiiString;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
-pub struct HostedBusiness {
+pub struct HostedBusinessDetail {
     pub name: PiiString,
     pub inviter: Inviter,
     pub invited: Invited,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
-pub struct HostedBusinessList {
+pub struct HostedBusiness {
     pub id: BoId,
     pub name: PiiString,
     pub created_at: DateTime<Utc>,
+    pub last_activity_at: DateTime<Utc>,
     pub is_incomplete: bool,
 }
 

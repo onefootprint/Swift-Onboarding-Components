@@ -22,7 +22,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HostedBusiness"
+                                    "$ref": "#/components/schemas/HostedBusinessDetail"
                                 }
                             }
                         }
@@ -268,7 +268,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/HostedBusinessList"
+                                        "$ref": "#/components/schemas/HostedBusiness"
                                     }
                                 }
                             }
@@ -3272,6 +3272,35 @@
             "HostedBusiness": {
                 "type": "object",
                 "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "is_incomplete": {
+                        "type": "boolean"
+                    },
+                    "last_activity_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "id",
+                    "is_incomplete",
+                    "last_activity_at",
+                    "name"
+                ]
+            },
+            "HostedBusinessDetail": {
+                "type": "object",
+                "properties": {
                     "invited": {
                         "description": "Information on the secondary BO that was pre-populated by the primary BO",
                         "type": "object",
@@ -3314,33 +3343,13 @@
                     "name"
                 ]
             },
-            "HostedBusinessList": {
+            "HostedBusinessOwner": {
                 "type": "object",
                 "properties": {
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
                     },
-                    "id": {
-                        "type": "string"
-                    },
-                    "is_incomplete": {
-                        "type": "boolean"
-                    },
-                    "name": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "created_at",
-                    "id",
-                    "is_incomplete",
-                    "name"
-                ]
-            },
-            "HostedBusinessOwner": {
-                "type": "object",
-                "properties": {
                     "decrypted_data": {
                         "example": {
                             "id.first_name": "Jane",
@@ -4302,6 +4311,7 @@
                     }
                 },
                 "required": [
+                    "created_at",
                     "decrypted_data",
                     "has_linked_user",
                     "is_authed_user",
@@ -5703,8 +5713,15 @@
                             "step_up",
                             "use_rules_outcome"
                         ]
+                    },
+                    "use_legacy_inherit_logic": {
+                        "description": "TODO: remove this once we've started showing the business selector screen.\n When true, allows using the legacy logic that could inherit an existing business",
+                        "type": "boolean"
                     }
-                }
+                },
+                "required": [
+                    "use_legacy_inherit_logic"
+                ]
             },
             "PostOnboardingRequest": {
                 "type": "object",

@@ -9,7 +9,7 @@ use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
-use api_wire_types::business::HostedBusinessList;
+use api_wire_types::business::HostedBusiness;
 use db::models::business_owner::BusinessOwner;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
@@ -24,7 +24,7 @@ use std::collections::HashMap;
     tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/businesses")]
-pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiListResponse<HostedBusinessList> {
+pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiListResponse<HostedBusiness> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let uv_id = user_auth.user.id.clone();
     let tenant = (user_auth.tenant.as_ref()).ok_or(ValidationError("Tenant is required"))?;
@@ -60,7 +60,7 @@ pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiList
             let name = name.to_piistring().ok()?;
             Some((bo, sb, name))
         })
-        .map(HostedBusinessList::from_db)
+        .map(HostedBusiness::from_db)
         .collect();
 
     Ok(results)
