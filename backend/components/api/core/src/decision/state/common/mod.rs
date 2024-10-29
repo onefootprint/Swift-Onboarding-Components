@@ -2,7 +2,6 @@ use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::features::incode_docv::{
     self,
 };
-use crate::decision::features::risk_signals::RiskSignalsForDecision;
 use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
@@ -33,6 +32,7 @@ use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::list_entry::ListWithEntries;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::risk_signal::RiskSignal;
 use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
@@ -395,7 +395,7 @@ pub fn get_aml_risk_signals_from_kyc_call(
 }
 
 pub fn get_review_reasons(
-    risk_signals: &RiskSignalsForDecision,
+    risk_signals: Vec<RiskSignal>,
     doc_collected: bool,
     obc: &ObConfiguration,
 ) -> Vec<ReviewReason> {
@@ -403,11 +403,8 @@ pub fn get_review_reasons(
         // currently review_reason's is just a Alpaca concept
         Some(CipKind::Alpaca) => {
             let watchlist_reason_codes: Vec<_> = risk_signals
-                .aml
-                .clone()
-                .unwrap_or_default()
                 .iter()
-                .map(|(rc, _, _)| rc.clone())
+                .filter_map(|frc| frc.reason_code.is_aml().then_some(frc.reason_code.clone()))
                 .collect();
             get_review_reasons_inner(&watchlist_reason_codes, doc_collected)
         }

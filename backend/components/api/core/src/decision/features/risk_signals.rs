@@ -6,16 +6,11 @@ use super::neuro_id;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::NewRiskSignalInfo;
-use db::models::risk_signal::RiskSignal;
 use idv::ParsedResponse;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind as IDK;
-use newtypes::RiskSignalGroupKind;
-use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
-use std::collections::HashMap;
 
 pub struct ParsedFootprintReasonCodes {
     pub kyc: Vec<NewRiskSignalInfo>,
@@ -87,54 +82,4 @@ pub fn parse_reason_codes(
         ParsedResponse::NeuroIdAnalytics(ref r) => neuro_id::footprint_reason_codes(r).into_iter().collect(),
         _ => vec![],
     }
-}
-
-// TODO: remove this and just use RiskSignal::latest_by_risk_signal_group_kinds
-pub fn fetch_latest_risk_signals_map(
-    conn: &mut db::PgConn,
-    scoped_vault_id: &ScopedVaultId,
-) -> FpResult<RiskSignalsForDecision> {
-    let mut db_risk_signals_map: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
-        // We don't make decisions on hidden risk signals
-        RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id, AtSeqno(None))?
-            .into_iter()
-            .fold(HashMap::new(), |mut acc, (kind, rs)| {
-                acc.entry(kind).or_default().push(rs);
-                acc
-            });
-
-    let risk_signals = db_risk_signals_map.clone();
-
-    let kyc = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Kyc);
-    let doc = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Doc);
-    let kyb = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Kyb);
-    let aml = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Aml);
-
-    Ok(RiskSignalsForDecision {
-        kyc,
-        doc,
-        kyb,
-        aml,
-        risk_signals,
-    })
-}
-
-fn extract_risk_signal_group(
-    db_risk_signals_map: &mut HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
-    group: RiskSignalGroupKind,
-) -> Option<Vec<NewRiskSignalInfo>> {
-    db_risk_signals_map.remove(&group).map(|rs| {
-        rs.into_iter()
-            .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
-            .collect::<Vec<_>>()
-    })
-}
-
-#[derive(Clone, Default)]
-pub struct RiskSignalsForDecision {
-    pub kyc: Option<Vec<NewRiskSignalInfo>>,
-    pub doc: Option<Vec<NewRiskSignalInfo>>,
-    pub kyb: Option<Vec<NewRiskSignalInfo>>,
-    pub aml: Option<Vec<NewRiskSignalInfo>>,
-    pub risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
 }

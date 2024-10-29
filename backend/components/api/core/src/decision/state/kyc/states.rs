@@ -6,7 +6,6 @@ use super::KycState;
 use super::KycVendorCalls;
 use super::MakeDecision;
 use super::MakeVendorCalls;
-use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
 use crate::decision::features::risk_signals::parse_reason_codes;
 use crate::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
 use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
@@ -41,6 +40,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
@@ -556,10 +556,17 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
         let fixture_result = decision::utils::get_fixture_result(ff_client.clone(), &v, &wf, &self.t_id)?;
-        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
+        let risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &self.sv_id, AtSeqno(None))?
+                .into_iter()
+                .into_group_map();
 
         let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
-        let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
+        let aml_rs = risk_signals
+            .get(&RiskSignalGroupKind::Aml)
+            .cloned()
+            .unwrap_or_default();
+        let review_reasons = common::get_review_reasons(aml_rs, doc_collected, &obc);
 
         // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision
         // instead of the decision from these real Rules
@@ -568,7 +575,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             obc_id: &obc.id,
             wf_id: &wf.id,
             kind: RuleSetResultKind::WorkflowDecision,
-            risk_signals: risk_signals.risk_signals,
+            risk_signals,
             vault_data: &vault_data_for_rules,
             lists: &lists_for_rules,
             is_fixture: fixture_result.is_some(),

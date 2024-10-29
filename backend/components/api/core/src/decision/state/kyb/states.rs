@@ -30,6 +30,7 @@ use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
@@ -480,9 +481,11 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
-        let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
-
-        let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
+        let kyb_rs: Vec<RiskSignal> =
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &wf.scoped_vault_id, AtSeqno(None))?
+                .into_iter()
+                .map(|(_, rs)| rs)
+                .collect();
 
         // TODO: Consider pulling in additional insight events?
         let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
