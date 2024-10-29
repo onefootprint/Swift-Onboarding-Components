@@ -576,6 +576,16 @@
           }
         }
       },
+      "business-selector": {
+        "title": "We found 2 businesses associated with your account",
+        "subtitle": "Choose an existing business or add a new one to verify it.",
+        "status": {
+          "incomplete": "Incomplete"
+        },
+        "created-at": "Created at {{date}}",
+        "or": "or",
+        "cta": "Add & verify a new business"
+      },
       "basic-data": {
         "title": "Basic data",
         "subtitle": "We need your business name and EIN.",
