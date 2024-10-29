@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@hey-api/openapi-ts';
+import { runBiome } from '@onefootprint/request-types/config/run-biome';
 import { addClientConfig } from './add-client-config';
-import { runBiome } from './run-biome';
 import { updateExports } from './update-exports';
 
 const create = async () => {

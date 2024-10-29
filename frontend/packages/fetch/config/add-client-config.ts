@@ -24,6 +24,12 @@ export const client = createClient(createConfig({
   // Replace the import from './types.gen' with '@onefootprint/request-types'
   content = content.replace(/from '\.\/types\.gen';/, "from '@onefootprint/request-types';");
 
+  // Transform URL parameters from camelCase to snake_case
+  content = content.replace(/\{(\w+)\}/g, (_, p1) => {
+    // Convert the snake_case string (p1) to camelCase
+    return `{${p1.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())}}`;
+  });
+
   // Replace the existing client creation with the new configuration
   content = content.replace(/export const client = createClient\(createConfig\(\)\);/, newClientConfig);
 

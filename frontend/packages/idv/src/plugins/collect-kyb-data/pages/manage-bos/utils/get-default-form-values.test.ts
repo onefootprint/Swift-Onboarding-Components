@@ -16,6 +16,7 @@ const MOCK_BO_EMPTY_PRIMARY: HostedBusinessOwner = {
   populatedData: [],
   ownershipStake: undefined,
   linkId: 'bo_link_primary',
+  createdAt: '2023-11-28T14:32:18.456Z',
 };
 
 const MOCK_BO_PRIMARY: HostedBusinessOwner = {
@@ -32,6 +33,7 @@ const MOCK_BO_PRIMARY: HostedBusinessOwner = {
   populatedData: [IdDI.firstName, IdDI.lastName, IdDI.phoneNumber, IdDI.email],
   ownershipStake: 40,
   linkId: 'bo_link_primary',
+  createdAt: '2023-11-28T14:32:18.456Z',
 };
 
 const MOCK_BO_SECONDARY: HostedBusinessOwner = {
@@ -48,6 +50,7 @@ const MOCK_BO_SECONDARY: HostedBusinessOwner = {
   populatedData: [IdDI.firstName, IdDI.lastName, IdDI.phoneNumber, IdDI.email],
   ownershipStake: 35,
   linkId: 'bo_link_secondary',
+  createdAt: '2023-11-28T14:32:18.456Z',
 };
 
 describe('getDefaultFormValues', () => {

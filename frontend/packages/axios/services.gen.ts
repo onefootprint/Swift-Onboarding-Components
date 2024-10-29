@@ -944,7 +944,7 @@ export const postHostedUserUploadByDocumentIdentifier = <ThrowOnError extends bo
     ThrowOnError
   >({
     ...options,
-    url: '/hosted/user/upload/{document_identifier}',
+    url: '/hosted/user/upload/{documentIdentifier}',
   });
 };
 

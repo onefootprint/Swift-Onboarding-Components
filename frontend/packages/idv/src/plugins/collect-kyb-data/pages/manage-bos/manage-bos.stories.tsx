@@ -51,6 +51,7 @@ const mockBos: HostedBusinessOwner[] = [
     populatedData: [IdDI.firstName, IdDI.lastName, IdDI.phoneNumber, IdDI.email],
     ownershipStake: 40,
     linkId: 'bo_link_primary',
+    createdAt: '2023-11-28T14:32:18.456Z',
   },
   {
     uuid: 'bo_link_secondary',
@@ -66,6 +67,7 @@ const mockBos: HostedBusinessOwner[] = [
     populatedData: [IdDI.firstName, IdDI.lastName, IdDI.phoneNumber, IdDI.email],
     ownershipStake: 35,
     linkId: 'bo_link_secondary',
+    createdAt: '2023-11-28T14:32:18.456Z',
   },
 ];
 const immutableBos = mockBos.filter(bo => !bo.isMutable);

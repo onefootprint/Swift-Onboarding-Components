@@ -29,6 +29,8 @@
     "@onefootprint/request": "workspace:*",
     "@onefootprint/types": "workspace:*",
     "@onefootprint/ui": "workspace:*",
+    "@onefootprint/axios": "workspace:*",
+    "@onefootprint/request-types": "workspace:*",
     "@radix-ui/react-collapsible": "1.0.2",
     "@radix-ui/react-dialog": "1.0.5",
     "@radix-ui/react-navigation-menu": "1.0.0",

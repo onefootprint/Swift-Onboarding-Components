@@ -235,10 +235,11 @@ export const getHostedBusinessQueryKey = (options?: Options) => [createQueryKey(
 
 export const getHostedBusinessOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedBusiness({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -253,10 +254,11 @@ export const postHostedBusinessOnboardingQueryKey = (options: Options<PostHosted
 
 export const postHostedBusinessOnboardingOptions = (options: Options<PostHostedBusinessOnboardingData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedBusinessOnboarding({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -289,10 +291,11 @@ export const getHostedBusinessOwnersQueryKey = (options?: Options) => [
 
 export const getHostedBusinessOwnersOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedBusinessOwners({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -343,10 +346,11 @@ export const postHostedBusinessVaultDecryptQueryKey = (options: Options<PostHost
 
 export const postHostedBusinessVaultDecryptOptions = (options: Options<PostHostedBusinessVaultDecryptData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedBusinessVaultDecrypt({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -381,10 +385,11 @@ export const postHostedBusinessVaultValidateQueryKey = (options: Options<PostHos
 
 export const postHostedBusinessVaultValidateOptions = (options: Options<PostHostedBusinessVaultValidateData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedBusinessVaultValidate({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -417,10 +422,11 @@ export const getHostedBusinessesQueryKey = (options?: Options) => [createQueryKe
 
 export const getHostedBusinessesOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedBusinesses({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -433,10 +439,11 @@ export const getHostedCheckSessionQueryKey = (options?: Options) => [createQuery
 
 export const getHostedCheckSessionOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedCheckSession({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -451,10 +458,11 @@ export const postHostedDocumentsQueryKey = (options: Options<PostHostedDocuments
 
 export const postHostedDocumentsOptions = (options: Options<PostHostedDocumentsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedDocuments({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -487,10 +495,11 @@ export const postHostedDocumentsByIdProcessQueryKey = (options: Options<PostHost
 
 export const postHostedDocumentsByIdProcessOptions = (options: Options<PostHostedDocumentsByIdProcessData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedDocumentsByIdProcess({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -527,10 +536,11 @@ export const postHostedDocumentsByIdUploadBySideOptions = (
   options: Options<PostHostedDocumentsByIdUploadBySideData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedDocumentsByIdUploadBySide({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -565,10 +575,11 @@ export const postHostedIdentifyQueryKey = (options: Options<PostHostedIdentifyDa
 
 export const postHostedIdentifyOptions = (options: Options<PostHostedIdentifyData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentify({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -601,10 +612,11 @@ export const postHostedIdentifyKbaQueryKey = (options: Options<PostHostedIdentif
 
 export const postHostedIdentifyKbaOptions = (options: Options<PostHostedIdentifyKbaData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifyKba({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -637,10 +649,11 @@ export const postHostedIdentifyLiteQueryKey = (options: Options<PostHostedIdenti
 
 export const postHostedIdentifyLiteOptions = (options: Options<PostHostedIdentifyLiteData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifyLite({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -673,10 +686,11 @@ export const postHostedIdentifyLoginChallengeQueryKey = (options: Options<PostHo
 
 export const postHostedIdentifyLoginChallengeOptions = (options: Options<PostHostedIdentifyLoginChallengeData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifyLoginChallenge({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -711,10 +725,11 @@ export const postHostedIdentifySignupChallengeQueryKey = (options: Options<PostH
 
 export const postHostedIdentifySignupChallengeOptions = (options: Options<PostHostedIdentifySignupChallengeData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifySignupChallenge({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -749,10 +764,11 @@ export const postHostedIdentifyValidationTokenQueryKey = (options?: Options) => 
 
 export const postHostedIdentifyValidationTokenOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifyValidationToken({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -785,10 +801,11 @@ export const postHostedIdentifyVerifyQueryKey = (options: Options<PostHostedIden
 
 export const postHostedIdentifyVerifyOptions = (options: Options<PostHostedIdentifyVerifyData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifyVerify({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -821,10 +838,11 @@ export const postHostedOnboardingQueryKey = (options?: Options<PostHostedOnboard
 
 export const postHostedOnboardingOptions = (options?: Options<PostHostedOnboardingData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboarding({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -857,10 +875,11 @@ export const postHostedOnboardingAuthorizeQueryKey = (options?: Options) => [
 
 export const postHostedOnboardingAuthorizeOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingAuthorize({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -893,10 +912,11 @@ export const getHostedOnboardingConfigQueryKey = (options?: Options) => [
 
 export const getHostedOnboardingConfigOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingConfig({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -911,10 +931,11 @@ export const hostedOnboardingD2pGenerateQueryKey = (options: Options<HostedOnboa
 
 export const hostedOnboardingD2pGenerateOptions = (options: Options<HostedOnboardingD2pGenerateData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await hostedOnboardingD2pGenerate({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -947,10 +968,11 @@ export const hostedOnboardingD2pSmsQueryKey = (options: Options<HostedOnboarding
 
 export const hostedOnboardingD2pSmsOptions = (options: Options<HostedOnboardingD2pSmsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await hostedOnboardingD2pSms({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -983,10 +1005,11 @@ export const hostedOnboardingD2pStatusQueryKey = (options?: Options) => [
 
 export const hostedOnboardingD2pStatusOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await hostedOnboardingD2pStatus({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1001,10 +1024,11 @@ export const hostedOnboardingD2pStatusPostQueryKey = (options: Options<HostedOnb
 
 export const hostedOnboardingD2pStatusPostOptions = (options: Options<HostedOnboardingD2pStatusPostData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await hostedOnboardingD2pStatusPost({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1039,10 +1063,11 @@ export const postHostedOnboardingFpQueryKey = (options: Options<PostHostedOnboar
 
 export const postHostedOnboardingFpOptions = (options: Options<PostHostedOnboardingFpData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingFp({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1075,10 +1100,11 @@ export const getHostedOnboardingNidQueryKey = (options?: Options) => [
 
 export const getHostedOnboardingNidOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingNid({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1093,10 +1119,11 @@ export const getHostedOnboardingPrivacyPassQueryKey = (options?: Options) => [
 
 export const getHostedOnboardingPrivacyPassOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingPrivacyPass({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1111,10 +1138,11 @@ export const postHostedOnboardingProcessQueryKey = (options?: Options<PostHosted
 
 export const postHostedOnboardingProcessOptions = (options?: Options<PostHostedOnboardingProcessData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingProcess({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1147,10 +1175,11 @@ export const postHostedOnboardingSdsQueryKey = (options: Options<PostHostedOnboa
 
 export const postHostedOnboardingSdsOptions = (options: Options<PostHostedOnboardingSdsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingSds({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1183,10 +1212,11 @@ export const getHostedOnboardingSessionQueryKey = (options?: Options) => [
 
 export const getHostedOnboardingSessionOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingSession({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1203,10 +1233,11 @@ export const postHostedOnboardingSkipPasskeyRegisterOptions = (
   options: Options<PostHostedOnboardingSkipPasskeyRegisterData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingSkipPasskeyRegister({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1241,10 +1272,11 @@ export const getHostedOnboardingStatusQueryKey = (options?: Options) => [
 
 export const getHostedOnboardingStatusOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingStatus({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1259,10 +1291,11 @@ export const postHostedOnboardingTelQueryKey = (options: Options<PostHostedOnboa
 
 export const postHostedOnboardingTelOptions = (options: Options<PostHostedOnboardingTelData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingTel({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1295,10 +1328,11 @@ export const postHostedOnboardingTimelineQueryKey = (options: Options<PostHosted
 
 export const postHostedOnboardingTimelineOptions = (options: Options<PostHostedOnboardingTimelineData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingTimeline({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1331,10 +1365,11 @@ export const postHostedOnboardingValidateQueryKey = (options?: Options) => [
 
 export const postHostedOnboardingValidateOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingValidate({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1367,10 +1402,11 @@ export const postHostedUserAttestDeviceQueryKey = (options: Options<PostHostedUs
 
 export const postHostedUserAttestDeviceOptions = (options: Options<PostHostedUserAttestDeviceData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserAttestDevice({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1405,10 +1441,11 @@ export const postHostedUserAttestDeviceChallengeOptions = (
   options: Options<PostHostedUserAttestDeviceChallengeData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserAttestDeviceChallenge({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1443,10 +1480,11 @@ export const getHostedUserAuthMethodsQueryKey = (options?: Options) => [
 
 export const getHostedUserAuthMethodsOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserAuthMethods({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1461,10 +1499,11 @@ export const getHostedUserAuthRequirementsQueryKey = (options?: Options) => [
 
 export const getHostedUserAuthRequirementsOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserAuthRequirements({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1479,10 +1518,11 @@ export const getHostedUserAuthorizedOrgsQueryKey = (options?: Options) => [
 
 export const getHostedUserAuthorizedOrgsOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserAuthorizedOrgs({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1497,10 +1537,11 @@ export const postHostedUserChallengeQueryKey = (options: Options<PostHostedUserC
 
 export const postHostedUserChallengeOptions = (options: Options<PostHostedUserChallengeData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserChallenge({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1533,10 +1574,11 @@ export const postHostedUserChallengeVerifyQueryKey = (options: Options<PostHoste
 
 export const postHostedUserChallengeVerifyOptions = (options: Options<PostHostedUserChallengeVerifyData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserChallengeVerify({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1571,10 +1613,11 @@ export const postHostedUserConsentQueryKey = (options: Options<PostHostedUserCon
 
 export const postHostedUserConsentOptions = (options: Options<PostHostedUserConsentData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserConsent({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1607,10 +1650,11 @@ export const postHostedUserDocumentsQueryKey = (options: Options<PostHostedUserD
 
 export const postHostedUserDocumentsOptions = (options: Options<PostHostedUserDocumentsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserDocuments({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1643,10 +1687,11 @@ export const postHostedUserDocumentsByIdProcessQueryKey = (
 
 export const postHostedUserDocumentsByIdProcessOptions = (options: Options<PostHostedUserDocumentsByIdProcessData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserDocumentsByIdProcess({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1683,10 +1728,11 @@ export const postHostedUserDocumentsByIdUploadBySideOptions = (
   options: Options<PostHostedUserDocumentsByIdUploadBySideData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserDocumentsByIdUploadBySide({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1721,10 +1767,11 @@ export const postHostedUserEmailVerifyQueryKey = (options: Options<PostHostedUse
 
 export const postHostedUserEmailVerifyOptions = (options: Options<PostHostedUserEmailVerifyData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserEmailVerify({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1757,10 +1804,11 @@ export const postHostedUserPrivateBoLinksQueryKey = (options?: Options) => [
 
 export const postHostedUserPrivateBoLinksOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserPrivateBoLinks({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1793,10 +1841,11 @@ export const getHostedUserPrivateTokenQueryKey = (options?: Options) => [
 
 export const getHostedUserPrivateTokenOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserPrivateToken({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1809,10 +1858,11 @@ export const getHostedUserTokenQueryKey = (options?: Options) => [createQueryKey
 
 export const getHostedUserTokenOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserToken({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1827,10 +1877,11 @@ export const postHostedUserTokensQueryKey = (options: Options<PostHostedUserToke
 
 export const postHostedUserTokensOptions = (options: Options<PostHostedUserTokensData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserTokens({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1865,10 +1916,11 @@ export const postHostedUserUploadByDocumentIdentifierOptions = (
   options: Options<PostHostedUserUploadByDocumentIdentifierData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserUploadByDocumentIdentifier({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1921,10 +1973,11 @@ export const postHostedUserVaultDecryptQueryKey = (options: Options<PostHostedUs
 
 export const postHostedUserVaultDecryptOptions = (options: Options<PostHostedUserVaultDecryptData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserVaultDecrypt({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1957,10 +2010,11 @@ export const postHostedUserVaultValidateQueryKey = (options: Options<PostHostedU
 
 export const postHostedUserVaultValidateOptions = (options: Options<PostHostedUserVaultValidateData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedUserVaultValidate({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -1991,10 +2045,11 @@ export const getOrgSdkArgsQueryKey = (options?: Options) => [createQueryKey('get
 
 export const getOrgSdkArgsOptions = (options?: Options) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgSdkArgs({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -2009,10 +2064,11 @@ export const postOrgSdkArgsQueryKey = (options: Options<PostOrgSdkArgsData>) => 
 
 export const postOrgSdkArgsOptions = (options: Options<PostOrgSdkArgsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postOrgSdkArgs({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;
@@ -2045,10 +2101,11 @@ export const postOrgSdkTelemetryQueryKey = (options: Options<PostOrgSdkTelemetry
 
 export const postOrgSdkTelemetryOptions = (options: Options<PostOrgSdkTelemetryData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await postOrgSdkTelemetry({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       });
       return data;

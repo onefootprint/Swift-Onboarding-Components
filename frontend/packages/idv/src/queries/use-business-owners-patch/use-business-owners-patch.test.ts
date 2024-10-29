@@ -21,6 +21,7 @@ describe('patchBusinessOwnersRequest', () => {
       isAuthedUser: false,
       populatedData: [],
       linkId: '',
+      createdAt: '2023-11-28T14:32:18.456Z',
     },
     {
       uuid: '2',
@@ -31,6 +32,7 @@ describe('patchBusinessOwnersRequest', () => {
       isAuthedUser: true,
       populatedData: [],
       linkId: '',
+      createdAt: '2023-11-28T14:32:18.456Z',
     },
     {
       uuid: '3',
@@ -41,6 +43,7 @@ describe('patchBusinessOwnersRequest', () => {
       isAuthedUser: false,
       populatedData: [],
       linkId: '',
+      createdAt: '2023-11-28T14:32:18.456Z',
     },
   ];
 

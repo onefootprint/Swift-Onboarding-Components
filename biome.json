@@ -13,6 +13,7 @@
     "enabled": true
   },
   "linter": {
+    "ignore": ["**/*/@tanstack/react-query.gen.ts"],
     "enabled": true,
     "rules": {
       "recommended": true,

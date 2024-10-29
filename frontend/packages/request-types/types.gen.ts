@@ -818,6 +818,13 @@ export type GetUserTokenResponse = {
   >;
 };
 export type HostedBusiness = {
+  createdAt: string;
+  id: string;
+  isIncomplete: boolean;
+  lastActivityAt: string;
+  name: string;
+};
+export type HostedBusinessDetail = {
   /**
    * Information on the secondary BO that was pre-populated by the primary BO
    */
@@ -834,13 +841,8 @@ export type HostedBusiness = {
   };
   name: string;
 };
-export type HostedBusinessList = {
-  createdAt: string;
-  id: string;
-  isIncomplete: boolean;
-  name: string;
-};
 export type HostedBusinessOwner = {
+  createdAt: string;
   decryptedData: {
     'bank.*.account_type'?: string;
     'bank.*.ach_account_id'?: string;
@@ -2315,6 +2317,11 @@ export type PostBusinessOnboardingRequest = {
    */
   inheritBusinessId?: string;
   kybFixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
+  /**
+   * TODO: remove this once we've started showing the business selector screen.
+   * When true, allows using the legacy logic that could inherit an existing business
+   */
+  useLegacyInheritLogic: boolean;
 };
 export type kyb_fixture_result = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type PostOnboardingRequest = {
@@ -3681,7 +3688,7 @@ export type UserDecryptResponse = {
     [key: string]: unknown;
   };
 };
-export type GetHostedBusinessResponse = HostedBusiness;
+export type GetHostedBusinessResponse = HostedBusinessDetail;
 export type GetHostedBusinessError = unknown;
 export type PostHostedBusinessOnboardingData = {
   body: PostBusinessOnboardingRequest;
@@ -3716,7 +3723,7 @@ export type PostHostedBusinessVaultValidateData = {
 };
 export type PostHostedBusinessVaultValidateResponse = Empty;
 export type PostHostedBusinessVaultValidateError = unknown;
-export type GetHostedBusinessesResponse = Array<HostedBusinessList>;
+export type GetHostedBusinessesResponse = Array<HostedBusiness>;
 export type GetHostedBusinessesError = unknown;
 export type GetHostedCheckSessionResponse = CheckSessionResponse;
 export type GetHostedCheckSessionError = unknown;
@@ -4209,7 +4216,7 @@ export type $OpenApiTs = {
         /**
          * OK
          */
-        '200': HostedBusiness;
+        '200': HostedBusinessDetail;
       };
     };
   };
@@ -4282,7 +4289,7 @@ export type $OpenApiTs = {
         /**
          * OK
          */
-        '200': Array<HostedBusinessList>;
+        '200': Array<HostedBusiness>;
       };
     };
   };

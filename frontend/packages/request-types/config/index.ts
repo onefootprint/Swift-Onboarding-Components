@@ -5,17 +5,11 @@ import { keyTypestoCamelCase } from './key-types-to-camel-case';
 import { runBiome } from './run-biome';
 import { cleanupTempFile, updateOpenApi } from './update-openapi';
 
-const create = async () => {
-  const clientDir = path.resolve('src');
+const createSDKTypes = async () => {
+  const clientDir = path.resolve('./');
 
-  // Clean-up src/ folder if it exists
-  if (fs.existsSync(clientDir)) {
-    fs.rmSync(clientDir, { recursive: true, force: true });
-    console.log('Deleted existing src folder');
-  }
-
-  const tempPath = await updateOpenApi();
-
+  const tempPath = 'tempSDKApiDocs.json';
+  await updateOpenApi(path.resolve('../../apps/docs/src/pages/api-reference/assets/hosted-api-docs.json'), tempPath);
   await createClient({
     input: tempPath,
     output: clientDir,
@@ -25,9 +19,43 @@ const create = async () => {
 
   keyTypestoCamelCase(path.resolve(clientDir, 'types.gen.ts'));
 
-  runBiome(clientDir);
+  runBiome(path.resolve(clientDir, 'types.gen.ts'));
+  runBiome(path.resolve(clientDir, 'index.ts'));
 
   await cleanupTempFile(tempPath);
 };
 
-create();
+const createDashboardTypes = async () => {
+  const tempDir = path.resolve('temp');
+
+  const tempPath = 'tempDashboardApiDocs.json';
+  await updateOpenApi(path.resolve('../../apps/docs/src/pages/api-reference/assets/dashboard-api-docs.json'), tempPath);
+  await createClient({
+    input: tempPath,
+    output: tempDir,
+    schemas: false,
+    services: false,
+  });
+
+  const generatedTypesPath = path.resolve(tempDir, 'types.gen.ts');
+  const dashboardTypesPath = path.resolve('dashboard.ts');
+
+  keyTypestoCamelCase(generatedTypesPath);
+
+  if (!fs.existsSync(dashboardTypesPath)) {
+    fs.writeFileSync(dashboardTypesPath, '');
+  }
+  fs.rename(generatedTypesPath, dashboardTypesPath, err => {
+    if (err) {
+      console.error('Error renaming file:', err);
+    } else {
+      runBiome(dashboardTypesPath);
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  cleanupTempFile(tempPath);
+};
+
+createSDKTypes();
+createDashboardTypes();

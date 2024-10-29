@@ -484,6 +484,9 @@ importers:
       '@googlemaps/js-api-loader':
         specifier: ^1.16.6
         version: 1.16.6
+      '@onefootprint/axios':
+        specifier: workspace:*
+        version: link:../../packages/axios
       '@onefootprint/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -505,6 +508,9 @@ importers:
       '@onefootprint/request':
         specifier: workspace:*
         version: link:../../packages/request
+      '@onefootprint/request-types':
+        specifier: workspace:*
+        version: link:../../packages/request-types
       '@onefootprint/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -1626,6 +1632,9 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1(axios@1.7.7)
     devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: ^0.53.11
+        version: 0.53.12(typescript@5.5.2)
       '@types/node':
         specifier: ^20
         version: 20.12.14
@@ -1722,6 +1731,9 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
     devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: ^0.53.11
+        version: 0.53.12(typescript@5.5.2)
       '@types/lodash':
         specifier: ^4.17.12
         version: 4.17.12
