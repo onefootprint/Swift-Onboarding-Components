@@ -135,7 +135,7 @@ pub async fn post(
             } else if let Some(obc) = user_auth.obc.as_ref() {
                 // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
                 let uv = Vault::lock(conn, uv_id)?;
-                let (su, is_new_su) = ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?;
+                let (su, is_new_su) = ScopedVault::get_or_create_for_tenant(conn, &uv, &obc.id)?;
                 root_span.record_su(&su);
                 if is_new_su {
                     // If the scoped vault is brand new, prefill its data

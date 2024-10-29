@@ -5,7 +5,6 @@ use super::ob_configuration::ObConfiguration;
 use super::scoped_vault_label::ScopedVaultLabel;
 use super::task::Task;
 use super::tenant::Tenant;
-use super::user_timeline::UserTimeline;
 use super::vault::NewVaultArgs;
 use super::vault::Vault;
 use super::watchlist_check::WatchlistCheck;
@@ -32,7 +31,6 @@ use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::BoId;
 use newtypes::DataLifetimeSeqno;
-use newtypes::DbActor;
 use newtypes::ExternalId;
 use newtypes::FireWebhookArgs;
 use newtypes::FpId;
@@ -44,7 +42,6 @@ use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::UserSpecificWebhookKind;
 use newtypes::UserSpecificWebhookPayload;
-use newtypes::VaultCreatedInfo;
 use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::WebhookEvent;
@@ -101,16 +98,16 @@ pub struct ScopedVault {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = scoped_vault)]
-struct NewScopedVault {
+struct NewScopedVault<'a> {
     id: ScopedVaultId,
     fp_id: FpId,
-    vault_id: VaultId,
-    tenant_id: TenantId,
+    vault_id: &'a VaultId,
+    tenant_id: &'a TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
     last_heartbeat_at: DateTime<Utc>,
     snapshot_seqno: DataLifetimeSeqno,
-    external_id: Option<ExternalId>,
+    external_id: Option<&'a ExternalId>,
     last_activity_at: DateTime<Utc>,
     kind: VaultKind,
     is_active: bool,
@@ -192,9 +189,11 @@ pub type SerializableEntity = (
 
 pub type IsNew = bool;
 
-pub struct NewScopedVaultArgs {
+pub struct NewScopedVaultArgs<'a> {
     pub is_active: bool,
     pub status: OnboardingStatus,
+    pub external_id: Option<&'a ExternalId>,
+    pub tenant_id: &'a TenantId,
 }
 
 #[derive(Debug)]
@@ -204,15 +203,15 @@ pub struct SvStatusDelta {
 }
 
 impl ScopedVault {
-    /// Used to create a ScopedVault for an already-existing portable vault when that vault onboards
-    /// onto a new tenant.
-    #[tracing::instrument("ScopedVault::get_or_create_for_playbook", skip_all)]
-    pub fn get_or_create_for_playbook(
+    /// Creates a new ScopedVault for the provided (vault, tenant) combo if one doesn't already
+    /// exist.
+    #[tracing::instrument("ScopedVault::get_or_create_for_tenant", skip_all)]
+    pub fn get_or_create_for_tenant(
         conn: &mut TxnPgConn,
         vault: &Locked<Vault>,
-        ob_configuration_id: ObConfigurationId,
+        ob_configuration_id: &ObConfigurationId,
     ) -> DbResult<(Self, IsNew)> {
-        let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
+        let (ob_config, _) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table
@@ -227,69 +226,35 @@ impl ScopedVault {
         let args = NewScopedVaultArgs {
             is_active: true,
             status: OnboardingStatus::None,
+            external_id: None,
+            tenant_id: &ob_config.tenant_id,
         };
-        let sv = Self::create_for_playbook(conn, vault, ob_config, args)?;
+        let sv = Self::create(conn, vault, args)?;
         Ok((sv, true))
     }
 
-    #[tracing::instrument("ScopedVault::create_for_playbook", skip_all)]
-    pub fn create_for_playbook(
-        conn: &mut TxnPgConn,
-        uv: &Locked<Vault>,
-        obc: ObConfiguration,
-        args: NewScopedVaultArgs,
-    ) -> DbResult<Self> {
-        if uv.is_live != obc.is_live {
-            return Err(DbError::SandboxMismatch);
-        }
-        let seqno = DataLifetime::get_current_seqno(conn)?;
-        let start_timestamp = Utc::now();
-        let new = NewScopedVault {
-            id: ScopedVaultId::generate(uv.kind),
-            fp_id: FpId::generate(uv.kind, uv.is_live),
-            vault_id: uv.id.clone(),
-            start_timestamp,
-            last_activity_at: start_timestamp,
-            tenant_id: obc.tenant_id,
-            is_live: obc.is_live,
-            last_heartbeat_at: Utc::now(),
-            is_active: args.is_active,
-            snapshot_seqno: seqno,
-            // NOTE: for now we won't support adding an external id to
-            // users created via Verify
-            external_id: None,
-            kind: uv.kind,
-            status: args.status,
-            is_billable_for_vault_storage: false,
-        };
-        let sv = diesel::insert_into(scoped_vault::table)
-            .values(new)
-            .get_result::<ScopedVault>(conn.conn())?;
-        Ok(sv)
-    }
-
-    /// Used to create a ScopedUser for a non-portable vault
-    #[tracing::instrument("ScopedVault::get_or_create_non_portable", skip_all)]
-    pub fn get_or_create_non_portable(
+    /// Used to get or create a new ScopedVault and Vault for the provided
+    /// idempotency_id/external_id
+    #[tracing::instrument("ScopedVault::get_or_create_by_external_id", skip_all)]
+    pub fn get_or_create_by_external_id(
         conn: &mut TxnPgConn,
         new_user: NewVaultArgs,
-        tenant_id: TenantId,
+        args: NewScopedVaultArgs,
         idempotency_id: Option<String>,
-        external_id: Option<ExternalId>,
-        actor: DbActor,
-    ) -> DbResult<(Self, Vault)> {
+    ) -> DbResult<(Self, Vault, IsNew)> {
         // Since the idempotency id and external ID are stored on the vault, concatenate them with
         // the tenant ID to make sure they are scoped per tenant.
-        let idempotency_id = idempotency_id.map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
+        let idempotency_id =
+            idempotency_id.map(|id| IdempotencyId::from(format!("{}.{}", args.tenant_id, id)));
         let idempotency_id_given = idempotency_id.is_some();
 
-        let (uv, is_new_vault) = match &external_id {
+        let (uv, is_new_vault) = match args.external_id.as_ref() {
             // Get the existing vault if an active scoped vault already exists with the given
             // external ID. Otherwise, create a new vault.
             Some(external_id) => {
                 let id = ScopedVaultIdentifier::ExternalId {
                     e_id: external_id,
-                    t_id: &tenant_id,
+                    t_id: args.tenant_id,
                     is_live: new_user.is_live,
                 };
                 let svr = ScopedVault::get(conn, id);
@@ -304,35 +269,11 @@ impl ScopedVault {
         };
 
         let su = if is_new_vault {
-            let start_timestamp = Utc::now();
-            let seqno = DataLifetime::get_current_seqno(conn)?;
-            let new = NewScopedVault {
-                id: ScopedVaultId::generate(uv.kind),
-                fp_id: FpId::generate(uv.kind, uv.is_live),
-                start_timestamp,
-                last_activity_at: start_timestamp,
-                tenant_id,
-                is_live: uv.is_live,
-                vault_id: uv.id.clone(),
-                last_heartbeat_at: Utc::now(),
-                // Vaults created via API are immediately active
-                is_active: true,
-                snapshot_seqno: seqno,
-                external_id,
-                kind: uv.kind,
-                status: OnboardingStatus::None,
-                is_billable_for_vault_storage: false,
-            };
-            let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
-                .values(new)
-                .get_result(conn.conn())?;
-            let event = VaultCreatedInfo { actor };
-            UserTimeline::create(conn, event, uv.id.clone(), sv.id.clone())?;
-            sv
+            Self::create(conn, &uv, args)?
         } else {
             scoped_vault::table
                 .filter(scoped_vault::vault_id.eq(&uv.id))
-                .filter(scoped_vault::tenant_id.eq(&tenant_id))
+                .filter(scoped_vault::tenant_id.eq(args.tenant_id))
                 .filter(scoped_vault::is_active.eq(true))
                 .get_result(conn.conn())
                 .map_err(|e| match e {
@@ -342,7 +283,39 @@ impl ScopedVault {
                     e => e.into(),
                 })?
         };
-        Ok((su, uv.into_inner()))
+        Ok((su, uv.into_inner(), is_new_vault))
+    }
+
+    #[tracing::instrument("ScopedVault::create", skip_all)]
+    pub fn create(conn: &mut TxnPgConn, uv: &Locked<Vault>, args: NewScopedVaultArgs) -> DbResult<Self> {
+        let NewScopedVaultArgs {
+            tenant_id,
+            is_active,
+            status,
+            external_id,
+        } = args;
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let start_timestamp = Utc::now();
+        let new = NewScopedVault {
+            id: ScopedVaultId::generate(uv.kind),
+            fp_id: FpId::generate(uv.kind, uv.is_live),
+            vault_id: &uv.id,
+            start_timestamp,
+            last_activity_at: start_timestamp,
+            tenant_id,
+            is_live: uv.is_live,
+            last_heartbeat_at: start_timestamp,
+            is_active,
+            snapshot_seqno: seqno,
+            external_id,
+            kind: uv.kind,
+            status,
+            is_billable_for_vault_storage: false,
+        };
+        let sv = diesel::insert_into(scoped_vault::table)
+            .values(new)
+            .get_result::<ScopedVault>(conn.conn())?;
+        Ok(sv)
     }
 
     #[tracing::instrument("ScopedVault::get", skip_all)]
@@ -882,26 +855,32 @@ mod tests {
         ];
 
         for test in tests {
-            let (sv0, _) = ScopedVault::get_or_create_non_portable(
+            let ext_id = (test.create_1.external_id).map(|s| ExternalId::from_str(s).unwrap());
+            let sv_args = NewScopedVaultArgs {
+                is_active: true,
+                status: OnboardingStatus::None,
+                tenant_id: &tenant.id,
+                external_id: ext_id.as_ref(),
+            };
+            let (sv0, _, _) = ScopedVault::get_or_create_by_external_id(
                 conn,
                 nva.clone(),
-                tenant.id.clone(),
+                sv_args,
                 test.create_1.idempotency_id.map(|s| s.into()),
-                test.create_1
-                    .external_id
-                    .map(|s| ExternalId::from_str(s).unwrap()),
-                DbActor::Footprint,
             )
             .unwrap_or_else(|e| panic!("{}: create 1 failed with error: {}", test.name, e,));
-            let (sv1, _) = ScopedVault::get_or_create_non_portable(
+            let ext_id = (test.create_2.external_id).map(|s| ExternalId::from_str(s).unwrap());
+            let sv_args = NewScopedVaultArgs {
+                is_active: true,
+                status: OnboardingStatus::None,
+                tenant_id: &tenant.id,
+                external_id: ext_id.as_ref(),
+            };
+            let (sv1, _, _) = ScopedVault::get_or_create_by_external_id(
                 conn,
                 nva.clone(),
-                tenant.id.clone(),
+                sv_args,
                 test.create_2.idempotency_id.map(|s| s.into()),
-                test.create_2
-                    .external_id
-                    .map(|s| ExternalId::from_str(s).unwrap()),
-                DbActor::Footprint,
             )
             .unwrap_or_else(|e| panic!("{}: create 2 failed with error: {}", test.name, e,));
             if test.expect_same_fp_ids {
@@ -942,96 +921,89 @@ mod tests {
             is_created_via_api: true,
             duplicate_of_id: None,
         };
+        let ext_id = ExternalId::from_str("external-id-1").unwrap();
 
         // Test first using an idempotency ID.
-        let (sv0, _) = ScopedVault::get_or_create_non_portable(
+        let sv_args = NewScopedVaultArgs {
+            is_active: true,
+            status: OnboardingStatus::None,
+            tenant_id: &tenant.id,
+            external_id: Some(&ext_id),
+        };
+        let (sv0, _, _) = ScopedVault::get_or_create_by_external_id(
             conn,
             nva.clone(),
-            tenant.id.clone(),
+            sv_args,
             Some("idempotency-id-1".into()),
-            Some(ExternalId::from_str("external-id-1").unwrap()),
-            DbActor::Footprint,
         )
         .unwrap();
-        assert_eq!(
-            sv0.external_id.map(|e| e.to_string()),
-            Some("external-id-1".to_owned())
-        );
+        assert_eq!(sv0.external_id.unwrap(), ext_id);
 
         ScopedVault::deactivate(conn, &sv0.id).unwrap();
 
-        let err = ScopedVault::get_or_create_non_portable(
+        let sv_args = NewScopedVaultArgs {
+            is_active: true,
+            status: OnboardingStatus::None,
+            tenant_id: &tenant.id,
+            external_id: Some(&ext_id),
+        };
+        let err = ScopedVault::get_or_create_by_external_id(
             conn,
             nva.clone(),
-            tenant.id.clone(),
+            sv_args,
             Some("idempotency-id-1".into()),
-            Some(ExternalId::from_str("external-id-1").unwrap()),
-            DbActor::Footprint,
         )
         .unwrap_err();
         assert!(matches!(err, DbError::ValidationError(_)));
 
-        let (sv1, _) = ScopedVault::get_or_create_non_portable(
+        let sv_args = NewScopedVaultArgs {
+            is_active: true,
+            status: OnboardingStatus::None,
+            tenant_id: &tenant.id,
+            external_id: Some(&ext_id),
+        };
+        let (sv1, _, _) = ScopedVault::get_or_create_by_external_id(
             conn,
             nva.clone(),
-            tenant.id.clone(),
+            sv_args,
             Some("idempotency-id-2".into()),
-            Some(ExternalId::from_str("external-id-1").unwrap()),
-            DbActor::Footprint,
         )
         .unwrap();
-        assert_eq!(
-            sv1.external_id.map(|e| e.to_string()),
-            Some("external-id-1".to_owned())
-        );
-
+        assert_eq!(sv1.external_id.unwrap(), ext_id);
         assert_ne!(sv0.fp_id, sv1.fp_id);
 
         // Test next without an idempotency ID.
-        let (sv2, _) = ScopedVault::get_or_create_non_portable(
-            conn,
-            nva.clone(),
-            tenant.id.clone(),
-            None,
-            Some(ExternalId::from_str("external-id-1").unwrap()),
-            DbActor::Footprint,
-        )
-        .unwrap();
-        assert_eq!(
-            sv2.external_id.map(|e| e.to_string()),
-            Some("external-id-1".to_owned())
-        );
-
-        let (sv3, _) = ScopedVault::get_or_create_non_portable(
-            conn,
-            nva.clone(),
-            tenant.id.clone(),
-            None,
-            Some(ExternalId::from_str("external-id-1").unwrap()),
-            DbActor::Footprint,
-        )
-        .unwrap();
+        let sv_args = NewScopedVaultArgs {
+            is_active: true,
+            status: OnboardingStatus::None,
+            tenant_id: &tenant.id,
+            external_id: Some(&ext_id),
+        };
+        let (sv2, _, _) =
+            ScopedVault::get_or_create_by_external_id(conn, nva.clone(), sv_args, None).unwrap();
+        assert_eq!(sv2.external_id.unwrap(), ext_id);
+        let sv_args = NewScopedVaultArgs {
+            is_active: true,
+            status: OnboardingStatus::None,
+            tenant_id: &tenant.id,
+            external_id: Some(&ext_id),
+        };
+        let (sv3, _, _) =
+            ScopedVault::get_or_create_by_external_id(conn, nva.clone(), sv_args, None).unwrap();
         assert_eq!(sv2.fp_id, sv3.fp_id);
-        assert_eq!(
-            sv3.external_id.map(|e| e.to_string()),
-            Some("external-id-1".to_owned())
-        );
+        assert_eq!(sv3.external_id.unwrap(), ext_id);
 
         ScopedVault::deactivate(conn, &sv2.id).unwrap();
 
-        let (sv4, _) = ScopedVault::get_or_create_non_portable(
-            conn,
-            nva.clone(),
-            tenant.id.clone(),
-            None,
-            Some(ExternalId::from_str("external-id-1").unwrap()),
-            DbActor::Footprint,
-        )
-        .unwrap();
+        let sv_args = NewScopedVaultArgs {
+            is_active: true,
+            status: OnboardingStatus::None,
+            tenant_id: &tenant.id,
+            external_id: Some(&ext_id),
+        };
+        let (sv4, _, _) =
+            ScopedVault::get_or_create_by_external_id(conn, nva.clone(), sv_args, None).unwrap();
         assert_ne!(sv3.fp_id, sv4.fp_id);
-        assert_eq!(
-            sv4.external_id.map(|e| e.to_string()),
-            Some("external-id-1".to_owned())
-        );
+        assert_eq!(sv4.external_id.unwrap(), ext_id);
     }
 }

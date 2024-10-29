@@ -114,8 +114,10 @@ impl VaultWrapper<Person> {
         let args = NewScopedVaultArgs {
             is_active: false,
             status,
+            tenant_id: &obc.tenant_id,
+            external_id: None,
         };
-        let su = ScopedVault::create_for_playbook(conn, &uv, obc, args)?;
+        let su = ScopedVault::create(conn, &uv, args)?;
 
         // Record some properties on the root span
         root_span.record_su(&su);

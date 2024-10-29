@@ -1,11 +1,15 @@
+use crate::models::scoped_vault::NewScopedVaultArgs;
 use crate::models::scoped_vault::ScopedVault;
+use crate::models::user_timeline::UserTimeline;
 use crate::models::vault::NewVaultArgs;
 use crate::models::vault::Vault;
 use crate::TxnPgConn;
 use newtypes::DbActor;
 use newtypes::Locked;
 use newtypes::ObConfigurationId;
+use newtypes::OnboardingStatus;
 use newtypes::TenantId;
+use newtypes::VaultCreatedInfo;
 use newtypes::VaultId;
 
 pub fn create(
@@ -14,7 +18,7 @@ pub fn create(
     ob_config_id: &ObConfigurationId,
 ) -> Locked<ScopedVault> {
     let uv = Vault::lock(conn, uv_id).unwrap();
-    let sv = ScopedVault::get_or_create_for_playbook(conn, &uv, ob_config_id.clone())
+    let sv = ScopedVault::get_or_create_for_tenant(conn, &uv, ob_config_id)
         .unwrap()
         .0;
 
@@ -26,15 +30,19 @@ pub fn create_non_portable(
     args: NewVaultArgs,
     tenant_id: &TenantId,
 ) -> (Locked<ScopedVault>, Vault) {
-    let (sv, vault) = ScopedVault::get_or_create_non_portable(
-        conn,
-        args,
-        tenant_id.clone(),
-        None,
-        None,
-        DbActor::Footprint,
-    )
-    .unwrap();
+    let sv_args = NewScopedVaultArgs {
+        is_active: true,
+        status: OnboardingStatus::None,
+        tenant_id,
+        external_id: None,
+    };
+    let (sv, vault, is_new) = ScopedVault::get_or_create_by_external_id(conn, args, sv_args, None).unwrap();
+    if is_new {
+        let event = VaultCreatedInfo {
+            actor: DbActor::Footprint,
+        };
+        UserTimeline::create(conn, event, vault.id.clone(), sv.id.clone()).unwrap();
+    }
 
     let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 

@@ -24,9 +24,11 @@ use api_wire_types::UpdateEntityRequest;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::scoped_vault_version::ScopedVaultVersion;
+use db::models::user_timeline::UserTimeline;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::DbError;
@@ -35,10 +37,12 @@ use newtypes::put_data_request::PatchDataRequest;
 use newtypes::AuditEventDetail;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::OnboardingStatus;
 use newtypes::PiiJsonValue;
 use newtypes::PreviewApi;
 use newtypes::SandboxId;
 use newtypes::ValidateArgs;
+use newtypes::VaultCreatedInfo;
 use newtypes::VaultKind;
 use paperclip::actix::web;
 use std::collections::HashMap;
@@ -106,29 +110,33 @@ pub async fn create_non_portable_vault(
     let (scoped_user, vault, new_version) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let idempotency_id = idempotency_id.0;
-            let external_id = external_id.0;
-            let db_actor: DbActor = actor.clone().into();
-            let (su, vault) = ScopedVault::get_or_create_non_portable(
-                conn,
-                new_user,
-                tenant_id,
-                idempotency_id,
-                external_id,
-                db_actor.clone(),
-            )?;
+            let sv_args = NewScopedVaultArgs {
+                // All new non-portable vaults start as active
+                is_active: true,
+                status: OnboardingStatus::None,
+                tenant_id: &tenant_id,
+                external_id: external_id.0.as_ref(),
+            };
+            let (su, vault, is_new) =
+                ScopedVault::get_or_create_by_external_id(conn, new_user, sv_args, idempotency_id)?;
+            if is_new {
+                let actor: DbActor = actor.clone().into();
+                let event = VaultCreatedInfo { actor };
+                UserTimeline::create(conn, event, vault.id.clone(), su.id.clone())?;
+            }
 
             let svv = if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
                 let PatchDataResult { version, .. } =
-                    uvw.patch_data(conn, request, DataRequestSource::TenantPatchVault(actor))?;
+                    uvw.patch_data(conn, request, DataRequestSource::TenantPatchVault(actor.clone()))?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 
                 // Create an audit event to show data was added
                 let event = NewAuditEvent {
                     tenant_id: su.tenant_id.clone(),
-                    principal_actor: db_actor,
+                    principal_actor: actor.into(),
                     insight_event_id,
                     detail: AuditEventDetail::UpdateUserData {
                         is_live: su.is_live,

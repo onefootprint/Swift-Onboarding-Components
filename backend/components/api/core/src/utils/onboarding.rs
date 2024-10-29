@@ -20,6 +20,7 @@ use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::IsNew;
+use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::vault::NewVaultArgs;
@@ -40,6 +41,7 @@ use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::KybConfig;
 use newtypes::ObConfigurationKind;
+use newtypes::OnboardingStatus;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::VaultKind;
@@ -259,7 +261,7 @@ fn get_or_create_business(
 
     // Otherwise, make a new business vault and scoped vault owned by the currently authed user
     let (public_key, e_private_key) = new_biz_keypair;
-    let args = NewVaultArgs {
+    let vault_args = NewVaultArgs {
         public_key,
         e_private_key,
         is_live: user_auth.user.is_live,
@@ -269,9 +271,15 @@ fn get_or_create_business(
         is_created_via_api: false,
         duplicate_of_id: None,
     };
-    let business_vault = Vault::create(conn, args)?;
-    BusinessOwner::create_primary(conn, user_auth.user.id.clone(), business_vault.id.clone())?;
-    let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
+
+    let sv_args = NewScopedVaultArgs {
+        is_active: true,
+        status: OnboardingStatus::None,
+        tenant_id: &obc.tenant_id,
+        external_id: None, // TODO eventually pass this in
+    };
+    let (sb, bv, _) = ScopedVault::get_or_create_by_external_id(conn, vault_args, sv_args, None)?;
+    BusinessOwner::create_primary(conn, user_auth.user.id.clone(), bv.id)?;
     Ok(sb.id)
 }
 
