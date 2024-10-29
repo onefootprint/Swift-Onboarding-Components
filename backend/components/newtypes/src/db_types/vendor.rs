@@ -110,6 +110,8 @@ pub enum VendorAPI {
     SambaLicenseValidationGetStatus,
     SambaLicenseValidationGetReport,
     SentilinkApplicationRisk,
+    // Used for internally generated non-vendor risk signals
+    Footprint,
 }
 impl_enum_str_diesel!(VendorAPI);
 pub use vendor_api_struct::*;
@@ -152,6 +154,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::SambaLicenseValidationGetStatus => Self::SambaSafety,
             VendorAPI::SambaLicenseValidationGetReport => Self::SambaSafety,
             VendorAPI::SentilinkApplicationRisk => Self::Sentilink,
+            VendorAPI::Footprint => Self::Footprint,
         }
     }
 }
