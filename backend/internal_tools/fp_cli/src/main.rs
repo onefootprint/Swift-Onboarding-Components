@@ -11,9 +11,11 @@ use kyc::KycArgs;
 use newtypes::export_reason_codes;
 use newtypes::PiiString;
 use newtypes::VaultPublicKey;
+use stripe_migrate::StripeCardMigrateArgs;
 mod backfill;
 mod export;
 mod kyc;
+mod stripe_migrate;
 mod util;
 
 #[derive(Parser)]
@@ -40,6 +42,8 @@ enum Commands {
     Backfill(BackfillArgs),
     /// KYC
     Kyc(KycArgs),
+    /// Migrate stripe card data to footprint
+    StripeCardMigrate(StripeCardMigrateArgs),
 }
 
 #[derive(Args)]
@@ -128,6 +132,10 @@ async fn main() -> anyhow::Result<()> {
         Commands::Kyc(args) => {
             kyc::kyc(args).await?;
             "Done running kyc".into()
+        }
+        Commands::StripeCardMigrate(args) => {
+            stripe_migrate::run(args).await?;
+            "Done migrating stripe card data".into()
         }
     };
     print!("{}", out);

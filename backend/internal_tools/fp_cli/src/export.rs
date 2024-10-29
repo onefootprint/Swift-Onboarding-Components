@@ -31,6 +31,9 @@ pub struct ExportArgs {
     /// users or businesses
     #[arg(long)]
     pub kind: String,
+
+    #[arg(long, default_value = "false")]
+    pub verbose: bool,
 }
 //TODO: move this to api_wire_types
 #[derive(Debug, Clone, Deserialize)]
@@ -47,7 +50,7 @@ struct CursorPaginatedResponse<T> {
 
 pub async fn export_entities(args: ExportArgs) -> anyhow::Result<()> {
     let client = api_client(args.api_key.clone())?;
-    let output = output_file(args.output.clone()).await?;
+    let output = output_file(args.output.clone(), args.verbose).await?;
     fetch_entities(client, &args, &output).await?;
     Ok(())
 }

@@ -39,10 +39,13 @@ pub struct KycArgs {
 
     #[arg(long)]
     pub only_run_on_status: Option<OnboardingStatus>,
+
+    #[arg(long, default_value = "false")]
+    pub verbose: bool,
 }
 
 pub async fn kyc(args: KycArgs) -> anyhow::Result<()> {
-    let output = output_file(args.output.clone()).await?;
+    let output = output_file(args.output.clone(), args.verbose).await?;
 
     let file = File::open(args.file.clone())?;
     let mut reader: Reader<File> = csv::ReaderBuilder::new().has_headers(false).from_reader(file);

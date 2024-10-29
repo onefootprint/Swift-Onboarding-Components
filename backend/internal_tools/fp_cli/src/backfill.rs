@@ -32,13 +32,16 @@ pub struct BackfillArgs {
 
     #[arg(long)]
     pub output: Option<String>,
+
+    #[arg(long, default_value = "false")]
+    pub verbose: bool,
 }
 
 pub async fn backfill(args: BackfillArgs) -> anyhow::Result<()> {
     let file = File::open(args.file)?;
     let mut reader = Reader::from_reader(file);
     let headers = reader.headers()?;
-    let output = output_file(args.output).await?;
+    let output = output_file(args.output, args.verbose).await?;
 
     let has_external_id = matches!(headers.iter().next(), Some("external_id"));
     log::info!("CSV has external_id: {:?}", has_external_id);

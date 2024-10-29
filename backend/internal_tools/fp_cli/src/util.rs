@@ -26,11 +26,14 @@ pub struct OutputFile {
     file_path: String,
     #[allow(unused)]
     handle: JoinHandle<anyhow::Result<()>>,
+    verbose: bool,
 }
 
 impl OutputFile {
     pub fn write<S: ToString>(&self, line: S) -> anyhow::Result<()> {
-        log::info!("{}", line.to_string());
+        if self.verbose {
+            log::info!("{}", line.to_string());
+        }
         self.tx.send(line.to_string())?;
         Ok(())
     }
@@ -43,7 +46,7 @@ impl OutputFile {
     }
 }
 
-pub async fn output_file(file: Option<String>) -> anyhow::Result<OutputFile> {
+pub async fn output_file(file: Option<String>, verbose: bool) -> anyhow::Result<OutputFile> {
     let path_str = file.unwrap_or_else(|| {
         format!(
             "fp_cli_out_{}.csv",
@@ -77,5 +80,6 @@ pub async fn output_file(file: Option<String>) -> anyhow::Result<OutputFile> {
         tx,
         file_path: path_str,
         handle,
+        verbose,
     })
 }
