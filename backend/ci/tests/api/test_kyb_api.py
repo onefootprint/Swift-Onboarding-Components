@@ -304,10 +304,7 @@ def test_onboard_kyb_bos_linked_via_api(sandbox_tenant, kyb_sandbox_ob_config):
 
     auth_token = IdentifyClient.from_token(auth_token).step_up()
     bifrost = BifrostClient.raw_auth(kyb_sandbox_ob_config, auth_token, sandbox_id)
-    body = bifrost.get_status()
-    r = next(
-        r for r in body["all_requirements"] if r["kind"] == "collect_business_data"
-    )
+    r = bifrost.get_requirement("collect_business_data")
 
     # Business beneficial owners should already be populated from the BO linked via API
     assert "business_kyced_beneficial_owners" in r["populated_attributes"]

@@ -1,3 +1,4 @@
+import pytest
 from tests.bifrost_client import BifrostClient
 from tests.utils import HttpError, _gen_random_n_digit_number, get, post
 from tests.headers import ExternalId, PlaybookKey
@@ -71,26 +72,28 @@ def test_business_external_id(sandbox_tenant, kyb_sandbox_ob_config):
     body = post("onboarding/session", data, sandbox_tenant.s_sk)
     ob_token = PlaybookKey(body["token"])
 
-    # Onboard a user with this ob session token
-    bifrost = BifrostClient.new_user(
-        obc, override_ob_config_auth=ob_token, omit_business_creation=True
-    )
-
-    # Since the business external ID is provided, we don't need to select a business. We will select it
-    # automatically by external ID
-    req = bifrost.get_requirement("create_business_onboarding")
-    assert not req["requires_business_selection"]
-
     # We should not be able to select a business when the external ID is provided
-    data = dict(inherit_business_id="1234")
-    body = post(
-        "/hosted/business/onboarding", data, bifrost.auth_token, status_code=400
-    )
+    with pytest.raises(HttpError) as e:
+        bifrost = BifrostClient.new_user(
+            obc, override_ob_config_auth=ob_token, inherit_business_id="1234"
+        )
     assert (
-        body["message"] == "Cannot select a business when business_external_id is set"
+        e.value.json()["message"]
+        == "Cannot select a business when business_external_id is set"
     )
 
+    # Onboard a user with this ob session token
+    bifrost = BifrostClient.new_user(obc, override_ob_config_auth=ob_token)
     user = bifrost.run()
+
+    # Since the business external ID is provided, we didn't need to select a business. We will select it
+    # automatically by external ID
+    req = next(
+        i
+        for i in bifrost.handled_requirements
+        if i["kind"] == "create_business_onboarding"
+    )
+    assert not req["requires_business_selection"]
 
     # Make sure the external ID is set on the business
     body = get(f"businesses/{user.fp_bid}", None, sandbox_tenant.s_sk)
@@ -99,10 +102,7 @@ def test_business_external_id(sandbox_tenant, kyb_sandbox_ob_config):
     # If we re-onboard onto the playbook, we should not create a new business - we should automatically
     # select the existing one
     bifrost = BifrostClient.login_user(
-        obc,
-        bifrost.sandbox_id,
-        override_ob_config_auth=ob_token,
-        omit_business_creation=True,
+        obc, bifrost.sandbox_id, override_ob_config_auth=ob_token
     )
     user = bifrost.run()
     assert user.fp_bid == user.fp_bid
@@ -118,15 +118,8 @@ def test_business_external_id_must_own(sandbox_tenant, kyb_sandbox_ob_config):
     ob_token = PlaybookKey(body["token"])
 
     # Onboard a user with this ob session token
-    bifrost = BifrostClient.new_user(
-        obc, override_ob_config_auth=ob_token, omit_business_creation=True
-    )
-    try:
-        bifrost.handle_one_requirement("create_business_onboarding")
-        assert (
-            False
-        ), "Should not be able to create business on an external ID that is not owned by the user"
-    except HttpError as e:
-        assert e.status_code == 400
-        assert e.json()["message"] == "The business is not owned by the authed user"
-        assert e.json()["code"] == "E124"
+    with pytest.raises(HttpError) as e:
+        BifrostClient.new_user(obc, override_ob_config_auth=ob_token)
+    assert e.value.status_code == 400
+    assert e.value.json()["message"] == "The business is not owned by the authed user"
+    assert e.value.json()["code"] == "E124"

@@ -2,6 +2,7 @@ import pytest
 from tests.bifrost.test_triggers import send_trigger
 from tests.identify_client import IdentifyClient
 from tests.utils import (
+    HttpError,
     get,
     patch,
     post,
@@ -18,10 +19,7 @@ from tests.constants import (
 @pytest.fixture(scope="session")
 def incomplete_bifrost(kyb_sandbox_ob_config, kyb_cdos):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    requirements = bifrost.get_status()["all_requirements"]
-    business_requirement = get_requirement_from_requirements(
-        "collect_business_data", requirements
-    )
+    business_requirement = bifrost.get_requirement("collect_business_data")
     assert set(business_requirement["missing_attributes"]) == set(kyb_cdos)
     return bifrost
 
@@ -103,18 +101,6 @@ def test_put_business_vault_not_authorized(sandbox_tenant):
         body["message"]
         == "Error loading session for header X-Fp-Authorization: Not allowed without business"
     )
-
-
-def test_one_click_kyb(kyb_sandbox_ob_config):
-    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
-    user = bifrost.run()
-
-    sandbox_id = bifrost.sandbox_id
-    bifrost2 = BifrostClient.login_user(kyb_sandbox_ob_config, sandbox_id)
-    user2 = bifrost2.run()
-    assert user.fp_id == user2.fp_id
-    assert user.fp_bid
-    assert user.fp_bid == user2.fp_bid
 
 
 @pytest.mark.parametrize(
@@ -276,11 +262,8 @@ def test_kyb_select_existing_business(sandbox_tenant, kyb_sandbox_ob_config):
     user1_info = get("hosted/user/private/token", None, bifrost1.auth_token)
 
     # Log into the same user and make biz2
-    bifrost2 = BifrostClient.login_user(
-        kyb_sandbox_ob_config, bifrost1.sandbox_id, omit_business_creation=True
-    )
+    bifrost2 = BifrostClient.login_user(kyb_sandbox_ob_config, bifrost1.sandbox_id)
     bifrost2.data["business.name"] = "Biz 2"
-    bifrost2.handle_create_business_onboarding()
     bifrost2.handle_one_requirement("collect_business_data")
     user2_info = get("hosted/user/private/token", None, bifrost2.auth_token)
     fp_bid2 = user2_info["fp_bid"]
@@ -303,13 +286,16 @@ def test_kyb_select_existing_business(sandbox_tenant, kyb_sandbox_ob_config):
 
     def onboard_and_select(biz_id, fp_bid, token_info):
         bifrost = BifrostClient.login_user(
-            kyb_sandbox_ob_config, bifrost1.sandbox_id, omit_business_creation=True
+            kyb_sandbox_ob_config, bifrost1.sandbox_id, inherit_business_id=biz_id
         )
-        req = bifrost.get_requirement("create_business_onboarding")
-        assert req["requires_business_selection"]
-        bifrost.handle_create_business_onboarding(biz_id)
-
         user_second_run = bifrost.run()
+        req = next(
+            i
+            for i in bifrost.handled_requirements
+            if i["kind"] == "create_business_onboarding"
+        )
+        assert req["requires_business_selection"]
+
         assert user_second_run.fp_id == user1.fp_id
         assert user_second_run.fp_bid == fp_bid
         assert bifrost.validate_response["user"]["status"] == "pass"
@@ -344,21 +330,17 @@ def test_kyb_select_existing_business(sandbox_tenant, kyb_sandbox_ob_config):
 
 
 def test_kyb_must_own_existing_business(kyb_sandbox_ob_config):
-    bifrost1 = BifrostClient.new_user(
-        kyb_sandbox_ob_config, omit_business_creation=True
-    )
+    bifrost1 = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost1.data["business.name"] = "Biz 1"
     bifrost1.run()
     biz_id1 = get("hosted/businesses", None, bifrost1.auth_token)[0]["id"]
 
-    bifrost2 = BifrostClient.new_user(
-        kyb_sandbox_ob_config, omit_business_creation=True
+    with pytest.raises(HttpError) as e:
+        BifrostClient.new_user(kyb_sandbox_ob_config, inherit_business_id=biz_id1)
+    assert (
+        e.value.json()["message"]
+        == "Could not find the requested business owned by the user."
     )
-    data = dict(inherit_business_id=biz_id1)
-    body = post(
-        "hosted/business/onboarding", data, bifrost2.auth_token, status_code=400
-    )
-    assert body["message"] == "Could not find the requested business owned by the user."
 
 
 def test_cannot_select_business_for_redo(kyb_sandbox_ob_config, sandbox_tenant):
@@ -376,23 +358,22 @@ def test_cannot_select_business_for_redo(kyb_sandbox_ob_config, sandbox_tenant):
         assert_had_no_scopes=True
     )
 
-    # Create an onboarding session to reonboard a business
-    bifrost = BifrostClient.raw_auth(
-        kyb_sandbox_ob_config,
-        auth_token,
-        bifrost.sandbox_id,
-        omit_business_creation=True,
-    )
-
     # Should not be able to provide a business ID, since the session already has a business attached
-    data = dict(inherit_business_id=biz_id1)
-    body = post("hosted/business/onboarding", data, bifrost.auth_token, status_code=400)
+    with pytest.raises(HttpError) as e:
+        BifrostClient.raw_auth(
+            kyb_sandbox_ob_config,
+            auth_token,
+            bifrost.sandbox_id,
+            inherit_business_id=biz_id1,
+        )
     assert (
-        body["message"]
+        e.value.json()["message"]
         == "Cannot provide business ID when a scoped business is already attached"
     )
 
     # But should be able to call POST /hosted/onboarding without a business ID
-    bifrost.handle_one_requirement("create_business_onboarding")
+    bifrost = BifrostClient.raw_auth(
+        kyb_sandbox_ob_config, auth_token, bifrost.sandbox_id
+    )
     fp_bid = get("hosted/user/private/token", None, bifrost.auth_token)["fp_bid"]
     assert fp_bid == user.fp_bid

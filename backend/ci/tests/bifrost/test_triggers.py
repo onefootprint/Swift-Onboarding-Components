@@ -488,12 +488,9 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
 
     def pre_run(bifrost):
         # Check that recollect_attributes are propagated through
-        requirements = bifrost.get_status()["all_requirements"]
-        collect_biz_data = next(
-            i for i in requirements if i["kind"] == "collect_business_data"
-        )
+        collect_biz_data = bifrost.get_requirement("collect_business_data", is_met=True)
         assert collect_biz_data["recollect_attributes"] == recollect_attributes
-        collect_data = next(i for i in requirements if i["kind"] == "collect_data")
+        collect_data = bifrost.get_requirement("collect_data", is_met=True)
         assert not collect_data["recollect_attributes"]
 
     complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)

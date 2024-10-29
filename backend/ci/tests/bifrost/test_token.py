@@ -101,7 +101,10 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
         "collect_business_data",
         "authorize",
     }
-    assert [i["kind"] for i in bifrost2.handled_requirements] == ["process"]
+    assert [i["kind"] for i in bifrost2.handled_requirements] == [
+        "create_business_onboarding",
+        "process",
+    ]
     assert user2.fp_id == user.fp_id
     assert user2.fp_bid == user.fp_bid
 
@@ -379,9 +382,7 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     assert set(body["user"]["available_challenge_kinds"]) >= {"sms"}
 
     # Now, one-click onboard onto another tenant!
-    bifrost = BifrostClient.login_user(
-        foo_sandbox_tenant.default_ob_config, sandbox_id
-    )
+    bifrost = BifrostClient.login_user(foo_sandbox_tenant.default_ob_config, sandbox_id)
     foo_user = bifrost.run()
     assert foo_user.fp_id != user.fp_id
     assert set(r["kind"] for r in foo_user.client.handled_requirements) == {

@@ -428,13 +428,10 @@ def clean_up_user(phone_number, email):
 
 
 def get_requirement_from_requirements(kind, requirements, is_met=False):
-    f = lambda kind, requirements: next(
-        r for r in requirements if r["kind"] == kind and r["is_met"] == is_met
+    return next(
+        (r for r in requirements if r["kind"] == kind and r["is_met"] == is_met),
+        None
     )
-    try:
-        return f(kind, requirements)
-    except StopIteration:
-        return None
 
 
 def _gen_random_n_digit_number(n):

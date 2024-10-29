@@ -80,6 +80,7 @@ def test_allow_reonboard_kyb(sandbox_tenant, must_collect_data):
     bifrost2 = BifrostClient.login_user(allow_reonboard_obc, bifrost1.sandbox_id)
     user2 = bifrost2.run()
     assert [r["kind"] for r in bifrost2.handled_requirements] == [
+        "create_business_onboarding",
         "collect_business_data",
         "process",
     ]

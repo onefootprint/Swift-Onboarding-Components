@@ -29,6 +29,7 @@ def primary_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     user = bifrost.run()
     assert [i["kind"] for i in bifrost.handled_requirements] == [
+        "create_business_onboarding",
         "collect_business_data",
         "collect_data",
         "liveness",

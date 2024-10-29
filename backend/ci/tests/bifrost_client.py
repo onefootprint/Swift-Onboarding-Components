@@ -71,8 +71,8 @@ class BifrostClient:
         override_email=None,
         fixture_result=None,
         kyb_fixture_result=None,
+        inherit_business_id=None,
         provide_playbook_auth=False,
-        omit_business_creation=False,
         vault_barcode_with_doc=True,
     ):
         self.ob_config = ob_config
@@ -143,10 +143,13 @@ class BifrostClient:
         )
         assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])
 
-        # Initialize the onboarding
-        self.initialize_onboarding(
-            provide_playbook_auth, omit_business_creation=omit_business_creation
-        )
+        # Initialize the user onboarding
+        self.initialize_onboarding(provide_playbook_auth)
+
+        req = self.get_requirement("create_business_onboarding")
+        if req:
+            # Initialize the business onboarding
+            self.handle_requirement(req, inherit_business_id=inherit_business_id)
 
     @property
     def decrypted_data(self):
@@ -170,7 +173,7 @@ class BifrostClient:
             auths.append(self.ob_config.key)
         body = dict(
             fixture_result=self.fixture_result,
-            kyb_fixture_result=self.kyb_fixture_result,
+            omit_business_creation=True,  # All migrated to the new flow
             **kwargs,
         )
         if not self.fixture_result:
@@ -181,9 +184,11 @@ class BifrostClient:
     def get_status(self):
         return get("hosted/onboarding/status", None, self.auth_token)
 
-    def get_requirement(self, kind):
+    def get_requirement(self, kind, **kwargs):
         status = self.get_status()
-        return get_requirement_from_requirements(kind, status["all_requirements"])
+        return get_requirement_from_requirements(
+            kind, status["all_requirements"], **kwargs
+        )
 
     def handle_all_requirements(self):
         """
@@ -215,7 +220,7 @@ class BifrostClient:
         req = self.get_requirement(kind)
         self.handle_requirement(req)
 
-    def handle_requirement(self, requirement):
+    def handle_requirement(self, requirement, **kwargs):
         """
         Simulates behavior of the bifrost app - given a requirement, we handle it by prompting the
         user to input a specific piece of information.
@@ -226,7 +231,7 @@ class BifrostClient:
             self.handle_collect_user(requirement)
             self.handle_ip_doc()
         elif requirement["kind"] == "create_business_onboarding":
-            self.handle_create_business_onboarding()
+            self.handle_create_business_onboarding(**kwargs)
         elif requirement["kind"] == "collect_business_data":
             self.handle_collect_business(requirement)
         elif requirement["kind"] == "collect_document":
@@ -260,7 +265,10 @@ class BifrostClient:
         patch("/hosted/user/vault", data, self.auth_token)
 
     def handle_create_business_onboarding(self, inherit_business_id=None):
-        data = dict(inherit_business_id=inherit_business_id)
+        data = dict(
+            inherit_business_id=inherit_business_id,
+            kyb_fixture_result=self.kyb_fixture_result,
+        )
         body = post("/hosted/business/onboarding", data, self.auth_token)
         self.auth_token = FpAuth(body["auth_token"])
 

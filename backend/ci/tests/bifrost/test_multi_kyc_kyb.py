@@ -70,7 +70,7 @@ def test_onboard_secondary_bo_live_phone(
 
 
 def test_onboard_secondary_bo(kyb_sandbox_ob_config):
-    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config, omit_business_creation=True)
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == "pass"
@@ -98,9 +98,7 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
 
     # Send the secondary BO through KYC
     bifrost = BifrostClient.new_user(
-        kyb_sandbox_ob_config,
-        override_ob_config_auth=secondary_bo_token,
-        omit_business_creation=True,
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
     secondary_bo = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == "pass"
@@ -254,6 +252,7 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = bifrost.run()
     assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
+        "create_business_onboarding",
         "collect_business_data",
         "process",
     ]
