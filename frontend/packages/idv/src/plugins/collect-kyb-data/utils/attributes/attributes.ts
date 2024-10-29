@@ -41,16 +41,6 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
     ...ctx.data,
   };
 
-  if (ctx.kybRequirement.hasLinkedBos) {
-    // If BOs are linked via API already, we don't support working with them in IDV.
-    BO_FIELDS.forEach(di => {
-      if (initialData[di]) {
-        console.warn(`${di} provided when they are already linked`);
-      }
-      initialData[di] = undefined;
-    });
-  }
-
   return omit(initialData, [BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake]);
 };
 

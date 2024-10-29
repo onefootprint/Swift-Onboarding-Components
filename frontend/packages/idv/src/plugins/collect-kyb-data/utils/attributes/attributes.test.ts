@@ -36,7 +36,6 @@ const getKybRequirement = ({
   recollect?: CollectedKybDataOption[];
 }): CollectKybDataRequirement => {
   return {
-    hasLinkedBos: false,
     isMet: false,
     kind: OnboardingRequirementKind.collectKybData,
     missingAttributes: missing,
