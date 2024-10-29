@@ -7,9 +7,10 @@ import {
   type VaultValue,
 } from '@onefootprint/types';
 
-import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
-import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
-import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
+import useCurrentEntity from '@/entity/hooks/use-current-entity';
+import useDocuments from '@/entity/hooks/use-documents';
+import useEntityId from '@/entity/hooks/use-entity-id';
+import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import getDecryptableDIs from 'src/utils/get-decryptable-dis';
 import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { Event, State, useDecryptMachine } from '../../../../../decrypt-machine';
@@ -37,8 +38,9 @@ const useDecryptControls = () => {
     state.matches(State.decryptingAll);
   const inProgressDecryptingAll = state.matches(State.confirmingDecryptAllReason) || state.matches(State.decryptingAll);
   const entityId = useEntityId();
+  const seqno = useEntitySeqno();
   const { data: entity } = useCurrentEntity();
-  const { data: documents } = useDocuments(entityId);
+  const { data: documents } = useDocuments(entityId, seqno);
 
   const start = () => {
     send(Event.started);
@@ -72,6 +74,11 @@ const useDecryptControls = () => {
     submitFields(attrs, documentKinds);
   };
 
+  const submitAllFieldsHistorical = (historicalFields: DataIdentifier[]) => {
+    const documentKinds = getAllDecryptableDocuments();
+    submitFields(historicalFields, documentKinds);
+  };
+
   const submitReason = (reason: string) => {
     send(Event.submittedReason, { payload: { reason } });
   };
@@ -83,10 +90,11 @@ const useDecryptControls = () => {
       onSuccess?: (response: EntityVault) => void;
       onError?: (error: unknown) => void;
     },
+    seqno?: string | undefined,
   ) => {
     const { reason, dis = [], documents = [] } = context;
     decryptFields(
-      { reason, dis, documents, entityId, vaultData },
+      { reason, dis, documents, entityId, vaultData, seqno },
       {
         onSuccess: results => {
           send(Event.decryptSucceeded);
@@ -174,6 +182,7 @@ const useDecryptControls = () => {
     isPending,
     submitFields,
     submitAllFields,
+    submitAllFieldsHistorical,
     inProgress,
     inProgressDecryptingAll,
     decrypt,

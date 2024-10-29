@@ -5,22 +5,25 @@ type Output = Partial<Record<DataIdentifier, VaultTextData | VaultArrayData | Va
 // this function is required because some data is stored as stringified JSON
 // business.beneficial_owners "[{\"first_name\":\"Jane\",\"last_name\":\"Doe\",\"ownership_stake\":25}]"
 // so we'll need to convert it to an object, array of object, or whatever it is
-const parseStringifiedValues = (input: Partial<Record<DataIdentifier, VaultValue>>) => {
+// additionally, if seqno is provided (for decrypting a historical version), we'll remove the seqno from the DI
+const parseStringifiedValues = (input: Partial<Record<DataIdentifier, VaultValue>>, seqno?: string) => {
   const output: Output = {};
 
   Object.entries(input).forEach(([key, value]) => {
+    const di = (seqno && key.includes(`:${seqno}`) ? key.replace(`:${seqno}`, '') : key) as DataIdentifier;
+
     if (typeof value === 'string') {
       try {
         const parsedValue = JSON.parse(value);
         const isArrayOrObject = typeof parsedValue === 'object' && parsedValue !== null;
-        output[key as DataIdentifier] = isArrayOrObject ? parsedValue : value;
+        output[di] = isArrayOrObject ? parsedValue : value;
       } catch (_e) {
         // If parsing fails, keep the original value
-        output[key as DataIdentifier] = value;
+        output[di] = value;
       }
     }
     if (Array.isArray(value)) {
-      output[key as DataIdentifier] = value;
+      output[di] = value;
     }
   });
 

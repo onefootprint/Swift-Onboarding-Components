@@ -2,6 +2,7 @@ import request from '@onefootprint/request';
 import type { GetHistoricalEntityDataRequest, GetHistoricalEntityDataResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -27,12 +28,22 @@ const useHistoricalEntityData = (
   const isReady = useRouter();
   const { authHeaders } = useSession();
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['entity', id, 'data', 'seqno', seqno, authHeaders],
     queryFn: () => getHistoricalEntityData(authHeaders, { id, seqno }),
     enabled: isReady && !!id && !!seqno,
-    ...callbacks,
   });
+
+  useEffect(() => {
+    if (query.isSuccess && callbacks?.onSuccess) {
+      callbacks.onSuccess(query.data);
+    }
+    if (query.isError && callbacks?.onError) {
+      callbacks.onError(query.error);
+    }
+  }, [query.isSuccess, query.isError, query.data, query.error]);
+
+  return query;
 };
 
 export default useHistoricalEntityData;

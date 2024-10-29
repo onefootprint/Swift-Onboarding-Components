@@ -1,4 +1,10 @@
-import type { DataIdentifier, EntityVault, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
+import type {
+  DataIdentifier,
+  DecryptResponse,
+  EntityVault,
+  SupportedIdDocTypes,
+  VaultValue,
+} from '@onefootprint/types';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 
@@ -12,7 +18,7 @@ type DecryptPayload = {
   dis?: DataIdentifier[];
   documents?: SupportedIdDocTypes[];
   vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
-  seqno?: string | undefined;
+  seqno?: string;
 };
 
 type DecryptCallbacks = {
@@ -26,21 +32,22 @@ const useDecryptFields = () => {
   const { data: documents } = useDocuments(entityId);
 
   const decryptFields = (
-    { reason = '', dis = [], documents: documentKinds = [], vaultData }: DecryptPayload,
+    { reason = '', dis = [], documents: documentKinds = [], vaultData, seqno }: DecryptPayload,
     { onSuccess, onError }: DecryptCallbacks,
   ) => {
     if (!dis.length && !documentKinds.length) {
       return;
     }
     const docDis = getDocDis({ documentKinds, documents, vaultData });
-    const fields = [...dis, ...docDis];
+    const disWithSeqno = seqno ? dis.map(di => `${di}:${seqno}` as DataIdentifier) : dis;
+    const fields = [...disWithSeqno, ...docDis];
     decryptText
       .mutateAsync({
         entityId,
         fields,
         reason,
       })
-      .then(transformResponseToVaultFormat)
+      .then((response: DecryptResponse) => transformResponseToVaultFormat(response, seqno))
       .then(onSuccess)
       .catch(onError);
   };

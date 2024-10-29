@@ -77,7 +77,9 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
         const newVaultDecryptedVals = Object.keys(newData.vault).filter(
           key => newData.vault[key as DataIdentifier] !== null,
         );
-        const isNewVaultEncrypted = newVaultDecryptedVals.length === 1 && newVaultDecryptedVals[0] === IdDI.firstName; // Only first name is decrypted, which is by default
+        const isNewVaultEncrypted =
+          newVaultDecryptedVals.length === 0 ||
+          (newVaultDecryptedVals.length === 1 && newVaultDecryptedVals[0] === IdDI.firstName); // Only first name is decrypted, which is by default
         const isJustDecrypted = isSameDIs && isPrevVaultDecrypted && isNewVaultEncrypted;
         return isJustDecrypted;
       }

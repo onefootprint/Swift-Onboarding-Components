@@ -80,7 +80,7 @@ const HistoricalBar = ({ entity, seqno }: HistoricalBarProps) => {
           )}
         </Stack>
         <Stack gap={3} justify="flex-end" align="center">
-          <DecryptHistoricalButton />
+          <DecryptHistoricalButton entity={entity} seqno={seqno} />
           {decryptControls.isIdle && <Button onClick={handleExitHistorical}>{t('exit')}</Button>}
         </Stack>
       </Stack>
