@@ -82,6 +82,8 @@ pub async fn post(
         })
         .await?;
 
+    tracing::info!(%omit_business_creation, obc_kind=%ob_config.kind, "omit_business_creation");
+
     let collecting_biz_doc = match wfr.clone().map(|wfr| wfr.config) {
         Some(WorkflowRequestConfig::Document { business_configs, .. }) => !business_configs.is_empty(),
         _ => false,
