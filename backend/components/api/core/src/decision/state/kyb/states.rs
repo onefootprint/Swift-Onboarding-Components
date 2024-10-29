@@ -51,6 +51,7 @@ use newtypes::Locked;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
 use newtypes::RuleSetResultKind;
+use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -80,7 +81,7 @@ impl KybDataCollection {
 
 #[async_trait]
 impl OnAction<Authorize, KybState> for KybDataCollection {
-    type AsyncRes = ();
+    type AsyncRes = KybBoFeatures;
 
     #[tracing::instrument(
         "KybDataCollection#OnAction<Authorize, KybState>::execute_async_idempotent_actions",
@@ -89,18 +90,47 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
     async fn execute_async_idempotent_actions(
         &self,
         _action: Authorize,
-        _state: &State,
+        state: &State,
     ) -> FpResult<Self::AsyncRes> {
-        Ok(())
+        let kyb_features = KybBoFeatures::build(state, &self.wf_id).await?;
+        Ok(kyb_features)
     }
 
     #[tracing::instrument("KybDataCollection#OnAction<Authorize, KybState>::on_commit", skip_all)]
     fn on_commit(
         self,
-        _wf: Locked<DbWorkflow>,
-        _async_res: (),
-        _conn: &mut db::TxnPgConn,
+        wf: Locked<DbWorkflow>,
+        async_res: KybBoFeatures,
+        conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
+        let scope = RiskSignalGroupScope::WorkflowId {
+            id: &wf.id,
+            sv_id: &wf.scoped_vault_id,
+        };
+        let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
+
+        let bo_ownership_total = async_res
+            .bos
+            .iter()
+            .filter_map(|bo| bo.ownership_stake)
+            .sum::<i32>();
+        // Per BSA/AML regulations, tenants performing KYB must verify all BOs that
+        // either 1) own 25% of the business or 2) exert significant control
+        //
+        // Here we try to give tenants a hint as to whether there's potentially another 25% owner that
+        // hasn't been submitted
+        let bo_ownership_check = (100 - bo_ownership_total) >= 25;
+
+        if bo_ownership_check {
+            let bo_rs = vec![(
+                FootprintReasonCode::BeneficialOwnerPossibleMissingBo,
+                VendorAPI::Footprint,
+                None,
+            )];
+            RiskSignal::bulk_add(conn, bo_rs, false, rsg.id)?;
+        }
+
+
         Ok(KybState::from(KybAwaitingBoKyc {
             wf_id: self.wf_id,
             t_id: self.t_id,
@@ -170,7 +200,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             id: &wf.id,
             sv_id: &wf.scoped_vault_id,
         };
-        let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
+        let rsg = RiskSignalGroup::get_or_create(conn, scope, RiskSignalGroupKind::Kyb)?;
         // we need to find a vendor_api and vres_id for risk signals. this is annoying and we should drop
         // the not null constraint..
         let bo_rs_for_risk_signals = if let Some((wf, _, _)) = bo_obds.first() {
@@ -201,18 +231,11 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         let bo_ownership_check = (100 - bo_ownership_total) >= 25;
 
         if let Some(rs) = bo_rs_for_risk_signals {
-            let bo_rs = vec![
-                bo_failed_kyc.then_some((
-                    FootprintReasonCode::BeneficialOwnerFailedKyc,
-                    rs.vendor_api,
-                    rs.verification_result_id.clone(),
-                )),
-                bo_ownership_check.then_some((
-                    FootprintReasonCode::BeneficialOwnerPossibleMissingBo,
-                    rs.vendor_api,
-                    rs.verification_result_id,
-                )),
-            ]
+            let bo_rs = vec![bo_failed_kyc.then_some((
+                FootprintReasonCode::BeneficialOwnerFailedKyc,
+                rs.vendor_api,
+                rs.verification_result_id.clone(),
+            ))]
             .into_iter()
             .flatten()
             .collect();

@@ -51,7 +51,6 @@ use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
 use newtypes::RuleAction;
 use newtypes::RuleInstanceKind;
-use newtypes::SignalSeverity;
 use newtypes::TerminalDecisionStatus;
 use newtypes::VendorAPI;
 use newtypes::VerificationCheck;
@@ -299,17 +298,9 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
     assert_eq!(WorkflowState::Kyb(KybState::Decisioning), wf.state);
 
     // Appropriate KYB passing risk signals are produced and not hidden
-    let expected_severity = match fixture_result {
-        WorkflowFixtureResult::Fail => SignalSeverity::High,
-        WorkflowFixtureResult::Pass => SignalSeverity::Info,
-        WorkflowFixtureResult::ManualReview => todo!(),
-        WorkflowFixtureResult::StepUp => todo!(),
-        WorkflowFixtureResult::UseRulesOutcome => panic!("unsupported fixture passed for kyb"),
-    };
-    assert!(rs.iter().all(|rs| rs.reason_code.severity() == expected_severity
-        && !rs.reason_code.scope().unwrap().is_for_person()
-        && rs.vendor_api == VendorAPI::MiddeskBusinessUpdateWebhook
-        && !rs.hidden));
+    assert!(rs
+        .iter()
+        .all(|rs| !rs.reason_code.scope().unwrap().is_for_person() && !rs.hidden));
 
     // MakeDecision
     let expected_status = match fixture_result {
@@ -443,9 +434,8 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
         WorkflowKind::Kyb(kyb::KybState::AwaitingAsyncVendors(_))
     ));
 
-    let (wf, _, _, _, rs) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingAsyncVendors), wf.state);
-    assert!(rs.is_empty());
 
     // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB
     // workflow
@@ -483,6 +473,10 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
 
     let mut expected_rs = vec![
+        (
+            VendorAPI::Footprint,
+            FootprintReasonCode::BeneficialOwnerPossibleMissingBo,
+        ),
         (
             VendorAPI::MiddeskBusinessUpdateWebhook,
             FootprintReasonCode::BusinessNameMatch,
