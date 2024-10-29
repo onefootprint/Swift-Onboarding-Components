@@ -15,7 +15,7 @@ def ob_config2(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
+def test_one_click_same_tenant(sandbox_tenant, ob_config2, foo_sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
 
@@ -38,11 +38,13 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
     ]
     for identifier in identifiers:
         data = dict(**identifier, scope="onboarding")
-        # We can find via global fingerprints without specifying OBC
-        body = post("hosted/identify", data, sandbox_id_h)
-        assert body["user"]
-        # And find from another tenant (via global fingerprints)
-        body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
+        # Can find from another tenant (via global fingerprints)
+        body = post(
+            "hosted/identify",
+            data,
+            foo_sandbox_tenant.default_ob_config.key,
+            sandbox_id_h,
+        )
         assert body["user"]
         # And find at the current tenant when specifying OBC
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)

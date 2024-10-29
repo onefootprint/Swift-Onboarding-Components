@@ -128,11 +128,6 @@ def test_allow_reonboard_ob_session_token(sandbox_tenant, must_collect_data):
     bifrost1 = BifrostClient.new_user(obc)
     user = bifrost1.run()
 
-    def reonboard(allow_reonboard: bool):
-        bifrost2 = BifrostClient.raw_auth(obc, auth_token, bifrost1.sandbox_id)
-        bifrost2.run()
-        return bifrost2
-
     data = dict(key=obc.key.value, allow_reonboard=True)
     body = post("/onboarding/session", data, sandbox_tenant.s_sk)
     ob_token = PlaybookKey(body["token"])

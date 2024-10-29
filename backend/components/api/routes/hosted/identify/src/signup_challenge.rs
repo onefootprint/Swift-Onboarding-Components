@@ -6,6 +6,7 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::IsComponentsSdk;
@@ -155,6 +156,10 @@ async fn make_vault_context(
     sandbox_id: Option<newtypes::SandboxId>,
     is_components_sdk: bool,
 ) -> FpResult<VaultContext> {
+    if ob_pk_auth.ob_config().is_live != sandbox_id.is_none() {
+        return ValidationError("Sandbox ID must be provided if and only if using a sandbox playbook").into();
+    }
+
     let sources = chain(
         email.as_ref().map(|e| (IDK::Email.into(), e.is_bootstrap)),
         phone.as_ref().map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap)),
