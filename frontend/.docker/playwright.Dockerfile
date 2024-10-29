@@ -58,6 +58,6 @@ ENV E2E_YIELDSTREET $E2E_YIELDSTREET
 
 COPY --link ./packages/e2e /e2e
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install && pnpm install:playwright
 
 CMD npx playwright test --workers=8 -g "#ci"
