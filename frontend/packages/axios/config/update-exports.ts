@@ -13,7 +13,7 @@ export function updateExports(filePath: string) {
   // Add new exports
   content += "export * from './services.gen';\n";
 
-  content += "export * from '@tanstack/react-query';\n";
+  content += "export * from './@tanstack/react-query.gen';\n";
 
   // Write the updated content back to index.ts
   fs.writeFileSync(indexPath, content, 'utf8');

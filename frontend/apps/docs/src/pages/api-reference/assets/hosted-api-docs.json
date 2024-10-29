@@ -6900,10 +6900,10 @@
                                 "to_ascii",
                                 "prefix(<n>)",
                                 "suffix(<n>)",
-                                "replace(<from>,<to>)",
-                                "date_format(<from_format>,<to_format>)",
-                                "hmac_sha256(<key>)",
-                                "encrypt(<algorithm>,<public_key>)"
+                                "replace('<from>','<to>')",
+                                "date_format('<from_format>','<to_format>')",
+                                "hmac_sha256('<key>')",
+                                "encrypt('<algorithm>','<public_key>')"
                             ]
                         }
                     },
