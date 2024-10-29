@@ -1,0 +1,32 @@
+export AWS_PROFILE := "cross-account"
+
+init:
+  terraform init
+
+plan:
+  terraform plan
+
+apply:
+  terraform apply
+
+login:
+  aws sso login
+
+testxaccount $AWS_PROFILE="dev-admin":
+  #!/usr/bin/env bash
+
+  set -euxo pipefail
+
+  aws sso login
+  aws sts get-caller-identity
+
+  CREDS=$(aws sts assume-role --role-arn arn:aws:iam::992382496642:role/fp-vault-data-management --role-session-name testing --external-id 34b65b2181a4a3bb57e740cec972794a)
+  export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r .Credentials.AccessKeyId)
+  export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r .Credentials.SecretAccessKey)
+  export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r .Credentials.SessionToken)
+
+  aws sts get-caller-identity
+
+  FILE=$(mktemp)
+  aws s3 cp $FILE s3://testing-footprint-vault-data/footprint/.vdr-access-probe
+  aws s3api list-objects-v2 --bucket testing-footprint-vault-data --prefix footprint/.vdr-access-probe
