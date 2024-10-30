@@ -46,6 +46,7 @@ pub struct CreateOnboardingSessionRequest {
     /// as its `external_id`.
     /// NOTE: the identified user must already own the business with this external ID or they will
     /// receive an error during onboarding.
+    #[openapi(example = "null")]
     pub business_external_id: Option<ExternalId>,
 }
 
