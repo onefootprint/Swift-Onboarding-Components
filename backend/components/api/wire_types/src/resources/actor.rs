@@ -13,7 +13,12 @@ pub enum Actor {
     /// A Footprint employee via the dashboard
     FirmEmployee,
     /// A dashboard user for a tenant
-    Organization { member: String },
+    Organization {
+        member: String,
+        email: String,
+        first_name: Option<String>,
+        last_name: Option<String>,
+    },
     /// A tenant API key
     ApiKey { id: TenantApiKeyId, name: String },
 }
