@@ -521,7 +521,7 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
                         identifier="document.custom.operating_agreement",
                         description="Operate this agreement",
                         upload_settings="prefer_upload",
-                        requires_human_review=False,
+                        requires_human_review=True,
                     ),
                 )
             ],
@@ -613,6 +613,7 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     body = get(f"entities/{secondary_bo.fp_bid}", None, *sandbox_tenant.db_auths)
     assert body["status"] == "fail"
     assert body["requires_manual_review"]
+    assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
 def extract_bo_session_sms(twilio, phone_number, business_name):

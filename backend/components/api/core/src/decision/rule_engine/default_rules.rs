@@ -118,56 +118,38 @@ pub fn alpaca_doc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> 
 fn ein_only_rules() -> Vec<(RuleExpression, RA)> {
     vec![
         (if_risk_signal(FRC::BeneficialOwnerFailedKyc), RA::ManualReview),
-        (if_not_risk_signal(FRC::TinMatch), RA::ManualReview),
+        (if_risk_signal(FRC::TinNotFound), RA::ManualReview),
+        (if_risk_signal(FRC::TinInvalid), RA::ManualReview),
+        (if_risk_signal(FRC::TinDoesNotMatch), RA::ManualReview),
     ]
 }
 
 pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RA)> {
     let base = ein_only_rules();
 
-    let full_kyb = vec![
+    let address_rules = vec![
         (
-            RuleExpression(vec![
-                RuleExpressionCondition::RiskSignal {
-                    field: FRC::BusinessNameMatch,
-                    op: BooleanOperator::DoesNotEqual,
-                    value: true,
-                },
-                RuleExpressionCondition::RiskSignal {
-                    field: FRC::BusinessNameSimilarMatch,
-                    op: BooleanOperator::DoesNotEqual,
-                    value: true,
-                },
-            ]),
+            if_risk_signal(FRC::BusinessAddressIncompleteMatch),
             RA::ManualReview,
         ),
-        (
-            RuleExpression(vec![
-                RuleExpressionCondition::RiskSignal {
-                    field: FRC::BusinessAddressMatch,
-                    op: BooleanOperator::DoesNotEqual,
-                    value: true,
-                },
-                RuleExpressionCondition::RiskSignal {
-                    field: FRC::BusinessAddressCloseMatch,
-                    op: BooleanOperator::DoesNotEqual,
-                    value: true,
-                },
-                RuleExpressionCondition::RiskSignal {
-                    field: FRC::BusinessAddressSimilarMatch,
-                    op: BooleanOperator::DoesNotEqual,
-                    value: true,
-                },
-            ]),
-            RA::ManualReview,
-        ),
-        (if_risk_signal(FRC::BusinessNameWatchlistHit), RA::ManualReview),
+        (if_risk_signal(FRC::BusinessAddressDoesNotMatch), RA::ManualReview),
     ];
+
+    let name_rules = vec![
+        (if_risk_signal(FRC::BusinessNameAlternateMatch), RA::ManualReview),
+        (if_risk_signal(FRC::BusinessNameDoesNotMatch), RA::ManualReview),
+    ];
+
+    let watchlist_rules = vec![(if_risk_signal(FRC::BusinessNameWatchlistHit), RA::ManualReview)];
 
     if ein_only {
         base
     } else {
-        base.into_iter().chain(full_kyb).collect()
+        base.into_iter()
+            .chain(address_rules)
+            .chain(name_rules)
+            .chain(watchlist_rules)
+            .collect()
     }
 }
 
