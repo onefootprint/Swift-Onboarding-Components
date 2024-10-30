@@ -29,6 +29,9 @@ pub enum BusinessDataKind {
     /// A JSON-serialized list of beneficial owners. Very interestingly, the primary BO exists in
     /// this JSON blob _and_ in the BusinessOwner table in the database.
     BeneficialOwners,
+    /// The ownership stake percentage of each linked beneficial owner. This has special
+    /// serialization.
+    BeneficialOwnerStake(BoLinkId),
     /// Very similar to BeneficialOwners, but with a few additional fields required to KYC the
     /// secondary BOs. Every record in this JSON blob will also have a corresponding BusinessOwner
     /// row in the database
@@ -74,6 +77,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::Zip => CollectedData::BusinessAddress,
             Self::Country => CollectedData::BusinessAddress,
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
+            Self::BeneficialOwnerStake(_) => CollectedData::BusinessBeneficialOwners,
             Self::KycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BeneficialOwnerData(_, _) => CollectedData::BusinessBeneficialOwners,
             Self::BeneficialOwnerExplanationMessage => return None,
@@ -119,6 +123,9 @@ impl TryFrom<BusinessDataKindDiscriminant> for BusinessDataKind {
             BusinessDataKindDiscriminant::Zip => Self::Zip,
             BusinessDataKindDiscriminant::Country => Self::Country,
             BusinessDataKindDiscriminant::BeneficialOwners => Self::BeneficialOwners,
+            BusinessDataKindDiscriminant::BeneficialOwnerStake => {
+                return Err(strum::ParseError::VariantNotFound)
+            }
             BusinessDataKindDiscriminant::KycedBeneficialOwners => Self::KycedBeneficialOwners,
             BusinessDataKindDiscriminant::BeneficialOwnerExplanationMessage => {
                 Self::BeneficialOwnerExplanationMessage
@@ -139,20 +146,35 @@ impl std::str::FromStr for BusinessDataKind {
 
     fn from_str(s: &str) -> Result<Self, <Self as std::str::FromStr>::Err> {
         if s.contains('.') {
-            // Only variant like this is BusinessOwnerData
+            // Examples:
+            //   beneficial_owners.<link_id>.ownership_stake
+            //   beneficial_owners.<link_id>.<data_identifier>
+
             let mut parts = s.split('.');
-            let _ = parts.next();
+
+            let prefix = parts.next();
+            if prefix != Some("beneficial_owners") {
+                return Err(strum::ParseError::VariantNotFound);
+            }
+
             let link_id = parts.next().ok_or(strum::ParseError::VariantNotFound)?;
-            let di = parts.join(".");
             let link_id = BoLinkId::from_str(link_id).map_err(|_| strum::ParseError::VariantNotFound)?;
-            let di = DataIdentifier::from_str(&di).map_err(|_| strum::ParseError::VariantNotFound)?;
-            return Ok(Self::bo_data(link_id, di));
+
+            let remaining = parts.join(".");
+            let di = match remaining.as_str() {
+                "ownership_stake" => Self::BeneficialOwnerStake(link_id),
+                remaining => {
+                    let di = DataIdentifier::from_str(remaining)
+                        .map_err(|_| strum::ParseError::VariantNotFound)?;
+                    Self::bo_data(link_id, di)
+                }
+            };
+            return Ok(di);
         }
 
         if let Ok(bdk) = BusinessDataKindDiscriminant::from_str(s).and_then(Self::try_from) {
             return Ok(bdk);
         }
-
 
         Err(strum::ParseError::VariantNotFound)
     }
@@ -161,7 +183,10 @@ impl std::str::FromStr for BusinessDataKind {
 impl std::fmt::Display for BusinessDataKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match &self {
-            &BusinessDataKind::BeneficialOwnerData(link_id, di) => {
+            BusinessDataKind::BeneficialOwnerStake(link_id) => {
+                write!(f, "beneficial_owners.{}.ownership_stake", link_id)
+            }
+            BusinessDataKind::BeneficialOwnerData(link_id, di) => {
                 write!(f, "beneficial_owners.{}.{}", link_id, di)
             }
             _ => write!(f, "{}", BusinessDataKindDiscriminant::from(self)),

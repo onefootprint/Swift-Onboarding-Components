@@ -21,6 +21,7 @@ use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::AuditEventDetail;
 use newtypes::BusinessDataIdentifier;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
 use newtypes::PreviewApi;
@@ -153,6 +154,17 @@ async fn delete_inner(
                 (false, Some(fields)) => fields,
                 _ => return ValidationError("Must provide only one of `delete_all` and `fields`").into(),
             };
+
+            // Temporary: Disallow deleting ownership_stake before we migrate entirely off the DB
+            // table. This simplifies coalescing the DB and vault data, since a null value in the
+            // vault will always mean the data hasn't been backfilled from DB to vault.
+            if requested_fields_to_delete
+                .iter()
+                .any(|di| matches!(di, DataIdentifier::Business(BDK::BeneficialOwnerStake(_))))
+            {
+                return ValidationError("Cannot delete ownership stake").into();
+            }
+
             let DeleteDataResult {
                 deleted_dis,
                 new_version,

@@ -46,6 +46,7 @@ impl CleanAndValidate for BDK {
             BDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
             BDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
+            BDK::BeneficialOwnerStake(_) => clean_and_validate_beneficial_owner_stake(value)?,
             BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value, args)?,
             BDK::BeneficialOwnerData(_, di) => {
                 clean_and_validate_beneficial_owner_data(*di.clone(), args, value, all_data)?
@@ -116,6 +117,16 @@ fn clean_and_validate_beneficial_owners(input: PiiJsonValue) -> VResult<PiiStrin
         if l.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }
+        Ok(())
+    })
+}
+
+fn clean_and_validate_beneficial_owner_stake(input: PiiJsonValue) -> VResult<PiiString> {
+    utils::parse_json_and_validate::<u32, _>(input, |stake| {
+        if stake > 100 {
+            return Err(Error::BusinessOwnersStakeAbove100);
+        }
+
         Ok(())
     })
 }

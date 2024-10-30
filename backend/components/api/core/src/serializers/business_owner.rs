@@ -8,6 +8,7 @@ use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::UserData;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
@@ -23,10 +24,14 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
                 last_name.leak().chars().take(1).collect::<String>()
             ))
         });
+
+        let ownership_stake_di = DI::Business(BDK::BeneficialOwnerStake(bo.bo.link_id));
+
         Self {
             status: bo.su.as_ref().map(|su| su.status),
             fp_id: bo.su.map(|su| su.fp_id),
             ownership_stake: bo.bo.ownership_stake.map(|i| i as u32),
+            ownership_stake_di,
             kind: bo.bo.kind,
             source: bo.bo.source,
             name,

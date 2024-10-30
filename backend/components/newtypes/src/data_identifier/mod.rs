@@ -168,6 +168,7 @@ impl DataIdentifier {
         matches!(
             self,
             Self::Business(BusinessDataKind::Name)
+                | Self::Business(BusinessDataKind::BeneficialOwnerStake(_))
                 | Self::Card(CardInfo {
                     alias: _,
                     kind: CardDataKind::Issuer
@@ -439,6 +440,7 @@ mod tests {
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwners) => "business.beneficial_owners")]
+    #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerStake(BoLinkId::escape_hatch("link_id".to_owned()))) => "business.beneficial_owners.link_id.ownership_stake")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Id(IdentityDataKind::FirstName)))) => "business.beneficial_owners.link_id.id.first_name")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned()))))) => "business.beneficial_owners.link_id.custom.flerp")]
     #[test_case(DataIdentifier::Document(DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.image")]
@@ -460,6 +462,7 @@ mod tests {
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("business.beneficial_owners" => DataIdentifier::Business(BusinessDataKind::BeneficialOwners))]
+    #[test_case("business.beneficial_owners.link_id.ownership_stake" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerStake(BoLinkId::escape_hatch("link_id".to_owned()))))]
     #[test_case("business.beneficial_owners.link_id.id.first_name" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Id(IdentityDataKind::FirstName)))))]
     #[test_case("business.beneficial_owners.link_id.custom.flerp" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned()))))))]
     #[test_case("document.drivers_license.front.image" => DataIdentifier::Document(DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front)))]

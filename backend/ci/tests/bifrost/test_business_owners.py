@@ -25,6 +25,8 @@ def _assert_decrypt_bo_data(link_id, fp_bid, tenant, expected_data):
         di = f"business.beneficial_owners.{link_id}.{field}"
         assert body[di] == expected_data.get(field, None)
 
+        # TODO: check business.beneficial_owners.link_id.ownership_stake
+
 
 def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)

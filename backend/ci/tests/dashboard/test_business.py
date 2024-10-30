@@ -1,9 +1,11 @@
 import pytest
+import re
 from tests.dashboard.utils import latest_audit_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, patch
 from tests.constants import (
     BUSINESS_DATA,
+    BUSINESS_SECONDARY_BOS,
     CDO_TO_DIS,
 )
 
@@ -123,3 +125,53 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
         set(audit_event["detail"]["data"]["decrypted_fields"])
         == expected_audit_event_fields
     )
+
+
+def test_update_ownership_stake(sandbox_tenant, kyb_sandbox_ob_config):
+    primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo = primary_bifrost.run()
+    fp_bid = primary_bo.fp_bid
+
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert len(body) == 2
+    assert body[0]["ownership_stake"] == 50
+    assert body[1]["ownership_stake"] == 30
+
+    primary_stake_di = body[0]["ownership_stake_di"]
+    secondary_stake_di = body[1]["ownership_stake_di"]
+
+    # TODO: replace ownership_stake write paths with the vault DI.
+    fields = get(f"entities/{fp_bid}/vault", None, *sandbox_tenant.db_auths)
+    stake_pattern = re.compile(
+        r"^business\.beneficial_owners\.[^\.]+\.ownership_stake$"
+    )
+    stake_dis = set(di for di in fields if stake_pattern.match(di))
+    # assert stake_dis == {primary_stake_di, secondary_stake_di}
+
+    patch(
+        f"entities/{fp_bid}/vault",
+        {
+            # TODO: validate total BO stake is <= 100
+            primary_stake_di: 80,
+            secondary_stake_di: 40,
+        },
+        *sandbox_tenant.db_auths,
+    )
+
+    body = patch(
+        f"entities/{fp_bid}/vault",
+        {primary_stake_di: 120},
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert (
+        body["context"][primary_stake_di]
+        == "The beneficial owners' ownership stakes must not sum to more than 100%"
+    )
+
+    # TODO: replace ownership_stake read paths with the vault DI.
+    # body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    # assert len(body) == 2
+    # assert body[0]["ownership_stake"] == 80
+    # assert body[1]["ownership_stake"] == 40
