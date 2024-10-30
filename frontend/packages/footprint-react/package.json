@@ -10,9 +10,7 @@
   "style": "./dist/footprint-react.css",
   "sideEffects": false,
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -29,22 +27,24 @@
   "devDependencies": {
     "@happy-dom/global-registrator": "^13.3.8",
     "@onefootprint/core": "workspace:*",
+    "@onefootprint/fetch": "workspace:*",
     "@onefootprint/footprint-js": "workspace:*",
+    "@onefootprint/request-types": "workspace:*",
     "@onefootprint/types": "workspace:*",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/classnames": "^2.3.1",
     "@types/cleave.js": "^1.4.6",
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react": "^18",
     "bun-types": "^1.0.26",
-    "react": "^18",
     "react-dom": "^18",
+    "react": "^18",
     "tsconfig": "workspace:*",
     "tsup": "^6.5.0",
-    "typescript": "^5.5.2",
-    "tsx": "^4.19.1"
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "classnames": "^2.5.1",
@@ -52,9 +52,7 @@
     "csstype": "^3.1.2",
     "i18next": "^23.16.0",
     "lodash": "^4.17.21",
-    "react-hook-form": "^7.52.2",
-    "@onefootprint/fetch": "workspace:*",
-    "@onefootprint/request-types": "workspace:*"
+    "react-hook-form": "^7.52.2"
   },
   "peerDependencies": {
     "@onefootprint/footprint-js": ">=3.15.2",

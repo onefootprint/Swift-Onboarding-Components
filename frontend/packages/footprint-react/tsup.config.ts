@@ -11,6 +11,7 @@ export default defineConfig(options => ({
   watch: options.watch,
   minify: !options.watch,
   external: ['react', 'react-dom', '@onefootprint/footprint-js'],
+  noExternal: ['@onefootprint/fetch'],
   env: {
     API_BASE_URL: options.watch ? 'https://api.dev.onefootprint.com' : 'https://api.onefootprint.com',
     NODE_ENV: options.watch ? 'development' : 'production',

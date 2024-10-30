@@ -8,9 +8,8 @@
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@onefootprint/axios",
-    "@onefootprint/storybook-utils",
     "@onefootprint/appearance",
+    "@onefootprint/axios",
     "@onefootprint/design-tokens",
     "@onefootprint/e2e",
     "@onefootprint/global-constants",
@@ -18,6 +17,7 @@
     "@onefootprint/icons",
     "@onefootprint/idv",
     "@onefootprint/request",
+    "@onefootprint/storybook-utils",
     "@onefootprint/test-utils",
     "@onefootprint/ui",
     "pos",

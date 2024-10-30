@@ -1771,12 +1771,6 @@ importers:
 
   packages/footprint-react:
     dependencies:
-      '@onefootprint/fetch':
-        specifier: workspace:*
-        version: link:../fetch
-      '@onefootprint/request-types':
-        specifier: workspace:*
-        version: link:../request-types
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -1802,9 +1796,15 @@ importers:
       '@onefootprint/core':
         specifier: workspace:*
         version: link:../core
+      '@onefootprint/fetch':
+        specifier: workspace:*
+        version: link:../fetch
       '@onefootprint/footprint-js':
         specifier: workspace:*
         version: link:../footprint-js
+      '@onefootprint/request-types':
+        specifier: workspace:*
+        version: link:../request-types
       '@onefootprint/types':
         specifier: workspace:*
         version: link:../types
