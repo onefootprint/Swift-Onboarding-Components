@@ -82,7 +82,7 @@ pub struct SaturatedWorkflowTriggeredEvent(
     pub Option<Workflow>,
     pub ObConfigurationId,
     pub SaturatedActor,
-    pub Option<WorkflowRequest>,
+    pub Option<(WorkflowRequest, ScopedVault)>,
 );
 
 #[allow(clippy::large_enum_variant)]
@@ -227,10 +227,11 @@ impl UserTimeline {
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
         let ob_configs = ObConfiguration::get_bulk(conn, ob_config_ids.collect())?;
         let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
-        let wfrs = WorkflowRequest::get_bulk(conn, wfr_ids.collect())?;
+        let wfrs = WorkflowRequest::get_bulk_with_user(conn, wfr_ids.collect())?;
         let auth_events = AuthEvent::get_bulk_for_timeline(conn, auth_event_ids.collect())?;
         let labels = ScopedVaultLabel::get_bulk(conn, label_ids.collect())?;
         let doc_reqs = DocumentRequest::get_bulk(conn, doc_req_ids.collect())?;
+
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results

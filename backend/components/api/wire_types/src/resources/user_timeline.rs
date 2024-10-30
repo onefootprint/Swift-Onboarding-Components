@@ -80,6 +80,8 @@ pub struct WorkflowTriggered {
     pub config: WorkflowRequestConfig,
     pub actor: Actor,
     pub note: Option<String>,
+    /// Only not populated for legacy events
+    pub fp_id: Option<FpId>,
 }
 
 #[derive(Debug, Clone, Serialize)]

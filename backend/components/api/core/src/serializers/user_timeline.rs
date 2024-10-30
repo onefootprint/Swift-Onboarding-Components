@@ -84,6 +84,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             }),
             SaturatedTimelineEvent::WorkflowTriggered(event) => {
                 let SaturatedWorkflowTriggeredEvent(workflow, playbook_id, actor, wfr) = event;
+                let (wfr, su) = wfr.unzip();
                 let note = wfr.as_ref().and_then(|wfr| wfr.note.clone());
                 // Some weird logic for backcompat to determine the trigger type
                 let config = if let Some(wfr) = wfr.as_ref() {
@@ -115,12 +116,14 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     }
                 };
                 let request_is_active = wfr.as_ref().is_some_and(|wfr| wfr.deactivated_at.is_none());
+                let fp_id = su.map(|su| su.fp_id);
 
                 Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
                     request_is_active,
                     config,
                     actor: api_wire_types::Actor::from_db(actor),
                     note,
+                    fp_id,
                 })
             }
             SaturatedTimelineEvent::WorkflowStarted((wf, pb)) => {

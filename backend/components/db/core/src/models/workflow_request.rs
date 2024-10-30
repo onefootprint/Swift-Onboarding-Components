@@ -1,3 +1,4 @@
+use super::scoped_vault::ScopedVault;
 use super::workflow_request_junction::NewWorkflowRequestJunctionRow;
 use super::workflow_request_junction::WorkflowRequestJunction;
 use crate::DbResult;
@@ -5,6 +6,7 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::scoped_vault;
 use db_schema::schema::workflow_request;
 use db_schema::schema::workflow_request_junction;
 use diesel::dsl::exists;
@@ -78,16 +80,20 @@ impl WorkflowRequest {
         Ok(result)
     }
 
-    #[tracing::instrument("Workflow::get_bulk", skip_all)]
-    pub fn get_bulk(
+    #[tracing::instrument("Workflow::get_bulk_with_user", skip_all)]
+    pub fn get_bulk_with_user(
         conn: &mut PgConn,
         ids: Vec<WorkflowRequestId>,
-    ) -> DbResult<HashMap<WorkflowRequestId, Self>> {
+    ) -> DbResult<HashMap<WorkflowRequestId, (Self, ScopedVault)>> {
         let res = workflow_request::table
             .filter(workflow_request::id.eq_any(ids))
-            .get_results::<Self>(conn)?
+            .inner_join(workflow_request_junction::table.inner_join(scoped_vault::table))
+            // Always fetch the person for whom the WFR is created, regardless of whether the WFR is also for a business
+            .filter(scoped_vault::kind.eq(VaultKind::Person))
+            .select((workflow_request::all_columns, scoped_vault::all_columns))
+            .get_results::<(Self, ScopedVault)>(conn)?
             .into_iter()
-            .map(|wfr| (wfr.id.clone(), wfr))
+            .map(|(wfr, su)| (wfr.id.clone(), (wfr, su)))
             .collect();
 
         Ok(res)
