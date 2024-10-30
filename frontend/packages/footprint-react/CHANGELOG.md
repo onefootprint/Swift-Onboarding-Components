@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.8.2
+
+### Patch Changes
+
+- 218ec1fa41: fix external dependency
+
 ## 7.8.1
 
 ### Patch Changes
