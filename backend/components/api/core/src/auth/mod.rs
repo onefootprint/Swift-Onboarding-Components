@@ -31,8 +31,8 @@ pub enum AuthError {
         "It looks like you may have provide a secret API key. Please use an onboarding publishable key instead, and keep your secret API keys safe on your backend!"
     )]
     ApiKeyUsedForObConfig,
-    #[error("Missing header: {0}")]
-    MissingHeader(String),
+    #[error("Missing header")]
+    MissingHeader(Vec<String>),
     #[error("Invalid {0}")]
     InvalidHeader(String),
     #[error("Error loading session for header {0}: {1}")]
@@ -113,7 +113,10 @@ impl api_errors::FpErrorTrait for AuthError {
     }
 
     fn message(&self) -> String {
-        self.to_string()
+        match self {
+            AuthError::MissingHeader(headers) => format!("Missing header: {}", headers.join(" or ")),
+            _ => self.to_string(),
+        }
     }
 
     fn code(&self) -> Option<FpErrorCode> {
@@ -125,7 +128,7 @@ impl api_errors::FpErrorTrait for AuthError {
 
     fn context(&self) -> Option<serde_json::Value> {
         match self {
-            AuthError::MissingHeader(h) => Some(serde_json::json!({"header": h})),
+            AuthError::MissingHeader(headers) => Some(serde_json::json!({"headers": headers})),
             _ => None,
         }
     }

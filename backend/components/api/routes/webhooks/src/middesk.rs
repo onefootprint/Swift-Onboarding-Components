@@ -51,7 +51,7 @@ impl FromRequest for MiddeskWebhookSignature {
             .headers()
             .get(MIDDESK_WEBHOOK_SIGNATURE_HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or_else(|| AuthError::MissingHeader(MIDDESK_WEBHOOK_SIGNATURE_HEADER_NAME.to_owned()));
+            .ok_or_else(|| AuthError::MissingHeader(vec![MIDDESK_WEBHOOK_SIGNATURE_HEADER_NAME.to_owned()]));
 
         let req_bytes = web::Bytes::from_request(req, payload);
 

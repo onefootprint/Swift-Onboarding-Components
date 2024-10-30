@@ -110,7 +110,7 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> FpResult<SecretApiKey> {
         .get(HEADER_NAME)
         .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
         .map(SecretApiKey::from)
-        .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()))?;
+        .ok_or_else(|| AuthError::MissingHeader(vec![HEADER_NAME.to_owned()]))?;
 
     Ok(tenant_sk_input)
 }

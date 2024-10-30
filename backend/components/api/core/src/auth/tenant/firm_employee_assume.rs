@@ -72,6 +72,11 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
         }
     }
 
+    fn header_names_for_err() -> Vec<&'static str> {
+        // Don't want to show that this header exists in an error message
+        vec![]
+    }
+
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,

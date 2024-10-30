@@ -43,7 +43,7 @@ impl FromRequest for PublicOnboardingContext {
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()));
+            .ok_or_else(|| AuthError::MissingHeader(vec![HEADER_NAME.to_owned()]));
 
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();

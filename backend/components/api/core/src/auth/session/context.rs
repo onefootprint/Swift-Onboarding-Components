@@ -21,6 +21,7 @@ use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
 use http::Method;
+use itertools::Itertools;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
 use paperclip::actix::OperationModifier;
@@ -145,7 +146,10 @@ where
                 .await
                 .map_err(|_| AssertionError("Cannot extract root span"))?;
 
-            let allowed_headers = T::header_names().join(" or "); // Temporary
+            let allowed_headers = T::header_names_for_err()
+                .into_iter()
+                .map(|s| s.to_owned())
+                .collect_vec();
             let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
             let auth_token = SessionAuthToken::from(auth_token);
 
@@ -164,7 +168,7 @@ where
             let parsed_session_data = state
                 .db_query(move |conn| T::try_load_session(raw_session_data, conn, ff_client, req))
                 .await
-                .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, e))?;
+                .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers.join(" or "), e))?;
             parsed_session_data.log_authed_principal(root_span);
 
             Ok(Self {

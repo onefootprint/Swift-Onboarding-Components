@@ -19,6 +19,10 @@ pub mod check;
 pub trait ExtractableAuthSession: Apiv2Schema + Sized + Send + Sync + 'static {
     fn header_names() -> Vec<&'static str>;
 
+    fn header_names_for_err() -> Vec<&'static str> {
+        Self::header_names()
+    }
+
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,

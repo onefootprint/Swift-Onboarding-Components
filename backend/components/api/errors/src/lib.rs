@@ -1,7 +1,9 @@
 pub use actix_web::http::StatusCode;
 pub use actix_web::HttpResponseBuilder;
 
-pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error + Send {
+pub trait FpErrorTrait:
+    std::fmt::Debug + std::fmt::Display + std::error::Error + Send + std::any::Any + 'static
+{
     /// The HTTP status code representing this error
     fn status_code(&self) -> StatusCode;
     /// For errors that clients can programatically respond to, a unique string to identify the

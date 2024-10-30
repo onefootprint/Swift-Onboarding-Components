@@ -56,15 +56,17 @@ where
                             Err(e1)
                         } else {
                             // Headers have different names, merge them
-                            let get_header_value = |e: ApiError| {
+                            let get_header_values = |e: ApiError| {
                                 e.context()
-                                    .and_then(|c| serde_json::from_value::<HashMap<String, String>>(c).ok())
-                                    .map(|m| m.into_values().collect_vec())
+                                    .and_then(|c| {
+                                        serde_json::from_value::<HashMap<String, Vec<String>>>(c).ok()
+                                    })
+                                    .map(|m| m.into_values().flatten().collect_vec())
                                     .unwrap_or_default()
                             };
-                            let missing_headers = chain!(get_header_value(e1), get_header_value(e2))
+                            let missing_headers = chain!(get_header_values(e1), get_header_values(e2))
                                 .unique()
-                                .join(" or ");
+                                .collect_vec();
                             Err(AuthError::MissingHeader(missing_headers).into())
                         }
                     }

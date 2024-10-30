@@ -6,6 +6,7 @@ use actix_web::FromRequest;
 use chrono::Utc;
 use db::models::session::Session;
 use futures_util::Future;
+use itertools::Itertools;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Security;
@@ -45,8 +46,11 @@ impl FromRequest for CheckSessionContext {
             .and_then(|hv| hv.to_str().map(PiiString::from).ok());
 
         Box::pin(async move {
-            let allowed_headers = Self::header_names().join(", ");
-            let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
+            let allowed_headers = Self::header_names()
+                .into_iter()
+                .map(|s| s.to_owned())
+                .collect_vec();
+            let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers))?;
             let auth_token = SessionAuthToken::from(auth_token);
 
             let key = auth_token.id();
