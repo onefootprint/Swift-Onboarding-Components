@@ -42,6 +42,7 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
   const displayLinkDialogProps = useDisplayLinkDialog({
     linkData: submitActionsMutation.data?.[0],
     onClose: handleClose,
+    entityId,
   });
 
   const handleGenerateLink = (data: TriggerFormData) => {

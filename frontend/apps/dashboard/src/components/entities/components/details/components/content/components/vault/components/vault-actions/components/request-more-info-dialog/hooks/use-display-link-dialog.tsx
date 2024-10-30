@@ -4,7 +4,6 @@ import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 import useEntity from '@/entity/hooks/use-entity';
-import useEntityId from '@/entity/hooks/use-entity-id';
 
 import hasDataIdentifier from 'src/utils/has-data-identifier';
 import useSendTokenLinkMutation from '../../../hooks/use-send-token-link';
@@ -13,15 +12,15 @@ import LinkDisplay from '../components/link-display';
 type UseDisplayLinkDialogProps = {
   linkData?: Omit<TriggerResponse, 'kind'>;
   onClose: () => void;
+  entityId: string;
 };
 
-const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) => {
+const useDisplayLinkDialog = ({ linkData, onClose, entityId }: UseDisplayLinkDialogProps) => {
   const sendLinkMutation = useSendTokenLinkMutation();
   const toast = useToast();
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'actions.request-more-info',
   });
-  const entityId = useEntityId();
   const entity = useEntity(entityId)?.data;
   const userHasPhone = hasDataIdentifier(entity, IdDI.phoneNumber);
 

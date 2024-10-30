@@ -27,9 +27,12 @@ const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBo
     setIsDialogOpen(false);
   };
   const showErrorToast = useRequestErrorToast();
+  // Some very legacy events don't have an fpId
+  const userEntityId = data.fpId || entityId;
   const { title, primaryButton, secondaryButton, component } = useDisplayLinkDialog({
     linkData: generateTokenMutation.data,
     onClose: handleClose,
+    entityId: userEntityId,
   });
 
   if (!data.requestIsActive) {
@@ -40,7 +43,7 @@ const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBo
     setIsDialogOpen(true);
     generateTokenMutation.mutate(
       {
-        entityId,
+        entityId: userEntityId,
         kind: TokenKind.inherit,
         sendLink: false,
       },

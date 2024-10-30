@@ -140,6 +140,8 @@ export type WorkflowTriggeredEventData = {
   config: WorkflowRequestConfig;
   actor: Actor;
   note?: string;
+  /**The fp_id of the _user_ for which this workflow was triggered. Will never be an `fp_bid`, even if the WFR is also for a business. */
+  fpId?: string;
 };
 
 export type WorkflowTriggeredEvent = {
