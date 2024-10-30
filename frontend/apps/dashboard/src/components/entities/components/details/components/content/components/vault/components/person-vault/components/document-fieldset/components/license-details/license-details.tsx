@@ -7,10 +7,12 @@ import {
 } from '@onefootprint/types';
 import { Dialog, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
 import Decrypt from '../decrypt/decrypt';
 import DetailsLayoutWrapper from '../details-layout-wrapper';
 import DocumentImage from '../document-image';
+import DrawerContent from './components/drawer-content';
 import UploadTitleCard from './components/upload-title-card/upload-title-card';
 
 export type LicenseAndSelfieDetailsProps = {
@@ -41,8 +43,8 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
       {isEncrypted ? (
         <Decrypt isDecryptable={isDecryptable} onClick={() => onDecrypt(document.kind)} />
       ) : (
-        <DetailsLayoutWrapper>
-          <Stack direction="column" align="center" gap={8} width="90%">
+        <DetailsLayoutWrapper drawerChildren={<DrawerContent document={document} vault={vault} />}>
+          <UploadsContainer direction="column" align="center" gap={8} width="90%">
             {uploads.map(upload => {
               const vaultIndex = `${upload.identifier}:${upload.version}` as DataIdentifier;
               const vaultValue = vault[vaultIndex] as string;
@@ -57,11 +59,19 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
                 </Stack>
               );
             })}
-          </Stack>
+          </UploadsContainer>
         </DetailsLayoutWrapper>
       )}
     </Dialog>
   );
 };
+
+const UploadsContainer = styled(Stack)`
+  ${({ theme }) => css`
+    > *:last-child {
+      padding-bottom: ${theme.spacing[7]};
+    }
+  `};
+`;
 
 export default LicenseAndSelfieDetails;

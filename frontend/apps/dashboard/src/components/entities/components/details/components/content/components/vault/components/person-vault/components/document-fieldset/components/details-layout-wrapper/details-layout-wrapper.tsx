@@ -25,7 +25,7 @@ const DetailsLayoutWrapper = ({ children, drawerChildren }: DetailsLayoutWrapper
           </Stack>
         </InnerDrawer>
       )}
-      <Stack width="100%" height="100%" backgroundColor="secondary" padding={7} overflowY="auto">
+      <Stack justify="center" width="100%" height="100%" backgroundColor="secondary" padding={7} overflowY="auto">
         {children}
       </Stack>
     </Container>
@@ -33,18 +33,18 @@ const DetailsLayoutWrapper = ({ children, drawerChildren }: DetailsLayoutWrapper
 };
 
 const Container = styled(Box)<{ open: boolean }>`
-${({ open, theme }) => css` 
-    background-color: ${theme.backgroundColor.secondary};
-    height: 100%;
-    overflow: hidden;
+  ${({ open, theme }) => css` 
+      background-color: ${theme.backgroundColor.secondary};
+      height: 100%;
+      overflow: hidden;
 
-    &[data-has-drawer="true"] {
-      display: grid;
-      grid-template-areas: "drawer content";
-      grid-template-columns: ${open ? '480px 1fr' : '1px 1fr'};
-      transition: grid-template-columns 0.2s ease-in-out;
-    }
-`}
+      &[data-has-drawer="true"] {
+        display: grid;
+        grid-template-areas: "drawer content";
+        grid-template-columns: ${open ? '480px 1fr' : '1px 1fr'};
+        transition: grid-template-columns 0.2s ease-in-out;
+      }
+  `}
 `;
 
 export default DetailsLayoutWrapper;
