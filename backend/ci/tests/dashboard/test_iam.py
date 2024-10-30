@@ -9,7 +9,7 @@ from tests.utils import (
     patch,
     _gen_random_n_digit_number,
 )
-from tests.dashboard.utils import has_audit_event_with_details
+from tests.dashboard.utils import assert_has_audit_event_with_details
 
 
 @pytest.fixture(scope="session")
@@ -482,7 +482,7 @@ def test_partner_tenant_scopes(run_id, sandbox_tenant, admin_role):
 
 
 def test_role_creation_audit_event(sandbox_tenant, limited_role):
-    has_audit_event_with_details(
+    assert_has_audit_event_with_details(
         tenant=sandbox_tenant,
         name="create_org_role",
         tenant_role_id=limited_role["id"],
@@ -501,7 +501,7 @@ def test_member_invitation_audit_event(run_id, sandbox_tenant, admin_role):
         first_name=first_name,
         last_name=last_name,
     )
-    has_audit_event_with_details(
+    assert_has_audit_event_with_details(
         tenant=sandbox_tenant,
         name="invite_org_member",
         tenant_role_id=admin_role["id"],
