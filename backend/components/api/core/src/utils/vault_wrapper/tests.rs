@@ -450,57 +450,6 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
             update: vec![(BDK::Tin.into(), PiiJsonValue::new_string("121231234".to_owned()))],
             is_allowed: true,
         },
-        // Allowed to add beneficial owners
-        Test {
-            update: vec![(
-                BDK::BeneficialOwners.into(),
-                PiiJsonValue::new(serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                ])),
-            )],
-            is_allowed: true,
-        },
-        // Allowed to update beneficial owners
-        Test {
-            update: vec![(
-                BDK::BeneficialOwners.into(),
-                PiiJsonValue::new(serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                    {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
-                ])),
-            )],
-            is_allowed: true,
-        },
-        // Allowed to replace with KYCed BOs
-        Test {
-            update: vec![(
-                BDK::KycedBeneficialOwners.into(),
-                PiiJsonValue::new(serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
-                    {"first_name": "Franklin", "last_name": "Frog", "email": "franklin@onefootprint.com", "phone_number": "+14154444444", "ownership_stake": 30},
-                ])),
-            )],
-            is_allowed: true,
-        },
-        // After this, can't update either KYCed BOs or replace with regular BOs
-        Test {
-            update: vec![(
-                BDK::KycedBeneficialOwners.into(),
-                PiiJsonValue::new(serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
-                ])),
-            )],
-            is_allowed: false,
-        },
-        Test {
-            update: vec![(
-                BDK::BeneficialOwners.into(),
-                PiiJsonValue::new(serde_json::json!([
-                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-                ])),
-            )],
-            is_allowed: false,
-        },
         // Allowed to update all remaining info
         Test {
             update: vec![
@@ -582,20 +531,6 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
         ],
         // Name without DBA should wipe name
         vec![(BDK::Name.into(), PiiJsonValue::new_string("Derp Inc".to_owned()))],
-        // BOs
-        vec![(
-            BDK::BeneficialOwners.into(),
-            PiiJsonValue::new(serde_json::json!([
-                {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-            ])),
-        )],
-        // Replace with fully-KYCed BOs
-        vec![(
-            BDK::KycedBeneficialOwners.into(),
-            PiiJsonValue::new(serde_json::json!([
-                {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
-            ])),
-        )],
     ];
 
     for update in updates {

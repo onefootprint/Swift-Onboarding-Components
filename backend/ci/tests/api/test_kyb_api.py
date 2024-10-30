@@ -254,33 +254,6 @@ def test_error_linking_bo(kyb_sandbox_ob_config, sandbox_tenant, sandbox_user):
     )
 
 
-def test_cannot_vault_bos_when_linked(sandbox_tenant):
-    """
-    Make sure we can't add BOs via the vault when there are already linked BOs
-    """
-    body = post("businesses", None, sandbox_tenant.sk.key)
-    fp_bid = body["id"]
-    body = post("users", None, sandbox_tenant.sk.key)
-    fp_id = body["id"]
-
-    data = dict(fp_id=fp_id, ownership_stake=100)
-    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
-
-    # Cannot vault BOs because there are already linked BOs
-    data = {
-        "business.beneficial_owners": [
-            {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 100}
-        ],
-    }
-    body = patch(
-        f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key, status_code=400
-    )
-    assert (
-        body["context"]["business.beneficial_owners"]
-        == "Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting"
-    )
-
-
 def test_onboard_kyb_bos_linked_via_api(sandbox_tenant, kyb_sandbox_ob_config):
     """
     Verify that the onboarding requirement to provide beneficial owners is satisfied by owners linked via API.

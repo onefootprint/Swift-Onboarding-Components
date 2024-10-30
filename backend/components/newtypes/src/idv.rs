@@ -1,5 +1,4 @@
 use super::Error::AssertionError;
-use crate::BusinessOwnerData;
 use crate::IdentityDataKind;
 use crate::Iso3166TwoDigitCountryCode;
 use crate::PiiString;
@@ -175,15 +174,6 @@ pub enum BusinessDataForRequest {
         tin: PiiString,
         name: PiiString,
     },
-}
-
-impl From<BusinessOwnerData> for BoData {
-    fn from(value: BusinessOwnerData) -> Self {
-        Self {
-            first_name: value.first_name,
-            last_name: value.last_name,
-        }
-    }
 }
 
 pub struct EinOnly(pub bool);

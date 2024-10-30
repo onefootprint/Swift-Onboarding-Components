@@ -222,9 +222,7 @@ CDO_TO_DIS = {
     ],
     "business_phone_number": ["business.phone_number"],
     "business_website": ["business.website"],
-    # Normally managed separately by the BO APIs, should remove this when we deprecated business.kyced_beneficial_owners entirely
     "business_kyced_beneficial_owners": [
-        "business.kyced_beneficial_owners",
         "business.beneficial_owner_explanation_message",
     ],
     "business_corporation_type": ["business.corporation_type"],

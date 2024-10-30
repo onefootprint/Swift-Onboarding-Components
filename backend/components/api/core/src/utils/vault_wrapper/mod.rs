@@ -38,7 +38,6 @@ pub struct Any;
 #[derive(Debug, Clone)]
 pub struct VaultWrapper<Type = Any> {
     pub vault: Vault,
-    sv_id: Option<ScopedVaultId>,
     /// All VaultDatas for each DataIdentifier.
     /// When there are multiple VaultDatas for one DI, the most recent VaultData comes first.
     /// Generally should use the .data() util instead of accessing this directly

@@ -14,8 +14,6 @@ mod document;
 mod identity;
 mod investor_profile;
 mod utils;
-pub use business::BusinessOwnerData;
-pub use business::KycedBusinessOwnerData;
 pub use card::CardData;
 pub use card::CardExpiration;
 pub use card::CardIssuer;

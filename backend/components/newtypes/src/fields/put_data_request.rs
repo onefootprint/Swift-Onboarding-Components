@@ -110,9 +110,14 @@ impl PatchDataRequest {
                         }
                         _ => None,
                     },
-                    DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(_, _)) => {
-                        Some(NtValidationError("Cannot vault beneficial owner data via API").into())
-                    }
+                    DataIdentifier::Business(k) => match k {
+                        BusinessDataKind::BeneficialOwnerData(_, _)
+                        | BusinessDataKind::BeneficialOwners
+                        | BusinessDataKind::KycedBeneficialOwners => {
+                            Some(NtValidationError("Cannot vault beneficial owner data via API").into())
+                        }
+                        _ => None,
+                    },
                     _ => None,
                 };
                 err.map(|err| (di.clone(), err))

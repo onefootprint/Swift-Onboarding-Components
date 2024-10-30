@@ -6,16 +6,12 @@ use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
 use api_errors::ValidationError;
-use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
-use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault_data::NewVaultData;
 use db::PgConn;
 use itertools::Itertools;
-use newtypes::BusinessDataKind as BDK;
-use newtypes::BusinessOwnerSource;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant;
@@ -84,7 +80,7 @@ impl<Type> TenantVw<Type> {
         request: FingerprintedDataRequest,
         request_source: &DataRequestSource,
     ) -> FpResult<ValidatedDataRequest> {
-        self.assert_update_allowed(conn, &request, request_source)?;
+        self.assert_update_allowed(&request, request_source)?;
         // Transform the request into a Vec<NewVaultData>
         let FingerprintedDataRequest {
             data,
@@ -240,15 +236,6 @@ impl<Type> TenantVw<Type> {
         let mut validation_errors = HashMap::<DataIdentifier, NtError>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
 
-        let irreplaceable_dis = vec![BDK::KycedBeneficialOwners.into()];
-        for di in irreplaceable_dis {
-            let update_has_di = dis.iter().any(|x| *x == &di);
-            let vault_already_has_di = self.data(&di).is_some();
-            if update_has_di && vault_already_has_di {
-                validation_errors.insert(di, DiValidationError::CannotReplaceData.into());
-            }
-        }
-
         // Then, validate that we're not overwriting any full data with partial data.
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
         let existing_cdos = CollectedDataOption::list_from(self.populated_dis());
@@ -318,29 +305,11 @@ impl<Type> TenantVw<Type> {
     /// Checks that the provided DIs are allowed to be vaulted
     fn assert_update_allowed(
         &self,
-        conn: &mut PgConn,
         request: &FingerprintedDataRequest,
         request_source: &DataRequestSource,
     ) -> FpResult<()> {
         assert_allowed_for_vault(request, self.vault.kind)?;
         assert_allowed_for_sources(request, request_source)?;
-
-        if self.vault.kind == VaultKind::Business {
-            if let Some(sv_id) = self.sv_id.as_ref() {
-                let sv = ScopedVault::get(conn, sv_id)?;
-                let bos = BusinessOwner::list_owners(conn, &self.vault.id, &sv.tenant_id)?;
-                let has_linked_bos = bos.iter().any(|(bo, _)| bo.source == BusinessOwnerSource::Tenant);
-                // TODO stop allowing vaulting this DI at all
-                let request_has_vaulted_bos = request.contains_key(&BDK::BeneficialOwners.into());
-                if has_linked_bos && request_has_vaulted_bos {
-                    // We shouldn't allow BOs to be vaulted when the tenant has already linked BOs
-                    // via API
-                    let err = newtypes::NtValidationError("Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting").into();
-                    let errs = HashMap::from_iter([(BDK::BeneficialOwners.into(), err)]);
-                    return Err(NtError::from(DataValidationError::FieldValidationError(errs)).into());
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -384,15 +353,6 @@ pub fn assert_allowed_for_sources(
                 (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::Email)) => return false,
                 _ => (),
             }
-        }
-        #[allow(clippy::single_match)]
-        match (source, di) {
-            // Tenants cannot add KycedBeneficialOwners - this is only editable via bifrost.
-            // Tenants should either user BeneficialOwners or just link BOs via API
-            (DataLifetimeSource::Tenant, DataIdentifier::Business(BDK::KycedBeneficialOwners)) => {
-                return false
-            }
-            _ => (),
         }
         true
     };

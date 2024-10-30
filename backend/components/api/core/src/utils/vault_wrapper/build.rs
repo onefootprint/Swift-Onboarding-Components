@@ -110,7 +110,6 @@ impl<Type> VaultWrapper<Type> {
 
         let result = Self {
             vault: user_vault,
-            sv_id: sv_id.cloned(),
             all_data: ordered_data,
             seqno,
             is_hydrated: PhantomData,

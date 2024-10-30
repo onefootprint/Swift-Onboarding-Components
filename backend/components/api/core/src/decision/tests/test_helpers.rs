@@ -37,7 +37,6 @@ use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowSource;
-use serde_json::json;
 
 pub async fn create_user_and_onboarding(
     state: &State,
@@ -240,12 +239,6 @@ pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId, obc:
         panic!("missing kyb check in configured obc")
     };
     let mut update = vec![
-        (
-            BusinessDataKind::BeneficialOwners.into(),
-            PiiJsonValue::new(json! {
-                [{"first_name": "Bob", "last_name": "Boberto", "ownership_stake": 88}]
-            }),
-        ),
         (
             BusinessDataKind::Name.into(),
             PiiJsonValue::new_string("Waffle House".to_owned()),
