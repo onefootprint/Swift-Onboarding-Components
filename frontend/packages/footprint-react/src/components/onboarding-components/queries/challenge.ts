@@ -168,9 +168,7 @@ export const verifyChallenge = async (
   options: { token: string; sandboxOutcome?: SandboxOutcome },
 ) => {
   const { authToken } = await verify(payload, options);
-  const [, vaultingToken] = await Promise.all([
-    initOnboarding({ authToken, sandboxOutcome: options.sandboxOutcome }),
-    createVaultingToken({ authToken }),
-  ]);
+  await initOnboarding({ authToken, sandboxOutcome: options.sandboxOutcome });
+  const vaultingToken = await createVaultingToken({ authToken });
   return { authToken, vaultingToken: vaultingToken.token };
 };
