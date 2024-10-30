@@ -1790,14 +1790,17 @@ export type CursorPaginatedAuditEvent = {
       | 'create_org_api_key'
       | 'decrypt_org_api_key'
       | 'update_org_api_key'
-      | 'invite_org_member'
       | 'update_org_member'
       | 'login_org_member'
       | 'remove_org_member'
       | 'create_org'
       | 'update_org_settings'
-      | 'create_org_role'
-      | 'update_org_role';
+      | 'update_org_role'
+      | 'create_playbook'
+      | 'disable_playbook'
+      | 'manually_review_entity'
+      | 'edit_playbook'
+      | 'deactivate_org_role';
     id: string;
     /**
      * Describes a device insight event with locations and IP of the event
@@ -1842,7 +1845,12 @@ export type CursorPaginatedAuditEvent = {
       | 'CreateOrgRole'
       | 'UpdateOrgRole'
       | 'CreateListEntry'
-      | 'DeleteListEntry';
+      | 'DeleteListEntry'
+      | 'CreatePlaybook'
+      | 'DisablePlaybook'
+      | 'ManuallyReviewEntity'
+      | 'EditPlaybook'
+      | 'DeactivateOrgRole';
     principal: 'footprint' | 'firm_employee';
     tenantId: string;
     timestamp: string;
@@ -3095,7 +3103,12 @@ export type CursorPaginatedListEvent = {
       | 'CreateOrgRole'
       | 'UpdateOrgRole'
       | 'CreateListEntry'
-      | 'DeleteListEntry';
+      | 'DeleteListEntry'
+      | 'CreatePlaybook'
+      | 'DisablePlaybook'
+      | 'ManuallyReviewEntity'
+      | 'EditPlaybook'
+      | 'DeactivateOrgRole';
     principal: 'footprint' | 'firm_employee';
     tenantId: string;
     timestamp: string;
@@ -5708,14 +5721,7 @@ export type EvaluateRuleRequest = {
   add?: Array<{
     isShadow: boolean;
     name?: string;
-    ruleAction:
-      | 'pass_with_manual_review'
-      | 'manual_review'
-      | 'fail'
-      | 'step_up.identity'
-      | 'step_up.proof_of_address'
-      | 'step_up.identity_proof_of_ssn'
-      | 'step_up.identity_proof_of_ssn_proof_of_address';
+    ruleAction: string;
     ruleExpression: Array<string>;
   }>;
   delete?: Array<string>;
@@ -11715,11 +11721,13 @@ export type ListDetails = {
         | 'step_up.identity'
         | 'step_up.proof_of_address'
         | 'step_up.identity_proof_of_ssn'
-        | 'step_up.identity_proof_of_ssn_proof_of_address';
+        | 'step_up.identity_proof_of_ssn_proof_of_address'
+        | 'step_up.custom';
       createdAt: string;
       isShadow: boolean;
       kind: 'Person' | 'Business' | 'Any';
       name?: string;
+      ruleAction: string;
       ruleExpression: Array<string>;
       ruleId: string;
     }>;
@@ -11800,14 +11808,7 @@ export type MultiUpdateRuleRequest = {
   add?: Array<{
     isShadow: boolean;
     name?: string;
-    ruleAction:
-      | 'pass_with_manual_review'
-      | 'manual_review'
-      | 'fail'
-      | 'step_up.identity'
-      | 'step_up.proof_of_address'
-      | 'step_up.identity_proof_of_ssn'
-      | 'step_up.identity_proof_of_ssn_proof_of_address';
+    ruleAction: string;
     ruleExpression: Array<string>;
   }>;
   delete?: Array<string>;
@@ -15279,11 +15280,13 @@ export type Rule = {
     | 'step_up.identity'
     | 'step_up.proof_of_address'
     | 'step_up.identity_proof_of_ssn'
-    | 'step_up.identity_proof_of_ssn_proof_of_address';
+    | 'step_up.identity_proof_of_ssn_proof_of_address'
+    | 'step_up.custom';
   createdAt: string;
   isShadow: boolean;
   kind: 'Person' | 'Business' | 'Any';
   name?: string;
+  ruleAction: string;
   ruleExpression: Array<string>;
   ruleId: string;
 };
@@ -15294,7 +15297,8 @@ export type action =
   | 'step_up.identity'
   | 'step_up.proof_of_address'
   | 'step_up.identity_proof_of_ssn'
-  | 'step_up.identity_proof_of_ssn_proof_of_address';
+  | 'step_up.identity_proof_of_ssn_proof_of_address'
+  | 'step_up.custom';
 export type kind10 = 'Person' | 'Business' | 'Any';
 export type RuleEvalResults = {
   results: Array<{
@@ -15305,7 +15309,8 @@ export type RuleEvalResults = {
       | 'step_up.identity'
       | 'step_up.proof_of_address'
       | 'step_up.identity_proof_of_ssn'
-      | 'step_up.identity_proof_of_ssn_proof_of_address';
+      | 'step_up.identity_proof_of_ssn_proof_of_address'
+      | 'step_up.custom';
     currentStatus: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
     fpId: string;
     historicalActionTriggered?:
@@ -15315,7 +15320,8 @@ export type RuleEvalResults = {
       | 'step_up.identity'
       | 'step_up.proof_of_address'
       | 'step_up.identity_proof_of_ssn'
-      | 'step_up.identity_proof_of_ssn_proof_of_address';
+      | 'step_up.identity_proof_of_ssn_proof_of_address'
+      | 'step_up.custom';
   }>;
   stats: {
     countByBacktestActionTriggered: {
@@ -15338,9 +15344,11 @@ export type RuleSetResult = {
     | 'step_up.identity'
     | 'step_up.proof_of_address'
     | 'step_up.identity_proof_of_ssn'
-    | 'step_up.identity_proof_of_ssn_proof_of_address';
+    | 'step_up.identity_proof_of_ssn_proof_of_address'
+    | 'step_up.custom';
   createdAt: string;
   obConfigurationId: string;
+  ruleActionTriggered?: string;
   ruleResults: Array<{
     result: boolean;
     rule: {
@@ -15351,11 +15359,13 @@ export type RuleSetResult = {
         | 'step_up.identity'
         | 'step_up.proof_of_address'
         | 'step_up.identity_proof_of_ssn'
-        | 'step_up.identity_proof_of_ssn_proof_of_address';
+        | 'step_up.identity_proof_of_ssn_proof_of_address'
+        | 'step_up.custom';
       createdAt: string;
       isShadow: boolean;
       kind: 'Person' | 'Business' | 'Any';
       name?: string;
+      ruleAction: string;
       ruleExpression: Array<string>;
       ruleId: string;
     };
@@ -15368,7 +15378,8 @@ export type action_triggered =
   | 'step_up.identity'
   | 'step_up.proof_of_address'
   | 'step_up.identity_proof_of_ssn'
-  | 'step_up.identity_proof_of_ssn_proof_of_address';
+  | 'step_up.identity_proof_of_ssn_proof_of_address'
+  | 'step_up.custom';
 /**
  * Secret API key
  */

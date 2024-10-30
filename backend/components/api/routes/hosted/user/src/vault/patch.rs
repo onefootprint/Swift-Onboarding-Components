@@ -14,8 +14,8 @@ use api_core::utils::vault_wrapper::VwArgs;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
 use db::models::ob_configuration::ObConfiguration;
+use newtypes::put_data_request::ModernRawUserDataRequest;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::DataLifetimeSource;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentRequestConfig;
@@ -40,7 +40,7 @@ use std::str::FromStr;
 #[actix::post("/hosted/user/vault/validate")]
 pub async fn post_validate(
     state: web::Data<State>,
-    request: Json<RawUserDataRequest>,
+    request: Json<ModernRawUserDataRequest>,
     user_wf_auth: UserWfAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
@@ -71,7 +71,7 @@ pub async fn post_validate(
 #[actix::patch("/hosted/user/vault")]
 pub async fn patch(
     state: web::Data<State>,
-    request: Json<RawUserDataRequest>,
+    request: Json<ModernRawUserDataRequest>,
     user_wf_auth: UserWfAuthContext,
     bootstrap_fields: BootstrapFieldsHeader,
 ) -> ApiResponse<api_wire_types::Empty> {

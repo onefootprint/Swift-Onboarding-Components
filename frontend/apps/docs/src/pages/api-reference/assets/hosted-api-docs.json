@@ -153,7 +153,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawBusinessDataRequest"
+                                "$ref": "#/components/schemas/ModernRawBusinessDataRequest"
                             }
                         }
                     },
@@ -228,7 +228,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawBusinessDataRequest"
+                                "$ref": "#/components/schemas/ModernRawBusinessDataRequest"
                             }
                         }
                     },
@@ -499,7 +499,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawUserDataRequest"
+                                "$ref": "#/components/schemas/ModernRawUserDataRequest"
                             }
                         }
                     },
@@ -2126,7 +2126,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawUserDataRequest"
+                                "$ref": "#/components/schemas/ModernRawUserDataRequest"
                             }
                         }
                     },
@@ -2201,7 +2201,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawUserDataRequest"
+                                "$ref": "#/components/schemas/ModernRawUserDataRequest"
                             }
                         }
                     },
@@ -4863,6 +4863,749 @@
                     "challenge_kind"
                 ]
             },
+            "ModernRawBusinessDataRequest": {
+                "example": {
+                    "business.name": "Acme Bank",
+                    "business.website": "acmebank.org",
+                    "custom.account_id": "d0af81fc-41c2-46ca-8a8d-797b8e4d3146"
+                },
+                "type": "object",
+                "properties": {
+                    "business.address_line1": {
+                        "type": "string"
+                    },
+                    "business.address_line2": {
+                        "type": "string"
+                    },
+                    "business.city": {
+                        "type": "string"
+                    },
+                    "business.corporation_type": {
+                        "type": "string"
+                    },
+                    "business.country": {
+                        "type": "string"
+                    },
+                    "business.dba": {
+                        "type": "string"
+                    },
+                    "business.formation_date": {
+                        "type": "string"
+                    },
+                    "business.formation_state": {
+                        "type": "string"
+                    },
+                    "business.name": {
+                        "type": "string"
+                    },
+                    "business.phone_number": {
+                        "type": "string"
+                    },
+                    "business.state": {
+                        "type": "string"
+                    },
+                    "business.tin": {
+                        "type": "string"
+                    },
+                    "business.website": {
+                        "type": "string"
+                    },
+                    "business.zip": {
+                        "type": "string"
+                    },
+                    "custom.*": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ModernRawUserDataRequest": {
+                "example": {
+                    "id.first_name": "Jane",
+                    "id.last_name": "Doe",
+                    "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58"
+                },
+                "type": "object",
+                "properties": {
+                    "bank.*.account_type": {
+                        "type": "string"
+                    },
+                    "bank.*.ach_account_id": {
+                        "type": "string"
+                    },
+                    "bank.*.ach_account_number": {
+                        "type": "string"
+                    },
+                    "bank.*.ach_routing_number": {
+                        "type": "string"
+                    },
+                    "bank.*.fingerprint": {
+                        "type": "string"
+                    },
+                    "bank.*.name": {
+                        "type": "string"
+                    },
+                    "card.*.billing_address.country": {
+                        "type": "string"
+                    },
+                    "card.*.billing_address.zip": {
+                        "type": "string"
+                    },
+                    "card.*.cvc": {
+                        "type": "string"
+                    },
+                    "card.*.expiration": {
+                        "type": "string"
+                    },
+                    "card.*.expiration_month": {
+                        "type": "string"
+                    },
+                    "card.*.expiration_year": {
+                        "type": "string"
+                    },
+                    "card.*.fingerprint": {
+                        "type": "string"
+                    },
+                    "card.*.issuer": {
+                        "type": "string"
+                    },
+                    "card.*.name": {
+                        "type": "string"
+                    },
+                    "card.*.number": {
+                        "type": "string"
+                    },
+                    "card.*.number_last4": {
+                        "type": "string"
+                    },
+                    "custom.*": {
+                        "type": "string"
+                    },
+                    "document.custom.*": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.back.image": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.curp": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.dob": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.document_number": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.expires_at": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.front.image": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.full_address": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.full_name": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.gender": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.issued_at": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.nationality": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.ref_number": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.finra_compliance_letter": {
+                        "type": "string"
+                    },
+                    "document.id_card.back.image": {
+                        "type": "string"
+                    },
+                    "document.id_card.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.id_card.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.id_card.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.id_card.curp": {
+                        "type": "string"
+                    },
+                    "document.id_card.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.id_card.dob": {
+                        "type": "string"
+                    },
+                    "document.id_card.document_number": {
+                        "type": "string"
+                    },
+                    "document.id_card.expires_at": {
+                        "type": "string"
+                    },
+                    "document.id_card.front.image": {
+                        "type": "string"
+                    },
+                    "document.id_card.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.id_card.full_address": {
+                        "type": "string"
+                    },
+                    "document.id_card.full_name": {
+                        "type": "string"
+                    },
+                    "document.id_card.gender": {
+                        "type": "string"
+                    },
+                    "document.id_card.issued_at": {
+                        "type": "string"
+                    },
+                    "document.id_card.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.id_card.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.id_card.nationality": {
+                        "type": "string"
+                    },
+                    "document.id_card.ref_number": {
+                        "type": "string"
+                    },
+                    "document.id_card.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.id_card.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport.back.image": {
+                        "type": "string"
+                    },
+                    "document.passport.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.passport.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.passport.curp": {
+                        "type": "string"
+                    },
+                    "document.passport.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.passport.dob": {
+                        "type": "string"
+                    },
+                    "document.passport.document_number": {
+                        "type": "string"
+                    },
+                    "document.passport.expires_at": {
+                        "type": "string"
+                    },
+                    "document.passport.front.image": {
+                        "type": "string"
+                    },
+                    "document.passport.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport.full_address": {
+                        "type": "string"
+                    },
+                    "document.passport.full_name": {
+                        "type": "string"
+                    },
+                    "document.passport.gender": {
+                        "type": "string"
+                    },
+                    "document.passport.issued_at": {
+                        "type": "string"
+                    },
+                    "document.passport.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.passport.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.passport.nationality": {
+                        "type": "string"
+                    },
+                    "document.passport.ref_number": {
+                        "type": "string"
+                    },
+                    "document.passport.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.passport.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport_card.back.image": {
+                        "type": "string"
+                    },
+                    "document.passport_card.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport_card.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.passport_card.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.passport_card.curp": {
+                        "type": "string"
+                    },
+                    "document.passport_card.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.passport_card.dob": {
+                        "type": "string"
+                    },
+                    "document.passport_card.document_number": {
+                        "type": "string"
+                    },
+                    "document.passport_card.expires_at": {
+                        "type": "string"
+                    },
+                    "document.passport_card.front.image": {
+                        "type": "string"
+                    },
+                    "document.passport_card.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport_card.full_address": {
+                        "type": "string"
+                    },
+                    "document.passport_card.full_name": {
+                        "type": "string"
+                    },
+                    "document.passport_card.gender": {
+                        "type": "string"
+                    },
+                    "document.passport_card.issued_at": {
+                        "type": "string"
+                    },
+                    "document.passport_card.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.passport_card.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.passport_card.nationality": {
+                        "type": "string"
+                    },
+                    "document.passport_card.ref_number": {
+                        "type": "string"
+                    },
+                    "document.passport_card.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.passport_card.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.permit.back.image": {
+                        "type": "string"
+                    },
+                    "document.permit.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.permit.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.permit.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.permit.curp": {
+                        "type": "string"
+                    },
+                    "document.permit.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.permit.dob": {
+                        "type": "string"
+                    },
+                    "document.permit.document_number": {
+                        "type": "string"
+                    },
+                    "document.permit.expires_at": {
+                        "type": "string"
+                    },
+                    "document.permit.front.image": {
+                        "type": "string"
+                    },
+                    "document.permit.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.permit.full_address": {
+                        "type": "string"
+                    },
+                    "document.permit.full_name": {
+                        "type": "string"
+                    },
+                    "document.permit.gender": {
+                        "type": "string"
+                    },
+                    "document.permit.issued_at": {
+                        "type": "string"
+                    },
+                    "document.permit.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.permit.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.permit.nationality": {
+                        "type": "string"
+                    },
+                    "document.permit.ref_number": {
+                        "type": "string"
+                    },
+                    "document.permit.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.permit.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.proof_of_address.image": {
+                        "type": "string"
+                    },
+                    "document.residence_document.back.image": {
+                        "type": "string"
+                    },
+                    "document.residence_document.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.residence_document.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.residence_document.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.residence_document.curp": {
+                        "type": "string"
+                    },
+                    "document.residence_document.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.residence_document.dob": {
+                        "type": "string"
+                    },
+                    "document.residence_document.document_number": {
+                        "type": "string"
+                    },
+                    "document.residence_document.expires_at": {
+                        "type": "string"
+                    },
+                    "document.residence_document.front.image": {
+                        "type": "string"
+                    },
+                    "document.residence_document.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.residence_document.full_address": {
+                        "type": "string"
+                    },
+                    "document.residence_document.full_name": {
+                        "type": "string"
+                    },
+                    "document.residence_document.gender": {
+                        "type": "string"
+                    },
+                    "document.residence_document.issued_at": {
+                        "type": "string"
+                    },
+                    "document.residence_document.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.residence_document.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.residence_document.nationality": {
+                        "type": "string"
+                    },
+                    "document.residence_document.ref_number": {
+                        "type": "string"
+                    },
+                    "document.residence_document.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.residence_document.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.ssn_card.image": {
+                        "type": "string"
+                    },
+                    "document.visa.back.image": {
+                        "type": "string"
+                    },
+                    "document.visa.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.visa.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.visa.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.visa.curp": {
+                        "type": "string"
+                    },
+                    "document.visa.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.visa.dob": {
+                        "type": "string"
+                    },
+                    "document.visa.document_number": {
+                        "type": "string"
+                    },
+                    "document.visa.expires_at": {
+                        "type": "string"
+                    },
+                    "document.visa.front.image": {
+                        "type": "string"
+                    },
+                    "document.visa.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.visa.full_address": {
+                        "type": "string"
+                    },
+                    "document.visa.full_name": {
+                        "type": "string"
+                    },
+                    "document.visa.gender": {
+                        "type": "string"
+                    },
+                    "document.visa.issued_at": {
+                        "type": "string"
+                    },
+                    "document.visa.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.visa.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.visa.nationality": {
+                        "type": "string"
+                    },
+                    "document.visa.ref_number": {
+                        "type": "string"
+                    },
+                    "document.visa.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.visa.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.back.image": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.classified_document_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.clave_de_elector": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.curp": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.curp_validation_response": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.dob": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.document_number": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.expires_at": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.front.image": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.front.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.full_address": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.full_name": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.gender": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.issued_at": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.issuing_country": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.issuing_state": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.nationality": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.ref_number": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.selfie.image": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "id.address_line1": {
+                        "type": "string"
+                    },
+                    "id.address_line2": {
+                        "type": "string"
+                    },
+                    "id.citizenships": {
+                        "type": "string"
+                    },
+                    "id.city": {
+                        "type": "string"
+                    },
+                    "id.country": {
+                        "type": "string"
+                    },
+                    "id.dob": {
+                        "type": "string"
+                    },
+                    "id.drivers_license_number": {
+                        "type": "string"
+                    },
+                    "id.drivers_license_state": {
+                        "type": "string"
+                    },
+                    "id.email": {
+                        "type": "string"
+                    },
+                    "id.first_name": {
+                        "type": "string"
+                    },
+                    "id.itin": {
+                        "type": "string"
+                    },
+                    "id.last_name": {
+                        "type": "string"
+                    },
+                    "id.middle_name": {
+                        "type": "string"
+                    },
+                    "id.nationality": {
+                        "type": "string"
+                    },
+                    "id.phone_number": {
+                        "type": "string"
+                    },
+                    "id.ssn4": {
+                        "type": "string"
+                    },
+                    "id.ssn9": {
+                        "type": "string"
+                    },
+                    "id.state": {
+                        "type": "string"
+                    },
+                    "id.us_legal_status": {
+                        "type": "string"
+                    },
+                    "id.us_tax_id": {
+                        "type": "string"
+                    },
+                    "id.visa_expiration_date": {
+                        "type": "string"
+                    },
+                    "id.visa_kind": {
+                        "type": "string"
+                    },
+                    "id.zip": {
+                        "type": "string"
+                    },
+                    "investor_profile.annual_income": {
+                        "type": "string"
+                    },
+                    "investor_profile.brokerage_firm_employer": {
+                        "type": "string"
+                    },
+                    "investor_profile.declarations": {
+                        "type": "string"
+                    },
+                    "investor_profile.employer": {
+                        "type": "string"
+                    },
+                    "investor_profile.employment_status": {
+                        "type": "string"
+                    },
+                    "investor_profile.family_member_names": {
+                        "type": "string"
+                    },
+                    "investor_profile.funding_sources": {
+                        "type": "string"
+                    },
+                    "investor_profile.investment_goals": {
+                        "type": "string"
+                    },
+                    "investor_profile.net_worth": {
+                        "type": "string"
+                    },
+                    "investor_profile.occupation": {
+                        "type": "string"
+                    },
+                    "investor_profile.political_organization": {
+                        "type": "string"
+                    },
+                    "investor_profile.risk_tolerance": {
+                        "type": "string"
+                    },
+                    "investor_profile.senior_executive_symbols": {
+                        "type": "string"
+                    }
+                }
+            },
             "NeuroIdentityIdResponse": {
                 "type": "object",
                 "properties": {
@@ -6156,291 +6899,6 @@
                     "skip_confirm",
                     "status",
                     "supported_countries"
-                ]
-            },
-            "RawBusinessDataRequest": {
-                "example": {
-                    "business.name": "Acme Bank",
-                    "business.website": "acmebank.org",
-                    "custom.account_id": "d0af81fc-41c2-46ca-8a8d-797b8e4d3146"
-                },
-                "type": "object",
-                "properties": {
-                    "<key>": {
-                        "type": "string",
-                        "enum": [
-                            "business.name",
-                            "business.dba",
-                            "business.website",
-                            "business.phone_number",
-                            "business.tin",
-                            "business.address_line1",
-                            "business.address_line2",
-                            "business.city",
-                            "business.state",
-                            "business.zip",
-                            "business.country",
-                            "business.corporation_type",
-                            "business.formation_state",
-                            "business.formation_date",
-                            "custom.*"
-                        ]
-                    },
-                    "<value>": {
-                        "type": "object"
-                    }
-                },
-                "required": [
-                    "<key>",
-                    "<value>"
-                ]
-            },
-            "RawUserDataRequest": {
-                "example": {
-                    "id.first_name": "Jane",
-                    "id.last_name": "Doe",
-                    "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58"
-                },
-                "type": "object",
-                "properties": {
-                    "<key>": {
-                        "type": "string",
-                        "enum": [
-                            "id.first_name",
-                            "id.middle_name",
-                            "id.last_name",
-                            "id.dob",
-                            "id.ssn4",
-                            "id.ssn9",
-                            "id.address_line1",
-                            "id.address_line2",
-                            "id.city",
-                            "id.state",
-                            "id.zip",
-                            "id.country",
-                            "id.email",
-                            "id.phone_number",
-                            "id.us_legal_status",
-                            "id.visa_kind",
-                            "id.visa_expiration_date",
-                            "id.nationality",
-                            "id.citizenships",
-                            "id.drivers_license_number",
-                            "id.drivers_license_state",
-                            "id.itin",
-                            "id.us_tax_id",
-                            "custom.*",
-                            "investor_profile.employment_status",
-                            "investor_profile.occupation",
-                            "investor_profile.employer",
-                            "investor_profile.annual_income",
-                            "investor_profile.net_worth",
-                            "investor_profile.investment_goals",
-                            "investor_profile.risk_tolerance",
-                            "investor_profile.declarations",
-                            "investor_profile.brokerage_firm_employer",
-                            "investor_profile.senior_executive_symbols",
-                            "investor_profile.family_member_names",
-                            "investor_profile.political_organization",
-                            "investor_profile.funding_sources",
-                            "document.id_card.front.image",
-                            "document.id_card.front.mime_type",
-                            "document.id_card.back.image",
-                            "document.id_card.back.mime_type",
-                            "document.id_card.selfie.image",
-                            "document.id_card.selfie.mime_type",
-                            "document.id_card.full_name",
-                            "document.id_card.dob",
-                            "document.id_card.gender",
-                            "document.id_card.full_address",
-                            "document.id_card.document_number",
-                            "document.id_card.expires_at",
-                            "document.id_card.issued_at",
-                            "document.id_card.issuing_state",
-                            "document.id_card.issuing_country",
-                            "document.id_card.ref_number",
-                            "document.id_card.nationality",
-                            "document.id_card.curp",
-                            "document.id_card.clave_de_elector",
-                            "document.id_card.classified_document_type",
-                            "document.id_card.curp_validation_response",
-                            "document.drivers_license.front.image",
-                            "document.drivers_license.front.mime_type",
-                            "document.drivers_license.back.image",
-                            "document.drivers_license.back.mime_type",
-                            "document.drivers_license.selfie.image",
-                            "document.drivers_license.selfie.mime_type",
-                            "document.drivers_license.full_name",
-                            "document.drivers_license.dob",
-                            "document.drivers_license.gender",
-                            "document.drivers_license.full_address",
-                            "document.drivers_license.document_number",
-                            "document.drivers_license.expires_at",
-                            "document.drivers_license.issued_at",
-                            "document.drivers_license.issuing_state",
-                            "document.drivers_license.issuing_country",
-                            "document.drivers_license.ref_number",
-                            "document.drivers_license.nationality",
-                            "document.drivers_license.curp",
-                            "document.drivers_license.clave_de_elector",
-                            "document.drivers_license.classified_document_type",
-                            "document.drivers_license.curp_validation_response",
-                            "document.passport.front.image",
-                            "document.passport.front.mime_type",
-                            "document.passport.back.image",
-                            "document.passport.back.mime_type",
-                            "document.passport.selfie.image",
-                            "document.passport.selfie.mime_type",
-                            "document.passport.full_name",
-                            "document.passport.dob",
-                            "document.passport.gender",
-                            "document.passport.full_address",
-                            "document.passport.document_number",
-                            "document.passport.expires_at",
-                            "document.passport.issued_at",
-                            "document.passport.issuing_state",
-                            "document.passport.issuing_country",
-                            "document.passport.ref_number",
-                            "document.passport.nationality",
-                            "document.passport.curp",
-                            "document.passport.clave_de_elector",
-                            "document.passport.classified_document_type",
-                            "document.passport.curp_validation_response",
-                            "document.passport_card.front.image",
-                            "document.passport_card.front.mime_type",
-                            "document.passport_card.back.image",
-                            "document.passport_card.back.mime_type",
-                            "document.passport_card.selfie.image",
-                            "document.passport_card.selfie.mime_type",
-                            "document.passport_card.full_name",
-                            "document.passport_card.dob",
-                            "document.passport_card.gender",
-                            "document.passport_card.full_address",
-                            "document.passport_card.document_number",
-                            "document.passport_card.expires_at",
-                            "document.passport_card.issued_at",
-                            "document.passport_card.issuing_state",
-                            "document.passport_card.issuing_country",
-                            "document.passport_card.ref_number",
-                            "document.passport_card.nationality",
-                            "document.passport_card.curp",
-                            "document.passport_card.clave_de_elector",
-                            "document.passport_card.classified_document_type",
-                            "document.passport_card.curp_validation_response",
-                            "document.permit.front.image",
-                            "document.permit.front.mime_type",
-                            "document.permit.back.image",
-                            "document.permit.back.mime_type",
-                            "document.permit.selfie.image",
-                            "document.permit.selfie.mime_type",
-                            "document.permit.full_name",
-                            "document.permit.dob",
-                            "document.permit.gender",
-                            "document.permit.full_address",
-                            "document.permit.document_number",
-                            "document.permit.expires_at",
-                            "document.permit.issued_at",
-                            "document.permit.issuing_state",
-                            "document.permit.issuing_country",
-                            "document.permit.ref_number",
-                            "document.permit.nationality",
-                            "document.permit.curp",
-                            "document.permit.clave_de_elector",
-                            "document.permit.classified_document_type",
-                            "document.permit.curp_validation_response",
-                            "document.visa.front.image",
-                            "document.visa.front.mime_type",
-                            "document.visa.back.image",
-                            "document.visa.back.mime_type",
-                            "document.visa.selfie.image",
-                            "document.visa.selfie.mime_type",
-                            "document.visa.full_name",
-                            "document.visa.dob",
-                            "document.visa.gender",
-                            "document.visa.full_address",
-                            "document.visa.document_number",
-                            "document.visa.expires_at",
-                            "document.visa.issued_at",
-                            "document.visa.issuing_state",
-                            "document.visa.issuing_country",
-                            "document.visa.ref_number",
-                            "document.visa.nationality",
-                            "document.visa.curp",
-                            "document.visa.clave_de_elector",
-                            "document.visa.classified_document_type",
-                            "document.visa.curp_validation_response",
-                            "document.residence_document.front.image",
-                            "document.residence_document.front.mime_type",
-                            "document.residence_document.back.image",
-                            "document.residence_document.back.mime_type",
-                            "document.residence_document.selfie.image",
-                            "document.residence_document.selfie.mime_type",
-                            "document.residence_document.full_name",
-                            "document.residence_document.dob",
-                            "document.residence_document.gender",
-                            "document.residence_document.full_address",
-                            "document.residence_document.document_number",
-                            "document.residence_document.expires_at",
-                            "document.residence_document.issued_at",
-                            "document.residence_document.issuing_state",
-                            "document.residence_document.issuing_country",
-                            "document.residence_document.ref_number",
-                            "document.residence_document.nationality",
-                            "document.residence_document.curp",
-                            "document.residence_document.clave_de_elector",
-                            "document.residence_document.classified_document_type",
-                            "document.residence_document.curp_validation_response",
-                            "document.voter_identification.front.image",
-                            "document.voter_identification.front.mime_type",
-                            "document.voter_identification.back.image",
-                            "document.voter_identification.back.mime_type",
-                            "document.voter_identification.selfie.image",
-                            "document.voter_identification.selfie.mime_type",
-                            "document.voter_identification.full_name",
-                            "document.voter_identification.dob",
-                            "document.voter_identification.gender",
-                            "document.voter_identification.full_address",
-                            "document.voter_identification.document_number",
-                            "document.voter_identification.expires_at",
-                            "document.voter_identification.issued_at",
-                            "document.voter_identification.issuing_state",
-                            "document.voter_identification.issuing_country",
-                            "document.voter_identification.ref_number",
-                            "document.voter_identification.nationality",
-                            "document.voter_identification.curp",
-                            "document.voter_identification.clave_de_elector",
-                            "document.voter_identification.classified_document_type",
-                            "document.voter_identification.curp_validation_response",
-                            "document.finra_compliance_letter",
-                            "document.proof_of_address.image",
-                            "document.ssn_card.image",
-                            "document.custom.*",
-                            "card.*.number",
-                            "card.*.expiration",
-                            "card.*.cvc",
-                            "card.*.name",
-                            "card.*.billing_address.zip",
-                            "card.*.billing_address.country",
-                            "card.*.expiration_month",
-                            "card.*.expiration_year",
-                            "card.*.number_last4",
-                            "card.*.issuer",
-                            "card.*.fingerprint",
-                            "bank.*.name",
-                            "bank.*.ach_routing_number",
-                            "bank.*.ach_account_number",
-                            "bank.*.ach_account_id",
-                            "bank.*.account_type",
-                            "bank.*.fingerprint"
-                        ]
-                    },
-                    "<value>": {
-                        "type": "object"
-                    }
-                },
-                "required": [
-                    "<key>",
-                    "<value>"
                 ]
             },
             "SdkArgs": {

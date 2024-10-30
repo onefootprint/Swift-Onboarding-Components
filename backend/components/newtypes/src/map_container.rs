@@ -89,6 +89,7 @@ pub mod declare_map_container {
     }
 
     pub use impl_map_apiv2_schema;
+    pub use impl_modern_map_apiv2_schema;
     pub use impl_request_type;
     pub use impl_response_type;
 }

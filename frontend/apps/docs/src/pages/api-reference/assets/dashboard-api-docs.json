@@ -11249,14 +11249,17 @@
                                         "create_org_api_key",
                                         "decrypt_org_api_key",
                                         "update_org_api_key",
-                                        "invite_org_member",
                                         "update_org_member",
                                         "login_org_member",
                                         "remove_org_member",
                                         "create_org",
                                         "update_org_settings",
-                                        "create_org_role",
-                                        "update_org_role"
+                                        "update_org_role",
+                                        "create_playbook",
+                                        "disable_playbook",
+                                        "manually_review_entity",
+                                        "edit_playbook",
+                                        "deactivate_org_role"
                                     ]
                                 },
                                 "id": {
@@ -11340,7 +11343,12 @@
                                         "CreateOrgRole",
                                         "UpdateOrgRole",
                                         "CreateListEntry",
-                                        "DeleteListEntry"
+                                        "DeleteListEntry",
+                                        "CreatePlaybook",
+                                        "DisablePlaybook",
+                                        "ManuallyReviewEntity",
+                                        "EditPlaybook",
+                                        "DeactivateOrgRole"
                                     ]
                                 },
                                 "principal": {
@@ -12904,7 +12912,12 @@
                                         "CreateOrgRole",
                                         "UpdateOrgRole",
                                         "CreateListEntry",
-                                        "DeleteListEntry"
+                                        "DeleteListEntry",
+                                        "CreatePlaybook",
+                                        "DisablePlaybook",
+                                        "ManuallyReviewEntity",
+                                        "EditPlaybook",
+                                        "DeactivateOrgRole"
                                     ]
                                 },
                                 "principal": {
@@ -15732,16 +15745,7 @@
                                     "type": "string"
                                 },
                                 "rule_action": {
-                                    "type": "string",
-                                    "enum": [
-                                        "pass_with_manual_review",
-                                        "manual_review",
-                                        "fail",
-                                        "step_up.identity",
-                                        "step_up.proof_of_address",
-                                        "step_up.identity_proof_of_ssn",
-                                        "step_up.identity_proof_of_ssn_proof_of_address"
-                                    ]
+                                    "type": "string"
                                 },
                                 "rule_expression": {
                                     "type": "array",
@@ -22433,7 +22437,8 @@
                                                     "step_up.identity",
                                                     "step_up.proof_of_address",
                                                     "step_up.identity_proof_of_ssn",
-                                                    "step_up.identity_proof_of_ssn_proof_of_address"
+                                                    "step_up.identity_proof_of_ssn_proof_of_address",
+                                                    "step_up.custom"
                                                 ]
                                             },
                                             "created_at": {
@@ -22454,6 +22459,9 @@
                                             "name": {
                                                 "type": "string"
                                             },
+                                            "rule_action": {
+                                                "type": "string"
+                                            },
                                             "rule_expression": {
                                                 "type": "array",
                                                 "items": {
@@ -22469,6 +22477,7 @@
                                             "created_at",
                                             "is_shadow",
                                             "kind",
+                                            "rule_action",
                                             "rule_expression",
                                             "rule_id"
                                         ]
@@ -22730,16 +22739,7 @@
                                     "type": "string"
                                 },
                                 "rule_action": {
-                                    "type": "string",
-                                    "enum": [
-                                        "pass_with_manual_review",
-                                        "manual_review",
-                                        "fail",
-                                        "step_up.identity",
-                                        "step_up.proof_of_address",
-                                        "step_up.identity_proof_of_ssn",
-                                        "step_up.identity_proof_of_ssn_proof_of_address"
-                                    ]
+                                    "type": "string"
                                 },
                                 "rule_expression": {
                                     "type": "array",
@@ -27389,7 +27389,8 @@
                             "step_up.identity",
                             "step_up.proof_of_address",
                             "step_up.identity_proof_of_ssn",
-                            "step_up.identity_proof_of_ssn_proof_of_address"
+                            "step_up.identity_proof_of_ssn_proof_of_address",
+                            "step_up.custom"
                         ]
                     },
                     "created_at": {
@@ -27410,6 +27411,9 @@
                     "name": {
                         "type": "string"
                     },
+                    "rule_action": {
+                        "type": "string"
+                    },
                     "rule_expression": {
                         "type": "array",
                         "items": {
@@ -27425,6 +27429,7 @@
                     "created_at",
                     "is_shadow",
                     "kind",
+                    "rule_action",
                     "rule_expression",
                     "rule_id"
                 ]
@@ -27446,7 +27451,8 @@
                                         "step_up.identity",
                                         "step_up.proof_of_address",
                                         "step_up.identity_proof_of_ssn",
-                                        "step_up.identity_proof_of_ssn_proof_of_address"
+                                        "step_up.identity_proof_of_ssn_proof_of_address",
+                                        "step_up.custom"
                                     ]
                                 },
                                 "current_status": {
@@ -27471,7 +27477,8 @@
                                         "step_up.identity",
                                         "step_up.proof_of_address",
                                         "step_up.identity_proof_of_ssn",
-                                        "step_up.identity_proof_of_ssn_proof_of_address"
+                                        "step_up.identity_proof_of_ssn_proof_of_address",
+                                        "step_up.custom"
                                     ]
                                 }
                             },
@@ -27523,7 +27530,8 @@
                             "step_up.identity",
                             "step_up.proof_of_address",
                             "step_up.identity_proof_of_ssn",
-                            "step_up.identity_proof_of_ssn_proof_of_address"
+                            "step_up.identity_proof_of_ssn_proof_of_address",
+                            "step_up.custom"
                         ]
                     },
                     "created_at": {
@@ -27531,6 +27539,9 @@
                         "format": "date-time"
                     },
                     "ob_configuration_id": {
+                        "type": "string"
+                    },
+                    "rule_action_triggered": {
                         "type": "string"
                     },
                     "rule_results": {
@@ -27553,7 +27564,8 @@
                                                 "step_up.identity",
                                                 "step_up.proof_of_address",
                                                 "step_up.identity_proof_of_ssn",
-                                                "step_up.identity_proof_of_ssn_proof_of_address"
+                                                "step_up.identity_proof_of_ssn_proof_of_address",
+                                                "step_up.custom"
                                             ]
                                         },
                                         "created_at": {
@@ -27574,6 +27586,9 @@
                                         "name": {
                                             "type": "string"
                                         },
+                                        "rule_action": {
+                                            "type": "string"
+                                        },
                                         "rule_expression": {
                                             "type": "array",
                                             "items": {
@@ -27589,6 +27604,7 @@
                                         "created_at",
                                         "is_shadow",
                                         "kind",
+                                        "rule_action",
                                         "rule_expression",
                                         "rule_id"
                                     ]

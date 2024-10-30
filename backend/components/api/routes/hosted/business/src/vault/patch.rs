@@ -8,8 +8,8 @@ use api_core::auth::user::UserBizWfAuthContext;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::TenantVw;
+use newtypes::put_data_request::ModernRawBusinessDataRequest;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawBusinessDataRequest;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
@@ -27,7 +27,7 @@ use paperclip::actix::{
 pub async fn post_validate(
     state: web::Data<State>,
     user_auth: UserBizWfAuthContext,
-    request: Json<RawBusinessDataRequest>,
+    request: Json<ModernRawBusinessDataRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_biz_workflow_guard(WorkflowGuard::AddData)?;
@@ -59,7 +59,7 @@ pub async fn post_validate(
 #[actix::patch("/hosted/business/vault")]
 pub async fn patch(
     state: web::Data<State>,
-    request: Json<RawBusinessDataRequest>,
+    request: Json<ModernRawBusinessDataRequest>,
     user_auth: UserBizWfAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;

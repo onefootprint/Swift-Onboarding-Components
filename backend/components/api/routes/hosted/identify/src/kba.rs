@@ -10,8 +10,8 @@ use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
+use newtypes::put_data_request::ModernRawUserDataRequest;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ValidateArgs;
@@ -28,7 +28,7 @@ use paperclip::actix::{
 )]
 #[actix::post("/hosted/identify/kba")]
 pub async fn post(
-    request: Json<RawUserDataRequest>,
+    request: Json<ModernRawUserDataRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> ApiResponse<KbaResponse> {
