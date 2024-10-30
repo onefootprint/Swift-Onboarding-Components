@@ -21,7 +21,6 @@ use db::PgConn;
 use feature_flag::BoolFlag;
 use itertools::chain;
 use itertools::Itertools;
-use newtypes::AlpacaKycState;
 use newtypes::AuthEventKind;
 use newtypes::AuthMethodKind;
 use newtypes::AuthorizeFields;
@@ -41,7 +40,6 @@ use newtypes::DocumentUploadSettings;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::KycState;
 use newtypes::LivenessSource;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
@@ -49,7 +47,6 @@ use newtypes::Selfie;
 use newtypes::UsLegalStatus;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowKind;
-use newtypes::WorkflowState;
 use std::str::FromStr;
 
 /// Wrapper type around DecryptUncheckedResult that is guaranteed to have all the IDKs we need for
@@ -178,17 +175,13 @@ pub struct RequirementContext<'a> {
     pub opts: RequirementOpts,
 }
 
-/// Omit the confirm screen for met requirements IF the workflow is already completed or the user is
-/// an alpaca user in step up returning to an incomplete onboarding
+/// Omit the confirm screen for met requirements IF the workflow has already moved on to a state
+/// that doesn't allow data input
 fn omit_confirm_if_necessary(req: OnboardingRequirement, wf: &Workflow) -> Option<OnboardingRequirement> {
     if !req.is_met() {
         return Some(req);
     }
-    let is_stepup = matches!(
-        wf.state,
-        WorkflowState::Kyc(KycState::DocCollection) | WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection)
-    );
-    (wf.completed_at.is_none() && !is_stepup).then_some(req)
+    (wf.state.requires_user_input() && !wf.state.is_step_up()).then_some(req)
 }
 struct RequirementProgress {
     populated_attributes: Vec<CDO>,

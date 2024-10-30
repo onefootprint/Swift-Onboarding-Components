@@ -493,6 +493,23 @@ def test_dont_proceed_on_nonterminal(kyb_sandbox_ob_config, sandbox_tenant):
     assert body["status"] == "in_progress"
 
 
+def test_ignore_confirm_on_awaiting_bo_kyc(kyb_sandbox_ob_config):
+    """
+    Make sure we don't serialize a requirement to show the confirm business data screen if the business
+    workflow has moved into a state that doesn't support data input
+    """
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    bifrost.handle_one_requirement("collect_business_data")
+    bifrost.handle_one_requirement("collect_data")
+    bifrost.handle_one_requirement("liveness")
+    bifrost.handle_one_requirement("process")
+    # Business workflow is now AwaitingBoKyc, we should not serialize even a "met" requirement for
+    # collect_business_data
+    all_reqs = bifrost.get_status()["all_requirements"]
+    assert not any(r["kind"] == "collect_business_data" for r in all_reqs)
+
+
 def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
