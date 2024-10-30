@@ -655,11 +655,7 @@ impl KybStepUpDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
-    type AsyncRes = (
-        Arc<dyn FeatureFlagClient>,
-        VaultDataForRules,
-        HashMap<ListId, ListWithDecryptedEntries>,
-    );
+    type AsyncRes = (VaultDataForRules, HashMap<ListId, ListWithDecryptedEntries>);
 
     #[tracing::instrument(
         "KybDecisioning#OnAction<MakeDecision, KybState>::execute_async_idempotent_actions",
@@ -692,7 +688,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let rule_exprs = rules.iter().map(|r| &r.rule_expression).collect_vec();
         let vault_data_for_rules = VaultDataForRules::decrypt_for_rules(state, vw, &rule_exprs).await?;
         let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
-        Ok((state.ff_client.clone(), vault_data_for_rules, lists_for_rules))
+        Ok((vault_data_for_rules, lists_for_rules))
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
@@ -702,9 +698,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
-        let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
-        let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
+        let (vault_data_for_rules, lists_for_rules) = async_res;
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
@@ -744,7 +738,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
             (RulesOutcome::RulesNotExecuted, None)
         };
 
-        let decision = get_final_rules_outcome(fixture_result, decision);
+        // Note: We unconditionally step up if the rules decision was to step up in sandbox
         if let RulesOutcome::RulesExecuted {
             rule_action: Some(RuleActionConfig::StepUp(step_up_configs)),
             ..

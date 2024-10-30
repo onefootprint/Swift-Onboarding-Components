@@ -497,7 +497,7 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
         fixture_result="pass",
-        kyb_fixture_result="use_rules_outcome",
+        kyb_fixture_result="pass",
         vault_barcode_with_doc=False,
     )
 
@@ -589,9 +589,11 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     assert rsr["rule_action_triggered"]["kind"] == "step_up"
     rule_results = rsr.get("rule_results", [])
     true_rules = [rule for rule in rule_results if rule.get("result")]
-    # TODO: need to filter to only run stepup rules in KybStepupDecisioning then can uncomment these
-    # assert len(true_rules) == 1
-    # assert true_rules[0]['rule']['rule_expression'][0]['field'] == 'beneficial_owner_possible_missing_bo'
+    assert len(true_rules) == 1
+    assert (
+        true_rules[0]["rule"]["rule_expression"][0]["field"]
+        == "beneficial_owner_possible_missing_bo"
+    )
 
     # We uploaded a doc
     doc_uploaded = [i for i in timeline if i["event"]["kind"] == "document_uploaded"]
