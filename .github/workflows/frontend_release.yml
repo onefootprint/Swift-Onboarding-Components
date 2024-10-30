@@ -28,6 +28,14 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
+      - name: Cache turbo build setup
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
       - name: Install pnpm
         uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # ratchet:pnpm/action-setup@v4
         with:
@@ -37,6 +45,7 @@ jobs:
         uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache-dependency-path: ./frontend/pnpm-lock.yaml
           cache: "pnpm"
 
       - name: Install Dependencies
