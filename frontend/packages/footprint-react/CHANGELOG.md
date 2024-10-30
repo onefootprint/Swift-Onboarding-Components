@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.8.1
+
+### Patch Changes
+
+- 4d1feaaea6: fix: copy otp from sms
+
 ## 7.7.3
 
 ### Patch Changes
