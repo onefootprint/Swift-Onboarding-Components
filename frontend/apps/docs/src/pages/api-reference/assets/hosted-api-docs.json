@@ -6479,16 +6479,6 @@
                             "use_rules_outcome"
                         ]
                     },
-                    "kyb_fixture_result": {
-                        "type": "string",
-                        "enum": [
-                            "fail",
-                            "pass",
-                            "manual_review",
-                            "step_up",
-                            "use_rules_outcome"
-                        ]
-                    },
                     "omit_business_creation": {
                         "description": "For newer clients - we will eventually make this the default ????",
                         "type": "boolean"

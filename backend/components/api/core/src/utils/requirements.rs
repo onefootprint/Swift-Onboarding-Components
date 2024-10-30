@@ -416,6 +416,7 @@ fn get_collect_kyb_data_requirement<T>(
         return Ok(None);
     }
 
+    // TODO remove this special `has_linked_bos` logic once we can edit BOs linked via API
     let has_linked_bos = (ctx.business_owners)
         .iter()
         .any(|bo| bo.bo.source == BusinessOwnerSource::Tenant);
@@ -456,7 +457,6 @@ fn get_collect_kyb_data_requirement<T>(
     let req = OnboardingRequirement::CollectBusinessData {
         missing_attributes,
         populated_attributes,
-        has_linked_bos,
         recollect_attributes,
     };
     let req = omit_confirm_if_necessary(req, biz_wf);
