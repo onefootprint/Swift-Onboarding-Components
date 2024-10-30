@@ -64,7 +64,7 @@ struct NewBusinessOwnerRow {
 
 pub struct NewSecondaryBo {
     pub link_id: BoLinkId,
-    pub ownership_stake: i32,
+    pub ownership_stake: Option<i32>,
     pub uuid: Uuid,
 }
 
@@ -99,7 +99,7 @@ impl BusinessOwner {
         bos: Vec<NewSecondaryBo>,
         business_vault_id: &VaultId,
     ) -> DbResult<Vec<Self>> {
-        if bos.iter().any(|bo| !(0..=100).contains(&bo.ownership_stake)) {
+        if (bos.iter()).any(|bo| bo.ownership_stake.is_some_and(|s| !(0..=100).contains(&s))) {
             return ValidationError("Invalid ownership stake").into();
         }
         let rows = bos
@@ -117,7 +117,7 @@ impl BusinessOwner {
                     link_id,
                     created_at: Utc::now(),
                     source: BusinessOwnerSource::Hosted,
-                    ownership_stake: Some(ownership_stake),
+                    ownership_stake,
                     uuid,
                 }
             })

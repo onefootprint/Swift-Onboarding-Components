@@ -247,7 +247,7 @@ impl<Type> WriteableVw<Type> {
             .iter()
             .map(|bo| NewSecondaryBo {
                 link_id: bo.link_id.clone(),
-                ownership_stake: bo.ownership_stake as i32,
+                ownership_stake: Some(bo.ownership_stake as i32),
                 uuid: Uuid::new_v4(),
             })
             .collect_vec();

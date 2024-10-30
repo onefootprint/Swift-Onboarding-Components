@@ -118,7 +118,7 @@ fn test_verify_unique_phones_and_emails(
             } else {
                 BatchRequest::Create {
                     uuid,
-                    ownership_stake: 10,
+                    ownership_stake: Some(10),
                     data,
                 }
             }

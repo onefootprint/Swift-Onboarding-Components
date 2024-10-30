@@ -26,14 +26,7 @@ pub struct HostedBusinessOwner {
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-pub struct CreateHostedBusinessOwnerRequest {
-    pub uuid: Uuid,
-    pub data: RawUserDataRequest,
-    pub ownership_stake: u32,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-pub struct UpdateHostedBusinessOwnerRequest {
+pub struct UpdateOrCreateHostedBusinessOwnerRequest {
     pub uuid: Uuid,
     #[serde(default)]
     pub data: RawUserDataRequest,
@@ -52,7 +45,7 @@ pub struct DeleteHostedBusinessOwnerRequest {
     example = r#"{"op": "create", "uuid": "73b7e274-8080-44d6-b160-86cbc9877a00", "data": {"id.first_name": "John", "id.last_name": "Doe"}, "ownership_stake": 30}"#
 )]
 pub enum BatchHostedBusinessOwnerRequest {
-    Update(UpdateHostedBusinessOwnerRequest),
-    Create(CreateHostedBusinessOwnerRequest),
+    Update(UpdateOrCreateHostedBusinessOwnerRequest),
+    Create(UpdateOrCreateHostedBusinessOwnerRequest),
     Delete(DeleteHostedBusinessOwnerRequest),
 }

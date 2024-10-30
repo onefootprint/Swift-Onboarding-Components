@@ -128,7 +128,7 @@ pub(super) fn validate_collective_bos(
                 uuid,
                 data,
                 ownership_stake,
-            } => (uuid, data, Some(ownership_stake)),
+            } => (uuid, data, ownership_stake.as_ref()),
             BatchRequest::Delete { uuid } => {
                 bo_phones.remove(&uuid);
                 bo_emails.remove(&uuid);
@@ -169,7 +169,7 @@ pub(super) enum BatchRequest {
     },
     Create {
         uuid: Uuid,
-        ownership_stake: u32,
+        ownership_stake: Option<u32>,
         data: DataRequest,
     },
     Delete {
@@ -238,7 +238,7 @@ impl BatchRequest {
                 let link_id = BoLinkId::generate(BusinessOwnerKind::Secondary);
                 let bo = NewSecondaryBo {
                     link_id: link_id.clone(),
-                    ownership_stake: ownership_stake as i32,
+                    ownership_stake: ownership_stake.map(|s| s as i32),
                     uuid,
                 };
                 BusinessOwner::bulk_create_secondary(conn, vec![bo], &bvw.vault.id)?;
