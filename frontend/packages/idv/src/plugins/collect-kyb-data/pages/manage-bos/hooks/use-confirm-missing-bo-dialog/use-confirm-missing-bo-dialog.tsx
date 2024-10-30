@@ -51,7 +51,9 @@ export const useConfirmMissingBoDialog = ({ authToken }: { authToken: string }) 
     );
   };
 
-  const ConfirmMissingBoDialog = () => <Dialog isOpen={isOpen} onClose={handleClose} onSubmit={handleSubmit} />;
+  const ConfirmMissingBoDialog = (
+    <Dialog isOpen={isOpen} onClose={handleClose} onSubmit={handleSubmit} isLoading={mutation.isPending} />
+  );
 
   return { showConfirmationModal, ConfirmMissingBoDialog };
 };

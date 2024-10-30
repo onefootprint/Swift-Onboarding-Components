@@ -22,7 +22,6 @@ const ConfirmMissingBoDialog = ({ isLoading, isOpen, onClose, onSubmit }: Confir
 
   const onSubmitFormData = ({ note }: { note: string }) => {
     onSubmit(note);
-    reset();
   };
 
   const handleOnClose = () => {
@@ -39,7 +38,7 @@ const ConfirmMissingBoDialog = ({ isLoading, isOpen, onClose, onSubmit }: Confir
       onClose={isLoading ? noop : handleOnClose}
       secondaryButton={{
         label: t('missing-bos-confirmation.secondary-cta'),
-        loading: isLoading,
+        disabled: isLoading,
         onClick: handleOnClose,
       }}
       primaryButton={{

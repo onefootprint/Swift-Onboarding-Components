@@ -95,7 +95,7 @@ const ManageBos = () => {
           defaultFormValues={getDefaultFormValues(bosQuery.data, bootstrapBusinessData, bootstrapUserData)}
           isLive={!!config?.isLive}
         />
-        <ConfirmMissingBoDialog />
+        {ConfirmMissingBoDialog}
       </Stack>
     );
   }
