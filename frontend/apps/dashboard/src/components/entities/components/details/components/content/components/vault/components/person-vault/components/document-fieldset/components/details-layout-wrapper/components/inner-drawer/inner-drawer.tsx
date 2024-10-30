@@ -1,6 +1,6 @@
 import { IcoChevronRight16 } from '@onefootprint/icons';
+import { Box, Stack } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
-import { Box, Stack } from '../../..';
 
 type InnerDrawerProps = {
   children: React.ReactNode;

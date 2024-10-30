@@ -8,6 +8,7 @@ import { Dialog } from '@onefootprint/ui';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
 import type { UploadWithDocument } from '../../types';
 import Decrypt from '../decrypt';
+import DetailsLayoutWrapper from '../details-layout-wrapper';
 import DocumentImage from '../document-image';
 
 export type UploadDetailsProps = {
@@ -32,7 +33,9 @@ const UploadDetails = ({ isDecryptable, open, title, upload, vault, onDecrypt }:
       {isEncrypted ? (
         <Decrypt isDecryptable={isDecryptable} onClick={() => onDecrypt(document.kind)} />
       ) : (
-        <DocumentImage base64Data={vaultValue} documentName={title} isSuccess={upload.failureReasons.length === 0} />
+        <DetailsLayoutWrapper>
+          <DocumentImage base64Data={vaultValue} documentName={title} isSuccess={upload.failureReasons.length === 0} />
+        </DetailsLayoutWrapper>
       )}
     </Dialog>
   );

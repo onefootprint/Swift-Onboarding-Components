@@ -9,6 +9,7 @@ import { Dialog, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
 import Decrypt from '../decrypt/decrypt';
+import DetailsLayoutWrapper from '../details-layout-wrapper';
 import DocumentImage from '../document-image';
 import UploadTitleCard from './components/upload-title-card/upload-title-card';
 
@@ -40,22 +41,24 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
       {isEncrypted ? (
         <Decrypt isDecryptable={isDecryptable} onClick={() => onDecrypt(document.kind)} />
       ) : (
-        <Stack direction="column" align="center" gap={8} width="90%">
-          {uploads.map(upload => {
-            const vaultIndex = `${upload.identifier}:${upload.version}` as DataIdentifier;
-            const vaultValue = vault[vaultIndex] as string;
-            return (
-              <Stack direction="column" align="center" gap={4} width="100%">
-                <UploadTitleCard upload={upload} />
-                <DocumentImage
-                  base64Data={vaultValue}
-                  documentName={t('license-and-selfie')}
-                  isSuccess={upload.failureReasons.length === 0}
-                />
-              </Stack>
-            );
-          })}
-        </Stack>
+        <DetailsLayoutWrapper>
+          <Stack direction="column" align="center" gap={8} width="90%">
+            {uploads.map(upload => {
+              const vaultIndex = `${upload.identifier}:${upload.version}` as DataIdentifier;
+              const vaultValue = vault[vaultIndex] as string;
+              return (
+                <Stack direction="column" align="center" gap={4} width="100%">
+                  <UploadTitleCard upload={upload} />
+                  <DocumentImage
+                    base64Data={vaultValue}
+                    documentName={t('license-and-selfie')}
+                    isSuccess={upload.failureReasons.length === 0}
+                  />
+                </Stack>
+              );
+            })}
+          </Stack>
+        </DetailsLayoutWrapper>
       )}
     </Dialog>
   );

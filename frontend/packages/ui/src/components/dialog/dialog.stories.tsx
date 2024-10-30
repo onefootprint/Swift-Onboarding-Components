@@ -6,8 +6,6 @@ import Stack from '../stack';
 import Text from '../text';
 import type { DialogProps } from './dialog';
 import Dialog from './dialog';
-import InnerContainerLayout from './inner-container-layout';
-import InnerDrawer from './inner-drawer';
 
 export default {
   component: Dialog,
@@ -171,33 +169,4 @@ OverflowingContent.args = {
       ))}
     </Stack>
   ),
-};
-
-const InnerContainerLayoutWrapper = () => {
-  const [drawerOpen, setDrawerOpen] = useState(true);
-
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  return (
-    <InnerContainerLayout open={drawerOpen} onOpenChange={setDrawerOpen}>
-      <InnerDrawer open={drawerOpen} onClose={handleDrawerToggle} onOpenChange={setDrawerOpen}>
-        <Text variant="body-3">Drawer Content</Text>
-      </InnerDrawer>
-      <Stack direction="column" gap={4}>
-        <Text variant="body-3">Main Content</Text>
-      </Stack>
-    </InnerContainerLayout>
-  );
-};
-
-export const InnerContainerLayoutStory = Template.bind({});
-InnerContainerLayoutStory.args = {
-  ...Base.args,
-  title: 'Inner Container Layout',
-  size: 'full-screen',
-  noPadding: true,
-  noScroll: true,
-  children: <InnerContainerLayoutWrapper />,
 };
