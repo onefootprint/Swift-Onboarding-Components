@@ -542,7 +542,8 @@
     "start-all": "Decrypt all",
     "decrypt": "Decrypt",
     "not-allowed": "You're not allowed to decrypt data",
-    "empty-not-allowed": "{{field}} not provided during onboarding",
+    "vault-empty-not-allowed": "No data provided during onboarding",
+    "field-empty-not-allowed": "{{field}} not provided during onboarding",
     "status": {
       "upload_failed": "Upload failed",
       "upload_incomplete": "Upload pending",

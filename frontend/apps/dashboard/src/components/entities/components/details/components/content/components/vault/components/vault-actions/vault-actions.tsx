@@ -34,6 +34,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   const isIdle = decryptControls.isIdle;
   const isInProgress = decryptControls.inProgress;
   const canDecrypt = hasSomeDiDecryptable(entity);
+  const isVaultEmpty = Object.keys(entityVault || {}).length === 0;
 
   const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
     if (e.key === 'Escape') {
@@ -56,7 +57,10 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
     return (
       <Stack gap={3} align="center">
         {!isViewingHistorical && (
-          <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
+          <Tooltip
+            disabled={canDecrypt}
+            text={isVaultEmpty ? t('decrypt.vault-empty-not-allowed') : t('decrypt.not-allowed')}
+          >
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
