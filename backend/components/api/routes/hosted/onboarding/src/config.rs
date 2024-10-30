@@ -12,10 +12,15 @@ use db::models::rule_instance::RuleInstance;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::DbResult;
 use db::PgConn;
+use itertools::Itertools;
 use macros::route_alias;
+use newtypes::DocumentRequestConfig;
+use newtypes::FootprintReasonCode;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
-use newtypes::RuleAction;
+use newtypes::RuleActionConfig;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
 use newtypes::TenantId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -69,8 +74,8 @@ pub fn get(
             let client_config = TenantClientConfig::get(conn, &tenant_id, is_live)?;
 
             // Allow users to choose `Stepup` as a sandbox outcome
-            let sandbox_stepup_outcome_enabled = if !is_live && matches!(obc_kind, ObConfigurationKind::Kyc) {
-                is_sandbox_stepup_outcome_enabled(conn, &tenant_id, &obc_id)?
+            let sandbox_stepup_outcome_enabled = if !is_live {
+                is_sandbox_stepup_outcome_enabled(conn, &tenant_id, &obc_id, obc_kind)?
             } else {
                 false
             };
@@ -98,10 +103,48 @@ fn is_sandbox_stepup_outcome_enabled(
     conn: &mut PgConn,
     tenant_id: &TenantId,
     obc_id: &ObConfigurationId,
+    ob_config_kind: ObConfigurationKind,
 ) -> DbResult<bool> {
-    let res = RuleInstance::list(conn, tenant_id, false, obc_id, IncludeRules::All)?
-        .iter()
-        .any(|ri| matches!(ri.action, RuleAction::StepUp(_)));
+    let step_up_condition_filter = |input: &(Vec<DocumentRequestConfig>, RuleExpression)| -> bool {
+        let (configs, rule_expression) = input;
+        match ob_config_kind {
+            // Always allow any KYC stepups
+            ObConfigurationKind::Kyc => true,
+            // Only allow this option for KYB if there's a specific risk signal and action combination
+            // As of Halloween 2024, KYB is not set up to do stepups in other situations
+            ObConfigurationKind::Kyb => {
+                configs.iter().all(|c| c.is_custom())
+                    && rule_expression.0.iter().all(|cond| {
+                        matches!(
+                            cond,
+                            RuleExpressionCondition::RiskSignal {
+                                field: FootprintReasonCode::BeneficialOwnerPossibleMissingBo,
+                                ..
+                            }
+                        )
+                    })
+            }
+            _ => false,
+        }
+    };
+    let step_up_rules = RuleInstance::list(conn, tenant_id, false, obc_id, IncludeRules::All)?
+        .into_iter()
+        .filter_map(|ri| {
+            if let RuleActionConfig::StepUp(configs) = ri.rule_action {
+                Some((configs, ri.rule_expression))
+            } else {
+                None
+            }
+        })
+        .collect_vec();
+
+    let res = match ob_config_kind {
+        // Allow any step up KYC rules
+        ObConfigurationKind::Kyc => step_up_rules.iter().any(step_up_condition_filter),
+        // Require all rules to match the filtering
+        ObConfigurationKind::Kyb => step_up_rules.iter().all(step_up_condition_filter),
+        _ => false,
+    };
 
     Ok(res)
 }

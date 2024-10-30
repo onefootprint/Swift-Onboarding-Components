@@ -497,7 +497,7 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
         fixture_result="pass",
-        kyb_fixture_result="use_rules_outcome",
+        kyb_fixture_result="step_up",
         vault_barcode_with_doc=False,
     )
 
