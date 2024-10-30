@@ -7,7 +7,6 @@ use db::models::vault_data::VaultData as DbVaultData;
 use db::HasLifetime;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
-use newtypes::ScopedVaultId;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
