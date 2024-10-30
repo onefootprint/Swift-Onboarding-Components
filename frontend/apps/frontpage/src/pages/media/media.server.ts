@@ -5,6 +5,17 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '16',
+      url: 'https://www.businesswire.com/news/home/20241030764010/en/Money2020-USA-Unveils-Seven-Incredible-Fintech-Startups-And-Industry-Disruptors',
+      website: 'Businesswire',
+      imageUrl: '/media/business-wire-1.png',
+      imageAlt: 'Money2020 Logo',
+      publishedAt: 'October 30, 2024',
+      title: 'Footprint selected by Money2020 as one of top 7 fintechs at 2024 conference',
+      excerpt:
+        'Money20/20 USA highlights Footprint and other pioneering fintechs poised to transform the future of finance.',
+    },
+    {
       id: '15',
       url: 'https://www.businessinsider.com/49-most-promising-fintech-startups-according-top-vc-investors-2024',
       website: 'Business Insider',

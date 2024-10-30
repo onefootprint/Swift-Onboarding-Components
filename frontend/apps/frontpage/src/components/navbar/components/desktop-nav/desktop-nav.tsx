@@ -14,7 +14,8 @@ import DesktopNavLink from './components/desktop-nav-link';
 import DesktopNavMenu from './components/desktop-nav-menu';
 import LogoCopyAssets from './components/logo-copy-assets';
 
-const ARTICLE_URL = '/blog/fraud-indemnification';
+const ARTICLE_URL =
+  'https://www.businesswire.com/news/home/20241030764010/en/Money2020-USA-Unveils-Seven-Incredible-Fintech-Startups-And-Industry-Disruptors?utm_source=footprint';
 
 type DesktopNavProps = {
   entries: NavEntry[];
