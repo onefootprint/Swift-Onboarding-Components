@@ -1,10 +1,7 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import cx from 'classnames';
-import identity from 'lodash/identity';
 import type React from 'react';
-import { type InputHTMLAttributes, useEffect, useState } from 'react';
+import { type InputHTMLAttributes, useEffect, useReducer, useRef } from 'react';
 
-import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
 import { getNextValue, isNumber } from './pin-input.utils';
 
@@ -14,88 +11,93 @@ export type PinInputProps = {
 } & InputHTMLAttributes<HTMLInputElement>;
 
 const PinInput = ({ containerClassName, onComplete, disabled, className, autoFocus, ...props }: PinInputProps) => {
-  const [enteredPin, setEnteredPin] = useState<string[]>([]);
-  const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
+  const [_, forceUpdate] = useReducer(x => x + 1, 0);
+  const input0 = useRef<HTMLInputElement>(null);
+  const input1 = useRef<HTMLInputElement>(null);
+  const input2 = useRef<HTMLInputElement>(null);
+  const input3 = useRef<HTMLInputElement>(null);
+  const input4 = useRef<HTMLInputElement>(null);
+  const input5 = useRef<HTMLInputElement>(null);
+  const refs = [input0, input1, input2, input3, input4, input5];
+
+  const handleCompletePinPaste = (values: string) => {
+    const lastInput = refs[INPUT_FIELDS_COUNT - 1];
+    const arrayOfValues = Array.from(values);
+
+    /** Update the inputs with the copied values */
+    arrayOfValues.forEach((value, idx) => {
+      if (refs[idx].current) {
+        refs[idx].current.value = value;
+      }
+    });
+    forceUpdate();
+
+    setTimeout(() => {
+      lastInput.current?.focus();
+      lastInput.current?.select();
+    }, 0);
+
+    return onComplete(values);
+  };
+
+  const focusAdjacentInput = (pinIndex: number, shouldFocusNext: boolean) => {
+    const otherInput = shouldFocusNext ? refs[pinIndex + 1] : refs[pinIndex - 1];
+    if (otherInput?.current) {
+      setTimeout(() => {
+        otherInput.current?.focus();
+        otherInput.current?.select();
+      }, 0);
+    }
+  };
+
+  const handleChange = (pinIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const values = event.target.value;
+    const input = refs[pinIndex];
+    if (!input.current) return;
+    if (!isNumber(values) && values !== '') return;
+
+    const isCompletePinPaste = values.length === INPUT_FIELDS_COUNT;
+    if (isCompletePinPaste) {
+      return handleCompletePinPaste(values);
+    }
+
+    input.current.value = getNextValue(input.current.value, values);
+    forceUpdate();
+
+    const combinedPinValues = refs.map(ref => ref.current?.value || '').join('');
+    if (combinedPinValues.length === INPUT_FIELDS_COUNT) {
+      return onComplete(combinedPinValues);
+    }
+
+    focusAdjacentInput(pinIndex, isNumber(values));
+  };
 
   useEffect(() => {
-    const firstPinInput = pinInputs.get(0);
-    if (firstPinInput && !disabled && autoFocus) firstPinInput.focus();
-  }, [autoFocus, disabled, pinInputs]);
-
-  const updatePin = (nextValue: string, pinIndex: number) => {
-    const nextValues = [...enteredPin];
-    nextValues[pinIndex] = nextValue;
-    setEnteredPin(nextValues);
-    return nextValues;
-  };
-
-  const moveToNextOrComplete = (pin: string, index: number) => {
-    const isLastIndex = index === INPUT_FIELDS_COUNT - 1;
-    const areAllTheFieldsFilled = pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
-
-    if (isLastIndex && areAllTheFieldsFilled) {
-      onComplete(pin);
-    } else {
-      const nextInput = pinInputs.next(index);
-      if (nextInput) {
-        requestAnimationFrame(() => {
-          nextInput.focus();
-          nextInput.select();
-        });
-      }
+    const firstPinInput = input0.current;
+    if (firstPinInput && !disabled && autoFocus) {
+      firstPinInput.focus();
+      firstPinInput.select();
     }
-  };
-
-  const handleChange = (pinIndex: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    const eventValue = event.target.value;
-    const currentValue = enteredPin[pinIndex];
-    const nextValue = getNextValue(currentValue, eventValue);
-    if (nextValue === '') {
-      updatePin('', pinIndex);
-    }
-    const wasPinPastedOrAutoCompleted = eventValue.length > 2;
-    if (wasPinPastedOrAutoCompleted) {
-      if (isNumber(eventValue)) {
-        const nextPin = Array.from(eventValue).filter((_, index) => index < INPUT_FIELDS_COUNT);
-        setEnteredPin(nextPin);
-        moveToNextOrComplete(nextPin.join(''), nextPin.length - 1);
-      }
-    } else if (isNumber(nextValue)) {
-      const nextPin = updatePin(nextValue, pinIndex);
-      moveToNextOrComplete(nextPin.join(''), pinIndex);
-    }
-  };
-
-  const handleKeyDown = (pinIndex: number) => (event: React.KeyboardEvent) => {
-    const element = event.target as HTMLInputElement;
-    if (event.key === 'Backspace' && element.value === '') {
-      const previousInput = pinInputs.previous(pinIndex);
-      if (previousInput) {
-        updatePin('', pinIndex - 1);
-        previousInput.focus();
-      }
-    }
-  };
+  }, [autoFocus, disabled, input0]);
 
   return (
     <div className={cx('fp-pin-input-container', containerClassName)}>
       {pins.map((_pinPosition, pinIndex) => {
-        const key = pinIndex;
-        const isIndexDisabled = pinIndex > enteredPin.length;
+        const key = `${_pinPosition}-${pinIndex}`;
+        const isIndexDisabled = pinIndex > 0 && !refs[pinIndex - 1]?.current?.value;
 
         return (
           <input
-            autoComplete="one-time-code"
+            {...(pinIndex === 0 && { autoComplete: 'one-time-code' })}
             inputMode="numeric"
             disabled={disabled || isIndexDisabled}
             key={key}
-            onChange={handleChange(pinIndex)}
-            onKeyDown={handleKeyDown(pinIndex)}
+            onChange={event => handleChange(pinIndex, event)}
             placeholder=""
-            ref={pinInputs.refs[pinIndex]}
+            ref={refs[pinIndex]}
             required
             type="tel"
-            value={enteredPin[pinIndex] || ''}
+            value={refs[pinIndex]?.current?.value || ''}
             className={cx('fp-input fp-pin-input', className)}
             {...props}
           />

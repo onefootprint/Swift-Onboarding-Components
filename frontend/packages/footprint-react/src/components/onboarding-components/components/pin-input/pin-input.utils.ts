@@ -3,14 +3,19 @@ export const isNumber = (value: string) => {
   return NUMERIC_REGEX.test(value);
 };
 
-export const getNextValue = (value: string, eventValue: string) => {
-  let nextValue = eventValue;
-  if (value?.length > 0) {
-    if (value[0] === eventValue.charAt(0)) {
-      nextValue = eventValue.charAt(1);
-    } else if (value[0] === eventValue.charAt(1)) {
-      nextValue = eventValue.charAt(0);
+export const getNextValue = (currentValue: string, eventValues: string): string => {
+  if (eventValues.length === 1) {
+    return eventValues;
+  }
+
+  let output = eventValues;
+  if (currentValue?.length > 0) {
+    if (currentValue[0] === eventValues.charAt(0)) {
+      output = eventValues.charAt(1);
+    } else if (currentValue[0] === eventValues.charAt(1)) {
+      output = eventValues.charAt(0);
     }
   }
-  return nextValue;
+
+  return output;
 };
