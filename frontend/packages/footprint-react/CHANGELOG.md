@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.8.3
+
+### Patch Changes
+
+- 46ac384094: Fix race condition after doing verify
+
 ## 7.8.2
 
 ### Patch Changes
