@@ -374,6 +374,24 @@
         "status": {
           "success": "Success",
           "failed": "Failed"
+        },
+        "ocr": {
+          "title": "Extracted document data (OCR)",
+          "labels": {
+            "full-name": "Full name",
+            "dob": "Date of birth",
+            "gender": "Gender",
+            "full-address": "Address",
+            "document-number": "Document number",
+            "issued-at": "Issued at",
+            "expires-at": "Expires at",
+            "issuing-country": "Issuing country",
+            "issuing-state": "Issuing state",
+            "ref-number": "Ref number",
+            "document-type": "Classified document type",
+            "nationality": "Nationality",
+            "curp": "CURP"
+          }
         }
       }
     },

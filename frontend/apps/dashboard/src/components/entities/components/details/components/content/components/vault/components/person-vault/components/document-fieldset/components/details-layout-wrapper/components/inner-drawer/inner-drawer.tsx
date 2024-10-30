@@ -21,7 +21,7 @@ const InnerDrawer = ({ children, open, onClose }: InnerDrawerProps) => {
           <IcoChevronRight16 />
         </Stack>
       </ChevronButtonContainer>
-      {children}
+      <Box display={open ? 'block' : 'none'}>{children}</Box>
     </Container>
   );
 };
