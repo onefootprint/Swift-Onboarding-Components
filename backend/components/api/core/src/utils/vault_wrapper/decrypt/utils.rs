@@ -9,6 +9,7 @@ use api_errors::AssertionError;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::DbError;
+use itertools::chain;
 use itertools::iproduct;
 use itertools::Itertools;
 use newtypes::BusinessDataKind as BDK;
@@ -89,7 +90,7 @@ impl TenantVw<Business> {
         let vid = self.vault().id.clone();
         let tid = self.scoped_vault.tenant_id.clone();
         let seqno = self.seqno;
-        let (linked_bos, vws) = state
+        let (linked_bos, bo_vws) = state
             .db_query(move |conn| -> FpResult<_> {
                 let linked_bos = BusinessOwner::list_owners(conn, &vid, &tid)?;
                 let vaults = linked_bos.iter().flat_map(|(_, x)| x.clone()).collect_vec();
@@ -99,7 +100,49 @@ impl TenantVw<Business> {
             })
             .await?;
 
-        let decrypt_futs = vws.into_iter().map(|(sv_id, vw)| async move {
+        let bo_data_dis = iproduct!(linked_bos.iter(), BusinessOwnerInfo::USER_DIS)
+            .map(|((bo, _), di)| BDK::bo_data(bo.link_id.clone(), di.clone()).into());
+        let bo_stake_dis = linked_bos
+            .iter()
+            .map(|(bo, _)| DI::Business(BDK::BeneficialOwnerStake(bo.link_id.clone())));
+        let biz_dis = chain!(bo_data_dis, bo_stake_dis).collect_vec();
+        let biz_data = self.decrypt_unchecked(&state.enclave_client, &biz_dis).await?;
+
+        let vaulted_ownership_stakes = biz_data
+            .results
+            .iter()
+            .filter(|(decrypt_op, _)| {
+                matches!(decrypt_op.identifier, DI::Business(BDK::BeneficialOwnerStake(_)))
+            })
+            .map(|(decrypt_op, pii)| {
+                let di = decrypt_op.identifier.clone();
+                let ownership_stake: i32 = pii
+                    .leak() // Ownership stake is not sensitive data.
+                    .parse()
+                    .map_err(|_| AssertionError("failed to parse vaulted ownership stake as i32"))?;
+
+                Ok((di, ownership_stake))
+            })
+            .collect::<FpResult<HashMap<_, _>>>()?;
+
+        let linked_bos = linked_bos
+            .into_iter()
+            .map(|(mut bo, sv_v)| {
+                let di = DI::Business(BDK::BeneficialOwnerStake(bo.link_id.clone()));
+
+                // Migration:
+                // Coalesce the new vaulted stake with the stake read from the database. Favor the
+                // vaulted value if it exists. We have disabled deleting vaulted ownership_stake so
+                // a null value in the vault always means the correct value is in the DB.
+                let vaulted_stake = vaulted_ownership_stakes.get(&di).copied();
+                let db_stake = bo.ownership_stake;
+                bo.ownership_stake = vaulted_stake.or(db_stake);
+
+                Ok((bo, sv_v))
+            })
+            .collect::<FpResult<Vec<_>>>()?;
+
+        let decrypt_futs = bo_vws.into_iter().map(|(sv_id, vw)| async move {
             let decrypted = vw
                 .decrypt_unchecked(&state.enclave_client, BusinessOwnerInfo::USER_DIS)
                 .await?;
@@ -113,12 +156,6 @@ impl TenantVw<Business> {
             .await
             .into_iter()
             .collect::<FpResult<HashMap<_, _>>>()?;
-
-        let dis = iproduct!(linked_bos.iter(), BusinessOwnerInfo::USER_DIS)
-            .map(|((bo, _), di)| BDK::bo_data(bo.link_id.clone(), di.clone()).into())
-            .collect_vec();
-        let biz_data = self.decrypt_unchecked(&state.enclave_client, &dis).await?;
-
 
         // For each beneficial owner, zip with the vault data either from the user vault or the business
         // vault

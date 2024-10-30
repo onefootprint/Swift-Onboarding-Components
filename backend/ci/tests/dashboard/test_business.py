@@ -170,8 +170,7 @@ def test_update_ownership_stake(sandbox_tenant, kyb_sandbox_ob_config):
         == "The beneficial owners' ownership stakes must not sum to more than 100%"
     )
 
-    # TODO: replace ownership_stake read paths with the vault DI.
-    # body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
-    # assert len(body) == 2
-    # assert body[0]["ownership_stake"] == 80
-    # assert body[1]["ownership_stake"] == 40
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert len(body) == 2
+    assert body[0]["ownership_stake"] == 80
+    assert body[1]["ownership_stake"] == 40
