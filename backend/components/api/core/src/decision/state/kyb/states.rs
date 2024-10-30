@@ -325,7 +325,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wf_id))
             .await?;
         let fixture_result =
-            decision::utils::get_kyb_fixture_result(state.ff_client.clone(), &v, &wf, &self.t_id)?;
+            decision::utils::get_fixture_result(state.ff_client.clone(), &v, &wf, &self.t_id)?;
         if fixture_result.is_none() {
             // TODO: later will refactor so we instead construct the BusinessData from the vault here, then
             // make the CreateBusiness request to middesk and then in the on_commit txn save the
@@ -504,7 +504,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
     ) -> FpResult<KybState> {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let fixture_result = decision::utils::get_kyb_fixture_result(ff_client, &v, &wf, &self.t_id)?;
+        let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
         let doc_req_configs = DocumentRequest::get_all(conn, &self.wf_id)?
             .into_iter()
@@ -704,7 +704,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
     ) -> FpResult<KybState> {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let fixture_result = decision::utils::get_kyb_fixture_result(ff_client, &v, &wf, &self.t_id)?;
+        let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;

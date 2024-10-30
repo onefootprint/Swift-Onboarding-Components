@@ -68,26 +68,6 @@ pub fn get_fixture_result(
     }
 }
 
-// There's slightly different logic for KYB workflows
-#[tracing::instrument(skip_all)]
-pub fn get_kyb_fixture_result(
-    ff_client: Arc<dyn FeatureFlagClient>, // Pass in ff_client directly to make it easier to test
-    vault: &Vault,
-    workflow: &Workflow,
-    tenant_id: &TenantId,
-) -> FpResult<Option<WorkflowFixtureResult>> {
-    let res = get_fixture_result(ff_client, vault, workflow, tenant_id)?.map(|fr| match fr {
-        // A hack to enable actually running the rules to step up in sandbox since there's no sandbox
-        // selector for UseRulesOutcome
-        // There are guards on when the FE can set this as the fixture that makes it such that it's
-        // only in the cases that are relevant for this WF kind
-        WorkflowFixtureResult::StepUp => WorkflowFixtureResult::UseRulesOutcome,
-        r => r,
-    });
-
-    Ok(res)
-}
-
 /// Determines whether to use the output of the rules engine or a fixture output.
 /// Creates a fixture RulesOutcome for the provided fixture_result if any, otherwise returns the
 /// actual outcome of running rules.
