@@ -203,11 +203,15 @@ pub async fn progress_business_workflow(
     let biz_wf = state
         .db_query(move |conn| Workflow::get(conn, &biz_wf.id))
         .await?;
+
+    // We are waiting for a business document to be uploaded
+    if !matches!(biz_wf.state, WorkflowState::Kyb(KybState::AwaitingBoKyc)) {
+        return Ok(());
+    }
     let kyb_features = KybBoFeatures::build(state, &biz_wf.id).await?;
     // Check if we're still waiting for BOs OR for the business to finish uploading a required document
     // before sending out links
-    let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results()
-        && !matches!(biz_wf.state, WorkflowState::Kyb(KybState::DocCollection));
+    let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
     if is_waiting_for_bo_kyc {
         send_missing_secondary_bo_links(state, su, &biz_wf, kyb_features, tenant).await?;
