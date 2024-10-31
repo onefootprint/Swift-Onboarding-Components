@@ -14,7 +14,6 @@ export const entityFixture: Entity = {
   kind: EntityKind.business,
   data: [
     { ...defaultAttribute, identifier: BusinessDI.addressLine1, isDecryptable: true, value: null },
-    { ...defaultAttribute, identifier: BusinessDI.beneficialOwners, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.city, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.country, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.name, isDecryptable: true, value: 'Acme Inc.' },
@@ -23,6 +22,13 @@ export const entityFixture: Entity = {
     { ...defaultAttribute, identifier: BusinessDI.tin, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.website, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.zip, isDecryptable: true, value: null },
+    {
+      ...defaultAttribute,
+      identifier: BusinessDI.beneficialOwnerExplanationMessage,
+      isDecryptable: true,
+      value:
+        "The other 5% is split among 10 small angel investors, so I didn't think it was relevant to add them all here.",
+    },
   ],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',

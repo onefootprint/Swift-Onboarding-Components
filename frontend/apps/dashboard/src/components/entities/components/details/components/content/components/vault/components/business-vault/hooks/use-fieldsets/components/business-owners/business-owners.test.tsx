@@ -43,5 +43,17 @@ describe('<BusinessOwners />', () => {
       const title = await screen.findByRole('list', { name: 'List of business owners' });
       expect(title).toBeInTheDocument();
     });
+
+    describe('when the sum of bos stake is not 100%', () => {
+      it('should show message explanining the reason', async () => {
+        renderBusinessOwners({});
+        await screen.findByRole('list', { name: 'List of business owners' });
+
+        const explanation = screen.getByText(
+          "The other 5% is split among 10 small angel investors, so I didn't think it was relevant to add them all here.",
+        );
+        expect(explanation).toBeInTheDocument();
+      });
+    });
   });
 });

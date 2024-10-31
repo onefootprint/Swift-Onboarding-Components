@@ -10,6 +10,10 @@ export type BusinessOwnersProps = {
 
 const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
   const { isPending, error, data } = useBusinessOwners(entity.id);
+  const explanationMessage = entity.data.find(
+    ({ identifier }) => identifier === 'business.beneficial_owner_explanation_message',
+  )?.value as string | undefined;
+
   if (isPending) {
     return <Loading />;
   }
@@ -17,7 +21,7 @@ const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
     return <ErrorComponent error={error} />;
   }
   if (data) {
-    return <Content businessOwners={data} />;
+    return <Content businessOwners={data} explanationMessage={explanationMessage} />;
   }
   return null;
 };

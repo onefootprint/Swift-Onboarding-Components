@@ -1,3 +1,4 @@
+import { IcoInfo16 } from '@onefootprint/icons';
 import type { BusinessOwner } from '@onefootprint/types';
 import { Badge, Grid, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
@@ -6,9 +7,10 @@ import StatusBadge from 'src/components/status-badge';
 
 export type ContentProps = {
   businessOwners: BusinessOwner[];
+  explanationMessage?: string;
 };
 
-const BusinessOwnersField = ({ businessOwners }: ContentProps) => {
+const BusinessOwnersField = ({ businessOwners, explanationMessage }: ContentProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('business-details', { keyPrefix: 'vault.bos' });
 
@@ -47,7 +49,7 @@ const BusinessOwnersField = ({ businessOwners }: ContentProps) => {
           </Stack>
         ))}
       </Grid.Container>
-      {/* <OwnershipExplanation explanation="The other 5% is split among 10 small angel investors, so I didn't think it was relevant to add them all here." /> */}
+      {explanationMessage ? <OwnershipExplanation value={explanationMessage} /> : null}
     </Stack>
   );
 };
@@ -67,29 +69,29 @@ const ViewProfileLink = ({ href }: { href: string }) => {
   );
 };
 
-// const OwnershipExplanation = ({ explanation }: { explanation: string }) => {
-//   const { t } = useTranslation('business-details', { keyPrefix: 'vault.bos.stake-explanation' });
+const OwnershipExplanation = ({ value }: { value: string }) => {
+  const { t } = useTranslation('business-details', { keyPrefix: 'vault.bos.stake-explanation' });
 
-//   return (
-//     <Stack
-//       backgroundColor="primary"
-//       borderColor="tertiary"
-//       borderRadius="default"
-//       borderStyle="solid"
-//       borderWidth={1}
-//       direction="column"
-//       gap={3}
-//       padding={5}
-//     >
-//       <Stack gap={2}>
-//         <IcoInfo16 />
-//         <Text variant="label-3">{t('title')}</Text>
-//       </Stack>
-//       <Text variant="body-3" color="secondary">
-//         {explanation}
-//       </Text>
-//     </Stack>
-//   );
-// };
+  return (
+    <Stack
+      backgroundColor="primary"
+      borderColor="tertiary"
+      borderRadius="default"
+      borderStyle="solid"
+      borderWidth={1}
+      direction="column"
+      gap={3}
+      padding={5}
+    >
+      <Stack gap={2} alignItems="center">
+        <IcoInfo16 />
+        <Text variant="label-3">{t('title')}</Text>
+      </Stack>
+      <Text variant="body-3" color="secondary">
+        {value}
+      </Text>
+    </Stack>
+  );
+};
 
 export default BusinessOwnersField;
