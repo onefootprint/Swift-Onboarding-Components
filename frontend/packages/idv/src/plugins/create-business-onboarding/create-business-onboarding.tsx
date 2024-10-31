@@ -4,15 +4,19 @@ import type { CreateBusinessOnboardingRequirement, OverallOutcome } from '@onefo
 import { Box, Shimmer, Stack } from '@onefootprint/ui';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import type { BootstrapBusinessData, BootstrapUserData } from '../../types';
 import type { CommonIdvContext } from '../../utils/state-machine';
 import BusinessSelector from './components/business-selector';
 import NewBusinessIntroduction from './components/new-business-introduction';
 import type { SharedState } from './create-business-onboarding.types';
+import useVaultBootstrapData from './hooks/use-vault-bootstrap-data';
 
 type CreateBusinessOnboardingProps = {
   context: {
-    requirement: CreateBusinessOnboardingRequirement;
+    bootstrapBusinessData: BootstrapBusinessData;
+    bootstrapUserData: BootstrapUserData;
     overallOutcome?: OverallOutcome;
+    requirement: CreateBusinessOnboardingRequirement;
   };
   idvContext: CommonIdvContext;
   onDone: () => void;
@@ -24,8 +28,17 @@ const CreateBusinessOnboarding = ({ idvContext, context, onDone, onError }: Crea
   const {
     requirement: { requiresBusinessSelection },
     overallOutcome: kybFixtureResult,
+    bootstrapUserData,
+    bootstrapBusinessData,
   } = context;
-  const sharedState = { authToken, kybFixtureResult, onDone, onError };
+  const sharedState = {
+    authToken,
+    kybFixtureResult,
+    onDone,
+    bootstrapUserData,
+    bootstrapBusinessData,
+    onError,
+  };
 
   if (requiresBusinessSelection) {
     return <BusinessSelectionContent state={sharedState} />;
@@ -78,27 +91,33 @@ const BusinessSelectionContent = ({
   return null;
 };
 
-const NoBusinessesFlow = ({ state: { authToken, kybFixtureResult, onDone, onError } }: { state: SharedState }) => {
-  const mutation = useMutation({
+const NoBusinessesFlow = ({
+  state: { authToken, kybFixtureResult, bootstrapBusinessData, bootstrapUserData, onDone, onError },
+}: { state: SharedState }) => {
+  const businessMutation = useMutation({
     ...postHostedBusinessOnboardingMutation({ headers: { 'X-Fp-Authorization': authToken } }),
     onError,
   });
+  const vaultMutation = useVaultBootstrapData({ authToken });
 
-  useEffect(() => {
-    mutation.mutate({ body: { kybFixtureResult, useLegacyInheritLogic: false } });
-  }, []);
+  const handleDone = async () => {
+    await businessMutation.mutateAsync({ body: { kybFixtureResult, useLegacyInheritLogic: false } });
+    await vaultMutation.mutateAsync({ bootstrapBusinessData, bootstrapUserData });
+    onDone();
+  };
 
-  return <NewBusinessIntroduction isBusy={mutation.isPending} onDone={onDone} />;
+  return <NewBusinessIntroduction isBusy={businessMutation.isPending || vaultMutation.isPending} onDone={handleDone} />;
 };
 
 const BusinessSelectionFlow = ({
   businesses,
-  state: { authToken, kybFixtureResult, onDone, onError },
+  state: { authToken, kybFixtureResult, bootstrapBusinessData, bootstrapUserData, onDone, onError },
 }: { businesses: HostedBusiness[]; state: SharedState }) => {
   const businessOnboardingMutation = useMutation({
     ...postHostedBusinessOnboardingMutation({ headers: { 'X-Fp-Authorization': authToken } }),
     onError,
   });
+  const vaultMutation = useVaultBootstrapData({ authToken });
   const [shouldShowIntroduction, setShowIntroduction] = useState(() => businesses.length === 0);
 
   const handleNewBusiness = () => {
@@ -117,8 +136,13 @@ const BusinessSelectionFlow = ({
     );
   };
 
+  const handleStartNewBusiness = async () => {
+    await vaultMutation.mutateAsync({ bootstrapBusinessData, bootstrapUserData });
+    onDone();
+  };
+
   return shouldShowIntroduction ? (
-    <NewBusinessIntroduction onDone={onDone} />
+    <NewBusinessIntroduction isBusy={vaultMutation.isPending} onDone={handleStartNewBusiness} />
   ) : (
     <BusinessSelector
       businesses={businesses}

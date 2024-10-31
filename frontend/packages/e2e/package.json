@@ -8,12 +8,12 @@
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe",
     "install:playwright": "npx playwright install",
-    "test:e2e:debug": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#debug\"",
-    "test:e2e:generate": "npx playwright codegen http://localhost:3002/e2e?ob_key=ob_test_yHlPBcaJ6lnxwkkD1YLStx&locale=es-MX",
+    "test:e2e:debug": "E2E_ACME_SECRET_API_KEY_DEV=sk_test_uD1EOsnwUDgmSsOt1mnLrGVxgDjF9ZJZ3c E2E_SECRET_API_KEY_DEV=sk_test_uD1EOsnwUDgmSsOt1mnLrGVxgDjF9ZJZ3c E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#debug\"",
+    "test:e2e:generate": "npx playwright codegen http://localhost:3002/e2e?ob_key=pb_test_93aTD4UecayaQyKKRjLbIH&locale=es-MX",
     "test:e2e:real": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#real\"",
     "test:e2e:show-report": "npx playwright show-report",
     "test:e2e:trace": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --workers 16 --reporter=html --trace on --retries=0 -g \"#ci\"",
-    "test:e2e:ui": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --ui"
+    "test:e2e:ui": "E2E_ACME_SECRET_API_KEY_DEV=sk_test_uD1EOsnwUDgmSsOt1mnLrGVxgDjF9ZJZ3c E2E_SECRET_API_KEY_DEV=sk_test_uD1EOsnwUDgmSsOt1mnLrGVxgDjF9ZJZ3c E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --ui"
   },
   "keywords": [],
   "author": "",

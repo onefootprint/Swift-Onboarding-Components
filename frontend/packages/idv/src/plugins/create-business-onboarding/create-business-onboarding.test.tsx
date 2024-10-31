@@ -2,7 +2,13 @@ import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-uti
 import { OnboardingRequirementKind, OverallOutcome } from '@onefootprint/types';
 import { Layout } from '../../components/';
 import CreateBusinessOnboarding from './create-business-onboarding';
-import { withBusinessOnboarding, withBusinesses, withNoBusinesses } from './create-business-onboarding.test.config';
+import {
+  withBusinessOnboarding,
+  withBusinessOwners,
+  withBusinessUpdate,
+  withBusinesses,
+  withNoBusinesses,
+} from './create-business-onboarding.test.config';
 
 describe('<CreateBusinessOnboarding />', () => {
   beforeEach(() => {
@@ -18,6 +24,8 @@ describe('<CreateBusinessOnboarding />', () => {
         <Layout>
           <CreateBusinessOnboarding
             context={{
+              bootstrapBusinessData: {},
+              bootstrapUserData: {},
               requirement: {
                 kind: OnboardingRequirementKind.createBusinessOnboarding,
                 requiresBusinessSelection: true,
@@ -97,6 +105,99 @@ describe('<CreateBusinessOnboarding />', () => {
             expect(onDone).toHaveBeenCalled();
           });
         });
+      });
+    });
+  });
+
+  describe('bootstrap data', () => {
+    const renderCreateBusinessOnboarding = ({
+      onDone = jest.fn(),
+      onError = jest.fn(),
+    }: { onDone?: () => void; onError?: () => void } = {}) => {
+      return customRender(
+        <Layout>
+          <CreateBusinessOnboarding
+            context={{
+              bootstrapBusinessData: {
+                'business.name': {
+                  value: 'Acme',
+                  isBootstrap: true,
+                },
+              },
+              bootstrapUserData: {},
+              requirement: {
+                kind: OnboardingRequirementKind.createBusinessOnboarding,
+                requiresBusinessSelection: true,
+              },
+              overallOutcome: OverallOutcome.success,
+            }}
+            idvContext={{
+              device: {
+                hasSupportForWebauthn: true,
+                browser: 'Chrome',
+                osName: 'Mac OS',
+                type: 'unknown',
+                initialCameraPermissionState: 'granted',
+              },
+              authToken: 'utok_h',
+              isInIframe: true,
+            }}
+            onDone={onDone}
+            onError={onError}
+          />
+        </Layout>,
+      );
+    };
+
+    it('should bootstrap data when there are no business associated to the user', async () => {
+      withNoBusinesses();
+      withBusinessUpdate();
+      withBusinessOwners();
+
+      const onDone = jest.fn();
+      renderCreateBusinessOnboarding({ onDone });
+
+      const continueBtn = await screen.findByRole('button', { name: 'Continue' });
+      await userEvent.click(continueBtn);
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+
+    it('should bootstrap data when there are businesses associated, but the user clicks on add new', async () => {
+      withBusinesses();
+      withBusinessUpdate();
+      withBusinessOwners();
+
+      const onDone = jest.fn();
+      renderCreateBusinessOnboarding({ onDone });
+
+      const btn = await screen.findByRole('button', { name: 'Add & verify a new business' });
+      await userEvent.click(btn);
+
+      const introTitle = await screen.findByText("Let's get to know your business!", { exact: false });
+      expect(introTitle).toBeInTheDocument();
+
+      const continueBtn = await screen.findByRole('button', { name: 'Continue' });
+      await userEvent.click(continueBtn);
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+
+    it('should discard bootstrap data when user selects a business', async () => {
+      withBusinesses();
+
+      const onDone = jest.fn();
+      renderCreateBusinessOnboarding({ onDone });
+
+      const business = await screen.findByText('Acme Bank');
+      await userEvent.click(business);
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
       });
     });
   });

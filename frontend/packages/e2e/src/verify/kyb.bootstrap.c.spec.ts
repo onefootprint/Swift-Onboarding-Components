@@ -21,9 +21,6 @@ const businessState = 'CA';
 const businessZip = '94117';
 const businessCountry = 'US';
 
-const idFirstName = 'Andrew';
-const idLastName = 'Anderson';
-
 const businessSecondaryOwnersFirstName = 'Bob';
 const businessSecondaryOwnersLastName = 'Bobson';
 
@@ -36,14 +33,7 @@ const userData = encodeURIComponent(
     'business.state': businessState,
     'business.zip': businessZip,
     'business.country': businessCountry,
-
-    // 'id.email': 'sandbox@onefootprint.com',
-    // 'id.phone_number': '+15555550100',
-    // 'id.first_name': idFirstName,
-    // 'id.last_name': idLastName,
-
     'business.primary_owner_stake': 51,
-
     'business.secondary_owners': [
       {
         first_name: businessSecondaryOwnersFirstName,
@@ -101,22 +91,18 @@ test('KYB bootstrapping only business.primary_owner_stake and business.secondary
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  const whoAreBOsH2 = frame.getByText('Add beneficial owners').first();
-  await whoAreBOsH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
-
-  await frame.locator('input[name="bos.0.firstName"]').first().fill(idFirstName);
-  await frame.locator('input[name="bos.0.lastName"]').first().fill(idLastName);
-
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
 
   await expect(frame.getByText(businessName).first()).toBeAttached();
 
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill('12-7777777');
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
-  await expect(frame.getByText(businessTin).first()).toBeAttached();
+  await expect(frame.getByText('12-7777777').first()).toBeAttached();
 
   await expect(frame.getByText(businessAddressLine1).first()).toBeAttached();
   await expect(frame.getByText(businessCity).first()).toBeAttached();
@@ -125,17 +111,9 @@ test('KYB bootstrapping only business.primary_owner_stake and business.secondary
   await expect(frame.getByText(businessCountry).first()).toBeAttached();
   await expect(frame.getByText('51%').first()).toBeAttached();
 
-  await expect(frame.getByText(idFirstName).first()).toBeAttached();
-  await expect(frame.getByText(idLastName).first()).toBeAttached();
   await expect(frame.getByText(businessSecondaryOwnersFirstName).first()).toBeAttached();
   await expect(frame.getByText(businessSecondaryOwnersLastName).first()).toBeAttached();
   await expect(frame.getByText('piip@onefootprint.com').first()).toBeAttached();
   await expect(frame.getByText('+15555550100').first()).toBeAttached();
   await expect(frame.getByText('49%').first()).toBeAttached();
-
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await expect(frame.getByText(idFirstName).first()).toBeAttached();
-  await expect(frame.getByText(idLastName).first()).toBeAttached();
 });

@@ -23,4 +23,8 @@ type BusinessBootstrapOnlyProps = {
   [BootstrapOnlyBusinessSecondaryOwnersKey]?: DIMetadata<BeneficialOwner[]>;
   [BootstrapOnlyBusinessPrimaryOwnerStake]?: DIMetadata<number>;
 };
+
+// TODO: Clean up this
+export type BootstrapUserData = UserData;
+
 export type BootstrapBusinessData = Omit<BusinessData, BootstrapIgnoredBusinessDI> & BusinessBootstrapOnlyProps;

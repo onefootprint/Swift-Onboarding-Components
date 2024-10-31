@@ -80,24 +80,25 @@ test('KYB bootstrapping id.xxx, business.primary_owner_stake and business.second
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
+  // For now, we will show the BOs screen even when they are bootstrapped.
+  // Once we support editing on the confirm screen, we should just jump straight to the confirm screen.
   const letsKYB = frame.getByText("Let's get to know your business!").first();
   await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
   await clickOnContinue(frame);
   await page.waitForLoadState();
-
-  // For now, we will show the BOs screen even when they are bootstrapped.
-  // Once we support editing on the confirm screen, we should just jump straight to the confirm screen.
-  const addBosH2 = frame.getByText('Add beneficial owners').first();
-  await addBosH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
-  await clickOnContinue(frame);
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 
   await expect(frame.getByText(businessName).first()).toBeAttached();
 
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill('12-7777777');
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
-  await expect(frame.getByText(businessTin).first()).toBeAttached();
+  await expect(frame.getByText('12-7777777').first()).toBeAttached();
 
   await expect(frame.getByText(businessAddressLine1).first()).toBeAttached();
   await expect(frame.getByText(businessCity).first()).toBeAttached();
@@ -117,6 +118,6 @@ test('KYB bootstrapping id.xxx, business.primary_owner_stake and business.second
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await expect(frame.getByText(idFirstName).first()).toBeAttached();
-  await expect(frame.getByText(idLastName).first()).toBeAttached();
+  expect(await frame.getByLabel('First name').first().inputValue()).toBe(idFirstName);
+  expect(await frame.getByLabel('Last name').first().inputValue()).toBe(idLastName);
 });

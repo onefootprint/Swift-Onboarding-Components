@@ -23,6 +23,7 @@ import CheckRequirements from '../check-requirements';
 import Process from '../process';
 import StartOnboarding from '../start-onboarding';
 import { filterBusinessData, filterUserData } from './utils/get-kyc-user-data';
+import validateBootstrapData from './utils/validate-bootstrap-data';
 
 type RouterProps = { onDone: () => void };
 
@@ -78,6 +79,8 @@ const Router = ({ onDone }: RouterProps) => {
       <CreateBusinessOnboarding
         idvContext={idvContext}
         context={{
+          bootstrapBusinessData: validateBootstrapData({ bootstrapData: bootstrapBusinessData, config }),
+          bootstrapUserData: validateBootstrapData({ bootstrapData: bootstrapUserData, config }),
           requirement: createBusinessOnboarding,
           overallOutcome,
         }}
@@ -91,7 +94,7 @@ const Router = ({ onDone }: RouterProps) => {
       <CollectKybData
         idvContext={idvContext}
         context={{
-          bootstrapBusinessData,
+          bootstrapBusinessData: {},
           bootstrapUserData,
           kybRequirement: kyb,
           kycRequirement: kyc,

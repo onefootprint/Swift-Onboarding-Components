@@ -124,9 +124,6 @@ test('KYB pbtok_ session with id.xxx and business.xxx #ci', async ({ page, isMob
 
   await expect(frame.getByText('Business name').first()).toBeAttached();
 
-  await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
-  await expect(frame.getByText('12-3456789').first()).toBeAttached();
-
   await expect(frame.getByText('123 Main St, Ap 201').first()).toBeAttached();
   await expect(frame.getByText('San Francisco, CA, 94105, US').first()).toBeAttached();
   await expect(frame.getByText('51%').first()).toBeAttached();

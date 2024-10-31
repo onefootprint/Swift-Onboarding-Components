@@ -98,8 +98,13 @@ test('KYB bootstrapping only id.xxxx and business.secondary_owners #ci', async (
 
   await expect(frame.getByText(businessName).first()).toBeAttached();
 
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill('12-7777777');
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
-  await expect(frame.getByText(businessTin).first()).toBeAttached();
+  await expect(frame.getByText('12-7777777').first()).toBeAttached();
 
   await expect(frame.getByText(businessAddressLine1).first()).toBeAttached();
   await expect(frame.getByText(businessCity).first()).toBeAttached();
@@ -119,6 +124,6 @@ test('KYB bootstrapping only id.xxxx and business.secondary_owners #ci', async (
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await expect(frame.getByText(idFirstName).first()).toBeAttached();
-  await expect(frame.getByText(idLastName).first()).toBeAttached();
+  expect(await frame.getByLabel('First name').first().inputValue()).toBe(idFirstName);
+  expect(await frame.getByLabel('Last name').first().inputValue()).toBe(idLastName);
 });
