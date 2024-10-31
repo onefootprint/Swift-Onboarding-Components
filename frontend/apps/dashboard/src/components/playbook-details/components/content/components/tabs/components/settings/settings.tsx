@@ -97,21 +97,20 @@ const Settings = ({ playbook }: PasskeysProps) => {
           </DescriptionContainer>
         </Stack>
       )}
-      {playbook.kind === OnboardingConfigKind.kyb ||
-        (playbook.kind === OnboardingConfigKind.kyc && (
-          <Stack direction="column">
-            <Toggle
-              label={t('skip-confirm.title')}
-              checked={localState.skipConfirm}
-              onChange={handleToggle('skipConfirm')}
-            />
-            <DescriptionContainer>
-              <Text variant="body-2" color="tertiary">
-                {t('skip-confirm.description')}
-              </Text>
-            </DescriptionContainer>
-          </Stack>
-        ))}
+      {(playbook.kind === OnboardingConfigKind.kyb || playbook.kind === OnboardingConfigKind.kyc) && (
+        <Stack direction="column">
+          <Toggle
+            label={t('skip-confirm.title')}
+            checked={localState.skipConfirm}
+            onChange={handleToggle('skipConfirm')}
+          />
+          <DescriptionContainer>
+            <Text variant="body-2" color="tertiary">
+              {t('skip-confirm.description')}
+            </Text>
+          </DescriptionContainer>
+        </Stack>
+      )}
     </Stack>
   );
 };
