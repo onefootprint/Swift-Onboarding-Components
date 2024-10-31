@@ -374,13 +374,42 @@
           "success": "Success",
           "failed": "Failed"
         },
+        "side": {
+          "front": "Front ID",
+          "back": "Back ID",
+          "selfie": "Selfie"
+        },
+        "latest": "(Latest {{side}})",
         "table-of-contents": {
-          "label": "{{side}} ⋅ {{status}}",
-          "side": {
-            "front": "Front ID",
-            "back": "Back ID",
-            "selfie": "Selfie"
-          }
+          "label": "{{side}} ⋅ {{status}}"
+        },
+        "failure-reasons": {
+          "doc-type-mismatch": "Document type didn't match.",
+          "unknown-document-type": "We couldn't classify this document.",
+          "unsupported-document-type": "The uploaded document type is not supported.",
+          "wrong-document-side": "Wrong side of the document.",
+          "wrong-one-sided-document": "Incorrect document type detected.",
+          "document-not-readable": "The document could not be read.",
+          "document-glare": "The document's picture has image glare.",
+          "document-sharpness": "The document image is blurry.",
+          "id-type-not-acceptable": "Invalid document type detected.",
+          "unable-to-align-document": "One or more corners of the document are not within the borders of the image.",
+          "unknown-country-code": "We couldn't detect the issuer country from the document.",
+          "country-code-mismatch": "The issuer country didn't match.",
+          "selfie-face-not-found": "We could not detect a face in the selfie.",
+          "selfie-low-confidence": "We could not verify the selfie.",
+          "selfie-too-dark": "The image was too dark.",
+          "selfie-glare": "The selfie had too much glare.",
+          "selfie-has-lenses": "We detected glasses in the selfie.",
+          "selfie-has-face-mask": "We detected a face mask in the selfie.",
+          "selfie-blurry": "The selfie was too blurry.",
+          "selfie-image-size-unsupported": "The selfie image was too small.",
+          "selfie-image-orientation-incorrect": "The selfie image has the wrong orientation.",
+          "selfie-bad-image-compression": "The selfie image has the incorrect image compression.",
+          "drivers-license-permit-not-allowed": "Driver's license permits are not allowed.",
+          "unknown-error": "An error occurred.",
+          "face-not-found": "We could not detect a face in the document provided.",
+          "military-id-not-allowed": "We cannot accept Military IDs per federal law."
         },
         "ocr": {
           "title": "Extracted document data (OCR)",

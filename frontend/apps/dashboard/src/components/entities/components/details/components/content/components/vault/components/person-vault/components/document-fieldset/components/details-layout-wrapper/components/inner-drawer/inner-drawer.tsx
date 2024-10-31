@@ -52,6 +52,7 @@ ${({ theme }) => css`
     align-items: center;
     justify-content: center;
     background-color: ${theme.backgroundColor.primary};
+    z-index: ${theme.zIndex.drawer};
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};

@@ -1,8 +1,9 @@
-import { IcoWarning16 } from '@onefootprint/icons';
-import type { DocumentUpload } from '@onefootprint/types';
-import { Stack, Text } from '@onefootprint/ui';
+import { IcoInfo16 } from '@onefootprint/icons';
+import type { DocumentUpload, IdDocImageProcessingError } from '@onefootprint/types';
+import { Stack, Text, Tooltip } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import useFailureReasonText from './hooks';
 
 export type UploadTitleCardProps = {
   upload: DocumentUpload;
@@ -10,7 +11,8 @@ export type UploadTitleCardProps = {
 
 const UploadTitleCard = ({ upload: { timestamp, failureReasons } }: UploadTitleCardProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset.documents.details' });
-  const isSuccess = failureReasons.length === 0;
+  const failureReasonT = useFailureReasonText();
+  const isSuccess = !failureReasons || failureReasons.length === 0;
 
   return (
     <Stack
@@ -32,10 +34,14 @@ const UploadTitleCard = ({ upload: { timestamp, failureReasons } }: UploadTitleC
       <Text tag="span" variant="label-3">
         ⋅
       </Text>
-      {!isSuccess && <IcoWarning16 color="error" />}
       <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
         {isSuccess ? t('status.success') : t('status.failed')}
       </Text>
+      {!isSuccess && (
+        <Tooltip text={failureReasonT(failureReasons[0] as IdDocImageProcessingError)}>
+          <IcoInfo16 color="tertiary" />
+        </Tooltip>
+      )}
     </Stack>
   );
 };
