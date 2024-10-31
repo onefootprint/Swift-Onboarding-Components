@@ -1,4 +1,6 @@
-import { AccessEventKind, IdDI } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
+
+import { AccessEventKind } from '@onefootprint/types';
 
 export const oneFieldFixture = {
   kind: AccessEventKind.DecryptUserData,

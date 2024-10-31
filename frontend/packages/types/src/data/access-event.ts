@@ -20,11 +20,81 @@ export enum AccessEventKind {
   DeactivateOrgRole = 'deactivate_org_role',
 }
 
-export type AccessEvent = {
+type AccessEventDetailWrapper<T> = {
+  kind: AccessEventKind;
+  data: T;
+};
+
+export type CreateOrgRoleDetail = AccessEventDetailWrapper<{
+  scopes: string[];
+  tenant_role_id: string;
+}>;
+
+export type UpdateUserDataDetail = AccessEventDetailWrapper<{}>;
+
+export type DeleteUserDataDetail = AccessEventDetailWrapper<{}>;
+
+export type DecryptUserDataDetail = AccessEventDetailWrapper<{
+  fpId: string;
+  reason: string;
+  decryptedFields: string[];
+}>;
+
+export type CreateUserAnnotationDetail = AccessEventDetailWrapper<{}>;
+
+export type CreateOrgApiKeyDetail = AccessEventDetailWrapper<{}>;
+
+export type DecryptOrgApiKeyDetail = AccessEventDetailWrapper<{}>;
+
+export type UpdateOrgApiKeyDetail = AccessEventDetailWrapper<{}>;
+
+export type InviteOrgMemberDetail = AccessEventDetailWrapper<{
+  email: string;
+  tenant_role_name: string;
+  tenant_role_id: string;
+  first_name: string;
+  last_name: string;
+  scopes: string[];
+}>;
+
+export type UpdateOrgMemberDetail = AccessEventDetailWrapper<{}>;
+
+export type RemoveOrgMemberDetail = AccessEventDetailWrapper<{}>;
+
+export type CreatePlaybookDetail = AccessEventDetailWrapper<{}>;
+
+export type DisablePlaybookDetail = AccessEventDetailWrapper<{}>;
+
+export type EditPlaybookDetail = AccessEventDetailWrapper<{}>;
+
+export type ManuallyReviewedUserDetail = AccessEventDetailWrapper<{}>;
+
+export type DeactivateOrgRoleDetail = AccessEventDetailWrapper<{}>;
+
+export type AccessEventDetailMap = {
+  [AccessEventKind.CreateOrgRole]: CreateOrgRoleDetail;
+  [AccessEventKind.UpdateUserData]: UpdateUserDataDetail;
+  [AccessEventKind.DeleteUserData]: DeleteUserDataDetail;
+  [AccessEventKind.DecryptUserData]: DecryptUserDataDetail;
+  [AccessEventKind.CreateUserAnnotation]: CreateUserAnnotationDetail;
+  [AccessEventKind.CreateOrgApiKey]: CreateOrgApiKeyDetail;
+  [AccessEventKind.DecryptOrgApiKey]: DecryptOrgApiKeyDetail;
+  [AccessEventKind.UpdateOrgApiKey]: UpdateOrgApiKeyDetail;
+  [AccessEventKind.InviteOrgMember]: InviteOrgMemberDetail;
+  [AccessEventKind.UpdateOrgMember]: UpdateOrgMemberDetail;
+  [AccessEventKind.RemoveOrgMember]: RemoveOrgMemberDetail;
+  [AccessEventKind.CreatePlaybook]: CreatePlaybookDetail;
+  [AccessEventKind.DisablePlaybook]: DisablePlaybookDetail;
+  [AccessEventKind.EditPlaybook]: EditPlaybookDetail;
+  [AccessEventKind.ManuallyReviewedUser]: ManuallyReviewedUserDetail;
+  [AccessEventKind.DeactivateOrgRole]: DeactivateOrgRoleDetail;
+};
+
+export type AccessEvent<T extends AccessEventKind = AccessEventKind> = {
   id: string;
   timestamp: string;
   tenantId: string;
-  name: AccessEventKind;
+  name: T;
   principal: {
     kind: string;
     id?: string;
@@ -32,14 +102,7 @@ export type AccessEvent = {
     member?: string;
   };
   insightEvent?: InsightEvent;
-  detail: {
-    kind: AccessEventKind;
-    data: {
-      fpId: string;
-      reason: string;
-      decryptedFields: string[];
-    };
-  };
+  detail: AccessEventDetailMap[T];
 };
 
 export type TransformedAccessEvent = {

@@ -1,4 +1,4 @@
-import type { AccessEvent } from '@onefootprint/types';
+import type { AccessEvent, DecryptUserDataDetail } from '@onefootprint/types';
 import { Box, CodeInline, Grid, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
@@ -14,7 +14,8 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
     keyPrefix: 'body',
   });
   const { insightEvent } = accessEvent;
-  const { fpId, reason } = accessEvent.detail.data;
+  const { data } = accessEvent.detail as DecryptUserDataDetail;
+  const { fpId, reason } = data;
 
   return (
     <Stack direction="column" gap={9}>

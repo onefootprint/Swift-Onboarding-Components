@@ -1,16 +1,17 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import type { AccessEvent } from '@onefootprint/types';
+import type { DecryptUserDataDetail } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type DecryptionReasonProps = {
-  detail: AccessEvent['detail'];
+  detail: DecryptUserDataDetail;
 };
 
 const DecryptionReason = ({ detail }: DecryptionReasonProps) => {
   const { t } = useTranslation('security-logs', {
     keyPrefix: 'events.body.decryption-reason',
   });
+  const { reason } = detail.data;
 
   return (
     <Stack
@@ -29,7 +30,7 @@ const DecryptionReason = ({ detail }: DecryptionReasonProps) => {
         <IcoInfo16 />
         <Text variant="label-3">{t('decryption-reason')}</Text>
       </Stack>
-      <Text variant="body-3">{detail.data.reason}</Text>
+      <Text variant="body-3">{reason}</Text>
     </Stack>
   );
 };

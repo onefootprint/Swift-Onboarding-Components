@@ -1,17 +1,15 @@
 import { IcoArrowTopRight16 } from '@onefootprint/icons';
-import type { AccessEvent } from '@onefootprint/types';
+import type { DecryptUserDataDetail } from '@onefootprint/types';
 import { LinkButton, Text, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import FirstFieldsText from './components/first-fields';
 
-type DecryptUserDataProps = { detail: AccessEvent['detail'] };
+type DecryptUserDataProps = { detail: DecryptUserDataDetail };
 
 const DecryptUserData = ({ detail }: DecryptUserDataProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.decryption-event' });
   const { t: allT } = useTranslation('common');
-  const {
-    data: { decryptedFields },
-  } = detail;
+  const { decryptedFields, fpId } = detail.data;
 
   if (decryptedFields.length > 3) {
     const numRemainingFields = decryptedFields.length - 3;
@@ -34,7 +32,7 @@ const DecryptUserData = ({ detail }: DecryptUserDataProps) => {
         <Text variant="body-3" tag="span" minWidth="fit-content">
           {t('of-a')}
         </Text>
-        <LinkButton href={`/security-logs/${detail.data.fpId}`} iconComponent={IcoArrowTopRight16}>
+        <LinkButton href={`/security-logs/${fpId}`} iconComponent={IcoArrowTopRight16}>
           {t('user')}
         </LinkButton>
       </>
@@ -50,7 +48,7 @@ const DecryptUserData = ({ detail }: DecryptUserDataProps) => {
       <Text variant="body-3" tag="span">
         {t('of-a')}
       </Text>
-      <LinkButton href={`/security-logs/${detail.data.fpId}`} iconComponent={IcoArrowTopRight16}>
+      <LinkButton href={`/security-logs/${fpId}`} iconComponent={IcoArrowTopRight16}>
         {t('user')}
       </LinkButton>
     </>

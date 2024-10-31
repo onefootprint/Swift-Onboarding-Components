@@ -1,6 +1,13 @@
 export {
   type AccessEvent,
   AccessEventKind,
+  type CreateOrgRoleDetail,
+  type UpdateUserDataDetail,
+  type DeleteUserDataDetail,
+  type DecryptUserDataDetail,
+  type CreateUserAnnotationDetail,
+  type CreateOrgApiKeyDetail,
+  type DecryptOrgApiKeyDetail,
 } from './access-event';
 export type { AccessLog } from './access-log';
 export { AccessLogKind } from './access-log';
