@@ -910,7 +910,6 @@ export const getPostOnboardingRequest = (props: Partial<PostOnboardingRequest>) 
     {
       fixtureResult: 'fail',
       kybFixtureResult: 'manual_review',
-      omitBusinessCreation: true,
     },
     props,
   ) as PostOnboardingRequest;

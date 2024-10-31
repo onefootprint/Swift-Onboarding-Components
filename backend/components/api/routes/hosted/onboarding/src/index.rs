@@ -49,15 +49,7 @@ pub async fn post(
     request: OptionalJson<PostOnboardingRequest>,
 ) -> ApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let PostOnboardingRequest {
-        fixture_result,
-        // Modern clients will send `omit_business_creation` and will create business workflows
-        // separately.
-        // But we still need to fetch the existing bwfl for the secondary BO flow
-        // TODO: once all clients are updated, we can remove all business logic in this API. Should
-        // probably rename it to `POST /hosted/user/onboarding` after that
-        omit_business_creation,
-    } = request.into_inner().unwrap_or_default();
+    let PostOnboardingRequest { fixture_result } = request.into_inner().unwrap_or_default();
 
     let scoped_user_id = (user_auth.su_id.clone()).ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user.id.clone();
@@ -72,8 +64,6 @@ pub async fn post(
             Ok((su, ob_config, tenant, vw))
         })
         .await?;
-
-    tracing::info!(%omit_business_creation, obc_kind=%ob_config.kind, "omit_business_creation");
 
     let prefill_data = vw
         .get_data_to_prefill(&state, &ob_config, PrefillKind::Onboarding(&scoped_user))

@@ -15,10 +15,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
     method: 'POST',
     url: '/hosted/onboarding',
     headers,
-    data: {
-      fixtureResult,
-      omitBusinessCreation: true,
-    },
+    data: { fixtureResult },
   });
   return response.data;
 };

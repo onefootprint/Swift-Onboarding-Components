@@ -6471,15 +6471,8 @@
                             "step_up",
                             "use_rules_outcome"
                         ]
-                    },
-                    "omit_business_creation": {
-                        "description": "For newer clients - we will eventually make this the default ????",
-                        "type": "boolean"
                     }
-                },
-                "required": [
-                    "omit_business_creation"
-                ]
+                }
             },
             "ProcessRequest": {
                 "type": "object",
