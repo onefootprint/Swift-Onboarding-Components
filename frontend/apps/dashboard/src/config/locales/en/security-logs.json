@@ -51,10 +51,15 @@
     }
   },
   "events": {
-    "decrypted": "decrypted",
-    "a-user": "a user",
     "decryption-event": {
-      "aria-label": "Decryption event"
+      "aria-label": "Decryption event",
+      "decrypted": "decrypted",
+      "a-user": "a user"
+    },
+    "body": {
+      "decryption-reason": {
+        "aria-label": "Decryption reason body"
+      }
     }
   },
   "body": {

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import DateTime from './components/date-time';
 import Event from './components/event';
+import EventBody from './components/event-body';
 
 const HEADER_HEIGHT = '32px';
 
@@ -78,7 +79,7 @@ const Timeline = ({ accessEvents }: { accessEvents: AccessEvent[] }) => {
                 </Grid.Item>
 
                 <Box height="20px" tag="span">
-                  Body Component
+                  <EventBody accessEvent={accessEvent} />
                 </Box>
               </Grid.Container>
             </Grid.Container>
