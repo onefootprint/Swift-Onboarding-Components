@@ -29,11 +29,11 @@ const getDefaultFormValues = (
       }
       return {
         uuid: bo.uuid,
-        email: bo.decryptedData[IdDI.email] || '',
-        phoneNumber: bo.decryptedData[IdDI.phoneNumber] || '',
+        email: bo.decryptedData[IdDI.email],
+        phoneNumber: bo.decryptedData[IdDI.phoneNumber],
         // For some fields, overlay bootstrapped data for the primary owner, if available
-        firstName: bootstrappedPrimaryOwnerFields.firstName || bo.decryptedData[IdDI.firstName] || '',
-        lastName: bootstrappedPrimaryOwnerFields.lastName || bo.decryptedData[IdDI.lastName] || '',
+        firstName: bootstrappedPrimaryOwnerFields.firstName || bo.decryptedData[IdDI.firstName],
+        lastName: bootstrappedPrimaryOwnerFields.lastName || bo.decryptedData[IdDI.lastName],
         ownershipStake: bootstrappedPrimaryOwnerFields.ownershipStake || bo.ownershipStake,
       };
     });
@@ -48,8 +48,8 @@ const getDefaultFormValues = (
         firstName: bo[BeneficialOwnerDataAttribute.firstName],
         lastName: bo[BeneficialOwnerDataAttribute.lastName],
         ownershipStake: bo[BeneficialOwnerDataAttribute.ownershipStake],
-        email: bo[BeneficialOwnerDataAttribute.email] || '',
-        phoneNumber: bo[BeneficialOwnerDataAttribute.phoneNumber] || '',
+        email: bo[BeneficialOwnerDataAttribute.email],
+        phoneNumber: bo[BeneficialOwnerDataAttribute.phoneNumber],
       });
     });
   }

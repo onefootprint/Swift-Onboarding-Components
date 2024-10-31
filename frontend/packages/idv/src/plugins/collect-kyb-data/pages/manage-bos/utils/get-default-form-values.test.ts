@@ -93,8 +93,8 @@ describe('getDefaultFormValues', () => {
     expect(result).toEqual([
       {
         uuid: MOCK_BO_EMPTY_PRIMARY.uuid,
-        email: '',
-        phoneNumber: '',
+        email: undefined,
+        phoneNumber: undefined,
         firstName: userBootstrapData[IdDI.firstName].value,
         lastName: userBootstrapData[IdDI.lastName].value,
         ownershipStake: 40,

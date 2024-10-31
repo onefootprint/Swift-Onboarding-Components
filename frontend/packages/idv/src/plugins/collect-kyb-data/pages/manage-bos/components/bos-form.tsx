@@ -176,7 +176,7 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
                       hasError={!!emailErrors}
                       {...register(`bos.${idx}.email`, {
                         required: t('fields.email.errors.required'),
-                        validate: value => (!isEmail(value) ? t('fields.email.errors.required') : undefined),
+                        validate: value => (!isEmail(value || '') ? t('fields.email.errors.required') : undefined),
                       })}
                     />
                     <Form.Errors>{emailErrors}</Form.Errors>
@@ -189,7 +189,7 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
                     rules={{
                       required: { value: true, message: t('fields.phone.errors.required') },
                       validate: value => {
-                        const isInvalid = !isPhoneNumber(value);
+                        const isInvalid = !isPhoneNumber(value || '');
                         return isInvalid ? t('fields.phone.errors.invalid') : undefined;
                       },
                     }}
