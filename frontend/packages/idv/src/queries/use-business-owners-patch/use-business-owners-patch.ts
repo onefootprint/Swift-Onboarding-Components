@@ -49,7 +49,7 @@ export const patchBusinessOwnersRequest = async ({
       throw new Error('Cannot be more than one authed user to update');
     }
 
-    const linkedUserDataChangeOperations = updateOperationsForAuthedUser
+    const authedUserDataChangeOperations = updateOperationsForAuthedUser
       .map(({ data, ...operation }) => ({
         ...operation,
         data: Object.fromEntries(Object.entries(data).filter(([di]) => di !== IdDI.email && di !== IdDI.phoneNumber)),
@@ -61,13 +61,13 @@ export const patchBusinessOwnersRequest = async ({
         ),
       );
 
-    if (linkedUserDataChangeOperations.length === 1) {
+    if (authedUserDataChangeOperations.length === 1) {
       try {
         await requestWithoutCaseConverter<Response>({
           method: 'PATCH',
           headers: { [AUTH_HEADER]: authToken },
           url: '/hosted/user/vault',
-          data: linkedUserDataChangeOperations[0].data,
+          data: authedUserDataChangeOperations[0].data,
         });
       } catch (error) {
         console.error('Failed to update linked user:', error);

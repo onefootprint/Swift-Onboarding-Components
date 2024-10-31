@@ -32,20 +32,28 @@ const EditBosForm = ({ authToken, existingBos, onDone, defaultFormValues, isLive
     }
 
     if (!existingBos.length || !authToken) throw new Error('Business owners data or authentication token is missing.');
+
+    const updateOrCreateOperations = bos.map(({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => {
+      const existingBo = existingBos.find(bo => bo.uuid === uuid);
+      const isMutable = !existingBo || existingBo?.isMutable;
+      const data = {
+        [IdDI.firstName]: firstName,
+        [IdDI.lastName]: lastName,
+        [IdDI.email]: email,
+        [IdDI.phoneNumber]: phoneNumber,
+      };
+      return {
+        uuid,
+        data: isMutable ? data : {},
+        ownershipStake,
+      };
+    });
+
     try {
       await bosMutation.mutateAsync({
         authToken,
         currentBos: existingBos,
-        updateOrCreateOperations: bos.map(({ uuid, firstName, lastName, email, phoneNumber, ownershipStake }) => ({
-          uuid,
-          data: {
-            [IdDI.firstName]: firstName,
-            [IdDI.lastName]: lastName,
-            [IdDI.email]: email,
-            [IdDI.phoneNumber]: phoneNumber,
-          },
-          ownershipStake,
-        })),
+        updateOrCreateOperations,
         deleteOperations: bosToDelete,
       });
       onDone();
