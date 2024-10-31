@@ -1,14 +1,17 @@
 import type { AccessEvent } from '@onefootprint/types';
-import DateTime from './components/date-time';
+import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import PrincipalActor from './components/principal-actor';
 
 const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
-  const { principal, timestamp, insightEvent } = accessEvent;
+  const { principal, insightEvent } = accessEvent;
   return (
-    <div>
-      <DateTime timestamp={timestamp} />
+    <Stack gap={2}>
       <PrincipalActor principal={principal} insightEvent={insightEvent} />
-    </div>
+      <Text variant="body-3" color="tertiary">
+        (josh@acmebank.com) created a new
+      </Text>
+      <LinkButton href={`/security-logs/${accessEvent.id}`}>Playbook</LinkButton>
+    </Stack>
   );
 };
 

@@ -21,16 +21,6 @@ type TimelineProps = {
 
 const HEADER_HEIGHT = '32px';
 
-export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
-  if (!time) {
-    return 'empty';
-  }
-  if ('timestamp' in time) {
-    return time.timestamp;
-  }
-  return `${time.start}-${time.end}`;
-};
-
 const Timeline = ({ items, isPending }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   if (!isPending && !items.length) {
@@ -121,5 +111,15 @@ const Line = styled(Grid.Item)`
     background-color: ${theme.borderColor.primary};
   `}
 `;
+
+export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
+  if (!time) {
+    return 'empty';
+  }
+  if ('timestamp' in time) {
+    return time.timestamp;
+  }
+  return `${time.start}-${time.end}`;
+};
 
 export default Timeline;

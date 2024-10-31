@@ -1,5 +1,5 @@
 import type { AccessEvent } from '@onefootprint/types';
-import { SearchInput, Text } from '@onefootprint/ui';
+import { Divider, SearchInput, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
@@ -29,14 +29,17 @@ const SecurityLogsPrivate = () => {
       <Text variant="heading-2" marginBottom={5}>
         {t('header.title')}
       </Text>
-      <SearchInput
-        width="232px"
-        onChangeText={() => console.log('test change text')}
-        value=""
-        size="compact"
-        placeholder={t('filters.search')}
-      />
-      <Timeline accessEvents={accessEvents} />
+      <Stack gap={5} direction="column">
+        <SearchInput
+          width="232px"
+          onChangeText={() => console.log('test change text')}
+          value=""
+          size="compact"
+          placeholder={t('filters.search')}
+        />
+        <Divider />
+        <Timeline accessEvents={accessEvents} />
+      </Stack>
     </>
   );
 };
