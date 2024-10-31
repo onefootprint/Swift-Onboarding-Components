@@ -374,6 +374,14 @@
           "success": "Success",
           "failed": "Failed"
         },
+        "table-of-contents": {
+          "label": "{{side}} ⋅ {{status}}",
+          "side": {
+            "front": "Front ID",
+            "back": "Back ID",
+            "selfie": "Selfie"
+          }
+        },
         "ocr": {
           "title": "Extracted document data (OCR)",
           "labels": {
