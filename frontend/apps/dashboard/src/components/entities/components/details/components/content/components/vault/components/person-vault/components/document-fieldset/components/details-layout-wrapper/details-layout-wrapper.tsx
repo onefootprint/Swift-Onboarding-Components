@@ -51,7 +51,7 @@ const DetailsLayoutWrapper = forwardRef<HTMLDivElement, DetailsLayoutWrapperProp
 
 const Container = styled(Box)<{ open: boolean }>`
   ${({ open }) => css` 
-      --drawer-width: 480px;
+      --drawer-width: 450px;
       &[data-has-drawer="true"] {
         display: grid;
         grid-template-areas: "drawer content";

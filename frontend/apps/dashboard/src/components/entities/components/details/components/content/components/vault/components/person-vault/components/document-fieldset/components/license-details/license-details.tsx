@@ -11,10 +11,12 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
 import findVisibleElement from '../../utils/find-visible-element';
+import showSelfiePreview from '../../utils/show-selfie-preview';
 import Decrypt from '../decrypt/decrypt';
 import DetailsLayoutWrapper from '../details-layout-wrapper';
 import DocumentImage from '../document-image';
 import DrawerContent from './components/drawer-content';
+import SelfiePreview from './components/selfie-preview';
 import TableOfContents from './components/table-of-contents';
 import UploadTitleCard from './components/upload-title-card/upload-title-card';
 
@@ -39,23 +41,26 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
   const [visibleUploadIndex, setVisibleUploadIndex] = useState<number>(0);
 
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
+    // The timeout is to ensure that the scroll container is rendered before the scroll event listener is added
+    setTimeout(() => {
+      const scrollContainer = scrollContainerRef.current;
+      if (!scrollContainer) return;
 
-    const updateVisibleUpload = () => {
-      const containerRect = scrollContainer.getBoundingClientRect();
-      const visibleIndex = findVisibleElement(containerRect, uploadRefs.current);
-      if (visibleIndex !== -1) {
-        setVisibleUploadIndex(visibleIndex);
-      }
-    };
+      const updateVisibleUpload = () => {
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const visibleIndex = findVisibleElement(containerRect, uploadRefs.current);
+        if (visibleIndex !== -1) {
+          setVisibleUploadIndex(visibleIndex);
+        }
+      };
 
-    scrollContainer.addEventListener('scroll', updateVisibleUpload);
-    updateVisibleUpload();
+      scrollContainer.addEventListener('scroll', updateVisibleUpload);
+      updateVisibleUpload();
 
-    return () => {
-      scrollContainer.removeEventListener('scroll', updateVisibleUpload);
-    };
+      return () => {
+        scrollContainer.removeEventListener('scroll', updateVisibleUpload);
+      };
+    }, 300);
   }, [open, isEncrypted]);
 
   const scrollToUpload = (index: number) => {
@@ -82,7 +87,7 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
           ref={scrollContainerRef}
         >
           <TableOfContents uploads={uploads} onClick={scrollToUpload} currentIndex={visibleUploadIndex} />
-          <UploadsContainer direction="column" align="center" gap={8} width="60%">
+          <UploadsContainer direction="column" align="center" gap={8} width="70%">
             {uploads.map((upload, index) => {
               const vaultIndex = `${upload.identifier}:${upload.version}` as DataIdentifier;
               const vaultValue = vault[vaultIndex] as string;
@@ -105,6 +110,7 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
               );
             })}
           </UploadsContainer>
+          {showSelfiePreview(uploads, visibleUploadIndex) && <SelfiePreview uploads={uploads} vault={vault} />}
         </DetailsLayoutWrapper>
       )}
     </Dialog>
