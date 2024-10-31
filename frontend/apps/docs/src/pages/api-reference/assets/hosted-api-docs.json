@@ -6456,15 +6456,8 @@
                             "step_up",
                             "use_rules_outcome"
                         ]
-                    },
-                    "use_legacy_inherit_logic": {
-                        "description": "TODO: remove this once we've started showing the business selector screen.\n When true, allows using the legacy logic that could inherit an existing business",
-                        "type": "boolean"
                     }
-                },
-                "required": [
-                    "use_legacy_inherit_logic"
-                ]
+                }
             },
             "PostOnboardingRequest": {
                 "type": "object",

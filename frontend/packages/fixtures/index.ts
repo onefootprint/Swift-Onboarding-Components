@@ -902,7 +902,6 @@ export const getPostBusinessOnboardingRequest = (props: Partial<PostBusinessOnbo
     {
       inheritBusinessId: '8add410e-5821-4dd9-9749-44846f8aeb55',
       kybFixtureResult: 'pass',
-      useLegacyInheritLogic: false,
     },
     props,
   ) as PostBusinessOnboardingRequest;

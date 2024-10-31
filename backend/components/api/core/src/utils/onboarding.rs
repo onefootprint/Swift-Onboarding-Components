@@ -199,31 +199,30 @@ pub fn get_or_create_user_workflow(
 pub struct CreateBusinessWfArgs<'a> {
     pub user_auth: &'a UserSessionContext,
     pub fixture_result: Option<WorkflowFixtureResult>,
-    pub inherit_business_id: InheritBusinessId,
-    pub external_id: Option<&'a ExternalId>,
+    pub scoped_vault_action: ScopedVaultAction,
 }
 
-pub enum InheritBusinessId {
-    /// If `force_create` is true, make a new business. Otherwise, inherit the most recently
-    /// completed business.
-    Legacy,
-    /// Inherit the provided business, otherwise create a new business
-    Modern(Option<BoId>),
+#[derive(derive_more::IsVariant)]
+pub enum ScopedVaultAction {
+    /// Create a new business
+    Create,
+    /// Inherit the provided business
+    InheritId(BoId),
+    /// Get or create a business with this external ID
+    GetOrCreateExternalId(ExternalId),
 }
 
 fn get_or_create_business(
     conn: &mut TxnPgConn,
     user_auth: &UserSessionContext,
     obc: &ObConfiguration,
-    inherit_business_id: InheritBusinessId,
+    sv_action: ScopedVaultAction,
     new_biz_keypair: VaultKeyPair,
-    external_id: Option<&ExternalId>,
-    force_create: bool,
 ) -> FpResult<ScopedVaultId> {
     if let Some(sb_id) = user_auth.sb_id.clone() {
         // A scoped business has been attached to this session already. This happens in secondary beneficial
         // owner tokens or in user-specific sessions with an `fp_bid`
-        if matches!(inherit_business_id, InheritBusinessId::Modern(Some(_))) {
+        if sv_action.is_inherit_id() {
             return ValidationError("Cannot provide business ID when a scoped business is already attached")
                 .into();
         }
@@ -234,34 +233,17 @@ fn get_or_create_business(
         return AssertionError("Secondary BO should already have associated business").into();
     }
 
-    let uv_id = &user_auth.user.id;
-    match inherit_business_id {
-        InheritBusinessId::Legacy => {
-            // TODO: deprecate this codepath
-            let existing_businesses =
-                (!force_create).then_some(BusinessOwner::list_owned_businesses(conn, uv_id, &obc.id)?);
-            if let Some((_, sb, _)) = existing_businesses.into_iter().flatten().next() {
-                // If the user has already started onboarding their business onto this exact ob config AND we
-                // aren't force creating a new workflow (which should also support force
-                // creating a new business), we should locate the existing business.
-                // This supports inheriting in-progress business onboaridngs and short-circuiting when a user
-                // has already onboarded onto a playbook.
-                return Ok(sb.id);
-            }
-        }
-        InheritBusinessId::Modern(Some(inherit_business_id)) => {
-            // The user has selected an existing business from the list of owned businesses
-            let id = ScopedVaultIdentifier::OwnedBusiness {
-                bo_id: &inherit_business_id,
-                uv_id,
-                t_id: &obc.tenant_id,
-            };
-            let sb = ScopedVault::get(conn, id).optional()?.ok_or(ValidationError(
-                "Could not find the requested business owned by the user.",
-            ))?;
-            return Ok(sb.id);
-        }
-        InheritBusinessId::Modern(None) => {}
+    if let ScopedVaultAction::InheritId(bo_id) = &sv_action {
+        // The user has selected an existing business from the list of owned businesses
+        let id = ScopedVaultIdentifier::OwnedBusiness {
+            bo_id,
+            uv_id: &user_auth.user.id,
+            t_id: &obc.tenant_id,
+        };
+        let sb = ScopedVault::get(conn, id).optional()?.ok_or(ValidationError(
+            "Could not find the requested business owned by the user.",
+        ))?;
+        return Ok(sb.id);
     }
 
     // Otherwise, make a new business vault and scoped vault owned by the currently authed user
@@ -275,6 +257,11 @@ fn get_or_create_business(
         sandbox_id: user_auth.user.sandbox_id.clone(), // Use the same sandbox ID for business vault
         is_created_via_api: false,
         duplicate_of_id: None,
+    };
+
+    let external_id = match &sv_action {
+        ScopedVaultAction::GetOrCreateExternalId(external_id) => Some(external_id),
+        _ => None,
     };
 
     let sv_args = NewScopedVaultArgs {
@@ -322,8 +309,7 @@ pub fn get_or_create_business_wf<'a>(
     let CreateBusinessWfArgs {
         user_auth,
         fixture_result,
-        inherit_business_id: biz_id,
-        external_id,
+        scoped_vault_action,
     } = args;
 
     let sb_id = user_auth.sb_id.as_ref();
@@ -349,7 +335,7 @@ pub fn get_or_create_business_wf<'a>(
     }
 
     Vault::lock(conn, &su.vault_id)?;
-    let sb_id = get_or_create_business(conn, user_auth, obc, biz_id, kp, external_id, force_create)?;
+    let sb_id = get_or_create_business(conn, user_auth, obc, scoped_vault_action, kp)?;
     ScopedVault::lock(conn, &sb_id)?;
 
 

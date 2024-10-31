@@ -2562,11 +2562,6 @@ export type PostBusinessOnboardingRequest = {
    */
   inheritBusinessId?: string;
   kybFixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
-  /**
-   * TODO: remove this once we've started showing the business selector screen.
-   * When true, allows using the legacy logic that could inherit an existing business
-   */
-  useLegacyInheritLogic: boolean;
 };
 export type kyb_fixture_result = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type PostOnboardingRequest = {

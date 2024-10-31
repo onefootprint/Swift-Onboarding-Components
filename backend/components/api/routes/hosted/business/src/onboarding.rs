@@ -12,7 +12,7 @@ use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
 use api_core::utils::onboarding::get_or_create_business_wf;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateBusinessWfArgs;
-use api_core::utils::onboarding::InheritBusinessId;
+use api_core::utils::onboarding::ScopedVaultAction;
 use api_core::web::Json;
 use api_wire_types::hosted::onboarding::BusinessOnboardingResponse;
 use api_wire_types::PostBusinessOnboardingRequest;
@@ -38,7 +38,6 @@ pub async fn post(
     let PostBusinessOnboardingRequest {
         kyb_fixture_result,
         inherit_business_id,
-        use_legacy_inherit_logic,
     } = request.into_inner();
 
     let maybe_new_biz_keypair = state.enclave_client.generate_sealed_keypair().await?;
@@ -51,9 +50,6 @@ pub async fn post(
                 .map(|wfr_id| WorkflowRequest::get(conn, wfr_id, &user_auth.scoped_user.id))
                 .transpose()?;
 
-            // TODO: how should force_create on the playbook work when inheriting a business?
-            // maybe we won't really need the playbook setting anymore - the default behavior will support
-            // making a _new_ business, but we never allow reonboarding a business just via playbook key
             let force_create =
                 user_auth.data.metadata().allow_reonboard || user_auth.ob_config.allow_reonboard;
             let common_args = CommonWfArgs {
@@ -65,22 +61,19 @@ pub async fn post(
                 su: &user_auth.scoped_user,
             };
             let external_id = user_auth.data.metadata().business_external_id;
-            let inherit_business_id = if external_id.is_some() {
-                if inherit_business_id.is_some() {
+            let scoped_vault_action = match (external_id, inherit_business_id) {
+                (Some(external_id), None) => ScopedVaultAction::GetOrCreateExternalId(external_id),
+                (None, Some(inherit_id)) => ScopedVaultAction::InheritId(inherit_id),
+                (Some(_), Some(_)) => {
                     return ValidationError("Cannot select a business when business_external_id is set")
-                        .into();
+                        .into()
                 }
-                InheritBusinessId::Modern(None)
-            } else if use_legacy_inherit_logic {
-                InheritBusinessId::Legacy
-            } else {
-                InheritBusinessId::Modern(inherit_business_id)
+                (None, None) => ScopedVaultAction::Create,
             };
             let args = CreateBusinessWfArgs {
                 user_auth: &user_auth,
                 fixture_result: kyb_fixture_result,
-                inherit_business_id,
-                external_id: external_id.as_ref(),
+                scoped_vault_action,
             };
             let (biz_wf, _) = get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
 

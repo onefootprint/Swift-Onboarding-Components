@@ -54,15 +54,7 @@ const StartOnboardingWithoutSelection = ({ state }: { state: SharedState }) => {
   });
 
   useEffect(() => {
-    businessOnboardingMutation.mutate(
-      {
-        body: {
-          kybFixtureResult,
-          useLegacyInheritLogic: false,
-        },
-      },
-      { onSuccess: onDone },
-    );
+    businessOnboardingMutation.mutate({ body: { kybFixtureResult } }, { onSuccess: onDone });
   }, []);
 
   return <Loading />;
@@ -101,7 +93,7 @@ const NoBusinessesFlow = ({
   const vaultMutation = useVaultBootstrapData({ authToken });
 
   const handleDone = async () => {
-    await businessMutation.mutateAsync({ body: { kybFixtureResult, useLegacyInheritLogic: false } });
+    await businessMutation.mutateAsync({ body: { kybFixtureResult } });
     await vaultMutation.mutateAsync({ bootstrapBusinessData, bootstrapUserData });
     onDone();
   };
@@ -122,7 +114,7 @@ const BusinessSelectionFlow = ({
 
   const handleNewBusiness = () => {
     businessOnboardingMutation.mutate(
-      { body: { kybFixtureResult, useLegacyInheritLogic: false } },
+      { body: { kybFixtureResult } },
       {
         onSuccess: () => setShowIntroduction(true),
       },
@@ -131,7 +123,7 @@ const BusinessSelectionFlow = ({
 
   const handleSelectBusiness = (businessId: string) => {
     businessOnboardingMutation.mutate(
-      { body: { kybFixtureResult, inheritBusinessId: businessId, useLegacyInheritLogic: false } },
+      { body: { kybFixtureResult, inheritBusinessId: businessId } },
       { onSuccess: onDone },
     );
   };

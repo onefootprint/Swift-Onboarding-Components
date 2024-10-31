@@ -18,8 +18,4 @@ pub struct PostBusinessOnboardingRequest {
     /// If null and there isn't already a business associated with this session, creates a new
     /// business.
     pub inherit_business_id: Option<BoId>,
-    /// TODO: remove this once we've started showing the business selector screen.
-    /// When true, allows using the legacy logic that could inherit an existing business
-    #[serde(default)]
-    pub use_legacy_inherit_logic: bool,
 }
