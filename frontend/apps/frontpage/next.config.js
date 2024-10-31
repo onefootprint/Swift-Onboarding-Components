@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const { execSync } = require('child_process');
-
 const withPlugins = require('next-compose-plugins');
 
 const withMDX = require('@next/mdx')({
@@ -16,20 +14,120 @@ const withMDX = require('@next/mdx')({
 const IS_DEV = process.env.NODE_ENV === 'development';
 
 const DEV_FRAME_SRC = (IS_DEV ? ['http://localhost:3000'] : []).join(' ');
+const MARKETING_SOURCES = {
+  connectSrc: [
+    '*.aplo-evnt.com',
+    '*.google-analytics.com',
+    '*.hsforms.com',
+    '*.hsforms.net',
+    '*.hubspot.com',
+    '*.intercom.io',
+    '*.nexus-websocket-a.intercom.io',
+    '*.unifyintent.com',
+    '*.usefathom.com',
+    'analytics.google.com',
+    'api.hubapi.com',
+    'aplo-evnt.com',
+    'conversions-config.reddit.com',
+    'forms.hscollectedforms.net',
+    'pixel-config.reddit.com',
+    'px.ads.linkedin.com',
+    'stats.g.doubleclick.net',
+    'unifyintent.com',
+    'wss://*.intercom.io',
+    'wss://*.nexus-websocket-a.intercom.io',
+    'www.google-analytics.com',
+    'www.google.com',
+    'www.redditstatic.com',
+  ],
+  frameSrc: [
+    '*.ads.linkedin.com',
+    '*.doubleclick.com',
+    '*.doubleclick.net',
+    '*.googletagmanager.com',
+    '*.hsforms.com',
+    '*.hsforms.net',
+    '*.unifyintent.com',
+    '*.youtube.com',
+  ],
+  scriptsSrc: [
+    '*.apollo.io',
+    '*.connect.facebook.net',
+    '*.facebook.com',
+    '*.google-analytics.com',
+    '*.googleads.g.doubleclick.net',
+    '*.googleadservices.com',
+    '*.googletagmanager.com',
+    '*.hs-analytics.net',
+    '*.hs-banner.com',
+    '*.hs-scripts.com',
+    '*.hsadspixel.net',
+    '*.hscollectedforms.net',
+    '*.hsforms.com',
+    '*.hsforms.net',
+    '*.hubspot.com',
+    '*.intercom.io',
+    '*.js.hs-scripts.com',
+    '*.platform.twitter.com',
+    '*.redditstatic.com',
+    '*.static.ads-twitter.com',
+    '*.tagmanager.google.com',
+    '*.unifyintent.com',
+    '*.usefathom.com',
+    '*.vercel-scripts.com',
+    '*.youtube.com',
+    'googleads.g.doubleclick.net',
+    'js.intercomcdn.com',
+    'snap.licdn.com',
+  ],
+  domains: [
+    '*.ads.linkedin.com',
+    '*.google.com',
+    '*.googleads.g.doubleclick.net',
+    '*.googleadservices.com',
+    '*.googletagmanager.com',
+    '*.hsforms.com',
+    '*.intercomassets.com',
+    '*.intercomcdn.com',
+    '*.unifyintent.com',
+  ],
+  fontSrc: ['*.intercomcdn.com', 'fonts.googleapis.com', 'fonts.gstatic.com'],
+  imgSrc: [
+    '*.google.com.br',
+    '*.googleadservices.com',
+    '*.usefathom.com',
+    'alb.reddit.com',
+    'footprint-blog.ghost.io',
+    'forms.hsforms.com',
+    'perf-na1.hsforms.com',
+    'px.ads.linkedin.com',
+    'px4.ads.linkedin.com',
+    'track.hubspot.com',
+    'www.google.com',
+  ],
+  styleSrc: ['*.tagmanager.google.com', 'fonts.googleapis.com', 'cdn.jsdelivr.net'],
+};
+
+const marketingConnectSrc = MARKETING_SOURCES.connectSrc.join(' ');
+const marketingFontSrc = MARKETING_SOURCES.fontSrc.join(' ');
+const marketingFrameSrc = MARKETING_SOURCES.frameSrc.join(' ');
+const marketingImgSrc = MARKETING_SOURCES.imgSrc.join(' ');
+const marketingScriptsSrc = MARKETING_SOURCES.scriptsSrc.join(' ');
+const marketingStyleSrc = MARKETING_SOURCES.styleSrc.join(' ');
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com getform.io/f/pbygomeb *.pusher.com wss://*.pusher.com vercel.live aplo-evnt.com usefathom.com *.usefathom.com *.youtube.com api.onefootprint.com unifyintent.com *.unifyintent.com px.ads.linkedin.com *.google-analytics.com *.intercom.io wss://nexus-websocket-a.intercom.io *.hubspot.com *.hsforms.net *.hsforms.com;
+  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com api.onefootprint.com ${marketingConnectSrc};
   default-src 'self' vitals.vercel-insights.com;
-  font-src 'self' fonts.googleapis.com fonts.gstatic.com *.intercomcdn.com;
+  font-src 'self' ${marketingFontSrc};
   form-action 'self' *.hsforms.com *.hsforms.net;
   frame-ancestors 'self';
-  frame-src 'self' ${DEV_FRAME_SRC} *.onefootprint.com vercel.live *.youtube.com form.typeform.com *.hsforms.com *.hsforms.net;
-  img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net unifyintent.com *.unifyintent.com cdn.jsdelivr.net px.ads.linkedin.com *.googleadservices.com *.google.com *.googletagmanager.com *.googleads.g.doubleclick.net *.intercomassets.com *.intercomcdn.com *.hsforms.com;
+  frame-src 'self' ${DEV_FRAME_SRC} *.onefootprint.com ${marketingFrameSrc};
+  img-src 'self' data: assets.vercel.com vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net ${marketingImgSrc};
   media-src 'self' https footprint-blog.ghost.io;
   object-src 'self' data:;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com *.tagmanager.google.com *.googletagmanager.com platform.twitter.com *.youtube.com static.ads-twitter.com connect.facebook.net *.facebook.com unifyintent.com *.unifyintent.com *.apollo.io *.vercel-scripts.com snap.licdn.com googleads.g.doubleclick.net *.googleadservices.com *.intercom.io *.google-analytics.com js.intercomcdn.com *.hsforms.net *.hsforms.com;
-  style-src 'self' 'unsafe-inline' *.tagmanager.google.com fonts.googleapis.com cdn.jsdelivr.net;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel-scripts.com vitals.vercel-insights.com ${marketingScriptsSrc};
+  style-src 'self' 'unsafe-inline' ${marketingStyleSrc};
   worker-src 'self' blob:;
 `;
 
