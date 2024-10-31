@@ -25761,8 +25761,8 @@
                     "kind": {
                         "type": "string",
                         "enum": [
-                            "Primary",
-                            "Secondary"
+                            "primary",
+                            "secondary"
                         ]
                     },
                     "name": {
@@ -26021,8 +26021,8 @@
                     "source": {
                         "type": "string",
                         "enum": [
-                            "Hosted",
-                            "Tenant"
+                            "hosted",
+                            "tenant"
                         ]
                     },
                     "status": {

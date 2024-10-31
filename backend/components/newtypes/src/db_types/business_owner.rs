@@ -28,7 +28,7 @@ use strum_macros::EnumString;
     macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum BusinessOwnerKind {
     /// The BusinessOwner filled out the initial KYB form for this business
@@ -57,7 +57,7 @@ crate::util::impl_enum_str_diesel!(BusinessOwnerKind);
     macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum BusinessOwnerSource {
     /// Created via a Footprint-hosted flow, bifrost
