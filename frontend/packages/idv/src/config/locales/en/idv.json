@@ -577,10 +577,16 @@
         }
       },
       "business-selector": {
-        "title": "We found 2 businesses associated with your account",
+        "title": "We found {{count}} businesses associated with your account",
         "subtitle": "Choose an existing business or add a new one to verify it.",
         "status": {
           "incomplete": "Incomplete"
+        },
+        "last-activity": {
+          "hours": "Last activity {{time}} ago",
+          "days_one": "Last activity {{days}} day ago",
+          "days_other": "Last activity {{days}} days ago",
+          "date": "Last activity on {{date}}"
         },
         "created-at": "Created at {{date}}",
         "or": "or",

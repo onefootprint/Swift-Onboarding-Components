@@ -1,24 +1,15 @@
 import { IcoStore24, IcoUser24 } from '@onefootprint/icons';
 import { Button, Stack } from '@onefootprint/ui';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SharedState } from '..';
-import { HeaderTitle, InfoBox, NavigationHeader } from '../../../components';
-import useBusinessOnboarding from '../hooks/use-business-onboarding';
+import { HeaderTitle, InfoBox, NavigationHeader } from '../../../../components';
 
-type NewBusinessIntroductionProps = {
-  state: SharedState;
+export type NewBusinessIntroductionProps = {
+  isBusy?: boolean;
+  onDone: () => void;
 };
 
-const NewBusinessIntroduction = ({ state }: NewBusinessIntroductionProps) => {
+const NewBusinessIntroduction = ({ isBusy, onDone }: NewBusinessIntroductionProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages' });
-  const { onDone, authToken, kybFixtureResult } = state;
-  const useBusinessOnboardingMutation = useBusinessOnboarding({ authToken, kybFixtureResult });
-  useEffect(() => {
-    // Start the business onboarding as soon as the user visits this screen, no need to wait for them
-    // to read and click the continue button to move on.
-    useBusinessOnboardingMutation.mutate({});
-  }, []);
 
   return (
     <Stack flexDirection="column" rowGap={7} justifyContent="center" alignItems="center">
@@ -44,7 +35,7 @@ const NewBusinessIntroduction = ({ state }: NewBusinessIntroductionProps) => {
         ]}
         variant="default"
       />
-      <Button fullWidth onClick={() => onDone()} size="large" loading={useBusinessOnboardingMutation.isPending}>
+      <Button fullWidth onClick={onDone} size="large" loading={isBusy}>
         {t('cta.continue')}
       </Button>
     </Stack>

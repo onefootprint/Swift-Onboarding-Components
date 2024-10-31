@@ -576,6 +576,22 @@
           }
         }
       },
+      "business-selector": {
+        "title": "Encontramos {{count}} empresas asociadas a tu cuenta",
+        "subtitle": "Elige una empresa existente o agrega una nueva para verificarla.",
+        "status": {
+          "incomplete": "Incompleto"
+        },
+        "last-activity": {
+          "hours": "Última actividad hace {{time}}",
+          "days_one": "Última actividad hace {{days}} día",
+          "days_other": "Última actividad hace {{days}} días",
+          "date": "Última actividad el {{date}}"
+        },
+        "created-at": "Creada el {{date}}",
+        "or": "o",
+        "cta": "Agregar y verificar una nueva empresa"
+      },
       "basic-data": {
         "title": "Datos básicos",
         "subtitle": "Necesitamos información sobre tu empresa.",
