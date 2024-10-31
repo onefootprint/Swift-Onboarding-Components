@@ -66,7 +66,7 @@ const vault = async (
       payload.push(primaryBoPayload);
     }
     if (secondaryBosPayload?.length) {
-      payload.push(secondaryBosPayload);
+      payload.push(...secondaryBosPayload);
     }
 
     await patchHostedBusinessOwners({
