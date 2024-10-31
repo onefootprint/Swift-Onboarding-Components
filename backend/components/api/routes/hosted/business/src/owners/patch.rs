@@ -210,10 +210,6 @@ impl BatchRequest {
                 data,
             } => {
                 let bo = BusinessOwner::get(conn, (bv_id, &uuid))?;
-                // Update the existing BO
-                if let Some(stake) = ownership_stake {
-                    BusinessOwner::update_ownership_stake(conn, bv_id, &bo.link_id, stake as i32)?;
-                }
 
                 if !data.is_empty() && bo.has_linked_user() {
                     return ValidationError("This owner is already linked to a user and cannot be updated")
@@ -233,7 +229,6 @@ impl BatchRequest {
                 let link_id = BoLinkId::generate(BusinessOwnerKind::Secondary);
                 let bo = NewSecondaryBo {
                     link_id: link_id.clone(),
-                    ownership_stake: ownership_stake.map(|s| s as i32),
                     uuid,
                 };
                 BusinessOwner::bulk_create_secondary(conn, vec![bo], &bvw.vault.id)?;
