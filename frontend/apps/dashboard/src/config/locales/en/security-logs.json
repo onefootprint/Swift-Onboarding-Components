@@ -50,6 +50,13 @@
       }
     }
   },
+  "events": {
+    "decrypted": "decrypted",
+    "a-user": "a user",
+    "decryption-event": {
+      "aria-label": "Decryption event"
+    }
+  },
   "body": {
     "footprint-token": "Footprint Token",
     "metadata": "Metadata",

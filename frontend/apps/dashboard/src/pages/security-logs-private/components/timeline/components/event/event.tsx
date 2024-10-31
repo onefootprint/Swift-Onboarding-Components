@@ -1,16 +1,17 @@
-import type { AccessEvent } from '@onefootprint/types';
-import { LinkButton, Stack, Text } from '@onefootprint/ui';
+import { type AccessEvent, AccessEventKind } from '@onefootprint/types';
+import { Stack, Text } from '@onefootprint/ui';
+import DecryptUserData from './components/decrypt-user-data';
 import PrincipalActor from './components/principal-actor';
-
 const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
-  const { principal, insightEvent } = accessEvent;
+  const { principal, insightEvent, detail } = accessEvent;
+  const { kind } = detail;
+
   return (
     <Stack gap={2}>
       <PrincipalActor principal={principal} insightEvent={insightEvent} />
       <Text variant="body-3" color="tertiary">
-        (josh@acmebank.com) created a new
+        {kind === AccessEventKind.DecryptUserData && <DecryptUserData detail={detail} />}
       </Text>
-      <LinkButton href={`/security-logs/${accessEvent.id}`}>Playbook</LinkButton>
     </Stack>
   );
 };
