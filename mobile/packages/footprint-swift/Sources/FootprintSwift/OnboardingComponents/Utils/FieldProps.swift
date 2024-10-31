@@ -4,61 +4,71 @@ internal struct FootprintInputProps{
     var keyboardType: UIKeyboardType? = nil
     var maxLength: Int? = nil
     var textContentType: UITextContentType? = nil
+    var autocapitalization: UITextAutocapitalizationType? = nil
     var format: ((_ value: String)-> String)? = nil
 }
 
 
 
-internal func getValidations(fieldName: VaultDI) -> (String) -> String?{
+internal func getValidations(fieldName: FpFieldName) -> (String) -> String?{
+    let translation = FootprintProvider.shared.l10n.translation
     switch fieldName {
-    case .idPeriodEmail:
-        return isEmail
-    case .idPeriodPhoneNumber:
-        return PhoneNumberValidator.isPhoneNumberGeneric
-    case .idPeriodDob:
+    case .idEmail:
         return { (value: String) -> String? in
-            return isDob(value, locale: FootprintProvider.shared.l10n.locale)
+            return isEmail(value, translation: translation)
         }
-    case .idPeriodSsn4:
-        return isSSN4
-    case .idPeriodSsn9:
+    case .idPhoneNumber:
         return { (value: String) -> String? in
-            return isSSN9(value, isFlexible: false)
+            return PhoneNumberValidator.isPhoneNumberGeneric(value, translation: translation)
         }
-    case .idPeriodFirstName:
+    case .idDob:
         return { (value: String) -> String? in
-            return isName(value, type: .firstName)
+            return isDob(value, locale: FootprintProvider.shared.l10n.locale, translation: translation)
         }
-    case .idPeriodLastName:
+    case .idSsn4:
         return { (value: String) -> String? in
-            return isName(value, type: .lastName)
+            isSSN4(value, translation: translation)
         }
-    case .idPeriodMiddleName:
+    case .idSsn9:
         return { (value: String) -> String? in
-            return isName(value, type: .middleName)
+            return isSSN9(value, isFlexible: false, translation: translation)
         }
-    case .idPeriodCountry:
-        return isSupportedCountryCode
-    case .idPeriodCity:
+    case .idFirstName:
         return { (value: String) -> String? in
-            if value.isEmpty { return "City is required" }
+            return isName(value, type: .firstName, translation: translation)
+        }
+    case .idLastName:
+        return { (value: String) -> String? in
+            return isName(value, type: .lastName, translation: translation)
+        }
+    case .idMiddleName:
+        return { (value: String) -> String? in
+            return isName(value, type: .middleName, translation: translation)
+        }
+    case .idCountry:
+        return { (value: String) -> String? in
+            isSupportedCountryCode(value, translation: translation)
+        }
+    case .idCity:
+        return { (value: String) -> String? in
+            if value.isEmpty { return translation?.city?.required ?? "City is required" }
             return nil
         }
-    case .idPeriodAddressLine1:
+    case .idAddressLine1:
         return { (value: String) -> String? in
-            if value.isEmpty { return "Address is required" }
+            if value.isEmpty { return translation?.addressLine1?.required ?? "Address is required" }
             return nil
         }
-    case .idPeriodAddressLine2:
+    case .idAddressLine2:
         return { _ in nil }
-    case .idPeriodZip:
+    case .idZip:
         return { (value: String) -> String? in
-            if value.isEmpty { return "Zip code is required" }
+            if value.isEmpty { return translation?.zipCode?.required ?? "Zip code is required" }
             return nil
         }
-    case .idPeriodState:
+    case .idState:
         return { (value: String) -> String? in
-            if value.isEmpty { return "State is required" }
+            if value.isEmpty { return translation?.state?.required ?? "State is required" }
             return nil
         }
     default:
@@ -66,52 +76,53 @@ internal func getValidations(fieldName: VaultDI) -> (String) -> String?{
     }
 }
 
-internal func getInputProps(fieldName: VaultDI) -> FootprintInputProps {
+internal func getInputProps(fieldName: FpFieldName) -> FootprintInputProps {
     var inputProps: FootprintInputProps = .init()
     switch fieldName {
-    case .idPeriodEmail:
+    case .idEmail:
         inputProps.keyboardType = .emailAddress
         inputProps.textContentType = .emailAddress
-    case .idPeriodPhoneNumber:
+        inputProps.autocapitalization = .none
+    case .idPhoneNumber:
         inputProps.keyboardType = .phonePad
         inputProps.textContentType = .telephoneNumber
         inputProps.format = formatPhoneNumber
-    case .idPeriodDob:
+    case .idDob:
         inputProps.keyboardType = .numberPad
         inputProps.maxLength = 10
         inputProps.format = formatDate
-    case .idPeriodSsn4:
+    case .idSsn4:
         inputProps.keyboardType = .numberPad
         inputProps.maxLength = 4
-    case .idPeriodSsn9:
+    case .idSsn9:
         inputProps.maxLength = 11
         inputProps.keyboardType = .numberPad
         inputProps.format = formatSsn9
-    case .idPeriodFirstName:
+    case .idFirstName:
         inputProps.textContentType = .name
         inputProps.keyboardType = .default
-    case .idPeriodLastName:
+    case .idLastName:
         inputProps.textContentType = .name
         inputProps.keyboardType = .default
-    case .idPeriodMiddleName:
+    case .idMiddleName:
         inputProps.textContentType = .name
         inputProps.keyboardType = .default
-    case .idPeriodCountry:
+    case .idCountry:
         inputProps.keyboardType = .default
         inputProps.textContentType = .countryName
-    case .idPeriodCity:
+    case .idCity:
         inputProps.keyboardType = .default
         inputProps.textContentType = .addressCity
-    case .idPeriodAddressLine1:
+    case .idAddressLine1:
         inputProps.keyboardType = .default
         inputProps.textContentType = .streetAddressLine1
-    case .idPeriodAddressLine2:
+    case .idAddressLine2:
         inputProps.keyboardType = .default
         inputProps.textContentType = .streetAddressLine2
-    case .idPeriodZip:
+    case .idZip:
         inputProps.keyboardType = .numberPad
         inputProps.textContentType = .postalCode
-    case .idPeriodState:
+    case .idState:
         inputProps.keyboardType = .default
         inputProps.textContentType = .addressState
     default :

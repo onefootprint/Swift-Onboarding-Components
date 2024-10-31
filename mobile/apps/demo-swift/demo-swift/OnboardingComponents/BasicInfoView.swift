@@ -65,149 +65,157 @@ struct BasicInfoView: View {
                             isLoading = false
                         }
                     },
-                    content: {
+                    builder: { formUtils in
                         VStack(spacing: 20) {
                             FpField(
-                                name: .idPeriodFirstName,
-                                label: { FpLabel("First name", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idFirstName,
+                                content: {
+                                    FpLabel("First name", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your first name")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodMiddleName,
-                                label: { FpLabel("Middle name", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idMiddleName,
+                                content: {
+                                    FpLabel("Middle name", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your middle name")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
                             
                             FpField(
-                                name: .idPeriodLastName,
-                                label: { FpLabel("Last name", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idLastName,
+                                content: {
+                                    FpLabel("Last name", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your last name")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodDob,
-                                label: { FpLabel("Date of birth", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idDob,
+                                content: {
+                                    FpLabel("Date of birth", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your date of birth")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                    
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodAddressLine1,
-                                label: { FpLabel("Address line 1", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idAddressLine1,
+                                content: {
+                                    FpLabel("Address line 1", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your address line 1")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodAddressLine2,
-                                label: { FpLabel("Address line 2", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idAddressLine2,
+                                content: {
+                                    FpLabel("Address line 2", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your address line 2")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodCity,
-                                label: { FpLabel("City", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idCity,
+                                content: {
+                                    FpLabel("City", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your city")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodState,
-                                label: { FpLabel("State", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idState,
+                                content: {
+                                    FpLabel("State", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your state")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodZip,
-                                label: { FpLabel("Zip code", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idZip,
+                                content: {
+                                    FpLabel("Zip code", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your zip code")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodCountry,
-                                label: { FpLabel("Country", font: .subheadline, color: .secondary) },
-                                input: {
+                                name: .idCountry,
+                                content: {
+                                    FpLabel("Country", font: .subheadline, color: .secondary)
                                     FpInput(placeholder: "Enter your country")
                                         .padding()
                                         .background(Color.gray.opacity(0.1))
                                         .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                    FpFieldError()
+                                }
                             )
 
                             FpField(
-                                name: .idPeriodSsn9,
-                                label: { FpLabel("SSN", font: .subheadline, color: .secondary) },
-                                input: {
-                                    FpInput(placeholder: "Enter your SSN")
-                                        .padding()
-                                        .background(Color.gray.opacity(0.1))
-                                        .cornerRadius(10)
-                                },
-                                error: { FpFieldError() }
+                                name: .idSsn9,
+                                content: {
+                                    FpLabel("SSN", font: .subheadline, color: .secondary)
+                                    FpInput() {binding, handleChange in
+                                        AnyView(TextField("SSN", text: binding)
+                                            .padding()
+                                            .background(Color.gray.opacity(0.1))
+                                            .cornerRadius(10)
+                                            .onChange(of: binding.wrappedValue){ newValue in
+                                                handleChange(newValue)
+                                            }
+                                        )
+                                        
+                                    }
+                                    FpFieldError()
+                                }
                             )
                         }
-                    },
-                    submitButton: {
-                        Text("Continue")
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(isLoading ? Color.gray : Color.blue)
-                            .cornerRadius(10)
-                            .disabled(isLoading)
+                        Button(action: formUtils.handleSubmit){
+                            Text("Continue")
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(isLoading ? Color.gray : Color.blue)
+                                .cornerRadius(10)
+                                .disabled(isLoading)
+                        }
                     }
                 )
             }

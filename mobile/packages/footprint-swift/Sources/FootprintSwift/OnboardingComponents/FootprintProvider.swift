@@ -214,9 +214,11 @@ public final class FootprintProvider {
         }
         
         var identifyScope = IdentifyRequest.Scope.onboarding
+        var signupScope = SignupChallengeRequest.Scope.onboarding
         if let obConfigKind = self.onboardingConfig?.kind{
             if obConfigKind == .auth {
                 identifyScope = IdentifyRequest.Scope.auth
+                signupScope = SignupChallengeRequest.Scope.auth
             }
         }
         
@@ -258,7 +260,8 @@ public final class FootprintProvider {
             email: email,
             phoneNumber: phoneNumber,
             kind: preferredAuthMethod,
-            sandboxId: self.sandboxId
+            sandboxId: self.sandboxId,
+            scope: signupScope
         )
     }
     
@@ -320,10 +323,15 @@ public final class FootprintProvider {
         guard let obConfigKind = self.onboardingConfig?.kind else {
             throw FootprintError(kind: .initializationError, message: "No onboarding config kind not found. Please make sure that the public key is correct.")
         }
+        var verifyScope = IdentifyVerifyRequest.Scope.onboarding
+            if obConfigKind == .auth {
+                verifyScope = .auth
+            }
         let verifyResponse = try await self.queries.verify(
             challenge: verificationCode,
             challengeToken: challengeToken,
-            authToken: challengeAuthToken
+            authToken: challengeAuthToken,
+            scope: verifyScope
         )
         var validationToken: String = ""
         var updatedAuthToken: String = verifyResponse.authToken

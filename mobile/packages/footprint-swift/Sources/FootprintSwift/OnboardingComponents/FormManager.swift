@@ -56,72 +56,72 @@ class FormManager: ObservableObject {
         }
         var errors = [String: String]()
         if fieldsUsed.contains("idEmail"){
-            if let err = getValidations(fieldName: .idPeriodEmail)(idEmail){
+            if let err = getValidations(fieldName: .idEmail)(idEmail){
                 errors["idEmail"] = err
             }
         }
         if fieldsUsed.contains("idPhoneNumber"){
-            if let err = getValidations(fieldName: .idPeriodPhoneNumber)(idPhoneNumber){
+            if let err = getValidations(fieldName: .idPhoneNumber)(idPhoneNumber){
                 errors["idPhoneNumber"] = err
             }
         }
         if fieldsUsed.contains("idDob"){
-            if let err = getValidations(fieldName: .idPeriodDob)(idDob){
+            if let err = getValidations(fieldName: .idDob)(idDob){
                 errors["idDob"] = err
             }
         }
         if fieldsUsed.contains("idSsn4"){
-            if let err = getValidations(fieldName: .idPeriodSsn4)(idSsn4){
+            if let err = getValidations(fieldName: .idSsn4)(idSsn4){
                 errors["idSsn4"] = err
             }
         }
         if fieldsUsed.contains("idSsn9"){
-            if let err = getValidations(fieldName: .idPeriodSsn9)(idSsn9){
+            if let err = getValidations(fieldName: .idSsn9)(idSsn9){
                 errors["idSsn9"] = err
             }
         }
         if fieldsUsed.contains("idFirstName"){
-            if let err = getValidations(fieldName: .idPeriodFirstName)(idFirstName){
+            if let err = getValidations(fieldName: .idFirstName)(idFirstName){
                 errors["idFirstName"] = err
             }
         }
         if fieldsUsed.contains("idLastName"){
-            if let err = getValidations(fieldName: .idPeriodLastName)(idLastName){
+            if let err = getValidations(fieldName: .idLastName)(idLastName){
                 errors["idLastName"] = err
             }
         }
         if fieldsUsed.contains("idMiddleName"){
-            if let err = getValidations(fieldName: .idPeriodMiddleName)(idMiddleName){
+            if let err = getValidations(fieldName: .idMiddleName)(idMiddleName){
                 errors["idMiddleName"] = err
             }
         }
         if fieldsUsed.contains("idCountry"){
-            if let err = getValidations(fieldName: .idPeriodCountry)(idCountry){
+            if let err = getValidations(fieldName: .idCountry)(idCountry){
                 errors["idCountry"] = err
             }
         }
         if fieldsUsed.contains("idState"){
-            if let err = getValidations(fieldName: .idPeriodState)(idState){
+            if let err = getValidations(fieldName: .idState)(idState){
                 errors["idState"] = err
             }
         }
         if fieldsUsed.contains("idCity"){
-            if let err = getValidations(fieldName: .idPeriodCity)(idCity){
+            if let err = getValidations(fieldName: .idCity)(idCity){
                 errors["idCity"] = err
             }
         }
         if fieldsUsed.contains("idZip"){
-            if let err = getValidations(fieldName: .idPeriodZip)(idZip){
+            if let err = getValidations(fieldName: .idZip)(idZip){
                 errors["idZip"] = err
             }
         }
         if fieldsUsed.contains("idAddressLine1"){
-            if let err = getValidations(fieldName: .idPeriodAddressLine1)(idAddressLine1){
+            if let err = getValidations(fieldName: .idAddressLine1)(idAddressLine1){
                 errors["idAddressLine1"] = err
             }
         }
         if fieldsUsed.contains("idAddressLine2"){
-            if let err = getValidations(fieldName: .idPeriodAddressLine2)(idAddressLine2){
+            if let err = getValidations(fieldName: .idAddressLine2)(idAddressLine2){
                 errors["idAddressLine2"] = err
             }
         }
@@ -216,70 +216,70 @@ class FormManager: ObservableObject {
         }
     }
     
-    func setValueByVaultDI(_ value: String, forDi: VaultDI){
-        switch forDi {
-        case .idPeriodEmail:
+    func setValueByFieldName(_ value: String, forField: FpFieldName){
+        switch forField {
+        case .idEmail:
             setValue(value, forKey: "idEmail")
-        case .idPeriodPhoneNumber:
+        case .idPhoneNumber:
             setValue(value, forKey: "idPhoneNumber")
-        case .idPeriodDob:
+        case .idDob:
             setValue(value, forKey: "idDob")
-        case .idPeriodSsn4:
+        case .idSsn4:
             setValue(value, forKey: "idSsn4")
-        case .idPeriodSsn9:
+        case .idSsn9:
             setValue(value, forKey: "idSsn9")
-        case .idPeriodFirstName:
+        case .idFirstName:
             setValue(value, forKey: "idFirstName")
-        case .idPeriodLastName:
+        case .idLastName:
             setValue(value, forKey: "idLastName")
-        case .idPeriodMiddleName:
+        case .idMiddleName:
             setValue(value, forKey: "idMiddleName")
-        case .idPeriodCountry:
+        case .idCountry:
             setValue(value, forKey: "idCountry")
-        case .idPeriodState:
+        case .idState:
             setValue(value, forKey: "idState")
-        case .idPeriodCity:
+        case .idCity:
             setValue(value, forKey: "idCity")
-        case .idPeriodZip:
+        case .idZip:
             setValue(value, forKey: "idZip")
-        case .idPeriodAddressLine1:
+        case .idAddressLine1:
             setValue(value, forKey: "idAddressLine1")
-        case .idPeriodAddressLine2:
+        case .idAddressLine2:
             setValue(value, forKey: "idAddressLine2")
         default:
             break
         }
     }
     
-    func getValueByVaultDi(_ forDi: VaultDI) -> String? {
-        switch forDi {
-        case .idPeriodEmail:
+    func getValueByFieldName(_ forField: FpFieldName) -> String? {
+        switch forField {
+        case .idEmail:
             return idEmail
-        case .idPeriodPhoneNumber:
+        case .idPhoneNumber:
             return idPhoneNumber
-        case .idPeriodDob:
+        case .idDob:
             return idDob
-        case .idPeriodSsn4:
+        case .idSsn4:
             return idSsn4
-        case .idPeriodSsn9:
+        case .idSsn9:
             return idSsn9
-        case .idPeriodFirstName:
+        case .idFirstName:
             return idFirstName
-        case .idPeriodLastName:
+        case .idLastName:
             return idLastName
-        case .idPeriodMiddleName:
+        case .idMiddleName:
             return idMiddleName
-        case .idPeriodCountry:
+        case .idCountry:
             return idCountry
-        case .idPeriodState:
+        case .idState:
             return idState
-        case .idPeriodCity:
+        case .idCity:
             return idCity
-        case .idPeriodZip:
+        case .idZip:
             return idZip
-        case .idPeriodAddressLine1:
+        case .idAddressLine1:
             return idAddressLine1
-        case .idPeriodAddressLine2:
+        case .idAddressLine2:
             return idAddressLine2
         default:
             return nil
@@ -326,73 +326,112 @@ class FormManager: ObservableObject {
         return vaultData
     }
     
-    func getErrorByVaultDI(fieldName: VaultDI) -> String? {
+    func getErrorByFieldName(fieldName: FpFieldName) -> String? {
         switch fieldName {
-        case .idPeriodPhoneNumber:
+        case .idPhoneNumber:
             return errors["idPhoneNumber"]
-        case .idPeriodEmail:
+        case .idEmail:
             return errors["idEmail"]
-        case .idPeriodDob:
+        case .idDob:
             return errors["idDob"]
-        case .idPeriodSsn4:
+        case .idSsn4:
             return errors["idSsn4"]
-        case .idPeriodSsn9:
+        case .idSsn9:
             return errors["idSsn9"]
-        case .idPeriodFirstName:
+        case .idFirstName:
             return errors["idFirstName"]
-        case .idPeriodLastName:
+        case .idLastName:
             return errors["idLastName"]
-        case .idPeriodMiddleName:
+        case .idMiddleName:
             return errors["idMiddleName"]
-        case .idPeriodCountry:
+        case .idCountry:
             return errors["idCountry"]
-        case .idPeriodState:
+        case .idState:
             return errors["idState"]
-        case .idPeriodCity:
+        case .idCity:
             return errors["idCity"]
-        case .idPeriodZip:
+        case .idZip:
             return errors["idZip"]
-        case .idPeriodAddressLine1:
+        case .idAddressLine1:
             return errors["idAddressLine1"]
-        case .idPeriodAddressLine2:
+        case .idAddressLine2:
             return errors["idAddressLine2"]
         default:
             return nil
         }
     }
     
-    func addToFieldsUsed(_ fieldName: VaultDI) {
+    func addToFieldsUsed(_ fieldName: FpFieldName) {
         switch fieldName {
-        case .idPeriodPhoneNumber:
+        case .idPhoneNumber:
             fieldsUsed.insert("idPhoneNumber")
-        case .idPeriodEmail:
+        case .idEmail:
             fieldsUsed.insert("idEmail")
-        case .idPeriodDob:
+        case .idDob:
             fieldsUsed.insert("idDob")
-        case .idPeriodSsn4:
+        case .idSsn4:
             fieldsUsed.insert("idSsn4")
-        case .idPeriodSsn9:
+        case .idSsn9:
             fieldsUsed.insert("idSsn9")
-        case .idPeriodFirstName:
+        case .idFirstName:
             fieldsUsed.insert("idFirstName")
-        case .idPeriodLastName:
+        case .idLastName:
             fieldsUsed.insert("idLastName")
-        case .idPeriodMiddleName:
+        case .idMiddleName:
             fieldsUsed.insert("idMiddleName")
-        case .idPeriodCountry:
+        case .idCountry:
             fieldsUsed.insert("idCountry")
-        case .idPeriodState:
+        case .idState:
             fieldsUsed.insert("idState")
-        case .idPeriodCity:
+        case .idCity:
             fieldsUsed.insert("idCity")
-        case .idPeriodZip:
+        case .idZip:
             fieldsUsed.insert("idZip")
-        case .idPeriodAddressLine1:
+        case .idAddressLine1:
             fieldsUsed.insert("idAddressLine1")
-        case .idPeriodAddressLine2:
+        case .idAddressLine2:
             fieldsUsed.insert("idAddressLine2")
         default:
             break
+        }
+    }
+    
+    func setDefaultValues(defaultValues: [FpFieldName: String]) {
+        // Setting default values doesn't automatically add the field key to used keys
+        // The field should be a part of used keys only if it's used in the UI
+        for (key, value) in defaultValues {
+            switch key {
+            case .idPhoneNumber:
+                idPhoneNumber = value
+            case .idEmail:
+                idEmail = value
+            case .idDob:
+                idDob = value
+            case .idSsn4:
+                idSsn4 = value
+            case .idSsn9:
+                idSsn9 = value
+            case .idFirstName:
+                idFirstName = value
+            case .idLastName:
+                idLastName = value
+            case .idMiddleName:
+                idMiddleName = value
+            case .idCountry:
+                idCountry = value
+            case .idState:
+                idState = value
+            case .idCity:
+                idCity = value
+            case .idZip:
+                idZip = value
+            case .idAddressLine1:
+                idAddressLine1 = value
+            case .idAddressLine2:
+                idAddressLine2 = value
+            default:
+                break
+            }
         }
     }
 }

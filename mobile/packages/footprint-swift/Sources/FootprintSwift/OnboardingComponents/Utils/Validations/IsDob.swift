@@ -56,16 +56,16 @@ func isDobInTheFuture(_ date: Date, today: Date = Date()) -> Bool {
     return date >= today
 }
 
-func isDob(_ dob: String, locale: FootprintLocale) -> String? {
+func isDob(_ dob: String, locale: FootprintLocale, translation: Translation?) -> String? {
     if dob.isEmpty {
-        return "Date of birth is required"
+        return translation?.dob?.required ?? "Date of birth is required"
     }
     
     let today = Date()
     let dateComponents = getMonthYearDateString(date: dob, locale: locale)
     let isCorrectFormat = validateFormat(dateComponents: dateComponents)
     let correctFormat = locale == .enUS ? "MM/DD/YYYY" : "DD/MM/YYYY"
-    if(!isCorrectFormat) { return "Invalid date format. Please use \(correctFormat)" }
+    if(!isCorrectFormat) { return translation?.dob?.invalid ?? "Invalid date format. Please use \(correctFormat)" }
     
     // Ensure day and month are padded to two digits
     let day = String(format: "%02d", Int(dateComponents["day"]!)!)
@@ -80,16 +80,16 @@ func isDob(_ dob: String, locale: FootprintLocale) -> String? {
     dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
     
     guard let date = dateFormatter.date(from: isoFormatDate) else {
-        return "Invalid date. Please use \(correctFormat)"
+        return translation?.dob?.invalid ?? "Invalid date. Please use \(correctFormat)"
     }
     
     let isTooYoung = isDobTooYoung(date, today: today)
     let isTooOld = isDobTooOld(date, today: today)
     let isInTheFuture = isDobInTheFuture(date, today: today)
     
-    if (isTooYoung) { return "Too young. Minimum age is \(DOB_MIN_AGE)" }
-    if (isTooOld) { return "Too old. Maximum age is \(DOB_MAX_AGE)" }
-    if (isInTheFuture) { return "In the future. Please use a valid date" }
+    if (isTooYoung) { return translation?.dob?.tooYoung ?? "Too young. Minimum age is \(DOB_MIN_AGE)" }
+    if (isTooOld) { return translation?.dob?.tooOld ?? "Too old. Maximum age is \(DOB_MAX_AGE)" }
+    if (isInTheFuture) { return translation?.dob?.inTheFuture ?? "In the future. Please use a valid date" }
     
     return nil
 }

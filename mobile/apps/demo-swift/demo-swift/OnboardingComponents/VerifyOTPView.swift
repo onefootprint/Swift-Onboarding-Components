@@ -6,7 +6,6 @@ import Inject
 struct VerifyOTPView: View {
     @ObserveInjection var inject
     private var onboardingComponents = FootprintProvider.shared
-    @State private var pin: String = "000000"
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var navigateToBasicInfo: Bool = false
@@ -18,27 +17,14 @@ struct VerifyOTPView: View {
                     .font(.title2)
                     .padding(.bottom, 20)
                 
-                PinInputField(pin: $pin)
+                PinInputField(){pincode in
+                    submitPin(pin: pincode)}
                     .padding()
                 
-                Button(action: {
-                    submitPin()
-                }) {
-                    HStack {
-                        if isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        }
-                        Text("Submit")
-                    }
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 }
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(isLoading ? Color.gray : Color.blue)
-                .cornerRadius(8)
-                .disabled(isLoading)
-                .padding()
                 
                 if let errorMessage = errorMessage {
                     Text(errorMessage)
@@ -55,7 +41,7 @@ struct VerifyOTPView: View {
         }
     }
     
-    private func submitPin() {
+    private func submitPin(pin: String) {
         isLoading = true
         errorMessage = nil
         

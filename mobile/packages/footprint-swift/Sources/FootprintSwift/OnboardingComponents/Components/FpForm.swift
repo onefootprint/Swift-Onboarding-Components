@@ -1,47 +1,56 @@
 import SwiftUI
 
-public struct FpForm<Content: View, SubmitButton: View>: View {
+public struct FormUtils {
+    public var handleSubmit: () -> Void
+    public var setValue: (_ value: String, _ forField: FpFieldName) -> Void
+    public var getError: (FpFieldName) -> String?
+    
+    init(handleSubmit: @escaping (() -> Void),
+         setValue: @escaping (_ value: String, _ forField: FpFieldName) -> Void,
+         getError: @escaping (FpFieldName) -> String?) {
+        self.handleSubmit = handleSubmit
+        self.setValue = setValue
+        self.getError = getError
+    }
+}
+
+public struct FpForm<Content: View>: View {
     @StateObject var form = FormManager()
-    @State private var isSubmitPressed = false
-    let content: Content
-    let spacing: CGFloat
-    let alignment: HorizontalAlignment
-    let onSubmit: ((VaultData) -> Void)?
-    let submitButtonBuilder: (() -> SubmitButton)?
+    var defaultValues: [FpFieldName: String]? = nil
+    let builder: (FormUtils) -> Content
+    let onSubmit: (VaultData) -> Void
+    
     
     public init(
-        spacing: CGFloat = 16,
-        alignment: HorizontalAlignment = .leading,
-        onSubmit: ((VaultData) -> Void)? = nil,
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder submitButton: @escaping (() -> SubmitButton)
+        defaultValues: [FpFieldName: String]? = nil,
+        onSubmit: @escaping (VaultData) -> Void,
+        @ViewBuilder builder: @escaping (FormUtils) -> Content
     ) {
-        self.spacing = spacing
-        self.alignment = alignment
+        self.builder = builder
         self.onSubmit = onSubmit
-        self.content = content()
-        self.submitButtonBuilder = submitButton
+        self.defaultValues = defaultValues
     }
     
     public var body: some View {
-        VStack(alignment: alignment, spacing: spacing) {
-            content
-            if let onSubmit = onSubmit, let submitButtonBuilder = submitButtonBuilder {
-                submitButtonBuilder()
-                    .onTapGesture {
-                        isSubmitPressed = true
-                        form.triggerValidation()
-                        print(form.isValid)
-                        
-                        if form.isValid{
-                            print("Email info:  \(form.idEmail)")
-                            print("Phone info: \(form.idPhoneNumber)")
-                            print("Vault data \(form.getVaultData())")
-                            onSubmit(form.getVaultData())
-                        }
+        VStack {
+            self.builder(.init(
+                handleSubmit: {
+                    form.triggerValidation()
+                    if form.isValid {
+                        self.onSubmit(form.getVaultData())
                     }
-            }
+                },
+                setValue: { value, field in
+                    form.setValueByFieldName(value, forField: field)
+                },
+                getError: { field in
+                    form.getErrorByFieldName(fieldName: field)
+                }
+            ))
         }
         .environmentObject(form)
+        .onAppear(){
+            form.setDefaultValues(defaultValues: defaultValues ?? [:])
+        }
     }
 }

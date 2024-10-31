@@ -19,41 +19,44 @@ struct EmailAndPhoneView: View {
                     }
                 }
             },
-            content: {
+            builder: { formUtils in
                 VStack(spacing: 20) {
                     FpField(
-                        name: .idPeriodEmail,
-                        label: { FpLabel("Email", font: .subheadline, color: .secondary) },
-                        input: {
-                            FpInput(placeholder: "Enter your email")
-                                .padding()
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(10)
-                        },
-                        error: { FpFieldError() }
+                        name: .idEmail,
+                        content:{
+                            VStack{
+                                FpLabel("Email", font: .subheadline, color: .secondary)
+                                FpInput(placeholder: "Enter your email")
+                                    .padding()
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(10)
+                                FpFieldError()
+                            }
+                        }
                     )
                     
                     FpField(
-                        name: .idPeriodPhoneNumber,
-                        label: { FpLabel("Phone Number", font: .subheadline, color: .secondary) },
-                        input: {
+                        name: .idPhoneNumber,
+                        content: {
+                            FpLabel("Phone Number", font: .subheadline, color: .secondary)
                             FpInput(placeholder: "Enter your phone number")
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(10)
-                        },
-                        error: { FpFieldError() }
+                            FpFieldError()
+                        }
                     )
+                    Button(action: formUtils.handleSubmit) {
+                        Text("Submit")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
                 }
-            },
-            submitButton: {
-                Text("Continue")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }                
+            }
+                          
         )        
         .padding(.horizontal, 20)
         .navigationTitle("Signup flow")

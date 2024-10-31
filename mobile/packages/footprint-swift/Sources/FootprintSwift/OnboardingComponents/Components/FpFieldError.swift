@@ -5,10 +5,10 @@ public struct FpFieldError: View {
     let font: Font
     var message: String?
     @EnvironmentObject var form: FormManager
-    @Environment(\.fpFieldName) var fpFieldName: VaultDI?
+    @EnvironmentObject var fieldManager: FieldManager
     private var errorMessage: String? {
-        if let fpFieldName {
-            let err = form.getErrorByVaultDI(fieldName: fpFieldName)
+        if let fpFieldName = fieldManager.name {
+            let err = form.getErrorByFieldName(fieldName: fpFieldName)
             if let err {
                 return message ?? err
             } else {

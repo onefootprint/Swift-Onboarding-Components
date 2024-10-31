@@ -59,7 +59,7 @@ internal class FootprintQueries {
     ) async throws ->  IdentifyResponse {
         let request = IdentifyRequest(email: email, phoneNumber: phoneNumber, scope: scope )
         do {
-            return try await IdentifyAPI.identify(xOnboardingConfigKey: self.configKey, identifyRequest: request, openAPIClient: client)
+            return try await IdentifyAPI.identify(xOnboardingConfigKey: self.configKey, identifyRequest: request, xSandboxId: sandboxId, xFpAuthorization: authToken, openAPIClient: client)
         } catch let errorResponse as ErrorResponse {
             let errorMessage = getQueryErrorMessage(errorResponse: errorResponse)
             throw FootprintError(kind: .authError, message: "Identify request failed. \(errorMessage)")
@@ -71,12 +71,14 @@ internal class FootprintQueries {
     
     func getSignupChallenge(email: String?, phoneNumber: String?,
                             kind: SignupChallengeRequest.ChallengeKind,
-                            sandboxId: String? = nil) async throws ->  SignupChallengeResponse {
+                            sandboxId: String? = nil,
+                            scope: SignupChallengeRequest.Scope = .onboarding
+    ) async throws ->  SignupChallengeResponse {
         let request = SignupChallengeRequest(
             challengeKind: kind,
             email: email != nil ? SignupChallengeRequestEmail(isBootstrap: false, value: email!) : nil,
             phoneNumber:  phoneNumber != nil ? SignupChallengeRequestEmail(isBootstrap: false, value: phoneNumber!) : nil,
-            scope: SignupChallengeRequest.Scope.onboarding
+            scope: scope
         )
         
         do{
@@ -132,11 +134,11 @@ internal class FootprintQueries {
         }
     }
     
-    func verify(challenge: String, challengeToken: String, authToken: String) async throws -> IdentifyVerifyResponse {
+    func verify(challenge: String, challengeToken: String, authToken: String, scope: IdentifyVerifyRequest.Scope = .onboarding) async throws -> IdentifyVerifyResponse {
         let request = IdentifyVerifyRequest(
             challengeResponse: challenge,
             challengeToken: challengeToken,
-            scope: .onboarding
+            scope: scope
         )
         do {
             return try await IdentifyAPI.verify(xFpAuthorization: authToken, xOnboardingConfigKey: self.configKey, identifyVerifyRequest: request, openAPIClient: client)

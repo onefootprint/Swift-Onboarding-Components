@@ -1,62 +1,102 @@
 import SwiftUI
 import Combine
 
+@available(iOS 15.0, *)
 public struct PinInputField: View {
-    @Binding public var pin: String
-    public let maxDigits: Int = 6
-    @State private var focusedField: Int = 0
+    @State private var digits: [String] = Array(repeating: "\u{200B}", count: 6) // Start with empty strings
+    @FocusState private var focusedFieldIndex: Int?
     
-    public init(pin: Binding<String>) {
-        self._pin = pin
+    var onComplete: ((String) -> Void)?
+
+    public init(onComplete: ((String) -> Void)? = nil) {
+        self.onComplete = onComplete
     }
-    
+
     public var body: some View {
         HStack(spacing: 10) {
-            ForEach(0..<maxDigits, id: \.self) { index in
-                TextField("", text: Binding(
-                    get: { String(pin.count > index ? String(pin[pin.index(pin.startIndex, offsetBy: index)]) : "") },
-                    set: { newValue in
-                        let filtered = newValue.filter { "0123456789".contains($0) }
-                        if filtered.count == 1 {
-                            if pin.count > index {
-                                pin.replaceSubrange(pin.index(pin.startIndex, offsetBy: index)...pin.index(pin.startIndex, offsetBy: index), with: filtered)
-                            } else {
-                                pin += filtered
-                            }
-                            if index < maxDigits - 1 {
-                                focusedField = index + 1
-                            }
-                        } else if filtered.isEmpty && !pin.isEmpty {
-                            if index < pin.count {
-                                pin.remove(at: pin.index(pin.startIndex, offsetBy: index))
-                            }
-                            if index > 0 {
-                                focusedField = index - 1
-                            }
-                        }
+            ForEach(0..<6, id: \.self) { index in
+                SingleDigitInput(
+                    digit: $digits[index],
+                    focusedIndex: $focusedFieldIndex,
+                    index: index,
+                    onComplete: {
+                        handleInput(at: index)
+                    },
+                    onBackspace: {
+                        handleBackspace(at: index)
                     }
-                ))
-                .frame(width: 40, height: 50)
-                .multilineTextAlignment(.center)
-                .keyboardType(.numberPad)
-                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
-                .onChange(of: focusedField) { newValue in
-                    if newValue == index {
-                        DispatchQueue.main.async {
-                            UIApplication.shared.sendAction(#selector(UIResponder.becomeFirstResponder), to: nil, from: nil, for: nil)
+                )
+            }
+        }
+        .onAppear {
+            focusedFieldIndex = 0 // Set initial focus to the first field
+        }
+    }
+    
+    private func handleInput(at index: Int) {
+        // Move to the next field if there is one
+        if index < 5 && !digits[index].isEmpty {
+            focusedFieldIndex = index + 1
+        }
+        var pinCode = digits.joined().filter(\.isNumber)
+        if pinCode.count == digits.count {
+            onComplete?(pinCode)
+        }
+    }
+
+    private func handleBackspace(at index: Int) {
+        if index > 0 {
+            focusedFieldIndex = index - 1
+        }
+    }
+}
+
+// SingleDigitInput component
+@available(iOS 15.0, *)
+struct SingleDigitInput: View {
+    @Binding var digit: String
+    @FocusState.Binding var focusedIndex: Int?
+    let index: Int
+    var onComplete: (() -> Void)?
+    var onBackspace: (() -> Void)?
+
+    var body: some View {
+        TextField("", text: $digit)
+            .keyboardType(.numberPad)
+            .textFieldStyle(.plain)
+            .frame(width: 40, height: 40)
+            .multilineTextAlignment(.center)
+            .font(.system(size: 20))
+            .background(Color.white)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.gray, lineWidth: 1)
+            )
+            .focused($focusedIndex, equals: index) // Bind focus state directly
+            .onChange(of: digit) { [prevValue = digit] newValue in
+                if prevValue == "\u{200B}" && newValue.isEmpty {
+                    digit = "\u{200B}"
+                    onBackspace?()
+                    return
+                } else if newValue.isEmpty {
+                    digit = "\u{200B}"
+                    return
+                }
+                
+                if newValue.count > 1 {
+                    var numericChar = ""
+                    newValue.forEach({char in
+                        if char.isNumber {
+                            numericChar = String(char)
                         }
+                    })
+                    if !numericChar.isEmpty {
+                        digit = numericChar
+                        onComplete?()
+                    }else{
+                        digit = "\u{200B}"
                     }
                 }
             }
-        }
-        .onReceive(Just(pin)) { _ in
-            limitText(maxDigits)
-        }
-    }
-    
-    private func limitText(_ upper: Int) {
-        if pin.count > upper {
-            pin = String(pin.prefix(upper))
-        }
     }
 }
