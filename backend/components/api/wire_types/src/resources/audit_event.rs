@@ -76,6 +76,8 @@ pub enum AuditEventDetail {
         first_name: Option<String>,
         last_name: Option<String>,
         tenant_role_id: TenantRoleId,
+        tenant_role_name: String,
+        scopes: Vec<TenantScope>,
     },
     UpdateOrgMember,
     LoginOrgMember,

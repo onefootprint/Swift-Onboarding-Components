@@ -32,6 +32,8 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             return Err(AssertionError("audit event name does not match metadata kind").into());
         }
 
+        let tenant_role2 = tenant_role.clone();
+
         let detail: AuditEventDetail = match audit_event.metadata {
             AuditEventMetadata::CreateUser { fields } => AuditEventDetail::CreateUser {
                 fp_id: scoped_vault
@@ -82,14 +84,17 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                 email,
                 first_name,
                 last_name,
-            } => AuditEventDetail::InviteOrgMember {
-                email,
-                first_name,
-                last_name,
-                tenant_role_id: tenant_role
-                    .ok_or(AssertionError("tenant role is not available for this event"))?
-                    .id,
-            },
+            } => {
+                let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
+                AuditEventDetail::InviteOrgMember {
+                    email,
+                    first_name,
+                    last_name,
+                    tenant_role_id: tr.id,
+                    tenant_role_name: tr.name,
+                    scopes: tr.scopes,
+                }
+            }
             AuditEventMetadata::UpdateOrgMember => AuditEventDetail::UpdateOrgMember,
             AuditEventMetadata::LoginOrgMember => AuditEventDetail::LoginOrgMember,
             AuditEventMetadata::RemoveOrgMember => AuditEventDetail::RemoveOrgMember,
@@ -97,7 +102,7 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             AuditEventMetadata::UpdateOrgSettings => AuditEventDetail::UpdateOrgSettings,
             AuditEventMetadata::CreateOrgRole { scopes } => AuditEventDetail::CreateOrgRole {
                 scopes,
-                tenant_role_id: tenant_role
+                tenant_role_id: tenant_role2
                     .ok_or(AssertionError("tenant role is not available for this event"))?
                     .id,
             },
