@@ -58,7 +58,8 @@
     },
     "body": {
       "decryption-reason": {
-        "aria-label": "Decryption reason body"
+        "aria-label": "Decryption reason body",
+        "decryption-reason": "Decryption reason"
       }
     }
   },
