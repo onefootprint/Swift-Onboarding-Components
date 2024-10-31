@@ -61,9 +61,7 @@ const ViewProfileLink = ({ href }: { href: string }) => {
     <>
       <span>·</span>
       <Text color="accent" variant="label-3">
-        <Link target="_blank" href={href}>
-          {t('link')}
-        </Link>
+        <Link href={href}>{t('link')}</Link>
       </Text>
     </>
   );

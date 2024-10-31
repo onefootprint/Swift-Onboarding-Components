@@ -53,9 +53,7 @@ const OwnedBusinesses = ({ businesses }: OwnedBusinessesProps) => {
                 </Stack>
               </Stack>
               <Text color="accent" variant="label-3">
-                <Link target="_blank" href={`/businesses/${business.id}`}>
-                  {t('link')}
-                </Link>
+                <Link href={`/businesses/${business.id}`}>{t('link')}</Link>
               </Text>
             </Field>
           ))}
