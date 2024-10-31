@@ -32,7 +32,8 @@
       }
     },
     "bos": {
-      "title": "Beneficial owners",
+      "title": "Business owners",
+      "list-title": "List of business owners",
       "link": "View profile",
       "status": {
         "awaiting-kyc": "Awaiting KYC"
@@ -41,6 +42,9 @@
         "primary-with-stake": "Owns {{stake}}%  of the business & submitted the business information",
         "primary-no-stake": "Submitted the business information",
         "generic-stake": "Owns {{stake}}% of the business"
+      },
+      "stake-explanation": {
+        "title": "User’s explanation for why the ownership percentages don’t add up"
       }
     },
     "address": {

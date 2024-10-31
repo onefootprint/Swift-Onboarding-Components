@@ -3,7 +3,7 @@ import mockRouter from 'next-router-mock';
 
 import type { BusinessOwnersProps } from './business-owners';
 import BusinessOwners from './business-owners';
-import { entityFixture, withBusinessOwnersError } from './business-owners.test.config';
+import { entityFixture, withBusinessOwners, withBusinessOwnersError } from './business-owners.test.config';
 
 describe('<BusinessOwners />', () => {
   beforeEach(() => {
@@ -13,8 +13,9 @@ describe('<BusinessOwners />', () => {
     };
   });
 
-  const renderBusinessOwners = ({ entity = entityFixture }: Partial<BusinessOwnersProps>) =>
-    customRender(<BusinessOwners entity={entity} />);
+  const renderBusinessOwners = ({ entity = entityFixture }: Partial<BusinessOwnersProps>) => {
+    return customRender(<BusinessOwners entity={entity} />);
+  };
 
   describe("when the request to fetch the BO's fails", () => {
     beforeEach(() => {
@@ -28,6 +29,19 @@ describe('<BusinessOwners />', () => {
         const feedback = screen.getByText('Something went wrong');
         expect(feedback).toBeInTheDocument();
       });
+    });
+  });
+
+  describe("when the request to fetch the BO's succeeds", () => {
+    beforeEach(() => {
+      withBusinessOwners();
+    });
+
+    it("should show the list of BO's", async () => {
+      renderBusinessOwners({});
+
+      const title = await screen.findByRole('list', { name: 'List of business owners' });
+      expect(title).toBeInTheDocument();
     });
   });
 });

@@ -63,3 +63,39 @@ export const withBusinessOwnersError = (entity = entityFixture) =>
       message: 'Something went wrong',
     },
   });
+
+export const withBusinessOwners = (entity = entityFixture) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/business_owners`,
+    statusCode: 200,
+    response: [
+      {
+        fpId: 'fp_id_test_4Cuir5AKf9Hdaxyjay3fMZ',
+        status: 'incomplete',
+        ownershipStake: 24,
+        ownershipStakeDi: 'business.beneficial_owners.bo_link_primary.ownership_stake',
+        kind: 'primary',
+        source: 'hosted',
+        name: 'John Smith',
+      },
+      {
+        fpId: 'fp_id_test_5Duir6BLg0Iebxzkbz4gNa',
+        status: 'incomplete',
+        ownershipStake: 35,
+        ownershipStakeDi: 'business.beneficial_owners.bo_link_primary.ownership_stake',
+        kind: 'secondary',
+        source: 'hosted',
+        name: 'Sarah Johnson',
+      },
+      {
+        fpId: 'fp_id_test_6Euir7CMh1Jfcyalc05hOb',
+        status: 'incomplete',
+        ownershipStake: 41,
+        ownershipStakeDi: 'business.beneficial_owners.bo_link_primary.ownership_stake',
+        kind: 'secondary',
+        source: 'hosted',
+        name: 'Michael Brown',
+      },
+    ],
+  });

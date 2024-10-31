@@ -1,8 +1,7 @@
 import type { BusinessOwner } from '@onefootprint/types';
-import { Badge, Box, Grid, Stack, Text } from '@onefootprint/ui';
+import { Badge, Grid, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { FieldOrPlaceholder } from 'src/components';
 import StatusBadge from 'src/components/status-badge';
 
 export type ContentProps = {
@@ -22,15 +21,10 @@ const BusinessOwnersField = ({ businessOwners }: ContentProps) => {
   };
 
   return (
-    <Box testID="business-owners-content">
-      <Grid.Container gap={4}>
+    <Stack gap={7} direction="column">
+      <Grid.Container gap={4} tag="ul" aria-label={t('list-title')}>
         {businessOwners.map((businessOwner, index) => (
-          <Stack
-            alignItems="center"
-            aria-label={allT('di.business.kyced_beneficial_owners')}
-            justifyContent="space-between"
-            key={businessOwner.fpId || index}
-          >
+          <Stack justifyContent="space-between" key={businessOwner.fpId || index} tag="li">
             <Stack direction="column" gap={2}>
               <Stack align="center" gap={2}>
                 <Text variant="body-3" color="tertiary">
@@ -39,29 +33,63 @@ const BusinessOwnersField = ({ businessOwners }: ContentProps) => {
                 {businessOwner.status ? (
                   <StatusBadge status={businessOwner.status} />
                 ) : (
-                  <Badge variant="warning">{t('status.awaiting-kyc')}</Badge>
+                  <Badge variant="info">{t('status.awaiting-kyc')}</Badge>
                 )}
-                {businessOwner.fpId && (
-                  <>
-                    <span>·</span>
-                    <Text color="accent" variant="label-3">
-                      <Link target="_blank" href={`/users/${businessOwner.fpId}`}>
-                        {t('link')}
-                      </Link>
-                    </Text>
-                  </>
-                )}
+                {businessOwner.fpId && <ViewProfileLink href={`/users/${businessOwner.fpId}`} />}
               </Stack>
               <Text variant="caption-2" color="secondary">
                 {getHintText(businessOwner)}
               </Text>
             </Stack>
-            <FieldOrPlaceholder data={businessOwner.name} />
+            <Text variant="body-3" color="primary" center height="24px">
+              {businessOwner.name}
+            </Text>
           </Stack>
         ))}
       </Grid.Container>
-    </Box>
+      {/* <OwnershipExplanation explanation="The other 5% is split among 10 small angel investors, so I didn't think it was relevant to add them all here." /> */}
+    </Stack>
   );
 };
+
+const ViewProfileLink = ({ href }: { href: string }) => {
+  const { t } = useTranslation('business-details', { keyPrefix: 'vault.bos' });
+
+  return (
+    <>
+      <span>·</span>
+      <Text color="accent" variant="label-3">
+        <Link target="_blank" href={href}>
+          {t('link')}
+        </Link>
+      </Text>
+    </>
+  );
+};
+
+// const OwnershipExplanation = ({ explanation }: { explanation: string }) => {
+//   const { t } = useTranslation('business-details', { keyPrefix: 'vault.bos.stake-explanation' });
+
+//   return (
+//     <Stack
+//       backgroundColor="primary"
+//       borderColor="tertiary"
+//       borderRadius="default"
+//       borderStyle="solid"
+//       borderWidth={1}
+//       direction="column"
+//       gap={3}
+//       padding={5}
+//     >
+//       <Stack gap={2}>
+//         <IcoInfo16 />
+//         <Text variant="label-3">{t('title')}</Text>
+//       </Stack>
+//       <Text variant="body-3" color="secondary">
+//         {explanation}
+//       </Text>
+//     </Stack>
+//   );
+// };
 
 export default BusinessOwnersField;

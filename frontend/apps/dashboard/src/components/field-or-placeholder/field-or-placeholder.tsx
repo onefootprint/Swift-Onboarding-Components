@@ -17,7 +17,7 @@ const FieldOrPlaceholder = ({ data, transforms }: FieldOrPlaceholderProps) => {
 
   if (isVaultDataText(data)) {
     return (
-      <Text isPrivate variant="body-3" color="primary">
+      <Text variant="body-3" color="primary">
         {data}
       </Text>
     );
