@@ -260,8 +260,6 @@ export {
 export type { GetOrgRiskSignalsResponse } from './api/get-org-risk-signals';
 export type {
   AccessEvent,
-  AccessEventKind,
-  AccessEventName,
   AccessLog,
   Actor,
   ActorApiKey,
@@ -445,6 +443,7 @@ export {
   WorkflowKind,
   AuthMethodKind,
   AccessLogKind,
+  AccessEventKind,
   LivenessSource,
   LivenessIssuer,
   AuthEventKind,
