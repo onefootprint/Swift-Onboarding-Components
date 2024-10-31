@@ -2,11 +2,17 @@ import { isEmail, isPhoneNumber } from '@onefootprint/core';
 import { uuidv4 } from '@onefootprint/dev-tools';
 import { IcoPlusSmall24, IcoUserCircle24 } from '@onefootprint/icons';
 import type { HostedBusinessOwner } from '@onefootprint/request-types';
-import { Button, Divider, Form, InlineAlert, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
+import { Divider, Form, InlineAlert, LinkButton, PhoneInput, Stack, Text, useToast } from '@onefootprint/ui';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import EditableFormButtonContainer from '../../../../../components/editable-form-button-container';
 import type { ManageBosFormData, NewBusinessOwner } from '../manage-bos.types';
 import { hasDuplicatedEmail, hasDuplicatedPhoneNumber, sumTotalOwnershipStake } from '../utils/manage-bos.utils';
+
+export type ConfirmProps = {
+  onCancel: () => void;
+  ctaLabel: string;
+};
 
 export type BosFormProps = {
   existingBos: HostedBusinessOwner[];
@@ -14,12 +20,15 @@ export type BosFormProps = {
   // If there is bootstrap data or existing BOs, we can use them to pre-populate the form.
   defaultFormValues: NewBusinessOwner[];
   isLive: boolean;
+  confirmProps?: ConfirmProps;
 };
 
 /** Renders a form for editing the mutable beneficial owners of a business or adding new beneficial owners. */
-const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormProps) => {
+const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive, confirmProps }: BosFormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
+
+  const forConfirmScreen = !!confirmProps;
 
   const {
     register,
@@ -110,15 +119,15 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
             <Stack
               key={field.id}
               direction="column"
-              borderRadius="sm"
-              borderColor="tertiary"
-              borderStyle="solid"
               borderWidth={1}
-              marginTop={5}
-              padding={5}
+              marginTop={forConfirmScreen ? 0 : 5}
+              padding={forConfirmScreen ? 0 : 5}
+              borderColor={forConfirmScreen ? undefined : 'tertiary'}
+              borderRadius={forConfirmScreen ? undefined : 'sm'}
+              borderStyle={forConfirmScreen ? undefined : 'solid'}
             >
               <Stack marginBottom={5} gap={3} alignItems="center">
-                <IcoUserCircle24 />
+                {!forConfirmScreen && <IcoUserCircle24 />}
                 <Text variant="label-3">
                   {isPrimaryBo ? t('fields-header.beneficial-owner-you') : t('fields-header.beneficial-owner')}
                 </Text>
@@ -228,6 +237,7 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
                   <Form.Errors>{ownershipStakeErrors?.message}</Form.Errors>
                 </Form.Field>
               </Stack>
+              {forConfirmScreen && idx !== fields.length - 1 && <Divider marginTop={7} marginBottom={7} />}
             </Stack>
           );
         })}
@@ -249,9 +259,12 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
             {t('add-another')}
           </LinkButton>
         </Stack>
-        <Button size="large" type="submit" loading={isSubmitting}>
-          {t('continue')}
-        </Button>
+        <EditableFormButtonContainer
+          onCancel={confirmProps?.onCancel}
+          isLoading={isSubmitting}
+          ctaLabel={confirmProps?.ctaLabel}
+          submitButtonTestID="kyb-bo"
+        />
       </Stack>
     </form>
   );

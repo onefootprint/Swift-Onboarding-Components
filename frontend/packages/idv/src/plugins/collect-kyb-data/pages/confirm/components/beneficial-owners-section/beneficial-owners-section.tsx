@@ -8,12 +8,14 @@ import type { SectionItemProps } from '../../../../../../components/confirm-coll
 import { MultiSection, Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import { useBusinessOwners } from '../../../../../../queries';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
+import BeneficialOwnersConfirm from './components/beneficial-owners-confirm';
 
 const BeneficialOwnersSection = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.confirm' });
   const [state] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
+    config,
   } = state.context;
   const [isEditing, setIsEditing] = useState(false);
   const bosQuery = useBusinessOwners({ authToken });
@@ -75,19 +77,22 @@ const BeneficialOwnersSection = () => {
     setIsEditing(true);
   };
 
-  // TODO: once we migrate to use ManageBos here, we can support editing BOs
-  const shouldHideEditButton = true;
+  const stopEditing = () => {
+    setIsEditing(false);
+  };
 
   return isEditing ? (
     <Section
-      content={null}
+      content={
+        <BeneficialOwnersConfirm authToken={authToken} bos={bosQuery.data} config={config} onDone={stopEditing} />
+      }
       IconComponent={IcoUserCircle24}
       testID="beneficial-owners"
       title={t('beneficial-owners.title')}
     />
   ) : (
     <MultiSection
-      editLabel={shouldHideEditButton ? '' : t('summary.edit')}
+      editLabel={t('summary.edit')}
       IconComponent={IcoUserCircle24}
       onEdit={startEditing}
       sections={getPreviewSections()}

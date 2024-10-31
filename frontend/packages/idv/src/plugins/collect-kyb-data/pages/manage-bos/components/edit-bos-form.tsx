@@ -5,7 +5,7 @@ import { useBusinessOwnersPatch } from '../../../../../queries';
 import useConfirmMissingBoDialog from '../hooks/use-confirm-missing-bo-dialog';
 import type { ManageBosFormData, NewBusinessOwner } from '../manage-bos.types';
 import { sumTotalOwnershipStake } from '../utils/manage-bos.utils';
-import BosForm from './bos-form';
+import BosForm, { type ConfirmProps } from './bos-form';
 
 const MISSING_BOS_CONFIRMATION_THRESHOLD = 76;
 
@@ -15,9 +15,10 @@ export type EditBosFormProps = {
   onDone: () => void;
   defaultFormValues: NewBusinessOwner[];
   isLive: boolean;
+  confirmProps?: ConfirmProps;
 };
 
-const EditBosForm = ({ authToken, existingBos, onDone, defaultFormValues, isLive }: EditBosFormProps) => {
+const EditBosForm = ({ authToken, existingBos, onDone, confirmProps, defaultFormValues, isLive }: EditBosFormProps) => {
   const { showConfirmationModal, ConfirmMissingBoDialog } = useConfirmMissingBoDialog({ authToken });
   const showRequestErrorToast = useRequestErrorToast();
   const bosMutation = useBusinessOwnersPatch();
@@ -69,6 +70,7 @@ const EditBosForm = ({ authToken, existingBos, onDone, defaultFormValues, isLive
         onSubmit={handleBosFormSubmit}
         defaultFormValues={defaultFormValues}
         isLive={isLive}
+        confirmProps={confirmProps}
       />
       {ConfirmMissingBoDialog}
     </>
