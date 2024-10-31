@@ -1,8 +1,15 @@
 use crate::data_identifier::DiValidationError;
+use crate::BankDataKind;
+use crate::BankInfo;
+use crate::BoLinkId;
+use crate::BusinessDataKind;
+use crate::CardDataKind;
+use crate::CardInfo;
 use crate::CleanAndValidate;
 use crate::DataIdentifier;
 use crate::DataValidationError;
 use crate::DeriveValues;
+use crate::Error;
 use crate::IdentityDataKind as IDK;
 use crate::NtResult;
 use crate::PiiJsonValue;
@@ -19,8 +26,8 @@ use std::collections::HashMap;
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
 pub struct DataRequest {
     #[deref]
-    pub data: HashMap<DataIdentifier, PiiString>,
-    pub json_fields: Vec<DataIdentifier>,
+    pub(super) data: HashMap<DataIdentifier, PiiString>,
+    pub(super) json_fields: Vec<DataIdentifier>,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -154,6 +161,42 @@ impl DataRequest {
         Ok(request)
     }
 
+    pub fn fingerprints(fingerprints: HashMap<DataIdentifier, PiiString>) -> NtResult<Self> {
+        for di in fingerprints.keys() {
+            let is_fingerprint = matches!(
+                di,
+                DataIdentifier::Card(CardInfo {
+                    alias: _,
+                    kind: CardDataKind::Fingerprint
+                }) | DataIdentifier::Bank(BankInfo {
+                    alias: _,
+                    kind: BankDataKind::Fingerprint
+                })
+            );
+
+            if !is_fingerprint {
+                return Err(Error::AssertionError(format!(
+                    "Cannot construct fingerprint DataRequest with DI {:?}",
+                    di
+                )));
+            }
+        }
+
+
+        Ok(Self {
+            data: fingerprints,
+            json_fields: vec![],
+        })
+    }
+
+    pub fn fixture_data(data: HashMap<DataIdentifier, PiiString>, json_fields: Vec<DataIdentifier>) -> Self {
+        Self { data, json_fields }
+    }
+
+    pub fn di_is_json(&self, di: &DataIdentifier) -> bool {
+        self.json_fields.contains(di)
+    }
+
     /// Filters out the elements that don't match DataIdentifier predicate.
     /// In other words, filters out all items for which f(&di) returns false.
     pub fn filter<F>(self, mut f: F) -> Self
@@ -166,6 +209,28 @@ impl DataRequest {
         } = self;
         data.retain(|di, _| f(di));
         json_fields.retain(f);
+        Self { data, json_fields }
+    }
+
+    pub fn extend(&mut self, other: Self) {
+        let Self { data, json_fields } = self;
+
+        data.extend(other.data);
+        *json_fields = chain!(std::mem::take(json_fields), other.json_fields)
+            .unique()
+            .collect();
+    }
+
+    /// Turn a user DataRequest into a DataRequest that will be stored on the business representing
+    /// a beneficial owner that has not yet onboarded.
+    pub fn into_beneficial_owner_data(self, link_id: &BoLinkId) -> Self {
+        let Self { data, json_fields } = self;
+
+        let map_di = move |di| BusinessDataKind::bo_data(link_id.clone(), di).into();
+
+        let data = data.into_iter().map(|(k, v)| (map_di(k), v)).collect();
+        let json_fields = json_fields.into_iter().map(map_di).collect();
+
         Self { data, json_fields }
     }
 }

@@ -181,13 +181,7 @@ fn create_fingerprinted_data_request(
     data: DataRequest,
     link_id: &BoLinkId,
 ) -> FpResult<FingerprintedDataRequest> {
-    // Add the business owner's link_id to every DI
-    let map_di = move |di| BDK::bo_data(link_id.clone(), di).into();
-
-    let DataRequest { data, json_fields } = data;
-    let data = data.into_iter().map(|(k, v)| (map_di(k), v)).collect();
-    let json_fields = json_fields.into_iter().map(map_di).collect();
-    let data = DataRequest { data, json_fields };
+    let data = data.into_beneficial_owner_data(link_id);
 
     // Never any fingerprints for beneficial owner data
     let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);

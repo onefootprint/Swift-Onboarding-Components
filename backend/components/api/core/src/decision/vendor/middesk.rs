@@ -810,8 +810,8 @@ impl MiddeskResponseDerivedVaultData {
 
     /// a fixture version of the data to be written to the vault
     pub fn fixture(sv_id: &ScopedVaultId) -> Self {
-        let data = DataRequest {
-            data: HashMap::from_iter(vec![
+        let data = DataRequest::fixture_data(
+            HashMap::from_iter(vec![
                 (
                     DataIdentifier::Business(BusinessDataKind::FormationState),
                     PiiString::from("CA"),
@@ -821,8 +821,8 @@ impl MiddeskResponseDerivedVaultData {
                     PiiString::from("2024-02-02"),
                 ),
             ]),
-            json_fields: vec![],
-        };
+            vec![],
+        );
 
         Self {
             scoped_vault_id: sv_id.clone(),

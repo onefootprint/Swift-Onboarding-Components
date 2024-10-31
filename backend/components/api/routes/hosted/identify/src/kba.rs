@@ -57,14 +57,13 @@ pub async fn post(
     let decrypted = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
 
     let successful_kba = data
-        .data
-        .into_iter()
+        .iter()
         .map(|(di, kba_response)| -> FpResult<_> {
             let actual = decrypted.get_di(di.clone())?;
             if !crypto::safe_compare(actual.leak().as_bytes(), kba_response.leak().as_bytes()) {
                 return ValidationError(&format!("Incorrect KBA response for {}", di)).into();
             }
-            Ok(di)
+            Ok(di.clone())
         })
         .collect::<FpResult<Vec<_>>>()?;
 

@@ -238,6 +238,7 @@ async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>)
     let PatchDataRequest {
         updates,
         deletions: _,
+        ..
     } = PatchDataRequest::clean_and_validate(request, args).unwrap();
     let data_req = FingerprintedDataRequest::build_for_new_user(state, updates, &sv.tenant_id)
         .await

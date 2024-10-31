@@ -22,8 +22,7 @@ use std::collections::HashMap;
 pub struct FingerprintedDataRequest {
     #[deref]
     #[deref_mut]
-    pub data: HashMap<DataIdentifier, PiiString>,
-    pub(super) json_fields: Vec<DataIdentifier>,
+    pub data: DataRequest,
     pub(super) fingerprints: Fingerprints,
 }
 
@@ -38,17 +37,13 @@ impl FingerprintedDataRequest {
     /// This gives us type safety that fingerprints are provided to the VW utils that add data to a
     /// vault
     #[tracing::instrument("FingerprintedDataRequest::build", skip_all)]
-    pub async fn build(state: &State, data: DataRequest, sv_id: &ScopedVaultId) -> FpResult<Self> {
+    pub async fn build(state: &State, mut data: DataRequest, sv_id: &ScopedVaultId) -> FpResult<Self> {
         let sv_id = sv_id.clone();
         let vw = state
             .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sv_id))
             .await?;
 
         let t_id = &vw.scoped_vault.tenant_id;
-        let DataRequest {
-            mut data,
-            json_fields,
-        } = data;
 
         let request_fingerprints = Self::generate_request_fingerprints(state, &data, t_id).await?;
         let (vault_fingerprints, salt_to_dl_id) =
@@ -62,13 +57,13 @@ impl FingerprintedDataRequest {
         let fp_salt_to_fp: HashMap<_, _> = fingerprints.iter().cloned().collect();
         let new_dis = data.keys().collect_vec();
 
-        let (composite_fingerprints, addl_dis) =
+        let (composite_fingerprints, fingerprint_dis) =
             Self::generate_composite_fingerprints(&fp_salt_to_fp, &vw.populated_dis(), &new_dis, t_id)?;
 
-        data.extend(addl_dis);
+
+        data.extend(DataRequest::fingerprints(fingerprint_dis)?);
         let request = Self {
             data,
-            json_fields,
             fingerprints: Fingerprints::new(fingerprints, composite_fingerprints, salt_to_dl_id),
         };
         Ok(request)
@@ -81,24 +76,20 @@ impl FingerprintedDataRequest {
     #[tracing::instrument("FingerprintedDataRequest::build_for_new_user", skip_all)]
     pub async fn build_for_new_user(
         state: &State,
-        data: DataRequest,
+        mut data: DataRequest,
         tenant_id: &TenantId,
     ) -> FpResult<Self> {
-        let DataRequest {
-            mut data,
-            json_fields,
-        } = data;
         let new_dis = data.keys().collect_vec();
         let fingerprints = Self::generate_request_fingerprints(state, &data, tenant_id).await?;
         let salt_to_fp: HashMap<_, _> = fingerprints.iter().cloned().collect();
 
-        let (composite_fingerprints, addl_dis) =
+        let (composite_fingerprints, fingerprint_dis) =
             Self::generate_composite_fingerprints(&salt_to_fp, &[], &new_dis, tenant_id)?;
 
-        data.extend(addl_dis);
+        data.extend(DataRequest::fingerprints(fingerprint_dis)?);
+
         let request = Self {
             data,
-            json_fields,
             fingerprints: Fingerprints::new(fingerprints, composite_fingerprints, HashMap::new()),
         };
         Ok(request)
@@ -222,8 +213,7 @@ impl FingerprintedDataRequest {
     /// data
     pub fn manual_fingerprints(data: DataRequest, fingerprints: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
         Self {
-            data: data.data,
-            json_fields: data.json_fields,
+            data,
             fingerprints: Fingerprints::new(fingerprints, vec![], HashMap::new()),
         }
     }
@@ -232,8 +222,7 @@ impl FingerprintedDataRequest {
     /// DataRequest for validation
     pub fn no_fingerprints_for_validation(data: DataRequest) -> Self {
         Self {
-            data: data.data,
-            json_fields: data.json_fields,
+            data,
             fingerprints: Fingerprints::new(vec![], vec![], HashMap::new()),
         }
     }

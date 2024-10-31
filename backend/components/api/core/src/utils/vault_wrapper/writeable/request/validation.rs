@@ -82,24 +82,21 @@ impl<Type> TenantVw<Type> {
     ) -> FpResult<ValidatedDataRequest> {
         self.assert_update_allowed(&request, request_source)?;
         // Transform the request into a Vec<NewVaultData>
-        let FingerprintedDataRequest {
-            data,
-            json_fields,
-            fingerprints,
-        } = request;
+        let FingerprintedDataRequest { data, fingerprints } = request;
+
         let data = data
-            .into_iter()
+            .iter()
             .map(|(kind, pii)| {
-                let e_data = self.vault().public_key.seal_pii(&pii)?;
-                let p_data = kind.store_plaintext().then_some(pii);
-                let format = if json_fields.contains(&kind) {
+                let e_data = self.vault().public_key.seal_pii(pii)?;
+                let p_data = kind.store_plaintext().then_some(pii.clone());
+                let format = if data.di_is_json(kind) {
                     VaultDataFormat::Json
                 } else {
                     VaultDataFormat::String
                 };
                 let vd = NewVaultData {
-                    source: request_source.dl_source(&kind),
-                    kind,
+                    source: request_source.dl_source(kind),
+                    kind: kind.clone(),
                     e_data,
                     p_data,
                     format,

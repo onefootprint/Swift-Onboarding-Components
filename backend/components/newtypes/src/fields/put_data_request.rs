@@ -18,6 +18,7 @@ use crate::PiiValueKind;
 use crate::UserDataIdentifier;
 use crate::ValidateArgs;
 use either::Either;
+use itertools::chain;
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -76,6 +77,7 @@ impl_modern_map_apiv2_schema!(
 impl_request_type!(ModernRawBusinessDataRequest);
 
 
+#[non_exhaustive]
 pub struct PatchDataRequest {
     pub updates: DataRequest,
     pub deletions: Vec<DataIdentifier>,
@@ -141,5 +143,14 @@ impl PatchDataRequest {
         };
 
         Ok(result)
+    }
+
+    pub fn extend(&mut self, other: Self) {
+        let Self { updates, deletions } = self;
+
+        updates.extend(other.updates);
+        *deletions = chain!(std::mem::take(deletions), other.deletions)
+            .unique()
+            .collect();
     }
 }
