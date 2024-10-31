@@ -35,6 +35,7 @@ const ConfirmMissingBoDialog = ({ isLoading, isOpen, onClose, onSubmit }: Confir
       isConfirmation
       title={t('missing-bos-confirmation.title')}
       open={isOpen}
+      size="compact"
       onClose={isLoading ? noop : handleOnClose}
       secondaryButton={{
         label: t('missing-bos-confirmation.secondary-cta'),

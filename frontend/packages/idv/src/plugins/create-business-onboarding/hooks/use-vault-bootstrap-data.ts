@@ -61,14 +61,18 @@ const vault = async (
   const secondaryBosPayload = getSecondaryBos(bootstrapBusinessData);
 
   if (primaryBoPayload || secondaryBosPayload?.length) {
+    const payload = [];
+    if (primaryBoPayload) {
+      payload.push(primaryBoPayload);
+    }
+    if (secondaryBosPayload?.length) {
+      payload.push(secondaryBosPayload);
+    }
+
     await patchHostedBusinessOwners({
       headers: { 'X-Fp-Authorization': options.authToken },
-      body: [
-        // @ts-ignore types on the BE are wrong - fix when it's possible
-        primaryBoPayload,
-        // @ts-ignore types on the BE are wrong - fix when it's possible
-        ...secondaryBosPayload,
-      ].filter(Boolean),
+      // @ts-ignore backend types are wrong
+      body: payload,
     });
   }
 };
