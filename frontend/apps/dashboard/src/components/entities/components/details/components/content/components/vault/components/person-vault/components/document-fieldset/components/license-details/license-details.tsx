@@ -82,7 +82,7 @@ const LicenseAndSelfieDetails = ({ document, isDecryptable, open, onDecrypt, vau
           ref={scrollContainerRef}
         >
           <TableOfContents uploads={uploads} onClick={scrollToUpload} currentIndex={visibleUploadIndex} />
-          <UploadsContainer direction="column" align="center" gap={8} width="80%">
+          <UploadsContainer direction="column" align="center" gap={8} width="60%">
             {uploads.map((upload, index) => {
               const vaultIndex = `${upload.identifier}:${upload.version}` as DataIdentifier;
               const vaultValue = vault[vaultIndex] as string;
