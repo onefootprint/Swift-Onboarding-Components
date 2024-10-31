@@ -425,7 +425,7 @@
           },
           "footer": {
             "label": "Note:",
-            "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+            "content": "we run AML checks at the time of onboarding and keep doing it monthly for all of your users onboarded through Footprint"
           }
         },
         "matching-method": {
