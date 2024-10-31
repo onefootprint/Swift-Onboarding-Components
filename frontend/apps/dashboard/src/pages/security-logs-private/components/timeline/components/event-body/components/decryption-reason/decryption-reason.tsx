@@ -23,6 +23,7 @@ const DecryptionReason = ({ detail }: DecryptionReasonProps) => {
       padding={5}
       gap={3}
       direction="column"
+      marginBottom={8}
     >
       <Stack gap={1} alignItems="center">
         <IcoInfo16 />

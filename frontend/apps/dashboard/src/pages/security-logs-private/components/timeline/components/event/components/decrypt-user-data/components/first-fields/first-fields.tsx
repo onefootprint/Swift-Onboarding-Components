@@ -30,7 +30,18 @@ const FirstFieldsText = ({ decryptedFields }: FirstFieldsTextProps) => {
   };
 
   const text = getFieldText();
-  return <Text variant="label-3">{text}</Text>;
+  return (
+    <>
+      {/* NOTE: we split these into parts so that we can wrap these across multiple 
+      lines in the parent container  */}
+      {text.split(', ').map((part, index, array) => (
+        <Text key={`${part}`} variant="label-3" wordWrap="break-word">
+          {part}
+          {index < array.length - 1 ? ',' : ''}
+        </Text>
+      ))}
+    </>
+  );
 };
 
 export default FirstFieldsText;

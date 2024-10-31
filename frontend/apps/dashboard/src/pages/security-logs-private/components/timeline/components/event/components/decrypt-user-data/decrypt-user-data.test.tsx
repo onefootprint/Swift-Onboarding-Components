@@ -21,17 +21,16 @@ describe('<DecryptUserData />', () => {
     const text = screen.getByText('First name and Last name');
     expect(text).toBeInTheDocument();
   });
-
   it('should render correctly with three fields', () => {
     customRender(<DecryptUserData detail={threeFieldsFixture} />);
-    const text = screen.getByText('First name, Last name, and Date of birth');
-    expect(text).toBeInTheDocument();
+    const elements = screen.getAllByRole('paragraph');
+    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,and Date of birth');
   });
 
   it('should render correctly with four fields', async () => {
     customRender(<DecryptUserData detail={fourFieldsFixture} />);
-    const text = screen.getByText('First name, Last name, Date of birth and');
-    expect(text).toBeInTheDocument();
+    const elements = screen.getAllByRole('paragraph');
+    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth and');
     const otherText = screen.getByText('1 other attribute');
     expect(otherText).toBeInTheDocument();
 
@@ -44,8 +43,8 @@ describe('<DecryptUserData />', () => {
 
   it('should render correctly with five fields', async () => {
     customRender(<DecryptUserData detail={fiveFieldsFixture} />);
-    const text = screen.getByText('First name, Last name, Date of birth and');
-    expect(text).toBeInTheDocument();
+    const elements = screen.getAllByRole('paragraph');
+    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth and');
     const otherText = screen.getByText('2 other attributes');
     expect(otherText).toBeInTheDocument();
 
@@ -58,8 +57,8 @@ describe('<DecryptUserData />', () => {
 
   it('should render correctly with twenty fields', async () => {
     customRender(<DecryptUserData detail={sixteenFieldsFixture} />);
-    const text = screen.getByText('First name, Last name, Date of birth and');
-    expect(text).toBeInTheDocument();
+    const elements = screen.getAllByRole('paragraph');
+    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth and');
     const otherText = screen.getByText('13 other attributes');
     expect(otherText).toBeInTheDocument();
 

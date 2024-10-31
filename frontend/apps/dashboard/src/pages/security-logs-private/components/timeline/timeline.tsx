@@ -41,7 +41,7 @@ const Timeline = ({ accessEvents }: { accessEvents: AccessEvent[] }) => {
               rows={[`${HEADER_HEIGHT} auto`]}
               alignItems="start"
               justifyContent="start"
-              templateAreas={['time icon content', 'empty line content', 'empty line content']}
+              templateAreas={['time icon content', 'empty line content']}
             >
               <Grid.Item grid="time" direction="row" gap={2} height={HEADER_HEIGHT} display="flex" alignItems="center">
                 <DateTime timestamp={accessEvent.timestamp} />
@@ -62,23 +62,16 @@ const Timeline = ({ accessEvents }: { accessEvents: AccessEvent[] }) => {
                 style={{ gridArea: 'content' }}
                 templateAreas={['header', 'body']}
                 columns={['1fr']}
-                rows={['auto']}
+                rows={['auto', 'auto']}
                 marginLeft={2}
-                gap={5}
+                marginTop={3}
+                flexDirection="column"
+                gap={3}
               >
-                <Grid.Item
-                  gridArea="header"
-                  align="center"
-                  justify="start"
-                  gap={2}
-                  minHeight={HEADER_HEIGHT}
-                  display="flex"
-                  alignItems="center"
-                >
+                <Grid.Item gridArea="header" align="flex-stat" justify="start" display="flex" alignItems="flex-start">
                   <Event accessEvent={accessEvent} />
                 </Grid.Item>
-
-                <Box height="20px" tag="span">
+                <Box height="auto" tag="span" marginTop={3}>
                   <EventBody accessEvent={accessEvent} />
                 </Box>
               </Grid.Container>
@@ -98,6 +91,7 @@ const Line = styled(Grid.Item)`
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
+    height: 100%;
     background-color: ${theme.borderColor.primary};
   `}
 `;
