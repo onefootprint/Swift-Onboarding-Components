@@ -3,6 +3,8 @@ import type { GetHostedBusinessOwnersResponse } from '@onefootprint/request-type
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
+export const QUERY_KEY = 'business-owners';
+
 const getBusinessOwnersRequest = async ({ authToken }: { authToken: string }) => {
   const { data } = await request<GetHostedBusinessOwnersResponse>({
     method: 'GET',
@@ -15,7 +17,7 @@ const getBusinessOwnersRequest = async ({ authToken }: { authToken: string }) =>
 
 const useBusinessOwners = ({ authToken }: { authToken: string }) => {
   return useQuery({
-    queryKey: ['business-owners', authToken],
+    queryKey: [QUERY_KEY, authToken],
     queryFn: () => getBusinessOwnersRequest({ authToken }),
     enabled: !!authToken,
   });

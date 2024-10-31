@@ -32,7 +32,6 @@ const ManageBos = () => {
         updateOrCreateOperations: [{ uuid, ownershipStake, data: {} }],
         deleteOperations: [],
       });
-      await bosQuery.refetch();
     } catch (error) {
       showRequestErrorToast(error);
     }

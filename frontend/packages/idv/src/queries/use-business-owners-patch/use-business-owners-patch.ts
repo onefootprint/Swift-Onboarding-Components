@@ -2,8 +2,9 @@ import { requestWithoutCaseConverter } from '@onefootprint/request';
 import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { IdDI } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import partition from 'lodash/partition';
+import { QUERY_KEY } from '../use-business-owners/use-business-owners';
 
 export type BusinessOwnerData = {
   [IdDI.firstName]: string;
@@ -114,9 +115,15 @@ export const patchBusinessOwnersRequest = async ({
   return response.data;
 };
 
-const useBusinessOwnersPatch = () =>
-  useMutation({
+const useBusinessOwnersPatch = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: patchBusinessOwnersRequest,
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: [QUERY_KEY] });
+    },
   });
+};
 
 export default useBusinessOwnersPatch;

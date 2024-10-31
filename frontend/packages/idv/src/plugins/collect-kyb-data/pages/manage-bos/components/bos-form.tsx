@@ -85,7 +85,6 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
       <Stack direction="column" width="100%">
         {fields.map((field, idx) => {
           const backendBo = existingBos.find(bo => bo.uuid === field.uuid);
-          const isAuthedUser = backendBo?.isAuthedUser;
 
           const firstNameErrors = errors.bos?.[idx]?.firstName;
           const lastNameErrors = errors.bos?.[idx]?.lastName;
@@ -102,6 +101,11 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
             }
           };
 
+          const isPrimaryBo = !!backendBo?.isAuthedUser;
+          const isMutable = !backendBo || backendBo.isMutable;
+          // Omit phone and email for the primary BO since they're already collected
+          const showPhoneAndEmail = isMutable && !isPrimaryBo;
+
           return (
             <Stack
               key={field.id}
@@ -111,22 +115,21 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
               borderStyle="solid"
               borderWidth={1}
               marginTop={5}
-              paddingInline={5}
-              paddingBottom={5}
+              padding={5}
             >
-              <Stack paddingTop={5} paddingBottom={5} gap={3} alignItems="center">
+              <Stack marginBottom={5} gap={3} alignItems="center">
                 <IcoUserCircle24 />
                 <Text variant="label-3">
-                  {isAuthedUser ? t('fields-header.beneficial-owner-you') : t('fields-header.beneficial-owner')}
+                  {isPrimaryBo ? t('fields-header.beneficial-owner-you') : t('fields-header.beneficial-owner')}
                 </Text>
-                {!isAuthedUser && (
+                {!isPrimaryBo && (
                   <LinkButton $marginLeft="auto" onClick={handleRemoveClick}>
                     {t('fields-header.remove')}
                   </LinkButton>
                 )}
               </Stack>
               <Stack direction="column" gap={6}>
-                {isAuthedUser && (
+                {isPrimaryBo && (
                   <InlineAlert variant="info">
                     <Text variant="body-2" color="info">
                       {t('fields.primary-bo-name-hint-new')}
@@ -141,6 +144,7 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
                     data-dd-action-name="First name input"
                     placeholder={t('fields.first-name.placeholder')}
                     hasError={!!firstNameErrors}
+                    disabled={!isMutable}
                     {...register(`bos.${idx}.firstName`, {
                       required: t('fields.first-name.error'),
                     })}
@@ -154,13 +158,14 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
                     data-dd-action-name="Last name input"
                     placeholder={t('fields.last-name.placeholder')}
                     hasError={!!lastNameErrors}
+                    disabled={!isMutable}
                     {...register(`bos.${idx}.lastName`, {
                       required: t('fields.last-name.error'),
                     })}
                   />
                   <Form.Errors>{lastNameErrors}</Form.Errors>
                 </Form.Field>
-                {!isAuthedUser && (
+                {showPhoneAndEmail && (
                   <Form.Field>
                     <Form.Label>{t('fields.email.label')}</Form.Label>
                     <Form.Input
@@ -177,7 +182,7 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive }: BosFormPr
                     <Form.Errors>{emailErrors}</Form.Errors>
                   </Form.Field>
                 )}
-                {!isAuthedUser && (
+                {showPhoneAndEmail && (
                   <Controller
                     control={control}
                     name={`bos.${idx}.phoneNumber`}
