@@ -14,7 +14,7 @@ import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
-import DocumentFieldset from './components/document-fieldset';
+import DocumentFields from './components/document-fields';
 import FinancialFieldset from './components/financial-fieldset';
 import InvestorProfileFields from './components/investor-profile-fields';
 import OwnedBusinesses from './components/owned-businesses';
@@ -32,10 +32,11 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
   );
   const hasCards = hasEntityCards(entity);
   const hasBankAccounts = hasEntityBankAccounts(entity);
-  const hasCustomDocuments = entity.data.some(attr => attr.identifier.startsWith('document.custom'));
-  const hasDocuments = hasEntityDocuments(entity) || hasCustomDocuments;
+  const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
-  const hasCustomData = entity.data.some(attr => attr.identifier.startsWith('custom'));
+  const hasCustomData = entity.data.some(
+    attr => attr.identifier.startsWith('custom') || attr.identifier.startsWith('document.custom'),
+  );
   const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(entity.id);
 
   // if there are three elements, we want to display as grid
@@ -114,9 +115,16 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           </GridItem>
         ) : null}
         {hasDocuments ? (
-          <WideGridItem>
-            <DocumentFieldset fields={documents.fields} />
-          </WideGridItem>
+          <GridItem>
+            <Fieldset
+              fields={documents.fields}
+              iconComponent={documents.iconComponent}
+              title={documents.title}
+              footer={<RiskSignalsOverview type="document" />}
+            >
+              <DocumentFields />
+            </Fieldset>
+          </GridItem>
         ) : null}
         {hasCards || hasBankAccounts ? (
           <GridItem>
