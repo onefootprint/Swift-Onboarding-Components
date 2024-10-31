@@ -11,6 +11,7 @@ const DecryptionReason = ({ detail }: DecryptionReasonProps) => {
   const { t } = useTranslation('security-logs', {
     keyPrefix: 'events.body.decryption-reason',
   });
+
   return (
     <Stack
       aria-label={t('aria-label')}

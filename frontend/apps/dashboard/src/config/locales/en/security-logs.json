@@ -54,7 +54,11 @@
     "decryption-event": {
       "aria-label": "Decryption event",
       "decrypted": "decrypted",
-      "a-user": "a user"
+      "and": "and",
+      "of-a": "of a",
+      "user": "user",
+      "other-attribute": "other attribute",
+      "other-attributes": "other attributes"
     },
     "body": {
       "decryption-reason": {

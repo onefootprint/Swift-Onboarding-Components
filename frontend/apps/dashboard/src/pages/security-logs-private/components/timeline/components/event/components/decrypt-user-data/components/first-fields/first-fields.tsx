@@ -26,7 +26,7 @@ const FirstFieldsText = ({ decryptedFields }: FirstFieldsTextProps) => {
     }
 
     const firstThreeFields = decryptedFields.slice(0, 3);
-    return firstThreeFields.map(field => t(`di.${field}`)).join(', ');
+    return `${firstThreeFields.map(field => t(`di.${field}`)).join(', ')} ${t('and')}`;
   };
 
   const text = getFieldText();

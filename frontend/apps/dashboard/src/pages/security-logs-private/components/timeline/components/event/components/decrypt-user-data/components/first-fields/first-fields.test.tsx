@@ -25,7 +25,7 @@ describe('FirstFieldsText', () => {
     customRender(
       <FirstFieldsText decryptedFields={[IdDI.firstName, IdDI.lastName, IdDI.email, IdDI.phoneNumber, IdDI.dob]} />,
     );
-    const element = screen.getByText('First name, Last name, Email');
+    const element = screen.getByText('First name, Last name, Email and');
     expect(element).toBeInTheDocument();
   });
 });
