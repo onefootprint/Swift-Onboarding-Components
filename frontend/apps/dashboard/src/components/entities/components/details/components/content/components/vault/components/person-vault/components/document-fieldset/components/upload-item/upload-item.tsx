@@ -38,7 +38,9 @@ const UploadItem = ({ entity, upload, vault, onDecrypt }: UploadItemProps) => {
           <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')}>
             <Checkbox
               checked={field.isChecked || undefined}
-              {...register(`documents.${document.kind}`)}
+              {...register(
+                document.kind === SupportedIdDocTypes.custom ? upload.identifier : `documents.${document.kind}`,
+              )}
               label={<ItemLabel document={document} timestamp={timestamp} title={title} />}
               disabled={field.disabled}
             />

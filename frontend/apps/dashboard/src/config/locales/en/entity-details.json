@@ -370,7 +370,6 @@
           "message-end": "to view these details.",
           "not-allowed": "You're not allowed to decrypt data"
         },
-        "encrypted": "This document is encrypted. Exit and decrypt to see details.",
         "status": {
           "success": "Success",
           "failed": "Failed"

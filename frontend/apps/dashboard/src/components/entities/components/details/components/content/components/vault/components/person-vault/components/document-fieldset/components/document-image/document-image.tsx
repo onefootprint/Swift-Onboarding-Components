@@ -1,6 +1,7 @@
 import { useObjectUrl } from '@onefootprint/ui';
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
+import PdfThumbnail from './components/pdf-thumbnail';
 
 type DocumentImageProps = {
   base64Data: string;
@@ -16,7 +17,11 @@ const DocumentImage = ({ base64Data, documentName }: DocumentImageProps) => {
     return null;
   }
 
-  return isPdf ? null : <StyledImage src={objectUrl} width={0} height={0} alt={documentName} />;
+  return isPdf ? (
+    <PdfThumbnail src={objectUrl} />
+  ) : (
+    <StyledImage src={objectUrl} width={0} height={0} alt={documentName} />
+  );
 };
 
 const StyledImage = styled(Image)`

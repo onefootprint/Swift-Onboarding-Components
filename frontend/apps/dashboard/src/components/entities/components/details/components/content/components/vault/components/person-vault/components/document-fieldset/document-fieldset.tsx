@@ -1,6 +1,6 @@
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
-import { IcoFileText224 } from '@onefootprint/icons';
+import { IcoFileText16 } from '@onefootprint/icons';
 import { Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -19,7 +19,7 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'fieldset',
   });
-  const isViewingHistorical = Boolean(useEntitySeqno);
+  const isViewingHistorical = Boolean(useEntitySeqno());
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const dis = fields.map(field => field.di);
@@ -40,7 +40,7 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
     <Container aria-label={t('documents.title')} data-primary-background={isViewingHistorical}>
       <Header data-primary-background={isViewingHistorical}>
         <Stack alignItems="center" gap={3}>
-          <IcoFileText224 />
+          <IcoFileText16 />
           <Text variant="label-2" tag="h2">
             {t('documents.title')}
           </Text>

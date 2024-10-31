@@ -2,7 +2,6 @@ import type { Entity } from '@onefootprint/types';
 import {
   hasEntityBankAccounts,
   hasEntityCards,
-  hasEntityCustomData,
   hasEntityDocuments,
   hasEntityInvestorProfile,
   hasEntityUsLegalStatus,
@@ -15,7 +14,7 @@ import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
-import DocumentsFields from './components/document-fields';
+import DocumentFieldset from './components/document-fieldset';
 import FinancialFieldset from './components/financial-fieldset';
 import InvestorProfileFields from './components/investor-profile-fields';
 import OwnedBusinesses from './components/owned-businesses';
@@ -33,9 +32,10 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
   );
   const hasCards = hasEntityCards(entity);
   const hasBankAccounts = hasEntityBankAccounts(entity);
-  const hasDocuments = hasEntityDocuments(entity);
+  const hasCustomDocuments = entity.data.some(attr => attr.identifier.startsWith('document.custom'));
+  const hasDocuments = hasEntityDocuments(entity) || hasCustomDocuments;
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
-  const hasCustomData = hasEntityCustomData(entity);
+  const hasCustomData = entity.data.some(attr => attr.identifier.startsWith('custom'));
   const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(entity.id);
 
   // if there are three elements, we want to display as grid
@@ -114,16 +114,9 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           </GridItem>
         ) : null}
         {hasDocuments ? (
-          <GridItem>
-            <Fieldset
-              fields={documents.fields}
-              iconComponent={documents.iconComponent}
-              title={documents.title}
-              footer={<RiskSignalsOverview type="document" />}
-            >
-              <DocumentsFields />
-            </Fieldset>
-          </GridItem>
+          <WideGridItem>
+            <DocumentFieldset fields={documents.fields} />
+          </WideGridItem>
         ) : null}
         {hasCards || hasBankAccounts ? (
           <GridItem>

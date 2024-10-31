@@ -16,6 +16,7 @@ const UploadTitleCard = ({ upload: { timestamp, failureReasons } }: UploadTitleC
     <Stack
       maxWidth="100%"
       width="500px"
+      align="center"
       gap={3}
       borderRadius="default"
       borderColor="tertiary"

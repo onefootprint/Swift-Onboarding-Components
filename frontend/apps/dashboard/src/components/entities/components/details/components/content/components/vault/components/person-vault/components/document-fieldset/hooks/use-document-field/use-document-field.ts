@@ -1,16 +1,25 @@
-import { type Document, type Entity, type EntityVault, isVaultDataDecrypted } from '@onefootprint/types';
+import {
+  type DataIdentifier,
+  type Document,
+  type Entity,
+  type EntityVault,
+  isVaultDataDecrypted,
+} from '@onefootprint/types';
 import isDiDecryptable from 'src/utils/is-di-decryptable';
 import { useDecryptControls } from '../../../../../vault-actions';
 
 export const useDocumentField = (entity: Entity, vault: EntityVault) => {
   const decryptControls = useDecryptControls();
 
-  const isDocTypeDecryptable = (document: Document) => {
-    return document.uploads.every(({ identifier: di }) => isDiDecryptable(entity, di));
+  const isDocTypeDecryptable = ({ uploads }: Document) => {
+    return uploads.every(({ identifier: di }) => isDiDecryptable(entity, di));
   };
 
-  const isDocTypeDecrypted = (document: Document) => {
-    return document.uploads.some(({ identifier: di }) => isVaultDataDecrypted(vault?.[di]));
+  const isDocTypeDecrypted = ({ uploads }: Document) => {
+    return uploads.some(({ identifier, version }) => {
+      const di = `${identifier}:${version}` as DataIdentifier;
+      return isVaultDataDecrypted(vault?.[di]);
+    });
   };
 
   const getProps = (document: Document) => {
