@@ -196,7 +196,7 @@ pub(super) async fn create_identified_token(
                 .and_then(|obc| obc.business_info().map(|bo| (bo, obc.tenant())));
             let (bo_id, sb_id, biz_wf_id) = if let Some(((bo, biz_wf_id), tenant)) = biz_info {
                 let sb = ScopedVault::get(conn, (&bo.business_vault_id, &tenant.id))?;
-                (Some(bo.id.clone()), Some(sb.id), biz_wf_id.cloned())
+                (Some(bo.id.clone()), Some(sb.id), Some(biz_wf_id.clone()))
             } else {
                 (None, None, None)
             };

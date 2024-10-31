@@ -58,7 +58,7 @@ pub async fn generate_secondary_bo_links<'a>(
             let session_data = BoSession {
                 bo_id: bo.bo.id.clone(),
                 ob_config_id: biz_wf.ob_configuration_id.clone(),
-                biz_wf_id: Some(biz_wf.id.clone()),
+                biz_wf_id: biz_wf.id.clone(),
             };
             (bo.bo.link_id.clone(), session_data)
         })

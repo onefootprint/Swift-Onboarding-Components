@@ -39,6 +39,5 @@ pub struct OnboardingSessionTrustedMetadata {
 pub struct BoSession {
     pub bo_id: BoId,
     pub ob_config_id: ObConfigurationId,
-    // TODO make optional after all tokens expire
-    pub biz_wf_id: Option<WorkflowId>,
+    pub biz_wf_id: WorkflowId,
 }

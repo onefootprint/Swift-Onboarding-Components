@@ -23,12 +23,10 @@ use paperclip::actix::{
 )]
 #[actix::get("/hosted/business")]
 pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse<HostedBusinessDetail> {
-    let bv_id = bo_auth.bo.business_vault_id.clone();
-    let ob_config_id = bo_auth.ob_config.id.clone();
+    let biz_wf_id = bo_auth.data.data.biz_wf_id.clone();
     let bvw = state
         .db_query(move |conn| -> FpResult<_> {
-            // TODO can read `biz_wf_id` once we make this required
-            let (_, sb) = Workflow::get_all(conn, (&bv_id, &ob_config_id))?;
+            let (_, sb) = Workflow::get_all(conn, &biz_wf_id)?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             Ok(bvw)
         })

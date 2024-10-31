@@ -35,9 +35,9 @@ impl ObConfigAuth {
     }
 
     /// The BusinessOwner associated with this auth session. Only non-null for BoSessionAuth
-    pub fn business_info(&self) -> Option<(&BusinessOwner, Option<&WorkflowId>)> {
+    pub fn business_info(&self) -> Option<(&BusinessOwner, &WorkflowId)> {
         match self {
-            Either::Right(Either::Right(a)) => Some((&a.bo, a.data.data.biz_wf_id.as_ref())),
+            Either::Right(Either::Right(a)) => Some((&a.bo, &a.data.data.biz_wf_id)),
             _ => None,
         }
     }
