@@ -4,7 +4,9 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::Business;
+use api_core::utils::vault_wrapper::DataRequestSource;
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
@@ -16,6 +18,7 @@ use db::DbError;
 use newtypes::preview_api;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
+use newtypes::DataRequest;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -33,6 +36,7 @@ pub async fn post(
     request: web::Json<NewBusinessOwnerRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::Read)?;
+    let actor = auth.actor();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();
@@ -41,9 +45,10 @@ pub async fn post(
         ownership_stake,
     } = request.into_inner();
 
-    if !(0..=100).contains(&ownership_stake) {
-        return ValidationError("ownership_stake must be between 0 and 100").into();
-    }
+    let ownership_stake_u32: u32 = match ownership_stake.try_into() {
+        Ok(stake) if (0..=100).contains(&stake) => FpResult::Ok(stake),
+        _ => ValidationError("ownership_stake must be between 0 and 100").into(),
+    }?;
 
     state
         .db_transaction(move |conn| -> FpResult<_> {
@@ -65,21 +70,30 @@ pub async fn post(
                 return ValidationError("Provided fp_id does not correspond to a person").into();
             }
 
-            let bvw = VaultWrapper::<Any>::build_for_tenant(conn, &sb.id)?;
-            if let Some(disallowed_di) = bvw.populated_dis().iter().find(|di| matches!(di, DI::Business(BDK::BeneficialOwners) | DI::Business(BDK::KycedBeneficialOwners) | DI::Business(BDK::BeneficialOwnerData(_, _)))) {
+            let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id)?;
+
+            // We don't check for ownership stake data here because that data is a side effect of
+            // using this tenant API ownership linking as well.
+            if let Some(disallowed_di) = bvw.populated_dis().iter().find(|di| matches!(di, DI::Business(BDK::BeneficialOwners) | DI::Business(BDK::KycedBeneficialOwners) | DI::Business(BDK::BeneficialOwnerData(_, _)) )) {
                 let err_str = format!("Business already has vaulted BOs. If you'd like to link a user as the beneficial owner of this business, please clear out {}", disallowed_di);
                 return ValidationError(&err_str).into();
             }
 
             let result = BusinessOwner::create_tenant_api(conn, sb, owner_su.vault_id, ownership_stake);
-            match result {
-                Ok(_) => (),
+            let bo = match result {
+                Ok(bo) => bo,
                 Err(DbError::UniqueConstraintViolation(_)) => {
                     return ValidationError("The provided user is already an owner of the provided business")
                         .into()
                 }
                 Err(e) => return Err(e.into()),
-            }
+            };
+
+            // Record the beneficial owner's ownership stake on the business vault.
+            let request = DataRequest::empty().into_beneficial_owner_data(&bo.link_id, Some(ownership_stake_u32))?;
+            let request = FingerprintedDataRequest::manual_fingerprints(request, vec![]);
+            bvw.patch_data(conn, request, DataRequestSource::TenantPatchVault(actor))?;
+
             Ok(())
         })
         .await?;

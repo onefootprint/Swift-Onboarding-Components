@@ -193,6 +193,13 @@ impl DataRequest {
         Self { data, json_fields }
     }
 
+    pub fn empty() -> Self {
+        Self {
+            data: HashMap::new(),
+            json_fields: vec![],
+        }
+    }
+
     pub fn di_is_json(&self, di: &DataIdentifier) -> bool {
         self.json_fields.contains(di)
     }
@@ -223,7 +230,11 @@ impl DataRequest {
 
     /// Turn a user DataRequest into a DataRequest that will be stored on the business representing
     /// a beneficial owner that has not yet onboarded.
-    pub fn into_beneficial_owner_data(self, link_id: &BoLinkId, ownership_stake: Option<u32>) -> Self {
+    pub fn into_beneficial_owner_data(
+        self,
+        link_id: &BoLinkId,
+        ownership_stake: Option<u32>,
+    ) -> NtResult<Self> {
         let Self { data, json_fields } = self;
 
         let map_di = move |di| BusinessDataKind::bo_data(link_id.clone(), di).into();
@@ -232,10 +243,14 @@ impl DataRequest {
         let json_fields = json_fields.into_iter().map(map_di).collect();
 
         if let Some(ownership_stake) = ownership_stake {
+            if !(0..=100).contains(&ownership_stake) {
+                return Err(DiValidationError::BusinessOwnersStakeAbove100.into());
+            }
+
             let ownership_stake_di = BusinessDataKind::BeneficialOwnerStake(link_id.clone()).into();
             data.insert(ownership_stake_di, PiiString::from(ownership_stake.to_string()));
         }
 
-        Self { data, json_fields }
+        Ok(Self { data, json_fields })
     }
 }

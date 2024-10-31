@@ -183,7 +183,7 @@ fn create_fingerprinted_data_request(
     data: DataRequest,
     ownership_stake: Option<u32>,
 ) -> FpResult<FingerprintedDataRequest> {
-    let data = data.into_beneficial_owner_data(link_id, ownership_stake);
+    let data = data.into_beneficial_owner_data(link_id, ownership_stake)?;
 
     // Never any fingerprints for beneficial owner data
     let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);

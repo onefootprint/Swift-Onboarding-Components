@@ -135,9 +135,6 @@ impl BusinessOwner {
         owner_vault_id: VaultId,
         ownership_stake: i32,
     ) -> DbResult<Self> {
-        if !(0..=100).contains(&ownership_stake) {
-            return ValidationError("Invalid ownership stake").into();
-        }
         let existing = business_owner::table
             .filter(business_owner::business_vault_id.eq(&sb.vault_id))
             .get_results::<Self>(conn.conn())?;

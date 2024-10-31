@@ -1,4 +1,5 @@
 import pytest
+import re
 from tests.headers import FpAuth
 from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
@@ -131,8 +132,9 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     }
     body = post("users", data, sandbox_tenant.sk.key)
     data = dict(fp_id=body["id"], ownership_stake=50)
-    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+    post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
+    # Run KYB
     data = dict(key=obc.key.value, fixture_result="pass")
     body = post(f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key)
     assert body["requires_manual_review"] == False
@@ -204,6 +206,25 @@ def test_link_bos(sandbox_tenant, sandbox_user):
     body = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)
     assert len(body["data"]) == 1
     assert body["data"][0]["fp_id"] == fp_id
+
+    # Check that BO ownership stake is vaulted
+    fields = get(f"businesses/{fp_bid}/vault", None, sandbox_tenant.sk.key)
+    stake_pattern = re.compile(
+        r"^business\.beneficial_owners\.[^\.]+\.ownership_stake$"
+    )
+    stake_dis = set(di for di in fields if stake_pattern.match(di))
+    primary_stake_di = "business.beneficial_owners.bo_link_primary.ownership_stake"
+    assert stake_dis == {primary_stake_di}
+
+    result = post(
+        f"businesses/{fp_bid}/vault/decrypt",
+        {
+            "fields": list(stake_dis),
+            "reason": "Test",
+        },
+        sandbox_tenant.sk.key,
+    )
+    assert result == {primary_stake_di: "50"}
 
     # Cannot set percentage outside of [0, 100]
     for percentage in [-1, 101]:
