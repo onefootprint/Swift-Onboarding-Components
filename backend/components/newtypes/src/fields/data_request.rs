@@ -223,13 +223,18 @@ impl DataRequest {
 
     /// Turn a user DataRequest into a DataRequest that will be stored on the business representing
     /// a beneficial owner that has not yet onboarded.
-    pub fn into_beneficial_owner_data(self, link_id: &BoLinkId) -> Self {
+    pub fn into_beneficial_owner_data(self, link_id: &BoLinkId, ownership_stake: Option<u32>) -> Self {
         let Self { data, json_fields } = self;
 
         let map_di = move |di| BusinessDataKind::bo_data(link_id.clone(), di).into();
 
-        let data = data.into_iter().map(|(k, v)| (map_di(k), v)).collect();
+        let mut data: HashMap<_, _> = data.into_iter().map(|(k, v)| (map_di(k), v)).collect();
         let json_fields = json_fields.into_iter().map(map_di).collect();
+
+        if let Some(ownership_stake) = ownership_stake {
+            let ownership_stake_di = BusinessDataKind::BeneficialOwnerStake(link_id.clone()).into();
+            data.insert(ownership_stake_di, PiiString::from(ownership_stake.to_string()));
+        }
 
         Self { data, json_fields }
     }

@@ -12,6 +12,7 @@ from tests.constants import (
 BUSINESS_VAULT_DERIVED_DATA = {
     "business.formation_state": "CA",
     "business.formation_date": "2024-02-02",
+    "business.beneficial_owners.bo_link_primary.ownership_stake": "50",
 }
 
 
@@ -141,13 +142,22 @@ def test_update_ownership_stake(sandbox_tenant, kyb_sandbox_ob_config):
     primary_stake_di = body[0]["ownership_stake_di"]
     secondary_stake_di = body[1]["ownership_stake_di"]
 
-    # TODO: replace ownership_stake write paths with the vault DI.
     fields = get(f"entities/{fp_bid}/vault", None, *sandbox_tenant.db_auths)
     stake_pattern = re.compile(
         r"^business\.beneficial_owners\.[^\.]+\.ownership_stake$"
     )
     stake_dis = set(di for di in fields if stake_pattern.match(di))
-    # assert stake_dis == {primary_stake_di, secondary_stake_di}
+    assert stake_dis == {primary_stake_di, secondary_stake_di}
+
+    result = post(
+        f"businesses/{fp_bid}/vault/decrypt",
+        {
+            "fields": list(stake_dis),
+            "reason": "Test",
+        },
+        sandbox_tenant.sk.key,
+    )
+    assert result == {primary_stake_di: "50", secondary_stake_di: "30"}
 
     patch(
         f"entities/{fp_bid}/vault",
