@@ -578,7 +578,8 @@
         }
       },
       "business-selector": {
-        "title": "We found {{count}} businesses associated with your account",
+        "title_one": "We found {{count}} business associated with your account",
+        "title_other": "We found {{count}} businesses associated with your account",
         "subtitle": "Choose an existing business or add a new one to verify it.",
         "status": {
           "incomplete": "Incomplete"

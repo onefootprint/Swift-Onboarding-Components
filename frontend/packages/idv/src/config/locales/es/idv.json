@@ -578,7 +578,8 @@
         }
       },
       "business-selector": {
-        "title": "Encontramos {{count}} empresas asociadas a tu cuenta",
+        "title_one": "Encontramos {{count}} empresa asociada a tu cuenta",
+        "title_other": "Encontramos {{count}} empresas asociadas a tu cuenta",
         "subtitle": "Elige una empresa existente o agrega una nueva para verificarla.",
         "status": {
           "incomplete": "Incompleto"
@@ -589,7 +590,7 @@
           "days_other": "Última actividad hace {{days}} días",
           "date": "Última actividad el {{date}}"
         },
-        "created-at": "Creada el {{date}}",
+        "created-at": "Creado el {{date}}",
         "or": "o",
         "cta": "Agregar y verificar una nueva empresa"
       },
