@@ -21,22 +21,22 @@ export type BosFormProps = {
   defaultFormValues: NewBusinessOwner[];
   isLive: boolean;
   confirmProps?: ConfirmProps;
+  // #TODO: Remove
+  isBusy?: boolean;
 };
 
 /** Renders a form for editing the mutable beneficial owners of a business or adding new beneficial owners. */
-const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive, confirmProps }: BosFormProps) => {
+const BosForm = ({ existingBos, onSubmit, defaultFormValues, isBusy = false, isLive, confirmProps }: BosFormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
-
   const forConfirmScreen = !!confirmProps;
-
   const {
     register,
     control,
     handleSubmit,
     getValues,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ManageBosFormData>({
     defaultValues: {
       bos: defaultFormValues,
@@ -46,7 +46,6 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive, confirmProp
   const { append, fields, remove } = useFieldArray({ name: 'bos', control });
   const newBos = useWatch({ control, name: 'bos' });
   const bosToDelete = useWatch({ control, name: 'bosToDelete' });
-
   const isStakeInvalid = sumTotalOwnershipStake(existingBos, { bos: newBos, bosToDelete }) > 100;
 
   const addBoToDelete = (uuid: string) => {
@@ -254,14 +253,14 @@ const BosForm = ({ existingBos, onSubmit, defaultFormValues, isLive, confirmProp
             iconPosition="left"
             variant="label-2"
             onClick={handleAdd}
-            disabled={isStakeInvalid || isSubmitting}
+            disabled={isStakeInvalid}
           >
             {t('add-another')}
           </LinkButton>
         </Stack>
         <EditableFormButtonContainer
           onCancel={confirmProps?.onCancel}
-          isLoading={isSubmitting}
+          isLoading={isBusy}
           ctaLabel={confirmProps?.ctaLabel}
           submitButtonTestID="kyb-bo"
         />

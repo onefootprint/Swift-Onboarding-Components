@@ -71,6 +71,7 @@ const EditBosForm = ({ authToken, existingBos, onDone, confirmProps, defaultForm
         defaultFormValues={defaultFormValues}
         isLive={isLive}
         confirmProps={confirmProps}
+        isBusy={bosMutation.isPending}
       />
       {ConfirmMissingBoDialog}
     </>
