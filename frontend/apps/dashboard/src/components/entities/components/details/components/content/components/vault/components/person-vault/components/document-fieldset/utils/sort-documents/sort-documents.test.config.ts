@@ -1,6 +1,7 @@
 import {
   type Document,
   DocumentDI,
+  IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocStatus,
   SupportedIdDocTypes,
@@ -111,7 +112,7 @@ export const driversLicenseDocument2: Document = {
   uploads: [
     {
       version: 789,
-      failureReasons: [],
+      failureReasons: [IdDocImageProcessingError.documentSharpness, IdDocImageProcessingError.unknownError],
       side: IdDocImageTypes.front,
       timestamp: '2022-01-05T00:00:00.000Z',
       isExtraCompressed: false,
@@ -119,7 +120,7 @@ export const driversLicenseDocument2: Document = {
     },
     {
       version: 790,
-      failureReasons: [],
+      failureReasons: [IdDocImageProcessingError.unableToAlignDocument],
       side: IdDocImageTypes.back,
       timestamp: '2009-11-01T00:00:00.000Z',
       isExtraCompressed: false,

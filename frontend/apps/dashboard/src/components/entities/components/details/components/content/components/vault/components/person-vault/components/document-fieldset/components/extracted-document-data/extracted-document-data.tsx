@@ -38,11 +38,11 @@ const ExtractedDocumentData = ({ vault, documentType, activeDocumentVersion }: E
       </Stack>
       <Stack direction="column" gap={3} width="100%">
         {relevantKeys.sort().map(key => (
-          <Stack key={key} justify="space-between" gap={11} flexWrap="wrap">
+          <Stack key={key} justify="space-between" flexWrap="wrap">
             <Text variant="body-3" color="tertiary" tag="label">
               {dataLabelT(key, activeDocumentVersion)}
             </Text>
-            <Text variant="body-3" color="primary" textAlign="right">
+            <Text variant="body-3" color="primary" textAlign="right" truncate>
               {getVaultValueString(key)}
             </Text>
           </Stack>

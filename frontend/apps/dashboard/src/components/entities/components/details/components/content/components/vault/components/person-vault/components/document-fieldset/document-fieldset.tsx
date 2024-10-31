@@ -41,7 +41,7 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
       <Header data-primary-background={isViewingHistorical}>
         <Stack alignItems="center" gap={3}>
           <IcoFileText16 />
-          <Text variant="label-2" tag="h2">
+          <Text variant="label-3" tag="h2">
             {t('documents.title')}
           </Text>
         </Stack>

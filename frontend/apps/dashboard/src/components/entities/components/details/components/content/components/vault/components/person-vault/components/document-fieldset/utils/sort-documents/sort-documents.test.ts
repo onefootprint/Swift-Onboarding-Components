@@ -1,3 +1,4 @@
+import { IdDocImageProcessingError } from '@onefootprint/types';
 import { DocumentDI } from '@onefootprint/types/src/data/di';
 import { IdDocImageTypes } from '@onefootprint/types/src/data/id-doc-type';
 import sortDocumentsAndUploads from './sort-documents';
@@ -123,14 +124,6 @@ describe('sortDocuments', () => {
         ...driversLicenseDocument2,
         uploads: [
           {
-            version: 789,
-            failureReasons: [],
-            side: IdDocImageTypes.front,
-            timestamp: '2022-01-05T00:00:00.000Z',
-            isExtraCompressed: false,
-            identifier: DocumentDI.latestDriversLicenseFront,
-          },
-          {
             version: 791,
             failureReasons: [],
             side: IdDocImageTypes.selfie,
@@ -139,8 +132,16 @@ describe('sortDocuments', () => {
             identifier: DocumentDI.latestDriversLicenseSelfie,
           },
           {
+            version: 789,
+            failureReasons: [IdDocImageProcessingError.documentSharpness, IdDocImageProcessingError.unknownError],
+            side: IdDocImageTypes.front,
+            timestamp: '2022-01-05T00:00:00.000Z',
+            isExtraCompressed: false,
+            identifier: DocumentDI.latestDriversLicenseFront,
+          },
+          {
             version: 790,
-            failureReasons: [],
+            failureReasons: [IdDocImageProcessingError.unableToAlignDocument],
             side: IdDocImageTypes.back,
             timestamp: '2009-11-01T00:00:00.000Z',
             isExtraCompressed: false,

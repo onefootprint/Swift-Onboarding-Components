@@ -17,22 +17,22 @@ const UploadTitleCard = ({ upload: { timestamp, failureReasons } }: UploadTitleC
       maxWidth="100%"
       width="500px"
       align="center"
-      gap={3}
+      gap={2}
       borderRadius="default"
       borderColor="tertiary"
       borderStyle="solid"
       borderWidth={1}
       paddingTop={2}
       paddingBottom={2}
-      paddingRight={5}
-      paddingLeft={5}
+      paddingRight={4}
+      paddingLeft={4}
       backgroundColor="primary"
     >
-      <Text variant="label-3">{format(new Date(timestamp), 'MM/dd/yy h:mma')}</Text>
+      <Text variant="snippet-1">{format(new Date(timestamp), 'MM/dd/yy h:mma')}</Text>
       <Text tag="span" variant="label-3">
         ⋅
       </Text>
-      {!isSuccess && <IcoWarning16 />}
+      {!isSuccess && <IcoWarning16 color="error" />}
       <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
         {isSuccess ? t('status.success') : t('status.failed')}
       </Text>
