@@ -184,7 +184,8 @@
     "components": {
       "error": {
         "title": "¡Vaya!",
-        "description": "Hubo un error al completar esta solicitud. Por favor, actualiza la página e inténtalo de nuevo."
+        "description": "Hubo un error al completar esta solicitud. Por favor, actualiza la página e inténtalo de nuevo.",
+        "description-business-not-owned-by-user": "La empresa especificada no te pertenece. Esto es un problema con la integración. Por favor, contacta al propietario de este producto o actualiza la página e inténtalo de nuevo."
       }
     },
     "pages": {

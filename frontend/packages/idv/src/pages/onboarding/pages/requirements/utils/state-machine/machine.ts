@@ -61,6 +61,7 @@ const createOnboardingRequirementsMachine = ({
       on: {
         error: {
           target: 'error',
+          actions: 'setError',
         },
       },
       states: {
@@ -196,6 +197,7 @@ const createOnboardingRequirementsMachine = ({
         setRequirementRouterVisited: assign(ctx => ({ ...ctx, isRequirementRouterVisited: true })),
         setContinueOnMobile: assign(ctx => ({ ...ctx, continueOnMobile: true })),
         setContinueOnDesktop: assign(ctx => ({ ...ctx, continueOnMobile: false })),
+        setError: assign((ctx, event) => ({ ...ctx, error: event.payload.error })),
       },
     },
   );

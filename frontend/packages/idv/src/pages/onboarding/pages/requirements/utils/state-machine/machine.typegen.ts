@@ -18,6 +18,7 @@ export interface Typegen0 {
     markLastHandledRequirement: 'continueOnMobile' | 'error' | 'xstate.stop';
     setContinueOnDesktop: 'continueOnDesktop';
     setContinueOnMobile: 'continueOnMobile';
+    setError: 'error';
     setInvestorProfileCollected: 'error' | 'xstate.stop';
     setKybDataCollected: 'error' | 'xstate.stop';
     setKycDataCollected: 'error' | 'xstate.stop';

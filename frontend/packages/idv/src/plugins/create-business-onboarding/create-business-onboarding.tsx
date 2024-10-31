@@ -16,15 +16,16 @@ type CreateBusinessOnboardingProps = {
   };
   idvContext: CommonIdvContext;
   onDone: () => void;
+  onError: (error: unknown) => void;
 };
 
-const CreateBusinessOnboarding = ({ idvContext, context, onDone }: CreateBusinessOnboardingProps) => {
+const CreateBusinessOnboarding = ({ idvContext, context, onDone, onError }: CreateBusinessOnboardingProps) => {
   const { authToken } = idvContext;
   const {
     requirement: { requiresBusinessSelection },
     overallOutcome: kybFixtureResult,
   } = context;
-  const sharedState = { authToken, kybFixtureResult, onDone };
+  const sharedState = { authToken, kybFixtureResult, onDone, onError };
 
   if (requiresBusinessSelection) {
     return <BusinessSelectionContent state={sharedState} />;
@@ -33,9 +34,10 @@ const CreateBusinessOnboarding = ({ idvContext, context, onDone }: CreateBusines
 };
 
 const StartOnboardingWithoutSelection = ({ state }: { state: SharedState }) => {
-  const { authToken, kybFixtureResult, onDone } = state;
+  const { authToken, kybFixtureResult, onDone, onError } = state;
   const businessOnboardingMutation = useMutation({
     ...postHostedBusinessOnboardingMutation({ headers: { 'X-Fp-Authorization': authToken } }),
+    onError,
   });
 
   useEffect(() => {
@@ -76,9 +78,10 @@ const BusinessSelectionContent = ({
   return null;
 };
 
-const NoBusinessesFlow = ({ state: { authToken, kybFixtureResult, onDone } }: { state: SharedState }) => {
+const NoBusinessesFlow = ({ state: { authToken, kybFixtureResult, onDone, onError } }: { state: SharedState }) => {
   const mutation = useMutation({
     ...postHostedBusinessOnboardingMutation({ headers: { 'X-Fp-Authorization': authToken } }),
+    onError,
   });
 
   useEffect(() => {
@@ -90,10 +93,11 @@ const NoBusinessesFlow = ({ state: { authToken, kybFixtureResult, onDone } }: { 
 
 const BusinessSelectionFlow = ({
   businesses,
-  state: { authToken, kybFixtureResult, onDone },
+  state: { authToken, kybFixtureResult, onDone, onError },
 }: { businesses: HostedBusiness[]; state: SharedState }) => {
   const businessOnboardingMutation = useMutation({
     ...postHostedBusinessOnboardingMutation({ headers: { 'X-Fp-Authorization': authToken } }),
+    onError,
   });
   const [shouldShowIntroduction, setShowIntroduction] = useState(() => businesses.length === 0);
 

@@ -184,7 +184,8 @@
     "components": {
       "error": {
         "title": "Uh-oh!",
-        "description": "There was an error while completing this request. Please refresh the page and try again."
+        "description": "There was an error while completing this request. Please refresh the page and try again.",
+        "description-business-not-owned-by-user": "The business specified is not owned by you. This is an issue with the integration. Please contact the owner of this product or refresh the page and try again."
       }
     },
     "pages": {

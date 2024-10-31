@@ -4,4 +4,5 @@ export type SharedState = {
   authToken: string;
   kybFixtureResult?: OverallOutcome;
   onDone: () => void;
+  onError: (error: unknown) => void;
 };

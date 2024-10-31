@@ -22,11 +22,11 @@ const StartOnboarding = () => {
           nid.identify(authToken);
           send('initialized');
         },
-        onError: (err: unknown) => {
-          Logger.error(`Error while initiating onboarding. ${getErrorMessage(err)}`, {
+        onError: (error: unknown) => {
+          Logger.error(`Error while initiating onboarding. ${getErrorMessage(error)}`, {
             location: 'onboarding-check-requirements',
           });
-          send('error');
+          send('error', { error });
         },
       },
     );

@@ -43,10 +43,13 @@ export type MachineContext = {
 
   /** Record whether the user decided to proceed with capturing the docs on mobile (only applicable for the desktop flow) */
   continueOnMobile: boolean;
+
+  /** If a sub-state receives an error, we'll save it here */
+  error?: unknown;
 };
 
 export type MachineEvents =
-  | { type: 'error' }
+  | { type: 'error'; payload: { error: unknown } }
   | { type: 'initialized' }
   | { type: 'onboardingRequirementsReceived'; payload: OnboardingRequirement[] }
   | { type: 'requirementCompleted' }

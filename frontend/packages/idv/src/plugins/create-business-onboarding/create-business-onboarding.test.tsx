@@ -10,7 +10,10 @@ describe('<CreateBusinessOnboarding />', () => {
   });
 
   describe('when it requires a selection', () => {
-    const renderCreateBusinessOnboarding = ({ onDone = jest.fn() }: { onDone?: () => void } = {}) => {
+    const renderCreateBusinessOnboarding = ({
+      onDone = jest.fn(),
+      onError = jest.fn(),
+    }: { onDone?: () => void; onError?: () => void } = {}) => {
       return customRender(
         <Layout>
           <CreateBusinessOnboarding
@@ -33,6 +36,7 @@ describe('<CreateBusinessOnboarding />', () => {
               isInIframe: true,
             }}
             onDone={onDone}
+            onError={onError}
           />
         </Layout>,
       );

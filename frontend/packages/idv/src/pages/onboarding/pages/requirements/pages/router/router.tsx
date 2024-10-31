@@ -36,6 +36,7 @@ const Router = ({ onDone }: RouterProps) => {
     isKycDataCollected,
     requirements,
     isTransferFromDesktopToMobileDisabled,
+    error,
   } = state.context;
   const { orgId } = config;
   const isDone = state.matches('success');
@@ -59,6 +60,10 @@ const Router = ({ onDone }: RouterProps) => {
     send({ type: 'requirementCompleted' });
   };
 
+  const handleError = (error: unknown) => {
+    send({ type: 'error', payload: { error } });
+  };
+
   if (state.matches('startOnboarding')) {
     return <StartOnboarding />;
   }
@@ -77,6 +82,7 @@ const Router = ({ onDone }: RouterProps) => {
           overallOutcome,
         }}
         onDone={handleRequirementCompleted}
+        onError={handleError}
       />
     );
   }
@@ -168,7 +174,7 @@ const Router = ({ onDone }: RouterProps) => {
     return <Process onDone={handleRequirementCompleted} />;
   }
   if (state.matches('error')) {
-    return <ErrorComponent />;
+    return <ErrorComponent error={error} />;
   }
 
   return null;
