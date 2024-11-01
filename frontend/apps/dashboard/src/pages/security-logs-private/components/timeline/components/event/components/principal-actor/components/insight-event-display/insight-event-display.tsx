@@ -15,7 +15,8 @@ const InsightEventDisplay = ({ insightEvent }: InsightEventDisplayProps) => {
   return (
     <ShadowStack
       direction="column"
-      padding={5}
+      paddingInline={5}
+      paddingBlock={4}
       gap={6}
       backgroundColor="primary"
       aria-label={t('aria-label')}

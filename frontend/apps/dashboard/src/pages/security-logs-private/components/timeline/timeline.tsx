@@ -3,10 +3,12 @@ import type { AccessEvent } from '@onefootprint/types';
 import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import useSecurityLogsFilters from 'src/hooks/use-security-logs-filters';
 import styled, { css } from 'styled-components';
 import DateTime from './components/date-time';
 import Event from './components/event';
 import EventBody from './components/event-body';
+import Loading from './loading';
 
 const HEADER_HEIGHT = '32px';
 
@@ -18,8 +20,18 @@ export const getKeyForItemTime = (time: string) => {
   return format(date, 'yyyy-MM-dd-HH-mm-ss');
 };
 
-const Timeline = ({ accessEvents }: { accessEvents: AccessEvent[] }) => {
+type TimelineProps = {
+  accessEvents: AccessEvent[];
+  isLoading: boolean;
+};
+
+const Timeline = ({ accessEvents, isLoading }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
+  const filters = useSecurityLogsFilters();
+
+  if (!filters.isReady || isLoading) {
+    return <Loading />;
+  }
 
   if (!accessEvents.length) {
     return <Text variant="body-3">{t('empty')}</Text>;

@@ -3,6 +3,7 @@
   "header": {
     "title": "Security logs"
   },
+  "loading-aria": "Loading...",
   "filters": {
     "search": "Search by FP ID...",
     "attributes": {

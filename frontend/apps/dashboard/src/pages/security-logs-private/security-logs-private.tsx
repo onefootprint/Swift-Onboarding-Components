@@ -3,19 +3,11 @@ import { Divider, SearchInput, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
-import useSession from 'src/hooks/use-session';
 import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
 
 const SecurityLogsPrivate = () => {
   const { t } = useTranslation('security-logs');
-  const {
-    data: { user },
-  } = useSession();
-
-  if (!user?.isFirmEmployee) {
-    return <div>Private page</div>;
-  }
 
   const getAccessEvents = useGetAccessEvents();
   const accessEvents: AccessEvent[] =
@@ -40,7 +32,7 @@ const SecurityLogsPrivate = () => {
         />
         <SecurityLogsFilters />
         <Divider />
-        <Timeline accessEvents={accessEvents} />
+        <Timeline accessEvents={accessEvents} isLoading={getAccessEvents.isLoading} />
       </Stack>
     </>
   );
