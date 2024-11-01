@@ -34,9 +34,9 @@ describe('isContextReady', () => {
       firstName: 'firstName',
       lastName: 'lastName',
     },
-    invited: {
-      email: 'email',
-      phoneNumber: 'phoneNumber',
+    invitedData: {
+      'id.email': 'email',
+      'id.phone_number': 'phoneNumber',
     },
   };
 

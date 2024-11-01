@@ -1,7 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import Idv, { AppErrorBoundary, Logger, trackAction } from '@onefootprint/idv';
-import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import type { GetServerSideProps } from 'next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
@@ -17,8 +16,7 @@ type RootProps = { variant?: FootprintVariant };
 const Root = ({ variant }: RootProps) => {
   const [state, send] = useHostedMachine();
   const { businessBoKycData, obConfigAuth, authToken } = state.context;
-  const { invited } = businessBoKycData || {};
-  const { email, phoneNumber } = invited || {};
+  const { invitedData } = businessBoKycData || {};
 
   const handleComplete = () => {
     send({ type: 'idvCompleted' });
@@ -39,10 +37,7 @@ const Root = ({ variant }: RootProps) => {
         {state.matches('error') ? <ErrorPage /> : null}
         {state.matches('idv') ? (
           <Idv
-            bootstrapData={{
-              [IdDI.email]: email,
-              [IdDI.phoneNumber]: phoneNumber,
-            }}
+            bootstrapData={invitedData}
             authToken={authToken}
             obConfigAuth={obConfigAuth}
             onComplete={handleComplete}
