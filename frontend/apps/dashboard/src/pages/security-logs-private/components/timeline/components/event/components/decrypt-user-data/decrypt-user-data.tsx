@@ -24,15 +24,15 @@ const DecryptUserData = ({ detail }: DecryptUserDataProps) => {
           {t('decrypted')}
         </Text>
         <FirstFieldsText decryptedFields={decryptedFields} />
-        <Tooltip text={remainingFieldsTranslated} position="top">
-          <Text variant="label-3" tag="span" textDecoration="underline">
+        <Tooltip text={remainingFieldsTranslated} position="bottom">
+          <Text variant="label-3" tag="span" textDecoration="underline" cursor="default">
             {numRemainingFields} {numRemainingFields === 1 ? t('other-attribute') : t('other-attributes')}
           </Text>
         </Tooltip>
         <Text variant="body-3" tag="span" minWidth="fit-content">
           {t('of-a')}
         </Text>
-        <LinkButton href={`/security-logs/${fpId}`} iconComponent={IcoArrowTopRight16}>
+        <LinkButton href={`/users/${fpId}`} iconComponent={IcoArrowTopRight16} target="_blank">
           {t('user')}
         </LinkButton>
       </>

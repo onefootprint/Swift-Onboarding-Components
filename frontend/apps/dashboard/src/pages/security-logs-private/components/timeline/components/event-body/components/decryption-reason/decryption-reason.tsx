@@ -26,7 +26,7 @@ const DecryptionReason = ({ detail }: DecryptionReasonProps) => {
       direction="column"
       marginBottom={8}
     >
-      <Stack gap={1} alignItems="center">
+      <Stack gap={2} alignItems="center">
         <IcoInfo16 />
         <Text variant="label-3">{t('decryption-reason')}</Text>
       </Stack>

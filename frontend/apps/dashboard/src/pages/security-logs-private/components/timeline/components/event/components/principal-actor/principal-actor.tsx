@@ -38,14 +38,15 @@ const PrincipalActor = ({ principal, insightEvent }: PrincipalActorProps) => {
 
 const Container = styled.div`
   position: relative;
+  cursor: default;
 `;
 
 const InsightEventWrapper = styled.div`
     display: none;
     position: absolute;
     z-index: 1;
-    bottom: 100%;
     left: 0;
+    top: 100%;
 
     ${Container}:hover & {
       display: block;
