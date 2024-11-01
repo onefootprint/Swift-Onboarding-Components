@@ -1,4 +1,4 @@
-import { AccessEventKind, IdDI } from '@onefootprint/types';
+import { AccessEventKind, ActorKind, IdDI } from '@onefootprint/types';
 
 export const decryptEventFixture = {
   id: 'test-id',
@@ -14,7 +14,8 @@ export const decryptEventFixture = {
   },
   timestamp: '2023-01-01T00:00:00Z',
   principal: {
-    kind: 'user',
+    kind: ActorKind.apiKey as const,
+    fpId: '123',
     id: '123',
     name: 'Test User',
   },
@@ -45,7 +46,8 @@ export const nonDecryptEventFixture = {
   },
   timestamp: '2023-01-01T00:00:00Z',
   principal: {
-    kind: 'user',
+    kind: ActorKind.user as const,
+    fpId: '123',
     id: '123',
     name: 'Test User',
   },

@@ -1,4 +1,4 @@
-import { type AccessEvent, AccessEventKind } from '@onefootprint/types';
+import { type AccessEvent, AccessEventKind, ActorKind } from '@onefootprint/types';
 
 export const accessEventsFixture: AccessEvent[] = [
   {
@@ -15,9 +15,8 @@ export const accessEventsFixture: AccessEvent[] = [
     },
     timestamp: '2023-01-01T00:00:00Z',
     principal: {
-      kind: 'user',
-      id: '123',
-      name: 'Test User',
+      kind: ActorKind.user as const,
+      fpId: '123',
     },
     insightEvent: {
       city: 'San Francisco',

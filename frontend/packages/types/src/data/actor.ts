@@ -22,6 +22,9 @@ export type ActorFirmEmployee = {
 export type ActorOrganization = {
   kind: ActorKind.organization;
   member: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
 };
 
 export type ActorApiKey = {

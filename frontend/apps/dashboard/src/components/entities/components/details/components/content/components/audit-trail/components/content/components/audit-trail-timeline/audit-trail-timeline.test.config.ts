@@ -213,6 +213,7 @@ export const TimelineFixture: Timeline = [
         actor: {
           kind: ActorKind.organization,
           member: 'Piip Penguin (piip@onefootprint.com)',
+          email: 'piip@onefootprint.com',
         },
         note: 'Hello today, please upload your flerpderp',
       },
@@ -251,6 +252,7 @@ export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
       actor: {
         kind: ActorKind.organization,
         member: 'Piip Penguin (piip@onefootprint.com)',
+        email: 'piip@onefootprint.com',
       },
     },
   },

@@ -48,7 +48,12 @@
         "ip-address": "IP address",
         "user-agent": "Device/OS"
       }
-    }
+    },
+    "footprint": "Footprint",
+    "firm-employee": "A Footprint employee",
+    "api-key": "An API key",
+    "user": "A user",
+    "employees": "An employee"
   },
   "events": {
     "decryption-event": {

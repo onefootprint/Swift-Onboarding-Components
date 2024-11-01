@@ -1,4 +1,4 @@
-import type { AccessEvent, DecryptUserDataDetail } from '@onefootprint/types';
+import type { AccessEvent, ActorOrganization, DecryptUserDataDetail } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 
 import FieldTagList from '../field-tag-list';
@@ -10,7 +10,8 @@ type SecurityLogHeaderProps = {
 const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => {
   const { data } = accessEvent.detail as DecryptUserDataDetail;
   const targets = data.decryptedFields;
-  const actor = accessEvent.principal.member || accessEvent.principal.name || 'an automated process';
+  const principal = accessEvent.principal as ActorOrganization;
+  const actor = principal.member || principal.email || 'an automated process';
   return (
     <Stack align="center" justify="flex-start" flexWrap="wrap" gap={2} marginTop={2}>
       <FieldTagList targets={targets} />

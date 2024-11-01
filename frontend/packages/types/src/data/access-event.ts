@@ -1,3 +1,4 @@
+import type { Actor } from './actor';
 import type { InsightEvent } from './insight-event';
 
 export enum AccessEventKind {
@@ -95,12 +96,7 @@ export type AccessEvent<T extends AccessEventKind = AccessEventKind> = {
   timestamp: string;
   tenantId: string;
   name: T;
-  principal: {
-    kind: string;
-    id?: string;
-    name?: string;
-    member?: string;
-  };
+  principal: Actor;
   insightEvent?: InsightEvent;
   detail: AccessEventDetailMap[T];
 };
@@ -112,6 +108,6 @@ export type TransformedAccessEvent = {
   reason?: string;
   tenantId: string;
   timestamp: string;
-  principal: string;
+  principal: Actor;
   insightEvent?: InsightEvent;
 };

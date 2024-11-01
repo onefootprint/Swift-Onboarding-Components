@@ -1,4 +1,9 @@
-import { type AccessEvent, AccessEventKind, type DecryptUserDataDetail } from '@onefootprint/types';
+import {
+  type AccessEvent,
+  AccessEventKind,
+  type ActorOrganization,
+  type DecryptUserDataDetail,
+} from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import DecryptUserData from './components/decrypt-user-data';
 import PrincipalActor from './components/principal-actor';
@@ -9,7 +14,7 @@ const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
 
   return (
     <Stack gap={2} flexWrap="wrap" width="100%" flexShrink={0}>
-      <PrincipalActor principal={principal} insightEvent={insightEvent} />
+      <PrincipalActor principal={principal as ActorOrganization} insightEvent={insightEvent} />
       {kind === AccessEventKind.DecryptUserData && <DecryptUserData detail={detail as DecryptUserDataDetail} />}
     </Stack>
   );
