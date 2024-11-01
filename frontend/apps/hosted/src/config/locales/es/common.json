@@ -62,6 +62,10 @@
         "title": "El enlace no es válido",
         "subtitle": "Por favor, contacta a la empresa que te lo envió e inténtalo de nuevo."
       },
+      "link-used": {
+        "title": "¡Listo!",
+        "subtitle": "Ya has completado tu información."
+      },
       "expired": {
         "title": "Sesión expirada",
         "subtitle": "Por razones de seguridad, esta sesión ha caducado. Por favor, solicita un nuevo enlace.",

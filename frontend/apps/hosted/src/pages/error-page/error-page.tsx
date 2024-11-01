@@ -1,4 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { HeaderTitle } from '@onefootprint/idv';
 import { useRequestError } from '@onefootprint/request';
 import { Box, Stack } from '@onefootprint/ui';
@@ -10,13 +11,31 @@ const ErrorPage = () => {
   const { getErrorCode } = useRequestError();
   const [state] = useHostedMachine();
   const { error } = state.context;
+  const errorCode = getErrorCode(error);
 
-  const isExpiredError = getErrorCode(error) === 'E118';
+  const isLinkAlreadyUsedError = errorCode === 'E125';
+  if (isLinkAlreadyUsedError) {
+    return <LinkAlreadyUsedError />;
+  }
+
+  const isExpiredError = errorCode === 'E118';
   if (isExpiredError) {
     return <LinkExpiredError />;
   }
 
   return <GenericError error={error} />;
+};
+
+const LinkAlreadyUsedError = () => {
+  const { t } = useTranslation('common', { keyPrefix: 'pages.error-page' });
+
+  return (
+    <Stack direction="column" alignItems="center" justifyContent="center" paddingTop={8}>
+      <IcoCheckCircle40 color="success" />
+      <Box marginBottom={4} />
+      <HeaderTitle title={t('link-used.title')} subtitle={t('link-used.subtitle')} />
+    </Stack>
+  );
 };
 
 const LinkExpiredError = () => {
