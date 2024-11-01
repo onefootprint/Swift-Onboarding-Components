@@ -5,9 +5,13 @@ use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
 use api_core::errors::ValidationError;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_errors::BadRequestWithCode;
+use api_errors::FpErrorCode;
 use api_wire_types::hosted::business::HostedBusinessDetail;
 use api_wire_types::hosted::business::Invited;
 use api_wire_types::hosted::business::Inviter;
+use db::errors::FpOptionalExtension;
+use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::workflow::Workflow;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
@@ -24,13 +28,23 @@ use paperclip::actix::{
 #[actix::get("/hosted/business")]
 pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse<HostedBusinessDetail> {
     let biz_wf_id = bo_auth.data.data.biz_wf_id.clone();
-    let bvw = state
+    let bo_id = bo_auth.bo.id.clone();
+    let (bvw, user_wfl) = state
         .db_query(move |conn| -> FpResult<_> {
             let (_, sb) = Workflow::get_all(conn, &biz_wf_id)?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
-            Ok(bvw)
+            let user_wfl = BusinessWorkflowLink::get_bo_workflow(conn, &bo_id, &biz_wf_id).optional()?;
+            Ok((bvw, user_wfl))
         })
         .await?;
+
+    if user_wfl.is_some_and(|(_, wf)| wf.completed_at.is_some()) {
+        return BadRequestWithCode(
+            "This link has already been used to collect a beneficial owner's information.",
+            FpErrorCode::BoLinkAlreadyUsed,
+        )
+        .into();
+    }
 
     let dbos = bvw.decrypt_business_owners(&state).await?;
     let primary_bo = dbos

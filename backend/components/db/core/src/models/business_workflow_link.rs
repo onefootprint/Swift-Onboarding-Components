@@ -52,11 +52,16 @@ impl BusinessWorkflowLink {
     }
 
     #[tracing::instrument("BusinessWorkflowLink::get", skip_all)]
-    pub fn get(conn: &mut PgConn, bo_id: &BoId, biz_wf_id: &WorkflowId) -> DbResult<Self> {
+    pub fn get_bo_workflow(
+        conn: &mut PgConn,
+        bo_id: &BoId,
+        biz_wf_id: &WorkflowId,
+    ) -> DbResult<(Self, Workflow)> {
         let result = business_workflow_link::table
+            .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::user_workflow_id)))
             .filter(business_workflow_link::business_owner_id.eq(bo_id))
             .filter(business_workflow_link::business_workflow_id.eq(biz_wf_id))
-            .get_result::<Self>(conn)?;
+            .get_result::<(Self, Workflow)>(conn)?;
         Ok(result)
     }
 

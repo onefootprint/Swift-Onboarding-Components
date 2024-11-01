@@ -879,6 +879,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "api_core",
+ "api_errors",
  "api_wire_types",
  "app-attest",
  "aws-config",

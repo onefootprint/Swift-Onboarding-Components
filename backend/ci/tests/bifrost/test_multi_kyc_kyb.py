@@ -129,6 +129,14 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     assert body[1]["ownership_stake"] == 30
     assert body[0]["source"] == "hosted"
 
+    # Should display error if you try to reuse the link
+    body = get("hosted/business", None, secondary_bo_token, status_code=400)
+    assert (
+        body["message"]
+        == "This link has already been used to collect a beneficial owner's information."
+    )
+    assert body["code"] == "E125"
+
     # Should be able to use the BO token in identify flow for same user
     phone_number = secondary_bo.client.data["id.phone_number"]
     sandbox_id = secondary_bo.client.sandbox_id
