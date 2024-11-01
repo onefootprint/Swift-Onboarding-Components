@@ -3,19 +3,48 @@ import FootprintSwift
 
 struct EmailAndPhoneView: View {
     @State private var shouldNavigateToNextView = false
+    @State private var isLoading = false
+    @State private var challengeKind: String = ""
+    @State private var otpComplete: Bool = false
     
-    var body: some View {        
+    var body: some View {
         FpForm(
             onSubmit: { vaultData in
+                isLoading = true
                 Task {
-                    print("onSubmit: ")
-                    print(vaultData)
                     do {
-                        try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: vaultData.idEmail, phoneNumber: vaultData.idPhoneNumber)
+                        let challengeKind = try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: vaultData.idEmail, phoneNumber: vaultData.idPhoneNumber)
+                        print("Pin code sent to: \(challengeKind)")
+                        self.challengeKind = challengeKind
                         shouldNavigateToNextView = true
+                        isLoading = false
                     } catch {
-                        print("Error: \(error)")
-                        shouldNavigateToNextView = false
+                        if let footprintError = error as? FootprintError {
+                            switch footprintError.kind {
+                            case .inlineOtpNotSupported:
+                                try await FootprintProvider.shared.launchIdentify(
+                                    email: vaultData.idEmail,
+                                    phone: vaultData.idPhoneNumber,
+                                    onCancel: {
+                                        print("User cancelled hosted identity flow")
+                                    },
+                                    onAuthenticated: { response in
+                                        print("Hosted identity flow completed: \(response)")
+                                        shouldNavigateToNextView = true
+                                        isLoading = false
+                                        otpComplete = true
+                                    },
+                                    onError: { error in
+                                        print("Error occurred: \(error)")
+                                    }
+                                )
+                                
+                            default:
+                                print("Error occurred: \(error)")
+                                shouldNavigateToNextView = false
+                                isLoading = false
+                            }
+                        }
                     }
                 }
             },
@@ -24,7 +53,7 @@ struct EmailAndPhoneView: View {
                     FpField(
                         name: .idEmail,
                         content:{
-                            VStack{
+                            VStack(alignment: .leading){
                                 FpLabel("Email", font: .subheadline, color: .secondary)
                                 FpInput(placeholder: "Enter your email")
                                     .padding()
@@ -38,26 +67,38 @@ struct EmailAndPhoneView: View {
                     FpField(
                         name: .idPhoneNumber,
                         content: {
-                            FpLabel("Phone Number", font: .subheadline, color: .secondary)
-                            FpInput(placeholder: "Enter your phone number")
-                                .padding()
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(10)
-                            FpFieldError()
+                            VStack(alignment: .leading){
+                                FpLabel("Phone Number", font: .subheadline, color: .secondary)
+                                FpInput(placeholder: "Enter your phone number")
+                                    .padding()
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(10)
+                                FpFieldError()
+                            }
                         }
                     )
                     Button(action: formUtils.handleSubmit) {
-                        Text("Submit")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(10)
+                        if isLoading {
+                            ProgressView() // Loading indicator
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .frame(width: 100, height: 50)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                                
+                        } else {
+                            Text("Submit")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(width: 100, height: 50)
+                                .background(Color.blue)
+                                .cornerRadius(10)   
+                        }
                     }
+                    .disabled(isLoading)
                 }
             }
-                          
-        )        
+            
+        )
         .padding(.horizontal, 20)
         .navigationTitle("Signup flow")
         .onAppear {
@@ -65,7 +106,7 @@ struct EmailAndPhoneView: View {
                 do {
                     let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
                     try await FootprintProvider.shared.initialize(
-                        configKey: "pb_test_QeSAeS8XHohiSpCOj2l4vd",
+                        configKey: "pb_test_SrKLqUT0RKvpZbXXpn1Xsf",
                         sandboxOutcome: sandboxOutcome
                     )
                 } catch {
@@ -73,7 +114,16 @@ struct EmailAndPhoneView: View {
                 }
             }
         }
-        .navigate(to: VerifyOTPView(), when: $shouldNavigateToNextView)
+        .navigate(to: destinationView(), when: $shouldNavigateToNextView)
+    }
+    
+    @ViewBuilder
+    private func destinationView() -> some View {
+        if otpComplete == false {
+            VerifyOTPView(challengeKind: challengeKind)
+        } else {
+            BasicInfoView()
+        }
     }
 }
 

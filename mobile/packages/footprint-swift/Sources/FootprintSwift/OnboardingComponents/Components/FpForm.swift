@@ -16,13 +16,13 @@ public struct FormUtils {
 
 public struct FpForm<Content: View>: View {
     @StateObject var form = FormManager()
-    var defaultValues: [FpFieldName: String]? = nil
+    var defaultValues: [FpFieldName: String?]? = nil
     let builder: (FormUtils) -> Content
     let onSubmit: (VaultData) -> Void
     
     
     public init(
-        defaultValues: [FpFieldName: String]? = nil,
+        defaultValues: [FpFieldName: String?]? = nil,
         onSubmit: @escaping (VaultData) -> Void,
         @ViewBuilder builder: @escaping (FormUtils) -> Content
     ) {

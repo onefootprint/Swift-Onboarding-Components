@@ -30,7 +30,7 @@ func formatAfterDecryption(_ data: VaultData, locale: FootprintLocale) throws ->
     
     if let dob {
         let usDobString = fromISO8601ToUSDate(dob)
-        formattedData.idDob = fromUsDateToStringInput(locale: locale, str: dob)
+        formattedData.idDob = fromUsDateToStringInput(locale: locale, str: usDobString ?? "")
         guard let dobDate = formattedData.idDob else {
             throw FootprintError(kind: .decryptionError, message: "Invalid date format for idDob field \(dob)")
         }
@@ -38,7 +38,7 @@ func formatAfterDecryption(_ data: VaultData, locale: FootprintLocale) throws ->
     
     if let visaExpirationDate {
         let usVisaExpirationDate = fromISO8601ToUSDate(visaExpirationDate)
-        formattedData.idVisaExpirationDate = fromUsDateToStringInput(locale: locale, str: visaExpirationDate)
+        formattedData.idVisaExpirationDate = fromUsDateToStringInput(locale: locale, str: usVisaExpirationDate ?? "")
         guard let visaExpDate = formattedData.idVisaExpirationDate else {
             throw FootprintError(kind: .decryptionError, message: "Invalid date format for idVisa \(visaExpirationDate)")
         }

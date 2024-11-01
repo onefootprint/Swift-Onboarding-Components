@@ -396,39 +396,39 @@ class FormManager: ObservableObject {
         }
     }
     
-    func setDefaultValues(defaultValues: [FpFieldName: String]) {
+    func setDefaultValues(defaultValues: [FpFieldName: String?]) {
         // Setting default values doesn't automatically add the field key to used keys
         // The field should be a part of used keys only if it's used in the UI
         for (key, value) in defaultValues {
             switch key {
             case .idPhoneNumber:
-                idPhoneNumber = value
+                idPhoneNumber = value ?? idPhoneNumber
             case .idEmail:
-                idEmail = value
+                idEmail = value ?? idEmail
             case .idDob:
-                idDob = value
+                idDob = value ?? idDob
             case .idSsn4:
-                idSsn4 = value
+                idSsn4 = value ?? idSsn4
             case .idSsn9:
-                idSsn9 = value
+                idSsn9 = value ?? idSsn9
             case .idFirstName:
-                idFirstName = value
+                idFirstName = value ?? idFirstName
             case .idLastName:
-                idLastName = value
+                idLastName = value ?? idLastName
             case .idMiddleName:
-                idMiddleName = value
+                idMiddleName = value ?? idMiddleName
             case .idCountry:
-                idCountry = value
+                idCountry = value ?? idCountry
             case .idState:
-                idState = value
+                idState = value ?? idState
             case .idCity:
-                idCity = value
+                idCity = value ?? idCity
             case .idZip:
-                idZip = value
+                idZip = value ?? idZip
             case .idAddressLine1:
-                idAddressLine1 = value
+                idAddressLine1 = value ?? idAddressLine1
             case .idAddressLine2:
-                idAddressLine2 = value
+                idAddressLine2 = value ?? idAddressLine2
             default:
                 break
             }
