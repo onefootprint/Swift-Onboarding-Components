@@ -4,6 +4,7 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::workflow;
 use db_schema::schema::workflow_request_junction;
 use diesel::prelude::*;
 use newtypes::ScopedVaultId;
@@ -14,6 +15,9 @@ use newtypes::WorkflowRequestJunctionId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = workflow_request_junction)]
+/// Junction table between a WorkflowRequest and a scoped vault created at the time the
+/// WorkflowRequest is made. The `workflow_id` is populated at the time a corresponding Workflow is
+/// created.
 pub struct WorkflowRequestJunction {
     pub id: WorkflowRequestJunctionId,
     pub _created_at: DateTime<Utc>,
@@ -51,14 +55,21 @@ impl WorkflowRequestJunction {
         Ok(results)
     }
 
-    pub fn get(conn: &mut PgConn, wfr_id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> DbResult<Self> {
+    #[tracing::instrument("WorkflowRequestJunction::get", skip_all)]
+    pub fn get(
+        conn: &mut PgConn,
+        wfr_id: &WorkflowRequestId,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<(Self, Option<Workflow>)> {
         let result = workflow_request_junction::table
+            .left_join(workflow::table)
             .filter(workflow_request_junction::workflow_request_id.eq(wfr_id))
             .filter(workflow_request_junction::scoped_vault_id.eq(sv_id))
-            .get_result::<Self>(conn)?;
+            .get_result(conn)?;
         Ok(result)
     }
 
+    #[tracing::instrument("WorkflowRequestJunction::list", skip_all)]
     pub fn list(conn: &mut PgConn, wfr_id: &WorkflowRequestId) -> DbResult<Vec<Self>> {
         let results = workflow_request_junction::table
             .filter(workflow_request_junction::workflow_request_id.eq(wfr_id))

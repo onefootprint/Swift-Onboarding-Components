@@ -2036,6 +2036,7 @@ diesel::joinable!(workflow -> scoped_vault (scoped_vault_id));
 diesel::joinable!(workflow_event -> workflow (workflow_id));
 diesel::joinable!(workflow_request -> ob_configuration (ob_configuration_id));
 diesel::joinable!(workflow_request_junction -> scoped_vault (scoped_vault_id));
+diesel::joinable!(workflow_request_junction -> workflow (workflow_id));
 diesel::joinable!(workflow_request_junction -> workflow_request (workflow_request_id));
 
 diesel::allow_tables_to_appear_in_same_query!(

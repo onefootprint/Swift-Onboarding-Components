@@ -1,0 +1,2 @@
+ALTER TABLE workflow_request_junction
+DROP CONSTRAINT fk_workflow_request_junction_workflow_id;

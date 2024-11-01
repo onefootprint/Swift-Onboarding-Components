@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS workflow_request_junction_scoped_vault_id ON workflow_request_junction(scoped_vault_id);

@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS workflow_request_junction_workflow_request_id ON workflow_request_junction(workflow_request_id);

@@ -113,9 +113,8 @@ pub fn get_or_create_user_workflow(
         .as_ref()
         .map(|wfr| WorkflowRequestJunction::get(conn, &wfr.id, &su.id))
         .transpose()?;
-    if let Some(wf_id) = wfr_junction.and_then(|wfr| wfr.workflow_id) {
+    if let Some(wf) = wfr_junction.and_then(|(_, wf)| wf) {
         // This request has already been used to make a Workflow. Return that workflow.
-        let wf = Workflow::get(conn, &wf_id)?;
         return Ok((wf, false));
     }
     if let Some(wf_id) = existing_wf_id {
@@ -317,9 +316,8 @@ pub fn get_or_create_business_wf<'a>(
         .zip(wfr.as_ref())
         .map(|(sb_id, wfr)| WorkflowRequestJunction::get(conn, &wfr.id, sb_id))
         .transpose()?;
-    if let Some(wf_id) = wfr_junction.and_then(|wfr| wfr.workflow_id) {
+    if let Some(wf) = wfr_junction.and_then(|(_, wf)| wf) {
         // This request has already been used to make a Workflow. Return that workflow.
-        let wf = Workflow::get(conn, &wf_id)?;
         return Ok((wf, false));
     }
 
