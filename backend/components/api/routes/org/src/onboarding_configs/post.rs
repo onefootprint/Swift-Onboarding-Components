@@ -4,6 +4,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::errors::tenant::TenantError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
@@ -44,6 +45,8 @@ pub struct CreateOnboardingConfigurationRequest {
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub skip_kyc: Option<bool>,
+    #[serde(default)]
+    pub doc_scan_for_optional_ssn: Option<CDO>,
     #[serde(default)]
     pub enhanced_aml: Option<EnhancedAml>,
     // TODO: drop this option
@@ -116,8 +119,15 @@ pub async fn post(
         required_auth_methods,
         prompt_for_passkey,
         allow_reonboard,
+        doc_scan_for_optional_ssn,
     } = pb_request;
 
+    if doc_scan_for_optional_ssn.is_some() {
+        return Err(TenantError::ValidationError(
+            "doc_scan_for_optional_ssn not supported. Please use the `ssn_not_provided` risk signal in a StepUp Rule to encode this logic.".to_string(),
+        )
+        .into());
+    }
 
     // TODO: clean this up by surfacing AM lists in FE
     let db_enhanced_aml = api_enhanced_aml.map(|r| r.into());
