@@ -42,7 +42,12 @@ def send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=None):
     data = dict(kind="inherit")
     body = post(f"entities/{fp_id}/token", data, *sandbox_tenant.db_auths)
     assert body["link"]
-    return FpAuth(body["token"])
+    auth_token = FpAuth(body["token"])
+
+    get("hosted/onboarding/config", None, auth_token)
+    # TODO test that the wfr config is serialized
+
+    return auth_token
 
 
 def complete_redo_flow_user(user, auth_token, pre_run=None):
@@ -59,13 +64,18 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     initial_num_obds = len(obds)
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
+    stepped_up_auth_token = IdentifyClient.from_token(auth_token).step_up(
         assert_had_no_scopes=True
     )
-    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    bifrost = BifrostClient.raw_auth(obc, stepped_up_auth_token, sandbox_id)
     if pre_run:
         pre_run(bifrost)
     bifrost.run()
+
+    # Shouldn't be able to re-use the link
+    body = get("hosted/onboarding/config", None, auth_token, status_code=400)
+    assert body["message"] == "This link has already been used."
+    assert body["code"] == "E125"
 
     # User shouldn't be marked as "info requested" anymore
     body = get(f"entities/{fp_id}", None, *tenant.db_auths)

@@ -68,7 +68,7 @@ impl WorkflowRequest {
         Ok(result)
     }
 
-    #[tracing::instrument("WorkflowRequest::get", skip_all)]
+    #[tracing::instrument("WorkflowRequest::get_active", skip_all)]
     pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let result = workflow_request::table
             .inner_join(workflow_request_junction::table)

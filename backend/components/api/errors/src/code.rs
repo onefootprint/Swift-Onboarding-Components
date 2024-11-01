@@ -74,7 +74,7 @@ pub enum FpErrorCode {
     #[strum(serialize = "E124")]
     BusinessNotOwnedByUser,
     #[strum(serialize = "E125")]
-    BoLinkAlreadyUsed,
+    LinkAlreadyUsed,
 
     // Tenant-facing errors
     #[strum(serialize = "T120")]
@@ -123,7 +123,7 @@ impl FpErrorCode {
             Self::FileTooSmall => true,
             Self::MissingAuthHeader => true,
             Self::BusinessNotOwnedByUser => true,
-            Self::BoLinkAlreadyUsed => true,
+            Self::LinkAlreadyUsed => true,
 
             // Tenant-facing errors
             Self::VaultDataValidationError => true,

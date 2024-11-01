@@ -42,7 +42,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     if user_wfl.is_some_and(|(_, wf)| wf.completed_at.is_some()) {
         return BadRequestWithCode(
             "This link has already been used to collect a beneficial owner's information.",
-            FpErrorCode::BoLinkAlreadyUsed,
+            FpErrorCode::LinkAlreadyUsed,
         )
         .into();
     }

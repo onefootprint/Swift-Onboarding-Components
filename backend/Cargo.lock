@@ -1020,6 +1020,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "api_core",
+ "api_errors",
  "api_route_hosted_core",
  "api_wire_types",
  "app-attest",
