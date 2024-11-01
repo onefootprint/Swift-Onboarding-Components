@@ -118,7 +118,10 @@ const footprint = () => {
       redirectUrl: redirectUrlOrFallback,
       token,
     });
-    const result = await WebBrowser.openAuthSessionAsync(url, redirectUrlOrFallback, { preferEphemeralSession: true });
+    const result = await WebBrowser.openAuthSessionAsync(url, redirectUrlOrFallback, {
+      preferEphemeralSession: true,
+      showInRecents: true,
+    });
     return result;
   };
 

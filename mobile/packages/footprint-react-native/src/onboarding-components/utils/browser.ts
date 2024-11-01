@@ -145,6 +145,7 @@ const footprint = () => {
     }
     const result = await InAppBrowser.openAuth(url, deepLink, {
       ephemeralWebSession: true, // To prevent sharing cookies & permission popup
+      showInRecents: true,
     });
     return result;
   };
