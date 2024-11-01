@@ -154,10 +154,8 @@ export type {
   SXStylesKeys,
 } from './hooks';
 export {
-  useEventListener,
   useMediaQuery,
   useObjectUrl,
-  useOnClickOutside,
   useSX,
 } from './hooks';
 export type { BootstrapProps } from './utils';

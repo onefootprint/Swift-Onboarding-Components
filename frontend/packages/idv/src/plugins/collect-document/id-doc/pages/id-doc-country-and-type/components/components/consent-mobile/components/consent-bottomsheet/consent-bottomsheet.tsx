@@ -1,4 +1,3 @@
-import { useOnClickOutside } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import { Button, Divider, IconButton, Overlay } from '@onefootprint/ui';
 import FocusTrap from 'focus-trap-react';
@@ -6,7 +5,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { useEffectOnce } from 'usehooks-ts';
+import { useEffectOnce, useOnClickOutside } from 'usehooks-ts';
 
 export type ConsentBottomSheetProps = {
   open: boolean;

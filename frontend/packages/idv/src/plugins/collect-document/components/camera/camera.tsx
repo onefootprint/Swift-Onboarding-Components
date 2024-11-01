@@ -1,11 +1,10 @@
-import { useCountdownCustom, useInterval } from '@onefootprint/hooks';
 import { LoadingSpinner, Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { useEffectOnce, useTimeout } from 'usehooks-ts';
+import { useCountdown, useEffectOnce, useInterval, useTimeout } from 'usehooks-ts';
 
 import { getLogger, trackAction } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
@@ -210,7 +209,7 @@ const Camera = ({
   }, [isVideoPlaying]);
 
   const videoSize = useSize(videoRef);
-  const [autoCaptureTimerVal, { startCountdown, stopCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
+  const [autoCaptureTimerVal, { startCountdown, stopCountdown, resetCountdown }] = useCountdown(CountDownProps);
 
   const getImageStringFromVideo = useGetImageString();
 

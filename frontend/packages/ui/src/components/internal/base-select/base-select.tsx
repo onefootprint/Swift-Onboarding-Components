@@ -9,7 +9,7 @@ import type { OptionProps } from 'react-select';
 import ReactSelect from 'react-select';
 import styled, { useTheme } from 'styled-components';
 
-import { useOnClickOutside } from '../../../hooks';
+import { useOnClickOutside } from 'usehooks-ts';
 import { createText } from '../../../utils/mixins';
 import Hint from '../../hint';
 import type { LabelTooltipProps } from '../../label';

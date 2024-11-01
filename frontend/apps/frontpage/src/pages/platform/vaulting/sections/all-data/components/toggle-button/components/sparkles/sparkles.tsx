@@ -1,8 +1,8 @@
-import { useInterval } from '@onefootprint/hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import type React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useInterval } from 'usehooks-ts';
 
 import range from './components/range';
 

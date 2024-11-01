@@ -1,6 +1,6 @@
-import { useCountdownCustom } from '@onefootprint/hooks';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCountdown } from 'usehooks-ts';
 
 import { REQUIRED_SUCCESSES, SELFIE_CHECK_INTERVAL, STATUS_CHANGE_DELAY } from '../../../constants';
 import type { CaptureStatus, Resolution, VideoRef } from '../types';
@@ -45,7 +45,7 @@ const useAutoCaptureFace = ({
   const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
 
   const { getFaceStatus } = useFaceDetection();
-  const [waitVal, { startCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
+  const [waitVal, { startCountdown, resetCountdown }] = useCountdown(CountDownProps);
 
   const detectAndCaptureFace = useCallback(async (): Promise<void> => {
     if (isCaptured || !videoRef.current || !canvasRef.current || !isNonZeroVideoSize(videoSize)) {

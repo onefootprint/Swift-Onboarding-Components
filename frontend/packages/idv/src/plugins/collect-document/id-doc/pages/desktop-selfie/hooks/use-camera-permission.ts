@@ -1,5 +1,5 @@
-import { useInterval } from '@onefootprint/hooks';
 import { useState } from 'react';
+import { useInterval } from 'usehooks-ts';
 
 import { Logger } from '../../../../../../utils/logger';
 import parsePermissionError from '../utils/parse-permission-error';

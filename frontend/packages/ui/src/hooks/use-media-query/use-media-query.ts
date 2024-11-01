@@ -3,6 +3,7 @@ import json2mq from 'json2mq';
 import { useTheme } from 'styled-components';
 import { useMediaQuery as useMediaQueryTs } from 'usehooks-ts';
 
+/** @deprecated: import from 'usehooks-ts'  */
 const useMediaQuery = (query: {
   minWidth?: Breakpoint;
   maxWidth?: Breakpoint;

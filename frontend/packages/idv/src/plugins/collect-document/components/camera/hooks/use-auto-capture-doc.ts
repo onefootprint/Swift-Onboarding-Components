@@ -1,7 +1,7 @@
-import { useCountdownCustom } from '@onefootprint/hooks';
 import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCountdown } from 'usehooks-ts';
 
 import { DOC_DETECTION_PARAMS_BATCH_SIZE, REQUIRED_SUCCESSES, STATUS_CHANGE_DELAY } from '../../../constants';
 import type { CaptureStatus, DocSrcDimensions, Resolution, VideoRef } from '../types';
@@ -27,7 +27,7 @@ type AutoCaptureProps = {
 };
 
 const CountDownProps = {
-  countStart: 3, // This is an arbitray value - basically we want a few counts to countdown from and complete the countdown in STATUS_CHANGE_DELAY time
+  countStart: 3, // This is an arbitrary value - basically we want a few counts to countdown from and complete the countdown in STATUS_CHANGE_DELAY time
   intervalMs: STATUS_CHANGE_DELAY / 3,
 };
 
@@ -73,7 +73,7 @@ const useAutoCaptureDoc = ({
   const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
 
   const { cv, loaded } = useOpenCv();
-  const [waitVal, { startCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
+  const [waitVal, { startCountdown, resetCountdown }] = useCountdown(CountDownProps);
 
   /**
    * Width and height of the image that will be used for detection algos

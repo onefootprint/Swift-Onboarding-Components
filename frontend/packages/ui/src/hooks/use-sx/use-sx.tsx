@@ -5,6 +5,7 @@ import { useTheme } from 'styled-components';
 import { customPropNativeMapper, customPropStyles, customPropThemeMapper } from './use-sx.constants';
 import type { CustomStyleProps, SXStyleProps, SXStyles } from './use-sx.types';
 
+/** @deprecated: only used in test files */
 const useSX = (sx: SXStyleProps = {}) => {
   const theme = useTheme();
   const nativeCSSProperties = omit(sx, customPropStyles);
