@@ -64,7 +64,8 @@ const Timeline = ({ accessEvents }: { accessEvents: AccessEvent[] }) => {
                 columns={['1fr']}
                 rows={['auto', 'auto']}
                 marginLeft={2}
-                marginTop={3}
+                marginTop={2}
+                paddingTop={1}
                 flexDirection="column"
                 gap={3}
               >
