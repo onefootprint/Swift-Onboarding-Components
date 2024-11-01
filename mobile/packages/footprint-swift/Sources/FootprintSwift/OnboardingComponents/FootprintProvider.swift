@@ -365,6 +365,13 @@ public final class FootprintProvider {
     }
     
     public func getRequirements() async throws -> RequirementAttributes {
+        guard let obConfigKind = self.onboardingConfig?.kind else {
+            throw FootprintError(kind: .initializationError, message: "Missing onboarding configuration kind")
+        }
+        
+        if obConfigKind != .kyc {
+            throw FootprintError(kind: .notAllowed, message: "Unsupported onboarding configuration kind. Only KYC is supported")
+        }
         guard let authToken = self.verifiedAuthToken else {
             throw FootprintError(kind: .authError, message: "Missing authentication token")
         }
@@ -374,6 +381,13 @@ public final class FootprintProvider {
     }
     
     public func getVaultData() async throws -> VaultData {
+        guard let obConfigKind = self.onboardingConfig?.kind else {
+            throw FootprintError(kind: .initializationError, message: "Missing onboarding configuration kind")
+        }
+        
+        if obConfigKind != .kyc {
+            throw FootprintError(kind: .notAllowed, message: "Unsupported onboarding configuration kind. Only KYC is supported")
+        }
         guard let authToken = self.verifiedAuthToken else {
             throw FootprintError(kind: .authError, message: "Missing authentication token")
         }
