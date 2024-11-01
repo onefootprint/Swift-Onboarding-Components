@@ -123,6 +123,15 @@
     },
     "generate:openapi": {
       "cache": false
+    },
+    "@onefootprint/axios#generate:openapi": {
+      "dependsOn": ["@onefootprint/request-types#generate:openapi"]
+    },
+    "@onefootprint/fetch#generate:openapi": {
+      "dependsOn": ["@onefootprint/request-types#generate:openapi"]
+    },
+    "@onefootprint/fixtures#generate:openapi": {
+      "dependsOn": ["@onefootprint/request-types#generate:openapi"]
     }
   }
 }

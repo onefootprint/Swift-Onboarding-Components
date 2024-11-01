@@ -2566,7 +2566,6 @@ export type PostBusinessOnboardingRequest = {
 export type kyb_fixture_result = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type PostOnboardingRequest = {
   fixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
-  kybFixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 };
 export type fixture_result2 = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type ProcessRequest = {
