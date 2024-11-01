@@ -11,7 +11,7 @@ import { persistedValues } from './persisted-values';
 import { createDictionaryFile, sortObjectKeys, toCamelCase } from './utils';
 
 JSONSchemaFaker.option({
-  minItems: 1,
+  minItems: 3,
   maxItems: 3,
   fillProperties: false,
   useDefaultValue: true,
@@ -54,7 +54,7 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
       const index = `${type}.${name}`;
 
       dictionary[index] = persistedValues[index]
-        ? _.isObject(dictionary[index])
+        ? _.isObject(persistedValues[index])
           ? merge(example, persistedValues[index])
           : persistedValues[index]
         : example;
