@@ -8,7 +8,7 @@ import { MissingPermissionsSheetProvider } from '../../components/missing-permis
 import { MachineProvider } from '../components/machine-provider';
 import type { MachineContext } from '../utils/state-machine';
 
-const renderPage = (context: MachineContext, component: ReactNode, initState?: string) =>
+const renderPage = (context: MachineContext, component: ReactNode, initState?: string): ReturnType<typeof render> =>
   render(
     <Wrapper>
       <MachineProvider args={context} initState={initState}>

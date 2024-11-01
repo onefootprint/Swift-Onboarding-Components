@@ -19,7 +19,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "tsconfig": "workspace:*",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "react": "^18",

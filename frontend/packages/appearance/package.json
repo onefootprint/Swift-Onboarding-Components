@@ -17,11 +17,11 @@
   "dependencies": {
     "@onefootprint/design-tokens": "workspace:*",
     "@onefootprint/footprint-js": "workspace:*",
-    "styled-components": "^6",
     "@onefootprint/types": "workspace:*",
     "@onefootprint/ui": "workspace:*",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "styled-components": "^6"
   },
   "devDependencies": {
     "@types/google.maps": "^3.55.11",
@@ -30,7 +30,7 @@
     "@types/react-dom": "^18",
     "bun-types": "^1.0.25",
     "tsconfig": "workspace:*",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   },
   "browser": {
     "fs": false

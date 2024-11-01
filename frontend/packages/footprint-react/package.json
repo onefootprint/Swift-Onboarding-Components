@@ -38,15 +38,15 @@
     "@types/classnames": "^2.3.1",
     "@types/cleave.js": "^1.4.6",
     "@types/lodash": "^4.14.202",
-    "@types/react-dom": "^18",
     "@types/react": "^18",
+    "@types/react-dom": "^18",
     "bun-types": "^1.0.26",
-    "react-dom": "^18",
     "react": "^18",
+    "react-dom": "^18",
     "tsconfig": "workspace:*",
     "tsup": "^6.5.0",
     "tsx": "^4.19.1",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "classnames": "^2.5.1",

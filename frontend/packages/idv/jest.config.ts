@@ -200,4 +200,4 @@ const config: Config = {
   testTimeout: 45000,
 };
 
-export default createJestConfig(config);
+export default createJestConfig(config) as Config;

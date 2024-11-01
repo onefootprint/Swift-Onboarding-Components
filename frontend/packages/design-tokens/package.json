@@ -25,6 +25,6 @@
   "devDependencies": {
     "csstype": "^3.1.2",
     "polished": "^4.2.2",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   }
 }

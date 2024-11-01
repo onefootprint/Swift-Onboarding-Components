@@ -15,6 +15,6 @@
     "@onefootprint/types": "workspace:*",
     "@types/node": "^20",
     "tsconfig": "workspace:*",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   }
 }

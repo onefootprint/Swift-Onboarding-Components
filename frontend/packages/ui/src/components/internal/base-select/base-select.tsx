@@ -100,7 +100,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
     const body = document.querySelector('body');
 
     const setBodyHeight = () => {
-      setMobileSheetHeight(window.innerHeight - TOP_OFFSET ?? 0); // 40px offset from the top
+      setMobileSheetHeight(window.innerHeight - TOP_OFFSET || 0); // 40px offset from the top
     };
 
     const resizeObserver = new ResizeObserver(setBodyHeight);
@@ -137,6 +137,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   };
 
   const localizedEmptyStateText =
+    /** @ts-ignore - Type instantiation is excessively deep and possibly infinite */
     emptyStateText ?? (t('components.internal.base-select.empty-state-text-default') as string);
   const renderEmptyState = useCallback(
     () => <EmptyState>{localizedEmptyStateText}</EmptyState>,
@@ -234,6 +235,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
             name={name}
             noOptionsMessage={renderEmptyState}
             onBlur={onBlur}
+            // @ts-ignore: Type '(newOption: Option | null) => void' is not assignable to type '(newValue: unknown, actionMeta: ActionMeta<unknown>) => void'.
             onChange={handleChange}
             onMenuClose={closeDropdown}
             options={options}

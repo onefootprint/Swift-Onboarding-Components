@@ -11,7 +11,20 @@ import CommandList from './components/command-list/command-list';
 import CommandSeparator from './components/command-separator';
 import CommandShortcut from './components/command-shortcut';
 
-const Command = {
+type CommandType = {
+  Root: typeof CommandRoot;
+  Container: typeof CommandContainer;
+  Input: typeof CommandInput;
+  Shortcut: typeof CommandShortcut;
+  List: typeof CommandList;
+  Empty: typeof CommandEmpty;
+  Group: typeof CommandGroup;
+  Item: typeof CommandItem;
+  Separator: typeof CommandSeparator;
+  Discover: typeof CommandDiscover;
+};
+
+const Command: CommandType = {
   Root: CommandRoot,
   Container: CommandContainer,
   Input: CommandInput,

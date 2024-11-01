@@ -8,7 +8,7 @@ import type { InitMachineArgs } from 'src/plugins/collect-kyc-data/utils/state-m
 import { Layout } from '../../../../../../../components';
 import IdentitySection from '../identity-section';
 
-export const renderIdentitySection = (initialContext: InitMachineArgs) =>
+export const renderIdentitySection = (initialContext: InitMachineArgs): ReturnType<typeof customRender> =>
   customRender(
     <ToastProvider>
       <Layout>

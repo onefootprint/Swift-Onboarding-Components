@@ -10,8 +10,13 @@
   "sideEffects": false,
   "author": "Footprint",
   "license": "MIT",
-  "files": ["dist"],
-  "keywords": ["kyc", "identity verification"],
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "kyc",
+    "identity verification"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -32,7 +37,7 @@
     "bun-types": "^1.0.25",
     "tsconfig": "workspace:*",
     "tsup": "^6.5.0",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   },
   "publishConfig": {
     "access": "public"

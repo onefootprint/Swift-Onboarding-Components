@@ -14,17 +14,17 @@
     "generate:openapi": "tsx config"
   },
   "dependencies": {
-    "@onefootprint/request-types": "workspace:*",
     "@hey-api/client-axios": "^0.2.9",
-    "axios-case-converter": "^1.1.1",
-    "axios": "^1.7.7",
+    "@onefootprint/request": "workspace:*",
+    "@onefootprint/request-types": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
-    "@onefootprint/request": "workspace:*"
+    "axios": "^1.7.7",
+    "axios-case-converter": "^1.1.1"
   },
   "devDependencies": {
-    "tsconfig": "workspace:*",
-    "typescript": "^5.5.2",
+    "@hey-api/openapi-ts": "^0.53.11",
     "@types/node": "^20",
-    "@hey-api/openapi-ts": "^0.53.11"
+    "tsconfig": "workspace:*",
+    "typescript": "^5.6.3"
   }
 }

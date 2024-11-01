@@ -24,7 +24,7 @@
     "axios-case-converter": "^1.1.0",
     "i18next-locales-sync": "^2.1.0",
     "tsconfig": "workspace:*",
-    "typescript": "^5.5.2"
+    "typescript": "^5.6.3"
   },
   "peerDependencies": {
     "axios": "^1.7.4",
@@ -32,7 +32,9 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"]
+    "setupFiles": [
+      "<rootDir>/src/config/initializers/i18next-test.ts"
+    ]
   },
   "dependencies": {
     "i18next": "^23.16.0",
