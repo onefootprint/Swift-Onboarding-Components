@@ -496,6 +496,9 @@ importers:
       '@onefootprint/dev-tools':
         specifier: workspace:*
         version: link:../../packages/dev-tools
+      '@onefootprint/fixtures':
+        specifier: workspace:*
+        version: link:../../packages/fixtures
       '@onefootprint/global-constants':
         specifier: workspace:*
         version: link:../../packages/global-constants

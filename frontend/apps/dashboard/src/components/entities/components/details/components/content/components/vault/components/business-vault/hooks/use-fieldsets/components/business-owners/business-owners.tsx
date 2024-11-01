@@ -1,5 +1,6 @@
-import useBusinessOwners from '@/entity/hooks/use-business-owners';
+import { getEntitiesByFpIdBusinessOwnersOptions } from '@onefootprint/axios/dashboard';
 import type { Entity } from '@onefootprint/types';
+import { useQuery } from '@tanstack/react-query';
 import ErrorComponent from 'src/components/error';
 import Content from './components/content';
 import Loading from './components/loading';
@@ -9,10 +10,14 @@ export type BusinessOwnersProps = {
 };
 
 const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
-  const { isPending, error, data } = useBusinessOwners(entity.id);
-  const explanationMessage = entity.data.find(
-    ({ identifier }) => identifier === 'business.beneficial_owner_explanation_message',
-  )?.value as string | undefined;
+  const { isPending, error, data } = useQuery(
+    getEntitiesByFpIdBusinessOwnersOptions({
+      path: { fpId: entity.id },
+    }),
+  );
+  const explanationMessage = entity.data
+    .find(item => item.identifier === 'business.beneficial_owner_explanation_message')
+    ?.value?.toString();
 
   if (isPending) {
     return <Loading />;

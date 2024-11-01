@@ -1,20 +1,21 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import type { BusinessOwner } from '@onefootprint/types';
+import type { PrivateBusinessOwner } from '@onefootprint/request-types/dashboard';
+import type { EntityStatus } from '@onefootprint/types';
 import { Badge, Grid, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import StatusBadge from 'src/components/status-badge';
 
 export type ContentProps = {
-  businessOwners: BusinessOwner[];
   explanationMessage?: string;
+  businessOwners: PrivateBusinessOwner[];
 };
 
 const BusinessOwnersField = ({ businessOwners, explanationMessage }: ContentProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('business-details', { keyPrefix: 'vault.bos' });
 
-  const getHintText = ({ ownershipStake: stake, kind, source }: BusinessOwner): string => {
+  const getHintText = ({ ownershipStake: stake, kind, source }: PrivateBusinessOwner): string => {
     const isPrimary = kind === 'primary' && source !== 'tenant';
     if (isPrimary) {
       return stake ? t('hint.primary-with-stake', { stake }) : t('hint.primary-no-stake');
@@ -33,7 +34,7 @@ const BusinessOwnersField = ({ businessOwners, explanationMessage }: ContentProp
                   {allT('di.business.kyced_beneficial_owners')}
                 </Text>
                 {businessOwner.status ? (
-                  <StatusBadge status={businessOwner.status} />
+                  <StatusBadge status={businessOwner.status as EntityStatus} />
                 ) : (
                   <Badge variant="info">{t('status.awaiting-kyc')}</Badge>
                 )}

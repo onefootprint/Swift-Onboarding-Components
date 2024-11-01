@@ -13554,10 +13554,10 @@ export type PatchProxyConfigRequest = {
 };
 export type PrivateBusinessOwner = {
   fpId?: string;
-  kind: 'Primary' | 'Secondary';
+  kind: 'primary' | 'secondary';
   name?: string;
   ownershipStake?: number;
-  source: 'Hosted' | 'Tenant';
+  source: 'hosted' | 'tenant';
   status?: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 };
 export type kind9 = 'Primary' | 'Secondary';

@@ -7,6 +7,7 @@ import Gate from './components/gate';
 import ModeSwitcher from './components/mode-switcher';
 import PrivateLayout from './components/private-layout';
 import PublicLayout from './components/public-layout';
+import useRequestHeaders from './hooks/use-request-headers';
 
 export type LayoutProps = {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ export type LayoutProps = {
 };
 
 const Layout = ({ children, name = 'default' }: LayoutProps) => {
+  useRequestHeaders();
   const router = useRouter();
   const { isLoggedIn } = useSession();
 
