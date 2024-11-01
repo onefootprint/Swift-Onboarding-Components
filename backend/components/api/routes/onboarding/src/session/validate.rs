@@ -10,6 +10,7 @@ use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::requirements::requires_biz_workflow;
 use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::UserAuthResponse;
@@ -23,7 +24,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use newtypes::AuthEventKind;
-use newtypes::ObConfigurationKind;
 use newtypes::OnboardingStatus;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
@@ -65,7 +65,7 @@ pub async fn post(
                 let mr_filters = ManualReviewFilters::get_active();
                 let user_mrs = ManualReview::get(conn, &sv.id, mr_filters.clone())?;
                 let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
-                let biz_wf = if obc.kind == ObConfigurationKind::Kyb {
+                let biz_wf = if requires_biz_workflow(&wf, &obc)? {
                     let biz_wf_id = biz_wf_id.ok_or(ValidationError("Missing business workflow"))?;
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf_id)?;
                     let biz_mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;

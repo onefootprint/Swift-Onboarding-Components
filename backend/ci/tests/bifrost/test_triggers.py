@@ -320,6 +320,29 @@ def test_collect_document_no_onboardings(sandbox_tenant):
     bifrost.validate()
 
 
+def test_collect_document_does_not_require_business(
+    sandbox_tenant, kyb_sandbox_ob_config
+):
+    """
+    Verify that document workflows that don't collect business docs _don't_ require business selection.
+    """
+    # Onboard the user onto a KYB playbook.
+    document_configs = [dict(kind="proof_of_address", data=dict())]
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    user = bifrost.run()
+    assert user.fp_bid
+
+    # Trigger recollect document. The document workflow here will be linked to a KYB playbook
+    trigger = dict(kind="document", data=dict(configs=document_configs))
+    initial_auth_token = send_trigger(user.fp_id, sandbox_tenant, trigger)
+
+    # Should not require business selection
+    bifrost = complete_redo_flow_user(user, initial_auth_token)
+    assert not any(
+        i["kind"] == "create_business_onboarding" for i in bifrost.handled_requirements
+    )
+
+
 def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
     document_configs = [
         dict(

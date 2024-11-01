@@ -9,6 +9,7 @@ use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::AssertionError;
 use db::models::contact_info::ContactInfo;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
@@ -41,7 +42,6 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::LivenessSource;
-use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
 use newtypes::Selfie;
 use newtypes::UsLegalStatus;
@@ -139,12 +139,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
             let mut requirements = get_requirements_for_wf(conn, ctx, &person_workflow, &uvw)?;
 
-            let collecting_biz_doc = match person_workflow.config {
-                WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => !business_configs.is_empty(),
-                _ => false,
-            };
-            let requires_kyb = person_obc.kind == ObConfigurationKind::Kyb || collecting_biz_doc;
-            if requires_kyb {
+            if requires_biz_workflow(&person_workflow, &person_obc)? {
                 if let Some((bvw, biz_wf)) = biz_wf_info {
                     requirements.extend(get_requirements_for_wf(conn, ctx, &biz_wf, &bvw)?);
                 } else {
@@ -163,6 +158,16 @@ pub async fn get_requirements_for_person_and_maybe_business(
         .await?;
 
     Ok(requirements)
+}
+
+/// Returns if the person workflow and playbook require the presence of a business workflow
+pub fn requires_biz_workflow(person_wf: &Workflow, person_obc: &ObConfiguration) -> FpResult<bool> {
+    let requires_biz_workflow = match &person_wf.config {
+        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => person_obc.kind.is_kyb(),
+        WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => !business_configs.is_empty(),
+        WorkflowConfig::Kyb(_) => return AssertionError("Person workflow cannot have kind KYB").into(),
+    };
+    Ok(requires_biz_workflow)
 }
 
 #[derive(Clone, Copy)]
