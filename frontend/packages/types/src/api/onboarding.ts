@@ -1,4 +1,4 @@
-import type { OverallOutcome, PublicOnboardingConfig } from '../data';
+import type { OverallOutcome } from '../data';
 
 export type OnboardingRequest = {
   authToken: string;
@@ -7,7 +7,6 @@ export type OnboardingRequest = {
 };
 
 export type OnboardingResponse = {
-  onboardingConfig: PublicOnboardingConfig;
   // TODO: not in use yet, but should migrate to inherit this new authToken.
   authToken: string;
 };
