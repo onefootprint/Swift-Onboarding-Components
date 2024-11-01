@@ -12,21 +12,12 @@ import {
   selectOutcomeOptional,
   verifyPhoneNumber,
 } from '../utils/commands';
+import { PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_HOSTED_BASE_URL || 'http://localhost:3004';
-const key = process.env.E2E_OB_KYC || process.env.NEXT_PUBLIC_E2E_TENANT_PK || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
+const key = process.env.E2E_OB_KYC || 'pb_test_MrO9iLr9QyJ25GwIeJDdCV';
 
-const firstName = 'E2E';
-const lastName = 'KYCBasic';
-const dob = '01/01/1990';
-const email = 'janedoe@acme.com';
-const phoneNumber = '5555550100';
-const addressLine1 = '432 3rd Ave';
-const city = 'Seward';
-const zipCode = '99664';
-const ssn = '418437970';
-
-test('Hosted KYC #ci ', async ({ browserName, isMobile, page }) => {
+test('Hosted KYC #ci', async ({ browserName, isMobile, page }) => {
   test.slow(); // ~15s
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
 
@@ -46,39 +37,42 @@ test('Hosted KYC #ci ', async ({ browserName, isMobile, page }) => {
   await clickOnContinue(page);
   await page.waitForLoadState();
 
-  await fillEmail(page, email);
+  await fillEmail(page, PERSONAL.email);
   await clickOnContinue(page);
   await page.waitForLoadState();
 
-  await fillPhoneNumber(page, phoneNumber);
+  await fillPhoneNumber(page, PERSONAL.phoneWithoutCountryCode);
   await clickOnVerifyWithSms(page);
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame: page, page });
   await page.waitForLoadState();
 
-  await fillNameAndDoB(page, { firstName, lastName, dob });
+  await fillNameAndDoB(page, { firstName: PERSONAL.firstName, lastName: PERSONAL.lastName, dob: PERSONAL.dob });
   await clickOnContinue(page);
   await page.waitForLoadState();
 
-  await fillAddress({ frame: page, page }, { addressLine1, city, zipCode });
+  await fillAddress(
+    { frame: page, page },
+    { addressLine1: PERSONAL.addressLine1, city: PERSONAL.city, zipCode: PERSONAL.zipCode },
+  );
   await clickOnContinue(page);
   await page.waitForLoadState();
 
-  await fillSSN(page, { ssn });
+  await fillSSN(page, { ssn: PERSONAL.ssn });
   await clickOnContinue(page);
   await page.waitForLoadState();
 
   await confirmData(page, {
-    firstName,
-    lastName,
-    dob,
-    addressLine1,
-    city,
-    state: 'AL',
-    zipCode,
-    country: 'US',
-    ssn,
+    firstName: PERSONAL.firstName,
+    lastName: PERSONAL.lastName,
+    dob: PERSONAL.dob,
+    addressLine1: PERSONAL.addressLine1,
+    city: PERSONAL.city,
+    state: PERSONAL.state,
+    zipCode: PERSONAL.zipCode,
+    country: PERSONAL.country,
+    ssn: PERSONAL.ssn,
   });
   await clickOnContinue(page);
   await page.waitForLoadState();

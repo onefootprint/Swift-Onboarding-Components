@@ -1,0 +1,38 @@
+export const PERSONAL = {
+  addressLine1: '123 Main St',
+  addressLine2: 'Apt 1',
+  city: 'Birmingham',
+  country: 'US',
+  dob: '01/01/1990',
+  email: 'sandbox@onefootprint.com',
+  firstName: 'Jasper',
+  lastName: 'Blackwood',
+  middleName: 'Quinn',
+  phone: '15555550100',
+  phoneWithoutCountryCode: '5555550100',
+  ssn: '418437970',
+  ssn9: '123-12-1234',
+  state: 'AL',
+  zipCode: '35203',
+};
+
+export const BUSINESS = {
+  bo2Name: 'Secondary',
+  bo2LastName: 'Owner',
+  bo2Email: 'secondary@onefootprint.com',
+  bo2Phone: '15555550100',
+
+  addressLine1: '1 Hayes St',
+  addressLine2: 'Ap 201',
+  as: 'QDS Technologies',
+  city: 'San Francisco',
+  corporationType: 'unknown',
+  country: 'US',
+  formationDate: '1999-12-31',
+  name: 'Quantum Dynamics Solutions',
+  phoneNumber: '15555550100',
+  state: 'CA',
+  tin: '12-3456789',
+  website: 'http://www.google.com',
+  zipCode: '94117',
+};

@@ -10,7 +10,7 @@ import {
 } from '../utils/commands';
 
 const appUrl = process.env.E2E_HOSTED_BASE_URL || 'http://localhost:3004';
-const key = process.env.E2E_OB_ID_PHONE_EMAIL || 'pb_test_s1295ljZR1lZ0ZZr42iDzO';
+const key = process.env.E2E_OB_ID_PHONE_EMAIL || 'pb_test_QMY8oyvlJ7lKlkqW9iJCof';
 
 const email = 'sandbox@onefootprint.com' as const;
 const phoneNumber = '5555550100';

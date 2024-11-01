@@ -9,7 +9,7 @@ import {
 } from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const pbKey = process.env.E2E_OB_KYC || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
+const pbKey = process.env.E2E_OB_KYC || 'pb_test_MrO9iLr9QyJ25GwIeJDdCV';
 const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
@@ -66,10 +66,8 @@ test('KYC with onboarding session token #ci ', async ({ page, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);

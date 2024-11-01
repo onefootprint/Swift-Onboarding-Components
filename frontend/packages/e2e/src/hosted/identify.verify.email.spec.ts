@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { clickOnContinue, fillEmail, fillPhoneNumber, selectOutcomeOptional } from '../utils/commands';
 
 const appUrl = process.env.E2E_HOSTED_BASE_URL || 'http://localhost:3004';
-const key = process.env.E2E_OB_ID_EMAIL || 'pb_test_79V6FKMz9B2zCpqdQA0vT7';
+const key = process.env.E2E_OB_ID_EMAIL || 'pb_test_00HxsVsrwxEaI9QjeElZPt';
 
 const email = 'sandbox@onefootprint.com' as const;
 const phoneNumber = '5555550100';

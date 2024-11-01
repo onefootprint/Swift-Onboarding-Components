@@ -7,37 +7,26 @@ import {
   verifyAppIframeClick,
   verifyPhoneNumber,
 } from '../utils/commands';
+import { PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_INVESTOR || 'ob_test_3xYoHcfrkxuOGNy8vILxh4';
-
-const firstName = 'E2E';
-const middleName = 'T';
-const lastName = 'Investor';
-const dob = '01/01/1990';
-const addressLine1 = '123 Main St';
-const addressLine2 = 'Apt 1';
-const city = 'San Francisco';
-const state = 'CA';
-const zipCode = '94105';
-const country = 'US';
-const ssn9 = '123412345';
+const key = process.env.E2E_OB_INVESTOR || 'pb_test_K8TrGHZFyrw6tXRSTIs0pT';
 
 const userData = encodeURIComponent(
   JSON.stringify({
-    'id.address_line1': addressLine1,
-    'id.address_line2': addressLine2,
-    'id.city': city,
-    'id.country': country,
-    'id.dob': dob,
-    'id.email': 'piip@onefootprint.com',
-    'id.first_name': firstName,
-    'id.last_name': lastName,
-    'id.middle_name': middleName,
-    'id.phone_number': '+15555550100',
-    'id.ssn9': ssn9,
-    'id.state': state,
-    'id.zip': zipCode,
+    'id.address_line1': PERSONAL.addressLine1,
+    'id.address_line2': PERSONAL.addressLine2,
+    'id.city': PERSONAL.city,
+    'id.country': PERSONAL.country,
+    'id.dob': PERSONAL.dob,
+    'id.email': PERSONAL.email,
+    'id.first_name': PERSONAL.firstName,
+    'id.last_name': PERSONAL.lastName,
+    'id.middle_name': PERSONAL.middleName,
+    'id.phone_number': `+${PERSONAL.phone}`,
+    'id.ssn9': PERSONAL.ssn,
+    'id.state': PERSONAL.state,
+    'id.zip': PERSONAL.zipCode,
   }),
 );
 
@@ -58,10 +47,8 @@ test('Verify KYC as an investor #ci', async ({ page, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -71,15 +58,15 @@ test('Verify KYC as an investor #ci', async ({ page, isMobile }) => {
   await page.waitForLoadState();
 
   await confirmData(frame, {
-    addressLine1,
-    city,
-    country: 'US',
-    dob,
-    firstName,
-    lastName,
-    ssn: ssn9,
-    state: 'AL',
-    zipCode,
+    addressLine1: PERSONAL.addressLine1,
+    city: PERSONAL.city,
+    country: PERSONAL.country,
+    dob: PERSONAL.dob,
+    firstName: PERSONAL.firstName,
+    lastName: PERSONAL.lastName,
+    ssn: PERSONAL.ssn,
+    state: PERSONAL.state,
+    zipCode: PERSONAL.zipCode,
   });
   await clickOnContinue(frame);
   await page.waitForLoadState();
