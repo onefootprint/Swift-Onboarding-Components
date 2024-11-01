@@ -169,7 +169,10 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
         token,
         status_code=400,
     )
-    assert body["message"] == "This business owner has already started KYC"
+    assert (
+        body["message"]
+        == "This link has already been used by a different beneficial owner. Please log into the account that last used this link or request a new link."
+    )
 
 
 def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data, kyb_cdos):

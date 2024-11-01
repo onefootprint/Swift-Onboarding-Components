@@ -2,7 +2,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum BusinessError {
-    #[error("This business owner has already started KYC")]
+    #[error("This link has already been used by a different beneficial owner. Please log into the account that last used this link or request a new link.")]
     BoAlreadyHasVault,
     #[error("This business doesn't have an associated name")]
     NoName,
