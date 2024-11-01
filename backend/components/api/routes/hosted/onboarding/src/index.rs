@@ -11,7 +11,6 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
-use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
 use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
@@ -55,17 +54,17 @@ pub async fn post(
     let uv_id = user_auth.user.id.clone();
     let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
     let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoObConfig)?;
-    let (scoped_user, ob_config, tenant, vw) = state
+    let (scoped_user, ob_config, portable_vw) = state
         .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
-            let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;
-            let vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
-            Ok((su, ob_config, tenant, vw))
+            let (ob_config, _) = ObConfiguration::get_enabled(conn, &obc_id)?;
+            let portable_vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
+            Ok((su, ob_config, portable_vw))
         })
         .await?;
 
-    let prefill_data = vw
+    let prefill_data = portable_vw
         .get_data_to_prefill(&state, &ob_config, PrefillKind::Onboarding(&scoped_user))
         .await?;
 
@@ -98,7 +97,7 @@ pub async fn post(
             };
             let args = CreateUserWfArgs {
                 existing_wf_id: user_auth.wf_id.clone(),
-                seqno: vw.seqno,
+                seqno: portable_vw.seqno,
                 fixture_result,
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
@@ -131,13 +130,5 @@ pub async fn post(
         })
         .await?;
 
-    let ff_client = state.ff_client.clone();
-    let onboarding_config = api_wire_types::PublicOnboardingConfiguration::from_db((
-        ob_config, tenant, None, None, ff_client, None,
-    ));
-    Ok(OnboardingResponse {
-        // Omit appearance serialization here
-        onboarding_config,
-        auth_token,
-    })
+    Ok(OnboardingResponse { auth_token })
 }

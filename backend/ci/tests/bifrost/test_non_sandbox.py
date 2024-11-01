@@ -116,8 +116,6 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     body = bifrost.initialize_onboarding(False)
 
     body = bifrost.get_status()
-    assert body["ob_configuration"]["org_name"] == bifrost.ob_config.tenant.name
-
     collect_data_req = get_requirement_from_requirements(
         "collect_data", body["all_requirements"]
     )

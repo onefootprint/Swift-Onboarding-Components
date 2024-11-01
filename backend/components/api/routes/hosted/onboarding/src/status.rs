@@ -14,7 +14,7 @@ use paperclip::actix::{
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),
-    description = "Returns the status of the onboarding."
+    description = "Returns the remaining onboarding requirements to complete the onboarding."
 )]
 #[actix::get("/hosted/onboarding/status")]
 pub async fn get(
@@ -24,13 +24,8 @@ pub async fn get(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let reqs = get_requirements_for_person_and_maybe_business(&state, &user_auth).await?;
 
-    let ob_config = user_auth.ob_config.clone();
-    let tenant = user_auth.tenant.clone();
+    let ob_config = &user_auth.ob_config;
     let all_requirements = OrderedOnboardingRequirements::from_unordered(reqs, ob_config.is_doc_first);
-    let ff_client = state.ff_client.clone();
-    let ob_config = api_wire_types::PublicOnboardingConfiguration::from_db((
-        ob_config, tenant, None, None, ff_client, None,
-    ));
 
-    Ok(OnboardingStatusResponse::from_db((all_requirements, ob_config)))
+    Ok(OnboardingStatusResponse::from_db(all_requirements))
 }

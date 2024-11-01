@@ -21,6 +21,8 @@ pub struct Appearance {
 }
 
 // We don't yet have codepaths to add appearances - we will just do it manually in the DB
+// NOTE: it doesn't seem anyone is even using this - there's only one row for a Composer sandbox
+// playbook
 
 impl Appearance {
     #[tracing::instrument("Appearance::get", skip_all)]
