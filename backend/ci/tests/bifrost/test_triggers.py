@@ -70,7 +70,7 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     bifrost = BifrostClient.raw_auth(obc, stepped_up_auth_token, sandbox_id)
     if pre_run:
         pre_run(bifrost)
-    bifrost.run()
+    user = bifrost.run()
 
     # Shouldn't be able to re-use the link
     body = get("hosted/onboarding/config", None, auth_token, status_code=400)
@@ -89,7 +89,7 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     assert not trigger_event["data"]["request_is_active"]
     obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == initial_num_obds + 1
-    return bifrost
+    return user
 
 
 def test_onboard_non_portable_document(sandbox_tenant, doc_first_obc):
@@ -347,9 +347,10 @@ def test_collect_document_does_not_require_business(
     initial_auth_token = send_trigger(user.fp_id, sandbox_tenant, trigger)
 
     # Should not require business selection
-    bifrost = complete_redo_flow_user(user, initial_auth_token)
+    user = complete_redo_flow_user(user, initial_auth_token)
     assert not any(
-        i["kind"] == "create_business_onboarding" for i in bifrost.handled_requirements
+        i["kind"] == "create_business_onboarding"
+        for i in user.client.handled_requirements
     )
 
 
@@ -540,7 +541,7 @@ def test_reonboard_kyb_multi_kyc(kyb_sandbox_ob_config, sandbox_tenant):
     primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = primary_bifrost.run()
 
-    secondary_bo_token = extract_bo_token(primary_bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
     secondary_bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
@@ -556,7 +557,7 @@ def test_reonboard_kyb_multi_kyc(kyb_sandbox_ob_config, sandbox_tenant):
         primary_bo.fp_id, sandbox_tenant, trigger, primary_bo.fp_bid
     )
 
-    bifrost = complete_redo_flow_user(primary_bo, initial_auth_token)
+    user = complete_redo_flow_user(primary_bo, initial_auth_token)
     assert bifrost.validate_response["business"]["status"] == "incomplete"
     assert any(r["kind"] == "collect_data" for r in bifrost.already_met_requirements)
 
@@ -564,7 +565,7 @@ def test_reonboard_kyb_multi_kyc(kyb_sandbox_ob_config, sandbox_tenant):
     # last KYC workflow instead of making a new one in `POST /hosted/onboarding`.
     # We will need to pass force_create through the BO token, but don't want to force create biz wf?
     # Complete the secondary BO form sent out
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(user)
     secondary_bifrost2 = BifrostClient.login_user(
         kyb_sandbox_ob_config,
         sandbox_id=secondary_bifrost.sandbox_id,
@@ -596,7 +597,7 @@ def test_reonboard_kyb_multi_kyc_reuse_kyc(kyb_sandbox_ob_config, sandbox_tenant
     primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo = primary_bifrost.run()
 
-    secondary_bo_token = extract_bo_token(primary_bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
     secondary_bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
@@ -610,11 +611,13 @@ def test_reonboard_kyb_multi_kyc_reuse_kyc(kyb_sandbox_ob_config, sandbox_tenant
         primary_bo.fp_id, sandbox_tenant, trigger, primary_bo.fp_bid
     )
 
-    bifrost = complete_redo_flow_user(primary_bo, initial_auth_token)
-    assert any(r["kind"] == "collect_data" for r in bifrost.already_met_requirements)
+    user = complete_redo_flow_user(primary_bo, initial_auth_token)
+    assert any(
+        r["kind"] == "collect_data" for r in user.client.already_met_requirements
+    )
 
     # Business should be terminal, even though the second BO didn't redo KYC
-    assert bifrost.validate_response["business"]["status"] == "pass"
+    assert user.client.validate_response["business"]["status"] == "pass"
 
     tests = [
         # Primary BO and business should have two workflows
@@ -634,7 +637,7 @@ def test_request_additional_bos(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost1.data.update(BUSINESS_SECONDARY_BOS)
     bo1 = bifrost1.run()
 
-    secondary_bo_token = extract_bo_token(bifrost1)
+    secondary_bo_token = extract_bo_token(bo1)
     bifrost2 = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
@@ -658,12 +661,12 @@ def test_request_additional_bos(kyb_sandbox_ob_config, sandbox_tenant):
         op = dict(op="create", uuid=str(uuid4()), ownership_stake=10, data=data)
         patch("/hosted/business/owners", [op], bifrost.auth_token)
 
-    bifrost = complete_redo_flow_user(bo1, initial_auth_token, pre_run)
+    user = complete_redo_flow_user(bo1, initial_auth_token, pre_run)
     # Business should be incomplete while we wait for the new BO to complete KYC
-    assert bifrost.validate_response["business"]["status"] == "incomplete"
+    assert user.client.validate_response["business"]["status"] == "incomplete"
 
     # Complete the third BO's KYC
-    bo_token = extract_bo_token(bifrost)
+    bo_token = extract_bo_token(user)
     bifrost3 = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=bo_token
     )

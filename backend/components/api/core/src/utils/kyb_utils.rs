@@ -1,3 +1,5 @@
+use super::vault_wrapper::Business;
+use super::vault_wrapper::TenantVw;
 use crate::auth::session::onboarding::BoSession;
 use crate::config::LinkKind;
 use crate::decision::biz_risk::BoWithKycInfo;
@@ -85,15 +87,13 @@ pub async fn generate_secondary_bo_links<'a>(
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
 #[tracing::instrument(skip_all)]
-async fn send_missing_secondary_bo_links(
+pub async fn send_missing_secondary_bo_links(
     state: &State,
-    su: Option<&ScopedVault>,
-    biz_wf: &Workflow,
-    kyb_features: KybBoFeatures,
+    bvw: &TenantVw<Business>,
+    bos: &[BoWithKycInfo],
+    tokens: Vec<(&BoWithKycInfo, SessionAuthToken)>,
     tenant: &Tenant,
 ) -> FpResult<()> {
-    let KybBoFeatures { bos, bvw } = kyb_features;
-    let tokens = generate_secondary_bo_links(state, su, biz_wf, &bos).await?;
     // Generate a link for each business owner
     let BoWithKycInfo(_, primary_bo) = bos
         .iter()
@@ -110,10 +110,7 @@ async fn send_missing_secondary_bo_links(
     let bo_sms_info = tokens
         .into_iter()
         .map(|(bo_data, token)| -> FpResult<_> {
-            let url = state
-                .config
-                .service_config
-                .generate_link(LinkKind::VerifyBusinessOwner, &token);
+            let url = (state.config.service_config).generate_link(LinkKind::VerifyBusinessOwner, &token);
             let sms_message = SmsMessage::BoSession {
                 inviter: inviter.clone(),
                 business_name: business_name.clone(),
@@ -214,7 +211,9 @@ pub async fn progress_business_workflow(
     let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
     if is_waiting_for_bo_kyc {
-        send_missing_secondary_bo_links(state, su, &biz_wf, kyb_features, tenant).await?;
+        let KybBoFeatures { bos, bvw } = kyb_features;
+        let tokens = generate_secondary_bo_links(state, su, &biz_wf, &bos).await?;
+        send_missing_secondary_bo_links(state, &bvw, &bos, tokens, tenant).await?;
         return Ok(());
     }
 

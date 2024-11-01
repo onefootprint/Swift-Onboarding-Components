@@ -12,22 +12,15 @@ use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
+use newtypes::SessionAuthToken;
 
 impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_types::PrivateBusinessOwner {
     fn from_db((bo, auth): (BusinessOwnerInfo, &'a Box<dyn TenantAuth>)) -> Self {
-        let can_see_name = CanDecrypt::new(vec![IDK::FirstName, IDK::LastName]).is_met(&auth.scopes());
-        let name = can_see_name.then_some(bo.clone().name()).flatten();
-        let name = name.map(|(first_name, last_name)| {
-            PiiString::from(format!(
-                "{} {}.",
-                first_name.leak(),
-                last_name.leak().chars().take(1).collect::<String>()
-            ))
-        });
-
+        let name = bo_name(&bo, auth);
         let ownership_stake_di = DI::Business(BDK::BeneficialOwnerStake(bo.bo.link_id));
 
         Self {
+            id: bo.bo.id,
             status: bo.su.as_ref().map(|su| su.status),
             fp_id: bo.su.map(|su| su.fp_id),
             ownership_stake: bo.bo.ownership_stake.map(|i| i as u32),
@@ -87,4 +80,40 @@ impl DbToApi<(BusinessOwner, UserData)> for api_wire_types::BusinessOwner {
         let ScopedVault { fp_id, .. } = sv;
         Self { fp_id }
     }
+}
+
+impl<'a>
+    DbToApi<(
+        &'a BusinessOwnerInfo,
+        &'a Box<dyn TenantAuth>,
+        PiiString,
+        SessionAuthToken,
+    )> for api_wire_types::PrivateBusinessOwnerKycLink
+{
+    fn from_db(
+        (bo, auth, link, token): (
+            &'a BusinessOwnerInfo,
+            &'a Box<dyn TenantAuth>,
+            PiiString,
+            SessionAuthToken,
+        ),
+    ) -> Self {
+        Self {
+            name: bo_name(bo, auth),
+            id: bo.bo.id.clone(),
+            link,
+            token,
+        }
+    }
+}
+
+#[allow(clippy::borrowed_box)]
+fn bo_name(bo: &BusinessOwnerInfo, auth: &Box<dyn TenantAuth>) -> Option<PiiString> {
+    let can_see_name = CanDecrypt::new(vec![IDK::FirstName, IDK::LastName]).is_met(&auth.scopes());
+    let (first_name, last_name) = can_see_name.then_some(bo.clone().name()).flatten()?;
+    Some(PiiString::from(format!(
+        "{} {}.",
+        first_name.leak(),
+        last_name.leak().chars().take(1).collect::<String>()
+    )))
 }

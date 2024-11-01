@@ -14,7 +14,7 @@ from tests.utils import (
     create_ob_config,
     try_until_success,
 )
-from tests.bifrost_client import BifrostClient
+from tests.bifrost_client import BifrostClient, User
 
 BO_DIS = ["id.first_name", "id.last_name", "id.email", "id.phone_number"]
 
@@ -83,7 +83,7 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
         r["kind"] == "collect_business_data" for r in bifrost.handled_requirements
     )
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
 
     # Check the business information for the hosted bifrost flow associated with the secondary BO's
     # token
@@ -192,10 +192,10 @@ def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data, kyb_
 
     bifrost = BifrostClient.new_user(obc)
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
-    bifrost.run()
+    user = bifrost.run()
     assert any(r["kind"] == "collect_document" for r in bifrost.handled_requirements)
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(user)
 
     bifrost = BifrostClient.new_user(obc, override_ob_config_auth=secondary_bo_token)
     bifrost.run()
@@ -219,9 +219,9 @@ def test_kyb_with_sentilink_on_bos(sandbox_tenant, must_collect_data, kyb_cdos):
 
     bifrost = BifrostClient.new_user(obc)
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
-    bifrost.run()
+    user = bifrost.run()
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(user)
 
     bifrost = BifrostClient.new_user(obc, override_ob_config_auth=secondary_bo_token)
     bo = bifrost.run()
@@ -269,7 +269,7 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
 
     # Then, onboard the secondary_bo_kyc as a BO of primary_bo's business
     sandbox_id = secondary_bo_kyc.client.sandbox_id
@@ -310,7 +310,7 @@ def test_kyb_fail_kyc(
     assert primary_bo.client.validate_response["user"]["status"] == primary_bo_result
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
 
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
@@ -356,7 +356,7 @@ def test_kyb_possible_bo_missing_reason_code(kyb_sandbox_ob_config, sandbox_tena
     }
     bifrost.data.update(secondary_bos)
     primary_bo = bifrost.run()
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
 
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
@@ -412,7 +412,7 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
 
     # Extract the secondary BO token, but don't use it yet
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
 
     # Then, onboard the same user onto the same playbook and pass them this time. This creates a new business.
     bifrost = BifrostClient.login_user(
@@ -479,7 +479,7 @@ def test_dont_proceed_on_nonterminal(kyb_sandbox_ob_config, sandbox_tenant):
     assert primary_bo.client.validate_response["user"]["status"] == "fail"
     assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
         override_ob_config_auth=secondary_bo_token,
@@ -624,7 +624,7 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     doc_uploaded = [i for i in timeline if i["event"]["kind"] == "document_uploaded"]
     assert len(doc_uploaded) == 1
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
 
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config,
@@ -662,7 +662,10 @@ def extract_bo_session_sms(twilio, phone_number, business_name):
     return try_until_success(inner, 60)
 
 
-def extract_bo_token(bifrost: BifrostClient):
-    body = post("hosted/user/private/bo_links", None, bifrost.auth_token)
+def extract_bo_token(user: User):
+    tenant = user.client.ob_config.tenant
+    body = post(
+        f"entities/{user.fp_bid}/business_owners/kyc_links", dict(), *tenant.db_auths
+    )
     assert len(body) == 1
     return BusinessOwnerAuth(body[0]["token"])

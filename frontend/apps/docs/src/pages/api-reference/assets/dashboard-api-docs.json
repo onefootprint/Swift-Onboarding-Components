@@ -1576,6 +1576,59 @@
                 ]
             }
         },
+        "/entities/{fp_id}/business_owners/kyc_links": {
+            "post": {
+                "tags": [
+                    "EntityDetails",
+                    "Private"
+                ],
+                "description": "Create (and optionally send) KYC links for beneficial owners awaiting KYC. Cannot be used for beneficials that have already completed KYC.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateKycLinksRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PrivateBusinessOwnerKycLink"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/businesses": {
             "get": {
                 "tags": [
@@ -10050,6 +10103,21 @@
                     "link",
                     "token"
                 ]
+            },
+            "CreateKycLinksRequest": {
+                "type": "object",
+                "properties": {
+                    "send_to_bo_ids": {
+                        "example": [
+                            "bo_EBYciq9X2bkIPMMqnL4R9P"
+                        ],
+                        "description": "The list of business owner IDs to which we should send KYC links via both email + SMS.\n Will generate and return links for all BOs regardless.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
             },
             "CreateListEntryRequest": {
                 "type": "object",
@@ -25758,6 +25826,9 @@
                     "fp_id": {
                         "type": "string"
                     },
+                    "id": {
+                        "type": "string"
+                    },
                     "kind": {
                         "type": "string",
                         "enum": [
@@ -26037,9 +26108,37 @@
                     }
                 },
                 "required": [
+                    "id",
                     "kind",
                     "ownership_stake_di",
                     "source"
+                ]
+            },
+            "PrivateBusinessOwnerKycLink": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "example": "bo_EBYciq9X2bkIPMMqnL4R9P",
+                        "type": "string"
+                    },
+                    "link": {
+                        "example": "https://api.onefootprint.com?type=bo&r=380#botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR",
+                        "type": "string"
+                    },
+                    "name": {
+                        "example": "Jane D.",
+                        "type": "string"
+                    },
+                    "token": {
+                        "example": "botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR",
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "link",
+                    "token"
                 ]
             },
             "PrivateOwnedBusiness": {

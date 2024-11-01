@@ -608,12 +608,11 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
+    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
             .filter(workflow::deactivated_at.is_null())
-            .first(conn)
-            .optional()?;
+            .first(conn)?;
         Ok(res)
     }
 

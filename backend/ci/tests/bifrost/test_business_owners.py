@@ -37,21 +37,25 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
 
     # Check the new business owners APIs
     body = get("hosted/business/owners", None, primary_bifrost.auth_token)
-    [primary_bo, secondary_bo] = body
+    [primary_bo_data, secondary_bo_data] = body
     # First BO is self
-    assert primary_bo["has_linked_user"]
-    assert primary_bo["is_authed_user"]
-    assert primary_bo["ownership_stake"] == primary_ownership_stake
-    _assert_bo_data(primary_bo, USER_BO_FIELDS, USER_BO_FIELDS, primary_bifrost.data)
+    assert primary_bo_data["has_linked_user"]
+    assert primary_bo_data["is_authed_user"]
+    assert primary_bo_data["ownership_stake"] == primary_ownership_stake
+    _assert_bo_data(
+        primary_bo_data, USER_BO_FIELDS, USER_BO_FIELDS, primary_bifrost.data
+    )
 
     # Secondary BO is incomplete, but has all data (from the business vault)
-    assert not secondary_bo["has_linked_user"]
-    assert not secondary_bo["is_authed_user"]
-    assert secondary_bo["ownership_stake"] == SECONDARY_BO_DATA["ownership_stake"]
-    _assert_bo_data(secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, SECONDARY_BO_DATA)
+    assert not secondary_bo_data["has_linked_user"]
+    assert not secondary_bo_data["is_authed_user"]
+    assert secondary_bo_data["ownership_stake"] == SECONDARY_BO_DATA["ownership_stake"]
+    _assert_bo_data(
+        secondary_bo_data, USER_BO_FIELDS, USER_BO_FIELDS, SECONDARY_BO_DATA
+    )
 
     # Test decrypting the new business owner DIs
-    secondary_link_id = secondary_bo["link_id"]
+    secondary_link_id = secondary_bo_data["link_id"]
     _assert_decrypt_bo_data(
         secondary_link_id, fp_bid, sandbox_tenant, SECONDARY_BO_DATA
     )
@@ -59,7 +63,7 @@ def test_onboard_new_bo_apis(kyb_sandbox_ob_config, sandbox_tenant):
     #
     # Finish onboarding the secondary BO
     #
-    secondary_bo_token = extract_bo_token(primary_bifrost)
+    secondary_bo_token = extract_bo_token(primary_bo)
     secondary_bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
@@ -177,7 +181,7 @@ def test_updating_linked_bo(kyb_sandbox_ob_config, sandbox_tenant):
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     user = bifrost.run()
 
-    secondary_bo_token = extract_bo_token(bifrost)
+    secondary_bo_token = extract_bo_token(user)
     bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )

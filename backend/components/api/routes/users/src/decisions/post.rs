@@ -10,6 +10,7 @@ use api_core::task;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use api_wire_types::CreateUserDecisionRequest;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
@@ -55,7 +56,9 @@ pub async fn post(
             if vault.kind != VaultKind::Person {
                 return Err(ValidationError("Can only create a manual decision for a user").into());
             }
-            let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
+            let wf = Workflow::get_active(conn, &sv.id)
+                .optional()?
+                .ok_or(OnboardingError::NoWorkflow)?;
             let annotation = CreateAnnotationRequest {
                 note: annotation,
                 is_pinned: false,

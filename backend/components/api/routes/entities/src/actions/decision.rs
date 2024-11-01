@@ -2,6 +2,7 @@ use crate::actions::EntityActionPostCommit;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::FpResult;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
@@ -15,7 +16,9 @@ pub(super) fn apply_manual_decision(
     sv: &ScopedVault,
     actor: DbActor,
 ) -> FpResult<EntityActionPostCommit> {
-    let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
+    let wf = Workflow::get_active(conn, &sv.id)
+        .optional()?
+        .ok_or(OnboardingError::NoWorkflow)?;
     let ManualDecisionRequest { annotation, status } = request;
     save_review_decision(conn, wf, status.into(), Some(annotation), actor)?;
     Ok(EntityActionPostCommit::FireWebhooks)
@@ -26,7 +29,9 @@ pub(super) fn clear_review(
     sv: &ScopedVault,
     actor: DbActor,
 ) -> FpResult<EntityActionPostCommit> {
-    let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
+    let wf = Workflow::get_active(conn, &sv.id)
+        .optional()?
+        .ok_or(OnboardingError::NoWorkflow)?;
     save_review_decision(conn, wf, DecisionStatus::None, None, actor)?;
     Ok(EntityActionPostCommit::FireWebhooks)
 }
