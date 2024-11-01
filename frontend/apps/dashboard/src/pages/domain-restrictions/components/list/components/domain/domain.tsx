@@ -13,7 +13,15 @@ const Domain = ({ domain, onRemove }: DomainProps) => {
   const { t } = useTranslation('domain-restrictions');
 
   return (
-    <Stack gap={3} justify="space-between" paddingLeft={3} paddingRight={3} role="listitem" aria-label={domain}>
+    <Stack
+      gap={3}
+      justify="space-between"
+      paddingLeft={3}
+      paddingRight={3}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <li />
+      role="listitem"
+      aria-label={domain}
+    >
       <Text variant="body-2">{domain}</Text>
       <Dropdown.Root>
         <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('list.not-allowed')}>

@@ -121,7 +121,11 @@ const RulesActionRow = ({ isEditing, rule, onDelete, onEdit, onUndoDelete, onUnd
   };
 
   return (
-    <RulesListItem role="row" aria-label={rule.ruleExpression.map(({ field }) => field).join(', ')}>
+    <RulesListItem
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+      role="row"
+      aria-label={rule.ruleExpression.map(({ field }) => field).join(', ')}
+    >
       <Stack justify="space-between" align="start">
         <Stack align="center" gap={3} flexWrap="wrap">
           <Text variant="body-3">{t('if')}</Text>

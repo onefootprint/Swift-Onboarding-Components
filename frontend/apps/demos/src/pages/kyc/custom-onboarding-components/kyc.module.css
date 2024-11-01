@@ -1,52 +1,51 @@
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 24px;
-  }
-  
-  .form button {
-    margin-top: 12px;
-  }
-  
-  .fieldset {
-    width: 450px;
-    display: block;
-    margin-inline-start: 2px;
-    margin-inline-end: 2px;
-    padding-block-start: 0.35em;
-    padding-inline-start: 0.75em;
-    padding-inline-end: 0.75em;
-    padding-block-end: 0.625em;
-    min-inline-size: min-content;
-    border-width: 2px;
-    border-style: groove;
-    border-color: rgb(192, 192, 192);
-    border-image: initial;
-  }
-  
-  .legend {
-    background-color: #000;
-    color: #fff;
-    padding: 3px 6px;
-  }
-  
-  .otpContainer {
-    display: flex;
-    gap: 16px;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-  }
-  
-  .otpPinContainer {
-    display: flex;
-    gap: 4px;
-  }
-  
-  .otpPinInput {
-    width: 40px;
-    height: 44px;
-    text-align: center;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
 
+.form button {
+  margin-top: 12px;
+}
+
+.fieldset {
+  width: 450px;
+  display: block;
+  margin-inline-start: 2px;
+  margin-inline-end: 2px;
+  padding-block-start: 0.35em;
+  padding-inline-start: 0.75em;
+  padding-inline-end: 0.75em;
+  padding-block-end: 0.625em;
+  min-inline-size: min-content;
+  border-width: 2px;
+  border-style: groove;
+  border-color: rgb(192, 192, 192);
+  border-image: initial;
+}
+
+.legend {
+  background-color: #000;
+  color: #fff;
+  padding: 3px 6px;
+}
+
+.otpContainer {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+
+.otpPinContainer {
+  display: flex;
+  gap: 4px;
+}
+
+.otpPinInput {
+  width: 40px;
+  height: 44px;
+  text-align: center;
+}

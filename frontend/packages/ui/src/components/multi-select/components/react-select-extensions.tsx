@@ -59,6 +59,8 @@ export const MultiValueRemove = <Option, IsMulti extends boolean, Group extends 
   children,
   innerProps,
 }: MultiValueRemoveProps<Option, IsMulti, Group>) => (
+  // biome-ignore lint/a11y/useFocusableInteractive: TODO: The HTML element with the interactive role "button" is not focusable.
+  // biome-ignore lint/a11y/useSemanticElements: TODO: change to <button />
   <div role="button" {...innerProps}>
     {children || <IcoCloseSmall16 color="tertiary" />}
   </div>
@@ -81,6 +83,7 @@ export const Option = <Option, IsMulti extends boolean, Group extends GroupBase<
       data-focused={isFocused}
       // @ts-ignore
       ref={innerRef}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <option />
       role="option"
       {...innerProps}
     >

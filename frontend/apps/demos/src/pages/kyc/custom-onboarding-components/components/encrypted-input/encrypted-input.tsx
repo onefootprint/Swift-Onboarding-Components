@@ -30,6 +30,7 @@ export const EncryptedInput = ({ label, valueToEncrypt }: EncryptedInputProps) =
 
   return (
     <Stack className="fp-field" direction="column">
+      {/* biome-ignore lint/a11y/noLabelWithoutControl: A form label must be associated with an input. */}
       <label className="fp-label">{label}</label>
       {valueToEncrypt && (
         <Stack justifyContent="space-between" className="fp-input" alignItems="center">

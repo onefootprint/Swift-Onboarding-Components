@@ -45,7 +45,11 @@ const EditField = ({ di, entity }: EditFieldProps) => {
   };
 
   return (
-    <Container role="row" aria-label={label ?? di}>
+    <Container
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+      role="row"
+      aria-label={label ?? di}
+    >
       <Form.Field variant="horizontal">
         <LabelContainer>
           <Form.Label>

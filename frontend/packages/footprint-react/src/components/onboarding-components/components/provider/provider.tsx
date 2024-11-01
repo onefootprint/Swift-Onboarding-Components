@@ -81,7 +81,7 @@ const Provider = ({
       sandboxId: isValid(sandboxId) ? sandboxId : createRandomSandboxId(),
       sandboxOutcome: {
         overallOutcome: sandboxOutcome?.overallOutcome ?? 'pass',
-        documentOutcome: response.requiresIdDoc ? sandboxOutcome?.documentOutcome ?? 'pass' : undefined,
+        documentOutcome: response.requiresIdDoc ? (sandboxOutcome?.documentOutcome ?? 'pass') : undefined,
       },
     };
   };

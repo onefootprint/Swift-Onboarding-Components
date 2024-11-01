@@ -26,7 +26,15 @@ type ItemProps = {
 
 const Item = ({ label, checked, children }: ItemProps) => {
   return (
-    <Stack aria-label={label} role="row" height="24px" justifyContent="space-between" width="100%" gap={10}>
+    <Stack
+      aria-label={label}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+      role="row"
+      height="24px"
+      justifyContent="space-between"
+      width="100%"
+      gap={10}
+    >
       <Text variant="body-3" color="tertiary">
         {label}
       </Text>

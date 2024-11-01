@@ -95,6 +95,7 @@ const ConsentBottomSheet = ({
   return visibleState === State.closed ? null : (
     <FocusTrap active={open}>
       <span>
+        {/* biome-ignore lint/a11y/useSemanticElements: TODO: change to <dialog /> */}
         <Sheet onClick={handleClick} className={visibleState} role="dialog" data-testid={testID} ref={bottomSheetRef}>
           <Header>
             <CloseContainer onClick={onClose}>

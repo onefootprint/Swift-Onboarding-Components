@@ -12,6 +12,7 @@ type SectionProps = {
 };
 
 const Section = ({ children, IconComponent, title, id, actions }: SectionProps) => (
+  // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
   <Box aria-label={title} id={id} role="group">
     <Header>
       <Text tag="h2" variant="label-1" gap={3} display="flex">

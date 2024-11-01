@@ -49,6 +49,7 @@ const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }
 
   return isEditing ? (
     <EditContainer>
+      {/* biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset /> */}
       <ExpressionContainer role="group" aria-label={ruleExpression.field}>
         <RiskSignalSelect value={ruleExpression.field} onChange={handleFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
@@ -63,6 +64,7 @@ const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }
       )}
     </EditContainer>
   ) : (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
     <ExpressionContainer role="group" aria-label={ruleExpression.field}>
       <Text variant="body-3" minWidth="fit-content">
         {ruleExpression.field}

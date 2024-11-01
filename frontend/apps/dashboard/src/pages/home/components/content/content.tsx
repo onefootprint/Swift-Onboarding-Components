@@ -14,7 +14,12 @@ const Content = ({ metrics }: ContentProps) => {
 
   return (
     <Stack direction="column" gap={9}>
-      <Stack direction="column" gap={5} aria-label={t('users')} role="group">
+      <Stack
+        direction="column"
+        gap={5} // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
+        aria-label={t('users')}
+        role="group"
+      >
         <Stack gap={3} align="center">
           <IcoUsers24 />
           <Text variant="heading-5">{t('users')}</Text>
@@ -22,6 +27,7 @@ const Content = ({ metrics }: ContentProps) => {
         <Section metrics={metrics.user} />
       </Stack>
       {metrics.business.newVaults ? (
+        // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
         <Stack direction="column" gap={5} aria-label={t('businesses')} role="group">
           <Stack gap={3} align="center">
             <IcoStore24 />

@@ -40,6 +40,7 @@ const Option = <Option, IsMulti extends boolean, Group extends GroupBase<Option>
       onClick={innerProps.onClick}
       onMouseMove={innerProps.onMouseMove}
       onMouseOver={innerProps.onMouseOver}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <option />"
       role="option"
       tabIndex={innerProps.tabIndex}
     >

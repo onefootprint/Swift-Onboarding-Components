@@ -4,7 +4,7 @@
   margin: 0 auto;
   grid-template-columns: 1fr minmax(auto, 480px) 1fr;
   grid-template-rows: 1fr;
-  grid-template-areas: 'left center right';
+  grid-template-areas: "left center right";
   margin-top: 32px;
   height: 100%;
   column-gap: 8px;

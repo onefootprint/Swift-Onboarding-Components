@@ -509,63 +509,60 @@ const Camera = ({
                 videoSize,
               })
             : null}
-          {isCameraVisible && (
-            <>
-              {!isImageProcessing ? (
-                <>
-                  <Overlay
-                    width={videoSize?.width ?? 0}
-                    height={positionFromTop}
-                    videoHeight={videoSize?.height ?? 0}
-                    captureKind={autoCaptureKind}
-                    outlineWidth={outlineWidth}
-                    outlineHeight={outlineHeight}
-                    timerAnimationVal={isTimerRunning ? autoCaptureTimerVal : undefined}
+          {isCameraVisible &&
+            (!isImageProcessing ? (
+              <>
+                <Overlay
+                  width={videoSize?.width ?? 0}
+                  height={positionFromTop}
+                  videoHeight={videoSize?.height ?? 0}
+                  captureKind={autoCaptureKind}
+                  outlineWidth={outlineWidth}
+                  outlineHeight={outlineHeight}
+                  timerAnimationVal={isTimerRunning ? autoCaptureTimerVal : undefined}
+                />
+                <Canvas
+                  ref={canvasImageCaptureRef as React.Ref<HTMLCanvasElement>}
+                  width={videoSize?.width}
+                  height={videoSize?.height}
+                />
+                <Canvas
+                  ref={canvasAutoCaptureRef as React.Ref<HTMLCanvasElement>}
+                  width={videoSize?.width}
+                  height={videoSize?.height}
+                />
+                {autoCaptureFeedback ? (
+                  <Feedback deviceKind={deviceKind} top={positionFromTop}>
+                    {feedbackText}
+                  </Feedback>
+                ) : null}
+                {isMobile(deviceKind) && (
+                  <CaptureButton
+                    onClick={onMobileCaptureClick}
+                    variant={isTimerRunning ? 'stop' : 'round'}
+                    disabled={!isCameraVisible || !videoSize}
                   />
-                  <Canvas
-                    ref={canvasImageCaptureRef as React.Ref<HTMLCanvasElement>}
-                    width={videoSize?.width}
-                    height={videoSize?.height}
+                )}
+                {isDocument(autoCaptureKind) && allowUpload && (
+                  <UploadButton
+                    onUploadBtnClick={onImageUpload}
+                    onUploadChangeDone={onUploadComplete}
+                    allowPdf={allowPdf}
+                    onUploadSuccess={onUpload}
+                    hasBadConnectivity={hasBadConnectivity}
                   />
-                  <Canvas
-                    ref={canvasAutoCaptureRef as React.Ref<HTMLCanvasElement>}
-                    width={videoSize?.width}
-                    height={videoSize?.height}
-                  />
-                  {autoCaptureFeedback ? (
-                    <Feedback deviceKind={deviceKind} top={positionFromTop}>
-                      {feedbackText}
-                    </Feedback>
-                  ) : null}
-                  {isMobile(deviceKind) && (
-                    <CaptureButton
-                      onClick={onMobileCaptureClick}
-                      variant={isTimerRunning ? 'stop' : 'round'}
-                      disabled={!isCameraVisible || !videoSize}
-                    />
-                  )}
-                  {isDocument(autoCaptureKind) && allowUpload && (
-                    <UploadButton
-                      onUploadBtnClick={onImageUpload}
-                      onUploadChangeDone={onUploadComplete}
-                      allowPdf={allowPdf}
-                      onUploadSuccess={onUpload}
-                      hasBadConnectivity={hasBadConnectivity}
-                    />
-                  )}
-                  {isTimerRunning ? (
-                    <TimerContainer height={positionFromTop}>
-                      <CountdownTimer current={autoCaptureTimerVal} start={AUTOCAPTURE_TIMER_START_VAL} />
-                    </TimerContainer>
-                  ) : null}
-                </>
-              ) : (
-                <ProcessingContainer>
-                  <LoadingSpinner />
-                </ProcessingContainer>
-              )}
-            </>
-          )}
+                )}
+                {isTimerRunning ? (
+                  <TimerContainer height={positionFromTop}>
+                    <CountdownTimer current={autoCaptureTimerVal} start={AUTOCAPTURE_TIMER_START_VAL} />
+                  </TimerContainer>
+                ) : null}
+              </>
+            ) : (
+              <ProcessingContainer>
+                <LoadingSpinner />
+              </ProcessingContainer>
+            ))}
         </VideoContainer>
         {isDesktop(deviceKind) && isCameraVisible && (
           <CaptureButton

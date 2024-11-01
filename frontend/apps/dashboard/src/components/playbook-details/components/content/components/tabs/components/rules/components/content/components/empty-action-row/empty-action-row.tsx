@@ -83,6 +83,7 @@ const EmptyActionRow = ({ action, tempId, onEdit, onDelete }: EmptyActionRowProp
   };
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
     <RulesListEmptyItem ref={ref} role="row" aria-label={t('empty-aria-label')}>
       <Stack justify="space-between" align="start">
         <Stack align="center" rowGap={2} columnGap={3} flexWrap="wrap">

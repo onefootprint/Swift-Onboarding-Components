@@ -31,6 +31,7 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
             const label = getLabel(typedName);
 
             return (
+              // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
               <OptionItem key={name} role="row" aria-label={label}>
                 <DisplayValue name={typedName} value={typedValue} />
                 <Label name={typedName} value={typedValue} />

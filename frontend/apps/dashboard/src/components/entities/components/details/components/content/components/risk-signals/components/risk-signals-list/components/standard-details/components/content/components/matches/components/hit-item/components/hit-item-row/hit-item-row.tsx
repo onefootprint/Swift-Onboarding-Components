@@ -58,7 +58,13 @@ const HitItemRow = ({ fieldName, fieldValue, handleShowAllFields, handleShowAmlM
   const labelText =
     fieldName === 'showAll' ? t('show-all.label', { count: fieldValue as number }) : toReadableString(fieldName);
   return (
-    <Stack direction="column" role="group" aria-label={fieldName} gap={1}>
+    <Stack
+      direction="column"
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
+      role="group"
+      aria-label={fieldName}
+      gap={1}
+    >
       <Text variant="body-3" color="tertiary" textAlign="left">
         {labelText}
       </Text>

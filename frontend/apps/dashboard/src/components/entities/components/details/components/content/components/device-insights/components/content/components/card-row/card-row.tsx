@@ -8,6 +8,7 @@ type CardRowProps = {
 };
 
 const CardRow = ({ label, value, labelSuffix }: CardRowProps) => (
+  // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
   <Row role="row" aria-label={label}>
     {labelSuffix ? (
       <Stack direction="row" align="center" gap={2}>

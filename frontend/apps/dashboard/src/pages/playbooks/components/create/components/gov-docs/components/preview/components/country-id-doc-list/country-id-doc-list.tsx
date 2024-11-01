@@ -16,6 +16,7 @@ const CountryDocList = ({ countryDocs }: CountryDocListProps) => {
         const countryName = getCountryNameFromCode(countryCode);
 
         return (
+          // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
           <Row key={countryName} role="row">
             <Label variant="body-3" color="tertiary">
               <Flag code={countryCode} />

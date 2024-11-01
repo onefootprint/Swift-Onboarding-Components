@@ -16,6 +16,7 @@ const Item = ({ option, value, onSelect }: ItemProps) => {
   const selected = option.value === value?.value;
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <option />
     <Box role="option" onClick={onSelect} tabIndex={0}>
       <ItemContainer>
         <Label variant="body-3">{label}</Label>

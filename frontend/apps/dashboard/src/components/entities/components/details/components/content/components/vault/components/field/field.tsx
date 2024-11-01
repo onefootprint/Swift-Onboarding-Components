@@ -34,7 +34,11 @@ const Field = ({ di, entity, renderValue, renderLabel }: FieldProps) => {
   );
 
   return (
-    <Container role="row" aria-label={ariaLabel}>
+    <Container
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+      role="row"
+      aria-label={ariaLabel}
+    >
       <Form.Field variant="horizontal">
         {field.showCheckbox ? (
           <Tooltip

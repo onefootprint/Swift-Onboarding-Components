@@ -16,6 +16,7 @@ const InlineButton = ({ icon: Icon, tooltipText, onClick, disabled, ariaLabel }:
   return onClick ? (
     <Tooltip text={tooltipText} disabled={disabled}>
       <Container
+        // biome-ignore lint/a11y/useSemanticElements: TODO: change to <button />
         role="button"
         onClick={onClick}
         aria-label={ariaLabel}

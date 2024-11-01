@@ -41,6 +41,7 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
       onKeyDown={onKeyDown}
       onMouseMove={onMouseMove}
       ref={ref}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <option />
       role="option"
     >
       <Title>{title}</Title>

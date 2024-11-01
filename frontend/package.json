@@ -28,9 +28,8 @@
     "version": "changeset version",
     "generate:openapi": "turbo run generate:openapi"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@biomejs/biome": "^1.8.3",
+    "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.26.2",
     "@datadog/datadog-ci": "^2.42.0",
     "jest": "^29.7.0",

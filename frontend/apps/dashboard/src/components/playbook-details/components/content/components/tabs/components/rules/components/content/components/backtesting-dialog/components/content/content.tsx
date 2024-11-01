@@ -96,15 +96,18 @@ const Content = ({ data, dateRange, onFilter }: ContentProps) => {
         />
       </Stack>
       <Divider marginTop={9} marginBottom={9} />
+      {/* biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset /> */}
       <Stack direction="column" marginBottom={9} role="group" aria-label={t('historical.heading')}>
         {renderHeading('historical')}
         <ActionCard data={data.stats.countByHistoricalActionTriggered} numTotal={numTotal} />
       </Stack>
+      {/* biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset /> */}
       <Stack direction="column" marginBottom={9} role="group" aria-label={t('backtested.heading')}>
         {renderHeading('backtested')}
         <ActionCard data={data.stats.countByBacktestActionTriggered} numTotal={numTotal} />
       </Stack>
       {!!numTotal && (
+        // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
         <Stack direction="column" role="group" aria-label={t('correlation.heading')}>
           {renderHeading('correlation')}
           <Stack direction="column" gap={5}>

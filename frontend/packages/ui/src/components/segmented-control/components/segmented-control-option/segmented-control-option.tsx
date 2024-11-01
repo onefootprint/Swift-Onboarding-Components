@@ -22,6 +22,7 @@ const SegmentedControlOption = ({
   size = 'default',
   variant = 'primary',
 }: SegmentedControlOptionProps) => (
+  // biome-ignore lint/a11y/useSemanticElements: TODO: change to type="button"
   <OptionTrigger
     role="button"
     value={optionValue}

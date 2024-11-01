@@ -9,7 +9,7 @@ const useCurrentSession = (documents: Document[]) => {
 
   const getSessionValue = (): string => {
     const decodedSession = session ? decodeURIComponent(session as string) : '';
-    return sessionIsValid(decodedSession) ? decodedSession : documents[0]?.startedAt ?? '';
+    return sessionIsValid(decodedSession) ? decodedSession : (documents[0]?.startedAt ?? '');
   };
 
   const getCurrentDocument = () => documents.find(doc => doc.startedAt === getSessionValue());

@@ -19,7 +19,13 @@ const RuleList = ({ rules, stepUpAction }: RuleListProps) => {
   const actionName = kebabCase(stepUpAction);
 
   return (
-    <Stack direction="column" gap={5} role="group" aria-label={t(`step-up.${actionName}` as ParseKeys<'common'>)}>
+    <Stack
+      direction="column"
+      gap={5}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
+      role="group"
+      aria-label={t(`step-up.${actionName}` as ParseKeys<'common'>)}
+    >
       {stepUpAction && (
         <Stack align="center" gap={3}>
           <IcoFileText16 />

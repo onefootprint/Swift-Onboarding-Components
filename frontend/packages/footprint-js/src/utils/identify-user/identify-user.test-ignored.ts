@@ -42,7 +42,7 @@ const convertStreamToObject = async (reader?: ReadableStreamDefaultReader<Uint8A
 };
 
 const isTest = process.env.NODE_ENV === 'test';
-const baseUrl = process.env.API_BASE_URL ?? isTest ? 'http://test' : '';
+const baseUrl = (process.env.API_BASE_URL ?? isTest) ? 'http://test' : '';
 const handlers = [
   // @ts-ignore: Parameter 'res' implicitly has an 'any' type.
   http.post(`${baseUrl}/hosted/identify/lite`, async res => {

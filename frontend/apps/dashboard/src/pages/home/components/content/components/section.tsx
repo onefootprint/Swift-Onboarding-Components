@@ -45,6 +45,7 @@ const Section = ({ metrics }: SectionProps) => {
         {formattedMetrics.map(({ key, value }) => (
           <BorderBox
             key={key}
+            // biome-ignore lint/a11y/useSemanticElements: TODO: change to <section />
             role="region"
             initial={{ opacity: 0, filter: 'blur(1px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}

@@ -40,32 +40,30 @@ const Content = ({ entity }: ContentProps) => {
     <>
       {error && getErrorMessage(error)}
       {vault && uploadsAndDocuments && (
-        <>
-          <Stack direction="column" gap={4}>
-            {licenseDocuments
-              ? licenseDocuments.map((document: Document) => (
-                  <LicenseItem
-                    key={document.startedAt}
-                    entity={entity}
-                    document={document}
-                    vault={vault}
-                    onDecrypt={handleDecryptDocument}
-                  />
-                ))
-              : null}
-            {uploadsWithDocuments
-              ? uploadsWithDocuments.map((upload: UploadWithDocument) => (
-                  <UploadItem
-                    key={upload.documentId}
-                    entity={entity}
-                    upload={upload}
-                    vault={vault}
-                    onDecrypt={handleDecryptDocument}
-                  />
-                ))
-              : null}
-          </Stack>
-        </>
+        <Stack direction="column" gap={4}>
+          {licenseDocuments
+            ? licenseDocuments.map((document: Document) => (
+                <LicenseItem
+                  key={document.startedAt}
+                  entity={entity}
+                  document={document}
+                  vault={vault}
+                  onDecrypt={handleDecryptDocument}
+                />
+              ))
+            : null}
+          {uploadsWithDocuments
+            ? uploadsWithDocuments.map((upload: UploadWithDocument) => (
+                <UploadItem
+                  key={upload.documentId}
+                  entity={entity}
+                  upload={upload}
+                  vault={vault}
+                  onDecrypt={handleDecryptDocument}
+                />
+              ))
+            : null}
+        </Stack>
       )}
     </>
   );

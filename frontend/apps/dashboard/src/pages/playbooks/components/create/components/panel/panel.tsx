@@ -10,6 +10,7 @@ export type PanelProps = {
 
 const Panel = ({ children, cta, title }: PanelProps) => {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <section />
     <Container aria-label={title} role="region">
       <Header>
         <Text variant="label-3">{title}</Text>

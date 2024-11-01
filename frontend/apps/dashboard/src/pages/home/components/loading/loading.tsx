@@ -4,6 +4,7 @@ const Loading = () => {
   const templateAreas = ['one', 'two', 'three', 'four', 'five', 'six'];
 
   return (
+    // biome-ignore lint/a11y/useFocusableInteractive: The HTML element with the interactive role "progressbar" is not focusable.
     <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0} aria-label="Loading home...">
       <Stack direction="column" gap={9}>
         {['one', 'two'].map(key => (

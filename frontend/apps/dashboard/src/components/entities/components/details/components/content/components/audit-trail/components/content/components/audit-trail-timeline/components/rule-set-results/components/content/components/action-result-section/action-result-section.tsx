@@ -41,6 +41,7 @@ const ActionResultSection = ({ actionSection, data }: ActionResultSectionProps) 
     <Stack
       direction="column"
       gap={5}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
       role="group"
       aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
       position="relative"

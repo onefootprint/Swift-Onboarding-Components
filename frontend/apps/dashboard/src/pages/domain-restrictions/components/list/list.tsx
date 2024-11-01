@@ -29,7 +29,13 @@ const List = ({ allowedDomains = [], error, isPending }: ListProps) => {
   }
 
   return allowedDomains.length ? (
-    <Stack direction="column" gap={5} aria-busy={isPending} role="list">
+    <Stack
+      direction="column"
+      gap={5}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <ul />
+      aria-busy={isPending}
+      role="list"
+    >
       {allowedDomains.map(domain => (
         <Domain key={domain} domain={domain} onRemove={handleRemove} />
       ))}

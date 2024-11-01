@@ -17,7 +17,11 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
   const rowActions = Object.keys(BacktestingRuleAction).filter(rowAction => rowAction !== sectionAction);
 
   return (
-    <Container role="group" aria-label={`${sectionAction} correlation card`}>
+    <Container
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
+      role="group"
+      aria-label={`${sectionAction} correlation card`}
+    >
       <Text variant="label-3" marginTop={4} marginBottom={5}>
         <Trans
           ns="playbook-details"
@@ -28,7 +32,10 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
           values={{ action: getActionText(sectionActionValue) }}
         />
       </Text>
-      <ActionRow data-is-last={false} role="row">
+      <ActionRow
+        data-is-last={false} // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+        role="row"
+      >
         <Text variant="body-3">
           <Trans
             ns="playbook-details"
@@ -44,7 +51,12 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
       {rowActions.map((rowAction, index) => {
         const rowActionValue = BacktestingRuleAction[rowAction as keyof typeof BacktestingRuleAction];
         return (
-          <ActionRow key={rowAction} data-is-last={index === rowActions.length - 1} role="row">
+          <ActionRow
+            key={rowAction}
+            data-is-last={index === rowActions.length - 1}
+            // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+            role="row"
+          >
             <Text variant="body-3">
               <Trans
                 ns="playbook-details"

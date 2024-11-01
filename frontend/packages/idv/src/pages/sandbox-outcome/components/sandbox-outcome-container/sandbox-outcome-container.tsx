@@ -62,7 +62,7 @@ const SandboxOutcomeFormWrapper = ({
       overallOutcome: OverallOutcome.success,
       docVerificationOutcome: IdVerificationOutcome.simulated,
       idDocOutcome: config?.requiresIdDoc ? IdDocOutcome.success : undefined,
-      testID: collectTestId ? sandboxId ?? getRandomID() : undefined,
+      testID: collectTestId ? (sandboxId ?? getRandomID()) : undefined,
     },
     mode: 'onChange',
   });

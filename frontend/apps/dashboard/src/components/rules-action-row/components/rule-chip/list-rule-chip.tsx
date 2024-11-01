@@ -89,6 +89,7 @@ const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onCh
 
   return isEditing ? (
     <EditContainer>
+      {/* biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset /> */}
       <ExpressionContainer role="group" aria-label={ruleExpression.field} data-is-editing={isEditing}>
         <DISelect defaultDI={ruleExpression.field} listKind={selectedList?.kind} onChange={handleListFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
@@ -109,6 +110,7 @@ const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onCh
       )}
     </EditContainer>
   ) : (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
     <ExpressionContainer role="group" aria-label={ruleExpression.field}>
       <Text variant="body-3" minWidth="fit-content">
         {ruleExpression.field}

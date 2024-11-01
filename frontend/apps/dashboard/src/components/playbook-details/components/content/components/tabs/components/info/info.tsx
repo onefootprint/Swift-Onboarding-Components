@@ -9,7 +9,13 @@ type GroupProps = {
 
 const Group = ({ title, children }: GroupProps) => {
   return (
-    <Stack flexDirection="column" gap={4} aria-label={title} role="group">
+    <Stack
+      flexDirection="column"
+      gap={4}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
+      aria-label={title}
+      role="group"
+    >
       <Text variant="label-2">{title}</Text>
       <Stack flexDirection="column" gap={2}>
         {children}
@@ -28,6 +34,7 @@ const Item = ({ label, hint, checked }: ItemProps) => {
   return (
     <Stack
       aria-label={label}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
       role="row"
       height="24px"
       justifyContent="flex-start"

@@ -3,7 +3,7 @@ import type { IdentifyRequest } from '../../types/identify';
 import { isObject } from '../prop-utils';
 
 const isTest = process.env.NODE_ENV === 'test';
-const baseUrl = process.env.API_BASE_URL ?? isTest ? 'http://test' : '';
+const baseUrl = (process.env.API_BASE_URL ?? isTest) ? 'http://test' : '';
 
 // TODO this won't be entirely accurate unless we pass the ob configuration key here
 const identifyUserRequest = async (payload: IdentifyRequest) => {

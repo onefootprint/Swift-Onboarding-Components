@@ -25,7 +25,11 @@ const DocumentFieldOrPlaceholder = ({ kind, entity, vault, documents }: Document
   const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
 
   return (
-    <Container role="row" aria-label={field.label}>
+    <Container
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
+      role="row"
+      aria-label={field.label}
+    >
       {field.showCheckbox ? (
         <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
           <Checkbox

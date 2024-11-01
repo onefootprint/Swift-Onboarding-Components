@@ -138,6 +138,7 @@ const ActionSection = ({
     <Stack
       direction="column"
       gap={1}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
       role="group"
       aria-label={t(`${kebabCase(actionName)}.title` as ParseKeys<'common'>)}
     >

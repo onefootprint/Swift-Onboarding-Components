@@ -7,7 +7,14 @@ type HeaderProps = {
 
 const Header = ({ title, subtitle }: HeaderProps) => {
   return (
-    <Stack gap={2} flexDirection="column" tag="header" aria-label={title} role="heading">
+    <Stack
+      gap={2}
+      flexDirection="column"
+      tag="header"
+      aria-label={title}
+      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <header />
+      role="heading"
+    >
       <Text variant="label-1" color="primary">
         {title}
       </Text>

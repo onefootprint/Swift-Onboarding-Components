@@ -32,6 +32,7 @@ const SelectSearch = ({
   };
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to type="search"
     <Container role="search">
       <InputContainer>
         <IcoSearch16 color="tertiary" />

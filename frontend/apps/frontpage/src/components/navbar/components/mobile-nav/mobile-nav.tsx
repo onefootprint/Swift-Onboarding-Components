@@ -94,38 +94,36 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
         </Main>
         <AnimatePresence>
           {isOpen && (
-            <>
-              <NavigationMenu.Root asChild>
-                <MenuContainer
-                  ref={menuContainerRef}
-                  variants={menuVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  flex={1}
-                >
-                  <LinkList>
-                    {entries.map(entry => {
-                      if (isNavLink(entry)) {
-                        return <MobileNavLink key={uniqueId()} link={entry} />;
-                      }
-                      if (isNavMenu(entry)) {
-                        return <MobileNavMenu menu={entry} key={entry.text} />;
-                      }
-                      return null;
-                    })}
-                  </LinkList>
-                  <CtaContainer>
-                    <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`} onClick={handleLoginClick}>
-                      {t('login')}
-                    </LoginLink>
-                    <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`} onClick={handleSignUpClick}>
-                      {t('sign-up')}
-                    </LinkButton>
-                  </CtaContainer>
-                </MenuContainer>
-              </NavigationMenu.Root>
-            </>
+            <NavigationMenu.Root asChild>
+              <MenuContainer
+                ref={menuContainerRef}
+                variants={menuVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                flex={1}
+              >
+                <LinkList>
+                  {entries.map(entry => {
+                    if (isNavLink(entry)) {
+                      return <MobileNavLink key={uniqueId()} link={entry} />;
+                    }
+                    if (isNavMenu(entry)) {
+                      return <MobileNavMenu menu={entry} key={entry.text} />;
+                    }
+                    return null;
+                  })}
+                </LinkList>
+                <CtaContainer>
+                  <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`} onClick={handleLoginClick}>
+                    {t('login')}
+                  </LoginLink>
+                  <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`} onClick={handleSignUpClick}>
+                    {t('sign-up')}
+                  </LinkButton>
+                </CtaContainer>
+              </MenuContainer>
+            </NavigationMenu.Root>
           )}
         </AnimatePresence>
       </OuterContainer>

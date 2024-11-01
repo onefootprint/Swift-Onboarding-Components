@@ -14,6 +14,7 @@ const MobileOption = ({ option, onSelect, value }: MobileOptionProps) => {
   const selected = value?.value === option.value;
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <option />
     <Box role="option" onClick={onSelect} tabIndex={0}>
       <OptionContainer>
         <Box display="flex" alignItems="center">

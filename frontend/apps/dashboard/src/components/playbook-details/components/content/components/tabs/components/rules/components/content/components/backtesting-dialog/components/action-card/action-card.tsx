@@ -19,6 +19,7 @@ const ActionCard = ({ data, numTotal }: ActionCardProps) => (
         <ActionRow
           key={action}
           data-is-last={index === Object.keys(RuleActionSection).length}
+          // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
           role="row"
           aria-label={action}
         >

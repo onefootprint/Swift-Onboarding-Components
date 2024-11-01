@@ -40,7 +40,12 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
         {mediaList.map((media: AmlHitMedia, index: number) => {
           const { date, title, snippet, url } = media;
           return (
-            <MediaItem key={JSON.stringify(media)} ref={index === 0 ? firstMediaRef : null} role="group">
+            <MediaItem
+              key={JSON.stringify(media)}
+              ref={index === 0 ? firstMediaRef : null}
+              // biome-ignore lint/a11y/useSemanticElements: TODO: change to <fieldset />
+              role="group"
+            >
               {renderMediaRow(t('date'), date ? formatDateWithShortMonth(new Date(date)) : '-')}
               {renderMediaRow(t('title'), title ?? '-')}
               {snippet && (
