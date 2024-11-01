@@ -3,8 +3,6 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   clickOnVerifyWithSms,
-  confirmData,
-  fillAddress,
   fillNameAndDoB,
   fillPhoneNumber,
   selectOutcomeOptional,
@@ -13,17 +11,14 @@ import {
 } from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYC_ES || 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
+const key = process.env.E2E_OB_KYC_NON_US || 'pb_test_N1PvhexakRkydx2t9dTl1m';
 const locale = 'es-MX';
 
-const firstName = 'E2E';
-const lastName = 'es-MX';
+const firstName = 'Jorge';
+const lastName = 'Mejia';
 const dob = '25/12/1990';
 const email = 'jorge@mejia.com';
 const phoneNumber = '5555550100';
-const addressLine1 = '432 3rd Ave';
-const city = 'Seward';
-const zipCode = '99664';
 
 const userData = encodeURIComponent(JSON.stringify({ 'id.email': email }));
 
@@ -46,10 +41,8 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ isMobile, page }) => {
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -73,18 +66,23 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ isMobile, page }) => {
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillAddress({ frame, page }, { addressLine1, city, zipCode });
+  await frame.getByRole('button').filter({ hasText: 'Taiwan' }).first().click();
+  await page.keyboard.press('m');
+  await page.keyboard.press('e');
+  await page.keyboard.press('x');
+  await page.keyboard.press('i');
+  await page.keyboard.press('Enter');
+
+  await frame.getByLabel('Address').first().fill('Av. Paseo de la Reforma 123');
+  await frame.getByLabel('Apartment/neighborhood (optional)').first().fill('Colonia Juárez');
+  await frame.getByLabel('City').first().fill('Cuidad de México');
+  await frame.getByLabel('Zip code').first().fill('06600');
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await confirmData(frame, {
-    firstName,
-    lastName,
-    dob,
-    addressLine1,
-    city,
-    state: 'AL',
-    zipCode,
-    country: 'US',
-  });
+  await expect(frame.getByText(firstName).first()).toBeAttached();
+  await expect(frame.getByText(lastName).first()).toBeAttached();
+  await expect(frame.getByText(dob).first()).toBeAttached();
+  await expect(frame.getByText('Av. Paseo de la Reforma 123, Colonia Juárez').first()).toBeAttached();
+  await expect(frame.getByText('Cuidad de México, 06600, MX').first()).toBeAttached();
 });

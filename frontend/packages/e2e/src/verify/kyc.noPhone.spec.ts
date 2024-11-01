@@ -57,10 +57,8 @@ test('KYC E2E.NoPhoneFlow #ci', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);

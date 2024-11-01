@@ -10,13 +10,15 @@ import {
   verifyPhoneNumber,
 } from '../utils/commands';
 
+import { PERSONAL } from '../utils/constants';
+
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
 
 const userData = encodeURIComponent(
   JSON.stringify({
-    'id.email': 'piip@onefootprint.com',
-    'id.phoneNumber': '+15555550100',
+    'id.email': PERSONAL.email,
+    'id.phoneNumber': `+${PERSONAL.phone}`,
   }),
 );
 
@@ -39,10 +41,8 @@ test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
 
   await context.grantPermissions(['camera']);
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
