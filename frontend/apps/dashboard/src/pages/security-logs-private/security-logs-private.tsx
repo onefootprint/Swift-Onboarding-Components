@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
 import useSession from 'src/hooks/use-session';
+import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
 
 const SecurityLogsPrivate = () => {
@@ -37,6 +38,7 @@ const SecurityLogsPrivate = () => {
           size="compact"
           placeholder={t('filters.search')}
         />
+        <SecurityLogsFilters />
         <Divider />
         <Timeline accessEvents={accessEvents} />
       </Stack>

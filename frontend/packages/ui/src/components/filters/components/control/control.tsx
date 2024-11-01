@@ -84,7 +84,7 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
           <Header>
             <Text variant="label-3">{t('components.filters.filter-by', { label })}</Text>
           </Header>
-          <ScrollArea padding={6}>
+          <ScrollArea padding={6} maxHeight="400px">
             {loading ? (
               <LoadingSpinner color="secondary" ariaLabel={`Loading ${label}`} size={24} />
             ) : (
