@@ -6,7 +6,6 @@ import type {
   CollectedKycDataOption,
 } from '../data/collected-data-option';
 import type { SupportedIdDocTypes } from '../data/id-doc-type';
-import type { PublicOnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   registerAuthMethod = 'register_auth_method',
@@ -151,8 +150,6 @@ export type AuthorizeFields = {
 
 export type OnboardingStatusResponse = {
   allRequirements: OnboardingRequirement[];
-  // This is only used to initialize handoff, and the requirements are discarded.
-  obConfiguration: PublicOnboardingConfig;
 };
 
 export type RequirementForKind<K> = K extends OnboardingRequirementKind.registerPasskey

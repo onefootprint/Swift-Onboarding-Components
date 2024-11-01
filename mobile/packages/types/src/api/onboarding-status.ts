@@ -5,7 +5,6 @@ import type {
 } from '../data/collected-data-option';
 import { DocumentRequestKind } from '../data/document-request-config';
 import type { SupportedIdDocTypes } from '../data/id-doc-type';
-import type { PublicOnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',
@@ -132,7 +131,6 @@ export type AuthorizeFields = {
 
 export type OnboardingStatusResponse = {
   allRequirements: OnboardingRequirement[];
-  obConfiguration: PublicOnboardingConfig;
 };
 
 export type RequirementForKind<K> = K extends OnboardingRequirementKind.liveness

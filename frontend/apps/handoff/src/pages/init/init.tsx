@@ -3,7 +3,7 @@ import {
   Logger,
   getLogger,
   useGetD2PStatus,
-  useGetOnboardingStatus,
+  useGetOnboardingConfig,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/idv';
@@ -133,11 +133,10 @@ const Init = () => {
     },
   });
 
-  useGetOnboardingStatus({
-    enabled: !state.done,
-    authToken,
-    options: {
-      onSuccess: ({ obConfiguration }) => {
+  useGetOnboardingConfig(
+    { authToken },
+    {
+      onSuccess: obConfiguration => {
         setupLogger(obConfiguration, orgIds);
 
         if (!state.done) {
@@ -148,10 +147,14 @@ const Init = () => {
         }
       },
       onError: (err: unknown) => {
-        logWarn(`Fetching onboarding status failed on handoff init page: ${getErrorMessage(err)}`, err);
+        logWarn(
+          `Fetching onboarding status failed on handoff init page: ${getErrorMessage(err)}
+`,
+          err,
+        );
       },
     },
-  });
+  );
 
   return <InitShimmer />;
 };
