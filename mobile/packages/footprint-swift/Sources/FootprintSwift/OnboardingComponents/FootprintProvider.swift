@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 public final class FootprintProvider {
     private var client: OpenAPIClient
@@ -46,12 +47,18 @@ public final class FootprintProvider {
         if let l10n {
             self.l10n = l10n
         }
+        
         self.appearance = appearance
         self.configKey = configKey
         self.authToken = authToken
         self.sandboxOutcome = sandboxOutcome
+        let packageInfo = PackageInfo.getCurrentPackageInfo()
+        self.client.customHeaders = [
+            "x-fp-client-version": "footprint-swift-\(packageInfo.installationType):\(packageInfo.version ?? "unknown")",
+        ]
         self.queries = FootprintQueries(client: self.client, configKey: self.configKey)
         self.onboardingConfig  = try await self.queries.getOnboardingConfig()
+        
         if(self.onboardingConfig != nil){
             self.isReady = true
         }

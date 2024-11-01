@@ -15,7 +15,9 @@ public class FootprintSdkArgsManager {
             do {
                 var request = URLRequest(url: URL(string: "\(FootprintSdkMetadata.apiBaseUrl)/org/sdk_args")!)
                 request.httpMethod = "POST"
-                request.setValue("\(FootprintSdkMetadata.name) \(FootprintSdkMetadata.version)", forHTTPHeaderField: "x-fp-client-version")
+                
+                let packageInfo = PackageInfo.getCurrentPackageInfo()
+                request.setValue("footprint-swift-\(packageInfo.installationType):\(packageInfo.version ?? "unknown")", forHTTPHeaderField: "x-fp-client-version")
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
                 let encoder = JSONEncoder()
