@@ -82,7 +82,12 @@ pub enum AuditEventDetail {
         scopes: Vec<TenantScope>,
         tenant_role_id: TenantRoleId,
     },
-    UpdateOrgRole,
+    UpdateOrgRole {
+        is_live: bool,
+        prev_scopes: Vec<TenantScope>,
+        new_scopes: Vec<TenantScope>,
+        tenant_role_id: TenantRoleId,
+    },
     CreateListEntry {
         is_live: bool,
         list_id: ListId,
@@ -266,7 +271,22 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
-            AuditEventDetail::UpdateOrgRole => todo!(),
+            AuditEventDetail::UpdateOrgRole {
+                is_live,
+                prev_scopes,
+                new_scopes,
+                tenant_role_id,
+            } => Self {
+                metadata: AuditEventMetadata::UpdateOrgRole {
+                    prev_scopes,
+                    new_scopes,
+                },
+                args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
+                    tenant_role_id: Some(tenant_role_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::CreatePlaybook => todo!(),
             AuditEventDetail::DisablePlaybook => todo!(),
             AuditEventDetail::EditPlaybook => todo!(),
@@ -354,7 +374,10 @@ pub enum AuditEventMetadata {
     CreateOrgRole {
         scopes: Vec<TenantScope>,
     },
-    UpdateOrgRole,
+    UpdateOrgRole {
+        prev_scopes: Vec<TenantScope>,
+        new_scopes: Vec<TenantScope>,
+    },
     CreateListEntry,
     DeleteListEntry,
     CreatePlaybook,

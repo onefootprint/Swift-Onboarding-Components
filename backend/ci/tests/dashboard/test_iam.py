@@ -378,6 +378,32 @@ def test_update_roles(sandbox_tenant, admin_role):
     )
 
 
+def test_role_update(sandbox_tenant):
+    # Create initial role
+    suffix = _gen_random_n_digit_number(10)
+    initial_scopes = [{"kind": "read"}, {"kind": "manage_webhooks"}]
+    role_data = dict(
+        name=f"Test update role {suffix}",
+        scopes=initial_scopes,
+        kind="dashboard_user",
+    )
+    role = post("org/roles", role_data, *sandbox_tenant.db_auths)
+
+    # Update role with new scopes
+    new_scopes = [{"kind": "read"}, {"kind": "onboarding_configuration"}]
+    patch_data = dict(name=f"Updated role {suffix}", scopes=new_scopes)
+    patch(f"org/roles/{role['id']}", patch_data, *sandbox_tenant.db_auths)
+
+    # Check audit event
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="update_org_role",
+        tenant_role_id=role["id"],
+        prev_scopes=initial_scopes,
+        new_scopes=new_scopes,
+    )
+
+
 def test_cant_update_admin_role(sandbox_tenant, admin_role):
     role_id = admin_role["id"]
     suffix = _gen_random_n_digit_number(10)

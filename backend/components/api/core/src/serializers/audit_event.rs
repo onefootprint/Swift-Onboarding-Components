@@ -106,7 +106,17 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     .ok_or(AssertionError("tenant role is not available for this event"))?
                     .id,
             },
-            AuditEventMetadata::UpdateOrgRole => AuditEventDetail::UpdateOrgRole,
+            AuditEventMetadata::UpdateOrgRole {
+                prev_scopes,
+                new_scopes,
+            } => {
+                let tr = tenant_role2.ok_or(AssertionError("tenant role is not available for this event"))?;
+                AuditEventDetail::UpdateOrgRole {
+                    prev_scopes,
+                    new_scopes,
+                    tenant_role_id: tr.id,
+                }
+            }
             AuditEventMetadata::CreateListEntry => AuditEventDetail::CreateListEntry {
                 list_id: list
                     .ok_or(AssertionError("list is not available for this event"))?

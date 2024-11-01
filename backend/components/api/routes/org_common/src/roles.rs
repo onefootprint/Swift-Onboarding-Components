@@ -118,14 +118,36 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantOrPartnerTenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
-
     let api_wire_types::UpdateTenantRoleRequest { name, scopes } = request.into_inner();
+    let is_live = auth.is_live()?;
+    let db_actor = auth.actor().clone();
+
     let result = state
-        .db_transaction(move |conn| TenantRole::update(conn, &authed_org_ident, &role_id, name, scopes))
+        .db_transaction(move |conn| {
+            if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident.clone() {
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                let prev_tenant_role = TenantRole::get(conn, &role_id.clone())?;
+                let detail = AuditEventDetail::UpdateOrgRole {
+                    prev_scopes: prev_tenant_role.scopes,
+                    new_scopes: scopes.clone().unwrap_or_default(),
+                    is_live,
+                    tenant_role_id: role_id.clone(),
+                };
+
+                let audit_event = NewAuditEvent {
+                    principal_actor: db_actor.into(),
+                    insight_event_id,
+                    tenant_id,
+                    detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
+            TenantRole::update(conn, &authed_org_ident, &role_id, name, scopes)
+        })
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);

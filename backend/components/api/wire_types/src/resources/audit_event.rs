@@ -88,7 +88,11 @@ pub enum AuditEventDetail {
         scopes: Vec<TenantScope>,
         tenant_role_id: TenantRoleId,
     },
-    UpdateOrgRole,
+    UpdateOrgRole {
+        prev_scopes: Vec<TenantScope>,
+        new_scopes: Vec<TenantScope>,
+        tenant_role_id: TenantRoleId,
+    },
     CreateListEntry {
         list_id: ListId,
         list_entry_creation_id: ListEntryCreationId,
