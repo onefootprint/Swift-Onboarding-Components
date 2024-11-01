@@ -16,8 +16,8 @@ const PrincipalActor = ({ principal, insightEvent }: PrincipalActorProps) => {
 
   return (
     <HoverCard.Root openDelay={0} closeDelay={0}>
-      <HoverCard.Trigger asChild>
-        <Stack gap={2} cursor="default">
+      <Stack gap={2} cursor="default">
+        <HoverCard.Trigger asChild>
           <Text variant="label-3" textDecoration="underline">
             {principal.kind === ActorKind.footprint && t('footprint')}
             {principal.kind === ActorKind.firmEmployee && t('firm-employee')}
@@ -28,10 +28,11 @@ const PrincipalActor = ({ principal, insightEvent }: PrincipalActorProps) => {
             {principal.kind === ActorKind.apiKey && `${t('api-key')}`}
             {principal.kind === ActorKind.user && t('user')}
           </Text>
-          {principal.kind === ActorKind.organization && <Text variant="body-3">({principal.email})</Text>}
-          {principal.kind === ActorKind.apiKey && <Text variant="body-3">({principal.name})</Text>}
-        </Stack>
-      </HoverCard.Trigger>
+        </HoverCard.Trigger>
+        {principal.kind === ActorKind.organization && <Text variant="body-3">({principal.email})</Text>}
+        {principal.kind === ActorKind.apiKey && <Text variant="body-3">({principal.name})</Text>}
+      </Stack>
+
       {insightEvent && (
         <HoverCard.Portal>
           <HoverCardContent side="bottom" sideOffset={5} align="start">
