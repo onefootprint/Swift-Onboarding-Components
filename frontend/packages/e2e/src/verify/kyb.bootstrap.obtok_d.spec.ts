@@ -7,11 +7,12 @@ import {
   verifyAppIframeClick,
   verifyPhoneNumber,
 } from '../utils/commands';
+import { BUSINESS, PERSONAL } from '../utils/constants';
 
 const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const pbKey = process.env.E2E_OB_KYB_KYCED_BO || 'pb_test_eWuI7QxglTuuVclccyfAk4'; // KYC all BOs
-const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
+const pbKey = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
+const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
   test.slow();
@@ -19,33 +20,36 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   // Create a session
   const session = await page.evaluate(
-    async ([secretKey, pbKey, backendUrl]) => {
+    async ([secretKey, pbKey, backendUrl, personal, business]) => {
+      const id = personal as typeof PERSONAL;
+      const biz = business as typeof BUSINESS;
       const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
-          'X-Footprint-Secret-Key': secretKey,
+          'X-Footprint-Secret-Key': secretKey as string,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           key: pbKey,
           bootstrap_data: {
-            'business.address_line1': '1 Infinite Way',
-            'business.city': 'Cupertino',
+            'business.address_line1': biz.addressLine1,
+            'business.address_line2': biz.addressLine2,
+            'business.city': biz.city,
             'business.corporation_type': 'unknown',
-            'business.country': 'US',
-            'business.name': 'PrintFoot',
+            'business.country': biz.country,
+            'business.name': biz.name,
+            'business.state': biz.state,
+            'business.tin': biz.tin,
+            'business.zip': biz.zipCode,
             'business.primary_owner_stake': 73,
-            'business.secondary_owners': [{ first_name: 'Bob', last_name: 'Boberto', ownership_stake: 27 }],
-            'business.state': 'CA',
-            'business.tin': '12-1212121',
-            'business.zip': '12121',
+            'business.secondary_owners': [{ first_name: biz.bo2Name, last_name: biz.bo2LastName, ownership_stake: 27 }],
 
-            'id.dob': '2000-04-12',
-            'id.email': 'id@onefootprint.com',
-            'id.first_name': 'Alex',
-            'id.last_name': 'Anderson',
-            'id.phone_number': '+15555550100',
-            'id.ssn9': '121212121',
+            'id.dob': id.dob,
+            'id.email': id.email,
+            'id.first_name': id.firstName,
+            'id.last_name': id.lastName,
+            'id.phone_number': `+${id.phone}`,
+            'id.ssn9': id.ssn9,
           },
         }),
       });
@@ -53,7 +57,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey, backendUrl],
+    [fpSKey, pbKey, backendUrl, PERSONAL, BUSINESS],
   );
 
   expect(session).toHaveProperty('token');
@@ -73,10 +77,8 @@ test('KYB pbtok_ with kyced bo until the end of the flow #ci', async ({ page, is
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -90,15 +92,14 @@ test('KYB pbtok_ with kyced bo until the end of the flow #ci', async ({ page, is
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  const whoAreBOsH2 = frame.getByText('Add beneficial owners').first();
-  await whoAreBOsH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+  await frame.getByTestId('beneficial-owners').getByRole('button', { name: 'Edit' }).click();
 
-  expect(await frame.locator('input[name="bos.0.firstName"]').first().inputValue()).toBe('Alex');
-  expect(await frame.locator('input[name="bos.0.lastName"]').first().inputValue()).toBe('Anderson');
+  expect(await frame.locator('input[name="bos.0.firstName"]').first().inputValue()).toBe(PERSONAL.firstName);
+  expect(await frame.locator('input[name="bos.0.lastName"]').first().inputValue()).toBe(PERSONAL.lastName);
   expect(await frame.locator('input[name="bos.0.ownershipStake"]').first().inputValue()).toBe('73');
 
-  expect(await frame.locator('input[name="bos.1.firstName"]').first().inputValue()).toBe('Bob');
-  expect(await frame.locator('input[name="bos.1.lastName"]').first().inputValue()).toBe('Boberto');
+  expect(await frame.locator('input[name="bos.1.firstName"]').first().inputValue()).toBe(BUSINESS.bo2Name);
+  expect(await frame.locator('input[name="bos.1.lastName"]').first().inputValue()).toBe(BUSINESS.bo2LastName);
   expect(await frame.locator('input[name="bos.1.ownershipStake"]').first().inputValue()).toBe('27');
 
   expect(await frame.locator('input[name="bos.1.email"]').first().inputValue()).toBeFalsy();
@@ -116,10 +117,10 @@ test('KYB pbtok_ with kyced bo until the end of the flow #ci', async ({ page, is
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  const idAddressLine1 = '432 3rd Ave';
-  const idCity = 'Seward';
-  const idZipCode = '99664';
-  await fillAddress({ frame, page }, { addressLine1: idAddressLine1, city: idCity, zipCode: idZipCode });
+  await fillAddress(
+    { frame, page },
+    { addressLine1: PERSONAL.addressLine1, city: PERSONAL.city, zipCode: PERSONAL.zipCode },
+  );
   await clickOnContinue(frame);
   await page.waitForLoadState();
 

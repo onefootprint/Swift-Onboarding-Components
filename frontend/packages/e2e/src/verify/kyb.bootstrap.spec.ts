@@ -2,72 +2,43 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  fillBeneficialOwners,
+  fillBusinessOwners,
   selectOutcomeOptional,
   verifyAppIframeClick,
   verifyPhoneNumber,
 } from '../utils/commands';
+import { BUSINESS, PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
-
-const firstName = 'E2E';
-const middleName = 'T';
-const lastName = 'KYB';
-const dob = '01/01/1990';
-const ssn = '418437970';
-const addressLine1 = '123 Main St';
-const addressLine2 = 'Apt 1';
-const city = 'San Francisco';
-const state = 'CA';
-const zipCode = '94105';
-const country = 'US';
-
-const beneficialOwner1Name = 'Bob';
-const beneficialOwner1LastName = 'Lee';
-const beneficialOwner1Email = 'boblee@acme.com';
-const beneficialOwner1Phone = '6105579459';
-
-const businessName = 'Acme Bank Inc.';
-const businessDba = 'Banana Bank';
-const businessTin = '12-3456789';
-const businessCorporationType = 'unknown';
-const businessWebsite = 'http://www.google.com';
-
-const businessAddressLine1 = '123 Main St';
-const businessAddressLine2 = 'Apt 123';
-const businessCity = 'Boston';
-const businessState = 'MA';
-const businessZip = '02117';
-const businessUs = 'US';
+const key = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
 
 const userData = encodeURIComponent(
   JSON.stringify({
-    'id.address_line1': addressLine1,
-    'id.address_line2': addressLine2,
-    'id.city': city,
-    'id.country': country,
-    'id.dob': dob,
-    'id.email': 'piip@onefootprint.com',
-    'id.first_name': firstName,
-    'id.last_name': lastName,
-    'id.middle_name': middleName,
-    'id.phone_number': '+15555550100',
-    'id.ssn9': ssn,
-    'id.state': state,
-    'id.zip': zipCode,
-    'business.name': businessName,
-    'business.dba': businessDba,
-    'business.tin': businessTin,
-    'business.corporation_type': businessCorporationType,
-    'business.website': businessWebsite,
-    'business.phone_number': '+12025550179',
-    'business.address_line1': businessAddressLine1,
-    'business.address_line2': businessAddressLine2,
-    'business.city': businessCity,
-    'business.state': businessState,
-    'business.zip': businessZip,
-    'business.country': businessUs,
+    'id.address_line1': PERSONAL.addressLine1,
+    'id.address_line2': PERSONAL.addressLine2,
+    'id.city': PERSONAL.city,
+    'id.country': PERSONAL.country,
+    'id.dob': PERSONAL.dob,
+    'id.email': PERSONAL.email,
+    'id.first_name': PERSONAL.firstName,
+    'id.last_name': PERSONAL.lastName,
+    'id.middle_name': PERSONAL.middleName,
+    'id.phone_number': `+${PERSONAL.phone}`,
+    'id.ssn9': PERSONAL.ssn,
+    'id.state': PERSONAL.state,
+    'id.zip': PERSONAL.zipCode,
+    'business.name': BUSINESS.name,
+    'business.dba': BUSINESS.as,
+    'business.tin': BUSINESS.tin,
+    'business.corporation_type': BUSINESS.corporationType,
+    'business.website': BUSINESS.website,
+    'business.phone_number': `+${BUSINESS.phoneNumber}`,
+    'business.address_line1': BUSINESS.addressLine1,
+    'business.address_line2': BUSINESS.addressLine2,
+    'business.city': BUSINESS.city,
+    'business.state': BUSINESS.state,
+    'business.zip': BUSINESS.zipCode,
+    'business.country': BUSINESS.country,
   }),
 );
 
@@ -88,10 +59,8 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -103,17 +72,19 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   const letsKYB = frame.getByText("Let's get to know your business!").first();
   await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
   await clickOnContinue(frame);
+
+  await frame.getByTestId('beneficial-owners').getByRole('button', { name: 'Edit' }).click();
   await page.waitForLoadState();
 
-  await fillBeneficialOwners(frame, {
-    beneficialOwner1Email,
-    beneficialOwner1LastName,
-    beneficialOwner1Name,
-    beneficialOwner1Phone,
-    userFirstName: firstName,
-    userLastName: lastName,
+  await fillBusinessOwners(frame, {
+    businessOwner1Email: BUSINESS.bo2Email,
+    businessOwner1LastName: BUSINESS.bo2LastName,
+    businessOwner1Name: BUSINESS.bo2Name,
+    businessOwner1Phone: BUSINESS.bo2PhoneWithoutCountryCode,
+    userFirstName: PERSONAL.firstName,
+    userLastName: PERSONAL.lastName,
   });
-  await clickOnContinue(frame);
+  await frame.getByTestId('beneficial-owners').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
@@ -123,23 +94,23 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   await frame.getByTestId('basic-data').getByRole('button', { name: 'Edit' }).click();
   await page.waitForLoadState();
 
-  await frame.getByLabel('Business name').first().fill('Umbrella Bank');
-  await frame.getByLabel('Doing Business As (optional)').first().fill('Umbrella');
+  await frame.getByLabel('Business name').first().fill(BUSINESS.name);
+  await frame.getByLabel('Doing Business As (optional)').first().fill(BUSINESS.as);
 
   await frame.getByTestId('basic-data').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
-  await expect(frame.getByText('Umbrella Bank').first()).toBeAttached();
-  await expect(frame.getByText('Umbrella').first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.name).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.as).first()).toBeAttached();
   await expect(frame.getByText('•••••••••').first()).toBeAttached();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();
-  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill('12-7777777');
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill(BUSINESS.tin);
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
-  await expect(frame.getByText('12-7777777').first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.tin).first()).toBeAttached();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Hide' }).click();
   await expect(frame.getByText('•••••••••').first()).toBeAttached();
@@ -150,12 +121,12 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   await frame.getByTestId('business-address').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
-  await expect(frame.getByText(businessAddressLine1).first()).toBeAttached();
-  await expect(frame.getByText(businessAddressLine2).first()).toBeAttached();
-  await expect(frame.getByText(businessCity).first()).toBeAttached();
-  await expect(frame.getByText(businessState).first()).toBeAttached();
-  await expect(frame.getByText(businessZip).first()).toBeAttached();
-  await expect(frame.getByText(businessUs).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.addressLine1).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.addressLine2).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.city).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.state).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.zipCode).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.country).first()).toBeAttached();
 
   await clickOnContinue(frame);
   await page.waitForLoadState();

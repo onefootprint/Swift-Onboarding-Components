@@ -21,6 +21,7 @@ export const BUSINESS = {
   bo2LastName: 'Owner',
   bo2Email: 'secondary@onefootprint.com',
   bo2Phone: '15555550100',
+  bo2PhoneWithoutCountryCode: '5555550100',
 
   addressLine1: '1 Hayes St',
   addressLine2: 'Ap 201',

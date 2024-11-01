@@ -114,7 +114,7 @@ export const fillBasicDataKYB = async (
     userTIN: string;
   },
 ) => {
-  await frame.getByLabel('Business name').first().fill(payload.businessName);
+  await frame.getByLabel('Legal business name').first().fill(payload.businessName);
   await frame.getByLabel('Doing Business As (optional)').first().fill(payload.businessNameOptional);
   await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill(payload.userTIN);
 };
@@ -143,13 +143,13 @@ export const fillAddressKYB = async (
   await page.keyboard.press('Enter');
 };
 
-export const fillBeneficialOwners = async (
+export const fillBusinessOwners = async (
   frame: FrameLocator,
   payload: {
-    beneficialOwner1Email: string;
-    beneficialOwner1LastName: string;
-    beneficialOwner1Name: string;
-    beneficialOwner1Phone: string;
+    businessOwner1Email: string;
+    businessOwner1LastName: string;
+    businessOwner1Name: string;
+    businessOwner1Phone: string;
     userFirstName: string;
     userLastName: string;
   },
@@ -162,10 +162,10 @@ export const fillBeneficialOwners = async (
 
   await frame.getByRole('button', { name: 'Add another beneficial owner' }).first().click();
 
-  await frame.locator('input[name="bos.1.firstName"]').first().fill(payload.beneficialOwner1Name);
-  await frame.locator('input[name="bos.1.lastName"]').first().fill(payload.beneficialOwner1LastName);
-  await frame.locator('input[name="bos.1.email"]').first().fill(payload.beneficialOwner1Email);
-  await frame.locator('input[name="bos.1.phoneNumber"]').first().fill(payload.beneficialOwner1Phone);
+  await frame.locator('input[name="bos.1.firstName"]').first().fill(payload.businessOwner1Name);
+  await frame.locator('input[name="bos.1.lastName"]').first().fill(payload.businessOwner1LastName);
+  await frame.locator('input[name="bos.1.email"]').first().fill(payload.businessOwner1Email);
+  await frame.locator('input[name="bos.1.phoneNumber"]').first().fill(payload.businessOwner1Phone);
   const share1 = frame.locator('input[name="bos.1.ownershipStake"]').first();
   await share1.clear();
   await share1.fill('50');

@@ -1,45 +1,31 @@
 import { expect, test } from '@playwright/test';
 
 import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from '../utils/commands';
+import { BUSINESS, PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
-
-const businessName = 'Business name';
-const businessTin = '12-3456789';
-const businessAddressLine1 = '1 Hayes St';
-const businessCity = 'San Francisco';
-const businessState = 'CA';
-const businessZip = '94117';
-const businessCountry = 'US';
-
-const idFirstName = 'Andrew';
-const idLastName = 'Anderson';
-
-const businessSecondaryOwnersFirstName = 'Bob';
-const businessSecondaryOwnersLastName = 'Bobson';
+const key = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
 
 const userData = encodeURIComponent(
   JSON.stringify({
-    'business.name': businessName,
-    'business.tin': businessTin,
-    'business.address_line1': businessAddressLine1,
-    'business.city': businessCity,
-    'business.state': businessState,
-    'business.zip': businessZip,
-    'business.country': businessCountry,
+    'business.name': BUSINESS.name,
+    'business.tin': BUSINESS.tin,
+    'business.address_line1': BUSINESS.addressLine1,
+    'business.city': BUSINESS.city,
+    'business.state': BUSINESS.state,
+    'business.zip': BUSINESS.zipCode,
+    'business.country': BUSINESS.country,
 
     'id.email': 'sandbox@onefootprint.com',
     'id.phone_number': '+15555550100',
-    'id.first_name': idFirstName,
-    'id.last_name': idLastName,
+    'id.first_name': PERSONAL.firstName,
+    'id.last_name': PERSONAL.lastName,
 
-    // 'business.primary_owner_stake': 51,
-
+    // 'business.primary_owner_stake': 51, <- intentionally not included
     'business.secondary_owners': [
       {
-        first_name: businessSecondaryOwnersFirstName,
-        last_name: businessSecondaryOwnersLastName,
+        first_name: BUSINESS.bo2Name,
+        last_name: BUSINESS.bo2LastName,
         email: 'piip@onefootprint.com',
         phone_number: '+15555550100',
         ownership_stake: 49,
@@ -65,10 +51,8 @@ test('KYB bootstrapping only id.xxxx and business.secondary_owners #ci', async (
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -80,43 +64,38 @@ test('KYB bootstrapping only id.xxxx and business.secondary_owners #ci', async (
   const letsKYB = frame.getByText("Let's get to know your business!").first();
   await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
   await clickOnContinue(frame);
-  await page.waitForLoadState();
 
-  const whoAreBOsH2 = frame.getByText('Add beneficial owners').first();
-  await whoAreBOsH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+  await frame.getByText('Confirm your business data').first().waitFor({ state: 'attached', timeout });
 
-  const primaryOwnerStake = frame.locator('input[name="bos.0.ownershipStake"]').first();
-  expect(await primaryOwnerStake.inputValue()).toBeFalsy();
-  await primaryOwnerStake.clear();
-  await primaryOwnerStake.fill('51');
-
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  const confirmH2 = frame.getByText('Confirm your business data').first();
-  await confirmH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
-
-  await expect(frame.getByText(businessName).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.name).first()).toBeAttached();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();
-  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill('12-7777777');
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill(BUSINESS.tin);
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
-  await expect(frame.getByText('12-7777777').first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.tin).first()).toBeAttached();
 
-  await expect(frame.getByText(businessAddressLine1).first()).toBeAttached();
-  await expect(frame.getByText(businessCity).first()).toBeAttached();
-  await expect(frame.getByText(businessState).first()).toBeAttached();
-  await expect(frame.getByText(businessZip).first()).toBeAttached();
-  await expect(frame.getByText(businessCountry).first()).toBeAttached();
+  await frame.getByTestId('beneficial-owners').getByRole('button', { name: 'Edit' }).click();
+  const primaryOwnerStake = frame.locator('input[name="bos.0.ownershipStake"]').first();
+  expect(await primaryOwnerStake.inputValue()).toBeFalsy();
+  await primaryOwnerStake.clear();
+  await primaryOwnerStake.fill('51');
+  await frame.getByTestId('beneficial-owners').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
+  await expect(frame.getByText(BUSINESS.addressLine1).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.city).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.state).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.zipCode).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.country).first()).toBeAttached();
   await expect(frame.getByText('51%').first()).toBeAttached();
 
-  await expect(frame.getByText(idFirstName).first()).toBeAttached();
-  await expect(frame.getByText(idLastName).first()).toBeAttached();
-  await expect(frame.getByText(businessSecondaryOwnersFirstName).first()).toBeAttached();
-  await expect(frame.getByText(businessSecondaryOwnersLastName).first()).toBeAttached();
+  await expect(frame.getByText(PERSONAL.firstName).first()).toBeAttached();
+  await expect(frame.getByText(PERSONAL.lastName).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.bo2Name).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.bo2LastName).first()).toBeAttached();
   await expect(frame.getByText('piip@onefootprint.com').first()).toBeAttached();
   await expect(frame.getByText('+15555550100').first()).toBeAttached();
   await expect(frame.getByText('49%').first()).toBeAttached();
@@ -124,6 +103,6 @@ test('KYB bootstrapping only id.xxxx and business.secondary_owners #ci', async (
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  expect(await frame.getByLabel('First name').first().inputValue()).toBe(idFirstName);
-  expect(await frame.getByLabel('Last name').first().inputValue()).toBe(idLastName);
+  expect(await frame.getByLabel('First name').first().inputValue()).toBe(PERSONAL.firstName);
+  expect(await frame.getByLabel('Last name').first().inputValue()).toBe(PERSONAL.lastName);
 });

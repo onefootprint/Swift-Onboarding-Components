@@ -8,19 +8,12 @@ import {
   verifyAppIframeClick,
   verifyPhoneNumber,
 } from '../utils/commands';
+import { BUSINESS, PERSONAL } from '../utils/constants';
 
 const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const pbKey = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
-const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
-
-const businessName = 'Business name';
-const businessNameOptional = 'Optional name';
-const businessTin = '123456789';
-
-const businessAddressLine1 = '123 Main St';
-const businessCity = 'San Francisco';
-const businessZipCode = '94105';
+const pbKey = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
+const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
   test.slow();
@@ -28,29 +21,31 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   // Create a session
   const session = await page.evaluate(
-    async ([secretKey, pbKey, backendUrl]) => {
+    async args => {
+      const [secretKey, pbKey, backendUrl, personal] = args;
+      const id = personal as typeof PERSONAL;
       const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
-          'X-Footprint-Secret-Key': secretKey,
+          'X-Footprint-Secret-Key': secretKey as string,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           key: pbKey,
           bootstrap_data: {
             'document.custom.trust_document': '1',
-            'id.address_line1': '1 Hayes St',
-            'id.address_line2': 'Ap 201',
-            'id.city': 'San Francisco',
-            'id.country': 'US',
-            'id.dob': '01/04/1995',
-            'id.email': 'sandbox@onefootprint.com',
-            'id.first_name': 'Piip',
-            'id.last_name': 'Penguin',
-            'id.phone_number': '+15555550100',
-            'id.ssn9': '123-12-1234',
-            'id.state': 'CA',
-            'id.zip': '94117',
+            'id.address_line1': id.addressLine1,
+            'id.address_line2': id.addressLine2,
+            'id.city': id.city,
+            'id.country': id.country,
+            'id.dob': id.dob,
+            'id.email': id.email,
+            'id.first_name': id.firstName,
+            'id.last_name': id.lastName,
+            'id.phone_number': `+${id.phone}`,
+            'id.ssn9': id.ssn,
+            'id.state': id.state,
+            'id.zip': id.zipCode,
           },
         }),
       });
@@ -58,7 +53,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey, backendUrl],
+    [fpSKey, pbKey, backendUrl, PERSONAL],
   );
 
   expect(session).toHaveProperty('token');
@@ -78,10 +73,8 @@ test('KYB pbtok_ session with id.xxx #ci', async ({ page, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -96,20 +89,20 @@ test('KYB pbtok_ session with id.xxx #ci', async ({ page, isMobile }) => {
   await page.waitForLoadState();
 
   await fillBasicDataKYB(frame, {
-    businessName,
-    businessNameOptional,
-    userTIN: businessTin,
+    businessName: BUSINESS.name,
+    businessNameOptional: BUSINESS.as,
+    userTIN: BUSINESS.tin,
   });
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await fillAddressKYB(
     { frame, page },
-    { addressLine1: businessAddressLine1, city: businessCity, zipCode: businessZipCode },
+    { addressLine1: BUSINESS.addressLine1, city: BUSINESS.city, zipCode: BUSINESS.zipCode },
   );
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  expect(await frame.getByLabel('First name').first().inputValue()).toBe('Piip');
-  expect(await frame.getByLabel('Last name').first().inputValue()).toBe('Penguin');
+  await expect(frame.getByText(PERSONAL.firstName).first()).toBeAttached();
+  await expect(frame.getByText(PERSONAL.lastName).first()).toBeAttached();
 });

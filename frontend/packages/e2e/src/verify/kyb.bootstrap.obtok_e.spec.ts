@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 
 import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from '../utils/commands';
+import { BUSINESS, PERSONAL } from '../utils/constants';
 
 const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const pbKey = process.env.E2E_OB_KYB_KYCED_BO || 'pb_test_eWuI7QxglTuuVclccyfAk4'; // KYC all BOs
-const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
+const pbKey = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
+const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
   test.slow();
@@ -13,45 +14,49 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   // Create a session
   const session = await page.evaluate(
-    async ([secretKey, pbKey, backendUrl]) => {
+    async ([secretKey, pbKey, backendUrl, personal, business]) => {
+      const id = personal as typeof PERSONAL;
+      const biz = business as typeof BUSINESS;
       const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
-          'X-Footprint-Secret-Key': secretKey,
+          'X-Footprint-Secret-Key': secretKey as string,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           key: pbKey,
           bootstrap_data: {
-            'business.address_line1': '1 Infinite Way',
-            'business.city': 'Cupertino',
-            'business.country': 'US',
-            'business.name': 'PrintFoot',
+            'business.address_line1': biz.addressLine1,
+            'business.address_line2': biz.addressLine2,
+            'business.city': biz.city,
+            'business.country': biz.country,
+            'business.name': biz.name,
+            'business.state': biz.state,
+            'business.tin': biz.tin,
+            'business.zip': biz.zipCode,
+
             'business.primary_owner_stake': 73,
-            'business.state': 'CA',
-            'business.tin': '12-1212121',
-            'business.zip': '12121',
             'business.secondary_owners': [
               {
-                first_name: 'Bob',
-                last_name: 'Boberto',
+                first_name: biz.bo2Name,
+                last_name: biz.bo2LastName,
                 ownership_stake: 27,
-                phone_number: '+15555550100',
-                email: 'bob@onefootprint.com',
+                phone_number: `+${biz.bo2Phone}`,
+                email: biz.bo2Email,
               },
             ],
 
-            'id.address_line1': '2 Penguin way',
-            'id.city': 'Boston',
-            'id.country': 'US',
-            'id.dob': '2000-04-12',
-            'id.email': 'alex@onefootprint.com',
-            'id.first_name': 'Alex',
-            'id.last_name': 'Anderson',
-            'id.phone_number': '+15555550100',
-            'id.ssn9': '121212121',
-            'id.state': 'MA',
-            'id.zip': '02446',
+            'id.address_line1': id.addressLine1,
+            'id.city': id.city,
+            'id.country': id.country,
+            'id.dob': id.dob,
+            'id.email': id.email,
+            'id.first_name': id.firstName,
+            'id.last_name': id.lastName,
+            'id.phone_number': `+${id.phone}`,
+            'id.ssn9': id.ssn9,
+            'id.state': id.state,
+            'id.zip': id.zipCode,
           },
         }),
       });
@@ -59,7 +64,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey, backendUrl],
+    [fpSKey, pbKey, backendUrl, PERSONAL, BUSINESS],
   );
 
   expect(session).toHaveProperty('token');
@@ -82,10 +87,8 @@ test('KYB pbtok_ happy path #ci', async ({ page, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
-    timeout,
-  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
   await selectOutcomeOptional(frame, 'Success');
   await clickOnContinue(frame);
@@ -104,19 +107,20 @@ test('KYB pbtok_ happy path #ci', async ({ page, isMobile }) => {
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 
-  await expect(frame.getByText('PrintFoot').first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.name).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.addressLine1).first()).toBeAttached();
+  await expect(
+    frame.getByText(`${BUSINESS.city}, ${BUSINESS.state}, ${BUSINESS.zipCode}, ${BUSINESS.country}`).first(),
+  ).toBeAttached();
 
-  await expect(frame.getByText('1 Infinite Way').first()).toBeAttached();
-  await expect(frame.getByText('Cupertino, CA, 12121, US').first()).toBeAttached();
-
-  await expect(frame.getByText('Alex').first()).toBeAttached();
-  await expect(frame.getByText('Anderson').first()).toBeAttached();
+  await expect(frame.getByText(PERSONAL.firstName).first()).toBeAttached();
+  await expect(frame.getByText(PERSONAL.lastName).first()).toBeAttached();
   await expect(frame.getByText('73%').first()).toBeAttached();
 
-  await expect(frame.getByText('Bob').first()).toBeAttached();
-  await expect(frame.getByText('Boberto').first()).toBeAttached();
-  await expect(frame.getByText('bob@onefootprint.com').first()).toBeAttached();
-  await expect(frame.getByText('+15555550100').first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.bo2Name).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.bo2LastName).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.bo2Email).first()).toBeAttached();
+  await expect(frame.getByText(`+${BUSINESS.bo2Phone}`).first()).toBeAttached();
   await expect(frame.getByText('27%').first()).toBeAttached();
 
   await clickOnContinue(frame);

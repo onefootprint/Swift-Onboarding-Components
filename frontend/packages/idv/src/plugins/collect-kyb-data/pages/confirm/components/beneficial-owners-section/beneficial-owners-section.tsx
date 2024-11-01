@@ -57,7 +57,7 @@ const BeneficialOwnersSection = () => {
           items.push({ text: t('beneficial-owners.phone-number'), subtext: phoneNumber });
         }
       }
-      items.push({ text: t('beneficial-owners.ownership-stake'), subtext: `${ownershipStake}%` });
+      items.push({ text: t('beneficial-owners.ownership-stake'), subtext: `${ownershipStake || 0}%` });
 
       return {
         title: isPrimary ? t('beneficial-owners.beneficial-owner-you') : t('beneficial-owners.beneficial-owner'),
