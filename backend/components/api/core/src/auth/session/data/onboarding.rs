@@ -33,6 +33,8 @@ pub struct OnboardingSessionTrustedMetadata {
     pub business_external_id: Option<ExternalId>,
 }
 
+// TODO: this is smelling like it could be consolidated with either user tokens or onboarding
+// session tokens
 /// A business-owner specific session. This is issued when sending out links to each owner of a
 /// business in order to allow each BO to fill out the
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]

@@ -4,6 +4,7 @@ use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
 use api_core::errors::ValidationError;
+use api_core::utils::vault_wrapper::BusinessOwnerInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_errors::BadRequestWithCode;
 use api_errors::FpErrorCode;
@@ -71,6 +72,15 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
             .clone(),
     };
 
+    // One day, we may support more sensitive data for secondary BOs, so filter down to only what we
+    // need to bootstrap the identify flow
+    // If we start to have, for ex, ssn here, we should bootstrap the data into the newly created vault
+    // via the backend
+    let invited_data = (invited_bo.data)
+        .into_iter()
+        .filter(|(di, _)| BusinessOwnerInfo::USER_DIS.contains(di))
+        .collect();
+
     let business_name = bvw
         .get_p_data(&BDK::Name.into())
         .ok_or(ValidationError("No business name"))?;
@@ -78,6 +88,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
         name: business_name.clone(),
         inviter,
         invited,
+        invited_data,
     };
     Ok(result)
 }

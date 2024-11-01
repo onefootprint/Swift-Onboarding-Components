@@ -16,6 +16,8 @@ from tests.utils import (
 )
 from tests.bifrost_client import BifrostClient
 
+BO_DIS = ["id.first_name", "id.last_name", "id.email", "id.phone_number"]
+
 
 @pytest.fixture(scope="session")
 def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, kyb_cdos):
@@ -92,9 +94,8 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
     assert body["invited"]["email"] == secondary_bos[0]["id.email"]
-    assert body["invited"]["phone_number"] == secondary_bos[0][
-        "id.phone_number"
-    ].replace(" ", "")
+    for di in BO_DIS:
+        assert body["invited_data"][di] == secondary_bos[0][di]
 
     # Send the secondary BO through KYC
     bifrost = BifrostClient.new_user(

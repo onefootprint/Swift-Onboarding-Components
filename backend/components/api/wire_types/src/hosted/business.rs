@@ -7,7 +7,10 @@ pub struct HostedBusinessDetail {
     pub name: PiiString,
     pub inviter: Inviter,
     pub invited: Invited,
+    /// The basic data provided for the user accepting this invitation.
+    pub invited_data: ModernUserDecryptResponse,
 }
+
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct HostedBusiness {
