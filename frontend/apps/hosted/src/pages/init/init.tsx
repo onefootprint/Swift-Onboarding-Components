@@ -1,6 +1,5 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { Logger, getLogger, trackAction, useBusiness, useGetOnboardingConfig } from '@onefootprint/idv';
-import { getErrorMessage, useRequestError } from '@onefootprint/request';
+import { getErrorMessage } from '@onefootprint/request';
 import { Shimmer, Stack, media } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
@@ -31,10 +30,8 @@ const setupLogger = (config: PublicOnboardingConfig) => {
 const Init = () => {
   const [state, send] = useHostedMachine();
   const { obConfigAuth, authToken } = state.context;
-  const showRequestError = useRequestErrorToast();
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
-  const { getErrorCode } = useRequestError();
 
   const queryGetBusiness = useBusiness({ obConfigAuth });
   const isGetBusinessLoading = queryGetBusiness.isFetching && queryGetBusiness.isPending;
@@ -58,7 +55,7 @@ const Init = () => {
     },
     onError: (err: string) => {
       logError('Error parsing URL', err);
-      send({ type: 'invalidUrlReceived' });
+      send({ type: 'errorReceived', payload: { error: err } });
     },
   });
 
@@ -76,13 +73,7 @@ const Init = () => {
         logError(`Fetching onboarding config: ${getErrorMessage(configError)}`, configError);
       }
 
-      if (getErrorCode(error) === 'E118') {
-        send({ type: 'expired' });
-      } else {
-        send({ type: 'invalidUrlReceived' });
-      }
-
-      showRequestError(error);
+      send({ type: 'errorReceived', payload: { error } });
       return;
     }
 

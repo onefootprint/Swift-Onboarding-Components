@@ -8,10 +8,9 @@ import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 import Layout from '../components/layout';
 import Complete from './complete';
-import Expired from './expired';
+import ErrorPage from './error-page';
 import Init from './init';
 import Intro from './intro';
-import InvalidUrl from './invalid-url';
 
 type RootProps = { variant?: FootprintVariant };
 
@@ -37,8 +36,7 @@ const Root = ({ variant }: RootProps) => {
       >
         {state.matches('init') ? <Init /> : null}
         {state.matches('intro') ? <Intro /> : null}
-        {state.matches('expired') ? <Expired /> : null}
-        {state.matches('invalidUrl') ? <InvalidUrl /> : null}
+        {state.matches('error') ? <ErrorPage /> : null}
         {state.matches('idv') ? (
           <Idv
             bootstrapData={{

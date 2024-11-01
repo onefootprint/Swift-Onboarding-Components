@@ -17,9 +17,6 @@ export const createHostedMachine = () =>
       initial: 'init',
       context: {},
       on: {
-        expired: {
-          target: 'expired',
-        },
         reset: {
           target: 'init',
           actions: ['resetContext'],
@@ -28,11 +25,9 @@ export const createHostedMachine = () =>
       states: {
         init: {
           on: {
-            invalidUrlReceived: {
-              target: 'invalidUrl',
-            },
-            expired: {
-              target: 'expired',
+            errorReceived: {
+              target: 'error',
+              actions: ['assignError'],
             },
             initContextUpdated: [
               {
@@ -51,7 +46,9 @@ export const createHostedMachine = () =>
             introductionCompleted: { target: 'idv' },
           },
         },
-        expired: {
+        idv: { on: { idvCompleted: { target: 'complete' } } },
+        complete: { type: 'final' },
+        error: {
           on: {
             reset: {
               target: 'init',
@@ -59,14 +56,12 @@ export const createHostedMachine = () =>
             },
           },
         },
-        idv: { on: { idvCompleted: { target: 'complete' } } },
-        complete: { type: 'final' },
-        invalidUrl: { type: 'final' },
       },
     },
     {
       actions: {
         resetContext: assign(() => ({})),
+        assignError: assign((context, event) => ({ ...context, error: event.payload.error })),
         assignInitContext: assign((context, event) => {
           const { obConfigAuth, businessBoKycData, onboardingConfig, authToken, urlType } = event.payload;
           context.obConfigAuth = obConfigAuth !== undefined ? obConfigAuth : context.obConfigAuth;

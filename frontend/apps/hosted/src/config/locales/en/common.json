@@ -57,18 +57,20 @@
       },
       "cta": "Verify your identity"
     },
-    "invalid-url": {
-      "title": "The link you opened is invalid",
-      "subtitle": "Please contact the business that sent you this link."
+    "error-page": {
+      "generic": {
+        "title": "The link you opened is invalid",
+        "subtitle": "Please contact the business that sent you this link."
+      },
+      "expired": {
+        "title": "Session expired",
+        "subtitle": "For security reasons, this session has timed out. Please request a new link.",
+        "cta": "Restart"
+      }
     },
     "complete": {
       "title": "Your submission is complete!",
       "subtitle": "Thanks for using Footprint."
-    },
-    "expired": {
-      "title": "Session expired",
-      "subtitle": "For security reasons, this session has timed out the flow or refresh the page.",
-      "cta": "Restart"
     }
   }
 }

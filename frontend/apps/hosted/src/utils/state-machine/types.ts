@@ -6,12 +6,12 @@ export type MachineContext = {
   businessBoKycData?: BusinessBoKycData;
   onboardingConfig?: PublicOnboardingConfig;
   urlType?: HostedUrlType;
+  error?: unknown;
 };
 
 export type MachineEvents =
   | { type: 'reset' }
-  | { type: 'invalidUrlReceived' }
-  | { type: 'expired' }
+  | { type: 'errorReceived'; payload: { error: unknown } }
   | {
       type: 'initContextUpdated';
       payload: {

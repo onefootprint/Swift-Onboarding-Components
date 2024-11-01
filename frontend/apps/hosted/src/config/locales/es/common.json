@@ -57,18 +57,20 @@
       },
       "cta": "Verificar tu identidad"
     },
-    "invalid-url": {
-      "title": "El enlace no es válido",
-      "subtitle": "Por favor, contacta a la empresa que te lo envió e inténtalo de nuevo."
+    "error-page": {
+      "generic": {
+        "title": "El enlace no es válido",
+        "subtitle": "Por favor, contacta a la empresa que te lo envió e inténtalo de nuevo."
+      },
+      "expired": {
+        "title": "Sesión expirada",
+        "subtitle": "Por razones de seguridad, esta sesión ha caducado. Por favor, solicita un nuevo enlace.",
+        "cta": "Reiniciar"
+      }
     },
     "complete": {
       "title": "¡Enviado con éxito!",
       "subtitle": "Gracias por usar Footprint."
-    },
-    "expired": {
-      "title": "Sesión expirada",
-      "subtitle": "Por razones de seguridad, esta sesión ha caducado, actualiza la página y vuelve a ingresar.",
-      "cta": "Reiniciar"
     }
   }
 }
