@@ -1,21 +1,22 @@
 import { IcoArrowTopRight16 } from '@onefootprint/icons';
-import type { DecryptUserDataDetail } from '@onefootprint/types';
+import type { DataIdentifier, DecryptUserDataDetail } from '@onefootprint/types';
 import { LinkButton, Text, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import useDITranslation from 'src/hooks/use-di-translation';
 import FirstFieldsText from './components/first-fields';
 
 type DecryptUserDataProps = { detail: DecryptUserDataDetail };
 
 const DecryptUserData = ({ detail }: DecryptUserDataProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.decryption-event' });
-  const { t: allT } = useTranslation('common');
   const { decryptedFields, fpId } = detail.data;
+  const { translateDI } = useDITranslation();
 
   if (decryptedFields.length > 3) {
     const numRemainingFields = decryptedFields.length - 3;
     const remainingFieldsTranslated = decryptedFields
       .slice(3)
-      .map(field => allT(`di.${field}`))
+      .map(field => translateDI(field as DataIdentifier))
       .join('; ');
 
     return (

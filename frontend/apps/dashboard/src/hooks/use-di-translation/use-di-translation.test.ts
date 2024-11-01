@@ -1,6 +1,6 @@
 import { renderHook } from '@onefootprint/test-utils';
 import { BusinessDI, type DataIdentifier, DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
-import { useDITranslation } from './use-di-translation';
+import useDITranslation from './use-di-translation';
 
 describe('useDITranslation', () => {
   describe('ID DIs', () => {

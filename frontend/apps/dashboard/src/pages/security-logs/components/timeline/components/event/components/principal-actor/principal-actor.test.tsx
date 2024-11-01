@@ -21,9 +21,9 @@ describe('<PrincipalActor />', () => {
   });
 
   describe('when actor is Firm Employee', () => {
-    it('should show "A Footprint employee"', () => {
+    it('should show "Footprint"', () => {
       customRender(<PrincipalActor principal={firmEmployeeActorFixture} insightEvent={undefined} />);
-      const element = screen.getByText('A Footprint employee');
+      const element = screen.getByText('Footprint');
       expect(element).toBeInTheDocument();
     });
   });

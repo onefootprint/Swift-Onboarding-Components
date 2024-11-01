@@ -1,7 +1,7 @@
 import { BusinessDI, type DataIdentifier, DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
-export const useDITranslation = () => {
+const useDITranslation = () => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
 
   const translateDI = (di: DataIdentifier): string => {
@@ -112,3 +112,5 @@ export const useDITranslation = () => {
 
   return { translateDI };
 };
+
+export default useDITranslation;
