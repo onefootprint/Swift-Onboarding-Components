@@ -10,10 +10,8 @@ use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::DlSourceWithOverrides;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::Person;
-use api_core::utils::vault_wrapper::VwArgs;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
-use db::models::ob_configuration::ObConfiguration;
 use newtypes::put_data_request::ModernRawUserDataRequest;
 use newtypes::put_data_request::PatchDataRequest;
 use newtypes::DataLifetimeSource;
@@ -129,43 +127,10 @@ pub async fn patch(
             state
                 .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
                 .await?;
-        } else if address.is_us_including_territories() {
-            handle_ssn_skipped(&state, obc.clone(), sv_id.clone(), wf.id.clone()).await?
         }
     }
 
     Ok(api_wire_types::Empty)
-}
-
-// Handle the case where ssn is skipped, we by default request a document if not already requested
-async fn handle_ssn_skipped(
-    state: &State,
-    obc: ObConfiguration,
-    sv_id: ScopedVaultId,
-    workflow_id: WorkflowId,
-) -> FpResult<()> {
-    // bail early if not needed
-    let Some(doc_info) = obc.document_cdo_for_optional_ssn() else {
-        return Ok(());
-    };
-
-    state
-        .db_transaction(move |conn| -> FpResult<_> {
-            let vw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
-            let ssn_optional_and_missing = api_core::decision::features::user_input::ssn_optional_and_missing(&vw, &obc);
-
-            if ssn_optional_and_missing {
-                let doc_req_args = default_identity_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id, obc.document_types_and_countries.clone());
-
-                tracing::info!(scoped_vault_id=%sv_id, wf_id=%workflow_id, "creating doc request for ssn skipped");
-                DocumentRequest::get_or_create(conn, doc_req_args)?;
-            }
-
-            Ok(())
-        })
-        .await?;
-
-    Ok(())
 }
 
 fn default_identity_doc_args(

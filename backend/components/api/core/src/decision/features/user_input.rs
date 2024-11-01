@@ -124,9 +124,8 @@ pub fn user_input_based_risk_signals(
 ) -> Vec<FootprintReasonCode> {
     let mut frcs = Vec::<FootprintReasonCode>::new();
 
-    let ssn_optional_and_missing_and_no_doc_stepup =
-        ssn_optional_and_missing(vw, obc) && !obc.should_stepup_to_do_for_optional_ssn();
-    if ssn_optional_and_missing_and_no_doc_stepup {
+    let ssn_optional_and_missing = ssn_optional_and_missing(vw, obc);
+    if ssn_optional_and_missing {
         frcs.push(FootprintReasonCode::SsnNotProvided);
     }
 

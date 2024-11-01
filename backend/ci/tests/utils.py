@@ -354,7 +354,6 @@ def create_ob_config(
     allow_us_residents=True,
     allow_us_territories=False,
     international_country_restrictions=None,
-    doc_scan_for_optional_ssn=None,
     kind=None,
     override_auths=None,
     enhanced_aml=None,
@@ -388,7 +387,6 @@ def create_ob_config(
         "allow_us_residents": allow_us_residents,
         "allow_us_territories": allow_us_territories,
         "international_country_restrictions": international_country_restrictions,
-        "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
         "kind": kind,
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
@@ -429,8 +427,7 @@ def clean_up_user(phone_number, email):
 
 def get_requirement_from_requirements(kind, requirements, is_met=False):
     return next(
-        (r for r in requirements if r["kind"] == kind and r["is_met"] == is_met),
-        None
+        (r for r in requirements if r["kind"] == kind and r["is_met"] == is_met), None
     )
 
 

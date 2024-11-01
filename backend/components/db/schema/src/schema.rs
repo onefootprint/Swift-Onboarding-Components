@@ -783,7 +783,6 @@ diesel::table! {
         allow_international_residents -> Bool,
         international_country_restrictions -> Nullable<Array<Nullable<Text>>>,
         author -> Nullable<Jsonb>,
-        doc_scan_for_optional_ssn -> Nullable<Text>,
         enhanced_aml -> Jsonb,
         allow_us_residents -> Bool,
         allow_us_territory_residents -> Bool,

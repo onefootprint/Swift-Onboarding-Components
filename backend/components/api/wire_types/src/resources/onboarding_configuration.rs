@@ -39,7 +39,6 @@ pub struct OnboardingConfiguration {
     pub skip_kyc: bool,
     pub skip_kyb: bool,
     pub enhanced_aml: EnhancedAml,
-    pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
     pub kind: ObConfigurationKind,
     pub is_rules_enabled: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
@@ -75,8 +74,6 @@ pub struct PublicOnboardingConfiguration {
     pub is_app_clip_enabled: bool,
     pub is_instant_app_enabled: bool,
     pub app_clip_experience_id: AppClipExperienceId,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub doc_scan_required_if_ssn_skipped: Option<bool>,
 
     pub is_no_phone_flow: bool,
     pub skip_confirm: bool,

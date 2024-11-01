@@ -7,10 +7,10 @@ from tests.utils import create_ob_config
 
 
 @pytest.mark.parametrize(
-    "submit_ssn,step_up_to_doc",
-    [(True, False), (False, False), (False, True), (True, True)],
+    "submit_ssn",
+    [True, False],
 )
-def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
+def test_requirements(sandbox_tenant, submit_ssn):
     must_collect_data = ["full_address", "name", "email", "phone_number"]
     optional_data = ["ssn9"]
     can_access_data = must_collect_data + optional_data
@@ -20,11 +20,6 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
         must_collect_data,
         can_access_data,
         optional_data=optional_data,
-        doc_scan_for_optional_ssn=(
-            "document.passport,drivers_license,visa.none.none"
-            if step_up_to_doc
-            else None
-        ),
     )
     bifrost = BifrostClient.new_user(obc, override_ob_config_auth=None)
 
@@ -61,13 +56,7 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
     )
     # requirements should be empty
     assert collect_data_req is None
-
-    if step_up_to_doc and not submit_ssn:
-        assert set(
-            collect_doc_req["config"]["supported_country_and_doc_types"]["US"]
-        ) == set(["passport", "drivers_license", "visa"])
-    else:
-        assert collect_doc_req is None
+    assert collect_doc_req is None
 
     # get met_requirement and assert ssn in populated_attributes
     status = bifrost.get_status()
@@ -99,7 +88,7 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
     )
     reason_codes = [r["reason_code"] for r in risk_signals]
 
-    if submit_ssn or step_up_to_doc:
+    if submit_ssn:
         assert "ssn_not_provided" not in reason_codes
     else:
         assert "ssn_not_provided" in reason_codes

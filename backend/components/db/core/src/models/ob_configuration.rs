@@ -77,7 +77,6 @@ pub struct ObConfiguration {
     #[diesel(deserialize_as = OptionalNonNullVec<Iso3166TwoDigitCountryCode>)]
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
-    pub doc_scan_for_optional_ssn: Option<CDO>,
     enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
@@ -149,12 +148,9 @@ impl ObConfiguration {
         }
 
         // Otherwise old logic
-        let id_doc_kinds = if let Some(kinds) = self
-            .restricted_id_doc_kinds()
-            .or(self.optional_ssn_restricted_id_doc_kinds())
-        // we'll only ever have 1 of these, we prevent OBCs from being created with doc
-        // AND optional SSN doc stepup
-        {
+        // TODO: remove this once all obcs have been updated to use the new document_types_and_countries
+        // field
+        let id_doc_kinds = if let Some(kinds) = self.restricted_id_doc_kinds() {
             kinds
         } else {
             IdDocKind::iter().collect()
@@ -259,15 +255,6 @@ impl ObConfiguration {
 
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         self.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds())
-    }
-
-    pub fn optional_ssn_restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
-        self.document_cdo_for_optional_ssn()
-            .and_then(|cdo| cdo.restricted_id_doc_kinds())
-    }
-
-    pub fn should_stepup_to_do_for_optional_ssn(&self) -> bool {
-        self.document_cdo_for_optional_ssn().is_some()
     }
 
     pub fn enhanced_aml_for_test(&self) -> EnhancedAmlOption {
@@ -378,7 +365,6 @@ struct NewObConfiguration {
     allow_international_residents: bool,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     author: DbActor,
-    doc_scan_for_optional_ssn: Option<CDO>,
     enhanced_aml: EnhancedAmlOption,
     allow_us_residents: bool,
     allow_us_territory_residents: bool,
@@ -406,7 +392,6 @@ pub struct NewObConfigurationArgs {
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: DbActor,
-    pub doc_scan_for_optional_ssn: Option<CDO>,
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
@@ -628,7 +613,6 @@ impl ObConfiguration {
             allow_international_residents,
             international_country_restrictions,
             author,
-            doc_scan_for_optional_ssn,
             allow_us_residents,
             allow_us_territory_residents,
             kind,
@@ -657,7 +641,6 @@ impl ObConfiguration {
             allow_international_residents,
             international_country_restrictions,
             author,
-            doc_scan_for_optional_ssn,
             enhanced_aml,
             allow_us_residents,
             allow_us_territory_residents,
@@ -734,13 +717,6 @@ impl ObConfiguration {
                 _ => None,
             })
             .next()
-    }
-
-    pub fn document_cdo_for_optional_ssn(&self) -> Option<DocumentCdoInfo> {
-        self.doc_scan_for_optional_ssn.as_ref().and_then(|cdo| match cdo {
-            CDO::Document(doc_info) => Some(doc_info.clone()),
-            _ => None,
-        })
     }
 
     pub fn can_access_document(&self) -> bool {

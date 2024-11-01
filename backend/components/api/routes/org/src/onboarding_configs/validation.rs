@@ -126,36 +126,6 @@ impl ObConfigurationArgsToValidate {
 
         self.validate_countries()?;
 
-        // Optional ssn
-        if [CDO::Ssn4, CDO::Ssn9]
-            .iter()
-            .any(|ssn_cdo| optional_data.contains(ssn_cdo))
-        {
-            if is_collecting_doc && self.doc_scan_for_optional_ssn.is_some() {
-                return Err(TenantError::ValidationError(
-                    "Cannot specify doc_scan_for_optional_ssn if already collecting a document".to_owned(),
-                )
-                .into());
-            }
-
-            if self
-                .doc_scan_for_optional_ssn
-                .as_ref()
-                .map(|cdo| !matches!(cdo, CDO::Document(_)))
-                .unwrap_or(false)
-            {
-                return Err(TenantError::ValidationError(
-                    "doc_scan_for_optional_ssn must be a Document collected data option".to_owned(),
-                )
-                .into());
-            }
-        } else if self.doc_scan_for_optional_ssn.is_some() {
-            return Err(TenantError::ValidationError(
-                "Cannot specify doc_scan_for_optional_ssn if Ssn4 or Ssn9 is not optional".to_owned(),
-            )
-            .into());
-        }
-
         // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
         let must_collect = group_by_parent(self.must_collect_data.clone())?;
         let optional_data = group_by_parent(optional_data)?;

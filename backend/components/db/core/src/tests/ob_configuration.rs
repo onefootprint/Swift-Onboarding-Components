@@ -76,7 +76,6 @@ fn test_ob_config_international_countries(
         allow_international_residents: allow_international,
         international_country_restrictions,
         author: DbActor::Footprint,
-        doc_scan_for_optional_ssn: None,
         allow_us_residents,
         allow_us_territory_residents,
         kind: ObConfigurationKind::Kyc,
@@ -118,7 +117,6 @@ fn obc_with_doc_cdo(
         allow_international_residents: allow_international,
         international_country_restrictions,
         author: DbActor::Footprint,
-        doc_scan_for_optional_ssn: None,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -356,41 +354,6 @@ fn test_supported_country_mapping_allow_international(
         .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
 }
 
-#[db_test_case(Some("document.passport.none.none".to_string()) => Some(vec![IdDocKind::Passport]))]
-#[db_test_case(Some("document.passport,drivers_license.none.none".to_string()) => Some(vec![IdDocKind::Passport, IdDocKind::DriversLicense]))]
-#[db_test_case(None => None)]
-#[db_test_case(Some("full_address".to_string()) => None)] // obc will fail when getting created anyways
-fn test_doc_scan_for_optional_ssn(conn: &mut TestPgConn, cdo: Option<String>) -> Option<Vec<IdDocKind>> {
-    let args = NewObConfigurationArgs {
-        name: "obc".into(),
-        tenant_id: TenantId::from_str("t_1234").unwrap(),
-        is_live: true,
-        must_collect_data: vec![],
-        can_access_data: vec![],
-        cip_kind: None,
-        optional_data: vec![],
-        is_no_phone_flow: false,
-        is_doc_first: false,
-        allow_international_residents: false,
-        international_country_restrictions: None,
-        author: DbActor::Footprint,
-        doc_scan_for_optional_ssn: cdo.map(|c| (CollectedDataOption::from_str(c.as_str()).unwrap())),
-        allow_us_residents: true,
-        allow_us_territory_residents: false,
-        kind: ObConfigurationKind::Kyc,
-        skip_confirm: false,
-        document_types_and_countries: None,
-        documents_to_collect: vec![],
-        business_documents_to_collect: vec![],
-        verification_checks: VerificationChecks::default(),
-        required_auth_methods: None,
-        prompt_for_passkey: true,
-        allow_reonboard: false,
-    };
-    let obc = ObConfiguration::create(conn, args).unwrap();
-
-    obc.optional_ssn_restricted_id_doc_kinds()
-}
 
 #[db_test_case(None, None)]
 #[db_test_case(None, Some(Iso3166TwoDigitCountryCode::US))]
@@ -417,7 +380,6 @@ fn test_cip_kind_documents(
         allow_international_residents: false,
         international_country_restrictions: None,
         author: DbActor::Footprint,
-        doc_scan_for_optional_ssn: None,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -492,7 +454,6 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
         allow_international_residents: false,
         international_country_restrictions: None,
         author: DbActor::Footprint,
-        doc_scan_for_optional_ssn: None,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -541,7 +502,6 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
         allow_international_residents: false,
         international_country_restrictions: None,
         author: DbActor::Footprint,
-        doc_scan_for_optional_ssn: None,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,

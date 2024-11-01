@@ -186,10 +186,7 @@ pub fn default_rules_for_obc(
     }
 
     // If collection of a Doc is possible, then include Document related rules
-    if obc.document_cdo().is_some()
-        || obc.document_cdo_for_optional_ssn().is_some()
-        || matches!(obc.cip_kind, Some(CipKind::Alpaca))
-    {
+    if obc.document_cdo().is_some() || matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
         person_rules.append(&mut base_doc_rules(matches!(obc.cip_kind, Some(CipKind::Alpaca))));
     }
 
