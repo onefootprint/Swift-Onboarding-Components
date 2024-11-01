@@ -9,7 +9,6 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_errors::BadRequestWithCode;
 use api_errors::FpErrorCode;
 use api_wire_types::hosted::business::HostedBusinessDetail;
-use api_wire_types::hosted::business::Invited;
 use api_wire_types::hosted::business::Inviter;
 use db::errors::FpOptionalExtension;
 use db::models::business_workflow_link::BusinessWorkflowLink;
@@ -63,14 +62,6 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
         first_name,
         last_name,
     };
-    let invited = Invited {
-        email: (invited_bo.email())
-            .ok_or(ValidationError("Invited no email"))?
-            .clone(),
-        phone_number: (invited_bo.phone_number())
-            .ok_or(ValidationError("Invited no phone"))?
-            .clone(),
-    };
 
     // One day, we may support more sensitive data for secondary BOs, so filter down to only what we
     // need to bootstrap the identify flow
@@ -87,7 +78,6 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     let result = HostedBusinessDetail {
         name: business_name.clone(),
         inviter,
-        invited,
         invited_data,
     };
     Ok(result)

@@ -3301,22 +3301,6 @@
             "HostedBusinessDetail": {
                 "type": "object",
                 "properties": {
-                    "invited": {
-                        "description": "Information on the secondary BO that was pre-populated by the primary BO",
-                        "type": "object",
-                        "properties": {
-                            "email": {
-                                "type": "string"
-                            },
-                            "phone_number": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "email",
-                            "phone_number"
-                        ]
-                    },
                     "invited_data": {
                         "example": {
                             "id.first_name": "Jane",
@@ -4026,7 +4010,6 @@
                     }
                 },
                 "required": [
-                    "invited",
                     "invited_data",
                     "inviter",
                     "name"

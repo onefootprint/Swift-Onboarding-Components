@@ -93,7 +93,6 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config):
     assert body["name"] == business_name
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
-    assert body["invited"]["email"] == secondary_bos[0]["id.email"]
     for di in BO_DIS:
         assert body["invited_data"][di] == secondary_bos[0][di]
 
