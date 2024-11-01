@@ -50,8 +50,7 @@ pub async fn post(
                 .map(|wfr_id| WorkflowRequest::get(conn, wfr_id, &user_auth.scoped_user.id))
                 .transpose()?;
 
-            let force_create =
-                user_auth.data.metadata().allow_reonboard || user_auth.ob_config.allow_reonboard;
+            let force_create = user_auth.data.metadata.allow_reonboard || user_auth.ob_config.allow_reonboard;
             let common_args = CommonWfArgs {
                 obc: &user_auth.ob_config,
                 insight_event: Some(insight_event),
@@ -60,7 +59,7 @@ pub async fn post(
                 force_create,
                 su: &user_auth.scoped_user,
             };
-            let external_id = user_auth.data.metadata().business_external_id;
+            let external_id = user_auth.metadata.business_external_id.clone();
             let scoped_vault_action = match (external_id, inherit_business_id) {
                 (Some(external_id), None) => ScopedVaultAction::GetOrCreateExternalId(external_id),
                 (None, Some(inherit_id)) => ScopedVaultAction::InheritId(inherit_id),

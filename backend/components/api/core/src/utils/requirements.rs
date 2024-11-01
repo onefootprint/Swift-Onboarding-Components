@@ -123,7 +123,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let is_secondary_bo = user_auth.user_session.is_secondary_bo();
     let auth_events = user_auth.user_session.auth_events.clone();
     let person_workflow = user_auth.workflow.clone();
-    let has_business_external_id = user_auth.metadata().business_external_id.is_some();
+    let has_business_external_id = user_auth.metadata.business_external_id.is_some();
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {
             let ctx = RequirementContext {

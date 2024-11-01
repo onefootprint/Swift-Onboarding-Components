@@ -86,7 +86,7 @@ pub async fn post(
 
             // If this auth token allows reonboarding OR the playbook is opted into always allow reonboarding,
             // force create a new workflwo
-            let force_create = user_auth.data.metadata().allow_reonboard || ob_config.allow_reonboard;
+            let force_create = user_auth.data.metadata.allow_reonboard || ob_config.allow_reonboard;
             let common_args = CommonWfArgs {
                 obc: &obc,
                 insight_event: Some(insight_event),

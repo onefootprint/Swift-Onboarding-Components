@@ -54,11 +54,8 @@ pub struct UserSession {
     /// The list of DataIdentifiers whose knowledge has been proven during this session
     #[serde(default)]
     pub kba: Vec<DataIdentifier>,
-    /// When true, allows the user to make a Workflow for a playbook they've already started
-    /// onboarding onto
-    allow_reonboard: bool,
     #[serde(default)]
-    metadata: OnboardingSessionTrustedMetadata,
+    pub metadata: OnboardingSessionTrustedMetadata,
 }
 
 #[derive(Default)]
@@ -224,7 +221,6 @@ impl UserSession {
             scopes,
             auth_events,
             kba,
-            allow_reonboard: metadata.allow_reonboard,
             metadata,
         });
         Ok(session)
@@ -241,7 +237,7 @@ impl UserSession {
         let old = self.clone();
         // Merge context, scopes, and auth factors and create a new session with these merged fields
         let context = NewUserSessionContext {
-            metadata: new_ctx.metadata.or(Some(old.metadata())),
+            metadata: new_ctx.metadata.or(Some(old.metadata)),
             su_id: new_ctx.su_id.or(old.su_id),
             sb_id: new_ctx.sb_id.or(old.sb_id),
             bo_id: new_ctx.bo_id.or(old.bo_id),
@@ -271,7 +267,7 @@ impl UserSession {
         self.validate_not_derived_from_components()?;
         let old = self.clone();
         let context = NewUserSessionContext {
-            metadata: Some(old.metadata()),
+            metadata: Some(old.metadata),
             su_id: old.su_id,
             sb_id: old.sb_id,
             bo_id: old.bo_id,
@@ -334,19 +330,6 @@ impl UserSession {
         self.purposes
             .iter()
             .any(|p| matches!(p, TokenCreationPurpose::SecondaryBo))
-    }
-
-    pub fn metadata(&self) -> OnboardingSessionTrustedMetadata {
-        // TODO remove this after deprecating allow_reonboard
-        if self.allow_reonboard {
-            // Legacy token that doesn't have the metadata field
-            OnboardingSessionTrustedMetadata {
-                allow_reonboard: true,
-                ..Default::default()
-            }
-        } else {
-            self.metadata.clone()
-        }
     }
 }
 
