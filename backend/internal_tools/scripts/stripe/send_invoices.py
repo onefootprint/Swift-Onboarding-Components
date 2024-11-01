@@ -105,6 +105,9 @@ def print_invoice_comparison(invoice: stripe.Invoice):
             ),
             dollar_fmt(last_month_li.amount) if last_month_li else "-",
         ]
+        if line[1] == "-" and line[4] != "-":
+            # The quantity for this line item is 0, but it was non-zero last month
+            line[1] = colored(line[1], "red")
         if line[2] != "-" and line[2] != line[5]:
             # The price for this line item has changed since last month, highlight it
             line[2] = colored(line[2], "yellow")
