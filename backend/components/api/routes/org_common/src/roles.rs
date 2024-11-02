@@ -158,13 +158,29 @@ pub async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantOrPartnerTenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
+    let db_actor = auth.actor().clone();
 
     let result = state
-        .db_transaction(move |conn| TenantRole::deactivate(conn, &role_id, &authed_org_ident))
+        .db_transaction(move |conn| {
+            if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident.clone() {
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                let detail = AuditEventDetail::DeactivateOrgRole {
+                    tenant_role_id: role_id.clone(),
+                };
+                let audit_event = NewAuditEvent {
+                    principal_actor: db_actor.into(),
+                    insight_event_id,
+                    tenant_id,
+                    detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
+            TenantRole::deactivate(conn, &role_id, &authed_org_ident)
+        })
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);

@@ -460,6 +460,13 @@ def test_deactivate_role_and_user(sandbox_tenant, run_id):
     # And now we can deactivate it
     post(f"org/roles/{role_id}/deactivate", None, *sandbox_tenant.db_auths)
 
+    # Make sure we generated an audit event
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="deactivate_org_role",
+        tenant_role_id=role_id,
+    )
+
     # Make sure the deactivated user isn't displayed anymore
     body = get("org/members", dict(page_size=100), *sandbox_tenant.db_auths)
     assert user_id not in set(u["id"] for u in body["data"])

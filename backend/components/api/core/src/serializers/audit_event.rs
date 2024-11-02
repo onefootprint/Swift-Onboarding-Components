@@ -106,6 +106,12 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     .ok_or(AssertionError("tenant role is not available for this event"))?
                     .id,
             },
+            AuditEventMetadata::DeactivateOrgRole => {
+                let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
+                AuditEventDetail::DeactivateOrgRole {
+                    tenant_role_id: tr.id,
+                }
+            }
             AuditEventMetadata::UpdateOrgRole {
                 prev_scopes,
                 new_scopes,
@@ -139,7 +145,6 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook,
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
-            AuditEventMetadata::DeactivateOrgRole => AuditEventDetail::DeactivateOrgRole,
         };
 
         Ok(api_wire_types::AuditEvent {

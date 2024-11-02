@@ -88,6 +88,9 @@ pub enum AuditEventDetail {
         new_scopes: Vec<TenantScope>,
         tenant_role_id: TenantRoleId,
     },
+    DeactivateOrgRole {
+        tenant_role_id: TenantRoleId,
+    },
     CreateListEntry {
         is_live: bool,
         list_id: ListId,
@@ -102,7 +105,6 @@ pub enum AuditEventDetail {
     DisablePlaybook,
     ManuallyReviewEntity,
     EditPlaybook,
-    DeactivateOrgRole,
 }
 
 
@@ -287,11 +289,17 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
+            AuditEventDetail::DeactivateOrgRole { tenant_role_id } => Self {
+                metadata: AuditEventMetadata::DeactivateOrgRole,
+                args: AuditEventOptionalArgs {
+                    tenant_role_id: Some(tenant_role_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::CreatePlaybook => todo!(),
             AuditEventDetail::DisablePlaybook => todo!(),
             AuditEventDetail::EditPlaybook => todo!(),
             AuditEventDetail::ManuallyReviewEntity => todo!(),
-            AuditEventDetail::DeactivateOrgRole => todo!(),
         }
     }
 }

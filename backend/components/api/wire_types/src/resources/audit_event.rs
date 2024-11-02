@@ -105,5 +105,7 @@ pub enum AuditEventDetail {
     DisablePlaybook,
     ManuallyReviewEntity,
     EditPlaybook,
-    DeactivateOrgRole,
+    DeactivateOrgRole {
+        tenant_role_id: TenantRoleId,
+    },
 }
