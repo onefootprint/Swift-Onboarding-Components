@@ -78,7 +78,8 @@ export type UpdateOrgMemberDetail = AccessEventDetailWrapper<{
 }>;
 
 export type DeactivateOrgMemberDetail = AccessEventDetailWrapper<{
-  tenant_role_id: string;
+  tenantRoleId: string;
+  roleName: string;
 }>;
 
 export type CreatePlaybookDetail = AccessEventDetailWrapper<{}>;
@@ -89,7 +90,10 @@ export type EditPlaybookDetail = AccessEventDetailWrapper<{}>;
 
 export type ManuallyReviewedUserDetail = AccessEventDetailWrapper<{}>;
 
-export type DeactivateOrgRoleDetail = AccessEventDetailWrapper<{}>;
+export type DeactivateOrgRoleDetail = AccessEventDetailWrapper<{
+  roleName: string;
+  scopes: RoleScope[];
+}>;
 
 export type AccessEventDetailMap = {
   [AccessEventKind.CreateOrgRole]: CreateOrgRoleDetail;

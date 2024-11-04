@@ -70,7 +70,8 @@
       "created-a-new": "created a new",
       "edited-the": "edited the",
       "role": "role",
-      "role-permissions": "role permissions"
+      "role-permissions": "role permissions",
+      "deleted-the": "deleted the"
     },
     "body": {
       "decryption-reason": {

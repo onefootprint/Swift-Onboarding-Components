@@ -9,6 +9,7 @@ export {
   type CreateOrgApiKeyDetail,
   type DecryptOrgApiKeyDetail,
   type UpdateOrgRoleDetail,
+  type DeactivateOrgRoleDetail,
 } from './access-event';
 export type { AccessLog } from './access-log';
 export { AccessLogKind } from './access-log';

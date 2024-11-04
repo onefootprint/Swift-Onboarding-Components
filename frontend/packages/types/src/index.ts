@@ -316,6 +316,7 @@ export type {
   CustomDocumentUploadSettings,
   D2PMeta,
   DataIdentifier,
+  DeactivateOrgRoleDetail,
   DecryptedDocument,
   DecryptOrgApiKeyDetail,
   DecryptRoleScope,
