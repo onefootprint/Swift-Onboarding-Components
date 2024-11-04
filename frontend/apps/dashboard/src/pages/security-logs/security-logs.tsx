@@ -14,9 +14,17 @@ const SecurityLogs = () => {
     getAccessEvents.data?.pages.reduce<AccessEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
 
+  const accessEventsToShow = [
+    AccessEventKind.DecryptUserData,
+    // coming soon - keep in for dev
+    // AccessEventKind.CreateOrgRole,
+    // AccessEventKind.UpdateOrgRole,
+    // AccessEventKind.DeactivateOrgRole,
+  ];
+
   // NOTE: placeholder for now
   // include other events as we add UI support for them
-  const filteredAccessEvents = accessEvents.filter(accessEvent => accessEvent.name === AccessEventKind.DecryptUserData);
+  const filteredAccessEvents = accessEvents.filter(accessEvent => accessEventsToShow.includes(accessEvent.name));
 
   return (
     <>

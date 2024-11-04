@@ -4,6 +4,8 @@ import type { RoleScope } from './role';
 
 export enum AccessEventKind {
   CreateOrgRole = 'create_org_role',
+  DeactivateOrgRole = 'deactivate_org_role',
+  UpdateOrgRole = 'update_org_role',
   UpdateUserData = 'update_user_data',
   DeleteUserData = 'delete_user_data',
   DecryptUserData = 'decrypt_user_data',
@@ -19,7 +21,6 @@ export enum AccessEventKind {
   DisablePlaybook = 'disable_playbook',
   EditPlaybook = 'edit_playbook',
   ManuallyReviewedUser = 'manually_reviewed_entity',
-  DeactivateOrgRole = 'deactivate_org_role',
 }
 
 type AccessEventDetailWrapper<T> = {
@@ -28,8 +29,9 @@ type AccessEventDetailWrapper<T> = {
 };
 
 export type CreateOrgRoleDetail = AccessEventDetailWrapper<{
+  roleName: string;
   scopes: RoleScope[];
-  tenant_role_id: string;
+  tenantRoleId: string;
 }>;
 
 export type UpdateUserDataDetail = AccessEventDetailWrapper<{}>;
@@ -42,6 +44,11 @@ export type DecryptUserDataDetail = AccessEventDetailWrapper<{
   decryptedFields: string[];
 }>;
 
+export type UpdateOrgRoleDetail = AccessEventDetailWrapper<{
+  prevScopes: RoleScope[];
+  newScopes: RoleScope[];
+  tenantRoleId: string;
+}>;
 export type CreateUserAnnotationDetail = AccessEventDetailWrapper<{}>;
 
 export type CreateOrgApiKeyDetail = AccessEventDetailWrapper<{}>;
@@ -52,10 +59,10 @@ export type UpdateOrgApiKeyDetail = AccessEventDetailWrapper<{}>;
 
 export type InviteOrgMemberDetail = AccessEventDetailWrapper<{
   email: string;
-  tenant_role_name: string;
-  tenant_role_id: string;
-  first_name: string;
-  last_name: string;
+  tenantRoleName: string;
+  tenantRoleId: string;
+  firstName: string;
+  lastName: string;
   scopes: RoleScope[];
 }>;
 
@@ -96,6 +103,7 @@ export type AccessEventDetailMap = {
   [AccessEventKind.EditPlaybook]: EditPlaybookDetail;
   [AccessEventKind.ManuallyReviewedUser]: ManuallyReviewedUserDetail;
   [AccessEventKind.DeactivateOrgRole]: DeactivateOrgRoleDetail;
+  [AccessEventKind.UpdateOrgRole]: UpdateOrgRoleDetail;
 };
 
 export type AccessEvent<T extends AccessEventKind = AccessEventKind> = {
