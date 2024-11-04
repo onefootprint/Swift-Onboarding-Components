@@ -4,8 +4,6 @@ use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::NewRule;
 use db::models::rule_instance::RuleInstance;
 use db::TxnPgConn;
-use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::BooleanOperator;
 use newtypes::CipKind;
@@ -22,7 +20,6 @@ use newtypes::RuleExpressionCondition;
 use newtypes::RuleInstanceKind;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
-use std::sync::Arc;
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
     vec![
@@ -154,10 +151,7 @@ pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RA)> {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn default_rules_for_obc(
-    obc: &ObConfiguration,
-    ff_client: Option<Arc<dyn FeatureFlagClient>>,
-) -> Vec<(RuleExpression, RuleAction, RuleInstanceKind)> {
+pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction, RuleInstanceKind)> {
     let mut person_rules = vec![];
 
     // KYC
@@ -222,14 +216,6 @@ pub fn default_rules_for_obc(
     };
     aml_risk_signals.into_iter().for_each(|rs| {
         person_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
-
-        if ff_client
-            .clone()
-            .map(|ff| ff.flag(BoolFlag::StepUpOnAmlHit(&obc.key)))
-            .unwrap_or(false)
-        {
-            person_rules.push((if_risk_signal(rs), RA::identity_stepup()));
-        }
     });
 
     // KYB
@@ -261,11 +247,7 @@ pub fn default_rules_for_obc(
 }
 
 #[tracing::instrument(skip_all)]
-pub fn save_default_rules_for_obc(
-    conn: &mut TxnPgConn,
-    obc: &Locked<ObConfiguration>,
-    ff_client: Option<Arc<dyn FeatureFlagClient>>,
-) -> FpResult<()> {
+pub fn save_default_rules_for_obc(conn: &mut TxnPgConn, obc: &Locked<ObConfiguration>) -> FpResult<()> {
     let existing_rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, IncludeRules::All)?;
     if !existing_rules.is_empty() {
         tracing::warn!(
@@ -275,7 +257,7 @@ pub fn save_default_rules_for_obc(
         return Ok(());
     }
 
-    let rules = default_rules_for_obc(obc, ff_client);
+    let rules = default_rules_for_obc(obc);
     RuleInstance::bulk_create(
         conn,
         obc,
@@ -317,7 +299,6 @@ mod tests {
     use db::test_helpers::assert_have_same_elements;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use db::tests::prelude::*;
-    use db::tests::MockFFClient;
     use macros::db_test_case;
     use newtypes::AmlMatchKind;
     use newtypes::CountryRestriction;
@@ -357,7 +338,7 @@ mod tests {
 
         assert_have_same_elements(
             expected,
-            default_rules_for_obc(&obc, Some(MockFFClient::new().into_mock()))
+            default_rules_for_obc(&obc)
                 .into_iter()
                 .map(|(r, a, _)| (r, a))
                 .collect(),

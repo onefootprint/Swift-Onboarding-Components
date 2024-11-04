@@ -69,7 +69,7 @@ pub async fn create_user_and_onboarding(
             let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
             // TODO: need to rework our test utils so they use the same codepaths as our application logic to
             // create things like OBC's and such
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, None).unwrap();
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc).unwrap();
 
             let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);
             let su = su.into_inner();

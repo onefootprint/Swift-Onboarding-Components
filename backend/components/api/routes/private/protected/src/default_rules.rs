@@ -17,12 +17,11 @@ pub async fn add_default_rules(
     _: ProtectedAuth,
     path: web::Path<ObConfigurationId>,
 ) -> ApiResponse<api_wire_types::Empty> {
-    let ff_client = state.ff_client.clone();
     state
         .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, &path.into_inner())?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc)
         })
         .await?;
     Ok(api_wire_types::Empty)

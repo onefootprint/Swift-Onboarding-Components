@@ -199,12 +199,11 @@ pub async fn post(
     )
     .await?;
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, &tvc)?;
-    let ff_client = state.ff_client.clone();
     let (obc, actor, rs) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))

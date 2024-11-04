@@ -71,8 +71,6 @@ pub enum BoolFlag<'a> {
     RunAwsRekognition(&'a TenantId),
     #[strum(to_string = "CreateKycWorkflowForAlpacaOnboardings")]
     CreateKycWorkflowForAlpacaOnboardings(&'a ObConfigurationKey),
-    #[strum(to_string = "StepUpOnAmlHit")]
-    StepUpOnAmlHit(&'a ObConfigurationKey),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
     #[strum(to_string = "RequireCaptureOnStepUp")]
@@ -136,7 +134,6 @@ impl<'a> BoolFlag<'a> {
             Self::CanProvideThirdPartyAuth(k) => Some(k.to_string()),
             Self::RunAwsRekognition(k) => Some(k.to_string()),
             Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
-            Self::StepUpOnAmlHit(k) => Some(k.to_string()),
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::PreferWhatsapp(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
@@ -183,7 +180,6 @@ impl<'a> BoolFlag<'a> {
             Self::CanProvideThirdPartyAuth(_) => false,
             Self::RunAwsRekognition(_) => false,
             Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
-            Self::StepUpOnAmlHit(_) => false,
             Self::UseBackupTwilioCredentials(_) => false,
             Self::PreferWhatsapp(_) => false,
             Self::MakeLexisCall(_) => false,
@@ -236,7 +232,6 @@ impl<'a> BoolFlag<'a> {
             | Self::CanProvideThirdPartyAuth(_)
             | Self::RunAwsRekognition(_)
             | Self::CreateKycWorkflowForAlpacaOnboardings(_)
-            | Self::StepUpOnAmlHit(_)
             | Self::MakeLexisCall(_)
             | Self::RequireCaptureOnStepUp(_)
             | Self::UseKycWaterfallV2Rollout(_)
