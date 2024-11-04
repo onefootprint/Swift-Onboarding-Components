@@ -99,6 +99,7 @@
     "admin": "Everything",
     "decrypt_fields_one": "Decrypt {{field}}",
     "decrypt_fields_other": "Decrypt {{count}} fields",
+    "decrypt_data": "Decrypt data",
     "read": "Read-only",
     "onboarding_configuration": "Manage Playbooks",
     "api_keys": "Manage API keys",
