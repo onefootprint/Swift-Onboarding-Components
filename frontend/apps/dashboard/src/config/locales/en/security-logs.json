@@ -66,6 +66,9 @@
       "other-attribute": "other attribute",
       "other-attributes": "other attributes"
     },
+    "roles": {
+      "role-permissions": "role permissions"
+    },
     "body": {
       "decryption-reason": {
         "aria-label": "Decryption reason body",
