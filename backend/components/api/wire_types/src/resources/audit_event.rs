@@ -85,6 +85,7 @@ pub enum AuditEventDetail {
     CreateOrg,
     UpdateOrgSettings,
     CreateOrgRole {
+        role_name: String,
         scopes: Vec<TenantScope>,
         tenant_role_id: TenantRoleId,
     },

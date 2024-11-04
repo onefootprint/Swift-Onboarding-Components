@@ -100,12 +100,14 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             AuditEventMetadata::RemoveOrgMember => AuditEventDetail::RemoveOrgMember,
             AuditEventMetadata::CreateOrg => AuditEventDetail::CreateOrg,
             AuditEventMetadata::UpdateOrgSettings => AuditEventDetail::UpdateOrgSettings,
-            AuditEventMetadata::CreateOrgRole { scopes } => AuditEventDetail::CreateOrgRole {
-                scopes,
-                tenant_role_id: tenant_role2
-                    .ok_or(AssertionError("tenant role is not available for this event"))?
-                    .id,
-            },
+            AuditEventMetadata::CreateOrgRole { scopes } => {
+                let tr = tenant_role2.ok_or(AssertionError("tenant role is not available for this event"))?;
+                AuditEventDetail::CreateOrgRole {
+                    role_name: tr.name,
+                    scopes,
+                    tenant_role_id: tr.id,
+                }
+            }
             AuditEventMetadata::DeactivateOrgRole => {
                 let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
                 AuditEventDetail::DeactivateOrgRole {
