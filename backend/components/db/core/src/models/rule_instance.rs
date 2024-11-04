@@ -88,7 +88,6 @@ pub struct NewRule {
     pub action: RuleAction,
     pub rule_action: RuleActionConfig,
     pub name: Option<String>,
-    pub kind: RuleInstanceKind,
     pub is_shadow: bool,
 }
 
@@ -99,7 +98,6 @@ pub struct RuleInstanceUpdate {
     rule_expression: Option<RuleExpression>,
     is_shadow: Option<bool>, // TODO: remove, we don't actually use this currently
     deactivate: bool,
-    kind: Option<RuleInstanceKind>,
 }
 
 impl RuleInstanceUpdate {
@@ -108,7 +106,6 @@ impl RuleInstanceUpdate {
         name: Option<Option<String>>,
         rule_expression: Option<RuleExpression>,
         is_shadow: Option<bool>,
-        kind: Option<RuleInstanceKind>,
     ) -> Self {
         Self {
             rule_id,
@@ -116,7 +113,6 @@ impl RuleInstanceUpdate {
             rule_expression,
             is_shadow,
             deactivate: false,
-            kind,
         }
     }
 
@@ -127,7 +123,6 @@ impl RuleInstanceUpdate {
             rule_expression: None,
             is_shadow: None,
             deactivate: true,
-            kind: None,
         }
     }
 }
@@ -215,13 +210,13 @@ impl RuleInstance {
                 ob_configuration_id: &obc.id,
                 actor,
                 name: r.name,
+                kind: r.rule_expression.kind(),
                 rule_expression: r.rule_expression,
                 rule_action: r.rule_action,
                 action: r.action,
                 is_shadow: false,
                 deactivated_at: None,
                 deactivated_seqno: None,
-                kind: r.kind,
             })
             .collect();
 
@@ -266,22 +261,28 @@ impl RuleInstance {
         // create new RuleInstance's for each update (both edits + deletes)
         let new_rule_instances = existing_with_update
             .into_iter()
-            .map(|(existing, update)| NewRuleInstance {
-                created_at: now,
-                created_seqno: seqno,
-                rule_id: update.rule_id.clone(),
-                ob_configuration_id: &obc.id,
-                actor,
-                name: update.name.unwrap_or(existing.name),
-                rule_expression: update.rule_expression.unwrap_or(existing.rule_expression),
-                action: existing.action,
-                rule_action: existing.rule_action,
-                is_shadow: update.is_shadow.unwrap_or(existing.is_shadow),
-                deactivated_at: update.deactivate.then_some(now),
-                deactivated_seqno: update.deactivate.then_some(seqno), /* when we delete rules, we write a
-                                                                        * new rule_instance row which has
-                                                                        * deactivated_seqno set, */
-                kind: update.kind.unwrap_or(existing.kind),
+            .map(|(existing, update)| {
+                let re = update.rule_expression.unwrap_or(existing.rule_expression);
+                let kind = re.kind();
+                NewRuleInstance {
+                    created_at: now,
+                    created_seqno: seqno,
+                    rule_id: update.rule_id.clone(),
+                    ob_configuration_id: &obc.id,
+                    actor,
+                    name: update.name.unwrap_or(existing.name),
+                    rule_expression: re,
+                    action: existing.action,
+                    rule_action: existing.rule_action,
+                    is_shadow: update.is_shadow.unwrap_or(existing.is_shadow),
+                    deactivated_at: update.deactivate.then_some(now),
+                    deactivated_seqno: update.deactivate.then_some(seqno), /* when we delete rules, we
+                                                                            * write a
+                                                                            * new rule_instance row which
+                                                                            * has
+                                                                            * deactivated_seqno set, */
+                    kind,
+                }
             })
             .collect_vec();
 
@@ -475,7 +476,6 @@ mod tests {
             rule_expression: expression.clone(),
             action,
             rule_action: action.to_rule_action(),
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
@@ -513,7 +513,6 @@ mod tests {
             action: r1_a,
             rule_action: r1_a.to_rule_action(),
             name: None,
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         let r2_a = RuleAction::Fail;
@@ -526,7 +525,6 @@ mod tests {
             action: r2_a,
             rule_action: r2_a.to_rule_action(),
             name: None,
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
 
@@ -540,7 +538,6 @@ mod tests {
             action: r3_a,
             rule_action: r3_a.to_rule_action(),
             name: None,
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
 
@@ -585,7 +582,6 @@ mod tests {
             action: r1_a,
             rule_action: r1_a.to_rule_action(),
             name: None,
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         // r2 references list2
@@ -608,7 +604,6 @@ mod tests {
             action: r2_a,
             rule_action: r2_a.to_rule_action(),
             name: None,
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         // r3 references no list
@@ -622,7 +617,6 @@ mod tests {
             action: r3_a,
             rule_action: r3_a.to_rule_action(),
             name: None,
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
 
@@ -653,7 +647,6 @@ mod tests {
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: RuleAction::Fail,
             rule_action: RuleAction::Fail.to_rule_action(),
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
@@ -674,7 +667,6 @@ mod tests {
             rule_expression: Some(tests::fixtures::rule::example_rule_expression()),
             is_shadow: Some(false),
             deactivate: false,
-            kind: None,
         };
         let updated_rule = RuleInstance::bulk_edit(
             conn,
@@ -738,7 +730,6 @@ mod tests {
                         action: RuleAction::Fail,
                         rule_action: RuleAction::Fail.to_rule_action(),
                         name: None,
-                        kind: RuleInstanceKind::Person,
                         is_shadow: false,
                     })
                     .collect(),
@@ -776,7 +767,6 @@ mod tests {
                         action: RuleAction::ManualReview,
                         rule_action: RuleAction::ManualReview.to_rule_action(),
                         name: None,
-                        kind: RuleInstanceKind::Person,
                         is_shadow: false,
                     })
                     .collect(),
@@ -787,14 +777,12 @@ mod tests {
                         None,
                         Some(tests::fixtures::rule::example_rule_expression2()),
                         None,
-                        None,
                     ),
                     // edit rule1
                     RuleInstanceUpdate::update(
                         rules[1].rule_id.clone(),
                         None,
                         Some(tests::fixtures::rule::example_rule_expression3()),
-                        None,
                         None,
                     ),
                     //delete rule2
@@ -872,7 +860,6 @@ mod tests {
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: r1_a,
             rule_action: r1_a.to_rule_action(),
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         let rule1 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule1])
@@ -889,7 +876,6 @@ mod tests {
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: r2_a,
             rule_action: r2_a.to_rule_action(),
-            kind: RuleInstanceKind::Person,
             is_shadow: false,
         };
         let rule2 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule2])

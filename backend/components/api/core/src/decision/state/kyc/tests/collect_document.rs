@@ -55,7 +55,6 @@ use newtypes::RiskSignalGroupKind;
 use newtypes::RuleAction;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
-use newtypes::RuleInstanceKind;
 use newtypes::Selfie;
 use newtypes::TenantId;
 use newtypes::VendorAPI;
@@ -114,7 +113,6 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
                     action,
                     rule_action: action.to_rule_action(),
                     name: None,
-                    kind: RuleInstanceKind::Person,
                     is_shadow: false,
                 };
                 RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])

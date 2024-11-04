@@ -316,7 +316,6 @@ mod tests {
     use newtypes::RuleAction as RA;
     use newtypes::RuleExpression as RE;
     use newtypes::RuleExpressionCondition as REC;
-    use newtypes::RuleInstanceKind;
     use newtypes::VendorAPI;
 
     #[db_test_case(vec![TRule(
@@ -389,7 +388,6 @@ mod tests {
                 action: r.1,
                 rule_action: r.1.to_rule_action(),
                 name: None,
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             })
             .collect_vec();

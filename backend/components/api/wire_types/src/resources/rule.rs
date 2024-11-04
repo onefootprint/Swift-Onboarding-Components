@@ -1,25 +1,14 @@
 use crate::*;
 use newtypes::FpId;
-use newtypes::ListId;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::RuleAction;
 use newtypes::RuleActionConfig;
 use newtypes::RuleExpression;
-use newtypes::RuleExpressionCondition;
 use newtypes::RuleId;
 use newtypes::RuleInstanceKind;
 use serde_with::SerializeDisplay;
 use std::collections::HashMap;
-
-#[derive(Debug, Clone, Deserialize, Eq, PartialEq, Apiv2Schema)]
-pub struct UnvalidatedRuleExpression(pub Vec<RuleExpressionCondition>);
-
-impl UnvalidatedRuleExpression {
-    pub fn list_ids(&self) -> Vec<ListId> {
-        self.0.iter().filter_map(|c| c.list_id().cloned()).collect()
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct Rule {

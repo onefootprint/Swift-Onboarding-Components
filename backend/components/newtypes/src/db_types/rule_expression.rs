@@ -1,14 +1,52 @@
+use super::RuleInstanceKind;
 use crate::DataIdentifier;
 use crate::DeviceInsightField;
 use crate::FootprintReasonCode;
 use crate::ListId;
 use crate::PiiString;
+use api_errors::AssertionError;
+use api_errors::FpResult;
+use api_errors::ValidationError;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
+
+#[derive(Debug, Clone, Deserialize, Eq, PartialEq, Apiv2Schema)]
+pub struct UnvalidatedRuleExpression(pub Vec<RuleExpressionCondition>);
+
+impl UnvalidatedRuleExpression {
+    pub fn list_ids(&self) -> Vec<ListId> {
+        self.0.iter().filter_map(|c| c.list_id().cloned()).collect()
+    }
+
+    pub fn validate(self: UnvalidatedRuleExpression) -> FpResult<RuleExpression> {
+        let rule_kinds = self.0.iter().map(|rc| rc.kind());
+        // make sure all rule expressions are about the same subject
+        let (person_rules, business_rules): (Vec<_>, Vec<_>) = rule_kinds
+            .clone()
+            .filter(|rik| !matches!(rik, RuleInstanceKind::Any)) // don't need to validate `Any rules`
+            .partition(|rik| matches!(rik, RuleInstanceKind::Person));
+
+        if !person_rules.is_empty() && !business_rules.is_empty() {
+            return ValidationError(
+                "Cannot make a rule expression that includes both Person and Business signals",
+            )
+            .into();
+        };
+
+
+        self.0
+            .iter()
+            .map(|c| c.kind())
+            .min()
+            .ok_or(AssertionError("unable to compute rule instance kind"))?;
+
+        Ok(RuleExpression(self.0))
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Apiv2Schema)]
 pub struct RuleExpression(pub Vec<RuleExpressionCondition>);
@@ -23,6 +61,15 @@ impl RuleExpression {
             .iter()
             .filter_map(|c| c.data_identifier().cloned())
             .collect()
+    }
+
+    // This has already been validated by UnvalidatedRuleExpression::validate
+    pub fn kind(&self) -> RuleInstanceKind {
+        self.0
+            .iter()
+            .map(|c| c.kind())
+            .min()
+            .unwrap_or(RuleInstanceKind::Any)
     }
 }
 
@@ -43,6 +90,36 @@ pub enum RuleExpressionCondition {
         op: NumberOperator,
         value: i64,
     },
+}
+
+impl RuleExpressionCondition {
+    pub fn kind(&self) -> RuleInstanceKind {
+        match self {
+            RuleExpressionCondition::RiskSignal { field, .. } => {
+                if field
+                    .scopes()
+                    .iter()
+                    .all(|s| !s.is_for_person() && s.is_for_kyb())
+                {
+                    RuleInstanceKind::Business
+                } else {
+                    RuleInstanceKind::Person
+                }
+            }
+            RuleExpressionCondition::VaultData(vault_data) => {
+                let field = match vault_data {
+                    VaultOperation::Equals { field, .. } => field,
+                    VaultOperation::IsIn { field, .. } => field,
+                };
+                match field {
+                    DataIdentifier::Business(_) => RuleInstanceKind::Business,
+                    _ => RuleInstanceKind::Person,
+                }
+            }
+            RuleExpressionCondition::RiskScore { .. } => RuleInstanceKind::Person, // todo!
+            RuleExpressionCondition::DeviceInsight(..) => RuleInstanceKind::Any,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]

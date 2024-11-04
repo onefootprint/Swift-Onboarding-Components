@@ -293,7 +293,6 @@ mod tests {
     use newtypes::KycState;
     use newtypes::Locked;
     use newtypes::RiskSignalGroupKind;
-    use newtypes::RuleInstanceKind;
     use newtypes::VendorAPI;
     use newtypes::WorkflowState;
 
@@ -317,7 +316,6 @@ mod tests {
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
                 action,
                 rule_action: action.to_rule_action(),
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             },
             NewRule {
@@ -325,7 +323,6 @@ mod tests {
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
                 action,
                 rule_action: action.to_rule_action(),
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             },
             NewRule {
@@ -333,7 +330,6 @@ mod tests {
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
                 action,
                 rule_action: action.to_rule_action(),
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             },
         ];

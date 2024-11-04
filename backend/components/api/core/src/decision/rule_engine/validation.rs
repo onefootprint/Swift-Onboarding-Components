@@ -1,8 +1,6 @@
-use crate::errors::AssertionError;
 use crate::errors::ValidationError;
 use crate::FpResult;
 use api_wire_types::MultiUpdateRuleRequest;
-use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use db::models::rule_instance::MultiRuleUpdate;
 use db::models::rule_instance::NewRule;
@@ -26,6 +24,7 @@ use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
 use newtypes::RuleInstanceKind;
 use newtypes::TenantId;
+use newtypes::UnvalidatedRuleExpression;
 use newtypes::ValidateArgs;
 use newtypes::VaultOperation;
 use std::collections::HashMap;
@@ -93,12 +92,16 @@ pub fn validate_rule_expression(
     rule_expression: UnvalidatedRuleExpression,
     lists: &HashMap<ListId, List>,
     is_live: bool,
-) -> FpResult<(RuleExpression, RuleInstanceKind)> {
+) -> FpResult<RuleExpression> {
     for condition in rule_expression.0.iter() {
         match condition {
             RuleExpressionCondition::RiskSignal { .. } => {}
             RuleExpressionCondition::VaultData(vault_op) => match vault_op {
-                VaultOperation::Equals { field, op: _, value } => {
+                VaultOperation::Equals {
+                    ref field,
+                    op: _,
+                    value,
+                } => {
                     if !di_supports_equality_rules(field) {
                         return ValidationError(&format!(
                             "Vaulted field {} does not support equality rules",
@@ -117,7 +120,11 @@ pub fn validate_rule_expression(
                         &all_data,
                     )?;
                 }
-                VaultOperation::IsIn { field, op: _, value } => {
+                VaultOperation::IsIn {
+                    field,
+                    op: _,
+                    ref value,
+                } => {
                     let Some(list) = lists.get(value) else {
                         return ValidationError(&format!("List with ID {} not found", value)).into();
                     };
@@ -163,7 +170,11 @@ pub fn validate_rule_expression(
                 }
             },
             RuleExpressionCondition::DeviceInsight(insight_op) => match insight_op {
-                DeviceInsightOperation::IsIn { field, op: _, value } => {
+                DeviceInsightOperation::IsIn {
+                    field,
+                    op: _,
+                    ref value,
+                } => {
                     let Some(list) = lists.get(value) else {
                         return ValidationError(&format!("List with ID {} not found", value)).into();
                     };
@@ -197,30 +208,12 @@ pub fn validate_rule_expression(
         }
     }
 
-    let rule_kinds = rule_expression.0.iter().map(rule_instance_kind_from_condition);
-    // make sure all rule expressions are about the same subject
-    let (person_rules, business_rules): (Vec<_>, Vec<_>) = rule_kinds
-        .clone()
-        .filter(|rik| !matches!(rik, RuleInstanceKind::Any)) // don't need to validate `Any rules`
-        .partition(|rik| matches!(rik, RuleInstanceKind::Person));
+    let rule_expression = rule_expression.validate()?;
 
-    // TODO: add RIK type that can be combined with person OR business
-    if !person_rules.is_empty() && !business_rules.is_empty() {
-        return ValidationError(
-            "Cannot make a rule expression that includes both Person and Business signals",
-        )
-        .into();
-    };
-
-    // If a rule includes a Person condition AND an `Any` condition, consider it a Person rule only.
-    let rule_instance_kind = rule_kinds
-        .min()
-        .ok_or(AssertionError("unable to compute rule instance kind"))?;
-
-    Ok((RuleExpression(rule_expression.0), rule_instance_kind))
+    Ok(rule_expression)
 }
 
-// TODO: test
+// TODO: TEST compared to .kind
 pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) -> RuleInstanceKind {
     let is_business = match condition {
         RuleExpressionCondition::RiskSignal { field, .. } => field
@@ -276,8 +269,7 @@ pub fn validate_rules_request(
         .unwrap_or_default()
         .into_iter()
         .map(|r| -> FpResult<_> {
-            let (rule_expression, rule_instance_kind) =
-                validate_rule_expression(r.rule_expression, &lists, is_live)?;
+            let rule_expression = validate_rule_expression(r.rule_expression, &lists, is_live)?;
 
             let (action, rule_action) = match r.rule_action {
                 api_wire_types::RuleActionMigration::Legacy(rule_action) => {
@@ -289,7 +281,6 @@ pub fn validate_rules_request(
             };
             Ok(NewRule {
                 rule_expression,
-                kind: rule_instance_kind,
                 action,
                 rule_action,
                 name: r.name,
@@ -319,13 +310,12 @@ pub fn validate_rules_request(
         .unwrap_or_default()
         .into_iter()
         .map(|e| {
-            let (rule_expression, kind) = validate_rule_expression(e.rule_expression, &lists, is_live)?;
+            let rule_expression = validate_rule_expression(e.rule_expression, &lists, is_live)?;
             Ok(RuleInstanceUpdate::update(
                 e.rule_id,
                 None,
                 Some(rule_expression.clone()),
                 None,
-                Some(kind),
             ))
         })
         .collect::<FpResult<Vec<_>>>()?;
@@ -528,8 +518,8 @@ mod tests {
         let unvalidated = UnvalidatedRuleExpression(recs);
         let lists = HashMap::from_iter([(test_list_id(), test_list(ListKind::IpAddress))]);
 
-        let rule_instance_kind = validate_rule_expression(unvalidated, &lists, true).map(|(_, rik)| rik);
-        match (rule_instance_kind, expected_kind) {
+        let rule_expression = validate_rule_expression(unvalidated, &lists, true);
+        match (rule_expression.map(|re| re.kind()), expected_kind) {
             (Ok(rik), Ok(expected_rik)) => assert_eq!(rik, expected_rik),
             (Err(err), Err(expected_err)) => {
                 if err.to_string() != expected_err.to_string() {

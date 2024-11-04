@@ -24,7 +24,6 @@ use crate::State;
 use api_wire_types::CreateRule;
 use api_wire_types::MultiUpdateRuleRequest;
 use api_wire_types::RuleActionMigration;
-use api_wire_types::UnvalidatedRuleExpression;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::NewRule;
 use db::models::rule_instance::RuleInstance;
@@ -53,8 +52,8 @@ use newtypes::RuleAction;
 use newtypes::RuleActionConfig;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
-use newtypes::RuleInstanceKind;
 use newtypes::StepUpKind;
+use newtypes::UnvalidatedRuleExpression;
 use newtypes::WorkflowState;
 use std::str::FromStr;
 
@@ -344,7 +343,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 action,
                 rule_action: action.to_rule_action(),
                 name: None,
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             };
 
@@ -360,7 +358,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 action: poa_action,
                 rule_action: poa_action.to_rule_action(),
                 name: None,
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             };
 
@@ -374,7 +371,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 action: poa_review_action,
                 rule_action: poa_review_action.to_rule_action(),
                 name: None,
-                kind: RuleInstanceKind::Person,
                 is_shadow: false,
             };
 

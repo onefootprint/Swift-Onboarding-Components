@@ -2,6 +2,7 @@ use crate::*;
 use newtypes::RuleAction;
 use newtypes::RuleActionConfig;
 use newtypes::RuleId;
+use newtypes::UnvalidatedRuleExpression;
 
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

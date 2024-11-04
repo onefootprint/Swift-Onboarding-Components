@@ -17,7 +17,6 @@ use newtypes::RuleAction;
 use newtypes::RuleAction as RA;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
-use newtypes::RuleInstanceKind;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 
@@ -151,7 +150,7 @@ pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RA)> {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction, RuleInstanceKind)> {
+pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
     let mut person_rules = vec![];
 
     // KYC
@@ -225,9 +224,7 @@ pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, Rule
         base_kyb_rules(ein_only)
     } else {
         vec![]
-    }
-    .into_iter()
-    .map(|(r, a)| (r, a, RuleInstanceKind::Business));
+    };
 
     // TODO: fix rule instance kind in the future to not be pinned to person potentially
     let verification_check_rules = obc
@@ -235,12 +232,10 @@ pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, Rule
         .inner()
         .iter()
         .flat_map(default_verification_check_rules)
-        .map(|(re, ra)| (re, ra, RuleInstanceKind::Person))
         .collect_vec();
 
     person_rules
         .into_iter()
-        .map(|(r, a)| (r, a, RuleInstanceKind::Person))
         .chain(business_rules)
         .chain(verification_check_rules)
         .collect()
@@ -264,12 +259,11 @@ pub fn save_default_rules_for_obc(conn: &mut TxnPgConn, obc: &Locked<ObConfigura
         &DbActor::Footprint,
         rules
             .into_iter()
-            .map(|(e, a, kind)| NewRule {
+            .map(|(e, a)| NewRule {
                 rule_expression: e,
                 action: a,
                 rule_action: a.to_rule_action(),
                 name: None,
-                kind,
                 is_shadow: false,
             })
             .collect(),
@@ -336,12 +330,6 @@ mod tests {
         let t = tests::fixtures::tenant::create(conn);
         let obc = tests::fixtures::ob_configuration::create_with_opts(conn, &t.id, obc_opts);
 
-        assert_have_same_elements(
-            expected,
-            default_rules_for_obc(&obc)
-                .into_iter()
-                .map(|(r, a, _)| (r, a))
-                .collect(),
-        )
+        assert_have_same_elements(expected, default_rules_for_obc(&obc))
     }
 }

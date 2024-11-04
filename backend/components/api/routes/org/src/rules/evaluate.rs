@@ -34,7 +34,6 @@ use newtypes::ObConfigurationId;
 use newtypes::RuleAction;
 use newtypes::RuleExpression;
 use newtypes::RuleId;
-use newtypes::RuleInstanceKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -102,7 +101,7 @@ pub async fn evaluate_rule(
             .collect();
             let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
 
-            let adds: Vec<((RuleExpression, RuleInstanceKind), RuleAction)> = add
+            let adds: Vec<(RuleExpression, RuleAction)> = add
                 .into_iter()
                 .flatten()
                 .map(|rule| -> FpResult<_> {
@@ -121,7 +120,7 @@ pub async fn evaluate_rule(
                 })
                 .collect::<FpResult<_>>()?;
 
-            let edits: Vec<(RuleId, (RuleExpression, RuleInstanceKind))> = edit
+            let edits: Vec<(RuleId, RuleExpression)> = edit
                 .into_iter()
                 .flatten()
                 .map(|rule| -> FpResult<_> {
@@ -193,7 +192,7 @@ pub async fn evaluate_rule(
         let curr_rule = current_rules
             .remove(&edit_rule_id)
             .ok_or(AssertionError(&format!("Rule not found: {}", edit_rule_id)))?;
-        let (expression, _) = edit_rule_expression;
+        let expression = edit_rule_expression;
 
         edit_rules.push(Rule {
             expression,
@@ -202,7 +201,7 @@ pub async fn evaluate_rule(
     }
 
     // For every add, add that rule to the rules
-    let add_rules = adds.into_iter().map(|((rule_expression, _), rule_action)| Rule {
+    let add_rules = adds.into_iter().map(|(rule_expression, rule_action)| Rule {
         expression: rule_expression,
         action: rule_action,
     });

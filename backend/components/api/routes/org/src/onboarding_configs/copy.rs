@@ -15,7 +15,6 @@ use api_core::{
 use api_wire_types::CopyPlaybookRequest;
 use api_wire_types::CreateRule;
 use api_wire_types::MultiUpdateRuleRequest;
-use api_wire_types::UnvalidatedRuleExpression;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
@@ -26,6 +25,7 @@ use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
 use newtypes::TenantId;
+use newtypes::UnvalidatedRuleExpression;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
