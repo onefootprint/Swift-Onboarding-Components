@@ -34,7 +34,6 @@ def test_doc_first(sandbox_tenant, documents_and_countries):
             "document",
             "ssn9",
         ],
-        can_access_data=["phone_number", "full_address", "name", "email"],
         document_types_and_countries=documents_and_countries,
         is_doc_first_flow=True,
     )

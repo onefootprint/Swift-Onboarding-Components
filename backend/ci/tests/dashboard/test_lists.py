@@ -59,7 +59,7 @@ def test_create_no_permissions(sandbox_tenant):
     )
 
 
-def test_list(sandbox_tenant, must_collect_data, can_access_data):
+def test_list(sandbox_tenant, must_collect_data):
     nonce = _gen_random_str(15)
     post(
         f"/org/lists",
@@ -92,12 +92,8 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
     )
 
-    obc1 = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
-    obc2 = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
+    obc1 = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
+    obc2 = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
 
     # use list2 in a rule in obc1
     rule = dict(
@@ -185,7 +181,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     assert len(list["playbooks"]) == 0
 
 
-def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
+def test_list_type_di_match(sandbox_tenant, must_collect_data):
     # We should only be able to use lists in a rule expression with a field
     # that matches the list type.
 
@@ -222,9 +218,7 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
     )
 
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
 
     ssn_rule_expr = {
         "field": "id.email",
@@ -825,10 +819,8 @@ def test_delete_list_entries_no_permissions(sandbox_tenant):
     assert entries[0]["data"] == entry1[0]["data"]
 
 
-def test_rule_list_id_validation(sandbox_tenant, must_collect_data, can_access_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
+def test_rule_list_id_validation(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
 
     nonce = _gen_random_str(15)
     ssn9_list = post(

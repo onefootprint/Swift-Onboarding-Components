@@ -16,12 +16,7 @@ from tests.utils import (
 
 @pytest.fixture(scope="session")
 def obc(sandbox_tenant, must_collect_data):
-    return create_ob_config(
-        sandbox_tenant,
-        "Acme Bank Card",
-        must_collect_data,
-        must_collect_data,
-    )
+    return create_ob_config(sandbox_tenant, "Acme Bank Card", must_collect_data)
 
 
 def test_idempotency_id(tenant, sandbox_tenant):
@@ -246,7 +241,7 @@ def test_kyc_non_us_country_code(sandbox_tenant, obc):
     assert body["message"] == "Validation error: Cannot trigger KYC on non-US addresses"
 
 
-def test_kyc_missing_derypt_perms(sandbox_tenant):
+def test_kyc_missing_derypt_perms(sandbox_tenant, deprecated_missing_can_access_obc):
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
         "id.email": EMAIL,
@@ -257,7 +252,7 @@ def test_kyc_missing_derypt_perms(sandbox_tenant):
     fp_id = body["id"]
 
     # The default OBC has can access < must collect
-    data = dict(key=sandbox_tenant.default_ob_config.key.value)
+    data = dict(key=deprecated_missing_can_access_obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
         body["message"]

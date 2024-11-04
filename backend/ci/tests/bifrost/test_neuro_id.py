@@ -2,12 +2,11 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import get_requirement_from_requirements, create_ob_config, patch, get
 
 
-def test_get_neuro_id_id(sandbox_tenant, must_collect_data, can_access_data):
+def test_get_neuro_id_id(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant,
         "Restricted doc request config",
         must_collect_data,
-        can_access_data,
     )
 
     # 2 users going through bifrost

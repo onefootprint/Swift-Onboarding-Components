@@ -23,10 +23,7 @@ def test_metrics_for_playbook(sandbox_user, sandbox_tenant, must_collect_data):
 
     # No metrics for brand new playbook
     pb = create_ob_config(
-        sandbox_tenant,
-        "Test playbook for metrics",
-        must_collect_data,
-        must_collect_data,
+        sandbox_tenant, "Test playbook for metrics", must_collect_data
     )
     body = get("/org/metrics", dict(playbook_id=pb.id), *sandbox_tenant.db_auths)
     assert body["user"]["total_onboardings"] == 0

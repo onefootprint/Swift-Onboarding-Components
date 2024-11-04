@@ -16,7 +16,6 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data):
         sandbox_tenant,
         "Alpaca",
         must_collect_data,
-        can_access_data=must_collect_data,
         cip_kind="alpaca",
         enhanced_aml={
             "enhanced_aml": True,

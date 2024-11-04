@@ -7,7 +7,6 @@ def test_international_address_req(sandbox_tenant, must_collect_data):
         sandbox_tenant,
         "International config",
         must_collect_data,
-        must_collect_data,
         allow_international_residents=True,
     )
     bifrost = BifrostClient.new_user(obc)
@@ -37,14 +36,11 @@ def test_international_address_req(sandbox_tenant, must_collect_data):
     assert "ssn9" not in fields_to_authorize
 
 
-def test_user_without_documents_international(
-    sandbox_tenant, must_collect_data, can_access_data
-):
+def test_user_without_documents_international(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
         must_collect_data,
-        can_access_data,
         allow_international_residents=True,
     )
     bifrost = BifrostClient.new_user(obc)
@@ -81,13 +77,12 @@ def test_user_without_documents_international(
 
 
 def test_with_documents_handles_international_address(
-    sandbox_tenant, must_collect_data, can_access_data
+    sandbox_tenant, must_collect_data
 ):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
         must_collect_data + ["document_and_selfie"],
-        can_access_data + ["document_and_selfie"],
         allow_international_residents=True,
     )
     bifrost = BifrostClient.new_user(obc)
@@ -117,13 +112,12 @@ def test_with_documents_handles_international_address(
 
 
 def test_with_documents_handles_international_address_restricted_documents(
-    sandbox_tenant, must_collect_data, can_access_data
+    sandbox_tenant, must_collect_data
 ):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
         must_collect_data + ["document_and_selfie"],
-        can_access_data + ["document_and_selfie"],
         allow_international_residents=True,
         international_country_restrictions=["MX", "NO"],
     )
@@ -149,7 +143,7 @@ def test_with_documents_handles_international_address_restricted_documents(
 
 
 def test_with_documents_handles_international_address_restricted_documents_with_dl(
-    sandbox_tenant, must_collect_data, can_access_data
+    sandbox_tenant, must_collect_data
 ):
     # in this test we expect to see the following behavior:
     #
@@ -160,7 +154,6 @@ def test_with_documents_handles_international_address_restricted_documents_with_
         sandbox_tenant,
         "International config weird case",
         must_collect_data + ["document.drivers_license,passport.none.require_selfie"],
-        can_access_data,
         allow_international_residents=True,
         international_country_restrictions=["US", "MX", "NO"],
     )
@@ -204,13 +197,6 @@ def test_us_legal_status(sandbox_tenant):
         sandbox_tenant,
         "KYC with legal status",
         must_collect_data=[
-            "full_address",
-            "name",
-            "phone_number",
-            "email",
-            "us_legal_status",
-        ],
-        can_access_data=[
             "full_address",
             "name",
             "phone_number",

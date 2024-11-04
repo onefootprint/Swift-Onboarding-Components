@@ -1,5 +1,3 @@
-from tests.constants import FIXTURE_PHONE_NUMBER
-from tests.utils import _gen_random_n_digit_number
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, create_ob_config
 from tests.integrations.test_alpaca import alpaca_kyc_ob_config
@@ -106,7 +104,6 @@ def test_synthetic(sandbox_tenant, must_collect_data):
         ],
         kind="kyc",
         optional_data=[],
-        can_access_data=[],
         verification_checks=[
             {"kind": "sentilink", "data": {}},
         ],

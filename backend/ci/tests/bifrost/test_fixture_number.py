@@ -10,7 +10,6 @@ def ob_config2(sandbox_tenant, must_collect_data):
     ob_conf_data = {
         "name": "Acme Bank Card 2",
         "must_collect_data": must_collect_data,
-        "can_access_data": must_collect_data,
     }
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
@@ -61,13 +60,14 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, foo_sandbox_tenant):
     }
 
 
-def test_one_click_same_tenant_no_decryption_bleeding(sandbox_tenant, ob_config2):
-    # If we onboard onto sandbox_tenant.default_ob_config first, the second onboarding _must_ require authorizing
+def test_one_click_same_tenant_no_decryption_bleeding(
+    deprecated_missing_can_access_obc, ob_config2
+):
+    # If we onboard onto sandbox_tenant.default_ob_config first, the second onboarding _must_ require authorizing.
     # default_ob_config doesn't have full decryption permissions - so if we automatically authorized
     # the second workflow, it would instantly grant decryption permissions to the second workflow
     # that the user didn't already have
-    ob_config = sandbox_tenant.default_ob_config
-    bifrost = BifrostClient.new_user(ob_config)
+    bifrost = BifrostClient.new_user(deprecated_missing_can_access_obc)
     bifrost.run()
 
     # Now onboard onto second ob config. This ob config needs access to more data than is already
@@ -107,7 +107,6 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
         sandbox_tenant,
         "skip phone",
         must_collect_data=["full_address", "name", "email"],
-        can_access_data=["full_address", "name", "email"],
         optional_data=[],
         is_no_phone_flow=True,
         override_auths=[sandbox_tenant.auth_token, IsLive("true")],

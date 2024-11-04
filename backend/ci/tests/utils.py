@@ -345,7 +345,7 @@ def create_ob_config(
     tenant,
     name,
     must_collect_data,
-    can_access_data=None,
+    deprecated_can_access_data=None,
     cip_kind=None,
     optional_data=None,
     is_no_phone_flow=False,
@@ -378,8 +378,7 @@ def create_ob_config(
         "name": name,
         "must_collect_data": must_collect_data,
         "optional_data": optional_data,
-        # Default to being able to decrypt all data that is collected
-        "can_access_data": can_access_data or must_collect_data,
+        "deprecated_can_access_data": deprecated_can_access_data,
         "cip_kind": cip_kind,
         "is_no_phone_flow": is_no_phone_flow,
         "is_doc_first_flow": is_doc_first_flow,

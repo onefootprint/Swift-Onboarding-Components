@@ -10188,7 +10188,18 @@
                             "type": "string"
                         }
                     },
-                    "can_access_data": {
+                    "cip_kind": {
+                        "type": "string",
+                        "enum": [
+                            "alpaca",
+                            "apex"
+                        ]
+                    },
+                    "curp_validation_enabled": {
+                        "type": "boolean"
+                    },
+                    "deprecated_can_access_data": {
+                        "description": "When provided, used to populate the deprecated `can_access_data` field. When not provided,\n can_access_data is computed from must_collect_data and optional_data.",
                         "type": "array",
                         "items": {
                             "description": "Represent the options of allowed CollectedData.\n Some CollectedData variants only have a single allowable CollectedDataOption.\n Other CollectedData variants may have multiple Options of assortments of data that can be\n collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by\n the CDO",
@@ -10217,16 +10228,6 @@
                                 "Bank"
                             ]
                         }
-                    },
-                    "cip_kind": {
-                        "type": "string",
-                        "enum": [
-                            "alpaca",
-                            "apex"
-                        ]
-                    },
-                    "curp_validation_enabled": {
-                        "type": "boolean"
                     },
                     "doc_scan_for_optional_ssn": {
                         "type": "string",
@@ -10690,7 +10691,6 @@
                     "allow_international_residents",
                     "allow_reonboard",
                     "business_documents_to_collect",
-                    "can_access_data",
                     "documents_to_collect",
                     "is_doc_first_flow",
                     "kind",

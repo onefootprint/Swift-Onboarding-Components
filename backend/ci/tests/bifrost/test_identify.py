@@ -163,7 +163,6 @@ def tenant_sandbox_obc(tenant, must_collect_data):
         tenant,
         "Sandbox config",
         must_collect_data,
-        must_collect_data,
         override_auths=[tenant.auth_token, IsLive("false")],
     )
 
@@ -265,9 +264,7 @@ def test_multi_identify(sandbox_user, sandbox_tenant):
 
 
 def test_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "flerp", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "flerp", must_collect_data)
 
     sandbox_id = sandbox_user.client.sandbox_id
     phone_number = sandbox_user.client.data["id.phone_number"]

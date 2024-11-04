@@ -24,7 +24,7 @@ def test_authorized_orgs(sandbox_user, auth_token):
     ob = body[0]
     assert ob["org_name"] == sandbox_user.client.ob_config.tenant.name
     assert set(ob["can_access_data"]) == set(
-        sandbox_user.client.ob_config.can_access_data
+        sandbox_user.client.ob_config.must_collect_data
     )
 
 

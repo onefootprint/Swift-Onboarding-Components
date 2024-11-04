@@ -13,12 +13,10 @@ from tests.utils import create_ob_config
 def test_requirements(sandbox_tenant, submit_ssn):
     must_collect_data = ["full_address", "name", "email", "phone_number"]
     optional_data = ["ssn9"]
-    can_access_data = must_collect_data + optional_data
     obc = create_ob_config(
         sandbox_tenant,
         "KYC with optional ssn",
         must_collect_data,
-        can_access_data,
         optional_data=optional_data,
     )
     bifrost = BifrostClient.new_user(obc, override_ob_config_auth=None)
@@ -95,14 +93,12 @@ def test_requirements(sandbox_tenant, submit_ssn):
 
 
 @pytest.mark.parametrize("middle_name", [None, "Billy"])
-@pytest.mark.parametrize("can_access_name", [True, False])
-def test_middle_name(sandbox_tenant, middle_name, can_access_name):
+def test_middle_name(sandbox_tenant, middle_name):
     base_data = ["full_address", "email", "phone_number"]
     obc = create_ob_config(
         sandbox_tenant,
         "Doc request config",
         base_data + ["name"],
-        base_data + ["name"] if can_access_name else base_data,
     )
 
     di = "id.middle_name"
@@ -118,26 +114,17 @@ def test_middle_name(sandbox_tenant, middle_name, can_access_name):
     # test decrypt permissions
     res = post(
         f"/users/{user.fp_id}/vault/decrypt",
-        dict(
-            reason="a",
-            fields=[di],
-        ),
+        dict(reason="a", fields=[di]),
         sandbox_tenant.sk.key,
     )
 
-    if can_access_name:
-        assert res[di] == middle_name
-    else:
-        assert res[di] is None
+    assert res[di] == middle_name
 
     # assert that /users/ includes id.middle_name cause why not
     res = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     if middle_name:
         assert di in res["attributes"]
-    else:
-        assert di not in res["attributes"]
-
-    if middle_name and can_access_name:
         assert di in res["decryptable_attributes"]
     else:
+        assert di not in res["attributes"]
         assert di not in res["decryptable_attributes"]

@@ -269,9 +269,7 @@ def test_create(sandbox_tenant, data, error, is_new_serialization):
 
 
 def test_create_business_rule(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
     rule = dict(
         name="My fancy business rule",
         rule_expression=[
@@ -286,9 +284,7 @@ def test_create_business_rule(sandbox_tenant, must_collect_data):
 
 
 def test_list(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
     # Note: obc will have a default set of rules it is created with
     rules = [
         dict(
@@ -313,9 +309,7 @@ def test_list(sandbox_tenant, must_collect_data):
 
 
 def test_get_rule_set_result(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Rules yo", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Rules yo", must_collect_data)
 
     rule1 = dict(
         name="My awesome rule1",
@@ -374,12 +368,11 @@ def new_list(kind, entries, sandbox_tenant):
     )
 
 
-def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
+def test_vault_data_rules(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant,
         "Test Vault Data Rules",
         must_collect_data,
-        can_access_data,
         # These are the necessary arguments to skip KYC so the status is only
         # dependent on rules evaluation.
         skip_kyc=True,
@@ -580,15 +573,10 @@ def status_as_action_triggered(pass_or_fail):
         raise Exception(f"Unexpected status: {pass_or_fail}")
 
 
-def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
+def test_ip_address_rules(sandbox_tenant, must_collect_data):
     # Flake note: requires a consistent client IP for the duration of the test.
 
-    obc = create_ob_config(
-        sandbox_tenant,
-        "Baseline",
-        must_collect_data,
-        can_access_data,
-    )
+    obc = create_ob_config(sandbox_tenant, "Baseline", must_collect_data)
     bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
     user = bifrost.run()
     fp_id = user.fp_id
@@ -701,9 +689,7 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
 
 
 def test_multi_edit(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
     # When OBC's are created they are given a default set of rules
     default_rules = get(
         f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
@@ -849,9 +835,7 @@ def test_multi_edit(sandbox_tenant, must_collect_data):
 
 
 def test_blocklist_rules(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
     nonce = _gen_random_str(10)
     list = post(
         f"/org/lists",
@@ -907,9 +891,7 @@ def test_blocklist_rules(sandbox_tenant, must_collect_data):
 
 
 def test_cannot_delete_all_rules(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
     default_rules = get(
         f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
     )
@@ -928,9 +910,7 @@ def test_cannot_delete_all_rules(sandbox_tenant, must_collect_data):
 
 
 def test_stepup_sandbox_outcome(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
-    )
+    obc = create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
     user = BifrostClient.new_user(obc)
     obc = get(
         f"org/onboarding_configs/{obc.id}",

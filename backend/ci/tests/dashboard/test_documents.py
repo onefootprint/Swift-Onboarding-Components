@@ -135,7 +135,6 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
         sandbox_tenant,
         "Lots of docs config",
         must_collect_data + ["document_and_selfie"],
-        must_collect_data + ["document_and_selfie"],
         document_types_and_countries={
             "global": [],
             "country_specific": {"MX": ["voter_identification"]},

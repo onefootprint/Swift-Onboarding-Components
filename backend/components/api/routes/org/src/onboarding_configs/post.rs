@@ -14,6 +14,7 @@ use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
 use db::models::rule_set_version::RuleSetVersion;
+use itertools::chain;
 use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
@@ -36,7 +37,9 @@ pub struct CreateOnboardingConfigurationRequest {
     pub name: String,
     pub must_collect_data: Vec<CDO>,
     pub optional_data: Option<Vec<CDO>>,
-    pub can_access_data: Vec<CDO>,
+    /// When provided, used to populate the deprecated `can_access_data` field. When not provided,
+    /// can_access_data is computed from must_collect_data and optional_data.
+    pub deprecated_can_access_data: Option<Vec<CDO>>,
     pub cip_kind: Option<CipKind>,
     pub is_no_phone_flow: Option<bool>,
     #[serde(default)]
@@ -99,7 +102,7 @@ pub async fn post(
         name,
         must_collect_data,
         optional_data,
-        can_access_data,
+        deprecated_can_access_data,
         cip_kind,
         is_no_phone_flow,
         is_doc_first_flow,
@@ -163,12 +166,15 @@ pub async fn post(
 
     let prompt_for_passkey =
         prompt_for_passkey.unwrap_or(!is_no_phone_flow && kind != ObConfigurationKind::Auth);
+    let optional_data = optional_data.unwrap_or(vec![]);
+    let can_access_data = deprecated_can_access_data
+        .unwrap_or(chain!(must_collect_data.clone(), optional_data.clone()).collect());
 
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),
         must_collect_data,
-        optional_data: optional_data.unwrap_or(vec![]),
+        optional_data,
         can_access_data,
         is_live,
         cip_kind,

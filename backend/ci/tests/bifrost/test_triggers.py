@@ -10,7 +10,7 @@ from tests.constants import (
 )
 from tests.headers import FpAuth
 from tests.identify_client import IdentifyClient
-from tests.utils import _gen_random_ssn, create_ob_config, post
+from tests.utils import _gen_random_ssn, post
 from tests.utils import get, patch
 
 

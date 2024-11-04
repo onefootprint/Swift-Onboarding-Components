@@ -15,7 +15,6 @@ def doc_first_obc(sandbox_tenant):
             "document.drivers_license.none.none",
             "ssn9",
         ],
-        can_access_data=["phone_number", "full_address", "name", "email"],
         document_types_and_countries={
             "global": [],
             "country_specific": {"US": ["drivers_license"]},

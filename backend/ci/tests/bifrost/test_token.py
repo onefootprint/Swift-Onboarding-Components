@@ -25,7 +25,6 @@ def ob_config(sandbox_tenant, must_collect_data):
     ob_conf_data = {
         "name": "Acme Bank Progressive Config",
         "must_collect_data": must_collect_data,
-        "can_access_data": must_collect_data,
     }
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 

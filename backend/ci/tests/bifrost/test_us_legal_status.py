@@ -15,13 +15,6 @@ def legal_status_obc(sandbox_tenant):
             "email",
             "us_legal_status",
         ],
-        can_access_data=[
-            "full_address",
-            "name",
-            "phone_number",
-            "email",
-            "us_legal_status",
-        ],
         optional_data=[],
     )
 

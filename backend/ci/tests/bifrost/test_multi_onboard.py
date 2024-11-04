@@ -8,14 +8,14 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant):
     data = {
         "name": "Ob config 1",
         "must_collect_data": REQUIRED_ATTRS,
-        "can_access_data": ["phone_number", "email"],
+        "deprecated_can_access_data": ["phone_number", "email"],
     }
     ob_config1 = create_ob_config(sandbox_tenant, **data)
     # Will onboarding onto this config but abort before authorize
     data = {
         "name": "Ob config 2",
         "must_collect_data": REQUIRED_ATTRS + ["ssn9"],
-        "can_access_data": ["full_address", "name", "ssn9"],
+        "deprecated_can_access_data": ["full_address", "name", "ssn9"],
     }
     ob_config2 = create_ob_config(sandbox_tenant, **data)
     # Will onboarding onto this config
@@ -23,7 +23,7 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant):
         "name": "Ob config 3",
         "must_collect_data": REQUIRED_ATTRS + ["ssn4"],
         # Request ability to decrypt full address and name that weren't approved before
-        "can_access_data": ["full_address", "name", "ssn4"],
+        "deprecated_can_access_data": ["full_address", "name", "ssn4"],
     }
     ob_config3 = create_ob_config(sandbox_tenant, **data)
 

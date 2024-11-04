@@ -110,7 +110,7 @@ def test_cannot_patch(assumed_token, path):
         # ("entities/some_fp_id/annotations", dict(note="", is_pinned=False)),
         # (
         #     "org/onboarding_configs",
-        #     dict(name="", must_collect_data=[], can_access_data=[]),
+        #     dict(name="", must_collect_data=[]),
         # ),
         ("org/members", dict(email="e@onefootprint.com", role_id="", redirect_url="")),
         ("org/members/some_id/deactivate", dict()),

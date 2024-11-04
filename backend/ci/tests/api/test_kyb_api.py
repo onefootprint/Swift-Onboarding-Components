@@ -15,7 +15,6 @@ def obc(sandbox_tenant):
         sandbox_tenant,
         "Business-only config",
         MUST_COLLECT_DATA,
-        MUST_COLLECT_DATA,
         kind="kyb",
         skip_kyc=True,
     )
@@ -105,7 +104,6 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
         sandbox_tenant,
         "Business-only config",
         must_collect_data,
-        must_collect_data,
         kind="kyb",
         skip_kyc=True,
     )
@@ -150,7 +148,6 @@ def test_kyb_with_no_bo_collection_but_bos_linked(sandbox_tenant):
     obc = create_ob_config(
         sandbox_tenant,
         "Business-only config",
-        must_collect_data,
         must_collect_data,
         kind="kyb",
         skip_kyc=True,

@@ -18,16 +18,14 @@ from tests.identify_client import IdentifyClient
 
 
 @pytest.fixture(scope="session")
-def ob_configuration(sandbox_tenant, must_collect_data, can_access_data):
-    return create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
+def ob_configuration(sandbox_tenant, must_collect_data):
+    return create_ob_config(sandbox_tenant, "Test OB Config", must_collect_data)
 
 
 @pytest.fixture(scope="session")
-def inactive_ob_configuration(sandbox_tenant, must_collect_data, can_access_data):
+def inactive_ob_configuration(sandbox_tenant, must_collect_data):
     ob_config = create_ob_config(
-        sandbox_tenant, "My inactive test OB Config", must_collect_data, can_access_data
+        sandbox_tenant, "My inactive test OB Config", must_collect_data
     )
     data = dict(status="disabled")
     body = patch(
@@ -47,7 +45,6 @@ def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration
     assert config["key"] == ob_configuration.key.value
     assert config["name"] == ob_configuration.name
     assert config["must_collect_data"] == ob_configuration.must_collect_data
-    assert config["can_access_data"] == ob_configuration.can_access_data
     assert config["status"] == ob_configuration.status
     assert config["kind"] == "kyc"
     assert config["created_at"]
@@ -94,7 +91,6 @@ def test_config_detail(sandbox_tenant, ob_configuration):
     assert config["key"] == ob_configuration.key.value
     assert config["name"] == ob_configuration.name
     assert config["must_collect_data"] == ob_configuration.must_collect_data
-    assert config["can_access_data"] == ob_configuration.can_access_data
     assert config["status"] == ob_configuration.status
     assert config["created_at"]
 
@@ -103,7 +99,6 @@ def test_config_create(sandbox_tenant):
     data = dict(
         name="Acme Bank Loan",
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
-        can_access_data=["ssn4", "phone_number", "email", "name", "full_address"],
         kind="kyc",
         verification_checks=[{"data": {}, "kind": "kyc"}],
     )
@@ -128,7 +123,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -145,7 +139,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[
@@ -166,7 +159,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -177,7 +169,7 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "email", "phone_number", "full_address"],
                 optional_data=[],
-                can_access_data=["ssn9"],
+                deprecated_can_access_data=["ssn9"],
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -188,7 +180,7 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=["ssn9"],
-                can_access_data=["name", "ssn9"],
+                deprecated_can_access_data=["name", "ssn9"],
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -199,7 +191,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=["dob"],
-                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -216,7 +207,6 @@ def test_config_create(sandbox_tenant):
                     "dob",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=["MX"],
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -233,7 +223,6 @@ def test_config_create(sandbox_tenant):
                     "dob",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=True,
                 international_country_restrictions=[],
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -250,7 +239,6 @@ def test_config_create(sandbox_tenant):
                     "dob",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=True,
                 international_country_restrictions=["MX"],
                 verification_checks=[],
@@ -267,7 +255,6 @@ def test_config_create(sandbox_tenant):
                     "dob",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=False,
                 allow_us_residents=False,
                 verification_checks=[{"kind": "kyc", "data": {}}],
@@ -284,7 +271,6 @@ def test_config_create(sandbox_tenant):
                     "dob",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 allow_international_residents=True,
                 allow_us_territories=True,
                 allow_us_residents=True,
@@ -296,7 +282,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "document.drivers_license.none.none"],
                 optional_data=[],
-                can_access_data=[],
                 kind="document",
                 skip_kyc=True,
             ),
@@ -306,7 +291,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["document.drivers_license.none.none"],
                 optional_data=[],
-                can_access_data=[],
                 kind="document",
                 skip_kyc=False,
             ),
@@ -317,7 +301,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["document.drivers_license.none.none"],
                 optional_data=[],
-                can_access_data=[],
                 kind="document",
                 verification_checks=[{"kind": "kyc", "data": {}}],
             ),
@@ -335,7 +318,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
@@ -361,7 +343,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
@@ -388,7 +369,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 allow_us_residents=True,
@@ -421,7 +401,6 @@ def test_config_create(sandbox_tenant):
                     "document",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
@@ -449,7 +428,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 allow_us_residents=True,
@@ -481,7 +459,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
@@ -509,7 +486,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 enhanced_aml=dict(
@@ -547,7 +523,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_kyc=False,
@@ -575,7 +550,6 @@ def test_config_create(sandbox_tenant):
                     "phone_number",
                 ],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
                 allow_us_residents=True,
@@ -588,7 +562,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind=None,
                 skip_kyc=False,
@@ -617,7 +590,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind=None,
                 allow_us_residents=False,
@@ -639,7 +611,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind=None,
                 skip_kyc=False,
@@ -668,7 +639,6 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=[],
-                can_access_data=[],
                 kind="kyc",
                 cip_kind=None,
                 allow_us_residents=True,
@@ -696,7 +666,6 @@ def test_config_create(sandbox_tenant):
                 ],
                 kind="kyc",
                 optional_data=[],
-                can_access_data=[],
                 verification_checks=[
                     {"kind": "kyc", "data": {}},
                     {"kind": "sentilink", "data": {}},
@@ -716,7 +685,6 @@ def test_config_create(sandbox_tenant):
                 ],
                 kind="kyc",
                 optional_data=[],
-                can_access_data=[],
                 verification_checks=[
                     {"kind": "kyc", "data": {}},
                     {"kind": "sentilink", "data": {}},
@@ -736,7 +704,6 @@ def test_config_create(sandbox_tenant):
                 ],
                 kind="kyc",
                 optional_data=[],
-                can_access_data=[],
                 is_doc_first_flow=True,
             ),
             "Validation error: Must collect document if is_doc_first is true",
@@ -754,7 +721,6 @@ def test_config_create(sandbox_tenant):
                 ],
                 kind="kyc",
                 optional_data=[],
-                can_access_data=[],
                 is_doc_first_flow=True,
             ),
             None,
@@ -783,7 +749,6 @@ def test_no_phone_obc(sandbox_tenant):
         name="Let's skip the phone",
         must_collect_data=collect_data,
         optional_data=[],
-        can_access_data=collect_data,
         is_no_phone_flow=True,
         kind="kyc",
         verification_checks=[{"kind": "kyc", "data": {}}],
@@ -793,7 +758,6 @@ def test_no_phone_obc(sandbox_tenant):
     assert res["is_no_phone_flow"] == True
     assert res["must_collect_data"] == collect_data
     assert res["optional_data"] == []
-    assert res["can_access_data"] == collect_data
 
 
 def test_doc_only(sandbox_tenant):
@@ -803,7 +767,6 @@ def test_doc_only(sandbox_tenant):
         name="Doc only",
         must_collect_data=collect_data,
         optional_data=[],
-        can_access_data=collect_data,
         kind="document",
         skip_kyc=True,
         document_types_and_countries={
@@ -815,7 +778,6 @@ def test_doc_only(sandbox_tenant):
 
     assert res["kind"] == "document"
     assert res["must_collect_data"] == collect_data
-    assert res["can_access_data"] == collect_data
     assert res["document_types_and_countries"] == {
         "global": ["passport"],
         "country_specific": {"US": ["drivers_license"]},
@@ -850,7 +812,6 @@ def test_skip_kyc(
     data = dict(
         name="skip kyc",
         must_collect_data=collect_data,
-        can_access_data=collect_data,
         allow_international_residents=allow_international_residents,
         skip_kyc=True,
         kind="kyc",
@@ -985,7 +946,6 @@ def test_verification_checks(
     data = dict(
         name="skip kyc",
         must_collect_data=collected_data,
-        can_access_data=collected_data,
         kind=kind,
         verification_checks=checks,
     )
@@ -1062,7 +1022,6 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         name="Yo",
         must_collect_data=must_collect_data,
         optional_data=[],
-        can_access_data=must_collect_data,
         enhanced_aml=enhanced_aml,
         kind="kyc",
         verification_checks=[{"kind": "kyc", "data": {}}],
@@ -1129,7 +1088,6 @@ def test_enhanced_aml_with_verification_checks(
         name="Yo",
         must_collect_data=must_collect_data,
         optional_data=[],
-        can_access_data=must_collect_data,
         kind="kyc",
         verification_checks=verification_checks,
     )
@@ -1199,7 +1157,6 @@ def test_business_aml_with_verification_checks(
         name="Yo",
         must_collect_data=must_collect_data,
         optional_data=[],
-        can_access_data=must_collect_data,
         kind=playbook_kind,
         verification_checks=verification_checks,
     )
@@ -1263,7 +1220,6 @@ def test_business_only_obc(sandbox_tenant):
     data = dict(
         name="Let's skip the phone",
         must_collect_data=collect_data,
-        can_access_data=collect_data,
         kind="kyb",
         verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
     )
@@ -1275,7 +1231,6 @@ def test_business_only_obc(sandbox_tenant):
     )
 
     assert res["must_collect_data"] == collect_data
-    assert res["can_access_data"] == collect_data
 
 
 def test_default_rules(sandbox_tenant):
@@ -1285,7 +1240,6 @@ def test_default_rules(sandbox_tenant):
         dict(
             name="test_default_rules",
             must_collect_data=collect_data,
-            can_access_data=collect_data,
             kind="kyc",
             verification_checks=[{"kind": "kyc", "data": {}}],
         ),
@@ -1349,7 +1303,6 @@ def test_copy_playbook(
         sandbox_tenant,
         "Test OB Config to copy",
         ["name", "full_address", "email", "phone_number", "nationality"],
-        ["name", "full_address", "email", "phone_number", "nationality", "ssn4"],
         optional_data=["ssn9"],
         is_doc_first_flow=True,
         documents_to_collect=[dict(kind="proof_of_address", data=dict())],

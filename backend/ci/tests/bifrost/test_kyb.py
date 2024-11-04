@@ -137,7 +137,6 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         sandbox_tenant,
         f"KYB config BOs: {beneficial_owners}",
         must_collect_data,
-        must_collect_data,
         skip_kyc=skip_kyc,
         kind="kyb",
     )

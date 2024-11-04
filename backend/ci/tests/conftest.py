@@ -80,18 +80,20 @@ def wait_for_deploy():
 
 
 @pytest.fixture(scope="session")
-def can_access_data():
-    # Everything but dob
-    return ["name", "ssn9", "full_address", "email", "phone_number", "nationality"]
+def must_collect_data():
+    return [
+        "name",
+        "ssn9",
+        "full_address",
+        "email",
+        "phone_number",
+        "nationality",
+        "dob",
+    ]
 
 
 @pytest.fixture(scope="session")
-def must_collect_data(can_access_data):
-    return can_access_data + ["dob"]
-
-
-@pytest.fixture(scope="session")
-def sandbox_tenant_data(must_collect_data, can_access_data):
+def sandbox_tenant_data(must_collect_data):
     # We reuse this in another place
     org_data = {
         "id": TENANT_ID2,
@@ -102,14 +104,13 @@ def sandbox_tenant_data(must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Acme Bank Card",
         "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
     }
 
     return (org_data, ob_conf_data)
 
 
 @pytest.fixture(scope="session")
-def tenant(must_collect_data, can_access_data):
+def tenant(must_collect_data):
     """
     Production, non-sandbox tenant. Only used for these tests
     """
@@ -122,7 +123,6 @@ def tenant(must_collect_data, can_access_data):
     ob_conf_data = {
         "name": "Acme Bank Card",
         "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
     }
 
     return create_tenant(org_data, ob_conf_data)
@@ -145,7 +145,6 @@ def foo_sandbox_tenant():
     ob_conf_data = {
         "name": "Foo Credit Card",
         "must_collect_data": fields,
-        "can_access_data": fields,
     }
 
     return create_tenant(org_data, ob_conf_data)
@@ -165,12 +164,11 @@ def partner_tenant(tenant):
 
 
 @pytest.fixture(scope="session")
-def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data):
     return create_ob_config(
         sandbox_tenant,
         "Doc request config",
         must_collect_data + ["document_and_selfie"],
-        can_access_data + ["document_and_selfie"],
     )
 
 
@@ -180,9 +178,19 @@ def skip_phone_obc(sandbox_tenant):
         sandbox_tenant,
         "skip phone",
         must_collect_data=["full_address", "name", "email"],
-        can_access_data=["full_address", "name", "email"],
         optional_data=[],
         is_no_phone_flow=True,
+    )
+
+
+@pytest.fixture(scope="session")
+def deprecated_missing_can_access_obc(sandbox_tenant, must_collect_data):
+    can_access_data = [i for i in must_collect_data if i != "dob"]
+    return create_ob_config(
+        sandbox_tenant,
+        "Missing can access",
+        must_collect_data,
+        deprecated_can_access_data=can_access_data,
     )
 
 
@@ -211,12 +219,11 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, kyb_cdos):
 
 
 @pytest.fixture(scope="session")
-def investor_profile_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+def investor_profile_ob_config(sandbox_tenant, must_collect_data):
     return create_ob_config(
         sandbox_tenant,
         "Investor profile config",
         must_collect_data + ["investor_profile"],
-        can_access_data + ["investor_profile"],
     )
 
 

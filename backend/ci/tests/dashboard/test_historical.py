@@ -58,7 +58,6 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
         sandbox_tenant,
         "Lots of documents",
         data,
-        data,
         documents_to_collect=[
             dict(
                 kind="custom",

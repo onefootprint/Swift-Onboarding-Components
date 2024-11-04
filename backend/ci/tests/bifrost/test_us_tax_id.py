@@ -15,13 +15,6 @@ def us_tax_id_obc(sandbox_tenant):
             "email",
             "us_tax_id",
         ],
-        can_access_data=[
-            "full_address",
-            "name",
-            "phone_number",
-            "email",
-            "us_tax_id",
-        ],
         optional_data=[],
     )
 

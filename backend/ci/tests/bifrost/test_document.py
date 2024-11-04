@@ -11,25 +11,21 @@ from tests.utils import (
 
 
 @pytest.fixture(scope="session")
-def restricted_doc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+def restricted_doc_ob_config(sandbox_tenant, must_collect_data):
     return create_ob_config(
         sandbox_tenant,
         "Restricted doc request config",
         must_collect_data + ["document.drivers_license.us_only.require_selfie"],
-        can_access_data + ["document.drivers_license.us_only.require_selfie"],
     )
 
 
 @pytest.fixture(scope="session")
-def restricted_doc_ob_config_only_international(
-    sandbox_tenant, must_collect_data, can_access_data
-):
+def restricted_doc_ob_config_only_international(sandbox_tenant, must_collect_data):
     return create_ob_config(
         sandbox_tenant,
         "Restricted doc request config (new)",
         # technically we don't support DL for anything other than US, so this is just so we can simulate the correct error
         must_collect_data + ["document.drivers_license,passport.none.require_selfie"],
-        can_access_data + ["document.drivers_license,passport.none.require_selfie"],
         allow_international_residents=True,
         international_country_restrictions=["MX"],
     )
@@ -353,14 +349,13 @@ def test_upload_documents_with_ob_config_restriction(
 
 
 def test_upload_documents_with_new_ob_config_document_and_countries_field(
-    sandbox_tenant, must_collect_data, can_access_data
+    sandbox_tenant, must_collect_data
 ):
     obc = create_ob_config(
         sandbox_tenant,
         "Restricted doc request config (new)",
         # we'll ignore all of this when using `document_types_and_countries`, which we test below by trying to upload a voter ID and it failing
         must_collect_data + ["document.voter_identification.none.require_selfie"],
-        can_access_data + ["document.voter_identification.none.require_selfie"],
         # restrict to only DL in US
         document_types_and_countries={
             "global": ["passport"],
@@ -643,12 +638,11 @@ def test_user_having_trouble_with_their_mobile_camera(
     assert doc_capture_failed_rule_results[0]["result"]
 
 
-def test_no_documents_set_on_obc(sandbox_tenant, must_collect_data, can_access_data):
+def test_no_documents_set_on_obc(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
         must_collect_data + ["document_and_selfie"],
-        can_access_data + ["document_and_selfie"],
         # thing under test, empty
         document_types_and_countries={"global": [], "country_specific": {}},
     )
