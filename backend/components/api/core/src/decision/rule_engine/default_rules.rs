@@ -18,7 +18,8 @@ use newtypes::RuleAction as RA;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
 use newtypes::VerificationCheck;
-use newtypes::VerificationCheckKind;
+use strum::EnumIter;
+use strum::IntoEnumIterator;
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
     vec![
@@ -59,6 +60,7 @@ pub fn default_verification_check_rules(check: &VerificationCheck) -> Vec<(RuleE
                 (if_risk_signal(FRC::DeviceMediumRisk), RA::ManualReview),
             ]
         }
+        VerificationCheck::Kyb { ein_only } => base_kyb_rules(*ein_only),
         _ => vec![],
     }
 }
@@ -149,96 +151,121 @@ pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RA)> {
     }
 }
 
+#[derive(EnumIter)]
+enum RuleGroup {
+    Kyc,
+    Document,
+    VerificationCheck,
+    Alpaca,
+    Aml,
+}
+
+impl RuleGroup {
+    fn has_kyc(obc: &ObConfiguration) -> bool {
+        (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb)
+            && !obc.verification_checks().skip_kyc()
+    }
+
+    fn kyc_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+        let mut kyc_rules = vec![];
+        let must_collect_ssn =
+            obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
+        let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
+
+        if Self::has_kyc(obc) {
+            kyc_rules.append(&mut base_kyc_rules());
+
+            if must_collect_ssn || optional_ssn {
+                kyc_rules.append(&mut ssn_rules());
+            }
+        }
+
+        if optional_ssn {
+            kyc_rules.append(&mut vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)]);
+        }
+
+        kyc_rules
+    }
+
+    fn alpaca_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+        let mut alpaca_rules = vec![];
+        if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+            alpaca_rules.append(&mut alpaca_kyc_field_validation_rules());
+            alpaca_rules.append(&mut alpaca_doc_field_validation_rules());
+        }
+        alpaca_rules
+    }
+
+    fn document_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+        let mut document_rules = vec![];
+        if obc.document_cdo().is_some() || matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+            document_rules.append(&mut base_doc_rules(matches!(obc.cip_kind, Some(CipKind::Alpaca))));
+        }
+        document_rules
+    }
+
+    fn aml_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+        let mut aml_rules = vec![];
+        let aml_risk_signals = match obc.verification_checks().enhanced_aml() {
+            // We do get some watchlist risk signals from normal KYC
+            EnhancedAmlOption::No if Self::has_kyc(obc) => {
+                vec![FRC::WatchlistHitOfac, FRC::WatchlistHitNonSdn]
+            }
+            // But if we're not running KYC at all, there will be no risk signals
+            EnhancedAmlOption::No => vec![],
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring: _,
+                adverse_media_lists: _,
+                match_kind: _,
+            } => {
+                let mut rs = vec![];
+                if ofac {
+                    rs.push(FRC::WatchlistHitOfac);
+                    rs.push(FRC::WatchlistHitNonSdn);
+                    // not really "ofac" but our EnhancedAmlOption doesn't separately specify this
+                    rs.push(FRC::WatchlistHitWarning);
+                }
+                if pep {
+                    rs.push(FRC::WatchlistHitPep);
+                }
+                if adverse_media {
+                    rs.push(FRC::AdverseMediaHit);
+                }
+                rs
+            }
+        };
+        aml_risk_signals.into_iter().for_each(|rs| {
+            aml_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
+        });
+
+        aml_rules
+    }
+
+    fn verification_check_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+        obc.verification_checks()
+            .inner()
+            .iter()
+            .flat_map(default_verification_check_rules)
+            .collect_vec()
+    }
+
+    fn rules(&self, obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+        match self {
+            Self::Kyc => Self::kyc_rules(obc),
+            Self::Document => Self::document_rules(obc),
+            Self::VerificationCheck => Self::verification_check_rules(obc),
+            Self::Alpaca => Self::alpaca_rules(obc),
+            Self::Aml => Self::aml_rules(obc),
+        }
+    }
+}
+
 #[tracing::instrument(skip_all)]
 pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
-    let mut person_rules = vec![];
-
-    // KYC
-    let has_kyc = (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb)
-        && !obc.verification_checks().skip_kyc();
-    let must_collect_ssn =
-        obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
-    let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
-
-    if has_kyc {
-        person_rules.append(&mut base_kyc_rules());
-
-        if must_collect_ssn || optional_ssn {
-            person_rules.append(&mut ssn_rules());
-        }
-    }
-
-    if optional_ssn {
-        person_rules.append(&mut vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)]);
-    }
-
-    // Alpaca
-    if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-        person_rules.append(&mut alpaca_kyc_field_validation_rules());
-        person_rules.append(&mut alpaca_doc_field_validation_rules());
-    }
-
-    // If collection of a Doc is possible, then include Document related rules
-    if obc.document_cdo().is_some() || matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-        person_rules.append(&mut base_doc_rules(matches!(obc.cip_kind, Some(CipKind::Alpaca))));
-    }
-
-    // AML
-    let aml_risk_signals = match obc.verification_checks().enhanced_aml() {
-        // We do get some watchlist risk signals from normal KYC
-        EnhancedAmlOption::No if has_kyc => vec![FRC::WatchlistHitOfac, FRC::WatchlistHitNonSdn],
-        // But if we're not running KYC at all, there will be no risk signals
-        EnhancedAmlOption::No => vec![],
-        EnhancedAmlOption::Yes {
-            ofac,
-            pep,
-            adverse_media,
-            continuous_monitoring: _,
-            adverse_media_lists: _,
-            match_kind: _,
-        } => {
-            let mut rs = vec![];
-            if ofac {
-                rs.push(FRC::WatchlistHitOfac);
-                rs.push(FRC::WatchlistHitNonSdn);
-                // not really "ofac" but our EnhancedAmlOption doesn't separately specify this
-                rs.push(FRC::WatchlistHitWarning);
-            }
-            if pep {
-                rs.push(FRC::WatchlistHitPep);
-            }
-            if adverse_media {
-                rs.push(FRC::AdverseMediaHit);
-            }
-            rs
-        }
-    };
-    aml_risk_signals.into_iter().for_each(|rs| {
-        person_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
-    });
-
-    // KYB
-    let business_rules = if let Some(VerificationCheck::Kyb { ein_only }) =
-        obc.verification_checks().get(VerificationCheckKind::Kyb)
-    {
-        base_kyb_rules(ein_only)
-    } else {
-        vec![]
-    };
-
-    // TODO: fix rule instance kind in the future to not be pinned to person potentially
-    let verification_check_rules = obc
-        .verification_checks()
-        .inner()
-        .iter()
-        .flat_map(default_verification_check_rules)
-        .collect_vec();
-
-    person_rules
-        .into_iter()
-        .chain(business_rules)
-        .chain(verification_check_rules)
-        .collect()
+    RuleGroup::iter().flat_map(|g| g.rules(obc)).collect_vec()
 }
 
 #[tracing::instrument(skip_all)]
