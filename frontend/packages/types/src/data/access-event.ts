@@ -1,5 +1,6 @@
 import type { Actor } from './actor';
 import type { InsightEvent } from './insight-event';
+import type { RoleScope } from './role';
 
 export enum AccessEventKind {
   CreateOrgRole = 'create_org_role',
@@ -12,7 +13,7 @@ export enum AccessEventKind {
   UpdateOrgApiKey = 'update_org_api_key',
   InviteOrgMember = 'invite_org_member',
   UpdateOrgMember = 'update_org_member',
-  RemoveOrgMember = 'remove_org_member',
+  DeactivateOrgMember = 'deactivate_org_member',
   // TODO - none below in BE headers yet
   CreatePlaybook = 'create_playbook',
   DisablePlaybook = 'disable_playbook',
@@ -27,7 +28,7 @@ type AccessEventDetailWrapper<T> = {
 };
 
 export type CreateOrgRoleDetail = AccessEventDetailWrapper<{
-  scopes: string[];
+  scopes: RoleScope[];
   tenant_role_id: string;
 }>;
 
@@ -55,12 +56,18 @@ export type InviteOrgMemberDetail = AccessEventDetailWrapper<{
   tenant_role_id: string;
   first_name: string;
   last_name: string;
-  scopes: string[];
+  scopes: RoleScope[];
 }>;
 
-export type UpdateOrgMemberDetail = AccessEventDetailWrapper<{}>;
+export type UpdateOrgMemberDetail = AccessEventDetailWrapper<{
+  tenant_role_id: string;
+  prev_scopes: RoleScope[];
+  new_scopes: RoleScope[];
+}>;
 
-export type RemoveOrgMemberDetail = AccessEventDetailWrapper<{}>;
+export type DeactivateOrgMemberDetail = AccessEventDetailWrapper<{
+  tenant_role_id: string;
+}>;
 
 export type CreatePlaybookDetail = AccessEventDetailWrapper<{}>;
 
@@ -83,7 +90,7 @@ export type AccessEventDetailMap = {
   [AccessEventKind.UpdateOrgApiKey]: UpdateOrgApiKeyDetail;
   [AccessEventKind.InviteOrgMember]: InviteOrgMemberDetail;
   [AccessEventKind.UpdateOrgMember]: UpdateOrgMemberDetail;
-  [AccessEventKind.RemoveOrgMember]: RemoveOrgMemberDetail;
+  [AccessEventKind.DeactivateOrgMember]: DeactivateOrgMemberDetail;
   [AccessEventKind.CreatePlaybook]: CreatePlaybookDetail;
   [AccessEventKind.DisablePlaybook]: DisablePlaybookDetail;
   [AccessEventKind.EditPlaybook]: EditPlaybookDetail;
