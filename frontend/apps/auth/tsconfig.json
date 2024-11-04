@@ -15,8 +15,9 @@
     "skipLibCheck": true,
     "strict": true,
     "paths": {
-      "react": ["node_modules/@types/react"],
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/idv/*": ["node_modules/@onefootprint/idv/src/*"],
+      "react": ["node_modules/@types/react"]
     }
   }
 }

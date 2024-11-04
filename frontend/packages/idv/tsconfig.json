@@ -8,8 +8,7 @@
     "types": ["google.maps", "jest"],
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"],
-      "@/identify/*": ["src/pages/identify-deprecated/*"]
+      "@/idv/*": ["./src/*"]
     }
   }
 }

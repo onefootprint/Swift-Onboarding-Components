@@ -6,6 +6,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
+      "@/idv/*": ["node_modules/@onefootprint/idv/src/*"],
       "src/*": ["./src/*"]
     },
     "types": ["../../styled.d.ts", "google.maps", "bun-types"]
