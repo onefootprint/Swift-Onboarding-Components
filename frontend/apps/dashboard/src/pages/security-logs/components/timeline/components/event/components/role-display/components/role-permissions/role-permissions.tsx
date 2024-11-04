@@ -1,21 +1,21 @@
-import { type Role, RoleScopeKind } from '@onefootprint/types';
+import { type RoleScope, RoleScopeKind } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useGetRoleText from './hooks/use-get-role-text/use-get-role-text';
 
 type RolePermissionsProps = {
-  role: Role;
+  scopes: RoleScope[];
+  name: string;
 };
 
-const RolePermissions = ({ role }: RolePermissionsProps) => {
+const RolePermissions = ({ scopes, name }: RolePermissionsProps) => {
   const getRoleText = useGetRoleText();
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.roles' });
-  const { scopes, name } = role;
   // In its current state, we have many scopes that represent a decryption, typically one for each DI.
   // For example: [{kind: "decrypt", data: "name"}, {kind: "decrypt", data: "email"}, {kind: "decrypt", data: "phone_number"}]
   // In our case, we just want to display "Decrypt data" for now, possibly later we'll add this functionality
   // The logic below gets rid of the individual scopes and just displays "Decrypt data"
-  const canDecrypt = role.scopes.some(scope => scope.kind === RoleScopeKind.decrypt);
+  const canDecrypt = scopes.some(scope => scope.kind === RoleScopeKind.decrypt);
   const roleScopesWithoutDecrypt = scopes.filter(scope => scope.kind !== RoleScopeKind.decrypt);
   const scopesTextWithoutDecrypt = roleScopesWithoutDecrypt.map(scope => getRoleText(scope));
   const scopesTextWithDecrypt = canDecrypt

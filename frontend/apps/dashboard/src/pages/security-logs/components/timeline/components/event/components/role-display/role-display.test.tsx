@@ -1,12 +1,11 @@
 import { customRender, screen, waitFor } from '@onefootprint/test-utils';
 import userEvent from '@testing-library/user-event';
 import RoleDisplay from './role-display';
-import { roleFixture } from './role-display.test.config';
 
 describe('<RoleDisplay />', () => {
   describe('when isNew is true', () => {
     it('should show role text with name', () => {
-      customRender(<RoleDisplay isNew role={roleFixture} />);
+      customRender(<RoleDisplay isNew name="Admin" scopes={[]} />);
       const element = screen.getByText('role (Admin)');
       expect(element).toBeInTheDocument();
     });
@@ -14,7 +13,7 @@ describe('<RoleDisplay />', () => {
 
   describe('when isNew is false', () => {
     it('should show only role name', () => {
-      customRender(<RoleDisplay role={roleFixture} />);
+      customRender(<RoleDisplay name="Admin" scopes={[]} />);
       const element = screen.getByText('Admin');
       expect(element).toBeInTheDocument();
     });
@@ -22,7 +21,7 @@ describe('<RoleDisplay />', () => {
 
   describe('hover behavior', () => {
     it('should show role permissions on hover', async () => {
-      customRender(<RoleDisplay role={roleFixture} />);
+      customRender(<RoleDisplay name="Admin" scopes={[]} />);
       const trigger = screen.getByText('Admin');
       await userEvent.hover(trigger);
       // RolePermissions component should be rendered

@@ -7,6 +7,7 @@ import {
 import { Stack } from '@onefootprint/ui';
 import DecryptUserData from './components/decrypt-user-data';
 import PrincipalActor from './components/principal-actor';
+
 const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
   const { principal, insightEvent, detail } = accessEvent;
   const { kind } = detail;

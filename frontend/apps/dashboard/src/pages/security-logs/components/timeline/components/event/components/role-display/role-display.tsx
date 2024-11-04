@@ -1,4 +1,4 @@
-import type { Role } from '@onefootprint/types';
+import type { RoleScope } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import * as HoverCard from '@radix-ui/react-hover-card';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +7,11 @@ import RolePermissions from './components/role-permissions';
 
 type RoleDisplayProps = {
   isNew?: boolean;
-  role: Role;
+  name: string;
+  scopes: RoleScope[];
 };
 
-const RoleDisplay = ({ isNew, role }: RoleDisplayProps) => {
+const RoleDisplay = ({ isNew, name, scopes }: RoleDisplayProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.roles' });
 
   return (
@@ -18,14 +19,14 @@ const RoleDisplay = ({ isNew, role }: RoleDisplayProps) => {
       <Stack gap={2} cursor="default">
         <HoverCard.Trigger asChild>
           <Text variant="label-3" textDecoration="underline">
-            {isNew ? `${t('role')} (${role.name})` : `${role.name}`}
+            {isNew ? `${t('role')} (${name})` : `${name}`}
           </Text>
         </HoverCard.Trigger>
       </Stack>
 
       <HoverCard.Portal>
         <HoverCardContent side="bottom" sideOffset={5} align="start">
-          <RolePermissions role={role} />
+          <RolePermissions scopes={scopes} name={name} />
         </HoverCardContent>
       </HoverCard.Portal>
     </HoverCard.Root>
