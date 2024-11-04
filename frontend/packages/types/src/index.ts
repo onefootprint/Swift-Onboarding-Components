@@ -420,6 +420,7 @@ export type {
   Timeline,
   TimelineEvent,
   UpdateUserDataDetail,
+  UpdateOrgRoleDetail,
   UserInsights,
   ValueTypeForBusinessDI,
   ValueTypeForIdDI,

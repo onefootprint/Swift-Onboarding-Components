@@ -8,6 +8,7 @@ export {
   type CreateUserAnnotationDetail,
   type CreateOrgApiKeyDetail,
   type DecryptOrgApiKeyDetail,
+  type UpdateOrgRoleDetail,
 } from './access-event';
 export type { AccessLog } from './access-log';
 export { AccessLogKind } from './access-log';

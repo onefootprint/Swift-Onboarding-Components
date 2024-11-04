@@ -68,6 +68,7 @@
     },
     "roles": {
       "created-a-new": "created a new",
+      "edited-the": "edited the",
       "role": "role",
       "role-permissions": "role permissions"
     },

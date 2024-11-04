@@ -34,7 +34,11 @@ export type CreateOrgRoleDetail = AccessEventDetailWrapper<{
   tenantRoleId: string;
 }>;
 
-export type UpdateUserDataDetail = AccessEventDetailWrapper<{}>;
+export type UpdateUserDataDetail = AccessEventDetailWrapper<{
+  roleName: string;
+  newScopes: RoleScope[];
+  prevScopes: RoleScope[];
+}>;
 
 export type DeleteUserDataDetail = AccessEventDetailWrapper<{}>;
 
@@ -45,6 +49,7 @@ export type DecryptUserDataDetail = AccessEventDetailWrapper<{
 }>;
 
 export type UpdateOrgRoleDetail = AccessEventDetailWrapper<{
+  roleName: string;
   prevScopes: RoleScope[];
   newScopes: RoleScope[];
   tenantRoleId: string;
