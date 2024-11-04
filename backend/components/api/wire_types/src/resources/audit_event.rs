@@ -93,6 +93,7 @@ pub enum AuditEventDetail {
         prev_scopes: Vec<TenantScope>,
         new_scopes: Vec<TenantScope>,
         tenant_role_id: TenantRoleId,
+        role_name: String,
     },
     CreateListEntry {
         list_id: ListId,
@@ -108,5 +109,7 @@ pub enum AuditEventDetail {
     EditPlaybook,
     DeactivateOrgRole {
         tenant_role_id: TenantRoleId,
+        role_name: String,
+        scopes: Vec<TenantScope>,
     },
 }
