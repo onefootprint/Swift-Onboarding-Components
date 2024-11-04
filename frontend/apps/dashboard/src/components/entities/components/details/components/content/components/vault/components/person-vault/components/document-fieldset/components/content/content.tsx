@@ -4,10 +4,8 @@ import type { Document, Entity, SupportedIdDocTypes } from '@onefootprint/types'
 import { Stack } from '@onefootprint/ui';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import { useDecryptControls } from '../../../../../vault-actions';
-import useUploadsAndDocuments from '../../hooks/use-uploads-and-documents';
-import type { UploadWithDocument } from '../../types';
-import LicenseItem from '../license-item';
-import UploadItem from '../upload-item';
+import useDocuments from '../../hooks/use-documents';
+import DocumentItem from '../document-item';
 
 type ContentProps = {
   entity: Entity;
@@ -15,8 +13,7 @@ type ContentProps = {
 
 const Content = ({ entity }: ContentProps) => {
   const seqno = useEntitySeqno();
-  const { data: uploadsAndDocuments, error } = useUploadsAndDocuments(entity.id, seqno);
-  const { licenseDocuments, uploadsWithDocuments } = uploadsAndDocuments || {};
+  const { data: documents, error } = useDocuments(entity.id, seqno);
   const { data: vaultData, update: updateVault } = useEntityVault(entity.id, entity);
   const { vault } = vaultData || {};
   const decryptControls = useDecryptControls();
@@ -39,30 +36,17 @@ const Content = ({ entity }: ContentProps) => {
   return (
     <>
       {error && getErrorMessage(error)}
-      {vault && uploadsAndDocuments && (
+      {vault && documents && (
         <Stack direction="column" gap={4}>
-          {licenseDocuments
-            ? licenseDocuments.map((document: Document) => (
-                <LicenseItem
-                  key={document.startedAt}
-                  entity={entity}
-                  document={document}
-                  vault={vault}
-                  onDecrypt={handleDecryptDocument}
-                />
-              ))
-            : null}
-          {uploadsWithDocuments
-            ? uploadsWithDocuments.map((upload: UploadWithDocument) => (
-                <UploadItem
-                  key={upload.documentId}
-                  entity={entity}
-                  upload={upload}
-                  vault={vault}
-                  onDecrypt={handleDecryptDocument}
-                />
-              ))
-            : null}
+          {documents.map((document: Document) => (
+            <DocumentItem
+              key={document.startedAt}
+              entity={entity}
+              document={document}
+              vault={vault}
+              onDecrypt={handleDecryptDocument}
+            />
+          ))}
         </Stack>
       )}
     </>

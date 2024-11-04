@@ -16,9 +16,9 @@ export const useDocumentField = (entity: Entity, vault: EntityVault) => {
   };
 
   const isDocTypeDecrypted = ({ uploads }: Document) => {
-    return uploads.some(({ identifier, version }) => {
-      const di = `${identifier}:${version}` as DataIdentifier;
-      return isVaultDataDecrypted(vault?.[di]);
+    return uploads.some(({ identifier: di, version }) => {
+      const diWithVersion = `${di}:${version}` as DataIdentifier;
+      return isVaultDataDecrypted(vault?.[di]) || isVaultDataDecrypted(vault?.[diWithVersion]);
     });
   };
 
