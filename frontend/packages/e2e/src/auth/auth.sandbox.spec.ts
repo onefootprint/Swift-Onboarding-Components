@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { sixDigitChallenger } from '../utils/commands';
 
 const iframeSelector = 'iframe[name^="footprint-iframe-"]';
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
-const key = process.env.E2E_AUTH_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
+const key = process.env.E2E_AUTH_KEY || 'pb_test_x4C4ofRAKiGuTuiD5CIuPI';
 
-const email = 'bruno@onefootprint.com';
+const email = 'sandbox@onefootprint.com';
 
 test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
   test.slow();
@@ -23,27 +24,29 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
     .first()
     .click();
 
-  const sandBoxEdit = page.frameLocator(iframeSelector).getByLabel('Edit');
+  const frame = page.frameLocator(iframeSelector);
+  const sandBoxEdit = frame.getByLabel('Edit');
   await expect(sandBoxEdit).toBeAttached();
   await sandBoxEdit.first().click();
 
-  await page.frameLocator(iframeSelector).getByPlaceholder('Enter test ID').fill('aoy4lrqr9oqKb');
-  await page.frameLocator(iframeSelector).getByLabel('Save').first().click();
+  await frame.getByPlaceholder('Enter test ID').fill('4nIf1LTzo8h7q');
+  await frame.getByLabel('Save').first().click();
 
-  const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
+  const emailEl = frame.getByLabel(/email/i);
   await emailEl.waitFor({ state: 'attached', timeout });
   await expect(emailEl).toBeAttached();
   await emailEl.first().fill(email);
 
-  await page
-    .frameLocator(iframeSelector)
+  await frame
     .getByRole('button')
     .filter({ hasText: /continue/i })
     .first()
     .click();
   await page.waitForLoadState();
 
-  await expect(
-    page.frameLocator(iframeSelector).locator('button').filter({ hasText: 'Send code to +49 ••••• •••••' }),
-  ).toBeAttached();
+  await expect(frame.getByText('Welcome back!').first()).toBeAttached();
+  await sixDigitChallenger('Enter the 6-digit code sent to +1 (•••) •••‑••00.', { frame, page });
+  await page.waitForLoadState();
+
+  await expect(frame.getByText('Welcome back!').first()).not.toBeAttached();
 });

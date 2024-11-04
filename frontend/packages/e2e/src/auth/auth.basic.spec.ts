@@ -4,7 +4,7 @@ import { verifyPhoneNumber } from '../utils/commands';
 
 const iframeSelector = 'iframe[name^="footprint-iframe-"]';
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
-const key = process.env.E2E_AUTH_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
+const key = process.env.E2E_AUTH_KEY || 'pb_test_x4C4ofRAKiGuTuiD5CIuPI';
 
 const email = 'sandbox@onefootprint.com';
 const phoneNumber = '5555550100';
@@ -26,12 +26,13 @@ test('Auth with email, fill phone number, verify phone #ci', async ({ browserNam
     .first()
     .click();
 
-  const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
+  const frame = page.frameLocator(iframeSelector);
+
+  const emailEl = frame.getByLabel(/email/i);
   await emailEl.waitFor({ state: 'attached', timeout });
   await emailEl.first().fill(email);
 
-  await page
-    .frameLocator(iframeSelector)
+  await frame
     .getByRole('button')
     .filter({ hasText: /continue/i })
     .first()
@@ -39,20 +40,19 @@ test('Auth with email, fill phone number, verify phone #ci', async ({ browserNam
 
   await page.waitForLoadState();
 
-  const phoneEl = page.frameLocator(iframeSelector).locator('input[name="phoneNumber"]');
+  const phoneEl = frame.locator('input[name="phoneNumber"]');
   await phoneEl.waitFor({ state: 'attached', timeout });
   await phoneEl.fill(phoneNumber);
 
-  await page
-    .frameLocator(iframeSelector)
+  await frame
     .getByRole('button')
     .filter({ hasText: /verify with sms/i })
     .first()
     .click();
   await page.waitForLoadState();
 
-  await verifyPhoneNumber({ frame: page.frameLocator(iframeSelector), page });
+  await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  expect(1).toBe(1);
+  await expect(frame.getByText('Verify your phone number')).not.toBeAttached();
 });

@@ -130,7 +130,5 @@ test.describe('/components/form', () => {
         country: 'US',
       },
     });
-
-    expect(1).toBe(1);
   });
 });
