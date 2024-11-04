@@ -119,7 +119,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
             .bos
             .iter()
             .filter_map(|bo| bo.ownership_stake)
-            .sum::<i32>();
+            .sum::<u32>();
         // Per BSA/AML regulations, tenants performing KYB must verify all BOs that
         // either 1) own 25% of the business or 2) exert significant control
         //
@@ -225,7 +225,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         let bo_ownership_total = bo_obds
             .iter()
             .filter_map(|(_, _, bo)| bo.ownership_stake)
-            .sum::<i32>();
+            .sum::<u32>();
         // Per BSA/AML regulations, tenants performing KYB must verify all BOs that
         // either 1) own 25% of the business or 2) exert significant control
         //

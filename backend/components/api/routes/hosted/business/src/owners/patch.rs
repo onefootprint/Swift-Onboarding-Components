@@ -115,7 +115,7 @@ pub(super) fn validate_collective_bos(
     let mut bo_emails: HashMap<_, _> = dbos.iter().map(|b| (&b.bo.uuid, b.email())).collect();
     let mut ownerships: HashMap<_, _> = dbos
         .iter()
-        .flat_map(|b| b.bo.ownership_stake.as_ref().map(|s| (&b.bo.uuid, *s as u32)))
+        .flat_map(|b| b.ownership_stake.as_ref().map(|s| (&b.bo.uuid, *s)))
         .collect();
     for op in ops {
         let (uuid, data, ownership_stake) = match &op {
@@ -210,7 +210,6 @@ impl BatchRequest {
                 data,
             } => {
                 let bo = BusinessOwner::get(conn, (bv_id, &uuid))?;
-
                 if !data.is_empty() && bo.has_linked_user() {
                     return ValidationError("This owner is already linked to a user and cannot be updated")
                         .into();

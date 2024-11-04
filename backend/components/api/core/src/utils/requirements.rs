@@ -25,11 +25,13 @@ use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::AuthMethodKind;
 use newtypes::AuthorizeFields;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerSource;
 use newtypes::CollectDocumentConfig;
 use newtypes::CollectedData;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::ContactInfoKind;
+use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::Declaration;
 use newtypes::DocumentCdoInfo;
@@ -431,7 +433,9 @@ fn get_collect_kyb_data_requirement<T>(
             // Maybe don't require phone and email for primary
             let vd_exists =
                 (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
-            let ownership_stake_exists = bo.bo.ownership_stake.is_some();
+
+            let stake_di = DataIdentifier::Business(BDK::BeneficialOwnerStake(bo.bo.link_id.clone()));
+            let ownership_stake_exists = bvw.has_field(&stake_di);
             if bo.has_linked_user() {
                 // Once there's a user linked, this BO's data will be collected by a CollectData
                 // requirement. We just have to make sure the ownership stake is set

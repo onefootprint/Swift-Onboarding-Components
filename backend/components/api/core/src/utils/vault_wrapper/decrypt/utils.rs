@@ -55,6 +55,7 @@ pub struct BusinessOwnerInfo {
     /// Data for the provided beneficial owner. Includes at most id.phone_number, id.email,
     /// id.first_name, and id.last_name. Accessed only through util methods
     pub data: HashMap<DI, PiiString>,
+    pub ownership_stake: Option<u32>,
 }
 
 impl BusinessOwnerInfo {
@@ -125,23 +126,6 @@ impl TenantVw<Business> {
             })
             .collect::<FpResult<HashMap<_, _>>>()?;
 
-        let linked_bos = linked_bos
-            .into_iter()
-            .map(|(mut bo, sv_v)| {
-                let di = DI::Business(BDK::BeneficialOwnerStake(bo.link_id.clone()));
-
-                // Migration:
-                // Coalesce the new vaulted stake with the stake read from the database. Favor the
-                // vaulted value if it exists. We have disabled deleting vaulted ownership_stake so
-                // a null value in the vault always means the correct value is in the DB.
-                let vaulted_stake = vaulted_ownership_stakes.get(&di).copied();
-                let db_stake = bo.ownership_stake;
-                bo.ownership_stake = vaulted_stake.or(db_stake);
-
-                Ok((bo, sv_v))
-            })
-            .collect::<FpResult<Vec<_>>>()?;
-
         let decrypt_futs = bo_vws.into_iter().map(|(sv_id, vw)| async move {
             let decrypted = vw
                 .decrypt_unchecked(&state.enclave_client, BusinessOwnerInfo::USER_DIS)
@@ -178,7 +162,19 @@ impl TenantVw<Business> {
                         })
                         .collect()
                 };
-                Ok(BusinessOwnerInfo { data, bo, su })
+
+                let stake_di = DI::Business(BDK::BeneficialOwnerStake(bo.link_id.clone()));
+                let ownership_stake = vaulted_ownership_stakes
+                    .get(&stake_di)
+                    .copied()
+                    .map(|stake| stake as u32);
+
+                Ok(BusinessOwnerInfo {
+                    data,
+                    bo,
+                    su,
+                    ownership_stake,
+                })
             })
             .collect::<FpResult<Vec<_>>>()?;
 

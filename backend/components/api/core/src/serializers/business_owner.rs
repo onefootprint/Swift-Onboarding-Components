@@ -23,7 +23,7 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
             id: bo.bo.id,
             status: bo.su.as_ref().map(|su| su.status),
             fp_id: bo.su.map(|su| su.fp_id),
-            ownership_stake: bo.bo.ownership_stake.map(|i| i as u32),
+            ownership_stake: bo.ownership_stake,
             ownership_stake_di,
             kind: bo.bo.kind,
             source: bo.bo.source,
@@ -35,7 +35,12 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
 impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wire_types::HostedBusinessOwner {
     fn from_db((bo, user_auth): (BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)) -> Self {
         let has_linked_user = bo.has_linked_user();
-        let BusinessOwnerInfo { bo, su, data } = bo;
+        let BusinessOwnerInfo {
+            bo,
+            su,
+            data,
+            ownership_stake,
+        } = bo;
         let is_authed_user = su.is_some_and(|su| su.id == user_auth.scoped_user.id);
         let is_mutable = !has_linked_user || is_authed_user;
         let populated_data = data.keys().cloned().collect();
@@ -60,7 +65,7 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wir
             is_mutable,
             populated_data,
             decrypted_data,
-            ownership_stake: bo.ownership_stake.map(|s| s as u32),
+            ownership_stake,
             created_at: bo.created_at,
         }
     }
