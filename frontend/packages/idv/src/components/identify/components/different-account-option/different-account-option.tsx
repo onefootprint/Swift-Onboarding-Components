@@ -3,7 +3,7 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger } from '@/idv/utils';
 import LegalFooter from '../../../legal-footer';
 import { useIdentifyMachine } from '../../state';
 

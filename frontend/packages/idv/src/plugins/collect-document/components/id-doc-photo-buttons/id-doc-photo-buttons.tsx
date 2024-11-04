@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { Logger } from '../../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import useProcessImage from '../../hooks/use-process-image';
 import type { ReceivedImagePayload } from '../../types';
 

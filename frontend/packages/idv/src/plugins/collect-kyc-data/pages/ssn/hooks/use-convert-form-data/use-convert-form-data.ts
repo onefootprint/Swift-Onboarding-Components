@@ -1,6 +1,6 @@
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
-import { getLogger } from '../../../../../../utils/logger';
+import { getLogger } from '@/idv/utils';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import getAllKycAttributes from '../../../../utils/all-attributes/all-attributes';
 import type { KycData } from '../../../../utils/data-types';

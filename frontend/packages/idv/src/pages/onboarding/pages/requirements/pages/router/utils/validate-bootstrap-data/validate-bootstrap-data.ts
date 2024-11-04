@@ -29,10 +29,8 @@ import {
 import isFuture from 'date-fns/isFuture';
 import snakeCase from 'lodash/snakeCase';
 
-// TODO: Fix this
-import type { BusinessData, DIMetadata, UserData } from '../../../../../../../../types';
-import { isNumber, isObject, isStringValid } from '../../../../../../../../utils';
-import { getLogger } from '../../../../../../../../utils/logger';
+import type { BusinessData, DIMetadata, UserData } from '@/idv/types';
+import { getLogger, isNumber, isObject, isStringValid } from '@/idv/utils';
 
 // biome-ignore lint/suspicious/noExplicitAny: This is intentional
 type Predicate = (...args: any[]) => boolean;

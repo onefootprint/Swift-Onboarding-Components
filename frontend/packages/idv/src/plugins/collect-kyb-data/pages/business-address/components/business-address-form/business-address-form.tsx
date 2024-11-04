@@ -6,7 +6,7 @@ import { AddressInput, Grid, Stack, TextInput } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
+import EditableFormButtonContainer from '@/idv/components/editable-form-button-container';
 import type { BusinessAddressData } from '../../../../utils/state-machine/types';
 import getAddressComponent from '../../utils/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country';

@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { Logger } from '@/idv/utils';
 import { useD2PSms } from '../../../../queries';
-import { Logger } from '../../../../utils/logger';
 
 const COUNTER_SECONDS = 10;
 

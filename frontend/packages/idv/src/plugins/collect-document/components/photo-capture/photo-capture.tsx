@@ -4,10 +4,10 @@ import { Box } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
+import { getLogger } from '@/idv/utils';
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
 import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../components';
 import useHandleCameraError from '../../../../plugins/collect-document/hooks/use-handle-camera-error';
-import { getLogger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind, ReceivedImagePayload } from '../../types';
 import { bytesToMegabytes, isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';

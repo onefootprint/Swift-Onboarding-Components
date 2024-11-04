@@ -1,7 +1,7 @@
 import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { getLogger } from '../../../../../utils/logger';
+import { getLogger } from '@/idv/utils';
 import { isDenied, isGranted, isMobileKind, isPrompt } from '../../../utils/capture';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';

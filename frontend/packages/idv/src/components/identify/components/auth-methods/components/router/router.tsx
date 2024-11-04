@@ -2,13 +2,12 @@ import { AuthMethodKind } from '@onefootprint/types';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { NavigationHeaderLeftButtonProps } from '@/idv/components/layout';
+import StepHeader from '@/idv/components/step-header';
+import { useDeviceInfo } from '@/idv/hooks';
+import Liveness from '@/idv/plugins/liveness';
+import { checkIsInIframe, getLogger, trackAction } from '@/idv/utils';
 import { Identify, IdentifyVariant, UpdateEmail, UpdatePhone } from '../../../..';
-import { useDeviceInfo } from '../../../../../../hooks';
-import Liveness from '../../../../../../plugins/liveness';
-import { getLogger, trackAction } from '../../../../../../utils';
-import checkIsIframe from '../../../../../../utils/check-is-in-iframe';
-import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
-import StepHeader from '../../../../../step-header';
 import type { HeaderProps } from '../../../../types';
 import type { AuthMethodsMachineContext as MachineContext } from '../../state';
 import { useAuthMethodsMachine } from '../../state';
@@ -118,7 +117,7 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
           idvContext={{
             authToken: context.verifyToken,
             device: device,
-            isInIframe: checkIsIframe(),
+            isInIframe: checkIsInIframe(),
           }}
           onDone={() => {
             trackAction('update-auth-methods:update-completed', { kind: 'passkey' });

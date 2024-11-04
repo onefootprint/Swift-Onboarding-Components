@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 
+import { getLogger, trackAction } from '@/idv/utils';
 import { useTranslation } from 'react-i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useLogStateMachine } from '../../../../hooks';
-import { trackAction } from '../../../../utils/logger';
-import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import { trackInitializedSteps } from '../../utils/utils';
 import Animation from '../animation';

@@ -1,7 +1,7 @@
 import { DocumentUploadSettings, type IdDocImageTypes } from '@onefootprint/types';
 
+import { NavigationHeader } from '@/idv/components';
 import { Stack } from '@onefootprint/ui';
-import { NavigationHeader } from '../../../../../components';
 import ErrorComponent from '../../../components/error';
 import FadeInContainer from '../../../components/fade-in-container';
 import IdDocPhotoButtons from '../../../components/id-doc-photo-buttons';

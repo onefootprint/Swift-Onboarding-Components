@@ -3,11 +3,11 @@ import { BusinessDI, type BusinessDIData } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { SectionAction } from '@/idv/components/confirm-collected-data';
+import { Section, SectionItem } from '@/idv/components/confirm-collected-data';
+import type { SectionItemProps } from '@/idv/components/confirm-collected-data/components/section-item';
 import { Box } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import type { SectionAction } from '../../../../../../components/confirm-collected-data';
-import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
-import type { SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BasicData from '../../../basic-data';
 

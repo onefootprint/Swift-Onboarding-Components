@@ -4,8 +4,8 @@ import type { CountrySelectOption } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
-import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '@/idv/components/confirm-collected-data';
+import { Section, SectionItem } from '@/idv/components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import isCountryUsOrTerritories from '../../../../utils/state-machine/utils/is-country-us-or-territories';
 import LegalStatus from '../../../legal-status';

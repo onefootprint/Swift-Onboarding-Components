@@ -1,4 +1,4 @@
-import { getLogger } from '../../../utils/logger';
+import { getLogger } from '@/idv/utils';
 import type { CompletePayload, SendResultCallback, WebViewAdapterReturn } from '../types';
 
 const { logError, logInfo, logTrack } = getLogger({ location: 'idv-webview' });

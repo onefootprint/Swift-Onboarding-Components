@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { Logger } from '../../../../../utils';
+import { Logger } from '@/idv/utils';
 import useSubmitDocType from '../../../hooks/use-submit-doc-type';
 import { isMobileKind } from '../../../utils/capture';
 import { useNonIdDocMachine } from '../../components/machine-provider';

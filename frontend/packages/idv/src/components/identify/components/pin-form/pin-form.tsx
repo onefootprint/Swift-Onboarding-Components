@@ -2,7 +2,7 @@ import { PinInput, Stack, Text } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import styled, { css } from 'styled-components';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger } from '@/idv/utils';
 import InlineAction from '../inline-action';
 import type { ResendButtonProps } from './components/resend-button';
 import ResendButton from './components/resend-button';

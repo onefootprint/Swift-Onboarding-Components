@@ -1,7 +1,7 @@
 import type { AuthMethodKind } from '@onefootprint/types';
 import type { Assigner } from 'xstate';
 
-import { isObject, isString } from '../../../../../utils';
+import { isObject, isString } from '@/idv/utils';
 import type { AuthMethodsMachineEvents as Events, AuthMethodsMachineContext as MachineContext } from './types';
 
 type Obj = Record<string, unknown>;

@@ -29,9 +29,8 @@ import {
 import isFuture from 'date-fns/isFuture';
 import snakeCase from 'lodash/snakeCase';
 
-import type { DIMetadata, UserData } from '../../../../../../types';
-import { isNumber, isObject, isStringValid } from '../../../../../../utils';
-import { getLogger } from '../../../../../../utils/logger';
+import type { DIMetadata, UserData } from '@/idv/types';
+import { getLogger, isNumber, isObject, isStringValid } from '@/idv/utils';
 
 // biome-ignore lint/suspicious/noExplicitAny: This is intentional
 type Predicate = (...args: any[]) => boolean;

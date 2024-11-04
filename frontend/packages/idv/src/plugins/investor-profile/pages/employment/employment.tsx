@@ -1,5 +1,5 @@
+import { getLogger, trackAction } from '@/idv/utils';
 import { InvestorProfileDI } from '@onefootprint/types';
-import { getLogger, trackAction } from '../../../../utils/logger';
 import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';

@@ -1,6 +1,6 @@
 import type { AuthMethodKind, DecryptUserResponse, UserChallengeActionKind } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../../hooks';
+import type { DeviceInfo } from '@/idv/hooks';
 
 type DashboardEntryStatus = 'empty' | 'set';
 type DashboardPayload = {

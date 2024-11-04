@@ -2,7 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { D2PStatus } from '@onefootprint/types';
 
-import { Logger } from '../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import useTransferMachine from './use-machine';
 
 const useHandleD2PStatusUpdate = () => {

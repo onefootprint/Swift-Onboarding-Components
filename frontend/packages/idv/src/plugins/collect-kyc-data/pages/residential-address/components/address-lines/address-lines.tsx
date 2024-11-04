@@ -3,7 +3,7 @@ import { AddressInput, TextInput } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { getAddressComponent } from '../../../../../../utils';
+import { getAddressComponent } from '@/idv/utils';
 import type { FormData } from '../../types';
 
 const AddressLines = () => {

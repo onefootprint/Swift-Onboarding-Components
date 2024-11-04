@@ -10,10 +10,10 @@ import { Divider, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
-import { useOnboardingAuthorize } from '../../../../../../queries';
-import { getLogger, trackAction } from '../../../../../../utils/logger';
+import HeaderTitle from '@/idv/components/layout/components/header-title';
+import NavigationHeader from '@/idv/components/layout/components/navigation-header';
+import { useOnboardingAuthorize } from '@/idv/queries';
+import { getLogger, trackAction } from '@/idv/utils';
 import { isDocCdo, isInvestorProfileCdo, isKybCdo, isKycCdo } from '../../../../utils/cdo-utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';

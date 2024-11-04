@@ -6,8 +6,8 @@ import { useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getBiometricChallengeResponse, getLogger } from '../../../../../utils';
-import { useIdentifyVerify, useLoginChallenge } from '../../../queries';
+import { useIdentifyVerify, useLoginChallenge } from '@/idv/components/identify/queries';
+import { getBiometricChallengeResponse, getLogger } from '@/idv/utils';
 import { useIdentifyMachine } from '../../../state';
 import getTokenScope from '../../../utils/token-scope';
 

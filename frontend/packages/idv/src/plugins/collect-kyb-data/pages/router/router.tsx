@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
+import { getLogger, trackAction } from '@/idv/utils';
 import { useLogStateMachine } from '../../../../hooks';
-import { getLogger, trackAction } from '../../../../utils/logger';
 import Loading from '../../components/loading';
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import BasicData from '../basic-data';

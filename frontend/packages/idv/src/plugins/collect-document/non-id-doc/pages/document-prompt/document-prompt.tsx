@@ -4,9 +4,9 @@ import { DocumentRequestKind, DocumentUploadSettings } from '@onefootprint/types
 import { Divider, LinkButton, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
+import { NavigationHeader } from '@/idv/components';
+import useOnboardingRequirementsMachine from '@/idv/pages/onboarding/pages/requirements/hooks/use-onboarding-requirements-machine';
 import styled, { css } from 'styled-components';
-import { NavigationHeader } from '../../../../../components';
-import useOnboardingRequirementsMachine from '../../../../../pages/onboarding/pages/requirements/hooks/use-onboarding-requirements-machine';
 import FadeInContainer from '../../../components/fade-in-container';
 import IdDocPhotoButtons from '../../../components/id-doc-photo-buttons';
 import PromptWithGuidelines from '../../../components/prompt-with-guidelines';

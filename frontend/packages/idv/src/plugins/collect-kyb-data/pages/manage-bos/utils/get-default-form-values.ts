@@ -1,3 +1,4 @@
+import type { BootstrapBusinessData, UserData } from '@/idv/types';
 import { uuidv4 } from '@onefootprint/dev-tools';
 import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import {
@@ -6,7 +7,6 @@ import {
   BootstrapOnlyBusinessSecondaryOwnersKey,
   IdDI,
 } from '@onefootprint/types';
-import type { BootstrapBusinessData, UserData } from '../../../../../types';
 import type { NewBusinessOwner } from '../manage-bos.types';
 
 const getDefaultFormValues = (

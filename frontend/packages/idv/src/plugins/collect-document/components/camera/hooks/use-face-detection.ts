@@ -1,6 +1,6 @@
 import { TinyFaceDetectorOptions, detectSingleFace, matchDimensions, resizeResults } from 'face-api.js';
 
-import { Logger } from '../../../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import { useFaceModel } from '../../../hooks/use-face-model-loader';
 import { calculateFaceAngle, isFaceCloseEnough, isFaceInTheFrame, isHeadStraight } from '../utils/face-utils';
 

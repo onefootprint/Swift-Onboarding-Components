@@ -1,11 +1,11 @@
+import { useDecryptUser } from '@/idv/queries';
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { type CountryCode, IdDI, type SubmitDocTypeResponse } from '@onefootprint/types';
 import type { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
-import { useDecryptUser } from '../../../../../queries';
 
+import { isObject } from '@/idv/utils/type-guards';
 import { useEffect, useState } from 'react';
-import { isObject } from '../../../../../utils/type-guards';
 import { useIdDocMachine } from '../../components/machine-provider';
 import IdDocCountryAndTypeContainer from './components/id-doc-country-and-type-container';
 import Loading from './components/loading';

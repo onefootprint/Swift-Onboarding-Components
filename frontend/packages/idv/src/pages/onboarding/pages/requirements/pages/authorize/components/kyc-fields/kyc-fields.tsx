@@ -30,7 +30,7 @@ import {
 import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import { isKycCdo } from '../../../../../../utils/cdo-utils';
+import { isKycCdo } from '@/idv/pages/onboarding/utils/cdo-utils';
 import type { FieldProps } from '../field';
 import FieldsList from '../fields-list';
 

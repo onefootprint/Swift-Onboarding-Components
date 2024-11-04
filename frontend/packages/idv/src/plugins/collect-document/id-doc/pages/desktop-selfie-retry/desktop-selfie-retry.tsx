@@ -4,8 +4,8 @@ import { Box, Button } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { NavigationHeader } from '@/idv/components';
 import upperFirst from 'lodash/upperFirst';
-import { NavigationHeader } from '../../../../../components';
 import DesktopHeader from '../../../components/desktop-header';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
 import ErrorComponent from '../../../components/error';

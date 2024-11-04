@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { getLogger } from '../../../../../utils';
-import { isUndefined } from '../../../../../utils/type-guards';
+import { getLogger, isUndefined } from '@/idv/utils';
 import type { CameraSide } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';
 

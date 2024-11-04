@@ -4,11 +4,11 @@ import { useToast } from '@onefootprint/ui';
 import omit from 'lodash/omit';
 import { useTranslation } from 'react-i18next';
 
+import { getLogger } from '@/idv/utils';
 import { useRequestError } from '@onefootprint/request';
 import { useL10nContext } from '../../../../components/l10n-provider';
 import { useIdvRequestErrorToast } from '../../../../hooks';
 import { useUserData } from '../../../../queries';
-import { getLogger } from '../../../../utils/logger';
 import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';
 import getRequestData from './utils/get-request-data';

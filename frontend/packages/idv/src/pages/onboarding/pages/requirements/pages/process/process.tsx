@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { getLogger, trackAction } from '../../../../../../utils/logger';
+import { getLogger, trackAction } from '@/idv/utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';
 

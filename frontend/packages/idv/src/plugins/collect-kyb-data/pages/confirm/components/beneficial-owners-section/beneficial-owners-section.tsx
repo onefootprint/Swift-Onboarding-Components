@@ -3,10 +3,10 @@ import { IdDI } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { SectionItemProps } from '@/idv/components/confirm-collected-data';
+import { MultiSection, Section, SectionItem } from '@/idv/components/confirm-collected-data';
+import { useBusinessOwners } from '@/idv/queries';
 import { Box, Shimmer, Stack } from '@onefootprint/ui';
-import type { SectionItemProps } from '../../../../../../components/confirm-collected-data';
-import { MultiSection, Section, SectionItem } from '../../../../../../components/confirm-collected-data';
-import { useBusinessOwners } from '../../../../../../queries';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BeneficialOwnersConfirm from './components/beneficial-owners-confirm';
 

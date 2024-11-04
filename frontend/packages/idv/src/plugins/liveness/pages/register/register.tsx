@@ -8,11 +8,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import { getLogger, trackAction } from '@/idv/utils';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useSkipLiveness } from '../../../../queries';
 import { FPCustomEvents, sendCustomEvent } from '../../../../utils/custom-event';
-import { getLogger, trackAction } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit, { isRegisterPasskeyError } from '../../hooks/use-register-biometric';
 

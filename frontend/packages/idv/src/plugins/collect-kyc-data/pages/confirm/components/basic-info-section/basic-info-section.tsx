@@ -6,8 +6,8 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { SectionItemProps } from '../../../../../../components/confirm-collected-data';
-import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
+import type { SectionItemProps } from '@/idv/components/confirm-collected-data';
+import { Section, SectionItem } from '@/idv/components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import type { VerifiedMethods } from '../../../../types';
 import BasicInformation from '../../../basic-information';

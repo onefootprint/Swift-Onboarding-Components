@@ -2,7 +2,7 @@ import type { FootprintProps } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent, FootprintPublicEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 
-import { getLogger } from '../../../utils/logger';
+import { getLogger } from '@/idv/utils';
 import type { CompletePayload, CustomChildAPI, IframeAdapterReturn } from '../types';
 import generateEventEmitter from '../utils/generate-event-emitter';
 

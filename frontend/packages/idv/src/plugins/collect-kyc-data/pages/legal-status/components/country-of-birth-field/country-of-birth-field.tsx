@@ -3,7 +3,7 @@ import type { FieldError } from 'react-hook-form';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { useL10nContext } from '../../../../../../components/l10n-provider';
+import { useL10nContext } from '@/idv/components/l10n-provider';
 
 const CountryOfBirthField = () => {
   const { t } = useTranslation('idv', {

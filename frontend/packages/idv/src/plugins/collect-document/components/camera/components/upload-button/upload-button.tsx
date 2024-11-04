@@ -4,7 +4,7 @@ import type React from 'react';
 import { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Logger } from '../../../../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import { CAPTURE_BTN_DEFAULT_INNER_RADIUS } from '../../../../constants';
 import useProcessImage from '../../../../hooks/use-process-image';
 import type { ReceivedImagePayload } from '../../../../types';

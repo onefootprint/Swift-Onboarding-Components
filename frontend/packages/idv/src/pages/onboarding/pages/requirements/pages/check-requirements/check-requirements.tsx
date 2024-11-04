@@ -2,8 +2,8 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { useEffect } from 'react';
 
-import { useGetOnboardingStatus } from '../../../../../../queries';
-import { getLogger, trackAction } from '../../../../../../utils/logger';
+import { useGetOnboardingStatus } from '@/idv/queries';
+import { getLogger, trackAction } from '@/idv/utils';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import filterRequirementsToShow from './utils/filter-requirements-to-show';
 

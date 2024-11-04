@@ -6,10 +6,10 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
+import NavigationHeader from '@/idv/components/layout/components/navigation-header';
+import { getLogger, trackAction } from '@/idv/utils';
 import upperFirst from 'lodash/upperFirst';
 import styled, { css } from 'styled-components';
-import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { getLogger, trackAction } from '../../../../../utils/logger';
 import DesktopHeader from '../../../components/desktop-header';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';

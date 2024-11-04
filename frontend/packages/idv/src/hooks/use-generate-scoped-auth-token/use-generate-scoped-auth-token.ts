@@ -3,9 +3,9 @@ import { getSessionId } from '@onefootprint/dev-tools';
 import type { D2PGenerateResponse, IdDocOutcome, L10n } from '@onefootprint/types';
 import { useEffect } from 'react';
 
+import { getLogger } from '@/idv/utils';
 import type { DeviceInfo } from '..';
 import { useD2PGenerate } from '../../queries';
-import { getLogger } from '../../utils/logger';
 
 type GenerateScopedAuthTokenArgs = {
   authToken: string;

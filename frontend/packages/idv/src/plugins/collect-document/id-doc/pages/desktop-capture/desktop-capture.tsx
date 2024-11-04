@@ -2,7 +2,7 @@ import type { IdDocImageUploadError } from '@onefootprint/types';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import type { ComponentProps } from 'react';
 
-import { NavigationHeader } from '../../../../../components';
+import { NavigationHeader } from '@/idv/components';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
 import { isSelfie } from '../../../utils/capture';
 import useDocName from '../../hooks/use-doc-name';

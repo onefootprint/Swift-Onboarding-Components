@@ -8,12 +8,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { useL10nContext } from '../../../../../../components/l10n-provider';
-import HeaderTitle from '../../../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
-import StickyBottomBox from '../../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
-import { useIdvRequestErrorToast } from '../../../../../../hooks';
-import { getLogger } from '../../../../../../utils/logger';
+import { useL10nContext } from '@/idv/components/l10n-provider';
+import HeaderTitle from '@/idv/components/layout/components/header-title';
+import NavigationHeader from '@/idv/components/layout/components/navigation-header';
+import StickyBottomBox from '@/idv/components/layout/components/sticky-bottom-box/sticky-bottom-box';
+import { useIdvRequestErrorToast } from '@/idv/hooks';
+import { getLogger } from '@/idv/utils';
 import useSubmitDocType from '../../../../hooks/use-submit-doc-type';
 import { isMobileKind } from '../../../../utils/capture';
 import { getCountryFromCode, getDefaultCountry } from '../../../../utils/get-country-from-code';

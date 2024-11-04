@@ -3,7 +3,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import Script from 'next/script';
 
-import { Logger } from '../../utils/logger';
+import { Logger } from '@/idv/utils';
 import nid from '../../utils/neuro-id';
 
 const NID_LIVE_SITE_NAME = 'humor717';

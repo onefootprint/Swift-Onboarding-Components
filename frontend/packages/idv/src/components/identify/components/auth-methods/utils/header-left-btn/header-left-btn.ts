@@ -1,4 +1,4 @@
-import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
+import type { NavigationHeaderLeftButtonProps } from '@/idv/components/layout';
 import type { AuthMethodsMachineHook, AuthMethodsMachineState } from '../../state';
 
 const getHeaderLeftNavButton = (

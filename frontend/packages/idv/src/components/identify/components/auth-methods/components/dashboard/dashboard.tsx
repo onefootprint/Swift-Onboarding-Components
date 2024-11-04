@@ -8,9 +8,8 @@ import type { ComponentProps } from 'react';
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import checkIsIframe from '../../../../../../utils/check-is-in-iframe';
 
-import { getLogger, trackAction } from '../../../../../../utils/logger';
+import { checkIsInIframe, getLogger, trackAction } from '@/idv/utils';
 import useEffectOnceStrict from '../../../../hooks/use-effect-once-strict';
 import { useDecryptUser, useUserAuthMethods } from '../../../../queries';
 import { useAuthMethodsMachine } from '../../state';
@@ -27,7 +26,7 @@ type DashboardProps = Pick<TComponentProps, 'children' | 'Header'> & {
 
 const EmailAndPhone: IdDI[] = [IdDI.email, IdDI.phoneNumber];
 const EmptyMethodsMap: MethodsMap = Object.create(null);
-const isAppInIframe = checkIsIframe();
+const isAppInIframe = checkIsInIframe();
 
 const actionKind = (isVerified: boolean): UserChallengeActionKind =>
   isVerified ? UserChallengeActionKind.replace : UserChallengeActionKind.addPrimary;

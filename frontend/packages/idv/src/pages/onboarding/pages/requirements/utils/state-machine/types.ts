@@ -1,7 +1,7 @@
 import type { IdDocOutcome, OnboardingRequirement, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
-import type { BootstrapBusinessData, UserData } from '../../../../../../types';
-import type { CommonIdvContext } from '../../../../../../utils/state-machine';
+import type { BootstrapBusinessData, UserData } from '@/idv/types';
+import type { CommonIdvContext } from '@/idv/utils/state-machine';
 
 export type MachineContext = {
   idvContext: CommonIdvContext;

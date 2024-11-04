@@ -1,7 +1,7 @@
 import { UserChallengeActionKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { DeviceInfo } from '../../../../../hooks/use-device-info';
+import type { DeviceInfo } from '@/idv/hooks/use-device-info';
 import {
   assignDecryptedData,
   assignDevice,

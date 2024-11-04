@@ -4,11 +4,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box';
-import { LAYOUT_CONTAINER_ID } from '../../../../../components/layout/constants';
-import { useIdvRequestErrorToast } from '../../../../../hooks';
-import { getLogger } from '../../../../../utils/logger';
+import NavigationHeader from '@/idv/components/layout/components/navigation-header';
+import StickyBottomBox from '@/idv/components/layout/components/sticky-bottom-box';
+import { LAYOUT_CONTAINER_ID } from '@/idv/components/layout/constants';
+import { useIdvRequestErrorToast } from '@/idv/hooks';
+import { getLogger } from '@/idv/utils';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';
 import useConsent from '../../hooks/use-consent';

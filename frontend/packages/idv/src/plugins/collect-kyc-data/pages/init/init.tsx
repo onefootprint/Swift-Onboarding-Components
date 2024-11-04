@@ -1,6 +1,6 @@
 import { LoadingSpinner, Stack } from '@onefootprint/ui';
 
-import { getLogger, trackAction } from '../../../../utils/logger';
+import { getLogger, trackAction } from '@/idv/utils';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import type { KycData } from '../../utils/data-types';
 import useDecryptKycData from './hooks/use-decrypt-kyc-data/use-decrypt-kyc-data';

@@ -1,9 +1,9 @@
+import { getLogger, trackAction } from '@/idv/utils';
 import { IcoCamera40, IcoClose24, IcoImages24 } from '@onefootprint/icons';
 import { Box, Button, IconButton, Text, media, useToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle } from 'styled-components';
-import { getLogger, trackAction } from '../../../../utils/logger';
 import { getMediaStream } from '../camera/hooks/use-user-media';
 
 type T = TFunction<'idv', 'document-flow'>;

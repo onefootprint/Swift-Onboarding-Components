@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useCountdown, useEffectOnce, useInterval, useTimeout } from 'usehooks-ts';
 
-import { getLogger, trackAction } from '../../../../utils/logger';
+import { getLogger, trackAction } from '@/idv/utils';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,

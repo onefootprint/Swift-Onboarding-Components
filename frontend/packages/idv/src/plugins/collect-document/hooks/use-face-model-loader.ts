@@ -3,7 +3,7 @@ import { nets } from 'face-api.js';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { Logger } from '../../../utils/logger';
+import { Logger } from '@/idv/utils';
 
 type FaceModelLoaderType = {
   isSelfieRequired: boolean;

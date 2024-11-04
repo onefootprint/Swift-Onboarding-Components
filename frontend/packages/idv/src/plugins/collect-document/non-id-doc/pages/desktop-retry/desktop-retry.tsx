@@ -1,6 +1,6 @@
 import type { IdDocImageUploadError } from '@onefootprint/types';
 
-import { NavigationHeader } from '../../../../../components';
+import { NavigationHeader } from '@/idv/components';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
 import type { ReceivedImagePayload } from '../../../types';
 import { useNonIdDocMachine } from '../../components/machine-provider';

@@ -4,10 +4,10 @@ import { LoadingSpinner } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 
+import { getLogger, trackAction } from '@/idv/utils';
 import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../queries';
 import { checkIsSocialMediaBrowser } from '../../../../utils';
-import { getLogger, trackAction } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 
 const { logError, logInfo, logWarn } = getLogger({ location: 'passkeys-unavailable' });

@@ -1,6 +1,6 @@
 import type { Mat, MatVector, Point, Rect, RotatedRect, useOpenCv } from 'opencv-react-ts';
 
-import { Logger } from '../../../../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import type { ParamsType } from './params';
 
 export type OpenCVType = Exclude<ReturnType<typeof useOpenCv>['cv'], null | undefined>;

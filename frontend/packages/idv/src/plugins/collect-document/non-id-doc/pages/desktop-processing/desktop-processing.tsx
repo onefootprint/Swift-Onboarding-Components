@@ -7,10 +7,10 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { HeaderTitle } from '@/idv/components';
+import NavigationHeader from '@/idv/components/layout/components/navigation-header';
+import { getLogger, trackAction } from '@/idv/utils';
 import upperFirst from 'lodash/upperFirst';
-import { HeaderTitle } from '../../../../../components';
-import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { getLogger, trackAction } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';

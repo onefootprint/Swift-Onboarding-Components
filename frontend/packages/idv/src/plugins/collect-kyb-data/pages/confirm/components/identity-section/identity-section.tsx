@@ -3,13 +3,13 @@ import { BusinessDI } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { SectionAction } from '@/idv/components/confirm-collected-data';
+import { Section, SectionItem } from '@/idv/components/confirm-collected-data';
+import { useStepUp } from '@/idv/hooks';
+import { useDecryptBusiness } from '@/idv/queries';
+import { FPCustomEvents, getLogger, sendCustomEvent } from '@/idv/utils';
 import { Box, useToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import type { SectionAction } from '../../../../../../components/confirm-collected-data';
-import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
-import { useStepUp } from '../../../../../../hooks';
-import { useDecryptBusiness } from '../../../../../../queries';
-import { FPCustomEvents, getLogger, sendCustomEvent } from '../../../../../../utils';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import { formatTin, isScrubbed } from '../../../../utils/utils';
 import TaxIdentificationForm from './tax-identification-form';

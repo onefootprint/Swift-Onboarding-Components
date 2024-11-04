@@ -4,7 +4,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../../components/layout/components/header-title';
+import HeaderTitle from '@/idv/components/layout/components/header-title';
 
 export type ImageConsentHandler = {
   getConsentInfo: () => { consentLanguageText: string; mlConsent: boolean };

@@ -2,7 +2,7 @@ import { Box, LoadingSpinner, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../../../components';
+import { HeaderTitle, NavigationHeader } from '@/idv/components';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../../../constants';
 import type { CameraPermissionState } from '../hooks/use-camera-permission';
 

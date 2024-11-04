@@ -2,7 +2,7 @@ import type { AuthMethodKind, CollectKycDataRequirement } from '@onefootprint/ty
 import { CollectedKycDataOption, IdDI, isCountryCode } from '@onefootprint/types';
 import type { TFunction } from 'i18next';
 
-import type { SectionItemProps as SectionItem } from '../../../../../../components/confirm-collected-data';
+import type { SectionItemProps as SectionItem } from '@/idv/components/confirm-collected-data';
 import type { ReturnOfCollectKycDataMachine } from '../../../../hooks/use-collect-kyc-data-machine';
 import getAllKycAttributes from '../../../../utils/all-attributes/all-attributes';
 import getInitialCountry from '../../../../utils/get-initial-country';

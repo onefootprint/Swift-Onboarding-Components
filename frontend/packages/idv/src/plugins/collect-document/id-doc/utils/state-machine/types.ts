@@ -9,7 +9,7 @@ import type {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../../hooks';
+import type { DeviceInfo } from '@/idv/hooks';
 import type { IdDocImageErrorType, ReceivedImagePayload } from '../../../types';
 
 export type MachineContext = {

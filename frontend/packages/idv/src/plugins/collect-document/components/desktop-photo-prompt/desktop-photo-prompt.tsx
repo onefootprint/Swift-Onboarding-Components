@@ -7,10 +7,10 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { getLogger } from '@/idv/utils';
 import { type DocumentRequirement, DocumentUploadSettings } from '@onefootprint/types/src/api/onboarding-status';
 import upperFirst from 'lodash/upperFirst';
 import { HeaderTitle } from '../../../../components';
-import { getLogger } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import useProcessImage from '../../hooks/use-process-image';
 import type { IdDocImageErrorType, ReceivedImagePayload } from '../../types';

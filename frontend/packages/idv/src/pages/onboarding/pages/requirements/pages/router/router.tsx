@@ -3,17 +3,10 @@ import { UserChallengeActionKind } from '@onefootprint/types';
 import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import { useEffect } from 'react';
 
-import { useLogStateMachine } from '../../../../../../hooks';
-import {
-  CollectDocument,
-  CollectKybData,
-  CollectKycData,
-  InvestorProfile,
-  Liveness,
-  Transfer,
-} from '../../../../../../plugins';
-import CreateBusinessOnboarding from '../../../../../../plugins/create-business-onboarding';
-import { getLogger } from '../../../../../../utils/logger';
+import { useLogStateMachine } from '@/idv/hooks';
+import { CollectDocument, CollectKybData, CollectKycData, InvestorProfile, Liveness, Transfer } from '@/idv/plugins';
+import CreateBusinessOnboarding from '@/idv/plugins/create-business-onboarding';
+import { getLogger } from '@/idv/utils';
 import ErrorComponent from '../../../../components/error';
 import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';

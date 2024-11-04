@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { getLogger, trackAction } from '../../../../../utils/logger';
+import { getLogger, trackAction } from '@/idv/utils';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';

@@ -1,7 +1,7 @@
 import { type OnboardingRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
-import { ComponentsSdkTypes } from '../../../../../../utils/state-machine/types';
+import { ComponentsSdkTypes } from '@/idv/utils/state-machine/types';
 import type { MachineContext, MachineEvents } from './types';
 
 export const getPreferUploadDoc = <K extends OnboardingRequirement>(docRequirement: K[]) =>

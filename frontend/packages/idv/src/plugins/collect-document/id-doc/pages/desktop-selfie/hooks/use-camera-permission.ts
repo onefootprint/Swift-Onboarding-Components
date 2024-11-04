@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { Logger } from '../../../../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import parsePermissionError from '../utils/parse-permission-error';
 
 export type CameraPermissionState =

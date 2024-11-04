@@ -2,7 +2,7 @@ import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import useOnboardingRequirementsMachine from '../../../../../../pages/onboarding/pages/requirements/hooks/use-onboarding-requirements-machine';
+import useOnboardingRequirementsMachine from '@/idv/pages/onboarding/pages/requirements/hooks/use-onboarding-requirements-machine';
 import useTransferMachine from '../../../../hooks/use-machine';
 
 const ContinueOnDesktop = () => {

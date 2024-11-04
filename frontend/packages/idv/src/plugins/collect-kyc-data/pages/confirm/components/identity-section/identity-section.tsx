@@ -6,13 +6,13 @@ import { useToast } from '@onefootprint/ui';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { SectionAction, SectionItemProps } from '@/idv/components/confirm-collected-data';
+import { Section, SectionItem } from '@/idv/components/confirm-collected-data';
+import { useStepUp } from '@/idv/hooks';
+import { useDecryptUser } from '@/idv/queries';
+import { getLogger } from '@/idv/utils';
+import { FPCustomEvents, sendCustomEvent } from '@/idv/utils';
 import type { TFunction } from 'i18next';
-import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
-import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
-import { useStepUp } from '../../../../../../hooks';
-import { useDecryptUser } from '../../../../../../queries';
-import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
-import { getLogger } from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import type { KycData } from '../../../../utils/data-types';
 import {

@@ -2,10 +2,10 @@ import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onef
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import type { BootstrapBusinessData, UserData } from '@/idv/types';
+import { getLogger } from '@/idv/utils';
+import type { CommonIdvContext } from '@/idv/utils/state-machine';
 import { DocumentUploadSettings, getRequirements } from '@onefootprint/types/src/api/onboarding-status';
-import type { BootstrapBusinessData, UserData } from '../../../../../../types';
-import { getLogger } from '../../../../../../utils/logger';
-import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
 import {
   NextRequirementTargets,

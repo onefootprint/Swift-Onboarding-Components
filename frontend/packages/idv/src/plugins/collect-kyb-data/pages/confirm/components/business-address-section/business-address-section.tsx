@@ -4,8 +4,8 @@ import { BusinessDI } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
-import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '@/idv/components/confirm-collected-data';
+import { Section, SectionItem } from '@/idv/components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BusinessAddress from '../../../business-address/business-address';
 

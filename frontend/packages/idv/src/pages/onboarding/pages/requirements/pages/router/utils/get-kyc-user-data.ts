@@ -6,9 +6,8 @@ import {
 } from '@onefootprint/types';
 import pickBy from 'lodash/pickBy';
 
-import type { BootstrapBusinessData, BusinessData, UserData } from '../../../../../../../types';
-import { isObject } from '../../../../../../../utils';
-import { getLogger } from '../../../../../../../utils/logger';
+import type { BootstrapBusinessData, BusinessData, UserData } from '@/idv/types';
+import { getLogger, isObject } from '@/idv/utils';
 
 const { logInfo } = getLogger();
 

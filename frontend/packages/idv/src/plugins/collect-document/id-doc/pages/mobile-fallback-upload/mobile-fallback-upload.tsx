@@ -1,10 +1,10 @@
 import { IcoClock40 } from '@onefootprint/icons';
 import { useTranslation } from 'react-i18next';
 
+import { HeaderTitle, NavigationHeader } from '@/idv/components';
 import { DocumentUploadSettings, type IdDocImageTypes, type SupportedIdDocTypes } from '@onefootprint/types';
 import { motion } from 'framer-motion';
 import { css, styled } from 'styled-components';
-import { HeaderTitle, NavigationHeader } from '../../../../../components';
 import IdDocPhotoButtons from '../../../components/id-doc-photo-buttons';
 import { isFront, isSelfie } from '../../../utils/capture';
 import { useIdDocMachine } from '../../components/machine-provider';

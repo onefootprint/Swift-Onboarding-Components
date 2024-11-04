@@ -2,7 +2,7 @@ import { Button, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import StickyBottomBox from '../../../../../../components/layout/components/sticky-bottom-box';
+import StickyBottomBox from '@/idv/components/layout/components/sticky-bottom-box';
 import type { DeviceKind } from '../../../camera/types';
 import type { CameraSide } from '../../../camera/utils/get-camera-options';
 

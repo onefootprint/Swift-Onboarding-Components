@@ -6,7 +6,7 @@ import type { FieldErrors, FieldValues, UseFormGetValues } from 'react-hook-form
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { useL10nContext } from '../../../../../../components/l10n-provider';
+import { useL10nContext } from '@/idv/components/l10n-provider';
 import validateDob, { DobValidationError } from './utils/validate-dob';
 
 type DobFieldProps = { disabled?: boolean };

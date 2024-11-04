@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { getTaxIdInputPattern } from '../../../../utils/ssn-utils/ssn-utils';
 import type { FormValues } from '../../ssn.types';
 
-import InfoBox from '../../../../../../components/info-box';
+import InfoBox from '@/idv/components/info-box';
 
 type VaultTaxId = 'ssn9' | 'usTaxId';
 

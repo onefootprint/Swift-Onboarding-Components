@@ -1,8 +1,8 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { useRef } from 'react';
 
-import { useIdvRequestErrorToast } from '../../../../../../../../hooks';
-import { Logger } from '../../../../../../../../utils/logger';
+import { useIdvRequestErrorToast } from '@/idv/hooks/';
+import { Logger } from '@/idv/utils';
 import type { ImageConsentHandler } from '../../../../../components/image-consent';
 import ImageConsent from '../../../../../components/image-consent';
 import useConsent from '../../../../../hooks/use-consent';

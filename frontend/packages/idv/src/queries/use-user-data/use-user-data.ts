@@ -3,7 +3,7 @@ import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { ALLOW_EXTRA_FIELDS_HEADER, AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { getLogger } from '../../utils/logger';
+import { getLogger } from '@/idv/utils';
 
 const BOOTSTRAP_FIELDS_HEADER = 'X-Fp-Bootstrapped-Fields';
 const { logInfo } = getLogger({ location: 'use-user-data' });

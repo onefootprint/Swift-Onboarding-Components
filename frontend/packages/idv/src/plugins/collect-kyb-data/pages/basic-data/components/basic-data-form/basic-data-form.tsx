@@ -5,10 +5,10 @@ import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import EditableFormButtonContainer from '@/idv/components/editable-form-button-container';
+import { useL10nContext } from '@/idv/components/l10n-provider';
+import checkIsPhoneValid from '@/idv/utils/check-is-phone-valid';
 import { isURL } from '@onefootprint/core';
-import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
-import { useL10nContext } from '../../../../../../components/l10n-provider';
-import checkIsPhoneValid from '../../../../../../utils/check-is-phone-valid';
 import type { BasicData } from '../../../../utils/state-machine/types';
 
 type FormHints = Partial<{ [K in keyof FormData]: string }>;

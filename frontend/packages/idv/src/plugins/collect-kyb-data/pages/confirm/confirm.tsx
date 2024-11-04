@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
+import { getLogger } from '@/idv/utils';
 import { useEffect } from 'react';
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
-import { getLogger } from '../../../../utils/logger';
 import Loading from '../../components/loading/loading';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';

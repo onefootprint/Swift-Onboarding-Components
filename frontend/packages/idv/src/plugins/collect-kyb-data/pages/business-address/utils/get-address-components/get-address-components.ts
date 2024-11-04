@@ -1,6 +1,6 @@
 import { getDetails } from 'use-places-autocomplete';
 
-import { getAutoCompleteCity } from '../../../../../../utils';
+import { getAutoCompleteCity } from '@/idv/utils';
 
 const getLongName = (key: string, addressComponent: google.maps.GeocoderAddressComponent[]) => {
   const part = addressComponent.find(c => c.types.includes(key));

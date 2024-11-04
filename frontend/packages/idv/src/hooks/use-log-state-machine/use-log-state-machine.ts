@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import type { State } from 'xstate';
 
-import { Logger } from '../../utils/logger';
+import { Logger } from '@/idv/utils';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const useLogStateMachine = (name: string, state: any) => {

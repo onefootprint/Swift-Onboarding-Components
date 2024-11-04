@@ -2,11 +2,11 @@ import { getErrorMessage } from '@onefootprint/request';
 import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
 import { useState } from 'react';
 
+import { getLogger } from '@/idv/utils';
 import { Button, Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useUploadFile } from '../../../../queries';
-import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import Declarations from '../declarations';

@@ -7,9 +7,9 @@ import {
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
+import { getLogger } from '@/idv/utils';
 import type { TFunction } from 'i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import { getLogger } from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';

@@ -3,8 +3,7 @@ import type { SupportedLocale } from '@onefootprint/footprint-js';
 import type { CollectKycDataRequirement } from '@onefootprint/types';
 import { CdoToAllDisMap, CollectedKycDataOptionToRequiredAttributes, IdDI } from '@onefootprint/types';
 
-import { getLogger } from '../../../../../../utils/logger';
-import { isUndefined } from '../../../../../../utils/type-guards';
+import { getLogger, isUndefined } from '@/idv/utils';
 import getAllKycAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useLogStateMachine } from '../../../../../hooks';
+import { useLogStateMachine } from '@/idv/hooks';
 import CameraAccessDenied from '../../../components/camera-access-denied';
 import CameraAccessRequest from '../../../components/camera-access-request';
 import CaptureRetryPrompt from '../../components/capture-retry-prompt';

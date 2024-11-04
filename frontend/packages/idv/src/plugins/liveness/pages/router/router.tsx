@@ -1,9 +1,8 @@
 import type { UserChallengeActionKind } from '@onefootprint/types';
 import { useEffect } from 'react';
 
+import { getLogger, trackAction } from '@/idv/utils';
 import { useLogStateMachine } from '../../../../hooks';
-import { trackAction } from '../../../../utils/logger';
-import { getLogger } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import Register from '../register';
 import Unavailable from '../unavailable';

@@ -1,6 +1,6 @@
+import { getLogger } from '@/idv/utils';
 import { BusinessDI } from '@onefootprint/types';
 import { useRef, useState } from 'react';
-import { getLogger } from '../../../../../../utils';
 import useSyncData from '../../../../hooks/use-sync-data';
 import Dialog from './components/confirm-missing-bo-dialog';
 

@@ -1,4 +1,4 @@
-import { Logger } from '../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import type { EmptyAdapterReturn } from '../types';
 
 const generateEmptyAdapter = (): EmptyAdapterReturn => {

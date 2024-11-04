@@ -2,7 +2,7 @@ import { IcoForbid40 } from '@onefootprint/icons';
 import { IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
-import { Logger } from '../../../../utils/logger';
+import { Logger } from '@/idv/utils';
 import type { IdDocImageErrorType } from '../../types';
 import PromptWithGuidelines from '../prompt-with-guidelines';
 

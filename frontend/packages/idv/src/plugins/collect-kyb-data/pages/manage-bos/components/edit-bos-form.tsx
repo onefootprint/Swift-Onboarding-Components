@@ -1,7 +1,7 @@
+import { useBusinessOwnersPatch } from '@/idv/queries';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { HostedBusinessOwner } from '@onefootprint/request-types';
 import { IdDI } from '@onefootprint/types';
-import { useBusinessOwnersPatch } from '../../../../../queries';
 import useConfirmMissingBoDialog from '../hooks/use-confirm-missing-bo-dialog';
 import type { ManageBosFormData, NewBusinessOwner } from '../manage-bos.types';
 import { sumTotalOwnershipStake } from '../utils/manage-bos.utils';

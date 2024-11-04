@@ -1,9 +1,9 @@
+import { Logger } from '@/idv/utils';
 import { getSessionIdFromStorage } from '@onefootprint/dev-tools';
 import { HANDOFF_BASE_URL } from '@onefootprint/global-constants';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { DocumentRequestKind } from '@onefootprint/types';
 import { useMemo } from 'react';
-import { Logger } from '../../../../utils/logger';
 
 import type { TransferRequirements } from '../../types';
 

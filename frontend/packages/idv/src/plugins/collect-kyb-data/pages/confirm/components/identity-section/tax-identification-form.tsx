@@ -3,10 +3,10 @@ import { BusinessDI } from '@onefootprint/types';
 import { Grid, Stack, TextInput } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
+import EditableFormButtonContainer from '@/idv/components/editable-form-button-container';
+import { useL10nContext } from '@/idv/components/l10n-provider';
+import { getLogger } from '@/idv/utils';
 import { useForm } from 'react-hook-form';
-import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
-import { useL10nContext } from '../../../../../../components/l10n-provider';
-import { getLogger } from '../../../../../../utils/logger';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../../../hooks/use-sync-data';
 import { getTinDefaultValue } from '../../../../utils/utils';
