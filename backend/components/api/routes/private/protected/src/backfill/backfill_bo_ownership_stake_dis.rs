@@ -104,7 +104,6 @@ pub async fn post(
 
                 let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sv_id)?;
 
-                #[allow(deprecated)]
                 let ownership_stake: Option<u32> = bo
                     .ownership_stake
                     .map(|stake| stake.try_into())

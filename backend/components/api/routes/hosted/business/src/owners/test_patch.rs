@@ -79,7 +79,6 @@ fn test_verify_unique_phones_and_emails(
         .map(|(k, v)| (k, PiiString::from(v)))
         .collect();
     let primary_uuid = Uuid::new_v4();
-    #[allow(deprecated)]
     let dbo = BusinessOwnerInfo {
         bo: BusinessOwner {
             id: BoId::test_data("Flerp".into()),
@@ -92,7 +91,6 @@ fn test_verify_unique_phones_and_emails(
             _updated_at: Utc::now(),
             created_at: Utc::now(),
             source: BusinessOwnerSource::Hosted,
-            ownership_stake: None,
             deactivated_at: None,
         },
         su: None,

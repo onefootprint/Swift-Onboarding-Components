@@ -2,8 +2,6 @@ use actix_web::web;
 use std::hash::DefaultHasher;
 use std::hash::Hasher;
 
-mod backfill_bo_ownership_stake_dis;
-
 /*
 #[derive(serde::Deserialize)]
 #[allow(unused)]
@@ -56,6 +54,4 @@ struct CursorBackfillResponse<T, TCursor> {
 struct BatchBackfillResponse {}
 
 #[allow(unused)]
-pub fn configure(config: &mut web::ServiceConfig) {
-    config.service(backfill_bo_ownership_stake_dis::post);
-}
+pub fn configure(config: &mut web::ServiceConfig) {}
