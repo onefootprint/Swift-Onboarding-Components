@@ -1,11 +1,13 @@
 use crate::utils::db2api::DbToApi;
 use api_wire_types::Actor;
+use api_wire_types::HostedWorkflowRequest;
 use db::actor::SaturatedActor;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_set_version::RuleSetVersion;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
+use db::models::workflow_request::WorkflowRequest;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use newtypes::DataIdentifierDiscriminant as DID;
@@ -16,18 +18,18 @@ type StepupEnabledInSandboxOutcomes = bool;
 pub type ObConfigInfo = (
     ObConfiguration,
     Tenant,
+    Option<WorkflowRequest>,
     Option<TenantClientConfig>,
     Option<Appearance>,
     Arc<dyn FeatureFlagClient>,
-    Option<StepupEnabledInSandboxOutcomes>,
+    StepupEnabledInSandboxOutcomes,
 );
 
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     fn from_db(
-        (ob_config, tenant, tenant_client_config, appearance, ff_client, stepup_sandbox_outcome_enabled): ObConfigInfo,
+        (ob_config, tenant, wfr, tenant_client_config, appearance, ff_client, is_stepup_enabled): ObConfigInfo,
     ) -> Self {
         let supported_countries = ob_config.supported_countries_for_residential_address();
-        let is_stepup_enabled = stepup_sandbox_outcome_enabled.unwrap_or(false);
         let required_auth_methods = ob_config.required_auth_methods.clone();
         let nid_enabled = ob_config
             .verification_checks()
@@ -67,6 +69,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let is_kyb = must_collect_data.iter().any(|cdo| cdo.matches(DID::Business));
         let requires_id_doc = must_collect_data.iter().any(|cdo| cdo.matches(DID::Document));
 
+
         Self {
             name,
             key,
@@ -95,6 +98,16 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             support_website,
             required_auth_methods,
             nid_enabled,
+            workflow_request: wfr.map(HostedWorkflowRequest::from_db),
+        }
+    }
+}
+
+impl DbToApi<WorkflowRequest> for HostedWorkflowRequest {
+    fn from_db(wfr: WorkflowRequest) -> Self {
+        Self {
+            note: wfr.note,
+            config: wfr.config,
         }
     }
 }

@@ -14,8 +14,8 @@ from tests.utils import _gen_random_ssn, post
 from tests.utils import get, patch
 
 
-def send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=None):
-    action = dict(trigger=trigger, kind="trigger", fp_bid=fp_bid)
+def send_trigger(fp_id, sandbox_tenant, trigger, **kwargs):
+    action = dict(trigger=trigger, kind="trigger", **kwargs)
     data = dict(actions=[action])
     post(f"entities/{fp_id}/actions", data, *sandbox_tenant.db_auths)
 
@@ -34,7 +34,8 @@ def send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=None):
     body = get(f"users/{fp_id}", None, sandbox_tenant.sk.key)
     assert body["requires_additional_info"]
 
-    if fp_bid:
+    if kwargs.get("fp_bid", None):
+        fp_bid = kwargs["fp_bid"]
         body = get(f"entities/{fp_bid}", None, *sandbox_tenant.db_auths)
         assert body["has_outstanding_workflow_request"]
 
@@ -43,9 +44,6 @@ def send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=None):
     body = post(f"entities/{fp_id}/token", data, *sandbox_tenant.db_auths)
     assert body["link"]
     auth_token = FpAuth(body["token"])
-
-    get("hosted/onboarding/config", None, auth_token)
-    # TODO test that the wfr config is serialized
 
     return auth_token
 
@@ -147,12 +145,16 @@ def test_retrigger_onboard(sandbox_tenant):
 
     # Trigger onboarding
     data = dict(kind="onboard", data=dict(playbook_id=obc.id))
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, data)
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, data, note="Pls fix")
 
-    # Make sure the proper ob config is associated with the token
+    # Make sure the proper ob config is associated with the token and WFR is serialized
     body = get("hosted/onboarding/config", None, initial_auth_token)
     assert body["name"] == obc.name
     assert body["key"] == obc.key.value
+    wfr = body["workflow_request"]
+    assert wfr["note"] == "Pls fix"
+    assert wfr["config"]["kind"] == "onboard"
+    assert wfr["config"]["data"]["playbook_id"] == obc.id
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
     auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
@@ -381,7 +383,7 @@ def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
             business_configs=document_configs,
         ),
     )
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid)
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=fp_bid)
 
     # re-run Bifrost with the token from the link we sent to user
     def pre_run(bifrost):
@@ -518,7 +520,7 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
     )
     fp_id = sandbox_user.fp_id
     fp_bid = sandbox_user.fp_bid
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid)
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=fp_bid)
 
     def pre_run(bifrost):
         # Check that recollect_attributes are propagated through
@@ -554,7 +556,7 @@ def test_reonboard_kyb_multi_kyc(kyb_sandbox_ob_config, sandbox_tenant):
         data=dict(playbook_id=primary_bifrost.ob_config.id),
     )
     initial_auth_token = send_trigger(
-        primary_bo.fp_id, sandbox_tenant, trigger, primary_bo.fp_bid
+        primary_bo.fp_id, sandbox_tenant, trigger, fp_bid=primary_bo.fp_bid
     )
 
     user = complete_redo_flow_user(primary_bo, initial_auth_token)
@@ -608,7 +610,7 @@ def test_reonboard_kyb_multi_kyc_reuse_kyc(kyb_sandbox_ob_config, sandbox_tenant
         data=dict(playbook_id=primary_bifrost.ob_config.id, reuse_existing_bo_kyc=True),
     )
     initial_auth_token = send_trigger(
-        primary_bo.fp_id, sandbox_tenant, trigger, primary_bo.fp_bid
+        primary_bo.fp_id, sandbox_tenant, trigger, fp_bid=primary_bo.fp_bid
     )
 
     user = complete_redo_flow_user(primary_bo, initial_auth_token)
@@ -652,7 +654,9 @@ def test_request_additional_bos(kyb_sandbox_ob_config, sandbox_tenant):
             recollect_attributes=["business_kyced_beneficial_owners"],
         ),
     )
-    initial_auth_token = send_trigger(bo1.fp_id, sandbox_tenant, trigger, bo1.fp_bid)
+    initial_auth_token = send_trigger(
+        bo1.fp_id, sandbox_tenant, trigger, fp_bid=bo1.fp_bid
+    )
 
     def pre_run(bifrost):
         # Add a third BO

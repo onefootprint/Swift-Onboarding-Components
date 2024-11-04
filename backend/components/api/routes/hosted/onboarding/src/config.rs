@@ -64,7 +64,7 @@ pub fn get(
     let obc_kind = ob_config.kind;
 
     // get other properties of our configuration relevant to rendering it
-    let (appearance, client_config, sandbox_stepup_outcome_enabled) = state
+    let (appearance, client_config, wfr, sandbox_stepup_outcome_enabled) = state
         .db_query(move |conn| -> FpResult<_> {
             let appearance = appearance_id
                 .map(|id| Appearance::get(conn, &id, &tenant_id))
@@ -79,7 +79,6 @@ pub fn get(
             };
 
             let wfr_id = user_auth.and_then(|ua| ua.data.session.wfr_id.zip(ua.data.session.su_id));
-            #[allow(unused_variables)]
             let wfr = if let Some((wfr_id, su_id)) = wfr_id {
                 let wfr = WorkflowRequest::get(conn, &wfr_id, &su_id)?;
                 let (_, wf) = WorkflowRequestJunction::get(conn, &wfr_id, &su_id)?;
@@ -95,7 +94,7 @@ pub fn get(
                 None
             };
 
-            Ok((appearance, client_config, sandbox_stepup_outcome_enabled))
+            Ok((appearance, client_config, wfr, sandbox_stepup_outcome_enabled))
         })
         .await?;
 
@@ -105,10 +104,11 @@ pub fn get(
     Ok(api_wire_types::PublicOnboardingConfiguration::from_db((
         ob_config,
         tenant,
+        wfr,
         client_config,
         appearance,
         ff_client,
-        Some(sandbox_stepup_outcome_enabled),
+        sandbox_stepup_outcome_enabled,
     )))
 }
 

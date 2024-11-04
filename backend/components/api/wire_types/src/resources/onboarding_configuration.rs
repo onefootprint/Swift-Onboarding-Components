@@ -13,6 +13,7 @@ use newtypes::ObConfigurationKey;
 use newtypes::ObConfigurationKind;
 use newtypes::TenantId;
 use newtypes::VerificationCheck;
+use newtypes::WorkflowRequestConfig;
 
 /// OnboardingConfiguration that was created
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
@@ -102,4 +103,14 @@ pub struct PublicOnboardingConfiguration {
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nid_enabled: Option<bool>,
+    /// Context on what information is specifically requested from the user, if any.
+    /// NOTE: This is not actually a property of the ob configuration.
+    pub workflow_request: Option<HostedWorkflowRequest>,
+}
+
+
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
+pub struct HostedWorkflowRequest {
+    pub note: Option<String>,
+    pub config: WorkflowRequestConfig,
 }
