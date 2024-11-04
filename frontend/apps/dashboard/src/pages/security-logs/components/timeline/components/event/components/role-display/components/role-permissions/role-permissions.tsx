@@ -36,6 +36,7 @@ const RolePermissions = ({ role }: RolePermissionsProps) => {
       borderWidth={1}
       borderStyle="solid"
       borderRadius="default"
+      backgroundColor="primary"
       width={scopesTextWithDecrypt.length > 1 ? '413px' : '212px'}
     >
       <Text variant="label-3">{`"${name}" ${t('role-permissions')}`}</Text>

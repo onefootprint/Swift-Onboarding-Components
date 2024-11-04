@@ -67,7 +67,8 @@
       "other-attributes": "other attributes"
     },
     "roles": {
-      "role-permissions": "role permissions"
+      "role-permissions": "role permissions",
+      "role": "role"
     },
     "body": {
       "decryption-reason": {
