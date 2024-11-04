@@ -8,56 +8,64 @@ use itertools::Itertools;
 use newtypes::BooleanOperator;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::CountrySpecificDocumentMapping;
 use newtypes::DbActor;
+use newtypes::DocumentAndCountryConfiguration;
+use newtypes::DocumentRequestConfig;
 use newtypes::EnhancedAmlOption;
 use newtypes::FootprintReasonCode as FRC;
+use newtypes::IdDocKind;
+use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::Locked;
 use newtypes::ObConfigurationKind;
-use newtypes::RuleAction;
-use newtypes::RuleAction as RA;
+use newtypes::RuleActionConfig as RAC;
 use newtypes::RuleExpression;
 use newtypes::RuleExpressionCondition;
 use newtypes::VerificationCheck;
+use std::collections::HashMap;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 
-pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
+pub fn base_kyc_rules() -> Vec<(RuleExpression, RAC)> {
     vec![
-        (if_risk_signal(FRC::IdNotLocated), RA::Fail),
-        (if_risk_signal(FRC::IdFlagged), RA::Fail),
-        (if_risk_signal(FRC::SubjectDeceased), RA::Fail),
-        (if_risk_signal(FRC::AddressInputIsPoBox), RA::Fail),
-        (if_risk_signal(FRC::DobLocatedCoppaAlert), RA::Fail),
-        (if_risk_signal(FRC::MultipleRecordsFound), RA::Fail),
+        (if_risk_signal(FRC::IdNotLocated), RAC::Fail {}),
+        (if_risk_signal(FRC::IdFlagged), RAC::Fail {}),
+        (if_risk_signal(FRC::SubjectDeceased), RAC::Fail {}),
+        (if_risk_signal(FRC::AddressInputIsPoBox), RAC::Fail {}),
+        (if_risk_signal(FRC::DobLocatedCoppaAlert), RAC::Fail {}),
+        (if_risk_signal(FRC::MultipleRecordsFound), RAC::Fail {}),
     ]
 }
 
-pub fn ssn_rules() -> Vec<(RuleExpression, RuleAction)> {
+pub fn ssn_rules() -> Vec<(RuleExpression, RAC)> {
     vec![
-        (if_risk_signal(FRC::SsnDoesNotMatch), RA::Fail),
-        (if_risk_signal(FRC::SsnPartiallyMatches), RA::Fail),
-        (if_risk_signal(FRC::SsnInputIsInvalid), RA::Fail),
-        (if_risk_signal(FRC::SsnLocatedIsInvalid), RA::Fail),
-        (if_risk_signal(FRC::SsnIssuedPriorToDob), RA::Fail),
+        (if_risk_signal(FRC::SsnDoesNotMatch), RAC::Fail {}),
+        (if_risk_signal(FRC::SsnPartiallyMatches), RAC::Fail {}),
+        (if_risk_signal(FRC::SsnInputIsInvalid), RAC::Fail {}),
+        (if_risk_signal(FRC::SsnLocatedIsInvalid), RAC::Fail {}),
+        (if_risk_signal(FRC::SsnIssuedPriorToDob), RAC::Fail {}),
     ]
 }
 
 
-pub fn default_verification_check_rules(check: &VerificationCheck) -> Vec<(RuleExpression, RuleAction)> {
+pub fn default_verification_check_rules(check: &VerificationCheck) -> Vec<(RuleExpression, RAC)> {
     match check {
         VerificationCheck::Sentilink {} => {
             vec![
-                (if_risk_signal(FRC::SentilinkIdentityTheftHighRisk), RA::Fail),
-                (if_risk_signal(FRC::SentilinkSyntheticIdentityHighRisk), RA::Fail),
+                (if_risk_signal(FRC::SentilinkIdentityTheftHighRisk), RAC::Fail {}),
+                (
+                    if_risk_signal(FRC::SentilinkSyntheticIdentityHighRisk),
+                    RAC::Fail {},
+                ),
             ]
         }
         // TODO: Change FRCs to be neuro specific maybe?
         VerificationCheck::NeuroId {} => {
             // These are the suggested rules from Neuro
             vec![
-                (if_risk_signal(FRC::BehaviorHighRisk), RA::Fail),
-                (if_risk_signal(FRC::DeviceHighRisk), RA::Fail),
-                (if_risk_signal(FRC::DeviceMediumRisk), RA::ManualReview),
+                (if_risk_signal(FRC::BehaviorHighRisk), RAC::Fail {}),
+                (if_risk_signal(FRC::DeviceHighRisk), RAC::Fail {}),
+                (if_risk_signal(FRC::DeviceMediumRisk), RAC::ManualReview {}),
             ]
         }
         VerificationCheck::Kyb { ein_only } => base_kyb_rules(*ein_only),
@@ -70,75 +78,139 @@ pub fn default_verification_check_rules(check: &VerificationCheck) -> Vec<(RuleE
 // with folks that there are cases where they want a document to "hard fail" and not even raise a
 // review. so for now, the alpaca rules will pass in always_review=true here and that means would be
 // Fail RuleAction's here are instead RuleAction::ManualReview
-pub fn base_doc_rules(always_review: bool) -> Vec<(RuleExpression, RuleAction)> {
+pub fn base_doc_rules(always_review: bool) -> Vec<(RuleExpression, RAC)> {
     let fail_action = match always_review {
-        true => RA::ManualReview,
-        false => RA::Fail,
+        true => RAC::ManualReview {},
+        false => RAC::Fail {},
     };
 
     vec![
-        (if_risk_signal(FRC::DocumentNotVerified), fail_action),
-        (if_risk_signal(FRC::DocumentSelfieDoesNotMatch), fail_action),
-        (if_risk_signal(FRC::DocumentSelfieNotLiveImage), RA::ManualReview),
-        (if_risk_signal(FRC::DocumentLiveCaptureFailed), RA::ManualReview),
-        (if_risk_signal(FRC::DocumentExpired), fail_action),
-        (if_risk_signal(FRC::DocumentUploadFailed), RA::ManualReview),
-        (if_risk_signal(FRC::DocumentTypeMismatch), RA::ManualReview),
-        (if_risk_signal(FRC::DocumentUnknownCountryCode), RA::ManualReview),
-        (if_risk_signal(FRC::DocumentCountryCodeMismatch), RA::ManualReview),
-    ]
-}
-
-pub fn alpaca_kyc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> {
-    vec![
-        (if_not_risk_signal(FRC::SsnMatches), RA::Fail),
-        (if_not_risk_signal(FRC::NameMatches), RA::identity_stepup()),
-        (if_not_risk_signal(FRC::DobMatches), RA::identity_stepup()),
-        (if_risk_signal(FRC::AddressDoesNotMatch), RA::identity_stepup()),
+        (if_risk_signal(FRC::DocumentNotVerified), fail_action.clone()),
         (
-            if_risk_signal(FRC::AddressNewerRecordFound),
-            RA::identity_stepup(),
+            if_risk_signal(FRC::DocumentSelfieDoesNotMatch),
+            fail_action.clone(),
+        ),
+        (
+            if_risk_signal(FRC::DocumentSelfieNotLiveImage),
+            RAC::ManualReview {},
+        ),
+        (
+            if_risk_signal(FRC::DocumentLiveCaptureFailed),
+            RAC::ManualReview {},
+        ),
+        (if_risk_signal(FRC::DocumentExpired), fail_action),
+        (if_risk_signal(FRC::DocumentUploadFailed), RAC::ManualReview {}),
+        (if_risk_signal(FRC::DocumentTypeMismatch), RAC::ManualReview {}),
+        (
+            if_risk_signal(FRC::DocumentUnknownCountryCode),
+            RAC::ManualReview {},
+        ),
+        (
+            if_risk_signal(FRC::DocumentCountryCodeMismatch),
+            RAC::ManualReview {},
         ),
     ]
 }
 
-pub fn alpaca_doc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> {
+fn alpaca_identity_stepup() -> RAC {
+    // In the general case, we need to accept a document that might have address
+    let alpaca_doc_types = vec![IdDocKind::DriversLicense, IdDocKind::IdCard];
+    // Alpaca supports territories: https://www.notion.so/onefootprint/Alpaca-US-Territory-31c04ec7d2b64cc5ad9cbbde0c026af2?pvs=4
+    // Allow docs from the US or territories
+    // There's a small difference in behavior in that we don't restrict to the territory the person said
+    // they were living in, but this is something we can add in the future as a param on
+    // DocReqConfig#restrict_to_residential_country
+    let alpaca_allowed_countries: Vec<Iso3166TwoDigitCountryCode> = Iso3166TwoDigitCountryCode::iter()
+        .filter(|c| c.is_us_including_territories())
+        .collect();
+
+    let map = HashMap::from_iter(
+        alpaca_allowed_countries
+            .into_iter()
+            .map(|c| (c, alpaca_doc_types.clone())),
+    );
+
+    let config = DocumentRequestConfig::Identity {
+        collect_selfie: true,
+        document_types_and_countries: Some(DocumentAndCountryConfiguration {
+            global: vec![],
+            country_specific: CountrySpecificDocumentMapping(map),
+        }),
+    };
+
+    RAC::StepUp(vec![config])
+}
+pub fn alpaca_kyc_field_validation_rules() -> Vec<(RuleExpression, RAC)> {
+    vec![
+        (if_not_risk_signal(FRC::SsnMatches), RAC::Fail {}),
+        (if_not_risk_signal(FRC::NameMatches), alpaca_identity_stepup()),
+        (if_not_risk_signal(FRC::DobMatches), alpaca_identity_stepup()),
+        (if_risk_signal(FRC::AddressDoesNotMatch), alpaca_identity_stepup()),
+        (
+            if_risk_signal(FRC::AddressNewerRecordFound),
+            alpaca_identity_stepup(),
+        ),
+    ]
+}
+
+pub fn alpaca_doc_field_validation_rules() -> Vec<(RuleExpression, RAC)> {
     vec![
         (
             if_risk_signal(FRC::DocumentOcrAddressDoesNotMatch),
-            RA::ManualReview,
+            RAC::ManualReview {},
         ),
-        (if_risk_signal(FRC::DocumentOcrDobDoesNotMatch), RA::ManualReview),
-        (if_risk_signal(FRC::DocumentOcrNameDoesNotMatch), RA::ManualReview),
+        (
+            if_risk_signal(FRC::DocumentOcrDobDoesNotMatch),
+            RAC::ManualReview {},
+        ),
+        (
+            if_risk_signal(FRC::DocumentOcrNameDoesNotMatch),
+            RAC::ManualReview {},
+        ),
     ]
 }
 
-fn ein_only_rules() -> Vec<(RuleExpression, RA)> {
+fn ein_only_rules() -> Vec<(RuleExpression, RAC)> {
     vec![
-        (if_risk_signal(FRC::BeneficialOwnerFailedKyc), RA::ManualReview),
-        (if_risk_signal(FRC::TinNotFound), RA::ManualReview),
-        (if_risk_signal(FRC::TinInvalid), RA::ManualReview),
-        (if_risk_signal(FRC::TinDoesNotMatch), RA::ManualReview),
+        (
+            if_risk_signal(FRC::BeneficialOwnerFailedKyc),
+            RAC::ManualReview {},
+        ),
+        (if_risk_signal(FRC::TinNotFound), RAC::ManualReview {}),
+        (if_risk_signal(FRC::TinInvalid), RAC::ManualReview {}),
+        (if_risk_signal(FRC::TinDoesNotMatch), RAC::ManualReview {}),
     ]
 }
 
-pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RA)> {
+pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RAC)> {
     let base = ein_only_rules();
 
     let address_rules = vec![
         (
             if_risk_signal(FRC::BusinessAddressIncompleteMatch),
-            RA::ManualReview,
+            RAC::ManualReview {},
         ),
-        (if_risk_signal(FRC::BusinessAddressDoesNotMatch), RA::ManualReview),
+        (
+            if_risk_signal(FRC::BusinessAddressDoesNotMatch),
+            RAC::ManualReview {},
+        ),
     ];
 
     let name_rules = vec![
-        (if_risk_signal(FRC::BusinessNameAlternateMatch), RA::ManualReview),
-        (if_risk_signal(FRC::BusinessNameDoesNotMatch), RA::ManualReview),
+        (
+            if_risk_signal(FRC::BusinessNameAlternateMatch),
+            RAC::ManualReview {},
+        ),
+        (
+            if_risk_signal(FRC::BusinessNameDoesNotMatch),
+            RAC::ManualReview {},
+        ),
     ];
 
-    let watchlist_rules = vec![(if_risk_signal(FRC::BusinessNameWatchlistHit), RA::ManualReview)];
+    let watchlist_rules = vec![(
+        if_risk_signal(FRC::BusinessNameWatchlistHit),
+        RAC::ManualReview {},
+    )];
 
     if ein_only {
         base
@@ -166,7 +238,7 @@ impl RuleGroup {
             && !obc.verification_checks().skip_kyc()
     }
 
-    fn kyc_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+    fn kyc_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
         let mut kyc_rules = vec![];
         let must_collect_ssn =
             obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
@@ -181,13 +253,16 @@ impl RuleGroup {
         }
 
         if optional_ssn {
-            kyc_rules.append(&mut vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)]);
+            kyc_rules.append(&mut vec![(
+                if_risk_signal(FRC::SsnNotProvided),
+                RAC::ManualReview {},
+            )]);
         }
 
         kyc_rules
     }
 
-    fn alpaca_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+    fn alpaca_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
         let mut alpaca_rules = vec![];
         if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
             alpaca_rules.append(&mut alpaca_kyc_field_validation_rules());
@@ -196,7 +271,7 @@ impl RuleGroup {
         alpaca_rules
     }
 
-    fn document_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+    fn document_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
         let mut document_rules = vec![];
         if obc.document_cdo().is_some() || matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
             document_rules.append(&mut base_doc_rules(matches!(obc.cip_kind, Some(CipKind::Alpaca))));
@@ -204,7 +279,7 @@ impl RuleGroup {
         document_rules
     }
 
-    fn aml_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+    fn aml_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
         let mut aml_rules = vec![];
         let aml_risk_signals = match obc.verification_checks().enhanced_aml() {
             // We do get some watchlist risk signals from normal KYC
@@ -238,13 +313,13 @@ impl RuleGroup {
             }
         };
         aml_risk_signals.into_iter().for_each(|rs| {
-            aml_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
+            aml_rules.push((if_risk_signal(rs.clone()), RAC::ManualReview {}));
         });
 
         aml_rules
     }
 
-    fn verification_check_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+    fn verification_check_rules(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
         obc.verification_checks()
             .inner()
             .iter()
@@ -252,7 +327,7 @@ impl RuleGroup {
             .collect_vec()
     }
 
-    fn rules(&self, obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+    fn rules(&self, obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
         match self {
             Self::Kyc => Self::kyc_rules(obc),
             Self::Document => Self::document_rules(obc),
@@ -264,7 +339,7 @@ impl RuleGroup {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RuleAction)> {
+pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)> {
     RuleGroup::iter().flat_map(|g| g.rules(obc)).collect_vec()
 }
 
@@ -286,12 +361,15 @@ pub fn save_default_rules_for_obc(conn: &mut TxnPgConn, obc: &Locked<ObConfigura
         &DbActor::Footprint,
         rules
             .into_iter()
-            .map(|(e, a)| NewRule {
-                rule_expression: e,
-                action: a,
-                rule_action: a.to_rule_action(),
-                name: None,
-                is_shadow: false,
+            .map(|(e, a)| {
+                let action = a.clone().into();
+                NewRule {
+                    rule_expression: e,
+                    action,
+                    rule_action: a,
+                    name: None,
+                    is_shadow: false,
+                }
             })
             .collect(),
     )?;
@@ -331,28 +409,29 @@ mod tests {
         Some(vec![VerificationCheck::Kyb { ein_only }])
     }
 
-    #[db_test_case(ObConfigurationOpts { ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn),  RA::ManualReview)]].concat() ; "basic KYC")]
-    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "basic KYC with SSN")]
+
+    #[db_test_case(ObConfigurationOpts { ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn),  RAC::ManualReview {})]].concat() ; "basic KYC")]
+    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {})]].concat() ; "basic KYC with SSN")]
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], skip_kyc: true, ..Default::default()}, vec![]  ; "SSN but skip_kyc")]
-    #[db_test_case(ObConfigurationOpts { optional_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)], vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "basic KYC with optional SSN")]
+    #[db_test_case(ObConfigurationOpts { optional_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::SsnNotProvided), RAC::ManualReview {})], vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {})]].concat() ; "basic KYC with optional SSN")]
     #[db_test_case(ObConfigurationOpts { skip_kyc: true, ..Default::default()}, vec![]; "skip_kyc")]
-    #[db_test_case(ObConfigurationOpts { skip_kyc: true, enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml even with skip kyc")]
-    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml, all options")]
-    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: false, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview)]].concat() ; "enhanced_aml, subbset of options")]
+    #[db_test_case(ObConfigurationOpts { skip_kyc: true, enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitWarning),  RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitPep), RAC::ManualReview {}), (if_risk_signal(FRC::AdverseMediaHit), RAC::ManualReview {})]].concat() ; "enhanced_aml even with skip kyc")]
+    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitWarning),  RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitPep), RAC::ManualReview {}), (if_risk_signal(FRC::AdverseMediaHit), RAC::ManualReview {})]].concat() ; "enhanced_aml, all options")]
+    #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: false, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None, match_kind: AmlMatchKind::ExactName}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitPep), RAC::ManualReview {})]].concat() ; "enhanced_aml, subbset of options")]
     // non-Alpaca but must_collect_data contains DOC CDO
-    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, [base_doc_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "Doc CDO")]
+    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, [base_doc_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {})]].concat() ; "Doc CDO")]
     // doc only (indicated by `kind = Document`)
     #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Document, must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, base_doc_rules(false); "Doc only")]
     // cip_kind = Alpaca
-    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(false), ..Default::default()}, [base_kyb_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB")]
-    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(true), ..Default::default()}, [ein_only_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB EIN Only")]
-    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(false),  ..Default::default()}, [base_kyb_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB, non-KYC BO")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(false), ..Default::default()}, [base_kyb_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {})]].concat() ; "KYB")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(true), ..Default::default()}, [ein_only_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {})]].concat() ; "KYB EIN Only")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(false),  ..Default::default()}, [base_kyb_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RAC::ManualReview {}), (if_risk_signal(FRC::WatchlistHitNonSdn), RAC::ManualReview {})]].concat() ; "KYB, non-KYC BO")]
     #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, skip_kyc: true, must_collect_data: vec![CDO::BusinessTin], verification_checks: kyb_vc(true), ..Default::default()}, [ein_only_rules()].concat() ; "KYB ein only, no BOs")]
     #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, skip_kyc: true, must_collect_data: vec![CDO::BusinessTin], verification_checks: kyb_vc(false), ..Default::default()}, [base_kyb_rules(false)].concat() ; "KYB full, no BOs")]
     fn test_default_rules_for_obc(
         conn: &mut TestPgConn,
         obc_opts: ObConfigurationOpts,
-        expected: Vec<(RuleExpression, RuleAction)>,
+        expected: Vec<(RuleExpression, RAC)>,
     ) {
         let t = tests::fixtures::tenant::create(conn);
         let obc = tests::fixtures::ob_configuration::create_with_opts(conn, &t.id, obc_opts);

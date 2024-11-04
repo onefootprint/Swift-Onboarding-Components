@@ -118,7 +118,7 @@ pub fn evaluate_workflow_decision<'a>(
         .into_iter()
         .map(|(re, ra)| Rule {
             expression: re,
-            action: ra,
+            action: ra.into(),
         })
         .collect();
     let (_, should_commit_action) = eval::evaluate_rule_set(
