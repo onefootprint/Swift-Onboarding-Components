@@ -17,12 +17,11 @@ use newtypes::put_data_request::PatchDataRequest;
 use newtypes::DataLifetimeSource;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentRequestConfig;
+use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
-use newtypes::WorkflowId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -120,9 +119,20 @@ pub async fn patch(
             && !address.is_us_including_territories()
         {
             tracing::info!(scoped_vault_id=%sv_id, wf_id=%wf.id, "creating doc request for international onboarding");
-
-            let args =
-                default_identity_doc_args(sv_id, true, &wf.id, obc.document_types_and_countries.clone());
+            // We only support passport for international onboarding for now
+            let passport_only_config = DocumentAndCountryConfiguration {
+                global: vec![IdDocKind::Passport],
+                ..Default::default()
+            };
+            let args = NewDocumentRequestArgs {
+                scoped_vault_id: sv_id.clone(),
+                workflow_id: wf.id.clone(),
+                rule_set_result_id: None,
+                config: DocumentRequestConfig::Identity {
+                    collect_selfie: true,
+                    document_types_and_countries: Some(passport_only_config),
+                },
+            };
             // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
             state
                 .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
@@ -131,21 +141,4 @@ pub async fn patch(
     }
 
     Ok(api_wire_types::Empty)
-}
-
-fn default_identity_doc_args(
-    sv_id: &ScopedVaultId,
-    should_collect_selfie: bool,
-    workflow_id: &WorkflowId,
-    document_types_and_countries: Option<DocumentAndCountryConfiguration>,
-) -> NewDocumentRequestArgs {
-    NewDocumentRequestArgs {
-        scoped_vault_id: sv_id.clone(),
-        workflow_id: workflow_id.clone(),
-        rule_set_result_id: None,
-        config: DocumentRequestConfig::Identity {
-            collect_selfie: should_collect_selfie,
-            document_types_and_countries,
-        },
-    }
 }
