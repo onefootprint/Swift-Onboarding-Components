@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 import useSession from 'src/hooks/use-session';
 
 const useRequestHeaders = () => {
-  const { authHeaders } = useSession();
+  const { authHeaders, isLive } = useSession();
   const queryClient = useQueryClient();
 
   useEffect(() => {
     client.setConfig({ headers: authHeaders });
     queryClient.resetQueries();
-  }, [authHeaders]);
+  }, [isLive]);
 };
 
 export default useRequestHeaders;
