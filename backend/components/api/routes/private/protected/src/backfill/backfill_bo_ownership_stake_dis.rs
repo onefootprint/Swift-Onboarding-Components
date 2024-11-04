@@ -14,6 +14,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use db::models::business_owner::BusinessOwner;
 use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::schema::business_owner;
 use db::schema::data_lifetime;
 use db::schema::scoped_vault;
@@ -99,6 +100,8 @@ pub async fn post(
 
             let mut num_vault_updates = 0;
             for (bo, sv_id) in db_bos {
+                tracing::info!("Backfilling for BO {}", bo.id);
+
                 let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sv_id)?;
 
                 #[allow(deprecated)]
@@ -107,6 +110,11 @@ pub async fn post(
                     .map(|stake| stake.try_into())
                     .transpose()
                     .map_err(|_| AssertionError("can't convert ownership stake to a u32"))?;
+
+                if ownership_stake.is_none() {
+                    // There's no ownership stake in the DB to backfill.
+                    continue;
+                }
 
                 let request =
                     DataRequest::empty().into_beneficial_owner_data(&bo.link_id, ownership_stake)?;
@@ -121,7 +129,7 @@ pub async fn post(
                     .map(|(di, pii)| (di.clone(), pii.clone()))
                     .collect_vec();
                 if new_data.len() != 1 {
-                    return AssertionError("Expected only one new DI").into();
+                    return AssertionError(&format!("Expected only one new DI, got {:?}", new_data)).into();
                 }
                 let (new_di, new_ownership_stake) =
                     new_data.into_iter().next().ok_or(AssertionError("No new DI"))?;
@@ -138,21 +146,37 @@ pub async fn post(
                 // new DL for the ownership_stake as if it were created in first vault write for the
                 // business vault. This makes all historical constructions of the business vault
                 // prior to the time of the backfill yield the DB ownership_stake value.
-                let min_seqno_dl: DataLifetime = data_lifetime::table
+                let min_seqno_dl: Option<DataLifetime> = data_lifetime::table
                     .filter(data_lifetime::scoped_vault_id.eq(&bvw.scoped_vault.id))
                     .select(DataLifetime::as_select())
                     .order_by(data_lifetime::created_seqno)
                     .first(conn.conn())
+                    .optional()
                     .map_err(DbError::from)?;
+
+                let (created_at, created_seqno) = match min_seqno_dl {
+                    Some(min_seqno_dl) => (min_seqno_dl.created_at, min_seqno_dl.created_seqno),
+                    None => {
+                        // No existing vault data for this vault.
+                        // Patch at the current timestamp (not inserted retroactively).
+                        tracing::info!("No existing vault data for BO {}", bo.id);
+
+                        let txn = DataLifetime::new_sv_txn(conn, &bvw.sv)?;
+                        let svv = ScopedVaultVersion::get_or_create(conn, &txn)?;
+
+                        tracing::info!("Created SVV {:?}", &svv);
+
+                        (Utc::now(), svv.seqno)
+                    }
+                };
 
                 let new_dl = NewDataLifetime {
                     vault_id: bvw.vault.id.clone(),
                     scoped_vault_id: bvw.scoped_vault.id.clone(),
-                    // Should this be the current time?
-                    created_at: min_seqno_dl.created_at,
+                    created_at,
                     portablized_at: None,
                     deactivated_at: None,
-                    created_seqno: min_seqno_dl.created_seqno,
+                    created_seqno,
                     portablized_seqno: None,
                     deactivated_seqno: None,
                     kind: new_di,
