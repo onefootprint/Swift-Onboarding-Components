@@ -396,6 +396,7 @@ impl AuditEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::tenant_role::ImmutableRoleKind;
     use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use crate::tests::prelude::*;
     use itertools::sorted;
@@ -403,6 +404,7 @@ mod tests {
     use macros::db_test;
     use newtypes::DataIdentifier;
     use newtypes::DecryptionContext;
+    use newtypes::TenantRoleKind;
 
     #[db_test]
     fn test_create_audit_event(conn: &mut TestPgConn) {
@@ -521,6 +523,13 @@ mod tests {
         };
         let id2 = AuditEvent::create(conn, event2).unwrap();
 
+        let tenant_role = TenantRole::get_immutable(
+            conn,
+            &tenant.id,
+            ImmutableRoleKind::Admin,
+            TenantRoleKind::DashboardUser,
+        )
+        .unwrap();
         let event3 = NewAuditEvent {
             tenant_id: tenant.id.clone(),
             principal_actor: DbActor::Footprint,
@@ -535,6 +544,19 @@ mod tests {
             },
         };
         let id3 = AuditEvent::create(conn, event3).unwrap();
+
+        let event4 = NewAuditEvent {
+            tenant_id: tenant.id.clone(),
+            principal_actor: DbActor::Footprint,
+            insight_event_id: insight_event.id.clone(),
+            detail: AuditEventDetail::InviteOrgMember {
+                email: "email@onefootprint.com".parse().unwrap(),
+                first_name: None,
+                last_name: None,
+                tenant_role_id: tenant_role.id,
+            },
+        };
+        let id4 = AuditEvent::create(conn, event4).unwrap();
 
         let events = AuditEvent::filter(
             conn,
@@ -552,22 +574,41 @@ mod tests {
             100,
         )
         .unwrap();
-        assert_eq!(events.len(), 2);
+        assert_eq!(events.len(), 3);
 
-        let first_cursor = events
-            .first()
-            .map(|event| (event.audit_event.timestamp, event.audit_event.id.clone()))
+        for page_size in 0..=events.len() {
+            let partial_events = AuditEvent::filter(
+                conn,
+                FilterQueryParams {
+                    cursor: None,
+                    tenant_id: tenant.id.clone(),
+                    search: None,
+                    timestamp_lte: None,
+                    timestamp_gte: None,
+                    names: vec![],
+                    targets: vec![],
+                    is_live: Some(true),
+                    list_id: None,
+                },
+                page_size as i64,
+            )
             .unwrap();
+            assert_eq!(partial_events.len(), page_size);
+        }
+
+        let mut cursor = events
+            .into_iter()
+            .map(|event| (event.audit_event.timestamp, event.audit_event.id.clone()));
+        let first_cursor = cursor.next().unwrap();
         let first_id = first_cursor.1.clone();
-        let second_cursor = events
-            .get(1)
-            .map(|event| (event.audit_event.timestamp, event.audit_event.id.clone()))
-            .unwrap();
+        let second_cursor = cursor.next().unwrap();
         let second_id = second_cursor.1.clone();
+        let third_cursor = cursor.next().unwrap();
+        let third_id = third_cursor.1.clone();
 
         let tests = vec![
             (
-                "filter by cursor bound, two results",
+                "filter by cursor bound, three results",
                 FilterQueryParams {
                     cursor: Some(first_cursor.clone()),
                     tenant_id: tenant.id.clone(),
@@ -579,10 +620,10 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
-                vec![first_id.clone(), second_id.clone()],
+                vec![first_id.clone(), second_id.clone(), third_id.clone()],
             ),
             (
-                "filter by id cursor bound, one result",
+                "filter by id cursor bound, two result",
                 FilterQueryParams {
                     cursor: Some(second_cursor.clone()),
                     tenant_id: tenant.id.clone(),
@@ -594,7 +635,7 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
-                vec![second_id.clone()],
+                vec![second_id.clone(), third_id.clone()],
             ),
             (
                 "filter by id cursor bound, no results",
@@ -657,7 +698,7 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
-                vec![id1.clone(), id2.clone()],
+                vec![id1.clone(), id2.clone(), id4.clone()],
             ),
             (
                 "timestamp >= 0",
@@ -672,7 +713,7 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
-                vec![id1.clone(), id2.clone()],
+                vec![id1.clone(), id2.clone(), id4.clone()],
             ),
             (
                 "timestamp >= far future",
@@ -765,7 +806,7 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
-                vec![id1.clone(), id2.clone()],
+                vec![id1.clone(), id2.clone(), id4.clone()],
             ),
             (
                 "live = true, tenant with no events",
@@ -795,7 +836,7 @@ mod tests {
                     is_live: Some(false),
                     list_id: None,
                 },
-                vec![id3.clone()],
+                vec![id3.clone(), id4.clone()],
             ),
         ];
 
