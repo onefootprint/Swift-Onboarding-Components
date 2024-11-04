@@ -11,7 +11,6 @@ import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
 import DecryptMachineProvider from '../../../../../decrypt-machine';
 import { useOpenDatadog } from '../../hooks/use-open-datadog';
-import AddToListDialog from '../add-to-list-dialog';
 import EditTagsDialog from '../edit-tags-dialog';
 import EditVaultDrawer from '../edit-vault-drawer';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
@@ -23,7 +22,6 @@ import ViewHistoricalDataDialog from '../view-historical-data-dialog';
 enum ActionDialog {
   Auth = 'auth',
   RequestMoreInfo = 'request-more-info',
-  AddToList = 'add-to-list',
   HistoricalData = 'historical-data',
   Summarize = 'summarize',
   UploadDoc = 'upload-doc',
@@ -85,11 +83,6 @@ const UserActions = ({ entity }: WithEntityProps) => {
                 {t('management.view-historical-data')}
               </DropdownItem>
             )}
-            {hasPermission(RoleScopeKind.writeLists) && (
-              <DropdownItem onSelect={handleDialogOpen(ActionDialog.AddToList)}>
-                {t('management.add-to-list')}
-              </DropdownItem>
-            )}
             <DropdownItem onSelect={handleDialogOpen(ActionDialog.Summarize)}>{t('management.summarize')}</DropdownItem>
           </Dropdown.Group>
           {hasPermission(RoleScopeKind.manualReview) && (
@@ -124,7 +117,6 @@ const UserActions = ({ entity }: WithEntityProps) => {
       </DecryptMachineProvider>
       <RequestMoreInfoDialog open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
       <UpdateAuthDialog open={openDialog === ActionDialog.Auth} onClose={handleCloseDialog} />
-      <AddToListDialog open={openDialog === ActionDialog.AddToList} onClose={handleCloseDialog} />
       <ViewHistoricalDataDialog open={openDialog === ActionDialog.HistoricalData} onClose={handleCloseDialog} />
       <SummarizeAiDialog open={openDialog === ActionDialog.Summarize} onClose={handleCloseDialog} />
       <UploadDocDialog open={openDialog === ActionDialog.UploadDoc} onClose={handleCloseDialog} />
