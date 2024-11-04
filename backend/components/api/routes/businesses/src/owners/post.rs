@@ -16,8 +16,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::DbError;
 use newtypes::preview_api;
-use newtypes::BusinessDataKind as BDK;
-use newtypes::DataIdentifier as DI;
 use newtypes::DataRequest;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
@@ -53,6 +51,7 @@ pub async fn post(
     state
         .db_transaction(move |conn| -> FpResult<_> {
             let sb = ScopedVault::lock(conn, (&fp_bid, &tenant_id, is_live))?;
+            let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id)?;
             if sb.kind != VaultKind::Business {
                 return ValidationError("Provided fp_bid does not correspond to a business").into();
             }
@@ -68,15 +67,6 @@ pub async fn post(
             let owner_su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             if owner_su.kind != VaultKind::Person {
                 return ValidationError("Provided fp_id does not correspond to a person").into();
-            }
-
-            let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id)?;
-
-            // We don't check for ownership stake data here because that data is a side effect of
-            // using this tenant API ownership linking as well.
-            if let Some(disallowed_di) = bvw.populated_dis().iter().find(|di| matches!(di, DI::Business(BDK::BeneficialOwners) | DI::Business(BDK::KycedBeneficialOwners) | DI::Business(BDK::BeneficialOwnerData(_, _)) )) {
-                let err_str = format!("Business already has vaulted BOs. If you'd like to link a user as the beneficial owner of this business, please clear out {}", disallowed_di);
-                return ValidationError(&err_str).into();
             }
 
             let result = BusinessOwner::create_tenant_api(conn, sb, owner_su.vault_id);
