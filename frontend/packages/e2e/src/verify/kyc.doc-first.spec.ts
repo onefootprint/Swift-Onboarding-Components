@@ -3,7 +3,6 @@ import {
   clickOnAgree,
   clickOnContinue,
   continueOnDesktop,
-  doTransferFromMobile,
   selectOutcomeOptional,
   uploadImage,
   verifyAppIframeClick,
@@ -13,7 +12,7 @@ import {
 import { PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
+const key = process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_HMo2GpDNb4HIGWdhk1RfAX';
 
 const userData = encodeURIComponent(
   JSON.stringify({
@@ -33,13 +32,10 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
+test('Document first #ci', async ({ isMobile, page }) => {
   test.slow(); // ~16.0s
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
-  const context = await browser.newContext({ permissions: ['camera'] });
-
-  await context.grantPermissions(['camera']);
 
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
   await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
@@ -49,22 +45,8 @@ test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });
-  await expect(frame.locator('input[type="tel"]')).not.toBeAttached();
-
-  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    const newPage = await doTransferFromMobile({
-      frame,
-      browser,
-    });
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await newPage.waitForTimeout(5000); // takes 3 seconds for the new tab to close
-    return;
-  }
-
   await page.waitForLoadState();
-  await expect(frame.getByText(/Continue on your mobile phone/i)).toBeVisible({
-    timeout,
-  });
+
   await continueOnDesktop(frame);
   await page.waitForLoadState();
 
@@ -83,10 +65,14 @@ test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
   await page.waitForLoadState();
 
   await uploadImage({ frame, page, isMobile }, /Choose file to upload/i, 'driver-front.png');
+  await expect(frame.getByText('Success!').first()).toBeAttached({ timeout: 10000 });
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await uploadImage({ frame, page, isMobile }, /Choose file to upload/i, 'driver-back.png');
+  await expect(frame.getByText('Success!').first()).toBeAttached({ timeout: 10000 });
   await clickOnContinue(frame);
-  expect(1).toBe(1);
+  await page.waitForLoadState();
+
+  await expect(frame.getByText("What's your Social Security Number?").first()).toBeAttached();
 });

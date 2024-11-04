@@ -8,35 +8,25 @@ import {
   verifyEmail,
 } from '../utils/commands';
 
-const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYC_NO_PHONE || 'ob_test_h9Qp2W3Trk1pfIoI7dTD5q';
+import { PERSONAL } from '../utils/constants';
 
-const addressLine1 = '123 Main St';
-const addressLine2 = 'Apt 1';
-const city = 'San Francisco';
-const country = 'US';
-const dob = '01/01/1990';
-const email = 'sandbox@onefootprint.com' as const;
-const firstName = 'E2E';
-const lastName = 'Doe';
-const ssn = '418437970';
-const state = 'CA';
-const zipCode = '94105';
+const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
+const key = process.env.E2E_OB_KYC_NO_PHONE || 'pb_test_uDiD4cdG8iNsIXF2JjemAJ';
 
 const userData = encodeURIComponent(
   JSON.stringify({
-    'id.address_line1': addressLine1,
-    'id.address_line2': addressLine2,
-    'id.city': city,
-    'id.country': country,
-    'id.dob': dob,
-    'id.email': email,
-    'id.first_name': firstName,
-    'id.last_name': lastName,
-    'id.phone_number': '+15555550100',
-    'id.ssn9': ssn,
-    'id.state': state,
-    'id.zip': zipCode,
+    'id.address_line1': PERSONAL.addressLine1,
+    'id.address_line2': PERSONAL.addressLine2,
+    'id.city': PERSONAL.city,
+    'id.country': PERSONAL.country,
+    'id.dob': PERSONAL.dob,
+    'id.email': PERSONAL.email,
+    'id.first_name': PERSONAL.firstName,
+    'id.last_name': PERSONAL.lastName,
+    'id.phone_number': `+${PERSONAL.phone}`,
+    'id.ssn9': PERSONAL.ssn,
+    'id.state': PERSONAL.state,
+    'id.zip': PERSONAL.zipCode,
   }),
 );
 
@@ -68,15 +58,15 @@ test('KYC E2E.NoPhoneFlow #ci', async ({ page, isMobile }) => {
   await page.waitForLoadState();
 
   await confirmData(frame, {
-    firstName,
-    lastName,
-    dob,
-    addressLine1,
-    city,
-    state,
-    zipCode,
-    country,
-    ssn,
+    firstName: PERSONAL.firstName,
+    lastName: PERSONAL.lastName,
+    dob: PERSONAL.dob,
+    addressLine1: PERSONAL.addressLine1,
+    city: PERSONAL.city,
+    state: PERSONAL.state,
+    zipCode: PERSONAL.zipCode,
+    country: PERSONAL.country,
+    ssn: PERSONAL.ssn,
   });
   await clickOnContinue(frame);
   await page.waitForLoadState();

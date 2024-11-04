@@ -181,7 +181,7 @@ export const fillTaxId = async (frame: FrameLocator, payload: { id: string }) =>
   await field.waitFor(attachedState).then(() => field.fill(payload.id));
 };
 
-export const fillVisa = async ({ frame, page }: PageNFrame) => {
+export const fillVisa = async ({ frame, page }: PageNFrame, payload: { visaExpirationDate: string }) => {
   await frame.getByRole('radio', { name: 'I have a Visa', disabled: false }).first().click();
 
   const citizenships = frame
@@ -216,7 +216,7 @@ export const fillVisa = async ({ frame, page }: PageNFrame) => {
   await frame.getByText('E-1').first().click();
 
   const field = frame.getByLabel('Visa expiration date').first();
-  await field.waitFor(attachedState).then(() => field.fill('01/01/2024'));
+  await field.waitFor(attachedState).then(() => field.fill(payload.visaExpirationDate));
 };
 
 export const confirmData = async (

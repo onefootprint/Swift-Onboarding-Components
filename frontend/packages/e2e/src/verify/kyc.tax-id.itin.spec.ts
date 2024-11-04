@@ -1,12 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  clickOnAgree,
+  clickOn,
   clickOnContinue,
-  confirmData,
-  continueOnDesktop,
+  fillTaxId,
   selectOutcomeOptional,
-  uploadImage,
   verifyAppIframeClick,
   verifyPhoneNumber,
 } from '../utils/commands';
@@ -14,7 +12,7 @@ import {
 import { PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYC_DOC || 'pb_test_Bmb3bDufq7THKCHsCExcJg';
+const key = process.env.E2E_OB_KYC_ITIN || 'pb_test_84lqIB3DpsQUKgEQhAKGEt';
 
 const userData = encodeURIComponent(
   JSON.stringify({
@@ -28,7 +26,6 @@ const userData = encodeURIComponent(
     'id.last_name': PERSONAL.lastName,
     'id.middle_name': PERSONAL.middleName,
     'id.phone_number': `+${PERSONAL.phone}`,
-    'id.ssn9': PERSONAL.ssn,
     'id.state': PERSONAL.state,
     'id.zip': PERSONAL.zipCode,
   }),
@@ -39,63 +36,42 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}&bootstrap_data=${userData}`);
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&user_data=${userData}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
 });
 
-test('E2E.KYC.DriverDocOnly #ci', async ({ page, isMobile }) => {
-  test.slow(); // ~30.9s
+test('KYC Tax ID/ITIN #ci', async ({ page, isMobile }) => {
+  test.slow();
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
   await expect(frame.getByText(/Sandbox Mode/i)).toBeVisible({ timeout });
 
-  await selectOutcomeOptional(frame, 'Success');
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
+  await selectOutcomeOptional(frame, 'Success')
+    .then(() => clickOnContinue(frame))
+    .then(() => page.waitForLoadState());
 
+  await expect(frame.getByText('Log in with a different account')).toBeAttached();
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  await confirmData(frame, {
-    addressLine1: PERSONAL.addressLine1,
-    city: PERSONAL.city,
-    country: PERSONAL.country,
-    dob: PERSONAL.dob,
-    firstName: PERSONAL.firstName,
-    lastName: PERSONAL.lastName,
-    ssn: PERSONAL.ssn,
-    state: PERSONAL.state,
-    zipCode: PERSONAL.zipCode,
-  });
+  await expect(frame.getByText('Tax ID').first()).toBeAttached();
+  await fillTaxId(frame, { id: '900801234' });
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await continueOnDesktop(frame);
-  await page.waitForLoadState();
-
+  await expect(frame.getByText('Confirm your personal data').first()).toBeAttached();
+  await frame.getByRole('button').filter({ hasText: 'Reveal' }).first().click();
+  await expect(frame.getByText('900-80-1234').first()).toBeAttached();
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await frame
-    .getByText(/Optional/i)
-    .first()
-    .scrollIntoViewIfNeeded();
-
-  await clickOnAgree(frame);
+  await clickOn(/continue on desktop/i, frame);
   await page.waitForLoadState();
-
-  await uploadImage({ frame, page, isMobile }, /Choose file to upload/i, 'driver-front.png');
-  await expect(frame.getByText('Success!').first()).toBeAttached({ timeout: 10000 });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await uploadImage({ frame, page, isMobile }, /Choose file to upload/i, 'driver-back.png');
-  await expect(frame.getByText('Success!').first()).toBeAttached({ timeout: 10000 });
-  await clickOnContinue(frame);
 
   await expect(page.getByTestId('result').first()).toContainText('_', { timeout: 5000 });
 });
