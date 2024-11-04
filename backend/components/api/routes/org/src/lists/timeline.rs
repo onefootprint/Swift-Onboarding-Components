@@ -68,7 +68,6 @@ async fn timeline(
         .db_transaction(move |conn| -> FpResult<_> {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let events = AuditEvent::filter(conn, params, (page_size + 1) as i64)?;
-            let events = events.into_iter().take(page_size).collect_vec(); // TODO: why is this needed?
 
             let lec_ids = events
                 .iter()

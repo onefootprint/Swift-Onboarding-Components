@@ -676,6 +676,35 @@ def test_list_list_entries(sandbox_tenant):
         ["protonmail.com", "somethingelse.com"]
     )
 
+    # Check that pagination works
+    events = get(
+        f"/org/lists/{list['id']}/timeline",
+        dict(
+            page_size=2,
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    assert len(events["data"]) == 2
+    assert set(events["data"][0]["detail"]["data"]["entries"]) == set(
+        ["bobertotech.org"]
+    )
+    assert set(events["data"][1]["detail"]["data"]["entries"]) == set(
+        ["baddiesinc.org"]
+    )
+    events = get(
+        f"/org/lists/{list['id']}/timeline",
+        dict(
+            page_size=2,
+            cursor=events["meta"]["next"],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    assert len(events["data"]) == 1
+    assert set(events["data"][0]["detail"]["data"]["entries"]) == set(
+        ["protonmail.com", "somethingelse.com"]
+    )
+    assert events["meta"]["next"] is None
+
 
 def test_delete_list_entries(sandbox_tenant):
     nonce = _gen_random_str(15)
