@@ -11,6 +11,7 @@ const useInitialFilters = (now = new Date()) => {
 
   const initialValues: FormData = {
     labels: [],
+    tags: [],
     others: [],
     period: 'all-time',
     customDate: { from: today, to: nextWeek },
@@ -20,6 +21,7 @@ const useInitialFilters = (now = new Date()) => {
   const defaultValues = useMemo(() => {
     const defaultData: Filters = {
       labels: [],
+      tags: [],
       others: [],
       playbooks: {},
       externalId: values.external_id,
@@ -27,6 +29,9 @@ const useInitialFilters = (now = new Date()) => {
     };
     if (requestParams.labels) {
       defaultData.labels = values.labels;
+    }
+    if (requestParams.tags) {
+      defaultData.tags = values.tags;
     }
     if (requestParams.playbookIds) {
       defaultData.playbooks = requestParams.playbookIds.reduce(

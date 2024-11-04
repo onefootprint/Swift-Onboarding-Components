@@ -146,6 +146,14 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
   },
 ];
 
+export const withOrgTags = () => {
+  return mockRequest({
+    method: 'get',
+    path: '/org/tags',
+    response: [],
+  });
+};
+
 export const withEntities = (response: Entity[] = entitiesFixture) =>
   mockRequest({
     method: 'post',

@@ -1,3 +1,4 @@
+import type { OrgTenantTag } from '@onefootprint/request-types/dashboard';
 import { EntityLabel } from '@onefootprint/types';
 import { Checkbox, DateRangeInput, Drawer, Radio, Stack, TextInput, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
@@ -8,16 +9,19 @@ import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 import useFilters from '../../../../../../hooks/use-filters';
-import Playbooks from './components/playbooks';
+import PlaybookList from './components/playbooks';
+import TagsList from './components/tags-list';
 import { FiltersDateRange, type FormData } from './drawer-filter.type';
 import useDateOptions from './hooks/use-date-options';
 import useInitialFilters from './hooks/use-initial-filters';
 import transformFormDataToQuery from './utils/transform-form-to-query';
 
-const DrawerFilter = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entities.filters.drawer',
-  });
+type DrawerFilterProps = {
+  tags: OrgTenantTag[];
+};
+
+const DrawerFilter = ({ tags }: DrawerFilterProps) => {
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entities.filters.drawer' });
   const {
     data: { user },
   } = useSession();
@@ -58,6 +62,7 @@ const DrawerFilter = () => {
       has_outstanding_workflow_request: undefined,
       show_unverified: undefined,
       labels: undefined,
+      tags: undefined,
       playbook_ids: undefined,
       external_id: undefined,
     });
@@ -96,6 +101,12 @@ const DrawerFilter = () => {
                     />
                   </Stack>
                 </fieldset>
+                {tags.length ? (
+                  <fieldset>
+                    <Legend>{t('tags.label')}</Legend>
+                    <TagsList tags={tags} />
+                  </fieldset>
+                ) : null}
                 <fieldset>
                   <Legend>{t('created.label')}</Legend>
                   <Stack direction="column" gap={3}>
@@ -131,7 +142,7 @@ const DrawerFilter = () => {
                 </fieldset>
                 <fieldset>
                   <Legend>{t('playbooks.label')}</Legend>
-                  <Playbooks />
+                  <PlaybookList />
                 </fieldset>
                 <fieldset>
                   <Legend>{t('other.label')}</Legend>

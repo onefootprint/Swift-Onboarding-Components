@@ -18,6 +18,7 @@ export type EntitiesQueryParams = {
   has_outstanding_workflow_request?: string;
   show_unverified?: string;
   labels?: string[];
+  tags?: string[];
   playbook_ids?: string[];
   external_id?: string;
 };
@@ -45,6 +46,7 @@ const defaultQueryParams: EntitiesQueryParams = {
   has_outstanding_workflow_request: undefined,
   show_unverified: undefined,
   labels: undefined,
+  tags: undefined,
   playbook_ids: undefined,
   external_id: undefined,
 };
@@ -87,6 +89,7 @@ const useFilters = () => {
       cursor: queryToArray(filters.query.cursor),
       dateRange: queryToArray(filters.query.date_range),
       labels: queryToArray(filters.query.labels),
+      tags: queryToArray(filters.query.tags),
       pageSize: filters.query.page_size ? Number.parseInt(filters.query.page_size, 10) : 15,
       search: filters.query.search,
       watchlist_hit: queryToBoolean(filters.query.watchlist_hit),
@@ -105,6 +108,7 @@ const useFilters = () => {
     cursor: lastCursor ? Number.parseInt(lastCursor, 10) : undefined,
     search: values.search,
     labels: values.labels,
+    tags: values.tags,
     pageSize: values.pageSize,
     timestampGte: from,
     timestampLte: to,
@@ -119,6 +123,7 @@ const useFilters = () => {
   const searchParams = getSearchParams({
     cursor: filters.query.cursor,
     labels: values.labels,
+    tags: values.tags,
     dateRange: filters.query.date_range,
     pageSize: filters.query.page_size,
     search: filters.query.search,
@@ -144,6 +149,9 @@ const useFilters = () => {
     }
     if (values.labels.length) {
       count += values.labels.length;
+    }
+    if (values.tags.length) {
+      count += values.tags.length;
     }
     if (values.dateRange.length) {
       const isDefault = values.dateRange.includes('all-time');

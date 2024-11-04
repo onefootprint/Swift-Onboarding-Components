@@ -55,8 +55,8 @@ export const entitiesFixture: Entity[] = [
   },
 ];
 
-export const withEntities = (response: Entity[] = entitiesFixture) =>
-  mockRequest({
+export const withEntities = (response: Entity[] = entitiesFixture) => {
+  return mockRequest({
     method: 'post',
     path: '/entities/search',
     response: {
@@ -64,9 +64,10 @@ export const withEntities = (response: Entity[] = entitiesFixture) =>
       meta: {},
     },
   });
+};
 
-export const withEntitiesError = () =>
-  mockRequest({
+export const withEntitiesError = () => {
+  return mockRequest({
     method: 'post',
     path: '/entities/search',
     statusCode: 400,
@@ -74,3 +75,4 @@ export const withEntitiesError = () =>
       message: 'Something went wrong',
     },
   });
+};

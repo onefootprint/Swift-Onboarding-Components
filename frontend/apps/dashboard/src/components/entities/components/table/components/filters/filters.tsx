@@ -1,6 +1,8 @@
 import { useEntitiesContext } from '@/entities/components/list/hooks/use-entities-context';
+import { getOrgTagsOptions } from '@onefootprint/axios/dashboard';
 import { EntityKind } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import useFilters, { EntityStatusFilter } from '../../../../hooks/use-filters';
 import DrawerFilter from './components/drawer-filter';
@@ -35,6 +37,7 @@ const Filters = () => {
   const filters = useFilters();
   const context = useEntitiesContext();
   const manualReviewQuery = useManualReview(context.kind);
+  const tagsQuery = useQuery(getOrgTagsOptions({ query: { kind: context.kind } }));
   const isAll = !filters.values.state && !filters.values.verification;
   const isBusinesses = context.kind === EntityKind.business;
 
@@ -92,7 +95,7 @@ const Filters = () => {
             });
           }}
         />
-        {filters.isReady && <DrawerFilter />}
+        {filters.isReady && tagsQuery.data && <DrawerFilter tags={tagsQuery.data} />}
       </Stack>
       <Info />
     </>

@@ -3,7 +3,7 @@ import mockRouter from 'next-router-mock';
 import { asAdminUser } from 'src/config/tests';
 
 import List from './list';
-import { withEntities, withEntitiesError, withOnboardingConfigs } from './list.test.config';
+import { withEntities, withEntitiesError, withOnboardingConfigs, withOrgTags } from './list.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -15,6 +15,7 @@ describe('<List />', () => {
   beforeEach(() => {
     asAdminUser();
     withOnboardingConfigs();
+    withOrgTags();
   });
 
   const renderEntities = () => customRender(<List />);
