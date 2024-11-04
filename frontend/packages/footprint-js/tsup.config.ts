@@ -83,6 +83,8 @@ export default defineConfig(options => ({
   format: ['cjs', 'esm', 'iife'],
   watch: options.watch,
   minify: !options.watch,
+  /** Always bundle modules matching given patterns */
+  noExternal: ['@onefootprint/dev-tools'],
   env: {
     API_BASE_URL: apiBaseUrl || getApiUrl(!!options.watch || forceFootprintToUseLocal),
     BIFROST_URL: getBifrostUrl(!!options.watch || forceFootprintToUseLocal),
