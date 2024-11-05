@@ -2032,6 +2032,59 @@
                 ]
             }
         },
+        "/entities/{fp_id}/onboardings/{onboarding_id}/risk_signals": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Lists the risk signals for a footprint user and onboarding.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "onboarding_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RiskSignal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/risk_signals": {
             "get": {
                 "tags": [
@@ -26944,6 +26997,20 @@
                     "description": {
                         "type": "string"
                     },
+                    "group": {
+                        "type": "string",
+                        "enum": [
+                            "Kyc",
+                            "Kyb",
+                            "Doc",
+                            "WebDevice",
+                            "NativeDevice",
+                            "Aml",
+                            "Behavior",
+                            "Phone",
+                            "Synthetic"
+                        ]
+                    },
                     "id": {
                         "type": "string"
                     },
@@ -27361,6 +27428,7 @@
                 },
                 "required": [
                     "description",
+                    "group",
                     "id",
                     "note",
                     "reason_code",

@@ -35,8 +35,8 @@ use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
@@ -512,11 +512,14 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             .collect_vec();
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
-        let kyb_rs: Vec<RiskSignal> =
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &wf.scoped_vault_id, AtSeqno(None))?
-                .into_iter()
-                .map(|(_, rs)| rs)
-                .collect();
+        let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(
+            conn,
+            &wf.scoped_vault_id,
+            RiskSignalFilter::LegacyLatest,
+        )?
+        .into_iter()
+        .map(|(_, rs)| rs)
+        .collect();
 
         // TODO: Consider pulling in additional insight events?
         let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
@@ -702,11 +705,14 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
-        let kyb_rs: Vec<RiskSignal> =
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &wf.scoped_vault_id, AtSeqno(None))?
-                .into_iter()
-                .map(|(_, rs)| rs)
-                .collect();
+        let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(
+            conn,
+            &wf.scoped_vault_id,
+            RiskSignalFilter::LegacyLatest,
+        )?
+        .into_iter()
+        .map(|(_, rs)| rs)
+        .collect();
 
         // TODO: Consider pulling in additional insight events?
         let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?

@@ -10,8 +10,8 @@ use api_core::FpResult;
 use api_wire_types::UserAiSummary;
 use db::models::annotation::Annotation;
 use db::models::auth_event::AuthEvent;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::rule_set_result::RuleSetResult;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::ExternalId;
@@ -48,7 +48,8 @@ pub async fn get(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (auth_events, _) = AuthEvent::list(conn, &sv.id, None)?;
             let annotations = Annotation::list(conn, fp_id.clone(), tenant_id.clone(), is_live, None)?;
-            let risk_signals = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(None))?;
+            let risk_signals =
+                RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::LegacyLatest)?;
             let rule_set_result = RuleSetResult::latest_workflow_decision(conn, &sv.id)?;
 
             Ok((sv, rule_set_result, risk_signals, auth_events, annotations))
@@ -63,7 +64,6 @@ pub async fn get(
         rule_set_result: rule_set_result.map(api_wire_types::RuleSetResult::from_db),
         risk_signals: risk_signals
             .into_iter()
-            .map(|(_, rs)| rs)
             .map(api_wire_types::RiskSignal::from_db)
             .collect(),
         auth_events: auth_events

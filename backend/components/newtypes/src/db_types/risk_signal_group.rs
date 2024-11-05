@@ -2,6 +2,7 @@ use crate::util::impl_enum_str_diesel;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
+use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use strum::AsRefStr;
@@ -22,6 +23,7 @@ use strum_macros::EnumString;
     EnumString,
     AsRefStr,
     Hash,
+    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

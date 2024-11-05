@@ -153,3 +153,44 @@ def test_synthetic(sandbox_tenant, must_collect_data):
             )
 
     assert test_ran
+
+
+def test_onboarding(sandbox_tenant, must_collect_data):
+    obc = alpaca_kyc_ob_config(sandbox_tenant, must_collect_data + ["investor_profile"])
+    bifrost = BifrostClient.new_user(obc, fixture_result="manual_review")
+    user = bifrost.run()
+
+    onboardings = get(
+        f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths
+    )
+    assert len(onboardings["data"]) == 1
+    onboarding_id = onboardings["data"][0]["id"]
+
+    risk_signals = get(
+        f"entities/{user.fp_id}/onboardings/{onboarding_id}/risk_signals",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    assert set(["watchlist_hit_ofac", "adverse_media_hit"]) <= set(
+        [rs["reason_code"] for rs in risk_signals]
+    )
+
+    bifrost = BifrostClient.new_user(obc, fixture_result="pass")
+    user = bifrost.run()
+
+    onboardings = get(
+        f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths
+    )
+    assert len(onboardings["data"]) == 1
+    onboarding_id = onboardings["data"][0]["id"]
+
+    risk_signals = get(
+        f"entities/{user.fp_id}/onboardings/{onboarding_id}/risk_signals",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    assert not set(["watchlist_hit_ofac", "adverse_media_hit"]) <= set(
+        [rs["reason_code"] for rs in risk_signals]
+    )

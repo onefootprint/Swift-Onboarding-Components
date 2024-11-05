@@ -23,8 +23,8 @@ use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_result::RuleResult;
@@ -220,11 +220,12 @@ pub async fn query_data(
     let wfid = wf_id.clone();
     state
         .db_query(move |conn| -> FpResult<_> {
-            let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, AtSeqno(None))
-                .unwrap()
-                .into_iter()
-                .map(|(_, rs)| rs)
-                .collect();
+            let rs =
+                RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, RiskSignalFilter::LegacyLatest)
+                    .unwrap()
+                    .into_iter()
+                    .map(|(_, rs)| rs)
+                    .collect();
 
             let wf = Workflow::get(conn, &wfid)?;
             let obd = OnboardingDecision::get_active(conn, &wfid)?;

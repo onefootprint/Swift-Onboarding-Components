@@ -30,14 +30,15 @@ use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndResult;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
 use db::DbResult;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeUpdatedWatchlistResult;
@@ -51,12 +52,14 @@ use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiJsonValue;
+use newtypes::RiskSignalGroupKind;
 use newtypes::RiskSignalId;
 use newtypes::SentilinkApplicationRisk;
 use newtypes::TenantId;
 use newtypes::Vendor;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
+use newtypes::WorkflowId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::post;
@@ -89,20 +92,26 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
+
     let api_wire_types::GetHistoricalDataRequest { seqno } = version.into_inner();
+    let rs_filters = if let Some(seqno) = seqno {
+        RiskSignalFilter::AtSeqno(seqno)
+    } else {
+        RiskSignalFilter::LegacyLatest
+    };
 
     let signals = state
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(seqno))
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, rs_filters)
         })
         .await?
         .into_iter()
         .filter(|(_, rs)| !rs.reason_code.to_be_deprecated())
-        .filter_map(|(_, rs)| {
+        .filter_map(|(group, rs)| {
             // FP-5097
             if !matches!(rs.reason_code, FootprintReasonCode::Other(_)) {
-                Some(rs)
+                Some((group, rs))
             } else {
                 tracing::error!(reason_code=%rs.reason_code, risk_signal_id=%rs.id, "FootprintReasonCode::Other retrieved in /risk_signals");
                 None
@@ -121,10 +130,13 @@ pub async fn get(
     Ok(signals)
 }
 
-fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<RiskSignal> {
+fn filter_and_sort(
+    signals: Vec<(RiskSignalGroupKind, RiskSignal)>,
+    filters: RiskSignalFilters,
+) -> Vec<(RiskSignalGroupKind, RiskSignal)> {
     signals
         .into_iter()
-        .filter(|signal| {
+        .filter(|(_, signal)| {
             let rc = signal.reason_code.clone();
             if !filters.scope.is_empty() && !rc.scopes().iter().any(|x| filters.scope.contains(x)) {
                 return false;
@@ -143,12 +155,55 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
             }
             true
         })
-        .sorted_by(|s1, s2| {
+        .sorted_by(|(_, s1), (_, s2)| {
             let s1 = s1.reason_code.severity();
             let s2 = s2.reason_code.severity();
             s1.cmp(&s2).reverse()
         })
         .collect()
+}
+
+#[api_v2_operation(
+    description = "Lists the risk signals for a footprint user and onboarding.",
+    tags(EntityDetails, Entities, Private)
+)]
+#[get("/entities/{fp_id}/onboardings/{onboarding_id}/risk_signals")]
+pub async fn get_onboardings(
+    state: web::Data<State>,
+    request: web::Path<(FpId, WorkflowId)>,
+    auth: TenantSessionAuth,
+) -> ApiListResponse<api_wire_types::RiskSignal> {
+    let auth = auth.check_guard(TenantGuard::Read)?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let (fp_id, wf_id) = request.into_inner();
+
+    let signals = state
+        .db_query(move |conn| -> DbResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let wf = Workflow::get(conn, (&sv.id, &wf_id))?;
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::WorkflowId(&wf.id))
+        })
+        .await?
+        .into_iter()
+        .filter(|(_, rs)| !rs.reason_code.to_be_deprecated())
+        .filter_map(|(group, rs)| {
+            // FP-5097
+            if !matches!(rs.reason_code, FootprintReasonCode::Other(_)) {
+                Some((group, rs))
+            } else {
+                tracing::error!(reason_code=%rs.reason_code, risk_signal_id=%rs.id, "FootprintReasonCode::Other retrieved in /risk_signals");
+                None
+            }
+        })
+        .collect_vec();
+
+    let signals = signals
+        .into_iter()
+        .map(api_wire_types::RiskSignal::from_db)
+        .collect();
+
+    Ok(signals)
 }
 
 #[api_v2_operation(

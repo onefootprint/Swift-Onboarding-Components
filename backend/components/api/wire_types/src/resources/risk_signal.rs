@@ -1,6 +1,7 @@
 use crate::*;
 use newtypes::FootprintReasonCode;
 use newtypes::OnboardingDecisionId;
+use newtypes::RiskSignalGroupKind;
 use newtypes::RiskSignalId;
 use newtypes::SignalScope;
 use newtypes::SignalSeverity;
@@ -13,6 +14,7 @@ pub struct RiskSignal {
     pub reason_code: FootprintReasonCode,
     pub note: String,
     pub description: String,
+    pub group: RiskSignalGroupKind,
     pub severity: SignalSeverity,
     pub scopes: Vec<SignalScope>,
     pub timestamp: chrono::DateTime<Utc>,

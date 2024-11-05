@@ -135,6 +135,10 @@ pub enum WorkflowIdentifier<'a> {
         vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
     },
+    ScopedVaultId {
+        scoped_vault_id: &'a ScopedVaultId,
+        workflow_id: &'a WorkflowId,
+    },
 }
 
 #[derive(Debug)]
@@ -324,12 +328,31 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::get", skip_all)]
-    pub fn get(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Self> {
-        let res = workflow::table
-            .filter(workflow::id.eq(workflow_id))
-            .get_result(conn)?;
+    pub fn get<'a, T: Into<WorkflowIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Self> {
+        let result = match id.into() {
+            WorkflowIdentifier::Id { id } => workflow::table.filter(workflow::id.eq(id)).get_result(conn)?,
+            WorkflowIdentifier::ScopedVaultId {
+                scoped_vault_id,
+                workflow_id,
+            } => workflow::table
+                .filter(workflow::id.eq(workflow_id))
+                .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
+                .get_result(conn)?,
+            WorkflowIdentifier::ConfigId {
+                vault_id,
+                ob_config_id,
+            } => {
+                use db_schema::schema::scoped_vault;
+                workflow::table
+                    .inner_join(scoped_vault::table)
+                    .filter(scoped_vault::vault_id.eq(vault_id))
+                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
+                    .select(workflow::all_columns)
+                    .get_result(conn)?
+            }
+        };
 
-        Ok(res)
+        Ok(result)
     }
 
     #[tracing::instrument("Workflow::list", skip_all)]
@@ -386,14 +409,24 @@ impl Workflow {
         use db_schema::schema::scoped_vault;
         let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
         match id.into() {
-            WorkflowIdentifier::Id { id } => query = query.filter(workflow::id.eq(id)),
+            WorkflowIdentifier::Id { id } => {
+                query = query.filter(workflow::id.eq(id));
+            }
+            WorkflowIdentifier::ScopedVaultId {
+                scoped_vault_id,
+                workflow_id,
+            } => {
+                query = query
+                    .filter(workflow::id.eq(workflow_id))
+                    .filter(workflow::scoped_vault_id.eq(scoped_vault_id));
+            }
             WorkflowIdentifier::ConfigId {
                 vault_id,
                 ob_config_id,
             } => {
                 query = query
                     .filter(scoped_vault::vault_id.eq(vault_id))
-                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
+                    .filter(workflow::ob_configuration_id.eq(ob_config_id));
             }
         }
         let res = query.get_result(conn)?;

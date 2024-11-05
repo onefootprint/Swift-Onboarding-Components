@@ -1,8 +1,9 @@
 use crate::utils::db2api::DbToApi;
 use db::models::risk_signal::RiskSignal;
+use newtypes::RiskSignalGroupKind;
 
-impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
-    fn from_db(rs: RiskSignal) -> Self {
+impl DbToApi<(RiskSignalGroupKind, RiskSignal)> for api_wire_types::RiskSignal {
+    fn from_db((group, rs): (RiskSignalGroupKind, RiskSignal)) -> Self {
         let RiskSignal {
             id,
             onboarding_decision_id,
@@ -16,6 +17,7 @@ impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
             onboarding_decision_id,
             note: reason_code.note(),
             description: reason_code.description(),
+            group,
             severity: reason_code.severity(),
             scopes: reason_code.scopes(),
             reason_code,

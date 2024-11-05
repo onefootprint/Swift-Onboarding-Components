@@ -42,6 +42,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(token::post)
         .service(timeline::get)
         .service(risk_signals::get)
+        .service(risk_signals::get_onboardings)
         .service(match_signals::get)
         .service(risk_signals::get_detail)
         .service(risk_signals::decrypt_aml_hits)

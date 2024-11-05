@@ -40,8 +40,8 @@ use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionFilters;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
@@ -253,10 +253,11 @@ pub(crate) async fn create_cip_request(
             let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-            let risk_signals = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(None))?
-                .into_iter()
-                .map(|(_, rs)| rs)
-                .collect_vec();
+            let risk_signals =
+                RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::LegacyLatest)?
+                    .into_iter()
+                    .map(|(_, rs)| rs)
+                    .collect_vec();
 
             let (mr, manual_obd, annotation) = match fp_obd.status {
                 DecisionStatus::Pass => (None, None, None),

@@ -5,8 +5,8 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::utils::fp_id_path::FpIdPath;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
 use itertools::Itertools;
@@ -35,7 +35,7 @@ pub async fn get(
     let signals = state
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(None))
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::LegacyLatest)
         })
         .await?
         .into_iter()

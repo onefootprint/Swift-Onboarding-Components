@@ -21,6 +21,7 @@ use newtypes::RiskSignalId;
 use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Eq, PartialEq)]
@@ -85,6 +86,12 @@ impl From<NewNonVendorRiskSignalInfo> for NewRiskSignalArgs {
             vendor_api,
         }
     }
+}
+
+pub enum RiskSignalFilter<'a> {
+    AtSeqno(DataLifetimeSeqno),
+    WorkflowId(&'a WorkflowId),
+    LegacyLatest,
 }
 
 #[derive(derive_more::Deref)]
@@ -200,7 +207,7 @@ impl RiskSignal {
     pub fn latest_by_risk_signal_group_kinds(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
-        at_seqno: AtSeqno,
+        filters: RiskSignalFilter,
     ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
         // First, fetch the most recent RSGs per kind that has any visible RSes
         let mut query = risk_signal_group::table
@@ -211,9 +218,17 @@ impl RiskSignal {
             .distinct_on(risk_signal_group::kind)
             .select(risk_signal_group::all_columns)
             .into_boxed();
-        if let Some(at_seqno) = at_seqno.as_ref() {
-            query = query.filter(risk_signal::seqno.le(at_seqno));
-        }
+
+        match filters {
+            RiskSignalFilter::AtSeqno(at_seqno) => {
+                query = query.filter(risk_signal::seqno.le(at_seqno));
+            }
+            RiskSignalFilter::WorkflowId(workflow_id) => {
+                query = query.filter(risk_signal_group::workflow_id.eq(workflow_id));
+            }
+            RiskSignalFilter::LegacyLatest => {}
+        };
+
         let rsgs = query.get_results::<RiskSignalGroup>(conn)?;
         let rsg_kinds: HashMap<_, _> = rsgs.into_iter().map(|r| (r.id, r.kind)).collect();
         let rsg_ids = rsg_kinds.keys().cloned().collect_vec();
@@ -223,9 +238,11 @@ impl RiskSignal {
             .filter(risk_signal::risk_signal_group_id.eq_any(rsg_ids))
             .filter(risk_signal::hidden.eq(false))
             .into_boxed();
-        if let Some(at_seqno) = at_seqno.as_ref() {
+
+        if let RiskSignalFilter::AtSeqno(at_seqno) = filters {
             query = query.filter(risk_signal::seqno.le(at_seqno));
         }
+
         let risk_signals = query.get_results::<Self>(conn)?;
 
         // construct output

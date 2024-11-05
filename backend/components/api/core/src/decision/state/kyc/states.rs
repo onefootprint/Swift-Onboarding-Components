@@ -40,9 +40,9 @@ use db::models::document_request::DocumentRequest;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::RiskSignalFilter;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
@@ -557,7 +557,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let fixture_result = decision::utils::get_fixture_result(ff_client.clone(), &v, &wf, &self.t_id)?;
         let risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &self.sv_id, AtSeqno(None))?
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &self.sv_id, RiskSignalFilter::LegacyLatest)?
                 .into_iter()
                 .into_group_map();
 
