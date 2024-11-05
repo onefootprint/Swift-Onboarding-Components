@@ -346,20 +346,19 @@ impl ParsedIncodeAddress {
 
     pub fn from_fetch_ocr_res(ocr: &FetchOCRResponse) -> ParsedIncodeAddress {
         // first check broken out fields
-        let (city, state, zip, street) =
-            match ocr.address_fields.as_ref().or(ocr.checked_address_bean.as_ref()) {
-                Some(a) => {
-                    // fields, full address
-                    let city = scrubbed_to_pii(a.city.as_ref());
-                    let state = scrubbed_to_pii(a.state.as_ref());
-                    // Incode sometimes returns zips in Zip9 format
-                    let zip = scrubbed_to_pii(a.postal_code.as_ref()).map(Self::normalize_zip);
-                    let street = scrubbed_to_pii(a.street.as_ref());
+        let (city, state, zip, street) = match ocr.address_fields() {
+            Some(a) => {
+                // fields, full address
+                let city = scrubbed_to_pii(a.city.as_ref());
+                let state = scrubbed_to_pii(a.state.as_ref());
+                // Incode sometimes returns zips in Zip9 format
+                let zip = scrubbed_to_pii(a.postal_code.as_ref()).map(Self::normalize_zip);
+                let street = scrubbed_to_pii(a.street.as_ref());
 
-                    (city, state, zip, street)
-                }
-                None => (None, None, None, None),
-            };
+                (city, state, zip, street)
+            }
+            None => (None, None, None, None),
+        };
 
         ParsedIncodeAddress::new(city, state, zip, street, scrubbed_to_pii(ocr.address.as_ref()))
     }

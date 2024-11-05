@@ -114,34 +114,18 @@ impl TryFrom<IncodeOcrField> for IDK {
 impl IncodeOcrField {
     pub fn build_parsed_incode_field_from_response(self, r: &FetchOCRResponse) -> Option<ParsedIncodeField> {
         let conf = r.ocr_data_confidence.clone();
-
-        let (nationality_conf, nationality_value) = if let Some(nationality) = r.nationality_mrz.clone() {
-            (
-                conf.as_ref().and_then(|c| c.nationality_mrz_confidence),
-                Some(PiiString::from(nationality)),
-            )
-        } else {
-            (
-                conf.as_ref().and_then(|c| c.nationality_confidence),
-                r.nationality.clone().map(PiiString::from),
-            )
-        };
-
         let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(r);
 
         // Incode sends full state in one field, and 2 character code in another, so we handle here. we
         // prefer the checked address, since it uses an external service to validate
-        let address_checked_bean_state = r.checked_address_bean.as_ref().and_then(|a| a.normalized_state());
-        let address_fields_state = r.address_fields.as_ref().and_then(|a| a.normalized_state());
-        let state = match address_checked_bean_state.or(address_fields_state) {
+        let address = r.address_fields();
+        let state = match address.and_then(|a| a.normalized_state()) {
             Some(Ok(s)) => Some(s),
             _ => {
                 tracing::warn!("incode changed address formats");
                 None
             }
         };
-
-        let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
         let zip5 = address.and_then(|a| a.normalized_zip5());
 
         let (drivers_license_number, drivers_license_state) =
@@ -160,6 +144,18 @@ impl IncodeOcrField {
             address.and_then(|a| a.colony.as_ref())
         } else {
             None
+        };
+
+        let (nationality_conf, nationality_value) = if let Some(nationality) = r.nationality_mrz.clone() {
+            (
+                conf.as_ref().and_then(|c| c.nationality_mrz_confidence),
+                Some(PiiString::from(nationality)),
+            )
+        } else {
+            (
+                conf.as_ref().and_then(|c| c.nationality_confidence),
+                r.nationality.clone().map(PiiString::from),
+            )
         };
         let (confidence, value) = match self {
             IncodeOcrField::FullName => (
@@ -214,21 +210,36 @@ impl IncodeOcrField {
             IncodeOcrField::ClassifiedDocumentType => {
                 (None, r.type_of_id.clone().map(|s| s.to_string().into()))
             }
-            IncodeOcrField::FirstName => (None, parsed_names.first_name),
+            IncodeOcrField::FirstName => (
+                conf.as_ref().and_then(|c| c.first_name_confidence),
+                parsed_names.first_name,
+            ),
 
-            IncodeOcrField::MiddleName => (None, parsed_names.middle_name),
-            IncodeOcrField::LastName => (None, parsed_names.last_name),
+            IncodeOcrField::MiddleName => (
+                conf.as_ref().and_then(|c| c.middle_name_confidence),
+                parsed_names.middle_name,
+            ),
+            IncodeOcrField::LastName => (
+                conf.as_ref().and_then(|c| c.fathers_name_confidence), // kinda only the correct conf for US
+                parsed_names.last_name,
+            ),
             IncodeOcrField::AddressLine1 => (
-                None,
+                conf.as_ref().and_then(|c| c.street_confidence),
                 address.and_then(|n| n.street.as_ref().map(|s| s.leak().into())),
             ),
             IncodeOcrField::AddressLine2 => (None, address_line2.map(|s| s.leak().into())),
             IncodeOcrField::City => (
-                None,
+                conf.as_ref().and_then(|c| c.city_confidence),
                 address.and_then(|n| n.city.as_ref().map(|s| s.leak().into())),
             ),
-            IncodeOcrField::State => (None, state.map(|s| s.leak().into())),
-            IncodeOcrField::Zip => (None, zip5.map(|s| s.leak().into())),
+            IncodeOcrField::State => (
+                conf.as_ref().and_then(|c| c.state_confidence),
+                state.map(|s| s.leak().into()),
+            ),
+            IncodeOcrField::Zip => (
+                conf.as_ref().and_then(|c| c.postal_code_confidence),
+                zip5.map(|s| s.leak().into()),
+            ),
             IncodeOcrField::Country => (None, r.issuing_country_two_digit().map(|s| s.leak().into())),
             IncodeOcrField::DriversLicenseNumber => (None, drivers_license_number.map(|s| s.leak().into())),
             IncodeOcrField::DriversLicenseState => (None, drivers_license_state.map(|s| s.leak().into())),

@@ -577,6 +577,12 @@ impl FetchOCRResponse {
         Self::format_date(self.issued_at.as_ref())
     }
 
+    pub fn address_fields(&self) -> Option<&OCRAddress> {
+        self.checked_address_bean
+            .as_ref()
+            .or(self.address_fields.as_ref())
+    }
+
     pub fn document_sub_type(&self) -> Option<IncodeDocumentSubType> {
         // maybe error or alert or something fancier if they arent the same??
         self.document_front_subtype
