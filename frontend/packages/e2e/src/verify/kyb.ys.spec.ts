@@ -10,8 +10,8 @@ import {
 } from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const pbKey = process.env.E2E_YIELDSTREET || 'pb_test_bH2tmxMPBCI8Gujjb90P3d';
-const fpSKey = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
+const pbKey = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
+const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
 
 const businessAs = 'Foot';
 const businessAddressLine1 = '1 Hayes St';
@@ -229,11 +229,6 @@ test('KYB With linked beneficial owner #ci', async ({ page, isMobile }) => {
   await expect(frame.getByText(idZipCode)).toBeAttached();
 
   await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await expect(frame.getByText('Add a passkey')).toBeAttached();
-
-  await frame.getByRole('button').filter({ hasText: 'Continue on Desktop' }).first().click();
   await page.waitForLoadState();
 
   return expect(frame.getByTestId('result').innerText).toBeDefined();

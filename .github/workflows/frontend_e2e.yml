@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 env:
-  E2E_UPDATE_UTOKEN: ''
+  E2E_UPDATE_UTOKEN: ""
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Get update auth methods token
         run: |
-          E2E_UPDATE_UTOKEN=$(curl -s https://api.dev.onefootprint.com/users/fp_id_test_rJBzCaVzkYQgWIfr0qtFDC/token -X POST -d '{"kind": "update_auth_methods"}' -u ${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }}: | jq -r '.token')
+          E2E_UPDATE_UTOKEN=$(curl -s https://api.dev.onefootprint.com/users/fp_id_test_S5hXITnVdQi0e04GWpEMaW/token -X POST -d '{"kind": "update_auth_methods"}' -u ${{ secrets.E2E_SECRET_API_KEY_DEV }}: | jq -r '.token')
           if [[ -z "$E2E_UPDATE_UTOKEN" ]]; then
             echo "Token is not valid"
           else
@@ -55,8 +55,6 @@ jobs:
           docker compose -f compose.yml build \
             --build-arg TURBO_TEAM=${{ vars.TURBO_TEAM }} \
             --build-arg TURBO_TOKEN=${{ secrets.TURBO_TOKEN }} \
-            --build-arg E2E_ACME_SECRET_API_KEY_DEV=${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }} \
-            --build-arg E2E_ACME_SECRET_API_KEY_PROD=${{ secrets.E2E_ACME_SECRET_API_KEY_PROD }} \
             --build-arg E2E_SECRET_API_KEY_DEV=${{ secrets.E2E_SECRET_API_KEY_DEV }} \
             --build-arg E2E_UPDATE_UTOKEN=${{ env.E2E_UPDATE_UTOKEN }} \
           && docker compose up --abort-on-container-exit --attach-dependencies --exit-code-from tester
@@ -80,9 +78,9 @@ jobs:
           echo "::notice title=HTML report url::https://pwe2e.z13.web.core.windows.net/$REPORT_DIR/index.html"
         env:
           AZCOPY_AUTO_LOGIN_TYPE: SPN
-          AZCOPY_SPA_APPLICATION_ID: '${{ secrets.AZCOPY_SPA_APPLICATION_ID }}'
-          AZCOPY_SPA_CLIENT_SECRET: '${{ secrets.AZCOPY_SPA_CLIENT_SECRET }}'
-          AZCOPY_TENANT_ID: '${{ secrets.AZCOPY_TENANT_ID }}'
+          AZCOPY_SPA_APPLICATION_ID: "${{ secrets.AZCOPY_SPA_APPLICATION_ID }}"
+          AZCOPY_SPA_CLIENT_SECRET: "${{ secrets.AZCOPY_SPA_CLIENT_SECRET }}"
+          AZCOPY_TENANT_ID: "${{ secrets.AZCOPY_TENANT_ID }}"
 
       - name: Add failure comment to PR
         if: ${{ failure() }}
