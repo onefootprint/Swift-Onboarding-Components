@@ -71,6 +71,12 @@ import type {
   GetEntitiesByFpIdMatchSignalsData,
   GetEntitiesByFpIdMatchSignalsError,
   GetEntitiesByFpIdMatchSignalsResponse,
+  GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData,
+  GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsError,
+  GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsResponse,
+  GetEntitiesByFpIdOnboardingsData,
+  GetEntitiesByFpIdOnboardingsError,
+  GetEntitiesByFpIdOnboardingsResponse,
   GetEntitiesByFpIdResponse,
   GetEntitiesByFpIdRiskSignalsBySignalIdData,
   GetEntitiesByFpIdRiskSignalsBySignalIdError,
@@ -268,6 +274,9 @@ import type {
   PostEntitiesByFpIdAnnotationsData,
   PostEntitiesByFpIdAnnotationsError,
   PostEntitiesByFpIdAnnotationsResponse,
+  PostEntitiesByFpIdBusinessOwnersKycLinksData,
+  PostEntitiesByFpIdBusinessOwnersKycLinksError,
+  PostEntitiesByFpIdBusinessOwnersKycLinksResponse,
   PostEntitiesByFpIdDecryptAmlHitsBySignalIdData,
   PostEntitiesByFpIdDecryptAmlHitsBySignalIdError,
   PostEntitiesByFpIdDecryptAmlHitsBySignalIdResponse,
@@ -786,6 +795,22 @@ export const getEntitiesByFpIdBusinessOwners = <ThrowOnError extends boolean = f
 };
 
 /**
+ * Create (and optionally send) KYC links for beneficial owners awaiting KYC. Cannot be used for beneficials that have already completed KYC.
+ */
+export const postEntitiesByFpIdBusinessOwnersKycLinks = <ThrowOnError extends boolean = false>(
+  options: Options<PostEntitiesByFpIdBusinessOwnersKycLinksData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostEntitiesByFpIdBusinessOwnersKycLinksResponse,
+    PostEntitiesByFpIdBusinessOwnersKycLinksError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/entities/{fpId}/business_owners/kyc_links',
+  });
+};
+
+/**
  * Gets the beneficial owners of a business entity.
  */
 export const getEntitiesByFpIdBusinesses = <ThrowOnError extends boolean = false>(
@@ -886,6 +911,38 @@ export const getEntitiesByFpIdMatchSignals = <ThrowOnError extends boolean = fal
   >({
     ...options,
     url: '/entities/{fpId}/match_signals',
+  });
+};
+
+/**
+ * Get the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.
+ */
+export const getEntitiesByFpIdOnboardings = <ThrowOnError extends boolean = false>(
+  options: Options<GetEntitiesByFpIdOnboardingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetEntitiesByFpIdOnboardingsResponse,
+    GetEntitiesByFpIdOnboardingsError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/entities/{fpId}/onboardings',
+  });
+};
+
+/**
+ * Lists the risk signals for a footprint user and onboarding.
+ */
+export const getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignals = <ThrowOnError extends boolean = false>(
+  options: Options<GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsResponse,
+    GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/entities/{fpId}/onboardings/{onboardingId}/risk_signals',
   });
 };
 

@@ -4420,6 +4420,7 @@
                         "type": "boolean"
                     },
                     "status": {
+                        "description": "The status of the onboarding",
                         "type": "string",
                         "enum": [
                             "pass",
@@ -12432,6 +12433,7 @@
                                     "type": "string"
                                 },
                                 "status": {
+                                    "description": "The status of the onboarding",
                                     "type": "string",
                                     "enum": [
                                         "pass",
@@ -13830,6 +13832,7 @@
                         "type": "boolean"
                     },
                     "status": {
+                        "description": "The status of the onboarding",
                         "type": "string",
                         "enum": [
                             "pass",

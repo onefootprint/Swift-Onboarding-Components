@@ -1,6 +1,7 @@
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
+use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use strum_macros::Display;
@@ -23,8 +24,11 @@ use strum_macros::EnumString;
     FromSqlRow,
     EnumString,
     EnumIter,
+    Apiv2Schema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DecryptionContext {
     /// Access for the vault proxy

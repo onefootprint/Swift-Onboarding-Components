@@ -44,6 +44,10 @@ import type {
   GetEntitiesByFpIdLabelData,
   GetEntitiesByFpIdLivenessData,
   GetEntitiesByFpIdMatchSignalsData,
+  GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData,
+  GetEntitiesByFpIdOnboardingsData,
+  GetEntitiesByFpIdOnboardingsError,
+  GetEntitiesByFpIdOnboardingsResponse,
   GetEntitiesByFpIdRiskSignalsBySignalIdData,
   GetEntitiesByFpIdRiskSignalsData,
   GetEntitiesByFpIdRuleSetResultByRuleSetResultIdData,
@@ -162,6 +166,9 @@ import type {
   PostEntitiesByFpIdAnnotationsData,
   PostEntitiesByFpIdAnnotationsError,
   PostEntitiesByFpIdAnnotationsResponse,
+  PostEntitiesByFpIdBusinessOwnersKycLinksData,
+  PostEntitiesByFpIdBusinessOwnersKycLinksError,
+  PostEntitiesByFpIdBusinessOwnersKycLinksResponse,
   PostEntitiesByFpIdDecryptAmlHitsBySignalIdData,
   PostEntitiesByFpIdDecryptAmlHitsBySignalIdError,
   PostEntitiesByFpIdDecryptAmlHitsBySignalIdResponse,
@@ -371,6 +378,8 @@ import {
   getEntitiesByFpIdLabel,
   getEntitiesByFpIdLiveness,
   getEntitiesByFpIdMatchSignals,
+  getEntitiesByFpIdOnboardings,
+  getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignals,
   getEntitiesByFpIdRiskSignals,
   getEntitiesByFpIdRiskSignalsBySignalId,
   getEntitiesByFpIdRuleSetResult,
@@ -449,6 +458,7 @@ import {
   postEntitiesByFpIdActions,
   postEntitiesByFpIdAiSummarize,
   postEntitiesByFpIdAnnotations,
+  postEntitiesByFpIdBusinessOwnersKycLinks,
   postEntitiesByFpIdDecryptAmlHitsBySignalId,
   postEntitiesByFpIdLabel,
   postEntitiesByFpIdSentilinkBySignalId,
@@ -1176,6 +1186,47 @@ export const getEntitiesByFpIdBusinessOwnersOptions = (options: Options<GetEntit
   });
 };
 
+export const postEntitiesByFpIdBusinessOwnersKycLinksQueryKey = (
+  options: Options<PostEntitiesByFpIdBusinessOwnersKycLinksData>,
+) => [createQueryKey('postEntitiesByFpIdBusinessOwnersKycLinks', options)];
+
+export const postEntitiesByFpIdBusinessOwnersKycLinksOptions = (
+  options: Options<PostEntitiesByFpIdBusinessOwnersKycLinksData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postEntitiesByFpIdBusinessOwnersKycLinks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postEntitiesByFpIdBusinessOwnersKycLinksQueryKey(options),
+  });
+};
+
+export const postEntitiesByFpIdBusinessOwnersKycLinksMutation = (
+  options?: Partial<Options<PostEntitiesByFpIdBusinessOwnersKycLinksData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostEntitiesByFpIdBusinessOwnersKycLinksResponse,
+    AxiosError<PostEntitiesByFpIdBusinessOwnersKycLinksError>,
+    Options<PostEntitiesByFpIdBusinessOwnersKycLinksData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postEntitiesByFpIdBusinessOwnersKycLinks({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getEntitiesByFpIdBusinessesQueryKey = (options: Options<GetEntitiesByFpIdBusinessesData>) => [
   createQueryKey('getEntitiesByFpIdBusinesses', options),
 ];
@@ -1328,6 +1379,121 @@ export const getEntitiesByFpIdMatchSignalsOptions = (options: Options<GetEntitie
       return data;
     },
     queryKey: getEntitiesByFpIdMatchSignalsQueryKey(options),
+  });
+};
+
+export const getEntitiesByFpIdOnboardingsQueryKey = (options: Options<GetEntitiesByFpIdOnboardingsData>) => [
+  createQueryKey('getEntitiesByFpIdOnboardings', options),
+];
+
+export const getEntitiesByFpIdOnboardingsOptions = (options: Options<GetEntitiesByFpIdOnboardingsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEntitiesByFpIdOnboardings({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEntitiesByFpIdOnboardingsQueryKey(options),
+  });
+};
+
+const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(
+  queryKey: QueryKey<Options>,
+  page: K,
+) => {
+  const params = queryKey[0];
+  if (page.body) {
+    params.body = {
+      ...(queryKey[0].body as any),
+      ...(page.body as any),
+    };
+  }
+  if (page.headers) {
+    params.headers = {
+      ...queryKey[0].headers,
+      ...page.headers,
+    };
+  }
+  if (page.path) {
+    params.path = {
+      ...queryKey[0].path,
+      ...page.path,
+    };
+  }
+  if (page.query) {
+    params.query = {
+      ...queryKey[0].query,
+      ...page.query,
+    };
+  }
+  return params as unknown as typeof page;
+};
+
+export const getEntitiesByFpIdOnboardingsInfiniteQueryKey = (
+  options: Options<GetEntitiesByFpIdOnboardingsData>,
+): QueryKey<Options<GetEntitiesByFpIdOnboardingsData>> => [
+  createQueryKey('getEntitiesByFpIdOnboardings', options, true),
+];
+
+export const getEntitiesByFpIdOnboardingsInfiniteOptions = (options: Options<GetEntitiesByFpIdOnboardingsData>) => {
+  return infiniteQueryOptions<
+    GetEntitiesByFpIdOnboardingsResponse,
+    AxiosError<GetEntitiesByFpIdOnboardingsError>,
+    InfiniteData<GetEntitiesByFpIdOnboardingsResponse>,
+    QueryKey<Options<GetEntitiesByFpIdOnboardingsData>>,
+    number | Pick<QueryKey<Options<GetEntitiesByFpIdOnboardingsData>>[0], 'body' | 'headers' | 'path' | 'query'>
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetEntitiesByFpIdOnboardingsData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getEntitiesByFpIdOnboardings({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getEntitiesByFpIdOnboardingsInfiniteQueryKey(options),
+    },
+  );
+};
+
+export const getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsQueryKey = (
+  options: Options<GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData>,
+) => [createQueryKey('getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignals', options)];
+
+export const getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions = (
+  options: Options<GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignals({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsQueryKey(options),
   });
 };
 
@@ -1875,38 +2041,6 @@ export const getOrgApiKeysOptions = (options?: Options<GetOrgApiKeysData>) => {
     },
     queryKey: getOrgApiKeysQueryKey(options),
   });
-};
-
-const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(
-  queryKey: QueryKey<Options>,
-  page: K,
-) => {
-  const params = queryKey[0];
-  if (page.body) {
-    params.body = {
-      ...(queryKey[0].body as any),
-      ...(page.body as any),
-    };
-  }
-  if (page.headers) {
-    params.headers = {
-      ...queryKey[0].headers,
-      ...page.headers,
-    };
-  }
-  if (page.path) {
-    params.path = {
-      ...queryKey[0].path,
-      ...page.path,
-    };
-  }
-  if (page.query) {
-    params.query = {
-      ...queryKey[0].query,
-      ...page.query,
-    };
-  }
-  return params as unknown as typeof page;
 };
 
 export const getOrgApiKeysInfiniteQueryKey = (

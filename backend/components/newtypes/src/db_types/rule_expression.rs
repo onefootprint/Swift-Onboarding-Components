@@ -122,7 +122,7 @@ impl RuleExpressionCondition {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(untagged)]
 pub enum VaultOperation {
@@ -155,7 +155,7 @@ impl VaultOperation {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(untagged)]
 pub enum DeviceInsightOperation {
@@ -166,7 +166,7 @@ pub enum DeviceInsightOperation {
     },
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum Equals {
     #[serde(rename = "eq")]
@@ -175,14 +175,14 @@ pub enum Equals {
     DoesNotEqual,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum IsIn {
     IsIn,
     IsNotIn,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum BooleanOperator {
     #[serde(rename = "eq")]
@@ -191,7 +191,7 @@ pub enum BooleanOperator {
     DoesNotEqual,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum NumberOperator {
     #[serde(rename = "gt")]
@@ -200,7 +200,7 @@ pub enum NumberOperator {
     LessThan,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum RiskScore {
     ExperianScore,

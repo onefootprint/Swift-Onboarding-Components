@@ -110,8 +110,6 @@ import type {
   PostHostedUserEmailVerifyData,
   PostHostedUserEmailVerifyError,
   PostHostedUserEmailVerifyResponse,
-  PostHostedUserPrivateBoLinksError,
-  PostHostedUserPrivateBoLinksResponse,
   PostHostedUserTokensData,
   PostHostedUserTokensError,
   PostHostedUserTokensResponse,
@@ -188,7 +186,6 @@ import {
   postHostedUserDocumentsByIdProcess,
   postHostedUserDocumentsByIdUploadBySide,
   postHostedUserEmailVerify,
-  postHostedUserPrivateBoLinks,
   postHostedUserTokens,
   postHostedUserUploadByDocumentIdentifier,
   postHostedUserVaultDecrypt,
@@ -1788,43 +1785,6 @@ export const postHostedUserEmailVerifyMutation = (options?: Partial<Options<Post
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedUserEmailVerify({
-        ...options,
-        ...localOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const postHostedUserPrivateBoLinksQueryKey = (options?: Options) => [
-  createQueryKey('postHostedUserPrivateBoLinks', options),
-];
-
-export const postHostedUserPrivateBoLinksOptions = (options?: Options) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await postHostedUserPrivateBoLinks({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: postHostedUserPrivateBoLinksQueryKey(options),
-  });
-};
-
-export const postHostedUserPrivateBoLinksMutation = (options?: Partial<Options>) => {
-  const mutationOptions: UseMutationOptions<
-    PostHostedUserPrivateBoLinksResponse,
-    AxiosError<PostHostedUserPrivateBoLinksError>,
-    Options
-  > = {
-    mutationFn: async localOptions => {
-      const { data } = await postHostedUserPrivateBoLinks({
         ...options,
         ...localOptions,
         throwOnError: true,

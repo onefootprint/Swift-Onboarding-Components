@@ -32,10 +32,12 @@ use strum_macros::EnumString;
     AsExpression,
     FromSqlRow,
     EnumDiscriminants,
+    macros::SerdeAttr,
 )]
 #[strum_discriminants(name(CollectedDataOptionKind))]
 #[strum_discriminants(derive(Display, EnumString))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 /// Represent the options of allowed CollectedData.
 /// Some CollectedData variants only have a single allowable CollectedDataOption.

@@ -24,6 +24,7 @@ macro_rules! footprint_reason_code_enum {
         pub enum $name {
             $(#[doc=$description] $item,)*
             #[strum(default)]
+            #[serde(skip)]
             Other(String)
         }
 

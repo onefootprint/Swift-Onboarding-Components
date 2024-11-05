@@ -9,6 +9,7 @@ use diesel::deserialize::FromSqlRow;
 use diesel::expression::AsExpression;
 use diesel::serialize::ToSql;
 use diesel::sql_types::Binary;
+use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -120,7 +121,18 @@ where
 
 /// Bytes of a sealed vault private key
 #[derive(
-    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+    Clone,
+    Hash,
+    PartialEq,
+    Eq,
+    From,
+    Into,
+    Serialize,
+    Deserialize,
+    Default,
+    AsExpression,
+    FromSqlRow,
+    Apiv2Schema,
 )]
 #[serde(transparent)]
 #[diesel(sql_type = Binary)]

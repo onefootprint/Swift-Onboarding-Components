@@ -16,7 +16,6 @@ use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
-use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_with::DeserializeFromStr;
@@ -41,7 +40,6 @@ use strum_macros::EnumString;
     FromSqlRow,
     EnumString,
     AsRefStr,
-    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -54,9 +52,7 @@ pub enum TaskStatus {
 }
 
 crate::util::impl_enum_str_diesel!(TaskStatus);
-#[derive(
-    Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants, derive_more::From,
-)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, EnumDiscriminants, derive_more::From)]
 #[strum_discriminants(
     name(TaskKind),
     vis(pub),

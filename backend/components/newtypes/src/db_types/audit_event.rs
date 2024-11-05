@@ -335,6 +335,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
     ),
     vis(pub),
     strum(serialize_all = "snake_case"),
+    serde(rename_all = "snake_case"),
     diesel(sql_type = Text)
 )]
 /// Represents the jsonb metadata column type in the audit_event table.

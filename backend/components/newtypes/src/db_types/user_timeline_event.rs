@@ -29,19 +29,19 @@ use serde_with::SerializeDisplay;
 use strum::Display;
 use strum::EnumDiscriminants;
 
-#[derive(
-    Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants, derive_more::From,
-)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, EnumDiscriminants, derive_more::From)]
 #[strum_discriminants(name(DbUserTimelineEventKind))]
 #[strum_discriminants(derive(
-    Apiv2Schema,
     DeserializeFromStr,
     SerializeDisplay,
     Display,
     strum_macros::EnumString,
     AsExpression,
     FromSqlRow,
+    macros::SerdeAttr,
+    Apiv2Schema,
 ))]
+#[strum_discriminants(serde(rename_all = "snake_case"))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[strum_discriminants(diesel(sql_type = Text))]
 #[serde(rename_all = "snake_case")]
@@ -49,6 +49,7 @@ use strum::EnumDiscriminants;
 pub enum DbUserTimelineEvent {
     DataCollected(DataCollectedInfo),
     #[serde(rename = "identity_document_uploaded")]
+    #[strum_discriminants(serde(rename = "identity_document_uploaded"))]
     #[strum_discriminants(strum(serialize = "identity_document_uploaded"))]
     DocumentUploaded(DocumentUploadedInfo),
     OnboardingDecision(OnboardingDecisionInfo),
@@ -148,11 +149,12 @@ pub struct LabelAddedInfo {
     pub id: LabelId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExternalIntegrationKind {
     AlpacaCip,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExternalIntegrationInfo {
     pub integration: ExternalIntegrationKind,

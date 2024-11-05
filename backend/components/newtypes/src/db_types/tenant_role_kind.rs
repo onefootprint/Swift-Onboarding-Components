@@ -18,9 +18,11 @@ use strum_macros::EnumString;
     AsExpression,
     FromSqlRow,
     EnumString,
+    macros::SerdeAttr,
 ))]
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(name(TenantRoleKindDiscriminant))]
+#[strum_discriminants(serde(rename_all = "snake_case"))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[strum_discriminants(diesel(sql_type = Text))]
 pub enum TenantRoleKind {

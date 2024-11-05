@@ -54,6 +54,28 @@ pub enum Selfie {
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct DocumentCdoInfo(pub DocTypeRestriction, pub CountryRestriction, pub Selfie);
 
+impl paperclip::v2::schema::Apiv2Schema for DocumentCdoInfo {
+    fn name() -> Option<String> {
+        Some("TaskStatus".to_string())
+    }
+
+    fn description() -> &'static str {
+        ""
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        use paperclip::v2::models::DataType;
+        use paperclip::v2::models::DefaultSchemaRaw;
+        DefaultSchemaRaw {
+            name: Some("TaskStatus".into()),
+            example: None,
+            data_type: Some(DataType::String),
+            ..Default::default()
+        }
+    }
+}
+impl paperclip::actix::OperationModifier for DocumentCdoInfo {}
+
 impl DocumentCdoInfo {
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         match self.doc_type_restriction() {

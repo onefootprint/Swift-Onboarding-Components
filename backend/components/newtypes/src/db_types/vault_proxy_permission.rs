@@ -1,9 +1,10 @@
 use crate::ProxyConfigId;
+use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, EnumDiscriminants)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, EnumDiscriminants, Apiv2Schema)]
 #[strum_discriminants(name(InvokeVaultProxyPermissionKind), derive(strum_macros::Display))]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]

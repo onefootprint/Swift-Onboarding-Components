@@ -177,6 +177,7 @@ impl EnhancedAmlOption {
     AsRefStr,
     serde_with::DeserializeFromStr,
     Serialize,
+    Apiv2Schema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

@@ -142,8 +142,6 @@ import type {
   PostHostedUserEmailVerifyData,
   PostHostedUserEmailVerifyError,
   PostHostedUserEmailVerifyResponse,
-  PostHostedUserPrivateBoLinksError,
-  PostHostedUserPrivateBoLinksResponse,
   PostHostedUserTokensData,
   PostHostedUserTokensError,
   PostHostedUserTokensResponse,
@@ -643,7 +641,7 @@ export const postHostedOnboardingSkipPasskeyRegister = <ThrowOnError extends boo
 };
 
 /**
- * Returns the status of the onboarding.
+ * Returns the remaining onboarding requirements to complete the onboarding.
  */
 export const getHostedOnboardingStatus = <ThrowOnError extends boolean = false>(
   options?: Options<unknown, ThrowOnError>,
@@ -879,22 +877,6 @@ export const postHostedUserEmailVerify = <ThrowOnError extends boolean = false>(
   >({
     ...options,
     url: '/hosted/user/email/verify',
-  });
-};
-
-/**
- * Generate links for all secondary BOs to complete onboarding onto a KYB playbook that requires KYC of all BOs.
- */
-export const postHostedUserPrivateBoLinks = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    PostHostedUserPrivateBoLinksResponse,
-    PostHostedUserPrivateBoLinksError,
-    ThrowOnError
-  >({
-    ...options,
-    url: '/hosted/user/private/bo_links',
   });
 };
 

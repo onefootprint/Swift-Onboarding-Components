@@ -3,6 +3,7 @@ use crate::TwilioLookupField;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
+use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
 use strum_macros::AsRefStr;
 use strum_macros::EnumString;
@@ -20,6 +21,7 @@ use strum_macros::EnumString;
     AsRefStr,
     serde_with::DeserializeFromStr,
     Serialize,
+    Apiv2Schema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

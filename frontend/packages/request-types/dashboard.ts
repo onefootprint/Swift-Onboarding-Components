@@ -20,10 +20,32 @@ export type Annotation = {
   id: string;
   isPinned: boolean;
   note: string;
-  source: 'footprint' | 'firm_employee';
+  source:
+    | {
+        id: string;
+        kind: 'user';
+      }
+    | {
+        kind: 'footprint';
+      }
+    | {
+        kind: 'firm_employee';
+      }
+    | {
+        email: string;
+        first_name?: string;
+        kind: 'organization';
+        last_name?: string;
+        member: string;
+      }
+    | {
+        id: string;
+        kind: 'api_key';
+        name: string;
+      };
   timestamp: string;
 };
-export type source = 'footprint' | 'firm_employee';
+export type kind = 'user';
 export type AssumePartnerRoleRequest = {
   partnerTenantId: string;
 };
@@ -62,37 +84,141 @@ export type AssumePartnerRoleResponse = {
       createdAt: string;
       id: string;
       isImmutable: boolean;
-      kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+      /**
+       * Auto-generated discriminant enum variants
+       */
+      kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
       name: string;
       numActiveApiKeys?: number;
       numActiveUsers?: number;
       scopes: Array<
-        | 'read'
-        | 'admin'
-        | 'api_keys'
-        | 'manage_vault_proxy'
-        | 'manage_webhooks'
-        | 'manual_review'
-        | 'onboarding_configuration'
-        | 'write_lists'
-        | 'org_settings'
-        | 'cip_integration'
-        | 'trigger_kyb'
-        | 'trigger_kyc'
-        | 'auth_token'
-        | 'onboarding'
-        | 'decrypt_custom'
-        | 'decrypt_document'
-        | 'decrypt_document_and_selfie'
-        | 'decrypt_all'
-        | 'decrypt_all_except_pci_data'
-        | 'write_entities'
-        | 'label_and_tag'
-        | 'manage_compliance_doc_submission'
-        | 'compliance_partner_read'
-        | 'compliance_partner_admin'
-        | 'compliance_partner_manage_templates'
-        | 'compliance_partner_manage_reviews'
+        | {
+            kind: 'read';
+          }
+        | {
+            kind: 'admin';
+          }
+        | {
+            kind: 'api_keys';
+          }
+        | {
+            kind: 'manage_vault_proxy';
+          }
+        | {
+            kind: 'manage_webhooks';
+          }
+        | {
+            kind: 'manual_review';
+          }
+        | {
+            kind: 'onboarding_configuration';
+          }
+        | {
+            kind: 'write_lists';
+          }
+        | {
+            kind: 'org_settings';
+          }
+        | {
+            kind: 'cip_integration';
+          }
+        | {
+            data:
+              | {
+                  kind: 'any';
+                }
+              | {
+                  kind: 'just_in_time';
+                }
+              | {
+                  id: string;
+                  kind: 'id';
+                };
+            kind: 'invoke_vault_proxy';
+          }
+        | {
+            kind: 'trigger_kyb';
+          }
+        | {
+            kind: 'trigger_kyc';
+          }
+        | {
+            kind: 'auth_token';
+          }
+        | {
+            kind: 'onboarding';
+          }
+        | {
+            /**
+             * Represent the options of allowed CollectedData.
+             * Some CollectedData variants only have a single allowable CollectedDataOption.
+             * Other CollectedData variants may have multiple Options of assortments of data that can be
+             * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+             * the CDO
+             */
+            data:
+              | 'name'
+              | 'dob'
+              | 'ssn4'
+              | 'ssn9'
+              | 'full_address'
+              | 'email'
+              | 'phone_number'
+              | 'nationality'
+              | 'us_legal_status'
+              | {
+                  document: string;
+                }
+              | 'business_name'
+              | 'business_tin'
+              | 'business_address'
+              | 'business_phone_number'
+              | 'business_website'
+              | 'business_beneficial_owners'
+              | 'business_kyced_beneficial_owners'
+              | 'business_corporation_type'
+              | 'investor_profile'
+              | 'card'
+              | 'us_tax_id'
+              | 'bank';
+            kind: 'decrypt';
+          }
+        | {
+            kind: 'decrypt_custom';
+          }
+        | {
+            kind: 'decrypt_document';
+          }
+        | {
+            kind: 'decrypt_document_and_selfie';
+          }
+        | {
+            kind: 'decrypt_all';
+          }
+        | {
+            kind: 'decrypt_all_except_pci_data';
+          }
+        | {
+            kind: 'write_entities';
+          }
+        | {
+            kind: 'label_and_tag';
+          }
+        | {
+            kind: 'manage_compliance_doc_submission';
+          }
+        | {
+            kind: 'compliance_partner_read';
+          }
+        | {
+            kind: 'compliance_partner_admin';
+          }
+        | {
+            kind: 'compliance_partner_manage_templates';
+          }
+        | {
+            kind: 'compliance_partner_manage_reviews';
+          }
       >;
     };
     /**
@@ -103,7 +229,10 @@ export type AssumePartnerRoleResponse = {
     };
   };
 };
-export type kind = 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+/**
+ * Auto-generated discriminant enum variants
+ */
+export type kind2 = 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
 export type AssumeRoleRequest = {
   tenantId: string;
 };
@@ -139,6 +268,9 @@ export type AssumeRoleResponse = {
       | 'client_vaulting_docs'
       | 'list_duplicate_users'
     >;
+    /**
+     * The type of data attribute
+     */
     companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
     domains: Array<string>;
     id: string;
@@ -185,37 +317,141 @@ export type AssumeRoleResponse = {
       createdAt: string;
       id: string;
       isImmutable: boolean;
-      kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+      /**
+       * Auto-generated discriminant enum variants
+       */
+      kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
       name: string;
       numActiveApiKeys?: number;
       numActiveUsers?: number;
       scopes: Array<
-        | 'read'
-        | 'admin'
-        | 'api_keys'
-        | 'manage_vault_proxy'
-        | 'manage_webhooks'
-        | 'manual_review'
-        | 'onboarding_configuration'
-        | 'write_lists'
-        | 'org_settings'
-        | 'cip_integration'
-        | 'trigger_kyb'
-        | 'trigger_kyc'
-        | 'auth_token'
-        | 'onboarding'
-        | 'decrypt_custom'
-        | 'decrypt_document'
-        | 'decrypt_document_and_selfie'
-        | 'decrypt_all'
-        | 'decrypt_all_except_pci_data'
-        | 'write_entities'
-        | 'label_and_tag'
-        | 'manage_compliance_doc_submission'
-        | 'compliance_partner_read'
-        | 'compliance_partner_admin'
-        | 'compliance_partner_manage_templates'
-        | 'compliance_partner_manage_reviews'
+        | {
+            kind: 'read';
+          }
+        | {
+            kind: 'admin';
+          }
+        | {
+            kind: 'api_keys';
+          }
+        | {
+            kind: 'manage_vault_proxy';
+          }
+        | {
+            kind: 'manage_webhooks';
+          }
+        | {
+            kind: 'manual_review';
+          }
+        | {
+            kind: 'onboarding_configuration';
+          }
+        | {
+            kind: 'write_lists';
+          }
+        | {
+            kind: 'org_settings';
+          }
+        | {
+            kind: 'cip_integration';
+          }
+        | {
+            data:
+              | {
+                  kind: 'any';
+                }
+              | {
+                  kind: 'just_in_time';
+                }
+              | {
+                  id: string;
+                  kind: 'id';
+                };
+            kind: 'invoke_vault_proxy';
+          }
+        | {
+            kind: 'trigger_kyb';
+          }
+        | {
+            kind: 'trigger_kyc';
+          }
+        | {
+            kind: 'auth_token';
+          }
+        | {
+            kind: 'onboarding';
+          }
+        | {
+            /**
+             * Represent the options of allowed CollectedData.
+             * Some CollectedData variants only have a single allowable CollectedDataOption.
+             * Other CollectedData variants may have multiple Options of assortments of data that can be
+             * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+             * the CDO
+             */
+            data:
+              | 'name'
+              | 'dob'
+              | 'ssn4'
+              | 'ssn9'
+              | 'full_address'
+              | 'email'
+              | 'phone_number'
+              | 'nationality'
+              | 'us_legal_status'
+              | {
+                  document: string;
+                }
+              | 'business_name'
+              | 'business_tin'
+              | 'business_address'
+              | 'business_phone_number'
+              | 'business_website'
+              | 'business_beneficial_owners'
+              | 'business_kyced_beneficial_owners'
+              | 'business_corporation_type'
+              | 'investor_profile'
+              | 'card'
+              | 'us_tax_id'
+              | 'bank';
+            kind: 'decrypt';
+          }
+        | {
+            kind: 'decrypt_custom';
+          }
+        | {
+            kind: 'decrypt_document';
+          }
+        | {
+            kind: 'decrypt_document_and_selfie';
+          }
+        | {
+            kind: 'decrypt_all';
+          }
+        | {
+            kind: 'decrypt_all_except_pci_data';
+          }
+        | {
+            kind: 'write_entities';
+          }
+        | {
+            kind: 'label_and_tag';
+          }
+        | {
+            kind: 'manage_compliance_doc_submission';
+          }
+        | {
+            kind: 'compliance_partner_read';
+          }
+        | {
+            kind: 'compliance_partner_admin';
+          }
+        | {
+            kind: 'compliance_partner_manage_templates';
+          }
+        | {
+            kind: 'compliance_partner_manage_reviews';
+          }
       >;
     };
     /**
@@ -226,6 +462,9 @@ export type AssumeRoleResponse = {
     };
   };
 };
+/**
+ * The type of data attribute
+ */
 export type company_size = 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
 export type AuthEvent = {
   createdAt: string;
@@ -260,7 +499,7 @@ export type AuthEvent = {
   }>;
   scope: 'my1fp' | 'onboarding' | 'auth';
 };
-export type kind2 = 'sms' | 'email' | 'passkey' | 'third_party';
+export type kind3 = 'sms' | 'email' | 'passkey' | 'third_party';
 export type scope = 'my1fp' | 'onboarding' | 'auth';
 /**
  * Member of an organization
@@ -274,32 +513,133 @@ export type AuthOrgMember = {
   isFirmEmployee: boolean;
   lastName?: string;
   scopes: Array<
-    | 'read'
-    | 'admin'
-    | 'api_keys'
-    | 'manage_vault_proxy'
-    | 'manage_webhooks'
-    | 'manual_review'
-    | 'onboarding_configuration'
-    | 'write_lists'
-    | 'org_settings'
-    | 'cip_integration'
-    | 'trigger_kyb'
-    | 'trigger_kyc'
-    | 'auth_token'
-    | 'onboarding'
-    | 'decrypt_custom'
-    | 'decrypt_document'
-    | 'decrypt_document_and_selfie'
-    | 'decrypt_all'
-    | 'decrypt_all_except_pci_data'
-    | 'write_entities'
-    | 'label_and_tag'
-    | 'manage_compliance_doc_submission'
-    | 'compliance_partner_read'
-    | 'compliance_partner_admin'
-    | 'compliance_partner_manage_templates'
-    | 'compliance_partner_manage_reviews'
+    | {
+        kind: 'read';
+      }
+    | {
+        kind: 'admin';
+      }
+    | {
+        kind: 'api_keys';
+      }
+    | {
+        kind: 'manage_vault_proxy';
+      }
+    | {
+        kind: 'manage_webhooks';
+      }
+    | {
+        kind: 'manual_review';
+      }
+    | {
+        kind: 'onboarding_configuration';
+      }
+    | {
+        kind: 'write_lists';
+      }
+    | {
+        kind: 'org_settings';
+      }
+    | {
+        kind: 'cip_integration';
+      }
+    | {
+        data:
+          | {
+              kind: 'any';
+            }
+          | {
+              kind: 'just_in_time';
+            }
+          | {
+              id: string;
+              kind: 'id';
+            };
+        kind: 'invoke_vault_proxy';
+      }
+    | {
+        kind: 'trigger_kyb';
+      }
+    | {
+        kind: 'trigger_kyc';
+      }
+    | {
+        kind: 'auth_token';
+      }
+    | {
+        kind: 'onboarding';
+      }
+    | {
+        /**
+         * Represent the options of allowed CollectedData.
+         * Some CollectedData variants only have a single allowable CollectedDataOption.
+         * Other CollectedData variants may have multiple Options of assortments of data that can be
+         * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+         * the CDO
+         */
+        data:
+          | 'name'
+          | 'dob'
+          | 'ssn4'
+          | 'ssn9'
+          | 'full_address'
+          | 'email'
+          | 'phone_number'
+          | 'nationality'
+          | 'us_legal_status'
+          | {
+              document: string;
+            }
+          | 'business_name'
+          | 'business_tin'
+          | 'business_address'
+          | 'business_phone_number'
+          | 'business_website'
+          | 'business_beneficial_owners'
+          | 'business_kyced_beneficial_owners'
+          | 'business_corporation_type'
+          | 'investor_profile'
+          | 'card'
+          | 'us_tax_id'
+          | 'bank';
+        kind: 'decrypt';
+      }
+    | {
+        kind: 'decrypt_custom';
+      }
+    | {
+        kind: 'decrypt_document';
+      }
+    | {
+        kind: 'decrypt_document_and_selfie';
+      }
+    | {
+        kind: 'decrypt_all';
+      }
+    | {
+        kind: 'decrypt_all_except_pci_data';
+      }
+    | {
+        kind: 'write_entities';
+      }
+    | {
+        kind: 'label_and_tag';
+      }
+    | {
+        kind: 'manage_compliance_doc_submission';
+      }
+    | {
+        kind: 'compliance_partner_read';
+      }
+    | {
+        kind: 'compliance_partner_admin';
+      }
+    | {
+        kind: 'compliance_partner_manage_templates';
+      }
+    | {
+        kind: 'compliance_partner_manage_reviews';
+      }
   >;
   /**
    * Organization
@@ -332,6 +672,9 @@ export type AuthOrgMember = {
       | 'client_vaulting_docs'
       | 'list_duplicate_users'
     >;
+    /**
+     * The type of data attribute
+     */
     companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
     domains: Array<string>;
     id: string;
@@ -829,14 +1172,84 @@ export type ComplianceDocEvent = {
       lastName?: string;
     };
   };
-  event: string;
+  event:
+    | {
+        data: {
+          description: string;
+          name: string;
+          template_id?: string;
+        };
+        kind: 'requested';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'request_retracted';
+      }
+    | {
+        data: {
+          /**
+           * Auto-generated discriminant enum variants
+           */
+          kind: 'external_url' | 'file_upload';
+          submission_id: string;
+        };
+        kind: 'submitted';
+      }
+    | {
+        data: {
+          decision: 'accepted' | 'rejected';
+          note: string;
+        };
+        kind: 'reviewed';
+      }
+    | {
+        data: {
+          /**
+           * None if the doc is unassigned.
+           */
+          assigned_to?: {
+            org: string;
+            /**
+             * Limited information about member of organization
+             *
+             * Intended to be non-sensitive information only, that may be shared between tenants/partner
+             * tenants.
+             */
+            user: {
+              first_name?: string;
+              id: string;
+              last_name?: string;
+            };
+          };
+          kind: 'Tenant' | 'PartnerTenant';
+        };
+        kind: 'assigned';
+      };
   timestamp: string;
 };
+export type kind4 = 'requested';
+export type decision = 'accepted' | 'rejected';
 export type ComplianceDocSubmission = {
   createdAt: string;
-  data: string;
+  data:
+    | {
+        data: {
+          url: string;
+        };
+        kind: 'external_url';
+      }
+    | {
+        data: {
+          data: string;
+          filename: string;
+        };
+        kind: 'file_upload';
+      };
   id: string;
 };
+export type kind5 = 'external_url';
 export type ComplianceDocSummary = {
   activeRequestId?: string;
   activeReviewId?: string;
@@ -921,7 +1334,7 @@ export type CreateEntityTokenRequest = {
   kind: 'onboard' | 'inherit' | 'user' | 'update_auth_methods';
   sendLink: boolean;
 };
-export type kind3 = 'onboard' | 'inherit' | 'user' | 'update_auth_methods';
+export type kind6 = 'onboard' | 'inherit' | 'user' | 'update_auth_methods';
 export type CreateEntityTokenResponse = {
   /**
    * When a link was requested to be sent, the method by which the link was sent
@@ -938,6 +1351,13 @@ export type CreateEntityTokenResponse = {
  * When a link was requested to be sent, the method by which the link was sent
  */
 export type delivery_method = 'phone' | 'email';
+export type CreateKycLinksRequest = {
+  /**
+   * The list of business owner IDs to which we should send KYC links via both email + SMS.
+   * Will generate and return links for all BOs regardless.
+   */
+  sendToBoIds?: Array<string>;
+};
 export type CreateListEntryRequest = {
   entries: Array<string>;
 };
@@ -947,7 +1367,7 @@ export type CreateListRequest = {
   kind: 'email_address' | 'email_domain' | 'ssn9' | 'phone_number' | 'phone_country_code' | 'ip_address';
   name: string;
 };
-export type kind4 = 'email_address' | 'email_domain' | 'ssn9' | 'phone_number' | 'phone_country_code' | 'ip_address';
+export type kind7 = 'email_address' | 'email_domain' | 'ssn9' | 'phone_number' | 'phone_country_code' | 'ip_address';
 export type CreateOnboardingConfigurationRequest = {
   allowInternationalResidents: boolean;
   /**
@@ -960,31 +1380,364 @@ export type CreateOnboardingConfigurationRequest = {
   allowReonboard: boolean;
   allowUsResidents?: boolean;
   allowUsTerritories?: boolean;
-  businessDocumentsToCollect: Array<string>;
+  businessDocumentsToCollect: Array<
+    | {
+        data: {
+          collect_selfie: boolean;
+          document_types_and_countries?: {
+            country_specific: {
+              [key: string]: unknown;
+            };
+            global: Array<
+              | 'id_card'
+              | 'drivers_license'
+              | 'passport'
+              | 'passport_card'
+              | 'permit'
+              | 'visa'
+              | 'residence_document'
+              | 'voter_identification'
+            >;
+          };
+        };
+        kind: 'identity';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_ssn';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_address';
+      }
+    | {
+        data: {
+          /**
+           * Optional human-readable description of the document that will be displayed to the user
+           */
+          description?: string;
+          /**
+           * Custom document identifier under which the document will be vaulted
+           */
+          identifier:
+            | 'id.first_name'
+            | 'id.middle_name'
+            | 'id.last_name'
+            | 'id.dob'
+            | 'id.ssn4'
+            | 'id.ssn9'
+            | 'id.address_line1'
+            | 'id.address_line2'
+            | 'id.city'
+            | 'id.state'
+            | 'id.zip'
+            | 'id.country'
+            | 'id.email'
+            | 'id.phone_number'
+            | 'id.us_legal_status'
+            | 'id.visa_kind'
+            | 'id.visa_expiration_date'
+            | 'id.nationality'
+            | 'id.citizenships'
+            | 'id.drivers_license_number'
+            | 'id.drivers_license_state'
+            | 'id.itin'
+            | 'id.us_tax_id'
+            | 'business.name'
+            | 'business.dba'
+            | 'business.website'
+            | 'business.phone_number'
+            | 'business.tin'
+            | 'business.address_line1'
+            | 'business.address_line2'
+            | 'business.city'
+            | 'business.state'
+            | 'business.zip'
+            | 'business.country'
+            | 'business.corporation_type'
+            | 'business.formation_state'
+            | 'business.formation_date'
+            | 'custom.*'
+            | 'investor_profile.employment_status'
+            | 'investor_profile.occupation'
+            | 'investor_profile.employer'
+            | 'investor_profile.annual_income'
+            | 'investor_profile.net_worth'
+            | 'investor_profile.investment_goals'
+            | 'investor_profile.risk_tolerance'
+            | 'investor_profile.declarations'
+            | 'investor_profile.brokerage_firm_employer'
+            | 'investor_profile.senior_executive_symbols'
+            | 'investor_profile.family_member_names'
+            | 'investor_profile.political_organization'
+            | 'investor_profile.funding_sources'
+            | 'document.id_card.front.image'
+            | 'document.id_card.front.mime_type'
+            | 'document.id_card.back.image'
+            | 'document.id_card.back.mime_type'
+            | 'document.id_card.selfie.image'
+            | 'document.id_card.selfie.mime_type'
+            | 'document.id_card.full_name'
+            | 'document.id_card.dob'
+            | 'document.id_card.gender'
+            | 'document.id_card.full_address'
+            | 'document.id_card.document_number'
+            | 'document.id_card.expires_at'
+            | 'document.id_card.issued_at'
+            | 'document.id_card.issuing_state'
+            | 'document.id_card.issuing_country'
+            | 'document.id_card.ref_number'
+            | 'document.id_card.nationality'
+            | 'document.id_card.curp'
+            | 'document.id_card.clave_de_elector'
+            | 'document.id_card.classified_document_type'
+            | 'document.id_card.curp_validation_response'
+            | 'document.drivers_license.front.image'
+            | 'document.drivers_license.front.mime_type'
+            | 'document.drivers_license.back.image'
+            | 'document.drivers_license.back.mime_type'
+            | 'document.drivers_license.selfie.image'
+            | 'document.drivers_license.selfie.mime_type'
+            | 'document.drivers_license.full_name'
+            | 'document.drivers_license.dob'
+            | 'document.drivers_license.gender'
+            | 'document.drivers_license.full_address'
+            | 'document.drivers_license.document_number'
+            | 'document.drivers_license.expires_at'
+            | 'document.drivers_license.issued_at'
+            | 'document.drivers_license.issuing_state'
+            | 'document.drivers_license.issuing_country'
+            | 'document.drivers_license.ref_number'
+            | 'document.drivers_license.nationality'
+            | 'document.drivers_license.curp'
+            | 'document.drivers_license.clave_de_elector'
+            | 'document.drivers_license.classified_document_type'
+            | 'document.drivers_license.curp_validation_response'
+            | 'document.passport.front.image'
+            | 'document.passport.front.mime_type'
+            | 'document.passport.back.image'
+            | 'document.passport.back.mime_type'
+            | 'document.passport.selfie.image'
+            | 'document.passport.selfie.mime_type'
+            | 'document.passport.full_name'
+            | 'document.passport.dob'
+            | 'document.passport.gender'
+            | 'document.passport.full_address'
+            | 'document.passport.document_number'
+            | 'document.passport.expires_at'
+            | 'document.passport.issued_at'
+            | 'document.passport.issuing_state'
+            | 'document.passport.issuing_country'
+            | 'document.passport.ref_number'
+            | 'document.passport.nationality'
+            | 'document.passport.curp'
+            | 'document.passport.clave_de_elector'
+            | 'document.passport.classified_document_type'
+            | 'document.passport.curp_validation_response'
+            | 'document.passport_card.front.image'
+            | 'document.passport_card.front.mime_type'
+            | 'document.passport_card.back.image'
+            | 'document.passport_card.back.mime_type'
+            | 'document.passport_card.selfie.image'
+            | 'document.passport_card.selfie.mime_type'
+            | 'document.passport_card.full_name'
+            | 'document.passport_card.dob'
+            | 'document.passport_card.gender'
+            | 'document.passport_card.full_address'
+            | 'document.passport_card.document_number'
+            | 'document.passport_card.expires_at'
+            | 'document.passport_card.issued_at'
+            | 'document.passport_card.issuing_state'
+            | 'document.passport_card.issuing_country'
+            | 'document.passport_card.ref_number'
+            | 'document.passport_card.nationality'
+            | 'document.passport_card.curp'
+            | 'document.passport_card.clave_de_elector'
+            | 'document.passport_card.classified_document_type'
+            | 'document.passport_card.curp_validation_response'
+            | 'document.permit.front.image'
+            | 'document.permit.front.mime_type'
+            | 'document.permit.back.image'
+            | 'document.permit.back.mime_type'
+            | 'document.permit.selfie.image'
+            | 'document.permit.selfie.mime_type'
+            | 'document.permit.full_name'
+            | 'document.permit.dob'
+            | 'document.permit.gender'
+            | 'document.permit.full_address'
+            | 'document.permit.document_number'
+            | 'document.permit.expires_at'
+            | 'document.permit.issued_at'
+            | 'document.permit.issuing_state'
+            | 'document.permit.issuing_country'
+            | 'document.permit.ref_number'
+            | 'document.permit.nationality'
+            | 'document.permit.curp'
+            | 'document.permit.clave_de_elector'
+            | 'document.permit.classified_document_type'
+            | 'document.permit.curp_validation_response'
+            | 'document.visa.front.image'
+            | 'document.visa.front.mime_type'
+            | 'document.visa.back.image'
+            | 'document.visa.back.mime_type'
+            | 'document.visa.selfie.image'
+            | 'document.visa.selfie.mime_type'
+            | 'document.visa.full_name'
+            | 'document.visa.dob'
+            | 'document.visa.gender'
+            | 'document.visa.full_address'
+            | 'document.visa.document_number'
+            | 'document.visa.expires_at'
+            | 'document.visa.issued_at'
+            | 'document.visa.issuing_state'
+            | 'document.visa.issuing_country'
+            | 'document.visa.ref_number'
+            | 'document.visa.nationality'
+            | 'document.visa.curp'
+            | 'document.visa.clave_de_elector'
+            | 'document.visa.classified_document_type'
+            | 'document.visa.curp_validation_response'
+            | 'document.residence_document.front.image'
+            | 'document.residence_document.front.mime_type'
+            | 'document.residence_document.back.image'
+            | 'document.residence_document.back.mime_type'
+            | 'document.residence_document.selfie.image'
+            | 'document.residence_document.selfie.mime_type'
+            | 'document.residence_document.full_name'
+            | 'document.residence_document.dob'
+            | 'document.residence_document.gender'
+            | 'document.residence_document.full_address'
+            | 'document.residence_document.document_number'
+            | 'document.residence_document.expires_at'
+            | 'document.residence_document.issued_at'
+            | 'document.residence_document.issuing_state'
+            | 'document.residence_document.issuing_country'
+            | 'document.residence_document.ref_number'
+            | 'document.residence_document.nationality'
+            | 'document.residence_document.curp'
+            | 'document.residence_document.clave_de_elector'
+            | 'document.residence_document.classified_document_type'
+            | 'document.residence_document.curp_validation_response'
+            | 'document.voter_identification.front.image'
+            | 'document.voter_identification.front.mime_type'
+            | 'document.voter_identification.back.image'
+            | 'document.voter_identification.back.mime_type'
+            | 'document.voter_identification.selfie.image'
+            | 'document.voter_identification.selfie.mime_type'
+            | 'document.voter_identification.full_name'
+            | 'document.voter_identification.dob'
+            | 'document.voter_identification.gender'
+            | 'document.voter_identification.full_address'
+            | 'document.voter_identification.document_number'
+            | 'document.voter_identification.expires_at'
+            | 'document.voter_identification.issued_at'
+            | 'document.voter_identification.issuing_state'
+            | 'document.voter_identification.issuing_country'
+            | 'document.voter_identification.ref_number'
+            | 'document.voter_identification.nationality'
+            | 'document.voter_identification.curp'
+            | 'document.voter_identification.clave_de_elector'
+            | 'document.voter_identification.classified_document_type'
+            | 'document.voter_identification.curp_validation_response'
+            | 'document.finra_compliance_letter'
+            | 'document.proof_of_address.image'
+            | 'document.ssn_card.image'
+            | 'document.custom.*'
+            | 'card.*.number'
+            | 'card.*.expiration'
+            | 'card.*.cvc'
+            | 'card.*.name'
+            | 'card.*.billing_address.zip'
+            | 'card.*.billing_address.country'
+            | 'card.*.expiration_month'
+            | 'card.*.expiration_year'
+            | 'card.*.number_last4'
+            | 'card.*.issuer'
+            | 'card.*.fingerprint'
+            | 'bank.*.name'
+            | 'bank.*.ach_routing_number'
+            | 'bank.*.ach_account_number'
+            | 'bank.*.ach_account_id'
+            | 'bank.*.account_type'
+            | 'bank.*.fingerprint';
+          /**
+           * The human-readable name of the document to display to the user
+           */
+          name: string;
+          requires_human_review: boolean;
+          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+        };
+        kind: 'custom';
+      }
+  >;
   cipKind?: 'alpaca' | 'apex';
   curpValidationEnabled?: boolean;
+  /**
+   * When provided, used to populate the deprecated `can_access_data` field. When not provided,
+   * can_access_data is computed from must_collect_data and optional_data.
+   */
+  deprecatedCanAccessData?: Array<
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank'
+  >;
+  /**
+   * Represent the options of allowed CollectedData.
+   * Some CollectedData variants only have a single allowable CollectedDataOption.
+   * Other CollectedData variants may have multiple Options of assortments of data that can be
+   * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+   * the CDO
+   */
   docScanForOptionalSsn?:
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank';
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank';
   documentTypesAndCountries?: {
     countrySpecific: {
       [key: string]: unknown;
@@ -1000,7 +1753,300 @@ export type CreateOnboardingConfigurationRequest = {
       | 'voter_identification'
     >;
   };
-  documentsToCollect: Array<string>;
+  documentsToCollect: Array<
+    | {
+        data: {
+          collect_selfie: boolean;
+          document_types_and_countries?: {
+            country_specific: {
+              [key: string]: unknown;
+            };
+            global: Array<
+              | 'id_card'
+              | 'drivers_license'
+              | 'passport'
+              | 'passport_card'
+              | 'permit'
+              | 'visa'
+              | 'residence_document'
+              | 'voter_identification'
+            >;
+          };
+        };
+        kind: 'identity';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_ssn';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_address';
+      }
+    | {
+        data: {
+          /**
+           * Optional human-readable description of the document that will be displayed to the user
+           */
+          description?: string;
+          /**
+           * Custom document identifier under which the document will be vaulted
+           */
+          identifier:
+            | 'id.first_name'
+            | 'id.middle_name'
+            | 'id.last_name'
+            | 'id.dob'
+            | 'id.ssn4'
+            | 'id.ssn9'
+            | 'id.address_line1'
+            | 'id.address_line2'
+            | 'id.city'
+            | 'id.state'
+            | 'id.zip'
+            | 'id.country'
+            | 'id.email'
+            | 'id.phone_number'
+            | 'id.us_legal_status'
+            | 'id.visa_kind'
+            | 'id.visa_expiration_date'
+            | 'id.nationality'
+            | 'id.citizenships'
+            | 'id.drivers_license_number'
+            | 'id.drivers_license_state'
+            | 'id.itin'
+            | 'id.us_tax_id'
+            | 'business.name'
+            | 'business.dba'
+            | 'business.website'
+            | 'business.phone_number'
+            | 'business.tin'
+            | 'business.address_line1'
+            | 'business.address_line2'
+            | 'business.city'
+            | 'business.state'
+            | 'business.zip'
+            | 'business.country'
+            | 'business.corporation_type'
+            | 'business.formation_state'
+            | 'business.formation_date'
+            | 'custom.*'
+            | 'investor_profile.employment_status'
+            | 'investor_profile.occupation'
+            | 'investor_profile.employer'
+            | 'investor_profile.annual_income'
+            | 'investor_profile.net_worth'
+            | 'investor_profile.investment_goals'
+            | 'investor_profile.risk_tolerance'
+            | 'investor_profile.declarations'
+            | 'investor_profile.brokerage_firm_employer'
+            | 'investor_profile.senior_executive_symbols'
+            | 'investor_profile.family_member_names'
+            | 'investor_profile.political_organization'
+            | 'investor_profile.funding_sources'
+            | 'document.id_card.front.image'
+            | 'document.id_card.front.mime_type'
+            | 'document.id_card.back.image'
+            | 'document.id_card.back.mime_type'
+            | 'document.id_card.selfie.image'
+            | 'document.id_card.selfie.mime_type'
+            | 'document.id_card.full_name'
+            | 'document.id_card.dob'
+            | 'document.id_card.gender'
+            | 'document.id_card.full_address'
+            | 'document.id_card.document_number'
+            | 'document.id_card.expires_at'
+            | 'document.id_card.issued_at'
+            | 'document.id_card.issuing_state'
+            | 'document.id_card.issuing_country'
+            | 'document.id_card.ref_number'
+            | 'document.id_card.nationality'
+            | 'document.id_card.curp'
+            | 'document.id_card.clave_de_elector'
+            | 'document.id_card.classified_document_type'
+            | 'document.id_card.curp_validation_response'
+            | 'document.drivers_license.front.image'
+            | 'document.drivers_license.front.mime_type'
+            | 'document.drivers_license.back.image'
+            | 'document.drivers_license.back.mime_type'
+            | 'document.drivers_license.selfie.image'
+            | 'document.drivers_license.selfie.mime_type'
+            | 'document.drivers_license.full_name'
+            | 'document.drivers_license.dob'
+            | 'document.drivers_license.gender'
+            | 'document.drivers_license.full_address'
+            | 'document.drivers_license.document_number'
+            | 'document.drivers_license.expires_at'
+            | 'document.drivers_license.issued_at'
+            | 'document.drivers_license.issuing_state'
+            | 'document.drivers_license.issuing_country'
+            | 'document.drivers_license.ref_number'
+            | 'document.drivers_license.nationality'
+            | 'document.drivers_license.curp'
+            | 'document.drivers_license.clave_de_elector'
+            | 'document.drivers_license.classified_document_type'
+            | 'document.drivers_license.curp_validation_response'
+            | 'document.passport.front.image'
+            | 'document.passport.front.mime_type'
+            | 'document.passport.back.image'
+            | 'document.passport.back.mime_type'
+            | 'document.passport.selfie.image'
+            | 'document.passport.selfie.mime_type'
+            | 'document.passport.full_name'
+            | 'document.passport.dob'
+            | 'document.passport.gender'
+            | 'document.passport.full_address'
+            | 'document.passport.document_number'
+            | 'document.passport.expires_at'
+            | 'document.passport.issued_at'
+            | 'document.passport.issuing_state'
+            | 'document.passport.issuing_country'
+            | 'document.passport.ref_number'
+            | 'document.passport.nationality'
+            | 'document.passport.curp'
+            | 'document.passport.clave_de_elector'
+            | 'document.passport.classified_document_type'
+            | 'document.passport.curp_validation_response'
+            | 'document.passport_card.front.image'
+            | 'document.passport_card.front.mime_type'
+            | 'document.passport_card.back.image'
+            | 'document.passport_card.back.mime_type'
+            | 'document.passport_card.selfie.image'
+            | 'document.passport_card.selfie.mime_type'
+            | 'document.passport_card.full_name'
+            | 'document.passport_card.dob'
+            | 'document.passport_card.gender'
+            | 'document.passport_card.full_address'
+            | 'document.passport_card.document_number'
+            | 'document.passport_card.expires_at'
+            | 'document.passport_card.issued_at'
+            | 'document.passport_card.issuing_state'
+            | 'document.passport_card.issuing_country'
+            | 'document.passport_card.ref_number'
+            | 'document.passport_card.nationality'
+            | 'document.passport_card.curp'
+            | 'document.passport_card.clave_de_elector'
+            | 'document.passport_card.classified_document_type'
+            | 'document.passport_card.curp_validation_response'
+            | 'document.permit.front.image'
+            | 'document.permit.front.mime_type'
+            | 'document.permit.back.image'
+            | 'document.permit.back.mime_type'
+            | 'document.permit.selfie.image'
+            | 'document.permit.selfie.mime_type'
+            | 'document.permit.full_name'
+            | 'document.permit.dob'
+            | 'document.permit.gender'
+            | 'document.permit.full_address'
+            | 'document.permit.document_number'
+            | 'document.permit.expires_at'
+            | 'document.permit.issued_at'
+            | 'document.permit.issuing_state'
+            | 'document.permit.issuing_country'
+            | 'document.permit.ref_number'
+            | 'document.permit.nationality'
+            | 'document.permit.curp'
+            | 'document.permit.clave_de_elector'
+            | 'document.permit.classified_document_type'
+            | 'document.permit.curp_validation_response'
+            | 'document.visa.front.image'
+            | 'document.visa.front.mime_type'
+            | 'document.visa.back.image'
+            | 'document.visa.back.mime_type'
+            | 'document.visa.selfie.image'
+            | 'document.visa.selfie.mime_type'
+            | 'document.visa.full_name'
+            | 'document.visa.dob'
+            | 'document.visa.gender'
+            | 'document.visa.full_address'
+            | 'document.visa.document_number'
+            | 'document.visa.expires_at'
+            | 'document.visa.issued_at'
+            | 'document.visa.issuing_state'
+            | 'document.visa.issuing_country'
+            | 'document.visa.ref_number'
+            | 'document.visa.nationality'
+            | 'document.visa.curp'
+            | 'document.visa.clave_de_elector'
+            | 'document.visa.classified_document_type'
+            | 'document.visa.curp_validation_response'
+            | 'document.residence_document.front.image'
+            | 'document.residence_document.front.mime_type'
+            | 'document.residence_document.back.image'
+            | 'document.residence_document.back.mime_type'
+            | 'document.residence_document.selfie.image'
+            | 'document.residence_document.selfie.mime_type'
+            | 'document.residence_document.full_name'
+            | 'document.residence_document.dob'
+            | 'document.residence_document.gender'
+            | 'document.residence_document.full_address'
+            | 'document.residence_document.document_number'
+            | 'document.residence_document.expires_at'
+            | 'document.residence_document.issued_at'
+            | 'document.residence_document.issuing_state'
+            | 'document.residence_document.issuing_country'
+            | 'document.residence_document.ref_number'
+            | 'document.residence_document.nationality'
+            | 'document.residence_document.curp'
+            | 'document.residence_document.clave_de_elector'
+            | 'document.residence_document.classified_document_type'
+            | 'document.residence_document.curp_validation_response'
+            | 'document.voter_identification.front.image'
+            | 'document.voter_identification.front.mime_type'
+            | 'document.voter_identification.back.image'
+            | 'document.voter_identification.back.mime_type'
+            | 'document.voter_identification.selfie.image'
+            | 'document.voter_identification.selfie.mime_type'
+            | 'document.voter_identification.full_name'
+            | 'document.voter_identification.dob'
+            | 'document.voter_identification.gender'
+            | 'document.voter_identification.full_address'
+            | 'document.voter_identification.document_number'
+            | 'document.voter_identification.expires_at'
+            | 'document.voter_identification.issued_at'
+            | 'document.voter_identification.issuing_state'
+            | 'document.voter_identification.issuing_country'
+            | 'document.voter_identification.ref_number'
+            | 'document.voter_identification.nationality'
+            | 'document.voter_identification.curp'
+            | 'document.voter_identification.clave_de_elector'
+            | 'document.voter_identification.classified_document_type'
+            | 'document.voter_identification.curp_validation_response'
+            | 'document.finra_compliance_letter'
+            | 'document.proof_of_address.image'
+            | 'document.ssn_card.image'
+            | 'document.custom.*'
+            | 'card.*.number'
+            | 'card.*.expiration'
+            | 'card.*.cvc'
+            | 'card.*.name'
+            | 'card.*.billing_address.zip'
+            | 'card.*.billing_address.country'
+            | 'card.*.expiration_month'
+            | 'card.*.expiration_year'
+            | 'card.*.number_last4'
+            | 'card.*.issuer'
+            | 'card.*.fingerprint'
+            | 'bank.*.name'
+            | 'bank.*.ach_routing_number'
+            | 'bank.*.ach_account_number'
+            | 'bank.*.ach_account_id'
+            | 'bank.*.account_type'
+            | 'bank.*.fingerprint';
+          /**
+           * The human-readable name of the document to display to the user
+           */
+          name: string;
+          requires_human_review: boolean;
+          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+        };
+        kind: 'custom';
+      }
+  >;
   enhancedAml?: {
     adverseMedia: boolean;
     enhancedAml: boolean;
@@ -1263,93 +2309,153 @@ export type CreateOnboardingConfigurationRequest = {
   isNoPhoneFlow?: boolean;
   kind: 'kyc' | 'kyb' | 'auth' | 'document';
   mustCollectData: Array<
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank'
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank'
   >;
   name: string;
   optionalData?: Array<
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank'
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank'
   >;
   promptForPasskey?: boolean;
   requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
   skipConfirm?: boolean;
   skipKyc?: boolean;
-  verificationChecks?: Array<string>;
+  verificationChecks?: Array<
+    | {
+        data: {
+          ein_only: boolean;
+        };
+        kind: 'kyb';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'business_aml';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'kyc';
+      }
+    | {
+        data: {
+          adverse_media: boolean;
+          adverse_media_lists?: Array<
+            | 'financial_crime'
+            | 'violent_crime'
+            | 'sexual_crime'
+            | 'cyber_crime'
+            | 'terrorism'
+            | 'fraud'
+            | 'narcotics'
+            | 'general_serious'
+            | 'general_minor'
+          >;
+          continuous_monitoring: boolean;
+          match_kind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
+          ofac: boolean;
+          pep: boolean;
+        };
+        kind: 'aml';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'curp_validation';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'identity_document';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'stytch_device';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'neuro_id';
+      }
+    | {
+        data: {
+          attributes: Array<'line_type_intelligence'>;
+        };
+        kind: 'phone';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'sentilink';
+      }
+  >;
 };
 export type cip_kind = 'alpaca' | 'apex';
-export type doc_scan_for_optional_ssn =
-  | 'Name'
-  | 'Dob'
-  | 'Ssn4'
-  | 'Ssn9'
-  | 'FullAddress'
-  | 'Email'
-  | 'PhoneNumber'
-  | 'Nationality'
-  | 'UsLegalStatus'
-  | 'BusinessName'
-  | 'BusinessTin'
-  | 'BusinessAddress'
-  | 'BusinessPhoneNumber'
-  | 'BusinessWebsite'
-  | 'BusinessBeneficialOwners'
-  | 'BusinessKycedBeneficialOwners'
-  | 'BusinessCorporationType'
-  | 'InvestorProfile'
-  | 'Card'
-  | 'UsTaxId'
-  | 'Bank';
 export type match_kind = 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
-export type kind5 = 'kyc' | 'kyb' | 'auth' | 'document';
+export type kind8 = 'kyc' | 'kyb' | 'auth' | 'document';
 export type CreateOrgFrequentNoteRequest = {
   content: string;
   kind: 'manual_review' | 'annotation' | 'trigger';
 };
-export type kind6 = 'manual_review' | 'annotation' | 'trigger';
+export type kind9 = 'manual_review' | 'annotation' | 'trigger';
 export type CreateOrgTenantTagRequest = {
   kind: 'person' | 'business';
   tag: string;
 };
-export type kind7 = 'person' | 'business';
+export type kind10 = 'person' | 'business';
 /**
  * Create a new proxy configuration
  */
@@ -1688,7 +2794,6 @@ export type CreateReviewRequest = {
   note: string;
   submissionId: string;
 };
-export type decision = 'accepted' | 'rejected';
 export type CreateTagRequest = {
   /**
    * Any string to tag the user
@@ -1708,35 +2813,139 @@ export type CreateTenantIosAppMetaRequest = {
   teamId: string;
 };
 export type CreateTenantRoleRequest = {
-  kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+  /**
+   * Auto-generated discriminant enum variants
+   */
+  kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
   name: string;
   scopes: Array<
-    | 'read'
-    | 'admin'
-    | 'api_keys'
-    | 'manage_vault_proxy'
-    | 'manage_webhooks'
-    | 'manual_review'
-    | 'onboarding_configuration'
-    | 'write_lists'
-    | 'org_settings'
-    | 'cip_integration'
-    | 'trigger_kyb'
-    | 'trigger_kyc'
-    | 'auth_token'
-    | 'onboarding'
-    | 'decrypt_custom'
-    | 'decrypt_document'
-    | 'decrypt_document_and_selfie'
-    | 'decrypt_all'
-    | 'decrypt_all_except_pci_data'
-    | 'write_entities'
-    | 'label_and_tag'
-    | 'manage_compliance_doc_submission'
-    | 'compliance_partner_read'
-    | 'compliance_partner_admin'
-    | 'compliance_partner_manage_templates'
-    | 'compliance_partner_manage_reviews'
+    | {
+        kind: 'read';
+      }
+    | {
+        kind: 'admin';
+      }
+    | {
+        kind: 'api_keys';
+      }
+    | {
+        kind: 'manage_vault_proxy';
+      }
+    | {
+        kind: 'manage_webhooks';
+      }
+    | {
+        kind: 'manual_review';
+      }
+    | {
+        kind: 'onboarding_configuration';
+      }
+    | {
+        kind: 'write_lists';
+      }
+    | {
+        kind: 'org_settings';
+      }
+    | {
+        kind: 'cip_integration';
+      }
+    | {
+        data:
+          | {
+              kind: 'any';
+            }
+          | {
+              kind: 'just_in_time';
+            }
+          | {
+              id: string;
+              kind: 'id';
+            };
+        kind: 'invoke_vault_proxy';
+      }
+    | {
+        kind: 'trigger_kyb';
+      }
+    | {
+        kind: 'trigger_kyc';
+      }
+    | {
+        kind: 'auth_token';
+      }
+    | {
+        kind: 'onboarding';
+      }
+    | {
+        /**
+         * Represent the options of allowed CollectedData.
+         * Some CollectedData variants only have a single allowable CollectedDataOption.
+         * Other CollectedData variants may have multiple Options of assortments of data that can be
+         * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+         * the CDO
+         */
+        data:
+          | 'name'
+          | 'dob'
+          | 'ssn4'
+          | 'ssn9'
+          | 'full_address'
+          | 'email'
+          | 'phone_number'
+          | 'nationality'
+          | 'us_legal_status'
+          | {
+              document: string;
+            }
+          | 'business_name'
+          | 'business_tin'
+          | 'business_address'
+          | 'business_phone_number'
+          | 'business_website'
+          | 'business_beneficial_owners'
+          | 'business_kyced_beneficial_owners'
+          | 'business_corporation_type'
+          | 'investor_profile'
+          | 'card'
+          | 'us_tax_id'
+          | 'bank';
+        kind: 'decrypt';
+      }
+    | {
+        kind: 'decrypt_custom';
+      }
+    | {
+        kind: 'decrypt_document';
+      }
+    | {
+        kind: 'decrypt_document_and_selfie';
+      }
+    | {
+        kind: 'decrypt_all';
+      }
+    | {
+        kind: 'decrypt_all_except_pci_data';
+      }
+    | {
+        kind: 'write_entities';
+      }
+    | {
+        kind: 'label_and_tag';
+      }
+    | {
+        kind: 'manage_compliance_doc_submission';
+      }
+    | {
+        kind: 'compliance_partner_read';
+      }
+    | {
+        kind: 'compliance_partner_admin';
+      }
+    | {
+        kind: 'compliance_partner_manage_templates';
+      }
+    | {
+        kind: 'compliance_partner_manage_reviews';
+      }
   >;
 };
 export type CreateTenantUserRequest = {
@@ -1757,27 +2966,1753 @@ export type CreateTenantUserRequest = {
 export type CursorPaginatedAuditEvent = {
   data: Array<{
     detail:
-      | 'create_user_annotation'
-      | 'complete_user_check_liveness'
-      | 'complete_user_check_watchlist'
-      | 'request_user_data'
-      | 'start_user_verification'
-      | 'complete_user_verification'
-      | 'collect_user_document'
-      | 'create_org_api_key'
-      | 'decrypt_org_api_key'
-      | 'update_org_api_key'
-      | 'update_org_member'
-      | 'login_org_member'
-      | 'remove_org_member'
-      | 'create_org'
-      | 'update_org_settings'
-      | 'update_org_role'
-      | 'create_playbook'
-      | 'disable_playbook'
-      | 'manually_review_entity'
-      | 'edit_playbook'
-      | 'deactivate_org_role';
+      | {
+          data: {
+            created_fields: Array<
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint'
+            >;
+            fp_id: string;
+          };
+          kind: 'create_user';
+        }
+      | {
+          data: {
+            fp_id: string;
+            updated_fields: Array<
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint'
+            >;
+          };
+          kind: 'update_user_data';
+        }
+      | {
+          data: {
+            deleted_fields: Array<
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint'
+            >;
+            fp_id: string;
+          };
+          kind: 'delete_user_data';
+        }
+      | {
+          data: {
+            context: 'vault_proxy' | 'reflect' | 'api' | 'unknown';
+            decrypted_fields: Array<
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint'
+            >;
+            fp_id: string;
+            reason: string;
+          };
+          kind: 'decrypt_user_data';
+        }
+      | {
+          data: {
+            fp_id: string;
+          };
+          kind: 'delete_user';
+        }
+      | {
+          kind: 'create_user_annotation';
+        }
+      | {
+          kind: 'complete_user_check_liveness';
+        }
+      | {
+          kind: 'complete_user_check_watchlist';
+        }
+      | {
+          kind: 'request_user_data';
+        }
+      | {
+          kind: 'start_user_verification';
+        }
+      | {
+          kind: 'complete_user_verification';
+        }
+      | {
+          kind: 'collect_user_document';
+        }
+      | {
+          kind: 'create_org_api_key';
+        }
+      | {
+          kind: 'decrypt_org_api_key';
+        }
+      | {
+          kind: 'update_org_api_key';
+        }
+      | {
+          data: {
+            email: string;
+            first_name?: string;
+            last_name?: string;
+            scopes: Array<
+              | {
+                  kind: 'read';
+                }
+              | {
+                  kind: 'admin';
+                }
+              | {
+                  kind: 'api_keys';
+                }
+              | {
+                  kind: 'manage_vault_proxy';
+                }
+              | {
+                  kind: 'manage_webhooks';
+                }
+              | {
+                  kind: 'manual_review';
+                }
+              | {
+                  kind: 'onboarding_configuration';
+                }
+              | {
+                  kind: 'write_lists';
+                }
+              | {
+                  kind: 'org_settings';
+                }
+              | {
+                  kind: 'cip_integration';
+                }
+              | {
+                  data:
+                    | {
+                        kind: 'any';
+                      }
+                    | {
+                        kind: 'just_in_time';
+                      }
+                    | {
+                        id: string;
+                        kind: 'id';
+                      };
+                  kind: 'invoke_vault_proxy';
+                }
+              | {
+                  kind: 'trigger_kyb';
+                }
+              | {
+                  kind: 'trigger_kyc';
+                }
+              | {
+                  kind: 'auth_token';
+                }
+              | {
+                  kind: 'onboarding';
+                }
+              | {
+                  /**
+                   * Represent the options of allowed CollectedData.
+                   * Some CollectedData variants only have a single allowable CollectedDataOption.
+                   * Other CollectedData variants may have multiple Options of assortments of data that can be
+                   * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+                   * the CDO
+                   */
+                  data:
+                    | 'name'
+                    | 'dob'
+                    | 'ssn4'
+                    | 'ssn9'
+                    | 'full_address'
+                    | 'email'
+                    | 'phone_number'
+                    | 'nationality'
+                    | 'us_legal_status'
+                    | {
+                        document: string;
+                      }
+                    | 'business_name'
+                    | 'business_tin'
+                    | 'business_address'
+                    | 'business_phone_number'
+                    | 'business_website'
+                    | 'business_beneficial_owners'
+                    | 'business_kyced_beneficial_owners'
+                    | 'business_corporation_type'
+                    | 'investor_profile'
+                    | 'card'
+                    | 'us_tax_id'
+                    | 'bank';
+                  kind: 'decrypt';
+                }
+              | {
+                  kind: 'decrypt_custom';
+                }
+              | {
+                  kind: 'decrypt_document';
+                }
+              | {
+                  kind: 'decrypt_document_and_selfie';
+                }
+              | {
+                  kind: 'decrypt_all';
+                }
+              | {
+                  kind: 'decrypt_all_except_pci_data';
+                }
+              | {
+                  kind: 'write_entities';
+                }
+              | {
+                  kind: 'label_and_tag';
+                }
+              | {
+                  kind: 'manage_compliance_doc_submission';
+                }
+              | {
+                  kind: 'compliance_partner_read';
+                }
+              | {
+                  kind: 'compliance_partner_admin';
+                }
+              | {
+                  kind: 'compliance_partner_manage_templates';
+                }
+              | {
+                  kind: 'compliance_partner_manage_reviews';
+                }
+            >;
+            tenant_role_id: string;
+            tenant_role_name: string;
+          };
+          kind: 'invite_org_member';
+        }
+      | {
+          kind: 'update_org_member';
+        }
+      | {
+          kind: 'login_org_member';
+        }
+      | {
+          kind: 'remove_org_member';
+        }
+      | {
+          kind: 'create_org';
+        }
+      | {
+          kind: 'update_org_settings';
+        }
+      | {
+          data: {
+            role_name: string;
+            scopes: Array<
+              | {
+                  kind: 'read';
+                }
+              | {
+                  kind: 'admin';
+                }
+              | {
+                  kind: 'api_keys';
+                }
+              | {
+                  kind: 'manage_vault_proxy';
+                }
+              | {
+                  kind: 'manage_webhooks';
+                }
+              | {
+                  kind: 'manual_review';
+                }
+              | {
+                  kind: 'onboarding_configuration';
+                }
+              | {
+                  kind: 'write_lists';
+                }
+              | {
+                  kind: 'org_settings';
+                }
+              | {
+                  kind: 'cip_integration';
+                }
+              | {
+                  data:
+                    | {
+                        kind: 'any';
+                      }
+                    | {
+                        kind: 'just_in_time';
+                      }
+                    | {
+                        id: string;
+                        kind: 'id';
+                      };
+                  kind: 'invoke_vault_proxy';
+                }
+              | {
+                  kind: 'trigger_kyb';
+                }
+              | {
+                  kind: 'trigger_kyc';
+                }
+              | {
+                  kind: 'auth_token';
+                }
+              | {
+                  kind: 'onboarding';
+                }
+              | {
+                  /**
+                   * Represent the options of allowed CollectedData.
+                   * Some CollectedData variants only have a single allowable CollectedDataOption.
+                   * Other CollectedData variants may have multiple Options of assortments of data that can be
+                   * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+                   * the CDO
+                   */
+                  data:
+                    | 'name'
+                    | 'dob'
+                    | 'ssn4'
+                    | 'ssn9'
+                    | 'full_address'
+                    | 'email'
+                    | 'phone_number'
+                    | 'nationality'
+                    | 'us_legal_status'
+                    | {
+                        document: string;
+                      }
+                    | 'business_name'
+                    | 'business_tin'
+                    | 'business_address'
+                    | 'business_phone_number'
+                    | 'business_website'
+                    | 'business_beneficial_owners'
+                    | 'business_kyced_beneficial_owners'
+                    | 'business_corporation_type'
+                    | 'investor_profile'
+                    | 'card'
+                    | 'us_tax_id'
+                    | 'bank';
+                  kind: 'decrypt';
+                }
+              | {
+                  kind: 'decrypt_custom';
+                }
+              | {
+                  kind: 'decrypt_document';
+                }
+              | {
+                  kind: 'decrypt_document_and_selfie';
+                }
+              | {
+                  kind: 'decrypt_all';
+                }
+              | {
+                  kind: 'decrypt_all_except_pci_data';
+                }
+              | {
+                  kind: 'write_entities';
+                }
+              | {
+                  kind: 'label_and_tag';
+                }
+              | {
+                  kind: 'manage_compliance_doc_submission';
+                }
+              | {
+                  kind: 'compliance_partner_read';
+                }
+              | {
+                  kind: 'compliance_partner_admin';
+                }
+              | {
+                  kind: 'compliance_partner_manage_templates';
+                }
+              | {
+                  kind: 'compliance_partner_manage_reviews';
+                }
+            >;
+            tenant_role_id: string;
+          };
+          kind: 'create_org_role';
+        }
+      | {
+          data: {
+            new_scopes: Array<
+              | {
+                  kind: 'read';
+                }
+              | {
+                  kind: 'admin';
+                }
+              | {
+                  kind: 'api_keys';
+                }
+              | {
+                  kind: 'manage_vault_proxy';
+                }
+              | {
+                  kind: 'manage_webhooks';
+                }
+              | {
+                  kind: 'manual_review';
+                }
+              | {
+                  kind: 'onboarding_configuration';
+                }
+              | {
+                  kind: 'write_lists';
+                }
+              | {
+                  kind: 'org_settings';
+                }
+              | {
+                  kind: 'cip_integration';
+                }
+              | {
+                  data:
+                    | {
+                        kind: 'any';
+                      }
+                    | {
+                        kind: 'just_in_time';
+                      }
+                    | {
+                        id: string;
+                        kind: 'id';
+                      };
+                  kind: 'invoke_vault_proxy';
+                }
+              | {
+                  kind: 'trigger_kyb';
+                }
+              | {
+                  kind: 'trigger_kyc';
+                }
+              | {
+                  kind: 'auth_token';
+                }
+              | {
+                  kind: 'onboarding';
+                }
+              | {
+                  /**
+                   * Represent the options of allowed CollectedData.
+                   * Some CollectedData variants only have a single allowable CollectedDataOption.
+                   * Other CollectedData variants may have multiple Options of assortments of data that can be
+                   * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+                   * the CDO
+                   */
+                  data:
+                    | 'name'
+                    | 'dob'
+                    | 'ssn4'
+                    | 'ssn9'
+                    | 'full_address'
+                    | 'email'
+                    | 'phone_number'
+                    | 'nationality'
+                    | 'us_legal_status'
+                    | {
+                        document: string;
+                      }
+                    | 'business_name'
+                    | 'business_tin'
+                    | 'business_address'
+                    | 'business_phone_number'
+                    | 'business_website'
+                    | 'business_beneficial_owners'
+                    | 'business_kyced_beneficial_owners'
+                    | 'business_corporation_type'
+                    | 'investor_profile'
+                    | 'card'
+                    | 'us_tax_id'
+                    | 'bank';
+                  kind: 'decrypt';
+                }
+              | {
+                  kind: 'decrypt_custom';
+                }
+              | {
+                  kind: 'decrypt_document';
+                }
+              | {
+                  kind: 'decrypt_document_and_selfie';
+                }
+              | {
+                  kind: 'decrypt_all';
+                }
+              | {
+                  kind: 'decrypt_all_except_pci_data';
+                }
+              | {
+                  kind: 'write_entities';
+                }
+              | {
+                  kind: 'label_and_tag';
+                }
+              | {
+                  kind: 'manage_compliance_doc_submission';
+                }
+              | {
+                  kind: 'compliance_partner_read';
+                }
+              | {
+                  kind: 'compliance_partner_admin';
+                }
+              | {
+                  kind: 'compliance_partner_manage_templates';
+                }
+              | {
+                  kind: 'compliance_partner_manage_reviews';
+                }
+            >;
+            prev_scopes: Array<
+              | {
+                  kind: 'read';
+                }
+              | {
+                  kind: 'admin';
+                }
+              | {
+                  kind: 'api_keys';
+                }
+              | {
+                  kind: 'manage_vault_proxy';
+                }
+              | {
+                  kind: 'manage_webhooks';
+                }
+              | {
+                  kind: 'manual_review';
+                }
+              | {
+                  kind: 'onboarding_configuration';
+                }
+              | {
+                  kind: 'write_lists';
+                }
+              | {
+                  kind: 'org_settings';
+                }
+              | {
+                  kind: 'cip_integration';
+                }
+              | {
+                  data:
+                    | {
+                        kind: 'any';
+                      }
+                    | {
+                        kind: 'just_in_time';
+                      }
+                    | {
+                        id: string;
+                        kind: 'id';
+                      };
+                  kind: 'invoke_vault_proxy';
+                }
+              | {
+                  kind: 'trigger_kyb';
+                }
+              | {
+                  kind: 'trigger_kyc';
+                }
+              | {
+                  kind: 'auth_token';
+                }
+              | {
+                  kind: 'onboarding';
+                }
+              | {
+                  /**
+                   * Represent the options of allowed CollectedData.
+                   * Some CollectedData variants only have a single allowable CollectedDataOption.
+                   * Other CollectedData variants may have multiple Options of assortments of data that can be
+                   * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+                   * the CDO
+                   */
+                  data:
+                    | 'name'
+                    | 'dob'
+                    | 'ssn4'
+                    | 'ssn9'
+                    | 'full_address'
+                    | 'email'
+                    | 'phone_number'
+                    | 'nationality'
+                    | 'us_legal_status'
+                    | {
+                        document: string;
+                      }
+                    | 'business_name'
+                    | 'business_tin'
+                    | 'business_address'
+                    | 'business_phone_number'
+                    | 'business_website'
+                    | 'business_beneficial_owners'
+                    | 'business_kyced_beneficial_owners'
+                    | 'business_corporation_type'
+                    | 'investor_profile'
+                    | 'card'
+                    | 'us_tax_id'
+                    | 'bank';
+                  kind: 'decrypt';
+                }
+              | {
+                  kind: 'decrypt_custom';
+                }
+              | {
+                  kind: 'decrypt_document';
+                }
+              | {
+                  kind: 'decrypt_document_and_selfie';
+                }
+              | {
+                  kind: 'decrypt_all';
+                }
+              | {
+                  kind: 'decrypt_all_except_pci_data';
+                }
+              | {
+                  kind: 'write_entities';
+                }
+              | {
+                  kind: 'label_and_tag';
+                }
+              | {
+                  kind: 'manage_compliance_doc_submission';
+                }
+              | {
+                  kind: 'compliance_partner_read';
+                }
+              | {
+                  kind: 'compliance_partner_admin';
+                }
+              | {
+                  kind: 'compliance_partner_manage_templates';
+                }
+              | {
+                  kind: 'compliance_partner_manage_reviews';
+                }
+            >;
+            role_name: string;
+            tenant_role_id: string;
+          };
+          kind: 'update_org_role';
+        }
+      | {
+          data: {
+            list_entry_creation_id: string;
+            list_id: string;
+          };
+          kind: 'create_list_entry';
+        }
+      | {
+          data: {
+            list_entry_id: string;
+            list_id: string;
+          };
+          kind: 'delete_list_entry';
+        }
+      | {
+          kind: 'create_playbook';
+        }
+      | {
+          kind: 'disable_playbook';
+        }
+      | {
+          kind: 'manually_review_entity';
+        }
+      | {
+          kind: 'edit_playbook';
+        }
+      | {
+          data: {
+            role_name: string;
+            scopes: Array<
+              | {
+                  kind: 'read';
+                }
+              | {
+                  kind: 'admin';
+                }
+              | {
+                  kind: 'api_keys';
+                }
+              | {
+                  kind: 'manage_vault_proxy';
+                }
+              | {
+                  kind: 'manage_webhooks';
+                }
+              | {
+                  kind: 'manual_review';
+                }
+              | {
+                  kind: 'onboarding_configuration';
+                }
+              | {
+                  kind: 'write_lists';
+                }
+              | {
+                  kind: 'org_settings';
+                }
+              | {
+                  kind: 'cip_integration';
+                }
+              | {
+                  data:
+                    | {
+                        kind: 'any';
+                      }
+                    | {
+                        kind: 'just_in_time';
+                      }
+                    | {
+                        id: string;
+                        kind: 'id';
+                      };
+                  kind: 'invoke_vault_proxy';
+                }
+              | {
+                  kind: 'trigger_kyb';
+                }
+              | {
+                  kind: 'trigger_kyc';
+                }
+              | {
+                  kind: 'auth_token';
+                }
+              | {
+                  kind: 'onboarding';
+                }
+              | {
+                  /**
+                   * Represent the options of allowed CollectedData.
+                   * Some CollectedData variants only have a single allowable CollectedDataOption.
+                   * Other CollectedData variants may have multiple Options of assortments of data that can be
+                   * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+                   * the CDO
+                   */
+                  data:
+                    | 'name'
+                    | 'dob'
+                    | 'ssn4'
+                    | 'ssn9'
+                    | 'full_address'
+                    | 'email'
+                    | 'phone_number'
+                    | 'nationality'
+                    | 'us_legal_status'
+                    | {
+                        document: string;
+                      }
+                    | 'business_name'
+                    | 'business_tin'
+                    | 'business_address'
+                    | 'business_phone_number'
+                    | 'business_website'
+                    | 'business_beneficial_owners'
+                    | 'business_kyced_beneficial_owners'
+                    | 'business_corporation_type'
+                    | 'investor_profile'
+                    | 'card'
+                    | 'us_tax_id'
+                    | 'bank';
+                  kind: 'decrypt';
+                }
+              | {
+                  kind: 'decrypt_custom';
+                }
+              | {
+                  kind: 'decrypt_document';
+                }
+              | {
+                  kind: 'decrypt_document_and_selfie';
+                }
+              | {
+                  kind: 'decrypt_all';
+                }
+              | {
+                  kind: 'decrypt_all_except_pci_data';
+                }
+              | {
+                  kind: 'write_entities';
+                }
+              | {
+                  kind: 'label_and_tag';
+                }
+              | {
+                  kind: 'manage_compliance_doc_submission';
+                }
+              | {
+                  kind: 'compliance_partner_read';
+                }
+              | {
+                  kind: 'compliance_partner_admin';
+                }
+              | {
+                  kind: 'compliance_partner_manage_templates';
+                }
+              | {
+                  kind: 'compliance_partner_manage_reviews';
+                }
+            >;
+            tenant_role_id: string;
+          };
+          kind: 'deactivate_org_role';
+        };
     id: string;
     /**
      * Describes a device insight event with locations and IP of the event
@@ -1797,38 +4732,63 @@ export type CursorPaginatedAuditEvent = {
       timestamp: string;
       userAgent?: string;
     };
+    /**
+     * Auto-generated discriminant enum variants
+     */
     name:
-      | 'CreateUser'
-      | 'UpdateUserData'
-      | 'DeleteUserData'
-      | 'DecryptUserData'
-      | 'DeleteUser'
-      | 'CreateUserAnnotation'
-      | 'CompleteUserCheckLiveness'
-      | 'CompleteUserCheckWatchlist'
-      | 'RequestUserData'
-      | 'StartUserVerification'
-      | 'CompleteUserVerification'
-      | 'CollectUserDocument'
-      | 'CreateOrgApiKey'
-      | 'DecryptOrgApiKey'
-      | 'UpdateOrgApiKey'
-      | 'InviteOrgMember'
-      | 'UpdateOrgMember'
-      | 'LoginOrgMember'
-      | 'RemoveOrgMember'
-      | 'CreateOrg'
-      | 'UpdateOrgSettings'
-      | 'CreateOrgRole'
-      | 'UpdateOrgRole'
-      | 'CreateListEntry'
-      | 'DeleteListEntry'
-      | 'CreatePlaybook'
-      | 'DisablePlaybook'
-      | 'ManuallyReviewEntity'
-      | 'EditPlaybook'
-      | 'DeactivateOrgRole';
-    principal: 'footprint' | 'firm_employee';
+      | 'create_user'
+      | 'update_user_data'
+      | 'delete_user_data'
+      | 'decrypt_user_data'
+      | 'delete_user'
+      | 'create_user_annotation'
+      | 'complete_user_check_liveness'
+      | 'complete_user_check_watchlist'
+      | 'request_user_data'
+      | 'start_user_verification'
+      | 'complete_user_verification'
+      | 'collect_user_document'
+      | 'create_org_api_key'
+      | 'decrypt_org_api_key'
+      | 'update_org_api_key'
+      | 'invite_org_member'
+      | 'update_org_member'
+      | 'login_org_member'
+      | 'remove_org_member'
+      | 'create_org'
+      | 'update_org_settings'
+      | 'create_org_role'
+      | 'update_org_role'
+      | 'create_list_entry'
+      | 'delete_list_entry'
+      | 'create_playbook'
+      | 'disable_playbook'
+      | 'manually_review_entity'
+      | 'edit_playbook'
+      | 'deactivate_org_role';
+    principal:
+      | {
+          id: string;
+          kind: 'user';
+        }
+      | {
+          kind: 'footprint';
+        }
+      | {
+          kind: 'firm_employee';
+        }
+      | {
+          email: string;
+          first_name?: string;
+          kind: 'organization';
+          last_name?: string;
+          member: string;
+        }
+      | {
+          id: string;
+          kind: 'api_key';
+          name: string;
+        };
     tenantId: string;
     timestamp: string;
   }>;
@@ -2623,6 +5583,9 @@ export type CursorPaginatedEntity = {
     requiresManualReview: boolean;
     sandboxId?: string;
     startTimestamp: string;
+    /**
+     * Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus
+     */
     status: 'pass' | 'fail' | 'incomplete' | 'in_progress' | 'pending' | 'none';
     /**
      * Only serialized for firm employess
@@ -3019,6 +5982,9 @@ export type CursorPaginatedEntity = {
         userAgent?: string;
       };
       playbookId: string;
+      /**
+       * The status of the onboarding
+       */
       status: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
     }>;
   }>;
@@ -3035,7 +6001,23 @@ export type CursorPaginatedEntity = {
 };
 export type CursorPaginatedListEvent = {
   data: Array<{
-    detail: string;
+    detail:
+      | {
+          data: {
+            entries: Array<string>;
+            list_entry_creation_id: string;
+            list_id: string;
+          };
+          kind: 'create_list_entry';
+        }
+      | {
+          data: {
+            entry: string;
+            list_entry_id: string;
+            list_id: string;
+          };
+          kind: 'delete_list_entry';
+        };
     id: string;
     /**
      * Describes a device insight event with locations and IP of the event
@@ -3055,38 +6037,63 @@ export type CursorPaginatedListEvent = {
       timestamp: string;
       userAgent?: string;
     };
+    /**
+     * Auto-generated discriminant enum variants
+     */
     name:
-      | 'CreateUser'
-      | 'UpdateUserData'
-      | 'DeleteUserData'
-      | 'DecryptUserData'
-      | 'DeleteUser'
-      | 'CreateUserAnnotation'
-      | 'CompleteUserCheckLiveness'
-      | 'CompleteUserCheckWatchlist'
-      | 'RequestUserData'
-      | 'StartUserVerification'
-      | 'CompleteUserVerification'
-      | 'CollectUserDocument'
-      | 'CreateOrgApiKey'
-      | 'DecryptOrgApiKey'
-      | 'UpdateOrgApiKey'
-      | 'InviteOrgMember'
-      | 'UpdateOrgMember'
-      | 'LoginOrgMember'
-      | 'RemoveOrgMember'
-      | 'CreateOrg'
-      | 'UpdateOrgSettings'
-      | 'CreateOrgRole'
-      | 'UpdateOrgRole'
-      | 'CreateListEntry'
-      | 'DeleteListEntry'
-      | 'CreatePlaybook'
-      | 'DisablePlaybook'
-      | 'ManuallyReviewEntity'
-      | 'EditPlaybook'
-      | 'DeactivateOrgRole';
-    principal: 'footprint' | 'firm_employee';
+      | 'create_user'
+      | 'update_user_data'
+      | 'delete_user_data'
+      | 'decrypt_user_data'
+      | 'delete_user'
+      | 'create_user_annotation'
+      | 'complete_user_check_liveness'
+      | 'complete_user_check_watchlist'
+      | 'request_user_data'
+      | 'start_user_verification'
+      | 'complete_user_verification'
+      | 'collect_user_document'
+      | 'create_org_api_key'
+      | 'decrypt_org_api_key'
+      | 'update_org_api_key'
+      | 'invite_org_member'
+      | 'update_org_member'
+      | 'login_org_member'
+      | 'remove_org_member'
+      | 'create_org'
+      | 'update_org_settings'
+      | 'create_org_role'
+      | 'update_org_role'
+      | 'create_list_entry'
+      | 'delete_list_entry'
+      | 'create_playbook'
+      | 'disable_playbook'
+      | 'manually_review_entity'
+      | 'edit_playbook'
+      | 'deactivate_org_role';
+    principal:
+      | {
+          id: string;
+          kind: 'user';
+        }
+      | {
+          kind: 'footprint';
+        }
+      | {
+          kind: 'firm_employee';
+        }
+      | {
+          email: string;
+          first_name?: string;
+          kind: 'organization';
+          last_name?: string;
+          member: string;
+        }
+      | {
+          id: string;
+          kind: 'api_key';
+          name: string;
+        };
     tenantId: string;
     timestamp: string;
   }>;
@@ -3355,6 +6362,9 @@ export type Document = {
    */
   curpCompletedVersion?: number;
   documentScore?: number;
+  /**
+   * The set of values we can use for identity_document.document_type
+   */
   kind:
     | 'id_card'
     | 'drivers_license'
@@ -3678,7 +6688,10 @@ export type Document = {
     version: number;
   }>;
 };
-export type kind8 =
+/**
+ * The set of values we can use for identity_document.document_type
+ */
+export type kind11 =
   | 'id_card'
   | 'drivers_license'
   | 'passport'
@@ -3989,6 +7002,9 @@ export type Dupes = {
     >;
     fpId: string;
     startTimestamp: string;
+    /**
+     * Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus
+     */
     status: 'pass' | 'fail' | 'incomplete' | 'in_progress' | 'pending' | 'none';
   }>;
 };
@@ -4782,6 +7798,9 @@ export type Entity = {
   requiresManualReview: boolean;
   sandboxId?: string;
   startTimestamp: string;
+  /**
+   * Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus
+   */
   status: 'pass' | 'fail' | 'incomplete' | 'in_progress' | 'pending' | 'none';
   /**
    * Only serialized for firm employess
@@ -5178,14 +8197,704 @@ export type Entity = {
       userAgent?: string;
     };
     playbookId: string;
+    /**
+     * The status of the onboarding
+     */
     status: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
   }>;
 };
 export type label = 'active' | 'offboard_fraud' | 'offboard_other';
+/**
+ * Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus
+ */
 export type status3 = 'pass' | 'fail' | 'incomplete' | 'in_progress' | 'pending' | 'none';
-export type EntityActionResponse = string;
+export type EntityActionResponse = {
+  /**
+   * The time at which the token (and link) expire
+   */
+  expiresAt: string;
+  kind: 'trigger';
+  /**
+   * A Footprint link embedding the `token` that can be sent to this user to allow them to
+   * complete the flow. This is useful to send in an automated message to the end user.
+   */
+  link: string;
+  /**
+   * A short-lived token that can be passed into the Verify SDK to allow the user to complete the
+   * flow. This is useful when you'd like to open a native interface inside your app for the user
+   * to complete the flow.
+   */
+  token: string;
+};
+export type kind12 = 'trigger';
 export type EntityActionsRequest = {
-  actions: Array<'clear_review'>;
+  actions: Array<
+    | {
+        fp_bid?: string;
+        kind: 'trigger';
+        /**
+         * Optional note with more context on what we're asking the user to do
+         */
+        note?: string;
+        trigger:
+          | {
+              /**
+               * Allow onboarding onto the specific playbook.
+               * This allows editing data, re-verifies data, and then re-triggers decision engine
+               */
+              data: {
+                playbook_id: string;
+                recollect_attributes: Array<
+                  | 'name'
+                  | 'dob'
+                  | 'ssn4'
+                  | 'ssn9'
+                  | 'full_address'
+                  | 'email'
+                  | 'phone_number'
+                  | 'nationality'
+                  | 'us_legal_status'
+                  | {
+                      document: string;
+                    }
+                  | 'business_name'
+                  | 'business_tin'
+                  | 'business_address'
+                  | 'business_phone_number'
+                  | 'business_website'
+                  | 'business_beneficial_owners'
+                  | 'business_kyced_beneficial_owners'
+                  | 'business_corporation_type'
+                  | 'investor_profile'
+                  | 'card'
+                  | 'us_tax_id'
+                  | 'bank'
+                >;
+                /**
+                 * When true, reuses existing BOs' KYC results on the same playbook.
+                 * When false, requires the existing BOs to re-complete KYC.
+                 * Can only be true for KYB playbooks
+                 */
+                reuse_existing_bo_kyc: boolean;
+              };
+              /**
+               * Allow onboarding onto the specific playbook.
+               * This allows editing data, re-verifies data, and then re-triggers decision engine
+               */
+              kind: 'onboard';
+            }
+          | {
+              /**
+               * Upload a new document and re-run the decision engine
+               */
+              data: {
+                business_configs: Array<
+                  | {
+                      data: {
+                        collect_selfie: boolean;
+                        document_types_and_countries?: {
+                          country_specific: {
+                            [key: string]: unknown;
+                          };
+                          global: Array<
+                            | 'id_card'
+                            | 'drivers_license'
+                            | 'passport'
+                            | 'passport_card'
+                            | 'permit'
+                            | 'visa'
+                            | 'residence_document'
+                            | 'voter_identification'
+                          >;
+                        };
+                      };
+                      kind: 'identity';
+                    }
+                  | {
+                      data: {
+                        requires_human_review: boolean;
+                      };
+                      kind: 'proof_of_ssn';
+                    }
+                  | {
+                      data: {
+                        requires_human_review: boolean;
+                      };
+                      kind: 'proof_of_address';
+                    }
+                  | {
+                      data: {
+                        /**
+                         * Optional human-readable description of the document that will be displayed to the user
+                         */
+                        description?: string;
+                        /**
+                         * Custom document identifier under which the document will be vaulted
+                         */
+                        identifier:
+                          | 'id.first_name'
+                          | 'id.middle_name'
+                          | 'id.last_name'
+                          | 'id.dob'
+                          | 'id.ssn4'
+                          | 'id.ssn9'
+                          | 'id.address_line1'
+                          | 'id.address_line2'
+                          | 'id.city'
+                          | 'id.state'
+                          | 'id.zip'
+                          | 'id.country'
+                          | 'id.email'
+                          | 'id.phone_number'
+                          | 'id.us_legal_status'
+                          | 'id.visa_kind'
+                          | 'id.visa_expiration_date'
+                          | 'id.nationality'
+                          | 'id.citizenships'
+                          | 'id.drivers_license_number'
+                          | 'id.drivers_license_state'
+                          | 'id.itin'
+                          | 'id.us_tax_id'
+                          | 'business.name'
+                          | 'business.dba'
+                          | 'business.website'
+                          | 'business.phone_number'
+                          | 'business.tin'
+                          | 'business.address_line1'
+                          | 'business.address_line2'
+                          | 'business.city'
+                          | 'business.state'
+                          | 'business.zip'
+                          | 'business.country'
+                          | 'business.corporation_type'
+                          | 'business.formation_state'
+                          | 'business.formation_date'
+                          | 'custom.*'
+                          | 'investor_profile.employment_status'
+                          | 'investor_profile.occupation'
+                          | 'investor_profile.employer'
+                          | 'investor_profile.annual_income'
+                          | 'investor_profile.net_worth'
+                          | 'investor_profile.investment_goals'
+                          | 'investor_profile.risk_tolerance'
+                          | 'investor_profile.declarations'
+                          | 'investor_profile.brokerage_firm_employer'
+                          | 'investor_profile.senior_executive_symbols'
+                          | 'investor_profile.family_member_names'
+                          | 'investor_profile.political_organization'
+                          | 'investor_profile.funding_sources'
+                          | 'document.id_card.front.image'
+                          | 'document.id_card.front.mime_type'
+                          | 'document.id_card.back.image'
+                          | 'document.id_card.back.mime_type'
+                          | 'document.id_card.selfie.image'
+                          | 'document.id_card.selfie.mime_type'
+                          | 'document.id_card.full_name'
+                          | 'document.id_card.dob'
+                          | 'document.id_card.gender'
+                          | 'document.id_card.full_address'
+                          | 'document.id_card.document_number'
+                          | 'document.id_card.expires_at'
+                          | 'document.id_card.issued_at'
+                          | 'document.id_card.issuing_state'
+                          | 'document.id_card.issuing_country'
+                          | 'document.id_card.ref_number'
+                          | 'document.id_card.nationality'
+                          | 'document.id_card.curp'
+                          | 'document.id_card.clave_de_elector'
+                          | 'document.id_card.classified_document_type'
+                          | 'document.id_card.curp_validation_response'
+                          | 'document.drivers_license.front.image'
+                          | 'document.drivers_license.front.mime_type'
+                          | 'document.drivers_license.back.image'
+                          | 'document.drivers_license.back.mime_type'
+                          | 'document.drivers_license.selfie.image'
+                          | 'document.drivers_license.selfie.mime_type'
+                          | 'document.drivers_license.full_name'
+                          | 'document.drivers_license.dob'
+                          | 'document.drivers_license.gender'
+                          | 'document.drivers_license.full_address'
+                          | 'document.drivers_license.document_number'
+                          | 'document.drivers_license.expires_at'
+                          | 'document.drivers_license.issued_at'
+                          | 'document.drivers_license.issuing_state'
+                          | 'document.drivers_license.issuing_country'
+                          | 'document.drivers_license.ref_number'
+                          | 'document.drivers_license.nationality'
+                          | 'document.drivers_license.curp'
+                          | 'document.drivers_license.clave_de_elector'
+                          | 'document.drivers_license.classified_document_type'
+                          | 'document.drivers_license.curp_validation_response'
+                          | 'document.passport.front.image'
+                          | 'document.passport.front.mime_type'
+                          | 'document.passport.back.image'
+                          | 'document.passport.back.mime_type'
+                          | 'document.passport.selfie.image'
+                          | 'document.passport.selfie.mime_type'
+                          | 'document.passport.full_name'
+                          | 'document.passport.dob'
+                          | 'document.passport.gender'
+                          | 'document.passport.full_address'
+                          | 'document.passport.document_number'
+                          | 'document.passport.expires_at'
+                          | 'document.passport.issued_at'
+                          | 'document.passport.issuing_state'
+                          | 'document.passport.issuing_country'
+                          | 'document.passport.ref_number'
+                          | 'document.passport.nationality'
+                          | 'document.passport.curp'
+                          | 'document.passport.clave_de_elector'
+                          | 'document.passport.classified_document_type'
+                          | 'document.passport.curp_validation_response'
+                          | 'document.passport_card.front.image'
+                          | 'document.passport_card.front.mime_type'
+                          | 'document.passport_card.back.image'
+                          | 'document.passport_card.back.mime_type'
+                          | 'document.passport_card.selfie.image'
+                          | 'document.passport_card.selfie.mime_type'
+                          | 'document.passport_card.full_name'
+                          | 'document.passport_card.dob'
+                          | 'document.passport_card.gender'
+                          | 'document.passport_card.full_address'
+                          | 'document.passport_card.document_number'
+                          | 'document.passport_card.expires_at'
+                          | 'document.passport_card.issued_at'
+                          | 'document.passport_card.issuing_state'
+                          | 'document.passport_card.issuing_country'
+                          | 'document.passport_card.ref_number'
+                          | 'document.passport_card.nationality'
+                          | 'document.passport_card.curp'
+                          | 'document.passport_card.clave_de_elector'
+                          | 'document.passport_card.classified_document_type'
+                          | 'document.passport_card.curp_validation_response'
+                          | 'document.permit.front.image'
+                          | 'document.permit.front.mime_type'
+                          | 'document.permit.back.image'
+                          | 'document.permit.back.mime_type'
+                          | 'document.permit.selfie.image'
+                          | 'document.permit.selfie.mime_type'
+                          | 'document.permit.full_name'
+                          | 'document.permit.dob'
+                          | 'document.permit.gender'
+                          | 'document.permit.full_address'
+                          | 'document.permit.document_number'
+                          | 'document.permit.expires_at'
+                          | 'document.permit.issued_at'
+                          | 'document.permit.issuing_state'
+                          | 'document.permit.issuing_country'
+                          | 'document.permit.ref_number'
+                          | 'document.permit.nationality'
+                          | 'document.permit.curp'
+                          | 'document.permit.clave_de_elector'
+                          | 'document.permit.classified_document_type'
+                          | 'document.permit.curp_validation_response'
+                          | 'document.visa.front.image'
+                          | 'document.visa.front.mime_type'
+                          | 'document.visa.back.image'
+                          | 'document.visa.back.mime_type'
+                          | 'document.visa.selfie.image'
+                          | 'document.visa.selfie.mime_type'
+                          | 'document.visa.full_name'
+                          | 'document.visa.dob'
+                          | 'document.visa.gender'
+                          | 'document.visa.full_address'
+                          | 'document.visa.document_number'
+                          | 'document.visa.expires_at'
+                          | 'document.visa.issued_at'
+                          | 'document.visa.issuing_state'
+                          | 'document.visa.issuing_country'
+                          | 'document.visa.ref_number'
+                          | 'document.visa.nationality'
+                          | 'document.visa.curp'
+                          | 'document.visa.clave_de_elector'
+                          | 'document.visa.classified_document_type'
+                          | 'document.visa.curp_validation_response'
+                          | 'document.residence_document.front.image'
+                          | 'document.residence_document.front.mime_type'
+                          | 'document.residence_document.back.image'
+                          | 'document.residence_document.back.mime_type'
+                          | 'document.residence_document.selfie.image'
+                          | 'document.residence_document.selfie.mime_type'
+                          | 'document.residence_document.full_name'
+                          | 'document.residence_document.dob'
+                          | 'document.residence_document.gender'
+                          | 'document.residence_document.full_address'
+                          | 'document.residence_document.document_number'
+                          | 'document.residence_document.expires_at'
+                          | 'document.residence_document.issued_at'
+                          | 'document.residence_document.issuing_state'
+                          | 'document.residence_document.issuing_country'
+                          | 'document.residence_document.ref_number'
+                          | 'document.residence_document.nationality'
+                          | 'document.residence_document.curp'
+                          | 'document.residence_document.clave_de_elector'
+                          | 'document.residence_document.classified_document_type'
+                          | 'document.residence_document.curp_validation_response'
+                          | 'document.voter_identification.front.image'
+                          | 'document.voter_identification.front.mime_type'
+                          | 'document.voter_identification.back.image'
+                          | 'document.voter_identification.back.mime_type'
+                          | 'document.voter_identification.selfie.image'
+                          | 'document.voter_identification.selfie.mime_type'
+                          | 'document.voter_identification.full_name'
+                          | 'document.voter_identification.dob'
+                          | 'document.voter_identification.gender'
+                          | 'document.voter_identification.full_address'
+                          | 'document.voter_identification.document_number'
+                          | 'document.voter_identification.expires_at'
+                          | 'document.voter_identification.issued_at'
+                          | 'document.voter_identification.issuing_state'
+                          | 'document.voter_identification.issuing_country'
+                          | 'document.voter_identification.ref_number'
+                          | 'document.voter_identification.nationality'
+                          | 'document.voter_identification.curp'
+                          | 'document.voter_identification.clave_de_elector'
+                          | 'document.voter_identification.classified_document_type'
+                          | 'document.voter_identification.curp_validation_response'
+                          | 'document.finra_compliance_letter'
+                          | 'document.proof_of_address.image'
+                          | 'document.ssn_card.image'
+                          | 'document.custom.*'
+                          | 'card.*.number'
+                          | 'card.*.expiration'
+                          | 'card.*.cvc'
+                          | 'card.*.name'
+                          | 'card.*.billing_address.zip'
+                          | 'card.*.billing_address.country'
+                          | 'card.*.expiration_month'
+                          | 'card.*.expiration_year'
+                          | 'card.*.number_last4'
+                          | 'card.*.issuer'
+                          | 'card.*.fingerprint'
+                          | 'bank.*.name'
+                          | 'bank.*.ach_routing_number'
+                          | 'bank.*.ach_account_number'
+                          | 'bank.*.ach_account_id'
+                          | 'bank.*.account_type'
+                          | 'bank.*.fingerprint';
+                        /**
+                         * The human-readable name of the document to display to the user
+                         */
+                        name: string;
+                        requires_human_review: boolean;
+                        upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                      };
+                      kind: 'custom';
+                    }
+                >;
+                configs: Array<
+                  | {
+                      data: {
+                        collect_selfie: boolean;
+                        document_types_and_countries?: {
+                          country_specific: {
+                            [key: string]: unknown;
+                          };
+                          global: Array<
+                            | 'id_card'
+                            | 'drivers_license'
+                            | 'passport'
+                            | 'passport_card'
+                            | 'permit'
+                            | 'visa'
+                            | 'residence_document'
+                            | 'voter_identification'
+                          >;
+                        };
+                      };
+                      kind: 'identity';
+                    }
+                  | {
+                      data: {
+                        requires_human_review: boolean;
+                      };
+                      kind: 'proof_of_ssn';
+                    }
+                  | {
+                      data: {
+                        requires_human_review: boolean;
+                      };
+                      kind: 'proof_of_address';
+                    }
+                  | {
+                      data: {
+                        /**
+                         * Optional human-readable description of the document that will be displayed to the user
+                         */
+                        description?: string;
+                        /**
+                         * Custom document identifier under which the document will be vaulted
+                         */
+                        identifier:
+                          | 'id.first_name'
+                          | 'id.middle_name'
+                          | 'id.last_name'
+                          | 'id.dob'
+                          | 'id.ssn4'
+                          | 'id.ssn9'
+                          | 'id.address_line1'
+                          | 'id.address_line2'
+                          | 'id.city'
+                          | 'id.state'
+                          | 'id.zip'
+                          | 'id.country'
+                          | 'id.email'
+                          | 'id.phone_number'
+                          | 'id.us_legal_status'
+                          | 'id.visa_kind'
+                          | 'id.visa_expiration_date'
+                          | 'id.nationality'
+                          | 'id.citizenships'
+                          | 'id.drivers_license_number'
+                          | 'id.drivers_license_state'
+                          | 'id.itin'
+                          | 'id.us_tax_id'
+                          | 'business.name'
+                          | 'business.dba'
+                          | 'business.website'
+                          | 'business.phone_number'
+                          | 'business.tin'
+                          | 'business.address_line1'
+                          | 'business.address_line2'
+                          | 'business.city'
+                          | 'business.state'
+                          | 'business.zip'
+                          | 'business.country'
+                          | 'business.corporation_type'
+                          | 'business.formation_state'
+                          | 'business.formation_date'
+                          | 'custom.*'
+                          | 'investor_profile.employment_status'
+                          | 'investor_profile.occupation'
+                          | 'investor_profile.employer'
+                          | 'investor_profile.annual_income'
+                          | 'investor_profile.net_worth'
+                          | 'investor_profile.investment_goals'
+                          | 'investor_profile.risk_tolerance'
+                          | 'investor_profile.declarations'
+                          | 'investor_profile.brokerage_firm_employer'
+                          | 'investor_profile.senior_executive_symbols'
+                          | 'investor_profile.family_member_names'
+                          | 'investor_profile.political_organization'
+                          | 'investor_profile.funding_sources'
+                          | 'document.id_card.front.image'
+                          | 'document.id_card.front.mime_type'
+                          | 'document.id_card.back.image'
+                          | 'document.id_card.back.mime_type'
+                          | 'document.id_card.selfie.image'
+                          | 'document.id_card.selfie.mime_type'
+                          | 'document.id_card.full_name'
+                          | 'document.id_card.dob'
+                          | 'document.id_card.gender'
+                          | 'document.id_card.full_address'
+                          | 'document.id_card.document_number'
+                          | 'document.id_card.expires_at'
+                          | 'document.id_card.issued_at'
+                          | 'document.id_card.issuing_state'
+                          | 'document.id_card.issuing_country'
+                          | 'document.id_card.ref_number'
+                          | 'document.id_card.nationality'
+                          | 'document.id_card.curp'
+                          | 'document.id_card.clave_de_elector'
+                          | 'document.id_card.classified_document_type'
+                          | 'document.id_card.curp_validation_response'
+                          | 'document.drivers_license.front.image'
+                          | 'document.drivers_license.front.mime_type'
+                          | 'document.drivers_license.back.image'
+                          | 'document.drivers_license.back.mime_type'
+                          | 'document.drivers_license.selfie.image'
+                          | 'document.drivers_license.selfie.mime_type'
+                          | 'document.drivers_license.full_name'
+                          | 'document.drivers_license.dob'
+                          | 'document.drivers_license.gender'
+                          | 'document.drivers_license.full_address'
+                          | 'document.drivers_license.document_number'
+                          | 'document.drivers_license.expires_at'
+                          | 'document.drivers_license.issued_at'
+                          | 'document.drivers_license.issuing_state'
+                          | 'document.drivers_license.issuing_country'
+                          | 'document.drivers_license.ref_number'
+                          | 'document.drivers_license.nationality'
+                          | 'document.drivers_license.curp'
+                          | 'document.drivers_license.clave_de_elector'
+                          | 'document.drivers_license.classified_document_type'
+                          | 'document.drivers_license.curp_validation_response'
+                          | 'document.passport.front.image'
+                          | 'document.passport.front.mime_type'
+                          | 'document.passport.back.image'
+                          | 'document.passport.back.mime_type'
+                          | 'document.passport.selfie.image'
+                          | 'document.passport.selfie.mime_type'
+                          | 'document.passport.full_name'
+                          | 'document.passport.dob'
+                          | 'document.passport.gender'
+                          | 'document.passport.full_address'
+                          | 'document.passport.document_number'
+                          | 'document.passport.expires_at'
+                          | 'document.passport.issued_at'
+                          | 'document.passport.issuing_state'
+                          | 'document.passport.issuing_country'
+                          | 'document.passport.ref_number'
+                          | 'document.passport.nationality'
+                          | 'document.passport.curp'
+                          | 'document.passport.clave_de_elector'
+                          | 'document.passport.classified_document_type'
+                          | 'document.passport.curp_validation_response'
+                          | 'document.passport_card.front.image'
+                          | 'document.passport_card.front.mime_type'
+                          | 'document.passport_card.back.image'
+                          | 'document.passport_card.back.mime_type'
+                          | 'document.passport_card.selfie.image'
+                          | 'document.passport_card.selfie.mime_type'
+                          | 'document.passport_card.full_name'
+                          | 'document.passport_card.dob'
+                          | 'document.passport_card.gender'
+                          | 'document.passport_card.full_address'
+                          | 'document.passport_card.document_number'
+                          | 'document.passport_card.expires_at'
+                          | 'document.passport_card.issued_at'
+                          | 'document.passport_card.issuing_state'
+                          | 'document.passport_card.issuing_country'
+                          | 'document.passport_card.ref_number'
+                          | 'document.passport_card.nationality'
+                          | 'document.passport_card.curp'
+                          | 'document.passport_card.clave_de_elector'
+                          | 'document.passport_card.classified_document_type'
+                          | 'document.passport_card.curp_validation_response'
+                          | 'document.permit.front.image'
+                          | 'document.permit.front.mime_type'
+                          | 'document.permit.back.image'
+                          | 'document.permit.back.mime_type'
+                          | 'document.permit.selfie.image'
+                          | 'document.permit.selfie.mime_type'
+                          | 'document.permit.full_name'
+                          | 'document.permit.dob'
+                          | 'document.permit.gender'
+                          | 'document.permit.full_address'
+                          | 'document.permit.document_number'
+                          | 'document.permit.expires_at'
+                          | 'document.permit.issued_at'
+                          | 'document.permit.issuing_state'
+                          | 'document.permit.issuing_country'
+                          | 'document.permit.ref_number'
+                          | 'document.permit.nationality'
+                          | 'document.permit.curp'
+                          | 'document.permit.clave_de_elector'
+                          | 'document.permit.classified_document_type'
+                          | 'document.permit.curp_validation_response'
+                          | 'document.visa.front.image'
+                          | 'document.visa.front.mime_type'
+                          | 'document.visa.back.image'
+                          | 'document.visa.back.mime_type'
+                          | 'document.visa.selfie.image'
+                          | 'document.visa.selfie.mime_type'
+                          | 'document.visa.full_name'
+                          | 'document.visa.dob'
+                          | 'document.visa.gender'
+                          | 'document.visa.full_address'
+                          | 'document.visa.document_number'
+                          | 'document.visa.expires_at'
+                          | 'document.visa.issued_at'
+                          | 'document.visa.issuing_state'
+                          | 'document.visa.issuing_country'
+                          | 'document.visa.ref_number'
+                          | 'document.visa.nationality'
+                          | 'document.visa.curp'
+                          | 'document.visa.clave_de_elector'
+                          | 'document.visa.classified_document_type'
+                          | 'document.visa.curp_validation_response'
+                          | 'document.residence_document.front.image'
+                          | 'document.residence_document.front.mime_type'
+                          | 'document.residence_document.back.image'
+                          | 'document.residence_document.back.mime_type'
+                          | 'document.residence_document.selfie.image'
+                          | 'document.residence_document.selfie.mime_type'
+                          | 'document.residence_document.full_name'
+                          | 'document.residence_document.dob'
+                          | 'document.residence_document.gender'
+                          | 'document.residence_document.full_address'
+                          | 'document.residence_document.document_number'
+                          | 'document.residence_document.expires_at'
+                          | 'document.residence_document.issued_at'
+                          | 'document.residence_document.issuing_state'
+                          | 'document.residence_document.issuing_country'
+                          | 'document.residence_document.ref_number'
+                          | 'document.residence_document.nationality'
+                          | 'document.residence_document.curp'
+                          | 'document.residence_document.clave_de_elector'
+                          | 'document.residence_document.classified_document_type'
+                          | 'document.residence_document.curp_validation_response'
+                          | 'document.voter_identification.front.image'
+                          | 'document.voter_identification.front.mime_type'
+                          | 'document.voter_identification.back.image'
+                          | 'document.voter_identification.back.mime_type'
+                          | 'document.voter_identification.selfie.image'
+                          | 'document.voter_identification.selfie.mime_type'
+                          | 'document.voter_identification.full_name'
+                          | 'document.voter_identification.dob'
+                          | 'document.voter_identification.gender'
+                          | 'document.voter_identification.full_address'
+                          | 'document.voter_identification.document_number'
+                          | 'document.voter_identification.expires_at'
+                          | 'document.voter_identification.issued_at'
+                          | 'document.voter_identification.issuing_state'
+                          | 'document.voter_identification.issuing_country'
+                          | 'document.voter_identification.ref_number'
+                          | 'document.voter_identification.nationality'
+                          | 'document.voter_identification.curp'
+                          | 'document.voter_identification.clave_de_elector'
+                          | 'document.voter_identification.classified_document_type'
+                          | 'document.voter_identification.curp_validation_response'
+                          | 'document.finra_compliance_letter'
+                          | 'document.proof_of_address.image'
+                          | 'document.ssn_card.image'
+                          | 'document.custom.*'
+                          | 'card.*.number'
+                          | 'card.*.expiration'
+                          | 'card.*.cvc'
+                          | 'card.*.name'
+                          | 'card.*.billing_address.zip'
+                          | 'card.*.billing_address.country'
+                          | 'card.*.expiration_month'
+                          | 'card.*.expiration_year'
+                          | 'card.*.number_last4'
+                          | 'card.*.issuer'
+                          | 'card.*.fingerprint'
+                          | 'bank.*.name'
+                          | 'bank.*.ach_routing_number'
+                          | 'bank.*.ach_account_number'
+                          | 'bank.*.ach_account_id'
+                          | 'bank.*.account_type'
+                          | 'bank.*.fingerprint';
+                        /**
+                         * The human-readable name of the document to display to the user
+                         */
+                        name: string;
+                        requires_human_review: boolean;
+                        upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                      };
+                      kind: 'custom';
+                    }
+                >;
+              };
+              /**
+               * Upload a new document and re-run the decision engine
+               */
+              kind: 'document';
+            };
+      }
+    | {
+        kind: 'clear_review';
+      }
+    | {
+        annotation: {
+          is_pinned: boolean;
+          note: string;
+        };
+        kind: 'manual_decision';
+        status: 'fail' | 'pass';
+      }
+  >;
 };
 export type EntityAttribute = {
   dataKind: 'vault_data' | 'document_data';
@@ -5685,7 +9394,7 @@ export type identifier =
   | 'bank.*.ach_account_id'
   | 'bank.*.account_type'
   | 'bank.*.fingerprint';
-export type source2 =
+export type source =
   | 'hosted'
   | 'components_sdk'
   | 'bootstrap'
@@ -5698,12 +9407,2063 @@ export type EvaluateRuleRequest = {
   add?: Array<{
     isShadow: boolean;
     name?: string;
-    ruleAction: string;
-    ruleExpression: Array<string>;
+    ruleAction:
+      | 'pass_with_manual_review'
+      | 'manual_review'
+      | 'fail'
+      | 'step_up.identity'
+      | 'step_up.proof_of_address'
+      | 'step_up.identity_proof_of_ssn'
+      | 'step_up.identity_proof_of_ssn_proof_of_address'
+      | 'step_up.custom'
+      | (
+          | {
+              /**
+               * ORDERING MATTERS!!!
+               */
+              config: {
+                [key: string]: unknown;
+              };
+              /**
+               * ORDERING MATTERS!!!
+               */
+              kind: 'pass_with_manual_review';
+            }
+          | {
+              config: {
+                [key: string]: unknown;
+              };
+              kind: 'manual_review';
+            }
+          | {
+              config: Array<
+                | {
+                    data: {
+                      collect_selfie: boolean;
+                      document_types_and_countries?: {
+                        country_specific: {
+                          [key: string]: unknown;
+                        };
+                        global: Array<
+                          | 'id_card'
+                          | 'drivers_license'
+                          | 'passport'
+                          | 'passport_card'
+                          | 'permit'
+                          | 'visa'
+                          | 'residence_document'
+                          | 'voter_identification'
+                        >;
+                      };
+                    };
+                    kind: 'identity';
+                  }
+                | {
+                    data: {
+                      requires_human_review: boolean;
+                    };
+                    kind: 'proof_of_ssn';
+                  }
+                | {
+                    data: {
+                      requires_human_review: boolean;
+                    };
+                    kind: 'proof_of_address';
+                  }
+                | {
+                    data: {
+                      /**
+                       * Optional human-readable description of the document that will be displayed to the user
+                       */
+                      description?: string;
+                      /**
+                       * Custom document identifier under which the document will be vaulted
+                       */
+                      identifier:
+                        | 'id.first_name'
+                        | 'id.middle_name'
+                        | 'id.last_name'
+                        | 'id.dob'
+                        | 'id.ssn4'
+                        | 'id.ssn9'
+                        | 'id.address_line1'
+                        | 'id.address_line2'
+                        | 'id.city'
+                        | 'id.state'
+                        | 'id.zip'
+                        | 'id.country'
+                        | 'id.email'
+                        | 'id.phone_number'
+                        | 'id.us_legal_status'
+                        | 'id.visa_kind'
+                        | 'id.visa_expiration_date'
+                        | 'id.nationality'
+                        | 'id.citizenships'
+                        | 'id.drivers_license_number'
+                        | 'id.drivers_license_state'
+                        | 'id.itin'
+                        | 'id.us_tax_id'
+                        | 'business.name'
+                        | 'business.dba'
+                        | 'business.website'
+                        | 'business.phone_number'
+                        | 'business.tin'
+                        | 'business.address_line1'
+                        | 'business.address_line2'
+                        | 'business.city'
+                        | 'business.state'
+                        | 'business.zip'
+                        | 'business.country'
+                        | 'business.corporation_type'
+                        | 'business.formation_state'
+                        | 'business.formation_date'
+                        | 'custom.*'
+                        | 'investor_profile.employment_status'
+                        | 'investor_profile.occupation'
+                        | 'investor_profile.employer'
+                        | 'investor_profile.annual_income'
+                        | 'investor_profile.net_worth'
+                        | 'investor_profile.investment_goals'
+                        | 'investor_profile.risk_tolerance'
+                        | 'investor_profile.declarations'
+                        | 'investor_profile.brokerage_firm_employer'
+                        | 'investor_profile.senior_executive_symbols'
+                        | 'investor_profile.family_member_names'
+                        | 'investor_profile.political_organization'
+                        | 'investor_profile.funding_sources'
+                        | 'document.id_card.front.image'
+                        | 'document.id_card.front.mime_type'
+                        | 'document.id_card.back.image'
+                        | 'document.id_card.back.mime_type'
+                        | 'document.id_card.selfie.image'
+                        | 'document.id_card.selfie.mime_type'
+                        | 'document.id_card.full_name'
+                        | 'document.id_card.dob'
+                        | 'document.id_card.gender'
+                        | 'document.id_card.full_address'
+                        | 'document.id_card.document_number'
+                        | 'document.id_card.expires_at'
+                        | 'document.id_card.issued_at'
+                        | 'document.id_card.issuing_state'
+                        | 'document.id_card.issuing_country'
+                        | 'document.id_card.ref_number'
+                        | 'document.id_card.nationality'
+                        | 'document.id_card.curp'
+                        | 'document.id_card.clave_de_elector'
+                        | 'document.id_card.classified_document_type'
+                        | 'document.id_card.curp_validation_response'
+                        | 'document.drivers_license.front.image'
+                        | 'document.drivers_license.front.mime_type'
+                        | 'document.drivers_license.back.image'
+                        | 'document.drivers_license.back.mime_type'
+                        | 'document.drivers_license.selfie.image'
+                        | 'document.drivers_license.selfie.mime_type'
+                        | 'document.drivers_license.full_name'
+                        | 'document.drivers_license.dob'
+                        | 'document.drivers_license.gender'
+                        | 'document.drivers_license.full_address'
+                        | 'document.drivers_license.document_number'
+                        | 'document.drivers_license.expires_at'
+                        | 'document.drivers_license.issued_at'
+                        | 'document.drivers_license.issuing_state'
+                        | 'document.drivers_license.issuing_country'
+                        | 'document.drivers_license.ref_number'
+                        | 'document.drivers_license.nationality'
+                        | 'document.drivers_license.curp'
+                        | 'document.drivers_license.clave_de_elector'
+                        | 'document.drivers_license.classified_document_type'
+                        | 'document.drivers_license.curp_validation_response'
+                        | 'document.passport.front.image'
+                        | 'document.passport.front.mime_type'
+                        | 'document.passport.back.image'
+                        | 'document.passport.back.mime_type'
+                        | 'document.passport.selfie.image'
+                        | 'document.passport.selfie.mime_type'
+                        | 'document.passport.full_name'
+                        | 'document.passport.dob'
+                        | 'document.passport.gender'
+                        | 'document.passport.full_address'
+                        | 'document.passport.document_number'
+                        | 'document.passport.expires_at'
+                        | 'document.passport.issued_at'
+                        | 'document.passport.issuing_state'
+                        | 'document.passport.issuing_country'
+                        | 'document.passport.ref_number'
+                        | 'document.passport.nationality'
+                        | 'document.passport.curp'
+                        | 'document.passport.clave_de_elector'
+                        | 'document.passport.classified_document_type'
+                        | 'document.passport.curp_validation_response'
+                        | 'document.passport_card.front.image'
+                        | 'document.passport_card.front.mime_type'
+                        | 'document.passport_card.back.image'
+                        | 'document.passport_card.back.mime_type'
+                        | 'document.passport_card.selfie.image'
+                        | 'document.passport_card.selfie.mime_type'
+                        | 'document.passport_card.full_name'
+                        | 'document.passport_card.dob'
+                        | 'document.passport_card.gender'
+                        | 'document.passport_card.full_address'
+                        | 'document.passport_card.document_number'
+                        | 'document.passport_card.expires_at'
+                        | 'document.passport_card.issued_at'
+                        | 'document.passport_card.issuing_state'
+                        | 'document.passport_card.issuing_country'
+                        | 'document.passport_card.ref_number'
+                        | 'document.passport_card.nationality'
+                        | 'document.passport_card.curp'
+                        | 'document.passport_card.clave_de_elector'
+                        | 'document.passport_card.classified_document_type'
+                        | 'document.passport_card.curp_validation_response'
+                        | 'document.permit.front.image'
+                        | 'document.permit.front.mime_type'
+                        | 'document.permit.back.image'
+                        | 'document.permit.back.mime_type'
+                        | 'document.permit.selfie.image'
+                        | 'document.permit.selfie.mime_type'
+                        | 'document.permit.full_name'
+                        | 'document.permit.dob'
+                        | 'document.permit.gender'
+                        | 'document.permit.full_address'
+                        | 'document.permit.document_number'
+                        | 'document.permit.expires_at'
+                        | 'document.permit.issued_at'
+                        | 'document.permit.issuing_state'
+                        | 'document.permit.issuing_country'
+                        | 'document.permit.ref_number'
+                        | 'document.permit.nationality'
+                        | 'document.permit.curp'
+                        | 'document.permit.clave_de_elector'
+                        | 'document.permit.classified_document_type'
+                        | 'document.permit.curp_validation_response'
+                        | 'document.visa.front.image'
+                        | 'document.visa.front.mime_type'
+                        | 'document.visa.back.image'
+                        | 'document.visa.back.mime_type'
+                        | 'document.visa.selfie.image'
+                        | 'document.visa.selfie.mime_type'
+                        | 'document.visa.full_name'
+                        | 'document.visa.dob'
+                        | 'document.visa.gender'
+                        | 'document.visa.full_address'
+                        | 'document.visa.document_number'
+                        | 'document.visa.expires_at'
+                        | 'document.visa.issued_at'
+                        | 'document.visa.issuing_state'
+                        | 'document.visa.issuing_country'
+                        | 'document.visa.ref_number'
+                        | 'document.visa.nationality'
+                        | 'document.visa.curp'
+                        | 'document.visa.clave_de_elector'
+                        | 'document.visa.classified_document_type'
+                        | 'document.visa.curp_validation_response'
+                        | 'document.residence_document.front.image'
+                        | 'document.residence_document.front.mime_type'
+                        | 'document.residence_document.back.image'
+                        | 'document.residence_document.back.mime_type'
+                        | 'document.residence_document.selfie.image'
+                        | 'document.residence_document.selfie.mime_type'
+                        | 'document.residence_document.full_name'
+                        | 'document.residence_document.dob'
+                        | 'document.residence_document.gender'
+                        | 'document.residence_document.full_address'
+                        | 'document.residence_document.document_number'
+                        | 'document.residence_document.expires_at'
+                        | 'document.residence_document.issued_at'
+                        | 'document.residence_document.issuing_state'
+                        | 'document.residence_document.issuing_country'
+                        | 'document.residence_document.ref_number'
+                        | 'document.residence_document.nationality'
+                        | 'document.residence_document.curp'
+                        | 'document.residence_document.clave_de_elector'
+                        | 'document.residence_document.classified_document_type'
+                        | 'document.residence_document.curp_validation_response'
+                        | 'document.voter_identification.front.image'
+                        | 'document.voter_identification.front.mime_type'
+                        | 'document.voter_identification.back.image'
+                        | 'document.voter_identification.back.mime_type'
+                        | 'document.voter_identification.selfie.image'
+                        | 'document.voter_identification.selfie.mime_type'
+                        | 'document.voter_identification.full_name'
+                        | 'document.voter_identification.dob'
+                        | 'document.voter_identification.gender'
+                        | 'document.voter_identification.full_address'
+                        | 'document.voter_identification.document_number'
+                        | 'document.voter_identification.expires_at'
+                        | 'document.voter_identification.issued_at'
+                        | 'document.voter_identification.issuing_state'
+                        | 'document.voter_identification.issuing_country'
+                        | 'document.voter_identification.ref_number'
+                        | 'document.voter_identification.nationality'
+                        | 'document.voter_identification.curp'
+                        | 'document.voter_identification.clave_de_elector'
+                        | 'document.voter_identification.classified_document_type'
+                        | 'document.voter_identification.curp_validation_response'
+                        | 'document.finra_compliance_letter'
+                        | 'document.proof_of_address.image'
+                        | 'document.ssn_card.image'
+                        | 'document.custom.*'
+                        | 'card.*.number'
+                        | 'card.*.expiration'
+                        | 'card.*.cvc'
+                        | 'card.*.name'
+                        | 'card.*.billing_address.zip'
+                        | 'card.*.billing_address.country'
+                        | 'card.*.expiration_month'
+                        | 'card.*.expiration_year'
+                        | 'card.*.number_last4'
+                        | 'card.*.issuer'
+                        | 'card.*.fingerprint'
+                        | 'bank.*.name'
+                        | 'bank.*.ach_routing_number'
+                        | 'bank.*.ach_account_number'
+                        | 'bank.*.ach_account_id'
+                        | 'bank.*.account_type'
+                        | 'bank.*.fingerprint';
+                      /**
+                       * The human-readable name of the document to display to the user
+                       */
+                      name: string;
+                      requires_human_review: boolean;
+                      upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                    };
+                    kind: 'custom';
+                  }
+              >;
+              kind: 'step_up';
+            }
+          | {
+              config: {
+                [key: string]: unknown;
+              };
+              kind: 'fail';
+            }
+        );
+    ruleExpression: Array<
+      | {
+          field:
+            | 'watchlist_hit_ofac'
+            | 'watchlist_hit_non_sdn'
+            | 'watchlist_hit_warning'
+            | 'watchlist_hit_pep'
+            | 'adverse_media_hit'
+            | 'id_not_located'
+            | 'id_flagged'
+            | 'credit_more_than3_inquiries_in_last30_days'
+            | 'credit_established_before_ssn_date'
+            | 'address_input_is_non_residential'
+            | 'address_located_is_non_residential'
+            | 'address_does_not_match'
+            | 'address_partially_matches'
+            | 'address_zip_code_does_not_match'
+            | 'address_city_does_not_match'
+            | 'address_city_matches'
+            | 'address_street_name_does_not_match'
+            | 'address_street_name_partially_matches'
+            | 'address_street_number_does_not_match'
+            | 'address_state_does_not_match'
+            | 'address_input_is_not_deliverable'
+            | 'address_input_is_po_box'
+            | 'address_input_is_correctional_facility'
+            | 'address_input_is_not_standard_campground'
+            | 'address_input_is_not_standard_college'
+            | 'address_input_is_not_standard_general_delivery'
+            | 'address_input_is_not_standard_hospital'
+            | 'address_input_is_not_standard_hotel'
+            | 'address_input_is_not_standard_mail_drop'
+            | 'address_input_is_not_standard_prison'
+            | 'address_input_is_not_standard_university'
+            | 'address_input_is_not_standard_uspo'
+            | 'address_input_not_on_file'
+            | 'address_located_is_po_box'
+            | 'address_located_is_not_standard_campground'
+            | 'address_located_is_not_standard_college'
+            | 'address_located_is_not_standard_general_delivery'
+            | 'address_located_is_not_standard_hospital'
+            | 'address_located_is_not_standard_hotel'
+            | 'address_located_is_not_standard_mail_drop'
+            | 'address_located_is_not_standard_prison'
+            | 'address_located_is_not_standard_university'
+            | 'address_located_is_not_standard_uspo'
+            | 'address_located_is_high_risk_address'
+            | 'address_risk_alert'
+            | 'address_alert_velocity'
+            | 'address_alert_stability'
+            | 'address_alert_longevity'
+            | 'address_alert_single_address_in_file'
+            | 'address_newer_record_found'
+            | 'dob_yob_does_not_match'
+            | 'dob_yob_does_not_match_within1_year'
+            | 'dob_mob_does_not_match'
+            | 'dob_day_does_not_match'
+            | 'dob_mob_not_available'
+            | 'dob_yob_not_available'
+            | 'dob_located_age_below_minimum'
+            | 'dob_located_age_above_maximum'
+            | 'dob_located_coppa_alert'
+            | 'dob_does_not_match'
+            | 'dob_partial_match'
+            | 'dob_not_on_file'
+            | 'dob_could_not_match'
+            | 'dob_input_age_less_than18'
+            | 'ssn_not_available'
+            | 'ssn_not_on_file'
+            | 'ssn_partially_matches'
+            | 'ssn_does_not_match'
+            | 'ssn_does_not_match_within1_digit'
+            | 'ssn_input_is_itin'
+            | 'ssn_located_is_itin'
+            | 'ssn_input_tied_to_multiple_names'
+            | 'ssn_input_is_invalid'
+            | 'ssn_located_is_invalid'
+            | 'ssn_not_provided'
+            | 'us_tax_id_is_itin'
+            | 'itin_is_expired'
+            | 'name_last_does_not_match'
+            | 'name_last_partially_matches'
+            | 'name_matches'
+            | 'name_does_not_match'
+            | 'name_partially_matches'
+            | 'ip_state_does_not_match'
+            | 'ip_input_invalid'
+            | 'ip_not_located'
+            | 'ip_location_not_available'
+            | 'ip_alert_high_risk_bot'
+            | 'ip_alert_high_risk_spam'
+            | 'ip_alert_high_risk_tor'
+            | 'ip_alert_high_risk_proxy'
+            | 'ip_proxy'
+            | 'ip_data_center'
+            | 'ip_alert_data_center'
+            | 'email_address_invalid'
+            | 'email_address_or_domain_does_not_exist'
+            | 'email_domain_recently_created'
+            | 'email_domain_private'
+            | 'email_domain_corporate'
+            | 'email_recently_verified'
+            | 'email_found_on_file'
+            | 'email_not_found_on_file'
+            | 'email_high_risk_country'
+            | 'email_high_risk_fraud'
+            | 'email_high_risk_tumbled'
+            | 'email_high_risk_disposable'
+            | 'email_high_risk_domain'
+            | 'sentilink_synthetic_identity_high_risk'
+            | 'sentilink_synthetic_identity_medium_risk'
+            | 'sentilink_synthetic_identity_low_risk'
+            | 'synthetic_identity_high_risk'
+            | 'synthetic_identity_medium_risk'
+            | 'synthetic_identity_low_risk'
+            | 'sentilink_identity_theft_high_risk'
+            | 'sentilink_identity_theft_medium_risk'
+            | 'sentilink_identity_theft_low_risk'
+            | 'phone_number_input_invalid'
+            | 'phone_number_located_is_voip'
+            | 'phone_number_is_voip'
+            | 'phone_number_mobile_account_type_postpaid'
+            | 'phone_number_mobile_account_type_prepaid'
+            | 'phone_number_mobile_account_type_unknown'
+            | 'phone_number_mobile_account_status_active'
+            | 'phone_number_mobile_account_status_deactivated'
+            | 'phone_number_mobile_account_status_suspended'
+            | 'phone_number_mobile_account_status_absent'
+            | 'phone_located_matches'
+            | 'phone_located_partially_matches'
+            | 'phone_located_does_not_match'
+            | 'phone_located_name_matches'
+            | 'phone_located_name_partially_matches'
+            | 'phone_located_name_does_not_match'
+            | 'phone_located_address_matches'
+            | 'phone_located_address_partially_matches'
+            | 'phone_located_address_does_not_match'
+            | 'phone_input_likely_belongs_to_another'
+            | 'phone_not_provided'
+            | 'multiple_records_found'
+            | 'subject_deceased'
+            | 'bureau_deleted_record'
+            | 'ssn_issued_prior_to_dob'
+            | 'ssn_issue_date_cannot_be_verified'
+            | 'ssn_located_issue_date_cannot_be_verified'
+            | 'ssn_potentially_belongs_to_another'
+            | 'ssn_likely_belongs_to_another'
+            | 'thin_file'
+            | 'input_phone_number_does_not_match_input_state'
+            | 'input_phone_number_does_not_match_located_state_history'
+            | 'input_phone_number_does_not_match_ip_state'
+            | 'drivers_license_number_different_number_found'
+            | 'drivers_license_number_not_on_record'
+            | 'drivers_license_number_not_valid'
+            | 'drivers_license_number_is_valid'
+            | 'document_upload_failed'
+            | 'document_not_verified'
+            | 'document_verified'
+            | 'document_ocr_not_successful'
+            | 'document_ocr_successful'
+            | 'document_barcode_could_not_be_read'
+            | 'document_barcode_could_be_read'
+            | 'document_barcode_content_matches'
+            | 'document_barcode_content_does_not_match'
+            | 'document_barcode_detected'
+            | 'document_barcode_could_not_be_detected'
+            | 'document_requires_review'
+            | 'document_expired'
+            | 'document_not_expired'
+            | 'document_from_restricted_country'
+            | 'document_restricted_template_type'
+            | 'document_type_not_allowed'
+            | 'document_field_crosscheck_failed'
+            | 'document_invalid_issuance_or_expiration_date'
+            | 'document_invalid_template_layout'
+            | 'document_possible_image_tampering'
+            | 'document_no_image_tampering'
+            | 'document_no_image_alteration_front'
+            | 'document_no_image_alteration_back'
+            | 'document_possible_image_alteration_front'
+            | 'document_possible_image_alteration_back'
+            | 'document_possible_image_alteration'
+            | 'document_possible_digital_fraud'
+            | 'document_selfie_used_with_different_information'
+            | 'document_selfie_not_used_with_different_information'
+            | 'document_selfie_mask'
+            | 'document_selfie_glasses'
+            | 'document_selfie_not_live_image'
+            | 'document_possible_fake_image'
+            | 'document_not_fake_image'
+            | 'document_pdf417_data_is_valid'
+            | 'document_pdf417_data_is_not_valid'
+            | 'document_photo_is_screen_capture'
+            | 'document_photo_is_not_screen_capture'
+            | 'document_photo_is_paper_capture'
+            | 'document_photo_is_not_paper_capture'
+            | 'document_alignment_failed'
+            | 'document_visible_photo_features_not_verified'
+            | 'document_mrz_line_format_check'
+            | 'document_qr_code_check'
+            | 'document_could_not_classify'
+            | 'document_visible_photo_features_verified'
+            | 'document_low_match_score_with_selfie'
+            | 'document_selfie_matches'
+            | 'document_selfie_does_not_match'
+            | 'document_selfie_bad_quality'
+            | 'document_type_mismatch'
+            | 'document_unknown_country_code'
+            | 'document_country_code_mismatch'
+            | 'document_is_permit_or_provisional_license'
+            | 'document_selfie_was_skipped'
+            | 'document_collected_via_desktop'
+            | 'document_not_live_capture'
+            | 'document_live_capture_failed'
+            | 'document_ocr_name_does_not_match'
+            | 'document_ocr_name_could_not_match'
+            | 'document_ocr_name_matches'
+            | 'document_ocr_address_does_not_match'
+            | 'document_ocr_address_could_not_match'
+            | 'document_ocr_address_matches'
+            | 'document_ocr_first_name_does_not_match'
+            | 'document_ocr_first_name_matches'
+            | 'document_ocr_last_name_does_not_match'
+            | 'document_ocr_last_name_matches'
+            | 'document_ocr_dob_does_not_match'
+            | 'document_ocr_dob_could_not_match'
+            | 'document_ocr_dob_matches'
+            | 'document_dob_crosscheck_matches'
+            | 'document_dob_crosscheck_does_not_match'
+            | 'document_expiration_date_crosscheck_matches'
+            | 'document_expiration_date_crosscheck_does_not_match'
+            | 'document_sex_crosscheck_matches'
+            | 'document_sex_crosscheck_does_not_match'
+            | 'document_full_name_crosscheck_matches'
+            | 'document_full_name_crosscheck_does_not_match'
+            | 'document_number_crosscheck_matches'
+            | 'document_number_crosscheck_does_not_match'
+            | 'document_expiration_check_digit_matches'
+            | 'document_expiration_check_digit_does_not_match'
+            | 'document_dob_check_digit_matches'
+            | 'document_dob_check_digit_does_not_match'
+            | 'document_number_check_digit_matches'
+            | 'document_number_check_digit_does_not_match'
+            | 'curp_not_valid'
+            | 'curp_not_found'
+            | 'curp_valid'
+            | 'curp_input_curp_invalid'
+            | 'curp_could_not_validate'
+            | 'curp_multiple_results_for_data'
+            | 'curp_service_not_available'
+            | 'curp_malformed'
+            | 'address_matches'
+            | 'address_zip_code_matches'
+            | 'address_street_name_matches'
+            | 'address_street_number_matches'
+            | 'address_state_matches'
+            | 'dob_matches'
+            | 'dob_yob_matches'
+            | 'dob_mob_matches'
+            | 'ssn_matches'
+            | 'name_last_matches'
+            | 'name_first_matches'
+            | 'name_first_does_not_match'
+            | 'name_first_partially_matches'
+            | 'ip_state_matches'
+            | 'phone_number_matches'
+            | 'input_phone_number_matches_input_state'
+            | 'input_phone_number_matches_located_state_history'
+            | 'affiliated_with_broker_or_finra'
+            | 'visa_is_other'
+            | 'visa_expired_or_expiring_soon'
+            | 'business_name_match'
+            | 'business_name_similar_match'
+            | 'business_name_alternate_match'
+            | 'business_name_does_not_match'
+            | 'business_name_no_watchlist_hits'
+            | 'business_name_watchlist_hit'
+            | 'business_dba_match'
+            | 'business_dba_similar_match'
+            | 'business_dba_alternate_match'
+            | 'business_dba_does_not_match'
+            | 'business_phone_number_match'
+            | 'business_phone_number_does_not_match'
+            | 'business_website_online'
+            | 'business_website_offline'
+            | 'business_website_verified'
+            | 'business_website_unverified'
+            | 'business_website_parking_page'
+            | 'tin_match'
+            | 'tin_not_found'
+            | 'tin_invalid'
+            | 'tin_does_not_match'
+            | 'business_address_match'
+            | 'business_address_close_match'
+            | 'business_address_similar_match'
+            | 'business_address_incomplete_match'
+            | 'business_address_does_not_match'
+            | 'business_address_commercial'
+            | 'business_address_commercial_mail_receiving_agency'
+            | 'business_address_residential'
+            | 'business_address_deliverable'
+            | 'business_address_not_deliverable'
+            | 'beneficial_owners_match'
+            | 'beneficial_owners_partial_match'
+            | 'beneficial_owners_do_not_match'
+            | 'beneficial_owner_failed_kyc'
+            | 'beneficial_owner_possible_missing_bo'
+            | 'sos_active_filing_found'
+            | 'sos_filing_no_status'
+            | 'sos_filing_partially_active'
+            | 'sos_filing_no_active_found'
+            | 'sos_filing_not_found'
+            | 'sos_domestic_active_filing_found'
+            | 'sos_domestic_filing_no_status'
+            | 'sos_domestic_filing_partially_active'
+            | 'sos_domestic_filing_not_found'
+            | 'sos_domestic_filing_status_good_standing'
+            | 'sos_domestic_filing_status_pending_active'
+            | 'sos_domestic_filing_status_pending_inactive'
+            | 'sos_domestic_filing_status_not_provided_by_state'
+            | 'sos_domestic_filing_status_not_in_good_standing'
+            | 'sos_domestic_filing_status_dissolved'
+            | 'sos_business_address_active_filing_found'
+            | 'sos_business_address_filing_status_not_available'
+            | 'sos_business_address_inactive_filing_found'
+            | 'sos_business_address_filing_not_found'
+            | 'device_low_risk'
+            | 'device_medium_risk'
+            | 'device_high_risk'
+            | 'device_factory_reset'
+            | 'device_gps_spoofing'
+            | 'ip_vpn'
+            | 'ip_tor_exit_node'
+            | 'device_bot_risk'
+            | 'device_suspicious'
+            | 'device_velocity'
+            | 'device_multiple_users'
+            | 'device_reputation'
+            | 'browser_incognito'
+            | 'browser_tampering'
+            | 'browser_automation'
+            | 'attested_device_apple'
+            | 'attested_device_android'
+            | 'attested_device_android_strong_integrity'
+            | 'attested_device_android_unlicensed'
+            | 'attested_device_android_risky'
+            | 'attested_device_android_failed_evaluation'
+            | 'attested_device_no_fraud_duplicate_risk'
+            | 'attested_device_fraud_duplicate_risk_low'
+            | 'attested_device_fraud_duplicate_risk_medium'
+            | 'attested_device_fraud_duplicate_risk_high'
+            | 'behavior_fraud_ring_risk'
+            | 'behavior_high_risk'
+            | 'behavior_low_risk'
+            | 'behavior_automatic_activity';
+          op: 'eq' | 'not_eq';
+          value: boolean;
+        }
+      | (
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'eq' | 'not_eq';
+              value: string;
+            }
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'is_in' | 'is_not_in';
+              value: string;
+            }
+        )
+      | {
+          field: 'ip_address';
+          op: 'is_in' | 'is_not_in';
+          value: string;
+        }
+      | {
+          field: 'experian_score' | 'incode_selfie_match_score';
+          op: 'gt' | 'lt';
+          value: number;
+        }
+    >;
   }>;
   delete?: Array<string>;
   edit?: Array<{
-    ruleExpression: Array<string>;
+    ruleExpression: Array<
+      | {
+          field:
+            | 'watchlist_hit_ofac'
+            | 'watchlist_hit_non_sdn'
+            | 'watchlist_hit_warning'
+            | 'watchlist_hit_pep'
+            | 'adverse_media_hit'
+            | 'id_not_located'
+            | 'id_flagged'
+            | 'credit_more_than3_inquiries_in_last30_days'
+            | 'credit_established_before_ssn_date'
+            | 'address_input_is_non_residential'
+            | 'address_located_is_non_residential'
+            | 'address_does_not_match'
+            | 'address_partially_matches'
+            | 'address_zip_code_does_not_match'
+            | 'address_city_does_not_match'
+            | 'address_city_matches'
+            | 'address_street_name_does_not_match'
+            | 'address_street_name_partially_matches'
+            | 'address_street_number_does_not_match'
+            | 'address_state_does_not_match'
+            | 'address_input_is_not_deliverable'
+            | 'address_input_is_po_box'
+            | 'address_input_is_correctional_facility'
+            | 'address_input_is_not_standard_campground'
+            | 'address_input_is_not_standard_college'
+            | 'address_input_is_not_standard_general_delivery'
+            | 'address_input_is_not_standard_hospital'
+            | 'address_input_is_not_standard_hotel'
+            | 'address_input_is_not_standard_mail_drop'
+            | 'address_input_is_not_standard_prison'
+            | 'address_input_is_not_standard_university'
+            | 'address_input_is_not_standard_uspo'
+            | 'address_input_not_on_file'
+            | 'address_located_is_po_box'
+            | 'address_located_is_not_standard_campground'
+            | 'address_located_is_not_standard_college'
+            | 'address_located_is_not_standard_general_delivery'
+            | 'address_located_is_not_standard_hospital'
+            | 'address_located_is_not_standard_hotel'
+            | 'address_located_is_not_standard_mail_drop'
+            | 'address_located_is_not_standard_prison'
+            | 'address_located_is_not_standard_university'
+            | 'address_located_is_not_standard_uspo'
+            | 'address_located_is_high_risk_address'
+            | 'address_risk_alert'
+            | 'address_alert_velocity'
+            | 'address_alert_stability'
+            | 'address_alert_longevity'
+            | 'address_alert_single_address_in_file'
+            | 'address_newer_record_found'
+            | 'dob_yob_does_not_match'
+            | 'dob_yob_does_not_match_within1_year'
+            | 'dob_mob_does_not_match'
+            | 'dob_day_does_not_match'
+            | 'dob_mob_not_available'
+            | 'dob_yob_not_available'
+            | 'dob_located_age_below_minimum'
+            | 'dob_located_age_above_maximum'
+            | 'dob_located_coppa_alert'
+            | 'dob_does_not_match'
+            | 'dob_partial_match'
+            | 'dob_not_on_file'
+            | 'dob_could_not_match'
+            | 'dob_input_age_less_than18'
+            | 'ssn_not_available'
+            | 'ssn_not_on_file'
+            | 'ssn_partially_matches'
+            | 'ssn_does_not_match'
+            | 'ssn_does_not_match_within1_digit'
+            | 'ssn_input_is_itin'
+            | 'ssn_located_is_itin'
+            | 'ssn_input_tied_to_multiple_names'
+            | 'ssn_input_is_invalid'
+            | 'ssn_located_is_invalid'
+            | 'ssn_not_provided'
+            | 'us_tax_id_is_itin'
+            | 'itin_is_expired'
+            | 'name_last_does_not_match'
+            | 'name_last_partially_matches'
+            | 'name_matches'
+            | 'name_does_not_match'
+            | 'name_partially_matches'
+            | 'ip_state_does_not_match'
+            | 'ip_input_invalid'
+            | 'ip_not_located'
+            | 'ip_location_not_available'
+            | 'ip_alert_high_risk_bot'
+            | 'ip_alert_high_risk_spam'
+            | 'ip_alert_high_risk_tor'
+            | 'ip_alert_high_risk_proxy'
+            | 'ip_proxy'
+            | 'ip_data_center'
+            | 'ip_alert_data_center'
+            | 'email_address_invalid'
+            | 'email_address_or_domain_does_not_exist'
+            | 'email_domain_recently_created'
+            | 'email_domain_private'
+            | 'email_domain_corporate'
+            | 'email_recently_verified'
+            | 'email_found_on_file'
+            | 'email_not_found_on_file'
+            | 'email_high_risk_country'
+            | 'email_high_risk_fraud'
+            | 'email_high_risk_tumbled'
+            | 'email_high_risk_disposable'
+            | 'email_high_risk_domain'
+            | 'sentilink_synthetic_identity_high_risk'
+            | 'sentilink_synthetic_identity_medium_risk'
+            | 'sentilink_synthetic_identity_low_risk'
+            | 'synthetic_identity_high_risk'
+            | 'synthetic_identity_medium_risk'
+            | 'synthetic_identity_low_risk'
+            | 'sentilink_identity_theft_high_risk'
+            | 'sentilink_identity_theft_medium_risk'
+            | 'sentilink_identity_theft_low_risk'
+            | 'phone_number_input_invalid'
+            | 'phone_number_located_is_voip'
+            | 'phone_number_is_voip'
+            | 'phone_number_mobile_account_type_postpaid'
+            | 'phone_number_mobile_account_type_prepaid'
+            | 'phone_number_mobile_account_type_unknown'
+            | 'phone_number_mobile_account_status_active'
+            | 'phone_number_mobile_account_status_deactivated'
+            | 'phone_number_mobile_account_status_suspended'
+            | 'phone_number_mobile_account_status_absent'
+            | 'phone_located_matches'
+            | 'phone_located_partially_matches'
+            | 'phone_located_does_not_match'
+            | 'phone_located_name_matches'
+            | 'phone_located_name_partially_matches'
+            | 'phone_located_name_does_not_match'
+            | 'phone_located_address_matches'
+            | 'phone_located_address_partially_matches'
+            | 'phone_located_address_does_not_match'
+            | 'phone_input_likely_belongs_to_another'
+            | 'phone_not_provided'
+            | 'multiple_records_found'
+            | 'subject_deceased'
+            | 'bureau_deleted_record'
+            | 'ssn_issued_prior_to_dob'
+            | 'ssn_issue_date_cannot_be_verified'
+            | 'ssn_located_issue_date_cannot_be_verified'
+            | 'ssn_potentially_belongs_to_another'
+            | 'ssn_likely_belongs_to_another'
+            | 'thin_file'
+            | 'input_phone_number_does_not_match_input_state'
+            | 'input_phone_number_does_not_match_located_state_history'
+            | 'input_phone_number_does_not_match_ip_state'
+            | 'drivers_license_number_different_number_found'
+            | 'drivers_license_number_not_on_record'
+            | 'drivers_license_number_not_valid'
+            | 'drivers_license_number_is_valid'
+            | 'document_upload_failed'
+            | 'document_not_verified'
+            | 'document_verified'
+            | 'document_ocr_not_successful'
+            | 'document_ocr_successful'
+            | 'document_barcode_could_not_be_read'
+            | 'document_barcode_could_be_read'
+            | 'document_barcode_content_matches'
+            | 'document_barcode_content_does_not_match'
+            | 'document_barcode_detected'
+            | 'document_barcode_could_not_be_detected'
+            | 'document_requires_review'
+            | 'document_expired'
+            | 'document_not_expired'
+            | 'document_from_restricted_country'
+            | 'document_restricted_template_type'
+            | 'document_type_not_allowed'
+            | 'document_field_crosscheck_failed'
+            | 'document_invalid_issuance_or_expiration_date'
+            | 'document_invalid_template_layout'
+            | 'document_possible_image_tampering'
+            | 'document_no_image_tampering'
+            | 'document_no_image_alteration_front'
+            | 'document_no_image_alteration_back'
+            | 'document_possible_image_alteration_front'
+            | 'document_possible_image_alteration_back'
+            | 'document_possible_image_alteration'
+            | 'document_possible_digital_fraud'
+            | 'document_selfie_used_with_different_information'
+            | 'document_selfie_not_used_with_different_information'
+            | 'document_selfie_mask'
+            | 'document_selfie_glasses'
+            | 'document_selfie_not_live_image'
+            | 'document_possible_fake_image'
+            | 'document_not_fake_image'
+            | 'document_pdf417_data_is_valid'
+            | 'document_pdf417_data_is_not_valid'
+            | 'document_photo_is_screen_capture'
+            | 'document_photo_is_not_screen_capture'
+            | 'document_photo_is_paper_capture'
+            | 'document_photo_is_not_paper_capture'
+            | 'document_alignment_failed'
+            | 'document_visible_photo_features_not_verified'
+            | 'document_mrz_line_format_check'
+            | 'document_qr_code_check'
+            | 'document_could_not_classify'
+            | 'document_visible_photo_features_verified'
+            | 'document_low_match_score_with_selfie'
+            | 'document_selfie_matches'
+            | 'document_selfie_does_not_match'
+            | 'document_selfie_bad_quality'
+            | 'document_type_mismatch'
+            | 'document_unknown_country_code'
+            | 'document_country_code_mismatch'
+            | 'document_is_permit_or_provisional_license'
+            | 'document_selfie_was_skipped'
+            | 'document_collected_via_desktop'
+            | 'document_not_live_capture'
+            | 'document_live_capture_failed'
+            | 'document_ocr_name_does_not_match'
+            | 'document_ocr_name_could_not_match'
+            | 'document_ocr_name_matches'
+            | 'document_ocr_address_does_not_match'
+            | 'document_ocr_address_could_not_match'
+            | 'document_ocr_address_matches'
+            | 'document_ocr_first_name_does_not_match'
+            | 'document_ocr_first_name_matches'
+            | 'document_ocr_last_name_does_not_match'
+            | 'document_ocr_last_name_matches'
+            | 'document_ocr_dob_does_not_match'
+            | 'document_ocr_dob_could_not_match'
+            | 'document_ocr_dob_matches'
+            | 'document_dob_crosscheck_matches'
+            | 'document_dob_crosscheck_does_not_match'
+            | 'document_expiration_date_crosscheck_matches'
+            | 'document_expiration_date_crosscheck_does_not_match'
+            | 'document_sex_crosscheck_matches'
+            | 'document_sex_crosscheck_does_not_match'
+            | 'document_full_name_crosscheck_matches'
+            | 'document_full_name_crosscheck_does_not_match'
+            | 'document_number_crosscheck_matches'
+            | 'document_number_crosscheck_does_not_match'
+            | 'document_expiration_check_digit_matches'
+            | 'document_expiration_check_digit_does_not_match'
+            | 'document_dob_check_digit_matches'
+            | 'document_dob_check_digit_does_not_match'
+            | 'document_number_check_digit_matches'
+            | 'document_number_check_digit_does_not_match'
+            | 'curp_not_valid'
+            | 'curp_not_found'
+            | 'curp_valid'
+            | 'curp_input_curp_invalid'
+            | 'curp_could_not_validate'
+            | 'curp_multiple_results_for_data'
+            | 'curp_service_not_available'
+            | 'curp_malformed'
+            | 'address_matches'
+            | 'address_zip_code_matches'
+            | 'address_street_name_matches'
+            | 'address_street_number_matches'
+            | 'address_state_matches'
+            | 'dob_matches'
+            | 'dob_yob_matches'
+            | 'dob_mob_matches'
+            | 'ssn_matches'
+            | 'name_last_matches'
+            | 'name_first_matches'
+            | 'name_first_does_not_match'
+            | 'name_first_partially_matches'
+            | 'ip_state_matches'
+            | 'phone_number_matches'
+            | 'input_phone_number_matches_input_state'
+            | 'input_phone_number_matches_located_state_history'
+            | 'affiliated_with_broker_or_finra'
+            | 'visa_is_other'
+            | 'visa_expired_or_expiring_soon'
+            | 'business_name_match'
+            | 'business_name_similar_match'
+            | 'business_name_alternate_match'
+            | 'business_name_does_not_match'
+            | 'business_name_no_watchlist_hits'
+            | 'business_name_watchlist_hit'
+            | 'business_dba_match'
+            | 'business_dba_similar_match'
+            | 'business_dba_alternate_match'
+            | 'business_dba_does_not_match'
+            | 'business_phone_number_match'
+            | 'business_phone_number_does_not_match'
+            | 'business_website_online'
+            | 'business_website_offline'
+            | 'business_website_verified'
+            | 'business_website_unverified'
+            | 'business_website_parking_page'
+            | 'tin_match'
+            | 'tin_not_found'
+            | 'tin_invalid'
+            | 'tin_does_not_match'
+            | 'business_address_match'
+            | 'business_address_close_match'
+            | 'business_address_similar_match'
+            | 'business_address_incomplete_match'
+            | 'business_address_does_not_match'
+            | 'business_address_commercial'
+            | 'business_address_commercial_mail_receiving_agency'
+            | 'business_address_residential'
+            | 'business_address_deliverable'
+            | 'business_address_not_deliverable'
+            | 'beneficial_owners_match'
+            | 'beneficial_owners_partial_match'
+            | 'beneficial_owners_do_not_match'
+            | 'beneficial_owner_failed_kyc'
+            | 'beneficial_owner_possible_missing_bo'
+            | 'sos_active_filing_found'
+            | 'sos_filing_no_status'
+            | 'sos_filing_partially_active'
+            | 'sos_filing_no_active_found'
+            | 'sos_filing_not_found'
+            | 'sos_domestic_active_filing_found'
+            | 'sos_domestic_filing_no_status'
+            | 'sos_domestic_filing_partially_active'
+            | 'sos_domestic_filing_not_found'
+            | 'sos_domestic_filing_status_good_standing'
+            | 'sos_domestic_filing_status_pending_active'
+            | 'sos_domestic_filing_status_pending_inactive'
+            | 'sos_domestic_filing_status_not_provided_by_state'
+            | 'sos_domestic_filing_status_not_in_good_standing'
+            | 'sos_domestic_filing_status_dissolved'
+            | 'sos_business_address_active_filing_found'
+            | 'sos_business_address_filing_status_not_available'
+            | 'sos_business_address_inactive_filing_found'
+            | 'sos_business_address_filing_not_found'
+            | 'device_low_risk'
+            | 'device_medium_risk'
+            | 'device_high_risk'
+            | 'device_factory_reset'
+            | 'device_gps_spoofing'
+            | 'ip_vpn'
+            | 'ip_tor_exit_node'
+            | 'device_bot_risk'
+            | 'device_suspicious'
+            | 'device_velocity'
+            | 'device_multiple_users'
+            | 'device_reputation'
+            | 'browser_incognito'
+            | 'browser_tampering'
+            | 'browser_automation'
+            | 'attested_device_apple'
+            | 'attested_device_android'
+            | 'attested_device_android_strong_integrity'
+            | 'attested_device_android_unlicensed'
+            | 'attested_device_android_risky'
+            | 'attested_device_android_failed_evaluation'
+            | 'attested_device_no_fraud_duplicate_risk'
+            | 'attested_device_fraud_duplicate_risk_low'
+            | 'attested_device_fraud_duplicate_risk_medium'
+            | 'attested_device_fraud_duplicate_risk_high'
+            | 'behavior_fraud_ring_risk'
+            | 'behavior_high_risk'
+            | 'behavior_low_risk'
+            | 'behavior_automatic_activity';
+          op: 'eq' | 'not_eq';
+          value: boolean;
+        }
+      | (
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'eq' | 'not_eq';
+              value: string;
+            }
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'is_in' | 'is_not_in';
+              value: string;
+            }
+        )
+      | {
+          field: 'ip_address';
+          op: 'is_in' | 'is_not_in';
+          value: string;
+        }
+      | {
+          field: 'experian_score' | 'incode_selfie_match_score';
+          op: 'gt' | 'lt';
+          value: number;
+        }
+    >;
     ruleId: string;
   }>;
   endTimestamp: string;
@@ -11173,6 +16933,9 @@ export type _key_ =
   | 'bank.*.fingerprint';
 export type InProgressOnboarding = {
   fpId: string;
+  /**
+   * The status of the onboarding
+   */
   status: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
   tenant: {
     name: string;
@@ -11180,6 +16943,9 @@ export type InProgressOnboarding = {
   };
   timestamp: string;
 };
+/**
+ * The status of the onboarding
+ */
 export type status4 = 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 export type IntegrityRequest = {
   /**
@@ -11669,7 +17435,34 @@ export type LinkAuthRequest = {
   redirectUrl: string;
 };
 export type List = {
-  actor: 'footprint';
+  actor:
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'user';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'tenant_user';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'tenant_api_key';
+      }
+    | {
+        kind: 'footprint';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'firm_employee';
+      };
   alias: string;
   createdAt: string;
   entriesCount: number;
@@ -11678,9 +17471,35 @@ export type List = {
   name: string;
   usedInPlaybook: boolean;
 };
-export type actor = 'footprint';
 export type ListDetails = {
-  actor: 'footprint';
+  actor:
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'user';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'tenant_user';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'tenant_api_key';
+      }
+    | {
+        kind: 'footprint';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'firm_employee';
+      };
   alias: string;
   createdAt: string;
   id: string;
@@ -11704,8 +17523,1189 @@ export type ListDetails = {
       isShadow: boolean;
       kind: 'Person' | 'Business' | 'Any';
       name?: string;
-      ruleAction: string;
-      ruleExpression: Array<string>;
+      ruleAction:
+        | {
+            /**
+             * ORDERING MATTERS!!!
+             */
+            config: {
+              [key: string]: unknown;
+            };
+            /**
+             * ORDERING MATTERS!!!
+             */
+            kind: 'pass_with_manual_review';
+          }
+        | {
+            config: {
+              [key: string]: unknown;
+            };
+            kind: 'manual_review';
+          }
+        | {
+            config: Array<
+              | {
+                  data: {
+                    collect_selfie: boolean;
+                    document_types_and_countries?: {
+                      country_specific: {
+                        [key: string]: unknown;
+                      };
+                      global: Array<
+                        | 'id_card'
+                        | 'drivers_license'
+                        | 'passport'
+                        | 'passport_card'
+                        | 'permit'
+                        | 'visa'
+                        | 'residence_document'
+                        | 'voter_identification'
+                      >;
+                    };
+                  };
+                  kind: 'identity';
+                }
+              | {
+                  data: {
+                    requires_human_review: boolean;
+                  };
+                  kind: 'proof_of_ssn';
+                }
+              | {
+                  data: {
+                    requires_human_review: boolean;
+                  };
+                  kind: 'proof_of_address';
+                }
+              | {
+                  data: {
+                    /**
+                     * Optional human-readable description of the document that will be displayed to the user
+                     */
+                    description?: string;
+                    /**
+                     * Custom document identifier under which the document will be vaulted
+                     */
+                    identifier:
+                      | 'id.first_name'
+                      | 'id.middle_name'
+                      | 'id.last_name'
+                      | 'id.dob'
+                      | 'id.ssn4'
+                      | 'id.ssn9'
+                      | 'id.address_line1'
+                      | 'id.address_line2'
+                      | 'id.city'
+                      | 'id.state'
+                      | 'id.zip'
+                      | 'id.country'
+                      | 'id.email'
+                      | 'id.phone_number'
+                      | 'id.us_legal_status'
+                      | 'id.visa_kind'
+                      | 'id.visa_expiration_date'
+                      | 'id.nationality'
+                      | 'id.citizenships'
+                      | 'id.drivers_license_number'
+                      | 'id.drivers_license_state'
+                      | 'id.itin'
+                      | 'id.us_tax_id'
+                      | 'business.name'
+                      | 'business.dba'
+                      | 'business.website'
+                      | 'business.phone_number'
+                      | 'business.tin'
+                      | 'business.address_line1'
+                      | 'business.address_line2'
+                      | 'business.city'
+                      | 'business.state'
+                      | 'business.zip'
+                      | 'business.country'
+                      | 'business.corporation_type'
+                      | 'business.formation_state'
+                      | 'business.formation_date'
+                      | 'custom.*'
+                      | 'investor_profile.employment_status'
+                      | 'investor_profile.occupation'
+                      | 'investor_profile.employer'
+                      | 'investor_profile.annual_income'
+                      | 'investor_profile.net_worth'
+                      | 'investor_profile.investment_goals'
+                      | 'investor_profile.risk_tolerance'
+                      | 'investor_profile.declarations'
+                      | 'investor_profile.brokerage_firm_employer'
+                      | 'investor_profile.senior_executive_symbols'
+                      | 'investor_profile.family_member_names'
+                      | 'investor_profile.political_organization'
+                      | 'investor_profile.funding_sources'
+                      | 'document.id_card.front.image'
+                      | 'document.id_card.front.mime_type'
+                      | 'document.id_card.back.image'
+                      | 'document.id_card.back.mime_type'
+                      | 'document.id_card.selfie.image'
+                      | 'document.id_card.selfie.mime_type'
+                      | 'document.id_card.full_name'
+                      | 'document.id_card.dob'
+                      | 'document.id_card.gender'
+                      | 'document.id_card.full_address'
+                      | 'document.id_card.document_number'
+                      | 'document.id_card.expires_at'
+                      | 'document.id_card.issued_at'
+                      | 'document.id_card.issuing_state'
+                      | 'document.id_card.issuing_country'
+                      | 'document.id_card.ref_number'
+                      | 'document.id_card.nationality'
+                      | 'document.id_card.curp'
+                      | 'document.id_card.clave_de_elector'
+                      | 'document.id_card.classified_document_type'
+                      | 'document.id_card.curp_validation_response'
+                      | 'document.drivers_license.front.image'
+                      | 'document.drivers_license.front.mime_type'
+                      | 'document.drivers_license.back.image'
+                      | 'document.drivers_license.back.mime_type'
+                      | 'document.drivers_license.selfie.image'
+                      | 'document.drivers_license.selfie.mime_type'
+                      | 'document.drivers_license.full_name'
+                      | 'document.drivers_license.dob'
+                      | 'document.drivers_license.gender'
+                      | 'document.drivers_license.full_address'
+                      | 'document.drivers_license.document_number'
+                      | 'document.drivers_license.expires_at'
+                      | 'document.drivers_license.issued_at'
+                      | 'document.drivers_license.issuing_state'
+                      | 'document.drivers_license.issuing_country'
+                      | 'document.drivers_license.ref_number'
+                      | 'document.drivers_license.nationality'
+                      | 'document.drivers_license.curp'
+                      | 'document.drivers_license.clave_de_elector'
+                      | 'document.drivers_license.classified_document_type'
+                      | 'document.drivers_license.curp_validation_response'
+                      | 'document.passport.front.image'
+                      | 'document.passport.front.mime_type'
+                      | 'document.passport.back.image'
+                      | 'document.passport.back.mime_type'
+                      | 'document.passport.selfie.image'
+                      | 'document.passport.selfie.mime_type'
+                      | 'document.passport.full_name'
+                      | 'document.passport.dob'
+                      | 'document.passport.gender'
+                      | 'document.passport.full_address'
+                      | 'document.passport.document_number'
+                      | 'document.passport.expires_at'
+                      | 'document.passport.issued_at'
+                      | 'document.passport.issuing_state'
+                      | 'document.passport.issuing_country'
+                      | 'document.passport.ref_number'
+                      | 'document.passport.nationality'
+                      | 'document.passport.curp'
+                      | 'document.passport.clave_de_elector'
+                      | 'document.passport.classified_document_type'
+                      | 'document.passport.curp_validation_response'
+                      | 'document.passport_card.front.image'
+                      | 'document.passport_card.front.mime_type'
+                      | 'document.passport_card.back.image'
+                      | 'document.passport_card.back.mime_type'
+                      | 'document.passport_card.selfie.image'
+                      | 'document.passport_card.selfie.mime_type'
+                      | 'document.passport_card.full_name'
+                      | 'document.passport_card.dob'
+                      | 'document.passport_card.gender'
+                      | 'document.passport_card.full_address'
+                      | 'document.passport_card.document_number'
+                      | 'document.passport_card.expires_at'
+                      | 'document.passport_card.issued_at'
+                      | 'document.passport_card.issuing_state'
+                      | 'document.passport_card.issuing_country'
+                      | 'document.passport_card.ref_number'
+                      | 'document.passport_card.nationality'
+                      | 'document.passport_card.curp'
+                      | 'document.passport_card.clave_de_elector'
+                      | 'document.passport_card.classified_document_type'
+                      | 'document.passport_card.curp_validation_response'
+                      | 'document.permit.front.image'
+                      | 'document.permit.front.mime_type'
+                      | 'document.permit.back.image'
+                      | 'document.permit.back.mime_type'
+                      | 'document.permit.selfie.image'
+                      | 'document.permit.selfie.mime_type'
+                      | 'document.permit.full_name'
+                      | 'document.permit.dob'
+                      | 'document.permit.gender'
+                      | 'document.permit.full_address'
+                      | 'document.permit.document_number'
+                      | 'document.permit.expires_at'
+                      | 'document.permit.issued_at'
+                      | 'document.permit.issuing_state'
+                      | 'document.permit.issuing_country'
+                      | 'document.permit.ref_number'
+                      | 'document.permit.nationality'
+                      | 'document.permit.curp'
+                      | 'document.permit.clave_de_elector'
+                      | 'document.permit.classified_document_type'
+                      | 'document.permit.curp_validation_response'
+                      | 'document.visa.front.image'
+                      | 'document.visa.front.mime_type'
+                      | 'document.visa.back.image'
+                      | 'document.visa.back.mime_type'
+                      | 'document.visa.selfie.image'
+                      | 'document.visa.selfie.mime_type'
+                      | 'document.visa.full_name'
+                      | 'document.visa.dob'
+                      | 'document.visa.gender'
+                      | 'document.visa.full_address'
+                      | 'document.visa.document_number'
+                      | 'document.visa.expires_at'
+                      | 'document.visa.issued_at'
+                      | 'document.visa.issuing_state'
+                      | 'document.visa.issuing_country'
+                      | 'document.visa.ref_number'
+                      | 'document.visa.nationality'
+                      | 'document.visa.curp'
+                      | 'document.visa.clave_de_elector'
+                      | 'document.visa.classified_document_type'
+                      | 'document.visa.curp_validation_response'
+                      | 'document.residence_document.front.image'
+                      | 'document.residence_document.front.mime_type'
+                      | 'document.residence_document.back.image'
+                      | 'document.residence_document.back.mime_type'
+                      | 'document.residence_document.selfie.image'
+                      | 'document.residence_document.selfie.mime_type'
+                      | 'document.residence_document.full_name'
+                      | 'document.residence_document.dob'
+                      | 'document.residence_document.gender'
+                      | 'document.residence_document.full_address'
+                      | 'document.residence_document.document_number'
+                      | 'document.residence_document.expires_at'
+                      | 'document.residence_document.issued_at'
+                      | 'document.residence_document.issuing_state'
+                      | 'document.residence_document.issuing_country'
+                      | 'document.residence_document.ref_number'
+                      | 'document.residence_document.nationality'
+                      | 'document.residence_document.curp'
+                      | 'document.residence_document.clave_de_elector'
+                      | 'document.residence_document.classified_document_type'
+                      | 'document.residence_document.curp_validation_response'
+                      | 'document.voter_identification.front.image'
+                      | 'document.voter_identification.front.mime_type'
+                      | 'document.voter_identification.back.image'
+                      | 'document.voter_identification.back.mime_type'
+                      | 'document.voter_identification.selfie.image'
+                      | 'document.voter_identification.selfie.mime_type'
+                      | 'document.voter_identification.full_name'
+                      | 'document.voter_identification.dob'
+                      | 'document.voter_identification.gender'
+                      | 'document.voter_identification.full_address'
+                      | 'document.voter_identification.document_number'
+                      | 'document.voter_identification.expires_at'
+                      | 'document.voter_identification.issued_at'
+                      | 'document.voter_identification.issuing_state'
+                      | 'document.voter_identification.issuing_country'
+                      | 'document.voter_identification.ref_number'
+                      | 'document.voter_identification.nationality'
+                      | 'document.voter_identification.curp'
+                      | 'document.voter_identification.clave_de_elector'
+                      | 'document.voter_identification.classified_document_type'
+                      | 'document.voter_identification.curp_validation_response'
+                      | 'document.finra_compliance_letter'
+                      | 'document.proof_of_address.image'
+                      | 'document.ssn_card.image'
+                      | 'document.custom.*'
+                      | 'card.*.number'
+                      | 'card.*.expiration'
+                      | 'card.*.cvc'
+                      | 'card.*.name'
+                      | 'card.*.billing_address.zip'
+                      | 'card.*.billing_address.country'
+                      | 'card.*.expiration_month'
+                      | 'card.*.expiration_year'
+                      | 'card.*.number_last4'
+                      | 'card.*.issuer'
+                      | 'card.*.fingerprint'
+                      | 'bank.*.name'
+                      | 'bank.*.ach_routing_number'
+                      | 'bank.*.ach_account_number'
+                      | 'bank.*.ach_account_id'
+                      | 'bank.*.account_type'
+                      | 'bank.*.fingerprint';
+                    /**
+                     * The human-readable name of the document to display to the user
+                     */
+                    name: string;
+                    requires_human_review: boolean;
+                    upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                  };
+                  kind: 'custom';
+                }
+            >;
+            kind: 'step_up';
+          }
+        | {
+            config: {
+              [key: string]: unknown;
+            };
+            kind: 'fail';
+          };
+      ruleExpression: Array<
+        | {
+            field:
+              | 'watchlist_hit_ofac'
+              | 'watchlist_hit_non_sdn'
+              | 'watchlist_hit_warning'
+              | 'watchlist_hit_pep'
+              | 'adverse_media_hit'
+              | 'id_not_located'
+              | 'id_flagged'
+              | 'credit_more_than3_inquiries_in_last30_days'
+              | 'credit_established_before_ssn_date'
+              | 'address_input_is_non_residential'
+              | 'address_located_is_non_residential'
+              | 'address_does_not_match'
+              | 'address_partially_matches'
+              | 'address_zip_code_does_not_match'
+              | 'address_city_does_not_match'
+              | 'address_city_matches'
+              | 'address_street_name_does_not_match'
+              | 'address_street_name_partially_matches'
+              | 'address_street_number_does_not_match'
+              | 'address_state_does_not_match'
+              | 'address_input_is_not_deliverable'
+              | 'address_input_is_po_box'
+              | 'address_input_is_correctional_facility'
+              | 'address_input_is_not_standard_campground'
+              | 'address_input_is_not_standard_college'
+              | 'address_input_is_not_standard_general_delivery'
+              | 'address_input_is_not_standard_hospital'
+              | 'address_input_is_not_standard_hotel'
+              | 'address_input_is_not_standard_mail_drop'
+              | 'address_input_is_not_standard_prison'
+              | 'address_input_is_not_standard_university'
+              | 'address_input_is_not_standard_uspo'
+              | 'address_input_not_on_file'
+              | 'address_located_is_po_box'
+              | 'address_located_is_not_standard_campground'
+              | 'address_located_is_not_standard_college'
+              | 'address_located_is_not_standard_general_delivery'
+              | 'address_located_is_not_standard_hospital'
+              | 'address_located_is_not_standard_hotel'
+              | 'address_located_is_not_standard_mail_drop'
+              | 'address_located_is_not_standard_prison'
+              | 'address_located_is_not_standard_university'
+              | 'address_located_is_not_standard_uspo'
+              | 'address_located_is_high_risk_address'
+              | 'address_risk_alert'
+              | 'address_alert_velocity'
+              | 'address_alert_stability'
+              | 'address_alert_longevity'
+              | 'address_alert_single_address_in_file'
+              | 'address_newer_record_found'
+              | 'dob_yob_does_not_match'
+              | 'dob_yob_does_not_match_within1_year'
+              | 'dob_mob_does_not_match'
+              | 'dob_day_does_not_match'
+              | 'dob_mob_not_available'
+              | 'dob_yob_not_available'
+              | 'dob_located_age_below_minimum'
+              | 'dob_located_age_above_maximum'
+              | 'dob_located_coppa_alert'
+              | 'dob_does_not_match'
+              | 'dob_partial_match'
+              | 'dob_not_on_file'
+              | 'dob_could_not_match'
+              | 'dob_input_age_less_than18'
+              | 'ssn_not_available'
+              | 'ssn_not_on_file'
+              | 'ssn_partially_matches'
+              | 'ssn_does_not_match'
+              | 'ssn_does_not_match_within1_digit'
+              | 'ssn_input_is_itin'
+              | 'ssn_located_is_itin'
+              | 'ssn_input_tied_to_multiple_names'
+              | 'ssn_input_is_invalid'
+              | 'ssn_located_is_invalid'
+              | 'ssn_not_provided'
+              | 'us_tax_id_is_itin'
+              | 'itin_is_expired'
+              | 'name_last_does_not_match'
+              | 'name_last_partially_matches'
+              | 'name_matches'
+              | 'name_does_not_match'
+              | 'name_partially_matches'
+              | 'ip_state_does_not_match'
+              | 'ip_input_invalid'
+              | 'ip_not_located'
+              | 'ip_location_not_available'
+              | 'ip_alert_high_risk_bot'
+              | 'ip_alert_high_risk_spam'
+              | 'ip_alert_high_risk_tor'
+              | 'ip_alert_high_risk_proxy'
+              | 'ip_proxy'
+              | 'ip_data_center'
+              | 'ip_alert_data_center'
+              | 'email_address_invalid'
+              | 'email_address_or_domain_does_not_exist'
+              | 'email_domain_recently_created'
+              | 'email_domain_private'
+              | 'email_domain_corporate'
+              | 'email_recently_verified'
+              | 'email_found_on_file'
+              | 'email_not_found_on_file'
+              | 'email_high_risk_country'
+              | 'email_high_risk_fraud'
+              | 'email_high_risk_tumbled'
+              | 'email_high_risk_disposable'
+              | 'email_high_risk_domain'
+              | 'sentilink_synthetic_identity_high_risk'
+              | 'sentilink_synthetic_identity_medium_risk'
+              | 'sentilink_synthetic_identity_low_risk'
+              | 'synthetic_identity_high_risk'
+              | 'synthetic_identity_medium_risk'
+              | 'synthetic_identity_low_risk'
+              | 'sentilink_identity_theft_high_risk'
+              | 'sentilink_identity_theft_medium_risk'
+              | 'sentilink_identity_theft_low_risk'
+              | 'phone_number_input_invalid'
+              | 'phone_number_located_is_voip'
+              | 'phone_number_is_voip'
+              | 'phone_number_mobile_account_type_postpaid'
+              | 'phone_number_mobile_account_type_prepaid'
+              | 'phone_number_mobile_account_type_unknown'
+              | 'phone_number_mobile_account_status_active'
+              | 'phone_number_mobile_account_status_deactivated'
+              | 'phone_number_mobile_account_status_suspended'
+              | 'phone_number_mobile_account_status_absent'
+              | 'phone_located_matches'
+              | 'phone_located_partially_matches'
+              | 'phone_located_does_not_match'
+              | 'phone_located_name_matches'
+              | 'phone_located_name_partially_matches'
+              | 'phone_located_name_does_not_match'
+              | 'phone_located_address_matches'
+              | 'phone_located_address_partially_matches'
+              | 'phone_located_address_does_not_match'
+              | 'phone_input_likely_belongs_to_another'
+              | 'phone_not_provided'
+              | 'multiple_records_found'
+              | 'subject_deceased'
+              | 'bureau_deleted_record'
+              | 'ssn_issued_prior_to_dob'
+              | 'ssn_issue_date_cannot_be_verified'
+              | 'ssn_located_issue_date_cannot_be_verified'
+              | 'ssn_potentially_belongs_to_another'
+              | 'ssn_likely_belongs_to_another'
+              | 'thin_file'
+              | 'input_phone_number_does_not_match_input_state'
+              | 'input_phone_number_does_not_match_located_state_history'
+              | 'input_phone_number_does_not_match_ip_state'
+              | 'drivers_license_number_different_number_found'
+              | 'drivers_license_number_not_on_record'
+              | 'drivers_license_number_not_valid'
+              | 'drivers_license_number_is_valid'
+              | 'document_upload_failed'
+              | 'document_not_verified'
+              | 'document_verified'
+              | 'document_ocr_not_successful'
+              | 'document_ocr_successful'
+              | 'document_barcode_could_not_be_read'
+              | 'document_barcode_could_be_read'
+              | 'document_barcode_content_matches'
+              | 'document_barcode_content_does_not_match'
+              | 'document_barcode_detected'
+              | 'document_barcode_could_not_be_detected'
+              | 'document_requires_review'
+              | 'document_expired'
+              | 'document_not_expired'
+              | 'document_from_restricted_country'
+              | 'document_restricted_template_type'
+              | 'document_type_not_allowed'
+              | 'document_field_crosscheck_failed'
+              | 'document_invalid_issuance_or_expiration_date'
+              | 'document_invalid_template_layout'
+              | 'document_possible_image_tampering'
+              | 'document_no_image_tampering'
+              | 'document_no_image_alteration_front'
+              | 'document_no_image_alteration_back'
+              | 'document_possible_image_alteration_front'
+              | 'document_possible_image_alteration_back'
+              | 'document_possible_image_alteration'
+              | 'document_possible_digital_fraud'
+              | 'document_selfie_used_with_different_information'
+              | 'document_selfie_not_used_with_different_information'
+              | 'document_selfie_mask'
+              | 'document_selfie_glasses'
+              | 'document_selfie_not_live_image'
+              | 'document_possible_fake_image'
+              | 'document_not_fake_image'
+              | 'document_pdf417_data_is_valid'
+              | 'document_pdf417_data_is_not_valid'
+              | 'document_photo_is_screen_capture'
+              | 'document_photo_is_not_screen_capture'
+              | 'document_photo_is_paper_capture'
+              | 'document_photo_is_not_paper_capture'
+              | 'document_alignment_failed'
+              | 'document_visible_photo_features_not_verified'
+              | 'document_mrz_line_format_check'
+              | 'document_qr_code_check'
+              | 'document_could_not_classify'
+              | 'document_visible_photo_features_verified'
+              | 'document_low_match_score_with_selfie'
+              | 'document_selfie_matches'
+              | 'document_selfie_does_not_match'
+              | 'document_selfie_bad_quality'
+              | 'document_type_mismatch'
+              | 'document_unknown_country_code'
+              | 'document_country_code_mismatch'
+              | 'document_is_permit_or_provisional_license'
+              | 'document_selfie_was_skipped'
+              | 'document_collected_via_desktop'
+              | 'document_not_live_capture'
+              | 'document_live_capture_failed'
+              | 'document_ocr_name_does_not_match'
+              | 'document_ocr_name_could_not_match'
+              | 'document_ocr_name_matches'
+              | 'document_ocr_address_does_not_match'
+              | 'document_ocr_address_could_not_match'
+              | 'document_ocr_address_matches'
+              | 'document_ocr_first_name_does_not_match'
+              | 'document_ocr_first_name_matches'
+              | 'document_ocr_last_name_does_not_match'
+              | 'document_ocr_last_name_matches'
+              | 'document_ocr_dob_does_not_match'
+              | 'document_ocr_dob_could_not_match'
+              | 'document_ocr_dob_matches'
+              | 'document_dob_crosscheck_matches'
+              | 'document_dob_crosscheck_does_not_match'
+              | 'document_expiration_date_crosscheck_matches'
+              | 'document_expiration_date_crosscheck_does_not_match'
+              | 'document_sex_crosscheck_matches'
+              | 'document_sex_crosscheck_does_not_match'
+              | 'document_full_name_crosscheck_matches'
+              | 'document_full_name_crosscheck_does_not_match'
+              | 'document_number_crosscheck_matches'
+              | 'document_number_crosscheck_does_not_match'
+              | 'document_expiration_check_digit_matches'
+              | 'document_expiration_check_digit_does_not_match'
+              | 'document_dob_check_digit_matches'
+              | 'document_dob_check_digit_does_not_match'
+              | 'document_number_check_digit_matches'
+              | 'document_number_check_digit_does_not_match'
+              | 'curp_not_valid'
+              | 'curp_not_found'
+              | 'curp_valid'
+              | 'curp_input_curp_invalid'
+              | 'curp_could_not_validate'
+              | 'curp_multiple_results_for_data'
+              | 'curp_service_not_available'
+              | 'curp_malformed'
+              | 'address_matches'
+              | 'address_zip_code_matches'
+              | 'address_street_name_matches'
+              | 'address_street_number_matches'
+              | 'address_state_matches'
+              | 'dob_matches'
+              | 'dob_yob_matches'
+              | 'dob_mob_matches'
+              | 'ssn_matches'
+              | 'name_last_matches'
+              | 'name_first_matches'
+              | 'name_first_does_not_match'
+              | 'name_first_partially_matches'
+              | 'ip_state_matches'
+              | 'phone_number_matches'
+              | 'input_phone_number_matches_input_state'
+              | 'input_phone_number_matches_located_state_history'
+              | 'affiliated_with_broker_or_finra'
+              | 'visa_is_other'
+              | 'visa_expired_or_expiring_soon'
+              | 'business_name_match'
+              | 'business_name_similar_match'
+              | 'business_name_alternate_match'
+              | 'business_name_does_not_match'
+              | 'business_name_no_watchlist_hits'
+              | 'business_name_watchlist_hit'
+              | 'business_dba_match'
+              | 'business_dba_similar_match'
+              | 'business_dba_alternate_match'
+              | 'business_dba_does_not_match'
+              | 'business_phone_number_match'
+              | 'business_phone_number_does_not_match'
+              | 'business_website_online'
+              | 'business_website_offline'
+              | 'business_website_verified'
+              | 'business_website_unverified'
+              | 'business_website_parking_page'
+              | 'tin_match'
+              | 'tin_not_found'
+              | 'tin_invalid'
+              | 'tin_does_not_match'
+              | 'business_address_match'
+              | 'business_address_close_match'
+              | 'business_address_similar_match'
+              | 'business_address_incomplete_match'
+              | 'business_address_does_not_match'
+              | 'business_address_commercial'
+              | 'business_address_commercial_mail_receiving_agency'
+              | 'business_address_residential'
+              | 'business_address_deliverable'
+              | 'business_address_not_deliverable'
+              | 'beneficial_owners_match'
+              | 'beneficial_owners_partial_match'
+              | 'beneficial_owners_do_not_match'
+              | 'beneficial_owner_failed_kyc'
+              | 'beneficial_owner_possible_missing_bo'
+              | 'sos_active_filing_found'
+              | 'sos_filing_no_status'
+              | 'sos_filing_partially_active'
+              | 'sos_filing_no_active_found'
+              | 'sos_filing_not_found'
+              | 'sos_domestic_active_filing_found'
+              | 'sos_domestic_filing_no_status'
+              | 'sos_domestic_filing_partially_active'
+              | 'sos_domestic_filing_not_found'
+              | 'sos_domestic_filing_status_good_standing'
+              | 'sos_domestic_filing_status_pending_active'
+              | 'sos_domestic_filing_status_pending_inactive'
+              | 'sos_domestic_filing_status_not_provided_by_state'
+              | 'sos_domestic_filing_status_not_in_good_standing'
+              | 'sos_domestic_filing_status_dissolved'
+              | 'sos_business_address_active_filing_found'
+              | 'sos_business_address_filing_status_not_available'
+              | 'sos_business_address_inactive_filing_found'
+              | 'sos_business_address_filing_not_found'
+              | 'device_low_risk'
+              | 'device_medium_risk'
+              | 'device_high_risk'
+              | 'device_factory_reset'
+              | 'device_gps_spoofing'
+              | 'ip_vpn'
+              | 'ip_tor_exit_node'
+              | 'device_bot_risk'
+              | 'device_suspicious'
+              | 'device_velocity'
+              | 'device_multiple_users'
+              | 'device_reputation'
+              | 'browser_incognito'
+              | 'browser_tampering'
+              | 'browser_automation'
+              | 'attested_device_apple'
+              | 'attested_device_android'
+              | 'attested_device_android_strong_integrity'
+              | 'attested_device_android_unlicensed'
+              | 'attested_device_android_risky'
+              | 'attested_device_android_failed_evaluation'
+              | 'attested_device_no_fraud_duplicate_risk'
+              | 'attested_device_fraud_duplicate_risk_low'
+              | 'attested_device_fraud_duplicate_risk_medium'
+              | 'attested_device_fraud_duplicate_risk_high'
+              | 'behavior_fraud_ring_risk'
+              | 'behavior_high_risk'
+              | 'behavior_low_risk'
+              | 'behavior_automatic_activity';
+            op: 'eq' | 'not_eq';
+            value: boolean;
+          }
+        | (
+            | {
+                field:
+                  | 'id.first_name'
+                  | 'id.middle_name'
+                  | 'id.last_name'
+                  | 'id.dob'
+                  | 'id.ssn4'
+                  | 'id.ssn9'
+                  | 'id.address_line1'
+                  | 'id.address_line2'
+                  | 'id.city'
+                  | 'id.state'
+                  | 'id.zip'
+                  | 'id.country'
+                  | 'id.email'
+                  | 'id.phone_number'
+                  | 'id.us_legal_status'
+                  | 'id.visa_kind'
+                  | 'id.visa_expiration_date'
+                  | 'id.nationality'
+                  | 'id.citizenships'
+                  | 'id.drivers_license_number'
+                  | 'id.drivers_license_state'
+                  | 'id.itin'
+                  | 'id.us_tax_id'
+                  | 'business.name'
+                  | 'business.dba'
+                  | 'business.website'
+                  | 'business.phone_number'
+                  | 'business.tin'
+                  | 'business.address_line1'
+                  | 'business.address_line2'
+                  | 'business.city'
+                  | 'business.state'
+                  | 'business.zip'
+                  | 'business.country'
+                  | 'business.corporation_type'
+                  | 'business.formation_state'
+                  | 'business.formation_date'
+                  | 'custom.*'
+                  | 'investor_profile.employment_status'
+                  | 'investor_profile.occupation'
+                  | 'investor_profile.employer'
+                  | 'investor_profile.annual_income'
+                  | 'investor_profile.net_worth'
+                  | 'investor_profile.investment_goals'
+                  | 'investor_profile.risk_tolerance'
+                  | 'investor_profile.declarations'
+                  | 'investor_profile.brokerage_firm_employer'
+                  | 'investor_profile.senior_executive_symbols'
+                  | 'investor_profile.family_member_names'
+                  | 'investor_profile.political_organization'
+                  | 'investor_profile.funding_sources'
+                  | 'document.id_card.front.image'
+                  | 'document.id_card.front.mime_type'
+                  | 'document.id_card.back.image'
+                  | 'document.id_card.back.mime_type'
+                  | 'document.id_card.selfie.image'
+                  | 'document.id_card.selfie.mime_type'
+                  | 'document.id_card.full_name'
+                  | 'document.id_card.dob'
+                  | 'document.id_card.gender'
+                  | 'document.id_card.full_address'
+                  | 'document.id_card.document_number'
+                  | 'document.id_card.expires_at'
+                  | 'document.id_card.issued_at'
+                  | 'document.id_card.issuing_state'
+                  | 'document.id_card.issuing_country'
+                  | 'document.id_card.ref_number'
+                  | 'document.id_card.nationality'
+                  | 'document.id_card.curp'
+                  | 'document.id_card.clave_de_elector'
+                  | 'document.id_card.classified_document_type'
+                  | 'document.id_card.curp_validation_response'
+                  | 'document.drivers_license.front.image'
+                  | 'document.drivers_license.front.mime_type'
+                  | 'document.drivers_license.back.image'
+                  | 'document.drivers_license.back.mime_type'
+                  | 'document.drivers_license.selfie.image'
+                  | 'document.drivers_license.selfie.mime_type'
+                  | 'document.drivers_license.full_name'
+                  | 'document.drivers_license.dob'
+                  | 'document.drivers_license.gender'
+                  | 'document.drivers_license.full_address'
+                  | 'document.drivers_license.document_number'
+                  | 'document.drivers_license.expires_at'
+                  | 'document.drivers_license.issued_at'
+                  | 'document.drivers_license.issuing_state'
+                  | 'document.drivers_license.issuing_country'
+                  | 'document.drivers_license.ref_number'
+                  | 'document.drivers_license.nationality'
+                  | 'document.drivers_license.curp'
+                  | 'document.drivers_license.clave_de_elector'
+                  | 'document.drivers_license.classified_document_type'
+                  | 'document.drivers_license.curp_validation_response'
+                  | 'document.passport.front.image'
+                  | 'document.passport.front.mime_type'
+                  | 'document.passport.back.image'
+                  | 'document.passport.back.mime_type'
+                  | 'document.passport.selfie.image'
+                  | 'document.passport.selfie.mime_type'
+                  | 'document.passport.full_name'
+                  | 'document.passport.dob'
+                  | 'document.passport.gender'
+                  | 'document.passport.full_address'
+                  | 'document.passport.document_number'
+                  | 'document.passport.expires_at'
+                  | 'document.passport.issued_at'
+                  | 'document.passport.issuing_state'
+                  | 'document.passport.issuing_country'
+                  | 'document.passport.ref_number'
+                  | 'document.passport.nationality'
+                  | 'document.passport.curp'
+                  | 'document.passport.clave_de_elector'
+                  | 'document.passport.classified_document_type'
+                  | 'document.passport.curp_validation_response'
+                  | 'document.passport_card.front.image'
+                  | 'document.passport_card.front.mime_type'
+                  | 'document.passport_card.back.image'
+                  | 'document.passport_card.back.mime_type'
+                  | 'document.passport_card.selfie.image'
+                  | 'document.passport_card.selfie.mime_type'
+                  | 'document.passport_card.full_name'
+                  | 'document.passport_card.dob'
+                  | 'document.passport_card.gender'
+                  | 'document.passport_card.full_address'
+                  | 'document.passport_card.document_number'
+                  | 'document.passport_card.expires_at'
+                  | 'document.passport_card.issued_at'
+                  | 'document.passport_card.issuing_state'
+                  | 'document.passport_card.issuing_country'
+                  | 'document.passport_card.ref_number'
+                  | 'document.passport_card.nationality'
+                  | 'document.passport_card.curp'
+                  | 'document.passport_card.clave_de_elector'
+                  | 'document.passport_card.classified_document_type'
+                  | 'document.passport_card.curp_validation_response'
+                  | 'document.permit.front.image'
+                  | 'document.permit.front.mime_type'
+                  | 'document.permit.back.image'
+                  | 'document.permit.back.mime_type'
+                  | 'document.permit.selfie.image'
+                  | 'document.permit.selfie.mime_type'
+                  | 'document.permit.full_name'
+                  | 'document.permit.dob'
+                  | 'document.permit.gender'
+                  | 'document.permit.full_address'
+                  | 'document.permit.document_number'
+                  | 'document.permit.expires_at'
+                  | 'document.permit.issued_at'
+                  | 'document.permit.issuing_state'
+                  | 'document.permit.issuing_country'
+                  | 'document.permit.ref_number'
+                  | 'document.permit.nationality'
+                  | 'document.permit.curp'
+                  | 'document.permit.clave_de_elector'
+                  | 'document.permit.classified_document_type'
+                  | 'document.permit.curp_validation_response'
+                  | 'document.visa.front.image'
+                  | 'document.visa.front.mime_type'
+                  | 'document.visa.back.image'
+                  | 'document.visa.back.mime_type'
+                  | 'document.visa.selfie.image'
+                  | 'document.visa.selfie.mime_type'
+                  | 'document.visa.full_name'
+                  | 'document.visa.dob'
+                  | 'document.visa.gender'
+                  | 'document.visa.full_address'
+                  | 'document.visa.document_number'
+                  | 'document.visa.expires_at'
+                  | 'document.visa.issued_at'
+                  | 'document.visa.issuing_state'
+                  | 'document.visa.issuing_country'
+                  | 'document.visa.ref_number'
+                  | 'document.visa.nationality'
+                  | 'document.visa.curp'
+                  | 'document.visa.clave_de_elector'
+                  | 'document.visa.classified_document_type'
+                  | 'document.visa.curp_validation_response'
+                  | 'document.residence_document.front.image'
+                  | 'document.residence_document.front.mime_type'
+                  | 'document.residence_document.back.image'
+                  | 'document.residence_document.back.mime_type'
+                  | 'document.residence_document.selfie.image'
+                  | 'document.residence_document.selfie.mime_type'
+                  | 'document.residence_document.full_name'
+                  | 'document.residence_document.dob'
+                  | 'document.residence_document.gender'
+                  | 'document.residence_document.full_address'
+                  | 'document.residence_document.document_number'
+                  | 'document.residence_document.expires_at'
+                  | 'document.residence_document.issued_at'
+                  | 'document.residence_document.issuing_state'
+                  | 'document.residence_document.issuing_country'
+                  | 'document.residence_document.ref_number'
+                  | 'document.residence_document.nationality'
+                  | 'document.residence_document.curp'
+                  | 'document.residence_document.clave_de_elector'
+                  | 'document.residence_document.classified_document_type'
+                  | 'document.residence_document.curp_validation_response'
+                  | 'document.voter_identification.front.image'
+                  | 'document.voter_identification.front.mime_type'
+                  | 'document.voter_identification.back.image'
+                  | 'document.voter_identification.back.mime_type'
+                  | 'document.voter_identification.selfie.image'
+                  | 'document.voter_identification.selfie.mime_type'
+                  | 'document.voter_identification.full_name'
+                  | 'document.voter_identification.dob'
+                  | 'document.voter_identification.gender'
+                  | 'document.voter_identification.full_address'
+                  | 'document.voter_identification.document_number'
+                  | 'document.voter_identification.expires_at'
+                  | 'document.voter_identification.issued_at'
+                  | 'document.voter_identification.issuing_state'
+                  | 'document.voter_identification.issuing_country'
+                  | 'document.voter_identification.ref_number'
+                  | 'document.voter_identification.nationality'
+                  | 'document.voter_identification.curp'
+                  | 'document.voter_identification.clave_de_elector'
+                  | 'document.voter_identification.classified_document_type'
+                  | 'document.voter_identification.curp_validation_response'
+                  | 'document.finra_compliance_letter'
+                  | 'document.proof_of_address.image'
+                  | 'document.ssn_card.image'
+                  | 'document.custom.*'
+                  | 'card.*.number'
+                  | 'card.*.expiration'
+                  | 'card.*.cvc'
+                  | 'card.*.name'
+                  | 'card.*.billing_address.zip'
+                  | 'card.*.billing_address.country'
+                  | 'card.*.expiration_month'
+                  | 'card.*.expiration_year'
+                  | 'card.*.number_last4'
+                  | 'card.*.issuer'
+                  | 'card.*.fingerprint'
+                  | 'bank.*.name'
+                  | 'bank.*.ach_routing_number'
+                  | 'bank.*.ach_account_number'
+                  | 'bank.*.ach_account_id'
+                  | 'bank.*.account_type'
+                  | 'bank.*.fingerprint';
+                op: 'eq' | 'not_eq';
+                value: string;
+              }
+            | {
+                field:
+                  | 'id.first_name'
+                  | 'id.middle_name'
+                  | 'id.last_name'
+                  | 'id.dob'
+                  | 'id.ssn4'
+                  | 'id.ssn9'
+                  | 'id.address_line1'
+                  | 'id.address_line2'
+                  | 'id.city'
+                  | 'id.state'
+                  | 'id.zip'
+                  | 'id.country'
+                  | 'id.email'
+                  | 'id.phone_number'
+                  | 'id.us_legal_status'
+                  | 'id.visa_kind'
+                  | 'id.visa_expiration_date'
+                  | 'id.nationality'
+                  | 'id.citizenships'
+                  | 'id.drivers_license_number'
+                  | 'id.drivers_license_state'
+                  | 'id.itin'
+                  | 'id.us_tax_id'
+                  | 'business.name'
+                  | 'business.dba'
+                  | 'business.website'
+                  | 'business.phone_number'
+                  | 'business.tin'
+                  | 'business.address_line1'
+                  | 'business.address_line2'
+                  | 'business.city'
+                  | 'business.state'
+                  | 'business.zip'
+                  | 'business.country'
+                  | 'business.corporation_type'
+                  | 'business.formation_state'
+                  | 'business.formation_date'
+                  | 'custom.*'
+                  | 'investor_profile.employment_status'
+                  | 'investor_profile.occupation'
+                  | 'investor_profile.employer'
+                  | 'investor_profile.annual_income'
+                  | 'investor_profile.net_worth'
+                  | 'investor_profile.investment_goals'
+                  | 'investor_profile.risk_tolerance'
+                  | 'investor_profile.declarations'
+                  | 'investor_profile.brokerage_firm_employer'
+                  | 'investor_profile.senior_executive_symbols'
+                  | 'investor_profile.family_member_names'
+                  | 'investor_profile.political_organization'
+                  | 'investor_profile.funding_sources'
+                  | 'document.id_card.front.image'
+                  | 'document.id_card.front.mime_type'
+                  | 'document.id_card.back.image'
+                  | 'document.id_card.back.mime_type'
+                  | 'document.id_card.selfie.image'
+                  | 'document.id_card.selfie.mime_type'
+                  | 'document.id_card.full_name'
+                  | 'document.id_card.dob'
+                  | 'document.id_card.gender'
+                  | 'document.id_card.full_address'
+                  | 'document.id_card.document_number'
+                  | 'document.id_card.expires_at'
+                  | 'document.id_card.issued_at'
+                  | 'document.id_card.issuing_state'
+                  | 'document.id_card.issuing_country'
+                  | 'document.id_card.ref_number'
+                  | 'document.id_card.nationality'
+                  | 'document.id_card.curp'
+                  | 'document.id_card.clave_de_elector'
+                  | 'document.id_card.classified_document_type'
+                  | 'document.id_card.curp_validation_response'
+                  | 'document.drivers_license.front.image'
+                  | 'document.drivers_license.front.mime_type'
+                  | 'document.drivers_license.back.image'
+                  | 'document.drivers_license.back.mime_type'
+                  | 'document.drivers_license.selfie.image'
+                  | 'document.drivers_license.selfie.mime_type'
+                  | 'document.drivers_license.full_name'
+                  | 'document.drivers_license.dob'
+                  | 'document.drivers_license.gender'
+                  | 'document.drivers_license.full_address'
+                  | 'document.drivers_license.document_number'
+                  | 'document.drivers_license.expires_at'
+                  | 'document.drivers_license.issued_at'
+                  | 'document.drivers_license.issuing_state'
+                  | 'document.drivers_license.issuing_country'
+                  | 'document.drivers_license.ref_number'
+                  | 'document.drivers_license.nationality'
+                  | 'document.drivers_license.curp'
+                  | 'document.drivers_license.clave_de_elector'
+                  | 'document.drivers_license.classified_document_type'
+                  | 'document.drivers_license.curp_validation_response'
+                  | 'document.passport.front.image'
+                  | 'document.passport.front.mime_type'
+                  | 'document.passport.back.image'
+                  | 'document.passport.back.mime_type'
+                  | 'document.passport.selfie.image'
+                  | 'document.passport.selfie.mime_type'
+                  | 'document.passport.full_name'
+                  | 'document.passport.dob'
+                  | 'document.passport.gender'
+                  | 'document.passport.full_address'
+                  | 'document.passport.document_number'
+                  | 'document.passport.expires_at'
+                  | 'document.passport.issued_at'
+                  | 'document.passport.issuing_state'
+                  | 'document.passport.issuing_country'
+                  | 'document.passport.ref_number'
+                  | 'document.passport.nationality'
+                  | 'document.passport.curp'
+                  | 'document.passport.clave_de_elector'
+                  | 'document.passport.classified_document_type'
+                  | 'document.passport.curp_validation_response'
+                  | 'document.passport_card.front.image'
+                  | 'document.passport_card.front.mime_type'
+                  | 'document.passport_card.back.image'
+                  | 'document.passport_card.back.mime_type'
+                  | 'document.passport_card.selfie.image'
+                  | 'document.passport_card.selfie.mime_type'
+                  | 'document.passport_card.full_name'
+                  | 'document.passport_card.dob'
+                  | 'document.passport_card.gender'
+                  | 'document.passport_card.full_address'
+                  | 'document.passport_card.document_number'
+                  | 'document.passport_card.expires_at'
+                  | 'document.passport_card.issued_at'
+                  | 'document.passport_card.issuing_state'
+                  | 'document.passport_card.issuing_country'
+                  | 'document.passport_card.ref_number'
+                  | 'document.passport_card.nationality'
+                  | 'document.passport_card.curp'
+                  | 'document.passport_card.clave_de_elector'
+                  | 'document.passport_card.classified_document_type'
+                  | 'document.passport_card.curp_validation_response'
+                  | 'document.permit.front.image'
+                  | 'document.permit.front.mime_type'
+                  | 'document.permit.back.image'
+                  | 'document.permit.back.mime_type'
+                  | 'document.permit.selfie.image'
+                  | 'document.permit.selfie.mime_type'
+                  | 'document.permit.full_name'
+                  | 'document.permit.dob'
+                  | 'document.permit.gender'
+                  | 'document.permit.full_address'
+                  | 'document.permit.document_number'
+                  | 'document.permit.expires_at'
+                  | 'document.permit.issued_at'
+                  | 'document.permit.issuing_state'
+                  | 'document.permit.issuing_country'
+                  | 'document.permit.ref_number'
+                  | 'document.permit.nationality'
+                  | 'document.permit.curp'
+                  | 'document.permit.clave_de_elector'
+                  | 'document.permit.classified_document_type'
+                  | 'document.permit.curp_validation_response'
+                  | 'document.visa.front.image'
+                  | 'document.visa.front.mime_type'
+                  | 'document.visa.back.image'
+                  | 'document.visa.back.mime_type'
+                  | 'document.visa.selfie.image'
+                  | 'document.visa.selfie.mime_type'
+                  | 'document.visa.full_name'
+                  | 'document.visa.dob'
+                  | 'document.visa.gender'
+                  | 'document.visa.full_address'
+                  | 'document.visa.document_number'
+                  | 'document.visa.expires_at'
+                  | 'document.visa.issued_at'
+                  | 'document.visa.issuing_state'
+                  | 'document.visa.issuing_country'
+                  | 'document.visa.ref_number'
+                  | 'document.visa.nationality'
+                  | 'document.visa.curp'
+                  | 'document.visa.clave_de_elector'
+                  | 'document.visa.classified_document_type'
+                  | 'document.visa.curp_validation_response'
+                  | 'document.residence_document.front.image'
+                  | 'document.residence_document.front.mime_type'
+                  | 'document.residence_document.back.image'
+                  | 'document.residence_document.back.mime_type'
+                  | 'document.residence_document.selfie.image'
+                  | 'document.residence_document.selfie.mime_type'
+                  | 'document.residence_document.full_name'
+                  | 'document.residence_document.dob'
+                  | 'document.residence_document.gender'
+                  | 'document.residence_document.full_address'
+                  | 'document.residence_document.document_number'
+                  | 'document.residence_document.expires_at'
+                  | 'document.residence_document.issued_at'
+                  | 'document.residence_document.issuing_state'
+                  | 'document.residence_document.issuing_country'
+                  | 'document.residence_document.ref_number'
+                  | 'document.residence_document.nationality'
+                  | 'document.residence_document.curp'
+                  | 'document.residence_document.clave_de_elector'
+                  | 'document.residence_document.classified_document_type'
+                  | 'document.residence_document.curp_validation_response'
+                  | 'document.voter_identification.front.image'
+                  | 'document.voter_identification.front.mime_type'
+                  | 'document.voter_identification.back.image'
+                  | 'document.voter_identification.back.mime_type'
+                  | 'document.voter_identification.selfie.image'
+                  | 'document.voter_identification.selfie.mime_type'
+                  | 'document.voter_identification.full_name'
+                  | 'document.voter_identification.dob'
+                  | 'document.voter_identification.gender'
+                  | 'document.voter_identification.full_address'
+                  | 'document.voter_identification.document_number'
+                  | 'document.voter_identification.expires_at'
+                  | 'document.voter_identification.issued_at'
+                  | 'document.voter_identification.issuing_state'
+                  | 'document.voter_identification.issuing_country'
+                  | 'document.voter_identification.ref_number'
+                  | 'document.voter_identification.nationality'
+                  | 'document.voter_identification.curp'
+                  | 'document.voter_identification.clave_de_elector'
+                  | 'document.voter_identification.classified_document_type'
+                  | 'document.voter_identification.curp_validation_response'
+                  | 'document.finra_compliance_letter'
+                  | 'document.proof_of_address.image'
+                  | 'document.ssn_card.image'
+                  | 'document.custom.*'
+                  | 'card.*.number'
+                  | 'card.*.expiration'
+                  | 'card.*.cvc'
+                  | 'card.*.name'
+                  | 'card.*.billing_address.zip'
+                  | 'card.*.billing_address.country'
+                  | 'card.*.expiration_month'
+                  | 'card.*.expiration_year'
+                  | 'card.*.number_last4'
+                  | 'card.*.issuer'
+                  | 'card.*.fingerprint'
+                  | 'bank.*.name'
+                  | 'bank.*.ach_routing_number'
+                  | 'bank.*.ach_account_number'
+                  | 'bank.*.ach_account_id'
+                  | 'bank.*.account_type'
+                  | 'bank.*.fingerprint';
+                op: 'is_in' | 'is_not_in';
+                value: string;
+              }
+          )
+        | {
+            field: 'ip_address';
+            op: 'is_in' | 'is_not_in';
+            value: string;
+          }
+        | {
+            field: 'experian_score' | 'incode_selfie_match_score';
+            op: 'gt' | 'lt';
+            value: number;
+          }
+      >;
       ruleId: string;
     }>;
   }>;
@@ -11733,7 +18733,34 @@ export type ListEntitiesSearchRequest = {
   watchlistHit?: boolean;
 };
 export type ListEntry = {
-  actor: 'footprint';
+  actor:
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'user';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'tenant_user';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'tenant_api_key';
+      }
+    | {
+        kind: 'footprint';
+      }
+    | {
+        data: {
+          id: string;
+        };
+        kind: 'firm_employee';
+      };
   createdAt: string;
   data: string;
   id: string;
@@ -11775,7 +18802,7 @@ export type LivenessEvent = {
     | 'apple_device_attestation'
     | 'google_device_attestation';
 };
-export type source3 =
+export type source2 =
   | 'skipped'
   | 'webauthn_attestation'
   | 'privacy_pass'
@@ -11785,19 +18812,2122 @@ export type MultiUpdateRuleRequest = {
   add?: Array<{
     isShadow: boolean;
     name?: string;
-    ruleAction: string;
-    ruleExpression: Array<string>;
+    ruleAction:
+      | 'pass_with_manual_review'
+      | 'manual_review'
+      | 'fail'
+      | 'step_up.identity'
+      | 'step_up.proof_of_address'
+      | 'step_up.identity_proof_of_ssn'
+      | 'step_up.identity_proof_of_ssn_proof_of_address'
+      | 'step_up.custom'
+      | (
+          | {
+              /**
+               * ORDERING MATTERS!!!
+               */
+              config: {
+                [key: string]: unknown;
+              };
+              /**
+               * ORDERING MATTERS!!!
+               */
+              kind: 'pass_with_manual_review';
+            }
+          | {
+              config: {
+                [key: string]: unknown;
+              };
+              kind: 'manual_review';
+            }
+          | {
+              config: Array<
+                | {
+                    data: {
+                      collect_selfie: boolean;
+                      document_types_and_countries?: {
+                        country_specific: {
+                          [key: string]: unknown;
+                        };
+                        global: Array<
+                          | 'id_card'
+                          | 'drivers_license'
+                          | 'passport'
+                          | 'passport_card'
+                          | 'permit'
+                          | 'visa'
+                          | 'residence_document'
+                          | 'voter_identification'
+                        >;
+                      };
+                    };
+                    kind: 'identity';
+                  }
+                | {
+                    data: {
+                      requires_human_review: boolean;
+                    };
+                    kind: 'proof_of_ssn';
+                  }
+                | {
+                    data: {
+                      requires_human_review: boolean;
+                    };
+                    kind: 'proof_of_address';
+                  }
+                | {
+                    data: {
+                      /**
+                       * Optional human-readable description of the document that will be displayed to the user
+                       */
+                      description?: string;
+                      /**
+                       * Custom document identifier under which the document will be vaulted
+                       */
+                      identifier:
+                        | 'id.first_name'
+                        | 'id.middle_name'
+                        | 'id.last_name'
+                        | 'id.dob'
+                        | 'id.ssn4'
+                        | 'id.ssn9'
+                        | 'id.address_line1'
+                        | 'id.address_line2'
+                        | 'id.city'
+                        | 'id.state'
+                        | 'id.zip'
+                        | 'id.country'
+                        | 'id.email'
+                        | 'id.phone_number'
+                        | 'id.us_legal_status'
+                        | 'id.visa_kind'
+                        | 'id.visa_expiration_date'
+                        | 'id.nationality'
+                        | 'id.citizenships'
+                        | 'id.drivers_license_number'
+                        | 'id.drivers_license_state'
+                        | 'id.itin'
+                        | 'id.us_tax_id'
+                        | 'business.name'
+                        | 'business.dba'
+                        | 'business.website'
+                        | 'business.phone_number'
+                        | 'business.tin'
+                        | 'business.address_line1'
+                        | 'business.address_line2'
+                        | 'business.city'
+                        | 'business.state'
+                        | 'business.zip'
+                        | 'business.country'
+                        | 'business.corporation_type'
+                        | 'business.formation_state'
+                        | 'business.formation_date'
+                        | 'custom.*'
+                        | 'investor_profile.employment_status'
+                        | 'investor_profile.occupation'
+                        | 'investor_profile.employer'
+                        | 'investor_profile.annual_income'
+                        | 'investor_profile.net_worth'
+                        | 'investor_profile.investment_goals'
+                        | 'investor_profile.risk_tolerance'
+                        | 'investor_profile.declarations'
+                        | 'investor_profile.brokerage_firm_employer'
+                        | 'investor_profile.senior_executive_symbols'
+                        | 'investor_profile.family_member_names'
+                        | 'investor_profile.political_organization'
+                        | 'investor_profile.funding_sources'
+                        | 'document.id_card.front.image'
+                        | 'document.id_card.front.mime_type'
+                        | 'document.id_card.back.image'
+                        | 'document.id_card.back.mime_type'
+                        | 'document.id_card.selfie.image'
+                        | 'document.id_card.selfie.mime_type'
+                        | 'document.id_card.full_name'
+                        | 'document.id_card.dob'
+                        | 'document.id_card.gender'
+                        | 'document.id_card.full_address'
+                        | 'document.id_card.document_number'
+                        | 'document.id_card.expires_at'
+                        | 'document.id_card.issued_at'
+                        | 'document.id_card.issuing_state'
+                        | 'document.id_card.issuing_country'
+                        | 'document.id_card.ref_number'
+                        | 'document.id_card.nationality'
+                        | 'document.id_card.curp'
+                        | 'document.id_card.clave_de_elector'
+                        | 'document.id_card.classified_document_type'
+                        | 'document.id_card.curp_validation_response'
+                        | 'document.drivers_license.front.image'
+                        | 'document.drivers_license.front.mime_type'
+                        | 'document.drivers_license.back.image'
+                        | 'document.drivers_license.back.mime_type'
+                        | 'document.drivers_license.selfie.image'
+                        | 'document.drivers_license.selfie.mime_type'
+                        | 'document.drivers_license.full_name'
+                        | 'document.drivers_license.dob'
+                        | 'document.drivers_license.gender'
+                        | 'document.drivers_license.full_address'
+                        | 'document.drivers_license.document_number'
+                        | 'document.drivers_license.expires_at'
+                        | 'document.drivers_license.issued_at'
+                        | 'document.drivers_license.issuing_state'
+                        | 'document.drivers_license.issuing_country'
+                        | 'document.drivers_license.ref_number'
+                        | 'document.drivers_license.nationality'
+                        | 'document.drivers_license.curp'
+                        | 'document.drivers_license.clave_de_elector'
+                        | 'document.drivers_license.classified_document_type'
+                        | 'document.drivers_license.curp_validation_response'
+                        | 'document.passport.front.image'
+                        | 'document.passport.front.mime_type'
+                        | 'document.passport.back.image'
+                        | 'document.passport.back.mime_type'
+                        | 'document.passport.selfie.image'
+                        | 'document.passport.selfie.mime_type'
+                        | 'document.passport.full_name'
+                        | 'document.passport.dob'
+                        | 'document.passport.gender'
+                        | 'document.passport.full_address'
+                        | 'document.passport.document_number'
+                        | 'document.passport.expires_at'
+                        | 'document.passport.issued_at'
+                        | 'document.passport.issuing_state'
+                        | 'document.passport.issuing_country'
+                        | 'document.passport.ref_number'
+                        | 'document.passport.nationality'
+                        | 'document.passport.curp'
+                        | 'document.passport.clave_de_elector'
+                        | 'document.passport.classified_document_type'
+                        | 'document.passport.curp_validation_response'
+                        | 'document.passport_card.front.image'
+                        | 'document.passport_card.front.mime_type'
+                        | 'document.passport_card.back.image'
+                        | 'document.passport_card.back.mime_type'
+                        | 'document.passport_card.selfie.image'
+                        | 'document.passport_card.selfie.mime_type'
+                        | 'document.passport_card.full_name'
+                        | 'document.passport_card.dob'
+                        | 'document.passport_card.gender'
+                        | 'document.passport_card.full_address'
+                        | 'document.passport_card.document_number'
+                        | 'document.passport_card.expires_at'
+                        | 'document.passport_card.issued_at'
+                        | 'document.passport_card.issuing_state'
+                        | 'document.passport_card.issuing_country'
+                        | 'document.passport_card.ref_number'
+                        | 'document.passport_card.nationality'
+                        | 'document.passport_card.curp'
+                        | 'document.passport_card.clave_de_elector'
+                        | 'document.passport_card.classified_document_type'
+                        | 'document.passport_card.curp_validation_response'
+                        | 'document.permit.front.image'
+                        | 'document.permit.front.mime_type'
+                        | 'document.permit.back.image'
+                        | 'document.permit.back.mime_type'
+                        | 'document.permit.selfie.image'
+                        | 'document.permit.selfie.mime_type'
+                        | 'document.permit.full_name'
+                        | 'document.permit.dob'
+                        | 'document.permit.gender'
+                        | 'document.permit.full_address'
+                        | 'document.permit.document_number'
+                        | 'document.permit.expires_at'
+                        | 'document.permit.issued_at'
+                        | 'document.permit.issuing_state'
+                        | 'document.permit.issuing_country'
+                        | 'document.permit.ref_number'
+                        | 'document.permit.nationality'
+                        | 'document.permit.curp'
+                        | 'document.permit.clave_de_elector'
+                        | 'document.permit.classified_document_type'
+                        | 'document.permit.curp_validation_response'
+                        | 'document.visa.front.image'
+                        | 'document.visa.front.mime_type'
+                        | 'document.visa.back.image'
+                        | 'document.visa.back.mime_type'
+                        | 'document.visa.selfie.image'
+                        | 'document.visa.selfie.mime_type'
+                        | 'document.visa.full_name'
+                        | 'document.visa.dob'
+                        | 'document.visa.gender'
+                        | 'document.visa.full_address'
+                        | 'document.visa.document_number'
+                        | 'document.visa.expires_at'
+                        | 'document.visa.issued_at'
+                        | 'document.visa.issuing_state'
+                        | 'document.visa.issuing_country'
+                        | 'document.visa.ref_number'
+                        | 'document.visa.nationality'
+                        | 'document.visa.curp'
+                        | 'document.visa.clave_de_elector'
+                        | 'document.visa.classified_document_type'
+                        | 'document.visa.curp_validation_response'
+                        | 'document.residence_document.front.image'
+                        | 'document.residence_document.front.mime_type'
+                        | 'document.residence_document.back.image'
+                        | 'document.residence_document.back.mime_type'
+                        | 'document.residence_document.selfie.image'
+                        | 'document.residence_document.selfie.mime_type'
+                        | 'document.residence_document.full_name'
+                        | 'document.residence_document.dob'
+                        | 'document.residence_document.gender'
+                        | 'document.residence_document.full_address'
+                        | 'document.residence_document.document_number'
+                        | 'document.residence_document.expires_at'
+                        | 'document.residence_document.issued_at'
+                        | 'document.residence_document.issuing_state'
+                        | 'document.residence_document.issuing_country'
+                        | 'document.residence_document.ref_number'
+                        | 'document.residence_document.nationality'
+                        | 'document.residence_document.curp'
+                        | 'document.residence_document.clave_de_elector'
+                        | 'document.residence_document.classified_document_type'
+                        | 'document.residence_document.curp_validation_response'
+                        | 'document.voter_identification.front.image'
+                        | 'document.voter_identification.front.mime_type'
+                        | 'document.voter_identification.back.image'
+                        | 'document.voter_identification.back.mime_type'
+                        | 'document.voter_identification.selfie.image'
+                        | 'document.voter_identification.selfie.mime_type'
+                        | 'document.voter_identification.full_name'
+                        | 'document.voter_identification.dob'
+                        | 'document.voter_identification.gender'
+                        | 'document.voter_identification.full_address'
+                        | 'document.voter_identification.document_number'
+                        | 'document.voter_identification.expires_at'
+                        | 'document.voter_identification.issued_at'
+                        | 'document.voter_identification.issuing_state'
+                        | 'document.voter_identification.issuing_country'
+                        | 'document.voter_identification.ref_number'
+                        | 'document.voter_identification.nationality'
+                        | 'document.voter_identification.curp'
+                        | 'document.voter_identification.clave_de_elector'
+                        | 'document.voter_identification.classified_document_type'
+                        | 'document.voter_identification.curp_validation_response'
+                        | 'document.finra_compliance_letter'
+                        | 'document.proof_of_address.image'
+                        | 'document.ssn_card.image'
+                        | 'document.custom.*'
+                        | 'card.*.number'
+                        | 'card.*.expiration'
+                        | 'card.*.cvc'
+                        | 'card.*.name'
+                        | 'card.*.billing_address.zip'
+                        | 'card.*.billing_address.country'
+                        | 'card.*.expiration_month'
+                        | 'card.*.expiration_year'
+                        | 'card.*.number_last4'
+                        | 'card.*.issuer'
+                        | 'card.*.fingerprint'
+                        | 'bank.*.name'
+                        | 'bank.*.ach_routing_number'
+                        | 'bank.*.ach_account_number'
+                        | 'bank.*.ach_account_id'
+                        | 'bank.*.account_type'
+                        | 'bank.*.fingerprint';
+                      /**
+                       * The human-readable name of the document to display to the user
+                       */
+                      name: string;
+                      requires_human_review: boolean;
+                      upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                    };
+                    kind: 'custom';
+                  }
+              >;
+              kind: 'step_up';
+            }
+          | {
+              config: {
+                [key: string]: unknown;
+              };
+              kind: 'fail';
+            }
+        );
+    ruleExpression: Array<
+      | {
+          field:
+            | 'watchlist_hit_ofac'
+            | 'watchlist_hit_non_sdn'
+            | 'watchlist_hit_warning'
+            | 'watchlist_hit_pep'
+            | 'adverse_media_hit'
+            | 'id_not_located'
+            | 'id_flagged'
+            | 'credit_more_than3_inquiries_in_last30_days'
+            | 'credit_established_before_ssn_date'
+            | 'address_input_is_non_residential'
+            | 'address_located_is_non_residential'
+            | 'address_does_not_match'
+            | 'address_partially_matches'
+            | 'address_zip_code_does_not_match'
+            | 'address_city_does_not_match'
+            | 'address_city_matches'
+            | 'address_street_name_does_not_match'
+            | 'address_street_name_partially_matches'
+            | 'address_street_number_does_not_match'
+            | 'address_state_does_not_match'
+            | 'address_input_is_not_deliverable'
+            | 'address_input_is_po_box'
+            | 'address_input_is_correctional_facility'
+            | 'address_input_is_not_standard_campground'
+            | 'address_input_is_not_standard_college'
+            | 'address_input_is_not_standard_general_delivery'
+            | 'address_input_is_not_standard_hospital'
+            | 'address_input_is_not_standard_hotel'
+            | 'address_input_is_not_standard_mail_drop'
+            | 'address_input_is_not_standard_prison'
+            | 'address_input_is_not_standard_university'
+            | 'address_input_is_not_standard_uspo'
+            | 'address_input_not_on_file'
+            | 'address_located_is_po_box'
+            | 'address_located_is_not_standard_campground'
+            | 'address_located_is_not_standard_college'
+            | 'address_located_is_not_standard_general_delivery'
+            | 'address_located_is_not_standard_hospital'
+            | 'address_located_is_not_standard_hotel'
+            | 'address_located_is_not_standard_mail_drop'
+            | 'address_located_is_not_standard_prison'
+            | 'address_located_is_not_standard_university'
+            | 'address_located_is_not_standard_uspo'
+            | 'address_located_is_high_risk_address'
+            | 'address_risk_alert'
+            | 'address_alert_velocity'
+            | 'address_alert_stability'
+            | 'address_alert_longevity'
+            | 'address_alert_single_address_in_file'
+            | 'address_newer_record_found'
+            | 'dob_yob_does_not_match'
+            | 'dob_yob_does_not_match_within1_year'
+            | 'dob_mob_does_not_match'
+            | 'dob_day_does_not_match'
+            | 'dob_mob_not_available'
+            | 'dob_yob_not_available'
+            | 'dob_located_age_below_minimum'
+            | 'dob_located_age_above_maximum'
+            | 'dob_located_coppa_alert'
+            | 'dob_does_not_match'
+            | 'dob_partial_match'
+            | 'dob_not_on_file'
+            | 'dob_could_not_match'
+            | 'dob_input_age_less_than18'
+            | 'ssn_not_available'
+            | 'ssn_not_on_file'
+            | 'ssn_partially_matches'
+            | 'ssn_does_not_match'
+            | 'ssn_does_not_match_within1_digit'
+            | 'ssn_input_is_itin'
+            | 'ssn_located_is_itin'
+            | 'ssn_input_tied_to_multiple_names'
+            | 'ssn_input_is_invalid'
+            | 'ssn_located_is_invalid'
+            | 'ssn_not_provided'
+            | 'us_tax_id_is_itin'
+            | 'itin_is_expired'
+            | 'name_last_does_not_match'
+            | 'name_last_partially_matches'
+            | 'name_matches'
+            | 'name_does_not_match'
+            | 'name_partially_matches'
+            | 'ip_state_does_not_match'
+            | 'ip_input_invalid'
+            | 'ip_not_located'
+            | 'ip_location_not_available'
+            | 'ip_alert_high_risk_bot'
+            | 'ip_alert_high_risk_spam'
+            | 'ip_alert_high_risk_tor'
+            | 'ip_alert_high_risk_proxy'
+            | 'ip_proxy'
+            | 'ip_data_center'
+            | 'ip_alert_data_center'
+            | 'email_address_invalid'
+            | 'email_address_or_domain_does_not_exist'
+            | 'email_domain_recently_created'
+            | 'email_domain_private'
+            | 'email_domain_corporate'
+            | 'email_recently_verified'
+            | 'email_found_on_file'
+            | 'email_not_found_on_file'
+            | 'email_high_risk_country'
+            | 'email_high_risk_fraud'
+            | 'email_high_risk_tumbled'
+            | 'email_high_risk_disposable'
+            | 'email_high_risk_domain'
+            | 'sentilink_synthetic_identity_high_risk'
+            | 'sentilink_synthetic_identity_medium_risk'
+            | 'sentilink_synthetic_identity_low_risk'
+            | 'synthetic_identity_high_risk'
+            | 'synthetic_identity_medium_risk'
+            | 'synthetic_identity_low_risk'
+            | 'sentilink_identity_theft_high_risk'
+            | 'sentilink_identity_theft_medium_risk'
+            | 'sentilink_identity_theft_low_risk'
+            | 'phone_number_input_invalid'
+            | 'phone_number_located_is_voip'
+            | 'phone_number_is_voip'
+            | 'phone_number_mobile_account_type_postpaid'
+            | 'phone_number_mobile_account_type_prepaid'
+            | 'phone_number_mobile_account_type_unknown'
+            | 'phone_number_mobile_account_status_active'
+            | 'phone_number_mobile_account_status_deactivated'
+            | 'phone_number_mobile_account_status_suspended'
+            | 'phone_number_mobile_account_status_absent'
+            | 'phone_located_matches'
+            | 'phone_located_partially_matches'
+            | 'phone_located_does_not_match'
+            | 'phone_located_name_matches'
+            | 'phone_located_name_partially_matches'
+            | 'phone_located_name_does_not_match'
+            | 'phone_located_address_matches'
+            | 'phone_located_address_partially_matches'
+            | 'phone_located_address_does_not_match'
+            | 'phone_input_likely_belongs_to_another'
+            | 'phone_not_provided'
+            | 'multiple_records_found'
+            | 'subject_deceased'
+            | 'bureau_deleted_record'
+            | 'ssn_issued_prior_to_dob'
+            | 'ssn_issue_date_cannot_be_verified'
+            | 'ssn_located_issue_date_cannot_be_verified'
+            | 'ssn_potentially_belongs_to_another'
+            | 'ssn_likely_belongs_to_another'
+            | 'thin_file'
+            | 'input_phone_number_does_not_match_input_state'
+            | 'input_phone_number_does_not_match_located_state_history'
+            | 'input_phone_number_does_not_match_ip_state'
+            | 'drivers_license_number_different_number_found'
+            | 'drivers_license_number_not_on_record'
+            | 'drivers_license_number_not_valid'
+            | 'drivers_license_number_is_valid'
+            | 'document_upload_failed'
+            | 'document_not_verified'
+            | 'document_verified'
+            | 'document_ocr_not_successful'
+            | 'document_ocr_successful'
+            | 'document_barcode_could_not_be_read'
+            | 'document_barcode_could_be_read'
+            | 'document_barcode_content_matches'
+            | 'document_barcode_content_does_not_match'
+            | 'document_barcode_detected'
+            | 'document_barcode_could_not_be_detected'
+            | 'document_requires_review'
+            | 'document_expired'
+            | 'document_not_expired'
+            | 'document_from_restricted_country'
+            | 'document_restricted_template_type'
+            | 'document_type_not_allowed'
+            | 'document_field_crosscheck_failed'
+            | 'document_invalid_issuance_or_expiration_date'
+            | 'document_invalid_template_layout'
+            | 'document_possible_image_tampering'
+            | 'document_no_image_tampering'
+            | 'document_no_image_alteration_front'
+            | 'document_no_image_alteration_back'
+            | 'document_possible_image_alteration_front'
+            | 'document_possible_image_alteration_back'
+            | 'document_possible_image_alteration'
+            | 'document_possible_digital_fraud'
+            | 'document_selfie_used_with_different_information'
+            | 'document_selfie_not_used_with_different_information'
+            | 'document_selfie_mask'
+            | 'document_selfie_glasses'
+            | 'document_selfie_not_live_image'
+            | 'document_possible_fake_image'
+            | 'document_not_fake_image'
+            | 'document_pdf417_data_is_valid'
+            | 'document_pdf417_data_is_not_valid'
+            | 'document_photo_is_screen_capture'
+            | 'document_photo_is_not_screen_capture'
+            | 'document_photo_is_paper_capture'
+            | 'document_photo_is_not_paper_capture'
+            | 'document_alignment_failed'
+            | 'document_visible_photo_features_not_verified'
+            | 'document_mrz_line_format_check'
+            | 'document_qr_code_check'
+            | 'document_could_not_classify'
+            | 'document_visible_photo_features_verified'
+            | 'document_low_match_score_with_selfie'
+            | 'document_selfie_matches'
+            | 'document_selfie_does_not_match'
+            | 'document_selfie_bad_quality'
+            | 'document_type_mismatch'
+            | 'document_unknown_country_code'
+            | 'document_country_code_mismatch'
+            | 'document_is_permit_or_provisional_license'
+            | 'document_selfie_was_skipped'
+            | 'document_collected_via_desktop'
+            | 'document_not_live_capture'
+            | 'document_live_capture_failed'
+            | 'document_ocr_name_does_not_match'
+            | 'document_ocr_name_could_not_match'
+            | 'document_ocr_name_matches'
+            | 'document_ocr_address_does_not_match'
+            | 'document_ocr_address_could_not_match'
+            | 'document_ocr_address_matches'
+            | 'document_ocr_first_name_does_not_match'
+            | 'document_ocr_first_name_matches'
+            | 'document_ocr_last_name_does_not_match'
+            | 'document_ocr_last_name_matches'
+            | 'document_ocr_dob_does_not_match'
+            | 'document_ocr_dob_could_not_match'
+            | 'document_ocr_dob_matches'
+            | 'document_dob_crosscheck_matches'
+            | 'document_dob_crosscheck_does_not_match'
+            | 'document_expiration_date_crosscheck_matches'
+            | 'document_expiration_date_crosscheck_does_not_match'
+            | 'document_sex_crosscheck_matches'
+            | 'document_sex_crosscheck_does_not_match'
+            | 'document_full_name_crosscheck_matches'
+            | 'document_full_name_crosscheck_does_not_match'
+            | 'document_number_crosscheck_matches'
+            | 'document_number_crosscheck_does_not_match'
+            | 'document_expiration_check_digit_matches'
+            | 'document_expiration_check_digit_does_not_match'
+            | 'document_dob_check_digit_matches'
+            | 'document_dob_check_digit_does_not_match'
+            | 'document_number_check_digit_matches'
+            | 'document_number_check_digit_does_not_match'
+            | 'curp_not_valid'
+            | 'curp_not_found'
+            | 'curp_valid'
+            | 'curp_input_curp_invalid'
+            | 'curp_could_not_validate'
+            | 'curp_multiple_results_for_data'
+            | 'curp_service_not_available'
+            | 'curp_malformed'
+            | 'address_matches'
+            | 'address_zip_code_matches'
+            | 'address_street_name_matches'
+            | 'address_street_number_matches'
+            | 'address_state_matches'
+            | 'dob_matches'
+            | 'dob_yob_matches'
+            | 'dob_mob_matches'
+            | 'ssn_matches'
+            | 'name_last_matches'
+            | 'name_first_matches'
+            | 'name_first_does_not_match'
+            | 'name_first_partially_matches'
+            | 'ip_state_matches'
+            | 'phone_number_matches'
+            | 'input_phone_number_matches_input_state'
+            | 'input_phone_number_matches_located_state_history'
+            | 'affiliated_with_broker_or_finra'
+            | 'visa_is_other'
+            | 'visa_expired_or_expiring_soon'
+            | 'business_name_match'
+            | 'business_name_similar_match'
+            | 'business_name_alternate_match'
+            | 'business_name_does_not_match'
+            | 'business_name_no_watchlist_hits'
+            | 'business_name_watchlist_hit'
+            | 'business_dba_match'
+            | 'business_dba_similar_match'
+            | 'business_dba_alternate_match'
+            | 'business_dba_does_not_match'
+            | 'business_phone_number_match'
+            | 'business_phone_number_does_not_match'
+            | 'business_website_online'
+            | 'business_website_offline'
+            | 'business_website_verified'
+            | 'business_website_unverified'
+            | 'business_website_parking_page'
+            | 'tin_match'
+            | 'tin_not_found'
+            | 'tin_invalid'
+            | 'tin_does_not_match'
+            | 'business_address_match'
+            | 'business_address_close_match'
+            | 'business_address_similar_match'
+            | 'business_address_incomplete_match'
+            | 'business_address_does_not_match'
+            | 'business_address_commercial'
+            | 'business_address_commercial_mail_receiving_agency'
+            | 'business_address_residential'
+            | 'business_address_deliverable'
+            | 'business_address_not_deliverable'
+            | 'beneficial_owners_match'
+            | 'beneficial_owners_partial_match'
+            | 'beneficial_owners_do_not_match'
+            | 'beneficial_owner_failed_kyc'
+            | 'beneficial_owner_possible_missing_bo'
+            | 'sos_active_filing_found'
+            | 'sos_filing_no_status'
+            | 'sos_filing_partially_active'
+            | 'sos_filing_no_active_found'
+            | 'sos_filing_not_found'
+            | 'sos_domestic_active_filing_found'
+            | 'sos_domestic_filing_no_status'
+            | 'sos_domestic_filing_partially_active'
+            | 'sos_domestic_filing_not_found'
+            | 'sos_domestic_filing_status_good_standing'
+            | 'sos_domestic_filing_status_pending_active'
+            | 'sos_domestic_filing_status_pending_inactive'
+            | 'sos_domestic_filing_status_not_provided_by_state'
+            | 'sos_domestic_filing_status_not_in_good_standing'
+            | 'sos_domestic_filing_status_dissolved'
+            | 'sos_business_address_active_filing_found'
+            | 'sos_business_address_filing_status_not_available'
+            | 'sos_business_address_inactive_filing_found'
+            | 'sos_business_address_filing_not_found'
+            | 'device_low_risk'
+            | 'device_medium_risk'
+            | 'device_high_risk'
+            | 'device_factory_reset'
+            | 'device_gps_spoofing'
+            | 'ip_vpn'
+            | 'ip_tor_exit_node'
+            | 'device_bot_risk'
+            | 'device_suspicious'
+            | 'device_velocity'
+            | 'device_multiple_users'
+            | 'device_reputation'
+            | 'browser_incognito'
+            | 'browser_tampering'
+            | 'browser_automation'
+            | 'attested_device_apple'
+            | 'attested_device_android'
+            | 'attested_device_android_strong_integrity'
+            | 'attested_device_android_unlicensed'
+            | 'attested_device_android_risky'
+            | 'attested_device_android_failed_evaluation'
+            | 'attested_device_no_fraud_duplicate_risk'
+            | 'attested_device_fraud_duplicate_risk_low'
+            | 'attested_device_fraud_duplicate_risk_medium'
+            | 'attested_device_fraud_duplicate_risk_high'
+            | 'behavior_fraud_ring_risk'
+            | 'behavior_high_risk'
+            | 'behavior_low_risk'
+            | 'behavior_automatic_activity';
+          op: 'eq' | 'not_eq';
+          value: boolean;
+        }
+      | (
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'eq' | 'not_eq';
+              value: string;
+            }
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'is_in' | 'is_not_in';
+              value: string;
+            }
+        )
+      | {
+          field: 'ip_address';
+          op: 'is_in' | 'is_not_in';
+          value: string;
+        }
+      | {
+          field: 'experian_score' | 'incode_selfie_match_score';
+          op: 'gt' | 'lt';
+          value: number;
+        }
+    >;
   }>;
   delete?: Array<string>;
   edit?: Array<{
-    ruleExpression: Array<string>;
+    ruleExpression: Array<
+      | {
+          field:
+            | 'watchlist_hit_ofac'
+            | 'watchlist_hit_non_sdn'
+            | 'watchlist_hit_warning'
+            | 'watchlist_hit_pep'
+            | 'adverse_media_hit'
+            | 'id_not_located'
+            | 'id_flagged'
+            | 'credit_more_than3_inquiries_in_last30_days'
+            | 'credit_established_before_ssn_date'
+            | 'address_input_is_non_residential'
+            | 'address_located_is_non_residential'
+            | 'address_does_not_match'
+            | 'address_partially_matches'
+            | 'address_zip_code_does_not_match'
+            | 'address_city_does_not_match'
+            | 'address_city_matches'
+            | 'address_street_name_does_not_match'
+            | 'address_street_name_partially_matches'
+            | 'address_street_number_does_not_match'
+            | 'address_state_does_not_match'
+            | 'address_input_is_not_deliverable'
+            | 'address_input_is_po_box'
+            | 'address_input_is_correctional_facility'
+            | 'address_input_is_not_standard_campground'
+            | 'address_input_is_not_standard_college'
+            | 'address_input_is_not_standard_general_delivery'
+            | 'address_input_is_not_standard_hospital'
+            | 'address_input_is_not_standard_hotel'
+            | 'address_input_is_not_standard_mail_drop'
+            | 'address_input_is_not_standard_prison'
+            | 'address_input_is_not_standard_university'
+            | 'address_input_is_not_standard_uspo'
+            | 'address_input_not_on_file'
+            | 'address_located_is_po_box'
+            | 'address_located_is_not_standard_campground'
+            | 'address_located_is_not_standard_college'
+            | 'address_located_is_not_standard_general_delivery'
+            | 'address_located_is_not_standard_hospital'
+            | 'address_located_is_not_standard_hotel'
+            | 'address_located_is_not_standard_mail_drop'
+            | 'address_located_is_not_standard_prison'
+            | 'address_located_is_not_standard_university'
+            | 'address_located_is_not_standard_uspo'
+            | 'address_located_is_high_risk_address'
+            | 'address_risk_alert'
+            | 'address_alert_velocity'
+            | 'address_alert_stability'
+            | 'address_alert_longevity'
+            | 'address_alert_single_address_in_file'
+            | 'address_newer_record_found'
+            | 'dob_yob_does_not_match'
+            | 'dob_yob_does_not_match_within1_year'
+            | 'dob_mob_does_not_match'
+            | 'dob_day_does_not_match'
+            | 'dob_mob_not_available'
+            | 'dob_yob_not_available'
+            | 'dob_located_age_below_minimum'
+            | 'dob_located_age_above_maximum'
+            | 'dob_located_coppa_alert'
+            | 'dob_does_not_match'
+            | 'dob_partial_match'
+            | 'dob_not_on_file'
+            | 'dob_could_not_match'
+            | 'dob_input_age_less_than18'
+            | 'ssn_not_available'
+            | 'ssn_not_on_file'
+            | 'ssn_partially_matches'
+            | 'ssn_does_not_match'
+            | 'ssn_does_not_match_within1_digit'
+            | 'ssn_input_is_itin'
+            | 'ssn_located_is_itin'
+            | 'ssn_input_tied_to_multiple_names'
+            | 'ssn_input_is_invalid'
+            | 'ssn_located_is_invalid'
+            | 'ssn_not_provided'
+            | 'us_tax_id_is_itin'
+            | 'itin_is_expired'
+            | 'name_last_does_not_match'
+            | 'name_last_partially_matches'
+            | 'name_matches'
+            | 'name_does_not_match'
+            | 'name_partially_matches'
+            | 'ip_state_does_not_match'
+            | 'ip_input_invalid'
+            | 'ip_not_located'
+            | 'ip_location_not_available'
+            | 'ip_alert_high_risk_bot'
+            | 'ip_alert_high_risk_spam'
+            | 'ip_alert_high_risk_tor'
+            | 'ip_alert_high_risk_proxy'
+            | 'ip_proxy'
+            | 'ip_data_center'
+            | 'ip_alert_data_center'
+            | 'email_address_invalid'
+            | 'email_address_or_domain_does_not_exist'
+            | 'email_domain_recently_created'
+            | 'email_domain_private'
+            | 'email_domain_corporate'
+            | 'email_recently_verified'
+            | 'email_found_on_file'
+            | 'email_not_found_on_file'
+            | 'email_high_risk_country'
+            | 'email_high_risk_fraud'
+            | 'email_high_risk_tumbled'
+            | 'email_high_risk_disposable'
+            | 'email_high_risk_domain'
+            | 'sentilink_synthetic_identity_high_risk'
+            | 'sentilink_synthetic_identity_medium_risk'
+            | 'sentilink_synthetic_identity_low_risk'
+            | 'synthetic_identity_high_risk'
+            | 'synthetic_identity_medium_risk'
+            | 'synthetic_identity_low_risk'
+            | 'sentilink_identity_theft_high_risk'
+            | 'sentilink_identity_theft_medium_risk'
+            | 'sentilink_identity_theft_low_risk'
+            | 'phone_number_input_invalid'
+            | 'phone_number_located_is_voip'
+            | 'phone_number_is_voip'
+            | 'phone_number_mobile_account_type_postpaid'
+            | 'phone_number_mobile_account_type_prepaid'
+            | 'phone_number_mobile_account_type_unknown'
+            | 'phone_number_mobile_account_status_active'
+            | 'phone_number_mobile_account_status_deactivated'
+            | 'phone_number_mobile_account_status_suspended'
+            | 'phone_number_mobile_account_status_absent'
+            | 'phone_located_matches'
+            | 'phone_located_partially_matches'
+            | 'phone_located_does_not_match'
+            | 'phone_located_name_matches'
+            | 'phone_located_name_partially_matches'
+            | 'phone_located_name_does_not_match'
+            | 'phone_located_address_matches'
+            | 'phone_located_address_partially_matches'
+            | 'phone_located_address_does_not_match'
+            | 'phone_input_likely_belongs_to_another'
+            | 'phone_not_provided'
+            | 'multiple_records_found'
+            | 'subject_deceased'
+            | 'bureau_deleted_record'
+            | 'ssn_issued_prior_to_dob'
+            | 'ssn_issue_date_cannot_be_verified'
+            | 'ssn_located_issue_date_cannot_be_verified'
+            | 'ssn_potentially_belongs_to_another'
+            | 'ssn_likely_belongs_to_another'
+            | 'thin_file'
+            | 'input_phone_number_does_not_match_input_state'
+            | 'input_phone_number_does_not_match_located_state_history'
+            | 'input_phone_number_does_not_match_ip_state'
+            | 'drivers_license_number_different_number_found'
+            | 'drivers_license_number_not_on_record'
+            | 'drivers_license_number_not_valid'
+            | 'drivers_license_number_is_valid'
+            | 'document_upload_failed'
+            | 'document_not_verified'
+            | 'document_verified'
+            | 'document_ocr_not_successful'
+            | 'document_ocr_successful'
+            | 'document_barcode_could_not_be_read'
+            | 'document_barcode_could_be_read'
+            | 'document_barcode_content_matches'
+            | 'document_barcode_content_does_not_match'
+            | 'document_barcode_detected'
+            | 'document_barcode_could_not_be_detected'
+            | 'document_requires_review'
+            | 'document_expired'
+            | 'document_not_expired'
+            | 'document_from_restricted_country'
+            | 'document_restricted_template_type'
+            | 'document_type_not_allowed'
+            | 'document_field_crosscheck_failed'
+            | 'document_invalid_issuance_or_expiration_date'
+            | 'document_invalid_template_layout'
+            | 'document_possible_image_tampering'
+            | 'document_no_image_tampering'
+            | 'document_no_image_alteration_front'
+            | 'document_no_image_alteration_back'
+            | 'document_possible_image_alteration_front'
+            | 'document_possible_image_alteration_back'
+            | 'document_possible_image_alteration'
+            | 'document_possible_digital_fraud'
+            | 'document_selfie_used_with_different_information'
+            | 'document_selfie_not_used_with_different_information'
+            | 'document_selfie_mask'
+            | 'document_selfie_glasses'
+            | 'document_selfie_not_live_image'
+            | 'document_possible_fake_image'
+            | 'document_not_fake_image'
+            | 'document_pdf417_data_is_valid'
+            | 'document_pdf417_data_is_not_valid'
+            | 'document_photo_is_screen_capture'
+            | 'document_photo_is_not_screen_capture'
+            | 'document_photo_is_paper_capture'
+            | 'document_photo_is_not_paper_capture'
+            | 'document_alignment_failed'
+            | 'document_visible_photo_features_not_verified'
+            | 'document_mrz_line_format_check'
+            | 'document_qr_code_check'
+            | 'document_could_not_classify'
+            | 'document_visible_photo_features_verified'
+            | 'document_low_match_score_with_selfie'
+            | 'document_selfie_matches'
+            | 'document_selfie_does_not_match'
+            | 'document_selfie_bad_quality'
+            | 'document_type_mismatch'
+            | 'document_unknown_country_code'
+            | 'document_country_code_mismatch'
+            | 'document_is_permit_or_provisional_license'
+            | 'document_selfie_was_skipped'
+            | 'document_collected_via_desktop'
+            | 'document_not_live_capture'
+            | 'document_live_capture_failed'
+            | 'document_ocr_name_does_not_match'
+            | 'document_ocr_name_could_not_match'
+            | 'document_ocr_name_matches'
+            | 'document_ocr_address_does_not_match'
+            | 'document_ocr_address_could_not_match'
+            | 'document_ocr_address_matches'
+            | 'document_ocr_first_name_does_not_match'
+            | 'document_ocr_first_name_matches'
+            | 'document_ocr_last_name_does_not_match'
+            | 'document_ocr_last_name_matches'
+            | 'document_ocr_dob_does_not_match'
+            | 'document_ocr_dob_could_not_match'
+            | 'document_ocr_dob_matches'
+            | 'document_dob_crosscheck_matches'
+            | 'document_dob_crosscheck_does_not_match'
+            | 'document_expiration_date_crosscheck_matches'
+            | 'document_expiration_date_crosscheck_does_not_match'
+            | 'document_sex_crosscheck_matches'
+            | 'document_sex_crosscheck_does_not_match'
+            | 'document_full_name_crosscheck_matches'
+            | 'document_full_name_crosscheck_does_not_match'
+            | 'document_number_crosscheck_matches'
+            | 'document_number_crosscheck_does_not_match'
+            | 'document_expiration_check_digit_matches'
+            | 'document_expiration_check_digit_does_not_match'
+            | 'document_dob_check_digit_matches'
+            | 'document_dob_check_digit_does_not_match'
+            | 'document_number_check_digit_matches'
+            | 'document_number_check_digit_does_not_match'
+            | 'curp_not_valid'
+            | 'curp_not_found'
+            | 'curp_valid'
+            | 'curp_input_curp_invalid'
+            | 'curp_could_not_validate'
+            | 'curp_multiple_results_for_data'
+            | 'curp_service_not_available'
+            | 'curp_malformed'
+            | 'address_matches'
+            | 'address_zip_code_matches'
+            | 'address_street_name_matches'
+            | 'address_street_number_matches'
+            | 'address_state_matches'
+            | 'dob_matches'
+            | 'dob_yob_matches'
+            | 'dob_mob_matches'
+            | 'ssn_matches'
+            | 'name_last_matches'
+            | 'name_first_matches'
+            | 'name_first_does_not_match'
+            | 'name_first_partially_matches'
+            | 'ip_state_matches'
+            | 'phone_number_matches'
+            | 'input_phone_number_matches_input_state'
+            | 'input_phone_number_matches_located_state_history'
+            | 'affiliated_with_broker_or_finra'
+            | 'visa_is_other'
+            | 'visa_expired_or_expiring_soon'
+            | 'business_name_match'
+            | 'business_name_similar_match'
+            | 'business_name_alternate_match'
+            | 'business_name_does_not_match'
+            | 'business_name_no_watchlist_hits'
+            | 'business_name_watchlist_hit'
+            | 'business_dba_match'
+            | 'business_dba_similar_match'
+            | 'business_dba_alternate_match'
+            | 'business_dba_does_not_match'
+            | 'business_phone_number_match'
+            | 'business_phone_number_does_not_match'
+            | 'business_website_online'
+            | 'business_website_offline'
+            | 'business_website_verified'
+            | 'business_website_unverified'
+            | 'business_website_parking_page'
+            | 'tin_match'
+            | 'tin_not_found'
+            | 'tin_invalid'
+            | 'tin_does_not_match'
+            | 'business_address_match'
+            | 'business_address_close_match'
+            | 'business_address_similar_match'
+            | 'business_address_incomplete_match'
+            | 'business_address_does_not_match'
+            | 'business_address_commercial'
+            | 'business_address_commercial_mail_receiving_agency'
+            | 'business_address_residential'
+            | 'business_address_deliverable'
+            | 'business_address_not_deliverable'
+            | 'beneficial_owners_match'
+            | 'beneficial_owners_partial_match'
+            | 'beneficial_owners_do_not_match'
+            | 'beneficial_owner_failed_kyc'
+            | 'beneficial_owner_possible_missing_bo'
+            | 'sos_active_filing_found'
+            | 'sos_filing_no_status'
+            | 'sos_filing_partially_active'
+            | 'sos_filing_no_active_found'
+            | 'sos_filing_not_found'
+            | 'sos_domestic_active_filing_found'
+            | 'sos_domestic_filing_no_status'
+            | 'sos_domestic_filing_partially_active'
+            | 'sos_domestic_filing_not_found'
+            | 'sos_domestic_filing_status_good_standing'
+            | 'sos_domestic_filing_status_pending_active'
+            | 'sos_domestic_filing_status_pending_inactive'
+            | 'sos_domestic_filing_status_not_provided_by_state'
+            | 'sos_domestic_filing_status_not_in_good_standing'
+            | 'sos_domestic_filing_status_dissolved'
+            | 'sos_business_address_active_filing_found'
+            | 'sos_business_address_filing_status_not_available'
+            | 'sos_business_address_inactive_filing_found'
+            | 'sos_business_address_filing_not_found'
+            | 'device_low_risk'
+            | 'device_medium_risk'
+            | 'device_high_risk'
+            | 'device_factory_reset'
+            | 'device_gps_spoofing'
+            | 'ip_vpn'
+            | 'ip_tor_exit_node'
+            | 'device_bot_risk'
+            | 'device_suspicious'
+            | 'device_velocity'
+            | 'device_multiple_users'
+            | 'device_reputation'
+            | 'browser_incognito'
+            | 'browser_tampering'
+            | 'browser_automation'
+            | 'attested_device_apple'
+            | 'attested_device_android'
+            | 'attested_device_android_strong_integrity'
+            | 'attested_device_android_unlicensed'
+            | 'attested_device_android_risky'
+            | 'attested_device_android_failed_evaluation'
+            | 'attested_device_no_fraud_duplicate_risk'
+            | 'attested_device_fraud_duplicate_risk_low'
+            | 'attested_device_fraud_duplicate_risk_medium'
+            | 'attested_device_fraud_duplicate_risk_high'
+            | 'behavior_fraud_ring_risk'
+            | 'behavior_high_risk'
+            | 'behavior_low_risk'
+            | 'behavior_automatic_activity';
+          op: 'eq' | 'not_eq';
+          value: boolean;
+        }
+      | (
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'eq' | 'not_eq';
+              value: string;
+            }
+          | {
+              field:
+                | 'id.first_name'
+                | 'id.middle_name'
+                | 'id.last_name'
+                | 'id.dob'
+                | 'id.ssn4'
+                | 'id.ssn9'
+                | 'id.address_line1'
+                | 'id.address_line2'
+                | 'id.city'
+                | 'id.state'
+                | 'id.zip'
+                | 'id.country'
+                | 'id.email'
+                | 'id.phone_number'
+                | 'id.us_legal_status'
+                | 'id.visa_kind'
+                | 'id.visa_expiration_date'
+                | 'id.nationality'
+                | 'id.citizenships'
+                | 'id.drivers_license_number'
+                | 'id.drivers_license_state'
+                | 'id.itin'
+                | 'id.us_tax_id'
+                | 'business.name'
+                | 'business.dba'
+                | 'business.website'
+                | 'business.phone_number'
+                | 'business.tin'
+                | 'business.address_line1'
+                | 'business.address_line2'
+                | 'business.city'
+                | 'business.state'
+                | 'business.zip'
+                | 'business.country'
+                | 'business.corporation_type'
+                | 'business.formation_state'
+                | 'business.formation_date'
+                | 'custom.*'
+                | 'investor_profile.employment_status'
+                | 'investor_profile.occupation'
+                | 'investor_profile.employer'
+                | 'investor_profile.annual_income'
+                | 'investor_profile.net_worth'
+                | 'investor_profile.investment_goals'
+                | 'investor_profile.risk_tolerance'
+                | 'investor_profile.declarations'
+                | 'investor_profile.brokerage_firm_employer'
+                | 'investor_profile.senior_executive_symbols'
+                | 'investor_profile.family_member_names'
+                | 'investor_profile.political_organization'
+                | 'investor_profile.funding_sources'
+                | 'document.id_card.front.image'
+                | 'document.id_card.front.mime_type'
+                | 'document.id_card.back.image'
+                | 'document.id_card.back.mime_type'
+                | 'document.id_card.selfie.image'
+                | 'document.id_card.selfie.mime_type'
+                | 'document.id_card.full_name'
+                | 'document.id_card.dob'
+                | 'document.id_card.gender'
+                | 'document.id_card.full_address'
+                | 'document.id_card.document_number'
+                | 'document.id_card.expires_at'
+                | 'document.id_card.issued_at'
+                | 'document.id_card.issuing_state'
+                | 'document.id_card.issuing_country'
+                | 'document.id_card.ref_number'
+                | 'document.id_card.nationality'
+                | 'document.id_card.curp'
+                | 'document.id_card.clave_de_elector'
+                | 'document.id_card.classified_document_type'
+                | 'document.id_card.curp_validation_response'
+                | 'document.drivers_license.front.image'
+                | 'document.drivers_license.front.mime_type'
+                | 'document.drivers_license.back.image'
+                | 'document.drivers_license.back.mime_type'
+                | 'document.drivers_license.selfie.image'
+                | 'document.drivers_license.selfie.mime_type'
+                | 'document.drivers_license.full_name'
+                | 'document.drivers_license.dob'
+                | 'document.drivers_license.gender'
+                | 'document.drivers_license.full_address'
+                | 'document.drivers_license.document_number'
+                | 'document.drivers_license.expires_at'
+                | 'document.drivers_license.issued_at'
+                | 'document.drivers_license.issuing_state'
+                | 'document.drivers_license.issuing_country'
+                | 'document.drivers_license.ref_number'
+                | 'document.drivers_license.nationality'
+                | 'document.drivers_license.curp'
+                | 'document.drivers_license.clave_de_elector'
+                | 'document.drivers_license.classified_document_type'
+                | 'document.drivers_license.curp_validation_response'
+                | 'document.passport.front.image'
+                | 'document.passport.front.mime_type'
+                | 'document.passport.back.image'
+                | 'document.passport.back.mime_type'
+                | 'document.passport.selfie.image'
+                | 'document.passport.selfie.mime_type'
+                | 'document.passport.full_name'
+                | 'document.passport.dob'
+                | 'document.passport.gender'
+                | 'document.passport.full_address'
+                | 'document.passport.document_number'
+                | 'document.passport.expires_at'
+                | 'document.passport.issued_at'
+                | 'document.passport.issuing_state'
+                | 'document.passport.issuing_country'
+                | 'document.passport.ref_number'
+                | 'document.passport.nationality'
+                | 'document.passport.curp'
+                | 'document.passport.clave_de_elector'
+                | 'document.passport.classified_document_type'
+                | 'document.passport.curp_validation_response'
+                | 'document.passport_card.front.image'
+                | 'document.passport_card.front.mime_type'
+                | 'document.passport_card.back.image'
+                | 'document.passport_card.back.mime_type'
+                | 'document.passport_card.selfie.image'
+                | 'document.passport_card.selfie.mime_type'
+                | 'document.passport_card.full_name'
+                | 'document.passport_card.dob'
+                | 'document.passport_card.gender'
+                | 'document.passport_card.full_address'
+                | 'document.passport_card.document_number'
+                | 'document.passport_card.expires_at'
+                | 'document.passport_card.issued_at'
+                | 'document.passport_card.issuing_state'
+                | 'document.passport_card.issuing_country'
+                | 'document.passport_card.ref_number'
+                | 'document.passport_card.nationality'
+                | 'document.passport_card.curp'
+                | 'document.passport_card.clave_de_elector'
+                | 'document.passport_card.classified_document_type'
+                | 'document.passport_card.curp_validation_response'
+                | 'document.permit.front.image'
+                | 'document.permit.front.mime_type'
+                | 'document.permit.back.image'
+                | 'document.permit.back.mime_type'
+                | 'document.permit.selfie.image'
+                | 'document.permit.selfie.mime_type'
+                | 'document.permit.full_name'
+                | 'document.permit.dob'
+                | 'document.permit.gender'
+                | 'document.permit.full_address'
+                | 'document.permit.document_number'
+                | 'document.permit.expires_at'
+                | 'document.permit.issued_at'
+                | 'document.permit.issuing_state'
+                | 'document.permit.issuing_country'
+                | 'document.permit.ref_number'
+                | 'document.permit.nationality'
+                | 'document.permit.curp'
+                | 'document.permit.clave_de_elector'
+                | 'document.permit.classified_document_type'
+                | 'document.permit.curp_validation_response'
+                | 'document.visa.front.image'
+                | 'document.visa.front.mime_type'
+                | 'document.visa.back.image'
+                | 'document.visa.back.mime_type'
+                | 'document.visa.selfie.image'
+                | 'document.visa.selfie.mime_type'
+                | 'document.visa.full_name'
+                | 'document.visa.dob'
+                | 'document.visa.gender'
+                | 'document.visa.full_address'
+                | 'document.visa.document_number'
+                | 'document.visa.expires_at'
+                | 'document.visa.issued_at'
+                | 'document.visa.issuing_state'
+                | 'document.visa.issuing_country'
+                | 'document.visa.ref_number'
+                | 'document.visa.nationality'
+                | 'document.visa.curp'
+                | 'document.visa.clave_de_elector'
+                | 'document.visa.classified_document_type'
+                | 'document.visa.curp_validation_response'
+                | 'document.residence_document.front.image'
+                | 'document.residence_document.front.mime_type'
+                | 'document.residence_document.back.image'
+                | 'document.residence_document.back.mime_type'
+                | 'document.residence_document.selfie.image'
+                | 'document.residence_document.selfie.mime_type'
+                | 'document.residence_document.full_name'
+                | 'document.residence_document.dob'
+                | 'document.residence_document.gender'
+                | 'document.residence_document.full_address'
+                | 'document.residence_document.document_number'
+                | 'document.residence_document.expires_at'
+                | 'document.residence_document.issued_at'
+                | 'document.residence_document.issuing_state'
+                | 'document.residence_document.issuing_country'
+                | 'document.residence_document.ref_number'
+                | 'document.residence_document.nationality'
+                | 'document.residence_document.curp'
+                | 'document.residence_document.clave_de_elector'
+                | 'document.residence_document.classified_document_type'
+                | 'document.residence_document.curp_validation_response'
+                | 'document.voter_identification.front.image'
+                | 'document.voter_identification.front.mime_type'
+                | 'document.voter_identification.back.image'
+                | 'document.voter_identification.back.mime_type'
+                | 'document.voter_identification.selfie.image'
+                | 'document.voter_identification.selfie.mime_type'
+                | 'document.voter_identification.full_name'
+                | 'document.voter_identification.dob'
+                | 'document.voter_identification.gender'
+                | 'document.voter_identification.full_address'
+                | 'document.voter_identification.document_number'
+                | 'document.voter_identification.expires_at'
+                | 'document.voter_identification.issued_at'
+                | 'document.voter_identification.issuing_state'
+                | 'document.voter_identification.issuing_country'
+                | 'document.voter_identification.ref_number'
+                | 'document.voter_identification.nationality'
+                | 'document.voter_identification.curp'
+                | 'document.voter_identification.clave_de_elector'
+                | 'document.voter_identification.classified_document_type'
+                | 'document.voter_identification.curp_validation_response'
+                | 'document.finra_compliance_letter'
+                | 'document.proof_of_address.image'
+                | 'document.ssn_card.image'
+                | 'document.custom.*'
+                | 'card.*.number'
+                | 'card.*.expiration'
+                | 'card.*.cvc'
+                | 'card.*.name'
+                | 'card.*.billing_address.zip'
+                | 'card.*.billing_address.country'
+                | 'card.*.expiration_month'
+                | 'card.*.expiration_year'
+                | 'card.*.number_last4'
+                | 'card.*.issuer'
+                | 'card.*.fingerprint'
+                | 'bank.*.name'
+                | 'bank.*.ach_routing_number'
+                | 'bank.*.ach_account_number'
+                | 'bank.*.ach_account_id'
+                | 'bank.*.account_type'
+                | 'bank.*.fingerprint';
+              op: 'is_in' | 'is_not_in';
+              value: string;
+            }
+        )
+      | {
+          field: 'ip_address';
+          op: 'is_in' | 'is_not_in';
+          value: string;
+        }
+      | {
+          field: 'experian_score' | 'incode_selfie_match_score';
+          op: 'gt' | 'lt';
+          value: number;
+        }
+    >;
     ruleId: string;
   }>;
   expectedRuleSetVersion: number;
 };
+export type OffsetPaginatedEntityOnboarding = {
+  data: Array<{
+    id: string;
+    playbookKey: string;
+    ruleSetResults: Array<{
+      id: string;
+      timestamp: string;
+    }>;
+    /**
+     * Sequence number used to order DataLifetimes
+     */
+    seqno?: number;
+    /**
+     * The status of the onboarding
+     */
+    status: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
+    timestamp: string;
+  }>;
+  meta: {
+    /**
+     * The `page` parameter to provide in order to request the next page of results
+     */
+    nextPage?: number;
+  };
+};
 export type OffsetPaginatedList = {
   data: Array<{
-    actor: 'footprint';
+    actor:
+      | {
+          data: {
+            id: string;
+          };
+          kind: 'user';
+        }
+      | {
+          data: {
+            id: string;
+          };
+          kind: 'tenant_user';
+        }
+      | {
+          data: {
+            id: string;
+          };
+          kind: 'tenant_api_key';
+        }
+      | {
+          kind: 'footprint';
+        }
+      | {
+          data: {
+            id: string;
+          };
+          kind: 'firm_employee';
+        };
     alias: string;
     createdAt: string;
     entriesCount: number;
@@ -11826,33 +20956,352 @@ export type OffsetPaginatedOnboardingConfiguration = {
     allowReonboard: boolean;
     allowUsResidents: boolean;
     allowUsTerritoryResidents: boolean;
-    author?: 'footprint' | 'firm_employee';
-    businessDocumentsToCollect: Array<string>;
+    author?:
+      | {
+          id: string;
+          kind: 'user';
+        }
+      | {
+          kind: 'footprint';
+        }
+      | {
+          kind: 'firm_employee';
+        }
+      | {
+          email: string;
+          first_name?: string;
+          kind: 'organization';
+          last_name?: string;
+          member: string;
+        }
+      | {
+          id: string;
+          kind: 'api_key';
+          name: string;
+        };
+    businessDocumentsToCollect: Array<
+      | {
+          data: {
+            collect_selfie: boolean;
+            document_types_and_countries?: {
+              country_specific: {
+                [key: string]: unknown;
+              };
+              global: Array<
+                | 'id_card'
+                | 'drivers_license'
+                | 'passport'
+                | 'passport_card'
+                | 'permit'
+                | 'visa'
+                | 'residence_document'
+                | 'voter_identification'
+              >;
+            };
+          };
+          kind: 'identity';
+        }
+      | {
+          data: {
+            requires_human_review: boolean;
+          };
+          kind: 'proof_of_ssn';
+        }
+      | {
+          data: {
+            requires_human_review: boolean;
+          };
+          kind: 'proof_of_address';
+        }
+      | {
+          data: {
+            /**
+             * Optional human-readable description of the document that will be displayed to the user
+             */
+            description?: string;
+            /**
+             * Custom document identifier under which the document will be vaulted
+             */
+            identifier:
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint';
+            /**
+             * The human-readable name of the document to display to the user
+             */
+            name: string;
+            requires_human_review: boolean;
+            upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+          };
+          kind: 'custom';
+        }
+    >;
+    canAccessData: Array<
+      | 'name'
+      | 'dob'
+      | 'ssn4'
+      | 'ssn9'
+      | 'full_address'
+      | 'email'
+      | 'phone_number'
+      | 'nationality'
+      | 'us_legal_status'
+      | {
+          document: string;
+        }
+      | 'business_name'
+      | 'business_tin'
+      | 'business_address'
+      | 'business_phone_number'
+      | 'business_website'
+      | 'business_beneficial_owners'
+      | 'business_kyced_beneficial_owners'
+      | 'business_corporation_type'
+      | 'investor_profile'
+      | 'card'
+      | 'us_tax_id'
+      | 'bank'
+    >;
     cipKind?: 'alpaca' | 'apex';
     createdAt: string;
     curpValidationEnabled: boolean;
-    docScanForOptionalSsn?:
-      | 'Name'
-      | 'Dob'
-      | 'Ssn4'
-      | 'Ssn9'
-      | 'FullAddress'
-      | 'Email'
-      | 'PhoneNumber'
-      | 'Nationality'
-      | 'UsLegalStatus'
-      | 'BusinessName'
-      | 'BusinessTin'
-      | 'BusinessAddress'
-      | 'BusinessPhoneNumber'
-      | 'BusinessWebsite'
-      | 'BusinessBeneficialOwners'
-      | 'BusinessKycedBeneficialOwners'
-      | 'BusinessCorporationType'
-      | 'InvestorProfile'
-      | 'Card'
-      | 'UsTaxId'
-      | 'Bank';
     documentTypesAndCountries?: {
       countrySpecific: {
         [key: string]: unknown;
@@ -11868,7 +21317,300 @@ export type OffsetPaginatedOnboardingConfiguration = {
         | 'voter_identification'
       >;
     };
-    documentsToCollect: Array<string>;
+    documentsToCollect: Array<
+      | {
+          data: {
+            collect_selfie: boolean;
+            document_types_and_countries?: {
+              country_specific: {
+                [key: string]: unknown;
+              };
+              global: Array<
+                | 'id_card'
+                | 'drivers_license'
+                | 'passport'
+                | 'passport_card'
+                | 'permit'
+                | 'visa'
+                | 'residence_document'
+                | 'voter_identification'
+              >;
+            };
+          };
+          kind: 'identity';
+        }
+      | {
+          data: {
+            requires_human_review: boolean;
+          };
+          kind: 'proof_of_ssn';
+        }
+      | {
+          data: {
+            requires_human_review: boolean;
+          };
+          kind: 'proof_of_address';
+        }
+      | {
+          data: {
+            /**
+             * Optional human-readable description of the document that will be displayed to the user
+             */
+            description?: string;
+            /**
+             * Custom document identifier under which the document will be vaulted
+             */
+            identifier:
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint';
+            /**
+             * The human-readable name of the document to display to the user
+             */
+            name: string;
+            requires_human_review: boolean;
+            upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+          };
+          kind: 'custom';
+        }
+    >;
     enhancedAml: {
       adverseMedia: boolean;
       enhancedAml: boolean;
@@ -12135,51 +21877,57 @@ export type OffsetPaginatedOnboardingConfiguration = {
     key: string;
     kind: 'kyc' | 'kyb' | 'auth' | 'document';
     mustCollectData: Array<
-      | 'Name'
-      | 'Dob'
-      | 'Ssn4'
-      | 'Ssn9'
-      | 'FullAddress'
-      | 'Email'
-      | 'PhoneNumber'
-      | 'Nationality'
-      | 'UsLegalStatus'
-      | 'BusinessName'
-      | 'BusinessTin'
-      | 'BusinessAddress'
-      | 'BusinessPhoneNumber'
-      | 'BusinessWebsite'
-      | 'BusinessBeneficialOwners'
-      | 'BusinessKycedBeneficialOwners'
-      | 'BusinessCorporationType'
-      | 'InvestorProfile'
-      | 'Card'
-      | 'UsTaxId'
-      | 'Bank'
+      | 'name'
+      | 'dob'
+      | 'ssn4'
+      | 'ssn9'
+      | 'full_address'
+      | 'email'
+      | 'phone_number'
+      | 'nationality'
+      | 'us_legal_status'
+      | {
+          document: string;
+        }
+      | 'business_name'
+      | 'business_tin'
+      | 'business_address'
+      | 'business_phone_number'
+      | 'business_website'
+      | 'business_beneficial_owners'
+      | 'business_kyced_beneficial_owners'
+      | 'business_corporation_type'
+      | 'investor_profile'
+      | 'card'
+      | 'us_tax_id'
+      | 'bank'
     >;
     name: string;
     optionalData: Array<
-      | 'Name'
-      | 'Dob'
-      | 'Ssn4'
-      | 'Ssn9'
-      | 'FullAddress'
-      | 'Email'
-      | 'PhoneNumber'
-      | 'Nationality'
-      | 'UsLegalStatus'
-      | 'BusinessName'
-      | 'BusinessTin'
-      | 'BusinessAddress'
-      | 'BusinessPhoneNumber'
-      | 'BusinessWebsite'
-      | 'BusinessBeneficialOwners'
-      | 'BusinessKycedBeneficialOwners'
-      | 'BusinessCorporationType'
-      | 'InvestorProfile'
-      | 'Card'
-      | 'UsTaxId'
-      | 'Bank'
+      | 'name'
+      | 'dob'
+      | 'ssn4'
+      | 'ssn9'
+      | 'full_address'
+      | 'email'
+      | 'phone_number'
+      | 'nationality'
+      | 'us_legal_status'
+      | {
+          document: string;
+        }
+      | 'business_name'
+      | 'business_tin'
+      | 'business_address'
+      | 'business_phone_number'
+      | 'business_website'
+      | 'business_beneficial_owners'
+      | 'business_kyced_beneficial_owners'
+      | 'business_corporation_type'
+      | 'investor_profile'
+      | 'card'
+      | 'us_tax_id'
+      | 'bank'
     >;
     promptForPasskey: boolean;
     requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
@@ -12190,7 +21938,83 @@ export type OffsetPaginatedOnboardingConfiguration = {
     skipKyb: boolean;
     skipKyc: boolean;
     status: 'disabled' | 'enabled';
-    verificationChecks: Array<string>;
+    verificationChecks: Array<
+      | {
+          data: {
+            ein_only: boolean;
+          };
+          kind: 'kyb';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'business_aml';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'kyc';
+        }
+      | {
+          data: {
+            adverse_media: boolean;
+            adverse_media_lists?: Array<
+              | 'financial_crime'
+              | 'violent_crime'
+              | 'sexual_crime'
+              | 'cyber_crime'
+              | 'terrorism'
+              | 'fraud'
+              | 'narcotics'
+              | 'general_serious'
+              | 'general_minor'
+            >;
+            continuous_monitoring: boolean;
+            match_kind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
+            ofac: boolean;
+            pep: boolean;
+          };
+          kind: 'aml';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'curp_validation';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'identity_document';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'stytch_device';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'neuro_id';
+        }
+      | {
+          data: {
+            attributes: Array<'line_type_intelligence'>;
+          };
+          kind: 'phone';
+        }
+      | {
+          data: {
+            [key: string]: unknown;
+          };
+          kind: 'sentilink';
+        }
+    >;
   }>;
   meta: {
     /**
@@ -12221,37 +22045,141 @@ export type OffsetPaginatedOrganizationMember = {
       createdAt: string;
       id: string;
       isImmutable: boolean;
-      kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+      /**
+       * Auto-generated discriminant enum variants
+       */
+      kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
       name: string;
       numActiveApiKeys?: number;
       numActiveUsers?: number;
       scopes: Array<
-        | 'read'
-        | 'admin'
-        | 'api_keys'
-        | 'manage_vault_proxy'
-        | 'manage_webhooks'
-        | 'manual_review'
-        | 'onboarding_configuration'
-        | 'write_lists'
-        | 'org_settings'
-        | 'cip_integration'
-        | 'trigger_kyb'
-        | 'trigger_kyc'
-        | 'auth_token'
-        | 'onboarding'
-        | 'decrypt_custom'
-        | 'decrypt_document'
-        | 'decrypt_document_and_selfie'
-        | 'decrypt_all'
-        | 'decrypt_all_except_pci_data'
-        | 'write_entities'
-        | 'label_and_tag'
-        | 'manage_compliance_doc_submission'
-        | 'compliance_partner_read'
-        | 'compliance_partner_admin'
-        | 'compliance_partner_manage_templates'
-        | 'compliance_partner_manage_reviews'
+        | {
+            kind: 'read';
+          }
+        | {
+            kind: 'admin';
+          }
+        | {
+            kind: 'api_keys';
+          }
+        | {
+            kind: 'manage_vault_proxy';
+          }
+        | {
+            kind: 'manage_webhooks';
+          }
+        | {
+            kind: 'manual_review';
+          }
+        | {
+            kind: 'onboarding_configuration';
+          }
+        | {
+            kind: 'write_lists';
+          }
+        | {
+            kind: 'org_settings';
+          }
+        | {
+            kind: 'cip_integration';
+          }
+        | {
+            data:
+              | {
+                  kind: 'any';
+                }
+              | {
+                  kind: 'just_in_time';
+                }
+              | {
+                  id: string;
+                  kind: 'id';
+                };
+            kind: 'invoke_vault_proxy';
+          }
+        | {
+            kind: 'trigger_kyb';
+          }
+        | {
+            kind: 'trigger_kyc';
+          }
+        | {
+            kind: 'auth_token';
+          }
+        | {
+            kind: 'onboarding';
+          }
+        | {
+            /**
+             * Represent the options of allowed CollectedData.
+             * Some CollectedData variants only have a single allowable CollectedDataOption.
+             * Other CollectedData variants may have multiple Options of assortments of data that can be
+             * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+             * the CDO
+             */
+            data:
+              | 'name'
+              | 'dob'
+              | 'ssn4'
+              | 'ssn9'
+              | 'full_address'
+              | 'email'
+              | 'phone_number'
+              | 'nationality'
+              | 'us_legal_status'
+              | {
+                  document: string;
+                }
+              | 'business_name'
+              | 'business_tin'
+              | 'business_address'
+              | 'business_phone_number'
+              | 'business_website'
+              | 'business_beneficial_owners'
+              | 'business_kyced_beneficial_owners'
+              | 'business_corporation_type'
+              | 'investor_profile'
+              | 'card'
+              | 'us_tax_id'
+              | 'bank';
+            kind: 'decrypt';
+          }
+        | {
+            kind: 'decrypt_custom';
+          }
+        | {
+            kind: 'decrypt_document';
+          }
+        | {
+            kind: 'decrypt_document_and_selfie';
+          }
+        | {
+            kind: 'decrypt_all';
+          }
+        | {
+            kind: 'decrypt_all_except_pci_data';
+          }
+        | {
+            kind: 'write_entities';
+          }
+        | {
+            kind: 'label_and_tag';
+          }
+        | {
+            kind: 'manage_compliance_doc_submission';
+          }
+        | {
+            kind: 'compliance_partner_read';
+          }
+        | {
+            kind: 'compliance_partner_admin';
+          }
+        | {
+            kind: 'compliance_partner_manage_templates';
+          }
+        | {
+            kind: 'compliance_partner_manage_reviews';
+          }
       >;
     };
     /**
@@ -12280,37 +22208,141 @@ export type OffsetPaginatedOrganizationRole = {
     createdAt: string;
     id: string;
     isImmutable: boolean;
-    kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+    /**
+     * Auto-generated discriminant enum variants
+     */
+    kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
     name: string;
     numActiveApiKeys?: number;
     numActiveUsers?: number;
     scopes: Array<
-      | 'read'
-      | 'admin'
-      | 'api_keys'
-      | 'manage_vault_proxy'
-      | 'manage_webhooks'
-      | 'manual_review'
-      | 'onboarding_configuration'
-      | 'write_lists'
-      | 'org_settings'
-      | 'cip_integration'
-      | 'trigger_kyb'
-      | 'trigger_kyc'
-      | 'auth_token'
-      | 'onboarding'
-      | 'decrypt_custom'
-      | 'decrypt_document'
-      | 'decrypt_document_and_selfie'
-      | 'decrypt_all'
-      | 'decrypt_all_except_pci_data'
-      | 'write_entities'
-      | 'label_and_tag'
-      | 'manage_compliance_doc_submission'
-      | 'compliance_partner_read'
-      | 'compliance_partner_admin'
-      | 'compliance_partner_manage_templates'
-      | 'compliance_partner_manage_reviews'
+      | {
+          kind: 'read';
+        }
+      | {
+          kind: 'admin';
+        }
+      | {
+          kind: 'api_keys';
+        }
+      | {
+          kind: 'manage_vault_proxy';
+        }
+      | {
+          kind: 'manage_webhooks';
+        }
+      | {
+          kind: 'manual_review';
+        }
+      | {
+          kind: 'onboarding_configuration';
+        }
+      | {
+          kind: 'write_lists';
+        }
+      | {
+          kind: 'org_settings';
+        }
+      | {
+          kind: 'cip_integration';
+        }
+      | {
+          data:
+            | {
+                kind: 'any';
+              }
+            | {
+                kind: 'just_in_time';
+              }
+            | {
+                id: string;
+                kind: 'id';
+              };
+          kind: 'invoke_vault_proxy';
+        }
+      | {
+          kind: 'trigger_kyb';
+        }
+      | {
+          kind: 'trigger_kyc';
+        }
+      | {
+          kind: 'auth_token';
+        }
+      | {
+          kind: 'onboarding';
+        }
+      | {
+          /**
+           * Represent the options of allowed CollectedData.
+           * Some CollectedData variants only have a single allowable CollectedDataOption.
+           * Other CollectedData variants may have multiple Options of assortments of data that can be
+           * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+           * the CDO
+           */
+          data:
+            | 'name'
+            | 'dob'
+            | 'ssn4'
+            | 'ssn9'
+            | 'full_address'
+            | 'email'
+            | 'phone_number'
+            | 'nationality'
+            | 'us_legal_status'
+            | {
+                document: string;
+              }
+            | 'business_name'
+            | 'business_tin'
+            | 'business_address'
+            | 'business_phone_number'
+            | 'business_website'
+            | 'business_beneficial_owners'
+            | 'business_kyced_beneficial_owners'
+            | 'business_corporation_type'
+            | 'investor_profile'
+            | 'card'
+            | 'us_tax_id'
+            | 'bank';
+          kind: 'decrypt';
+        }
+      | {
+          kind: 'decrypt_custom';
+        }
+      | {
+          kind: 'decrypt_document';
+        }
+      | {
+          kind: 'decrypt_document_and_selfie';
+        }
+      | {
+          kind: 'decrypt_all';
+        }
+      | {
+          kind: 'decrypt_all_except_pci_data';
+        }
+      | {
+          kind: 'write_entities';
+        }
+      | {
+          kind: 'label_and_tag';
+        }
+      | {
+          kind: 'manage_compliance_doc_submission';
+        }
+      | {
+          kind: 'compliance_partner_read';
+        }
+      | {
+          kind: 'compliance_partner_admin';
+        }
+      | {
+          kind: 'compliance_partner_manage_templates';
+        }
+      | {
+          kind: 'compliance_partner_manage_reviews';
+        }
     >;
   }>;
   meta: {
@@ -12345,37 +22377,141 @@ export type OffsetPaginatedSecretApiKey = {
       createdAt: string;
       id: string;
       isImmutable: boolean;
-      kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+      /**
+       * Auto-generated discriminant enum variants
+       */
+      kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
       name: string;
       numActiveApiKeys?: number;
       numActiveUsers?: number;
       scopes: Array<
-        | 'read'
-        | 'admin'
-        | 'api_keys'
-        | 'manage_vault_proxy'
-        | 'manage_webhooks'
-        | 'manual_review'
-        | 'onboarding_configuration'
-        | 'write_lists'
-        | 'org_settings'
-        | 'cip_integration'
-        | 'trigger_kyb'
-        | 'trigger_kyc'
-        | 'auth_token'
-        | 'onboarding'
-        | 'decrypt_custom'
-        | 'decrypt_document'
-        | 'decrypt_document_and_selfie'
-        | 'decrypt_all'
-        | 'decrypt_all_except_pci_data'
-        | 'write_entities'
-        | 'label_and_tag'
-        | 'manage_compliance_doc_submission'
-        | 'compliance_partner_read'
-        | 'compliance_partner_admin'
-        | 'compliance_partner_manage_templates'
-        | 'compliance_partner_manage_reviews'
+        | {
+            kind: 'read';
+          }
+        | {
+            kind: 'admin';
+          }
+        | {
+            kind: 'api_keys';
+          }
+        | {
+            kind: 'manage_vault_proxy';
+          }
+        | {
+            kind: 'manage_webhooks';
+          }
+        | {
+            kind: 'manual_review';
+          }
+        | {
+            kind: 'onboarding_configuration';
+          }
+        | {
+            kind: 'write_lists';
+          }
+        | {
+            kind: 'org_settings';
+          }
+        | {
+            kind: 'cip_integration';
+          }
+        | {
+            data:
+              | {
+                  kind: 'any';
+                }
+              | {
+                  kind: 'just_in_time';
+                }
+              | {
+                  id: string;
+                  kind: 'id';
+                };
+            kind: 'invoke_vault_proxy';
+          }
+        | {
+            kind: 'trigger_kyb';
+          }
+        | {
+            kind: 'trigger_kyc';
+          }
+        | {
+            kind: 'auth_token';
+          }
+        | {
+            kind: 'onboarding';
+          }
+        | {
+            /**
+             * Represent the options of allowed CollectedData.
+             * Some CollectedData variants only have a single allowable CollectedDataOption.
+             * Other CollectedData variants may have multiple Options of assortments of data that can be
+             * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+             * the CDO
+             */
+            data:
+              | 'name'
+              | 'dob'
+              | 'ssn4'
+              | 'ssn9'
+              | 'full_address'
+              | 'email'
+              | 'phone_number'
+              | 'nationality'
+              | 'us_legal_status'
+              | {
+                  document: string;
+                }
+              | 'business_name'
+              | 'business_tin'
+              | 'business_address'
+              | 'business_phone_number'
+              | 'business_website'
+              | 'business_beneficial_owners'
+              | 'business_kyced_beneficial_owners'
+              | 'business_corporation_type'
+              | 'investor_profile'
+              | 'card'
+              | 'us_tax_id'
+              | 'bank';
+            kind: 'decrypt';
+          }
+        | {
+            kind: 'decrypt_custom';
+          }
+        | {
+            kind: 'decrypt_document';
+          }
+        | {
+            kind: 'decrypt_document_and_selfie';
+          }
+        | {
+            kind: 'decrypt_all';
+          }
+        | {
+            kind: 'decrypt_all_except_pci_data';
+          }
+        | {
+            kind: 'write_entities';
+          }
+        | {
+            kind: 'label_and_tag';
+          }
+        | {
+            kind: 'manage_compliance_doc_submission';
+          }
+        | {
+            kind: 'compliance_partner_read';
+          }
+        | {
+            kind: 'compliance_partner_admin';
+          }
+        | {
+            kind: 'compliance_partner_manage_templates';
+          }
+        | {
+            kind: 'compliance_partner_manage_reviews';
+          }
       >;
     };
     scrubbedKey: string;
@@ -12400,33 +22536,352 @@ export type OnboardingConfiguration = {
   allowReonboard: boolean;
   allowUsResidents: boolean;
   allowUsTerritoryResidents: boolean;
-  author?: 'footprint' | 'firm_employee';
-  businessDocumentsToCollect: Array<string>;
+  author?:
+    | {
+        id: string;
+        kind: 'user';
+      }
+    | {
+        kind: 'footprint';
+      }
+    | {
+        kind: 'firm_employee';
+      }
+    | {
+        email: string;
+        first_name?: string;
+        kind: 'organization';
+        last_name?: string;
+        member: string;
+      }
+    | {
+        id: string;
+        kind: 'api_key';
+        name: string;
+      };
+  businessDocumentsToCollect: Array<
+    | {
+        data: {
+          collect_selfie: boolean;
+          document_types_and_countries?: {
+            country_specific: {
+              [key: string]: unknown;
+            };
+            global: Array<
+              | 'id_card'
+              | 'drivers_license'
+              | 'passport'
+              | 'passport_card'
+              | 'permit'
+              | 'visa'
+              | 'residence_document'
+              | 'voter_identification'
+            >;
+          };
+        };
+        kind: 'identity';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_ssn';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_address';
+      }
+    | {
+        data: {
+          /**
+           * Optional human-readable description of the document that will be displayed to the user
+           */
+          description?: string;
+          /**
+           * Custom document identifier under which the document will be vaulted
+           */
+          identifier:
+            | 'id.first_name'
+            | 'id.middle_name'
+            | 'id.last_name'
+            | 'id.dob'
+            | 'id.ssn4'
+            | 'id.ssn9'
+            | 'id.address_line1'
+            | 'id.address_line2'
+            | 'id.city'
+            | 'id.state'
+            | 'id.zip'
+            | 'id.country'
+            | 'id.email'
+            | 'id.phone_number'
+            | 'id.us_legal_status'
+            | 'id.visa_kind'
+            | 'id.visa_expiration_date'
+            | 'id.nationality'
+            | 'id.citizenships'
+            | 'id.drivers_license_number'
+            | 'id.drivers_license_state'
+            | 'id.itin'
+            | 'id.us_tax_id'
+            | 'business.name'
+            | 'business.dba'
+            | 'business.website'
+            | 'business.phone_number'
+            | 'business.tin'
+            | 'business.address_line1'
+            | 'business.address_line2'
+            | 'business.city'
+            | 'business.state'
+            | 'business.zip'
+            | 'business.country'
+            | 'business.corporation_type'
+            | 'business.formation_state'
+            | 'business.formation_date'
+            | 'custom.*'
+            | 'investor_profile.employment_status'
+            | 'investor_profile.occupation'
+            | 'investor_profile.employer'
+            | 'investor_profile.annual_income'
+            | 'investor_profile.net_worth'
+            | 'investor_profile.investment_goals'
+            | 'investor_profile.risk_tolerance'
+            | 'investor_profile.declarations'
+            | 'investor_profile.brokerage_firm_employer'
+            | 'investor_profile.senior_executive_symbols'
+            | 'investor_profile.family_member_names'
+            | 'investor_profile.political_organization'
+            | 'investor_profile.funding_sources'
+            | 'document.id_card.front.image'
+            | 'document.id_card.front.mime_type'
+            | 'document.id_card.back.image'
+            | 'document.id_card.back.mime_type'
+            | 'document.id_card.selfie.image'
+            | 'document.id_card.selfie.mime_type'
+            | 'document.id_card.full_name'
+            | 'document.id_card.dob'
+            | 'document.id_card.gender'
+            | 'document.id_card.full_address'
+            | 'document.id_card.document_number'
+            | 'document.id_card.expires_at'
+            | 'document.id_card.issued_at'
+            | 'document.id_card.issuing_state'
+            | 'document.id_card.issuing_country'
+            | 'document.id_card.ref_number'
+            | 'document.id_card.nationality'
+            | 'document.id_card.curp'
+            | 'document.id_card.clave_de_elector'
+            | 'document.id_card.classified_document_type'
+            | 'document.id_card.curp_validation_response'
+            | 'document.drivers_license.front.image'
+            | 'document.drivers_license.front.mime_type'
+            | 'document.drivers_license.back.image'
+            | 'document.drivers_license.back.mime_type'
+            | 'document.drivers_license.selfie.image'
+            | 'document.drivers_license.selfie.mime_type'
+            | 'document.drivers_license.full_name'
+            | 'document.drivers_license.dob'
+            | 'document.drivers_license.gender'
+            | 'document.drivers_license.full_address'
+            | 'document.drivers_license.document_number'
+            | 'document.drivers_license.expires_at'
+            | 'document.drivers_license.issued_at'
+            | 'document.drivers_license.issuing_state'
+            | 'document.drivers_license.issuing_country'
+            | 'document.drivers_license.ref_number'
+            | 'document.drivers_license.nationality'
+            | 'document.drivers_license.curp'
+            | 'document.drivers_license.clave_de_elector'
+            | 'document.drivers_license.classified_document_type'
+            | 'document.drivers_license.curp_validation_response'
+            | 'document.passport.front.image'
+            | 'document.passport.front.mime_type'
+            | 'document.passport.back.image'
+            | 'document.passport.back.mime_type'
+            | 'document.passport.selfie.image'
+            | 'document.passport.selfie.mime_type'
+            | 'document.passport.full_name'
+            | 'document.passport.dob'
+            | 'document.passport.gender'
+            | 'document.passport.full_address'
+            | 'document.passport.document_number'
+            | 'document.passport.expires_at'
+            | 'document.passport.issued_at'
+            | 'document.passport.issuing_state'
+            | 'document.passport.issuing_country'
+            | 'document.passport.ref_number'
+            | 'document.passport.nationality'
+            | 'document.passport.curp'
+            | 'document.passport.clave_de_elector'
+            | 'document.passport.classified_document_type'
+            | 'document.passport.curp_validation_response'
+            | 'document.passport_card.front.image'
+            | 'document.passport_card.front.mime_type'
+            | 'document.passport_card.back.image'
+            | 'document.passport_card.back.mime_type'
+            | 'document.passport_card.selfie.image'
+            | 'document.passport_card.selfie.mime_type'
+            | 'document.passport_card.full_name'
+            | 'document.passport_card.dob'
+            | 'document.passport_card.gender'
+            | 'document.passport_card.full_address'
+            | 'document.passport_card.document_number'
+            | 'document.passport_card.expires_at'
+            | 'document.passport_card.issued_at'
+            | 'document.passport_card.issuing_state'
+            | 'document.passport_card.issuing_country'
+            | 'document.passport_card.ref_number'
+            | 'document.passport_card.nationality'
+            | 'document.passport_card.curp'
+            | 'document.passport_card.clave_de_elector'
+            | 'document.passport_card.classified_document_type'
+            | 'document.passport_card.curp_validation_response'
+            | 'document.permit.front.image'
+            | 'document.permit.front.mime_type'
+            | 'document.permit.back.image'
+            | 'document.permit.back.mime_type'
+            | 'document.permit.selfie.image'
+            | 'document.permit.selfie.mime_type'
+            | 'document.permit.full_name'
+            | 'document.permit.dob'
+            | 'document.permit.gender'
+            | 'document.permit.full_address'
+            | 'document.permit.document_number'
+            | 'document.permit.expires_at'
+            | 'document.permit.issued_at'
+            | 'document.permit.issuing_state'
+            | 'document.permit.issuing_country'
+            | 'document.permit.ref_number'
+            | 'document.permit.nationality'
+            | 'document.permit.curp'
+            | 'document.permit.clave_de_elector'
+            | 'document.permit.classified_document_type'
+            | 'document.permit.curp_validation_response'
+            | 'document.visa.front.image'
+            | 'document.visa.front.mime_type'
+            | 'document.visa.back.image'
+            | 'document.visa.back.mime_type'
+            | 'document.visa.selfie.image'
+            | 'document.visa.selfie.mime_type'
+            | 'document.visa.full_name'
+            | 'document.visa.dob'
+            | 'document.visa.gender'
+            | 'document.visa.full_address'
+            | 'document.visa.document_number'
+            | 'document.visa.expires_at'
+            | 'document.visa.issued_at'
+            | 'document.visa.issuing_state'
+            | 'document.visa.issuing_country'
+            | 'document.visa.ref_number'
+            | 'document.visa.nationality'
+            | 'document.visa.curp'
+            | 'document.visa.clave_de_elector'
+            | 'document.visa.classified_document_type'
+            | 'document.visa.curp_validation_response'
+            | 'document.residence_document.front.image'
+            | 'document.residence_document.front.mime_type'
+            | 'document.residence_document.back.image'
+            | 'document.residence_document.back.mime_type'
+            | 'document.residence_document.selfie.image'
+            | 'document.residence_document.selfie.mime_type'
+            | 'document.residence_document.full_name'
+            | 'document.residence_document.dob'
+            | 'document.residence_document.gender'
+            | 'document.residence_document.full_address'
+            | 'document.residence_document.document_number'
+            | 'document.residence_document.expires_at'
+            | 'document.residence_document.issued_at'
+            | 'document.residence_document.issuing_state'
+            | 'document.residence_document.issuing_country'
+            | 'document.residence_document.ref_number'
+            | 'document.residence_document.nationality'
+            | 'document.residence_document.curp'
+            | 'document.residence_document.clave_de_elector'
+            | 'document.residence_document.classified_document_type'
+            | 'document.residence_document.curp_validation_response'
+            | 'document.voter_identification.front.image'
+            | 'document.voter_identification.front.mime_type'
+            | 'document.voter_identification.back.image'
+            | 'document.voter_identification.back.mime_type'
+            | 'document.voter_identification.selfie.image'
+            | 'document.voter_identification.selfie.mime_type'
+            | 'document.voter_identification.full_name'
+            | 'document.voter_identification.dob'
+            | 'document.voter_identification.gender'
+            | 'document.voter_identification.full_address'
+            | 'document.voter_identification.document_number'
+            | 'document.voter_identification.expires_at'
+            | 'document.voter_identification.issued_at'
+            | 'document.voter_identification.issuing_state'
+            | 'document.voter_identification.issuing_country'
+            | 'document.voter_identification.ref_number'
+            | 'document.voter_identification.nationality'
+            | 'document.voter_identification.curp'
+            | 'document.voter_identification.clave_de_elector'
+            | 'document.voter_identification.classified_document_type'
+            | 'document.voter_identification.curp_validation_response'
+            | 'document.finra_compliance_letter'
+            | 'document.proof_of_address.image'
+            | 'document.ssn_card.image'
+            | 'document.custom.*'
+            | 'card.*.number'
+            | 'card.*.expiration'
+            | 'card.*.cvc'
+            | 'card.*.name'
+            | 'card.*.billing_address.zip'
+            | 'card.*.billing_address.country'
+            | 'card.*.expiration_month'
+            | 'card.*.expiration_year'
+            | 'card.*.number_last4'
+            | 'card.*.issuer'
+            | 'card.*.fingerprint'
+            | 'bank.*.name'
+            | 'bank.*.ach_routing_number'
+            | 'bank.*.ach_account_number'
+            | 'bank.*.ach_account_id'
+            | 'bank.*.account_type'
+            | 'bank.*.fingerprint';
+          /**
+           * The human-readable name of the document to display to the user
+           */
+          name: string;
+          requires_human_review: boolean;
+          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+        };
+        kind: 'custom';
+      }
+  >;
+  canAccessData: Array<
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank'
+  >;
   cipKind?: 'alpaca' | 'apex';
   createdAt: string;
   curpValidationEnabled: boolean;
-  docScanForOptionalSsn?:
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank';
   documentTypesAndCountries?: {
     countrySpecific: {
       [key: string]: unknown;
@@ -12442,7 +22897,300 @@ export type OnboardingConfiguration = {
       | 'voter_identification'
     >;
   };
-  documentsToCollect: Array<string>;
+  documentsToCollect: Array<
+    | {
+        data: {
+          collect_selfie: boolean;
+          document_types_and_countries?: {
+            country_specific: {
+              [key: string]: unknown;
+            };
+            global: Array<
+              | 'id_card'
+              | 'drivers_license'
+              | 'passport'
+              | 'passport_card'
+              | 'permit'
+              | 'visa'
+              | 'residence_document'
+              | 'voter_identification'
+            >;
+          };
+        };
+        kind: 'identity';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_ssn';
+      }
+    | {
+        data: {
+          requires_human_review: boolean;
+        };
+        kind: 'proof_of_address';
+      }
+    | {
+        data: {
+          /**
+           * Optional human-readable description of the document that will be displayed to the user
+           */
+          description?: string;
+          /**
+           * Custom document identifier under which the document will be vaulted
+           */
+          identifier:
+            | 'id.first_name'
+            | 'id.middle_name'
+            | 'id.last_name'
+            | 'id.dob'
+            | 'id.ssn4'
+            | 'id.ssn9'
+            | 'id.address_line1'
+            | 'id.address_line2'
+            | 'id.city'
+            | 'id.state'
+            | 'id.zip'
+            | 'id.country'
+            | 'id.email'
+            | 'id.phone_number'
+            | 'id.us_legal_status'
+            | 'id.visa_kind'
+            | 'id.visa_expiration_date'
+            | 'id.nationality'
+            | 'id.citizenships'
+            | 'id.drivers_license_number'
+            | 'id.drivers_license_state'
+            | 'id.itin'
+            | 'id.us_tax_id'
+            | 'business.name'
+            | 'business.dba'
+            | 'business.website'
+            | 'business.phone_number'
+            | 'business.tin'
+            | 'business.address_line1'
+            | 'business.address_line2'
+            | 'business.city'
+            | 'business.state'
+            | 'business.zip'
+            | 'business.country'
+            | 'business.corporation_type'
+            | 'business.formation_state'
+            | 'business.formation_date'
+            | 'custom.*'
+            | 'investor_profile.employment_status'
+            | 'investor_profile.occupation'
+            | 'investor_profile.employer'
+            | 'investor_profile.annual_income'
+            | 'investor_profile.net_worth'
+            | 'investor_profile.investment_goals'
+            | 'investor_profile.risk_tolerance'
+            | 'investor_profile.declarations'
+            | 'investor_profile.brokerage_firm_employer'
+            | 'investor_profile.senior_executive_symbols'
+            | 'investor_profile.family_member_names'
+            | 'investor_profile.political_organization'
+            | 'investor_profile.funding_sources'
+            | 'document.id_card.front.image'
+            | 'document.id_card.front.mime_type'
+            | 'document.id_card.back.image'
+            | 'document.id_card.back.mime_type'
+            | 'document.id_card.selfie.image'
+            | 'document.id_card.selfie.mime_type'
+            | 'document.id_card.full_name'
+            | 'document.id_card.dob'
+            | 'document.id_card.gender'
+            | 'document.id_card.full_address'
+            | 'document.id_card.document_number'
+            | 'document.id_card.expires_at'
+            | 'document.id_card.issued_at'
+            | 'document.id_card.issuing_state'
+            | 'document.id_card.issuing_country'
+            | 'document.id_card.ref_number'
+            | 'document.id_card.nationality'
+            | 'document.id_card.curp'
+            | 'document.id_card.clave_de_elector'
+            | 'document.id_card.classified_document_type'
+            | 'document.id_card.curp_validation_response'
+            | 'document.drivers_license.front.image'
+            | 'document.drivers_license.front.mime_type'
+            | 'document.drivers_license.back.image'
+            | 'document.drivers_license.back.mime_type'
+            | 'document.drivers_license.selfie.image'
+            | 'document.drivers_license.selfie.mime_type'
+            | 'document.drivers_license.full_name'
+            | 'document.drivers_license.dob'
+            | 'document.drivers_license.gender'
+            | 'document.drivers_license.full_address'
+            | 'document.drivers_license.document_number'
+            | 'document.drivers_license.expires_at'
+            | 'document.drivers_license.issued_at'
+            | 'document.drivers_license.issuing_state'
+            | 'document.drivers_license.issuing_country'
+            | 'document.drivers_license.ref_number'
+            | 'document.drivers_license.nationality'
+            | 'document.drivers_license.curp'
+            | 'document.drivers_license.clave_de_elector'
+            | 'document.drivers_license.classified_document_type'
+            | 'document.drivers_license.curp_validation_response'
+            | 'document.passport.front.image'
+            | 'document.passport.front.mime_type'
+            | 'document.passport.back.image'
+            | 'document.passport.back.mime_type'
+            | 'document.passport.selfie.image'
+            | 'document.passport.selfie.mime_type'
+            | 'document.passport.full_name'
+            | 'document.passport.dob'
+            | 'document.passport.gender'
+            | 'document.passport.full_address'
+            | 'document.passport.document_number'
+            | 'document.passport.expires_at'
+            | 'document.passport.issued_at'
+            | 'document.passport.issuing_state'
+            | 'document.passport.issuing_country'
+            | 'document.passport.ref_number'
+            | 'document.passport.nationality'
+            | 'document.passport.curp'
+            | 'document.passport.clave_de_elector'
+            | 'document.passport.classified_document_type'
+            | 'document.passport.curp_validation_response'
+            | 'document.passport_card.front.image'
+            | 'document.passport_card.front.mime_type'
+            | 'document.passport_card.back.image'
+            | 'document.passport_card.back.mime_type'
+            | 'document.passport_card.selfie.image'
+            | 'document.passport_card.selfie.mime_type'
+            | 'document.passport_card.full_name'
+            | 'document.passport_card.dob'
+            | 'document.passport_card.gender'
+            | 'document.passport_card.full_address'
+            | 'document.passport_card.document_number'
+            | 'document.passport_card.expires_at'
+            | 'document.passport_card.issued_at'
+            | 'document.passport_card.issuing_state'
+            | 'document.passport_card.issuing_country'
+            | 'document.passport_card.ref_number'
+            | 'document.passport_card.nationality'
+            | 'document.passport_card.curp'
+            | 'document.passport_card.clave_de_elector'
+            | 'document.passport_card.classified_document_type'
+            | 'document.passport_card.curp_validation_response'
+            | 'document.permit.front.image'
+            | 'document.permit.front.mime_type'
+            | 'document.permit.back.image'
+            | 'document.permit.back.mime_type'
+            | 'document.permit.selfie.image'
+            | 'document.permit.selfie.mime_type'
+            | 'document.permit.full_name'
+            | 'document.permit.dob'
+            | 'document.permit.gender'
+            | 'document.permit.full_address'
+            | 'document.permit.document_number'
+            | 'document.permit.expires_at'
+            | 'document.permit.issued_at'
+            | 'document.permit.issuing_state'
+            | 'document.permit.issuing_country'
+            | 'document.permit.ref_number'
+            | 'document.permit.nationality'
+            | 'document.permit.curp'
+            | 'document.permit.clave_de_elector'
+            | 'document.permit.classified_document_type'
+            | 'document.permit.curp_validation_response'
+            | 'document.visa.front.image'
+            | 'document.visa.front.mime_type'
+            | 'document.visa.back.image'
+            | 'document.visa.back.mime_type'
+            | 'document.visa.selfie.image'
+            | 'document.visa.selfie.mime_type'
+            | 'document.visa.full_name'
+            | 'document.visa.dob'
+            | 'document.visa.gender'
+            | 'document.visa.full_address'
+            | 'document.visa.document_number'
+            | 'document.visa.expires_at'
+            | 'document.visa.issued_at'
+            | 'document.visa.issuing_state'
+            | 'document.visa.issuing_country'
+            | 'document.visa.ref_number'
+            | 'document.visa.nationality'
+            | 'document.visa.curp'
+            | 'document.visa.clave_de_elector'
+            | 'document.visa.classified_document_type'
+            | 'document.visa.curp_validation_response'
+            | 'document.residence_document.front.image'
+            | 'document.residence_document.front.mime_type'
+            | 'document.residence_document.back.image'
+            | 'document.residence_document.back.mime_type'
+            | 'document.residence_document.selfie.image'
+            | 'document.residence_document.selfie.mime_type'
+            | 'document.residence_document.full_name'
+            | 'document.residence_document.dob'
+            | 'document.residence_document.gender'
+            | 'document.residence_document.full_address'
+            | 'document.residence_document.document_number'
+            | 'document.residence_document.expires_at'
+            | 'document.residence_document.issued_at'
+            | 'document.residence_document.issuing_state'
+            | 'document.residence_document.issuing_country'
+            | 'document.residence_document.ref_number'
+            | 'document.residence_document.nationality'
+            | 'document.residence_document.curp'
+            | 'document.residence_document.clave_de_elector'
+            | 'document.residence_document.classified_document_type'
+            | 'document.residence_document.curp_validation_response'
+            | 'document.voter_identification.front.image'
+            | 'document.voter_identification.front.mime_type'
+            | 'document.voter_identification.back.image'
+            | 'document.voter_identification.back.mime_type'
+            | 'document.voter_identification.selfie.image'
+            | 'document.voter_identification.selfie.mime_type'
+            | 'document.voter_identification.full_name'
+            | 'document.voter_identification.dob'
+            | 'document.voter_identification.gender'
+            | 'document.voter_identification.full_address'
+            | 'document.voter_identification.document_number'
+            | 'document.voter_identification.expires_at'
+            | 'document.voter_identification.issued_at'
+            | 'document.voter_identification.issuing_state'
+            | 'document.voter_identification.issuing_country'
+            | 'document.voter_identification.ref_number'
+            | 'document.voter_identification.nationality'
+            | 'document.voter_identification.curp'
+            | 'document.voter_identification.clave_de_elector'
+            | 'document.voter_identification.classified_document_type'
+            | 'document.voter_identification.curp_validation_response'
+            | 'document.finra_compliance_letter'
+            | 'document.proof_of_address.image'
+            | 'document.ssn_card.image'
+            | 'document.custom.*'
+            | 'card.*.number'
+            | 'card.*.expiration'
+            | 'card.*.cvc'
+            | 'card.*.name'
+            | 'card.*.billing_address.zip'
+            | 'card.*.billing_address.country'
+            | 'card.*.expiration_month'
+            | 'card.*.expiration_year'
+            | 'card.*.number_last4'
+            | 'card.*.issuer'
+            | 'card.*.fingerprint'
+            | 'bank.*.name'
+            | 'bank.*.ach_routing_number'
+            | 'bank.*.ach_account_number'
+            | 'bank.*.ach_account_id'
+            | 'bank.*.account_type'
+            | 'bank.*.fingerprint';
+          /**
+           * The human-readable name of the document to display to the user
+           */
+          name: string;
+          requires_human_review: boolean;
+          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+        };
+        kind: 'custom';
+      }
+  >;
   enhancedAml: {
     adverseMedia: boolean;
     enhancedAml: boolean;
@@ -12709,51 +23457,57 @@ export type OnboardingConfiguration = {
   key: string;
   kind: 'kyc' | 'kyb' | 'auth' | 'document';
   mustCollectData: Array<
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank'
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank'
   >;
   name: string;
   optionalData: Array<
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank'
+    | 'name'
+    | 'dob'
+    | 'ssn4'
+    | 'ssn9'
+    | 'full_address'
+    | 'email'
+    | 'phone_number'
+    | 'nationality'
+    | 'us_legal_status'
+    | {
+        document: string;
+      }
+    | 'business_name'
+    | 'business_tin'
+    | 'business_address'
+    | 'business_phone_number'
+    | 'business_website'
+    | 'business_beneficial_owners'
+    | 'business_kyced_beneficial_owners'
+    | 'business_corporation_type'
+    | 'investor_profile'
+    | 'card'
+    | 'us_tax_id'
+    | 'bank'
   >;
   promptForPasskey: boolean;
   requiredAuthMethods?: Array<'phone' | 'passkey' | 'email'>;
@@ -12764,9 +23518,84 @@ export type OnboardingConfiguration = {
   skipKyb: boolean;
   skipKyc: boolean;
   status: 'disabled' | 'enabled';
-  verificationChecks: Array<string>;
+  verificationChecks: Array<
+    | {
+        data: {
+          ein_only: boolean;
+        };
+        kind: 'kyb';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'business_aml';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'kyc';
+      }
+    | {
+        data: {
+          adverse_media: boolean;
+          adverse_media_lists?: Array<
+            | 'financial_crime'
+            | 'violent_crime'
+            | 'sexual_crime'
+            | 'cyber_crime'
+            | 'terrorism'
+            | 'fraud'
+            | 'narcotics'
+            | 'general_serious'
+            | 'general_minor'
+          >;
+          continuous_monitoring: boolean;
+          match_kind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
+          ofac: boolean;
+          pep: boolean;
+        };
+        kind: 'aml';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'curp_validation';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'identity_document';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'stytch_device';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'neuro_id';
+      }
+    | {
+        data: {
+          attributes: Array<'line_type_intelligence'>;
+        };
+        kind: 'phone';
+      }
+    | {
+        data: {
+          [key: string]: unknown;
+        };
+        kind: 'sentilink';
+      }
+  >;
 };
-export type author = 'footprint' | 'firm_employee';
 export type status5 = 'disabled' | 'enabled';
 /**
  * Object that represents a user Onboarding
@@ -12850,6 +23679,9 @@ export type OrgLoginResponse = {
       | 'client_vaulting_docs'
       | 'list_duplicate_users'
     >;
+    /**
+     * The type of data attribute
+     */
     companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
     domains: Array<string>;
     id: string;
@@ -12892,37 +23724,141 @@ export type OrgLoginResponse = {
       createdAt: string;
       id: string;
       isImmutable: boolean;
-      kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+      /**
+       * Auto-generated discriminant enum variants
+       */
+      kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
       name: string;
       numActiveApiKeys?: number;
       numActiveUsers?: number;
       scopes: Array<
-        | 'read'
-        | 'admin'
-        | 'api_keys'
-        | 'manage_vault_proxy'
-        | 'manage_webhooks'
-        | 'manual_review'
-        | 'onboarding_configuration'
-        | 'write_lists'
-        | 'org_settings'
-        | 'cip_integration'
-        | 'trigger_kyb'
-        | 'trigger_kyc'
-        | 'auth_token'
-        | 'onboarding'
-        | 'decrypt_custom'
-        | 'decrypt_document'
-        | 'decrypt_document_and_selfie'
-        | 'decrypt_all'
-        | 'decrypt_all_except_pci_data'
-        | 'write_entities'
-        | 'label_and_tag'
-        | 'manage_compliance_doc_submission'
-        | 'compliance_partner_read'
-        | 'compliance_partner_admin'
-        | 'compliance_partner_manage_templates'
-        | 'compliance_partner_manage_reviews'
+        | {
+            kind: 'read';
+          }
+        | {
+            kind: 'admin';
+          }
+        | {
+            kind: 'api_keys';
+          }
+        | {
+            kind: 'manage_vault_proxy';
+          }
+        | {
+            kind: 'manage_webhooks';
+          }
+        | {
+            kind: 'manual_review';
+          }
+        | {
+            kind: 'onboarding_configuration';
+          }
+        | {
+            kind: 'write_lists';
+          }
+        | {
+            kind: 'org_settings';
+          }
+        | {
+            kind: 'cip_integration';
+          }
+        | {
+            data:
+              | {
+                  kind: 'any';
+                }
+              | {
+                  kind: 'just_in_time';
+                }
+              | {
+                  id: string;
+                  kind: 'id';
+                };
+            kind: 'invoke_vault_proxy';
+          }
+        | {
+            kind: 'trigger_kyb';
+          }
+        | {
+            kind: 'trigger_kyc';
+          }
+        | {
+            kind: 'auth_token';
+          }
+        | {
+            kind: 'onboarding';
+          }
+        | {
+            /**
+             * Represent the options of allowed CollectedData.
+             * Some CollectedData variants only have a single allowable CollectedDataOption.
+             * Other CollectedData variants may have multiple Options of assortments of data that can be
+             * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+             * the CDO
+             */
+            data:
+              | 'name'
+              | 'dob'
+              | 'ssn4'
+              | 'ssn9'
+              | 'full_address'
+              | 'email'
+              | 'phone_number'
+              | 'nationality'
+              | 'us_legal_status'
+              | {
+                  document: string;
+                }
+              | 'business_name'
+              | 'business_tin'
+              | 'business_address'
+              | 'business_phone_number'
+              | 'business_website'
+              | 'business_beneficial_owners'
+              | 'business_kyced_beneficial_owners'
+              | 'business_corporation_type'
+              | 'investor_profile'
+              | 'card'
+              | 'us_tax_id'
+              | 'bank';
+            kind: 'decrypt';
+          }
+        | {
+            kind: 'decrypt_custom';
+          }
+        | {
+            kind: 'decrypt_document';
+          }
+        | {
+            kind: 'decrypt_document_and_selfie';
+          }
+        | {
+            kind: 'decrypt_all';
+          }
+        | {
+            kind: 'decrypt_all_except_pci_data';
+          }
+        | {
+            kind: 'write_entities';
+          }
+        | {
+            kind: 'label_and_tag';
+          }
+        | {
+            kind: 'manage_compliance_doc_submission';
+          }
+        | {
+            kind: 'compliance_partner_read';
+          }
+        | {
+            kind: 'compliance_partner_admin';
+          }
+        | {
+            kind: 'compliance_partner_manage_templates';
+          }
+        | {
+            kind: 'compliance_partner_manage_reviews';
+          }
       >;
     };
     /**
@@ -13000,6 +23936,9 @@ export type Organization = {
     | 'client_vaulting_docs'
     | 'list_duplicate_users'
   >;
+  /**
+   * The type of data attribute
+   */
   companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
   domains: Array<string>;
   id: string;
@@ -13042,37 +23981,141 @@ export type OrganizationMember = {
     createdAt: string;
     id: string;
     isImmutable: boolean;
-    kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+    /**
+     * Auto-generated discriminant enum variants
+     */
+    kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
     name: string;
     numActiveApiKeys?: number;
     numActiveUsers?: number;
     scopes: Array<
-      | 'read'
-      | 'admin'
-      | 'api_keys'
-      | 'manage_vault_proxy'
-      | 'manage_webhooks'
-      | 'manual_review'
-      | 'onboarding_configuration'
-      | 'write_lists'
-      | 'org_settings'
-      | 'cip_integration'
-      | 'trigger_kyb'
-      | 'trigger_kyc'
-      | 'auth_token'
-      | 'onboarding'
-      | 'decrypt_custom'
-      | 'decrypt_document'
-      | 'decrypt_document_and_selfie'
-      | 'decrypt_all'
-      | 'decrypt_all_except_pci_data'
-      | 'write_entities'
-      | 'label_and_tag'
-      | 'manage_compliance_doc_submission'
-      | 'compliance_partner_read'
-      | 'compliance_partner_admin'
-      | 'compliance_partner_manage_templates'
-      | 'compliance_partner_manage_reviews'
+      | {
+          kind: 'read';
+        }
+      | {
+          kind: 'admin';
+        }
+      | {
+          kind: 'api_keys';
+        }
+      | {
+          kind: 'manage_vault_proxy';
+        }
+      | {
+          kind: 'manage_webhooks';
+        }
+      | {
+          kind: 'manual_review';
+        }
+      | {
+          kind: 'onboarding_configuration';
+        }
+      | {
+          kind: 'write_lists';
+        }
+      | {
+          kind: 'org_settings';
+        }
+      | {
+          kind: 'cip_integration';
+        }
+      | {
+          data:
+            | {
+                kind: 'any';
+              }
+            | {
+                kind: 'just_in_time';
+              }
+            | {
+                id: string;
+                kind: 'id';
+              };
+          kind: 'invoke_vault_proxy';
+        }
+      | {
+          kind: 'trigger_kyb';
+        }
+      | {
+          kind: 'trigger_kyc';
+        }
+      | {
+          kind: 'auth_token';
+        }
+      | {
+          kind: 'onboarding';
+        }
+      | {
+          /**
+           * Represent the options of allowed CollectedData.
+           * Some CollectedData variants only have a single allowable CollectedDataOption.
+           * Other CollectedData variants may have multiple Options of assortments of data that can be
+           * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+           * the CDO
+           */
+          data:
+            | 'name'
+            | 'dob'
+            | 'ssn4'
+            | 'ssn9'
+            | 'full_address'
+            | 'email'
+            | 'phone_number'
+            | 'nationality'
+            | 'us_legal_status'
+            | {
+                document: string;
+              }
+            | 'business_name'
+            | 'business_tin'
+            | 'business_address'
+            | 'business_phone_number'
+            | 'business_website'
+            | 'business_beneficial_owners'
+            | 'business_kyced_beneficial_owners'
+            | 'business_corporation_type'
+            | 'investor_profile'
+            | 'card'
+            | 'us_tax_id'
+            | 'bank';
+          kind: 'decrypt';
+        }
+      | {
+          kind: 'decrypt_custom';
+        }
+      | {
+          kind: 'decrypt_document';
+        }
+      | {
+          kind: 'decrypt_document_and_selfie';
+        }
+      | {
+          kind: 'decrypt_all';
+        }
+      | {
+          kind: 'decrypt_all_except_pci_data';
+        }
+      | {
+          kind: 'write_entities';
+        }
+      | {
+          kind: 'label_and_tag';
+        }
+      | {
+          kind: 'manage_compliance_doc_submission';
+        }
+      | {
+          kind: 'compliance_partner_read';
+        }
+      | {
+          kind: 'compliance_partner_admin';
+        }
+      | {
+          kind: 'compliance_partner_manage_templates';
+        }
+      | {
+          kind: 'compliance_partner_manage_reviews';
+        }
     >;
   };
   /**
@@ -13089,37 +24132,141 @@ export type OrganizationRole = {
   createdAt: string;
   id: string;
   isImmutable: boolean;
-  kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+  /**
+   * Auto-generated discriminant enum variants
+   */
+  kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
   name: string;
   numActiveApiKeys?: number;
   numActiveUsers?: number;
   scopes: Array<
-    | 'read'
-    | 'admin'
-    | 'api_keys'
-    | 'manage_vault_proxy'
-    | 'manage_webhooks'
-    | 'manual_review'
-    | 'onboarding_configuration'
-    | 'write_lists'
-    | 'org_settings'
-    | 'cip_integration'
-    | 'trigger_kyb'
-    | 'trigger_kyc'
-    | 'auth_token'
-    | 'onboarding'
-    | 'decrypt_custom'
-    | 'decrypt_document'
-    | 'decrypt_document_and_selfie'
-    | 'decrypt_all'
-    | 'decrypt_all_except_pci_data'
-    | 'write_entities'
-    | 'label_and_tag'
-    | 'manage_compliance_doc_submission'
-    | 'compliance_partner_read'
-    | 'compliance_partner_admin'
-    | 'compliance_partner_manage_templates'
-    | 'compliance_partner_manage_reviews'
+    | {
+        kind: 'read';
+      }
+    | {
+        kind: 'admin';
+      }
+    | {
+        kind: 'api_keys';
+      }
+    | {
+        kind: 'manage_vault_proxy';
+      }
+    | {
+        kind: 'manage_webhooks';
+      }
+    | {
+        kind: 'manual_review';
+      }
+    | {
+        kind: 'onboarding_configuration';
+      }
+    | {
+        kind: 'write_lists';
+      }
+    | {
+        kind: 'org_settings';
+      }
+    | {
+        kind: 'cip_integration';
+      }
+    | {
+        data:
+          | {
+              kind: 'any';
+            }
+          | {
+              kind: 'just_in_time';
+            }
+          | {
+              id: string;
+              kind: 'id';
+            };
+        kind: 'invoke_vault_proxy';
+      }
+    | {
+        kind: 'trigger_kyb';
+      }
+    | {
+        kind: 'trigger_kyc';
+      }
+    | {
+        kind: 'auth_token';
+      }
+    | {
+        kind: 'onboarding';
+      }
+    | {
+        /**
+         * Represent the options of allowed CollectedData.
+         * Some CollectedData variants only have a single allowable CollectedDataOption.
+         * Other CollectedData variants may have multiple Options of assortments of data that can be
+         * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+         * the CDO
+         */
+        data:
+          | 'name'
+          | 'dob'
+          | 'ssn4'
+          | 'ssn9'
+          | 'full_address'
+          | 'email'
+          | 'phone_number'
+          | 'nationality'
+          | 'us_legal_status'
+          | {
+              document: string;
+            }
+          | 'business_name'
+          | 'business_tin'
+          | 'business_address'
+          | 'business_phone_number'
+          | 'business_website'
+          | 'business_beneficial_owners'
+          | 'business_kyced_beneficial_owners'
+          | 'business_corporation_type'
+          | 'investor_profile'
+          | 'card'
+          | 'us_tax_id'
+          | 'bank';
+        kind: 'decrypt';
+      }
+    | {
+        kind: 'decrypt_custom';
+      }
+    | {
+        kind: 'decrypt_document';
+      }
+    | {
+        kind: 'decrypt_document_and_selfie';
+      }
+    | {
+        kind: 'decrypt_all';
+      }
+    | {
+        kind: 'decrypt_all_except_pci_data';
+      }
+    | {
+        kind: 'write_entities';
+      }
+    | {
+        kind: 'label_and_tag';
+      }
+    | {
+        kind: 'manage_compliance_doc_submission';
+      }
+    | {
+        kind: 'compliance_partner_read';
+      }
+    | {
+        kind: 'compliance_partner_admin';
+      }
+    | {
+        kind: 'compliance_partner_manage_templates';
+      }
+    | {
+        kind: 'compliance_partner_manage_reviews';
+      }
   >;
 };
 export type PartnerLoginRequest = {
@@ -13485,6 +24632,7 @@ export type PatchProxyConfigRequest = {
 };
 export type PrivateBusinessOwner = {
   fpId?: string;
+  id: string;
   kind: 'primary' | 'secondary';
   name?: string;
   ownershipStake?: number;
@@ -13733,9 +24881,12 @@ export type PrivateBusinessOwner = {
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
   source: 'hosted' | 'tenant';
+  /**
+   * The status of the onboarding
+   */
   status?: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 };
-export type kind9 = 'primary' | 'secondary';
+export type kind13 = 'primary' | 'secondary';
 /**
  * The vault field that can be used to update the ownership stake.
  */
@@ -13980,9 +25131,21 @@ export type ownership_stake_di =
   | 'bank.*.ach_account_id'
   | 'bank.*.account_type'
   | 'bank.*.fingerprint';
-export type source4 = 'hosted' | 'tenant';
+export type source3 = 'hosted' | 'tenant';
+export type PrivateBusinessOwnerKycLink = {
+  id: string;
+  link: string;
+  name?: string;
+  /**
+   * An cryptographically generated auth token to authenticate a session
+   */
+  token: string;
+};
 export type PrivateOwnedBusiness = {
   id: string;
+  /**
+   * The status of the onboarding
+   */
   status: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 };
 /**
@@ -14556,6 +25719,7 @@ export type ReuploadComplianceDocRequest = {
  */
 export type RiskSignal = {
   description: string;
+  group: 'kyc' | 'kyb' | 'doc' | 'web_device' | 'native_device' | 'aml' | 'behavior' | 'phone' | 'synthetic';
   id: string;
   note: string;
   onboardingDecisionId?: string;
@@ -14943,6 +26107,7 @@ export type RiskSignal = {
   severity: 'info' | 'low' | 'medium' | 'high';
   timestamp: string;
 };
+export type group = 'kyc' | 'kyb' | 'doc' | 'web_device' | 'native_device' | 'aml' | 'behavior' | 'phone' | 'synthetic';
 export type reason_code =
   | 'watchlist_hit_ofac'
   | 'watchlist_hit_non_sdn'
@@ -15705,8 +26870,1189 @@ export type Rule = {
   isShadow: boolean;
   kind: 'Person' | 'Business' | 'Any';
   name?: string;
-  ruleAction: string;
-  ruleExpression: Array<string>;
+  ruleAction:
+    | {
+        /**
+         * ORDERING MATTERS!!!
+         */
+        config: {
+          [key: string]: unknown;
+        };
+        /**
+         * ORDERING MATTERS!!!
+         */
+        kind: 'pass_with_manual_review';
+      }
+    | {
+        config: {
+          [key: string]: unknown;
+        };
+        kind: 'manual_review';
+      }
+    | {
+        config: Array<
+          | {
+              data: {
+                collect_selfie: boolean;
+                document_types_and_countries?: {
+                  country_specific: {
+                    [key: string]: unknown;
+                  };
+                  global: Array<
+                    | 'id_card'
+                    | 'drivers_license'
+                    | 'passport'
+                    | 'passport_card'
+                    | 'permit'
+                    | 'visa'
+                    | 'residence_document'
+                    | 'voter_identification'
+                  >;
+                };
+              };
+              kind: 'identity';
+            }
+          | {
+              data: {
+                requires_human_review: boolean;
+              };
+              kind: 'proof_of_ssn';
+            }
+          | {
+              data: {
+                requires_human_review: boolean;
+              };
+              kind: 'proof_of_address';
+            }
+          | {
+              data: {
+                /**
+                 * Optional human-readable description of the document that will be displayed to the user
+                 */
+                description?: string;
+                /**
+                 * Custom document identifier under which the document will be vaulted
+                 */
+                identifier:
+                  | 'id.first_name'
+                  | 'id.middle_name'
+                  | 'id.last_name'
+                  | 'id.dob'
+                  | 'id.ssn4'
+                  | 'id.ssn9'
+                  | 'id.address_line1'
+                  | 'id.address_line2'
+                  | 'id.city'
+                  | 'id.state'
+                  | 'id.zip'
+                  | 'id.country'
+                  | 'id.email'
+                  | 'id.phone_number'
+                  | 'id.us_legal_status'
+                  | 'id.visa_kind'
+                  | 'id.visa_expiration_date'
+                  | 'id.nationality'
+                  | 'id.citizenships'
+                  | 'id.drivers_license_number'
+                  | 'id.drivers_license_state'
+                  | 'id.itin'
+                  | 'id.us_tax_id'
+                  | 'business.name'
+                  | 'business.dba'
+                  | 'business.website'
+                  | 'business.phone_number'
+                  | 'business.tin'
+                  | 'business.address_line1'
+                  | 'business.address_line2'
+                  | 'business.city'
+                  | 'business.state'
+                  | 'business.zip'
+                  | 'business.country'
+                  | 'business.corporation_type'
+                  | 'business.formation_state'
+                  | 'business.formation_date'
+                  | 'custom.*'
+                  | 'investor_profile.employment_status'
+                  | 'investor_profile.occupation'
+                  | 'investor_profile.employer'
+                  | 'investor_profile.annual_income'
+                  | 'investor_profile.net_worth'
+                  | 'investor_profile.investment_goals'
+                  | 'investor_profile.risk_tolerance'
+                  | 'investor_profile.declarations'
+                  | 'investor_profile.brokerage_firm_employer'
+                  | 'investor_profile.senior_executive_symbols'
+                  | 'investor_profile.family_member_names'
+                  | 'investor_profile.political_organization'
+                  | 'investor_profile.funding_sources'
+                  | 'document.id_card.front.image'
+                  | 'document.id_card.front.mime_type'
+                  | 'document.id_card.back.image'
+                  | 'document.id_card.back.mime_type'
+                  | 'document.id_card.selfie.image'
+                  | 'document.id_card.selfie.mime_type'
+                  | 'document.id_card.full_name'
+                  | 'document.id_card.dob'
+                  | 'document.id_card.gender'
+                  | 'document.id_card.full_address'
+                  | 'document.id_card.document_number'
+                  | 'document.id_card.expires_at'
+                  | 'document.id_card.issued_at'
+                  | 'document.id_card.issuing_state'
+                  | 'document.id_card.issuing_country'
+                  | 'document.id_card.ref_number'
+                  | 'document.id_card.nationality'
+                  | 'document.id_card.curp'
+                  | 'document.id_card.clave_de_elector'
+                  | 'document.id_card.classified_document_type'
+                  | 'document.id_card.curp_validation_response'
+                  | 'document.drivers_license.front.image'
+                  | 'document.drivers_license.front.mime_type'
+                  | 'document.drivers_license.back.image'
+                  | 'document.drivers_license.back.mime_type'
+                  | 'document.drivers_license.selfie.image'
+                  | 'document.drivers_license.selfie.mime_type'
+                  | 'document.drivers_license.full_name'
+                  | 'document.drivers_license.dob'
+                  | 'document.drivers_license.gender'
+                  | 'document.drivers_license.full_address'
+                  | 'document.drivers_license.document_number'
+                  | 'document.drivers_license.expires_at'
+                  | 'document.drivers_license.issued_at'
+                  | 'document.drivers_license.issuing_state'
+                  | 'document.drivers_license.issuing_country'
+                  | 'document.drivers_license.ref_number'
+                  | 'document.drivers_license.nationality'
+                  | 'document.drivers_license.curp'
+                  | 'document.drivers_license.clave_de_elector'
+                  | 'document.drivers_license.classified_document_type'
+                  | 'document.drivers_license.curp_validation_response'
+                  | 'document.passport.front.image'
+                  | 'document.passport.front.mime_type'
+                  | 'document.passport.back.image'
+                  | 'document.passport.back.mime_type'
+                  | 'document.passport.selfie.image'
+                  | 'document.passport.selfie.mime_type'
+                  | 'document.passport.full_name'
+                  | 'document.passport.dob'
+                  | 'document.passport.gender'
+                  | 'document.passport.full_address'
+                  | 'document.passport.document_number'
+                  | 'document.passport.expires_at'
+                  | 'document.passport.issued_at'
+                  | 'document.passport.issuing_state'
+                  | 'document.passport.issuing_country'
+                  | 'document.passport.ref_number'
+                  | 'document.passport.nationality'
+                  | 'document.passport.curp'
+                  | 'document.passport.clave_de_elector'
+                  | 'document.passport.classified_document_type'
+                  | 'document.passport.curp_validation_response'
+                  | 'document.passport_card.front.image'
+                  | 'document.passport_card.front.mime_type'
+                  | 'document.passport_card.back.image'
+                  | 'document.passport_card.back.mime_type'
+                  | 'document.passport_card.selfie.image'
+                  | 'document.passport_card.selfie.mime_type'
+                  | 'document.passport_card.full_name'
+                  | 'document.passport_card.dob'
+                  | 'document.passport_card.gender'
+                  | 'document.passport_card.full_address'
+                  | 'document.passport_card.document_number'
+                  | 'document.passport_card.expires_at'
+                  | 'document.passport_card.issued_at'
+                  | 'document.passport_card.issuing_state'
+                  | 'document.passport_card.issuing_country'
+                  | 'document.passport_card.ref_number'
+                  | 'document.passport_card.nationality'
+                  | 'document.passport_card.curp'
+                  | 'document.passport_card.clave_de_elector'
+                  | 'document.passport_card.classified_document_type'
+                  | 'document.passport_card.curp_validation_response'
+                  | 'document.permit.front.image'
+                  | 'document.permit.front.mime_type'
+                  | 'document.permit.back.image'
+                  | 'document.permit.back.mime_type'
+                  | 'document.permit.selfie.image'
+                  | 'document.permit.selfie.mime_type'
+                  | 'document.permit.full_name'
+                  | 'document.permit.dob'
+                  | 'document.permit.gender'
+                  | 'document.permit.full_address'
+                  | 'document.permit.document_number'
+                  | 'document.permit.expires_at'
+                  | 'document.permit.issued_at'
+                  | 'document.permit.issuing_state'
+                  | 'document.permit.issuing_country'
+                  | 'document.permit.ref_number'
+                  | 'document.permit.nationality'
+                  | 'document.permit.curp'
+                  | 'document.permit.clave_de_elector'
+                  | 'document.permit.classified_document_type'
+                  | 'document.permit.curp_validation_response'
+                  | 'document.visa.front.image'
+                  | 'document.visa.front.mime_type'
+                  | 'document.visa.back.image'
+                  | 'document.visa.back.mime_type'
+                  | 'document.visa.selfie.image'
+                  | 'document.visa.selfie.mime_type'
+                  | 'document.visa.full_name'
+                  | 'document.visa.dob'
+                  | 'document.visa.gender'
+                  | 'document.visa.full_address'
+                  | 'document.visa.document_number'
+                  | 'document.visa.expires_at'
+                  | 'document.visa.issued_at'
+                  | 'document.visa.issuing_state'
+                  | 'document.visa.issuing_country'
+                  | 'document.visa.ref_number'
+                  | 'document.visa.nationality'
+                  | 'document.visa.curp'
+                  | 'document.visa.clave_de_elector'
+                  | 'document.visa.classified_document_type'
+                  | 'document.visa.curp_validation_response'
+                  | 'document.residence_document.front.image'
+                  | 'document.residence_document.front.mime_type'
+                  | 'document.residence_document.back.image'
+                  | 'document.residence_document.back.mime_type'
+                  | 'document.residence_document.selfie.image'
+                  | 'document.residence_document.selfie.mime_type'
+                  | 'document.residence_document.full_name'
+                  | 'document.residence_document.dob'
+                  | 'document.residence_document.gender'
+                  | 'document.residence_document.full_address'
+                  | 'document.residence_document.document_number'
+                  | 'document.residence_document.expires_at'
+                  | 'document.residence_document.issued_at'
+                  | 'document.residence_document.issuing_state'
+                  | 'document.residence_document.issuing_country'
+                  | 'document.residence_document.ref_number'
+                  | 'document.residence_document.nationality'
+                  | 'document.residence_document.curp'
+                  | 'document.residence_document.clave_de_elector'
+                  | 'document.residence_document.classified_document_type'
+                  | 'document.residence_document.curp_validation_response'
+                  | 'document.voter_identification.front.image'
+                  | 'document.voter_identification.front.mime_type'
+                  | 'document.voter_identification.back.image'
+                  | 'document.voter_identification.back.mime_type'
+                  | 'document.voter_identification.selfie.image'
+                  | 'document.voter_identification.selfie.mime_type'
+                  | 'document.voter_identification.full_name'
+                  | 'document.voter_identification.dob'
+                  | 'document.voter_identification.gender'
+                  | 'document.voter_identification.full_address'
+                  | 'document.voter_identification.document_number'
+                  | 'document.voter_identification.expires_at'
+                  | 'document.voter_identification.issued_at'
+                  | 'document.voter_identification.issuing_state'
+                  | 'document.voter_identification.issuing_country'
+                  | 'document.voter_identification.ref_number'
+                  | 'document.voter_identification.nationality'
+                  | 'document.voter_identification.curp'
+                  | 'document.voter_identification.clave_de_elector'
+                  | 'document.voter_identification.classified_document_type'
+                  | 'document.voter_identification.curp_validation_response'
+                  | 'document.finra_compliance_letter'
+                  | 'document.proof_of_address.image'
+                  | 'document.ssn_card.image'
+                  | 'document.custom.*'
+                  | 'card.*.number'
+                  | 'card.*.expiration'
+                  | 'card.*.cvc'
+                  | 'card.*.name'
+                  | 'card.*.billing_address.zip'
+                  | 'card.*.billing_address.country'
+                  | 'card.*.expiration_month'
+                  | 'card.*.expiration_year'
+                  | 'card.*.number_last4'
+                  | 'card.*.issuer'
+                  | 'card.*.fingerprint'
+                  | 'bank.*.name'
+                  | 'bank.*.ach_routing_number'
+                  | 'bank.*.ach_account_number'
+                  | 'bank.*.ach_account_id'
+                  | 'bank.*.account_type'
+                  | 'bank.*.fingerprint';
+                /**
+                 * The human-readable name of the document to display to the user
+                 */
+                name: string;
+                requires_human_review: boolean;
+                upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+              };
+              kind: 'custom';
+            }
+        >;
+        kind: 'step_up';
+      }
+    | {
+        config: {
+          [key: string]: unknown;
+        };
+        kind: 'fail';
+      };
+  ruleExpression: Array<
+    | {
+        field:
+          | 'watchlist_hit_ofac'
+          | 'watchlist_hit_non_sdn'
+          | 'watchlist_hit_warning'
+          | 'watchlist_hit_pep'
+          | 'adverse_media_hit'
+          | 'id_not_located'
+          | 'id_flagged'
+          | 'credit_more_than3_inquiries_in_last30_days'
+          | 'credit_established_before_ssn_date'
+          | 'address_input_is_non_residential'
+          | 'address_located_is_non_residential'
+          | 'address_does_not_match'
+          | 'address_partially_matches'
+          | 'address_zip_code_does_not_match'
+          | 'address_city_does_not_match'
+          | 'address_city_matches'
+          | 'address_street_name_does_not_match'
+          | 'address_street_name_partially_matches'
+          | 'address_street_number_does_not_match'
+          | 'address_state_does_not_match'
+          | 'address_input_is_not_deliverable'
+          | 'address_input_is_po_box'
+          | 'address_input_is_correctional_facility'
+          | 'address_input_is_not_standard_campground'
+          | 'address_input_is_not_standard_college'
+          | 'address_input_is_not_standard_general_delivery'
+          | 'address_input_is_not_standard_hospital'
+          | 'address_input_is_not_standard_hotel'
+          | 'address_input_is_not_standard_mail_drop'
+          | 'address_input_is_not_standard_prison'
+          | 'address_input_is_not_standard_university'
+          | 'address_input_is_not_standard_uspo'
+          | 'address_input_not_on_file'
+          | 'address_located_is_po_box'
+          | 'address_located_is_not_standard_campground'
+          | 'address_located_is_not_standard_college'
+          | 'address_located_is_not_standard_general_delivery'
+          | 'address_located_is_not_standard_hospital'
+          | 'address_located_is_not_standard_hotel'
+          | 'address_located_is_not_standard_mail_drop'
+          | 'address_located_is_not_standard_prison'
+          | 'address_located_is_not_standard_university'
+          | 'address_located_is_not_standard_uspo'
+          | 'address_located_is_high_risk_address'
+          | 'address_risk_alert'
+          | 'address_alert_velocity'
+          | 'address_alert_stability'
+          | 'address_alert_longevity'
+          | 'address_alert_single_address_in_file'
+          | 'address_newer_record_found'
+          | 'dob_yob_does_not_match'
+          | 'dob_yob_does_not_match_within1_year'
+          | 'dob_mob_does_not_match'
+          | 'dob_day_does_not_match'
+          | 'dob_mob_not_available'
+          | 'dob_yob_not_available'
+          | 'dob_located_age_below_minimum'
+          | 'dob_located_age_above_maximum'
+          | 'dob_located_coppa_alert'
+          | 'dob_does_not_match'
+          | 'dob_partial_match'
+          | 'dob_not_on_file'
+          | 'dob_could_not_match'
+          | 'dob_input_age_less_than18'
+          | 'ssn_not_available'
+          | 'ssn_not_on_file'
+          | 'ssn_partially_matches'
+          | 'ssn_does_not_match'
+          | 'ssn_does_not_match_within1_digit'
+          | 'ssn_input_is_itin'
+          | 'ssn_located_is_itin'
+          | 'ssn_input_tied_to_multiple_names'
+          | 'ssn_input_is_invalid'
+          | 'ssn_located_is_invalid'
+          | 'ssn_not_provided'
+          | 'us_tax_id_is_itin'
+          | 'itin_is_expired'
+          | 'name_last_does_not_match'
+          | 'name_last_partially_matches'
+          | 'name_matches'
+          | 'name_does_not_match'
+          | 'name_partially_matches'
+          | 'ip_state_does_not_match'
+          | 'ip_input_invalid'
+          | 'ip_not_located'
+          | 'ip_location_not_available'
+          | 'ip_alert_high_risk_bot'
+          | 'ip_alert_high_risk_spam'
+          | 'ip_alert_high_risk_tor'
+          | 'ip_alert_high_risk_proxy'
+          | 'ip_proxy'
+          | 'ip_data_center'
+          | 'ip_alert_data_center'
+          | 'email_address_invalid'
+          | 'email_address_or_domain_does_not_exist'
+          | 'email_domain_recently_created'
+          | 'email_domain_private'
+          | 'email_domain_corporate'
+          | 'email_recently_verified'
+          | 'email_found_on_file'
+          | 'email_not_found_on_file'
+          | 'email_high_risk_country'
+          | 'email_high_risk_fraud'
+          | 'email_high_risk_tumbled'
+          | 'email_high_risk_disposable'
+          | 'email_high_risk_domain'
+          | 'sentilink_synthetic_identity_high_risk'
+          | 'sentilink_synthetic_identity_medium_risk'
+          | 'sentilink_synthetic_identity_low_risk'
+          | 'synthetic_identity_high_risk'
+          | 'synthetic_identity_medium_risk'
+          | 'synthetic_identity_low_risk'
+          | 'sentilink_identity_theft_high_risk'
+          | 'sentilink_identity_theft_medium_risk'
+          | 'sentilink_identity_theft_low_risk'
+          | 'phone_number_input_invalid'
+          | 'phone_number_located_is_voip'
+          | 'phone_number_is_voip'
+          | 'phone_number_mobile_account_type_postpaid'
+          | 'phone_number_mobile_account_type_prepaid'
+          | 'phone_number_mobile_account_type_unknown'
+          | 'phone_number_mobile_account_status_active'
+          | 'phone_number_mobile_account_status_deactivated'
+          | 'phone_number_mobile_account_status_suspended'
+          | 'phone_number_mobile_account_status_absent'
+          | 'phone_located_matches'
+          | 'phone_located_partially_matches'
+          | 'phone_located_does_not_match'
+          | 'phone_located_name_matches'
+          | 'phone_located_name_partially_matches'
+          | 'phone_located_name_does_not_match'
+          | 'phone_located_address_matches'
+          | 'phone_located_address_partially_matches'
+          | 'phone_located_address_does_not_match'
+          | 'phone_input_likely_belongs_to_another'
+          | 'phone_not_provided'
+          | 'multiple_records_found'
+          | 'subject_deceased'
+          | 'bureau_deleted_record'
+          | 'ssn_issued_prior_to_dob'
+          | 'ssn_issue_date_cannot_be_verified'
+          | 'ssn_located_issue_date_cannot_be_verified'
+          | 'ssn_potentially_belongs_to_another'
+          | 'ssn_likely_belongs_to_another'
+          | 'thin_file'
+          | 'input_phone_number_does_not_match_input_state'
+          | 'input_phone_number_does_not_match_located_state_history'
+          | 'input_phone_number_does_not_match_ip_state'
+          | 'drivers_license_number_different_number_found'
+          | 'drivers_license_number_not_on_record'
+          | 'drivers_license_number_not_valid'
+          | 'drivers_license_number_is_valid'
+          | 'document_upload_failed'
+          | 'document_not_verified'
+          | 'document_verified'
+          | 'document_ocr_not_successful'
+          | 'document_ocr_successful'
+          | 'document_barcode_could_not_be_read'
+          | 'document_barcode_could_be_read'
+          | 'document_barcode_content_matches'
+          | 'document_barcode_content_does_not_match'
+          | 'document_barcode_detected'
+          | 'document_barcode_could_not_be_detected'
+          | 'document_requires_review'
+          | 'document_expired'
+          | 'document_not_expired'
+          | 'document_from_restricted_country'
+          | 'document_restricted_template_type'
+          | 'document_type_not_allowed'
+          | 'document_field_crosscheck_failed'
+          | 'document_invalid_issuance_or_expiration_date'
+          | 'document_invalid_template_layout'
+          | 'document_possible_image_tampering'
+          | 'document_no_image_tampering'
+          | 'document_no_image_alteration_front'
+          | 'document_no_image_alteration_back'
+          | 'document_possible_image_alteration_front'
+          | 'document_possible_image_alteration_back'
+          | 'document_possible_image_alteration'
+          | 'document_possible_digital_fraud'
+          | 'document_selfie_used_with_different_information'
+          | 'document_selfie_not_used_with_different_information'
+          | 'document_selfie_mask'
+          | 'document_selfie_glasses'
+          | 'document_selfie_not_live_image'
+          | 'document_possible_fake_image'
+          | 'document_not_fake_image'
+          | 'document_pdf417_data_is_valid'
+          | 'document_pdf417_data_is_not_valid'
+          | 'document_photo_is_screen_capture'
+          | 'document_photo_is_not_screen_capture'
+          | 'document_photo_is_paper_capture'
+          | 'document_photo_is_not_paper_capture'
+          | 'document_alignment_failed'
+          | 'document_visible_photo_features_not_verified'
+          | 'document_mrz_line_format_check'
+          | 'document_qr_code_check'
+          | 'document_could_not_classify'
+          | 'document_visible_photo_features_verified'
+          | 'document_low_match_score_with_selfie'
+          | 'document_selfie_matches'
+          | 'document_selfie_does_not_match'
+          | 'document_selfie_bad_quality'
+          | 'document_type_mismatch'
+          | 'document_unknown_country_code'
+          | 'document_country_code_mismatch'
+          | 'document_is_permit_or_provisional_license'
+          | 'document_selfie_was_skipped'
+          | 'document_collected_via_desktop'
+          | 'document_not_live_capture'
+          | 'document_live_capture_failed'
+          | 'document_ocr_name_does_not_match'
+          | 'document_ocr_name_could_not_match'
+          | 'document_ocr_name_matches'
+          | 'document_ocr_address_does_not_match'
+          | 'document_ocr_address_could_not_match'
+          | 'document_ocr_address_matches'
+          | 'document_ocr_first_name_does_not_match'
+          | 'document_ocr_first_name_matches'
+          | 'document_ocr_last_name_does_not_match'
+          | 'document_ocr_last_name_matches'
+          | 'document_ocr_dob_does_not_match'
+          | 'document_ocr_dob_could_not_match'
+          | 'document_ocr_dob_matches'
+          | 'document_dob_crosscheck_matches'
+          | 'document_dob_crosscheck_does_not_match'
+          | 'document_expiration_date_crosscheck_matches'
+          | 'document_expiration_date_crosscheck_does_not_match'
+          | 'document_sex_crosscheck_matches'
+          | 'document_sex_crosscheck_does_not_match'
+          | 'document_full_name_crosscheck_matches'
+          | 'document_full_name_crosscheck_does_not_match'
+          | 'document_number_crosscheck_matches'
+          | 'document_number_crosscheck_does_not_match'
+          | 'document_expiration_check_digit_matches'
+          | 'document_expiration_check_digit_does_not_match'
+          | 'document_dob_check_digit_matches'
+          | 'document_dob_check_digit_does_not_match'
+          | 'document_number_check_digit_matches'
+          | 'document_number_check_digit_does_not_match'
+          | 'curp_not_valid'
+          | 'curp_not_found'
+          | 'curp_valid'
+          | 'curp_input_curp_invalid'
+          | 'curp_could_not_validate'
+          | 'curp_multiple_results_for_data'
+          | 'curp_service_not_available'
+          | 'curp_malformed'
+          | 'address_matches'
+          | 'address_zip_code_matches'
+          | 'address_street_name_matches'
+          | 'address_street_number_matches'
+          | 'address_state_matches'
+          | 'dob_matches'
+          | 'dob_yob_matches'
+          | 'dob_mob_matches'
+          | 'ssn_matches'
+          | 'name_last_matches'
+          | 'name_first_matches'
+          | 'name_first_does_not_match'
+          | 'name_first_partially_matches'
+          | 'ip_state_matches'
+          | 'phone_number_matches'
+          | 'input_phone_number_matches_input_state'
+          | 'input_phone_number_matches_located_state_history'
+          | 'affiliated_with_broker_or_finra'
+          | 'visa_is_other'
+          | 'visa_expired_or_expiring_soon'
+          | 'business_name_match'
+          | 'business_name_similar_match'
+          | 'business_name_alternate_match'
+          | 'business_name_does_not_match'
+          | 'business_name_no_watchlist_hits'
+          | 'business_name_watchlist_hit'
+          | 'business_dba_match'
+          | 'business_dba_similar_match'
+          | 'business_dba_alternate_match'
+          | 'business_dba_does_not_match'
+          | 'business_phone_number_match'
+          | 'business_phone_number_does_not_match'
+          | 'business_website_online'
+          | 'business_website_offline'
+          | 'business_website_verified'
+          | 'business_website_unverified'
+          | 'business_website_parking_page'
+          | 'tin_match'
+          | 'tin_not_found'
+          | 'tin_invalid'
+          | 'tin_does_not_match'
+          | 'business_address_match'
+          | 'business_address_close_match'
+          | 'business_address_similar_match'
+          | 'business_address_incomplete_match'
+          | 'business_address_does_not_match'
+          | 'business_address_commercial'
+          | 'business_address_commercial_mail_receiving_agency'
+          | 'business_address_residential'
+          | 'business_address_deliverable'
+          | 'business_address_not_deliverable'
+          | 'beneficial_owners_match'
+          | 'beneficial_owners_partial_match'
+          | 'beneficial_owners_do_not_match'
+          | 'beneficial_owner_failed_kyc'
+          | 'beneficial_owner_possible_missing_bo'
+          | 'sos_active_filing_found'
+          | 'sos_filing_no_status'
+          | 'sos_filing_partially_active'
+          | 'sos_filing_no_active_found'
+          | 'sos_filing_not_found'
+          | 'sos_domestic_active_filing_found'
+          | 'sos_domestic_filing_no_status'
+          | 'sos_domestic_filing_partially_active'
+          | 'sos_domestic_filing_not_found'
+          | 'sos_domestic_filing_status_good_standing'
+          | 'sos_domestic_filing_status_pending_active'
+          | 'sos_domestic_filing_status_pending_inactive'
+          | 'sos_domestic_filing_status_not_provided_by_state'
+          | 'sos_domestic_filing_status_not_in_good_standing'
+          | 'sos_domestic_filing_status_dissolved'
+          | 'sos_business_address_active_filing_found'
+          | 'sos_business_address_filing_status_not_available'
+          | 'sos_business_address_inactive_filing_found'
+          | 'sos_business_address_filing_not_found'
+          | 'device_low_risk'
+          | 'device_medium_risk'
+          | 'device_high_risk'
+          | 'device_factory_reset'
+          | 'device_gps_spoofing'
+          | 'ip_vpn'
+          | 'ip_tor_exit_node'
+          | 'device_bot_risk'
+          | 'device_suspicious'
+          | 'device_velocity'
+          | 'device_multiple_users'
+          | 'device_reputation'
+          | 'browser_incognito'
+          | 'browser_tampering'
+          | 'browser_automation'
+          | 'attested_device_apple'
+          | 'attested_device_android'
+          | 'attested_device_android_strong_integrity'
+          | 'attested_device_android_unlicensed'
+          | 'attested_device_android_risky'
+          | 'attested_device_android_failed_evaluation'
+          | 'attested_device_no_fraud_duplicate_risk'
+          | 'attested_device_fraud_duplicate_risk_low'
+          | 'attested_device_fraud_duplicate_risk_medium'
+          | 'attested_device_fraud_duplicate_risk_high'
+          | 'behavior_fraud_ring_risk'
+          | 'behavior_high_risk'
+          | 'behavior_low_risk'
+          | 'behavior_automatic_activity';
+        op: 'eq' | 'not_eq';
+        value: boolean;
+      }
+    | (
+        | {
+            field:
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint';
+            op: 'eq' | 'not_eq';
+            value: string;
+          }
+        | {
+            field:
+              | 'id.first_name'
+              | 'id.middle_name'
+              | 'id.last_name'
+              | 'id.dob'
+              | 'id.ssn4'
+              | 'id.ssn9'
+              | 'id.address_line1'
+              | 'id.address_line2'
+              | 'id.city'
+              | 'id.state'
+              | 'id.zip'
+              | 'id.country'
+              | 'id.email'
+              | 'id.phone_number'
+              | 'id.us_legal_status'
+              | 'id.visa_kind'
+              | 'id.visa_expiration_date'
+              | 'id.nationality'
+              | 'id.citizenships'
+              | 'id.drivers_license_number'
+              | 'id.drivers_license_state'
+              | 'id.itin'
+              | 'id.us_tax_id'
+              | 'business.name'
+              | 'business.dba'
+              | 'business.website'
+              | 'business.phone_number'
+              | 'business.tin'
+              | 'business.address_line1'
+              | 'business.address_line2'
+              | 'business.city'
+              | 'business.state'
+              | 'business.zip'
+              | 'business.country'
+              | 'business.corporation_type'
+              | 'business.formation_state'
+              | 'business.formation_date'
+              | 'custom.*'
+              | 'investor_profile.employment_status'
+              | 'investor_profile.occupation'
+              | 'investor_profile.employer'
+              | 'investor_profile.annual_income'
+              | 'investor_profile.net_worth'
+              | 'investor_profile.investment_goals'
+              | 'investor_profile.risk_tolerance'
+              | 'investor_profile.declarations'
+              | 'investor_profile.brokerage_firm_employer'
+              | 'investor_profile.senior_executive_symbols'
+              | 'investor_profile.family_member_names'
+              | 'investor_profile.political_organization'
+              | 'investor_profile.funding_sources'
+              | 'document.id_card.front.image'
+              | 'document.id_card.front.mime_type'
+              | 'document.id_card.back.image'
+              | 'document.id_card.back.mime_type'
+              | 'document.id_card.selfie.image'
+              | 'document.id_card.selfie.mime_type'
+              | 'document.id_card.full_name'
+              | 'document.id_card.dob'
+              | 'document.id_card.gender'
+              | 'document.id_card.full_address'
+              | 'document.id_card.document_number'
+              | 'document.id_card.expires_at'
+              | 'document.id_card.issued_at'
+              | 'document.id_card.issuing_state'
+              | 'document.id_card.issuing_country'
+              | 'document.id_card.ref_number'
+              | 'document.id_card.nationality'
+              | 'document.id_card.curp'
+              | 'document.id_card.clave_de_elector'
+              | 'document.id_card.classified_document_type'
+              | 'document.id_card.curp_validation_response'
+              | 'document.drivers_license.front.image'
+              | 'document.drivers_license.front.mime_type'
+              | 'document.drivers_license.back.image'
+              | 'document.drivers_license.back.mime_type'
+              | 'document.drivers_license.selfie.image'
+              | 'document.drivers_license.selfie.mime_type'
+              | 'document.drivers_license.full_name'
+              | 'document.drivers_license.dob'
+              | 'document.drivers_license.gender'
+              | 'document.drivers_license.full_address'
+              | 'document.drivers_license.document_number'
+              | 'document.drivers_license.expires_at'
+              | 'document.drivers_license.issued_at'
+              | 'document.drivers_license.issuing_state'
+              | 'document.drivers_license.issuing_country'
+              | 'document.drivers_license.ref_number'
+              | 'document.drivers_license.nationality'
+              | 'document.drivers_license.curp'
+              | 'document.drivers_license.clave_de_elector'
+              | 'document.drivers_license.classified_document_type'
+              | 'document.drivers_license.curp_validation_response'
+              | 'document.passport.front.image'
+              | 'document.passport.front.mime_type'
+              | 'document.passport.back.image'
+              | 'document.passport.back.mime_type'
+              | 'document.passport.selfie.image'
+              | 'document.passport.selfie.mime_type'
+              | 'document.passport.full_name'
+              | 'document.passport.dob'
+              | 'document.passport.gender'
+              | 'document.passport.full_address'
+              | 'document.passport.document_number'
+              | 'document.passport.expires_at'
+              | 'document.passport.issued_at'
+              | 'document.passport.issuing_state'
+              | 'document.passport.issuing_country'
+              | 'document.passport.ref_number'
+              | 'document.passport.nationality'
+              | 'document.passport.curp'
+              | 'document.passport.clave_de_elector'
+              | 'document.passport.classified_document_type'
+              | 'document.passport.curp_validation_response'
+              | 'document.passport_card.front.image'
+              | 'document.passport_card.front.mime_type'
+              | 'document.passport_card.back.image'
+              | 'document.passport_card.back.mime_type'
+              | 'document.passport_card.selfie.image'
+              | 'document.passport_card.selfie.mime_type'
+              | 'document.passport_card.full_name'
+              | 'document.passport_card.dob'
+              | 'document.passport_card.gender'
+              | 'document.passport_card.full_address'
+              | 'document.passport_card.document_number'
+              | 'document.passport_card.expires_at'
+              | 'document.passport_card.issued_at'
+              | 'document.passport_card.issuing_state'
+              | 'document.passport_card.issuing_country'
+              | 'document.passport_card.ref_number'
+              | 'document.passport_card.nationality'
+              | 'document.passport_card.curp'
+              | 'document.passport_card.clave_de_elector'
+              | 'document.passport_card.classified_document_type'
+              | 'document.passport_card.curp_validation_response'
+              | 'document.permit.front.image'
+              | 'document.permit.front.mime_type'
+              | 'document.permit.back.image'
+              | 'document.permit.back.mime_type'
+              | 'document.permit.selfie.image'
+              | 'document.permit.selfie.mime_type'
+              | 'document.permit.full_name'
+              | 'document.permit.dob'
+              | 'document.permit.gender'
+              | 'document.permit.full_address'
+              | 'document.permit.document_number'
+              | 'document.permit.expires_at'
+              | 'document.permit.issued_at'
+              | 'document.permit.issuing_state'
+              | 'document.permit.issuing_country'
+              | 'document.permit.ref_number'
+              | 'document.permit.nationality'
+              | 'document.permit.curp'
+              | 'document.permit.clave_de_elector'
+              | 'document.permit.classified_document_type'
+              | 'document.permit.curp_validation_response'
+              | 'document.visa.front.image'
+              | 'document.visa.front.mime_type'
+              | 'document.visa.back.image'
+              | 'document.visa.back.mime_type'
+              | 'document.visa.selfie.image'
+              | 'document.visa.selfie.mime_type'
+              | 'document.visa.full_name'
+              | 'document.visa.dob'
+              | 'document.visa.gender'
+              | 'document.visa.full_address'
+              | 'document.visa.document_number'
+              | 'document.visa.expires_at'
+              | 'document.visa.issued_at'
+              | 'document.visa.issuing_state'
+              | 'document.visa.issuing_country'
+              | 'document.visa.ref_number'
+              | 'document.visa.nationality'
+              | 'document.visa.curp'
+              | 'document.visa.clave_de_elector'
+              | 'document.visa.classified_document_type'
+              | 'document.visa.curp_validation_response'
+              | 'document.residence_document.front.image'
+              | 'document.residence_document.front.mime_type'
+              | 'document.residence_document.back.image'
+              | 'document.residence_document.back.mime_type'
+              | 'document.residence_document.selfie.image'
+              | 'document.residence_document.selfie.mime_type'
+              | 'document.residence_document.full_name'
+              | 'document.residence_document.dob'
+              | 'document.residence_document.gender'
+              | 'document.residence_document.full_address'
+              | 'document.residence_document.document_number'
+              | 'document.residence_document.expires_at'
+              | 'document.residence_document.issued_at'
+              | 'document.residence_document.issuing_state'
+              | 'document.residence_document.issuing_country'
+              | 'document.residence_document.ref_number'
+              | 'document.residence_document.nationality'
+              | 'document.residence_document.curp'
+              | 'document.residence_document.clave_de_elector'
+              | 'document.residence_document.classified_document_type'
+              | 'document.residence_document.curp_validation_response'
+              | 'document.voter_identification.front.image'
+              | 'document.voter_identification.front.mime_type'
+              | 'document.voter_identification.back.image'
+              | 'document.voter_identification.back.mime_type'
+              | 'document.voter_identification.selfie.image'
+              | 'document.voter_identification.selfie.mime_type'
+              | 'document.voter_identification.full_name'
+              | 'document.voter_identification.dob'
+              | 'document.voter_identification.gender'
+              | 'document.voter_identification.full_address'
+              | 'document.voter_identification.document_number'
+              | 'document.voter_identification.expires_at'
+              | 'document.voter_identification.issued_at'
+              | 'document.voter_identification.issuing_state'
+              | 'document.voter_identification.issuing_country'
+              | 'document.voter_identification.ref_number'
+              | 'document.voter_identification.nationality'
+              | 'document.voter_identification.curp'
+              | 'document.voter_identification.clave_de_elector'
+              | 'document.voter_identification.classified_document_type'
+              | 'document.voter_identification.curp_validation_response'
+              | 'document.finra_compliance_letter'
+              | 'document.proof_of_address.image'
+              | 'document.ssn_card.image'
+              | 'document.custom.*'
+              | 'card.*.number'
+              | 'card.*.expiration'
+              | 'card.*.cvc'
+              | 'card.*.name'
+              | 'card.*.billing_address.zip'
+              | 'card.*.billing_address.country'
+              | 'card.*.expiration_month'
+              | 'card.*.expiration_year'
+              | 'card.*.number_last4'
+              | 'card.*.issuer'
+              | 'card.*.fingerprint'
+              | 'bank.*.name'
+              | 'bank.*.ach_routing_number'
+              | 'bank.*.ach_account_number'
+              | 'bank.*.ach_account_id'
+              | 'bank.*.account_type'
+              | 'bank.*.fingerprint';
+            op: 'is_in' | 'is_not_in';
+            value: string;
+          }
+      )
+    | {
+        field: 'ip_address';
+        op: 'is_in' | 'is_not_in';
+        value: string;
+      }
+    | {
+        field: 'experian_score' | 'incode_selfie_match_score';
+        op: 'gt' | 'lt';
+        value: number;
+      }
+  >;
   ruleId: string;
 };
 export type action =
@@ -15718,7 +28064,7 @@ export type action =
   | 'step_up.identity_proof_of_ssn'
   | 'step_up.identity_proof_of_ssn_proof_of_address'
   | 'step_up.custom';
-export type kind10 = 'Person' | 'Business' | 'Any';
+export type kind14 = 'Person' | 'Business' | 'Any';
 export type RuleEvalResults = {
   results: Array<{
     backtestActionTriggered?:
@@ -15730,6 +28076,9 @@ export type RuleEvalResults = {
       | 'step_up.identity_proof_of_ssn'
       | 'step_up.identity_proof_of_ssn_proof_of_address'
       | 'step_up.custom';
+    /**
+     * The status of the onboarding
+     */
     currentStatus: 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
     fpId: string;
     historicalActionTriggered?:
@@ -15767,7 +28116,328 @@ export type RuleSetResult = {
     | 'step_up.custom';
   createdAt: string;
   obConfigurationId: string;
-  ruleActionTriggered?: string;
+  ruleActionTriggered?:
+    | {
+        /**
+         * ORDERING MATTERS!!!
+         */
+        config: {
+          [key: string]: unknown;
+        };
+        /**
+         * ORDERING MATTERS!!!
+         */
+        kind: 'pass_with_manual_review';
+      }
+    | {
+        config: {
+          [key: string]: unknown;
+        };
+        kind: 'manual_review';
+      }
+    | {
+        config: Array<
+          | {
+              data: {
+                collect_selfie: boolean;
+                document_types_and_countries?: {
+                  country_specific: {
+                    [key: string]: unknown;
+                  };
+                  global: Array<
+                    | 'id_card'
+                    | 'drivers_license'
+                    | 'passport'
+                    | 'passport_card'
+                    | 'permit'
+                    | 'visa'
+                    | 'residence_document'
+                    | 'voter_identification'
+                  >;
+                };
+              };
+              kind: 'identity';
+            }
+          | {
+              data: {
+                requires_human_review: boolean;
+              };
+              kind: 'proof_of_ssn';
+            }
+          | {
+              data: {
+                requires_human_review: boolean;
+              };
+              kind: 'proof_of_address';
+            }
+          | {
+              data: {
+                /**
+                 * Optional human-readable description of the document that will be displayed to the user
+                 */
+                description?: string;
+                /**
+                 * Custom document identifier under which the document will be vaulted
+                 */
+                identifier:
+                  | 'id.first_name'
+                  | 'id.middle_name'
+                  | 'id.last_name'
+                  | 'id.dob'
+                  | 'id.ssn4'
+                  | 'id.ssn9'
+                  | 'id.address_line1'
+                  | 'id.address_line2'
+                  | 'id.city'
+                  | 'id.state'
+                  | 'id.zip'
+                  | 'id.country'
+                  | 'id.email'
+                  | 'id.phone_number'
+                  | 'id.us_legal_status'
+                  | 'id.visa_kind'
+                  | 'id.visa_expiration_date'
+                  | 'id.nationality'
+                  | 'id.citizenships'
+                  | 'id.drivers_license_number'
+                  | 'id.drivers_license_state'
+                  | 'id.itin'
+                  | 'id.us_tax_id'
+                  | 'business.name'
+                  | 'business.dba'
+                  | 'business.website'
+                  | 'business.phone_number'
+                  | 'business.tin'
+                  | 'business.address_line1'
+                  | 'business.address_line2'
+                  | 'business.city'
+                  | 'business.state'
+                  | 'business.zip'
+                  | 'business.country'
+                  | 'business.corporation_type'
+                  | 'business.formation_state'
+                  | 'business.formation_date'
+                  | 'custom.*'
+                  | 'investor_profile.employment_status'
+                  | 'investor_profile.occupation'
+                  | 'investor_profile.employer'
+                  | 'investor_profile.annual_income'
+                  | 'investor_profile.net_worth'
+                  | 'investor_profile.investment_goals'
+                  | 'investor_profile.risk_tolerance'
+                  | 'investor_profile.declarations'
+                  | 'investor_profile.brokerage_firm_employer'
+                  | 'investor_profile.senior_executive_symbols'
+                  | 'investor_profile.family_member_names'
+                  | 'investor_profile.political_organization'
+                  | 'investor_profile.funding_sources'
+                  | 'document.id_card.front.image'
+                  | 'document.id_card.front.mime_type'
+                  | 'document.id_card.back.image'
+                  | 'document.id_card.back.mime_type'
+                  | 'document.id_card.selfie.image'
+                  | 'document.id_card.selfie.mime_type'
+                  | 'document.id_card.full_name'
+                  | 'document.id_card.dob'
+                  | 'document.id_card.gender'
+                  | 'document.id_card.full_address'
+                  | 'document.id_card.document_number'
+                  | 'document.id_card.expires_at'
+                  | 'document.id_card.issued_at'
+                  | 'document.id_card.issuing_state'
+                  | 'document.id_card.issuing_country'
+                  | 'document.id_card.ref_number'
+                  | 'document.id_card.nationality'
+                  | 'document.id_card.curp'
+                  | 'document.id_card.clave_de_elector'
+                  | 'document.id_card.classified_document_type'
+                  | 'document.id_card.curp_validation_response'
+                  | 'document.drivers_license.front.image'
+                  | 'document.drivers_license.front.mime_type'
+                  | 'document.drivers_license.back.image'
+                  | 'document.drivers_license.back.mime_type'
+                  | 'document.drivers_license.selfie.image'
+                  | 'document.drivers_license.selfie.mime_type'
+                  | 'document.drivers_license.full_name'
+                  | 'document.drivers_license.dob'
+                  | 'document.drivers_license.gender'
+                  | 'document.drivers_license.full_address'
+                  | 'document.drivers_license.document_number'
+                  | 'document.drivers_license.expires_at'
+                  | 'document.drivers_license.issued_at'
+                  | 'document.drivers_license.issuing_state'
+                  | 'document.drivers_license.issuing_country'
+                  | 'document.drivers_license.ref_number'
+                  | 'document.drivers_license.nationality'
+                  | 'document.drivers_license.curp'
+                  | 'document.drivers_license.clave_de_elector'
+                  | 'document.drivers_license.classified_document_type'
+                  | 'document.drivers_license.curp_validation_response'
+                  | 'document.passport.front.image'
+                  | 'document.passport.front.mime_type'
+                  | 'document.passport.back.image'
+                  | 'document.passport.back.mime_type'
+                  | 'document.passport.selfie.image'
+                  | 'document.passport.selfie.mime_type'
+                  | 'document.passport.full_name'
+                  | 'document.passport.dob'
+                  | 'document.passport.gender'
+                  | 'document.passport.full_address'
+                  | 'document.passport.document_number'
+                  | 'document.passport.expires_at'
+                  | 'document.passport.issued_at'
+                  | 'document.passport.issuing_state'
+                  | 'document.passport.issuing_country'
+                  | 'document.passport.ref_number'
+                  | 'document.passport.nationality'
+                  | 'document.passport.curp'
+                  | 'document.passport.clave_de_elector'
+                  | 'document.passport.classified_document_type'
+                  | 'document.passport.curp_validation_response'
+                  | 'document.passport_card.front.image'
+                  | 'document.passport_card.front.mime_type'
+                  | 'document.passport_card.back.image'
+                  | 'document.passport_card.back.mime_type'
+                  | 'document.passport_card.selfie.image'
+                  | 'document.passport_card.selfie.mime_type'
+                  | 'document.passport_card.full_name'
+                  | 'document.passport_card.dob'
+                  | 'document.passport_card.gender'
+                  | 'document.passport_card.full_address'
+                  | 'document.passport_card.document_number'
+                  | 'document.passport_card.expires_at'
+                  | 'document.passport_card.issued_at'
+                  | 'document.passport_card.issuing_state'
+                  | 'document.passport_card.issuing_country'
+                  | 'document.passport_card.ref_number'
+                  | 'document.passport_card.nationality'
+                  | 'document.passport_card.curp'
+                  | 'document.passport_card.clave_de_elector'
+                  | 'document.passport_card.classified_document_type'
+                  | 'document.passport_card.curp_validation_response'
+                  | 'document.permit.front.image'
+                  | 'document.permit.front.mime_type'
+                  | 'document.permit.back.image'
+                  | 'document.permit.back.mime_type'
+                  | 'document.permit.selfie.image'
+                  | 'document.permit.selfie.mime_type'
+                  | 'document.permit.full_name'
+                  | 'document.permit.dob'
+                  | 'document.permit.gender'
+                  | 'document.permit.full_address'
+                  | 'document.permit.document_number'
+                  | 'document.permit.expires_at'
+                  | 'document.permit.issued_at'
+                  | 'document.permit.issuing_state'
+                  | 'document.permit.issuing_country'
+                  | 'document.permit.ref_number'
+                  | 'document.permit.nationality'
+                  | 'document.permit.curp'
+                  | 'document.permit.clave_de_elector'
+                  | 'document.permit.classified_document_type'
+                  | 'document.permit.curp_validation_response'
+                  | 'document.visa.front.image'
+                  | 'document.visa.front.mime_type'
+                  | 'document.visa.back.image'
+                  | 'document.visa.back.mime_type'
+                  | 'document.visa.selfie.image'
+                  | 'document.visa.selfie.mime_type'
+                  | 'document.visa.full_name'
+                  | 'document.visa.dob'
+                  | 'document.visa.gender'
+                  | 'document.visa.full_address'
+                  | 'document.visa.document_number'
+                  | 'document.visa.expires_at'
+                  | 'document.visa.issued_at'
+                  | 'document.visa.issuing_state'
+                  | 'document.visa.issuing_country'
+                  | 'document.visa.ref_number'
+                  | 'document.visa.nationality'
+                  | 'document.visa.curp'
+                  | 'document.visa.clave_de_elector'
+                  | 'document.visa.classified_document_type'
+                  | 'document.visa.curp_validation_response'
+                  | 'document.residence_document.front.image'
+                  | 'document.residence_document.front.mime_type'
+                  | 'document.residence_document.back.image'
+                  | 'document.residence_document.back.mime_type'
+                  | 'document.residence_document.selfie.image'
+                  | 'document.residence_document.selfie.mime_type'
+                  | 'document.residence_document.full_name'
+                  | 'document.residence_document.dob'
+                  | 'document.residence_document.gender'
+                  | 'document.residence_document.full_address'
+                  | 'document.residence_document.document_number'
+                  | 'document.residence_document.expires_at'
+                  | 'document.residence_document.issued_at'
+                  | 'document.residence_document.issuing_state'
+                  | 'document.residence_document.issuing_country'
+                  | 'document.residence_document.ref_number'
+                  | 'document.residence_document.nationality'
+                  | 'document.residence_document.curp'
+                  | 'document.residence_document.clave_de_elector'
+                  | 'document.residence_document.classified_document_type'
+                  | 'document.residence_document.curp_validation_response'
+                  | 'document.voter_identification.front.image'
+                  | 'document.voter_identification.front.mime_type'
+                  | 'document.voter_identification.back.image'
+                  | 'document.voter_identification.back.mime_type'
+                  | 'document.voter_identification.selfie.image'
+                  | 'document.voter_identification.selfie.mime_type'
+                  | 'document.voter_identification.full_name'
+                  | 'document.voter_identification.dob'
+                  | 'document.voter_identification.gender'
+                  | 'document.voter_identification.full_address'
+                  | 'document.voter_identification.document_number'
+                  | 'document.voter_identification.expires_at'
+                  | 'document.voter_identification.issued_at'
+                  | 'document.voter_identification.issuing_state'
+                  | 'document.voter_identification.issuing_country'
+                  | 'document.voter_identification.ref_number'
+                  | 'document.voter_identification.nationality'
+                  | 'document.voter_identification.curp'
+                  | 'document.voter_identification.clave_de_elector'
+                  | 'document.voter_identification.classified_document_type'
+                  | 'document.voter_identification.curp_validation_response'
+                  | 'document.finra_compliance_letter'
+                  | 'document.proof_of_address.image'
+                  | 'document.ssn_card.image'
+                  | 'document.custom.*'
+                  | 'card.*.number'
+                  | 'card.*.expiration'
+                  | 'card.*.cvc'
+                  | 'card.*.name'
+                  | 'card.*.billing_address.zip'
+                  | 'card.*.billing_address.country'
+                  | 'card.*.expiration_month'
+                  | 'card.*.expiration_year'
+                  | 'card.*.number_last4'
+                  | 'card.*.issuer'
+                  | 'card.*.fingerprint'
+                  | 'bank.*.name'
+                  | 'bank.*.ach_routing_number'
+                  | 'bank.*.ach_account_number'
+                  | 'bank.*.ach_account_id'
+                  | 'bank.*.account_type'
+                  | 'bank.*.fingerprint';
+                /**
+                 * The human-readable name of the document to display to the user
+                 */
+                name: string;
+                requires_human_review: boolean;
+                upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+              };
+              kind: 'custom';
+            }
+        >;
+        kind: 'step_up';
+      }
+    | {
+        config: {
+          [key: string]: unknown;
+        };
+        kind: 'fail';
+      };
   ruleResults: Array<{
     result: boolean;
     rule: {
@@ -15784,8 +28454,1189 @@ export type RuleSetResult = {
       isShadow: boolean;
       kind: 'Person' | 'Business' | 'Any';
       name?: string;
-      ruleAction: string;
-      ruleExpression: Array<string>;
+      ruleAction:
+        | {
+            /**
+             * ORDERING MATTERS!!!
+             */
+            config: {
+              [key: string]: unknown;
+            };
+            /**
+             * ORDERING MATTERS!!!
+             */
+            kind: 'pass_with_manual_review';
+          }
+        | {
+            config: {
+              [key: string]: unknown;
+            };
+            kind: 'manual_review';
+          }
+        | {
+            config: Array<
+              | {
+                  data: {
+                    collect_selfie: boolean;
+                    document_types_and_countries?: {
+                      country_specific: {
+                        [key: string]: unknown;
+                      };
+                      global: Array<
+                        | 'id_card'
+                        | 'drivers_license'
+                        | 'passport'
+                        | 'passport_card'
+                        | 'permit'
+                        | 'visa'
+                        | 'residence_document'
+                        | 'voter_identification'
+                      >;
+                    };
+                  };
+                  kind: 'identity';
+                }
+              | {
+                  data: {
+                    requires_human_review: boolean;
+                  };
+                  kind: 'proof_of_ssn';
+                }
+              | {
+                  data: {
+                    requires_human_review: boolean;
+                  };
+                  kind: 'proof_of_address';
+                }
+              | {
+                  data: {
+                    /**
+                     * Optional human-readable description of the document that will be displayed to the user
+                     */
+                    description?: string;
+                    /**
+                     * Custom document identifier under which the document will be vaulted
+                     */
+                    identifier:
+                      | 'id.first_name'
+                      | 'id.middle_name'
+                      | 'id.last_name'
+                      | 'id.dob'
+                      | 'id.ssn4'
+                      | 'id.ssn9'
+                      | 'id.address_line1'
+                      | 'id.address_line2'
+                      | 'id.city'
+                      | 'id.state'
+                      | 'id.zip'
+                      | 'id.country'
+                      | 'id.email'
+                      | 'id.phone_number'
+                      | 'id.us_legal_status'
+                      | 'id.visa_kind'
+                      | 'id.visa_expiration_date'
+                      | 'id.nationality'
+                      | 'id.citizenships'
+                      | 'id.drivers_license_number'
+                      | 'id.drivers_license_state'
+                      | 'id.itin'
+                      | 'id.us_tax_id'
+                      | 'business.name'
+                      | 'business.dba'
+                      | 'business.website'
+                      | 'business.phone_number'
+                      | 'business.tin'
+                      | 'business.address_line1'
+                      | 'business.address_line2'
+                      | 'business.city'
+                      | 'business.state'
+                      | 'business.zip'
+                      | 'business.country'
+                      | 'business.corporation_type'
+                      | 'business.formation_state'
+                      | 'business.formation_date'
+                      | 'custom.*'
+                      | 'investor_profile.employment_status'
+                      | 'investor_profile.occupation'
+                      | 'investor_profile.employer'
+                      | 'investor_profile.annual_income'
+                      | 'investor_profile.net_worth'
+                      | 'investor_profile.investment_goals'
+                      | 'investor_profile.risk_tolerance'
+                      | 'investor_profile.declarations'
+                      | 'investor_profile.brokerage_firm_employer'
+                      | 'investor_profile.senior_executive_symbols'
+                      | 'investor_profile.family_member_names'
+                      | 'investor_profile.political_organization'
+                      | 'investor_profile.funding_sources'
+                      | 'document.id_card.front.image'
+                      | 'document.id_card.front.mime_type'
+                      | 'document.id_card.back.image'
+                      | 'document.id_card.back.mime_type'
+                      | 'document.id_card.selfie.image'
+                      | 'document.id_card.selfie.mime_type'
+                      | 'document.id_card.full_name'
+                      | 'document.id_card.dob'
+                      | 'document.id_card.gender'
+                      | 'document.id_card.full_address'
+                      | 'document.id_card.document_number'
+                      | 'document.id_card.expires_at'
+                      | 'document.id_card.issued_at'
+                      | 'document.id_card.issuing_state'
+                      | 'document.id_card.issuing_country'
+                      | 'document.id_card.ref_number'
+                      | 'document.id_card.nationality'
+                      | 'document.id_card.curp'
+                      | 'document.id_card.clave_de_elector'
+                      | 'document.id_card.classified_document_type'
+                      | 'document.id_card.curp_validation_response'
+                      | 'document.drivers_license.front.image'
+                      | 'document.drivers_license.front.mime_type'
+                      | 'document.drivers_license.back.image'
+                      | 'document.drivers_license.back.mime_type'
+                      | 'document.drivers_license.selfie.image'
+                      | 'document.drivers_license.selfie.mime_type'
+                      | 'document.drivers_license.full_name'
+                      | 'document.drivers_license.dob'
+                      | 'document.drivers_license.gender'
+                      | 'document.drivers_license.full_address'
+                      | 'document.drivers_license.document_number'
+                      | 'document.drivers_license.expires_at'
+                      | 'document.drivers_license.issued_at'
+                      | 'document.drivers_license.issuing_state'
+                      | 'document.drivers_license.issuing_country'
+                      | 'document.drivers_license.ref_number'
+                      | 'document.drivers_license.nationality'
+                      | 'document.drivers_license.curp'
+                      | 'document.drivers_license.clave_de_elector'
+                      | 'document.drivers_license.classified_document_type'
+                      | 'document.drivers_license.curp_validation_response'
+                      | 'document.passport.front.image'
+                      | 'document.passport.front.mime_type'
+                      | 'document.passport.back.image'
+                      | 'document.passport.back.mime_type'
+                      | 'document.passport.selfie.image'
+                      | 'document.passport.selfie.mime_type'
+                      | 'document.passport.full_name'
+                      | 'document.passport.dob'
+                      | 'document.passport.gender'
+                      | 'document.passport.full_address'
+                      | 'document.passport.document_number'
+                      | 'document.passport.expires_at'
+                      | 'document.passport.issued_at'
+                      | 'document.passport.issuing_state'
+                      | 'document.passport.issuing_country'
+                      | 'document.passport.ref_number'
+                      | 'document.passport.nationality'
+                      | 'document.passport.curp'
+                      | 'document.passport.clave_de_elector'
+                      | 'document.passport.classified_document_type'
+                      | 'document.passport.curp_validation_response'
+                      | 'document.passport_card.front.image'
+                      | 'document.passport_card.front.mime_type'
+                      | 'document.passport_card.back.image'
+                      | 'document.passport_card.back.mime_type'
+                      | 'document.passport_card.selfie.image'
+                      | 'document.passport_card.selfie.mime_type'
+                      | 'document.passport_card.full_name'
+                      | 'document.passport_card.dob'
+                      | 'document.passport_card.gender'
+                      | 'document.passport_card.full_address'
+                      | 'document.passport_card.document_number'
+                      | 'document.passport_card.expires_at'
+                      | 'document.passport_card.issued_at'
+                      | 'document.passport_card.issuing_state'
+                      | 'document.passport_card.issuing_country'
+                      | 'document.passport_card.ref_number'
+                      | 'document.passport_card.nationality'
+                      | 'document.passport_card.curp'
+                      | 'document.passport_card.clave_de_elector'
+                      | 'document.passport_card.classified_document_type'
+                      | 'document.passport_card.curp_validation_response'
+                      | 'document.permit.front.image'
+                      | 'document.permit.front.mime_type'
+                      | 'document.permit.back.image'
+                      | 'document.permit.back.mime_type'
+                      | 'document.permit.selfie.image'
+                      | 'document.permit.selfie.mime_type'
+                      | 'document.permit.full_name'
+                      | 'document.permit.dob'
+                      | 'document.permit.gender'
+                      | 'document.permit.full_address'
+                      | 'document.permit.document_number'
+                      | 'document.permit.expires_at'
+                      | 'document.permit.issued_at'
+                      | 'document.permit.issuing_state'
+                      | 'document.permit.issuing_country'
+                      | 'document.permit.ref_number'
+                      | 'document.permit.nationality'
+                      | 'document.permit.curp'
+                      | 'document.permit.clave_de_elector'
+                      | 'document.permit.classified_document_type'
+                      | 'document.permit.curp_validation_response'
+                      | 'document.visa.front.image'
+                      | 'document.visa.front.mime_type'
+                      | 'document.visa.back.image'
+                      | 'document.visa.back.mime_type'
+                      | 'document.visa.selfie.image'
+                      | 'document.visa.selfie.mime_type'
+                      | 'document.visa.full_name'
+                      | 'document.visa.dob'
+                      | 'document.visa.gender'
+                      | 'document.visa.full_address'
+                      | 'document.visa.document_number'
+                      | 'document.visa.expires_at'
+                      | 'document.visa.issued_at'
+                      | 'document.visa.issuing_state'
+                      | 'document.visa.issuing_country'
+                      | 'document.visa.ref_number'
+                      | 'document.visa.nationality'
+                      | 'document.visa.curp'
+                      | 'document.visa.clave_de_elector'
+                      | 'document.visa.classified_document_type'
+                      | 'document.visa.curp_validation_response'
+                      | 'document.residence_document.front.image'
+                      | 'document.residence_document.front.mime_type'
+                      | 'document.residence_document.back.image'
+                      | 'document.residence_document.back.mime_type'
+                      | 'document.residence_document.selfie.image'
+                      | 'document.residence_document.selfie.mime_type'
+                      | 'document.residence_document.full_name'
+                      | 'document.residence_document.dob'
+                      | 'document.residence_document.gender'
+                      | 'document.residence_document.full_address'
+                      | 'document.residence_document.document_number'
+                      | 'document.residence_document.expires_at'
+                      | 'document.residence_document.issued_at'
+                      | 'document.residence_document.issuing_state'
+                      | 'document.residence_document.issuing_country'
+                      | 'document.residence_document.ref_number'
+                      | 'document.residence_document.nationality'
+                      | 'document.residence_document.curp'
+                      | 'document.residence_document.clave_de_elector'
+                      | 'document.residence_document.classified_document_type'
+                      | 'document.residence_document.curp_validation_response'
+                      | 'document.voter_identification.front.image'
+                      | 'document.voter_identification.front.mime_type'
+                      | 'document.voter_identification.back.image'
+                      | 'document.voter_identification.back.mime_type'
+                      | 'document.voter_identification.selfie.image'
+                      | 'document.voter_identification.selfie.mime_type'
+                      | 'document.voter_identification.full_name'
+                      | 'document.voter_identification.dob'
+                      | 'document.voter_identification.gender'
+                      | 'document.voter_identification.full_address'
+                      | 'document.voter_identification.document_number'
+                      | 'document.voter_identification.expires_at'
+                      | 'document.voter_identification.issued_at'
+                      | 'document.voter_identification.issuing_state'
+                      | 'document.voter_identification.issuing_country'
+                      | 'document.voter_identification.ref_number'
+                      | 'document.voter_identification.nationality'
+                      | 'document.voter_identification.curp'
+                      | 'document.voter_identification.clave_de_elector'
+                      | 'document.voter_identification.classified_document_type'
+                      | 'document.voter_identification.curp_validation_response'
+                      | 'document.finra_compliance_letter'
+                      | 'document.proof_of_address.image'
+                      | 'document.ssn_card.image'
+                      | 'document.custom.*'
+                      | 'card.*.number'
+                      | 'card.*.expiration'
+                      | 'card.*.cvc'
+                      | 'card.*.name'
+                      | 'card.*.billing_address.zip'
+                      | 'card.*.billing_address.country'
+                      | 'card.*.expiration_month'
+                      | 'card.*.expiration_year'
+                      | 'card.*.number_last4'
+                      | 'card.*.issuer'
+                      | 'card.*.fingerprint'
+                      | 'bank.*.name'
+                      | 'bank.*.ach_routing_number'
+                      | 'bank.*.ach_account_number'
+                      | 'bank.*.ach_account_id'
+                      | 'bank.*.account_type'
+                      | 'bank.*.fingerprint';
+                    /**
+                     * The human-readable name of the document to display to the user
+                     */
+                    name: string;
+                    requires_human_review: boolean;
+                    upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                  };
+                  kind: 'custom';
+                }
+            >;
+            kind: 'step_up';
+          }
+        | {
+            config: {
+              [key: string]: unknown;
+            };
+            kind: 'fail';
+          };
+      ruleExpression: Array<
+        | {
+            field:
+              | 'watchlist_hit_ofac'
+              | 'watchlist_hit_non_sdn'
+              | 'watchlist_hit_warning'
+              | 'watchlist_hit_pep'
+              | 'adverse_media_hit'
+              | 'id_not_located'
+              | 'id_flagged'
+              | 'credit_more_than3_inquiries_in_last30_days'
+              | 'credit_established_before_ssn_date'
+              | 'address_input_is_non_residential'
+              | 'address_located_is_non_residential'
+              | 'address_does_not_match'
+              | 'address_partially_matches'
+              | 'address_zip_code_does_not_match'
+              | 'address_city_does_not_match'
+              | 'address_city_matches'
+              | 'address_street_name_does_not_match'
+              | 'address_street_name_partially_matches'
+              | 'address_street_number_does_not_match'
+              | 'address_state_does_not_match'
+              | 'address_input_is_not_deliverable'
+              | 'address_input_is_po_box'
+              | 'address_input_is_correctional_facility'
+              | 'address_input_is_not_standard_campground'
+              | 'address_input_is_not_standard_college'
+              | 'address_input_is_not_standard_general_delivery'
+              | 'address_input_is_not_standard_hospital'
+              | 'address_input_is_not_standard_hotel'
+              | 'address_input_is_not_standard_mail_drop'
+              | 'address_input_is_not_standard_prison'
+              | 'address_input_is_not_standard_university'
+              | 'address_input_is_not_standard_uspo'
+              | 'address_input_not_on_file'
+              | 'address_located_is_po_box'
+              | 'address_located_is_not_standard_campground'
+              | 'address_located_is_not_standard_college'
+              | 'address_located_is_not_standard_general_delivery'
+              | 'address_located_is_not_standard_hospital'
+              | 'address_located_is_not_standard_hotel'
+              | 'address_located_is_not_standard_mail_drop'
+              | 'address_located_is_not_standard_prison'
+              | 'address_located_is_not_standard_university'
+              | 'address_located_is_not_standard_uspo'
+              | 'address_located_is_high_risk_address'
+              | 'address_risk_alert'
+              | 'address_alert_velocity'
+              | 'address_alert_stability'
+              | 'address_alert_longevity'
+              | 'address_alert_single_address_in_file'
+              | 'address_newer_record_found'
+              | 'dob_yob_does_not_match'
+              | 'dob_yob_does_not_match_within1_year'
+              | 'dob_mob_does_not_match'
+              | 'dob_day_does_not_match'
+              | 'dob_mob_not_available'
+              | 'dob_yob_not_available'
+              | 'dob_located_age_below_minimum'
+              | 'dob_located_age_above_maximum'
+              | 'dob_located_coppa_alert'
+              | 'dob_does_not_match'
+              | 'dob_partial_match'
+              | 'dob_not_on_file'
+              | 'dob_could_not_match'
+              | 'dob_input_age_less_than18'
+              | 'ssn_not_available'
+              | 'ssn_not_on_file'
+              | 'ssn_partially_matches'
+              | 'ssn_does_not_match'
+              | 'ssn_does_not_match_within1_digit'
+              | 'ssn_input_is_itin'
+              | 'ssn_located_is_itin'
+              | 'ssn_input_tied_to_multiple_names'
+              | 'ssn_input_is_invalid'
+              | 'ssn_located_is_invalid'
+              | 'ssn_not_provided'
+              | 'us_tax_id_is_itin'
+              | 'itin_is_expired'
+              | 'name_last_does_not_match'
+              | 'name_last_partially_matches'
+              | 'name_matches'
+              | 'name_does_not_match'
+              | 'name_partially_matches'
+              | 'ip_state_does_not_match'
+              | 'ip_input_invalid'
+              | 'ip_not_located'
+              | 'ip_location_not_available'
+              | 'ip_alert_high_risk_bot'
+              | 'ip_alert_high_risk_spam'
+              | 'ip_alert_high_risk_tor'
+              | 'ip_alert_high_risk_proxy'
+              | 'ip_proxy'
+              | 'ip_data_center'
+              | 'ip_alert_data_center'
+              | 'email_address_invalid'
+              | 'email_address_or_domain_does_not_exist'
+              | 'email_domain_recently_created'
+              | 'email_domain_private'
+              | 'email_domain_corporate'
+              | 'email_recently_verified'
+              | 'email_found_on_file'
+              | 'email_not_found_on_file'
+              | 'email_high_risk_country'
+              | 'email_high_risk_fraud'
+              | 'email_high_risk_tumbled'
+              | 'email_high_risk_disposable'
+              | 'email_high_risk_domain'
+              | 'sentilink_synthetic_identity_high_risk'
+              | 'sentilink_synthetic_identity_medium_risk'
+              | 'sentilink_synthetic_identity_low_risk'
+              | 'synthetic_identity_high_risk'
+              | 'synthetic_identity_medium_risk'
+              | 'synthetic_identity_low_risk'
+              | 'sentilink_identity_theft_high_risk'
+              | 'sentilink_identity_theft_medium_risk'
+              | 'sentilink_identity_theft_low_risk'
+              | 'phone_number_input_invalid'
+              | 'phone_number_located_is_voip'
+              | 'phone_number_is_voip'
+              | 'phone_number_mobile_account_type_postpaid'
+              | 'phone_number_mobile_account_type_prepaid'
+              | 'phone_number_mobile_account_type_unknown'
+              | 'phone_number_mobile_account_status_active'
+              | 'phone_number_mobile_account_status_deactivated'
+              | 'phone_number_mobile_account_status_suspended'
+              | 'phone_number_mobile_account_status_absent'
+              | 'phone_located_matches'
+              | 'phone_located_partially_matches'
+              | 'phone_located_does_not_match'
+              | 'phone_located_name_matches'
+              | 'phone_located_name_partially_matches'
+              | 'phone_located_name_does_not_match'
+              | 'phone_located_address_matches'
+              | 'phone_located_address_partially_matches'
+              | 'phone_located_address_does_not_match'
+              | 'phone_input_likely_belongs_to_another'
+              | 'phone_not_provided'
+              | 'multiple_records_found'
+              | 'subject_deceased'
+              | 'bureau_deleted_record'
+              | 'ssn_issued_prior_to_dob'
+              | 'ssn_issue_date_cannot_be_verified'
+              | 'ssn_located_issue_date_cannot_be_verified'
+              | 'ssn_potentially_belongs_to_another'
+              | 'ssn_likely_belongs_to_another'
+              | 'thin_file'
+              | 'input_phone_number_does_not_match_input_state'
+              | 'input_phone_number_does_not_match_located_state_history'
+              | 'input_phone_number_does_not_match_ip_state'
+              | 'drivers_license_number_different_number_found'
+              | 'drivers_license_number_not_on_record'
+              | 'drivers_license_number_not_valid'
+              | 'drivers_license_number_is_valid'
+              | 'document_upload_failed'
+              | 'document_not_verified'
+              | 'document_verified'
+              | 'document_ocr_not_successful'
+              | 'document_ocr_successful'
+              | 'document_barcode_could_not_be_read'
+              | 'document_barcode_could_be_read'
+              | 'document_barcode_content_matches'
+              | 'document_barcode_content_does_not_match'
+              | 'document_barcode_detected'
+              | 'document_barcode_could_not_be_detected'
+              | 'document_requires_review'
+              | 'document_expired'
+              | 'document_not_expired'
+              | 'document_from_restricted_country'
+              | 'document_restricted_template_type'
+              | 'document_type_not_allowed'
+              | 'document_field_crosscheck_failed'
+              | 'document_invalid_issuance_or_expiration_date'
+              | 'document_invalid_template_layout'
+              | 'document_possible_image_tampering'
+              | 'document_no_image_tampering'
+              | 'document_no_image_alteration_front'
+              | 'document_no_image_alteration_back'
+              | 'document_possible_image_alteration_front'
+              | 'document_possible_image_alteration_back'
+              | 'document_possible_image_alteration'
+              | 'document_possible_digital_fraud'
+              | 'document_selfie_used_with_different_information'
+              | 'document_selfie_not_used_with_different_information'
+              | 'document_selfie_mask'
+              | 'document_selfie_glasses'
+              | 'document_selfie_not_live_image'
+              | 'document_possible_fake_image'
+              | 'document_not_fake_image'
+              | 'document_pdf417_data_is_valid'
+              | 'document_pdf417_data_is_not_valid'
+              | 'document_photo_is_screen_capture'
+              | 'document_photo_is_not_screen_capture'
+              | 'document_photo_is_paper_capture'
+              | 'document_photo_is_not_paper_capture'
+              | 'document_alignment_failed'
+              | 'document_visible_photo_features_not_verified'
+              | 'document_mrz_line_format_check'
+              | 'document_qr_code_check'
+              | 'document_could_not_classify'
+              | 'document_visible_photo_features_verified'
+              | 'document_low_match_score_with_selfie'
+              | 'document_selfie_matches'
+              | 'document_selfie_does_not_match'
+              | 'document_selfie_bad_quality'
+              | 'document_type_mismatch'
+              | 'document_unknown_country_code'
+              | 'document_country_code_mismatch'
+              | 'document_is_permit_or_provisional_license'
+              | 'document_selfie_was_skipped'
+              | 'document_collected_via_desktop'
+              | 'document_not_live_capture'
+              | 'document_live_capture_failed'
+              | 'document_ocr_name_does_not_match'
+              | 'document_ocr_name_could_not_match'
+              | 'document_ocr_name_matches'
+              | 'document_ocr_address_does_not_match'
+              | 'document_ocr_address_could_not_match'
+              | 'document_ocr_address_matches'
+              | 'document_ocr_first_name_does_not_match'
+              | 'document_ocr_first_name_matches'
+              | 'document_ocr_last_name_does_not_match'
+              | 'document_ocr_last_name_matches'
+              | 'document_ocr_dob_does_not_match'
+              | 'document_ocr_dob_could_not_match'
+              | 'document_ocr_dob_matches'
+              | 'document_dob_crosscheck_matches'
+              | 'document_dob_crosscheck_does_not_match'
+              | 'document_expiration_date_crosscheck_matches'
+              | 'document_expiration_date_crosscheck_does_not_match'
+              | 'document_sex_crosscheck_matches'
+              | 'document_sex_crosscheck_does_not_match'
+              | 'document_full_name_crosscheck_matches'
+              | 'document_full_name_crosscheck_does_not_match'
+              | 'document_number_crosscheck_matches'
+              | 'document_number_crosscheck_does_not_match'
+              | 'document_expiration_check_digit_matches'
+              | 'document_expiration_check_digit_does_not_match'
+              | 'document_dob_check_digit_matches'
+              | 'document_dob_check_digit_does_not_match'
+              | 'document_number_check_digit_matches'
+              | 'document_number_check_digit_does_not_match'
+              | 'curp_not_valid'
+              | 'curp_not_found'
+              | 'curp_valid'
+              | 'curp_input_curp_invalid'
+              | 'curp_could_not_validate'
+              | 'curp_multiple_results_for_data'
+              | 'curp_service_not_available'
+              | 'curp_malformed'
+              | 'address_matches'
+              | 'address_zip_code_matches'
+              | 'address_street_name_matches'
+              | 'address_street_number_matches'
+              | 'address_state_matches'
+              | 'dob_matches'
+              | 'dob_yob_matches'
+              | 'dob_mob_matches'
+              | 'ssn_matches'
+              | 'name_last_matches'
+              | 'name_first_matches'
+              | 'name_first_does_not_match'
+              | 'name_first_partially_matches'
+              | 'ip_state_matches'
+              | 'phone_number_matches'
+              | 'input_phone_number_matches_input_state'
+              | 'input_phone_number_matches_located_state_history'
+              | 'affiliated_with_broker_or_finra'
+              | 'visa_is_other'
+              | 'visa_expired_or_expiring_soon'
+              | 'business_name_match'
+              | 'business_name_similar_match'
+              | 'business_name_alternate_match'
+              | 'business_name_does_not_match'
+              | 'business_name_no_watchlist_hits'
+              | 'business_name_watchlist_hit'
+              | 'business_dba_match'
+              | 'business_dba_similar_match'
+              | 'business_dba_alternate_match'
+              | 'business_dba_does_not_match'
+              | 'business_phone_number_match'
+              | 'business_phone_number_does_not_match'
+              | 'business_website_online'
+              | 'business_website_offline'
+              | 'business_website_verified'
+              | 'business_website_unverified'
+              | 'business_website_parking_page'
+              | 'tin_match'
+              | 'tin_not_found'
+              | 'tin_invalid'
+              | 'tin_does_not_match'
+              | 'business_address_match'
+              | 'business_address_close_match'
+              | 'business_address_similar_match'
+              | 'business_address_incomplete_match'
+              | 'business_address_does_not_match'
+              | 'business_address_commercial'
+              | 'business_address_commercial_mail_receiving_agency'
+              | 'business_address_residential'
+              | 'business_address_deliverable'
+              | 'business_address_not_deliverable'
+              | 'beneficial_owners_match'
+              | 'beneficial_owners_partial_match'
+              | 'beneficial_owners_do_not_match'
+              | 'beneficial_owner_failed_kyc'
+              | 'beneficial_owner_possible_missing_bo'
+              | 'sos_active_filing_found'
+              | 'sos_filing_no_status'
+              | 'sos_filing_partially_active'
+              | 'sos_filing_no_active_found'
+              | 'sos_filing_not_found'
+              | 'sos_domestic_active_filing_found'
+              | 'sos_domestic_filing_no_status'
+              | 'sos_domestic_filing_partially_active'
+              | 'sos_domestic_filing_not_found'
+              | 'sos_domestic_filing_status_good_standing'
+              | 'sos_domestic_filing_status_pending_active'
+              | 'sos_domestic_filing_status_pending_inactive'
+              | 'sos_domestic_filing_status_not_provided_by_state'
+              | 'sos_domestic_filing_status_not_in_good_standing'
+              | 'sos_domestic_filing_status_dissolved'
+              | 'sos_business_address_active_filing_found'
+              | 'sos_business_address_filing_status_not_available'
+              | 'sos_business_address_inactive_filing_found'
+              | 'sos_business_address_filing_not_found'
+              | 'device_low_risk'
+              | 'device_medium_risk'
+              | 'device_high_risk'
+              | 'device_factory_reset'
+              | 'device_gps_spoofing'
+              | 'ip_vpn'
+              | 'ip_tor_exit_node'
+              | 'device_bot_risk'
+              | 'device_suspicious'
+              | 'device_velocity'
+              | 'device_multiple_users'
+              | 'device_reputation'
+              | 'browser_incognito'
+              | 'browser_tampering'
+              | 'browser_automation'
+              | 'attested_device_apple'
+              | 'attested_device_android'
+              | 'attested_device_android_strong_integrity'
+              | 'attested_device_android_unlicensed'
+              | 'attested_device_android_risky'
+              | 'attested_device_android_failed_evaluation'
+              | 'attested_device_no_fraud_duplicate_risk'
+              | 'attested_device_fraud_duplicate_risk_low'
+              | 'attested_device_fraud_duplicate_risk_medium'
+              | 'attested_device_fraud_duplicate_risk_high'
+              | 'behavior_fraud_ring_risk'
+              | 'behavior_high_risk'
+              | 'behavior_low_risk'
+              | 'behavior_automatic_activity';
+            op: 'eq' | 'not_eq';
+            value: boolean;
+          }
+        | (
+            | {
+                field:
+                  | 'id.first_name'
+                  | 'id.middle_name'
+                  | 'id.last_name'
+                  | 'id.dob'
+                  | 'id.ssn4'
+                  | 'id.ssn9'
+                  | 'id.address_line1'
+                  | 'id.address_line2'
+                  | 'id.city'
+                  | 'id.state'
+                  | 'id.zip'
+                  | 'id.country'
+                  | 'id.email'
+                  | 'id.phone_number'
+                  | 'id.us_legal_status'
+                  | 'id.visa_kind'
+                  | 'id.visa_expiration_date'
+                  | 'id.nationality'
+                  | 'id.citizenships'
+                  | 'id.drivers_license_number'
+                  | 'id.drivers_license_state'
+                  | 'id.itin'
+                  | 'id.us_tax_id'
+                  | 'business.name'
+                  | 'business.dba'
+                  | 'business.website'
+                  | 'business.phone_number'
+                  | 'business.tin'
+                  | 'business.address_line1'
+                  | 'business.address_line2'
+                  | 'business.city'
+                  | 'business.state'
+                  | 'business.zip'
+                  | 'business.country'
+                  | 'business.corporation_type'
+                  | 'business.formation_state'
+                  | 'business.formation_date'
+                  | 'custom.*'
+                  | 'investor_profile.employment_status'
+                  | 'investor_profile.occupation'
+                  | 'investor_profile.employer'
+                  | 'investor_profile.annual_income'
+                  | 'investor_profile.net_worth'
+                  | 'investor_profile.investment_goals'
+                  | 'investor_profile.risk_tolerance'
+                  | 'investor_profile.declarations'
+                  | 'investor_profile.brokerage_firm_employer'
+                  | 'investor_profile.senior_executive_symbols'
+                  | 'investor_profile.family_member_names'
+                  | 'investor_profile.political_organization'
+                  | 'investor_profile.funding_sources'
+                  | 'document.id_card.front.image'
+                  | 'document.id_card.front.mime_type'
+                  | 'document.id_card.back.image'
+                  | 'document.id_card.back.mime_type'
+                  | 'document.id_card.selfie.image'
+                  | 'document.id_card.selfie.mime_type'
+                  | 'document.id_card.full_name'
+                  | 'document.id_card.dob'
+                  | 'document.id_card.gender'
+                  | 'document.id_card.full_address'
+                  | 'document.id_card.document_number'
+                  | 'document.id_card.expires_at'
+                  | 'document.id_card.issued_at'
+                  | 'document.id_card.issuing_state'
+                  | 'document.id_card.issuing_country'
+                  | 'document.id_card.ref_number'
+                  | 'document.id_card.nationality'
+                  | 'document.id_card.curp'
+                  | 'document.id_card.clave_de_elector'
+                  | 'document.id_card.classified_document_type'
+                  | 'document.id_card.curp_validation_response'
+                  | 'document.drivers_license.front.image'
+                  | 'document.drivers_license.front.mime_type'
+                  | 'document.drivers_license.back.image'
+                  | 'document.drivers_license.back.mime_type'
+                  | 'document.drivers_license.selfie.image'
+                  | 'document.drivers_license.selfie.mime_type'
+                  | 'document.drivers_license.full_name'
+                  | 'document.drivers_license.dob'
+                  | 'document.drivers_license.gender'
+                  | 'document.drivers_license.full_address'
+                  | 'document.drivers_license.document_number'
+                  | 'document.drivers_license.expires_at'
+                  | 'document.drivers_license.issued_at'
+                  | 'document.drivers_license.issuing_state'
+                  | 'document.drivers_license.issuing_country'
+                  | 'document.drivers_license.ref_number'
+                  | 'document.drivers_license.nationality'
+                  | 'document.drivers_license.curp'
+                  | 'document.drivers_license.clave_de_elector'
+                  | 'document.drivers_license.classified_document_type'
+                  | 'document.drivers_license.curp_validation_response'
+                  | 'document.passport.front.image'
+                  | 'document.passport.front.mime_type'
+                  | 'document.passport.back.image'
+                  | 'document.passport.back.mime_type'
+                  | 'document.passport.selfie.image'
+                  | 'document.passport.selfie.mime_type'
+                  | 'document.passport.full_name'
+                  | 'document.passport.dob'
+                  | 'document.passport.gender'
+                  | 'document.passport.full_address'
+                  | 'document.passport.document_number'
+                  | 'document.passport.expires_at'
+                  | 'document.passport.issued_at'
+                  | 'document.passport.issuing_state'
+                  | 'document.passport.issuing_country'
+                  | 'document.passport.ref_number'
+                  | 'document.passport.nationality'
+                  | 'document.passport.curp'
+                  | 'document.passport.clave_de_elector'
+                  | 'document.passport.classified_document_type'
+                  | 'document.passport.curp_validation_response'
+                  | 'document.passport_card.front.image'
+                  | 'document.passport_card.front.mime_type'
+                  | 'document.passport_card.back.image'
+                  | 'document.passport_card.back.mime_type'
+                  | 'document.passport_card.selfie.image'
+                  | 'document.passport_card.selfie.mime_type'
+                  | 'document.passport_card.full_name'
+                  | 'document.passport_card.dob'
+                  | 'document.passport_card.gender'
+                  | 'document.passport_card.full_address'
+                  | 'document.passport_card.document_number'
+                  | 'document.passport_card.expires_at'
+                  | 'document.passport_card.issued_at'
+                  | 'document.passport_card.issuing_state'
+                  | 'document.passport_card.issuing_country'
+                  | 'document.passport_card.ref_number'
+                  | 'document.passport_card.nationality'
+                  | 'document.passport_card.curp'
+                  | 'document.passport_card.clave_de_elector'
+                  | 'document.passport_card.classified_document_type'
+                  | 'document.passport_card.curp_validation_response'
+                  | 'document.permit.front.image'
+                  | 'document.permit.front.mime_type'
+                  | 'document.permit.back.image'
+                  | 'document.permit.back.mime_type'
+                  | 'document.permit.selfie.image'
+                  | 'document.permit.selfie.mime_type'
+                  | 'document.permit.full_name'
+                  | 'document.permit.dob'
+                  | 'document.permit.gender'
+                  | 'document.permit.full_address'
+                  | 'document.permit.document_number'
+                  | 'document.permit.expires_at'
+                  | 'document.permit.issued_at'
+                  | 'document.permit.issuing_state'
+                  | 'document.permit.issuing_country'
+                  | 'document.permit.ref_number'
+                  | 'document.permit.nationality'
+                  | 'document.permit.curp'
+                  | 'document.permit.clave_de_elector'
+                  | 'document.permit.classified_document_type'
+                  | 'document.permit.curp_validation_response'
+                  | 'document.visa.front.image'
+                  | 'document.visa.front.mime_type'
+                  | 'document.visa.back.image'
+                  | 'document.visa.back.mime_type'
+                  | 'document.visa.selfie.image'
+                  | 'document.visa.selfie.mime_type'
+                  | 'document.visa.full_name'
+                  | 'document.visa.dob'
+                  | 'document.visa.gender'
+                  | 'document.visa.full_address'
+                  | 'document.visa.document_number'
+                  | 'document.visa.expires_at'
+                  | 'document.visa.issued_at'
+                  | 'document.visa.issuing_state'
+                  | 'document.visa.issuing_country'
+                  | 'document.visa.ref_number'
+                  | 'document.visa.nationality'
+                  | 'document.visa.curp'
+                  | 'document.visa.clave_de_elector'
+                  | 'document.visa.classified_document_type'
+                  | 'document.visa.curp_validation_response'
+                  | 'document.residence_document.front.image'
+                  | 'document.residence_document.front.mime_type'
+                  | 'document.residence_document.back.image'
+                  | 'document.residence_document.back.mime_type'
+                  | 'document.residence_document.selfie.image'
+                  | 'document.residence_document.selfie.mime_type'
+                  | 'document.residence_document.full_name'
+                  | 'document.residence_document.dob'
+                  | 'document.residence_document.gender'
+                  | 'document.residence_document.full_address'
+                  | 'document.residence_document.document_number'
+                  | 'document.residence_document.expires_at'
+                  | 'document.residence_document.issued_at'
+                  | 'document.residence_document.issuing_state'
+                  | 'document.residence_document.issuing_country'
+                  | 'document.residence_document.ref_number'
+                  | 'document.residence_document.nationality'
+                  | 'document.residence_document.curp'
+                  | 'document.residence_document.clave_de_elector'
+                  | 'document.residence_document.classified_document_type'
+                  | 'document.residence_document.curp_validation_response'
+                  | 'document.voter_identification.front.image'
+                  | 'document.voter_identification.front.mime_type'
+                  | 'document.voter_identification.back.image'
+                  | 'document.voter_identification.back.mime_type'
+                  | 'document.voter_identification.selfie.image'
+                  | 'document.voter_identification.selfie.mime_type'
+                  | 'document.voter_identification.full_name'
+                  | 'document.voter_identification.dob'
+                  | 'document.voter_identification.gender'
+                  | 'document.voter_identification.full_address'
+                  | 'document.voter_identification.document_number'
+                  | 'document.voter_identification.expires_at'
+                  | 'document.voter_identification.issued_at'
+                  | 'document.voter_identification.issuing_state'
+                  | 'document.voter_identification.issuing_country'
+                  | 'document.voter_identification.ref_number'
+                  | 'document.voter_identification.nationality'
+                  | 'document.voter_identification.curp'
+                  | 'document.voter_identification.clave_de_elector'
+                  | 'document.voter_identification.classified_document_type'
+                  | 'document.voter_identification.curp_validation_response'
+                  | 'document.finra_compliance_letter'
+                  | 'document.proof_of_address.image'
+                  | 'document.ssn_card.image'
+                  | 'document.custom.*'
+                  | 'card.*.number'
+                  | 'card.*.expiration'
+                  | 'card.*.cvc'
+                  | 'card.*.name'
+                  | 'card.*.billing_address.zip'
+                  | 'card.*.billing_address.country'
+                  | 'card.*.expiration_month'
+                  | 'card.*.expiration_year'
+                  | 'card.*.number_last4'
+                  | 'card.*.issuer'
+                  | 'card.*.fingerprint'
+                  | 'bank.*.name'
+                  | 'bank.*.ach_routing_number'
+                  | 'bank.*.ach_account_number'
+                  | 'bank.*.ach_account_id'
+                  | 'bank.*.account_type'
+                  | 'bank.*.fingerprint';
+                op: 'eq' | 'not_eq';
+                value: string;
+              }
+            | {
+                field:
+                  | 'id.first_name'
+                  | 'id.middle_name'
+                  | 'id.last_name'
+                  | 'id.dob'
+                  | 'id.ssn4'
+                  | 'id.ssn9'
+                  | 'id.address_line1'
+                  | 'id.address_line2'
+                  | 'id.city'
+                  | 'id.state'
+                  | 'id.zip'
+                  | 'id.country'
+                  | 'id.email'
+                  | 'id.phone_number'
+                  | 'id.us_legal_status'
+                  | 'id.visa_kind'
+                  | 'id.visa_expiration_date'
+                  | 'id.nationality'
+                  | 'id.citizenships'
+                  | 'id.drivers_license_number'
+                  | 'id.drivers_license_state'
+                  | 'id.itin'
+                  | 'id.us_tax_id'
+                  | 'business.name'
+                  | 'business.dba'
+                  | 'business.website'
+                  | 'business.phone_number'
+                  | 'business.tin'
+                  | 'business.address_line1'
+                  | 'business.address_line2'
+                  | 'business.city'
+                  | 'business.state'
+                  | 'business.zip'
+                  | 'business.country'
+                  | 'business.corporation_type'
+                  | 'business.formation_state'
+                  | 'business.formation_date'
+                  | 'custom.*'
+                  | 'investor_profile.employment_status'
+                  | 'investor_profile.occupation'
+                  | 'investor_profile.employer'
+                  | 'investor_profile.annual_income'
+                  | 'investor_profile.net_worth'
+                  | 'investor_profile.investment_goals'
+                  | 'investor_profile.risk_tolerance'
+                  | 'investor_profile.declarations'
+                  | 'investor_profile.brokerage_firm_employer'
+                  | 'investor_profile.senior_executive_symbols'
+                  | 'investor_profile.family_member_names'
+                  | 'investor_profile.political_organization'
+                  | 'investor_profile.funding_sources'
+                  | 'document.id_card.front.image'
+                  | 'document.id_card.front.mime_type'
+                  | 'document.id_card.back.image'
+                  | 'document.id_card.back.mime_type'
+                  | 'document.id_card.selfie.image'
+                  | 'document.id_card.selfie.mime_type'
+                  | 'document.id_card.full_name'
+                  | 'document.id_card.dob'
+                  | 'document.id_card.gender'
+                  | 'document.id_card.full_address'
+                  | 'document.id_card.document_number'
+                  | 'document.id_card.expires_at'
+                  | 'document.id_card.issued_at'
+                  | 'document.id_card.issuing_state'
+                  | 'document.id_card.issuing_country'
+                  | 'document.id_card.ref_number'
+                  | 'document.id_card.nationality'
+                  | 'document.id_card.curp'
+                  | 'document.id_card.clave_de_elector'
+                  | 'document.id_card.classified_document_type'
+                  | 'document.id_card.curp_validation_response'
+                  | 'document.drivers_license.front.image'
+                  | 'document.drivers_license.front.mime_type'
+                  | 'document.drivers_license.back.image'
+                  | 'document.drivers_license.back.mime_type'
+                  | 'document.drivers_license.selfie.image'
+                  | 'document.drivers_license.selfie.mime_type'
+                  | 'document.drivers_license.full_name'
+                  | 'document.drivers_license.dob'
+                  | 'document.drivers_license.gender'
+                  | 'document.drivers_license.full_address'
+                  | 'document.drivers_license.document_number'
+                  | 'document.drivers_license.expires_at'
+                  | 'document.drivers_license.issued_at'
+                  | 'document.drivers_license.issuing_state'
+                  | 'document.drivers_license.issuing_country'
+                  | 'document.drivers_license.ref_number'
+                  | 'document.drivers_license.nationality'
+                  | 'document.drivers_license.curp'
+                  | 'document.drivers_license.clave_de_elector'
+                  | 'document.drivers_license.classified_document_type'
+                  | 'document.drivers_license.curp_validation_response'
+                  | 'document.passport.front.image'
+                  | 'document.passport.front.mime_type'
+                  | 'document.passport.back.image'
+                  | 'document.passport.back.mime_type'
+                  | 'document.passport.selfie.image'
+                  | 'document.passport.selfie.mime_type'
+                  | 'document.passport.full_name'
+                  | 'document.passport.dob'
+                  | 'document.passport.gender'
+                  | 'document.passport.full_address'
+                  | 'document.passport.document_number'
+                  | 'document.passport.expires_at'
+                  | 'document.passport.issued_at'
+                  | 'document.passport.issuing_state'
+                  | 'document.passport.issuing_country'
+                  | 'document.passport.ref_number'
+                  | 'document.passport.nationality'
+                  | 'document.passport.curp'
+                  | 'document.passport.clave_de_elector'
+                  | 'document.passport.classified_document_type'
+                  | 'document.passport.curp_validation_response'
+                  | 'document.passport_card.front.image'
+                  | 'document.passport_card.front.mime_type'
+                  | 'document.passport_card.back.image'
+                  | 'document.passport_card.back.mime_type'
+                  | 'document.passport_card.selfie.image'
+                  | 'document.passport_card.selfie.mime_type'
+                  | 'document.passport_card.full_name'
+                  | 'document.passport_card.dob'
+                  | 'document.passport_card.gender'
+                  | 'document.passport_card.full_address'
+                  | 'document.passport_card.document_number'
+                  | 'document.passport_card.expires_at'
+                  | 'document.passport_card.issued_at'
+                  | 'document.passport_card.issuing_state'
+                  | 'document.passport_card.issuing_country'
+                  | 'document.passport_card.ref_number'
+                  | 'document.passport_card.nationality'
+                  | 'document.passport_card.curp'
+                  | 'document.passport_card.clave_de_elector'
+                  | 'document.passport_card.classified_document_type'
+                  | 'document.passport_card.curp_validation_response'
+                  | 'document.permit.front.image'
+                  | 'document.permit.front.mime_type'
+                  | 'document.permit.back.image'
+                  | 'document.permit.back.mime_type'
+                  | 'document.permit.selfie.image'
+                  | 'document.permit.selfie.mime_type'
+                  | 'document.permit.full_name'
+                  | 'document.permit.dob'
+                  | 'document.permit.gender'
+                  | 'document.permit.full_address'
+                  | 'document.permit.document_number'
+                  | 'document.permit.expires_at'
+                  | 'document.permit.issued_at'
+                  | 'document.permit.issuing_state'
+                  | 'document.permit.issuing_country'
+                  | 'document.permit.ref_number'
+                  | 'document.permit.nationality'
+                  | 'document.permit.curp'
+                  | 'document.permit.clave_de_elector'
+                  | 'document.permit.classified_document_type'
+                  | 'document.permit.curp_validation_response'
+                  | 'document.visa.front.image'
+                  | 'document.visa.front.mime_type'
+                  | 'document.visa.back.image'
+                  | 'document.visa.back.mime_type'
+                  | 'document.visa.selfie.image'
+                  | 'document.visa.selfie.mime_type'
+                  | 'document.visa.full_name'
+                  | 'document.visa.dob'
+                  | 'document.visa.gender'
+                  | 'document.visa.full_address'
+                  | 'document.visa.document_number'
+                  | 'document.visa.expires_at'
+                  | 'document.visa.issued_at'
+                  | 'document.visa.issuing_state'
+                  | 'document.visa.issuing_country'
+                  | 'document.visa.ref_number'
+                  | 'document.visa.nationality'
+                  | 'document.visa.curp'
+                  | 'document.visa.clave_de_elector'
+                  | 'document.visa.classified_document_type'
+                  | 'document.visa.curp_validation_response'
+                  | 'document.residence_document.front.image'
+                  | 'document.residence_document.front.mime_type'
+                  | 'document.residence_document.back.image'
+                  | 'document.residence_document.back.mime_type'
+                  | 'document.residence_document.selfie.image'
+                  | 'document.residence_document.selfie.mime_type'
+                  | 'document.residence_document.full_name'
+                  | 'document.residence_document.dob'
+                  | 'document.residence_document.gender'
+                  | 'document.residence_document.full_address'
+                  | 'document.residence_document.document_number'
+                  | 'document.residence_document.expires_at'
+                  | 'document.residence_document.issued_at'
+                  | 'document.residence_document.issuing_state'
+                  | 'document.residence_document.issuing_country'
+                  | 'document.residence_document.ref_number'
+                  | 'document.residence_document.nationality'
+                  | 'document.residence_document.curp'
+                  | 'document.residence_document.clave_de_elector'
+                  | 'document.residence_document.classified_document_type'
+                  | 'document.residence_document.curp_validation_response'
+                  | 'document.voter_identification.front.image'
+                  | 'document.voter_identification.front.mime_type'
+                  | 'document.voter_identification.back.image'
+                  | 'document.voter_identification.back.mime_type'
+                  | 'document.voter_identification.selfie.image'
+                  | 'document.voter_identification.selfie.mime_type'
+                  | 'document.voter_identification.full_name'
+                  | 'document.voter_identification.dob'
+                  | 'document.voter_identification.gender'
+                  | 'document.voter_identification.full_address'
+                  | 'document.voter_identification.document_number'
+                  | 'document.voter_identification.expires_at'
+                  | 'document.voter_identification.issued_at'
+                  | 'document.voter_identification.issuing_state'
+                  | 'document.voter_identification.issuing_country'
+                  | 'document.voter_identification.ref_number'
+                  | 'document.voter_identification.nationality'
+                  | 'document.voter_identification.curp'
+                  | 'document.voter_identification.clave_de_elector'
+                  | 'document.voter_identification.classified_document_type'
+                  | 'document.voter_identification.curp_validation_response'
+                  | 'document.finra_compliance_letter'
+                  | 'document.proof_of_address.image'
+                  | 'document.ssn_card.image'
+                  | 'document.custom.*'
+                  | 'card.*.number'
+                  | 'card.*.expiration'
+                  | 'card.*.cvc'
+                  | 'card.*.name'
+                  | 'card.*.billing_address.zip'
+                  | 'card.*.billing_address.country'
+                  | 'card.*.expiration_month'
+                  | 'card.*.expiration_year'
+                  | 'card.*.number_last4'
+                  | 'card.*.issuer'
+                  | 'card.*.fingerprint'
+                  | 'bank.*.name'
+                  | 'bank.*.ach_routing_number'
+                  | 'bank.*.ach_account_number'
+                  | 'bank.*.ach_account_id'
+                  | 'bank.*.account_type'
+                  | 'bank.*.fingerprint';
+                op: 'is_in' | 'is_not_in';
+                value: string;
+              }
+          )
+        | {
+            field: 'ip_address';
+            op: 'is_in' | 'is_not_in';
+            value: string;
+          }
+        | {
+            field: 'experian_score' | 'incode_selfie_match_score';
+            op: 'gt' | 'lt';
+            value: number;
+          }
+      >;
       ruleId: string;
     };
   }>;
@@ -15799,6 +29650,10 @@ export type action_triggered =
   | 'step_up.identity_proof_of_ssn'
   | 'step_up.identity_proof_of_ssn_proof_of_address'
   | 'step_up.custom';
+/**
+ * ORDERING MATTERS!!!
+ */
+export type kind15 = 'pass_with_manual_review';
 /**
  * Secret API key
  */
@@ -15819,37 +29674,141 @@ export type SecretApiKey = {
     createdAt: string;
     id: string;
     isImmutable: boolean;
-    kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+    /**
+     * Auto-generated discriminant enum variants
+     */
+    kind: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
     name: string;
     numActiveApiKeys?: number;
     numActiveUsers?: number;
     scopes: Array<
-      | 'read'
-      | 'admin'
-      | 'api_keys'
-      | 'manage_vault_proxy'
-      | 'manage_webhooks'
-      | 'manual_review'
-      | 'onboarding_configuration'
-      | 'write_lists'
-      | 'org_settings'
-      | 'cip_integration'
-      | 'trigger_kyb'
-      | 'trigger_kyc'
-      | 'auth_token'
-      | 'onboarding'
-      | 'decrypt_custom'
-      | 'decrypt_document'
-      | 'decrypt_document_and_selfie'
-      | 'decrypt_all'
-      | 'decrypt_all_except_pci_data'
-      | 'write_entities'
-      | 'label_and_tag'
-      | 'manage_compliance_doc_submission'
-      | 'compliance_partner_read'
-      | 'compliance_partner_admin'
-      | 'compliance_partner_manage_templates'
-      | 'compliance_partner_manage_reviews'
+      | {
+          kind: 'read';
+        }
+      | {
+          kind: 'admin';
+        }
+      | {
+          kind: 'api_keys';
+        }
+      | {
+          kind: 'manage_vault_proxy';
+        }
+      | {
+          kind: 'manage_webhooks';
+        }
+      | {
+          kind: 'manual_review';
+        }
+      | {
+          kind: 'onboarding_configuration';
+        }
+      | {
+          kind: 'write_lists';
+        }
+      | {
+          kind: 'org_settings';
+        }
+      | {
+          kind: 'cip_integration';
+        }
+      | {
+          data:
+            | {
+                kind: 'any';
+              }
+            | {
+                kind: 'just_in_time';
+              }
+            | {
+                id: string;
+                kind: 'id';
+              };
+          kind: 'invoke_vault_proxy';
+        }
+      | {
+          kind: 'trigger_kyb';
+        }
+      | {
+          kind: 'trigger_kyc';
+        }
+      | {
+          kind: 'auth_token';
+        }
+      | {
+          kind: 'onboarding';
+        }
+      | {
+          /**
+           * Represent the options of allowed CollectedData.
+           * Some CollectedData variants only have a single allowable CollectedDataOption.
+           * Other CollectedData variants may have multiple Options of assortments of data that can be
+           * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+           * the CDO
+           */
+          data:
+            | 'name'
+            | 'dob'
+            | 'ssn4'
+            | 'ssn9'
+            | 'full_address'
+            | 'email'
+            | 'phone_number'
+            | 'nationality'
+            | 'us_legal_status'
+            | {
+                document: string;
+              }
+            | 'business_name'
+            | 'business_tin'
+            | 'business_address'
+            | 'business_phone_number'
+            | 'business_website'
+            | 'business_beneficial_owners'
+            | 'business_kyced_beneficial_owners'
+            | 'business_corporation_type'
+            | 'investor_profile'
+            | 'card'
+            | 'us_tax_id'
+            | 'bank';
+          kind: 'decrypt';
+        }
+      | {
+          kind: 'decrypt_custom';
+        }
+      | {
+          kind: 'decrypt_document';
+        }
+      | {
+          kind: 'decrypt_document_and_selfie';
+        }
+      | {
+          kind: 'decrypt_all';
+        }
+      | {
+          kind: 'decrypt_all_except_pci_data';
+        }
+      | {
+          kind: 'write_entities';
+        }
+      | {
+          kind: 'label_and_tag';
+        }
+      | {
+          kind: 'manage_compliance_doc_submission';
+        }
+      | {
+          kind: 'compliance_partner_read';
+        }
+      | {
+          kind: 'compliance_partner_admin';
+        }
+      | {
+          kind: 'compliance_partner_manage_templates';
+        }
+      | {
+          kind: 'compliance_partner_manage_reviews';
+        }
     >;
   };
   scrubbedKey: string;
@@ -15935,7 +29894,7 @@ export type UpdateLabelRequest = {
 /**
  * Label value to set. Unset by sending `null`
  */
-export type kind11 = 'active' | 'offboard_fraud' | 'offboard_other';
+export type kind16 = 'active' | 'offboard_fraud' | 'offboard_other';
 export type UpdateListRequest = {
   alias: string;
   name: string;
@@ -15978,6 +29937,9 @@ export type UpdateTenantRequest = {
    * Used to set support_website to null
    */
   clearSupportWebsite?: boolean;
+  /**
+   * The type of data attribute
+   */
   companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
   name?: string;
   privacyPolicyUrl?: string;
@@ -15989,32 +29951,133 @@ export type UpdateTenantRequest = {
 export type UpdateTenantRoleRequest = {
   name?: string;
   scopes?: Array<
-    | 'read'
-    | 'admin'
-    | 'api_keys'
-    | 'manage_vault_proxy'
-    | 'manage_webhooks'
-    | 'manual_review'
-    | 'onboarding_configuration'
-    | 'write_lists'
-    | 'org_settings'
-    | 'cip_integration'
-    | 'trigger_kyb'
-    | 'trigger_kyc'
-    | 'auth_token'
-    | 'onboarding'
-    | 'decrypt_custom'
-    | 'decrypt_document'
-    | 'decrypt_document_and_selfie'
-    | 'decrypt_all'
-    | 'decrypt_all_except_pci_data'
-    | 'write_entities'
-    | 'label_and_tag'
-    | 'manage_compliance_doc_submission'
-    | 'compliance_partner_read'
-    | 'compliance_partner_admin'
-    | 'compliance_partner_manage_templates'
-    | 'compliance_partner_manage_reviews'
+    | {
+        kind: 'read';
+      }
+    | {
+        kind: 'admin';
+      }
+    | {
+        kind: 'api_keys';
+      }
+    | {
+        kind: 'manage_vault_proxy';
+      }
+    | {
+        kind: 'manage_webhooks';
+      }
+    | {
+        kind: 'manual_review';
+      }
+    | {
+        kind: 'onboarding_configuration';
+      }
+    | {
+        kind: 'write_lists';
+      }
+    | {
+        kind: 'org_settings';
+      }
+    | {
+        kind: 'cip_integration';
+      }
+    | {
+        data:
+          | {
+              kind: 'any';
+            }
+          | {
+              kind: 'just_in_time';
+            }
+          | {
+              id: string;
+              kind: 'id';
+            };
+        kind: 'invoke_vault_proxy';
+      }
+    | {
+        kind: 'trigger_kyb';
+      }
+    | {
+        kind: 'trigger_kyc';
+      }
+    | {
+        kind: 'auth_token';
+      }
+    | {
+        kind: 'onboarding';
+      }
+    | {
+        /**
+         * Represent the options of allowed CollectedData.
+         * Some CollectedData variants only have a single allowable CollectedDataOption.
+         * Other CollectedData variants may have multiple Options of assortments of data that can be
+         * collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+         * the CDO
+         */
+        data:
+          | 'name'
+          | 'dob'
+          | 'ssn4'
+          | 'ssn9'
+          | 'full_address'
+          | 'email'
+          | 'phone_number'
+          | 'nationality'
+          | 'us_legal_status'
+          | {
+              document: string;
+            }
+          | 'business_name'
+          | 'business_tin'
+          | 'business_address'
+          | 'business_phone_number'
+          | 'business_website'
+          | 'business_beneficial_owners'
+          | 'business_kyced_beneficial_owners'
+          | 'business_corporation_type'
+          | 'investor_profile'
+          | 'card'
+          | 'us_tax_id'
+          | 'bank';
+        kind: 'decrypt';
+      }
+    | {
+        kind: 'decrypt_custom';
+      }
+    | {
+        kind: 'decrypt_document';
+      }
+    | {
+        kind: 'decrypt_document_and_selfie';
+      }
+    | {
+        kind: 'decrypt_all';
+      }
+    | {
+        kind: 'decrypt_all_except_pci_data';
+      }
+    | {
+        kind: 'write_entities';
+      }
+    | {
+        kind: 'label_and_tag';
+      }
+    | {
+        kind: 'manage_compliance_doc_submission';
+      }
+    | {
+        kind: 'compliance_partner_read';
+      }
+    | {
+        kind: 'compliance_partner_admin';
+      }
+    | {
+        kind: 'compliance_partner_manage_templates';
+      }
+    | {
+        kind: 'compliance_partner_manage_reviews';
+      }
   >;
 };
 export type UpdateTenantRolebindingRequest = {
@@ -16760,12 +30823,12 @@ export type UserDeleteResponse = {
 export type UserInsight = {
   description: string;
   name: string;
-  scope: 'Behavior' | 'Device' | 'Workflow';
-  unit: 'DurationMs' | 'Boolean' | 'String';
+  scope: 'behavior' | 'device' | 'workflow';
+  unit: 'duration_ms' | 'boolean' | 'string';
   value: string;
 };
-export type scope2 = 'Behavior' | 'Device' | 'Workflow';
-export type unit = 'DurationMs' | 'Boolean' | 'String';
+export type scope2 = 'behavior' | 'device' | 'workflow';
+export type unit = 'duration_ms' | 'boolean' | 'string';
 export type UserLabel = {
   createdAt?: string;
   kind?: 'active' | 'offboard_fraud' | 'offboard_other';
@@ -16775,17 +30838,2087 @@ export type UserTag = {
   id: string;
   tag: string;
 };
-/**
- * Describes a liveness event that took place
- */
 export type UserTimeline = {
-  event: string;
+  event:
+    | {
+        data: {
+          actor?:
+            | {
+                id: string;
+                kind: 'user';
+              }
+            | {
+                kind: 'footprint';
+              }
+            | {
+                kind: 'firm_employee';
+              }
+            | {
+                email: string;
+                first_name?: string;
+                kind: 'organization';
+                last_name?: string;
+                member: string;
+              }
+            | {
+                id: string;
+                kind: 'api_key';
+                name: string;
+              };
+          /**
+           * The list of CDOs that had a DI that was edited
+           */
+          attributes: Array<
+            | 'name'
+            | 'dob'
+            | 'ssn4'
+            | 'ssn9'
+            | 'full_address'
+            | 'email'
+            | 'phone_number'
+            | 'nationality'
+            | 'us_legal_status'
+            | {
+                document: string;
+              }
+            | 'business_name'
+            | 'business_tin'
+            | 'business_address'
+            | 'business_phone_number'
+            | 'business_website'
+            | 'business_beneficial_owners'
+            | 'business_kyced_beneficial_owners'
+            | 'business_corporation_type'
+            | 'investor_profile'
+            | 'card'
+            | 'us_tax_id'
+            | 'bank'
+          >;
+          /**
+           * True when the data added in this timeline event was added via a one-click onboarding
+           */
+          is_prefill: boolean;
+          targets: Array<
+            | 'id.first_name'
+            | 'id.middle_name'
+            | 'id.last_name'
+            | 'id.dob'
+            | 'id.ssn4'
+            | 'id.ssn9'
+            | 'id.address_line1'
+            | 'id.address_line2'
+            | 'id.city'
+            | 'id.state'
+            | 'id.zip'
+            | 'id.country'
+            | 'id.email'
+            | 'id.phone_number'
+            | 'id.us_legal_status'
+            | 'id.visa_kind'
+            | 'id.visa_expiration_date'
+            | 'id.nationality'
+            | 'id.citizenships'
+            | 'id.drivers_license_number'
+            | 'id.drivers_license_state'
+            | 'id.itin'
+            | 'id.us_tax_id'
+            | 'business.name'
+            | 'business.dba'
+            | 'business.website'
+            | 'business.phone_number'
+            | 'business.tin'
+            | 'business.address_line1'
+            | 'business.address_line2'
+            | 'business.city'
+            | 'business.state'
+            | 'business.zip'
+            | 'business.country'
+            | 'business.corporation_type'
+            | 'business.formation_state'
+            | 'business.formation_date'
+            | 'custom.*'
+            | 'investor_profile.employment_status'
+            | 'investor_profile.occupation'
+            | 'investor_profile.employer'
+            | 'investor_profile.annual_income'
+            | 'investor_profile.net_worth'
+            | 'investor_profile.investment_goals'
+            | 'investor_profile.risk_tolerance'
+            | 'investor_profile.declarations'
+            | 'investor_profile.brokerage_firm_employer'
+            | 'investor_profile.senior_executive_symbols'
+            | 'investor_profile.family_member_names'
+            | 'investor_profile.political_organization'
+            | 'investor_profile.funding_sources'
+            | 'document.id_card.front.image'
+            | 'document.id_card.front.mime_type'
+            | 'document.id_card.back.image'
+            | 'document.id_card.back.mime_type'
+            | 'document.id_card.selfie.image'
+            | 'document.id_card.selfie.mime_type'
+            | 'document.id_card.full_name'
+            | 'document.id_card.dob'
+            | 'document.id_card.gender'
+            | 'document.id_card.full_address'
+            | 'document.id_card.document_number'
+            | 'document.id_card.expires_at'
+            | 'document.id_card.issued_at'
+            | 'document.id_card.issuing_state'
+            | 'document.id_card.issuing_country'
+            | 'document.id_card.ref_number'
+            | 'document.id_card.nationality'
+            | 'document.id_card.curp'
+            | 'document.id_card.clave_de_elector'
+            | 'document.id_card.classified_document_type'
+            | 'document.id_card.curp_validation_response'
+            | 'document.drivers_license.front.image'
+            | 'document.drivers_license.front.mime_type'
+            | 'document.drivers_license.back.image'
+            | 'document.drivers_license.back.mime_type'
+            | 'document.drivers_license.selfie.image'
+            | 'document.drivers_license.selfie.mime_type'
+            | 'document.drivers_license.full_name'
+            | 'document.drivers_license.dob'
+            | 'document.drivers_license.gender'
+            | 'document.drivers_license.full_address'
+            | 'document.drivers_license.document_number'
+            | 'document.drivers_license.expires_at'
+            | 'document.drivers_license.issued_at'
+            | 'document.drivers_license.issuing_state'
+            | 'document.drivers_license.issuing_country'
+            | 'document.drivers_license.ref_number'
+            | 'document.drivers_license.nationality'
+            | 'document.drivers_license.curp'
+            | 'document.drivers_license.clave_de_elector'
+            | 'document.drivers_license.classified_document_type'
+            | 'document.drivers_license.curp_validation_response'
+            | 'document.passport.front.image'
+            | 'document.passport.front.mime_type'
+            | 'document.passport.back.image'
+            | 'document.passport.back.mime_type'
+            | 'document.passport.selfie.image'
+            | 'document.passport.selfie.mime_type'
+            | 'document.passport.full_name'
+            | 'document.passport.dob'
+            | 'document.passport.gender'
+            | 'document.passport.full_address'
+            | 'document.passport.document_number'
+            | 'document.passport.expires_at'
+            | 'document.passport.issued_at'
+            | 'document.passport.issuing_state'
+            | 'document.passport.issuing_country'
+            | 'document.passport.ref_number'
+            | 'document.passport.nationality'
+            | 'document.passport.curp'
+            | 'document.passport.clave_de_elector'
+            | 'document.passport.classified_document_type'
+            | 'document.passport.curp_validation_response'
+            | 'document.passport_card.front.image'
+            | 'document.passport_card.front.mime_type'
+            | 'document.passport_card.back.image'
+            | 'document.passport_card.back.mime_type'
+            | 'document.passport_card.selfie.image'
+            | 'document.passport_card.selfie.mime_type'
+            | 'document.passport_card.full_name'
+            | 'document.passport_card.dob'
+            | 'document.passport_card.gender'
+            | 'document.passport_card.full_address'
+            | 'document.passport_card.document_number'
+            | 'document.passport_card.expires_at'
+            | 'document.passport_card.issued_at'
+            | 'document.passport_card.issuing_state'
+            | 'document.passport_card.issuing_country'
+            | 'document.passport_card.ref_number'
+            | 'document.passport_card.nationality'
+            | 'document.passport_card.curp'
+            | 'document.passport_card.clave_de_elector'
+            | 'document.passport_card.classified_document_type'
+            | 'document.passport_card.curp_validation_response'
+            | 'document.permit.front.image'
+            | 'document.permit.front.mime_type'
+            | 'document.permit.back.image'
+            | 'document.permit.back.mime_type'
+            | 'document.permit.selfie.image'
+            | 'document.permit.selfie.mime_type'
+            | 'document.permit.full_name'
+            | 'document.permit.dob'
+            | 'document.permit.gender'
+            | 'document.permit.full_address'
+            | 'document.permit.document_number'
+            | 'document.permit.expires_at'
+            | 'document.permit.issued_at'
+            | 'document.permit.issuing_state'
+            | 'document.permit.issuing_country'
+            | 'document.permit.ref_number'
+            | 'document.permit.nationality'
+            | 'document.permit.curp'
+            | 'document.permit.clave_de_elector'
+            | 'document.permit.classified_document_type'
+            | 'document.permit.curp_validation_response'
+            | 'document.visa.front.image'
+            | 'document.visa.front.mime_type'
+            | 'document.visa.back.image'
+            | 'document.visa.back.mime_type'
+            | 'document.visa.selfie.image'
+            | 'document.visa.selfie.mime_type'
+            | 'document.visa.full_name'
+            | 'document.visa.dob'
+            | 'document.visa.gender'
+            | 'document.visa.full_address'
+            | 'document.visa.document_number'
+            | 'document.visa.expires_at'
+            | 'document.visa.issued_at'
+            | 'document.visa.issuing_state'
+            | 'document.visa.issuing_country'
+            | 'document.visa.ref_number'
+            | 'document.visa.nationality'
+            | 'document.visa.curp'
+            | 'document.visa.clave_de_elector'
+            | 'document.visa.classified_document_type'
+            | 'document.visa.curp_validation_response'
+            | 'document.residence_document.front.image'
+            | 'document.residence_document.front.mime_type'
+            | 'document.residence_document.back.image'
+            | 'document.residence_document.back.mime_type'
+            | 'document.residence_document.selfie.image'
+            | 'document.residence_document.selfie.mime_type'
+            | 'document.residence_document.full_name'
+            | 'document.residence_document.dob'
+            | 'document.residence_document.gender'
+            | 'document.residence_document.full_address'
+            | 'document.residence_document.document_number'
+            | 'document.residence_document.expires_at'
+            | 'document.residence_document.issued_at'
+            | 'document.residence_document.issuing_state'
+            | 'document.residence_document.issuing_country'
+            | 'document.residence_document.ref_number'
+            | 'document.residence_document.nationality'
+            | 'document.residence_document.curp'
+            | 'document.residence_document.clave_de_elector'
+            | 'document.residence_document.classified_document_type'
+            | 'document.residence_document.curp_validation_response'
+            | 'document.voter_identification.front.image'
+            | 'document.voter_identification.front.mime_type'
+            | 'document.voter_identification.back.image'
+            | 'document.voter_identification.back.mime_type'
+            | 'document.voter_identification.selfie.image'
+            | 'document.voter_identification.selfie.mime_type'
+            | 'document.voter_identification.full_name'
+            | 'document.voter_identification.dob'
+            | 'document.voter_identification.gender'
+            | 'document.voter_identification.full_address'
+            | 'document.voter_identification.document_number'
+            | 'document.voter_identification.expires_at'
+            | 'document.voter_identification.issued_at'
+            | 'document.voter_identification.issuing_state'
+            | 'document.voter_identification.issuing_country'
+            | 'document.voter_identification.ref_number'
+            | 'document.voter_identification.nationality'
+            | 'document.voter_identification.curp'
+            | 'document.voter_identification.clave_de_elector'
+            | 'document.voter_identification.classified_document_type'
+            | 'document.voter_identification.curp_validation_response'
+            | 'document.finra_compliance_letter'
+            | 'document.proof_of_address.image'
+            | 'document.ssn_card.image'
+            | 'document.custom.*'
+            | 'card.*.number'
+            | 'card.*.expiration'
+            | 'card.*.cvc'
+            | 'card.*.name'
+            | 'card.*.billing_address.zip'
+            | 'card.*.billing_address.country'
+            | 'card.*.expiration_month'
+            | 'card.*.expiration_year'
+            | 'card.*.number_last4'
+            | 'card.*.issuer'
+            | 'card.*.fingerprint'
+            | 'bank.*.name'
+            | 'bank.*.ach_routing_number'
+            | 'bank.*.ach_account_number'
+            | 'bank.*.ach_account_id'
+            | 'bank.*.account_type'
+            | 'bank.*.fingerprint'
+          >;
+        };
+        kind: 'data_collected';
+      }
+    | {
+        /**
+         * Describes a liveness event that took place
+         */
+        data: {
+          attributes?: {
+            device?: string;
+            issuers: Array<'apple' | 'google' | 'cloudflare' | 'footprint'>;
+            metadata?: {
+              [key: string]: unknown;
+            };
+            os?: string;
+          };
+          /**
+           * Describes a device insight event with locations and IP of the event
+           */
+          insight_event?: {
+            city?: string;
+            country?: string;
+            ip_address?: string;
+            latitude?: number;
+            longitude?: number;
+            metro_code?: string;
+            postal_code?: string;
+            region?: string;
+            region_name?: string;
+            session_id?: string;
+            time_zone?: string;
+            timestamp: string;
+            user_agent?: string;
+          };
+          source:
+            | 'skipped'
+            | 'webauthn_attestation'
+            | 'privacy_pass'
+            | 'apple_device_attestation'
+            | 'google_device_attestation';
+        };
+        kind: 'liveness';
+      }
+    | {
+        data: {
+          config:
+            | {
+                data: {
+                  collect_selfie: boolean;
+                  document_types_and_countries?: {
+                    country_specific: {
+                      [key: string]: unknown;
+                    };
+                    global: Array<
+                      | 'id_card'
+                      | 'drivers_license'
+                      | 'passport'
+                      | 'passport_card'
+                      | 'permit'
+                      | 'visa'
+                      | 'residence_document'
+                      | 'voter_identification'
+                    >;
+                  };
+                };
+                kind: 'identity';
+              }
+            | {
+                data: {
+                  requires_human_review: boolean;
+                };
+                kind: 'proof_of_ssn';
+              }
+            | {
+                data: {
+                  requires_human_review: boolean;
+                };
+                kind: 'proof_of_address';
+              }
+            | {
+                data: {
+                  /**
+                   * Optional human-readable description of the document that will be displayed to the user
+                   */
+                  description?: string;
+                  /**
+                   * Custom document identifier under which the document will be vaulted
+                   */
+                  identifier:
+                    | 'id.first_name'
+                    | 'id.middle_name'
+                    | 'id.last_name'
+                    | 'id.dob'
+                    | 'id.ssn4'
+                    | 'id.ssn9'
+                    | 'id.address_line1'
+                    | 'id.address_line2'
+                    | 'id.city'
+                    | 'id.state'
+                    | 'id.zip'
+                    | 'id.country'
+                    | 'id.email'
+                    | 'id.phone_number'
+                    | 'id.us_legal_status'
+                    | 'id.visa_kind'
+                    | 'id.visa_expiration_date'
+                    | 'id.nationality'
+                    | 'id.citizenships'
+                    | 'id.drivers_license_number'
+                    | 'id.drivers_license_state'
+                    | 'id.itin'
+                    | 'id.us_tax_id'
+                    | 'business.name'
+                    | 'business.dba'
+                    | 'business.website'
+                    | 'business.phone_number'
+                    | 'business.tin'
+                    | 'business.address_line1'
+                    | 'business.address_line2'
+                    | 'business.city'
+                    | 'business.state'
+                    | 'business.zip'
+                    | 'business.country'
+                    | 'business.corporation_type'
+                    | 'business.formation_state'
+                    | 'business.formation_date'
+                    | 'custom.*'
+                    | 'investor_profile.employment_status'
+                    | 'investor_profile.occupation'
+                    | 'investor_profile.employer'
+                    | 'investor_profile.annual_income'
+                    | 'investor_profile.net_worth'
+                    | 'investor_profile.investment_goals'
+                    | 'investor_profile.risk_tolerance'
+                    | 'investor_profile.declarations'
+                    | 'investor_profile.brokerage_firm_employer'
+                    | 'investor_profile.senior_executive_symbols'
+                    | 'investor_profile.family_member_names'
+                    | 'investor_profile.political_organization'
+                    | 'investor_profile.funding_sources'
+                    | 'document.id_card.front.image'
+                    | 'document.id_card.front.mime_type'
+                    | 'document.id_card.back.image'
+                    | 'document.id_card.back.mime_type'
+                    | 'document.id_card.selfie.image'
+                    | 'document.id_card.selfie.mime_type'
+                    | 'document.id_card.full_name'
+                    | 'document.id_card.dob'
+                    | 'document.id_card.gender'
+                    | 'document.id_card.full_address'
+                    | 'document.id_card.document_number'
+                    | 'document.id_card.expires_at'
+                    | 'document.id_card.issued_at'
+                    | 'document.id_card.issuing_state'
+                    | 'document.id_card.issuing_country'
+                    | 'document.id_card.ref_number'
+                    | 'document.id_card.nationality'
+                    | 'document.id_card.curp'
+                    | 'document.id_card.clave_de_elector'
+                    | 'document.id_card.classified_document_type'
+                    | 'document.id_card.curp_validation_response'
+                    | 'document.drivers_license.front.image'
+                    | 'document.drivers_license.front.mime_type'
+                    | 'document.drivers_license.back.image'
+                    | 'document.drivers_license.back.mime_type'
+                    | 'document.drivers_license.selfie.image'
+                    | 'document.drivers_license.selfie.mime_type'
+                    | 'document.drivers_license.full_name'
+                    | 'document.drivers_license.dob'
+                    | 'document.drivers_license.gender'
+                    | 'document.drivers_license.full_address'
+                    | 'document.drivers_license.document_number'
+                    | 'document.drivers_license.expires_at'
+                    | 'document.drivers_license.issued_at'
+                    | 'document.drivers_license.issuing_state'
+                    | 'document.drivers_license.issuing_country'
+                    | 'document.drivers_license.ref_number'
+                    | 'document.drivers_license.nationality'
+                    | 'document.drivers_license.curp'
+                    | 'document.drivers_license.clave_de_elector'
+                    | 'document.drivers_license.classified_document_type'
+                    | 'document.drivers_license.curp_validation_response'
+                    | 'document.passport.front.image'
+                    | 'document.passport.front.mime_type'
+                    | 'document.passport.back.image'
+                    | 'document.passport.back.mime_type'
+                    | 'document.passport.selfie.image'
+                    | 'document.passport.selfie.mime_type'
+                    | 'document.passport.full_name'
+                    | 'document.passport.dob'
+                    | 'document.passport.gender'
+                    | 'document.passport.full_address'
+                    | 'document.passport.document_number'
+                    | 'document.passport.expires_at'
+                    | 'document.passport.issued_at'
+                    | 'document.passport.issuing_state'
+                    | 'document.passport.issuing_country'
+                    | 'document.passport.ref_number'
+                    | 'document.passport.nationality'
+                    | 'document.passport.curp'
+                    | 'document.passport.clave_de_elector'
+                    | 'document.passport.classified_document_type'
+                    | 'document.passport.curp_validation_response'
+                    | 'document.passport_card.front.image'
+                    | 'document.passport_card.front.mime_type'
+                    | 'document.passport_card.back.image'
+                    | 'document.passport_card.back.mime_type'
+                    | 'document.passport_card.selfie.image'
+                    | 'document.passport_card.selfie.mime_type'
+                    | 'document.passport_card.full_name'
+                    | 'document.passport_card.dob'
+                    | 'document.passport_card.gender'
+                    | 'document.passport_card.full_address'
+                    | 'document.passport_card.document_number'
+                    | 'document.passport_card.expires_at'
+                    | 'document.passport_card.issued_at'
+                    | 'document.passport_card.issuing_state'
+                    | 'document.passport_card.issuing_country'
+                    | 'document.passport_card.ref_number'
+                    | 'document.passport_card.nationality'
+                    | 'document.passport_card.curp'
+                    | 'document.passport_card.clave_de_elector'
+                    | 'document.passport_card.classified_document_type'
+                    | 'document.passport_card.curp_validation_response'
+                    | 'document.permit.front.image'
+                    | 'document.permit.front.mime_type'
+                    | 'document.permit.back.image'
+                    | 'document.permit.back.mime_type'
+                    | 'document.permit.selfie.image'
+                    | 'document.permit.selfie.mime_type'
+                    | 'document.permit.full_name'
+                    | 'document.permit.dob'
+                    | 'document.permit.gender'
+                    | 'document.permit.full_address'
+                    | 'document.permit.document_number'
+                    | 'document.permit.expires_at'
+                    | 'document.permit.issued_at'
+                    | 'document.permit.issuing_state'
+                    | 'document.permit.issuing_country'
+                    | 'document.permit.ref_number'
+                    | 'document.permit.nationality'
+                    | 'document.permit.curp'
+                    | 'document.permit.clave_de_elector'
+                    | 'document.permit.classified_document_type'
+                    | 'document.permit.curp_validation_response'
+                    | 'document.visa.front.image'
+                    | 'document.visa.front.mime_type'
+                    | 'document.visa.back.image'
+                    | 'document.visa.back.mime_type'
+                    | 'document.visa.selfie.image'
+                    | 'document.visa.selfie.mime_type'
+                    | 'document.visa.full_name'
+                    | 'document.visa.dob'
+                    | 'document.visa.gender'
+                    | 'document.visa.full_address'
+                    | 'document.visa.document_number'
+                    | 'document.visa.expires_at'
+                    | 'document.visa.issued_at'
+                    | 'document.visa.issuing_state'
+                    | 'document.visa.issuing_country'
+                    | 'document.visa.ref_number'
+                    | 'document.visa.nationality'
+                    | 'document.visa.curp'
+                    | 'document.visa.clave_de_elector'
+                    | 'document.visa.classified_document_type'
+                    | 'document.visa.curp_validation_response'
+                    | 'document.residence_document.front.image'
+                    | 'document.residence_document.front.mime_type'
+                    | 'document.residence_document.back.image'
+                    | 'document.residence_document.back.mime_type'
+                    | 'document.residence_document.selfie.image'
+                    | 'document.residence_document.selfie.mime_type'
+                    | 'document.residence_document.full_name'
+                    | 'document.residence_document.dob'
+                    | 'document.residence_document.gender'
+                    | 'document.residence_document.full_address'
+                    | 'document.residence_document.document_number'
+                    | 'document.residence_document.expires_at'
+                    | 'document.residence_document.issued_at'
+                    | 'document.residence_document.issuing_state'
+                    | 'document.residence_document.issuing_country'
+                    | 'document.residence_document.ref_number'
+                    | 'document.residence_document.nationality'
+                    | 'document.residence_document.curp'
+                    | 'document.residence_document.clave_de_elector'
+                    | 'document.residence_document.classified_document_type'
+                    | 'document.residence_document.curp_validation_response'
+                    | 'document.voter_identification.front.image'
+                    | 'document.voter_identification.front.mime_type'
+                    | 'document.voter_identification.back.image'
+                    | 'document.voter_identification.back.mime_type'
+                    | 'document.voter_identification.selfie.image'
+                    | 'document.voter_identification.selfie.mime_type'
+                    | 'document.voter_identification.full_name'
+                    | 'document.voter_identification.dob'
+                    | 'document.voter_identification.gender'
+                    | 'document.voter_identification.full_address'
+                    | 'document.voter_identification.document_number'
+                    | 'document.voter_identification.expires_at'
+                    | 'document.voter_identification.issued_at'
+                    | 'document.voter_identification.issuing_state'
+                    | 'document.voter_identification.issuing_country'
+                    | 'document.voter_identification.ref_number'
+                    | 'document.voter_identification.nationality'
+                    | 'document.voter_identification.curp'
+                    | 'document.voter_identification.clave_de_elector'
+                    | 'document.voter_identification.classified_document_type'
+                    | 'document.voter_identification.curp_validation_response'
+                    | 'document.finra_compliance_letter'
+                    | 'document.proof_of_address.image'
+                    | 'document.ssn_card.image'
+                    | 'document.custom.*'
+                    | 'card.*.number'
+                    | 'card.*.expiration'
+                    | 'card.*.cvc'
+                    | 'card.*.name'
+                    | 'card.*.billing_address.zip'
+                    | 'card.*.billing_address.country'
+                    | 'card.*.expiration_month'
+                    | 'card.*.expiration_year'
+                    | 'card.*.number_last4'
+                    | 'card.*.issuer'
+                    | 'card.*.fingerprint'
+                    | 'bank.*.name'
+                    | 'bank.*.ach_routing_number'
+                    | 'bank.*.ach_account_number'
+                    | 'bank.*.ach_account_id'
+                    | 'bank.*.account_type'
+                    | 'bank.*.fingerprint';
+                  /**
+                   * The human-readable name of the document to display to the user
+                   */
+                  name: string;
+                  requires_human_review: boolean;
+                  upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                };
+                kind: 'custom';
+              };
+          device_type: 'desktop' | 'mobile';
+          /**
+           * The set of values we can use for identity_document.document_type
+           */
+          document_type:
+            | 'id_card'
+            | 'drivers_license'
+            | 'passport'
+            | 'passport_card'
+            | 'permit'
+            | 'visa'
+            | 'residence_document'
+            | 'voter_identification'
+            | 'ssn_card'
+            | 'proof_of_address'
+            | 'custom';
+          status: 'pending' | 'failed' | 'complete';
+        };
+        kind: 'document_uploaded';
+      }
+    | {
+        data: {
+          annotation?: {
+            id: string;
+            is_pinned: boolean;
+            note: string;
+            source:
+              | {
+                  id: string;
+                  kind: 'user';
+                }
+              | {
+                  kind: 'footprint';
+                }
+              | {
+                  kind: 'firm_employee';
+                }
+              | {
+                  email: string;
+                  first_name?: string;
+                  kind: 'organization';
+                  last_name?: string;
+                  member: string;
+                }
+              | {
+                  id: string;
+                  kind: 'api_key';
+                  name: string;
+                };
+            timestamp: string;
+          };
+          /**
+           * Describes the outcome of an onboarding decision that took place on the user.
+           */
+          decision: {
+            cleared_manual_reviews: Array<{
+              kind: 'rule_triggered' | 'document_needs_review';
+            }>;
+            id: string;
+            /**
+             * ObConfiguration serialization used inside of an OnboardingDecision
+             */
+            ob_configuration: {
+              id: string;
+              must_collect_data: Array<
+                | 'name'
+                | 'dob'
+                | 'ssn4'
+                | 'ssn9'
+                | 'full_address'
+                | 'email'
+                | 'phone_number'
+                | 'nationality'
+                | 'us_legal_status'
+                | {
+                    document: string;
+                  }
+                | 'business_name'
+                | 'business_tin'
+                | 'business_address'
+                | 'business_phone_number'
+                | 'business_website'
+                | 'business_beneficial_owners'
+                | 'business_kyced_beneficial_owners'
+                | 'business_corporation_type'
+                | 'investor_profile'
+                | 'card'
+                | 'us_tax_id'
+                | 'bank'
+              >;
+              name: string;
+            };
+            /**
+             * When true, the rules were ran for this decision despite being in sandbox mode - we should
+             * show the rules outcome drawer
+             */
+            ran_rules_in_sandbox: boolean;
+            rule_set_result_id?: string;
+            source:
+              | {
+                  id: string;
+                  kind: 'user';
+                }
+              | {
+                  kind: 'footprint';
+                }
+              | {
+                  kind: 'firm_employee';
+                }
+              | {
+                  email: string;
+                  first_name?: string;
+                  kind: 'organization';
+                  last_name?: string;
+                  member: string;
+                }
+              | {
+                  id: string;
+                  kind: 'api_key';
+                  name: string;
+                };
+            status: 'fail' | 'step_up' | 'pass' | 'none';
+            timestamp: string;
+            /**
+             * Auto-generated discriminant enum variants
+             */
+            workflow_kind: 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
+          };
+          workflow_source: 'hosted' | 'tenant' | 'unknown';
+        };
+        kind: 'onboarding_decision';
+      }
+    | {
+        data: {
+          id: string;
+          is_pinned: boolean;
+          note: string;
+          source:
+            | {
+                id: string;
+                kind: 'user';
+              }
+            | {
+                kind: 'footprint';
+              }
+            | {
+                kind: 'firm_employee';
+              }
+            | {
+                email: string;
+                first_name?: string;
+                kind: 'organization';
+                last_name?: string;
+                member: string;
+              }
+            | {
+                id: string;
+                kind: 'api_key';
+                name: string;
+              };
+          timestamp: string;
+        };
+        kind: 'annotation';
+      }
+    | {
+        data: {
+          id: string;
+          reason_codes?: Array<
+            | 'watchlist_hit_ofac'
+            | 'watchlist_hit_non_sdn'
+            | 'watchlist_hit_warning'
+            | 'watchlist_hit_pep'
+            | 'adverse_media_hit'
+            | 'id_not_located'
+            | 'id_flagged'
+            | 'credit_more_than3_inquiries_in_last30_days'
+            | 'credit_established_before_ssn_date'
+            | 'address_input_is_non_residential'
+            | 'address_located_is_non_residential'
+            | 'address_does_not_match'
+            | 'address_partially_matches'
+            | 'address_zip_code_does_not_match'
+            | 'address_city_does_not_match'
+            | 'address_city_matches'
+            | 'address_street_name_does_not_match'
+            | 'address_street_name_partially_matches'
+            | 'address_street_number_does_not_match'
+            | 'address_state_does_not_match'
+            | 'address_input_is_not_deliverable'
+            | 'address_input_is_po_box'
+            | 'address_input_is_correctional_facility'
+            | 'address_input_is_not_standard_campground'
+            | 'address_input_is_not_standard_college'
+            | 'address_input_is_not_standard_general_delivery'
+            | 'address_input_is_not_standard_hospital'
+            | 'address_input_is_not_standard_hotel'
+            | 'address_input_is_not_standard_mail_drop'
+            | 'address_input_is_not_standard_prison'
+            | 'address_input_is_not_standard_university'
+            | 'address_input_is_not_standard_uspo'
+            | 'address_input_not_on_file'
+            | 'address_located_is_po_box'
+            | 'address_located_is_not_standard_campground'
+            | 'address_located_is_not_standard_college'
+            | 'address_located_is_not_standard_general_delivery'
+            | 'address_located_is_not_standard_hospital'
+            | 'address_located_is_not_standard_hotel'
+            | 'address_located_is_not_standard_mail_drop'
+            | 'address_located_is_not_standard_prison'
+            | 'address_located_is_not_standard_university'
+            | 'address_located_is_not_standard_uspo'
+            | 'address_located_is_high_risk_address'
+            | 'address_risk_alert'
+            | 'address_alert_velocity'
+            | 'address_alert_stability'
+            | 'address_alert_longevity'
+            | 'address_alert_single_address_in_file'
+            | 'address_newer_record_found'
+            | 'dob_yob_does_not_match'
+            | 'dob_yob_does_not_match_within1_year'
+            | 'dob_mob_does_not_match'
+            | 'dob_day_does_not_match'
+            | 'dob_mob_not_available'
+            | 'dob_yob_not_available'
+            | 'dob_located_age_below_minimum'
+            | 'dob_located_age_above_maximum'
+            | 'dob_located_coppa_alert'
+            | 'dob_does_not_match'
+            | 'dob_partial_match'
+            | 'dob_not_on_file'
+            | 'dob_could_not_match'
+            | 'dob_input_age_less_than18'
+            | 'ssn_not_available'
+            | 'ssn_not_on_file'
+            | 'ssn_partially_matches'
+            | 'ssn_does_not_match'
+            | 'ssn_does_not_match_within1_digit'
+            | 'ssn_input_is_itin'
+            | 'ssn_located_is_itin'
+            | 'ssn_input_tied_to_multiple_names'
+            | 'ssn_input_is_invalid'
+            | 'ssn_located_is_invalid'
+            | 'ssn_not_provided'
+            | 'us_tax_id_is_itin'
+            | 'itin_is_expired'
+            | 'name_last_does_not_match'
+            | 'name_last_partially_matches'
+            | 'name_matches'
+            | 'name_does_not_match'
+            | 'name_partially_matches'
+            | 'ip_state_does_not_match'
+            | 'ip_input_invalid'
+            | 'ip_not_located'
+            | 'ip_location_not_available'
+            | 'ip_alert_high_risk_bot'
+            | 'ip_alert_high_risk_spam'
+            | 'ip_alert_high_risk_tor'
+            | 'ip_alert_high_risk_proxy'
+            | 'ip_proxy'
+            | 'ip_data_center'
+            | 'ip_alert_data_center'
+            | 'email_address_invalid'
+            | 'email_address_or_domain_does_not_exist'
+            | 'email_domain_recently_created'
+            | 'email_domain_private'
+            | 'email_domain_corporate'
+            | 'email_recently_verified'
+            | 'email_found_on_file'
+            | 'email_not_found_on_file'
+            | 'email_high_risk_country'
+            | 'email_high_risk_fraud'
+            | 'email_high_risk_tumbled'
+            | 'email_high_risk_disposable'
+            | 'email_high_risk_domain'
+            | 'sentilink_synthetic_identity_high_risk'
+            | 'sentilink_synthetic_identity_medium_risk'
+            | 'sentilink_synthetic_identity_low_risk'
+            | 'synthetic_identity_high_risk'
+            | 'synthetic_identity_medium_risk'
+            | 'synthetic_identity_low_risk'
+            | 'sentilink_identity_theft_high_risk'
+            | 'sentilink_identity_theft_medium_risk'
+            | 'sentilink_identity_theft_low_risk'
+            | 'phone_number_input_invalid'
+            | 'phone_number_located_is_voip'
+            | 'phone_number_is_voip'
+            | 'phone_number_mobile_account_type_postpaid'
+            | 'phone_number_mobile_account_type_prepaid'
+            | 'phone_number_mobile_account_type_unknown'
+            | 'phone_number_mobile_account_status_active'
+            | 'phone_number_mobile_account_status_deactivated'
+            | 'phone_number_mobile_account_status_suspended'
+            | 'phone_number_mobile_account_status_absent'
+            | 'phone_located_matches'
+            | 'phone_located_partially_matches'
+            | 'phone_located_does_not_match'
+            | 'phone_located_name_matches'
+            | 'phone_located_name_partially_matches'
+            | 'phone_located_name_does_not_match'
+            | 'phone_located_address_matches'
+            | 'phone_located_address_partially_matches'
+            | 'phone_located_address_does_not_match'
+            | 'phone_input_likely_belongs_to_another'
+            | 'phone_not_provided'
+            | 'multiple_records_found'
+            | 'subject_deceased'
+            | 'bureau_deleted_record'
+            | 'ssn_issued_prior_to_dob'
+            | 'ssn_issue_date_cannot_be_verified'
+            | 'ssn_located_issue_date_cannot_be_verified'
+            | 'ssn_potentially_belongs_to_another'
+            | 'ssn_likely_belongs_to_another'
+            | 'thin_file'
+            | 'input_phone_number_does_not_match_input_state'
+            | 'input_phone_number_does_not_match_located_state_history'
+            | 'input_phone_number_does_not_match_ip_state'
+            | 'drivers_license_number_different_number_found'
+            | 'drivers_license_number_not_on_record'
+            | 'drivers_license_number_not_valid'
+            | 'drivers_license_number_is_valid'
+            | 'document_upload_failed'
+            | 'document_not_verified'
+            | 'document_verified'
+            | 'document_ocr_not_successful'
+            | 'document_ocr_successful'
+            | 'document_barcode_could_not_be_read'
+            | 'document_barcode_could_be_read'
+            | 'document_barcode_content_matches'
+            | 'document_barcode_content_does_not_match'
+            | 'document_barcode_detected'
+            | 'document_barcode_could_not_be_detected'
+            | 'document_requires_review'
+            | 'document_expired'
+            | 'document_not_expired'
+            | 'document_from_restricted_country'
+            | 'document_restricted_template_type'
+            | 'document_type_not_allowed'
+            | 'document_field_crosscheck_failed'
+            | 'document_invalid_issuance_or_expiration_date'
+            | 'document_invalid_template_layout'
+            | 'document_possible_image_tampering'
+            | 'document_no_image_tampering'
+            | 'document_no_image_alteration_front'
+            | 'document_no_image_alteration_back'
+            | 'document_possible_image_alteration_front'
+            | 'document_possible_image_alteration_back'
+            | 'document_possible_image_alteration'
+            | 'document_possible_digital_fraud'
+            | 'document_selfie_used_with_different_information'
+            | 'document_selfie_not_used_with_different_information'
+            | 'document_selfie_mask'
+            | 'document_selfie_glasses'
+            | 'document_selfie_not_live_image'
+            | 'document_possible_fake_image'
+            | 'document_not_fake_image'
+            | 'document_pdf417_data_is_valid'
+            | 'document_pdf417_data_is_not_valid'
+            | 'document_photo_is_screen_capture'
+            | 'document_photo_is_not_screen_capture'
+            | 'document_photo_is_paper_capture'
+            | 'document_photo_is_not_paper_capture'
+            | 'document_alignment_failed'
+            | 'document_visible_photo_features_not_verified'
+            | 'document_mrz_line_format_check'
+            | 'document_qr_code_check'
+            | 'document_could_not_classify'
+            | 'document_visible_photo_features_verified'
+            | 'document_low_match_score_with_selfie'
+            | 'document_selfie_matches'
+            | 'document_selfie_does_not_match'
+            | 'document_selfie_bad_quality'
+            | 'document_type_mismatch'
+            | 'document_unknown_country_code'
+            | 'document_country_code_mismatch'
+            | 'document_is_permit_or_provisional_license'
+            | 'document_selfie_was_skipped'
+            | 'document_collected_via_desktop'
+            | 'document_not_live_capture'
+            | 'document_live_capture_failed'
+            | 'document_ocr_name_does_not_match'
+            | 'document_ocr_name_could_not_match'
+            | 'document_ocr_name_matches'
+            | 'document_ocr_address_does_not_match'
+            | 'document_ocr_address_could_not_match'
+            | 'document_ocr_address_matches'
+            | 'document_ocr_first_name_does_not_match'
+            | 'document_ocr_first_name_matches'
+            | 'document_ocr_last_name_does_not_match'
+            | 'document_ocr_last_name_matches'
+            | 'document_ocr_dob_does_not_match'
+            | 'document_ocr_dob_could_not_match'
+            | 'document_ocr_dob_matches'
+            | 'document_dob_crosscheck_matches'
+            | 'document_dob_crosscheck_does_not_match'
+            | 'document_expiration_date_crosscheck_matches'
+            | 'document_expiration_date_crosscheck_does_not_match'
+            | 'document_sex_crosscheck_matches'
+            | 'document_sex_crosscheck_does_not_match'
+            | 'document_full_name_crosscheck_matches'
+            | 'document_full_name_crosscheck_does_not_match'
+            | 'document_number_crosscheck_matches'
+            | 'document_number_crosscheck_does_not_match'
+            | 'document_expiration_check_digit_matches'
+            | 'document_expiration_check_digit_does_not_match'
+            | 'document_dob_check_digit_matches'
+            | 'document_dob_check_digit_does_not_match'
+            | 'document_number_check_digit_matches'
+            | 'document_number_check_digit_does_not_match'
+            | 'curp_not_valid'
+            | 'curp_not_found'
+            | 'curp_valid'
+            | 'curp_input_curp_invalid'
+            | 'curp_could_not_validate'
+            | 'curp_multiple_results_for_data'
+            | 'curp_service_not_available'
+            | 'curp_malformed'
+            | 'address_matches'
+            | 'address_zip_code_matches'
+            | 'address_street_name_matches'
+            | 'address_street_number_matches'
+            | 'address_state_matches'
+            | 'dob_matches'
+            | 'dob_yob_matches'
+            | 'dob_mob_matches'
+            | 'ssn_matches'
+            | 'name_last_matches'
+            | 'name_first_matches'
+            | 'name_first_does_not_match'
+            | 'name_first_partially_matches'
+            | 'ip_state_matches'
+            | 'phone_number_matches'
+            | 'input_phone_number_matches_input_state'
+            | 'input_phone_number_matches_located_state_history'
+            | 'affiliated_with_broker_or_finra'
+            | 'visa_is_other'
+            | 'visa_expired_or_expiring_soon'
+            | 'business_name_match'
+            | 'business_name_similar_match'
+            | 'business_name_alternate_match'
+            | 'business_name_does_not_match'
+            | 'business_name_no_watchlist_hits'
+            | 'business_name_watchlist_hit'
+            | 'business_dba_match'
+            | 'business_dba_similar_match'
+            | 'business_dba_alternate_match'
+            | 'business_dba_does_not_match'
+            | 'business_phone_number_match'
+            | 'business_phone_number_does_not_match'
+            | 'business_website_online'
+            | 'business_website_offline'
+            | 'business_website_verified'
+            | 'business_website_unverified'
+            | 'business_website_parking_page'
+            | 'tin_match'
+            | 'tin_not_found'
+            | 'tin_invalid'
+            | 'tin_does_not_match'
+            | 'business_address_match'
+            | 'business_address_close_match'
+            | 'business_address_similar_match'
+            | 'business_address_incomplete_match'
+            | 'business_address_does_not_match'
+            | 'business_address_commercial'
+            | 'business_address_commercial_mail_receiving_agency'
+            | 'business_address_residential'
+            | 'business_address_deliverable'
+            | 'business_address_not_deliverable'
+            | 'beneficial_owners_match'
+            | 'beneficial_owners_partial_match'
+            | 'beneficial_owners_do_not_match'
+            | 'beneficial_owner_failed_kyc'
+            | 'beneficial_owner_possible_missing_bo'
+            | 'sos_active_filing_found'
+            | 'sos_filing_no_status'
+            | 'sos_filing_partially_active'
+            | 'sos_filing_no_active_found'
+            | 'sos_filing_not_found'
+            | 'sos_domestic_active_filing_found'
+            | 'sos_domestic_filing_no_status'
+            | 'sos_domestic_filing_partially_active'
+            | 'sos_domestic_filing_not_found'
+            | 'sos_domestic_filing_status_good_standing'
+            | 'sos_domestic_filing_status_pending_active'
+            | 'sos_domestic_filing_status_pending_inactive'
+            | 'sos_domestic_filing_status_not_provided_by_state'
+            | 'sos_domestic_filing_status_not_in_good_standing'
+            | 'sos_domestic_filing_status_dissolved'
+            | 'sos_business_address_active_filing_found'
+            | 'sos_business_address_filing_status_not_available'
+            | 'sos_business_address_inactive_filing_found'
+            | 'sos_business_address_filing_not_found'
+            | 'device_low_risk'
+            | 'device_medium_risk'
+            | 'device_high_risk'
+            | 'device_factory_reset'
+            | 'device_gps_spoofing'
+            | 'ip_vpn'
+            | 'ip_tor_exit_node'
+            | 'device_bot_risk'
+            | 'device_suspicious'
+            | 'device_velocity'
+            | 'device_multiple_users'
+            | 'device_reputation'
+            | 'browser_incognito'
+            | 'browser_tampering'
+            | 'browser_automation'
+            | 'attested_device_apple'
+            | 'attested_device_android'
+            | 'attested_device_android_strong_integrity'
+            | 'attested_device_android_unlicensed'
+            | 'attested_device_android_risky'
+            | 'attested_device_android_failed_evaluation'
+            | 'attested_device_no_fraud_duplicate_risk'
+            | 'attested_device_fraud_duplicate_risk_low'
+            | 'attested_device_fraud_duplicate_risk_medium'
+            | 'attested_device_fraud_duplicate_risk_high'
+            | 'behavior_fraud_ring_risk'
+            | 'behavior_high_risk'
+            | 'behavior_low_risk'
+            | 'behavior_automatic_activity'
+          >;
+          status: 'pending' | 'pass' | 'fail' | 'error' | 'not_needed';
+        };
+        kind: 'watchlist_check';
+      }
+    | {
+        data: {
+          actor:
+            | {
+                id: string;
+                kind: 'user';
+              }
+            | {
+                kind: 'footprint';
+              }
+            | {
+                kind: 'firm_employee';
+              }
+            | {
+                email: string;
+                first_name?: string;
+                kind: 'organization';
+                last_name?: string;
+                member: string;
+              }
+            | {
+                id: string;
+                kind: 'api_key';
+                name: string;
+              };
+        };
+        kind: 'vault_created';
+      }
+    | {
+        data: {
+          actor:
+            | {
+                id: string;
+                kind: 'user';
+              }
+            | {
+                kind: 'footprint';
+              }
+            | {
+                kind: 'firm_employee';
+              }
+            | {
+                email: string;
+                first_name?: string;
+                kind: 'organization';
+                last_name?: string;
+                member: string;
+              }
+            | {
+                id: string;
+                kind: 'api_key';
+                name: string;
+              };
+          config:
+            | {
+                /**
+                 * Allow onboarding onto the specific playbook.
+                 * This allows editing data, re-verifies data, and then re-triggers decision engine
+                 */
+                data: {
+                  playbook_id: string;
+                  recollect_attributes: Array<
+                    | 'name'
+                    | 'dob'
+                    | 'ssn4'
+                    | 'ssn9'
+                    | 'full_address'
+                    | 'email'
+                    | 'phone_number'
+                    | 'nationality'
+                    | 'us_legal_status'
+                    | {
+                        document: string;
+                      }
+                    | 'business_name'
+                    | 'business_tin'
+                    | 'business_address'
+                    | 'business_phone_number'
+                    | 'business_website'
+                    | 'business_beneficial_owners'
+                    | 'business_kyced_beneficial_owners'
+                    | 'business_corporation_type'
+                    | 'investor_profile'
+                    | 'card'
+                    | 'us_tax_id'
+                    | 'bank'
+                  >;
+                  /**
+                   * When true, reuses existing BOs' KYC results on the same playbook.
+                   * When false, requires the existing BOs to re-complete KYC.
+                   * Can only be true for KYB playbooks
+                   */
+                  reuse_existing_bo_kyc: boolean;
+                };
+                /**
+                 * Allow onboarding onto the specific playbook.
+                 * This allows editing data, re-verifies data, and then re-triggers decision engine
+                 */
+                kind: 'onboard';
+              }
+            | {
+                /**
+                 * Upload a new document and re-run the decision engine
+                 */
+                data: {
+                  business_configs: Array<
+                    | {
+                        data: {
+                          collect_selfie: boolean;
+                          document_types_and_countries?: {
+                            country_specific: {
+                              [key: string]: unknown;
+                            };
+                            global: Array<
+                              | 'id_card'
+                              | 'drivers_license'
+                              | 'passport'
+                              | 'passport_card'
+                              | 'permit'
+                              | 'visa'
+                              | 'residence_document'
+                              | 'voter_identification'
+                            >;
+                          };
+                        };
+                        kind: 'identity';
+                      }
+                    | {
+                        data: {
+                          requires_human_review: boolean;
+                        };
+                        kind: 'proof_of_ssn';
+                      }
+                    | {
+                        data: {
+                          requires_human_review: boolean;
+                        };
+                        kind: 'proof_of_address';
+                      }
+                    | {
+                        data: {
+                          /**
+                           * Optional human-readable description of the document that will be displayed to the user
+                           */
+                          description?: string;
+                          /**
+                           * Custom document identifier under which the document will be vaulted
+                           */
+                          identifier:
+                            | 'id.first_name'
+                            | 'id.middle_name'
+                            | 'id.last_name'
+                            | 'id.dob'
+                            | 'id.ssn4'
+                            | 'id.ssn9'
+                            | 'id.address_line1'
+                            | 'id.address_line2'
+                            | 'id.city'
+                            | 'id.state'
+                            | 'id.zip'
+                            | 'id.country'
+                            | 'id.email'
+                            | 'id.phone_number'
+                            | 'id.us_legal_status'
+                            | 'id.visa_kind'
+                            | 'id.visa_expiration_date'
+                            | 'id.nationality'
+                            | 'id.citizenships'
+                            | 'id.drivers_license_number'
+                            | 'id.drivers_license_state'
+                            | 'id.itin'
+                            | 'id.us_tax_id'
+                            | 'business.name'
+                            | 'business.dba'
+                            | 'business.website'
+                            | 'business.phone_number'
+                            | 'business.tin'
+                            | 'business.address_line1'
+                            | 'business.address_line2'
+                            | 'business.city'
+                            | 'business.state'
+                            | 'business.zip'
+                            | 'business.country'
+                            | 'business.corporation_type'
+                            | 'business.formation_state'
+                            | 'business.formation_date'
+                            | 'custom.*'
+                            | 'investor_profile.employment_status'
+                            | 'investor_profile.occupation'
+                            | 'investor_profile.employer'
+                            | 'investor_profile.annual_income'
+                            | 'investor_profile.net_worth'
+                            | 'investor_profile.investment_goals'
+                            | 'investor_profile.risk_tolerance'
+                            | 'investor_profile.declarations'
+                            | 'investor_profile.brokerage_firm_employer'
+                            | 'investor_profile.senior_executive_symbols'
+                            | 'investor_profile.family_member_names'
+                            | 'investor_profile.political_organization'
+                            | 'investor_profile.funding_sources'
+                            | 'document.id_card.front.image'
+                            | 'document.id_card.front.mime_type'
+                            | 'document.id_card.back.image'
+                            | 'document.id_card.back.mime_type'
+                            | 'document.id_card.selfie.image'
+                            | 'document.id_card.selfie.mime_type'
+                            | 'document.id_card.full_name'
+                            | 'document.id_card.dob'
+                            | 'document.id_card.gender'
+                            | 'document.id_card.full_address'
+                            | 'document.id_card.document_number'
+                            | 'document.id_card.expires_at'
+                            | 'document.id_card.issued_at'
+                            | 'document.id_card.issuing_state'
+                            | 'document.id_card.issuing_country'
+                            | 'document.id_card.ref_number'
+                            | 'document.id_card.nationality'
+                            | 'document.id_card.curp'
+                            | 'document.id_card.clave_de_elector'
+                            | 'document.id_card.classified_document_type'
+                            | 'document.id_card.curp_validation_response'
+                            | 'document.drivers_license.front.image'
+                            | 'document.drivers_license.front.mime_type'
+                            | 'document.drivers_license.back.image'
+                            | 'document.drivers_license.back.mime_type'
+                            | 'document.drivers_license.selfie.image'
+                            | 'document.drivers_license.selfie.mime_type'
+                            | 'document.drivers_license.full_name'
+                            | 'document.drivers_license.dob'
+                            | 'document.drivers_license.gender'
+                            | 'document.drivers_license.full_address'
+                            | 'document.drivers_license.document_number'
+                            | 'document.drivers_license.expires_at'
+                            | 'document.drivers_license.issued_at'
+                            | 'document.drivers_license.issuing_state'
+                            | 'document.drivers_license.issuing_country'
+                            | 'document.drivers_license.ref_number'
+                            | 'document.drivers_license.nationality'
+                            | 'document.drivers_license.curp'
+                            | 'document.drivers_license.clave_de_elector'
+                            | 'document.drivers_license.classified_document_type'
+                            | 'document.drivers_license.curp_validation_response'
+                            | 'document.passport.front.image'
+                            | 'document.passport.front.mime_type'
+                            | 'document.passport.back.image'
+                            | 'document.passport.back.mime_type'
+                            | 'document.passport.selfie.image'
+                            | 'document.passport.selfie.mime_type'
+                            | 'document.passport.full_name'
+                            | 'document.passport.dob'
+                            | 'document.passport.gender'
+                            | 'document.passport.full_address'
+                            | 'document.passport.document_number'
+                            | 'document.passport.expires_at'
+                            | 'document.passport.issued_at'
+                            | 'document.passport.issuing_state'
+                            | 'document.passport.issuing_country'
+                            | 'document.passport.ref_number'
+                            | 'document.passport.nationality'
+                            | 'document.passport.curp'
+                            | 'document.passport.clave_de_elector'
+                            | 'document.passport.classified_document_type'
+                            | 'document.passport.curp_validation_response'
+                            | 'document.passport_card.front.image'
+                            | 'document.passport_card.front.mime_type'
+                            | 'document.passport_card.back.image'
+                            | 'document.passport_card.back.mime_type'
+                            | 'document.passport_card.selfie.image'
+                            | 'document.passport_card.selfie.mime_type'
+                            | 'document.passport_card.full_name'
+                            | 'document.passport_card.dob'
+                            | 'document.passport_card.gender'
+                            | 'document.passport_card.full_address'
+                            | 'document.passport_card.document_number'
+                            | 'document.passport_card.expires_at'
+                            | 'document.passport_card.issued_at'
+                            | 'document.passport_card.issuing_state'
+                            | 'document.passport_card.issuing_country'
+                            | 'document.passport_card.ref_number'
+                            | 'document.passport_card.nationality'
+                            | 'document.passport_card.curp'
+                            | 'document.passport_card.clave_de_elector'
+                            | 'document.passport_card.classified_document_type'
+                            | 'document.passport_card.curp_validation_response'
+                            | 'document.permit.front.image'
+                            | 'document.permit.front.mime_type'
+                            | 'document.permit.back.image'
+                            | 'document.permit.back.mime_type'
+                            | 'document.permit.selfie.image'
+                            | 'document.permit.selfie.mime_type'
+                            | 'document.permit.full_name'
+                            | 'document.permit.dob'
+                            | 'document.permit.gender'
+                            | 'document.permit.full_address'
+                            | 'document.permit.document_number'
+                            | 'document.permit.expires_at'
+                            | 'document.permit.issued_at'
+                            | 'document.permit.issuing_state'
+                            | 'document.permit.issuing_country'
+                            | 'document.permit.ref_number'
+                            | 'document.permit.nationality'
+                            | 'document.permit.curp'
+                            | 'document.permit.clave_de_elector'
+                            | 'document.permit.classified_document_type'
+                            | 'document.permit.curp_validation_response'
+                            | 'document.visa.front.image'
+                            | 'document.visa.front.mime_type'
+                            | 'document.visa.back.image'
+                            | 'document.visa.back.mime_type'
+                            | 'document.visa.selfie.image'
+                            | 'document.visa.selfie.mime_type'
+                            | 'document.visa.full_name'
+                            | 'document.visa.dob'
+                            | 'document.visa.gender'
+                            | 'document.visa.full_address'
+                            | 'document.visa.document_number'
+                            | 'document.visa.expires_at'
+                            | 'document.visa.issued_at'
+                            | 'document.visa.issuing_state'
+                            | 'document.visa.issuing_country'
+                            | 'document.visa.ref_number'
+                            | 'document.visa.nationality'
+                            | 'document.visa.curp'
+                            | 'document.visa.clave_de_elector'
+                            | 'document.visa.classified_document_type'
+                            | 'document.visa.curp_validation_response'
+                            | 'document.residence_document.front.image'
+                            | 'document.residence_document.front.mime_type'
+                            | 'document.residence_document.back.image'
+                            | 'document.residence_document.back.mime_type'
+                            | 'document.residence_document.selfie.image'
+                            | 'document.residence_document.selfie.mime_type'
+                            | 'document.residence_document.full_name'
+                            | 'document.residence_document.dob'
+                            | 'document.residence_document.gender'
+                            | 'document.residence_document.full_address'
+                            | 'document.residence_document.document_number'
+                            | 'document.residence_document.expires_at'
+                            | 'document.residence_document.issued_at'
+                            | 'document.residence_document.issuing_state'
+                            | 'document.residence_document.issuing_country'
+                            | 'document.residence_document.ref_number'
+                            | 'document.residence_document.nationality'
+                            | 'document.residence_document.curp'
+                            | 'document.residence_document.clave_de_elector'
+                            | 'document.residence_document.classified_document_type'
+                            | 'document.residence_document.curp_validation_response'
+                            | 'document.voter_identification.front.image'
+                            | 'document.voter_identification.front.mime_type'
+                            | 'document.voter_identification.back.image'
+                            | 'document.voter_identification.back.mime_type'
+                            | 'document.voter_identification.selfie.image'
+                            | 'document.voter_identification.selfie.mime_type'
+                            | 'document.voter_identification.full_name'
+                            | 'document.voter_identification.dob'
+                            | 'document.voter_identification.gender'
+                            | 'document.voter_identification.full_address'
+                            | 'document.voter_identification.document_number'
+                            | 'document.voter_identification.expires_at'
+                            | 'document.voter_identification.issued_at'
+                            | 'document.voter_identification.issuing_state'
+                            | 'document.voter_identification.issuing_country'
+                            | 'document.voter_identification.ref_number'
+                            | 'document.voter_identification.nationality'
+                            | 'document.voter_identification.curp'
+                            | 'document.voter_identification.clave_de_elector'
+                            | 'document.voter_identification.classified_document_type'
+                            | 'document.voter_identification.curp_validation_response'
+                            | 'document.finra_compliance_letter'
+                            | 'document.proof_of_address.image'
+                            | 'document.ssn_card.image'
+                            | 'document.custom.*'
+                            | 'card.*.number'
+                            | 'card.*.expiration'
+                            | 'card.*.cvc'
+                            | 'card.*.name'
+                            | 'card.*.billing_address.zip'
+                            | 'card.*.billing_address.country'
+                            | 'card.*.expiration_month'
+                            | 'card.*.expiration_year'
+                            | 'card.*.number_last4'
+                            | 'card.*.issuer'
+                            | 'card.*.fingerprint'
+                            | 'bank.*.name'
+                            | 'bank.*.ach_routing_number'
+                            | 'bank.*.ach_account_number'
+                            | 'bank.*.ach_account_id'
+                            | 'bank.*.account_type'
+                            | 'bank.*.fingerprint';
+                          /**
+                           * The human-readable name of the document to display to the user
+                           */
+                          name: string;
+                          requires_human_review: boolean;
+                          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                        };
+                        kind: 'custom';
+                      }
+                  >;
+                  configs: Array<
+                    | {
+                        data: {
+                          collect_selfie: boolean;
+                          document_types_and_countries?: {
+                            country_specific: {
+                              [key: string]: unknown;
+                            };
+                            global: Array<
+                              | 'id_card'
+                              | 'drivers_license'
+                              | 'passport'
+                              | 'passport_card'
+                              | 'permit'
+                              | 'visa'
+                              | 'residence_document'
+                              | 'voter_identification'
+                            >;
+                          };
+                        };
+                        kind: 'identity';
+                      }
+                    | {
+                        data: {
+                          requires_human_review: boolean;
+                        };
+                        kind: 'proof_of_ssn';
+                      }
+                    | {
+                        data: {
+                          requires_human_review: boolean;
+                        };
+                        kind: 'proof_of_address';
+                      }
+                    | {
+                        data: {
+                          /**
+                           * Optional human-readable description of the document that will be displayed to the user
+                           */
+                          description?: string;
+                          /**
+                           * Custom document identifier under which the document will be vaulted
+                           */
+                          identifier:
+                            | 'id.first_name'
+                            | 'id.middle_name'
+                            | 'id.last_name'
+                            | 'id.dob'
+                            | 'id.ssn4'
+                            | 'id.ssn9'
+                            | 'id.address_line1'
+                            | 'id.address_line2'
+                            | 'id.city'
+                            | 'id.state'
+                            | 'id.zip'
+                            | 'id.country'
+                            | 'id.email'
+                            | 'id.phone_number'
+                            | 'id.us_legal_status'
+                            | 'id.visa_kind'
+                            | 'id.visa_expiration_date'
+                            | 'id.nationality'
+                            | 'id.citizenships'
+                            | 'id.drivers_license_number'
+                            | 'id.drivers_license_state'
+                            | 'id.itin'
+                            | 'id.us_tax_id'
+                            | 'business.name'
+                            | 'business.dba'
+                            | 'business.website'
+                            | 'business.phone_number'
+                            | 'business.tin'
+                            | 'business.address_line1'
+                            | 'business.address_line2'
+                            | 'business.city'
+                            | 'business.state'
+                            | 'business.zip'
+                            | 'business.country'
+                            | 'business.corporation_type'
+                            | 'business.formation_state'
+                            | 'business.formation_date'
+                            | 'custom.*'
+                            | 'investor_profile.employment_status'
+                            | 'investor_profile.occupation'
+                            | 'investor_profile.employer'
+                            | 'investor_profile.annual_income'
+                            | 'investor_profile.net_worth'
+                            | 'investor_profile.investment_goals'
+                            | 'investor_profile.risk_tolerance'
+                            | 'investor_profile.declarations'
+                            | 'investor_profile.brokerage_firm_employer'
+                            | 'investor_profile.senior_executive_symbols'
+                            | 'investor_profile.family_member_names'
+                            | 'investor_profile.political_organization'
+                            | 'investor_profile.funding_sources'
+                            | 'document.id_card.front.image'
+                            | 'document.id_card.front.mime_type'
+                            | 'document.id_card.back.image'
+                            | 'document.id_card.back.mime_type'
+                            | 'document.id_card.selfie.image'
+                            | 'document.id_card.selfie.mime_type'
+                            | 'document.id_card.full_name'
+                            | 'document.id_card.dob'
+                            | 'document.id_card.gender'
+                            | 'document.id_card.full_address'
+                            | 'document.id_card.document_number'
+                            | 'document.id_card.expires_at'
+                            | 'document.id_card.issued_at'
+                            | 'document.id_card.issuing_state'
+                            | 'document.id_card.issuing_country'
+                            | 'document.id_card.ref_number'
+                            | 'document.id_card.nationality'
+                            | 'document.id_card.curp'
+                            | 'document.id_card.clave_de_elector'
+                            | 'document.id_card.classified_document_type'
+                            | 'document.id_card.curp_validation_response'
+                            | 'document.drivers_license.front.image'
+                            | 'document.drivers_license.front.mime_type'
+                            | 'document.drivers_license.back.image'
+                            | 'document.drivers_license.back.mime_type'
+                            | 'document.drivers_license.selfie.image'
+                            | 'document.drivers_license.selfie.mime_type'
+                            | 'document.drivers_license.full_name'
+                            | 'document.drivers_license.dob'
+                            | 'document.drivers_license.gender'
+                            | 'document.drivers_license.full_address'
+                            | 'document.drivers_license.document_number'
+                            | 'document.drivers_license.expires_at'
+                            | 'document.drivers_license.issued_at'
+                            | 'document.drivers_license.issuing_state'
+                            | 'document.drivers_license.issuing_country'
+                            | 'document.drivers_license.ref_number'
+                            | 'document.drivers_license.nationality'
+                            | 'document.drivers_license.curp'
+                            | 'document.drivers_license.clave_de_elector'
+                            | 'document.drivers_license.classified_document_type'
+                            | 'document.drivers_license.curp_validation_response'
+                            | 'document.passport.front.image'
+                            | 'document.passport.front.mime_type'
+                            | 'document.passport.back.image'
+                            | 'document.passport.back.mime_type'
+                            | 'document.passport.selfie.image'
+                            | 'document.passport.selfie.mime_type'
+                            | 'document.passport.full_name'
+                            | 'document.passport.dob'
+                            | 'document.passport.gender'
+                            | 'document.passport.full_address'
+                            | 'document.passport.document_number'
+                            | 'document.passport.expires_at'
+                            | 'document.passport.issued_at'
+                            | 'document.passport.issuing_state'
+                            | 'document.passport.issuing_country'
+                            | 'document.passport.ref_number'
+                            | 'document.passport.nationality'
+                            | 'document.passport.curp'
+                            | 'document.passport.clave_de_elector'
+                            | 'document.passport.classified_document_type'
+                            | 'document.passport.curp_validation_response'
+                            | 'document.passport_card.front.image'
+                            | 'document.passport_card.front.mime_type'
+                            | 'document.passport_card.back.image'
+                            | 'document.passport_card.back.mime_type'
+                            | 'document.passport_card.selfie.image'
+                            | 'document.passport_card.selfie.mime_type'
+                            | 'document.passport_card.full_name'
+                            | 'document.passport_card.dob'
+                            | 'document.passport_card.gender'
+                            | 'document.passport_card.full_address'
+                            | 'document.passport_card.document_number'
+                            | 'document.passport_card.expires_at'
+                            | 'document.passport_card.issued_at'
+                            | 'document.passport_card.issuing_state'
+                            | 'document.passport_card.issuing_country'
+                            | 'document.passport_card.ref_number'
+                            | 'document.passport_card.nationality'
+                            | 'document.passport_card.curp'
+                            | 'document.passport_card.clave_de_elector'
+                            | 'document.passport_card.classified_document_type'
+                            | 'document.passport_card.curp_validation_response'
+                            | 'document.permit.front.image'
+                            | 'document.permit.front.mime_type'
+                            | 'document.permit.back.image'
+                            | 'document.permit.back.mime_type'
+                            | 'document.permit.selfie.image'
+                            | 'document.permit.selfie.mime_type'
+                            | 'document.permit.full_name'
+                            | 'document.permit.dob'
+                            | 'document.permit.gender'
+                            | 'document.permit.full_address'
+                            | 'document.permit.document_number'
+                            | 'document.permit.expires_at'
+                            | 'document.permit.issued_at'
+                            | 'document.permit.issuing_state'
+                            | 'document.permit.issuing_country'
+                            | 'document.permit.ref_number'
+                            | 'document.permit.nationality'
+                            | 'document.permit.curp'
+                            | 'document.permit.clave_de_elector'
+                            | 'document.permit.classified_document_type'
+                            | 'document.permit.curp_validation_response'
+                            | 'document.visa.front.image'
+                            | 'document.visa.front.mime_type'
+                            | 'document.visa.back.image'
+                            | 'document.visa.back.mime_type'
+                            | 'document.visa.selfie.image'
+                            | 'document.visa.selfie.mime_type'
+                            | 'document.visa.full_name'
+                            | 'document.visa.dob'
+                            | 'document.visa.gender'
+                            | 'document.visa.full_address'
+                            | 'document.visa.document_number'
+                            | 'document.visa.expires_at'
+                            | 'document.visa.issued_at'
+                            | 'document.visa.issuing_state'
+                            | 'document.visa.issuing_country'
+                            | 'document.visa.ref_number'
+                            | 'document.visa.nationality'
+                            | 'document.visa.curp'
+                            | 'document.visa.clave_de_elector'
+                            | 'document.visa.classified_document_type'
+                            | 'document.visa.curp_validation_response'
+                            | 'document.residence_document.front.image'
+                            | 'document.residence_document.front.mime_type'
+                            | 'document.residence_document.back.image'
+                            | 'document.residence_document.back.mime_type'
+                            | 'document.residence_document.selfie.image'
+                            | 'document.residence_document.selfie.mime_type'
+                            | 'document.residence_document.full_name'
+                            | 'document.residence_document.dob'
+                            | 'document.residence_document.gender'
+                            | 'document.residence_document.full_address'
+                            | 'document.residence_document.document_number'
+                            | 'document.residence_document.expires_at'
+                            | 'document.residence_document.issued_at'
+                            | 'document.residence_document.issuing_state'
+                            | 'document.residence_document.issuing_country'
+                            | 'document.residence_document.ref_number'
+                            | 'document.residence_document.nationality'
+                            | 'document.residence_document.curp'
+                            | 'document.residence_document.clave_de_elector'
+                            | 'document.residence_document.classified_document_type'
+                            | 'document.residence_document.curp_validation_response'
+                            | 'document.voter_identification.front.image'
+                            | 'document.voter_identification.front.mime_type'
+                            | 'document.voter_identification.back.image'
+                            | 'document.voter_identification.back.mime_type'
+                            | 'document.voter_identification.selfie.image'
+                            | 'document.voter_identification.selfie.mime_type'
+                            | 'document.voter_identification.full_name'
+                            | 'document.voter_identification.dob'
+                            | 'document.voter_identification.gender'
+                            | 'document.voter_identification.full_address'
+                            | 'document.voter_identification.document_number'
+                            | 'document.voter_identification.expires_at'
+                            | 'document.voter_identification.issued_at'
+                            | 'document.voter_identification.issuing_state'
+                            | 'document.voter_identification.issuing_country'
+                            | 'document.voter_identification.ref_number'
+                            | 'document.voter_identification.nationality'
+                            | 'document.voter_identification.curp'
+                            | 'document.voter_identification.clave_de_elector'
+                            | 'document.voter_identification.classified_document_type'
+                            | 'document.voter_identification.curp_validation_response'
+                            | 'document.finra_compliance_letter'
+                            | 'document.proof_of_address.image'
+                            | 'document.ssn_card.image'
+                            | 'document.custom.*'
+                            | 'card.*.number'
+                            | 'card.*.expiration'
+                            | 'card.*.cvc'
+                            | 'card.*.name'
+                            | 'card.*.billing_address.zip'
+                            | 'card.*.billing_address.country'
+                            | 'card.*.expiration_month'
+                            | 'card.*.expiration_year'
+                            | 'card.*.number_last4'
+                            | 'card.*.issuer'
+                            | 'card.*.fingerprint'
+                            | 'bank.*.name'
+                            | 'bank.*.ach_routing_number'
+                            | 'bank.*.ach_account_number'
+                            | 'bank.*.ach_account_id'
+                            | 'bank.*.account_type'
+                            | 'bank.*.fingerprint';
+                          /**
+                           * The human-readable name of the document to display to the user
+                           */
+                          name: string;
+                          requires_human_review: boolean;
+                          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                        };
+                        kind: 'custom';
+                      }
+                  >;
+                };
+                /**
+                 * Upload a new document and re-run the decision engine
+                 */
+                kind: 'document';
+              };
+          /**
+           * Only not populated for legacy events
+           */
+          fp_id?: string;
+          note?: string;
+          request_is_active: boolean;
+        };
+        kind: 'workflow_triggered';
+      }
+    | {
+        data: {
+          kind: 'playbook' | 'document';
+          /**
+           * ObConfiguration serialization used inside of an OnboardingDecision
+           */
+          playbook: {
+            id: string;
+            must_collect_data: Array<
+              | 'name'
+              | 'dob'
+              | 'ssn4'
+              | 'ssn9'
+              | 'full_address'
+              | 'email'
+              | 'phone_number'
+              | 'nationality'
+              | 'us_legal_status'
+              | {
+                  document: string;
+                }
+              | 'business_name'
+              | 'business_tin'
+              | 'business_address'
+              | 'business_phone_number'
+              | 'business_website'
+              | 'business_beneficial_owners'
+              | 'business_kyced_beneficial_owners'
+              | 'business_corporation_type'
+              | 'investor_profile'
+              | 'card'
+              | 'us_tax_id'
+              | 'bank'
+            >;
+            name: string;
+          };
+        };
+        kind: 'workflow_started';
+      }
+    | {
+        data: {
+          action: 'replace' | 'add_primary';
+          /**
+           * Describes a device insight event with locations and IP of the event
+           */
+          insight_event: {
+            city?: string;
+            country?: string;
+            ip_address?: string;
+            latitude?: number;
+            longitude?: number;
+            metro_code?: string;
+            postal_code?: string;
+            region?: string;
+            region_name?: string;
+            session_id?: string;
+            time_zone?: string;
+            timestamp: string;
+            user_agent?: string;
+          };
+          kind: 'phone' | 'passkey' | 'email';
+        };
+        kind: 'auth_method_updated';
+      }
+    | {
+        data: {
+          kind: 'active' | 'offboard_fraud' | 'offboard_other';
+        };
+        kind: 'label_added';
+      }
+    | {
+        data: {
+          external_id?: string;
+          integration: 'alpaca_cip';
+          successful: boolean;
+        };
+        kind: 'external_integration_called';
+      }
+    | {
+        data: Array<{
+          /**
+           * Auto-generated discriminant enum variants
+           */
+          kind: 'identity' | 'proof_of_ssn' | 'proof_of_address' | 'custom';
+          rule_set_result_id?: string;
+        }>;
+        kind: 'step_up';
+      }
+    | {
+        data: {
+          event: string;
+          session_id?: string;
+        };
+        kind: 'onboarding_timeline';
+      }
+    | {
+        data: {
+          /**
+           * Describes the outcome of an onboarding decision that took place on the user.
+           */
+          decision: {
+            cleared_manual_reviews: Array<{
+              kind: 'rule_triggered' | 'document_needs_review';
+            }>;
+            id: string;
+            /**
+             * ObConfiguration serialization used inside of an OnboardingDecision
+             */
+            ob_configuration: {
+              id: string;
+              must_collect_data: Array<
+                | 'name'
+                | 'dob'
+                | 'ssn4'
+                | 'ssn9'
+                | 'full_address'
+                | 'email'
+                | 'phone_number'
+                | 'nationality'
+                | 'us_legal_status'
+                | {
+                    document: string;
+                  }
+                | 'business_name'
+                | 'business_tin'
+                | 'business_address'
+                | 'business_phone_number'
+                | 'business_website'
+                | 'business_beneficial_owners'
+                | 'business_kyced_beneficial_owners'
+                | 'business_corporation_type'
+                | 'investor_profile'
+                | 'card'
+                | 'us_tax_id'
+                | 'bank'
+              >;
+              name: string;
+            };
+            /**
+             * When true, the rules were ran for this decision despite being in sandbox mode - we should
+             * show the rules outcome drawer
+             */
+            ran_rules_in_sandbox: boolean;
+            rule_set_result_id?: string;
+            source:
+              | {
+                  id: string;
+                  kind: 'user';
+                }
+              | {
+                  kind: 'footprint';
+                }
+              | {
+                  kind: 'firm_employee';
+                }
+              | {
+                  email: string;
+                  first_name?: string;
+                  kind: 'organization';
+                  last_name?: string;
+                  member: string;
+                }
+              | {
+                  id: string;
+                  kind: 'api_key';
+                  name: string;
+                };
+            status: 'fail' | 'step_up' | 'pass' | 'none';
+            timestamp: string;
+            /**
+             * Auto-generated discriminant enum variants
+             */
+            workflow_kind: 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
+          };
+          fp_id: string;
+        };
+        kind: 'business_owner_completed_kyc';
+      };
   /**
    * Sequence number used to order DataLifetimes
    */
   seqno: number;
   timestamp: string;
 };
+export type upload_settings = 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+export type device_type = 'desktop' | 'mobile';
+/**
+ * The set of values we can use for identity_document.document_type
+ */
+export type document_type =
+  | 'id_card'
+  | 'drivers_license'
+  | 'passport'
+  | 'passport_card'
+  | 'permit'
+  | 'visa'
+  | 'residence_document'
+  | 'voter_identification'
+  | 'ssn_card'
+  | 'proof_of_address'
+  | 'custom';
+/**
+ * Auto-generated discriminant enum variants
+ */
+export type workflow_kind = 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
+export type workflow_source = 'hosted' | 'tenant' | 'unknown';
+export type action2 = 'replace' | 'add_primary';
+export type integration = 'alpaca_cip';
 export type VaultDrAwsPreEnrollResponse = {
   externalId: string;
 };
@@ -17521,6 +33654,14 @@ export type GetEntitiesByFpIdBusinessOwnersData = {
 };
 export type GetEntitiesByFpIdBusinessOwnersResponse = Array<PrivateBusinessOwner>;
 export type GetEntitiesByFpIdBusinessOwnersError = unknown;
+export type PostEntitiesByFpIdBusinessOwnersKycLinksData = {
+  body: CreateKycLinksRequest;
+  path: {
+    fpId: string;
+  };
+};
+export type PostEntitiesByFpIdBusinessOwnersKycLinksResponse = Array<PrivateBusinessOwnerKycLink>;
+export type PostEntitiesByFpIdBusinessOwnersKycLinksError = unknown;
 export type GetEntitiesByFpIdBusinessesData = {
   path: {
     fpId: string;
@@ -17583,6 +33724,25 @@ export type GetEntitiesByFpIdMatchSignalsData = {
 };
 export type GetEntitiesByFpIdMatchSignalsResponse = GetFieldValidationResponse;
 export type GetEntitiesByFpIdMatchSignalsError = unknown;
+export type GetEntitiesByFpIdOnboardingsData = {
+  path: {
+    fpId: string;
+  };
+  query?: {
+    page?: number;
+    pageSize?: number;
+  };
+};
+export type GetEntitiesByFpIdOnboardingsResponse = OffsetPaginatedEntityOnboarding;
+export type GetEntitiesByFpIdOnboardingsError = unknown;
+export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData = {
+  path: {
+    fpId: string;
+    onboardingId: string;
+  };
+};
+export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsResponse = Array<RiskSignal>;
+export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsError = unknown;
 export type GetEntitiesByFpIdRiskSignalsData = {
   path: {
     fpId: string;
@@ -17663,21 +33823,21 @@ export type GetEntitiesByFpIdTimelineData = {
   };
   query: {
     kinds: Array<
-      | 'DataCollected'
-      | 'DocumentUploaded'
-      | 'OnboardingDecision'
-      | 'Liveness'
-      | 'Annotation'
-      | 'WatchlistCheck'
-      | 'VaultCreated'
-      | 'WorkflowTriggered'
-      | 'WorkflowStarted'
-      | 'AuthMethodUpdated'
-      | 'LabelAdded'
-      | 'ExternalIntegrationCalled'
-      | 'StepUp'
-      | 'OnboardingTimeline'
-      | 'BusinessOwnerCompletedKyc'
+      | 'data_collected'
+      | 'identity_document_uploaded'
+      | 'onboarding_decision'
+      | 'liveness'
+      | 'annotation'
+      | 'watchlist_check'
+      | 'vault_created'
+      | 'workflow_triggered'
+      | 'workflow_started'
+      | 'auth_method_updated'
+      | 'label_added'
+      | 'external_integration_called'
+      | 'step_up'
+      | 'onboarding_timeline'
+      | 'business_owner_completed_kyc'
     >;
   };
 };
@@ -18688,7 +34848,10 @@ export type PostOrgProxyConfigsByProxyConfigIdDeactivateResponse = Empty;
 export type PostOrgProxyConfigsByProxyConfigIdDeactivateError = unknown;
 export type GetOrgRolesData = {
   query?: {
-    kind?: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+    /**
+     * Auto-generated discriminant enum variants
+     */
+    kind?: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
     page?: number;
     pageSize?: number;
     search?: string;
@@ -18909,7 +35072,10 @@ export type GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdRespon
 export type GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdError = unknown;
 export type GetPartnerRolesData = {
   query?: {
-    kind?: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+    /**
+     * Auto-generated discriminant enum variants
+     */
+    kind?: 'api_key' | 'dashboard_user' | 'compliance_partner_dashboard_user';
     page?: number;
     pageSize?: number;
     search?: string;
@@ -19189,6 +35355,17 @@ export type $OpenApiTs = {
       };
     };
   };
+  '/entities/{fp_id}/business_owners/kyc_links': {
+    post: {
+      req: PostEntitiesByFpIdBusinessOwnersKycLinksData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<PrivateBusinessOwnerKycLink>;
+      };
+    };
+  };
   '/entities/{fp_id}/businesses': {
     get: {
       req: GetEntitiesByFpIdBusinessesData;
@@ -19263,6 +35440,28 @@ export type $OpenApiTs = {
          * OK
          */
         '200': GetFieldValidationResponse;
+      };
+    };
+  };
+  '/entities/{fp_id}/onboardings': {
+    get: {
+      req: GetEntitiesByFpIdOnboardingsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OffsetPaginatedEntityOnboarding;
+      };
+    };
+  };
+  '/entities/{fp_id}/onboardings/{onboarding_id}/risk_signals': {
+    get: {
+      req: GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<RiskSignal>;
       };
     };
   };

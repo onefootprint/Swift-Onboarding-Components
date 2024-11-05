@@ -29,6 +29,7 @@ paperclip = { workspace = true }
 diesel = { workspace = true }
 
 strum = { workspace = true }
+strum_macros = { workspace = true }
 aws-config = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 aws-sdk-kms = { workspace = true }

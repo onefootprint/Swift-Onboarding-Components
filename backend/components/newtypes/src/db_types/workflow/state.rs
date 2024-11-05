@@ -39,8 +39,10 @@ use strum_macros::EnumString;
         DeserializeFromStr,
         SerializeDisplay,
         Apiv2Schema,
+        macros::SerdeAttr,
     ),
-    strum(serialize_all = "snake_case")
+    strum(serialize_all = "snake_case"),
+    serde(rename_all = "snake_case")
 )]
 #[strum_discriminants(diesel(sql_type = Text))]
 #[strum(serialize_all = "snake_case")]
@@ -119,8 +121,9 @@ impl FromStr for WorkflowState {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString, Apiv2Schema, macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum KycState {
     DataCollection,
     VendorCalls,
@@ -135,8 +138,9 @@ impl From<KycState> for WorkflowState {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString, Apiv2Schema, macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum AlpacaKycState {
     DataCollection,
     VendorCalls,
@@ -153,8 +157,9 @@ impl From<AlpacaKycState> for WorkflowState {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString, Apiv2Schema, macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum DocumentState {
     DataCollection,
     Decisioning,
@@ -167,8 +172,9 @@ impl From<DocumentState> for WorkflowState {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString, Apiv2Schema, macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum KybState {
     DataCollection,
     StepUpDecisioning,

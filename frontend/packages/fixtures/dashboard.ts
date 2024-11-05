@@ -21,6 +21,7 @@ import type {
   CreateComplianceDocTemplateRequest,
   CreateEntityTokenRequest,
   CreateEntityTokenResponse,
+  CreateKycLinksRequest,
   CreateListEntryRequest,
   CreateListRequest,
   CreateOnboardingConfigurationRequest,
@@ -61,6 +62,7 @@ import type {
   ListEntry,
   LivenessEvent,
   MultiUpdateRuleRequest,
+  OffsetPaginatedEntityOnboarding,
   OffsetPaginatedList,
   OffsetPaginatedOnboardingConfiguration,
   OffsetPaginatedOrganizationMember,
@@ -79,6 +81,7 @@ import type {
   PartnerOrganization,
   PatchProxyConfigRequest,
   PrivateBusinessOwner,
+  PrivateBusinessOwnerKycLink,
   PrivateOwnedBusiness,
   ProxyConfigBasic,
   ProxyConfigDetailed,
@@ -165,6 +168,7 @@ export const getAmlDetail = (props: Partial<AmlDetail>) =>
             {
               date: '1955-11-21T17:18:30.0Z',
               pdfUrl: 'https://pointed-hydrant.org',
+              snippet: 'incididunt amet',
               title: 'dolor',
               url: 'https://apt-convection.us/',
             },
@@ -177,6 +181,10 @@ export const getAmlDetail = (props: Partial<AmlDetail>) =>
             },
             {
               date: '1942-02-01T06:31:38.0Z',
+              pdfUrl: 'https://partial-advancement.info',
+              snippet: 'commodo veniam in',
+              title: 'magna in',
+              url: 'https://ignorant-scorn.info/',
             },
           ],
           name: 'Taylor McGlynn',
@@ -453,9 +461,13 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
           addressLine2: '99034 Johanna Neck Apt. 471',
           city: 'Port Rashawnchester',
           cmra: true,
+          deliverable: false,
+          latitude: 77054825.74787724,
           longitude: -21939669.494741574,
           postalCode: 'Lorem enim pariatur eiusmod proident',
+          propertyType: 'reprehenderit aute anim',
           sources: 'sunt enim',
+          state: 'South Dakota',
           submitted: true,
           verified: true,
         },
@@ -524,6 +536,10 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
           submitted: true,
         },
         {
+          associationVerified: false,
+          name: 'Dr. Ebony Langosh',
+          role: 'dolor ea reprehenderit et occaecat',
+          sources: 'do consectetur incididunt minim',
           submitted: false,
         },
         {
@@ -553,6 +569,10 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
             {
               name: 'Neal Monahan',
               roles: 'dolore consequat cillum',
+            },
+            {
+              name: 'Miss Vera Muller',
+              roles: 'Ut ullamco sint',
             },
           ],
           registeredAgent: 'elit mollit incididunt ea',
@@ -637,19 +657,26 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
                 url: 'https://happy-diversity.biz',
               },
               {
+                agency: 'ipsum',
                 agencyAbbr: 'ipsum ad officia consequat',
+                agencyInformationUrl: 'https://palatable-lyre.net',
                 agencyListUrl: 'https://fussy-flat.net/',
                 entityAliases: ['sed non sit', 'Lorem esse occaecat', 'sint Excepteur'],
+                entityName: 'Arturo McGlynn',
                 listCountry: 'Qatar',
+                listName: 'Angela Aufderhar',
                 url: 'https://turbulent-elevator.biz',
               },
               {
                 agency: 'cupidatat amet',
                 agencyAbbr: 'pariatur in et irure',
+                agencyInformationUrl: 'https://happy-go-lucky-management.name/',
                 agencyListUrl: 'https://fussy-flat.net/',
                 entityAliases: ['in', 'proident sed culpa non', 'eu ipsum'],
+                entityName: 'Tommie Cronin',
                 listCountry: 'Samoa',
                 listName: 'Gwendolyn Johnson',
+                url: 'https://runny-marten.info',
               },
             ],
             screenedEntityName: 'Dawn Weissnat',
@@ -1009,6 +1036,13 @@ export const getCreateEntityTokenResponse = (props: Partial<CreateEntityTokenRes
     },
     props,
   ) as CreateEntityTokenResponse;
+export const getCreateKycLinksRequest = (props: Partial<CreateKycLinksRequest>) =>
+  merge(
+    {
+      sendToBoIds: ['deserunt ipsum pariatur non veniam', 'et elit dolor consectetur', 'dolore do'],
+    },
+    props,
+  ) as CreateKycLinksRequest;
 export const getCreateListEntryRequest = (props: Partial<CreateListEntryRequest>) =>
   merge(
     {
@@ -1038,8 +1072,10 @@ export const getCreateOnboardingConfigurationRequest = (props: Partial<CreateOnb
         'in dolore aliquip pariatur laborum',
         'non do labore',
       ],
+      canAccessData: ['Card', 'UsLegalStatus', 'Email'],
       cipKind: 'alpaca',
       curpValidationEnabled: false,
+      deprecatedCanAccessData: ['business_website', 'business_name', 'name'],
       docScanForOptionalSsn: 'Card',
       documentTypesAndCountries: {
         countrySpecific: {},
@@ -1415,6 +1451,7 @@ export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>) 
                 longitude: -98351289.21925028,
                 metroCode: 'quis occaecat mollit magna',
                 postalCode: 'magna Lorem aliqua quis',
+                region: 'ex pariatur sit ullamco',
                 regionName: 'Amelia Will',
                 sessionId: '4e5f5f3a-3292-41ff-93dc-93559a0afaeb',
                 timeZone: 'reprehenderit Duis sit dolor aliquip',
@@ -1505,13 +1542,18 @@ export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>) 
               createdAt: '1906-07-20T02:08:47.0Z',
               insightEvent: {
                 city: 'Lake Shannystead',
+                country: 'Mauritius',
                 ipAddress: '327 Harris Heights Suite 347',
                 latitude: 6396329.095703065,
                 longitude: 13030889.22663264,
+                metroCode: 'et',
                 postalCode: 'culpa adipisicing',
+                region: 'officia sed dolor dolore occaecat',
+                regionName: 'Jaime Windler',
                 sessionId: '4329f3ae-374d-4dd9-b4df-dad870fea6e8',
                 timeZone: 'eu quis Excepteur ipsum',
                 timestamp: '1934-01-30T11:54:01.0Z',
+                userAgent: 'et reprehenderit ut ullamco sed',
               },
               playbookId: '522f882d-5e56-491f-a0ab-f1aedac97303',
               status: 'pass',
@@ -1540,10 +1582,14 @@ export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>) 
               createdAt: '1943-01-25T23:15:18.0Z',
               insightEvent: {
                 city: 'North Ocie',
+                country: 'Mauritius',
+                ipAddress: '9808 Clark Street Apt. 697',
                 latitude: 55922766.93963197,
                 longitude: -41177785.64484333,
                 metroCode: 'dolore enim ipsum',
                 postalCode: 'nulla aute in',
+                region: 'commodo ut',
+                regionName: 'Jaime Windler',
                 sessionId: '07f4116a-346c-4277-b353-6aff2c47b234',
                 timeZone: 'mollit',
                 timestamp: '1911-08-26T12:19:49.0Z',
@@ -1651,6 +1697,7 @@ export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>) 
                 city: 'East Keegan',
                 country: 'Rwanda',
                 ipAddress: '5732 Littel Loop Suite 339',
+                latitude: -39276682.61361341,
                 longitude: 58173827.60973367,
                 metroCode: 'minim velit occaecat',
                 postalCode: 'in culpa minim aliqua',
@@ -1714,6 +1761,7 @@ export const getCursorPaginatedListEvent = (props: Partial<CursorPaginatedListEv
             sessionId: 'ebf0809b-4cfb-4745-8fdb-a76d4b5ae7b8',
             timeZone: 'consectetur',
             timestamp: '1905-12-06T04:37:15.0Z',
+            userAgent: 'esse Lorem adipisicing culpa ad',
           },
           name: 'Eric Emmerich',
           principal: 'footprint',
@@ -2067,10 +2115,16 @@ export const getEntity = (props: Partial<Entity>) =>
         {
           createdAt: '1962-05-24T08:04:54.0Z',
           insightEvent: {
+            city: 'Riverworth',
             country: 'Northern Mariana Islands',
             ipAddress: '254 Mante Courts Apt. 861',
             latitude: 86425149.8992486,
             longitude: 60113976.59500566,
+            metroCode: 'quis Ut aute',
+            postalCode: 'eiusmod dolor sed voluptate',
+            region: 'dolor culpa aute proident Duis',
+            regionName: 'Jared Schmeler',
+            sessionId: '5b1168b9-bf9f-42c1-ab41-f57b4bf0cb2e',
             timeZone: 'nostrud',
             timestamp: '1951-07-28T19:56:38.0Z',
             userAgent: 'nostrud minim ex quis',
@@ -2190,6 +2244,162 @@ export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationR
           },
         ],
       },
+      businessAddress: {
+        matchLevel: 'no_match',
+        signals: [
+          {
+            description: 'ipsum',
+            matchLevel: 'exact',
+            note: 'labore id',
+            reasonCode: 'ip_not_located',
+            severity: 'medium',
+          },
+          {
+            description: 'labore',
+            matchLevel: 'partial',
+            note: 'aute exercitation',
+            reasonCode: 'document_country_code_mismatch',
+            severity: 'high',
+          },
+          {
+            description: 'exercitation Ut deserunt',
+            matchLevel: 'partial',
+            note: 'labore ad ut ipsum in',
+            reasonCode: 'phone_located_address_does_not_match',
+            severity: 'info',
+          },
+        ],
+      },
+      businessBeneficialOwners: {
+        matchLevel: 'partial',
+        signals: [
+          {
+            description: 'cillum magna do ullamco',
+            matchLevel: 'exact',
+            note: 'nostrud',
+            reasonCode: 'attested_device_fraud_duplicate_risk_low',
+            severity: 'info',
+          },
+          {
+            description: 'Excepteur',
+            matchLevel: 'partial',
+            note: 'ipsum aute in reprehenderit',
+            reasonCode: 'curp_not_valid',
+            severity: 'high',
+          },
+          {
+            description: 'dolor occaecat',
+            matchLevel: 'could_not_match',
+            note: 'labore sed reprehenderit Ut magna',
+            reasonCode: 'document_selfie_mask',
+            severity: 'high',
+          },
+        ],
+      },
+      businessDba: {
+        matchLevel: 'no_match',
+        signals: [
+          {
+            description: 'deserunt pariatur sint tempor',
+            matchLevel: 'partial',
+            note: 'exercitation',
+            reasonCode: 'address_located_is_not_standard_hospital',
+            severity: 'medium',
+          },
+          {
+            description: 'ut',
+            matchLevel: 'exact',
+            note: 'dolor magna',
+            reasonCode: 'document_collected_via_desktop',
+            severity: 'medium',
+          },
+          {
+            description: 'Duis dolor enim et',
+            matchLevel: 'could_not_match',
+            note: 'sint minim laborum',
+            reasonCode: 'address_alert_longevity',
+            severity: 'info',
+          },
+        ],
+      },
+      businessName: {
+        matchLevel: 'partial',
+        signals: [
+          {
+            description: 'ad pariatur nulla laborum',
+            matchLevel: 'no_match',
+            note: 'laboris ullamco aliqua',
+            reasonCode: 'curp_valid',
+            severity: 'low',
+          },
+          {
+            description: 'eu cillum consequat pariatur ad',
+            matchLevel: 'exact',
+            note: 'aute pariatur Lorem amet',
+            reasonCode: 'business_address_commercial_mail_receiving_agency',
+            severity: 'low',
+          },
+          {
+            description: 'fugiat laborum',
+            matchLevel: 'no_match',
+            note: 'occaecat',
+            reasonCode: 'document_ocr_last_name_matches',
+            severity: 'info',
+          },
+        ],
+      },
+      businessPhoneNumber: {
+        matchLevel: 'partial',
+        signals: [
+          {
+            description: 'occaecat labore',
+            matchLevel: 'partial',
+            note: 'dolor ut',
+            reasonCode: 'ssn_potentially_belongs_to_another',
+            severity: 'medium',
+          },
+          {
+            description: 'sint do cupidatat adipisicing Duis',
+            matchLevel: 'could_not_match',
+            note: 'velit culpa',
+            reasonCode: 'business_website_verified',
+            severity: 'low',
+          },
+          {
+            description: 'culpa mollit fugiat cillum magna',
+            matchLevel: 'could_not_match',
+            note: 'officia in ad',
+            reasonCode: 'sos_domestic_filing_status_good_standing',
+            severity: 'low',
+          },
+        ],
+      },
+      businessTin: {
+        matchLevel: 'could_not_match',
+        signals: [
+          {
+            description: 'in',
+            matchLevel: 'exact',
+            note: 'voluptate qui ea',
+            reasonCode: 'curp_valid',
+            severity: 'high',
+          },
+          {
+            description: 'pariatur do est consectetur',
+            matchLevel: 'could_not_match',
+            note: 'magna',
+            reasonCode: 'name_does_not_match',
+            severity: 'medium',
+          },
+          {
+            description: 'eiusmod Ut in',
+            matchLevel: 'could_not_match',
+            note: 'sunt',
+            reasonCode: 'document_ocr_address_could_not_match',
+            severity: 'low',
+          },
+        ],
+      },
       dob: {
         matchLevel: 'could_not_match',
         signals: [
@@ -2216,6 +2426,32 @@ export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationR
           },
         ],
       },
+      document: {
+        matchLevel: 'no_match',
+        signals: [
+          {
+            description: 'ex non',
+            matchLevel: 'could_not_match',
+            note: 'elit',
+            reasonCode: 'sos_domestic_filing_status_not_provided_by_state',
+            severity: 'high',
+          },
+          {
+            description: 'nulla reprehenderit ex officia tempor',
+            matchLevel: 'no_match',
+            note: 'eu in enim',
+            reasonCode: 'device_velocity',
+            severity: 'medium',
+          },
+          {
+            description: 'cillum nostrud ut eu consequat',
+            matchLevel: 'exact',
+            note: 'dolor dolore',
+            reasonCode: 'browser_automation',
+            severity: 'high',
+          },
+        ],
+      },
       email: {
         matchLevel: 'partial',
         signals: [
@@ -2239,6 +2475,32 @@ export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationR
             note: 'exercitation irure minim voluptate',
             reasonCode: 'curp_valid',
             severity: 'high',
+          },
+        ],
+      },
+      name: {
+        matchLevel: 'exact',
+        signals: [
+          {
+            description: 'amet aute',
+            matchLevel: 'exact',
+            note: 'in amet dolor est ut',
+            reasonCode: 'business_address_commercial',
+            severity: 'medium',
+          },
+          {
+            description: 'ea',
+            matchLevel: 'partial',
+            note: 'incididunt',
+            reasonCode: 'sos_business_address_active_filing_found',
+            severity: 'medium',
+          },
+          {
+            description: 'id Duis Lorem',
+            matchLevel: 'no_match',
+            note: 'sed labore ad deserunt laborum',
+            reasonCode: 'address_input_is_not_standard_hotel',
+            severity: 'info',
           },
         ],
       },
@@ -2358,6 +2620,7 @@ export const getInvoicePreview = (props: Partial<InvoicePreview>) =>
           id: 'a7bd6b08-7730-4040-87b2-0aa8f09a31bb',
           notionalCents: -1165783,
           quantity: 22326329,
+          unitPriceCents: 'ut amet aliqua proident',
         },
       ],
     },
@@ -2624,6 +2887,80 @@ export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>
     },
     props,
   ) as MultiUpdateRuleRequest;
+export const getOffsetPaginatedEntityOnboarding = (props: Partial<OffsetPaginatedEntityOnboarding>) =>
+  merge(
+    {
+      data: [
+        {
+          id: '6e2cbbd5-fcad-4b2f-9b77-073fc75ea309',
+          playbookKey: 'b2856c4a-ff5b-4be5-a370-1b2afb67fd54',
+          ruleSetResults: [
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1892-09-05T01:36:55.0Z',
+            },
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1891-10-18T02:32:19.0Z',
+            },
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1903-11-22T06:35:25.0Z',
+            },
+          ],
+          seqno: -18412475,
+          status: 'incomplete',
+          timestamp: '1894-10-20T10:56:51.0Z',
+        },
+        {
+          id: '6e2cbbd5-fcad-4b2f-9b77-073fc75ea309',
+          playbookKey: 'b2856c4a-ff5b-4be5-a370-1b2afb67fd54',
+          ruleSetResults: [
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1942-02-27T08:12:16.0Z',
+            },
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1918-04-11T01:16:17.0Z',
+            },
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1950-05-26T07:17:18.0Z',
+            },
+          ],
+          seqno: 77878530,
+          status: 'none',
+          timestamp: '1961-08-08T14:48:23.0Z',
+        },
+        {
+          id: '6e2cbbd5-fcad-4b2f-9b77-073fc75ea309',
+          playbookKey: 'b2856c4a-ff5b-4be5-a370-1b2afb67fd54',
+          ruleSetResults: [
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1937-12-13T09:39:27.0Z',
+            },
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1923-07-26T15:29:57.0Z',
+            },
+            {
+              id: '3023908c-03b2-4599-9b40-0eb88ff32b66',
+              timestamp: '1914-07-06T08:03:34.0Z',
+            },
+          ],
+          seqno: 22033863,
+          status: 'pass',
+          timestamp: '1906-02-03T08:22:14.0Z',
+        },
+      ],
+      meta: {
+        nextPage: 62770087,
+      },
+    },
+    props,
+  ) as OffsetPaginatedEntityOnboarding;
 export const getOffsetPaginatedList = (props: Partial<OffsetPaginatedList>) =>
   merge(
     {
@@ -2677,6 +3014,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
           allowUsTerritoryResidents: true,
           author: 'footprint',
           businessDocumentsToCollect: ['ipsum eiusmod aliquip', 'anim sit', 'cillum elit'],
+          canAccessData: ['Email', 'Email', 'BusinessBeneficialOwners'],
           cipKind: 'alpaca',
           createdAt: '1955-01-06T17:08:19.0Z',
           curpValidationEnabled: true,
@@ -2721,6 +3059,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
           allowUsTerritoryResidents: false,
           author: 'firm_employee',
           businessDocumentsToCollect: ['nulla aliqua sunt dolor enim', 'sit esse elit', 'nostrud non laborum Lorem eu'],
+          canAccessData: ['UsTaxId', 'Nationality', 'Ssn9'],
           cipKind: 'alpaca',
           createdAt: '1922-03-27T09:55:11.0Z',
           curpValidationEnabled: false,
@@ -2765,6 +3104,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
           allowUsTerritoryResidents: false,
           author: 'firm_employee',
           businessDocumentsToCollect: ['ea cillum aliquip', 'minim', 'esse dolor'],
+          canAccessData: ['BusinessBeneficialOwners', 'BusinessWebsite', 'Nationality'],
           cipKind: 'apex',
           createdAt: '1916-02-04T12:17:24.0Z',
           curpValidationEnabled: true,
@@ -3012,6 +3352,7 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
       allowUsTerritoryResidents: false,
       author: 'footprint',
       businessDocumentsToCollect: ['nisi eu eiusmod in id', 'in eiusmod reprehenderit sit adipisicing', 'sunt'],
+      canAccessData: ['BusinessName', 'BusinessKycedBeneficialOwners', 'BusinessAddress'],
       cipKind: 'alpaca',
       createdAt: '1941-09-12T05:42:02.0Z',
       curpValidationEnabled: false,
@@ -3093,15 +3434,23 @@ export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>) =>
         companySize: 's1001_plus',
         domains: ['dolor voluptate culpa', 'ex mollit labore in', 'fugiat'],
         id: 'ce6d5bc6-9f1e-4e4b-94d7-6fd82041d9fe',
+        isAuthMethodSupported: false,
         isDomainAlreadyClaimed: true,
         isProdAuthPlaybookRestricted: true,
         isProdKybPlaybookRestricted: false,
         isProdKycPlaybookRestricted: true,
         isProdNeuroEnabled: true,
+        isProdSentilinkEnabled: true,
         isSandboxRestricted: false,
         logoUrl: 'https://some-thyme.com',
         name: 'Nicole Connelly',
+        parent: {
+          id: 'b8ab461b-8079-4198-9262-7fb991dfa7e6',
+          name: 'Rose Pagac',
+        },
+        supportEmail: 'jo2@gmail.com',
         supportPhone: '+16712410391',
+        supportWebsite: 'https://comfortable-creature.org/',
         websiteUrl: 'https://stunning-runway.info/',
       },
       user: {
@@ -3313,6 +3662,7 @@ export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>) =>
   merge(
     {
       fpId: '3d6fd0a4-fa08-4431-938e-d4cc2858c04f',
+      id: '6be30853-4437-4976-9e4f-822b903fe66e',
       kind: 'Primary',
       name: 'Levi Konopelski',
       ownershipStake: -49821559,
@@ -3322,6 +3672,16 @@ export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>) =>
     },
     props,
   ) as PrivateBusinessOwner;
+export const getPrivateBusinessOwnerKycLink = (props: Partial<PrivateBusinessOwnerKycLink>) =>
+  merge(
+    {
+      id: '8a428328-b0ed-468f-86fb-1a05f64f0790',
+      link: 'dolore labore non Duis eu',
+      name: 'Dennis Moore',
+      token: '43991239-6845-41d3-9c06-64ca8a18ef00',
+    },
+    props,
+  ) as PrivateBusinessOwnerKycLink;
 export const getPrivateOwnedBusiness = (props: Partial<PrivateOwnedBusiness>) =>
   merge(
     {
@@ -3424,6 +3784,7 @@ export const getRiskSignal = (props: Partial<RiskSignal>) =>
   merge(
     {
       description: 'laborum in',
+      group: 'native_device',
       id: '6138f5f6-1e6f-4ab8-afb8-0092fec8fe6e',
       note: 'elit laboris sunt',
       onboardingDecisionId: 'c38d0d63-7eac-471b-95cd-72a086fa29d1',
@@ -3722,7 +4083,9 @@ export const getUpdateObConfigRequest = (props: Partial<UpdateObConfigRequest>) 
     {
       allowReonboard: false,
       name: 'Mr. Kent Hirthe',
+      promptForPasskey: true,
       skipConfirm: false,
+      status: 'disabled',
     },
     props,
   ) as UpdateObConfigRequest;
@@ -3749,16 +4112,21 @@ export const getUpdateTenantIosAppMetaRequest = (props: Partial<UpdateTenantIosA
   merge(
     {
       appBundleIds: ['dolor in', 'dolore irure cillum laborum aliqua', 'ut et'],
+      deviceCheckKeyId: '6316adb4-27b2-44dc-8a46-5d7c0d75a95f',
+      deviceCheckPrivateKey: '2c4952ff-1a3f-4e46-b3ce-e85844b0c91f',
+      teamId: '48cee401-4e96-4678-88c8-85dfb5052472',
     },
     props,
   ) as UpdateTenantIosAppMetaRequest;
 export const getUpdateTenantRequest = (props: Partial<UpdateTenantRequest>) =>
   merge(
     {
+      allowDomainAccess: true,
       clearSupportEmail: true,
       clearSupportPhone: true,
       clearSupportWebsite: true,
       companySize: 's1001_plus',
+      name: 'Clarence Pouros',
       privacyPolicyUrl: 'https://secret-deployment.info',
       supportEmail: 'yvonne71@gmail.com',
       supportPhone: '+19222252388',

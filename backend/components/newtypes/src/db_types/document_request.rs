@@ -54,6 +54,7 @@ pub struct DocumentRequestConfigIdentifier(pub String);
     ),
     vis(pub),
     strum(serialize_all = "snake_case"),
+    serde(rename_all = "snake_case"),
     diesel(sql_type = Text)
 )]
 pub enum DocumentRequestConfig {

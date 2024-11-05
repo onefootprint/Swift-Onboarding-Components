@@ -25,7 +25,6 @@ use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowSource;
 use serde::Deserialize;
 
-/// Describes a liveness event that took place
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct UserTimeline {
@@ -34,7 +33,6 @@ pub struct UserTimeline {
     pub timestamp: DateTime<Utc>,
 }
 
-// TODO need Apiv2Schema to generate the oneOf type. Paperclip doesn't support this though...
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
@@ -64,7 +62,7 @@ pub enum UserTimelineEvent {
     },
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct DataCollectedInfo {
     /// The list of CDOs that had a DI that was edited
     pub attributes: Vec<CollectedDataOption>,
@@ -74,7 +72,7 @@ pub struct DataCollectedInfo {
     pub is_prefill: bool,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct WorkflowTriggered {
     pub request_is_active: bool,
     pub config: WorkflowRequestConfig,
@@ -84,20 +82,20 @@ pub struct WorkflowTriggered {
     pub fp_id: Option<FpId>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct WorkflowStarted {
     pub kind: WorkflowStartedEventKind,
     pub playbook: TimelinePlaybook,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct AuthMethodUpdated {
     pub kind: AuthMethodKind,
     pub action: ActionKind,
     pub insight_event: InsightEvent,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkflowStartedEventKind {
     /// Onboarding onto an existing playbook
@@ -106,19 +104,19 @@ pub enum WorkflowStartedEventKind {
     Document,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct LabelAdded {
     pub kind: LabelKind,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct ExternalIntegrationCalled {
     pub integration: ExternalIntegrationKind,
     pub successful: bool,
     pub external_id: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct OnboardingTimelineInfo {
     pub event: String,
     pub session_id: Option<String>,
