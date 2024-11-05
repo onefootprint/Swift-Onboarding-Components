@@ -68,10 +68,10 @@ def test_tenant_document_decrypt(user_with_documents):
 
     assert compare_b64_contents(
         resp["document.drivers_license.front.latest_upload"],
-        "drivers_license.front.png",
+        "drivers_license.front.jpg",
     )
     assert compare_b64_contents(
-        resp["document.drivers_license.front.image"], "drivers_license.front.png"
+        resp["document.drivers_license.front.image"], "drivers_license.front.jpg"
     )
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.document_number"] == "Y12341234"
@@ -102,8 +102,8 @@ def test_tenant_document_decrypt_download(user_with_documents):
     # Make raw request since the downloaded content is not json
     response = get_raw(f"users/vault/decrypt/{token}")
     assert response.headers.get("content-disposition") == "attachment"
-    assert response.headers.get("content-type") == "image/png"
-    assert compare_contents(response.content, "drivers_license.front.png")
+    assert response.headers.get("content-type") == "image/jpg"
+    assert compare_contents(response.content, "drivers_license.front.jpg")
 
     audit_event = latest_audit_event_for(user_with_documents.fp_id, tenant)
     assert audit_event["name"] == "decrypt_user_data"
@@ -164,7 +164,7 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
         f"users/{user.fp_id}/vault/document.id_card.front.image/upload",
         None,
         sandbox_tenant.sk.key,
-        files=open_multipart_file("drivers_license.front.png", "image/png")(),
+        files=open_multipart_file("drivers_license.front.jpg", "image/jpg")(),
     )
     post(
         f"users/{user.fp_id}/vault/document.custom.my_special_doc/upload",
@@ -246,11 +246,11 @@ def test_decrypt_historical(user_with_documents):
 
     assert compare_b64_contents(
         body["document.drivers_license.front.latest_upload"],
-        "drivers_license.front.png",
+        "drivers_license.front.jpg",
     )
     assert compare_b64_contents(
         body[f"document.drivers_license.front.latest_upload:{front_version}"],
-        "drivers_license.front.png",
+        "drivers_license.front.jpg",
     )
     # Version before created version should be empty
     assert (

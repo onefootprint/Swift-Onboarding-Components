@@ -75,7 +75,7 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
         f"users/{user.fp_id}/vault/document.id_card.front.image/upload",
         None,
         sandbox_tenant.sk.key,
-        files=open_multipart_file("drivers_license.front.png", "image/png")(),
+        files=open_multipart_file("drivers_license.front.jpg", "image/jpg")(),
     )
 
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)

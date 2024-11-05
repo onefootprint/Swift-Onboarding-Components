@@ -72,14 +72,14 @@ def test_tenant_image_decrypt(
     )
 
     tests = [
-        ("document.drivers_license.front.image", "drivers_license.front.png"),
-        ("document.drivers_license.back.image", "drivers_license.back.png"),
-        ("document.drivers_license.selfie.image", "drivers_license.selfie.png"),
+        ("document.drivers_license.front.image", "drivers_license.front.jpg"),
+        ("document.drivers_license.back.image", "drivers_license.back.jpg"),
+        ("document.drivers_license.selfie.image", "drivers_license.selfie.jpg"),
     ]
     for di, file_name in tests:
         assert compare_b64_contents(resp[di], file_name)
 
-    assert resp["document.drivers_license.front.mime_type"] == "image/png"
+    assert resp["document.drivers_license.front.mime_type"] == "image/jpg"
 
     audit_event = latest_audit_event_for(user.fp_id, sandbox_tenant)
     assert audit_event["name"] == "decrypt_user_data"

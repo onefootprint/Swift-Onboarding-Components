@@ -30,8 +30,8 @@ FINAL_FP_ID_2_DATA = {
     "id.first_name": "alice",
     "id.last_name": "wonderland",
     "id.phone_number": "+2222222222",
-    "document.id_card.front.image": file_contents("drivers_license.front.png"),
-    "document.id_card.front.latest_upload": file_contents("drivers_license.front.png"),
+    "document.id_card.front.image": file_contents("drivers_license.front.jpg"),
+    "document.id_card.front.latest_upload": file_contents("drivers_license.front.jpg"),
 }
 
 INVALID_API_ROOT = "http://127.0.0.1:123"

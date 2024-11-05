@@ -103,13 +103,13 @@ class BifrostClient:
                 "example_pdf.pdf", "application/pdf"
             ),
             "document.drivers_license.front.image": open_multipart_file(
-                "drivers_license.front.png", "image/png"
+                "drivers_license.front.jpg", "image/jpg"
             ),
             "document.drivers_license.back.image": open_multipart_file(
-                "drivers_license.back.png", "image/png"
+                "drivers_license.back.jpg", "image/jpg"
             ),
             "document.drivers_license.selfie.image": open_multipart_file(
-                "drivers_license.selfie.png", "image/png"
+                "drivers_license.selfie.jpg", "image/jpg"
             ),
             "id.ssn9": ssn9,
             "id.ssn4": ssn9[-4:],
