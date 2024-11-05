@@ -1,11 +1,12 @@
+import { getOrgOptions } from '@onefootprint/axios/dashboard';
+import { getErrorMessage } from '@onefootprint/request';
 import { Box, Divider, Text } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import SectionHeader from 'src/components/section-header';
-import useOrg from 'src/hooks/use-org';
 import styled, { css } from 'styled-components';
 
-import { getErrorMessage } from '@onefootprint/request';
 import Content from './components/content';
 import ErrorDisplay from './components/error-display';
 import Loading from './components/loading';
@@ -14,7 +15,7 @@ const BusinessProfile = () => {
   const { t } = useTranslation('settings', {
     keyPrefix: 'pages.business-profile',
   });
-  const { isPending, data, error } = useOrg();
+  const { isPending, data, error } = useQuery(getOrgOptions());
 
   return (
     <>

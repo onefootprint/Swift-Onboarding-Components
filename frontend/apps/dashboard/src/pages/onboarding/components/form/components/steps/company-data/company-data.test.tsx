@@ -1,4 +1,4 @@
-import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 
 import type { CompanyDataProps } from './company-data';
 import CompanyData from './company-data';
@@ -78,6 +78,9 @@ describe('<CompanyData />', () => {
         it('should an error message', async () => {
           await renderCompanyDataAndWaitData({});
 
+          const websiteField = screen.getByLabelText('Company website');
+          await userEvent.clear(websiteField);
+
           const submitButton = screen.getByRole('button', { name: 'Next' });
           await userEvent.click(submitButton);
 
@@ -100,9 +103,6 @@ describe('<CompanyData />', () => {
 
           const websiteField = screen.getByLabelText('Company website');
           await userEvent.type(websiteField, 'https://acme.com');
-
-          const sizeField = screen.getByRole('button', { name: 'Select' });
-          await selectEvents.select(sizeField, '1-10');
 
           const submitButton = screen.getByRole('button', { name: 'Next' });
           await userEvent.click(submitButton);
@@ -131,9 +131,6 @@ describe('<CompanyData />', () => {
 
           const websiteField = screen.getByLabelText('Company website');
           await userEvent.type(websiteField, 'https://acme.com');
-
-          const sizeField = screen.getByRole('button', { name: 'Select' });
-          await selectEvents.select(sizeField, '1-10');
 
           const submitButton = screen.getByRole('button', { name: 'Next' });
           await userEvent.click(submitButton);

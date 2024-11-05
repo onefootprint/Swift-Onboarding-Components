@@ -1,5 +1,6 @@
+import { getOrgOptions } from '@onefootprint/axios/dashboard';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import useOrg from 'src/hooks/use-org';
 
 import Header from '../header';
 import Content from './components/content';
@@ -12,10 +13,8 @@ export type CompanyDataProps = {
 };
 
 const CompanyData = ({ onBack, onComplete }: CompanyDataProps) => {
-  const orgQuery = useOrg();
-  const { t } = useTranslation('onboarding', {
-    keyPrefix: 'company-data',
-  });
+  const { t } = useTranslation('onboarding', { keyPrefix: 'company-data' });
+  const orgQuery = useQuery(getOrgOptions());
 
   return (
     <>

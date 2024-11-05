@@ -1,6 +1,7 @@
+import { getOrgOptions } from '@onefootprint/axios/dashboard';
 import { RoleKind } from '@onefootprint/types';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import useOrg from 'src/hooks/use-org';
 import useRoles from 'src/hooks/use-roles';
 
 import Header from '../header';
@@ -18,7 +19,7 @@ const Invite = ({ onBack, onComplete }: InviteProps) => {
     keyPrefix: 'invite',
   });
   const rolesQuery = useRoles(RoleKind.dashboardUser);
-  const orgQuery = useOrg();
+  const orgQuery = useQuery(getOrgOptions());
 
   return (
     <>

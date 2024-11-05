@@ -1,27 +1,16 @@
+import { getOrganization } from '@onefootprint/fixtures/dashboard';
+import type { Organization } from '@onefootprint/request-types/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Organization } from '@onefootprint/types';
 
-export const organizationFixture: Organization = {
+export const organizationFixture = getOrganization({
   id: 'org_9L42CAdpXhDeSmi1DI8Qks',
   name: 'Acme',
-  allowDomainAccess: false,
-  allowedPreviewApis: [],
-  companySize: null,
-  domains: [],
-  isDomainAlreadyClaimed: false,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
-  isProdAuthPlaybookRestricted: false,
-  isProdNeuroEnabled: false,
-  isProdSentilinkEnabled: false,
-  isSandboxRestricted: false,
   logoUrl: 'https://acme.com/logo.png',
-  parent: null,
   supportEmail: 'support@acme.com',
   supportPhone: '123-456-7890',
   supportWebsite: 'https://support.acme.com',
   websiteUrl: 'https://acme.com',
-};
+});
 
 export const organizationDataLabels = [
   'Company name',

@@ -1,4 +1,4 @@
-import type { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/request-types/dashboard';
 
 export enum SupportLinkType {
   Email = 'email',

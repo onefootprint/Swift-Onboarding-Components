@@ -1,10 +1,11 @@
+import { getOrgOptions } from '@onefootprint/axios/dashboard';
 import { Stack, Tabs, Text } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
 import SectionHeader from 'src/components/section-header';
-import useOrg from 'src/hooks/use-org';
 import styled, { css } from 'styled-components';
 
 import Members from './components/members';
@@ -18,7 +19,7 @@ enum TabName {
 
 const TeamRoles = () => {
   const { t } = useTranslation('settings', { keyPrefix: 'pages.team-roles' });
-  const orgQuery = useOrg();
+  const orgQuery = useQuery(getOrgOptions());
   const [tab, setTab] = useQueryState('tab', parseAsString.withDefault(TabName.members));
   const tabs = [
     { label: t('tabs.members'), value: TabName.members },

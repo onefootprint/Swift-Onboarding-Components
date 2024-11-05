@@ -1,4 +1,4 @@
-import type { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/request-types/dashboard';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Avatar, createFontStyles } from '@onefootprint/ui';
 import type React from 'react';

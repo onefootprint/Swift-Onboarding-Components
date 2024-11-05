@@ -1,8 +1,9 @@
+import { getOrgOptions } from '@onefootprint/axios/dashboard';
 import { CollectedKycDataOption, OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
-import useOrg from 'src/hooks/use-org';
 import useCreatePlaybook from '../../hooks/use-create-playbook';
 import NameStep from '../name-step';
 import RequiredAuthMethodsStep from '../required-auth-methods-step';
@@ -24,7 +25,7 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.stepper' });
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
-  const orgQuery = useOrg();
+  const orgQuery = useQuery(getOrgOptions());
   const options = [
     { label: t('name'), value: 'name' },
     { label: t('templates'), value: 'templates' },

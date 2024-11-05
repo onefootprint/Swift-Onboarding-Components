@@ -1,6 +1,7 @@
+import { getOrganization } from '@onefootprint/fixtures/dashboard';
+import type { Organization } from '@onefootprint/request-types/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Organization, Role } from '@onefootprint/types';
-import { RoleKind, RoleScopeKind } from '@onefootprint/types';
+import { type Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const RolesFixture: Role[] = [
   {
@@ -25,24 +26,10 @@ export const RolesFixture: Role[] = [
   },
 ];
 
-export const orgFixture: Organization = {
+export const orgFixture = getOrganization({
   id: 'org_9242CAdpXXlDDeSmi1DQks',
   name: 'Acme Inc',
-  allowDomainAccess: false,
-  allowedPreviewApis: [],
-  companySize: null,
-  domains: [],
-  isDomainAlreadyClaimed: false,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
-  isProdAuthPlaybookRestricted: false,
-  isProdNeuroEnabled: false,
-  isProdSentilinkEnabled: false,
-  isSandboxRestricted: false,
-  logoUrl: null,
-  parent: null,
-  websiteUrl: null,
-};
+});
 
 export const withRoles = (Roles: Role[] = RolesFixture) =>
   mockRequest({

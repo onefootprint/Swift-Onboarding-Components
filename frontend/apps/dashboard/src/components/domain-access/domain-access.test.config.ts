@@ -1,66 +1,24 @@
+import { getOrganization } from '@onefootprint/fixtures/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Organization } from '@onefootprint/types';
 
-export const orgAllowDomainFixture: Organization = {
+export const orgAllowDomainFixture = getOrganization({
   allowDomainAccess: false,
-  allowedPreviewApis: [],
-  companySize: null,
-  domains: ['footprint.com'],
-  id: 'org_9242CAdpXXlDDeSmi1DQks',
-  isDomainAlreadyClaimed: false,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
-  isProdAuthPlaybookRestricted: false,
-  isProdNeuroEnabled: false,
-  isProdSentilinkEnabled: false,
-  isSandboxRestricted: false,
-  logoUrl: null,
-  name: 'Acme Inc',
-  parent: null,
-  websiteUrl: null,
-};
+});
 
-export const orgEnabledAllowDomainAccessFixture: Organization = {
+export const orgEnabledAllowDomainAccessFixture = getOrganization({
   allowDomainAccess: true,
-  allowedPreviewApis: [],
-  companySize: null,
-  domains: ['footprint.com'],
-  id: 'org_9242CAdpXXlDDeSmi1DQks',
-  isDomainAlreadyClaimed: false,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
-  isProdAuthPlaybookRestricted: false,
-  isProdNeuroEnabled: false,
-  isProdSentilinkEnabled: false,
-  isSandboxRestricted: false,
-  logoUrl: null,
-  name: 'Acme Inc',
-  parent: null,
-  websiteUrl: null,
-};
+});
 
-export const orgDomainAlreadyClaimed: Organization = {
+export const orgDomainAlreadyClaimed = getOrganization({
   allowDomainAccess: false,
-  allowedPreviewApis: [],
-  companySize: null,
-  domains: ['footprint.com'],
-  id: 'org_9242CAdpXXlDDeSmi1DQks',
   isDomainAlreadyClaimed: true,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
-  isProdAuthPlaybookRestricted: false,
-  isProdNeuroEnabled: false,
-  isProdSentilinkEnabled: false,
-  isSandboxRestricted: false,
-  logoUrl: null,
-  name: 'Acme Inc',
-  parent: null,
-  websiteUrl: null,
-};
+  domains: ['footprint.com'],
+});
 
-export const withOrgUpdate = () =>
-  mockRequest({
+export const withOrgUpdate = () => {
+  return mockRequest({
     method: 'patch',
     path: '/org',
     response: null,
   });
+};

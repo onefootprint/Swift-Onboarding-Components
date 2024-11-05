@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
-import type { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/request-types/dashboard';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Divider, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';

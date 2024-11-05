@@ -1,34 +1,22 @@
+import { getOrganization } from '@onefootprint/fixtures/dashboard';
+import type { Organization } from '@onefootprint/request-types/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Organization } from '@onefootprint/types';
 
-export const orgFixture: Organization = {
+export const orgFixture = getOrganization({
   id: 'org_9242CAdpXXlDDeSmi1DQks',
   name: 'Acme Inc',
-  allowDomainAccess: false,
-  allowedPreviewApis: [],
-  companySize: null,
-  domains: [],
-  isDomainAlreadyClaimed: false,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
-  isProdAuthPlaybookRestricted: false,
-  isProdNeuroEnabled: false,
-  isProdSentilinkEnabled: false,
-  isSandboxRestricted: false,
-  logoUrl: null,
-  parent: null,
-  websiteUrl: null,
+});
+
+export const withOrg = (response = orgFixture) => {
+  return mockRequest({
+    method: 'get',
+    path: '/org',
+    response,
+  });
 };
 
-export const withOrg = (response: Organization = orgFixture) =>
-  mockRequest({
-    method: 'get',
-    path: '/org',
-    response,
-  });
-
-export const withOrgError = () =>
-  mockRequest({
+export const withOrgError = () => {
+  return mockRequest({
     method: 'get',
     path: '/org',
     statusCode: 400,
@@ -36,16 +24,18 @@ export const withOrgError = () =>
       message: 'Something went wrong',
     },
   });
+};
 
-export const withUpdateOrg = (response: Partial<Organization>) =>
-  mockRequest({
+export const withUpdateOrg = (response: Partial<Organization>) => {
+  return mockRequest({
     method: 'patch',
     path: '/org',
     response,
   });
+};
 
-export const withUpdateOrgError = () =>
-  mockRequest({
+export const withUpdateOrgError = () => {
+  return mockRequest({
     method: 'patch',
     path: '/org',
     statusCode: 400,
@@ -53,3 +43,4 @@ export const withUpdateOrgError = () =>
       message: 'Something went wrong',
     },
   });
+};
