@@ -28,8 +28,8 @@ impl DbToApi<(JoinedAuditEvent, ListEventDetail)> for ListEvent {
             timestamp: audit_event.timestamp,
             tenant_id: audit_event.tenant_id,
             name: audit_event.name,
-            principal: Actor::from_db(saturated_actor),
-            insight_event: Some(InsightEvent::from_db(insight_event)),
+            principal: saturated_actor.map(Actor::from_db),
+            insight_event: insight_event.map(InsightEvent::from_db),
             detail,
         }
     }

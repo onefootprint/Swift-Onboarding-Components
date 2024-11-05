@@ -1,7 +1,7 @@
 use super::list::List;
 use super::list_entry::ListEntry;
 use super::list_entry_creation::ListEntryCreation;
-use crate::actor::saturate_actors;
+use crate::actor::saturate_actors_nullable;
 use crate::actor::HasActor;
 use crate::actor::SaturatedActor;
 use crate::models::document_data::DocumentData;
@@ -68,8 +68,8 @@ pub struct AuditEvent {
     pub timestamp: DateTime<Utc>,
     pub tenant_id: TenantId,
     pub name: AuditEventName,
-    pub principal_actor: DbActor,
-    pub insight_event_id: InsightEventId,
+    pub principal_actor: Option<DbActor>,
+    pub insight_event_id: Option<InsightEventId>,
 
     pub metadata: AuditEventMetadata,
 
@@ -150,8 +150,8 @@ pub struct FilterQueryParams {
 pub struct JoinedAuditEvent {
     pub audit_event: AuditEvent,
     pub tenant: Tenant,
-    pub saturated_actor: SaturatedActor,
-    pub insight_event: InsightEvent,
+    pub saturated_actor: Option<SaturatedActor>,
+    pub insight_event: Option<InsightEvent>,
 
     pub scoped_vault: Option<ScopedVault>,
     pub ob_configuration: Option<ObConfiguration>,
@@ -167,7 +167,7 @@ pub struct JoinedAuditEvent {
 type DieselJoinedAuditEvent = (
     AuditEvent,
     Tenant,
-    InsightEvent,
+    Option<InsightEvent>,
     Option<ScopedVault>,
     Option<ObConfiguration>,
     Option<DocumentData>,
@@ -181,7 +181,7 @@ type DieselJoinedAuditEvent = (
 
 impl HasActor for DieselJoinedAuditEvent {
     fn actor(&self) -> Option<DbActor> {
-        Some(self.0.principal_actor.clone())
+        self.0.principal_actor.clone()
     }
 }
 
@@ -303,11 +303,11 @@ impl AuditEvent {
             results = results.filter(scoped_vault::fp_id.eq(search));
         }
 
-        let results: Vec<DieselJoinedAuditEvent> = results
+        let results = results
             .select((
                 AuditEvent::as_select(),
                 Tenant::as_select(),
-                InsightEvent::as_select(),
+                insight_event::all_columns.nullable(),
                 scoped_vault::all_columns.nullable(),
                 ob_configuration::all_columns.nullable(),
                 document_data::all_columns.nullable(),
@@ -319,7 +319,7 @@ impl AuditEvent {
                 list::all_columns.nullable(),
             ))
             .load(conn)?;
-        let saturated_results = saturate_actors(conn, results)?;
+        let saturated_results = saturate_actors_nullable(conn, results)?;
 
         let events = saturated_results
             .into_iter()

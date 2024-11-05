@@ -17,7 +17,7 @@ pub struct ListEvent {
     pub timestamp: DateTime<Utc>,
     pub tenant_id: TenantId,
     pub name: AuditEventName,
-    pub principal: Actor,
+    pub principal: Option<Actor>,
     pub insight_event: Option<InsightEvent>,
     pub detail: ListEventDetail,
 }

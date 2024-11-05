@@ -20,7 +20,7 @@ pub struct AuditEvent {
     pub timestamp: DateTime<Utc>,
     pub tenant_id: TenantId,
     pub name: AuditEventName,
-    pub principal: Actor,
+    pub principal: Option<Actor>,
 
     // insight_event is optional because it is redacted in the end user's view.
     pub insight_event: Option<InsightEvent>,

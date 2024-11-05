@@ -52,7 +52,7 @@ impl HasActor for ObConfiguration {
 
 impl HasActor for AuditEvent {
     fn actor(&self) -> Option<DbActor> {
-        Some(self.principal_actor.clone())
+        self.principal_actor.clone()
     }
 }
 
