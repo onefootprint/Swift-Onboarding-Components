@@ -3,7 +3,7 @@ from tests.identify_client import IdentifyClient
 from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
 from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
-from tests.constants import BUSINESS_SECONDARY_BOS
+from tests.constants import BUSINESS_SECONDARY_BOS, FIXTURE_PHONE_NUMBER
 from uuid import uuid4
 
 USER_BO_FIELDS = ["id.first_name", "id.last_name", "id.phone_number", "id.email"]
@@ -246,3 +246,49 @@ def test_cannot_vault_bo_data_directly(kyb_sandbox_ob_config, sandbox_tenant):
         f"entities/{user.fp_bid}/vault", data, *sandbox_tenant.db_auths, status_code=400
     )
     assert body["context"][di] == "Cannot vault beneficial owner data via API"
+
+
+def test_can_edit_tenant_linked_bos(kyb_sandbox_ob_config, sandbox_tenant):
+    """
+    Make sure that bifrost can edit BOs that were linked by the tenant via API.
+    """
+    data = {"id.phone_number": FIXTURE_PHONE_NUMBER}
+    user = post("users", data, sandbox_tenant.s_sk)
+    fp_id = user["id"]
+    sandbox_id = user["sandbox_id"]
+
+    data = {"business.name": "printfoot"}
+    business = post("businesses", data, sandbox_tenant.s_sk)
+    fp_bid = business["id"]
+
+    data = dict(fp_id=fp_id, ownership_stake=25)
+    post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.s_sk)
+
+    # Onboard the user, manually add additional BOs
+    token_kwargs = dict(fp_bid=fp_bid)
+    bifrost = BifrostClient.for_fpid(
+        kyb_sandbox_ob_config, fp_id, sandbox_id, token_kwargs
+    )
+
+    body = get("hosted/business/owners", None, bifrost.auth_token)
+    assert len(body) == 1
+    bo = body[0]
+    assert bo["ownership_stake"] == 25
+    assert bo["has_linked_user"]
+    assert bo["is_authed_user"]
+
+    ops = [dict(op="update", uuid=bo["uuid"], ownership_stake=30)]
+    for secondary_owner in BUSINESS_SECONDARY_BOS[
+        "business.secondary_beneficial_owners"
+    ]:
+        secondary_owner = {**secondary_owner}
+        op = dict(
+            op="create",
+            uuid=str(uuid4()),
+            ownership_stake=secondary_owner.pop("ownership_stake"),
+            data=secondary_owner,
+        )
+        ops.append(op)
+
+    patch("hosted/business/owners", ops, bifrost.auth_token)
+    bifrost.run()

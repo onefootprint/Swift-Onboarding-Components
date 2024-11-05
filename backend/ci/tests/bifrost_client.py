@@ -34,6 +34,17 @@ class BifrostClient:
     FIXTURE_EMAIl
     """
 
+    def for_fpid(ob_config, fp_id, sandbox_id, token_kwargs=None, **kwargs):
+        """
+        Create a user-specific session for the provided fp_id.
+        """
+        data = dict(kind="onboard", key=ob_config.key.value, **token_kwargs)
+        key = ob_config.tenant.s_sk if sandbox_id else ob_config.tenant.l_sk
+        body = post(f"users/{fp_id}/token", data, key)
+        auth_token = FpAuth(body["token"])
+        auth_token = IdentifyClient.from_token(auth_token).step_up()
+        return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
+
     def raw_auth(ob_config, auth_token, sandbox_id, **kwargs):
         """
         Create an instance of BifrostClient that uses the provided auth token, skipping the identify flow in
