@@ -2,8 +2,7 @@ use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
-use api_core::decision;
-use api_core::decision::vendor::samba::license_validation::CreateOrderContext;
+use api_core::decision::vendor::samba::create_order;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
@@ -38,12 +37,8 @@ pub async fn create_samba_order(
         })
         .await?;
 
-    decision::vendor::samba::license_validation::run_samba_create_order(
-        &state,
-        CreateOrderContext::Adhoc { di, data },
-        kind,
-    )
-    .await?;
+    create_order::run_samba_create_order(&state, create_order::CreateOrderContext::Adhoc { di, data }, kind)
+        .await?;
 
     Ok(api_wire_types::Empty)
 }

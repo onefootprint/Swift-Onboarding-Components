@@ -10,7 +10,8 @@ use newtypes::VendorAPI;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-pub mod license_validation;
+pub mod create_order;
+pub mod get_report;
 
 
 impl SaveVerificationResultArgs {

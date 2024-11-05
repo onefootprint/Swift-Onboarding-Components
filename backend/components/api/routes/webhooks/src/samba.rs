@@ -1,5 +1,5 @@
 use actix_web::web;
-use api_core::decision::vendor::samba::license_validation::get_samba_license_validation_report;
+use api_core::decision::vendor::samba::get_report::get_samba_license_validation_report;
 use api_core::types::ApiResponse;
 use api_core::web::Json;
 use api_core::FpResult;
