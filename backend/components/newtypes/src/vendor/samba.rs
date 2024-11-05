@@ -40,8 +40,8 @@ pub struct SambaAddress {
     pub zip_code: PiiString,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct SambaLicenseValidationData {
+#[derive(Clone, Serialize, Deserialize, Debug, Default)]
+pub struct SambaData {
     pub first_name: PiiString,
     pub last_name: PiiString,
     pub license_number: PiiString,

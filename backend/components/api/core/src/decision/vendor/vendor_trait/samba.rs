@@ -3,41 +3,41 @@ use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::samba::client::SambaSafetyClientAdapter;
-use idv::samba::request::SambaCheckLVOrderStatusRequest;
-use idv::samba::request::SambaCreateLVOrderRequest;
-use idv::samba::request::SambaGetLVReportRequest;
-use idv::samba::response::license_validation::CheckLVOrderStatus;
-use idv::samba::response::license_validation::CreateLVOrderResponse;
+use idv::samba::common::SambaCheckOrderStatusRequest;
+use idv::samba::common::SambaGetReportRequest;
+use idv::samba::common::SambaOrderRequest;
 use idv::samba::response::license_validation::GetLVOrderResponse;
+use idv::samba::response::CreateOrderResponse;
+use idv::samba::response::OrderStatusResponse;
 use idv::samba::SambaAPIResponse;
 use idv::ParsedResponse;
 use newtypes::VendorAPI;
 
 /// Create License Validation Samba Order
 #[async_trait]
-impl
-    VendorAPICall<
-        SambaCreateLVOrderRequest,
-        SambaAPIResponse<CreateLVOrderResponse>,
-        idv::samba::error::Error,
-    > for FootprintVendorHttpClient
+impl VendorAPICall<SambaOrderRequest, SambaAPIResponse<CreateOrderResponse>, idv::samba::error::Error>
+    for FootprintVendorHttpClient
 {
-    #[tracing::instrument("make_request", skip_all, fields(request = "SambaCreateLVOrderRequest"))]
+    #[tracing::instrument(
+        "make_request",
+        skip_all,
+        fields(request = "SambaOrderRequest<LicenseValidation>")
+    )]
     async fn make_request(
         &self,
-        request: SambaCreateLVOrderRequest,
-    ) -> Result<SambaAPIResponse<CreateLVOrderResponse>, idv::samba::error::Error> {
+        request: SambaOrderRequest,
+    ) -> Result<SambaAPIResponse<CreateOrderResponse>, idv::samba::error::Error> {
         let client_adapter = SambaSafetyClientAdapter::new(request.credentials.clone())?;
         let authed_client = client_adapter.get_authenticated_client(self).await?;
         let raw_response = authed_client
-            .create_license_validation_order(self, request)
+            .create_license_validation_order(self, request.data)
             .await?;
         let res = SambaAPIResponse::from_response(raw_response).await;
         Ok(res)
     }
 }
 
-impl VendorAPIResponse for SambaAPIResponse<CreateLVOrderResponse> {
+impl VendorAPIResponse for SambaAPIResponse<CreateOrderResponse> {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::SambaLicenseValidationCreate
     }
@@ -56,17 +56,17 @@ impl VendorAPIResponse for SambaAPIResponse<CreateLVOrderResponse> {
 #[async_trait]
 impl
     VendorAPICall<
-        SambaCheckLVOrderStatusRequest,
-        SambaAPIResponse<CheckLVOrderStatus>,
+        SambaCheckOrderStatusRequest,
+        SambaAPIResponse<OrderStatusResponse>,
         idv::samba::error::Error,
     > for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "SambaCheckLVOrderStatusRequest"))]
     async fn make_request(
         &self,
-        request: SambaCheckLVOrderStatusRequest,
-    ) -> Result<SambaAPIResponse<CheckLVOrderStatus>, idv::samba::error::Error> {
-        let SambaCheckLVOrderStatusRequest {
+        request: SambaCheckOrderStatusRequest,
+    ) -> Result<SambaAPIResponse<OrderStatusResponse>, idv::samba::error::Error> {
+        let SambaCheckOrderStatusRequest {
             credentials,
             order_id,
         } = request;
@@ -81,7 +81,7 @@ impl
 }
 
 /// Get License Validation Samba Report
-impl VendorAPIResponse for SambaAPIResponse<CheckLVOrderStatus> {
+impl VendorAPIResponse for SambaAPIResponse<OrderStatusResponse> {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::SambaLicenseValidationGetStatus
     }
@@ -97,15 +97,15 @@ impl VendorAPIResponse for SambaAPIResponse<CheckLVOrderStatus> {
 }
 
 #[async_trait]
-impl VendorAPICall<SambaGetLVReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>
+impl VendorAPICall<SambaGetReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "SambaGetLVReportRequest"))]
     async fn make_request(
         &self,
-        request: SambaGetLVReportRequest,
+        request: SambaGetReportRequest,
     ) -> Result<SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error> {
-        let SambaGetLVReportRequest {
+        let SambaGetReportRequest {
             credentials,
             report_id,
         } = request;

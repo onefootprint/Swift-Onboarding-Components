@@ -1,8 +1,8 @@
 use super::error::Error as SambaSafetyError;
 use super::request::license_validation::CreateLVOrderRequest;
-use super::request::SambaCreateLVOrderRequest;
 use super::response::auth::AuthenticationResponse;
 use crate::footprint_http_client::FootprintVendorHttpClient;
+use newtypes::samba::SambaData;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
 use newtypes::PiiString;
 use newtypes::SambaOrderId;
@@ -62,7 +62,7 @@ impl SambaSafetyClientAdapter {
         let mut params = std::collections::HashMap::new();
         params.insert("grant_type", "client_credentials");
         params.insert("scope", "API");
-        let url = self.api_url("oauth2/v1/token")?;
+        let url = self.api_url("oauth2/v1/token");
 
         let response = footprint_http_client
             .post(url)
@@ -97,14 +97,8 @@ impl SambaSafetyClientAdapter {
 }
 
 impl SambaSafetyClientAdapter {
-    // TODO: auto-fix this
-    fn api_url(&self, path: &str) -> SambaResult<String> {
-        if path.starts_with('/') {
-            return Err(SambaSafetyError::SendError(
-                "path suffix should not start with leading /".into(),
-            ));
-        }
-        Ok(format!("{}/{}", self.base_url, path))
+    fn api_url(&self, path: &str) -> String {
+        format!("{}/{}", self.base_url, path.to_string().trim_start_matches('/'))
     }
 }
 
@@ -131,10 +125,10 @@ impl AuthenticatedSambaSafetyClientAdapter {
     pub async fn create_license_validation_order(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
-        request: SambaCreateLVOrderRequest,
+        request: SambaData,
     ) -> SambaResult<reqwest::Response> {
         let request = CreateLVOrderRequest::from(request);
-        let url = self.api_url("orders/v1/licensereports/verifylicense")?;
+        let url = self.api_url("orders/v1/licensereports/verifylicense");
 
         let response = footprint_http_client
             .post(url)
@@ -157,7 +151,7 @@ impl AuthenticatedSambaSafetyClientAdapter {
         order_id: SambaOrderId,
     ) -> SambaResult<reqwest::Response> {
         let path = format!("orders/v1/licensereports/verifylicense/{0}", order_id.as_str());
-        let url = self.api_url(&path)?;
+        let url = self.api_url(&path);
 
         let response = footprint_http_client
             .get(url)
@@ -177,7 +171,7 @@ impl AuthenticatedSambaSafetyClientAdapter {
         report_id: SambaReportId,
     ) -> SambaResult<reqwest::Response> {
         let path = format!("reports/v1/licensereports/verifylicense/{0}", report_id.as_str());
-        let url = self.api_url(&path)?;
+        let url = self.api_url(&path);
 
         let response = footprint_http_client
             .get(url)
@@ -194,10 +188,11 @@ impl AuthenticatedSambaSafetyClientAdapter {
 mod tests {
     use super::*;
     use crate::footprint_http_client::FpVendorClientArgs;
-    use crate::samba::request::license_validation::CreateLVOrderAddress;
-    use crate::samba::response::license_validation::CheckLVOrderStatus;
-    use crate::samba::response::license_validation::CreateLVOrderResponse;
     use crate::samba::response::license_validation::GetLVOrderResponse;
+    use crate::samba::response::CreateOrderResponse;
+    use crate::samba::response::OrderStatusResponse;
+    use newtypes::samba::SambaAddress;
+    use newtypes::samba::SambaData;
     use std::thread;
     use std::time;
 
@@ -229,9 +224,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_create_order() {
-        // samba provided test case
-        let request = SambaCreateLVOrderRequest {
-            credentials: get_credentials(),
+        let data = SambaData {
             first_name: "John".into(),
             last_name: "Doe".into(),
             license_number: "057986548".into(),
@@ -239,7 +232,7 @@ mod tests {
             // result doesn't change if we add these or don't include them
             // their test cases aren't amazing though
             dob: Some("1980-08-16".into()),
-            address: Some(CreateLVOrderAddress {
+            address: Some(SambaAddress {
                 street: "495 Grove Street".into(),
                 city: "Boulder".into(),
                 state: "CO".into(),
@@ -247,20 +240,23 @@ mod tests {
             }),
             ..Default::default()
         };
+        let credentials = get_credentials();
+        // samba provided test case
 
-        let authed_client = get_authed_client(request.credentials.clone()).await;
+
+        let authed_client = get_authed_client(credentials.clone()).await;
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
 
         // create order
         let raw_response = authed_client
-            .create_license_validation_order(&fp_client, request)
+            .create_license_validation_order(&fp_client, data)
             .await
             .unwrap()
             .json()
             .await
             .unwrap();
 
-        let response: CreateLVOrderResponse = serde_json::from_value(raw_response).unwrap();
+        let response: CreateOrderResponse = serde_json::from_value(raw_response).unwrap();
         let order_id = response.order_id;
         assert!(!order_id.leak().is_empty());
 
@@ -276,7 +272,7 @@ mod tests {
             .await
             .unwrap();
 
-        let response: CheckLVOrderStatus = serde_json::from_value(order_resp).unwrap();
+        let response: OrderStatusResponse = serde_json::from_value(order_resp).unwrap();
         let report_id = response.report_id().unwrap();
         let report_resp = authed_client
             .get_license_validation_report(&fp_client, report_id)

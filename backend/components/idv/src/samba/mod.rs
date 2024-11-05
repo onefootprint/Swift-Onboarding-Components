@@ -6,6 +6,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 pub mod client;
+pub mod common;
 pub mod error;
 pub mod request;
 pub mod response;

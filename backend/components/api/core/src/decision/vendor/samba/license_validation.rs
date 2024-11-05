@@ -21,13 +21,13 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::PgConn;
 use idv::incode::doc::response::FetchOCRResponse;
+use idv::samba::common::SambaGetReportRequest;
+use idv::samba::common::SambaOrderRequest;
 use idv::samba::license_state_is_supported_for_license_validation;
-use idv::samba::request::license_validation::CreateLVOrderAddress;
-use idv::samba::request::SambaCreateLVOrderRequest;
-use idv::samba::request::SambaGetLVReportRequest;
-use idv::samba::response::license_validation::SambaLinkType;
 use idv::samba::response::webhook::SambaWebhook;
-use newtypes::samba::SambaLicenseValidationData;
+use idv::samba::response::SambaLinkType;
+use newtypes::samba::SambaAddress;
+use newtypes::samba::SambaData;
 use newtypes::samba::SambaOrderKind;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::vendor_api_struct::SambaLicenseValidationCreate;
@@ -53,7 +53,7 @@ pub enum CreateOrderContext {
     Adhoc {
         di: DecisionIntent,
         // support optionally sending data as well
-        data: Option<SambaLicenseValidationData>,
+        data: Option<SambaData>,
     },
 }
 
@@ -108,7 +108,7 @@ impl CreateOrderContext {
         vw: &VaultWrapper,
         doc_id: Option<DocumentId>,
         tvc: &TenantVendorControl,
-    ) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+    ) -> FpResult<(SambaOrderRequest, Vec<DataLifetimeId>)> {
         match self {
             // we're in the context of a workflow
             CreateOrderContext::Workflow { .. } => {
@@ -116,10 +116,11 @@ impl CreateOrderContext {
             }
             CreateOrderContext::Adhoc { data, .. } => {
                 if let Some(d) = data {
-                    Ok((
-                        SambaCreateLVOrderRequest::from((d.clone(), tvc.samba_credentials())),
-                        vec![],
-                    ))
+                    let request = SambaOrderRequest {
+                        data: d.clone(),
+                        credentials: tvc.samba_credentials(),
+                    };
+                    Ok((request, vec![]))
                 } else {
                     // otherwise take the latest DL and run it through
                     build_request_from_ocr_response(state, vw, doc_id, tvc).await
@@ -135,7 +136,7 @@ async fn build_request_from_ocr_response(
     vw: &VaultWrapper,
     doc_id: Option<DocumentId>,
     tvc: &TenantVendorControl,
-) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+) -> FpResult<(SambaOrderRequest, Vec<DataLifetimeId>)> {
     let Some(did) = doc_id else {
         return Err(AssertionError("missing document id").into());
     };
@@ -158,11 +159,11 @@ async fn build_request_from_ocr_response(
 fn build_request(
     ocr_res: &FetchOCRResponse,
     credentials: SambaSafetyCredentials,
-) -> FpResult<SambaCreateLVOrderRequest> {
+) -> FpResult<SambaOrderRequest> {
     let names = ParsedIncodeNames::from_fetch_ocr_res(ocr_res);
     let address: ParsedIncodeAddress = ParsedIncodeAddress::from_fetch_ocr_res(ocr_res);
     let samba_address = match (address.street, address.zip, address.city, address.state) {
-        (Some(street), Some(zip_code), Some(city), Some(state)) => Some(CreateLVOrderAddress {
+        (Some(street), Some(zip_code), Some(city), Some(state)) => Some(SambaAddress {
             street,
             zip_code,
             city,
@@ -171,9 +172,7 @@ fn build_request(
         _ => None,
     };
     let dob: Option<PiiString> = ocr_res.dob().ok().map(|s| s.into());
-
-    let request = SambaCreateLVOrderRequest {
-        credentials,
+    let data = SambaData {
         first_name: names.first_name.ok_or(AssertionError("missing first name"))?,
         last_name: names.last_name.ok_or(AssertionError("missing last name"))?,
         license_number: ocr_res
@@ -190,6 +189,8 @@ fn build_request(
         address: samba_address,
         ..Default::default()
     };
+
+    let request = SambaOrderRequest { data, credentials };
 
     Ok(request)
 }
@@ -244,7 +245,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     .await?;
     // create our request based on what type of data we're handling
     let (request, lifetime_ids) = context.create_request(state, &vw, doc_id.clone(), &tvc).await?;
-    let license_state = UsStateAndTerritories::from_raw_string(request.license_state.leak()).ok();
+    let license_state = UsStateAndTerritories::from_raw_string(request.data.license_state.leak()).ok();
 
     let can_run_request_for_state = if let Some(state) = license_state {
         license_state_is_supported_for_license_validation(state)
@@ -332,7 +333,7 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
 
     let tvc =
         TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
-    let request = SambaGetLVReportRequest {
+    let request = SambaGetReportRequest {
         credentials: tvc.samba_credentials(),
         report_id: report_id.clone(),
     };
@@ -405,6 +406,6 @@ mod tests {
         let ocr_res: FetchOCRResponse =
             serde_json::from_value(FetchOCRResponse::fixture_response(Some(fixture))).unwrap();
         let req = build_request(&ocr_res, creds).unwrap();
-        req.license_state.leak().to_string()
+        req.data.license_state.leak().to_string()
     }
 }

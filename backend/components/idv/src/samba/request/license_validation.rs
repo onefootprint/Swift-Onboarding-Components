@@ -1,4 +1,5 @@
-use super::SambaCreateLVOrderRequest;
+use crate::samba::common::SambaOrderAddress;
+use newtypes::samba::SambaData;
 use newtypes::PiiString;
 use serde::Serialize;
 
@@ -34,7 +35,7 @@ pub struct CreateLVOrderRequest {
     issue_date: Option<PiiString>,
     expiry_date: Option<PiiString>,
     gender: Option<PiiString>,
-    address: Option<CreateLVOrderAddress>,
+    address: Option<SambaOrderAddress>,
     eye_color: Option<PiiString>,
     height: Option<u16>,
     weight: Option<u16>,
@@ -47,19 +48,9 @@ pub struct CreateLVOrderCustomField {
     value: Option<PiiString>,
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateLVOrderAddress {
-    pub street: PiiString,
-    pub city: PiiString,
-    pub state: PiiString,
-    pub zip_code: PiiString,
-}
-
-impl From<SambaCreateLVOrderRequest> for CreateLVOrderRequest {
-    fn from(value: SambaCreateLVOrderRequest) -> Self {
-        let SambaCreateLVOrderRequest {
-            credentials: _,
+impl From<SambaData> for CreateLVOrderRequest {
+    fn from(value: SambaData) -> Self {
+        let SambaData {
             first_name,
             last_name,
             middle_name,
@@ -90,7 +81,7 @@ impl From<SambaCreateLVOrderRequest> for CreateLVOrderRequest {
             height,
             weight,
             birth_date: dob,
-            address,
+            address: address.map(|a| a.into()),
             suffix: None,
             bill_code: None,
             bill_reference: None,

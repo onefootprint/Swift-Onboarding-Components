@@ -45,10 +45,10 @@ use idv::middesk::MiddeskGetBusinessRequest;
 use idv::middesk::MiddeskGetBusinessResponse;
 use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
-use idv::samba::request::SambaCreateLVOrderRequest;
-use idv::samba::request::SambaGetLVReportRequest;
-use idv::samba::response::license_validation::CreateLVOrderResponse;
+use idv::samba::common::SambaGetReportRequest;
+use idv::samba::common::SambaOrderRequest;
 use idv::samba::response::license_validation::GetLVOrderResponse;
+use idv::samba::response::CreateOrderResponse;
 use idv::samba::SambaAPIResponse;
 use idv::sentilink::SentilinkAPIResponse;
 use idv::sentilink::SentilinkApplicationRiskRequest;
@@ -234,13 +234,10 @@ impl IncodeClients {
 
 #[derive(Clone)]
 pub struct SambaClients {
-    pub samba_create_license_validation_order: VendorClient<
-        SambaCreateLVOrderRequest,
-        SambaAPIResponse<CreateLVOrderResponse>,
-        idv::samba::error::Error,
-    >,
+    pub samba_create_license_validation_order:
+        VendorClient<SambaOrderRequest, SambaAPIResponse<CreateOrderResponse>, idv::samba::error::Error>,
     pub samba_get_license_validation_report:
-        VendorClient<SambaGetLVReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>,
+        VendorClient<SambaGetReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>,
 }
 
 impl SambaClients {
@@ -249,12 +246,12 @@ impl SambaClients {
         use crate::decision::vendor::vendor_trait::MockVendorAPICall;
         Self {
             samba_create_license_validation_order: Arc::new(MockVendorAPICall::<
-                SambaCreateLVOrderRequest,
-                SambaAPIResponse<CreateLVOrderResponse>,
+                SambaOrderRequest,
+                SambaAPIResponse<CreateOrderResponse>,
                 idv::samba::error::Error,
             >::new()),
             samba_get_license_validation_report: Arc::new(MockVendorAPICall::<
-                SambaGetLVReportRequest,
+                SambaGetReportRequest,
                 SambaAPIResponse<GetLVOrderResponse>,
                 idv::samba::error::Error,
             >::new()),

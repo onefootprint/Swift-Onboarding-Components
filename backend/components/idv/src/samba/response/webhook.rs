@@ -1,6 +1,6 @@
-use super::license_validation::OrderStatusLink;
-use super::license_validation::OrderStatusLinks;
-use super::license_validation::SambaLinkType;
+use super::OrderStatusLink;
+use super::OrderStatusLinks;
+use super::SambaLinkType;
 use newtypes::SambaOrderId;
 use newtypes::SambaWebhookEventType;
 use serde::Deserialize;

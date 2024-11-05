@@ -10,14 +10,14 @@ use api_core::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
-use newtypes::samba::SambaLicenseValidationData;
+use newtypes::samba::SambaData;
 use newtypes::DecisionIntentKind;
 use newtypes::FpId;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct CreateSambaOrderRequest {
     pub fp_id: FpId,
-    pub data: Option<SambaLicenseValidationData>,
+    pub data: Option<SambaData>,
 }
 #[post("/private/protected/samba/create_order")]
 pub async fn create_samba_order(

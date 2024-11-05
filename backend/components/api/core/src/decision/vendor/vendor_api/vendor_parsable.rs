@@ -13,7 +13,7 @@ use idv::lexis::response::FlexIdResponse;
 use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
-use idv::samba::response::license_validation::CreateLVOrderResponse;
+use idv::samba::response::CreateOrderResponse;
 use idv::sentilink::application_risk::response::ApplicationRiskResponse;
 use idv::ParsedResponse;
 use newtypes::vendor_api_struct::*;
@@ -149,7 +149,7 @@ impl AsParsedResponse for MiddeskBusinessUpdateWebhookResponse {
 // Samba
 // we don't need a vendor result for this one
 impl VendorParsable for SambaLicenseValidationCreate {
-    type ParsedType = CreateLVOrderResponse;
+    type ParsedType = CreateOrderResponse;
 }
 
 // Neuro
