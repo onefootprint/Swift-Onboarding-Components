@@ -81,7 +81,6 @@ const getNextConfig = () => {
       '@onefootprint/hooks',
       '@onefootprint/request',
       '@onefootprint/types',
-      '@onefootprint/dev-tools',
       '@radix-ui',
     ],
     async redirects() {
