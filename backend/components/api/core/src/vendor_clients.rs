@@ -60,6 +60,8 @@ use idv::stytch::StytchLookupRequest;
 use idv::stytch::StytchLookupResponse;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
+use newtypes::SambaLicenseValidationCreate;
+use newtypes::SambaLicenseValidationGetReport;
 use std::sync::Arc;
 
 pub type VendorClient<Req, Resp, E> = Arc<dyn VendorAPICall<Req, Resp, E>>;
@@ -234,10 +236,16 @@ impl IncodeClients {
 
 #[derive(Clone)]
 pub struct SambaClients {
-    pub samba_create_license_validation_order:
-        VendorClient<SambaOrderRequest, SambaAPIResponse<CreateOrderResponse>, idv::samba::error::Error>,
-    pub samba_get_license_validation_report:
-        VendorClient<SambaGetReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>,
+    pub samba_create_license_validation_order: VendorClient<
+        SambaOrderRequest<SambaLicenseValidationCreate>,
+        SambaAPIResponse<CreateOrderResponse>,
+        idv::samba::error::Error,
+    >,
+    pub samba_get_license_validation_report: VendorClient<
+        SambaGetReportRequest<SambaLicenseValidationGetReport>,
+        SambaAPIResponse<GetLVOrderResponse>,
+        idv::samba::error::Error,
+    >,
 }
 
 impl SambaClients {
@@ -246,12 +254,12 @@ impl SambaClients {
         use crate::decision::vendor::vendor_trait::MockVendorAPICall;
         Self {
             samba_create_license_validation_order: Arc::new(MockVendorAPICall::<
-                SambaOrderRequest,
+                SambaOrderRequest<SambaLicenseValidationCreate>,
                 SambaAPIResponse<CreateOrderResponse>,
                 idv::samba::error::Error,
             >::new()),
             samba_get_license_validation_report: Arc::new(MockVendorAPICall::<
-                SambaGetReportRequest,
+                SambaGetReportRequest<SambaLicenseValidationGetReport>,
                 SambaAPIResponse<GetLVOrderResponse>,
                 idv::samba::error::Error,
             >::new()),

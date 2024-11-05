@@ -4315,3 +4315,10 @@ pub fn sentilink_result(opts: SentilinkTestOpts) -> serde_json::Value {
         "transaction_id": "01J85SSE-PAPV-04P4RHED"
     })
 }
+
+
+pub fn samba_create_order_response() -> serde_json::Value {
+    serde_json::json!({
+        "orderId": "f6113a2c-61e3-4ede-b8ad-aeaf67a80477"
+    })
+}

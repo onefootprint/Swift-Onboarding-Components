@@ -152,6 +152,10 @@ impl VendorParsable for SambaLicenseValidationCreate {
     type ParsedType = CreateOrderResponse;
 }
 
+impl VendorParsable for SambaActivityHistoryCreate {
+    type ParsedType = CreateOrderResponse;
+}
+
 // Neuro
 impl VendorParsable for NeuroIdAnalytics {
     type ParsedType = NeuroIdAnalyticsResponse;

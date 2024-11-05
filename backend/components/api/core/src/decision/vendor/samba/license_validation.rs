@@ -108,7 +108,10 @@ impl CreateOrderContext {
         vw: &VaultWrapper,
         doc_id: Option<DocumentId>,
         tvc: &TenantVendorControl,
-    ) -> FpResult<(SambaOrderRequest, Vec<DataLifetimeId>)> {
+    ) -> FpResult<(
+        SambaOrderRequest<SambaLicenseValidationCreate>,
+        Vec<DataLifetimeId>,
+    )> {
         match self {
             // we're in the context of a workflow
             CreateOrderContext::Workflow { .. } => {
@@ -116,10 +119,7 @@ impl CreateOrderContext {
             }
             CreateOrderContext::Adhoc { data, .. } => {
                 if let Some(d) = data {
-                    let request = SambaOrderRequest {
-                        data: d.clone(),
-                        credentials: tvc.samba_credentials(),
-                    };
+                    let request = SambaOrderRequest::new(tvc.samba_credentials(), d.clone());
                     Ok((request, vec![]))
                 } else {
                     // otherwise take the latest DL and run it through
@@ -136,7 +136,10 @@ async fn build_request_from_ocr_response(
     vw: &VaultWrapper,
     doc_id: Option<DocumentId>,
     tvc: &TenantVendorControl,
-) -> FpResult<(SambaOrderRequest, Vec<DataLifetimeId>)> {
+) -> FpResult<(
+    SambaOrderRequest<SambaLicenseValidationCreate>,
+    Vec<DataLifetimeId>,
+)> {
     let Some(did) = doc_id else {
         return Err(AssertionError("missing document id").into());
     };
@@ -159,7 +162,7 @@ async fn build_request_from_ocr_response(
 fn build_request(
     ocr_res: &FetchOCRResponse,
     credentials: SambaSafetyCredentials,
-) -> FpResult<SambaOrderRequest> {
+) -> FpResult<SambaOrderRequest<SambaLicenseValidationCreate>> {
     let names = ParsedIncodeNames::from_fetch_ocr_res(ocr_res);
     let address: ParsedIncodeAddress = ParsedIncodeAddress::from_fetch_ocr_res(ocr_res);
     let samba_address = match (address.street, address.zip, address.city, address.state) {
@@ -190,7 +193,7 @@ fn build_request(
         ..Default::default()
     };
 
-    let request = SambaOrderRequest { data, credentials };
+    let request = SambaOrderRequest::new(credentials, data);
 
     Ok(request)
 }
@@ -333,10 +336,7 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
 
     let tvc =
         TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
-    let request = SambaGetReportRequest {
-        credentials: tvc.samba_credentials(),
-        report_id: report_id.clone(),
-    };
+    let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
 
     // make request
     let res = state

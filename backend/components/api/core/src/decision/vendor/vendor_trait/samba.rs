@@ -11,12 +11,18 @@ use idv::samba::response::CreateOrderResponse;
 use idv::samba::response::OrderStatusResponse;
 use idv::samba::SambaAPIResponse;
 use idv::ParsedResponse;
+use newtypes::SambaLicenseValidationCreate;
+use newtypes::SambaLicenseValidationGetReport;
 use newtypes::VendorAPI;
 
 /// Create License Validation Samba Order
 #[async_trait]
-impl VendorAPICall<SambaOrderRequest, SambaAPIResponse<CreateOrderResponse>, idv::samba::error::Error>
-    for FootprintVendorHttpClient
+impl
+    VendorAPICall<
+        SambaOrderRequest<SambaLicenseValidationCreate>,
+        SambaAPIResponse<CreateOrderResponse>,
+        idv::samba::error::Error,
+    > for FootprintVendorHttpClient
 {
     #[tracing::instrument(
         "make_request",
@@ -25,7 +31,7 @@ impl VendorAPICall<SambaOrderRequest, SambaAPIResponse<CreateOrderResponse>, idv
     )]
     async fn make_request(
         &self,
-        request: SambaOrderRequest,
+        request: SambaOrderRequest<SambaLicenseValidationCreate>,
     ) -> Result<SambaAPIResponse<CreateOrderResponse>, idv::samba::error::Error> {
         let client_adapter = SambaSafetyClientAdapter::new(request.credentials.clone())?;
         let authed_client = client_adapter.get_authenticated_client(self).await?;
@@ -97,17 +103,22 @@ impl VendorAPIResponse for SambaAPIResponse<OrderStatusResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<SambaGetReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>
-    for FootprintVendorHttpClient
+impl
+    VendorAPICall<
+        SambaGetReportRequest<SambaLicenseValidationGetReport>,
+        SambaAPIResponse<GetLVOrderResponse>,
+        idv::samba::error::Error,
+    > for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "SambaGetLVReportRequest"))]
     async fn make_request(
         &self,
-        request: SambaGetReportRequest,
+        request: SambaGetReportRequest<SambaLicenseValidationGetReport>,
     ) -> Result<SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error> {
         let SambaGetReportRequest {
             credentials,
             report_id,
+            _phantom,
         } = request;
         let client_adapter = SambaSafetyClientAdapter::new(credentials)?;
         let authed_client = client_adapter.get_authenticated_client(self).await?;

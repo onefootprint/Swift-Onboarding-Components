@@ -110,6 +110,8 @@ pub enum VendorAPI {
     SambaLicenseValidationGetStatus,
     SambaLicenseValidationGetReport,
     SentilinkApplicationRisk,
+    SambaActivityHistoryCreate,
+    SambaActivityHistoryGetReport,
     // Used for internally generated non-vendor risk signals
     Footprint,
 }
@@ -155,6 +157,8 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::SambaLicenseValidationGetReport => Self::SambaSafety,
             VendorAPI::SentilinkApplicationRisk => Self::Sentilink,
             VendorAPI::Footprint => Self::Footprint,
+            VendorAPI::SambaActivityHistoryCreate => Self::SambaSafety,
+            VendorAPI::SambaActivityHistoryGetReport => Self::SambaSafety,
         }
     }
 }

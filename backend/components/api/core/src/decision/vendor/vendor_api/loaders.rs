@@ -432,6 +432,20 @@ mod tests {
             VendorAPI::SambaLicenseValidationGetReport => todo!(),
             VendorAPI::SentilinkApplicationRisk => todo!(),
             VendorAPI::Footprint => todo!(),
+            VendorAPI::SambaActivityHistoryCreate => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    sv_id2,
+                    doc_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    SambaActivityHistoryCreate,
+                )
+                .await
+            }
+            VendorAPI::SambaActivityHistoryGetReport => todo!(),
         };
 
         assert!(test_ran)
@@ -580,15 +594,13 @@ mod tests {
             VendorAPI::AwsTextract => todo!(),
             VendorAPI::LexisFlexId => idv::test_fixtures::passing_lexis_flex_id_response(),
             VendorAPI::NeuroIdAnalytics => todo!(),
-            VendorAPI::SambaLicenseValidationCreate => {
-                serde_json::json!({
-                    "orderId": "f6113a2c-61e3-4ede-b8ad-aeaf67a80477"
-                })
-            }
+            VendorAPI::SambaLicenseValidationCreate => idv::test_fixtures::samba_create_order_response(),
             VendorAPI::SambaLicenseValidationGetStatus => todo!(),
             VendorAPI::SambaLicenseValidationGetReport => todo!(),
             VendorAPI::SentilinkApplicationRisk => todo!(),
             VendorAPI::Footprint => todo!(),
+            VendorAPI::SambaActivityHistoryCreate => idv::test_fixtures::samba_create_order_response(),
+            VendorAPI::SambaActivityHistoryGetReport => todo!(),
         }
     }
 }
