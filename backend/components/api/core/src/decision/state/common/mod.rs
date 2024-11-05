@@ -7,6 +7,10 @@ use crate::decision::risk;
 use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::neuro_id::run_neuro_call;
+use crate::decision::vendor::samba::create_order::SambaOrderConfig;
+use crate::decision::vendor::samba::create_order::{
+    self,
+};
 use crate::decision::vendor::sentilink::application_risk::run_sentilink_application_risk;
 use crate::decision::vendor::twilio::run_twilio_call;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
@@ -43,10 +47,12 @@ use db::DbPool;
 use db::DbResult;
 use db::PgConn;
 use db::TxnPgConn;
+use feature_flag::BoolFlag;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use itertools::Itertools;
+use newtypes::samba::SambaOrderKind;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::CipKind;
 use newtypes::DataLifetimeSeqno;
@@ -67,6 +73,7 @@ use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::StepUpInfo;
 use newtypes::TenantId;
+use newtypes::UsStateAndTerritories;
 use newtypes::VaultId;
 use newtypes::VaultOperation;
 use newtypes::VendorAPI;
@@ -284,6 +291,59 @@ pub async fn run_aml_call(
         .await
     }
 }
+
+
+#[tracing::instrument(skip(state))]
+pub async fn run_samba_if_needed(state: &State, wf_id: &WorkflowId, obc: &ObConfiguration) -> FpResult<()> {
+    let samba_enabled = state
+        .ff_client
+        .flag(BoolFlag::RunSambaActivityHistoryForPlaybook(&obc.key));
+    if !samba_enabled {
+        return Ok(());
+    }
+
+    let wfid = wf_id.clone();
+    let (wf, di) = state
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, di))
+        })
+        .await?;
+
+    let s2 = state.clone();
+    // Flexcar only wants this in PA at the moment
+    let config = if obc.tenant_id.is_flexcar() {
+        let c = SambaOrderConfig {
+            states: vec![UsStateAndTerritories::PA],
+        };
+        Some(c)
+    } else {
+        None
+    };
+
+    tokio::spawn(async move {
+        match create_order::run_samba_create_order(
+            &s2,
+            create_order::CreateOrderContext::Workflow { di, wf_id: wf.id },
+            SambaOrderKind::ActivityHistory,
+            config,
+        )
+        .await
+        {
+            Ok(_) => (),
+            Err(e) => tracing::error!(?e, "error running samba create order"),
+        }
+    });
+
+    Ok(())
+}
+
 
 pub enum DecisionOutput {
     Terminal,

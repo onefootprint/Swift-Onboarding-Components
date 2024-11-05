@@ -93,6 +93,8 @@ pub enum BoolFlag<'a> {
 
     #[strum(to_string = "DisableVaultDisasterRecoveryWorker")]
     DisableVaultDisasterRecoveryWorker(&'a VaultDrConfigId),
+    #[strum(to_string = "RunSambaActivityHistoryForPlaybook")]
+    RunSambaActivityHistoryForPlaybook(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -143,6 +145,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanSendSmsToHighFraudCountries(k) => Some(k.to_string()),
             Self::RunSentilinkForPlaybookTemporary(k) => Some(k.to_string()),
             Self::DisableVaultDisasterRecoveryWorker(k) => Some(k.to_string()),
+            Self::RunSambaActivityHistoryForPlaybook(k) => Some(k.to_string()),
         }
     }
 
@@ -189,6 +192,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanSendSmsToHighFraudCountries(_) => false,
             Self::RunSentilinkForPlaybookTemporary(_) => false,
             Self::DisableVaultDisasterRecoveryWorker(_) => false,
+            Self::RunSambaActivityHistoryForPlaybook(_) => false,
         }
     }
 
@@ -237,6 +241,7 @@ impl<'a> BoolFlag<'a> {
             | Self::UseKycWaterfallV2Rollout(_)
             | Self::CanSendSmsToHighFraudCountries(_)
             | Self::RunSentilinkForPlaybookTemporary(_)
+            | Self::RunSambaActivityHistoryForPlaybook(_)
             | Self::ApiKycSkipEmailAndPhoneRequirements(_)
             | Self::DisableVaultDisasterRecoveryWorker(_) => false,
             // These are migrated to the newer format

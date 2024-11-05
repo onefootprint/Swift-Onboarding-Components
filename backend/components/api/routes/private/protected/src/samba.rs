@@ -37,8 +37,13 @@ pub async fn create_samba_order(
         })
         .await?;
 
-    create_order::run_samba_create_order(&state, create_order::CreateOrderContext::Adhoc { di, data }, kind)
-        .await?;
+    create_order::run_samba_create_order(
+        &state,
+        create_order::CreateOrderContext::Adhoc { di, data },
+        kind,
+        None,
+    )
+    .await?;
 
     Ok(api_wire_types::Empty)
 }

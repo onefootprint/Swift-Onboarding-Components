@@ -81,7 +81,7 @@ impl CreateOrderContext {
     }
 
     #[tracing::instrument(skip_all)]
-    fn get_document_id(&self, conn: &mut PgConn) -> FpResult<Option<DocumentId>> {
+    fn get_document(&self, conn: &mut PgConn) -> FpResult<Option<Document>> {
         // If we're running this in the context of a wf, only check documents collected in this workflow
         let id_documents = match self {
             CreateOrderContext::Workflow { wf_id, .. } => {
@@ -98,11 +98,9 @@ impl CreateOrderContext {
             .filter(|(d, _, _)| d.vaulted_document_type == Some(DocumentKind::DriversLicense))
             .collect();
 
-        let doc_id = AdditionalIdentityDocumentVerificationHelper::new(id_documents)
-            .identity_document()
-            .map(|d| d.id);
+        let doc = AdditionalIdentityDocumentVerificationHelper::new(id_documents).identity_document();
 
-        Ok(doc_id)
+        Ok(doc)
     }
 }
 
@@ -291,11 +289,17 @@ fn build_request(ocr_res: &FetchOCRResponse) -> FpResult<SambaData> {
     Ok(data)
 }
 
+#[derive(Clone, Debug)]
+pub struct SambaOrderConfig {
+    pub states: Vec<UsStateAndTerritories>,
+}
+
 #[tracing::instrument(skip_all)]
 pub async fn run_samba_create_order(
     state: &State,
     context: CreateOrderContext,
     kind: SambaOrderKind,
+    config: Option<SambaOrderConfig>,
 ) -> FpResult<()> {
     let di = context.decision_intent();
     let vreq_identifier = context.vreq_identifier();
@@ -303,22 +307,24 @@ pub async fn run_samba_create_order(
     let di_id = di.id.clone();
     let context2 = context.clone();
 
-    let (vw, tenant_id, doc_id) = state
+    let (vw, tenant_id, doc) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
             // If we're running this in the context of a wf, only check documents collected in this workflow
-            let doc_id = context2.get_document_id(conn.conn())?;
+            let doc = context2.get_document(conn.conn())?;
 
-            Ok((vw, tenant_id, doc_id))
+            Ok((vw, tenant_id, doc))
         })
         .await?;
 
-    if doc_id.is_none() && !context.is_adhoc_with_data() {
+    if doc.is_none() && !context.is_adhoc_with_data() {
         return Err(AssertionError("no data to call samba").into());
     }
+
+    let doc_id = doc.as_ref().map(|d| d.id.clone());
 
     let samba_helper = SambaOrderHelper {
         kind,
@@ -340,7 +346,6 @@ pub async fn run_samba_create_order(
     }
 
     // Make the call
-
     let tvc = TenantVendorControl::new(
         tenant_id.clone(),
         &state.db_pool,
@@ -365,6 +370,16 @@ pub async fn run_samba_create_order(
             let (request, lifetime_ids) = samba_helper
                 .create_ah_request(state, &vw, doc_id.clone(), &tvc)
                 .await?;
+
+            // TODO: will need to refactor this in the future. Not all too elegant
+            if let Some(config) = config.as_ref() {
+                let state = UsStateAndTerritories::from_raw_string(request.data.license_state.leak()).ok();
+                if state.map(|s| !config.states.contains(&s)).unwrap_or(true) {
+                    tracing::info!(?state, "Samba config does not support this state");
+                    return Ok(());
+                }
+            }
+
             (
                 samba_helper.make_activity_history_request(state, request).await,
                 lifetime_ids,
@@ -393,7 +408,7 @@ pub async fn run_samba_create_order(
         .db_transaction(move |conn| -> FpResult<_> {
             let args = NewSambaOrderArgs {
                 decision_intent_id: di_id,
-                document_id: doc_id,
+                document_id: doc_id.clone(),
                 lifetime_ids,
                 kind: samba_helper.kind,
                 order_id: create_order_response.order_id.leak_to_string().into(),

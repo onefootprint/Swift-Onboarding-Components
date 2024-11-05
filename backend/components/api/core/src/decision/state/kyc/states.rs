@@ -260,10 +260,6 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        // TODO: Figure out the right way to represent in our product (e.g. VerificationChecks)
-        //   FF is temporary to avoid serializing stuff in DB that we need to fix later
-        // TODO: FP reason codes
-        // TODO: models for storing score-specific reason codes?
         let sentilink_result = if obc
             .verification_checks()
             .is_enabled(VerificationCheckKind::Sentilink)
@@ -278,6 +274,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         } else {
             None
         };
+
+        // Run samba if needed
+        match common::run_samba_if_needed(state, &self.wf_id, &obc).await {
+            Ok(()) => (),
+            Err(err) => {
+                tracing::warn!(?err, wf_id=?self.wf_id, "non-Samba related error running Samba");
+            }
+        }
 
 
         let aml_vendor_result = match obc.verification_checks().enhanced_aml() {
