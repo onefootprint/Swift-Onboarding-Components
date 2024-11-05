@@ -151,6 +151,7 @@ fn can_fill_doc_first_id_data(dk: ValidatedIdDocKind, rs: &[NewRiskSignal], tena
     }
 }
 
+
 fn doc_first_id_data(
     r: &FetchOCRResponse,
     validate_args: ValidateArgs,

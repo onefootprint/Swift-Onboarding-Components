@@ -1,4 +1,5 @@
 use super::error::Error as SambaSafetyError;
+use super::request::activity_history::CreateAHOrderRequest;
 use super::request::license_validation::CreateLVOrderRequest;
 use super::response::auth::AuthenticationResponse;
 use crate::footprint_http_client::FootprintVendorHttpClient;
@@ -20,6 +21,16 @@ impl SambaHeaders {
         headers.insert(
             "Accept",
             header::HeaderValue::from_str("application/vnd.sambasafety.json;version=2.0.4")?,
+        );
+
+        Ok(headers)
+    }
+
+    pub fn headers_for_activity_history(&self) -> SambaResult<header::HeaderMap> {
+        let mut headers = self.0.clone();
+        headers.insert(
+            "Accept",
+            header::HeaderValue::from_str("application/vnd.sambasafety.activityhistory+json;version=2.0.0")?,
         );
 
         Ok(headers)
@@ -182,15 +193,79 @@ impl AuthenticatedSambaSafetyClientAdapter {
             .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
         Ok(response)
     }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn create_activity_history_order(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        request: SambaData,
+    ) -> SambaResult<reqwest::Response> {
+        let request = CreateAHOrderRequest::from(request);
+        let url = self.api_url("orders/v1/activityreports/history");
+
+        let response = footprint_http_client
+            .post(url)
+            .bearer_auth(self.auth_token.leak())
+            .headers(self.headers.clone().0)
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
+
+        Ok(response)
+    }
+
+    /// Get the status of a ActivityHistory Order, returns a report_id which we can use to fetch
+    /// the results
+    #[tracing::instrument(skip_all)]
+    pub async fn get_activity_history_status(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        order_id: SambaOrderId,
+    ) -> SambaResult<reqwest::Response> {
+        let path = format!("orders/v1/activityreports/history/{0}", order_id.as_str());
+        let url = self.api_url(&path);
+
+        let response = footprint_http_client
+            .get(url)
+            .bearer_auth(self.auth_token.leak())
+            .headers(self.headers.clone().0)
+            .send()
+            .await
+            .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
+        Ok(response)
+    }
+
+    /// Get the AH Report
+    #[tracing::instrument(skip_all)]
+    pub async fn get_activity_history_report(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        report_id: SambaReportId,
+    ) -> SambaResult<reqwest::Response> {
+        let path = format!("reports/v1/activityreports/history/{0}", report_id.as_str());
+        let url = self.api_url(&path);
+
+        let response = footprint_http_client
+            .get(url)
+            .bearer_auth(self.auth_token.leak())
+            .headers(self.headers.headers_for_activity_history()?) // need to specify "Accept" here, or we get 400
+            .send()
+            .await
+            .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
+        Ok(response)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::footprint_http_client::FpVendorClientArgs;
+    use crate::samba::response::activity_history::GetAHOrderResponse;
     use crate::samba::response::license_validation::GetLVOrderResponse;
     use crate::samba::response::CreateOrderResponse;
     use crate::samba::response::OrderStatusResponse;
+    use crate::samba::response::SambaLinkType;
     use newtypes::samba::SambaAddress;
     use newtypes::samba::SambaData;
     use std::thread;
@@ -273,7 +348,7 @@ mod tests {
             .unwrap();
 
         let response: OrderStatusResponse = serde_json::from_value(order_resp).unwrap();
-        let report_id = response.report_id().unwrap();
+        let report_id = response.report_id(SambaLinkType::LicenseReports).unwrap();
         let report_resp = authed_client
             .get_license_validation_report(&fp_client, report_id)
             .await
@@ -289,5 +364,71 @@ mod tests {
             response.record.dl_record.result.error_code.unwrap(),
             "A2".to_string()
         );
+    }
+
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_activity_history_create_order() {
+        let data = SambaData {
+            first_name: "John".into(),
+            last_name: "Doe".into(),
+            license_number: "057986548".into(),
+            license_state: "GA".into(),
+            // result doesn't change if we add these or don't include them
+            // their test cases aren't amazing though
+            dob: Some("1980-08-16".into()),
+            address: Some(SambaAddress {
+                street: "495 Grove Street".into(),
+                city: "Boulder".into(),
+                state: "CO".into(),
+                zip_code: "80301".into(),
+            }),
+            ..Default::default()
+        };
+        let credentials = get_credentials();
+        // samba provided test case
+
+
+        let authed_client = get_authed_client(credentials.clone()).await;
+        let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
+
+        // create order
+        let raw_response = authed_client
+            .create_activity_history_order(&fp_client, data)
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+        let response: CreateOrderResponse = serde_json::from_value(raw_response).unwrap();
+        let order_id = response.order_id;
+        assert!(!order_id.leak().is_empty());
+
+        // wait for a few secs so it moves to FULFILLED
+        thread::sleep(time::Duration::from_secs(20));
+
+        // get order status
+        let order_resp = authed_client
+            .get_activity_history_status(&fp_client, SambaOrderId::from(order_id.leak_to_string()))
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+        let response: OrderStatusResponse = serde_json::from_value(order_resp).unwrap();
+        let report_id = response.report_id(SambaLinkType::ActivityHistory).unwrap();
+        let report_resp: serde_json::Value = authed_client
+            .get_activity_history_report(&fp_client, report_id.clone())
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+        let response: GetAHOrderResponse = serde_json::from_value(report_resp).unwrap();
+        assert_eq!(response.report_id, report_id.to_string());
     }
 }

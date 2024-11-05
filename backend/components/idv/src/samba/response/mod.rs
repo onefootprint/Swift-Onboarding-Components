@@ -5,6 +5,7 @@ use serde::Serialize;
 use std::str::FromStr;
 use strum_macros::EnumString;
 
+pub mod activity_history;
 pub(crate) mod auth;
 pub mod license_validation;
 pub mod webhook;
@@ -28,11 +29,9 @@ pub struct OrderStatusResponse {
 }
 
 impl OrderStatusResponse {
-    pub fn report_id(&self) -> Option<SambaReportId> {
+    pub fn report_id(&self, link_type: SambaLinkType) -> Option<SambaReportId> {
         // would we have more reports here?
-        self.links
-            .get_link(SambaLinkType::LicenseReports)
-            .map(|l| l.report_id.into())
+        self.links.get_link(link_type).map(|l| l.report_id.into())
     }
 }
 
@@ -54,6 +53,8 @@ pub enum SambaLinkType {
     ActivityReports,
     #[strum(serialize = "licensereports")]
     LicenseReports,
+    #[strum(serialize = "activityhistory")]
+    ActivityHistory,
 }
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct OrderStatusLinks(pub Vec<OrderStatusLink>);
