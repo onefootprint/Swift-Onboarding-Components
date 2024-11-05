@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 import sortDocumentsAndUploads from '../../utils/sort-documents';
+import transformUploadsWithDocuments from '../../utils/transform-uploads-with-is-latest';
 
 type GetDocumentsRequest = {
   entityId: string;
@@ -32,7 +33,12 @@ const useDocuments = (id: string, seqno?: string) => {
     queryFn: () => getDocuments(authHeaders, { ...requestParams }),
     enabled: !!id,
     select: (documents: Document[]) => {
-      return sortDocumentsAndUploads(documents);
+      const sortedDocuments = sortDocumentsAndUploads(documents);
+      const docsWithIsLatest = sortedDocuments.map(doc => ({
+        ...doc,
+        uploads: transformUploadsWithDocuments(doc.uploads),
+      }));
+      return docsWithIsLatest;
     },
   });
 };

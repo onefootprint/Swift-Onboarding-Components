@@ -3,15 +3,17 @@ import type { DocumentUpload, IdDocImageProcessingError } from '@onefootprint/ty
 import { Stack, Text, Tooltip } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import useUploadSideText from '../../../../../../hooks/use-upload-side-text';
 import useFailureReasonText from './hooks';
 
 export type UploadTitleCardProps = {
-  upload: DocumentUpload;
+  upload: DocumentUpload & { isLatest: boolean };
 };
 
-const UploadTitleCard = ({ upload: { timestamp, failureReasons } }: UploadTitleCardProps) => {
+const UploadTitleCard = ({ upload: { timestamp, failureReasons, isLatest, side } }: UploadTitleCardProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset.documents.details' });
   const failureReasonT = useFailureReasonText();
+  const sideT = useUploadSideText();
   const isSuccess = !failureReasons || failureReasons.length === 0;
 
   return (
@@ -41,6 +43,11 @@ const UploadTitleCard = ({ upload: { timestamp, failureReasons } }: UploadTitleC
         <Tooltip text={failureReasonT(failureReasons[0] as IdDocImageProcessingError)}>
           <IcoInfo16 color="tertiary" />
         </Tooltip>
+      )}
+      {isLatest && (
+        <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
+          {t('latest', { side: sideT(side) })}
+        </Text>
       )}
     </Stack>
   );
