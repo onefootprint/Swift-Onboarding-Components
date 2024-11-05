@@ -1,5 +1,5 @@
 import * as storybook from '@storybook/test';
-import { expect, fn, within } from '@storybook/test';
+import { expect, within } from '@storybook/test';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
@@ -61,9 +61,6 @@ const Template = () => {
 export default {
   component: Template,
   title: 'Components/Combo',
-  args: {
-    onSelect: fn(),
-  },
 } satisfies Meta<typeof Template>;
 
 type Story = StoryObj<typeof Template>;
