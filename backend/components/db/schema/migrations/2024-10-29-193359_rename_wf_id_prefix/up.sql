@@ -1,0 +1,1 @@
+ALTER TABLE workflow ALTER COLUMN id SET DEFAULT prefixed_uid('ob_');
