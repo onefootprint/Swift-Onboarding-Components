@@ -94,12 +94,17 @@ pub enum OcrDataKind {
     ClassifiedDocumentType,
     /// This is the full response from Curp validation
     CurpValidationResponse,
+    /// This is the full response from Samba Activity History API
+    SambaActivityHistoryResponse,
 }
 
 impl OcrDataKind {
     // some data is stored as json
     pub fn is_json(&self) -> bool {
-        matches!(self, Self::CurpValidationResponse)
+        matches!(
+            self,
+            Self::CurpValidationResponse | Self::SambaActivityHistoryResponse
+        )
     }
 }
 

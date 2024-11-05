@@ -266,7 +266,12 @@ mod tests {
             .filter_map(|f| ODK::try_from(f).ok())
             .collect_vec();
         let odks = ODK::iter()
-            .filter(|odk| !matches!(odk, ODK::CurpValidationResponse))
+            .filter(|odk| {
+                !matches!(
+                    odk,
+                    ODK::CurpValidationResponse | ODK::SambaActivityHistoryResponse
+                )
+            })
             .collect_vec();
 
         assert_have_same_elements(incode_odks, odks);

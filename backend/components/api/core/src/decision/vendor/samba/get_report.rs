@@ -3,21 +3,35 @@ use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DataRequestSource;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
 use crate::State;
+use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::samba_order::SambaOrder;
 use db::models::samba_order::UpdateSambaOrder;
 use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
+use db::TxnPgConn;
 use idv::samba::common::SambaGetReportRequest;
 use idv::samba::response::webhook::SambaWebhook;
 use idv::samba::response::SambaLinkType;
 use newtypes::samba::SambaOrderKind;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataRequest;
+use newtypes::DocumentDiKind;
+use newtypes::IdDocKind;
+use newtypes::OcrDataKind;
+use newtypes::PiiJsonValue;
 use newtypes::SambaReportId;
+use newtypes::ScopedVaultId;
+use newtypes::ValidateArgs;
 use newtypes::VendorAPI;
+use std::collections::HashMap;
 
 
 #[tracing::instrument(skip_all)]
@@ -58,7 +72,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
 
     // make request
 
-    let vres_id = match kind {
+    let (vres_id, vault_data) = match kind {
         SambaOrderKind::LicenseValidation => {
             let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
             let res = state
@@ -80,7 +94,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
 
             let resp = res.map_err(into_fp_error)?;
             let _ = resp.result.into_success().map_err(into_fp_error)?;
-            vres_id
+            (vres_id, None)
         }
         SambaOrderKind::ActivityHistory => {
             let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
@@ -100,9 +114,12 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
             );
             let (vres_id, _) = args.save(&state.db_pool).await?;
             let resp = res.map_err(into_fp_error)?;
+            let raw = resp.raw_response.clone();
             let _ = resp.result.into_success().map_err(into_fp_error)?;
+            let data =
+                compute_vault_data_for_activity_history(state, raw, false, &di.scoped_vault_id).await?;
 
-            vres_id
+            (vres_id, Some(data))
         }
     };
 
@@ -111,7 +128,14 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
             let locked = SambaOrder::lock(conn, &order.id)?;
             // check again we should be creating the report
             if locked.completed_at.is_none() {
-                let _ = SambaReport::create(conn, order.id, report_id, vres_id)?;
+                // Vault the data if applicable
+                let seqno = if let Some(data) = vault_data {
+                    vault_samba_response(conn, &di.scoped_vault_id, data)?
+                } else {
+                    DataLifetime::get_current_seqno(conn)?
+                };
+
+                let _ = SambaReport::create(conn, order.id, report_id, vres_id, seqno)?;
                 let update = UpdateSambaOrder::set_completed_at();
                 let _ = SambaOrder::update(conn, locked, update)?;
             }
@@ -121,4 +145,38 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
         .await?;
 
     Ok(())
+}
+
+
+pub async fn compute_vault_data_for_activity_history(
+    state: &State,
+    response: PiiJsonValue,
+    is_live: bool,
+    sv_id: &ScopedVaultId,
+) -> FpResult<FingerprintedDataRequest> {
+    let data = vec![(
+        DocumentDiKind::OcrData(
+            IdDocKind::DriversLicense,
+            OcrDataKind::SambaActivityHistoryResponse,
+        )
+        .into(),
+        response,
+    )];
+    let validate_args = ValidateArgs::for_bifrost(is_live);
+
+    let data = HashMap::from_iter(data.into_iter());
+    let data = DataRequest::clean_and_validate(data, validate_args)?;
+    let data = FingerprintedDataRequest::build(state, data, sv_id).await?;
+    Ok(data)
+}
+
+pub fn vault_samba_response(
+    conn: &mut TxnPgConn,
+    sv_id: &ScopedVaultId,
+    data: FingerprintedDataRequest,
+) -> FpResult<DataLifetimeSeqno> {
+    let vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
+    let result = vw.patch_data(conn, data, DataRequestSource::Ocr)?;
+
+    Ok(result.seqno)
 }

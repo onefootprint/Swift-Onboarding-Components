@@ -1100,6 +1100,7 @@ diesel::table! {
         verification_result_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        completed_seqno -> Nullable<Int8>,
     }
 }
 

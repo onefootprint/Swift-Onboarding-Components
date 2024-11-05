@@ -4,6 +4,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::samba_report;
 use diesel::prelude::*;
+use newtypes::DataLifetimeSeqno;
 use newtypes::SambaOrderTableId;
 use newtypes::SambaReportId;
 use newtypes::SambaReportTableId;
@@ -19,6 +20,7 @@ pub struct SambaReport {
     pub verification_result_id: VerificationResultId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub completed_seqno: Option<DataLifetimeSeqno>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -28,6 +30,7 @@ struct NewSambaReportRow {
     order_id: SambaOrderTableId,
     report_id: SambaReportId,
     verification_result_id: VerificationResultId,
+    completed_seqno: DataLifetimeSeqno,
 }
 
 impl SambaReport {
@@ -37,12 +40,14 @@ impl SambaReport {
         order_id: SambaOrderTableId,
         report_id: SambaReportId,
         verification_result_id: VerificationResultId,
+        completed_seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
         let new_row = NewSambaReportRow {
             created_at: Utc::now(),
             order_id,
             report_id,
             verification_result_id,
+            completed_seqno,
         };
 
         let res = diesel::insert_into(samba_report::table)

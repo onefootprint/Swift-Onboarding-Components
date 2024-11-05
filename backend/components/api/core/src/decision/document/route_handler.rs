@@ -423,15 +423,11 @@ pub async fn complete_non_identity_document(
             // mark identity doc as complete
             let update = DocumentUpdate {
                 completed_seqno: Some(seqno),
-                document_score: None,
-                selfie_score: None,
-                ocr_confidence_score: None,
                 status: Some(DocumentStatus::Complete),
                 vaulted_document_type: Some(dk),
-                curp_completed_seqno: None,
-                validated_country_code: None,
                 // Non-ID docs need to be reviewed by a human - put them into a review required state
                 review_status,
+                ..Default::default()
             };
             Document::update(conn, &id_doc.id, update)?;
 

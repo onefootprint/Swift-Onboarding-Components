@@ -1,0 +1,1 @@
+ALTER TABLE samba_report ADD COLUMN completed_seqno BIGINT;

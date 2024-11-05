@@ -39,15 +39,8 @@ impl Fail {
     ) -> FpResult<()> {
         // Mark the id doc as failed
         let update = DocumentUpdate {
-            completed_seqno: None,
-            document_score: None,
-            selfie_score: None,
-            ocr_confidence_score: None,
-            vaulted_document_type: None,
             status: Some(DocumentStatus::Failed),
-            curp_completed_seqno: None,
-            validated_country_code: None,
-            review_status: None,
+            ..Default::default()
         };
         // TODO: fix this to add wf_id
         // https://linear.app/footprint/issue/BE-1605/fix-failenter-to-have-rsg-scope-wf

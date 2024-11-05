@@ -395,9 +395,9 @@ impl Complete {
             ocr_confidence_score,
             status: Some(DocumentStatus::Complete),
             vaulted_document_type: Some(validated_doc_kind.into()),
-            curp_completed_seqno: None,
             validated_country_code: country_code.map(|c| c.0),
             review_status: Some(terminal_review_status),
+            ..Default::default()
         };
         Document::update(conn, id_doc_id, update)?;
 
