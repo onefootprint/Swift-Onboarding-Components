@@ -33,7 +33,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
             </Text>
           </Form.Label>
           {allowRealOutcome ? (
-            <Form.Select {...register('docVerificationOutcome')} id="docVerificationOutcome" size="compact">
+            <Form.Select {...register('docVerificationOutcome')} size="compact">
               {options.map(({ value, label }) => (
                 <option key={value} value={value} aria-selected={docVerificationOutcome === value}>
                   {label}

@@ -1,7 +1,6 @@
-import { fn } from '@storybook/test';
-import * as actual from './get-random-id';
+import { type Mock, fn } from '@storybook/test';
+import original from './get-random-id';
 
-export * from './get-random-id';
-const getRandomID = fn(actual.default).mockName('getRandomID');
+const getRandomID: Mock<[length?: number | undefined], string> = fn(original).mockName('getRandomID');
 
 export default getRandomID;

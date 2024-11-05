@@ -1,8 +1,8 @@
+import getRandomID from '@/idv/utils/get-random-id/get-random-id.mock';
 import { expect, fn, userEvent } from '@onefootprint/storybook-utils';
 import { OnboardingConfigStatus, type PublicOnboardingConfig } from '@onefootprint/types';
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 import noop from 'lodash/noop';
-import getRandomID from '../../utils/get-random-id/get-random-id.mock';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
 
@@ -12,7 +12,7 @@ const Template: StoryFn<{
   collectTestId?: boolean;
   onSubmit: (formData: SandboxOutcomeFormData) => void;
 }> = ({ requiresIdDoc, allowRealDocOutcome, collectTestId, onSubmit }) => {
-  getRandomID.mockReturnValue('testId');
+  getRandomID.mockReturnValue('testid');
 
   return (
     <SandboxOutcomeContainer
@@ -23,14 +23,14 @@ const Template: StoryFn<{
   );
 };
 
-export default {
+const meta: Meta<typeof SandboxOutcomeContainer> = {
   component: SandboxOutcomeContainer,
   title: 'SandboxOutcome',
   args: {
     // 👇 Use `fn` to spy on the onSubmit arg
     onSubmit: fn(),
   },
-} satisfies Meta<typeof SandboxOutcomeContainer>;
+};
 
 const getOnboardingConfig = (
   requiresIdDoc = true,
@@ -249,3 +249,5 @@ export const TestIdFieldValidations: Story = {
     });
   },
 };
+
+export default meta;

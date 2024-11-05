@@ -7,20 +7,6 @@ import BosForm, { type BosFormProps } from './components/bos-form';
 import BosList, { type BosListProps } from './components/bos-list';
 import getDefaultFormValues from './utils/get-default-form-values';
 
-const DefaultHeader = () => {
-  return (
-    <Stack direction="column" gap={3} marginBottom={3}>
-      <Text variant="heading-3" textAlign="center">
-        Add beneficial owners
-      </Text>
-      <Text variant="body-2" textAlign="center">
-        List all individuals who own at least 25% of the business or have substantial control over it. Spell first,
-        middle and last names exactly as shown on everyone's government-issued ID.
-      </Text>
-    </Stack>
-  );
-};
-
 type BeneficialOwnersProps = {
   listProps: BosListProps;
   formProps: BosFormProps;
@@ -29,7 +15,15 @@ type BeneficialOwnersProps = {
 const Template: StoryFn<BeneficialOwnersProps> = ({ listProps, formProps }) => {
   return (
     <>
-      <DefaultHeader />
+      <Stack direction="column" gap={3} marginBottom={3}>
+        <Text variant="heading-3" textAlign="center">
+          Add beneficial owners
+        </Text>
+        <Text variant="body-2" textAlign="center">
+          List all individuals who own at least 25% of the business or have substantial control over it. Spell first,
+          middle and last names exactly as shown on everyone's government-issued ID.
+        </Text>
+      </Stack>
       <BosList {...listProps} />
       <BosForm {...formProps} />
     </>
@@ -75,12 +69,12 @@ const immutableBos = mockBos.filter(bo => !bo.isMutable);
 export const Default: StoryFn<BeneficialOwnersProps> = () => {
   const listProps: BosListProps = {
     immutableBos,
-    onSubmit: console.log,
+    onSubmit: fn(),
   };
 
   const formProps: BosFormProps = {
     existingBos: mockBos,
-    onSubmit: console.log,
+    onSubmit: fn(),
     defaultFormValues: getDefaultFormValues(mockBos, {}, {}),
     isLive: true,
   };
@@ -91,16 +85,4 @@ export const Default: StoryFn<BeneficialOwnersProps> = () => {
 export default {
   component: Template,
   title: 'BeneficialOwners',
-  args: {
-    formProps: {
-      existingBos: mockBos,
-      onSubmit: fn(),
-      defaultFormValues: getDefaultFormValues(mockBos, {}, {}),
-      isLive: true,
-    },
-    listProps: {
-      immutableBos,
-      onSubmit: fn(),
-    },
-  },
 } satisfies Meta<typeof Template>;

@@ -83,12 +83,12 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
     <Stack flexDirection="column" gap={5}>
       <Stack alignItems="center" justifyContent="space-between">
         <Form.Field>
-          <Form.Label htmlFor="overallOutcome">
+          <Form.Label>
             <Text variant="label-3" color="primary">
               {t('title')}
             </Text>
           </Form.Label>
-          <Form.Select size="compact" disabled={isDisabled} {...register('overallOutcome')} id="overallOutcome">
+          <Form.Select size="compact" disabled={isDisabled} {...register('overallOutcome')}>
             {options.map(({ value, label }) => (
               <option key={value} value={value} aria-selected={watchOverallOutcome === value}>
                 {label}
