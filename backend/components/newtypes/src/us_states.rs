@@ -101,6 +101,20 @@ impl UsStateAndTerritories {
 
         UsStateAndTerritories::try_from(sanitized.as_str())
     }
+
+    pub fn is_state(&self) -> bool {
+        !matches!(
+            self,
+            UsStateAndTerritories::PR
+                | UsStateAndTerritories::AS
+                | UsStateAndTerritories::GU
+                | UsStateAndTerritories::MP
+                | UsStateAndTerritories::MH
+                | UsStateAndTerritories::VI
+                | UsStateAndTerritories::PW
+                | UsStateAndTerritories::FM
+        )
+    }
 }
 
 #[derive(Display, Debug, EnumString, Eq, PartialEq)]

@@ -153,12 +153,36 @@ impl SambaOrderHelper {
     #[tracing::instrument(skip_all)]
     pub async fn create_ah_request(
         &self,
-        _state: &State,
-        _vw: &VaultWrapper,
-        _doc_id: Option<DocumentId>,
-        _tvc: &TenantVendorControl,
+        state: &State,
+        vw: &VaultWrapper,
+        doc_id: Option<DocumentId>,
+        tvc: &TenantVendorControl,
     ) -> FpResult<(SambaOrderRequest<SambaActivityHistoryCreate>, Vec<DataLifetimeId>)> {
-        todo!()
+        let (request, lifetime_ids) = match &self.ctx {
+            // we're in the context of a workflow
+            // TODO: change this to DIs
+            CreateOrderContext::Workflow { .. } => {
+                let (data, lifetime_ids) = build_request_from_ocr_response(state, vw, doc_id).await?;
+                let request = SambaOrderRequest::new(tvc.samba_credentials(), data);
+                (request, lifetime_ids)
+            }
+            CreateOrderContext::Adhoc { data, .. } => {
+                if let Some(d) = data {
+                    let request = SambaOrderRequest::new(tvc.samba_credentials(), d.clone());
+                    (request, vec![])
+                } else {
+                    // otherwise take the latest DL and run it through
+                    let (data, lifetime_ids) = build_request_from_ocr_response(state, vw, doc_id).await?;
+                    let request = SambaOrderRequest::new(tvc.samba_credentials(), data);
+                    (request, lifetime_ids)
+                }
+            }
+        };
+        // Validate
+        let state = UsStateAndTerritories::from_raw_string(request.data.license_state.leak()).ok();
+        self.validate_state(state)?;
+
+        Ok((request, lifetime_ids))
     }
 
     fn validate_state(&self, state: Option<UsStateAndTerritories>) -> FpResult<()> {
@@ -172,6 +196,8 @@ impl SambaOrderHelper {
                     Err(into_fp_error(err))
                 }
             }
+            // Samba apparently supports all for activity_history (but not all have both court and public
+            // records) See https://docs.google.com/spreadsheets/d/1JF6Db1hVbVKWL9NWPPrSdRLJGjGM8uGQ/edit?gid=644192107#gid=644192107
             SambaOrderKind::ActivityHistory => Ok(()),
         }
     }
