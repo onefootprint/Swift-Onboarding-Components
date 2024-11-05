@@ -1,10 +1,11 @@
 use actix_web::web;
-use api_core::decision::vendor::samba::get_report::get_samba_license_validation_report;
+use api_core::decision::vendor::samba::get_report::get_samba_report;
 use api_core::types::ApiResponse;
 use api_core::web::Json;
 use api_core::FpResult;
 use api_core::State;
 use idv::samba::response::webhook::SambaWebhook;
+use newtypes::samba::SambaOrderKind;
 use newtypes::SambaWebhookEventType;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -37,13 +38,16 @@ async fn handle_webhook_inner(state: &State, webhook: SambaWebhook) -> FpResult<
     match webhook.event_type() {
         Some(k) => match k {
             SambaWebhookEventType::LicenseValidationReceived => {
-                get_samba_license_validation_report(state, webhook).await?;
+                get_samba_report(state, webhook, SambaOrderKind::LicenseValidation).await?;
             }
             event_type @ SambaWebhookEventType::LicenseValidationError => {
                 log(Some(event_type), "lv error");
             }
-            event_type => {
-                log(Some(event_type), "unexpected event");
+            SambaWebhookEventType::ActivityHistoryReceived => {
+                get_samba_report(state, webhook, SambaOrderKind::ActivityHistory).await?;
+            }
+            event_type @ SambaWebhookEventType::ActivityHistoryError => {
+                log(Some(event_type), "ah error");
             }
         },
         None => log(None, "event type missing"),

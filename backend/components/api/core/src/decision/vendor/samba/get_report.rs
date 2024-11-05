@@ -15,14 +15,19 @@ use db::models::scoped_vault::ScopedVault;
 use idv::samba::common::SambaGetReportRequest;
 use idv::samba::response::webhook::SambaWebhook;
 use idv::samba::response::SambaLinkType;
+use newtypes::samba::SambaOrderKind;
 use newtypes::SambaReportId;
 use newtypes::VendorAPI;
 
 
 #[tracing::instrument(skip_all)]
-pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWebhook) -> FpResult<()> {
+pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaOrderKind) -> FpResult<()> {
+    let link_type = match kind {
+        SambaOrderKind::LicenseValidation => SambaLinkType::LicenseReports,
+        SambaOrderKind::ActivityHistory => SambaLinkType::ActivityHistory,
+    };
     let Some(report_id) = webhook
-        .get_link(SambaLinkType::LicenseReports)
+        .get_link(link_type)
         .map(|l| SambaReportId::from(l.report_id))
     else {
         return Err(AssertionError("missing report id").into());
@@ -49,33 +54,57 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
 
     let tvc =
         TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
-    let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
+
 
     // make request
-    let res = state
-        .vendor_clients
-        .samba
-        .samba_get_license_validation_report
-        .make_request(request)
-        .await;
 
-    // save
-    let args = SaveVerificationResultArgs::new_for_samba(
-        &res,
-        di.id.clone(),
-        di.scoped_vault_id.clone(),
-        vw.vault.public_key.clone(),
-        VendorAPI::SambaLicenseValidationGetReport,
-        order.document_id.clone(),
-    );
+    let vres_id = match kind {
+        SambaOrderKind::LicenseValidation => {
+            let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
+            let res = state
+                .vendor_clients
+                .samba
+                .samba_get_license_validation_report
+                .make_request(request)
+                .await;
+            // save
+            let args = SaveVerificationResultArgs::new_for_samba(
+                &res,
+                di.id.clone(),
+                di.scoped_vault_id.clone(),
+                vw.vault.public_key.clone(),
+                VendorAPI::SambaLicenseValidationGetReport,
+                order.document_id.clone(),
+            );
+            let (vres_id, _) = args.save(&state.db_pool).await?;
 
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+            let resp = res.map_err(into_fp_error)?;
+            let _ = resp.result.into_success().map_err(into_fp_error)?;
+            vres_id
+        }
+        SambaOrderKind::ActivityHistory => {
+            let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
+            let res = state
+                .vendor_clients
+                .samba
+                .samba_get_activity_history_report
+                .make_request(request)
+                .await;
+            let args = SaveVerificationResultArgs::new_for_samba(
+                &res,
+                di.id.clone(),
+                di.scoped_vault_id.clone(),
+                vw.vault.public_key.clone(),
+                VendorAPI::SambaActivityHistoryGetReport,
+                order.document_id.clone(),
+            );
+            let (vres_id, _) = args.save(&state.db_pool).await?;
+            let resp = res.map_err(into_fp_error)?;
+            let _ = resp.result.into_success().map_err(into_fp_error)?;
 
-    let resp = res.map_err(into_fp_error)?;
-    // check we got a successful_response
-    // TODO: How should we handle this? i think this is right, we don't complete the order if we get
-    // some sort of error..
-    let _ = resp.result.into_success().map_err(into_fp_error)?;
+            vres_id
+        }
+    };
 
     state
         .db_transaction(move |conn| -> FpResult<_> {
