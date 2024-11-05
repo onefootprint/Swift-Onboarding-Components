@@ -51,7 +51,6 @@ const MARKETING_SOURCES = {
     '*.youtube.com',
   ],
   scriptsSrc: [
-    '*.apollo.io',
     '*.connect.facebook.net',
     '*.facebook.com',
     '*.google-analytics.com',

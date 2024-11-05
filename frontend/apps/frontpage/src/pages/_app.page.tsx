@@ -59,22 +59,6 @@ const App = ({ Component, pageProps }: AppProps) => {
           type="module"
         />
       )}
-      <Script
-        id="apollo-tracker"
-        strategy="afterInteractive"
-        onLoad={() => {
-          if (window.trackingFunctions) {
-            window.trackingFunctions.onLoad({
-              appId: '663123f271615b03001f0da9',
-            });
-          }
-        }}
-        src={`https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache=${Math.random()
-          .toString(36)
-          .substring(7)}`}
-        async
-        defer
-      />
       <GoogleTagManager gtmId="GTM-PKWK59QW" />
       <Providers>
         <GlobalStyle />
