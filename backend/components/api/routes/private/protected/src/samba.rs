@@ -11,6 +11,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
 use newtypes::samba::SambaData;
+use newtypes::samba::SambaOrderKind;
 use newtypes::DecisionIntentKind;
 use newtypes::FpId;
 
@@ -18,6 +19,7 @@ use newtypes::FpId;
 pub struct CreateSambaOrderRequest {
     pub fp_id: FpId,
     pub data: Option<SambaData>,
+    pub kind: SambaOrderKind,
 }
 #[post("/private/protected/samba/create_order")]
 pub async fn create_samba_order(
@@ -25,7 +27,7 @@ pub async fn create_samba_order(
     _: ProtectedAuth,
     request: Json<CreateSambaOrderRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
-    let CreateSambaOrderRequest { fp_id, data } = request.into_inner();
+    let CreateSambaOrderRequest { fp_id, data, kind } = request.into_inner();
 
     let di = state
         .db_query(move |conn| -> FpResult<_> {
@@ -39,6 +41,7 @@ pub async fn create_samba_order(
     decision::vendor::samba::license_validation::run_samba_create_order(
         &state,
         CreateOrderContext::Adhoc { di, data },
+        kind,
     )
     .await?;
 

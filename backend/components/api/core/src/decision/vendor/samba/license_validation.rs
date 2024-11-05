@@ -21,11 +21,14 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::PgConn;
 use idv::incode::doc::response::FetchOCRResponse;
+use idv::samba::client::SambaResult;
 use idv::samba::common::SambaGetReportRequest;
 use idv::samba::common::SambaOrderRequest;
 use idv::samba::license_state_is_supported_for_license_validation;
 use idv::samba::response::webhook::SambaWebhook;
+use idv::samba::response::CreateOrderResponse;
 use idv::samba::response::SambaLinkType;
+use idv::samba::SambaAPIResponse;
 use newtypes::samba::SambaAddress;
 use newtypes::samba::SambaData;
 use newtypes::samba::SambaOrderKind;
@@ -36,10 +39,18 @@ use newtypes::DataLifetimeId;
 use newtypes::DocumentId;
 use newtypes::DocumentKind;
 use newtypes::PiiString;
+use newtypes::SambaActivityHistoryCreate;
 use newtypes::SambaReportId;
 use newtypes::UsStateAndTerritories;
 use newtypes::VendorAPI;
 use newtypes::WorkflowId;
+
+
+#[derive(Clone, Debug)]
+pub struct CreateOrderArgs {
+    pub kind: SambaOrderKind,
+    pub ctx: CreateOrderContext,
+}
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
@@ -100,9 +111,17 @@ impl CreateOrderContext {
 
         Ok(doc_id)
     }
+}
 
+#[derive(Clone, Debug)]
+pub struct SambaOrderHelper {
+    pub kind: SambaOrderKind,
+    pub ctx: CreateOrderContext,
+}
+
+impl SambaOrderHelper {
     #[tracing::instrument(skip_all)]
-    pub async fn create_request(
+    pub async fn create_lv_request(
         &self,
         state: &State,
         vw: &VaultWrapper,
@@ -112,21 +131,81 @@ impl CreateOrderContext {
         SambaOrderRequest<SambaLicenseValidationCreate>,
         Vec<DataLifetimeId>,
     )> {
-        match self {
+        let (request, lifetime_ids) = match &self.ctx {
             // we're in the context of a workflow
             CreateOrderContext::Workflow { .. } => {
-                build_request_from_ocr_response(state, vw, doc_id, tvc).await
+                build_request_from_ocr_response(state, vw, doc_id, tvc).await?
             }
             CreateOrderContext::Adhoc { data, .. } => {
                 if let Some(d) = data {
                     let request = SambaOrderRequest::new(tvc.samba_credentials(), d.clone());
-                    Ok((request, vec![]))
+                    (request, vec![])
                 } else {
                     // otherwise take the latest DL and run it through
-                    build_request_from_ocr_response(state, vw, doc_id, tvc).await
+                    build_request_from_ocr_response(state, vw, doc_id, tvc).await?
                 }
             }
+        };
+        // Validate
+        let state = UsStateAndTerritories::from_raw_string(request.data.license_state.leak()).ok();
+        self.validate_state(state)?;
+
+        Ok((request, lifetime_ids))
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn create_ah_request(
+        &self,
+        _state: &State,
+        _vw: &VaultWrapper,
+        _doc_id: Option<DocumentId>,
+        _tvc: &TenantVendorControl,
+    ) -> FpResult<(SambaOrderRequest<SambaActivityHistoryCreate>, Vec<DataLifetimeId>)> {
+        todo!()
+    }
+
+    fn validate_state(&self, state: Option<UsStateAndTerritories>) -> FpResult<()> {
+        let state = state.ok_or(AssertionError("missing license state"))?; // maybe should be 400?
+        match self.kind {
+            SambaOrderKind::LicenseValidation => {
+                if license_state_is_supported_for_license_validation(state) {
+                    Ok(())
+                } else {
+                    let err = idv::samba::error::Error::UnsupportedState("license_validation".to_string());
+                    Err(into_fp_error(err))
+                }
+            }
+            SambaOrderKind::ActivityHistory => Ok(()),
         }
+    }
+
+    // Remove the generic type parameter and make two separate methods
+    #[tracing::instrument(skip_all)]
+    pub async fn make_license_validation_request(
+        &self,
+        state: &State,
+        request: SambaOrderRequest<SambaLicenseValidationCreate>,
+    ) -> SambaResult<SambaAPIResponse<CreateOrderResponse>> {
+        state
+            .vendor_clients
+            .samba
+            .samba_create_license_validation_order
+            .make_request(request)
+            .await
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn make_activity_history_request(
+        &self,
+        state: &State,
+        request: SambaOrderRequest<SambaActivityHistoryCreate>,
+    ) -> SambaResult<SambaAPIResponse<CreateOrderResponse>> {
+        state
+            .vendor_clients
+            .samba
+            .samba_create_activity_history_order
+            .make_request(request)
+            .await
     }
 }
 
@@ -199,7 +278,11 @@ fn build_request(
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) -> FpResult<()> {
+pub async fn run_samba_create_order(
+    state: &State,
+    context: CreateOrderContext,
+    kind: SambaOrderKind,
+) -> FpResult<()> {
     let di = context.decision_intent();
     let vreq_identifier = context.vreq_identifier();
     let svid = di.scoped_vault_id.clone();
@@ -222,6 +305,11 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     if doc_id.is_none() && !context.is_adhoc_with_data() {
         return Err(AssertionError("no data to call samba").into());
     }
+
+    let samba_helper = SambaOrderHelper {
+        kind,
+        ctx: context.clone(),
+    };
 
     // check if we've already created an order
     let existing_result = load_response_for_vendor_api(
@@ -246,29 +334,30 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         &state.enclave_client,
     )
     .await?;
+
     // create our request based on what type of data we're handling
-    let (request, lifetime_ids) = context.create_request(state, &vw, doc_id.clone(), &tvc).await?;
-    let license_state = UsStateAndTerritories::from_raw_string(request.data.license_state.leak()).ok();
-
-    let can_run_request_for_state = if let Some(state) = license_state {
-        license_state_is_supported_for_license_validation(state)
-    } else {
-        false
+    let (res, lifetime_ids, vendor_api) = match samba_helper.kind {
+        SambaOrderKind::LicenseValidation => {
+            let (request, lifetime_ids) = samba_helper
+                .create_lv_request(state, &vw, doc_id.clone(), &tvc)
+                .await?;
+            (
+                samba_helper.make_license_validation_request(state, request).await,
+                lifetime_ids,
+                VendorAPI::SambaLicenseValidationCreate,
+            )
+        }
+        SambaOrderKind::ActivityHistory => {
+            let (request, lifetime_ids) = samba_helper
+                .create_ah_request(state, &vw, doc_id.clone(), &tvc)
+                .await?;
+            (
+                samba_helper.make_activity_history_request(state, request).await,
+                lifetime_ids,
+                VendorAPI::SambaActivityHistoryCreate,
+            )
+        }
     };
-
-    if !can_run_request_for_state {
-        return Err(into_fp_error(idv::samba::error::Error::UnsupportedState(
-            "license_validation".to_string(),
-        )));
-    }
-
-    // make request
-    let res = state
-        .vendor_clients
-        .samba
-        .samba_create_license_validation_order
-        .make_request(request)
-        .await;
 
     // save
     let args = SaveVerificationResultArgs::new_for_samba(
@@ -276,7 +365,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         di.id.clone(),
         di.scoped_vault_id.clone(),
         vw.vault.public_key.clone(),
-        VendorAPI::SambaLicenseValidationCreate,
+        vendor_api,
         doc_id.clone(),
     );
 

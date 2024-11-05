@@ -10,7 +10,7 @@ use newtypes::SambaOrderId;
 use newtypes::SambaReportId;
 use reqwest::header;
 
-type SambaResult<T> = Result<T, SambaSafetyError>;
+pub type SambaResult<T> = Result<T, SambaSafetyError>;
 
 #[derive(Clone)]
 struct SambaHeaders(header::HeaderMap);
