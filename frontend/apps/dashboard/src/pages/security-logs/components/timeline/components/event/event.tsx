@@ -1,7 +1,7 @@
 import {
   type AccessEvent,
   AccessEventKind,
-  type ActorOrganization,
+  type Actor,
   type CreateOrgRoleDetail,
   type DeactivateOrgRoleDetail,
   type DecryptUserDataDetail,
@@ -17,14 +17,21 @@ import UpdateOrgRole from './components/update-org-role';
 const Event = ({ accessEvent }: { accessEvent: AccessEvent }) => {
   const { principal, insightEvent, detail } = accessEvent;
   const { kind } = detail;
+  const hasPrincipalActor = Boolean(principal && insightEvent);
 
   return (
     <Stack gap={2} flexWrap="wrap" width="100%" flexShrink={0}>
-      <PrincipalActor principal={principal as ActorOrganization} insightEvent={insightEvent} />
+      {hasPrincipalActor && <PrincipalActor principal={principal as Actor} insightEvent={insightEvent} />}
       {kind === AccessEventKind.DecryptUserData && <DecryptUserData detail={detail as DecryptUserDataDetail} />}
-      {kind === AccessEventKind.CreateOrgRole && <CreateOrgRole detail={detail as CreateOrgRoleDetail} />}
-      {kind === AccessEventKind.UpdateOrgRole && <UpdateOrgRole detail={detail as UpdateOrgRoleDetail} />}
-      {kind === AccessEventKind.DeactivateOrgRole && <DeactivateOrgRole detail={detail as DeactivateOrgRoleDetail} />}
+      {kind === AccessEventKind.CreateOrgRole && (
+        <CreateOrgRole detail={detail as CreateOrgRoleDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === AccessEventKind.UpdateOrgRole && (
+        <UpdateOrgRole detail={detail as UpdateOrgRoleDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === AccessEventKind.DeactivateOrgRole && (
+        <DeactivateOrgRole detail={detail as DeactivateOrgRoleDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
     </Stack>
   );
 };

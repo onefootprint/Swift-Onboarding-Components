@@ -120,7 +120,7 @@ export type AccessEvent<T extends AccessEventKind = AccessEventKind> = {
   timestamp: string;
   tenantId: string;
   name: T;
-  principal: Actor;
+  principal?: Actor;
   insightEvent?: InsightEvent;
   detail: AccessEventDetailMap[T];
 };
