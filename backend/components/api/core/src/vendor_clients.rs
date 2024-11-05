@@ -47,6 +47,7 @@ use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
 use idv::samba::common::SambaGetReportRequest;
 use idv::samba::common::SambaOrderRequest;
+use idv::samba::response::activity_history::GetAHOrderResponse;
 use idv::samba::response::license_validation::GetLVOrderResponse;
 use idv::samba::response::CreateOrderResponse;
 use idv::samba::SambaAPIResponse;
@@ -60,6 +61,8 @@ use idv::stytch::StytchLookupRequest;
 use idv::stytch::StytchLookupResponse;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
+use newtypes::SambaActivityHistoryCreate;
+use newtypes::SambaActivityHistoryGetReport;
 use newtypes::SambaLicenseValidationCreate;
 use newtypes::SambaLicenseValidationGetReport;
 use std::sync::Arc;
@@ -246,6 +249,16 @@ pub struct SambaClients {
         SambaAPIResponse<GetLVOrderResponse>,
         idv::samba::error::Error,
     >,
+    pub samba_create_activity_history_order: VendorClient<
+        SambaOrderRequest<SambaActivityHistoryCreate>,
+        SambaAPIResponse<CreateOrderResponse>,
+        idv::samba::error::Error,
+    >,
+    pub samba_get_activity_history_report: VendorClient<
+        SambaGetReportRequest<SambaActivityHistoryGetReport>,
+        SambaAPIResponse<GetAHOrderResponse>,
+        idv::samba::error::Error,
+    >,
 }
 
 impl SambaClients {
@@ -263,6 +276,16 @@ impl SambaClients {
                 SambaAPIResponse<GetLVOrderResponse>,
                 idv::samba::error::Error,
             >::new()),
+            samba_create_activity_history_order: Arc::new(MockVendorAPICall::<
+                SambaOrderRequest<SambaActivityHistoryCreate>,
+                SambaAPIResponse<CreateOrderResponse>,
+                idv::samba::error::Error,
+            >::new()),
+            samba_get_activity_history_report: Arc::new(MockVendorAPICall::<
+                SambaGetReportRequest<SambaActivityHistoryGetReport>,
+                SambaAPIResponse<GetAHOrderResponse>,
+                idv::samba::error::Error,
+            >::new()),
         }
     }
 
@@ -270,6 +293,8 @@ impl SambaClients {
         Self {
             samba_create_license_validation_order: footprint_client.clone(),
             samba_get_license_validation_report: footprint_client.clone(),
+            samba_create_activity_history_order: footprint_client.clone(),
+            samba_get_activity_history_report: footprint_client.clone(),
         }
     }
 }
