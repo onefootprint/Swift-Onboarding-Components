@@ -15,9 +15,7 @@
     "typecheck": "pnpm tsc --noEmit"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@intercom/messenger-js-sdk": "^0.0.11",
-    "@lottiefiles/react-lottie-player": "^3.5.3",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^3.0.1",
     "@next/mdx": "^14.1.4",
@@ -34,12 +32,9 @@
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@tanstack/react-query": "^5.56.2",
     "@tryghost/content-api": "^1.11.20",
-    "@typeform/embed": "^1.35.1",
     "@vercel/speed-insights": "^1.0.11",
     "axios": "^1.7.4",
-    "cookies-next": "^4.1.1",
     "date-fns": "^3.4.0",
-    "fathom-client": "^3.5.0",
     "framer-motion": "^7.8.0",
     "i18next": "^23.16.0",
     "lodash": "^4.17.21",
@@ -56,8 +51,6 @@
     "react-hook-form": "^7.52.2",
     "react-i18next": "^15.0.3",
     "react-player": "^2.12.0",
-    "react-swipeable": "^7.0.0",
-    "react-syntax-highlighter": "^15.5.0",
     "styled-components": "^6",
     "usehooks-ts": "2.16.0"
   },

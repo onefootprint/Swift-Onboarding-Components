@@ -934,15 +934,9 @@ importers:
 
   apps/frontpage:
     dependencies:
-      '@formkit/auto-animate':
-        specifier: ^1.0.0-beta.5
-        version: 1.0.0-beta.6
       '@intercom/messenger-js-sdk':
         specifier: ^0.0.11
         version: 0.0.11
-      '@lottiefiles/react-lottie-player':
-        specifier: ^3.5.3
-        version: 3.5.3(react@18.3.1)
       '@mdx-js/loader':
         specifier: ^3.0.1
         version: 3.0.1(webpack@5.94.0)
@@ -991,24 +985,15 @@ importers:
       '@tryghost/content-api':
         specifier: ^1.11.20
         version: 1.11.21
-      '@typeform/embed':
-        specifier: ^1.35.1
-        version: 1.38.0
       '@vercel/speed-insights':
         specifier: ^1.0.11
         version: 1.0.11(next@14.2.12)(react@18.3.1)
       axios:
         specifier: ^1.7.4
         version: 1.7.7
-      cookies-next:
-        specifier: ^4.1.1
-        version: 4.1.1
       date-fns:
         specifier: ^3.4.0
         version: 3.6.0
-      fathom-client:
-        specifier: ^3.5.0
-        version: 3.5.0
       framer-motion:
         specifier: ^7.8.0
         version: 7.10.3(react-dom@18.3.1)(react@18.3.1)
@@ -1057,12 +1042,6 @@ importers:
       react-player:
         specifier: ^2.12.0
         version: 2.14.1(react@18.3.1)
-      react-swipeable:
-        specifier: ^7.0.0
-        version: 7.0.0(react@18.3.1)
-      react-syntax-highlighter:
-        specifier: ^15.5.0
-        version: 15.5.0(react@18.3.1)
       styled-components:
         specifier: ^6
         version: 6.1.8(react-dom@18.3.1)(react@18.3.1)
@@ -7341,15 +7320,6 @@ packages:
     resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
     dev: true
 
-  /@lottiefiles/react-lottie-player@3.5.3(react@18.3.1):
-    resolution: {integrity: sha512-6pGbiTMjGnPddR1ur8M/TIDCiogZMc1aKIUbMEKXKAuNeYwZ2hvqwBJ+w5KRm88ccdcU88C2cGyLVsboFlSdVQ==}
-    peerDependencies:
-      react: 16 - 18
-    dependencies:
-      lottie-web: 5.12.2
-      react: 18.3.1
-    dev: false
-
   /@manypkg/find-root@1.1.0:
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
     dependencies:
@@ -12136,11 +12106,6 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
-  /@typeform/embed@1.38.0:
-    resolution: {integrity: sha512-qYxtwckEcRt++F1sUeILb/qmUFQ3PwcUxKedCBSseC8lFo1ukD1wmsBf+Il8YSRPKPqhTrGUG5WPaJg83n1xuw==}
-    engines: {node: '>=10'}
-    dev: false
-
   /@types/acorn@4.0.6:
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
     dependencies:
@@ -12222,6 +12187,7 @@ packages:
 
   /@types/cookie@0.6.0:
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
+    dev: true
 
   /@types/creditcardutils@1.0.0:
     resolution: {integrity: sha512-UdXzeNWx4NDcKDlqi3TpbNKug87MPa0a/KcR3F32S4e0XWl/KRSroRnVwhKWPDTf6Sro4GoWP5NpYtNpNEY5xg==}
@@ -12458,10 +12424,6 @@ packages:
 
   /@types/node@12.20.55:
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
-
-  /@types/node@16.18.93:
-    resolution: {integrity: sha512-epWuohp6c0bQt0j3RYCiP9x52axHVn+CjS1Rx1VjPwF+ySg8lrigH3yXGs88XqnA+jGM2qnSMuFTsBxft+hO1Q==}
-    dev: false
 
   /@types/node@16.9.1:
     resolution: {integrity: sha512-QpLcX9ZSsq3YYUUnD3nFDY8H7wctAhQj/TFKL8Ya8v5fMm3CFXxo8zStsLAl780ltoYoo1WvKUVGBQK+1ifr7g==}
@@ -14376,14 +14338,7 @@ packages:
   /cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
-
-  /cookies-next@4.1.1:
-    resolution: {integrity: sha512-20QaN0iQSz87Os0BhNg9M71eM++gylT3N5szTlhq2rK6QvXn1FYGPB4eAgU4qFTunbQKhD35zfQ95ZWgzUy3Cg==}
-    dependencies:
-      '@types/cookie': 0.6.0
-      '@types/node': 16.18.93
-      cookie: 0.6.0
-    dev: false
+    dev: true
 
   /core-js-compat@3.38.1:
     resolution: {integrity: sha512-JRH6gfXxGmrzF3tZ57lFx97YARxCXPaMzPo6jELZhv88pBH5VXpQ+y0znKGlFnzuaihqhLbefxSJxWJMPtfDzw==}
@@ -15885,10 +15840,6 @@ packages:
     resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
     dependencies:
       reusify: 1.0.4
-
-  /fathom-client@3.5.0:
-    resolution: {integrity: sha512-BiRDS9Q9a8Zma0H717FWC5cvf545K/CsxBpxKT22TcSl1EbRhhlHWIJgrdeiQUfdorBK2ppy09TwMOhRsbos/A==}
-    dev: false
 
   /fault@1.0.4:
     resolution: {integrity: sha512-CJ0HCB5tL5fYTEA7ToAq5+kTwd++Borf1/bifxd9iT70QcXr4MRrO3Llf8Ifs70q+SJcGHFtnIE/Nw6giCtECA==}
@@ -18897,10 +18848,6 @@ packages:
     dependencies:
       js-tokens: 4.0.0
 
-  /lottie-web@5.12.2:
-    resolution: {integrity: sha512-uvhvYPC8kGPjXT3MyKMrL3JitEAmDMp30lVkuq/590Mw9ok6pWcFCwXJveo0t5uqYw1UREQHofD+jVpdjBv8wg==}
-    dev: false
-
   /loupe@2.3.7:
     resolution: {integrity: sha512-zSMINGVYkdpYSOBmLi0D1Uo7JU9nVdQKrHxC8eYlV+9YKK9WePqAlL7lSlorG/U2Fw1w0hTBmaa/jrQ3UbPHtA==}
     dependencies:
@@ -21699,14 +21646,6 @@ packages:
       invariant: 2.2.4
       react: 18.3.1
       tslib: 2.6.2
-    dev: false
-
-  /react-swipeable@7.0.0(react@18.3.1):
-    resolution: {integrity: sha512-NI7KGfQ6gwNFN0Hor3vytYW3iRfMMaivGEuxcADOOfBCx/kqwXE8IfHFxEcxSUkxCYf38COLKYd9EMYZghqaUA==}
-    peerDependencies:
-      react: ^16.8.3 || ^17 || ^18
-    dependencies:
-      react: 18.3.1
     dev: false
 
   /react-syntax-highlighter@15.5.0(react@18.3.1):
