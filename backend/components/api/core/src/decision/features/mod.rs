@@ -4,6 +4,7 @@ pub mod fp_device_attestation;
 pub mod helpers;
 pub mod idology_expectid;
 pub mod incode_docv;
+pub mod incode_ocr_fields;
 pub mod incode_utils;
 pub mod incode_watchlist;
 pub mod lexis;

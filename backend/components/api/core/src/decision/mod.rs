@@ -40,6 +40,8 @@ pub enum Error {
     DecisionNotFound,
     #[error("CURP validation error")]
     CurpError(#[from] CurpValidationError),
+    #[error("Could not convert Incode OCR to data identifier")]
+    IncodeOCRDataIdentifierConversionError,
 }
 
 impl api_errors::FpErrorTrait for Error {

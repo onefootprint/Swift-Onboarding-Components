@@ -1,31 +1,59 @@
 use super::incode_docv::IncodeOcrAddress;
 use super::incode_docv::IncodeOcrComparisonDataFields;
+use super::incode_ocr_fields::IncodeOcrField as IOF;
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
 use levenshtein::levenshtein;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind;
-use newtypes::OcrDataKind as ODK;
+use newtypes::OcrDataKind;
 use newtypes::PiiString;
 use newtypes::ScrubbedPiiString;
 use regex::Regex;
 
 #[derive(Debug, Clone)]
 pub struct ParsedIncodeField {
-    pub odk: ODK,
+    pub odk: IOF,
     pub confidence: Option<f32>,
     pub value: PiiString,
 }
 
 #[derive(Debug, Clone)]
 pub struct ParsedIncodeFields(pub Vec<ParsedIncodeField>);
+impl ParsedIncodeFields {
+    /// Given something that can be converted from an IncodeOcrField, return the corresponding
+    /// ParsedIncodeField (this is ODKs and IDKs)
+    pub fn get<T>(&self, di: T) -> Option<&ParsedIncodeField>
+    where
+        T: TryFrom<IOF> + Eq + PartialEq,
+    {
+        self.0
+            .iter()
+            .filter_map(|p| {
+                let d = T::try_from(p.odk).ok()?;
+                if di == d {
+                    Some(p)
+                } else {
+                    None
+                }
+            })
+            .next()
+    }
+
+    pub fn ocr_data_kinds(&self) -> Vec<(OcrDataKind, PiiString)> {
+        self.0
+            .iter()
+            .filter_map(|p| OcrDataKind::try_from(p.odk).ok().map(|o| (o, p.value.clone())))
+            .collect()
+    }
+}
 
 impl ParsedIncodeFields {
     pub fn from_fetch_ocr_res(r: &FetchOCRResponse) -> ParsedIncodeFields {
         // TODO: maybe we should incorporate the confidence scores in here and not vault a particular field
         // at all if its confidence is too low?
 
-        let pif = |odk: ODK, confidence: Option<f32>, pii: Option<PiiString>| -> Option<ParsedIncodeField> {
+        let pif = |odk: IOF, confidence: Option<f32>, pii: Option<PiiString>| -> Option<ParsedIncodeField> {
             pii.map(|value| ParsedIncodeField {
                 odk,
                 confidence,
@@ -50,71 +78,71 @@ impl ParsedIncodeFields {
         ParsedIncodeFields(
             vec![
                 pif(
-                    ODK::FullName,
+                    IOF::FullName,
                     conf.as_ref().and_then(|c| c.name_confidence),
                     ParsedIncodeNames::from_fetch_ocr_res(r).full_name,
                 ),
                 pif(
-                    ODK::FullAddress,
+                    IOF::FullAddress,
                     conf.as_ref().and_then(|c| c.address_confidence),
                     ParsedIncodeAddress::from_fetch_ocr_res(r).full_address,
                 ),
                 pif(
-                    ODK::Dob,
+                    IOF::Dob,
                     conf.as_ref().and_then(|c| c.birth_date_confidence),
                     r.dob().ok().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::ExpiresAt,
+                    IOF::ExpiresAt,
                     conf.as_ref().and_then(|c| c.expire_at_confidence),
                     r.expiration_date().ok().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::IssuedAt,
+                    IOF::IssuedAt,
                     conf.as_ref().and_then(|c| c.issued_at_confidence),
                     r.issue_date().ok().map(|s| s.into()),
                 ),
                 // TODO: seems like theres no confidence for these two..?
                 pif(
-                    ODK::IssuingCountry,
+                    IOF::IssuingCountry,
                     None,
                     r.issuing_country_two_digit().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::IssuingState,
+                    IOF::IssuingState,
                     None,
                     r.normalized_issuing_state().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::Gender,
+                    IOF::Gender,
                     conf.as_ref().and_then(|c| c.gender_confidence),
                     r.gender.clone().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::DocumentNumber,
+                    IOF::DocumentNumber,
                     conf.as_ref().and_then(|c| c.document_number_confidence),
                     r.document_number.clone().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::RefNumber,
+                    IOF::RefNumber,
                     conf.as_ref().and_then(|c| c.ref_number_confidence),
                     r.ref_number.clone().map(|s| s.into()),
                 ),
                 // TODO: use nationality_mrz_confidence here too? also why would a MRZ field have confidence
                 // in the first place?
-                pif(ODK::Nationality, nationality_conf, nationality_value),
+                pif(IOF::Nationality, nationality_conf, nationality_value),
                 pif(
-                    ODK::Curp,
+                    IOF::Curp,
                     conf.as_ref().and_then(|c| c.curp_confidence),
                     r.curp.clone().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::ClaveDeElector,
+                    IOF::ClaveDeElector,
                     conf.as_ref().and_then(|c| c.clave_de_elector_confidence),
                     r.clave_de_elector.clone().map(|s| s.into()),
                 ),
                 pif(
-                    ODK::ClassifiedDocumentType,
+                    IOF::ClassifiedDocumentType,
                     None,
                     r.type_of_id.clone().map(|s| s.to_string().into()),
                 ),
@@ -676,6 +704,9 @@ pub fn reason_codes_from_match_field(
         }
     }
 }
+
+pub enum IncodeOcrFields {}
+
 
 #[cfg(test)]
 mod tests {

@@ -106,11 +106,11 @@ pub(super) async fn compute_ocr_data<'a>(
     let validate_args = ValidateArgs::for_bifrost(obc.is_live);
 
     let data = ParsedIncodeFields::from_fetch_ocr_res(r)
-        .0
+        .ocr_data_kinds()
         .into_iter()
-        .map(|pif| {
-            let di = DocumentDiKind::OcrData(dk.0, pif.odk).into();
-            let v = PiiJsonValue::from(pif.value);
+        .map(|(odk, value)| {
+            let di = DocumentDiKind::OcrData(dk.0, odk).into();
+            let v = PiiJsonValue::from(value);
             (di, v)
         })
         .collect_vec();
