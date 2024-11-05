@@ -2158,9 +2158,6 @@ importers:
       '@storybook/test-runner':
         specifier: ^0.19.1
         version: 0.19.1(@types/node@20.12.14)(storybook@8.2.9)(ts-node@10.9.2)
-      '@storybook/testing-library':
-        specifier: ^0.2.2
-        version: 0.2.2
       '@types/google.maps':
         specifier: ^3.55.11
         version: 3.55.11
@@ -2303,9 +2300,6 @@ importers:
       '@storybook/test-runner':
         specifier: ^0.19.1
         version: 0.19.1(@types/node@20.12.14)(storybook@8.2.9)(ts-node@10.9.2)
-      '@storybook/testing-library':
-        specifier: ^0.2.2
-        version: 0.2.2
       '@testing-library/dom':
         specifier: ^8.14.0
         version: 8.20.0
@@ -11557,15 +11551,6 @@ packages:
       - vitest
     dev: true
 
-  /@storybook/testing-library@0.2.2:
-    resolution: {integrity: sha512-L8sXFJUHmrlyU2BsWWZGuAjv39Jl1uAqUHdxmN42JY15M4+XCMjGlArdCCjDe1wpTSW6USYISA9axjZojgtvnw==}
-    deprecated: In Storybook 8, this package functionality has been integrated to a new package called @storybook/test, which uses Vitest APIs for an improved experience. When upgrading to Storybook 8 with 'npx storybook@latest upgrade', you will get prompted and will get an automigration for the new package. Please migrate when you can.
-    dependencies:
-      '@testing-library/dom': 9.3.4
-      '@testing-library/user-event': 14.5.2(@testing-library/dom@9.3.4)
-      ts-dedent: 2.2.0
-    dev: true
-
   /@storybook/theming@8.2.9(storybook@8.2.9):
     resolution: {integrity: sha512-OL0NFvowPX85N5zIYdgeKKaFm7V4Vgtci093vL3cDZT13LGH6GuEzJKkUFGuUGNPFlJc+EgTj0o6PYKrOLyQ6w==}
     peerDependencies:
@@ -12032,15 +12017,6 @@ packages:
       '@testing-library/dom': '>=7.21.4'
     dependencies:
       '@testing-library/dom': 8.20.0
-    dev: true
-
-  /@testing-library/user-event@14.5.2(@testing-library/dom@9.3.4):
-    resolution: {integrity: sha512-YAh82Wh4TIrxYLmfGcixwD18oIjyC1pFQC2Y01F2lzV2HTMiYrI0nze0FD0ocB//CKS/7jIUgae+adPqxK5yCQ==}
-    engines: {node: '>=12', npm: '>=6'}
-    peerDependencies:
-      '@testing-library/dom': '>=7.21.4'
-    dependencies:
-      '@testing-library/dom': 9.3.4
     dev: true
 
   /@tokenizer/token@0.3.0:

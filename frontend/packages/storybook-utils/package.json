@@ -21,7 +21,6 @@
     "@storybook/react": "^8.2.9",
     "@storybook/test": "^8.2.9",
     "@storybook/test-runner": "^0.19.1",
-    "@storybook/testing-library": "^0.2.2",
     "@testing-library/dom": "^8.14.0",
     "@testing-library/jest-dom": "^6.2.20",
     "@testing-library/react": "^13.3.0",
