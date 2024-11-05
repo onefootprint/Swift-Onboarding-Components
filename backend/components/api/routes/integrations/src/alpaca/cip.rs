@@ -648,14 +648,22 @@ fn watchlist(
             .map(|r| r.review_reasons.contains(&ReviewReason::AdverseMediaHit))
             .unwrap_or(false)
     {
-        tracing::error!("CIP endpoint ExpectedReviewReasonNotFound: AdverseMediaHit");
+        tracing::warn!(
+            mr =?mr.as_ref().map(|r| r.id.clone()),
+            reason=%"adverse media",
+            "CIP endpoint ExpectedReviewReasonNotFound"
+        );
     }
     if (pep | sanctions | monitored_lists)
         && !mr
             .map(|r| r.review_reasons.contains(&ReviewReason::WatchlistHit))
             .unwrap_or(false)
     {
-        tracing::error!("CIP endpoint ExpectedReviewReasonNotFound: WatchlistHit");
+        tracing::warn!(
+            mr =?mr.as_ref().map(|r| r.id.clone()),
+            reason=%"WatchlistHit",
+            "CIP endpoint ExpectedReviewReasonNotFound"
+        );
     }
 
     // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist
