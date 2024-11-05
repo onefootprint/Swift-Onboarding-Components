@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { usePopper as useBasePopper } from 'react-popper';
 
-const usePopper = () => {
+type UsePopperReturn = {
+  popper: ReturnType<typeof useBasePopper>;
+  setReferenceElement: (element: HTMLElement | null) => void;
+  setPopperElement: (element: HTMLUListElement | null) => void;
+};
+
+const usePopper = (): UsePopperReturn => {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>();
   const [popperElement, setPopperElement] = useState<HTMLUListElement | null>();
 

@@ -2,22 +2,26 @@ import '../../config/initializers/i18next-test';
 
 import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import MockDate from 'mockdate';
 import { customRender } from '../../utils/test-utils';
 
 import type { FiltersProps } from './filters';
 import Filters from './filters';
 
-const testDate = new Date('2023-01-04');
-
 describe('<Filters />', () => {
-  beforeAll(() => {
-    MockDate.set(testDate);
-  });
+  /**
+   * THE @onefootprint/ui UNIT TESTS ARE CURRENTLY DISABLED
+   * TODO: FIXME add MockDate back in
+   * The @onefootprint/ui cannot import @onefootprint/test-utils
+   * because it would create a circular dependency.
+   */
 
-  afterAll(() => {
-    MockDate.reset();
-  });
+  // const testDate = new Date('2023-01-04');
+  // beforeAll(() => {
+  //   MockDate.set(testDate);
+  // });
+  // afterAll(() => {
+  //   MockDate.reset();
+  // });
 
   const renderFilters = ({
     controls = [
