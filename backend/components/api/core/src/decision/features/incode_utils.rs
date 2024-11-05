@@ -47,6 +47,17 @@ impl ParsedIncodeFields {
             .filter_map(|p| OcrDataKind::try_from(p.field).ok().map(|o| (o, p.value.clone())))
             .collect()
     }
+
+    pub fn identity_data_kinds(&self) -> Vec<(IdentityDataKind, PiiString)> {
+        self.0
+            .iter()
+            .filter_map(|p| {
+                IdentityDataKind::try_from(p.field)
+                    .ok()
+                    .map(|o| (o, p.value.clone()))
+            })
+            .collect()
+    }
 }
 
 impl ParsedIncodeFields {

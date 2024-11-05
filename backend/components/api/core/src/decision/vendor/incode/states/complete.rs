@@ -6,7 +6,6 @@ use crate::decision::features::incode_docv::{
     self,
 };
 use crate::decision::features::incode_utils::ParsedIncodeFields;
-use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
@@ -52,15 +51,12 @@ use newtypes::DocumentReviewStatus;
 use newtypes::DocumentStatus;
 use newtypes::FootprintReasonCode;
 use newtypes::IdDocKind;
-use newtypes::IdentityDataKind as IDK;
 use newtypes::IncodeFailureReason;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
 use newtypes::OcrDataKind as ODK;
 use newtypes::PiiJsonValue;
-use newtypes::PiiString;
 use newtypes::ScopedVaultId;
-use newtypes::ScrubbedPiiString;
 use newtypes::TenantId;
 use newtypes::ValidateArgs;
 use newtypes::VendorAPI;
@@ -156,67 +152,11 @@ fn doc_first_id_data(
     r: &FetchOCRResponse,
     validate_args: ValidateArgs,
 ) -> Vec<(DataIdentifier, PiiJsonValue)> {
-    let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(r);
-
-    // Incode sends full state in one field, and 2 character code in another, so we handle here. we
-    // prefer the checked address, since it uses an external service to validate
-    let address_checked_bean_state = r.checked_address_bean.as_ref().and_then(|a| a.normalized_state());
-    let address_fields_state = r.address_fields.as_ref().and_then(|a| a.normalized_state());
-    let state = match address_checked_bean_state.or(address_fields_state) {
-        Some(Ok(s)) => Some(s),
-        _ => {
-            tracing::warn!("incode changed address formats");
-            None
-        }
-    };
-
-    let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
-    let zip5 = address.and_then(|a| a.normalized_zip5());
-
-    let (drivers_license_number, drivers_license_state) =
-        if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::DriversLicense) {
-            let state = r
-                .issuing_state_us_2_char()
-                .map(|s| s.to_string().into())
-                .or(r.normalized_issuing_state());
-            (r.document_number.as_ref(), state)
-        } else {
-            (None, None)
-        };
-
-    let address_line2 = if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::VoterIdentification) {
-        address.and_then(|a| a.colony.as_ref())
-    } else {
-        None
-    };
-
-    let all_data = vec![
-        (
-            IDK::FirstName,
-            parsed_names.first_name.map(ScrubbedPiiString::from).as_ref(),
-        ),
-        (
-            IDK::MiddleName,
-            parsed_names.middle_name.map(ScrubbedPiiString::from).as_ref(),
-        ),
-        (
-            IDK::LastName,
-            parsed_names.last_name.map(ScrubbedPiiString::from).as_ref(),
-        ),
-        (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
-        (IDK::AddressLine2, address_line2),
-        (IDK::City, address.and_then(|n| n.city.as_ref())),
-        (IDK::State, state.as_ref()),
-        (IDK::Zip, zip5.as_ref()),
-        (IDK::Country, r.issuing_country_two_digit().as_ref()),
-        (IDK::Dob, r.dob().ok().as_ref()),
-        (IDK::DriversLicenseNumber, drivers_license_number),
-        (IDK::DriversLicenseState, drivers_license_state.as_ref()),
-    ]
-    .into_iter()
-    .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
-    .map(|(k, v)| (k, PiiJsonValue::from(v)))
-    .collect::<HashMap<_, _>>();
+    let all_data = ParsedIncodeFields::from_fetch_ocr_res(r)
+        .identity_data_kinds()
+        .into_iter()
+        .map(|(k, v)| (DataIdentifier::from(k), PiiJsonValue::from(v)))
+        .collect::<HashMap<_, _>>();
 
     let raw_data = all_data.clone();
 
