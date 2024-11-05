@@ -1,3 +1,5 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
+
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 import {
@@ -28,6 +30,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
   const entityQuery = useEntity(entityId);
   const bosQuery = useBusinessOwners(entityId);
   const submitMutation = useSubmitActions();
+  const showErrorToast = useRequestErrorToast();
 
   const getBo = (boId: string) => {
     if (!bosQuery.data) throw new Error('Business owners data is not available');
@@ -43,6 +46,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
         actions: [
           {
             kind: ActionRequestKind.trigger,
+            note: formValues.note,
             fpBid: entityId,
             trigger: {
               kind: TriggerKind.Document,
@@ -67,6 +71,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
           const bo = getBo(request.entityId);
           onSubmit({ bo: { id: bo.id, hasPhone: bo.hasPhone }, action: response[0] });
         },
+        onError: showErrorToast,
       },
     );
   };
@@ -82,6 +87,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
         actions: [
           {
             kind: ActionRequestKind.trigger,
+            note: formValues.note,
             fpBid: entityId,
             trigger: {
               kind: TriggerKind.Onboard,
@@ -99,6 +105,7 @@ const FormDialog = ({ open, onClose, onSubmit }: FormDialogProps) => {
           const bo = getBo(request.entityId);
           onSubmit({ bo: { id: bo.id, hasPhone: bo.hasPhone }, action: response[0] });
         },
+        onError: showErrorToast,
       },
     );
   };

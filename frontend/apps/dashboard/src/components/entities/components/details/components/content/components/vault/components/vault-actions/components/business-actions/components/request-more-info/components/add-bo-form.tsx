@@ -1,4 +1,4 @@
-import { Form, Stack } from '@onefootprint/ui';
+import { Divider, Form, Stack } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { AddBoFormValues } from '../request-more-info.types';
@@ -34,6 +34,12 @@ const AddBoForm = ({ onSubmit, businessOwners }: AddBoFormProps) => {
             ))}
           </Form.Select>
           <Form.Errors>{errors.boId?.message}</Form.Errors>
+        </Form.Field>
+        <Divider variant="secondary" marginTop={2} />
+        <Form.Field>
+          <Form.Label>{t('note.label')}</Form.Label>
+          <Form.TextArea placeholder={t('note.placeholder')} {...register('note')} />
+          <Form.Errors>{errors.note?.message}</Form.Errors>
         </Form.Field>
       </Stack>
     </form>

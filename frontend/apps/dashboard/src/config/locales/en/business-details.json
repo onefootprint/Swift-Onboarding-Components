@@ -78,12 +78,9 @@
           "required": "Please select a beneficial owner"
         }
       },
-      "playbook": {
-        "label": "Playbook",
-        "placeholder": "Select a playbook",
-        "errors": {
-          "required": "Please select a playbook"
-        }
+      "note": {
+        "label": "Note for the beneficial owner (optional)",
+        "placeholder": "Please provide information about any additional beneficial owners who have substantial control or own at least 25% of the business..."
       }
     },
     "upload-docs-form": {

@@ -1,6 +1,6 @@
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import { Divider, Form, LinkButton, Stack } from '@onefootprint/ui';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { UploadDocsFormValues } from '../request-more-info.types';
 
@@ -26,7 +26,6 @@ const UploadDocsForm = ({ onSubmit, businessOwners }: UploadDocsFormProps) => {
     },
   });
   const { fields, append, remove } = useFieldArray({ control, name: 'docs' });
-  const boId = useWatch({ control, name: 'boId' });
 
   const handleAddMore = () => {
     append({ name: '', identifier: '', description: '' });
@@ -46,81 +45,79 @@ const UploadDocsForm = ({ onSubmit, businessOwners }: UploadDocsFormProps) => {
         </Form.Select>
         <Form.Errors>{errors.boId?.message}</Form.Errors>
       </Form.Field>
-      {boId ? (
-        <>
-          <Divider variant="secondary" marginBlock={7} />
-          <Stack flexDirection="column" gap={5}>
-            {fields.map((field, index) => (
-              <Stack
-                key={field.id}
-                borderColor="tertiary"
-                borderRadius="default"
-                borderStyle="solid"
-                borderWidth={1}
-                flexDirection="column"
-                gap={5}
-                padding={5}
-              >
-                <Stack flexDirection="column" gap={7}>
-                  <Form.Field>
-                    <Form.Label tooltip={{ text: t('document.name.tooltip') }}>{t('document.name.label')}</Form.Label>
+      <>
+        <Divider variant="secondary" marginBlock={7} />
+        <Stack flexDirection="column" gap={5}>
+          {fields.map((field, index) => (
+            <Stack
+              key={field.id}
+              borderColor="tertiary"
+              borderRadius="default"
+              borderStyle="solid"
+              borderWidth={1}
+              flexDirection="column"
+              gap={5}
+              padding={5}
+            >
+              <Stack flexDirection="column" gap={7}>
+                <Form.Field>
+                  <Form.Label tooltip={{ text: t('document.name.tooltip') }}>{t('document.name.label')}</Form.Label>
+                  <Form.Input
+                    autoFocus
+                    placeholder={t('document.name.placeholder')}
+                    size="compact"
+                    {...register(`docs.${index}.name`, {
+                      required: t('document.name.error'),
+                    })}
+                  />
+                  <Form.Errors>{errors.docs?.[index]?.name?.message}</Form.Errors>
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label tooltip={{ text: t('document.identifier.tooltip') }}>
+                    {t('document.identifier.label')}
+                  </Form.Label>
+                  <Form.Group>
+                    <Form.Addon size="compact">{t('document.identifier.prefix')}</Form.Addon>
                     <Form.Input
-                      autoFocus
-                      placeholder={t('document.name.placeholder')}
+                      placeholder=""
                       size="compact"
-                      {...register(`docs.${index}.name`, {
-                        required: t('document.name.error'),
+                      {...register(`docs.${index}.identifier`, {
+                        required: t('document.identifier.error.required'),
+                        validate: (value: string) => {
+                          if (!value.match(/^[A-Za-z0-9_-]+$/)) {
+                            return t('document.identifier.error.invalid');
+                          }
+                          return true;
+                        },
                       })}
                     />
-                    <Form.Errors>{errors.docs?.[index]?.name?.message}</Form.Errors>
-                  </Form.Field>
-                  <Form.Field>
-                    <Form.Label tooltip={{ text: t('document.identifier.tooltip') }}>
-                      {t('document.identifier.label')}
-                    </Form.Label>
-                    <Form.Group>
-                      <Form.Addon size="compact">{t('document.identifier.prefix')}</Form.Addon>
-                      <Form.Input
-                        placeholder=""
-                        size="compact"
-                        {...register(`docs.${index}.identifier`, {
-                          required: t('document.identifier.error.required'),
-                          validate: (value: string) => {
-                            if (!value.match(/^[A-Za-z0-9_-]+$/)) {
-                              return t('document.identifier.error.invalid');
-                            }
-                            return true;
-                          },
-                        })}
-                      />
-                    </Form.Group>
-                    <Form.Errors>{errors.docs?.[index]?.identifier?.message}</Form.Errors>
-                  </Form.Field>
-                  <Form.Field>
-                    <Form.Label>{t('document.description.label')}</Form.Label>
-                    <Form.TextArea {...register(`docs.${index}.description`)} />
-                    <Form.Errors>{errors.docs?.[index]?.description?.message}</Form.Errors>
-                  </Form.Field>
-                </Stack>
-                {fields.length > 1 && (
-                  <LinkButton onClick={() => remove(index)} destructive iconComponent={IcoTrash16} iconPosition="left">
-                    {t('remove')}
-                  </LinkButton>
-                )}
+                  </Form.Group>
+                  <Form.Errors>{errors.docs?.[index]?.identifier?.message}</Form.Errors>
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>{t('document.description.label')}</Form.Label>
+                  <Form.TextArea {...register(`docs.${index}.description`)} />
+                  <Form.Errors>{errors.docs?.[index]?.description?.message}</Form.Errors>
+                </Form.Field>
               </Stack>
-            ))}
-            <LinkButton onClick={handleAddMore} variant="label-3" iconComponent={IcoPlusSmall16} iconPosition="left">
-              {t('add')}
-            </LinkButton>
-          </Stack>
-          <Divider variant="secondary" marginBlock={7} />
-          <Form.Field>
-            <Form.Label>{t('note.label')}</Form.Label>
-            <Form.TextArea placeholder={t('note.placeholder')} {...register('note')} />
-            <Form.Errors>{errors.note?.message}</Form.Errors>
-          </Form.Field>
-        </>
-      ) : null}
+              {fields.length > 1 && (
+                <LinkButton onClick={() => remove(index)} destructive iconComponent={IcoTrash16} iconPosition="left">
+                  {t('remove')}
+                </LinkButton>
+              )}
+            </Stack>
+          ))}
+          <LinkButton onClick={handleAddMore} variant="label-3" iconComponent={IcoPlusSmall16} iconPosition="left">
+            {t('add')}
+          </LinkButton>
+        </Stack>
+        <Divider variant="secondary" marginBlock={7} />
+        <Form.Field>
+          <Form.Label>{t('note.label')}</Form.Label>
+          <Form.TextArea placeholder={t('note.placeholder')} {...register('note')} />
+          <Form.Errors>{errors.note?.message}</Form.Errors>
+        </Form.Field>
+      </>
     </form>
   );
 };

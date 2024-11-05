@@ -1,5 +1,6 @@
 export type AddBoFormValues = {
   boId: string;
+  note: string;
 };
 
 export type UploadDocsFormValues = {
