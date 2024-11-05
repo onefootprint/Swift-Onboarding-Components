@@ -6,7 +6,7 @@ import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline
 
 import Section from '../section';
 import AddFreeFormNote from './components/add-free-form-note';
-import Content from './components/content';
+import AuditTrailTimeline from './components/audit-trail-timeline';
 
 const AuditTrail = () => {
   const { t } = useTranslation('entity-details', {
@@ -18,7 +18,7 @@ const AuditTrail = () => {
     <Section title={t('title')} id={AUDIT_TRAILS_ID} suffixActions={<AddFreeFormNote />}>
       <>
         {error && <ErrorComponent error={error} />}
-        {data && <Content timeline={data} />}
+        {data && <AuditTrailTimeline timeline={data} />}
       </>
     </Section>
   );

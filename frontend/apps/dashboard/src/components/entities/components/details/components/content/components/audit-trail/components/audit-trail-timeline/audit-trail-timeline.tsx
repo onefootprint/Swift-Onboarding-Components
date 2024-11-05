@@ -59,19 +59,11 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
 
   const items: TimelineItem[] = [];
   if (entity.status === EntityStatus.incomplete) {
-    // Prepend a custom timeline item for incomplete users
-    if (mergedTimeline.length) {
-      items.push({
-        time: mergedTimeline[0].time,
-        headerComponent: <AbandonedEventHeader entity={entity} />,
-        bodyComponent: undefined,
-      });
-    } else {
-      items.push({
-        headerComponent: <AbandonedEventHeader entity={entity} />,
-        bodyComponent: undefined,
-      });
-    }
+    items.push({
+      time: mergedTimeline.length ? mergedTimeline[0].time : undefined,
+      headerComponent: <AbandonedEventHeader entity={entity} />,
+      bodyComponent: undefined,
+    });
   }
   mergedTimeline.forEach((event: AuditTrailTimelineEvent) => {
     const {
