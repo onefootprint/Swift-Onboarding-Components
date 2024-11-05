@@ -13,7 +13,6 @@ const createAuthFlowPayload = ({
   return {
     name: nameForm.name,
     kind: OnboardingConfigKind.auth,
-    canAccessData: ['phone_number', 'email'],
     mustCollectData: ['phone_number', 'email'],
     verificationChecks: [{ kind: 'kyc', data: {} }],
     requiredAuthMethods: createRequiredAuthMethodsPayload(requiredAuthMethodsForm),

@@ -89,7 +89,6 @@ const createMustCollect = ({ person, investor, gov }: DetailsFormData) => {
   return {
     mustCollectData,
     optionalData,
-    canAccessData: [...mustCollectData, ...optionalData],
   };
 };
 

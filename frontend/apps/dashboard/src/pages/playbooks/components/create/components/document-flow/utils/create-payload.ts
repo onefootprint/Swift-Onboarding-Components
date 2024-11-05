@@ -17,7 +17,6 @@ const createPayload = (formData: NameFormData & DocumentsDetailsFormData): OrgOn
     name: formData.name,
     kind: OnboardingConfigKind.document,
     verificationChecks: [],
-    canAccessData: createIdDocOnlyMustCollectDataPayload(formData),
     mustCollectData: createIdDocOnlyMustCollectDataPayload(formData),
     documentTypesAndCountries: createGovDocsPayload(formData.gov),
     documentsToCollect: createAdditionalDocsPayload(formData.docs),

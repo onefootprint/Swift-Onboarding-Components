@@ -14,7 +14,6 @@ export type OrgOnboardingConfigCreateRequest = {
   // 'none' is passed if all three types are selected
   // eg: 'document.passport,id_card.regionality.selfie_required'.
   mustCollectData: CollectedDataOption[];
-  canAccessData: CollectedDataOption[];
   optionalData?: CollectedDataOption[];
   isDocFirstFlow?: boolean;
   isNoPhoneFlow?: boolean;

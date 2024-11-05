@@ -62,7 +62,6 @@ const createPayload = ({
     allowUsTerritories: false,
     allowInternationalResidents: false,
     mustCollectData,
-    canAccessData: mustCollectData,
     optionalData: personOptionalData,
     documentTypesAndCountries: createGovDocsPayload(boForm.gov),
     documentsToCollect: createAdditionalDocsPayload(boForm.docs),

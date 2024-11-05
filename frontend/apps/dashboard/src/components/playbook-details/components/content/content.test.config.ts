@@ -9,7 +9,6 @@ const basePlaybook: OnboardingConfig = {
   createdAt: '2023-01-01T00:00:00Z',
   status: OnboardingConfigStatus.enabled,
   mustCollectData: ['name'],
-  canAccessData: ['email'],
   optionalData: [],
   isNoPhoneFlow: false,
   allowUsResidents: true,

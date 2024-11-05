@@ -16,7 +16,6 @@ export const playbookWithPasskeysFixture: OnboardingConfig = {
   allowUsResidents: true,
   allowUsTerritoryResidents: false,
   appearance: undefined,
-  canAccessData: [],
   createdAt: '2023-06-15T12:00:00Z',
   id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
   internationalCountryRestrictions: null,

@@ -14,7 +14,6 @@ export const onboardingConfigFixture: OnboardingConfig = {
   createdAt: '2024-10-28T21:23:05.360166Z',
   mustCollectData: ['email', 'name', 'dob', 'full_address', 'phone_number', 'ssn9'],
   optionalData: [],
-  canAccessData: ['email', 'name', 'dob', 'full_address', 'phone_number', 'ssn9'],
   allowInternationalResidents: false,
   internationalCountryRestrictions: null,
   allowUsResidents: true,

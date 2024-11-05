@@ -96,7 +96,6 @@ export const getAuthRequirementsResponse = (props: Partial<AuthRequirementsRespo
 export const getAuthorizedOrg = (props: Partial<AuthorizedOrg>) =>
   merge(
     {
-      canAccessData: ['UsTaxId', 'Ssn4', 'Name'],
       logoUrl: 'https://elementary-dredger.name',
       orgName: 'Ted Sipes',
     },

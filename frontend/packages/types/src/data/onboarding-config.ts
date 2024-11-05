@@ -114,7 +114,6 @@ export type OnboardingConfig = {
   status: OnboardingConfigStatus;
   appearance?: FootprintAppearance;
   mustCollectData: CollectedDataOption[];
-  canAccessData: CollectedDataOption[];
   optionalData: CollectedDataOption[];
   isNoPhoneFlow: boolean;
   allowUsResidents: boolean;

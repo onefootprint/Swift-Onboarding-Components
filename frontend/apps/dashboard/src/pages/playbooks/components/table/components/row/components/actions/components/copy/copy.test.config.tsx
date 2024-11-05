@@ -23,7 +23,6 @@ export const playbookFixture: OnboardingConfig = {
   allowUsResidents: true,
   allowUsTerritoryResidents: false,
   appearance: undefined,
-  canAccessData: [],
   createdAt: '',
   id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
   internationalCountryRestrictions: null,

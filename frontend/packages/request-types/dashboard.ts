@@ -961,29 +961,6 @@ export type CreateOnboardingConfigurationRequest = {
   allowUsResidents?: boolean;
   allowUsTerritories?: boolean;
   businessDocumentsToCollect: Array<string>;
-  canAccessData: Array<
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank'
-  >;
   cipKind?: 'alpaca' | 'apex';
   curpValidationEnabled?: boolean;
   docScanForOptionalSsn?:
@@ -11851,29 +11828,6 @@ export type OffsetPaginatedOnboardingConfiguration = {
     allowUsTerritoryResidents: boolean;
     author?: 'footprint' | 'firm_employee';
     businessDocumentsToCollect: Array<string>;
-    canAccessData: Array<
-      | 'Name'
-      | 'Dob'
-      | 'Ssn4'
-      | 'Ssn9'
-      | 'FullAddress'
-      | 'Email'
-      | 'PhoneNumber'
-      | 'Nationality'
-      | 'UsLegalStatus'
-      | 'BusinessName'
-      | 'BusinessTin'
-      | 'BusinessAddress'
-      | 'BusinessPhoneNumber'
-      | 'BusinessWebsite'
-      | 'BusinessBeneficialOwners'
-      | 'BusinessKycedBeneficialOwners'
-      | 'BusinessCorporationType'
-      | 'InvestorProfile'
-      | 'Card'
-      | 'UsTaxId'
-      | 'Bank'
-    >;
     cipKind?: 'alpaca' | 'apex';
     createdAt: string;
     curpValidationEnabled: boolean;
@@ -12448,29 +12402,6 @@ export type OnboardingConfiguration = {
   allowUsTerritoryResidents: boolean;
   author?: 'footprint' | 'firm_employee';
   businessDocumentsToCollect: Array<string>;
-  canAccessData: Array<
-    | 'Name'
-    | 'Dob'
-    | 'Ssn4'
-    | 'Ssn9'
-    | 'FullAddress'
-    | 'Email'
-    | 'PhoneNumber'
-    | 'Nationality'
-    | 'UsLegalStatus'
-    | 'BusinessName'
-    | 'BusinessTin'
-    | 'BusinessAddress'
-    | 'BusinessPhoneNumber'
-    | 'BusinessWebsite'
-    | 'BusinessBeneficialOwners'
-    | 'BusinessKycedBeneficialOwners'
-    | 'BusinessCorporationType'
-    | 'InvestorProfile'
-    | 'Card'
-    | 'UsTaxId'
-    | 'Bank'
-  >;
   cipKind?: 'alpaca' | 'apex';
   createdAt: string;
   curpValidationEnabled: boolean;
