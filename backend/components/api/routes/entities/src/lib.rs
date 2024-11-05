@@ -16,6 +16,7 @@ mod get;
 mod label;
 mod liveness;
 mod match_signals;
+mod onboarding;
 mod risk_signals;
 mod rule_set_result;
 mod tags;
@@ -59,5 +60,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(tags::delete)
         .service(label::get)
         .service(label::post)
-        .service(ai_summarize::get);
+        .service(ai_summarize::get)
+        .service(onboarding::get);
 }

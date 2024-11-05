@@ -54,7 +54,6 @@ pub async fn get(
 
     let results = wfs
         .into_iter()
-        .filter_map(|(wf, obc)| obc.map(|obc| (wf, obc)))
         .filter(|(wf, _)| wf.kind.has_tenant_facing_decision())
         // Start by only showing workflows with a terminal decision
         .filter(|(wf, _)| wf.status.is_terminal())

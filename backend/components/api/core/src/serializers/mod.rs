@@ -9,6 +9,7 @@ mod compliance;
 mod document;
 mod dupes;
 mod entity;
+mod entity_onboarding;
 mod identity_document;
 mod insight_event;
 mod list;

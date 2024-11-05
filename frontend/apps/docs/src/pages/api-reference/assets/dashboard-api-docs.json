@@ -1973,6 +1973,65 @@
                 ]
             }
         },
+        "/entities/{fp_id}/onboardings": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Get the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedEntityOnboarding"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/risk_signals": {
             "get": {
                 "tags": [
@@ -11322,12 +11381,10 @@
                                         "remove_org_member",
                                         "create_org",
                                         "update_org_settings",
-                                        "update_org_role",
                                         "create_playbook",
                                         "disable_playbook",
                                         "manually_review_entity",
-                                        "edit_playbook",
-                                        "deactivate_org_role"
+                                        "edit_playbook"
                                     ]
                                 },
                                 "id": {
@@ -22859,6 +22916,87 @@
                     "expected_rule_set_version"
                 ]
             },
+            "OffsetPaginatedEntityOnboarding": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "playbook_key": {
+                                    "example": "pb_live_fZvYlX3JpanlQ3MAwE45g0",
+                                    "type": "string"
+                                },
+                                "rule_set_results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "timestamp": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "timestamp"
+                                        ]
+                                    }
+                                },
+                                "seqno": {
+                                    "description": "Sequence number used to order DataLifetimes",
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "pass",
+                                        "fail",
+                                        "incomplete",
+                                        "pending",
+                                        "none"
+                                    ]
+                                },
+                                "timestamp": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "playbook_key",
+                                "rule_set_results",
+                                "status",
+                                "timestamp"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
             "OffsetPaginatedList": {
                 "description": "",
                 "type": "object",
@@ -23022,32 +23160,6 @@
                                 },
                                 "curp_validation_enabled": {
                                     "type": "boolean"
-                                },
-                                "doc_scan_for_optional_ssn": {
-                                    "type": "string",
-                                    "enum": [
-                                        "Name",
-                                        "Dob",
-                                        "Ssn4",
-                                        "Ssn9",
-                                        "FullAddress",
-                                        "Email",
-                                        "PhoneNumber",
-                                        "Nationality",
-                                        "UsLegalStatus",
-                                        "BusinessName",
-                                        "BusinessTin",
-                                        "BusinessAddress",
-                                        "BusinessPhoneNumber",
-                                        "BusinessWebsite",
-                                        "BusinessBeneficialOwners",
-                                        "BusinessKycedBeneficialOwners",
-                                        "BusinessCorporationType",
-                                        "InvestorProfile",
-                                        "Card",
-                                        "UsTaxId",
-                                        "Bank"
-                                    ]
                                 },
                                 "document_types_and_countries": {
                                     "type": "object",
@@ -24064,32 +24176,6 @@
                     },
                     "curp_validation_enabled": {
                         "type": "boolean"
-                    },
-                    "doc_scan_for_optional_ssn": {
-                        "type": "string",
-                        "enum": [
-                            "Name",
-                            "Dob",
-                            "Ssn4",
-                            "Ssn9",
-                            "FullAddress",
-                            "Email",
-                            "PhoneNumber",
-                            "Nationality",
-                            "UsLegalStatus",
-                            "BusinessName",
-                            "BusinessTin",
-                            "BusinessAddress",
-                            "BusinessPhoneNumber",
-                            "BusinessWebsite",
-                            "BusinessBeneficialOwners",
-                            "BusinessKycedBeneficialOwners",
-                            "BusinessCorporationType",
-                            "InvestorProfile",
-                            "Card",
-                            "UsTaxId",
-                            "Bank"
-                        ]
                     },
                     "document_types_and_countries": {
                         "type": "object",

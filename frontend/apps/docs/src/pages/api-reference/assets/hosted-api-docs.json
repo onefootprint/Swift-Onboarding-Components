@@ -6359,9 +6359,6 @@
                     "can_make_real_doc_scan_calls_in_sandbox": {
                         "type": "boolean"
                     },
-                    "doc_scan_required_if_ssn_skipped": {
-                        "type": "boolean"
-                    },
                     "is_app_clip_enabled": {
                         "type": "boolean"
                     },

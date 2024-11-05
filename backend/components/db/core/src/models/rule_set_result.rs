@@ -32,6 +32,7 @@ use newtypes::RuleSetResultId;
 use newtypes::RuleSetResultKind;
 use newtypes::ScopedVaultId;
 use newtypes::WorkflowId;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Eq, PartialEq)]
 #[diesel(table_name = rule_set_result)]
@@ -180,6 +181,24 @@ impl RuleSetResult {
         let rule_results = RuleResult::list(conn, &rule_set_result.id)?;
 
         Ok(Some((rule_set_result, rule_results)))
+    }
+
+    #[tracing::instrument("RuleSetResult::bulk_get_for_workflows", skip(conn))]
+    pub fn bulk_get_for_workflows(
+        conn: &mut PgConn,
+        workflow_ids: Vec<WorkflowId>,
+    ) -> DbResult<HashMap<WorkflowId, Vec<Self>>> {
+        let results = rule_set_result::table
+            .filter(rule_set_result::workflow_id.eq_any(workflow_ids))
+            .filter(rule_set_result::kind.eq(RuleSetResultKind::WorkflowDecision))
+            .order_by(rule_set_result::created_seqno.desc())
+            .then_order_by(rule_set_result::_created_at.desc())
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .filter_map(|rsr| rsr.workflow_id.clone().map(|wf_id| (wf_id, rsr)))
+            .into_group_map();
+
+        Ok(results)
     }
 
     #[tracing::instrument("RuleSetResult::get", skip_all)]

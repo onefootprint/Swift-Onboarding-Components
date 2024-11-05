@@ -337,11 +337,11 @@ impl Workflow {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         pagination: OffsetPagination,
-    ) -> DbResult<OffsetPaginatedResult<(Self, Option<ObConfiguration>)>> {
+    ) -> DbResult<OffsetPaginatedResult<(Self, ObConfiguration)>> {
         let mut query = workflow::table
             .filter(workflow::scoped_vault_id.eq(sv_id))
             .order_by(workflow::created_at.desc())
-            .left_join(ob_configuration::table)
+            .inner_join(ob_configuration::table)
             .limit(pagination.limit())
             .into_boxed();
         if let Some(offset) = pagination.offset() {
