@@ -10,11 +10,13 @@ import styled, { css } from 'styled-components';
 
 import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses';
 
+import useSession from 'src/hooks/use-session';
 import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
 import DocumentFields from './components/document-fields';
+import DocumentFieldset from './components/document-fieldset';
 import FinancialFieldset from './components/financial-fieldset';
 import InvestorProfileFields from './components/investor-profile-fields';
 import OwnedBusinesses from './components/owned-businesses';
@@ -38,6 +40,13 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
     attr => attr.identifier.startsWith('custom') || attr.identifier.startsWith('document.custom'),
   );
   const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(entity.id);
+
+  const {
+    data: { user },
+  } = useSession();
+  const hasAnyDocuments =
+    hasEntityDocuments(entity) || entity.data.some(attr => attr.identifier.startsWith('document.custom'));
+  const showNewDocumentFieldset = user?.isFirmEmployee && hasAnyDocuments;
 
   // if there are three elements, we want to display as grid
   const displayFirstSectionAsGrid = getGridTemplateAreas({ entity, hasBusinesses }) <= 3;
@@ -125,6 +134,11 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
               <DocumentFields />
             </Fieldset>
           </GridItem>
+        ) : null}
+        {showNewDocumentFieldset ? (
+          <WideGridItem>
+            <DocumentFieldset fields={documents.fields} />
+          </WideGridItem>
         ) : null}
         {hasCards || hasBankAccounts ? (
           <GridItem>
