@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import Text from '../text';
 
 export type BreadcrumbItemProps = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  as?: any;
+  as?: React.ElementType;
   href?: string;
   children: string;
 };

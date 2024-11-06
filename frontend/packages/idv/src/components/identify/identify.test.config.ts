@@ -108,11 +108,7 @@ export const withLoginChallenge = (challengeKind: string) =>
     },
   });
 
-export const withSignupChallenge = (
-  challengeKind?: string,
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  onRequest?: (args: any) => void,
-) =>
+export const withSignupChallenge = (challengeKind?: string, onRequest?: (args: unknown) => void) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify/signup_challenge',

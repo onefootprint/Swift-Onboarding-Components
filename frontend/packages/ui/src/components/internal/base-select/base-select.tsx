@@ -5,7 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';
-import type { OptionProps } from 'react-select';
+import type { ControlProps, GroupBase, MenuListProps, OptionProps } from 'react-select';
 import ReactSelect from 'react-select';
 import styled, { useTheme } from 'styled-components';
 
@@ -49,8 +49,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   searchPlaceholder?: string;
   size?: BaseSelectSize;
   value?: Option;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  OptionComponent?: React.ComponentType<OptionProps<any, false, any>>;
+  OptionComponent?: React.ComponentType<OptionProps<Option, false, GroupBase<Option>>>;
   testID?: string;
   MobileOptionComponent?: React.ComponentType<ItemProps>;
 };
@@ -189,10 +188,10 @@ const BaseSelect = <Option extends BaseSelectOption>({
             backspaceRemovesValue={false}
             controlShouldRenderValue={false}
             components={{
-              Control,
+              Control: Control as React.ComponentType<ControlProps<Option, false, GroupBase<Option>>>,
               DropdownIndicator: null,
               IndicatorSeparator: null,
-              MenuList,
+              MenuList: MenuList as React.ComponentType<MenuListProps<Option, false, GroupBase<Option>>>,
               Option: OptionComponent,
               ...(isSearchable ? {} : { Control: () => null }),
             }}

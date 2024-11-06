@@ -17,8 +17,7 @@ import Layout from '../client-layout';
 import type { NotificationProps } from '../notification';
 import Notification from '../notification';
 
-// biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
-type VoidOr<T> = T | void | undefined | null;
+type VoidOr<T> = T | undefined | null;
 type AuthContainerProps = { variant?: Variant | null; Loading: JSX.Element };
 
 const EmptyConfig = {} as PublicOnboardingConfig;

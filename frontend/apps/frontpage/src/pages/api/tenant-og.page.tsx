@@ -10,7 +10,7 @@ export default async function handler(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const tenantLogoUrl = searchParams.get('logo_url');
   if (!tenantLogoUrl) {
-    // biome-ignore lint/complexity/noUselessFragments: <explanation>
+    // biome-ignore lint/complexity/noUselessFragments: ImageResponse requires a React node
     return new ImageResponse(<>Missing tenantLogoUrl</>, {
       width: 1200,
       height: 630,

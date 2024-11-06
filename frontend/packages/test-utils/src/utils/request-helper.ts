@@ -14,16 +14,14 @@ export type RequestParams = {
   path: string;
   queryParams?: URLSearchParams;
   statusCode?: number;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  response: any;
+  response: unknown;
   once?: boolean;
   /** Called with information from the mocked request. Can be used to check the HTTP body, headers, and query params in the request. */
   onRequest?: (args: OnRequestCalledArgs) => void;
 };
 
 export type OnRequestCalledArgs = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  body: any;
+  body: unknown;
   headers: Record<string, string>;
   queryParams: URLSearchParams;
 };

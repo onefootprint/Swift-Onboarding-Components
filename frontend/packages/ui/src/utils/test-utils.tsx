@@ -142,8 +142,7 @@ export const createGoogleMapsSpy = (type = 'success', data = defaultGoogleMapsDa
           getPlacePredictions =
             type === 'opts'
               ? getPlacePredictions
-              : // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-                (_: any, cb: (dataArg: any, status: string) => void) => {
+              : (_: unknown, cb: (dataArg: unknown, status: string) => void) => {
                   setTimeout(() => {
                     cb(type === 'success' ? data : null, type === 'success' ? 'OK' : 'ERROR');
                   }, 500);

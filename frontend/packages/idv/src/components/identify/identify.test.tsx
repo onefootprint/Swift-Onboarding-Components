@@ -4,6 +4,7 @@ import { customRender, mockRequest, screen, userEvent, waitFor } from '@onefootp
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, IdDI, UserTokenScope } from '@onefootprint/types';
 import mockRouter from 'next-router-mock';
 
+import type { ComponentProps } from 'react';
 import { Layout } from '../layout';
 import Identify from './identify';
 import {
@@ -31,6 +32,9 @@ import {
 } from './identify.test.config';
 import { IdentifyVariant } from './state/types';
 
+type Config = ComponentProps<typeof Identify>['config'];
+type Device = ComponentProps<typeof Identify>['device'];
+
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 jest.mock('../../utils/get-biometric-challenge-response', () => ({
@@ -56,14 +60,11 @@ describe('<Identify />', () => {
     bootstrapPhone?: string;
     initialAuthToken?: string;
     isComponentsSdk?: boolean;
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    config: any;
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    device?: any;
+    config: Config;
+    device?: Device;
     onDone?: () => void;
   }) => {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    const bootstrapData: any = {};
+    const bootstrapData: Record<string, unknown> = {};
     if (bootstrapEmail) {
       bootstrapData.email = bootstrapEmail;
     }
@@ -75,7 +76,7 @@ describe('<Identify />', () => {
         <Identify
           variant={IdentifyVariant.verify}
           config={config}
-          isLive={config.isLive}
+          isLive={Boolean(config?.isLive)}
           isComponentsSdk={isComponentsSdk}
           obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
           bootstrapData={bootstrapEmail || bootstrapPhone ? bootstrapData : undefined}
@@ -85,6 +86,7 @@ describe('<Identify />', () => {
               type: 'mobile',
               hasSupportForWebauthn: true,
               osName: 'iOS',
+              browser: 'Safari',
             }
           }
           onDone={onDone ?? (() => undefined)}
@@ -767,6 +769,7 @@ describe('<Identify />', () => {
             type: 'desktop',
             hasSupportForWebauthn: false,
             osName: 'windows vista',
+            browser: 'Internet Explorer',
           },
           onDone,
         });
@@ -797,6 +800,7 @@ describe('<Identify />', () => {
             type: 'desktop',
             hasSupportForWebauthn: false,
             osName: 'windows vista',
+            browser: 'Internet Explorer',
           },
           onDone,
         });

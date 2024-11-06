@@ -3,18 +3,17 @@ import type { FootprintAppearanceRules } from '@onefootprint/footprint-js';
 import footprintClassNamesMap from './constants/footprint-class-names-map';
 import rulesWhitelist from './constants/rules-whitelist';
 
-const createRules = (rules?: FootprintAppearanceRules) => {
+type CSSProperties = Record<string, string | number>;
+type StyleRules = Record<string, CSSProperties>;
+
+const createRules = (rules?: Partial<FootprintAppearanceRules>) => {
   if (!rules || Object.keys(rules).length === 0) return null;
-  const filteredRules = filterNonWhitelistRules(rules);
+  const filteredRules = filterNonWhitelistRules(rules as StyleRules);
   const styles = createStylesFromRules(filteredRules);
   return styles;
 };
 
-export const filterNonWhitelistRules = (
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  rules: Record<string, any>,
-  whitelist: string[] = rulesWhitelist,
-) => {
+export const filterNonWhitelistRules = (rules: StyleRules, whitelist: string[] = rulesWhitelist): StyleRules => {
   const clonedRules = { ...rules };
   Object.entries(rules).forEach(([rule]) => {
     if (!whitelist.includes(rule)) {
@@ -34,28 +33,26 @@ export const getSelector = (selector: string, selectors: Record<string, string> 
   return `.fp-custom-appearance${selectors[selector]}`;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const convertObjectToCSS = (rules: Record<string, any>) => {
+export const convertObjectToCSS = (rules: CSSProperties): string => {
   const toKebabCase = (selector: string) =>
     selector
       .split(/(?=[A-Z])/)
       .join('-')
       .toLowerCase();
-  const formatValue = (selector: string, value: string) => {
+  const formatValue = (selector: string, value: string | number): string => {
     if (selector === 'content') {
       return `"${value}"`;
     }
-    return value;
+    return value as string;
   };
 
-  return Object.keys(rules).reduce(
-    (acc, selector) => `${acc + toKebabCase(selector)}:${formatValue(selector, rules[selector])};`,
+  return Object.entries(rules).reduce(
+    (acc, [selector, value]) => `${acc + toKebabCase(selector)}:${formatValue(selector, String(value))};`,
     '',
   );
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const createStylesFromRules = (rules: Record<string, any>) => {
+export const createStylesFromRules = (rules: StyleRules): string => {
   let styles = ' ';
   Object.entries(rules).forEach(([selector, stylesObject]) => {
     const fpSelector = getSelector(selector);
