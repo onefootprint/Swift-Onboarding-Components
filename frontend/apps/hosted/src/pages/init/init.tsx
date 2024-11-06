@@ -39,7 +39,7 @@ const Init = () => {
 
   const queryGetOnboardingConfig = useGetOnboardingConfig({ obConfigAuth, authToken });
   const isGetOnboardingConfigLoading = queryGetOnboardingConfig.isFetching && queryGetOnboardingConfig.isPending;
-  const onboardingConfig = queryGetOnboardingConfig.data;
+  const onboardingConfigResponse = queryGetOnboardingConfig.data;
 
   useParseUrl({
     onSuccess: ({ obConfigAuth: parsedObConfigAuth, authToken: parsedAuthToken, urlType }) => {
@@ -77,17 +77,19 @@ const Init = () => {
       return;
     }
 
-    if (onboardingConfig?.isLive === true && orgIds.has(onboardingConfig?.orgId)) {
-      setupLogger(onboardingConfig);
+    const { config, workflowRequest } = onboardingConfigResponse || {};
+    if (config?.isLive === true && orgIds.has(config?.orgId)) {
+      setupLogger(config);
     }
 
-    if (businessBoKycData || onboardingConfig) {
+    if (businessBoKycData || config) {
       trackAction('hosted:started');
       send({
         type: 'initContextUpdated',
         payload: {
           businessBoKycData,
-          onboardingConfig,
+          onboardingConfig: config,
+          workflowRequest,
         },
       });
     }
@@ -96,7 +98,7 @@ const Init = () => {
     isGetOnboardingConfigLoading,
     queryGetBusiness.error,
     queryGetOnboardingConfig.error,
-    onboardingConfig,
+    onboardingConfigResponse,
     businessBoKycData,
     orgIds,
   ]);

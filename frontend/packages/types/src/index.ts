@@ -126,6 +126,7 @@ export type {
   GetProxyConfigsRequest,
   GetProxyConfigsResponse,
   GetPublicOnboardingConfigResponse,
+  HostedWorkflowRequest,
   GetRiskSignalDetailsRequest,
   GetRiskSignalDetailsResponse,
   GetRolesRequest,

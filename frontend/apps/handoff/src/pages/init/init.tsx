@@ -136,13 +136,13 @@ const Init = () => {
   useGetOnboardingConfig(
     { authToken },
     {
-      onSuccess: obConfiguration => {
-        setupLogger(obConfiguration, orgIds);
+      onSuccess: ({ config }) => {
+        setupLogger(config, orgIds);
 
         if (!state.done) {
           send({
             type: 'initContextUpdated',
-            payload: { onboardingConfig: obConfiguration },
+            payload: { onboardingConfig: config },
           });
         }
       },

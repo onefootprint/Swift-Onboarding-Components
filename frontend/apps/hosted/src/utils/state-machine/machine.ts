@@ -63,11 +63,13 @@ export const createHostedMachine = () =>
         resetContext: assign(() => ({})),
         assignError: assign((context, event) => ({ ...context, error: event.payload.error })),
         assignInitContext: assign((context, event) => {
-          const { obConfigAuth, businessBoKycData, onboardingConfig, authToken, urlType } = event.payload;
+          const { obConfigAuth, businessBoKycData, onboardingConfig, authToken, urlType, workflowRequest } =
+            event.payload;
           context.obConfigAuth = obConfigAuth !== undefined ? obConfigAuth : context.obConfigAuth;
           context.authToken = authToken !== undefined ? authToken : context.authToken;
           context.businessBoKycData = businessBoKycData !== undefined ? businessBoKycData : context.businessBoKycData;
           context.onboardingConfig = onboardingConfig !== undefined ? onboardingConfig : context.onboardingConfig;
+          context.workflowRequest = workflowRequest !== undefined ? workflowRequest : context.workflowRequest;
           context.urlType = urlType !== undefined ? urlType : context.urlType;
 
           return context;

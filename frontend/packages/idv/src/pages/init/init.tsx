@@ -1,5 +1,4 @@
 import { getErrorMessage, useRequestError } from '@onefootprint/request';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
 
 import { ConfigRequestFailureReason } from '../../../src/utils/state-machine/types';
@@ -35,12 +34,10 @@ const Init = () => {
   useGetOnboardingConfig(
     { obConfigAuth, authToken },
     {
-      onSuccess: (config: PublicOnboardingConfig) => {
+      onSuccess: ({ config }) => {
         send({
           type: 'initContextUpdated',
-          payload: {
-            config,
-          },
+          payload: { config },
         });
       },
       onError: error => {
@@ -62,9 +59,7 @@ const Init = () => {
 
         send({
           type: 'configRequestFailed',
-          payload: {
-            reason,
-          },
+          payload: { reason },
         });
       },
     },

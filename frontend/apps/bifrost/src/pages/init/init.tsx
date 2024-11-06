@@ -79,7 +79,7 @@ const Init = () => {
   useGetOnboardingConfig(
     { obConfigAuth, authToken: authTokenContext },
     {
-      onSuccess: (config: PublicOnboardingConfig) => {
+      onSuccess: ({ config }) => {
         setupLogger({
           orgIds,
           config,

@@ -1,13 +1,22 @@
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
-import type { GetOnboardingConfigRequest, GetPublicOnboardingConfigResponse } from '@onefootprint/types';
+import type {
+  GetOnboardingConfigRequest,
+  GetPublicOnboardingConfigResponse,
+  HostedWorkflowRequest,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+type HostedOnboardingConfigResponse = PublicOnboardingConfig & {
+  workflowRequest?: HostedWorkflowRequest;
+};
+
 const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
   const { obConfigAuth, authToken } = payload;
-  const response = await request<GetPublicOnboardingConfigResponse>({
+  const response = await request<HostedOnboardingConfigResponse>({
     method: 'GET',
     url: '/hosted/onboarding/config',
     headers: obConfigAuth ?? {
@@ -15,7 +24,11 @@ const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
     },
   });
 
-  return response.data;
+  // The API response includes a workflowRequest, but it's not actually a property of the playbook.
+  // So we pull out the workflowRequest here for clarity.
+  const { workflowRequest, ...config } = response.data;
+
+  return { workflowRequest, config };
 };
 
 const useGetOnboardingConfig = (

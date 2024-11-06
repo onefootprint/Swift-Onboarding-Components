@@ -42,18 +42,14 @@
   "pages": {
     "intro": {
       "header": {
-        "bo-kyc": {
-          "title": "{{tenantName}} quiere verificar tu empresa",
-          "subtitle": "{{otherBoName}} está verificando su empresa {{businessName}}. Ha sido usted identificado como propietario y por ello necesitamos verificar su identidad."
-        },
-        "kyb": {
-          "title": "{{tenantName}} quiere verificar tu empresa",
-          "subtitle": "{{tenantName}} necesita recopilar información de la empresa y de las personas que la integran para continuar."
-        },
-        "kyc": {
-          "title": "{{tenantName}} quiere verificar tu identidad",
-          "subtitle": "{{tenantName}} necesita recopilar su información personal y así poder verificar los datos de su empresa."
-        }
+        "user-title": "{{tenantName}} quiere verificar tu identidad",
+        "business-title": "{{tenantName}} quiere verificar tu empresa",
+        "bo-kyc-subtitle": "{{otherBoName}} está verificando su empresa {{businessName}}. Ha sido usted identificado como propietario y por ello necesitamos verificar su identidad.",
+        "kyb-subtitle": "{{tenantName}} necesita recopilar información de la empresa y de las personas que la integran para continuar.",
+        "kyc-subtitle": "{{tenantName}} necesita recopilar su información personal y así poder verificar los datos de su empresa.",
+        "recollect-bos-subtitle": "{{tenantName}} ha solicitado que proporcione más información sobre los propietarios beneficiarios de su empresa.",
+        "user-document-subtitle": "{{tenantName}} necesita recopilar algunos documentos para verificar su identidad.",
+        "business-document-subtitle": "{{tenantName}} necesita recopilar algunos documentos para verificar su empresa."
       },
       "cta": "Verificar tu identidad"
     },

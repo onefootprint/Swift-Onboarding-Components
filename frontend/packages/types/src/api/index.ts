@@ -129,6 +129,7 @@ export type {
   GetOnboardingConfigRequest,
   GetOnboardingConfigResponse,
   GetPublicOnboardingConfigResponse,
+  HostedWorkflowRequest,
 } from './get-onboarding-config';
 export type {
   GetOnboardingConfigsRequest,

@@ -37,8 +37,8 @@ const getOnboardingConfig = async (authHeaders: Record<string, string>): Promise
   if (!response.ok) {
     throw new Error(response.statusText);
   }
-  const tenant = await response.json();
-  return tenant;
+  const config = await response.json();
+  return { config };
 };
 
 const getAppearanceFromObConfig = async (payload: OnboardingConfigRequestType): Promise<FootprintAppearance | null> => {
@@ -48,8 +48,8 @@ const getAppearanceFromObConfig = async (payload: OnboardingConfigRequestType): 
   }
 
   try {
-    const tenant = await getOnboardingConfig(authHeaders);
-    return tenant.appearance || null;
+    const { config } = await getOnboardingConfig(authHeaders);
+    return config.appearance || null;
   } catch (_) {
     return null;
   }

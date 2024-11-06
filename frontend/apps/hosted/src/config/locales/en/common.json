@@ -42,18 +42,16 @@
   "pages": {
     "intro": {
       "header": {
-        "bo-kyc": {
-          "title": "{{tenantName}} wants to verify your business",
-          "subtitle": "{{otherBoName}} is verifying {{businessName}}, and you were identified as a beneficial owner. In order to successfully verify your business, we need to verify your identity first."
-        },
-        "kyb": {
-          "title": "{{tenantName}} wants to verify your business",
-          "subtitle": "{{tenantName}} needs to collect some business and personal information to confirm your identity."
-        },
-        "kyc": {
-          "title": "{{tenantName}} wants to verify your identity",
-          "subtitle": "{{tenantName}} needs to collect some personal information to confirm your identity."
-        }
+        "user-title": "{{tenantName}} wants to verify your identity",
+        "business-title": "{{tenantName}} wants to verify your business",
+        "bo-kyc-subtitle": "{{otherBoName}} is verifying {{businessName}}, and you were identified as a beneficial owner. In order to successfully verify your business, we need to verify your identity first.",
+        "kyb-subtitle": "{{tenantName}} needs to collect some business and personal information to verify your business.",
+        "kyc-subtitle": "{{tenantName}} needs to collect some personal information to confirm your identity.",
+        "recollect-bos-subtitle": "{{tenantName}} has requested that you provide more information on the beneficial owners of your business.",
+        "user-document-subtitle_one": "{{tenantName}} needs to collect a document to verify your identity.",
+        "user-document-subtitle_other": "{{tenantName}} needs to collect some documents to verify your identity.",
+        "business-document-subtitle_one": "{{tenantName}} needs to collect a document to verify your business.",
+        "business-document-subtitle_other": "{{tenantName}} needs to collect some documents to verify your business."
       },
       "cta": "Verify your identity"
     },

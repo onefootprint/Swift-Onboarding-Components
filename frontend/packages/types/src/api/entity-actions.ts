@@ -42,7 +42,6 @@ export type WorkflowRequestConfig =
   | {
       kind: TriggerKind.Document;
       data: {
-        fpBid?: string;
         configs: DocumentRequestConfig[];
         businessConfigs: DocumentRequestConfig[];
       };
