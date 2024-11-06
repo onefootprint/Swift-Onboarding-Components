@@ -1,14 +1,15 @@
 import { postEntitiesByFpIdBusinessOwnersKycLinksMutation } from '@onefootprint/axios/dashboard';
 import { useClipboard, useToggle } from '@onefootprint/hooks';
 import type { PrivateBusinessOwnerKycLink } from '@onefootprint/request-types/dashboard';
-import { Checkbox, Dialog, LinkButton, Stack, Text, useToast } from '@onefootprint/ui';
+import { Checkbox, Dialog, InlineAlert, LinkButton, Stack, Text, useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 type FormValues = {
   boIds: string[];
+  hasOptionSelected?: boolean;
 };
 
 type AwaitingBosEventProps = {
@@ -79,11 +80,13 @@ const Form = ({
 }: { onSubmit: (data: FormValues) => void; businessOwners: Array<PrivateBusinessOwnerKycLink> }) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail.timeline.awaiting-bos-event' });
   const { copy, copiedText } = useClipboard();
-  const { register, handleSubmit } = useForm<FormValues>({
+  const { control, register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       boIds: businessOwners.map(bo => bo.id),
     },
   });
+  const boIds = useWatch({ control, name: 'boIds' });
+  const noOptionSelected = boIds.length === 0;
 
   return (
     <form id="resend-form" onSubmit={handleSubmit(onSubmit)}>
@@ -100,6 +103,14 @@ const Form = ({
           ))}
         </Stack>
       </Stack>
+      {noOptionSelected ? (
+        <>
+          <InlineAlert marginTop={5} variant="warning">
+            {t('error')}
+          </InlineAlert>
+          <input type="hidden" {...register('hasOptionSelected', { required: true })} />
+        </>
+      ) : null}
     </form>
   );
 };

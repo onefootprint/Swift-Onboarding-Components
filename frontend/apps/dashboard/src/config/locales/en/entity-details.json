@@ -1019,7 +1019,8 @@
         "feedback": {
           "title": "KYC links sent",
           "description": "The KYC links have been sent via SMS and Email to the selected beneficial owners"
-        }
+        },
+        "error": "Please select at least one beneficial owner"
       },
       "external-integration-called": {
         "true": "Successfully submitted user to {{kind}} ",

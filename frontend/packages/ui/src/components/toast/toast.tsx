@@ -38,7 +38,7 @@ const Toast = ({
       align="start"
       width={isMobile ? MOBILE_WIDTH : DESKTOP_WIDTH}
     >
-      <Stack align="center" justify="center" marginTop={1}>
+      <Stack align="center" justify="center">
         <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
       </Stack>
       <Stack flexGrow={1} align="start" justify="flex-start" height="fit-content" direction="column" gap={4}>

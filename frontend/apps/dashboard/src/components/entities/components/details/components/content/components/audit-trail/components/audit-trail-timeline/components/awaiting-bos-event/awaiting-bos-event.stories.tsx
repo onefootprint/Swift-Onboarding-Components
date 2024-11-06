@@ -21,7 +21,7 @@ const meta: Meta<typeof AwaitingBosEvent> = {
             return HttpResponse.json([
               getPrivateBusinessOwnerKycLink({
                 id: 'bo_LCG6lhG5P44H4RrXffoxlA',
-                name: 'Jane D',
+                name: 'Jane D.',
                 link: 'http://hosted.onefootprint.com?type=bo&r=713#botok_zCHOLmqnX97FlggJa1IUQVxPxRAwo4twad',
               }),
               getPrivateBusinessOwnerKycLink({
@@ -77,6 +77,31 @@ export const CopyKycLink: Story = {
 
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
     await userEvent.click(cancelButton);
+  },
+};
+
+export const FormWithError: Story = {
+  play: async () => {
+    const screen = within(document.body);
+
+    const triggerButton = screen.getByRole('button', {
+      name: 'Resend KYC link',
+    });
+    await userEvent.click(triggerButton);
+
+    const firstOption = await screen.findByRole('checkbox', { name: 'Jane D.' });
+    await userEvent.click(firstOption);
+
+    const secondOption = await screen.findByRole('checkbox', { name: 'John S.' });
+    await userEvent.click(secondOption);
+
+    const submitButton = await screen.findByRole('button', {
+      name: 'Send via SMS and Email',
+    });
+    await userEvent.click(submitButton);
+
+    const errorMessage = await screen.findByRole('Please select at least one beneficial owner');
+    expect(errorMessage).toBeInTheDocument();
   },
 };
 
