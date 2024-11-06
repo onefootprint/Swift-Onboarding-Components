@@ -619,9 +619,6 @@ pub fn reason_codes_from_match_field(
     }
 }
 
-pub enum IncodeOcrFields {}
-
-
 #[cfg(test)]
 mod tests {
     use super::*;

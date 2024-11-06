@@ -201,9 +201,7 @@ impl
         } = request;
         let client_adapter = SambaSafetyClientAdapter::new(credentials)?;
         let authed_client = client_adapter.get_authenticated_client(self).await?;
-        let raw_response = authed_client
-            .get_license_validation_report(self, report_id)
-            .await?;
+        let raw_response = authed_client.get_activity_history_report(self, report_id).await?;
         let res = SambaAPIResponse::from_response(raw_response).await;
         Ok(res)
     }
