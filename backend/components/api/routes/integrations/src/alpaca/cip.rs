@@ -292,7 +292,7 @@ pub(crate) async fn create_cip_request(
 
                     // randomly take the latest review annotation, hoping this is the one that is most like
                     // "good to go"
-                    let annotation = Annotation::get_for_obd(conn, &obd_manual.id)?;
+                    let annotation = Annotation::get_for_obd(conn, &sv.id, &obd_manual.id)?;
 
                     (mr, Some(obd_manual), annotation)
                 }

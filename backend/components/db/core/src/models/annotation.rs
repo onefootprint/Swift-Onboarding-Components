@@ -17,6 +17,7 @@ use newtypes::DbActor;
 use newtypes::DbUserTimelineEvent;
 use newtypes::FpId;
 use newtypes::OnboardingDecisionId;
+use newtypes::OnboardingDecisionInfo;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use serde::Deserialize;
@@ -155,9 +156,15 @@ impl Annotation {
     }
 
     #[tracing::instrument("Annotation::get_for_obd", skip_all)]
-    pub fn get_for_obd(conn: &mut PgConn, obd_id: &OnboardingDecisionId) -> DbResult<Option<Self>> {
-        // Right now, the only thing linking annotations and OBD's is user_timeline
+    /// Unfortunately, the only junction between an OBD and an annotation is the user_timeline.
+    /// For now, we'll just look up the annotation via the user_timelin
+    pub fn get_for_obd(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        obd_id: &OnboardingDecisionId,
+    ) -> DbResult<Option<Self>> {
         let ut: Option<UserTimeline> = user_timeline::table
+            .filter(user_timeline::scoped_vault_id.eq(sv_id))
             .filter(
                 user_timeline::event
                     .retrieve_by_path_as_text(vec!["data", "id"])
@@ -170,24 +177,17 @@ impl Annotation {
             .get_result(conn)
             .optional()?;
 
-        let res = if let Some(ut) = ut {
-            match ut.event {
-                DbUserTimelineEvent::OnboardingDecision(o) => {
-                    if let Some(annotation_id) = o.annotation_id {
-                        annotation::table
-                            .filter(annotation::id.eq(annotation_id))
-                            .get_result::<Annotation>(conn)
-                            .optional()?
-                    } else {
-                        // technically impossible given above sql query
-                        None
-                    }
-                }
-                _ => None,
-            }
-        } else {
-            None
+        let Some(DbUserTimelineEvent::OnboardingDecision(OnboardingDecisionInfo {
+            annotation_id: Some(annotation_id),
+            ..
+        })) = ut.map(|ut| ut.event)
+        else {
+            return Ok(None);
         };
+        let res = annotation::table
+            .filter(annotation::id.eq(annotation_id))
+            .get_result::<Annotation>(conn)
+            .optional()?;
 
         Ok(res)
     }
