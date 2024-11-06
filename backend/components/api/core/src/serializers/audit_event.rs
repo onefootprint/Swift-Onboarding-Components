@@ -14,7 +14,7 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
     fn try_from_db(event: JoinedAuditEvent) -> FpResult<Self> {
         let JoinedAuditEvent {
             audit_event,
-            tenant: _,
+            tenant,
             saturated_actor,
             insight_event,
             scoped_vault,
@@ -90,6 +90,7 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     email,
                     first_name,
                     last_name,
+                    tenant_name: tenant.name,
                     tenant_role_id: tr.id,
                     tenant_role_name: tr.name,
                     scopes: tr.scopes,

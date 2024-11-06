@@ -542,6 +542,7 @@ def test_member_invitation_audit_event(run_id, sandbox_tenant, admin_role):
         tenant_role_id=admin_role["id"],
         tenant_role_name=admin_role["name"],
         email=email,
+        tenant_name="Footprint Sandbox Integration Testing",
         first_name=first_name,
         last_name=last_name,
     )
