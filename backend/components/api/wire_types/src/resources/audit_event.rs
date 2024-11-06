@@ -11,6 +11,7 @@ use newtypes::OrgMemberEmail;
 use newtypes::TenantId;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
+use newtypes::TenantUserId;
 use strum_macros::Display;
 
 /// Describes an event relevant to security as seen by tenants.
@@ -80,7 +81,16 @@ pub enum AuditEventDetail {
         tenant_name: String,
         scopes: Vec<TenantScope>,
     },
-    UpdateOrgMember,
+    UpdateOrgMember {
+        // TODO: hydrate old role name
+        old_tenant_role_id: TenantRoleId,
+
+        first_name: Option<String>,
+        last_name: Option<String>,
+        tenant_user_id: TenantUserId,
+
+        new_role: crate::OrganizationRole,
+    },
     LoginOrgMember,
     RemoveOrgMember,
     CreateOrg,

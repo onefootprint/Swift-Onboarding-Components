@@ -17,6 +17,7 @@ use db::helpers::TenantOrPartnerTenantRef;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_rolebinding::TenantRolebindingFilters;
 use db::models::tenant_rolebinding::TenantRolebindingUpdate;
@@ -146,7 +147,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
@@ -155,21 +156,41 @@ pub async fn patch(
     let tu_id = tu_id.into_inner();
     let api_wire_types::UpdateTenantRolebindingRequest { role_id } = request.into_inner();
 
-    if let AuthActor::TenantUser(tenant_user_id) = actor {
-        if tenant_user_id == tu_id {
+    if let AuthActor::TenantUser(ref tenant_user_id) = actor {
+        if tenant_user_id == &tu_id {
             return Err(TenantError::CannotEditCurrentUser.into());
         }
     }
 
-    let rolebinding_update = TenantRolebindingUpdate {
-        tenant_role_id: role_id,
-        ..Default::default()
-    };
     let (user, rb, role) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
-            let (user, _, role, _) = TenantRolebinding::get(conn, (&tu_id, org_ref))?;
+            let (user, _, old_role, _) = TenantRolebinding::get(conn, (&tu_id, org_ref))?;
+            if let (OrgIdentifier::TenantId(tenant_id), Some(role_id)) = (&authed_org_ident, role_id.as_ref())
+            {
+                let new_role = TenantRole::get(conn, role_id)?;
+
+                let detail = AuditEventDetail::UpdateOrgMember {
+                    old_tenant_role_id: old_role.id,
+                    new_tenant_role_id: new_role.id,
+                    tenant_user_id: tu_id.clone(),
+                };
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+
+                let audit_event = NewAuditEvent {
+                    principal_actor: actor.into(),
+                    insight_event_id,
+                    tenant_id: tenant_id.clone(),
+                    detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
+            let rolebinding_update = TenantRolebindingUpdate {
+                tenant_role_id: role_id,
+                ..Default::default()
+            };
             let rb = TenantRolebinding::update(conn, (&tu_id, org_ref), rolebinding_update)?;
+            let role = TenantRole::get(conn, &rb.tenant_role_id)?;
             Ok((user, rb, role))
         })
         .await?;

@@ -11,6 +11,7 @@ from tests.utils import (
 )
 from tests.dashboard.utils import (
     assert_has_audit_event_with_details,
+    get_audit_event_with_details,
 )
 
 
@@ -546,3 +547,32 @@ def test_member_invitation_audit_event(run_id, sandbox_tenant, admin_role):
         first_name=first_name,
         last_name=last_name,
     )
+
+
+def test_member_update_audit_event(run_id, sandbox_tenant, admin_role, limited_role):
+    # First create a user with admin role
+    email = f"test.{run_id}@gmail.com"
+    user = create_tenant_user(
+        sandbox_tenant,
+        admin_role,
+        email=email,
+        first_name="Pip",
+        last_name="The Warrior",
+    )
+
+    # Update the user's role to limited_role
+    patch(
+        f"org/members/{user['id']}",
+        {"role_id": limited_role["id"]},
+        *sandbox_tenant.db_auths,
+    )
+
+    print(limited_role["id"])
+
+    # Verify audit event for the update
+    event = get_audit_event_with_details(
+        tenant=sandbox_tenant,
+        tenant_user_id=user["id"],
+        name="update_org_member",
+    )
+    assert event["detail"]["data"]["new_role"]["id"] == limited_role["id"]

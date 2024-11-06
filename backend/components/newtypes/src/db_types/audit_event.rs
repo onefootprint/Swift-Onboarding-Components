@@ -72,7 +72,11 @@ pub enum AuditEventDetail {
         last_name: Option<String>,
         tenant_role_id: TenantRoleId,
     },
-    UpdateOrgMember,
+    UpdateOrgMember {
+        new_tenant_role_id: TenantRoleId,
+        old_tenant_role_id: TenantRoleId,
+        tenant_user_id: TenantUserId,
+    },
     LoginOrgMember,
     RemoveOrgMember,
     CreateOrg,
@@ -256,11 +260,22 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
-            AuditEventDetail::UpdateOrgMember => todo!(),
             AuditEventDetail::LoginOrgMember => todo!(),
             AuditEventDetail::RemoveOrgMember => todo!(),
             AuditEventDetail::CreateOrg => todo!(),
             AuditEventDetail::UpdateOrgSettings => todo!(),
+            AuditEventDetail::UpdateOrgMember {
+                old_tenant_role_id,
+                new_tenant_role_id,
+                tenant_user_id,
+            } => Self {
+                metadata: AuditEventMetadata::UpdateOrgMember { old_tenant_role_id },
+                args: AuditEventOptionalArgs {
+                    tenant_role_id: Some(new_tenant_role_id),
+                    tenant_user_id: Some(tenant_user_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::CreateOrgRole {
                 is_live,
                 scopes,
@@ -375,7 +390,9 @@ pub enum AuditEventMetadata {
         first_name: Option<String>,
         last_name: Option<String>,
     },
-    UpdateOrgMember,
+    UpdateOrgMember {
+        old_tenant_role_id: TenantRoleId,
+    },
     LoginOrgMember,
     RemoveOrgMember,
     CreateOrg,

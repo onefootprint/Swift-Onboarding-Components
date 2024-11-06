@@ -21,7 +21,7 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             ob_configuration: _,
             document_data: _,
             tenant_api_key: _,
-            tenant_user: _,
+            tenant_user,
             tenant_role,
             list_entry_creation,
             list_entry,
@@ -96,7 +96,17 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     scopes: tr.scopes,
                 }
             }
-            AuditEventMetadata::UpdateOrgMember => AuditEventDetail::UpdateOrgMember,
+            AuditEventMetadata::UpdateOrgMember { old_tenant_role_id } => {
+                let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
+                AuditEventDetail::UpdateOrgMember {
+                    first_name: tu.first_name,
+                    last_name: tu.last_name,
+                    old_tenant_role_id,
+                    tenant_user_id: tu.id,
+                    new_role: api_wire_types::OrganizationRole::from_db(tr),
+                }
+            }
             AuditEventMetadata::LoginOrgMember => AuditEventDetail::LoginOrgMember,
             AuditEventMetadata::RemoveOrgMember => AuditEventDetail::RemoveOrgMember,
             AuditEventMetadata::CreateOrg => AuditEventDetail::CreateOrg,
