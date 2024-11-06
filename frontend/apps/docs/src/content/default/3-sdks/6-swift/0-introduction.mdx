@@ -1,0 +1,80 @@
+---
+page: default
+slug: /articles/sdks/swift-introduction
+category: SDKs
+subcategory: Swift
+title: Introduction
+meta:
+  {
+    title: "Footprint Swift Integration",
+    description: "Discover how to integrate Footprint with a Swift Codebase",
+  }
+---
+
+# FootprintSwift package overview
+
+You can use our `FootprintSwift` package for adding Footprint-powered onboarding flows to your application. Our verification flows run in a secure `ASWebAuthenticationSession` inside your app that doesn't share any cookies or data with other apps.
+
+## Minimum version requirements
+
+Our onboarding flows require a minimum deployment version of 13.0 or above.
+
+If you're using older versions, please consider upgrading to ensure compatibility with `FootprintSwift`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
+
+## Installation
+
+### Swift Package Manager
+Our app can be installed using the Swift Package Manager, which is the official installation tool by Apple for managing the distribution of Swift code. It integrates with the Swift build system to automate the process of downloading, compiling, and linking dependencies.
+
+You can integrate with `FootprintSwift` by adding the following snippet to your `Package.swift` file:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/onefootprint/footprint-swift", from: "<VERSION>")
+]
+```
+
+<inline-alert variant="info">
+     You should replace `<VERSION>` with the version number, like `1.0.1`. We recommend always using the latest available version published. You can find the published versions [here](https://swiftpackageindex.com/onefootprint/footprint-swift).
+</inline-alert>
+
+
+You can also install `FootprintSwift` through the [Swift Package Index](https://swiftpackageindex.com/onefootprint/footprint-swift), which is a search engine for Swift packages. You can also install by clicking on “File > Add Package Dependencies…” and searching for “Footprint”.
+
+### CocoaPods
+CocoaPods is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website. To integrate `FootprintSwift` into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+pod 'FootprintSwift', :git => 'https://github.com/onefootprint/footprint-swift.git'
+```
+
+Alternatively, you can install the components separately by adding the following snippets to your `Podfile`:
+
+1. For the hosted flow:
+
+```ruby
+pod 'FootprintSwift/Hosted', :git => 'https://github.com/onefootprint/footprint-swift.git'
+``` 
+
+2. For the onboarding components:
+
+```ruby
+pod 'FootprintSwift/OnboardingComponents', :git => 'https://github.com/onefootprint/footprint-swift.git'
+```
+
+## Available components
+
+There are two ways to utilize FootprintSwift:
+
+### Hosted
+
+The Hosted integration is the solution that allows the Footprint's flow to be executed in a Webview. It requires a very minimal setup and is the easiest way to get started.
+
+You can find more information [here](/articles/sdks/swift-hosted).
+
+### Onboarding components
+
+The Onboarding components integration allows you to embed the Footprint's flow directly into your app, giving you full control over the design and layout.
+
+You can find more information [here](/articles/sdks/swift-onboarding-components).
+

@@ -1,0 +1,665 @@
+---
+page: default
+slug: /articles/sdks/swift-onboarding-components
+category: SDKs
+subcategory: Swift
+title: Onboarding Components
+meta:
+  {
+    title: "Footprint Swift Onboarding Components Integration",
+    description: "How to integrate swift onboarding components",
+  }
+---
+
+<inline-alert variant="warning">
+  Onboarding Components is currently in alpha. If you have any feedback, please
+  reach out using the "Need help" button at the bottom left of the page.
+</inline-alert>
+
+## 1. What are onboarding components
+
+Our [Swift hosted flow](/articles/sdks/swift-hosted) provides a handy way to pass pre-existing bootstrap data and appearance styling to open the verification/onboarding flow on a web view. However, many developers prefer to incorporate data collection forms directly within their apps, customized to their specific design needs. To address this, our Swift Onboarding Components SDK provides a suite of versatile UI views that can be seamlessly embedded into apps. These views are designed to handle essential data collection and validation logic for the Footprint onboarding flow internally while giving developers full control over the appearance and user experience. The SDK also provides a set of necessary utility functions to identify users, save data into Footprint vault, etc.
+
+## 2. Installation
+
+Please follow `FootprintSwift` installation instructions [here](/articles/sdks/swift-introduction#footprint-swift-package-overview-installation).
+
+## 3. Basic concepts
+
+Before we dive deep into how to implement an onboarding or auth flow using the onboarding components, let’s understand some basic features that our SDK provides.
+
+### 3.1 FootprintProvider
+
+`FootprintProvider` is a class that manages the state of the flow and provides the necessary util functions. It uses a singleton pattern i.e. at any given moment there will be only one instance of this class accessible app-wide. The instance can be accessed by `FootprintProvider.shared` and can be initialized by calling `FootprintProvider.shared.initialize()` passing the following arguments:
+
+| Name             | Type                              |
+| ---------------- | --------------------------------- |
+| `configKey`      | `String`                          |
+| `authToken`      | `String?` (optional)              |
+| `sandboxId`      | `String?` (optional)              |
+| `sandboxOutcome` | `SandboxOutcome?` (optional)      |
+| `options`        | `FootprintOptions?` (optional)    |
+| `l10n`           | `FootprintL10n?` (optional)       |
+| `appearance`     | `FootprintAppearance?` (optional) |
+
+The arguments above create the context for the flow. So, make sure to re-initialize the instance with correct context every time you start a new onboarding/auth flow.
+
+### 3.2 FpForm
+
+`FpForm` is a generic SwiftUI component designed to create Footprint data collection or auth forms. It leverages the `FormUtils` struct to handle form submission, manage field values, and retrieve validation errors. `FpForm` can be initialized with default values and a submission handler. You provide a closure that returns the content of the form using the `FormUtils` for managing form behavior.
+
+```swift
+FpForm(defaultValues: [.idEmail: "email@example.com"], onSubmit: { vaultData in
+    // Handle the submission of vaultData
+}) { formUtils in
+    VStack {
+        FpLabel("Email", font: .subheadline, color: .secondary)
+        FpInput(placeholder: "Enter your email")
+        FpFieldError()
+    }
+}
+```
+
+- `defaultValues`: An optional dictionary of default values for form fields. Keys are of type `FpFieldName`, and values are optional strings.
+- `onSubmit`: A closure that takes `VaultData` and is called when the form is successfully submitted.
+- `builder`: A closure that takes a `FormUtils` instance and returns the view content for the form.
+
+### 3.3 FpField
+
+`FpField` is a SwiftUI view component used to represent individual form fields. It binds a field's name and manages its internal state. The field content (e.g., a `TextField`) is passed through the `content` closure.
+
+```swift
+FpField(name: .idEmail, content: {
+    FpInput(placeholder: "Enter your email")
+    FpFieldError()
+})
+```
+
+- `name`: The name of the field (of type `FpFieldName`), used to identify the field in form validation and value management.
+- `content`: A closure that returns the content of the form field (e.g., `TextField`).
+
+### 3.4 FpInput
+
+`FpInput` is a customizable SwiftUI view designed to handle text input fields with built-in form management and validation support. It can either use a default `TextField` or a custom text field (provided via a closure). Note: `FpInput` must be inside an `FpField` .
+
+```swift
+// Default TextField
+FpInput(placeholder: "Enter value")
+
+// Custom TextField
+FpInput { binding, handleChange in
+    // Return a custom TextField, e.g., using a SecureField or another custom view
+}
+```
+
+### 3.5 Additional views
+
+Additionally we provide a few views for better developer experience such as:
+
+- `FpLabel` for setting label of a field
+- `FpFieldError` for showing validation errors
+- `PinInputField` for handling verification pin in the OTP step (only available for iOS 15+)
+
+### 3.5 Footprint views’ hierarchy
+
+To ensure proper state management, we recommend wrapping `FpInput` , `FpFieldError` inside an `FpField`, and placing one or more `FpField` views inside an `FpForm`. While most views in the SDK accept generic child views, this approach ensures smooth integration with the form's state management system.
+
+## 4. Getting started
+
+### 4.1 Get a public key
+
+- Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
+- Use an existing playbook or create a new one.
+- Obtain the Publishable Key, e.g., `pb_test_bbIu7RhC4bwlI4UAQFtiUZ`.
+  <br />
+  <br />
+
+### 4.2 Initialize the flow
+
+As discussed above in section [3.1](/articles/sdks/swift-onboarding-components#3-basic-concepts-3-1-footprint-provider), we need to initialize the `FootprintProvider` with the context for the flow.
+
+```swift
+var body: some View {
+        VStack  {
+
+        }
+        .onAppear {
+            Task {
+                do {
+                    let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
+                    try await FootprintProvider.shared.initialize(
+                        configKey: "pb_test_bbIu7RhC4bwlI4UAQFtiUZ",
+                        sandboxOutcome: sandboxOutcome
+                    )
+                } catch {
+                    print("Error: \(error)")
+                }
+            }
+        }
+    }
+```
+
+## 5. Identification
+
+Before you can start data-collection, you must identify the user using Footprint auth. You can identify a user using authToken (that you pass to the `FootprintProvider`) or email/phone that you collect from user during the identification process. We support creating auth flow inline as well as doing the auth on a webview. We suggest using the webview auth as a backup for rare cases when inline auth is not supported. Here is how you can build auth flow using our SDK.
+
+### 5.1 Check auth requirements
+
+We start by calling the function `requiresAuth()` . This function needs to be called only once and will return `(requiresAuth: Bool, verificationResult: Verify?)` .
+
+- `requiresAuth` will tell you if you need to authenticate at all. If you provided a fully scoped `authToken` , you will most likely not need to authenticate again.
+- The `verificationResult` will provide you `requirements:RequirementAttributes?`, `validationToken: String`, `vaultData: VaultData?`.
+  - You can use the validation token to find the `fp_id` using [this API](https://www.notion.so/api-reference#post-onboarding-session-validate). `verificationResult` will be `null` if the `requiresAuth` prop above returns `true` i.e. if you need to authenticate.
+  - `requirements` contains information about the requirements for the flow including missing, collected, and optional fields to help you guide through the fields you need to collect and the ones that has already been collected.
+  - `vaultData` is an object containing the decrypted data that has already been vaulted before this flow started possibly (but not always) using API or in an incomplete flow.
+
+Note that you can get the updated `requirements` in the middle of the flow by calling `FootprintProvider.shared.getRequirements()` , and updated `vaultData` by calling `FootprintProvider.shared.getVaultData()`
+
+_Note: You can skip calling this function if you didn’t provide auth token and authenticate using email and phone._
+
+```swift
+let requiresAuthResponse = try await onboardingComponents.requiresAuth()
+print("Requires auth response: \(requiresAuthResponse.requiresAuth)")
+if requiresAuthResponse.requiresAuth {
+    // Authenticate the user
+} else {
+    // You can start collecting data
+}
+```
+
+### 5.2 Create challenge
+
+Next we create challenge based on the response from the previous step. We have a widget, few helper functions and values to accomplish this.
+
+- `FootprintProvider.shared.isReady` tells you whether the SDK is ready to create an auth challenge or any other operation.
+- We provide 2 helper functions for creating challenge: `FootprintProvider.shared.createAuthTokenBasedChallenge` , `FootprintProvider.shared.createEmailPhoneBasedChallenge` , and one function for verifying challenge `FootprintProvider.shared.verify` (we will talk about verification in the next step).
+- In rare cases when we don’t support inline OTP, we throw a `FootprintError` of kind `inlineProcessNotSupported` . You can use `FootprintProvider.shared.launchIdentify` to launch the OTP flow on the webview in those cases.
+
+Here is an example view with the form to collect email and phone and create the challenge:
+
+```swift
+import SwiftUI
+import FootprintSwift
+
+struct EmailAndPhoneView: View {
+    @State private var shouldNavigateToNextView = false
+    @State private var isLoading = false
+    @State private var challengeKind: String = ""
+    @State private var otpComplete: Bool = false
+
+    var body: some View {
+        FpForm(
+            onSubmit: { vaultData in
+                isLoading = true
+                Task {
+                    do {
+                        let challengeKind = try await FootprintProvider.shared.createEmailPhoneBasedChallenge(email: vaultData.idEmail, phoneNumber: vaultData.idPhoneNumber)
+                        print("Pin code sent to: \(challengeKind)")
+                        self.challengeKind = challengeKind
+                        shouldNavigateToNextView = true
+                        isLoading = false
+                    } catch {
+                        if let footprintError = error as? FootprintError {
+                            switch footprintError.kind {
+                            case .inlineOtpNotSupported:
+                                try await FootprintProvider.shared.launchIdentify(
+                                    email: vaultData.idEmail,
+                                    phone: vaultData.idPhoneNumber,
+                                    onCancel: {
+                                        print("User cancelled hosted identity flow")
+                                    },
+                                    onAuthenticated: { response in
+                                        print("Hosted identity flow completed: \(response)")
+                                        shouldNavigateToNextView = true
+                                        isLoading = false
+                                        otpComplete = true
+                                    },
+                                    onError: { error in
+                                        print("Error occurred: \(error)")
+                                    }
+                                )
+
+                            default:
+                                print("Error occurred: \(error)")
+                                shouldNavigateToNextView = false
+                                isLoading = false
+                            }
+                        }
+                    }
+                }
+            },
+            builder: { formUtils in
+                VStack(spacing: 20) {
+                    FpField(
+                        name: .idEmail,
+                        content:{
+                            VStack(alignment: .leading){
+                                FpLabel("Email", font: .subheadline, color: .secondary)
+                                FpInput(placeholder: "Enter your email")
+                                    .padding()
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(10)
+                                FpFieldError()
+                            }
+                        }
+                    )
+
+                    FpField(
+                        name: .idPhoneNumber,
+                        content: {
+                            VStack(alignment: .leading){
+                                FpLabel("Phone Number", font: .subheadline, color: .secondary)
+                                FpInput(placeholder: "Enter your phone number")
+                                    .padding()
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(10)
+                                FpFieldError()
+                            }
+                        }
+                    )
+                    Button(action: formUtils.handleSubmit) {
+                        if isLoading {
+                            ProgressView() // Loading indicator
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .frame(width: 100, height: 50)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+
+                        } else {
+                            Text("Submit")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(width: 100, height: 50)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                        }
+                    }
+                    .disabled(isLoading)
+                }
+            }
+
+        )
+        .padding(.horizontal, 20)
+        .navigationTitle("Signup flow")
+        .onAppear {
+            Task {
+                do {
+                    let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
+                    try await FootprintProvider.shared.initialize(
+                        configKey: "pb_test_bbIu7RhC4bwlI4UAQFtiUZ",
+                        sandboxOutcome: sandboxOutcome
+                    )
+                } catch {
+                    print("Error: \(error)")
+                }
+            }
+        }
+        .navigate(to: destinationView(), when: $shouldNavigateToNextView)
+    }
+
+    @ViewBuilder
+    private func destinationView() -> some View {
+        if otpComplete == false {
+            VerifyOTPView(challengeKind: challengeKind)
+        } else {
+            BasicInfoView()
+        }
+    }
+}
+
+extension View {
+    func navigate<NewView: View>(to view: NewView, when binding: Binding<Bool>) -> some View {
+        NavigationView {
+            ZStack {
+                self
+                    .navigationBarTitle("")
+                    .navigationBarHidden(true)
+
+                NavigationLink(
+                    destination: view
+                        .navigationBarTitle("")
+                        .navigationBarHidden(true),
+                    isActive: binding
+                ) {
+                    EmptyView()
+                }
+            }
+        }
+        .navigationViewStyle(.stack)
+    }
+}
+```
+
+### 5.3 Verify challenge
+
+Finally we need to verify the challenge calling `FootprintProvider.shared.verify()` . We provide a `PinInputField` for handling verification pin in the OTP step (only available for iOS 15+) that you can use, or you can create your own input field.
+
+```swift
+import SwiftUI
+import FootprintSwift
+import Inject
+
+struct VerifyOTPView: View {
+    @ObserveInjection var inject
+    private var onboardingComponents = FootprintProvider.shared
+    let challengeKind: String
+    @State private var isLoading: Bool = false
+    @State private var errorMessage: String?
+    @State private var navigateToBasicInfo: Bool = false
+    @State private var vaultData: VaultData?
+
+    init(challengeKind: String) {
+        self.challengeKind = challengeKind
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("Enter Verification Code from \(challengeKind.uppercased())")
+                    .font(.title2)
+                    .padding(.bottom, 20)
+
+                PinInputField { pincode in
+                    submitPin(pin: pincode)
+                }
+                .padding()
+
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                        .padding() // Add padding for better layout
+                }
+
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding()
+                }
+            }
+            .enableInjection()
+            .background(
+                NavigationLink(destination: BasicInfoView(), isActive: $navigateToBasicInfo) {
+                    EmptyView()
+                }
+            )
+            .padding() // Add padding to the VStack for better layout
+        }
+    }
+
+    private func submitPin(pin: String) {
+        isLoading = true
+        errorMessage = nil
+
+        Task {
+            do {
+                let response = try await FootprintProvider.shared.verify(verificationCode: pin)
+                print("Verification response: \(response)")
+                self.vaultData = response.vaultData
+                // Set navigate to true on the main thread
+                DispatchQueue.main.async {
+                    self.navigateToBasicInfo = true
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    errorMessage = "Failed to submit PIN. Please try again."
+                    print("Error submitting PIN: \(error)")
+                }
+            }
+            // Set loading state to false
+            DispatchQueue.main.async {
+                isLoading = false
+            }
+        }
+    }
+}
+```
+
+## 6. Collecting user’s data and finalizing the flow
+
+Once the authentication is completed, you can start collecting user data.
+
+### 6.1 Data collection
+
+You can create a data collection form using the views we provide as describedin section [3](/articles/sdks/swift-onboarding-components#3-basic-concepts). To vault user data, you can call `FootprintProvider.shared.vault()` . Note, you can split the required fields in as many forms as you want and vault separately.
+
+### 6.2 Finalizing the flow
+
+Once all the data are collected, we need to finalizing the onboarding. We can verify if all the data are collected by checking the response from `FootprintProvider.shared.getRequirements()`. In order to finalize the onboarding, we have two options:
+
+- If all requirements are completed and there is no passkey and id-doc requirements, we can call `FootprintProvider.shared..process()` for process the onbaording inline. `FootprintProvider.shared.process()` return a validation token.
+- `FootprintProvider.shared.process()` will throw a `FootprintError` of kind `.inlineProcessNotSupported` if all requirements are not completed or if inline process is not supported for this case. If that happens you can handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `FootprintProvider.shared.handoff` function.
+
+Example of data collection and finalizing the flow:
+
+```swift
+import SwiftUI
+import FootprintSwift
+
+struct BasicInfoView: View {
+    @State private var isLoading: Bool = false
+    @State private var errorMessage: String?
+    @State private var showSuccessView: Bool = false
+    @State private var vaultData: VaultData?
+    @State private var isDataReady: Bool = false // State variable to track data readiness
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                if isDataReady {
+                    FpForm(
+                        defaultValues: [
+                            .idFirstName: vaultData?.idFirstName,
+                            .idMiddleName: vaultData?.idMiddleName,
+                            .idLastName: vaultData?.idLastName,
+                            .idDob: vaultData?.idDob,
+                            .idAddressLine1: vaultData?.idAddressLine1,
+                            .idAddressLine2: vaultData?.idAddressLine2,
+                            .idCity: vaultData?.idCity,
+                            .idState: vaultData?.idState,
+                            .idZip: vaultData?.idZip,
+                            .idCountry: vaultData?.idCountry,
+                            .idSsn9: vaultData?.idSsn9
+                        ],
+                        onSubmit: { vaultData in
+                            submitVaultData(vaultData)
+                        },
+                        builder: { formUtils in
+                            formContent(formUtils: formUtils)
+                        }
+                    )
+                } else {
+                    ProgressView("Loading data...") // Loading indicator
+                        .padding()
+                }
+            }
+            .navigationBarHidden(true)
+            .background(
+                NavigationLink(destination: SuccessView(), isActive: $showSuccessView) {
+                    EmptyView()
+                }
+            )
+            .onAppear {
+                fetchVaultData()
+                fetchRequirements()
+            }
+        }
+    }
+
+    private func fetchVaultData() {
+        Task {
+            do {
+                let fetchedVaultData = try await FootprintProvider.shared.getVaultData()
+                DispatchQueue.main.async {
+                    self.vaultData = fetchedVaultData
+                    self.isDataReady = true // Set to true after fetching data
+                }
+            } catch {
+                print("Error fetching vault data: \(error)")
+                errorMessage = "Failed to fetch your information. Please try again."
+            }
+        }
+    }
+
+    private func fetchRequirements() {
+        // This is an example of how you can fetch the most updated requirements
+        // This example only print some of the information, however you can use this information in many ways
+        // For example you can only show the input fields that are missing in the requirements
+        Task {
+            do {
+                let requirementAttributes = try await FootprintProvider.shared.getRequirements()
+                let collected = requirementAttributes.fields.collected
+                let missing = requirementAttributes.fields.missing
+                let optional = requirementAttributes.fields.optional
+
+                print("Collected fields: \(collected)")
+                print("Missing fields: \(missing)")
+                print("Optional fields: \(optional)")
+            } catch {
+                print("Error fetching requirements: \(error)")
+            }
+        }
+    }
+
+    private func submitVaultData(_ vaultData: VaultData) {
+        isLoading = true
+        errorMessage = nil
+
+        Task {
+            do {
+                try await FootprintProvider.shared.vault(vaultData: vaultData)
+                print("Vault data submitted successfully")
+                let response = try await FootprintProvider.shared.process()
+                showSuccessView = true
+                print("Process submitted successfully: \(response.validationToken)")
+            } catch {
+                handleVaultError(error)
+            }
+            isLoading = false
+        }
+    }
+
+    private func handleVaultError(_ error: Error) {
+        if let footprintError = error as? FootprintError {
+            switch footprintError.kind {
+            case .inlineProcessNotSupported:
+                handleHandoff()
+            case .vaultingError(let context):
+                print("Vaulting error - context: \(context), message: \(footprintError.message)")
+            default:
+                print("Error occurred: \(error)")
+            }
+        }
+    }
+
+    private func handleHandoff() {
+        Task {
+            do {
+                try await FootprintProvider.shared.handoff(
+                    onCancel: {
+                        print("Handoff was canceled by the user")
+                        errorMessage = "Verification was canceled. Please try again."
+                    },
+                    onComplete: { validationToken in
+                        print("Handoff completed successfully with token: \(validationToken)")
+                        showSuccessView = true // Navigate to success view on completion
+                    },
+                    onError: { error in
+                        print("Error occurred during handoff: \(error)")
+                        errorMessage = "An error occurred during verification. Please try again."
+                    }
+                )
+            } catch {
+                print("Error during handoff: \(error)")
+                errorMessage = "An error occurred during verification. Please try again."
+            }
+        }
+    }
+
+    private func formContent(formUtils: FormUtils) -> some View {
+        VStack(spacing: 20) {
+            FpField(name: .idFirstName, content: {
+                inputField(label: "First name", placeholder: "Enter your first name")
+            })
+            FpField(name: .idMiddleName, content: {
+                inputField(label: "Middle name", placeholder: "Enter your middle name")
+            })
+            FpField(name: .idLastName, content: {
+                inputField(label: "Last name", placeholder: "Enter your last name")
+            })
+            FpField(name: .idDob, content: {
+                inputField(label: "Date of birth", placeholder: "Enter your date of birth")
+            })
+            FpField(name: .idAddressLine1, content: {
+                inputField(label: "Address line 1", placeholder: "Enter your address line 1")
+            })
+            FpField(name: .idAddressLine2, content: {
+                inputField(label: "Address line 2", placeholder: "Enter your address line 2")
+            })
+            FpField(name: .idCity, content: {
+                inputField(label: "City", placeholder: "Enter your city")
+            })
+            FpField(name: .idState, content: {
+                inputField(label: "State", placeholder: "Enter your state")
+            })
+            FpField(name: .idZip, content: {
+                inputField(label: "Zip code", placeholder: "Enter your zip code")
+            })
+            FpField(name: .idCountry, content: {
+                inputField(label: "Country", placeholder: "Enter your country")
+            })
+            FpField(name: .idSsn9, content: {
+                VStack(alignment: .leading) {
+                    FpLabel("SSN", font: .subheadline, color: .secondary)
+                    FpInput() { binding, handleChange in
+                        AnyView(TextField("SSN", text: binding)
+                            .padding()
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(10)
+                            .onChange(of: binding.wrappedValue) { newValue in
+                                handleChange(newValue)
+                            }
+                        )
+                    }
+                    FpFieldError()
+                }
+            })
+            submitButton(formUtils: formUtils)
+        }
+        .padding()
+    }
+
+    private func inputField(label: String, placeholder: String) -> some View {
+        VStack(alignment: .leading) {
+            FpLabel(label, font: .subheadline, color: .secondary)
+            FpInput(placeholder: placeholder)
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(10)
+            FpFieldError()
+        }
+    }
+
+    private func submitButton(formUtils: FormUtils) -> some View {
+        Button(action: formUtils.handleSubmit) {
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            } else {
+                Text("Continue")
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+                    .disabled(isLoading)
+            }
+        }
+    }
+}
+```
+
+## 7. Example
+
+Example of a complete flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-swift-ui/mobile-swift-ui/OnboardingComponents).

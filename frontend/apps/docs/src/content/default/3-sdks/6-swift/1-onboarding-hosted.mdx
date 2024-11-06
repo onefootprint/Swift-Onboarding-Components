@@ -1,42 +1,20 @@
 ---
 page: default
-slug: /articles/sdks/swift
+slug: /articles/sdks/swift-hosted
 category: SDKs
-title: Swift
+subcategory: Swift
+title: Onboarding (Hosted flow)
 meta:
   {
-    title: "Footprint Swift Integration",
-    description: "Discover how to integrate Footprint with a Swift Codebase",
+    title: "Footprint Swift Hosted Flow Integration",
+    description: "Discover how to integrate Footprint hosted flow with a Swift Codebase",
   }
 ---
 
-# FootprintSwift package overview
+## Getting started
 
-You can use our `FootprintSwift` package for adding Footprint-powered onboarding flows to your application. Our verification flows run in a secure `ASWebAuthenticationSession` inside your app that doesn't share any cookies or data with other apps.
+This guide explains how to integrate the Footprint onboarding flow for KYC (Know Your Customer) and KYB (Know Your Business) into your React Native applications. This is our Hosted integration, meaning that Footprint's flow will be executed in a Webview, and hence, it's our most simple and quick integration.
 
-## Minimum version requirements
-
-Our onboarding flows require a minimum deployment version of 13.0 or above.
-
-If you're using older versions, please consider upgrading to ensure compatibility with `FootprintSwift`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
-
-## Installation
-
-Our app can be installed using the Swift Package Manager, which is the official installation tool by Apple for managing the distribution of Swift code. It integrates with the Swift build system to automate the process of downloading, compiling, and linking dependencies.
-
-You can integrate with `FootprintSwift` by adding the following snippet to your `Package.swift` file:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/onefootprint/footprint-swift", from: "<VERSION>")
-]
-```
-
-You should replace `<VERSION>` with the version number, like `1.0.1`. We recommend always using the latest available version published. You can find the published versions [here](https://swiftpackageindex.com/onefootprint/footprint-swift).
-
-You can also install `FootprintSwift` through the [Swift Package Index](https://swiftpackageindex.com/onefootprint/footprint-swift), which is a search engine for Swift packages. You can also install by clicking on “File > Add Package Dependencies…” and searching for “Footprint”.
-
-## Integration
 
 1. Start by getting your Playbook public key, for instance, `pb_test_VMooXd04EUlnu3AvMYKjMW` from your [Footprint Dashboard](https://dashboard.onefootprint.com/playbooks).
 
@@ -340,3 +318,4 @@ struct ContentView: View {
 | `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                                    |
 | `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                                    |
 | `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                     |
+
