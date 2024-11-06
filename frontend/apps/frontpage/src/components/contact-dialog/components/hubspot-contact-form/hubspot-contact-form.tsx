@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LINTRK_CONVERSION_ID } from 'src/config/constants';
+import { getCurrentParams } from 'src/utils/dom';
 import styled, { css } from 'styled-components';
 
 const HubspotContactForm = () => {
@@ -30,6 +31,18 @@ const HubspotContactForm = () => {
     portalId: '44814407',
     formId: '15f21d51-8890-4792-9477-65f49ca49b77',
     target: '#hubspot-form-wrapper',
+    onFormReady: $form => {
+      const params = getCurrentParams();
+      const utmFields = ['utm_content', 'utm_term', 'utm_source', 'utm_medium', 'utm_campaign'];
+
+      /** Set hidden fields to the values of the query params */
+      utmFields.forEach(field => {
+        const value = params.get(field);
+        if (value) {
+          $form?.querySelector(`input[name="${field}"]`)?.setAttribute('value', value);
+        }
+      });
+    },
     onFormSubmitted: handleFormSubmitted,
     onFormError: handleFormError,
   });
