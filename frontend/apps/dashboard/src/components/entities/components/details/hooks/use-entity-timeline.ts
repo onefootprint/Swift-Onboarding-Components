@@ -25,10 +25,13 @@ const useEntityTimeline = (id: string) => {
       query: {},
     }),
     select: events => {
-      const response = mergeAuditTrailTimelineEvents(events as TimelineEvent[]);
+      const mergedEvents = mergeAuditTrailTimelineEvents(events as TimelineEvent[]);
+
       if (entity.data?.status === EntityStatus.incomplete) {
-        const hasPendingBos = bosQuery.data?.some(bo => bo.status === 'incomplete' || bo.status == null);
-        response.unshift({
+        const hasPendingBos = bosQuery.data?.some(bo => {
+          return bo.name && (bo.status === 'incomplete' || bo.status == null);
+        });
+        mergedEvents.unshift({
           event: {
             kind: hasPendingBos ? TimelineEventKind.awaitingBos : TimelineEventKind.abandoned,
             data: {},
@@ -37,7 +40,7 @@ const useEntityTimeline = (id: string) => {
           time: events[0],
         });
       }
-      return response;
+      return mergedEvents;
     },
     enabled: (!!id && !isBusiness) || (!!id && isBusiness && !!bosQuery.data),
   });
