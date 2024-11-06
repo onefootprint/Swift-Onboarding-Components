@@ -18,11 +18,13 @@ const MARKETING_SOURCES = {
   connectSrc: [
     '*.aplo-evnt.com',
     '*.google-analytics.com',
+    '*.google.com',
     '*.hsforms.com',
     '*.hsforms.net',
     '*.hubspot.com',
     '*.intercom.io',
     '*.nexus-websocket-a.intercom.io',
+    '*.pagead.google.com',
     '*.unifyintent.com',
     '*.usefathom.com',
     'analytics.google.com',
@@ -30,6 +32,7 @@ const MARKETING_SOURCES = {
     'aplo-evnt.com',
     'conversions-config.reddit.com',
     'forms.hscollectedforms.net',
+    'pagead.google.com',
     'pixel-config.reddit.com',
     'px.ads.linkedin.com',
     'stats.g.doubleclick.net',
@@ -39,6 +42,7 @@ const MARKETING_SOURCES = {
     'www.google-analytics.com',
     'www.google.com',
     'www.redditstatic.com',
+    'google.com',
   ],
   frameSrc: [
     '*.ads.linkedin.com',
@@ -54,6 +58,7 @@ const MARKETING_SOURCES = {
     '*.connect.facebook.net',
     '*.facebook.com',
     '*.google-analytics.com',
+    '*.google.com',
     '*.googleads.g.doubleclick.net',
     '*.googleadservices.com',
     '*.googletagmanager.com',
@@ -94,10 +99,13 @@ const MARKETING_SOURCES = {
   imgSrc: [
     '*.google.com.br',
     '*.googleadservices.com',
+    '*.googletagmanager.com',
     '*.usefathom.com',
     'alb.reddit.com',
     'footprint-blog.ghost.io',
+    'forms-na1.hsforms.com',
     'forms.hsforms.com',
+    'googleads.g.doubleclick.net',
     'perf-na1.hsforms.com',
     'px.ads.linkedin.com',
     'px4.ads.linkedin.com',
@@ -214,10 +222,6 @@ module.exports = withPlugins([withMDX], {
       {
         protocol: 'https',
         hostname: 'static.ghost.org',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i.onefp.net',
       },
       {
         protocol: 'https',
