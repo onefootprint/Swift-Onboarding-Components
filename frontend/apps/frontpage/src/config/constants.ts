@@ -9,3 +9,4 @@ export const INTERCOM_APP_ID = process.env.NEXT_PUBLIC_INTERCOM_APP_ID;
 export const SIGN_UP_URL = `${DASHBOARD_BASE_URL}/authentication/sign-up`;
 export const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 export const LINTRK_CONVERSION_ID = 17629874;
+export const CURRENT_PARAMS_KEY = '__cp';

@@ -9,6 +9,7 @@ import Script from 'next/script';
 import { useEffect } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
+import { storeCurrentUrlParamsInSession } from 'src/utils/dom';
 import Layout from '../components/layout';
 import Providers from '../components/providers';
 import { INTERCOM_APP_ID, UNIFY_API_KEY } from '../config/constants';
@@ -33,10 +34,12 @@ const codeFont = DM_Mono({
 const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
     if (INTERCOM_APP_ID) {
-      Intercom({
-        app_id: INTERCOM_APP_ID,
-      });
+      Intercom({ app_id: INTERCOM_APP_ID });
     }
+  }, []);
+
+  useEffect(() => {
+    storeCurrentUrlParamsInSession();
   }, []);
 
   return (

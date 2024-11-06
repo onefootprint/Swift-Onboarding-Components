@@ -3,6 +3,7 @@ import { Button, Stack, media } from '@onefootprint/ui';
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import { addCurrentParamsToUrl } from 'src/utils/dom';
 import ContactDialog from '../contact-dialog';
 
 type ContactButtonsProps = {
@@ -28,7 +29,10 @@ const ContactButtons = ({ signUpButton, bookADemoButton, justify = 'left' }: Con
         <Button
           variant="primary"
           size="large"
-          onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
+          onClick={() => {
+            const urlWithParams = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
+            window.open(urlWithParams, '_blank');
+          }}
         >
           {signUpButton}
         </Button>

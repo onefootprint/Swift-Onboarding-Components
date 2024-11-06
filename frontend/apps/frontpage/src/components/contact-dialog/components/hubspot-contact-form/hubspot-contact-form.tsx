@@ -13,7 +13,7 @@ const HubspotContactForm = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const toast = useToast();
 
-  const handleFormSubmit = () => {
+  const handleFormSubmitted = () => {
     setShowSuccess(true);
     window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
   };
@@ -30,7 +30,7 @@ const HubspotContactForm = () => {
     portalId: '44814407',
     formId: '15f21d51-8890-4792-9477-65f49ca49b77',
     target: '#hubspot-form-wrapper',
-    onFormSubmit: handleFormSubmit,
+    onFormSubmitted: handleFormSubmitted,
     onFormError: handleFormError,
   });
 

@@ -2,9 +2,9 @@ import { Button, Container, Stack, Text, createFontStyles, media } from '@onefoo
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
 import { SIGN_UP_URL } from 'src/config/constants';
+import { addCurrentParamsToUrl } from 'src/utils/dom';
 import styled, { css } from 'styled-components';
 import FishingPenguin from './components/fishing-penguin';
 
@@ -19,7 +19,8 @@ const Banner = ({ title, imgSrc }: BannerProps) => {
     keyPrefix: 'pages.home.banner',
   });
   const handleSignUpClick = () => {
-    window.open(SIGN_UP_URL, '_blank');
+    const urlWithParams = addCurrentParamsToUrl(SIGN_UP_URL);
+    window.open(urlWithParams, '_blank');
   };
 
   const handleBookCall = useCallback(() => {

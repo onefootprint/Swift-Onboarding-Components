@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 import { LINTRK_CONVERSION_ID } from 'src/config/constants';
+import { addCurrentParamsToUrl } from 'src/utils/dom';
 import styled, { css } from 'styled-components';
 import Logos from './logos';
 
@@ -19,7 +20,8 @@ const CustomersLogos = () => {
 
   const handleGetStartedClick = () => {
     window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-    window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank');
+    const urlWithParams = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
+    window.open(urlWithParams, '_blank');
   };
 
   const handleCloseDialog = () => {

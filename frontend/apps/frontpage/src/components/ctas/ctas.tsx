@@ -2,6 +2,7 @@ import { Button, Stack, media } from '@onefootprint/ui';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LINTRK_CONVERSION_ID, SIGN_UP_URL } from 'src/config/constants';
+import { addCurrentParamsToUrl } from 'src/utils/dom';
 import styled, { css } from 'styled-components';
 import ContactDialog from '../contact-dialog';
 
@@ -26,8 +27,14 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
   const [showDialog, setShowDialog] = useState(false);
 
   const handleSignUpClick = () => {
-    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-    window.open(SIGN_UP_URL, '_blank');
+    try {
+      window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID }); // linkedin conversion tracking
+    } catch (_) {
+      // ignore
+    }
+
+    const urlWithParams = addCurrentParamsToUrl(SIGN_UP_URL);
+    window.open(urlWithParams, '_blank');
   };
 
   const handleBookCall = useCallback(() => {
@@ -74,8 +81,6 @@ const ButtonsContainer = styled(Stack)<{
 				width: fit-content;
 			}
 		`}
-
-        
 	`}
 `;
 
