@@ -115,8 +115,6 @@ export type {
   GetOnboardingConfigsRequest,
   GetOnboardingConfigsResponse,
   GetOrgFrequentNotesResponse,
-  GetOrgMetricsRequest,
-  GetOrgMetricsResponse,
   GetOrgRequest,
   GetOrgResponse,
   GetPinnedAnnotationsRequest,

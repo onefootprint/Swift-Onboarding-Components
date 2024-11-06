@@ -198,7 +198,6 @@ export { default as OnboardingStatus } from './onboarding-status';
 export type { OrgFrequentNote } from './org-frequent-note';
 export { OrgFrequentNoteKind } from './org-frequent-note';
 export type { Member } from './org-member';
-export type { OrgMetrics, OrgMetricsResponse } from './org-metrics';
 export type { Organization } from './organization';
 export { OrganizationSize } from './organization';
 export type {

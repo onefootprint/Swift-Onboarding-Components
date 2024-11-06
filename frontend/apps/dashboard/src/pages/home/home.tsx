@@ -1,18 +1,24 @@
+import { getOrgMetricsOptions } from '@onefootprint/axios/dashboard';
 import { Box, Stack, Text } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import Content from './components/content';
 import DateFilter from './components/date-filter';
 import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import PlaybooksFilter from './components/playbooks-filter';
-import useOrgMetrics from './hooks/use-org-metrics';
+import useFilters from './hooks/use-filters';
 
 const Home = () => {
   const { t } = useTranslation('home');
-  const metrics = useOrgMetrics();
+  const filters = useFilters();
+  const metricsQuery = useQuery(
+    getOrgMetricsOptions({
+      query: filters.requestParams,
+    }),
+  );
 
   return (
     <>
@@ -22,8 +28,16 @@ const Home = () => {
       <Text variant="heading-2" marginBottom={7}>
         {t('header.title')}
       </Text>
-      <Box aria-busy={metrics.isPending}>
-        <SectionTitle>
+      <Box aria-busy={metricsQuery.isPending}>
+        <Stack
+          alignItems="center"
+          borderBottomWidth={1}
+          borderColor="tertiary"
+          borderStyle="solid"
+          justifyContent="space-between"
+          marginBottom={4}
+          paddingBottom={4}
+        >
           <Text variant="heading-5" tag="h1">
             {t('onboarding-metrics.title')}
           </Text>
@@ -31,24 +45,13 @@ const Home = () => {
             <DateFilter />
             <PlaybooksFilter />
           </Stack>
-        </SectionTitle>
-        {metrics.isPending ? <Loading /> : null}
-        {metrics.error ? <ErrorComponent error={metrics.error} /> : null}
-        {metrics.data ? <Content metrics={metrics.data} /> : null}
+        </Stack>
+        {metricsQuery.isPending ? <Loading /> : null}
+        {metricsQuery.error ? <ErrorComponent error={metricsQuery.error} /> : null}
+        {metricsQuery.data ? <Content metrics={metricsQuery.data} /> : null}
       </Box>
     </>
   );
 };
-
-const SectionTitle = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: ${theme.spacing[4]};
-    margin-bottom: ${theme.spacing[7]};
-    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-  `}
-`;
 
 export default Home;
