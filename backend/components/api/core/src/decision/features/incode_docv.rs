@@ -274,7 +274,7 @@ fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRRespon
     let parsed_odks = ParsedIncodeFields::from_fetch_ocr_res(ocr_res);
     let all_expected_fields_present_and_high_confidence =
         dk.expected_critical_ocr_data_kinds().into_iter().all(|odk| {
-            let pif = parsed_odks.get(odk);
+            let pif = parsed_odks.get_di(odk);
             if let Some(pif) = pif {
                 // we don't have a lot of confidence (no pun intended) on Incode's consistency with producing
                 // these scores and for some fields its a little ambiguous which of several

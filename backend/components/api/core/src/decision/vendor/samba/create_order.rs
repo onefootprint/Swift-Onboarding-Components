@@ -1,5 +1,5 @@
-use crate::decision::features::incode_utils::ParsedIncodeAddress;
-use crate::decision::features::incode_utils::ParsedIncodeNames;
+use crate::decision::features::incode_ocr_fields::IncodeOcrField;
+use crate::decision::features::incode_utils::ParsedIncodeFields;
 use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
@@ -32,7 +32,6 @@ use newtypes::vendor_api_struct::SambaLicenseValidationCreate;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentId;
 use newtypes::DocumentKind;
-use newtypes::PiiString;
 use newtypes::SambaActivityHistoryCreate;
 use newtypes::UsStateAndTerritories;
 use newtypes::VendorAPI;
@@ -256,33 +255,34 @@ async fn build_request_from_ocr_response(
 }
 
 fn build_request(ocr_res: &FetchOCRResponse) -> FpResult<SambaData> {
-    let names = ParsedIncodeNames::from_fetch_ocr_res(ocr_res);
-    let address: ParsedIncodeAddress = ParsedIncodeAddress::from_fetch_ocr_res(ocr_res);
-    let samba_address = match (address.street, address.zip, address.city, address.state) {
-        (Some(street), Some(zip_code), Some(city), Some(state)) => Some(SambaAddress {
+    let fields = ParsedIncodeFields::from_fetch_ocr_res(ocr_res);
+    let address = fields
+        .get_value(IncodeOcrField::AddressLine1)
+        .zip(fields.get_value(IncodeOcrField::State))
+        .zip(fields.get_value(IncodeOcrField::City))
+        .zip(fields.get_value(IncodeOcrField::Zip))
+        .map(|(((street, state), city), zip)| SambaAddress {
             street,
-            zip_code,
-            city,
             state,
-        }),
-        _ => None,
-    };
-    let dob: Option<PiiString> = ocr_res.dob().ok().map(|s| s.into());
+            city,
+            zip_code: zip,
+        });
     let data = SambaData {
-        first_name: names.first_name.ok_or(AssertionError("missing first name"))?,
-        last_name: names.last_name.ok_or(AssertionError("missing last name"))?,
-        license_number: ocr_res
-            .document_number
-            .clone()
-            .map(|s| s.into())
+        first_name: fields
+            .get_value(IncodeOcrField::FirstName)
+            .ok_or(AssertionError("missing first name"))?,
+        last_name: fields
+            .get_value(IncodeOcrField::LastName)
+            .ok_or(AssertionError("missing last name"))?,
+        license_number: fields
+            .get_value(IncodeOcrField::DriversLicenseNumber)
             .ok_or(AssertionError("missing license number"))?,
-        license_state: ocr_res
-            .issuing_state_us_2_char()
-            .map(|s| s.to_string().into())
+        license_state: fields
+            .get_value(IncodeOcrField::DriversLicenseState)
             .ok_or(AssertionError("missing license state"))?,
 
-        dob,
-        address: samba_address,
+        dob: fields.get_value(IncodeOcrField::Dob),
+        address,
         ..Default::default()
     };
 
@@ -429,6 +429,7 @@ pub async fn run_samba_create_order(
 mod tests {
     use super::*;
     use idv::incode::doc::response::IncodeOcrFixtureResponseFields;
+    use newtypes::PiiString;
     use test_case::test_case;
 
 

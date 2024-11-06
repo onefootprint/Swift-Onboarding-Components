@@ -22,9 +22,13 @@ pub struct ParsedIncodeField {
 #[derive(Debug, Clone)]
 pub struct ParsedIncodeFields(pub Vec<ParsedIncodeField>);
 impl ParsedIncodeFields {
+    pub fn get_value(&self, field: IncodeOcrField) -> Option<PiiString> {
+        self.0.iter().find(|p| p.field == field).map(|p| p.value.clone())
+    }
+
     /// Given something that can be converted from an IncodeOcrField, return the corresponding
     /// ParsedIncodeField (this is ODKs and IDKs)
-    pub fn get<T>(&self, di: T) -> Option<&ParsedIncodeField>
+    pub fn get_di<T>(&self, di: T) -> Option<&ParsedIncodeField>
     where
         T: TryFrom<IncodeOcrField> + Eq + PartialEq,
     {
