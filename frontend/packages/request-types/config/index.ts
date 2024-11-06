@@ -57,5 +57,9 @@ const createDashboardTypes = async () => {
   cleanupTempFile(tempPath);
 };
 
-createSDKTypes();
-createDashboardTypes();
+const generate = async () => {
+  await createSDKTypes();
+  await createDashboardTypes();
+};
+
+generate();

@@ -14,6 +14,7 @@ const excludePrefixes: string[] = [
   'x-',
   '/',
 ];
+
 export async function keyTypestoCamelCase(filePath: string): Promise<void> {
   try {
     const source = await fs.readFile(filePath, 'utf-8');
@@ -23,73 +24,51 @@ export async function keyTypestoCamelCase(filePath: string): Promise<void> {
       newLine: ts.NewLineKind.LineFeed,
     });
 
-    const camelCaseCache = new Map<string, string>();
-
     const transform = (context: ts.TransformationContext) => {
       const visit = (node: ts.Node): ts.Node => {
-        // Handle type literals (object types) for sorting
-        if (ts.isTypeLiteralNode(node)) {
+        // Sort and transform properties within type literals and interfaces
+        if (ts.isTypeLiteralNode(node) || ts.isInterfaceDeclaration(node)) {
           const members = [...node.members];
 
-          // Only sort PropertySignature nodes
           const properties = members.filter(ts.isPropertySignature);
           const otherMembers = members.filter(m => !ts.isPropertySignature(m));
 
-          // Sort properties by name
-          const sortedProperties = properties.sort((a, b) => {
-            const aName = getPropertyName(a.name) || '';
-            const bName = getPropertyName(b.name) || '';
-            return aName.localeCompare(bName);
-          });
+          // Transform and update each property name
+          const transformedProperties = properties
+            .map(prop => visitProperty(prop))
+            .sort((a, b) => {
+              const aName = getPropertyName(a.name) || '';
+              const bName = getPropertyName(b.name) || '';
+              return aName.localeCompare(bName);
+            });
 
-          // Create new type literal with sorted properties
-          return ts.factory.createTypeLiteralNode([
-            ...sortedProperties.map(prop => visitProperty(prop)),
-            ...otherMembers.map(m => ts.visitNode(m, visit)),
-          ] as ts.TypeElement[]);
-        }
-
-        // Handle interface declarations
-        if (ts.isInterfaceDeclaration(node)) {
-          const members = [...node.members];
-
-          // Only sort PropertySignature nodes
-          const properties = members.filter(ts.isPropertySignature);
-          const otherMembers = members.filter(m => !ts.isPropertySignature(m));
-
-          // Sort properties by name
-          const sortedProperties = properties.sort((a, b) => {
-            const aName = getPropertyName(a.name) || '';
-            const bName = getPropertyName(b.name) || '';
-            return aName.localeCompare(bName);
-          });
-
-          // Create new interface with sorted properties
-          return ts.factory.updateInterfaceDeclaration(
-            node,
-            node.modifiers,
-            node.name,
-            node.typeParameters,
-            node.heritageClauses,
-            [
-              ...sortedProperties.map(prop => visitProperty(prop)),
+          if (ts.isTypeLiteralNode(node)) {
+            return ts.factory.createTypeLiteralNode([
+              ...transformedProperties,
               ...otherMembers.map(m => ts.visitNode(m, visit)),
-            ] as ts.TypeElement[],
-          );
+            ] as ts.TypeElement[]);
+          }
+          if (ts.isInterfaceDeclaration(node)) {
+            return ts.factory.updateInterfaceDeclaration(
+              node,
+              node.modifiers,
+              node.name,
+              node.typeParameters,
+              node.heritageClauses,
+              [...transformedProperties, ...otherMembers.map(m => ts.visitNode(m, visit))] as ts.TypeElement[],
+            );
+          }
         }
 
         return ts.visitEachChild(node, visit, context);
       };
 
-      // Helper function to visit and transform properties
+      // Helper function to transform and camelCase property names
       const visitProperty = (node: ts.PropertySignature): ts.PropertySignature => {
         const name = getPropertyName(node.name);
+
         if (name && !shouldExclude(name)) {
-          let camelCased = camelCaseCache.get(name);
-          if (!camelCased) {
-            camelCased = camelCase(name);
-            camelCaseCache.set(name, camelCased as string);
-          }
+          const camelCased = camelCase(name);
 
           if (camelCased !== name) {
             return ts.factory.updatePropertySignature(

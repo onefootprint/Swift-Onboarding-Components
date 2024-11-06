@@ -3512,11 +3512,11 @@ export type ProcessRequest = {
  * The public onboarding configuration
  */
 export type PublicOnboardingConfiguration = {
-  allowInternationalResidents: boolean;
   /**
    * allow list of origins permitted to host the embedded flow
    */
   allowedOrigins?: Array<string>;
+  allowInternationalResidents: boolean;
   appClipExperienceId: string;
   appearance?: {
     [key: string]: unknown;
@@ -3545,9 +3545,6 @@ export type PublicOnboardingConfiguration = {
   requiresIdDoc: boolean;
   skipConfirm: boolean;
   status: 'disabled' | 'enabled';
-  supportEmail?: string;
-  supportPhone?: string;
-  supportWebsite?: string;
   supportedCountries: Array<
     | 'TW'
     | 'AF'
@@ -3799,6 +3796,9 @@ export type PublicOnboardingConfiguration = {
     | 'ZW'
     | 'AX'
   >;
+  supportEmail?: string;
+  supportPhone?: string;
+  supportWebsite?: string;
   /**
    * Context on what information is specifically requested from the user, if any.
    * NOTE: This is not actually a property of the ob configuration.

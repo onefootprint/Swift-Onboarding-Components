@@ -59,5 +59,9 @@ const createDashboardRequests = async () => {
   await cleanupTempFile(tempPath);
 };
 
-createSDKRequests();
-createDashboardRequests();
+const generate = async () => {
+  await createSDKRequests();
+  await createDashboardRequests();
+};
+
+generate();

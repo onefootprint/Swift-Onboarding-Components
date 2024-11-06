@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import { runBiome } from '@onefootprint/request-types/config/run-biome';
+import deepmerge from 'deepmerge';
 import { JSONSchemaFaker } from 'json-schema-faker';
 import _ from 'lodash';
-import merge from 'lodash/merge';
 import type { OpenAPIV3 } from 'openapi-types';
 import { injectFaker } from './inject-faker';
 import { persistedValues } from './persisted-values';
@@ -55,7 +55,9 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
 
       dictionary[index] = persistedValues[index]
         ? _.isObject(persistedValues[index])
-          ? merge(example, persistedValues[index])
+          ? deepmerge(example as Record<string, unknown>, persistedValues[index] as Record<string, unknown>, {
+              arrayMerge: (_, sourceArray) => sourceArray,
+            })
           : persistedValues[index]
         : example;
 

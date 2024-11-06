@@ -482,8 +482,8 @@ export type AuthEvent = {
     region?: string;
     regionName?: string;
     sessionId?: string;
-    timeZone?: string;
     timestamp: string;
+    timeZone?: string;
     userAgent?: string;
   };
   kind: 'sms' | 'email' | 'passkey' | 'third_party';
@@ -787,11 +787,11 @@ export type BusinessInsights = {
      * Does not include watchlist information
      */
     sources?: string;
+    submitted: boolean;
     /**
      * More granular status (from enum NameTask)
      */
     subStatus?: string;
-    submitted: boolean;
     /**
      * It's possible we get a name submitted / found but did not try to verify, hence Option
      */
@@ -1738,21 +1738,6 @@ export type CreateOnboardingConfigurationRequest = {
     | 'card'
     | 'us_tax_id'
     | 'bank';
-  documentTypesAndCountries?: {
-    countrySpecific: {
-      [key: string]: unknown;
-    };
-    global: Array<
-      | 'id_card'
-      | 'drivers_license'
-      | 'passport'
-      | 'passport_card'
-      | 'permit'
-      | 'visa'
-      | 'residence_document'
-      | 'voter_identification'
-    >;
-  };
   documentsToCollect: Array<
     | {
         data: {
@@ -2047,6 +2032,21 @@ export type CreateOnboardingConfigurationRequest = {
         kind: 'custom';
       }
   >;
+  documentTypesAndCountries?: {
+    countrySpecific: {
+      [key: string]: unknown;
+    };
+    global: Array<
+      | 'id_card'
+      | 'drivers_license'
+      | 'passport'
+      | 'passport_card'
+      | 'permit'
+      | 'visa'
+      | 'residence_document'
+      | 'voter_identification'
+    >;
+  };
   enhancedAml?: {
     adverseMedia: boolean;
     enhancedAml: boolean;
@@ -4728,8 +4728,8 @@ export type CursorPaginatedAuditEvent = {
       region?: string;
       regionName?: string;
       sessionId?: string;
-      timeZone?: string;
       timestamp: string;
+      timeZone?: string;
       userAgent?: string;
     };
     /**
@@ -5977,8 +5977,8 @@ export type CursorPaginatedEntity = {
         region?: string;
         regionName?: string;
         sessionId?: string;
-        timeZone?: string;
         timestamp: string;
+        timeZone?: string;
         userAgent?: string;
       };
       playbookId: string;
@@ -6033,8 +6033,8 @@ export type CursorPaginatedListEvent = {
       region?: string;
       regionName?: string;
       sessionId?: string;
-      timeZone?: string;
       timestamp: string;
+      timeZone?: string;
       userAgent?: string;
     };
     /**
@@ -6394,7 +6394,6 @@ export type Document = {
    * Non-null for images uploaded via bifrost
    */
   status?: 'pending' | 'failed' | 'complete';
-  uploadSource: 'Desktop' | 'Mobile' | 'Api';
   uploads: Array<{
     failureReasons: Array<
       | 'image_too_small'
@@ -6687,6 +6686,7 @@ export type Document = {
      */
     version: number;
   }>;
+  uploadSource: 'Desktop' | 'Mobile' | 'Api';
 };
 /**
  * The set of values we can use for identity_document.document_type
@@ -8192,8 +8192,8 @@ export type Entity = {
       region?: string;
       regionName?: string;
       sessionId?: string;
-      timeZone?: string;
       timestamp: string;
+      timeZone?: string;
       userAgent?: string;
     };
     playbookId: string;
@@ -18791,8 +18791,8 @@ export type LivenessEvent = {
     region?: string;
     regionName?: string;
     sessionId?: string;
-    timeZone?: string;
     timestamp: string;
+    timeZone?: string;
     userAgent?: string;
   };
   source:
@@ -21302,21 +21302,6 @@ export type OffsetPaginatedOnboardingConfiguration = {
     cipKind?: 'alpaca' | 'apex';
     createdAt: string;
     curpValidationEnabled: boolean;
-    documentTypesAndCountries?: {
-      countrySpecific: {
-        [key: string]: unknown;
-      };
-      global: Array<
-        | 'id_card'
-        | 'drivers_license'
-        | 'passport'
-        | 'passport_card'
-        | 'permit'
-        | 'visa'
-        | 'residence_document'
-        | 'voter_identification'
-      >;
-    };
     documentsToCollect: Array<
       | {
           data: {
@@ -21611,6 +21596,21 @@ export type OffsetPaginatedOnboardingConfiguration = {
           kind: 'custom';
         }
     >;
+    documentTypesAndCountries?: {
+      countrySpecific: {
+        [key: string]: unknown;
+      };
+      global: Array<
+        | 'id_card'
+        | 'drivers_license'
+        | 'passport'
+        | 'passport_card'
+        | 'permit'
+        | 'visa'
+        | 'residence_document'
+        | 'voter_identification'
+      >;
+    };
     enhancedAml: {
       adverseMedia: boolean;
       enhancedAml: boolean;
@@ -22882,21 +22882,6 @@ export type OnboardingConfiguration = {
   cipKind?: 'alpaca' | 'apex';
   createdAt: string;
   curpValidationEnabled: boolean;
-  documentTypesAndCountries?: {
-    countrySpecific: {
-      [key: string]: unknown;
-    };
-    global: Array<
-      | 'id_card'
-      | 'drivers_license'
-      | 'passport'
-      | 'passport_card'
-      | 'permit'
-      | 'visa'
-      | 'residence_document'
-      | 'voter_identification'
-    >;
-  };
   documentsToCollect: Array<
     | {
         data: {
@@ -23191,6 +23176,21 @@ export type OnboardingConfiguration = {
         kind: 'custom';
       }
   >;
+  documentTypesAndCountries?: {
+    countrySpecific: {
+      [key: string]: unknown;
+    };
+    global: Array<
+      | 'id_card'
+      | 'drivers_license'
+      | 'passport'
+      | 'passport_card'
+      | 'permit'
+      | 'visa'
+      | 'residence_document'
+      | 'voter_identification'
+    >;
+  };
   enhancedAml: {
     adverseMedia: boolean;
     enhancedAml: boolean;
@@ -31170,8 +31170,8 @@ export type UserTimeline = {
             region?: string;
             regionName?: string;
             sessionId?: string;
-            timeZone?: string;
             timestamp: string;
+            timeZone?: string;
             userAgent?: string;
           };
           source:
@@ -32767,8 +32767,8 @@ export type UserTimeline = {
             region?: string;
             regionName?: string;
             sessionId?: string;
-            timeZone?: string;
             timestamp: string;
+            timeZone?: string;
             userAgent?: string;
           };
           kind: 'phone' | 'passkey' | 'email';
