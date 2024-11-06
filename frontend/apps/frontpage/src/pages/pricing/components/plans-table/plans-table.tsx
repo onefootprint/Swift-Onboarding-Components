@@ -1,6 +1,6 @@
 import { Button, Container, Stack, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -27,8 +27,8 @@ const PlansTable = () => {
     <>
       <PlansContainer>
         {PlansDetails.map(plan => (
-          <>
-            <PlanContent gridArea={`${plan.id}-content`}>
+          <React.Fragment key={plan.id}>
+            <PlanContent $gridArea={`${plan.id}-content`}>
               <Header title={t(`plans.${plan.title}.title` as ParseKeys<'common'>)} price={plan.price} />
               <Stack direction="column" flexGrow={1} gap={3} padding={5} height="100%">
                 {plan.title !== Plans.startup && <EverythingAndBanner plan={plan.title} />}
@@ -39,12 +39,12 @@ const PlansTable = () => {
                 ))}
               </Stack>
             </PlanContent>
-            <ButtonWrapper gridArea={`${plan.id}-button`}>
+            <ButtonWrapper $gridArea={`${plan.id}-button`}>
               <Button variant={plan.buttonVariant} onClick={handleClick} fullWidth size="large">
                 {t(`plans.${plan.title}.${plan.buttonLabel}` as ParseKeys<'common'>)}
               </Button>
             </ButtonWrapper>
-          </>
+          </React.Fragment>
         ))}
       </PlansContainer>
       <ContactDialog open={showDialog} onClose={handleClose} />
@@ -83,18 +83,18 @@ const PlansContainer = styled(Container)`
   `}
 `;
 
-const PlanContent = styled.div<{ gridArea: string }>`
-  ${({ gridArea }) => css`
+const PlanContent = styled.div<{ $gridArea: string }>`
+  ${({ $gridArea }) => css`
     display: flex;
     flex-direction: column;
     height: 100%;
-    grid-area: ${gridArea};
+    grid-area: ${$gridArea};
   `}
 `;
 
-const ButtonWrapper = styled.div<{ gridArea: string }>`
-  ${({ gridArea, theme }) => css`
-    grid-area: ${gridArea};
+const ButtonWrapper = styled.div<{ $gridArea: string }>`
+  ${({ $gridArea, theme }) => css`
+    grid-area: ${$gridArea};
     padding: 0 ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[7]};
 
