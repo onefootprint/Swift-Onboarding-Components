@@ -46,7 +46,7 @@ export type AuthorizedOrg = {
 export type BatchHostedBusinessOwnerRequest =
   | {
       data: {
-        '<key>':
+        key:
           | 'id.first_name'
           | 'id.middle_name'
           | 'id.last_name'
@@ -273,7 +273,7 @@ export type BatchHostedBusinessOwnerRequest =
           | 'bank.*.ach_account_id'
           | 'bank.*.account_type'
           | 'bank.*.fingerprint';
-        '<value>': {
+        value: {
           [key: string]: unknown;
         };
       };
@@ -283,7 +283,7 @@ export type BatchHostedBusinessOwnerRequest =
     }
   | {
       data: {
-        '<key>':
+        key:
           | 'id.first_name'
           | 'id.middle_name'
           | 'id.last_name'
@@ -510,7 +510,7 @@ export type BatchHostedBusinessOwnerRequest =
           | 'bank.*.ach_account_id'
           | 'bank.*.account_type'
           | 'bank.*.fingerprint';
-        '<value>': {
+        value: {
           [key: string]: unknown;
         };
       };
@@ -754,7 +754,7 @@ export type op = 'update';
  * A key-value map with the corresponding decrypted values
  */
 export type BusinessDecryptResponse = {
-  '<key>':
+  key:
     | 'business.name'
     | 'business.dba'
     | 'business.website'
@@ -770,7 +770,7 @@ export type BusinessDecryptResponse = {
     | 'business.formation_state'
     | 'business.formation_date'
     | 'custom.*';
-  '<value>': {
+  value: {
     [key: string]: unknown;
   };
 };
@@ -1393,7 +1393,7 @@ export type D2pGenerateRequest = {
    * to deserialize old versions
    */
   meta?: {
-    l10n?: {
+    l10N?: {
       language?: string;
       locale?: string;
     };
@@ -1423,7 +1423,7 @@ export type D2pStatusResponse = {
    * to deserialize old versions
    */
   meta?: {
-    l10n?: {
+    l10N?: {
       language?: string;
       locale?: string;
     };
@@ -1535,25 +1535,25 @@ export type GetSdkArgsTokenResponse = {
   args:
     | {
         data: {
-          auth_token?: string;
-          document_fixture_result?: 'Fail' | 'Pass' | 'Real';
-          fixture_result?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
+          authToken?: string;
+          documentFixtureResult?: 'Fail' | 'Pass' | 'Real';
+          fixtureResult?: 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
           /**
            * The components SDK wraps the verify SDK with the same args
            */
-          is_components_sdk?: boolean;
-          l10n?: {
+          isComponentsSdk?: boolean;
+          l10N?: {
             language?: string;
             locale?: string;
           };
           options?: {
-            show_completion_page?: boolean;
-            show_logo?: boolean;
+            showCompletionPage?: boolean;
+            showLogo?: boolean;
           };
-          public_key?: string;
-          sandbox_id?: string;
-          should_relay_to_components?: boolean;
-          user_data?: {
+          publicKey?: string;
+          sandboxId?: string;
+          shouldRelayToComponents?: boolean;
+          userData?: {
             [key: string]: unknown;
           };
         };
@@ -1561,22 +1561,22 @@ export type GetSdkArgsTokenResponse = {
       }
     | {
         data: {
-          auth_token: string;
-          device_response: string;
+          authToken: string;
+          deviceResponse: string;
         };
         kind: 'verify_result_v1';
       }
     | {
         data: {
-          auth_token?: string;
-          l10n?: {
+          authToken?: string;
+          l10N?: {
             language?: string;
             locale?: string;
           };
           options?: {
-            hide_buttons?: boolean;
-            hide_cancel_button?: boolean;
-            hide_footprint_logo?: boolean;
+            hideButtons?: boolean;
+            hideCancelButton?: boolean;
+            hideFootprintLogo?: boolean;
           };
           title?: string;
         };
@@ -1584,15 +1584,15 @@ export type GetSdkArgsTokenResponse = {
       }
     | {
         data: {
-          l10n?: {
+          l10N?: {
             language?: string;
             locale?: string;
           };
           options?: {
-            show_logo?: boolean;
+            showLogo?: boolean;
           };
-          public_key?: string;
-          user_data?: {
+          publicKey?: string;
+          userData?: {
             [key: string]: unknown;
           };
         };
@@ -1600,22 +1600,22 @@ export type GetSdkArgsTokenResponse = {
       }
     | {
         data: {
-          auth_token: string;
-          l10n?: {
+          authToken: string;
+          l10N?: {
             language?: string;
             locale?: string;
           };
           options?: {
-            show_logo?: boolean;
+            showLogo?: boolean;
           };
         };
         kind: 'update_auth_methods_v1';
       }
     | {
         data: {
-          auth_token: string;
-          can_copy?: boolean;
-          default_hidden?: boolean;
+          authToken: string;
+          canCopy?: boolean;
+          defaultHidden?: boolean;
           id:
             | 'id.first_name'
             | 'id.middle_name'
@@ -1858,7 +1858,7 @@ export type GetSdkArgsTokenResponse = {
             | 'bank.*.account_type'
             | 'bank.*.fingerprint';
           label?: string;
-          show_hidden_toggle?: boolean;
+          showHiddenToggle?: boolean;
         };
         kind: 'render_v1';
       };
@@ -2187,27 +2187,6 @@ export type HostedBusinessDetail = {
     'document.id_card.ref_number'?: string;
     'document.id_card.selfie.image'?: string;
     'document.id_card.selfie.mime_type'?: string;
-    'document.passport.back.image'?: string;
-    'document.passport.back.mime_type'?: string;
-    'document.passport.classified_document_type'?: string;
-    'document.passport.clave_de_elector'?: string;
-    'document.passport.curp'?: string;
-    'document.passport.curp_validation_response'?: string;
-    'document.passport.dob'?: string;
-    'document.passport.document_number'?: string;
-    'document.passport.expires_at'?: string;
-    'document.passport.front.image'?: string;
-    'document.passport.front.mime_type'?: string;
-    'document.passport.full_address'?: string;
-    'document.passport.full_name'?: string;
-    'document.passport.gender'?: string;
-    'document.passport.issued_at'?: string;
-    'document.passport.issuing_country'?: string;
-    'document.passport.issuing_state'?: string;
-    'document.passport.nationality'?: string;
-    'document.passport.ref_number'?: string;
-    'document.passport.selfie.image'?: string;
-    'document.passport.selfie.mime_type'?: string;
     'document.passport_card.back.image'?: string;
     'document.passport_card.back.mime_type'?: string;
     'document.passport_card.classified_document_type'?: string;
@@ -2229,6 +2208,27 @@ export type HostedBusinessDetail = {
     'document.passport_card.ref_number'?: string;
     'document.passport_card.selfie.image'?: string;
     'document.passport_card.selfie.mime_type'?: string;
+    'document.passport.back.image'?: string;
+    'document.passport.back.mime_type'?: string;
+    'document.passport.classified_document_type'?: string;
+    'document.passport.clave_de_elector'?: string;
+    'document.passport.curp'?: string;
+    'document.passport.curp_validation_response'?: string;
+    'document.passport.dob'?: string;
+    'document.passport.document_number'?: string;
+    'document.passport.expires_at'?: string;
+    'document.passport.front.image'?: string;
+    'document.passport.front.mime_type'?: string;
+    'document.passport.full_address'?: string;
+    'document.passport.full_name'?: string;
+    'document.passport.gender'?: string;
+    'document.passport.issued_at'?: string;
+    'document.passport.issuing_country'?: string;
+    'document.passport.issuing_state'?: string;
+    'document.passport.nationality'?: string;
+    'document.passport.ref_number'?: string;
+    'document.passport.selfie.image'?: string;
+    'document.passport.selfie.mime_type'?: string;
     'document.permit.back.image'?: string;
     'document.permit.back.mime_type'?: string;
     'document.permit.classified_document_type'?: string;
@@ -2426,27 +2426,6 @@ export type HostedBusinessOwner = {
     'document.id_card.ref_number'?: string;
     'document.id_card.selfie.image'?: string;
     'document.id_card.selfie.mime_type'?: string;
-    'document.passport.back.image'?: string;
-    'document.passport.back.mime_type'?: string;
-    'document.passport.classified_document_type'?: string;
-    'document.passport.clave_de_elector'?: string;
-    'document.passport.curp'?: string;
-    'document.passport.curp_validation_response'?: string;
-    'document.passport.dob'?: string;
-    'document.passport.document_number'?: string;
-    'document.passport.expires_at'?: string;
-    'document.passport.front.image'?: string;
-    'document.passport.front.mime_type'?: string;
-    'document.passport.full_address'?: string;
-    'document.passport.full_name'?: string;
-    'document.passport.gender'?: string;
-    'document.passport.issued_at'?: string;
-    'document.passport.issuing_country'?: string;
-    'document.passport.issuing_state'?: string;
-    'document.passport.nationality'?: string;
-    'document.passport.ref_number'?: string;
-    'document.passport.selfie.image'?: string;
-    'document.passport.selfie.mime_type'?: string;
     'document.passport_card.back.image'?: string;
     'document.passport_card.back.mime_type'?: string;
     'document.passport_card.classified_document_type'?: string;
@@ -2468,6 +2447,27 @@ export type HostedBusinessOwner = {
     'document.passport_card.ref_number'?: string;
     'document.passport_card.selfie.image'?: string;
     'document.passport_card.selfie.mime_type'?: string;
+    'document.passport.back.image'?: string;
+    'document.passport.back.mime_type'?: string;
+    'document.passport.classified_document_type'?: string;
+    'document.passport.clave_de_elector'?: string;
+    'document.passport.curp'?: string;
+    'document.passport.curp_validation_response'?: string;
+    'document.passport.dob'?: string;
+    'document.passport.document_number'?: string;
+    'document.passport.expires_at'?: string;
+    'document.passport.front.image'?: string;
+    'document.passport.front.mime_type'?: string;
+    'document.passport.full_address'?: string;
+    'document.passport.full_name'?: string;
+    'document.passport.gender'?: string;
+    'document.passport.issued_at'?: string;
+    'document.passport.issuing_country'?: string;
+    'document.passport.issuing_state'?: string;
+    'document.passport.nationality'?: string;
+    'document.passport.ref_number'?: string;
+    'document.passport.selfie.image'?: string;
+    'document.passport.selfie.mime_type'?: string;
     'document.permit.back.image'?: string;
     'document.permit.back.mime_type'?: string;
     'document.permit.classified_document_type'?: string;
@@ -2883,7 +2883,7 @@ export type IdentifyRequest = {
         email: string;
       }
     | {
-        phone_number: string;
+        phoneNumber: string;
       };
   phoneNumber?: string;
   /**
@@ -3307,27 +3307,6 @@ export type ModernRawUserDataRequest = {
   'document.id_card.ref_number'?: string;
   'document.id_card.selfie.image'?: string;
   'document.id_card.selfie.mime_type'?: string;
-  'document.passport.back.image'?: string;
-  'document.passport.back.mime_type'?: string;
-  'document.passport.classified_document_type'?: string;
-  'document.passport.clave_de_elector'?: string;
-  'document.passport.curp'?: string;
-  'document.passport.curp_validation_response'?: string;
-  'document.passport.dob'?: string;
-  'document.passport.document_number'?: string;
-  'document.passport.expires_at'?: string;
-  'document.passport.front.image'?: string;
-  'document.passport.front.mime_type'?: string;
-  'document.passport.full_address'?: string;
-  'document.passport.full_name'?: string;
-  'document.passport.gender'?: string;
-  'document.passport.issued_at'?: string;
-  'document.passport.issuing_country'?: string;
-  'document.passport.issuing_state'?: string;
-  'document.passport.nationality'?: string;
-  'document.passport.ref_number'?: string;
-  'document.passport.selfie.image'?: string;
-  'document.passport.selfie.mime_type'?: string;
   'document.passport_card.back.image'?: string;
   'document.passport_card.back.mime_type'?: string;
   'document.passport_card.classified_document_type'?: string;
@@ -3349,6 +3328,27 @@ export type ModernRawUserDataRequest = {
   'document.passport_card.ref_number'?: string;
   'document.passport_card.selfie.image'?: string;
   'document.passport_card.selfie.mime_type'?: string;
+  'document.passport.back.image'?: string;
+  'document.passport.back.mime_type'?: string;
+  'document.passport.classified_document_type'?: string;
+  'document.passport.clave_de_elector'?: string;
+  'document.passport.curp'?: string;
+  'document.passport.curp_validation_response'?: string;
+  'document.passport.dob'?: string;
+  'document.passport.document_number'?: string;
+  'document.passport.expires_at'?: string;
+  'document.passport.front.image'?: string;
+  'document.passport.front.mime_type'?: string;
+  'document.passport.full_address'?: string;
+  'document.passport.full_name'?: string;
+  'document.passport.gender'?: string;
+  'document.passport.issued_at'?: string;
+  'document.passport.issuing_country'?: string;
+  'document.passport.issuing_state'?: string;
+  'document.passport.nationality'?: string;
+  'document.passport.ref_number'?: string;
+  'document.passport.selfie.image'?: string;
+  'document.passport.selfie.mime_type'?: string;
   'document.permit.back.image'?: string;
   'document.permit.back.mime_type'?: string;
   'document.permit.classified_document_type'?: string;
@@ -3811,8 +3811,8 @@ export type PublicOnboardingConfiguration = {
            * This allows editing data, re-verifies data, and then re-triggers decision engine
            */
           data: {
-            playbook_id: string;
-            recollect_attributes: Array<
+            playbookId: string;
+            recollectAttributes: Array<
               | 'name'
               | 'dob'
               | 'ssn4'
@@ -3843,7 +3843,7 @@ export type PublicOnboardingConfiguration = {
              * When false, requires the existing BOs to re-complete KYC.
              * Can only be true for KYB playbooks
              */
-            reuse_existing_bo_kyc: boolean;
+            reuseExistingBoKyc: boolean;
           };
           /**
            * Allow onboarding onto the specific playbook.
@@ -3856,12 +3856,12 @@ export type PublicOnboardingConfiguration = {
            * Upload a new document and re-run the decision engine
            */
           data: {
-            business_configs: Array<
+            businessConfigs: Array<
               | {
                   data: {
-                    collect_selfie: boolean;
-                    document_types_and_countries?: {
-                      country_specific: {
+                    collectSelfie: boolean;
+                    documentTypesAndCountries?: {
+                      countrySpecific: {
                         [key: string]: unknown;
                       };
                       global: Array<
@@ -3880,13 +3880,13 @@ export type PublicOnboardingConfiguration = {
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_ssn';
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_address';
                 }
@@ -4144,8 +4144,8 @@ export type PublicOnboardingConfiguration = {
                      * The human-readable name of the document to display to the user
                      */
                     name: string;
-                    requires_human_review: boolean;
-                    upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                    requiresHumanReview: boolean;
+                    uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                   };
                   kind: 'custom';
                 }
@@ -4153,9 +4153,9 @@ export type PublicOnboardingConfiguration = {
             configs: Array<
               | {
                   data: {
-                    collect_selfie: boolean;
-                    document_types_and_countries?: {
-                      country_specific: {
+                    collectSelfie: boolean;
+                    documentTypesAndCountries?: {
+                      countrySpecific: {
                         [key: string]: unknown;
                       };
                       global: Array<
@@ -4174,13 +4174,13 @@ export type PublicOnboardingConfiguration = {
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_ssn';
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_address';
                 }
@@ -4438,8 +4438,8 @@ export type PublicOnboardingConfiguration = {
                      * The human-readable name of the document to display to the user
                      */
                     name: string;
-                    requires_human_review: boolean;
-                    upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                    requiresHumanReview: boolean;
+                    uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                   };
                   kind: 'custom';
                 }
@@ -4471,7 +4471,7 @@ export type SdkArgs =
          * The components SDK wraps the verify SDK with the same args
          */
         isComponentsSdk?: boolean;
-        l10n?: {
+        l10N?: {
           language?: string;
           locale?: string;
         };
@@ -4498,7 +4498,7 @@ export type SdkArgs =
   | {
       data: {
         authToken?: string;
-        l10n?: {
+        l10N?: {
           language?: string;
           locale?: string;
         };
@@ -4513,7 +4513,7 @@ export type SdkArgs =
     }
   | {
       data: {
-        l10n?: {
+        l10N?: {
           language?: string;
           locale?: string;
         };
@@ -4530,7 +4530,7 @@ export type SdkArgs =
   | {
       data: {
         authToken: string;
-        l10n?: {
+        l10N?: {
           language?: string;
           locale?: string;
         };
@@ -5138,7 +5138,7 @@ export type UserDecryptRequest = {
  * A key-value map with the corresponding decrypted values
  */
 export type UserDecryptResponse = {
-  '<key>':
+  key:
     | 'id.first_name'
     | 'id.middle_name'
     | 'id.last_name'
@@ -5365,7 +5365,7 @@ export type UserDecryptResponse = {
     | 'bank.*.ach_account_id'
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
-  '<value>': {
+  value: {
     [key: string]: unknown;
   };
 };

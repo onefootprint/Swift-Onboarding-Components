@@ -70,7 +70,7 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
   }
   imports += `} from "${config.import}";\n\n`;
 
-  createDictionaryFile(dictionary);
+  createDictionaryFile(sortObjectKeys(dictionary) as Record<string, unknown>);
 
   // Ensure parent directory of output file exists
   const outputDir = path.dirname(config.outputPath);

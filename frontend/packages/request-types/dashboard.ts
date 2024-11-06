@@ -33,9 +33,9 @@ export type Annotation = {
       }
     | {
         email: string;
-        first_name?: string;
+        firstName?: string;
         kind: 'organization';
-        last_name?: string;
+        lastName?: string;
         member: string;
       }
     | {
@@ -1177,7 +1177,7 @@ export type ComplianceDocEvent = {
         data: {
           description: string;
           name: string;
-          template_id?: string;
+          templateId?: string;
         };
         kind: 'requested';
       }
@@ -1193,7 +1193,7 @@ export type ComplianceDocEvent = {
            * Auto-generated discriminant enum variants
            */
           kind: 'external_url' | 'file_upload';
-          submission_id: string;
+          submissionId: string;
         };
         kind: 'submitted';
       }
@@ -1209,7 +1209,7 @@ export type ComplianceDocEvent = {
           /**
            * None if the doc is unassigned.
            */
-          assigned_to?: {
+          assignedTo?: {
             org: string;
             /**
              * Limited information about member of organization
@@ -1218,9 +1218,9 @@ export type ComplianceDocEvent = {
              * tenants.
              */
             user: {
-              first_name?: string;
+              firstName?: string;
               id: string;
-              last_name?: string;
+              lastName?: string;
             };
           };
           kind: 'Tenant' | 'PartnerTenant';
@@ -1383,9 +1383,9 @@ export type CreateOnboardingConfigurationRequest = {
   businessDocumentsToCollect: Array<
     | {
         data: {
-          collect_selfie: boolean;
-          document_types_and_countries?: {
-            country_specific: {
+          collectSelfie: boolean;
+          documentTypesAndCountries?: {
+            countrySpecific: {
               [key: string]: unknown;
             };
             global: Array<
@@ -1404,13 +1404,13 @@ export type CreateOnboardingConfigurationRequest = {
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_ssn';
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_address';
       }
@@ -1668,8 +1668,8 @@ export type CreateOnboardingConfigurationRequest = {
            * The human-readable name of the document to display to the user
            */
           name: string;
-          requires_human_review: boolean;
-          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+          requiresHumanReview: boolean;
+          uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
         };
         kind: 'custom';
       }
@@ -1756,9 +1756,9 @@ export type CreateOnboardingConfigurationRequest = {
   documentsToCollect: Array<
     | {
         data: {
-          collect_selfie: boolean;
-          document_types_and_countries?: {
-            country_specific: {
+          collectSelfie: boolean;
+          documentTypesAndCountries?: {
+            countrySpecific: {
               [key: string]: unknown;
             };
             global: Array<
@@ -1777,13 +1777,13 @@ export type CreateOnboardingConfigurationRequest = {
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_ssn';
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_address';
       }
@@ -2041,8 +2041,8 @@ export type CreateOnboardingConfigurationRequest = {
            * The human-readable name of the document to display to the user
            */
           name: string;
-          requires_human_review: boolean;
-          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+          requiresHumanReview: boolean;
+          uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
         };
         kind: 'custom';
       }
@@ -2368,7 +2368,7 @@ export type CreateOnboardingConfigurationRequest = {
   verificationChecks?: Array<
     | {
         data: {
-          ein_only: boolean;
+          einOnly: boolean;
         };
         kind: 'kyb';
       }
@@ -2386,8 +2386,8 @@ export type CreateOnboardingConfigurationRequest = {
       }
     | {
         data: {
-          adverse_media: boolean;
-          adverse_media_lists?: Array<
+          adverseMedia: boolean;
+          adverseMediaLists?: Array<
             | 'financial_crime'
             | 'violent_crime'
             | 'sexual_crime'
@@ -2398,8 +2398,8 @@ export type CreateOnboardingConfigurationRequest = {
             | 'general_serious'
             | 'general_minor'
           >;
-          continuous_monitoring: boolean;
-          match_kind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
+          continuousMonitoring: boolean;
+          matchKind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
           ofac: boolean;
           pep: boolean;
         };
@@ -2801,7 +2801,7 @@ export type CreateTagRequest = {
   tag: string;
 };
 export type CreateTenantAndroidAppMetaRequest = {
-  apkCertSha256s: Array<string>;
+  apkCertSha256S: Array<string>;
   integrityDecryptionKey: string;
   integrityVerificationKey: string;
   packageNames: Array<string>;
@@ -2968,7 +2968,7 @@ export type CursorPaginatedAuditEvent = {
     detail:
       | {
           data: {
-            created_fields: Array<
+            createdFields: Array<
               | 'id.first_name'
               | 'id.middle_name'
               | 'id.last_name'
@@ -3210,14 +3210,14 @@ export type CursorPaginatedAuditEvent = {
               | 'bank.*.account_type'
               | 'bank.*.fingerprint'
             >;
-            fp_id: string;
+            fpId: string;
           };
           kind: 'create_user';
         }
       | {
           data: {
-            fp_id: string;
-            updated_fields: Array<
+            fpId: string;
+            updatedFields: Array<
               | 'id.first_name'
               | 'id.middle_name'
               | 'id.last_name'
@@ -3464,7 +3464,7 @@ export type CursorPaginatedAuditEvent = {
         }
       | {
           data: {
-            deleted_fields: Array<
+            deletedFields: Array<
               | 'id.first_name'
               | 'id.middle_name'
               | 'id.last_name'
@@ -3706,14 +3706,14 @@ export type CursorPaginatedAuditEvent = {
               | 'bank.*.account_type'
               | 'bank.*.fingerprint'
             >;
-            fp_id: string;
+            fpId: string;
           };
           kind: 'delete_user_data';
         }
       | {
           data: {
             context: 'vault_proxy' | 'reflect' | 'api' | 'unknown';
-            decrypted_fields: Array<
+            decryptedFields: Array<
               | 'id.first_name'
               | 'id.middle_name'
               | 'id.last_name'
@@ -3955,14 +3955,14 @@ export type CursorPaginatedAuditEvent = {
               | 'bank.*.account_type'
               | 'bank.*.fingerprint'
             >;
-            fp_id: string;
+            fpId: string;
             reason: string;
           };
           kind: 'decrypt_user_data';
         }
       | {
           data: {
-            fp_id: string;
+            fpId: string;
           };
           kind: 'delete_user';
         }
@@ -3999,8 +3999,8 @@ export type CursorPaginatedAuditEvent = {
       | {
           data: {
             email: string;
-            first_name?: string;
-            last_name?: string;
+            firstName?: string;
+            lastName?: string;
             scopes: Array<
               | {
                   kind: 'read';
@@ -4130,8 +4130,8 @@ export type CursorPaginatedAuditEvent = {
                   kind: 'compliance_partner_manage_reviews';
                 }
             >;
-            tenant_role_id: string;
-            tenant_role_name: string;
+            tenantRoleId: string;
+            tenantRoleName: string;
           };
           kind: 'invite_org_member';
         }
@@ -4152,7 +4152,7 @@ export type CursorPaginatedAuditEvent = {
         }
       | {
           data: {
-            role_name: string;
+            roleName: string;
             scopes: Array<
               | {
                   kind: 'read';
@@ -4282,13 +4282,13 @@ export type CursorPaginatedAuditEvent = {
                   kind: 'compliance_partner_manage_reviews';
                 }
             >;
-            tenant_role_id: string;
+            tenantRoleId: string;
           };
           kind: 'create_org_role';
         }
       | {
           data: {
-            new_scopes: Array<
+            newScopes: Array<
               | {
                   kind: 'read';
                 }
@@ -4417,7 +4417,7 @@ export type CursorPaginatedAuditEvent = {
                   kind: 'compliance_partner_manage_reviews';
                 }
             >;
-            prev_scopes: Array<
+            prevScopes: Array<
               | {
                   kind: 'read';
                 }
@@ -4546,22 +4546,22 @@ export type CursorPaginatedAuditEvent = {
                   kind: 'compliance_partner_manage_reviews';
                 }
             >;
-            role_name: string;
-            tenant_role_id: string;
+            roleName: string;
+            tenantRoleId: string;
           };
           kind: 'update_org_role';
         }
       | {
           data: {
-            list_entry_creation_id: string;
-            list_id: string;
+            listEntryCreationId: string;
+            listId: string;
           };
           kind: 'create_list_entry';
         }
       | {
           data: {
-            list_entry_id: string;
-            list_id: string;
+            listEntryId: string;
+            listId: string;
           };
           kind: 'delete_list_entry';
         }
@@ -4579,7 +4579,7 @@ export type CursorPaginatedAuditEvent = {
         }
       | {
           data: {
-            role_name: string;
+            roleName: string;
             scopes: Array<
               | {
                   kind: 'read';
@@ -4709,7 +4709,7 @@ export type CursorPaginatedAuditEvent = {
                   kind: 'compliance_partner_manage_reviews';
                 }
             >;
-            tenant_role_id: string;
+            tenantRoleId: string;
           };
           kind: 'deactivate_org_role';
         };
@@ -4779,9 +4779,9 @@ export type CursorPaginatedAuditEvent = {
         }
       | {
           email: string;
-          first_name?: string;
+          firstName?: string;
           kind: 'organization';
-          last_name?: string;
+          lastName?: string;
           member: string;
         }
       | {
@@ -6005,16 +6005,16 @@ export type CursorPaginatedListEvent = {
       | {
           data: {
             entries: Array<string>;
-            list_entry_creation_id: string;
-            list_id: string;
+            listEntryCreationId: string;
+            listId: string;
           };
           kind: 'create_list_entry';
         }
       | {
           data: {
             entry: string;
-            list_entry_id: string;
-            list_id: string;
+            listEntryId: string;
+            listId: string;
           };
           kind: 'delete_list_entry';
         };
@@ -6084,9 +6084,9 @@ export type CursorPaginatedListEvent = {
         }
       | {
           email: string;
-          first_name?: string;
+          firstName?: string;
           kind: 'organization';
-          last_name?: string;
+          lastName?: string;
           member: string;
         }
       | {
@@ -8230,7 +8230,7 @@ export type kind12 = 'trigger';
 export type EntityActionsRequest = {
   actions: Array<
     | {
-        fp_bid?: string;
+        fpBid?: string;
         kind: 'trigger';
         /**
          * Optional note with more context on what we're asking the user to do
@@ -8243,8 +8243,8 @@ export type EntityActionsRequest = {
                * This allows editing data, re-verifies data, and then re-triggers decision engine
                */
               data: {
-                playbook_id: string;
-                recollect_attributes: Array<
+                playbookId: string;
+                recollectAttributes: Array<
                   | 'name'
                   | 'dob'
                   | 'ssn4'
@@ -8275,7 +8275,7 @@ export type EntityActionsRequest = {
                  * When false, requires the existing BOs to re-complete KYC.
                  * Can only be true for KYB playbooks
                  */
-                reuse_existing_bo_kyc: boolean;
+                reuseExistingBoKyc: boolean;
               };
               /**
                * Allow onboarding onto the specific playbook.
@@ -8288,12 +8288,12 @@ export type EntityActionsRequest = {
                * Upload a new document and re-run the decision engine
                */
               data: {
-                business_configs: Array<
+                businessConfigs: Array<
                   | {
                       data: {
-                        collect_selfie: boolean;
-                        document_types_and_countries?: {
-                          country_specific: {
+                        collectSelfie: boolean;
+                        documentTypesAndCountries?: {
+                          countrySpecific: {
                             [key: string]: unknown;
                           };
                           global: Array<
@@ -8312,13 +8312,13 @@ export type EntityActionsRequest = {
                     }
                   | {
                       data: {
-                        requires_human_review: boolean;
+                        requiresHumanReview: boolean;
                       };
                       kind: 'proof_of_ssn';
                     }
                   | {
                       data: {
-                        requires_human_review: boolean;
+                        requiresHumanReview: boolean;
                       };
                       kind: 'proof_of_address';
                     }
@@ -8576,8 +8576,8 @@ export type EntityActionsRequest = {
                          * The human-readable name of the document to display to the user
                          */
                         name: string;
-                        requires_human_review: boolean;
-                        upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                        requiresHumanReview: boolean;
+                        uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                       };
                       kind: 'custom';
                     }
@@ -8585,9 +8585,9 @@ export type EntityActionsRequest = {
                 configs: Array<
                   | {
                       data: {
-                        collect_selfie: boolean;
-                        document_types_and_countries?: {
-                          country_specific: {
+                        collectSelfie: boolean;
+                        documentTypesAndCountries?: {
+                          countrySpecific: {
                             [key: string]: unknown;
                           };
                           global: Array<
@@ -8606,13 +8606,13 @@ export type EntityActionsRequest = {
                     }
                   | {
                       data: {
-                        requires_human_review: boolean;
+                        requiresHumanReview: boolean;
                       };
                       kind: 'proof_of_ssn';
                     }
                   | {
                       data: {
-                        requires_human_review: boolean;
+                        requiresHumanReview: boolean;
                       };
                       kind: 'proof_of_address';
                     }
@@ -8870,8 +8870,8 @@ export type EntityActionsRequest = {
                          * The human-readable name of the document to display to the user
                          */
                         name: string;
-                        requires_human_review: boolean;
-                        upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                        requiresHumanReview: boolean;
+                        uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                       };
                       kind: 'custom';
                     }
@@ -8888,7 +8888,7 @@ export type EntityActionsRequest = {
       }
     | {
         annotation: {
-          is_pinned: boolean;
+          isPinned: boolean;
           note: string;
         };
         kind: 'manual_decision';
@@ -9439,9 +9439,9 @@ export type EvaluateRuleRequest = {
               config: Array<
                 | {
                     data: {
-                      collect_selfie: boolean;
-                      document_types_and_countries?: {
-                        country_specific: {
+                      collectSelfie: boolean;
+                      documentTypesAndCountries?: {
+                        countrySpecific: {
                           [key: string]: unknown;
                         };
                         global: Array<
@@ -9460,13 +9460,13 @@ export type EvaluateRuleRequest = {
                   }
                 | {
                     data: {
-                      requires_human_review: boolean;
+                      requiresHumanReview: boolean;
                     };
                     kind: 'proof_of_ssn';
                   }
                 | {
                     data: {
-                      requires_human_review: boolean;
+                      requiresHumanReview: boolean;
                     };
                     kind: 'proof_of_address';
                   }
@@ -9724,8 +9724,8 @@ export type EvaluateRuleRequest = {
                        * The human-readable name of the document to display to the user
                        */
                       name: string;
-                      requires_human_review: boolean;
-                      upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                      requiresHumanReview: boolean;
+                      uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                     };
                     kind: 'custom';
                   }
@@ -16475,7 +16475,7 @@ export type match_level = 'no_match' | 'could_not_match' | 'partial' | 'exact';
  * A key-value map of identifier to whether the identifier exists in the vault
  */
 export type GetUserVaultResponse = {
-  '<key>':
+  key:
     | 'id.first_name'
     | 'id.middle_name'
     | 'id.last_name'
@@ -16702,7 +16702,7 @@ export type GetUserVaultResponse = {
     | 'bank.*.ach_account_id'
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
-  '<value>': boolean;
+  value: boolean;
 };
 export type _key_ =
   | 'id.first_name'
@@ -17189,7 +17189,7 @@ export type IntegrityRequest = {
  * A key-value map with the corresponding hex-encoded hash values
  */
 export type IntegrityResponse = {
-  '<key>':
+  key:
     | 'id.first_name'
     | 'id.middle_name'
     | 'id.last_name'
@@ -17416,7 +17416,7 @@ export type IntegrityResponse = {
     | 'bank.*.ach_account_id'
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
-  '<value>': {
+  value: {
     [key: string]: unknown;
   };
 };
@@ -17546,9 +17546,9 @@ export type ListDetails = {
             config: Array<
               | {
                   data: {
-                    collect_selfie: boolean;
-                    document_types_and_countries?: {
-                      country_specific: {
+                    collectSelfie: boolean;
+                    documentTypesAndCountries?: {
+                      countrySpecific: {
                         [key: string]: unknown;
                       };
                       global: Array<
@@ -17567,13 +17567,13 @@ export type ListDetails = {
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_ssn';
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_address';
                 }
@@ -17831,8 +17831,8 @@ export type ListDetails = {
                      * The human-readable name of the document to display to the user
                      */
                     name: string;
-                    requires_human_review: boolean;
-                    upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                    requiresHumanReview: boolean;
+                    uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                   };
                   kind: 'custom';
                 }
@@ -18844,9 +18844,9 @@ export type MultiUpdateRuleRequest = {
               config: Array<
                 | {
                     data: {
-                      collect_selfie: boolean;
-                      document_types_and_countries?: {
-                        country_specific: {
+                      collectSelfie: boolean;
+                      documentTypesAndCountries?: {
+                        countrySpecific: {
                           [key: string]: unknown;
                         };
                         global: Array<
@@ -18865,13 +18865,13 @@ export type MultiUpdateRuleRequest = {
                   }
                 | {
                     data: {
-                      requires_human_review: boolean;
+                      requiresHumanReview: boolean;
                     };
                     kind: 'proof_of_ssn';
                   }
                 | {
                     data: {
-                      requires_human_review: boolean;
+                      requiresHumanReview: boolean;
                     };
                     kind: 'proof_of_address';
                   }
@@ -19129,8 +19129,8 @@ export type MultiUpdateRuleRequest = {
                        * The human-readable name of the document to display to the user
                        */
                       name: string;
-                      requires_human_review: boolean;
-                      upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                      requiresHumanReview: boolean;
+                      uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                     };
                     kind: 'custom';
                   }
@@ -20969,9 +20969,9 @@ export type OffsetPaginatedOnboardingConfiguration = {
         }
       | {
           email: string;
-          first_name?: string;
+          firstName?: string;
           kind: 'organization';
-          last_name?: string;
+          lastName?: string;
           member: string;
         }
       | {
@@ -20982,9 +20982,9 @@ export type OffsetPaginatedOnboardingConfiguration = {
     businessDocumentsToCollect: Array<
       | {
           data: {
-            collect_selfie: boolean;
-            document_types_and_countries?: {
-              country_specific: {
+            collectSelfie: boolean;
+            documentTypesAndCountries?: {
+              countrySpecific: {
                 [key: string]: unknown;
               };
               global: Array<
@@ -21003,13 +21003,13 @@ export type OffsetPaginatedOnboardingConfiguration = {
         }
       | {
           data: {
-            requires_human_review: boolean;
+            requiresHumanReview: boolean;
           };
           kind: 'proof_of_ssn';
         }
       | {
           data: {
-            requires_human_review: boolean;
+            requiresHumanReview: boolean;
           };
           kind: 'proof_of_address';
         }
@@ -21267,8 +21267,8 @@ export type OffsetPaginatedOnboardingConfiguration = {
              * The human-readable name of the document to display to the user
              */
             name: string;
-            requires_human_review: boolean;
-            upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+            requiresHumanReview: boolean;
+            uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
           };
           kind: 'custom';
         }
@@ -21320,9 +21320,9 @@ export type OffsetPaginatedOnboardingConfiguration = {
     documentsToCollect: Array<
       | {
           data: {
-            collect_selfie: boolean;
-            document_types_and_countries?: {
-              country_specific: {
+            collectSelfie: boolean;
+            documentTypesAndCountries?: {
+              countrySpecific: {
                 [key: string]: unknown;
               };
               global: Array<
@@ -21341,13 +21341,13 @@ export type OffsetPaginatedOnboardingConfiguration = {
         }
       | {
           data: {
-            requires_human_review: boolean;
+            requiresHumanReview: boolean;
           };
           kind: 'proof_of_ssn';
         }
       | {
           data: {
-            requires_human_review: boolean;
+            requiresHumanReview: boolean;
           };
           kind: 'proof_of_address';
         }
@@ -21605,8 +21605,8 @@ export type OffsetPaginatedOnboardingConfiguration = {
              * The human-readable name of the document to display to the user
              */
             name: string;
-            requires_human_review: boolean;
-            upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+            requiresHumanReview: boolean;
+            uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
           };
           kind: 'custom';
         }
@@ -21941,7 +21941,7 @@ export type OffsetPaginatedOnboardingConfiguration = {
     verificationChecks: Array<
       | {
           data: {
-            ein_only: boolean;
+            einOnly: boolean;
           };
           kind: 'kyb';
         }
@@ -21959,8 +21959,8 @@ export type OffsetPaginatedOnboardingConfiguration = {
         }
       | {
           data: {
-            adverse_media: boolean;
-            adverse_media_lists?: Array<
+            adverseMedia: boolean;
+            adverseMediaLists?: Array<
               | 'financial_crime'
               | 'violent_crime'
               | 'sexual_crime'
@@ -21971,8 +21971,8 @@ export type OffsetPaginatedOnboardingConfiguration = {
               | 'general_serious'
               | 'general_minor'
             >;
-            continuous_monitoring: boolean;
-            match_kind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
+            continuousMonitoring: boolean;
+            matchKind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
             ofac: boolean;
             pep: boolean;
           };
@@ -22549,9 +22549,9 @@ export type OnboardingConfiguration = {
       }
     | {
         email: string;
-        first_name?: string;
+        firstName?: string;
         kind: 'organization';
-        last_name?: string;
+        lastName?: string;
         member: string;
       }
     | {
@@ -22562,9 +22562,9 @@ export type OnboardingConfiguration = {
   businessDocumentsToCollect: Array<
     | {
         data: {
-          collect_selfie: boolean;
-          document_types_and_countries?: {
-            country_specific: {
+          collectSelfie: boolean;
+          documentTypesAndCountries?: {
+            countrySpecific: {
               [key: string]: unknown;
             };
             global: Array<
@@ -22583,13 +22583,13 @@ export type OnboardingConfiguration = {
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_ssn';
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_address';
       }
@@ -22847,8 +22847,8 @@ export type OnboardingConfiguration = {
            * The human-readable name of the document to display to the user
            */
           name: string;
-          requires_human_review: boolean;
-          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+          requiresHumanReview: boolean;
+          uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
         };
         kind: 'custom';
       }
@@ -22900,9 +22900,9 @@ export type OnboardingConfiguration = {
   documentsToCollect: Array<
     | {
         data: {
-          collect_selfie: boolean;
-          document_types_and_countries?: {
-            country_specific: {
+          collectSelfie: boolean;
+          documentTypesAndCountries?: {
+            countrySpecific: {
               [key: string]: unknown;
             };
             global: Array<
@@ -22921,13 +22921,13 @@ export type OnboardingConfiguration = {
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_ssn';
       }
     | {
         data: {
-          requires_human_review: boolean;
+          requiresHumanReview: boolean;
         };
         kind: 'proof_of_address';
       }
@@ -23185,8 +23185,8 @@ export type OnboardingConfiguration = {
            * The human-readable name of the document to display to the user
            */
           name: string;
-          requires_human_review: boolean;
-          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+          requiresHumanReview: boolean;
+          uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
         };
         kind: 'custom';
       }
@@ -23521,7 +23521,7 @@ export type OnboardingConfiguration = {
   verificationChecks: Array<
     | {
         data: {
-          ein_only: boolean;
+          einOnly: boolean;
         };
         kind: 'kyb';
       }
@@ -23539,8 +23539,8 @@ export type OnboardingConfiguration = {
       }
     | {
         data: {
-          adverse_media: boolean;
-          adverse_media_lists?: Array<
+          adverseMedia: boolean;
+          adverseMediaLists?: Array<
             | 'financial_crime'
             | 'violent_crime'
             | 'sexual_crime'
@@ -23551,8 +23551,8 @@ export type OnboardingConfiguration = {
             | 'general_serious'
             | 'general_minor'
           >;
-          continuous_monitoring: boolean;
-          match_kind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
+          continuousMonitoring: boolean;
+          matchKind: 'exact_name_and_dob_year' | 'exact_name' | 'fuzzy_high' | 'fuzzy_medium' | 'fuzzy_low';
           ofac: boolean;
           pep: boolean;
         };
@@ -25479,7 +25479,7 @@ export type ProxyConfigDetailed = {
  */
 export type ingress_content_type = 'json';
 export type RawUserDataRequest = {
-  '<key>':
+  key:
     | 'id.first_name'
     | 'id.middle_name'
     | 'id.last_name'
@@ -25706,7 +25706,7 @@ export type RawUserDataRequest = {
     | 'bank.*.ach_account_id'
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
-  '<value>': {
+  value: {
     [key: string]: unknown;
   };
 };
@@ -26893,9 +26893,9 @@ export type Rule = {
         config: Array<
           | {
               data: {
-                collect_selfie: boolean;
-                document_types_and_countries?: {
-                  country_specific: {
+                collectSelfie: boolean;
+                documentTypesAndCountries?: {
+                  countrySpecific: {
                     [key: string]: unknown;
                   };
                   global: Array<
@@ -26914,13 +26914,13 @@ export type Rule = {
             }
           | {
               data: {
-                requires_human_review: boolean;
+                requiresHumanReview: boolean;
               };
               kind: 'proof_of_ssn';
             }
           | {
               data: {
-                requires_human_review: boolean;
+                requiresHumanReview: boolean;
               };
               kind: 'proof_of_address';
             }
@@ -27178,8 +27178,8 @@ export type Rule = {
                  * The human-readable name of the document to display to the user
                  */
                 name: string;
-                requires_human_review: boolean;
-                upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                requiresHumanReview: boolean;
+                uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
               };
               kind: 'custom';
             }
@@ -28139,9 +28139,9 @@ export type RuleSetResult = {
         config: Array<
           | {
               data: {
-                collect_selfie: boolean;
-                document_types_and_countries?: {
-                  country_specific: {
+                collectSelfie: boolean;
+                documentTypesAndCountries?: {
+                  countrySpecific: {
                     [key: string]: unknown;
                   };
                   global: Array<
@@ -28160,13 +28160,13 @@ export type RuleSetResult = {
             }
           | {
               data: {
-                requires_human_review: boolean;
+                requiresHumanReview: boolean;
               };
               kind: 'proof_of_ssn';
             }
           | {
               data: {
-                requires_human_review: boolean;
+                requiresHumanReview: boolean;
               };
               kind: 'proof_of_address';
             }
@@ -28424,8 +28424,8 @@ export type RuleSetResult = {
                  * The human-readable name of the document to display to the user
                  */
                 name: string;
-                requires_human_review: boolean;
-                upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                requiresHumanReview: boolean;
+                uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
               };
               kind: 'custom';
             }
@@ -28477,9 +28477,9 @@ export type RuleSetResult = {
             config: Array<
               | {
                   data: {
-                    collect_selfie: boolean;
-                    document_types_and_countries?: {
-                      country_specific: {
+                    collectSelfie: boolean;
+                    documentTypesAndCountries?: {
+                      countrySpecific: {
                         [key: string]: unknown;
                       };
                       global: Array<
@@ -28498,13 +28498,13 @@ export type RuleSetResult = {
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_ssn';
                 }
               | {
                   data: {
-                    requires_human_review: boolean;
+                    requiresHumanReview: boolean;
                   };
                   kind: 'proof_of_address';
                 }
@@ -28762,8 +28762,8 @@ export type RuleSetResult = {
                      * The human-readable name of the document to display to the user
                      */
                     name: string;
-                    requires_human_review: boolean;
-                    upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                    requiresHumanReview: boolean;
+                    uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                   };
                   kind: 'custom';
                 }
@@ -29841,7 +29841,7 @@ export type SubmitExternalUrlRequest = {
   url: string;
 };
 export type TenantAndroidAppMeta = {
-  apkCertSha256s: Array<string>;
+  apkCertSha256S: Array<string>;
   id: string;
   integrityDecryptionKey?: string;
   integrityVerificationKey?: string;
@@ -29912,7 +29912,7 @@ export type UpdatePartnerTenantRequest = {
   websiteUrl?: string;
 };
 export type UpdateTenantAndroidAppMetaRequest = {
-  apkCertSha256s?: Array<string>;
+  apkCertSha256S?: Array<string>;
   integrityDecryptionKey?: string;
   integrityVerificationKey?: string;
   packageNames?: Array<string>;
@@ -30356,7 +30356,7 @@ export type UserDecryptRequest = {
  * A key-value map with the corresponding decrypted values
  */
 export type UserDecryptResponse = {
-  '<key>':
+  key:
     | 'id.first_name'
     | 'id.middle_name'
     | 'id.last_name'
@@ -30583,7 +30583,7 @@ export type UserDecryptResponse = {
     | 'bank.*.ach_account_id'
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
-  '<value>': {
+  value: {
     [key: string]: unknown;
   };
 };
@@ -30591,7 +30591,7 @@ export type UserDecryptResponse = {
  * A key-value map of identifier to whether the identifier was successfully deleted in the vault
  */
 export type UserDeleteResponse = {
-  '<key>':
+  key:
     | 'id.first_name'
     | 'id.middle_name'
     | 'id.last_name'
@@ -30818,7 +30818,7 @@ export type UserDeleteResponse = {
     | 'bank.*.ach_account_id'
     | 'bank.*.account_type'
     | 'bank.*.fingerprint';
-  '<value>': boolean;
+  value: boolean;
 };
 export type UserInsight = {
   description: string;
@@ -30855,9 +30855,9 @@ export type UserTimeline = {
               }
             | {
                 email: string;
-                first_name?: string;
+                firstName?: string;
                 kind: 'organization';
-                last_name?: string;
+                lastName?: string;
                 member: string;
               }
             | {
@@ -30897,7 +30897,7 @@ export type UserTimeline = {
           /**
            * True when the data added in this timeline event was added via a one-click onboarding
            */
-          is_prefill: boolean;
+          isPrefill: boolean;
           targets: Array<
             | 'id.first_name'
             | 'id.middle_name'
@@ -31159,20 +31159,20 @@ export type UserTimeline = {
           /**
            * Describes a device insight event with locations and IP of the event
            */
-          insight_event?: {
+          insightEvent?: {
             city?: string;
             country?: string;
-            ip_address?: string;
+            ipAddress?: string;
             latitude?: number;
             longitude?: number;
-            metro_code?: string;
-            postal_code?: string;
+            metroCode?: string;
+            postalCode?: string;
             region?: string;
-            region_name?: string;
-            session_id?: string;
-            time_zone?: string;
+            regionName?: string;
+            sessionId?: string;
+            timeZone?: string;
             timestamp: string;
-            user_agent?: string;
+            userAgent?: string;
           };
           source:
             | 'skipped'
@@ -31188,9 +31188,9 @@ export type UserTimeline = {
           config:
             | {
                 data: {
-                  collect_selfie: boolean;
-                  document_types_and_countries?: {
-                    country_specific: {
+                  collectSelfie: boolean;
+                  documentTypesAndCountries?: {
+                    countrySpecific: {
                       [key: string]: unknown;
                     };
                     global: Array<
@@ -31209,13 +31209,13 @@ export type UserTimeline = {
               }
             | {
                 data: {
-                  requires_human_review: boolean;
+                  requiresHumanReview: boolean;
                 };
                 kind: 'proof_of_ssn';
               }
             | {
                 data: {
-                  requires_human_review: boolean;
+                  requiresHumanReview: boolean;
                 };
                 kind: 'proof_of_address';
               }
@@ -31473,16 +31473,16 @@ export type UserTimeline = {
                    * The human-readable name of the document to display to the user
                    */
                   name: string;
-                  requires_human_review: boolean;
-                  upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                  requiresHumanReview: boolean;
+                  uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                 };
                 kind: 'custom';
               };
-          device_type: 'desktop' | 'mobile';
+          deviceType: 'desktop' | 'mobile';
           /**
            * The set of values we can use for identity_document.document_type
            */
-          document_type:
+          documentType:
             | 'id_card'
             | 'drivers_license'
             | 'passport'
@@ -31502,7 +31502,7 @@ export type UserTimeline = {
         data: {
           annotation?: {
             id: string;
-            is_pinned: boolean;
+            isPinned: boolean;
             note: string;
             source:
               | {
@@ -31517,9 +31517,9 @@ export type UserTimeline = {
                 }
               | {
                   email: string;
-                  first_name?: string;
+                  firstName?: string;
                   kind: 'organization';
-                  last_name?: string;
+                  lastName?: string;
                   member: string;
                 }
               | {
@@ -31533,16 +31533,16 @@ export type UserTimeline = {
            * Describes the outcome of an onboarding decision that took place on the user.
            */
           decision: {
-            cleared_manual_reviews: Array<{
+            clearedManualReviews: Array<{
               kind: 'rule_triggered' | 'document_needs_review';
             }>;
             id: string;
             /**
              * ObConfiguration serialization used inside of an OnboardingDecision
              */
-            ob_configuration: {
+            obConfiguration: {
               id: string;
-              must_collect_data: Array<
+              mustCollectData: Array<
                 | 'name'
                 | 'dob'
                 | 'ssn4'
@@ -31574,8 +31574,8 @@ export type UserTimeline = {
              * When true, the rules were ran for this decision despite being in sandbox mode - we should
              * show the rules outcome drawer
              */
-            ran_rules_in_sandbox: boolean;
-            rule_set_result_id?: string;
+            ranRulesInSandbox: boolean;
+            ruleSetResultId?: string;
             source:
               | {
                   id: string;
@@ -31589,9 +31589,9 @@ export type UserTimeline = {
                 }
               | {
                   email: string;
-                  first_name?: string;
+                  firstName?: string;
                   kind: 'organization';
-                  last_name?: string;
+                  lastName?: string;
                   member: string;
                 }
               | {
@@ -31604,16 +31604,16 @@ export type UserTimeline = {
             /**
              * Auto-generated discriminant enum variants
              */
-            workflow_kind: 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
+            workflowKind: 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
           };
-          workflow_source: 'hosted' | 'tenant' | 'unknown';
+          workflowSource: 'hosted' | 'tenant' | 'unknown';
         };
         kind: 'onboarding_decision';
       }
     | {
         data: {
           id: string;
-          is_pinned: boolean;
+          isPinned: boolean;
           note: string;
           source:
             | {
@@ -31628,9 +31628,9 @@ export type UserTimeline = {
               }
             | {
                 email: string;
-                first_name?: string;
+                firstName?: string;
                 kind: 'organization';
-                last_name?: string;
+                lastName?: string;
                 member: string;
               }
             | {
@@ -31645,7 +31645,7 @@ export type UserTimeline = {
     | {
         data: {
           id: string;
-          reason_codes?: Array<
+          reasonCodes?: Array<
             | 'watchlist_hit_ofac'
             | 'watchlist_hit_non_sdn'
             | 'watchlist_hit_warning'
@@ -32018,9 +32018,9 @@ export type UserTimeline = {
               }
             | {
                 email: string;
-                first_name?: string;
+                firstName?: string;
                 kind: 'organization';
-                last_name?: string;
+                lastName?: string;
                 member: string;
               }
             | {
@@ -32046,9 +32046,9 @@ export type UserTimeline = {
               }
             | {
                 email: string;
-                first_name?: string;
+                firstName?: string;
                 kind: 'organization';
-                last_name?: string;
+                lastName?: string;
                 member: string;
               }
             | {
@@ -32063,8 +32063,8 @@ export type UserTimeline = {
                  * This allows editing data, re-verifies data, and then re-triggers decision engine
                  */
                 data: {
-                  playbook_id: string;
-                  recollect_attributes: Array<
+                  playbookId: string;
+                  recollectAttributes: Array<
                     | 'name'
                     | 'dob'
                     | 'ssn4'
@@ -32095,7 +32095,7 @@ export type UserTimeline = {
                    * When false, requires the existing BOs to re-complete KYC.
                    * Can only be true for KYB playbooks
                    */
-                  reuse_existing_bo_kyc: boolean;
+                  reuseExistingBoKyc: boolean;
                 };
                 /**
                  * Allow onboarding onto the specific playbook.
@@ -32108,12 +32108,12 @@ export type UserTimeline = {
                  * Upload a new document and re-run the decision engine
                  */
                 data: {
-                  business_configs: Array<
+                  businessConfigs: Array<
                     | {
                         data: {
-                          collect_selfie: boolean;
-                          document_types_and_countries?: {
-                            country_specific: {
+                          collectSelfie: boolean;
+                          documentTypesAndCountries?: {
+                            countrySpecific: {
                               [key: string]: unknown;
                             };
                             global: Array<
@@ -32132,13 +32132,13 @@ export type UserTimeline = {
                       }
                     | {
                         data: {
-                          requires_human_review: boolean;
+                          requiresHumanReview: boolean;
                         };
                         kind: 'proof_of_ssn';
                       }
                     | {
                         data: {
-                          requires_human_review: boolean;
+                          requiresHumanReview: boolean;
                         };
                         kind: 'proof_of_address';
                       }
@@ -32396,8 +32396,8 @@ export type UserTimeline = {
                            * The human-readable name of the document to display to the user
                            */
                           name: string;
-                          requires_human_review: boolean;
-                          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                          requiresHumanReview: boolean;
+                          uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                         };
                         kind: 'custom';
                       }
@@ -32405,9 +32405,9 @@ export type UserTimeline = {
                   configs: Array<
                     | {
                         data: {
-                          collect_selfie: boolean;
-                          document_types_and_countries?: {
-                            country_specific: {
+                          collectSelfie: boolean;
+                          documentTypesAndCountries?: {
+                            countrySpecific: {
                               [key: string]: unknown;
                             };
                             global: Array<
@@ -32426,13 +32426,13 @@ export type UserTimeline = {
                       }
                     | {
                         data: {
-                          requires_human_review: boolean;
+                          requiresHumanReview: boolean;
                         };
                         kind: 'proof_of_ssn';
                       }
                     | {
                         data: {
-                          requires_human_review: boolean;
+                          requiresHumanReview: boolean;
                         };
                         kind: 'proof_of_address';
                       }
@@ -32690,8 +32690,8 @@ export type UserTimeline = {
                            * The human-readable name of the document to display to the user
                            */
                           name: string;
-                          requires_human_review: boolean;
-                          upload_settings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
+                          requiresHumanReview: boolean;
+                          uploadSettings: 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
                         };
                         kind: 'custom';
                       }
@@ -32705,9 +32705,9 @@ export type UserTimeline = {
           /**
            * Only not populated for legacy events
            */
-          fp_id?: string;
+          fpId?: string;
           note?: string;
-          request_is_active: boolean;
+          requestIsActive: boolean;
         };
         kind: 'workflow_triggered';
       }
@@ -32719,7 +32719,7 @@ export type UserTimeline = {
            */
           playbook: {
             id: string;
-            must_collect_data: Array<
+            mustCollectData: Array<
               | 'name'
               | 'dob'
               | 'ssn4'
@@ -32756,20 +32756,20 @@ export type UserTimeline = {
           /**
            * Describes a device insight event with locations and IP of the event
            */
-          insight_event: {
+          insightEvent: {
             city?: string;
             country?: string;
-            ip_address?: string;
+            ipAddress?: string;
             latitude?: number;
             longitude?: number;
-            metro_code?: string;
-            postal_code?: string;
+            metroCode?: string;
+            postalCode?: string;
             region?: string;
-            region_name?: string;
-            session_id?: string;
-            time_zone?: string;
+            regionName?: string;
+            sessionId?: string;
+            timeZone?: string;
             timestamp: string;
-            user_agent?: string;
+            userAgent?: string;
           };
           kind: 'phone' | 'passkey' | 'email';
         };
@@ -32783,7 +32783,7 @@ export type UserTimeline = {
       }
     | {
         data: {
-          external_id?: string;
+          externalId?: string;
           integration: 'alpaca_cip';
           successful: boolean;
         };
@@ -32795,14 +32795,14 @@ export type UserTimeline = {
            * Auto-generated discriminant enum variants
            */
           kind: 'identity' | 'proof_of_ssn' | 'proof_of_address' | 'custom';
-          rule_set_result_id?: string;
+          ruleSetResultId?: string;
         }>;
         kind: 'step_up';
       }
     | {
         data: {
           event: string;
-          session_id?: string;
+          sessionId?: string;
         };
         kind: 'onboarding_timeline';
       }
@@ -32812,16 +32812,16 @@ export type UserTimeline = {
            * Describes the outcome of an onboarding decision that took place on the user.
            */
           decision: {
-            cleared_manual_reviews: Array<{
+            clearedManualReviews: Array<{
               kind: 'rule_triggered' | 'document_needs_review';
             }>;
             id: string;
             /**
              * ObConfiguration serialization used inside of an OnboardingDecision
              */
-            ob_configuration: {
+            obConfiguration: {
               id: string;
-              must_collect_data: Array<
+              mustCollectData: Array<
                 | 'name'
                 | 'dob'
                 | 'ssn4'
@@ -32853,8 +32853,8 @@ export type UserTimeline = {
              * When true, the rules were ran for this decision despite being in sandbox mode - we should
              * show the rules outcome drawer
              */
-            ran_rules_in_sandbox: boolean;
-            rule_set_result_id?: string;
+            ranRulesInSandbox: boolean;
+            ruleSetResultId?: string;
             source:
               | {
                   id: string;
@@ -32868,9 +32868,9 @@ export type UserTimeline = {
                 }
               | {
                   email: string;
-                  first_name?: string;
+                  firstName?: string;
                   kind: 'organization';
-                  last_name?: string;
+                  lastName?: string;
                   member: string;
                 }
               | {
@@ -32883,9 +32883,9 @@ export type UserTimeline = {
             /**
              * Auto-generated discriminant enum variants
              */
-            workflow_kind: 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
+            workflowKind: 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
           };
-          fp_id: string;
+          fpId: string;
         };
         kind: 'business_owner_completed_kyc';
       };
@@ -32974,7 +32974,7 @@ export type PostBusinessesByFpBidVaultByIdentifierUploadData = {
     /**
      * Specify the content type of the object like `application/json` or `image/png`
      */
-    'content-type'?: string;
+    contentType?: string;
   };
   path: {
     fpBid: string;
@@ -33294,7 +33294,7 @@ export type PostEntitiesVaultByIdentifierUploadData = {
     /**
      * Specify the content type of the object like `application/json` or `image/png`
      */
-    'content-type'?: string;
+    contentType?: string;
     /**
      * Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.
      */
@@ -34166,7 +34166,7 @@ export type PostEntitiesByFpIdVaultByIdentifierUploadData = {
     /**
      * Specify the content type of the object like `application/json` or `image/png`
      */
-    'content-type'?: string;
+    contentType?: string;
   };
   path: {
     fpId: string;
@@ -35136,77 +35136,6 @@ export type $OpenApiTs = {
       };
     };
   };
-  '/entities/client_token': {
-    get: {
-      req: GetEntitiesClientTokenData;
-      res: {
-        /**
-         * OK
-         */
-        '200': GetClientTokenResponse;
-      };
-    };
-  };
-  '/entities/search': {
-    post: {
-      req: PostEntitiesSearchData;
-      res: {
-        /**
-         * OK
-         */
-        '200': CursorPaginatedEntity;
-      };
-    };
-  };
-  '/entities/vault': {
-    patch: {
-      req: PatchEntitiesVaultData;
-      res: {
-        /**
-         * OK
-         */
-        '200': Empty;
-      };
-    };
-  };
-  '/entities/vault/decrypt': {
-    post: {
-      req: PostEntitiesVaultDecryptData;
-      res: {
-        /**
-         * OK
-         */
-        '200': UserDecryptResponse;
-      };
-    };
-  };
-  '/entities/vault/decrypt/{token}': {
-    get: {
-      req: GetEntitiesVaultDecryptByTokenData;
-    };
-  };
-  '/entities/vault/validate': {
-    post: {
-      req: PostEntitiesVaultValidateData;
-      res: {
-        /**
-         * OK
-         */
-        '200': Empty;
-      };
-    };
-  };
-  '/entities/vault/{identifier}/upload': {
-    post: {
-      req: PostEntitiesVaultByIdentifierUploadData;
-      res: {
-        /**
-         * OK
-         */
-        '200': Empty;
-      };
-    };
-  };
   '/entities/{fp_bid}/business_insights': {
     get: {
       req: GetEntitiesByFpBidBusinessInsightsData;
@@ -35226,57 +35155,6 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Entity;
-      };
-    };
-  };
-  '/entities/{fp_id}/label': {
-    get: {
-      req: GetEntitiesByFpIdLabelData;
-      res: {
-        /**
-         * OK
-         */
-        '200': UserLabel;
-      };
-    };
-    post: {
-      req: PostEntitiesByFpIdLabelData;
-      res: {
-        /**
-         * OK
-         */
-        '200': Empty;
-      };
-    };
-  };
-  '/entities/{fp_id}/tags': {
-    get: {
-      req: GetEntitiesByFpIdTagsData;
-      res: {
-        /**
-         * OK
-         */
-        '200': Array<UserTag>;
-      };
-    };
-    post: {
-      req: PostEntitiesByFpIdTagsData;
-      res: {
-        /**
-         * OK
-         */
-        '200': UserTag;
-      };
-    };
-  };
-  '/entities/{fp_id}/tags/{tag_id}': {
-    delete: {
-      req: DeleteEntitiesByFpIdTagsByTagIdData;
-      res: {
-        /**
-         * OK
-         */
-        '200': Empty;
       };
     };
   };
@@ -35421,6 +35299,26 @@ export type $OpenApiTs = {
       };
     };
   };
+  '/entities/{fp_id}/label': {
+    get: {
+      req: GetEntitiesByFpIdLabelData;
+      res: {
+        /**
+         * OK
+         */
+        '200': UserLabel;
+      };
+    };
+    post: {
+      req: PostEntitiesByFpIdLabelData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
   '/entities/{fp_id}/liveness': {
     get: {
       req: GetEntitiesByFpIdLivenessData;
@@ -35520,6 +35418,37 @@ export type $OpenApiTs = {
       };
     };
   };
+  '/entities/{fp_id}/tags': {
+    get: {
+      req: GetEntitiesByFpIdTagsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Array<UserTag>;
+      };
+    };
+    post: {
+      req: PostEntitiesByFpIdTagsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': UserTag;
+      };
+    };
+  };
+  '/entities/{fp_id}/tags/{tag_id}': {
+    delete: {
+      req: DeleteEntitiesByFpIdTagsByTagIdData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
   '/entities/{fp_id}/timeline': {
     get: {
       req: GetEntitiesByFpIdTimelineData;
@@ -35554,15 +35483,6 @@ export type $OpenApiTs = {
     };
   };
   '/entities/{fp_id}/vault': {
-    get: {
-      req: GetEntitiesByFpIdVaultData;
-      res: {
-        /**
-         * OK
-         */
-        '200': GetUserVaultResponse;
-      };
-    };
     delete: {
       req: DeleteEntitiesByFpIdVaultData;
       res: {
@@ -35572,8 +35492,28 @@ export type $OpenApiTs = {
         '200': UserDeleteResponse;
       };
     };
+    get: {
+      req: GetEntitiesByFpIdVaultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': GetUserVaultResponse;
+      };
+    };
     patch: {
       req: PatchEntitiesByFpIdVaultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/entities/{fp_id}/vault/{identifier}/upload': {
+    post: {
+      req: PostEntitiesByFpIdVaultByIdentifierUploadData;
       res: {
         /**
          * OK
@@ -35615,9 +35555,69 @@ export type $OpenApiTs = {
       };
     };
   };
-  '/entities/{fp_id}/vault/{identifier}/upload': {
+  '/entities/client_token': {
+    get: {
+      req: GetEntitiesClientTokenData;
+      res: {
+        /**
+         * OK
+         */
+        '200': GetClientTokenResponse;
+      };
+    };
+  };
+  '/entities/search': {
     post: {
-      req: PostEntitiesByFpIdVaultByIdentifierUploadData;
+      req: PostEntitiesSearchData;
+      res: {
+        /**
+         * OK
+         */
+        '200': CursorPaginatedEntity;
+      };
+    };
+  };
+  '/entities/vault': {
+    patch: {
+      req: PatchEntitiesVaultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/entities/vault/{identifier}/upload': {
+    post: {
+      req: PostEntitiesVaultByIdentifierUploadData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/entities/vault/decrypt': {
+    post: {
+      req: PostEntitiesVaultDecryptData;
+      res: {
+        /**
+         * OK
+         */
+        '200': UserDecryptResponse;
+      };
+    };
+  };
+  '/entities/vault/decrypt/{token}': {
+    get: {
+      req: GetEntitiesVaultDecryptByTokenData;
+    };
+  };
+  '/entities/vault/validate': {
+    post: {
+      req: PostEntitiesVaultValidateData;
       res: {
         /**
          * OK
@@ -35989,15 +35989,6 @@ export type $OpenApiTs = {
     };
   };
   '/org/lists/{list_id}': {
-    get: {
-      req: GetOrgListsByListIdData;
-      res: {
-        /**
-         * OK
-         */
-        '200': ListDetails;
-      };
-    };
     delete: {
       req: DeleteOrgListsByListIdData;
       res: {
@@ -36005,6 +35996,15 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Empty;
+      };
+    };
+    get: {
+      req: GetOrgListsByListIdData;
+      res: {
+        /**
+         * OK
+         */
+        '200': ListDetails;
       };
     };
     patch: {
@@ -36537,15 +36537,6 @@ export type $OpenApiTs = {
     };
   };
   '/partner/doc_templates/{template_id}': {
-    put: {
-      req: PutPartnerDocTemplatesByTemplateIdData;
-      res: {
-        /**
-         * OK
-         */
-        '200': ComplianceDocTemplate;
-      };
-    };
     delete: {
       req: DeletePartnerDocTemplatesByTemplateIdData;
       res: {
@@ -36553,6 +36544,15 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Empty;
+      };
+    };
+    put: {
+      req: PutPartnerDocTemplatesByTemplateIdData;
+      res: {
+        /**
+         * OK
+         */
+        '200': ComplianceDocTemplate;
       };
     };
   };

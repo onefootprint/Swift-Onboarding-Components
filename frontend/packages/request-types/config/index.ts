@@ -17,7 +17,7 @@ const createSDKTypes = async () => {
     services: false,
   });
 
-  keyTypestoCamelCase(path.resolve(clientDir, 'types.gen.ts'));
+  await keyTypestoCamelCase(path.resolve(clientDir, 'types.gen.ts'));
 
   runBiome(path.resolve(clientDir, 'types.gen.ts'));
   runBiome(path.resolve(clientDir, 'index.ts'));
@@ -40,7 +40,7 @@ const createDashboardTypes = async () => {
   const generatedTypesPath = path.resolve(tempDir, 'types.gen.ts');
   const dashboardTypesPath = path.resolve('dashboard.ts');
 
-  keyTypestoCamelCase(generatedTypesPath);
+  await keyTypestoCamelCase(generatedTypesPath);
 
   if (!fs.existsSync(dashboardTypesPath)) {
     fs.writeFileSync(dashboardTypesPath, '');
