@@ -4,6 +4,7 @@ import type { CommonPropsAndClassName, GroupBase } from 'react-select';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../../utils/mixins';
+import Stack from '../../../../stack/stack';
 import Text from '../../../../text';
 import type { BaseSelectOption } from '../../base-select.types';
 
@@ -40,7 +41,7 @@ const Option = <Option extends BaseSelectOption, IsMulti extends boolean, Group 
       role="option"
       tabIndex={innerProps.tabIndex}
     >
-      <Content>
+      <Stack flexDirection="column" gap={1} alignItems="flex-start">
         <Highlighter
           searchWords={inputValue.split(' ')}
           textToHighlight={label}
@@ -56,7 +57,7 @@ const Option = <Option extends BaseSelectOption, IsMulti extends boolean, Group 
             {data.description}
           </Text>
         )}
-      </Content>
+      </Stack>
       {isSelected && <IcoCheck16 color="primary" />}
     </OptionContainer>
   );
@@ -88,15 +89,6 @@ const OptionContainer = styled.div`
       }
     `;
   }}
-`;
-
-const Content = styled.div`
-  ${({ theme }) => css`
-    align-items: flex-start;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[1]};
-  `}
 `;
 
 export default Option;

@@ -1,4 +1,4 @@
-import { Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 import type { Option } from './collected-information.types';
@@ -16,14 +16,14 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
   const getLabel = useInfoLabel();
 
   return (
-    <Container>
+    <Stack flexDirection="column" gap={4}>
       {title && (
         <Text variant="label-2" color="secondary">
           {title}
         </Text>
       )}
       {options ? (
-        <OptionsContainer>
+        <Stack flexDirection="column" alignItems="center" gap={2}>
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
             const typedName = name as keyof Option;
@@ -38,33 +38,16 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
               </OptionItem>
             );
           })}
-        </OptionsContainer>
+        </Stack>
       ) : null}
       {subtitle && (
         <Text color="secondary" variant="body-2">
           {subtitle}
         </Text>
       )}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `}
-`;
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-  `}
-`;
 
 const OptionItem = styled.div`
   ${({ theme }) => css`

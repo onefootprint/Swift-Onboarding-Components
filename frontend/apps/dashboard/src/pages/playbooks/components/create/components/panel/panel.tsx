@@ -1,6 +1,5 @@
-import { Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
-import styled, { css } from 'styled-components';
 
 export type PanelProps = {
   children: React.ReactNode;
@@ -10,34 +9,26 @@ export type PanelProps = {
 
 const Panel = ({ children, cta, title }: PanelProps) => {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: TODO: change to <section />
-    <Container aria-label={title} role="region">
-      <Header>
+    <Stack
+      tag="section"
+      aria-label={title}
+      flexDirection="column"
+      width="100%"
+      paddingBlock={5}
+      paddingInline={6}
+      gap={6}
+      borderColor="tertiary"
+      borderRadius="default"
+      borderStyle="solid"
+      borderWidth={1}
+    >
+      <Stack tag="header" flexDirection="row" justifyContent="space-between" width="100%">
         <Text variant="label-3">{title}</Text>
         {cta}
-      </Header>
+      </Stack>
       {children}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[6]};
-    padding: ${theme.spacing[5]} ${theme.spacing[6]};
-    width: 100%;
-  `};
-`;
-
-const Header = styled.header`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-`;
 
 export default Panel;

@@ -1,6 +1,6 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
-import { Flag, Text } from '@onefootprint/ui';
+import { Flag, Stack, Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 import IdDocList from '../id-doc-list';
 
@@ -10,7 +10,7 @@ type CountryDocListProps = {
 
 const CountryDocList = ({ countryDocs }: CountryDocListProps) => {
   return (
-    <Container>
+    <Stack flexDirection="column" gap={2} alignItems="center">
       {Object.entries(countryDocs).map(([code, docs]) => {
         const countryCode = code as CountryCode;
         const countryName = getCountryNameFromCode(countryCode);
@@ -26,18 +26,9 @@ const CountryDocList = ({ countryDocs }: CountryDocListProps) => {
           </Row>
         );
       })}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-  `}
-`;
 
 const Row = styled.div`
   ${({ theme }) => css`
