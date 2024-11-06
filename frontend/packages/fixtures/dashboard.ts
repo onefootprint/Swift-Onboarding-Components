@@ -475,6 +475,7 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
       details: {
         entityType: 'do veniam sit mollit',
         formationDate: 'voluptate',
+        formationState: 'New Jersey',
         phoneNumbers: [
           {
             phone: '+17038402947',
