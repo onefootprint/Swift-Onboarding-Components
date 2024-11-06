@@ -1,7 +1,6 @@
 import { Dialog, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';
 
 import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -22,7 +21,7 @@ const ViewHistoricalDataDialog = ({ open, onClose }: ViewHistoricalDataDialogPro
   });
   const router = useRouter();
   const entityId = useEntityId();
-  const { data: events, isPending, error } = useCurrentEntityTimeline();
+  const timelineQuery = useCurrentEntityTimeline();
   const viewDataMutation = { isPending: false };
 
   const handleViewHistorical = (data: HistoricalFormData) => {
@@ -52,13 +51,13 @@ const ViewHistoricalDataDialog = ({ open, onClose }: ViewHistoricalDataDialogPro
         onClick: onClose,
       }}
     >
-      {isPending && <Loading />}
-      {events && events.length > 0 ? (
-        <ViewHistoricalDataForm events={mergeAuditTrailTimelineEvents(events)} onSubmit={handleViewHistorical} />
+      {timelineQuery.isPending && <Loading />}
+      {timelineQuery.data ? (
+        <ViewHistoricalDataForm events={timelineQuery.data} onSubmit={handleViewHistorical} />
       ) : (
         <Text variant="body-3">{t('no-events')}</Text>
       )}
-      {!!error && <ErrorComponent error={error} />}
+      {!!timelineQuery.error && <ErrorComponent error={timelineQuery.error} />}
     </Dialog>
   );
 };

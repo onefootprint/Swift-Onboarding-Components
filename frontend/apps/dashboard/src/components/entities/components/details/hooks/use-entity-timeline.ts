@@ -1,26 +1,45 @@
-import request from '@onefootprint/request';
-import type { GetTimelineResponse } from '@onefootprint/types';
+import useEntity from '@/entity/hooks/use-entity';
+import {
+  getEntitiesByFpIdBusinessOwnersOptions,
+  getEntitiesByFpIdTimelineOptions,
+} from '@onefootprint/axios/dashboard';
+import { EntityStatus, type TimelineEvent, TimelineEventKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import type { AuthHeaders } from 'src/hooks/use-session';
-import useSession from 'src/hooks/use-session';
-
-const getTimeline = async (userId: string, authHeaders: AuthHeaders) => {
-  const response = await request<GetTimelineResponse>({
-    method: 'GET',
-    url: `/entities/${userId}/timeline`,
-    headers: authHeaders,
-  });
-
-  return response.data;
-};
+import { useRouter } from 'next/router';
+import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';
 
 const useEntityTimeline = (id: string) => {
-  const { authHeaders } = useSession();
-
+  const router = useRouter();
+  const isBusiness = router.pathname.includes('businesses');
+  const entity = useEntity(id);
+  const bosQuery = useQuery({
+    ...getEntitiesByFpIdBusinessOwnersOptions({
+      path: { fpId: id },
+    }),
+    enabled: isBusiness,
+  });
   return useQuery({
-    queryKey: ['entity', id, 'timeline', authHeaders],
-    queryFn: () => getTimeline(id, authHeaders),
-    enabled: !!id,
+    ...getEntitiesByFpIdTimelineOptions({
+      path: { fpId: id },
+      // @ts-expect-error: remove once backend is fixed
+      query: {},
+    }),
+    select: events => {
+      const response = mergeAuditTrailTimelineEvents(events as TimelineEvent[]);
+      if (entity.data?.status === EntityStatus.incomplete) {
+        const hasPendingBos = bosQuery.data?.some(bo => bo.status === 'incomplete' || bo.status == null);
+        response.unshift({
+          event: {
+            kind: hasPendingBos ? TimelineEventKind.awaitingBos : TimelineEventKind.abandoned,
+            data: {},
+          },
+          seqno: events[0].seqno,
+          time: events[0],
+        });
+      }
+      return response;
+    },
+    enabled: (!!id && !isBusiness) || (!!id && isBusiness && !!bosQuery.data),
   });
 };
 

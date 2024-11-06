@@ -11,7 +11,6 @@ import useEntityId from '@/entities/components/details/hooks/use-entity-id';
 import useEntityVault, { type VaultType } from '@/entities/hooks/use-entity-vault';
 
 import TimelineItemTime from 'src/components/timeline-item-time';
-import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';
 import getTimelineEventText from '../../utils/get-timeline-event-text';
 import { useDecryptControls } from '../vault/components/vault-actions';
 import DecryptHistoricalButton from './components/decrypt-historical-button';
@@ -28,10 +27,8 @@ const HistoricalBar = ({ entity, seqno }: HistoricalBarProps) => {
   const router = useRouter();
   const decryptControls = useDecryptControls();
   const { updateForHistorical } = useEntityVault(id, entity);
-  const { data: timelineData } = useCurrentEntityTimeline();
-  const shownHistoricalEvent = timelineData
-    ? mergeAuditTrailTimelineEvents(timelineData).find(event => `${event.seqno}` === seqno)
-    : null;
+  const timelineQuery = useCurrentEntityTimeline();
+  const shownHistoricalEvent = timelineQuery.data ? timelineQuery.data.find(event => `${event.seqno}` === seqno) : null;
 
   const removeHistoricalFromVault = () => {
     const vaultsAndTransforms: VaultType = {

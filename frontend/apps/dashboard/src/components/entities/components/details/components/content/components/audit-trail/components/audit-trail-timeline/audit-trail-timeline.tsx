@@ -5,7 +5,6 @@ import type {
   CombinedWatchlistChecksEvent,
   DocumentUploadedEventData,
   Entity,
-  Timeline as EntityTimeline,
   ExternalIntegrationCalledData,
   LivenessEventData,
   OnboardingDecisionEventData,
@@ -15,7 +14,7 @@ import type {
   WatchlistCheckEventData,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
-import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
+import { TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
   LabelAddedEventData,
@@ -27,11 +26,11 @@ import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
 import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
-import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
 import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event';
+import AwaitingBosEvent from './components/awaiting-bos-event';
 import DataCollectedEventHeader from './components/data-collected-event';
 import DocumentUploadedEventHeader from './components/document-uploaded-event';
 import {
@@ -47,31 +46,33 @@ import WorkflowStartedEventHeader from './components/workflow-started-event';
 import { WorkflowTriggeredEventBody, WorkflowTriggeredEventHeader } from './components/workflow-triggered-event';
 
 export type AuditTrailTimelineProps = {
-  timeline: EntityTimeline;
+  timeline: AuditTrailTimelineEvent[];
   entity: Entity;
 };
 
 const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'audit-trail',
-  });
-  const mergedTimeline = mergeAuditTrailTimelineEvents(timeline);
+  const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail' });
 
   const items: TimelineItem[] = [];
-  if (entity.status === EntityStatus.incomplete) {
-    items.push({
-      time: mergedTimeline.length ? mergedTimeline[0].time : undefined,
-      headerComponent: <AbandonedEventHeader entity={entity} />,
-      bodyComponent: undefined,
-    });
-  }
-  mergedTimeline.forEach((event: AuditTrailTimelineEvent) => {
+  timeline.forEach(event => {
+    console.log(event);
     const {
       event: { kind, data },
       time,
     } = event;
-
-    if (kind === TimelineEventKind.liveness) {
+    if (kind === TimelineEventKind.abandoned) {
+      items.push({
+        time: timeline.length ? timeline[0].time : undefined,
+        headerComponent: <AbandonedEventHeader entity={entity} />,
+        bodyComponent: undefined,
+      });
+    } else if (kind === TimelineEventKind.awaitingBos) {
+      items.push({
+        time: timeline.length ? timeline[0].time : undefined,
+        headerComponent: <AwaitingBosEvent fpId={entity.id} />,
+        bodyComponent: undefined,
+      });
+    } else if (kind === TimelineEventKind.liveness) {
       const eventData = data as LivenessEventData;
       items.push({
         time,

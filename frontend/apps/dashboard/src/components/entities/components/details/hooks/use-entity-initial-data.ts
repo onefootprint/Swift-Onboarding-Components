@@ -1,7 +1,10 @@
+import { useEntityContext } from '@/entity/hooks/use-entity-context';
+import { getEntitiesByFpIdBusinessOwnersOptions } from '@onefootprint/axios/dashboard';
+import { EntityKind } from '@onefootprint/types';
+import { useQuery } from '@tanstack/react-query';
 import useLabel from 'src/hooks/use-label';
 import useEntityVault from '../../../hooks/use-entity-vault';
 import useRiskSignalsOverview from '../../../hooks/use-risk-signals-overview';
-import useBusinessOwners from './use-business-owners';
 import useCurrentEntity from './use-current-entity';
 import useEntityAnnotations from './use-entity-annotations';
 import useEntityLiveness from './use-entity-auth-events';
@@ -16,6 +19,8 @@ import useEntityTimeline from './use-entity-timeline';
 const useEntityInitialData = () => {
   const id = useEntityId();
   const seqno = useEntitySeqno();
+  const { kind } = useEntityContext();
+  const isBusiness = kind === EntityKind.business;
   const entityQuery = useCurrentEntity();
   const entityTimelineQuery = useEntityTimeline(id);
   const entityVaultQuery = useEntityVault(id, entityQuery.data);
@@ -25,14 +30,20 @@ const useEntityInitialData = () => {
   const entityOtherInsights = useEntityOtherInsights(id);
   const entityOwnedBusinesses = useEntityOwnedBusinesses(id);
   const entityTags = useEntityTags(id);
-  const businessOwners = useBusinessOwners(id);
   const fraudLabel = useLabel(id);
   const riskSignalsOverview = useRiskSignalsOverview(id, seqno);
-  const isPendingVault = entityVaultQuery.isPending && !entityQuery.isError;
+  const bosQuery = useQuery({
+    ...getEntitiesByFpIdBusinessOwnersOptions({
+      path: { fpId: id },
+    }),
+    enabled: isBusiness,
+  });
 
   return {
     ...entityQuery,
     isPending:
+      (isBusiness ? bosQuery.isPending : false) ||
+      (entityVaultQuery.isPending && !entityQuery.isError) ||
       entityQuery.isPending ||
       entityTimelineQuery.isPending ||
       entityRiskSignalsQuery.isPending ||
@@ -41,10 +52,8 @@ const useEntityInitialData = () => {
       entityOtherInsights.isPending ||
       entityOwnedBusinesses.isPending ||
       entityTags.isPending ||
-      businessOwners.isPending ||
       fraudLabel.isPending ||
-      riskSignalsOverview.isPending ||
-      isPendingVault,
+      riskSignalsOverview.isPending,
   };
 };
 

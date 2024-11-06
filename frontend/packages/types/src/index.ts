@@ -260,6 +260,7 @@ export {
 } from './api';
 export type { GetOrgRiskSignalsResponse } from './api/get-org-risk-signals';
 export type {
+  AbandonedEvent,
   AccessEvent,
   AccessLog,
   Actor,
@@ -279,6 +280,7 @@ export type {
   Attribute,
   AuthEvent,
   AuthTokenIdentifier,
+  AwaitingBosEvent,
   BacktestedOnboarding,
   BasicRoleScope,
   BasicRoleScopeKind,
@@ -287,6 +289,7 @@ export type {
   BiometricRegisterChallengeJson,
   BootstrapIgnoredBusinessDI,
   BusinessAddress,
+  BusinessAmlCheck,
   BusinessBoKycData,
   BusinessDetailPhoneNumber,
   BusinessDetails,
@@ -355,7 +358,6 @@ export type {
   KybCheck,
   KycBootstrapData,
   KycCheck,
-  BusinessAmlCheck,
   L10n,
   LabelAddedEvent,
   LabelAddedEventData,
@@ -421,8 +423,8 @@ export type {
   Tenant,
   Timeline,
   TimelineEvent,
-  UpdateUserDataDetail,
   UpdateOrgRoleDetail,
+  UpdateUserDataDetail,
   UserInsights,
   ValueTypeForBusinessDI,
   ValueTypeForIdDI,

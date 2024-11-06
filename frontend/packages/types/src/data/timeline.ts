@@ -15,6 +15,8 @@ import type { InsightEvent } from './insight-event';
 import type { OnboardingDecision, TimelinePlaybook } from './onboarding-decision';
 
 export enum TimelineEventKind {
+  abandoned = 'abandoned',
+  awaitingBos = 'awaiting-bos',
   labelAdded = 'label_added',
   dataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
@@ -30,6 +32,16 @@ export enum TimelineEventKind {
   externalIntegrationCalled = 'external_integration_called',
   stepUp = 'step_up',
 }
+
+export type AbandonedEvent = {
+  kind: TimelineEventKind.abandoned;
+  data: {};
+};
+
+export type AwaitingBosEvent = {
+  kind: TimelineEventKind.awaitingBos;
+  data: {};
+};
 
 export type LabelAddedEvent = {
   kind: TimelineEventKind.labelAdded;
@@ -244,6 +256,8 @@ export enum StepUpDocumentKind {
 
 export type TimelineEvent = {
   event:
+    | AbandonedEvent
+    | AwaitingBosEvent
     | LabelAddedEvent
     | CollectedDataEvent
     | LivenessEvent

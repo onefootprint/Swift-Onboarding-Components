@@ -1,7 +1,8 @@
-import useBusinessOwners from '@/entity/hooks/use-business-owners';
+import { getEntitiesByFpIdBusinessOwnersOptions } from '@onefootprint/axios/dashboard';
 import { IcoBuilding16 } from '@onefootprint/icons';
 import { type Entity, hasEntityCustomData } from '@onefootprint/types';
 import { Grid } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import AddressFieldset from '../address-fieldset';
@@ -22,8 +23,12 @@ type BusinessVaultProps = {
 const BusinessVault = ({ entity }: BusinessVaultProps) => {
   const { t } = useTranslation('business-details', { keyPrefix: 'vault' });
   const { basic, address, custom } = useFieldsets();
-  const { data: boData } = useBusinessOwners(entity.id);
-  const hasBos = !!boData?.length;
+  const bosQuery = useQuery(
+    getEntitiesByFpIdBusinessOwnersOptions({
+      path: { fpId: entity.id },
+    }),
+  );
+  const hasBos = !!bosQuery.data?.length;
   const hasCustomData = hasEntityCustomData(entity);
   const templateAreas = getTemplateAreas(hasBos, hasCustomData);
 

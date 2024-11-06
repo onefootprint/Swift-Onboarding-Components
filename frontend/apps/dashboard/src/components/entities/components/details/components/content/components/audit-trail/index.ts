@@ -1,1 +1,5 @@
-export { default } from './audit-trail';
+import AuditTrail from './audit-trail';
+
+import withEntity from '@/entity/components/with-entity';
+
+export default withEntity(AuditTrail);
