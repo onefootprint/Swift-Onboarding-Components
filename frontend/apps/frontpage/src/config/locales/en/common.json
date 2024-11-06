@@ -701,8 +701,8 @@
         "banner": {
           "alt-img": "A penguin fishing in the north pole",
           "title": "Start onboarding your applicants safely and seamlessly now",
-          "primary-button": "Sign up for free",
-          "secondary-button": "Book a demo"
+          "primary-button": "Book a demo",
+          "secondary-button": "Sign up for free"
         }
       },
       "auto": {
@@ -782,8 +782,8 @@
         "banner": {
           "alt-img": "A penguin fishing in the north pole",
           "title": "Start onboarding your drivers safely and seamlessly now",
-          "primary-button": "Sign up for free",
-          "secondary-button": "Book a demo"
+          "primary-button": "Book a demo",
+          "secondary-button": "Sign up for free"
         }
       },
       "real-estate": {
@@ -871,8 +871,8 @@
         "banner": {
           "alt-img": "A penguin fishing in the north pole",
           "title": "Enhance your screening experience today",
-          "primary-button": "Sign up for free",
-          "secondary-button": "Book a demo"
+          "primary-button": "Book a demo",
+          "secondary-button": "Sign up for free"
         }
       }
     },

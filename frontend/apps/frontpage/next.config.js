@@ -102,6 +102,7 @@ const MARKETING_SOURCES = {
     '*.googletagmanager.com',
     '*.usefathom.com',
     'alb.reddit.com',
+    'cdn.jsdelivr.net',
     'footprint-blog.ghost.io',
     'forms-na1.hsforms.com',
     'forms.hsforms.com',
