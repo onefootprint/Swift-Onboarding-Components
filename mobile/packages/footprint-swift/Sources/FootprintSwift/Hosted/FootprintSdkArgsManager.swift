@@ -24,7 +24,7 @@ public class FootprintSdkArgsManager {
                 encoder.keyEncodingStrategy = .convertToSnakeCase
                 let encodedConfiguration = try encoder.encode(self.configuration)
                 guard let configurationJSON = try? JSONSerialization.jsonObject(with: encodedConfiguration, options: []) else {
-                    self.logger?.logError(error: "Converting configuration object to JSON failed.")
+                    self.logger?.logError(error: FootprintHostedError(kind: .httpRequestError, message: "Converting configuration object to JSON failed."))
                     return nil
                 }
                 let body = try JSONSerialization.data(withJSONObject: [
@@ -34,20 +34,20 @@ public class FootprintSdkArgsManager {
                 request.httpBody = body
                 
                 guard let (data, _) = try? await URLSession.shared.data(for: request) else {
-                    self.logger?.logError(error: "Encountered network error while saving SDK args.")
+                    self.logger?.logError(error: FootprintHostedError(kind: .httpRequestError, message: "Encountered network error while saving SDK args."))
                     return nil
                 }
                 guard let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
-                    self.logger?.logError(error: "Received invalid JSON response when saving sdk args.")
+                    self.logger?.logError(error: FootprintHostedError(kind: .httpRequestError, message: "Received invalid JSON response when saving sdk args."))
                     return nil
                 }
                 guard let token = jsonResponse["token"] as? String else {
-                    self.logger?.logError(error: "Missing string token from SDK args.")
+                    self.logger?.logError(error: FootprintHostedError(kind: .httpRequestError, message: "Missing string token from SDK args."))
                     return nil
                 }
                 return token
             } catch {
-                self.logger?.logError(error: "Encountered error while sending SDK args: \(error)")
+                self.logger?.logError(error: FootprintHostedError(kind: .httpRequestError, message: "Encountered error while sending SDK args: \(error)"))
                 return nil
             }
         }

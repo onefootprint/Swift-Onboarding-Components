@@ -10,16 +10,13 @@ import Foundation
 public struct OnboardingStatusResponse: Codable, JSONEncodable, Hashable {
 
     public var allRequirements: [Requirement]
-    public var obConfiguration: GetSdkArgsTokenResponseObConfig
 
-    public init(allRequirements: [Requirement], obConfiguration: GetSdkArgsTokenResponseObConfig) {
+    public init(allRequirements: [Requirement]) {
         self.allRequirements = allRequirements
-        self.obConfiguration = obConfiguration
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case allRequirements = "all_requirements"
-        case obConfiguration = "ob_configuration"
     }
 
     // Encodable protocol methods
@@ -27,7 +24,6 @@ public struct OnboardingStatusResponse: Codable, JSONEncodable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(allRequirements, forKey: .allRequirements)
-        try container.encode(obConfiguration, forKey: .obConfiguration)
     }
 }
 

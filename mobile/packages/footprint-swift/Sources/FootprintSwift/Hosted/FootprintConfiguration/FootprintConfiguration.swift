@@ -8,7 +8,7 @@ public struct FootprintConfiguration: Encodable {
     public var onCancel: (() -> Void)?
     public var onComplete: ((_ validationToken: String) -> Void)?
     internal var onAuthenticationComplete: ((_ authToken: String, _ vaultingToken: String) -> Void)?
-    public var onError: ((_ errorMessage: String) -> Void)?
+    public var onError: ((_ error: FootprintHostedError) -> Void)?
     public var options: FootprintOptions?
     public var l10n: FootprintL10n?
     public var appearance: FootprintAppearance?
@@ -30,7 +30,7 @@ public struct FootprintConfiguration: Encodable {
                 isAuthPlaybook: Bool? = nil,
                 onCancel: (() -> Void)? = nil,
                 onComplete: ((_ validationToken: String) -> Void)? = nil,
-                onError: ((_ errorMessage: String) -> Void)? = nil
+                onError: ((_ error: FootprintHostedError) -> Void)? = nil
     ) {
         precondition(publicKey != nil || authToken != nil, "Either publicKey or authToken must be provided")
         
@@ -64,7 +64,7 @@ public struct FootprintConfiguration: Encodable {
                   onCancel: (() -> Void)? = nil,
                   onComplete: ((_ validationToken: String) -> Void)? = nil,
                   onAuthenticationComplete: ((_ authToken: String, _ vaultingToken: String) -> Void)? = nil,
-                  onError: ((_ errorMessage: String) -> Void)? = nil
+                  onError: ((_ error: FootprintHostedError) -> Void)? = nil
     ) {
         precondition(publicKey != nil || authToken != nil, "Either publicKey or authToken must be provided")
         self.publicKey = publicKey

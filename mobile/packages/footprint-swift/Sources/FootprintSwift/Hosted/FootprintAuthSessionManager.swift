@@ -69,23 +69,23 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
                         self?.configuration.onCancel?()
                         return
                     case .presentationContextNotProvided:
-                        self?.logger?.logError(error: "Presentation context not provided.", shouldCancel: true)
+                        self?.logger?.logError(error: FootprintHostedError(kind: .presentationError , message: "Presentation context not provided."), shouldCancel: true)
                         return
                     case .presentationContextInvalid:
-                        self?.logger?.logError(error: "Invalid presentation context.", shouldCancel: true)
+                        self?.logger?.logError(error: FootprintHostedError(kind: .presentationError , message: "Invalid presentation context."), shouldCancel: true)
                         return
                     default:
-                        self?.logger?.logError(error:"Authentication session failed: \(error.localizedDescription)", shouldCancel: true)
+                        self?.logger?.logError(error: FootprintHostedError(kind: .authError , message: "Authentication session failed: \(error.localizedDescription)"), shouldCancel: true)
                         return
                     }
                 } else {
-                    self?.logger?.logError(error: "An unexpected error occurred during auth: \(error.localizedDescription)", shouldCancel: true)
+                    self?.logger?.logError(error: FootprintHostedError(kind: .authError , message: "An unexpected error occurred during auth: \(error.localizedDescription)"), shouldCancel: true)
                 }
                 return
             }
             
             guard let callbackURL = callbackURL else {
-                self?.logger?.logError(error: "Missing callbackURL from auth session", shouldCancel: true)
+                self?.logger?.logError(error: FootprintHostedError(kind: .authError , message: "Missing callbackURL from auth session"), shouldCancel: true)
                 return
             }
             
@@ -123,7 +123,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
                     self?.configuration.onAuthenticationComplete?(authToken, vaultingToken)
                 }
             } else {
-                self?.logger?.logError(error: "Encountered error when redirecting after flow is complete.", shouldCancel: true)
+                self?.logger?.logError(error: FootprintHostedError(kind: .exceptionError , message: "Encountered error when redirecting after flow is complete."), shouldCancel: true)
             }
         }
         
@@ -134,10 +134,14 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
     
     // Presentation context provider for the web authentication session
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        guard Thread.isMainThread else {
+            return DispatchQueue.main.sync { presentationAnchor(for: session) }
+        }
+        
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                     let window = scene.windows.first else {
-                   fatalError("@onefootprint/footprint-swift: no window available.")
-               }
-               return window
+              let window = scene.windows.first else {
+            fatalError("@onefootprint/footprint-swift: no window available.")
+        }
+        return window
     }
 }

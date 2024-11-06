@@ -38,7 +38,7 @@ public class Footprint: NSObject {
     
     private func render() async {
         guard let configuration = self.configuration else {
-            self.logger?.logError(error: "No configuration found.")
+            self.logger?.logError(error: FootprintHostedError(kind: .exceptionError, message: "No configuration found."))
             return
         }
         
@@ -55,7 +55,7 @@ public class Footprint: NSObject {
             })
         } catch {
             self.hasActiveSession = false
-            self.logger?.logError(error: "Could not initialize auth session.")
+            self.logger?.logError(error: FootprintHostedError(kind: .exceptionError, message: "Could not initialize auth session."))
         }
     }
     

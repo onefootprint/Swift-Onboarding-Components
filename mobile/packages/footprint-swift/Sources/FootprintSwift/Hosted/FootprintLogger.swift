@@ -13,15 +13,15 @@ public class FootprintLogger {
         return "@onefootprint/footprint-swift: \(raw)"
     }
     
-    public func logError(error: String, shouldCancel: Bool? = nil) {
-        let errorMsg = self.getMessage(raw: error)
+    public func logError(error: FootprintHostedError, shouldCancel: Bool? = nil) {
+        let errorMsg = self.getMessage(raw: error.message)
         if debugMode {
             print(errorMsg)
         } else {
-            sendLog(message: error, level: "error")
+            sendLog(message: error.message, level: "error")
         }
         if let onError = self.configuration?.onError {
-            onError(errorMsg)
+            onError(error)
         }
         if let onCancel = self.configuration?.onCancel, (shouldCancel ?? false) {
             onCancel()
