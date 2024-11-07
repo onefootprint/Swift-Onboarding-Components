@@ -12,9 +12,11 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
+use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use itertools::chain;
 use itertools::Itertools;
+use newtypes::samba::SambaOrderKind;
 use newtypes::CustomDocumentConfig;
 use newtypes::DataIdentifier;
 use newtypes::DocumentDiKind;
@@ -59,10 +61,22 @@ pub async fn get(
                 })
                 .filter_ok(|(_, _, images)| !images.is_empty())
                 .collect::<FpResult<Vec<_>>>()?;
+            let id_doc_ids = id_docs.iter().map(|(doc, _, _)| doc.id.clone()).collect_vec();
+            // Include Samba responses
+            let samba_reports = SambaReport::bulk_get_latest_by_order_kind(conn, &id_doc_ids)?;
+            let id_docs = id_docs
+                .into_iter()
+                .map(|(doc, dr, uploads)| {
+                    let activity_history_seqno = samba_reports
+                        .get(&(doc.id.clone(), SambaOrderKind::ActivityHistory))
+                        .and_then(|r| r.completed_seqno);
+                    (doc, dr, uploads, activity_history_seqno)
+                })
+                .collect_vec();
 
             let custom_dis = id_docs
                 .iter()
-                .filter_map(|(_, dr, _)| match dr.config {
+                .filter_map(|(_, dr, _, _)| match dr.config {
                     DocumentRequestConfig::Custom(CustomDocumentConfig { ref identifier, .. }) => {
                         Some(identifier)
                     }

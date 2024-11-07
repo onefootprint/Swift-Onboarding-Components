@@ -24,6 +24,7 @@ use strum_macros::EnumString;
     AsRefStr,
     PartialEq,
     Eq,
+    Hash,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

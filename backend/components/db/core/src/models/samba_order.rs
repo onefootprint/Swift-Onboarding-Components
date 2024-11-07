@@ -18,7 +18,7 @@ use newtypes::SambaOrderTableId;
 use newtypes::VerificationResultId;
 
 /// Represents a single order placed with Samba
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = samba_order)]
 pub struct SambaOrder {
     pub id: SambaOrderTableId,

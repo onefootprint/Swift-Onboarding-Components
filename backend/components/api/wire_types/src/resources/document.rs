@@ -36,6 +36,7 @@ pub struct Document {
     pub review_status: Option<DocumentReviewStatus>,
     pub completed_version: Option<DataLifetimeSeqno>,
     pub curp_completed_version: Option<DataLifetimeSeqno>,
+    pub samba_activity_history_completed_version: Option<DataLifetimeSeqno>,
     pub uploads: Vec<DocumentUpload>,
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,

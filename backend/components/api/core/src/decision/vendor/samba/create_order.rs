@@ -47,12 +47,10 @@ pub struct CreateOrderArgs {
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum CreateOrderContext {
-    // TODO: support IDK version of this. For now we pull from the iddoc
     Workflow {
         wf_id: WorkflowId,
         di: DecisionIntent,
     },
-    // TODO: support IDK version of this. For now we pull from the latest DL iddoc
     Adhoc {
         di: DecisionIntent,
         // support optionally sending data as well

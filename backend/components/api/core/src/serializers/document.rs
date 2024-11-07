@@ -7,17 +7,23 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DeviceType;
 use newtypes::DocumentKind;
 use newtypes::DocumentSide;
 
 /// Document info from Documents, created via hosted bifrost
-pub type DocumentInfo = (Document, DocumentRequest, Vec<DocumentUpload>);
+pub type DocumentInfo = (
+    Document,
+    DocumentRequest,
+    Vec<DocumentUpload>,
+    Option<DataLifetimeSeqno>,
+);
 /// Document info from the vault, created via API
 pub type DocumentVaultInfo = (DocumentKind, Vec<(DocumentSide, DataLifetime)>);
 
 impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
-    fn try_from_db((doc, dr, uploads): DocumentInfo) -> FpResult<Self> {
+    fn try_from_db((doc, dr, uploads, activity_history_seqno): DocumentInfo) -> FpResult<Self> {
         let uploads = uploads
             .into_iter()
             .map(|u| (&doc, &dr, u))
@@ -52,6 +58,7 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
             ocr_confidence_score,
             // TODO: Should we have default here?
             upload_source: device_type.unwrap_or(DeviceType::Mobile).into(),
+            samba_activity_history_completed_version: activity_history_seqno,
         };
         Ok(result)
     }
@@ -99,6 +106,7 @@ impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
             review_status: None,
             completed_version: None,
             curp_completed_version: None,
+            samba_activity_history_completed_version: None,
             uploads,
             document_score: None,
             selfie_score: None,
