@@ -45,6 +45,9 @@ pub struct TriggerRequest {
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
 pub enum EntityAction {
+    // TODO: when we have internal tag, no data, we end up adding "kind" to the parent type.
+    // Be careful here, this is mutating the actual type.
+    // We should force inline in this case
     Trigger(TriggerRequest),
     ClearReview,
     ManualDecision(ManualDecisionRequest),

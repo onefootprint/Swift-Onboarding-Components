@@ -607,6 +607,7 @@ export const getAuditEvent = (props: Partial<AuditEvent>) =>
         metroCode: 'dolore cupidatat culpa in minim',
         postalCode: 'occaecat Lorem',
         region: 'nostrud',
+        regionName: 'Hubert Cronin',
         sessionId: '2573adf6-667d-4c4e-801f-0fc1aff2fd41',
         timestamp: '1936-07-22T19:58:59.0Z',
         userAgent: 'consequat quis labore',
@@ -635,9 +636,65 @@ export const getAuditEventDetail = (props: Partial<AuditEventDetail>) =>
           'document.residence_document.issuing_state',
           'document.drivers_license.front.image',
         ],
+        firstName: 'ad nisi ex minim',
         fpId: 'aute laborum irure',
+        lastName: 'dolore incididunt elit',
         listEntryId: 'sed sint et',
         listId: 'Ut ea',
+        newRole: {
+          createdAt: '1962-01-24T21:16:34.0Z',
+          id: 'sed consequat dolor fugiat',
+          isImmutable: false,
+          kind: 'api_key',
+          name: 'nostrud sunt',
+          numActiveApiKeys: -35810516,
+          numActiveUsers: -24054848,
+          scopes: [
+            {
+              kind: 'write_lists',
+            },
+            {
+              kind: 'manual_review',
+            },
+            {
+              kind: 'onboarding',
+            },
+          ],
+        },
+        oldRole: {
+          createdAt: '1930-01-29T15:22:37.0Z',
+          id: 'occaecat voluptate et',
+          isImmutable: true,
+          kind: 'dashboard_user',
+          name: 'elit esse fugiat',
+          numActiveApiKeys: 6820060,
+          numActiveUsers: -92865090,
+          scopes: [
+            {
+              kind: 'onboarding',
+            },
+            {
+              kind: 'decrypt_all_except_pci_data',
+            },
+            {
+              kind: 'manage_compliance_doc_submission',
+            },
+          ],
+        },
+        roleName: 'Lorem consectetur proident',
+        scopes: [
+          {
+            kind: 'decrypt_document',
+          },
+          {
+            kind: 'api_keys',
+          },
+          {
+            kind: 'write_lists',
+          },
+        ],
+        tenantRoleId: 'eiusmod ex ipsum occaecat minim',
+        tenantUserId: 'ullamco nisi velit nostrud',
       },
       kind: 'collect_user_document',
     },
@@ -2460,6 +2517,7 @@ export const getDocument = (props: Partial<Document>) =>
       kind: 'id_card',
       ocrConfidenceScore: -24067831.627324134,
       reviewStatus: 'pending_machine_review',
+      sambaActivityHistoryCompletedVersion: 14441396,
       selfieScore: 58194394.94926214,
       startedAt: '1910-02-13T09:33:26.0Z',
       status: 'complete',
@@ -2869,6 +2927,7 @@ export const getEntityAction = (props: Partial<EntityAction>) =>
       },
       fpBid: 'occaecat',
       kind: 'manual_decision',
+      note: 'deserunt nulla nisi officia sit',
       status: 'pass',
       trigger: {
         data: {
@@ -2922,6 +2981,9 @@ export const getEntityAction = (props: Partial<EntityAction>) =>
               kind: 'proof_of_address',
             },
           ],
+          playbookId: 'eu exercitation reprehenderit Excepteur laboris',
+          recollectAttributes: ['dob', 'business_phone_number', 'business_address'],
+          reuseExistingBoKyc: true,
         },
         kind: 'document',
       },
@@ -2989,6 +3051,7 @@ export const getEntityWorkflow = (props: Partial<EntityWorkflow>) =>
       createdAt: '1898-10-30T13:28:25.0Z',
       insightEvent: {
         city: 'Koelpinborough',
+        country: 'Gambia',
         ipAddress: '94438 Abshire Overpass Suite 326',
         latitude: -81692336.78012651,
         longitude: -38631546.78142693,
@@ -6220,9 +6283,11 @@ export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>) =>
   merge(
     {
       data: {
+        action: 'replace',
         actor: {
           id: 'in',
           kind: 'user',
+          name: 'cillum veniam nulla in labore',
         },
         attributes: ['business_tin', 'us_tax_id', 'ssn4'],
         config: {
@@ -6277,14 +6342,28 @@ export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>) =>
                 kind: 'proof_of_ssn',
               },
             ],
+            playbookId: 'labore anim id est',
+            recollectAttributes: ['dob', 'ssn9', 'email'],
+            reuseExistingBoKyc: false,
           },
           kind: 'document',
         },
         event: 'ad laborum et',
         externalId: 'qui Excepteur Ut',
         fpId: 'fugiat ullamco',
+        insightEvent: {
+          city: 'dolore',
+          ipAddress: 'laborum voluptate ex dolore commodo',
+          latitude: 91947249.93068042,
+          longitude: 74174514.09754801,
+          metroCode: 'proident do',
+          regionName: 'proident nulla Ut',
+          sessionId: 'commodo quis dolor',
+          timestamp: '1935-01-16T03:56:04.0Z',
+        },
         integration: 'alpaca_cip',
         isPrefill: true,
+        kind: 'passkey',
         note: 'cillum do veniam reprehenderit',
         requestIsActive: true,
         sessionId: 'minim in culpa in sit',
@@ -6521,6 +6600,9 @@ export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>) 
             kind: 'proof_of_ssn',
           },
         ],
+        playbookId: 'do',
+        recollectAttributes: ['business_website', 'investor_profile', 'business_name'],
+        reuseExistingBoKyc: false,
       },
       kind: 'document',
     },

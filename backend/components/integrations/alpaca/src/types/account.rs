@@ -20,7 +20,7 @@ pub struct CreateAccountRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trusted_contact: Option<TrustedContact>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub account_type: Option<AccountType>,
+    pub account_type: Option<AlpacaAccountType>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -90,7 +90,7 @@ pub struct Disclosures {
     pub immediate_family_exposed: bool, // false,
     /// Information relevant to the user’s disclosure selection should be sent through this object.
     pub context: Option<Vec<DisclosureContext>>,
-    pub employment_status: Option<EmploymentStatus>,
+    pub employment_status: Option<AlpacaEmploymentStatus>,
     pub employer_name: Option<AlpacaPiiString>,
     pub employer_address: Option<AlpacaPiiString>,
     pub employment_position: Option<AlpacaPiiString>,
@@ -117,7 +117,7 @@ impl Disclosures {
 /// identifies with any of the disclosures before the account can be approved. This information can
 /// be sent through the context object to speed up the time to approve their account.
 pub struct DisclosureContext {
-    pub context_type: ContextType, // "AFFILIATE_FIRM",
+    pub context_type: AlpacaContextType, // "AFFILIATE_FIRM",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
     pub company_name: AlpacaPiiString, // "Finra",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
@@ -140,7 +140,7 @@ pub struct DisclosureContext {
 /// In order to comply with Alpaca’s terms of service, each account owner must be presented the
 /// following agreements.
 pub struct Agreement {
-    pub agreement: Agreements,
+    pub agreement: AlpacaAgreements,
     /// string (timestamp)
     pub signed_at: DateTime<Utc>, //"2020-09-11T18:13:44Z",
     pub ip_address: AlpacaPiiString, //"185.13.21.99"
@@ -152,7 +152,7 @@ pub struct Agreement {
 /// objects whose contents are encoded in base64. Each encoded content size is limited to 10MB if
 /// you use Alpaca for KYCaaS. If you perform your own KYC there are no document size limitations.
 pub struct Document {
-    pub document_type: DocumentType,
+    pub document_type: AlpacaDocumentType,
     pub document_sub_type: Option<String>, // "passport",
     /// base64 string
     pub content: AlpacaPiiString,
@@ -259,7 +259,7 @@ pub enum FundingSource {
 
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
-pub enum ContextType {
+pub enum AlpacaContextType {
     CONTROLLED_FIRM, // Controlled firm. Recommened to use when is_control_person = true
     AFFILIATE_FIRM,  /* 	Affiliated firm. Recommened to use when is_affiliated_exchange_or_finra
                       * = true */
@@ -270,7 +270,7 @@ pub enum ContextType {
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
-pub enum EmploymentStatus {
+pub enum AlpacaEmploymentStatus {
     UNEMPLOYED, //	Unemployed
     EMPLOYED,   //	Employed
     STUDENT,    //	Student
@@ -279,7 +279,7 @@ pub enum EmploymentStatus {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub enum Agreements {
+pub enum AlpacaAgreements {
     CustomerAgreement,          // Customer agreement
     CryptoAgreement,            // Crypto agreement
     AccountAgreement,           // Account agreement
@@ -290,7 +290,7 @@ pub enum Agreements {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub enum DocumentType {
+pub enum AlpacaDocumentType {
     IdentityVerification,    //	Identity verification
     AddressVerification,     //	Address verification
     DateOfBirthVerification, //	Date of birth verification
@@ -302,7 +302,7 @@ pub enum DocumentType {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub enum AccountType {
+pub enum AlpacaAccountType {
     Trading, // Typical brokerage account
     Custodial, /* Trading account opened on behalf of a minor and ownership will be transferred to the
               * minor when they reach the age of majority */

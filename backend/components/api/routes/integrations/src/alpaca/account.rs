@@ -1,8 +1,8 @@
+use alpaca::types::account::AlpacaDocumentType;
 use alpaca::types::account::Contact;
 use alpaca::types::account::CreateAccountRequest;
 use alpaca::types::account::Disclosures;
 use alpaca::types::account::Document as AlpacaDocument;
-use alpaca::types::account::DocumentType;
 use alpaca::types::account::Identity;
 use alpaca::types::account::TaxIdType;
 use alpaca::AlpacaCip;
@@ -206,7 +206,7 @@ async fn create_create_account_request(
                 let content = decrypted.rm_di(latest_doc_di)?.into();
                 let mime_type = decrypted.rm_di(mime_di)?;
                 Ok(AlpacaDocument {
-                    document_type: DocumentType::IdentityVerification,
+                    document_type: AlpacaDocumentType::IdentityVerification,
                     document_sub_type: Some(doc_info.id_doc_kind.to_string()),
                     content,
                     mime_type: mime_type.leak_to_string(),

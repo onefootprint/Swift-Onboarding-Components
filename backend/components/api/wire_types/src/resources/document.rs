@@ -9,8 +9,9 @@ use newtypes::DocumentStatus;
 use serde_with::SerializeDisplay;
 pub use strum_macros::Display;
 
-#[derive(Debug, Display, SerializeDisplay, Apiv2Schema)]
+#[derive(Debug, Display, SerializeDisplay, Apiv2Schema, macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum UploadSource {
     Desktop,
     Mobile,

@@ -243,8 +243,10 @@ crate::util::impl_enum_string_diesel!(RuleSetResultKind);
     DeserializeFromStr,
     PartialOrd,
     Ord,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum RuleInstanceKind {
     Person,

@@ -26,8 +26,10 @@ use strum_macros::EnumString;
     FromSqlRow,
     EnumString,
     AsRefStr,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum TenantKind {
     // A Footprint tenant for vaulting, KYC, etc.

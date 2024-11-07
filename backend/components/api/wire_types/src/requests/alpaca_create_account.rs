@@ -1,6 +1,6 @@
 use crate::*;
-use alpaca::types::account::AccountType;
 use alpaca::types::account::Agreement;
+use alpaca::types::account::AlpacaAccountType;
 use alpaca::types::account::AssetClass;
 use alpaca::types::account::Disclosures;
 use alpaca::types::account::TrustedContact;
@@ -24,7 +24,7 @@ pub struct AlpacaCreateAccountRequest {
     pub disclosures: Option<Disclosures>,
     pub agreements: Option<Vec<Agreement>>,
     pub trusted_contact: Option<TrustedContact>,
-    pub account_type: Option<AccountType>,
+    pub account_type: Option<AlpacaAccountType>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
@@ -46,7 +46,7 @@ pub struct DeprecatedAlpacaCreateAccountRequest {
     pub disclosures: Option<Disclosures>,
     pub agreements: Option<Vec<Agreement>>,
     pub trusted_contact: Option<TrustedContact>,
-    pub account_type: Option<AccountType>,
+    pub account_type: Option<AlpacaAccountType>,
 }
 
 #[derive(Debug, Clone, Apiv2Response, Serialize, macros::JsonResponder)]

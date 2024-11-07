@@ -1878,9 +1878,15 @@
                                 "document.id_card.selfie.image",
                                 "document.id_card.selfie.mime_type",
                                 "document.id_card.full_name",
+                                "document.id_card.first_name",
+                                "document.id_card.last_name",
                                 "document.id_card.dob",
                                 "document.id_card.gender",
                                 "document.id_card.full_address",
+                                "document.id_card.address_line1",
+                                "document.id_card.city",
+                                "document.id_card.state",
+                                "document.id_card.postal_code",
                                 "document.id_card.document_number",
                                 "document.id_card.expires_at",
                                 "document.id_card.issued_at",
@@ -1900,9 +1906,15 @@
                                 "document.drivers_license.selfie.image",
                                 "document.drivers_license.selfie.mime_type",
                                 "document.drivers_license.full_name",
+                                "document.drivers_license.first_name",
+                                "document.drivers_license.last_name",
                                 "document.drivers_license.dob",
                                 "document.drivers_license.gender",
                                 "document.drivers_license.full_address",
+                                "document.drivers_license.address_line1",
+                                "document.drivers_license.city",
+                                "document.drivers_license.state",
+                                "document.drivers_license.postal_code",
                                 "document.drivers_license.document_number",
                                 "document.drivers_license.expires_at",
                                 "document.drivers_license.issued_at",
@@ -1922,9 +1934,15 @@
                                 "document.passport.selfie.image",
                                 "document.passport.selfie.mime_type",
                                 "document.passport.full_name",
+                                "document.passport.first_name",
+                                "document.passport.last_name",
                                 "document.passport.dob",
                                 "document.passport.gender",
                                 "document.passport.full_address",
+                                "document.passport.address_line1",
+                                "document.passport.city",
+                                "document.passport.state",
+                                "document.passport.postal_code",
                                 "document.passport.document_number",
                                 "document.passport.expires_at",
                                 "document.passport.issued_at",
@@ -1944,9 +1962,15 @@
                                 "document.passport_card.selfie.image",
                                 "document.passport_card.selfie.mime_type",
                                 "document.passport_card.full_name",
+                                "document.passport_card.first_name",
+                                "document.passport_card.last_name",
                                 "document.passport_card.dob",
                                 "document.passport_card.gender",
                                 "document.passport_card.full_address",
+                                "document.passport_card.address_line1",
+                                "document.passport_card.city",
+                                "document.passport_card.state",
+                                "document.passport_card.postal_code",
                                 "document.passport_card.document_number",
                                 "document.passport_card.expires_at",
                                 "document.passport_card.issued_at",
@@ -1966,9 +1990,15 @@
                                 "document.permit.selfie.image",
                                 "document.permit.selfie.mime_type",
                                 "document.permit.full_name",
+                                "document.permit.first_name",
+                                "document.permit.last_name",
                                 "document.permit.dob",
                                 "document.permit.gender",
                                 "document.permit.full_address",
+                                "document.permit.address_line1",
+                                "document.permit.city",
+                                "document.permit.state",
+                                "document.permit.postal_code",
                                 "document.permit.document_number",
                                 "document.permit.expires_at",
                                 "document.permit.issued_at",
@@ -1988,9 +2018,15 @@
                                 "document.visa.selfie.image",
                                 "document.visa.selfie.mime_type",
                                 "document.visa.full_name",
+                                "document.visa.first_name",
+                                "document.visa.last_name",
                                 "document.visa.dob",
                                 "document.visa.gender",
                                 "document.visa.full_address",
+                                "document.visa.address_line1",
+                                "document.visa.city",
+                                "document.visa.state",
+                                "document.visa.postal_code",
                                 "document.visa.document_number",
                                 "document.visa.expires_at",
                                 "document.visa.issued_at",
@@ -2010,9 +2046,15 @@
                                 "document.residence_document.selfie.image",
                                 "document.residence_document.selfie.mime_type",
                                 "document.residence_document.full_name",
+                                "document.residence_document.first_name",
+                                "document.residence_document.last_name",
                                 "document.residence_document.dob",
                                 "document.residence_document.gender",
                                 "document.residence_document.full_address",
+                                "document.residence_document.address_line1",
+                                "document.residence_document.city",
+                                "document.residence_document.state",
+                                "document.residence_document.postal_code",
                                 "document.residence_document.document_number",
                                 "document.residence_document.expires_at",
                                 "document.residence_document.issued_at",
@@ -2032,9 +2074,15 @@
                                 "document.voter_identification.selfie.image",
                                 "document.voter_identification.selfie.mime_type",
                                 "document.voter_identification.full_name",
+                                "document.voter_identification.first_name",
+                                "document.voter_identification.last_name",
                                 "document.voter_identification.dob",
                                 "document.voter_identification.gender",
                                 "document.voter_identification.full_address",
+                                "document.voter_identification.address_line1",
+                                "document.voter_identification.city",
+                                "document.voter_identification.state",
+                                "document.voter_identification.postal_code",
                                 "document.voter_identification.document_number",
                                 "document.voter_identification.expires_at",
                                 "document.voter_identification.issued_at",
@@ -2865,9 +2913,15 @@
                     "document.id_card.selfie.image",
                     "document.id_card.selfie.mime_type",
                     "document.id_card.full_name",
+                    "document.id_card.first_name",
+                    "document.id_card.last_name",
                     "document.id_card.dob",
                     "document.id_card.gender",
                     "document.id_card.full_address",
+                    "document.id_card.address_line1",
+                    "document.id_card.city",
+                    "document.id_card.state",
+                    "document.id_card.postal_code",
                     "document.id_card.document_number",
                     "document.id_card.expires_at",
                     "document.id_card.issued_at",
@@ -2887,9 +2941,15 @@
                     "document.drivers_license.selfie.image",
                     "document.drivers_license.selfie.mime_type",
                     "document.drivers_license.full_name",
+                    "document.drivers_license.first_name",
+                    "document.drivers_license.last_name",
                     "document.drivers_license.dob",
                     "document.drivers_license.gender",
                     "document.drivers_license.full_address",
+                    "document.drivers_license.address_line1",
+                    "document.drivers_license.city",
+                    "document.drivers_license.state",
+                    "document.drivers_license.postal_code",
                     "document.drivers_license.document_number",
                     "document.drivers_license.expires_at",
                     "document.drivers_license.issued_at",
@@ -2909,9 +2969,15 @@
                     "document.passport.selfie.image",
                     "document.passport.selfie.mime_type",
                     "document.passport.full_name",
+                    "document.passport.first_name",
+                    "document.passport.last_name",
                     "document.passport.dob",
                     "document.passport.gender",
                     "document.passport.full_address",
+                    "document.passport.address_line1",
+                    "document.passport.city",
+                    "document.passport.state",
+                    "document.passport.postal_code",
                     "document.passport.document_number",
                     "document.passport.expires_at",
                     "document.passport.issued_at",
@@ -2931,9 +2997,15 @@
                     "document.passport_card.selfie.image",
                     "document.passport_card.selfie.mime_type",
                     "document.passport_card.full_name",
+                    "document.passport_card.first_name",
+                    "document.passport_card.last_name",
                     "document.passport_card.dob",
                     "document.passport_card.gender",
                     "document.passport_card.full_address",
+                    "document.passport_card.address_line1",
+                    "document.passport_card.city",
+                    "document.passport_card.state",
+                    "document.passport_card.postal_code",
                     "document.passport_card.document_number",
                     "document.passport_card.expires_at",
                     "document.passport_card.issued_at",
@@ -2953,9 +3025,15 @@
                     "document.permit.selfie.image",
                     "document.permit.selfie.mime_type",
                     "document.permit.full_name",
+                    "document.permit.first_name",
+                    "document.permit.last_name",
                     "document.permit.dob",
                     "document.permit.gender",
                     "document.permit.full_address",
+                    "document.permit.address_line1",
+                    "document.permit.city",
+                    "document.permit.state",
+                    "document.permit.postal_code",
                     "document.permit.document_number",
                     "document.permit.expires_at",
                     "document.permit.issued_at",
@@ -2975,9 +3053,15 @@
                     "document.visa.selfie.image",
                     "document.visa.selfie.mime_type",
                     "document.visa.full_name",
+                    "document.visa.first_name",
+                    "document.visa.last_name",
                     "document.visa.dob",
                     "document.visa.gender",
                     "document.visa.full_address",
+                    "document.visa.address_line1",
+                    "document.visa.city",
+                    "document.visa.state",
+                    "document.visa.postal_code",
                     "document.visa.document_number",
                     "document.visa.expires_at",
                     "document.visa.issued_at",
@@ -2997,9 +3081,15 @@
                     "document.residence_document.selfie.image",
                     "document.residence_document.selfie.mime_type",
                     "document.residence_document.full_name",
+                    "document.residence_document.first_name",
+                    "document.residence_document.last_name",
                     "document.residence_document.dob",
                     "document.residence_document.gender",
                     "document.residence_document.full_address",
+                    "document.residence_document.address_line1",
+                    "document.residence_document.city",
+                    "document.residence_document.state",
+                    "document.residence_document.postal_code",
                     "document.residence_document.document_number",
                     "document.residence_document.expires_at",
                     "document.residence_document.issued_at",
@@ -3019,9 +3109,15 @@
                     "document.voter_identification.selfie.image",
                     "document.voter_identification.selfie.mime_type",
                     "document.voter_identification.full_name",
+                    "document.voter_identification.first_name",
+                    "document.voter_identification.last_name",
                     "document.voter_identification.dob",
                     "document.voter_identification.gender",
                     "document.voter_identification.full_address",
+                    "document.voter_identification.address_line1",
+                    "document.voter_identification.city",
+                    "document.voter_identification.state",
+                    "document.voter_identification.postal_code",
                     "document.voter_identification.document_number",
                     "document.voter_identification.expires_at",
                     "document.voter_identification.issued_at",
@@ -4294,10 +4390,16 @@
                     "document.custom.*": {
                         "type": "string"
                     },
+                    "document.drivers_license.address_line1": {
+                        "type": "string"
+                    },
                     "document.drivers_license.back.image": {
                         "type": "string"
                     },
                     "document.drivers_license.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.city": {
                         "type": "string"
                     },
                     "document.drivers_license.classified_document_type": {
@@ -4319,6 +4421,9 @@
                         "type": "string"
                     },
                     "document.drivers_license.expires_at": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.first_name": {
                         "type": "string"
                     },
                     "document.drivers_license.front.image": {
@@ -4345,7 +4450,13 @@
                     "document.drivers_license.issuing_state": {
                         "type": "string"
                     },
+                    "document.drivers_license.last_name": {
+                        "type": "string"
+                    },
                     "document.drivers_license.nationality": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.postal_code": {
                         "type": "string"
                     },
                     "document.drivers_license.ref_number": {
@@ -4360,13 +4471,22 @@
                     "document.drivers_license.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.drivers_license.state": {
+                        "type": "string"
+                    },
                     "document.finra_compliance_letter": {
+                        "type": "string"
+                    },
+                    "document.id_card.address_line1": {
                         "type": "string"
                     },
                     "document.id_card.back.image": {
                         "type": "string"
                     },
                     "document.id_card.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.id_card.city": {
                         "type": "string"
                     },
                     "document.id_card.classified_document_type": {
@@ -4388,6 +4508,9 @@
                         "type": "string"
                     },
                     "document.id_card.expires_at": {
+                        "type": "string"
+                    },
+                    "document.id_card.first_name": {
                         "type": "string"
                     },
                     "document.id_card.front.image": {
@@ -4414,7 +4537,13 @@
                     "document.id_card.issuing_state": {
                         "type": "string"
                     },
+                    "document.id_card.last_name": {
+                        "type": "string"
+                    },
                     "document.id_card.nationality": {
+                        "type": "string"
+                    },
+                    "document.id_card.postal_code": {
                         "type": "string"
                     },
                     "document.id_card.ref_number": {
@@ -4429,10 +4558,19 @@
                     "document.id_card.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.id_card.state": {
+                        "type": "string"
+                    },
+                    "document.passport.address_line1": {
+                        "type": "string"
+                    },
                     "document.passport.back.image": {
                         "type": "string"
                     },
                     "document.passport.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport.city": {
                         "type": "string"
                     },
                     "document.passport.classified_document_type": {
@@ -4454,6 +4592,9 @@
                         "type": "string"
                     },
                     "document.passport.expires_at": {
+                        "type": "string"
+                    },
+                    "document.passport.first_name": {
                         "type": "string"
                     },
                     "document.passport.front.image": {
@@ -4480,7 +4621,13 @@
                     "document.passport.issuing_state": {
                         "type": "string"
                     },
+                    "document.passport.last_name": {
+                        "type": "string"
+                    },
                     "document.passport.nationality": {
+                        "type": "string"
+                    },
+                    "document.passport.postal_code": {
                         "type": "string"
                     },
                     "document.passport.ref_number": {
@@ -4495,10 +4642,19 @@
                     "document.passport.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.passport.state": {
+                        "type": "string"
+                    },
+                    "document.passport_card.address_line1": {
+                        "type": "string"
+                    },
                     "document.passport_card.back.image": {
                         "type": "string"
                     },
                     "document.passport_card.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport_card.city": {
                         "type": "string"
                     },
                     "document.passport_card.classified_document_type": {
@@ -4520,6 +4676,9 @@
                         "type": "string"
                     },
                     "document.passport_card.expires_at": {
+                        "type": "string"
+                    },
+                    "document.passport_card.first_name": {
                         "type": "string"
                     },
                     "document.passport_card.front.image": {
@@ -4546,7 +4705,13 @@
                     "document.passport_card.issuing_state": {
                         "type": "string"
                     },
+                    "document.passport_card.last_name": {
+                        "type": "string"
+                    },
                     "document.passport_card.nationality": {
+                        "type": "string"
+                    },
+                    "document.passport_card.postal_code": {
                         "type": "string"
                     },
                     "document.passport_card.ref_number": {
@@ -4561,10 +4726,19 @@
                     "document.passport_card.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.passport_card.state": {
+                        "type": "string"
+                    },
+                    "document.permit.address_line1": {
+                        "type": "string"
+                    },
                     "document.permit.back.image": {
                         "type": "string"
                     },
                     "document.permit.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.permit.city": {
                         "type": "string"
                     },
                     "document.permit.classified_document_type": {
@@ -4586,6 +4760,9 @@
                         "type": "string"
                     },
                     "document.permit.expires_at": {
+                        "type": "string"
+                    },
+                    "document.permit.first_name": {
                         "type": "string"
                     },
                     "document.permit.front.image": {
@@ -4612,7 +4789,13 @@
                     "document.permit.issuing_state": {
                         "type": "string"
                     },
+                    "document.permit.last_name": {
+                        "type": "string"
+                    },
                     "document.permit.nationality": {
+                        "type": "string"
+                    },
+                    "document.permit.postal_code": {
                         "type": "string"
                     },
                     "document.permit.ref_number": {
@@ -4627,13 +4810,22 @@
                     "document.permit.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.permit.state": {
+                        "type": "string"
+                    },
                     "document.proof_of_address.image": {
+                        "type": "string"
+                    },
+                    "document.residence_document.address_line1": {
                         "type": "string"
                     },
                     "document.residence_document.back.image": {
                         "type": "string"
                     },
                     "document.residence_document.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.residence_document.city": {
                         "type": "string"
                     },
                     "document.residence_document.classified_document_type": {
@@ -4655,6 +4847,9 @@
                         "type": "string"
                     },
                     "document.residence_document.expires_at": {
+                        "type": "string"
+                    },
+                    "document.residence_document.first_name": {
                         "type": "string"
                     },
                     "document.residence_document.front.image": {
@@ -4681,7 +4876,13 @@
                     "document.residence_document.issuing_state": {
                         "type": "string"
                     },
+                    "document.residence_document.last_name": {
+                        "type": "string"
+                    },
                     "document.residence_document.nationality": {
+                        "type": "string"
+                    },
+                    "document.residence_document.postal_code": {
                         "type": "string"
                     },
                     "document.residence_document.ref_number": {
@@ -4696,13 +4897,22 @@
                     "document.residence_document.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.residence_document.state": {
+                        "type": "string"
+                    },
                     "document.ssn_card.image": {
+                        "type": "string"
+                    },
+                    "document.visa.address_line1": {
                         "type": "string"
                     },
                     "document.visa.back.image": {
                         "type": "string"
                     },
                     "document.visa.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.visa.city": {
                         "type": "string"
                     },
                     "document.visa.classified_document_type": {
@@ -4724,6 +4934,9 @@
                         "type": "string"
                     },
                     "document.visa.expires_at": {
+                        "type": "string"
+                    },
+                    "document.visa.first_name": {
                         "type": "string"
                     },
                     "document.visa.front.image": {
@@ -4750,7 +4963,13 @@
                     "document.visa.issuing_state": {
                         "type": "string"
                     },
+                    "document.visa.last_name": {
+                        "type": "string"
+                    },
                     "document.visa.nationality": {
+                        "type": "string"
+                    },
+                    "document.visa.postal_code": {
                         "type": "string"
                     },
                     "document.visa.ref_number": {
@@ -4765,10 +4984,19 @@
                     "document.visa.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.visa.state": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.address_line1": {
+                        "type": "string"
+                    },
                     "document.voter_identification.back.image": {
                         "type": "string"
                     },
                     "document.voter_identification.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.city": {
                         "type": "string"
                     },
                     "document.voter_identification.classified_document_type": {
@@ -4790,6 +5018,9 @@
                         "type": "string"
                     },
                     "document.voter_identification.expires_at": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.first_name": {
                         "type": "string"
                     },
                     "document.voter_identification.front.image": {
@@ -4816,7 +5047,13 @@
                     "document.voter_identification.issuing_state": {
                         "type": "string"
                     },
+                    "document.voter_identification.last_name": {
+                        "type": "string"
+                    },
                     "document.voter_identification.nationality": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.postal_code": {
                         "type": "string"
                     },
                     "document.voter_identification.ref_number": {
@@ -4829,6 +5066,9 @@
                         "type": "string"
                     },
                     "document.voter_identification.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.state": {
                         "type": "string"
                     },
                     "id.address_line1": {
@@ -5005,10 +5245,16 @@
                     "document.custom.*": {
                         "type": "string"
                     },
+                    "document.drivers_license.address_line1": {
+                        "type": "string"
+                    },
                     "document.drivers_license.back.image": {
                         "type": "string"
                     },
                     "document.drivers_license.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.city": {
                         "type": "string"
                     },
                     "document.drivers_license.classified_document_type": {
@@ -5030,6 +5276,9 @@
                         "type": "string"
                     },
                     "document.drivers_license.expires_at": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.first_name": {
                         "type": "string"
                     },
                     "document.drivers_license.front.image": {
@@ -5056,7 +5305,13 @@
                     "document.drivers_license.issuing_state": {
                         "type": "string"
                     },
+                    "document.drivers_license.last_name": {
+                        "type": "string"
+                    },
                     "document.drivers_license.nationality": {
+                        "type": "string"
+                    },
+                    "document.drivers_license.postal_code": {
                         "type": "string"
                     },
                     "document.drivers_license.ref_number": {
@@ -5071,13 +5326,22 @@
                     "document.drivers_license.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.drivers_license.state": {
+                        "type": "string"
+                    },
                     "document.finra_compliance_letter": {
+                        "type": "string"
+                    },
+                    "document.id_card.address_line1": {
                         "type": "string"
                     },
                     "document.id_card.back.image": {
                         "type": "string"
                     },
                     "document.id_card.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.id_card.city": {
                         "type": "string"
                     },
                     "document.id_card.classified_document_type": {
@@ -5099,6 +5363,9 @@
                         "type": "string"
                     },
                     "document.id_card.expires_at": {
+                        "type": "string"
+                    },
+                    "document.id_card.first_name": {
                         "type": "string"
                     },
                     "document.id_card.front.image": {
@@ -5125,7 +5392,13 @@
                     "document.id_card.issuing_state": {
                         "type": "string"
                     },
+                    "document.id_card.last_name": {
+                        "type": "string"
+                    },
                     "document.id_card.nationality": {
+                        "type": "string"
+                    },
+                    "document.id_card.postal_code": {
                         "type": "string"
                     },
                     "document.id_card.ref_number": {
@@ -5140,10 +5413,19 @@
                     "document.id_card.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.id_card.state": {
+                        "type": "string"
+                    },
+                    "document.passport.address_line1": {
+                        "type": "string"
+                    },
                     "document.passport.back.image": {
                         "type": "string"
                     },
                     "document.passport.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport.city": {
                         "type": "string"
                     },
                     "document.passport.classified_document_type": {
@@ -5165,6 +5447,9 @@
                         "type": "string"
                     },
                     "document.passport.expires_at": {
+                        "type": "string"
+                    },
+                    "document.passport.first_name": {
                         "type": "string"
                     },
                     "document.passport.front.image": {
@@ -5191,7 +5476,13 @@
                     "document.passport.issuing_state": {
                         "type": "string"
                     },
+                    "document.passport.last_name": {
+                        "type": "string"
+                    },
                     "document.passport.nationality": {
+                        "type": "string"
+                    },
+                    "document.passport.postal_code": {
                         "type": "string"
                     },
                     "document.passport.ref_number": {
@@ -5206,10 +5497,19 @@
                     "document.passport.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.passport.state": {
+                        "type": "string"
+                    },
+                    "document.passport_card.address_line1": {
+                        "type": "string"
+                    },
                     "document.passport_card.back.image": {
                         "type": "string"
                     },
                     "document.passport_card.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.passport_card.city": {
                         "type": "string"
                     },
                     "document.passport_card.classified_document_type": {
@@ -5231,6 +5531,9 @@
                         "type": "string"
                     },
                     "document.passport_card.expires_at": {
+                        "type": "string"
+                    },
+                    "document.passport_card.first_name": {
                         "type": "string"
                     },
                     "document.passport_card.front.image": {
@@ -5257,7 +5560,13 @@
                     "document.passport_card.issuing_state": {
                         "type": "string"
                     },
+                    "document.passport_card.last_name": {
+                        "type": "string"
+                    },
                     "document.passport_card.nationality": {
+                        "type": "string"
+                    },
+                    "document.passport_card.postal_code": {
                         "type": "string"
                     },
                     "document.passport_card.ref_number": {
@@ -5272,10 +5581,19 @@
                     "document.passport_card.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.passport_card.state": {
+                        "type": "string"
+                    },
+                    "document.permit.address_line1": {
+                        "type": "string"
+                    },
                     "document.permit.back.image": {
                         "type": "string"
                     },
                     "document.permit.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.permit.city": {
                         "type": "string"
                     },
                     "document.permit.classified_document_type": {
@@ -5297,6 +5615,9 @@
                         "type": "string"
                     },
                     "document.permit.expires_at": {
+                        "type": "string"
+                    },
+                    "document.permit.first_name": {
                         "type": "string"
                     },
                     "document.permit.front.image": {
@@ -5323,7 +5644,13 @@
                     "document.permit.issuing_state": {
                         "type": "string"
                     },
+                    "document.permit.last_name": {
+                        "type": "string"
+                    },
                     "document.permit.nationality": {
+                        "type": "string"
+                    },
+                    "document.permit.postal_code": {
                         "type": "string"
                     },
                     "document.permit.ref_number": {
@@ -5338,13 +5665,22 @@
                     "document.permit.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.permit.state": {
+                        "type": "string"
+                    },
                     "document.proof_of_address.image": {
+                        "type": "string"
+                    },
+                    "document.residence_document.address_line1": {
                         "type": "string"
                     },
                     "document.residence_document.back.image": {
                         "type": "string"
                     },
                     "document.residence_document.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.residence_document.city": {
                         "type": "string"
                     },
                     "document.residence_document.classified_document_type": {
@@ -5366,6 +5702,9 @@
                         "type": "string"
                     },
                     "document.residence_document.expires_at": {
+                        "type": "string"
+                    },
+                    "document.residence_document.first_name": {
                         "type": "string"
                     },
                     "document.residence_document.front.image": {
@@ -5392,7 +5731,13 @@
                     "document.residence_document.issuing_state": {
                         "type": "string"
                     },
+                    "document.residence_document.last_name": {
+                        "type": "string"
+                    },
                     "document.residence_document.nationality": {
+                        "type": "string"
+                    },
+                    "document.residence_document.postal_code": {
                         "type": "string"
                     },
                     "document.residence_document.ref_number": {
@@ -5407,13 +5752,22 @@
                     "document.residence_document.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.residence_document.state": {
+                        "type": "string"
+                    },
                     "document.ssn_card.image": {
+                        "type": "string"
+                    },
+                    "document.visa.address_line1": {
                         "type": "string"
                     },
                     "document.visa.back.image": {
                         "type": "string"
                     },
                     "document.visa.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.visa.city": {
                         "type": "string"
                     },
                     "document.visa.classified_document_type": {
@@ -5435,6 +5789,9 @@
                         "type": "string"
                     },
                     "document.visa.expires_at": {
+                        "type": "string"
+                    },
+                    "document.visa.first_name": {
                         "type": "string"
                     },
                     "document.visa.front.image": {
@@ -5461,7 +5818,13 @@
                     "document.visa.issuing_state": {
                         "type": "string"
                     },
+                    "document.visa.last_name": {
+                        "type": "string"
+                    },
                     "document.visa.nationality": {
+                        "type": "string"
+                    },
+                    "document.visa.postal_code": {
                         "type": "string"
                     },
                     "document.visa.ref_number": {
@@ -5476,10 +5839,19 @@
                     "document.visa.selfie.mime_type": {
                         "type": "string"
                     },
+                    "document.visa.state": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.address_line1": {
+                        "type": "string"
+                    },
                     "document.voter_identification.back.image": {
                         "type": "string"
                     },
                     "document.voter_identification.back.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.city": {
                         "type": "string"
                     },
                     "document.voter_identification.classified_document_type": {
@@ -5501,6 +5873,9 @@
                         "type": "string"
                     },
                     "document.voter_identification.expires_at": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.first_name": {
                         "type": "string"
                     },
                     "document.voter_identification.front.image": {
@@ -5527,7 +5902,13 @@
                     "document.voter_identification.issuing_state": {
                         "type": "string"
                     },
+                    "document.voter_identification.last_name": {
+                        "type": "string"
+                    },
                     "document.voter_identification.nationality": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.postal_code": {
                         "type": "string"
                     },
                     "document.voter_identification.ref_number": {
@@ -5540,6 +5921,9 @@
                         "type": "string"
                     },
                     "document.voter_identification.selfie.mime_type": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.state": {
                         "type": "string"
                     },
                     "id.address_line1": {
@@ -5912,9 +6296,15 @@
                             "document.id_card.selfie.image",
                             "document.id_card.selfie.mime_type",
                             "document.id_card.full_name",
+                            "document.id_card.first_name",
+                            "document.id_card.last_name",
                             "document.id_card.dob",
                             "document.id_card.gender",
                             "document.id_card.full_address",
+                            "document.id_card.address_line1",
+                            "document.id_card.city",
+                            "document.id_card.state",
+                            "document.id_card.postal_code",
                             "document.id_card.document_number",
                             "document.id_card.expires_at",
                             "document.id_card.issued_at",
@@ -5934,9 +6324,15 @@
                             "document.drivers_license.selfie.image",
                             "document.drivers_license.selfie.mime_type",
                             "document.drivers_license.full_name",
+                            "document.drivers_license.first_name",
+                            "document.drivers_license.last_name",
                             "document.drivers_license.dob",
                             "document.drivers_license.gender",
                             "document.drivers_license.full_address",
+                            "document.drivers_license.address_line1",
+                            "document.drivers_license.city",
+                            "document.drivers_license.state",
+                            "document.drivers_license.postal_code",
                             "document.drivers_license.document_number",
                             "document.drivers_license.expires_at",
                             "document.drivers_license.issued_at",
@@ -5956,9 +6352,15 @@
                             "document.passport.selfie.image",
                             "document.passport.selfie.mime_type",
                             "document.passport.full_name",
+                            "document.passport.first_name",
+                            "document.passport.last_name",
                             "document.passport.dob",
                             "document.passport.gender",
                             "document.passport.full_address",
+                            "document.passport.address_line1",
+                            "document.passport.city",
+                            "document.passport.state",
+                            "document.passport.postal_code",
                             "document.passport.document_number",
                             "document.passport.expires_at",
                             "document.passport.issued_at",
@@ -5978,9 +6380,15 @@
                             "document.passport_card.selfie.image",
                             "document.passport_card.selfie.mime_type",
                             "document.passport_card.full_name",
+                            "document.passport_card.first_name",
+                            "document.passport_card.last_name",
                             "document.passport_card.dob",
                             "document.passport_card.gender",
                             "document.passport_card.full_address",
+                            "document.passport_card.address_line1",
+                            "document.passport_card.city",
+                            "document.passport_card.state",
+                            "document.passport_card.postal_code",
                             "document.passport_card.document_number",
                             "document.passport_card.expires_at",
                             "document.passport_card.issued_at",
@@ -6000,9 +6408,15 @@
                             "document.permit.selfie.image",
                             "document.permit.selfie.mime_type",
                             "document.permit.full_name",
+                            "document.permit.first_name",
+                            "document.permit.last_name",
                             "document.permit.dob",
                             "document.permit.gender",
                             "document.permit.full_address",
+                            "document.permit.address_line1",
+                            "document.permit.city",
+                            "document.permit.state",
+                            "document.permit.postal_code",
                             "document.permit.document_number",
                             "document.permit.expires_at",
                             "document.permit.issued_at",
@@ -6022,9 +6436,15 @@
                             "document.visa.selfie.image",
                             "document.visa.selfie.mime_type",
                             "document.visa.full_name",
+                            "document.visa.first_name",
+                            "document.visa.last_name",
                             "document.visa.dob",
                             "document.visa.gender",
                             "document.visa.full_address",
+                            "document.visa.address_line1",
+                            "document.visa.city",
+                            "document.visa.state",
+                            "document.visa.postal_code",
                             "document.visa.document_number",
                             "document.visa.expires_at",
                             "document.visa.issued_at",
@@ -6044,9 +6464,15 @@
                             "document.residence_document.selfie.image",
                             "document.residence_document.selfie.mime_type",
                             "document.residence_document.full_name",
+                            "document.residence_document.first_name",
+                            "document.residence_document.last_name",
                             "document.residence_document.dob",
                             "document.residence_document.gender",
                             "document.residence_document.full_address",
+                            "document.residence_document.address_line1",
+                            "document.residence_document.city",
+                            "document.residence_document.state",
+                            "document.residence_document.postal_code",
                             "document.residence_document.document_number",
                             "document.residence_document.expires_at",
                             "document.residence_document.issued_at",
@@ -6066,9 +6492,15 @@
                             "document.voter_identification.selfie.image",
                             "document.voter_identification.selfie.mime_type",
                             "document.voter_identification.full_name",
+                            "document.voter_identification.first_name",
+                            "document.voter_identification.last_name",
                             "document.voter_identification.dob",
                             "document.voter_identification.gender",
                             "document.voter_identification.full_address",
+                            "document.voter_identification.address_line1",
+                            "document.voter_identification.city",
+                            "document.voter_identification.state",
+                            "document.voter_identification.postal_code",
                             "document.voter_identification.document_number",
                             "document.voter_identification.expires_at",
                             "document.voter_identification.issued_at",
@@ -6591,9 +7023,15 @@
                     "document.id_card.selfie.image",
                     "document.id_card.selfie.mime_type",
                     "document.id_card.full_name",
+                    "document.id_card.first_name",
+                    "document.id_card.last_name",
                     "document.id_card.dob",
                     "document.id_card.gender",
                     "document.id_card.full_address",
+                    "document.id_card.address_line1",
+                    "document.id_card.city",
+                    "document.id_card.state",
+                    "document.id_card.postal_code",
                     "document.id_card.document_number",
                     "document.id_card.expires_at",
                     "document.id_card.issued_at",
@@ -6613,9 +7051,15 @@
                     "document.drivers_license.selfie.image",
                     "document.drivers_license.selfie.mime_type",
                     "document.drivers_license.full_name",
+                    "document.drivers_license.first_name",
+                    "document.drivers_license.last_name",
                     "document.drivers_license.dob",
                     "document.drivers_license.gender",
                     "document.drivers_license.full_address",
+                    "document.drivers_license.address_line1",
+                    "document.drivers_license.city",
+                    "document.drivers_license.state",
+                    "document.drivers_license.postal_code",
                     "document.drivers_license.document_number",
                     "document.drivers_license.expires_at",
                     "document.drivers_license.issued_at",
@@ -6635,9 +7079,15 @@
                     "document.passport.selfie.image",
                     "document.passport.selfie.mime_type",
                     "document.passport.full_name",
+                    "document.passport.first_name",
+                    "document.passport.last_name",
                     "document.passport.dob",
                     "document.passport.gender",
                     "document.passport.full_address",
+                    "document.passport.address_line1",
+                    "document.passport.city",
+                    "document.passport.state",
+                    "document.passport.postal_code",
                     "document.passport.document_number",
                     "document.passport.expires_at",
                     "document.passport.issued_at",
@@ -6657,9 +7107,15 @@
                     "document.passport_card.selfie.image",
                     "document.passport_card.selfie.mime_type",
                     "document.passport_card.full_name",
+                    "document.passport_card.first_name",
+                    "document.passport_card.last_name",
                     "document.passport_card.dob",
                     "document.passport_card.gender",
                     "document.passport_card.full_address",
+                    "document.passport_card.address_line1",
+                    "document.passport_card.city",
+                    "document.passport_card.state",
+                    "document.passport_card.postal_code",
                     "document.passport_card.document_number",
                     "document.passport_card.expires_at",
                     "document.passport_card.issued_at",
@@ -6679,9 +7135,15 @@
                     "document.permit.selfie.image",
                     "document.permit.selfie.mime_type",
                     "document.permit.full_name",
+                    "document.permit.first_name",
+                    "document.permit.last_name",
                     "document.permit.dob",
                     "document.permit.gender",
                     "document.permit.full_address",
+                    "document.permit.address_line1",
+                    "document.permit.city",
+                    "document.permit.state",
+                    "document.permit.postal_code",
                     "document.permit.document_number",
                     "document.permit.expires_at",
                     "document.permit.issued_at",
@@ -6701,9 +7163,15 @@
                     "document.visa.selfie.image",
                     "document.visa.selfie.mime_type",
                     "document.visa.full_name",
+                    "document.visa.first_name",
+                    "document.visa.last_name",
                     "document.visa.dob",
                     "document.visa.gender",
                     "document.visa.full_address",
+                    "document.visa.address_line1",
+                    "document.visa.city",
+                    "document.visa.state",
+                    "document.visa.postal_code",
                     "document.visa.document_number",
                     "document.visa.expires_at",
                     "document.visa.issued_at",
@@ -6723,9 +7191,15 @@
                     "document.residence_document.selfie.image",
                     "document.residence_document.selfie.mime_type",
                     "document.residence_document.full_name",
+                    "document.residence_document.first_name",
+                    "document.residence_document.last_name",
                     "document.residence_document.dob",
                     "document.residence_document.gender",
                     "document.residence_document.full_address",
+                    "document.residence_document.address_line1",
+                    "document.residence_document.city",
+                    "document.residence_document.state",
+                    "document.residence_document.postal_code",
                     "document.residence_document.document_number",
                     "document.residence_document.expires_at",
                     "document.residence_document.issued_at",
@@ -6745,9 +7219,15 @@
                     "document.voter_identification.selfie.image",
                     "document.voter_identification.selfie.mime_type",
                     "document.voter_identification.full_name",
+                    "document.voter_identification.first_name",
+                    "document.voter_identification.last_name",
                     "document.voter_identification.dob",
                     "document.voter_identification.gender",
                     "document.voter_identification.full_address",
+                    "document.voter_identification.address_line1",
+                    "document.voter_identification.city",
+                    "document.voter_identification.state",
+                    "document.voter_identification.postal_code",
                     "document.voter_identification.document_number",
                     "document.voter_identification.expires_at",
                     "document.voter_identification.issued_at",
@@ -6876,9 +7356,15 @@
                             "document.id_card.selfie.image",
                             "document.id_card.selfie.mime_type",
                             "document.id_card.full_name",
+                            "document.id_card.first_name",
+                            "document.id_card.last_name",
                             "document.id_card.dob",
                             "document.id_card.gender",
                             "document.id_card.full_address",
+                            "document.id_card.address_line1",
+                            "document.id_card.city",
+                            "document.id_card.state",
+                            "document.id_card.postal_code",
                             "document.id_card.document_number",
                             "document.id_card.expires_at",
                             "document.id_card.issued_at",
@@ -6898,9 +7384,15 @@
                             "document.drivers_license.selfie.image",
                             "document.drivers_license.selfie.mime_type",
                             "document.drivers_license.full_name",
+                            "document.drivers_license.first_name",
+                            "document.drivers_license.last_name",
                             "document.drivers_license.dob",
                             "document.drivers_license.gender",
                             "document.drivers_license.full_address",
+                            "document.drivers_license.address_line1",
+                            "document.drivers_license.city",
+                            "document.drivers_license.state",
+                            "document.drivers_license.postal_code",
                             "document.drivers_license.document_number",
                             "document.drivers_license.expires_at",
                             "document.drivers_license.issued_at",
@@ -6920,9 +7412,15 @@
                             "document.passport.selfie.image",
                             "document.passport.selfie.mime_type",
                             "document.passport.full_name",
+                            "document.passport.first_name",
+                            "document.passport.last_name",
                             "document.passport.dob",
                             "document.passport.gender",
                             "document.passport.full_address",
+                            "document.passport.address_line1",
+                            "document.passport.city",
+                            "document.passport.state",
+                            "document.passport.postal_code",
                             "document.passport.document_number",
                             "document.passport.expires_at",
                             "document.passport.issued_at",
@@ -6942,9 +7440,15 @@
                             "document.passport_card.selfie.image",
                             "document.passport_card.selfie.mime_type",
                             "document.passport_card.full_name",
+                            "document.passport_card.first_name",
+                            "document.passport_card.last_name",
                             "document.passport_card.dob",
                             "document.passport_card.gender",
                             "document.passport_card.full_address",
+                            "document.passport_card.address_line1",
+                            "document.passport_card.city",
+                            "document.passport_card.state",
+                            "document.passport_card.postal_code",
                             "document.passport_card.document_number",
                             "document.passport_card.expires_at",
                             "document.passport_card.issued_at",
@@ -6964,9 +7468,15 @@
                             "document.permit.selfie.image",
                             "document.permit.selfie.mime_type",
                             "document.permit.full_name",
+                            "document.permit.first_name",
+                            "document.permit.last_name",
                             "document.permit.dob",
                             "document.permit.gender",
                             "document.permit.full_address",
+                            "document.permit.address_line1",
+                            "document.permit.city",
+                            "document.permit.state",
+                            "document.permit.postal_code",
                             "document.permit.document_number",
                             "document.permit.expires_at",
                             "document.permit.issued_at",
@@ -6986,9 +7496,15 @@
                             "document.visa.selfie.image",
                             "document.visa.selfie.mime_type",
                             "document.visa.full_name",
+                            "document.visa.first_name",
+                            "document.visa.last_name",
                             "document.visa.dob",
                             "document.visa.gender",
                             "document.visa.full_address",
+                            "document.visa.address_line1",
+                            "document.visa.city",
+                            "document.visa.state",
+                            "document.visa.postal_code",
                             "document.visa.document_number",
                             "document.visa.expires_at",
                             "document.visa.issued_at",
@@ -7008,9 +7524,15 @@
                             "document.residence_document.selfie.image",
                             "document.residence_document.selfie.mime_type",
                             "document.residence_document.full_name",
+                            "document.residence_document.first_name",
+                            "document.residence_document.last_name",
                             "document.residence_document.dob",
                             "document.residence_document.gender",
                             "document.residence_document.full_address",
+                            "document.residence_document.address_line1",
+                            "document.residence_document.city",
+                            "document.residence_document.state",
+                            "document.residence_document.postal_code",
                             "document.residence_document.document_number",
                             "document.residence_document.expires_at",
                             "document.residence_document.issued_at",
@@ -7030,9 +7552,15 @@
                             "document.voter_identification.selfie.image",
                             "document.voter_identification.selfie.mime_type",
                             "document.voter_identification.full_name",
+                            "document.voter_identification.first_name",
+                            "document.voter_identification.last_name",
                             "document.voter_identification.dob",
                             "document.voter_identification.gender",
                             "document.voter_identification.full_address",
+                            "document.voter_identification.address_line1",
+                            "document.voter_identification.city",
+                            "document.voter_identification.state",
+                            "document.voter_identification.postal_code",
                             "document.voter_identification.document_number",
                             "document.voter_identification.expires_at",
                             "document.voter_identification.issued_at",
