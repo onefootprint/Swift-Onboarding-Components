@@ -93,6 +93,9 @@ export const getExample = (schema?: ContentSchemaNoRef, name?: string, index = 0
 
     return {};
   }
+  if (schema.anyOf?.length) {
+    return getExample(schema.anyOf[0], name, index);
+  }
   console.error("Couldn't generate a spec for", name, schema);
   return null;
 };

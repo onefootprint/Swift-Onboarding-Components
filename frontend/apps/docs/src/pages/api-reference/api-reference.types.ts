@@ -66,6 +66,7 @@ export type ContentSchema = FpExtensions & {
   properties?: Record<string, ContentSchemaNoRef>;
   required?: string[];
   type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'integer';
+  anyOf?: ContentSchema[];
   format?: string;
   $ref?: string;
 };
@@ -79,6 +80,7 @@ export type ContentSchemaNoRef = FpExtensions & {
   properties?: Record<string, ContentSchemaNoRef>;
   required?: string[];
   type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'integer';
+  anyOf?: ContentSchemaNoRef[];
   format?: string;
 };
 

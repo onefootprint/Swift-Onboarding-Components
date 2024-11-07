@@ -16,7 +16,10 @@ const useHydrateSchema = (openApiSpec: any) => {
   /** Open API request and response schemas may by defined either inline or by a reference to a list of schemas. This recursively dereferenecs all referenced schema and returns a guaranteed schema definition. */
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const resolveAllSchemaRefs = (schema: any): any => {
-    if (typeof schema !== 'object' || Array.isArray(schema) || !schema) {
+    if (Array.isArray(schema)) {
+      return schema.map(s => resolveAllSchemaRefs(s));
+    }
+    if (typeof schema !== 'object' || !schema) {
       return schema;
     }
 
