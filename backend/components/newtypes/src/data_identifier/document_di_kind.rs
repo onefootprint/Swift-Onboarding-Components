@@ -78,9 +78,16 @@ crate::util::impl_enum_string_diesel!(DocumentDiKind);
 #[strum(serialize_all = "snake_case")]
 pub enum OcrDataKind {
     FullName,
+    FirstName,
+    LastName,
     Dob,
     Gender,
     FullAddress,
+    AddressLine1,
+    City,
+    State,
+    // Global version of zip
+    PostalCode,
     DocumentNumber,
     ExpiresAt,
     IssuedAt,

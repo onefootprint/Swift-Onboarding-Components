@@ -56,15 +56,15 @@ impl TryFrom<IncodeOcrField> for ODK {
             IncodeOcrField::Curp => Ok(ODK::Curp),
             IncodeOcrField::ClaveDeElector => Ok(ODK::ClaveDeElector),
             IncodeOcrField::ClassifiedDocumentType => Ok(ODK::ClassifiedDocumentType),
-            // IDKs
-            IncodeOcrField::FirstName
-            | IncodeOcrField::MiddleName
-            | IncodeOcrField::LastName
-            | IncodeOcrField::AddressLine1
+            IncodeOcrField::FirstName => Ok(ODK::FirstName),
+            IncodeOcrField::AddressLine1 => Ok(ODK::AddressLine1),
+            IncodeOcrField::LastName => Ok(ODK::LastName),
+            IncodeOcrField::City => Ok(ODK::City),
+            IncodeOcrField::State => Ok(ODK::State),
+            IncodeOcrField::Zip => Ok(ODK::PostalCode),
+            // IDKs only
+            IncodeOcrField::MiddleName
             | IncodeOcrField::AddressLine2
-            | IncodeOcrField::City
-            | IncodeOcrField::State
-            | IncodeOcrField::Zip
             | IncodeOcrField::Country
             | IncodeOcrField::DriversLicenseNumber
             | IncodeOcrField::DriversLicenseState => {
