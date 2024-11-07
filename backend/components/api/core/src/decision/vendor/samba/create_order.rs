@@ -11,12 +11,14 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
+use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
 use db::models::samba_order::NewSambaOrderArgs;
 use db::models::samba_order::SambaOrder;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
+use db::models::workflow::Workflow;
 use db::PgConn;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::samba::client::SambaResult;
@@ -30,14 +32,17 @@ use newtypes::samba::SambaData;
 use newtypes::samba::SambaOrderKind;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::vendor_api_struct::SambaLicenseValidationCreate;
+use newtypes::BillingEventKind;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentId;
 use newtypes::DocumentKind;
 use newtypes::IdDocKind;
+use newtypes::ObConfigurationId;
 use newtypes::OcrDataKind as ODK;
 use newtypes::SambaActivityHistoryCreate;
+use newtypes::ScopedVaultId;
 use newtypes::UsStateAndTerritories;
 use newtypes::VendorAPI;
 use newtypes::WorkflowId;
@@ -103,6 +108,21 @@ impl CreateOrderContext {
         let doc = AdditionalIdentityDocumentVerificationHelper::new(id_documents).identity_document();
 
         Ok(doc)
+    }
+
+    // Consider this billable if it is in the context of a workflow
+    // TODO: figure out how to handle adhoc requests, for now it'll just be us running adhoc requests
+    // and we shouldn't bill for thos
+    pub fn get_billable_info(
+        &self,
+        conn: &mut PgConn,
+    ) -> FpResult<Option<(ScopedVaultId, ObConfigurationId)>> {
+        if let Self::Workflow { wf_id, .. } = self {
+            let wf = Workflow::get(conn, wf_id)?;
+            Ok(Some((wf.scoped_vault_id, wf.ob_configuration_id)))
+        } else {
+            Ok(None)
+        }
     }
 }
 
@@ -485,6 +505,20 @@ pub async fn run_samba_create_order(
             };
             // create samba order
             let _ = SambaOrder::create(conn, args)?;
+
+            // create billing event if applicable
+            if let Some((sv_id, obc_id)) = samba_helper.ctx.get_billable_info(conn.conn())? {
+                if matches!(samba_helper.kind, SambaOrderKind::ActivityHistory) {
+                    BillingEvent::create(
+                        conn,
+                        &sv_id,
+                        Some(&obc_id),
+                        BillingEventKind::SambaActivityHistory,
+                    )?;
+                } else {
+                    tracing::error!("Samba license validation was run in a workflow but is not yet billable");
+                }
+            }
 
             Ok(())
         })
