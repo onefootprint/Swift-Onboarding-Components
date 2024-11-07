@@ -5,19 +5,24 @@ import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 import styled from 'styled-components';
 
+import noop from 'lodash/noop';
 import { useState } from 'react';
-import Form from './components/form';
+import useTrackingStorage from 'src/hooks/use-tracking-storage';
+import Form, { type FormData } from './components/form';
 import Header from './components/header';
 import Takeover from './components/takeover';
 import { useGetInProgressOnboardings } from './hooks/use-get-in-progress-onboardings';
+import { useSubmitHubspotOnboardingForm } from './hooks/use-submit-hubspot-onboarding-form';
 
 const Onboarding = () => {
   const { t } = useTranslation('onboarding');
   const router = useRouter();
   const session = useSession();
+  const trackingStorage = useTrackingStorage();
   const [hasShownWarning, setHasShownWarning] = useState(false);
   const authToken = session.authHeaders['x-fp-dashboard-authorization'] || '';
   const { data: inProgressOnboardings } = useGetInProgressOnboardings({ authToken });
+  const { mutateAsync: submitHubspotOnboardingForm, isPending: isSubmitting } = useSubmitHubspotOnboardingForm();
   const shouldShowTakeover = inProgressOnboardings && inProgressOnboardings.length > 0 && !hasShownWarning;
 
   const handleConfirm = () => {
@@ -28,9 +33,23 @@ const Onboarding = () => {
     router.push('/logout');
   };
 
-  const handleCompleted = () => {
+  const submitOnboardingData = async (email: string, formData: FormData) => {
+    try {
+      await submitHubspotOnboardingForm({ ...trackingStorage.data, ...formData, email });
+      // Fire Google Analytics event here
+    } catch (error) {
+      console.error('Error submitting to HubSpot:', error); // Don't block the user from completing the onboarding
+    } finally {
+      trackingStorage.reset();
+    }
+  };
+
+  const handleCompleted = async (formData: FormData) => {
+    const userEmail = session.data.user?.email;
+    if (userEmail) {
+      await submitOnboardingData(userEmail, formData);
+    }
     session.completeOnboarding();
-    // TODO: Redirect back to DEFAULT_PUBLIC_ROUTE
     router.push('/users');
   };
 
@@ -47,7 +66,7 @@ const Onboarding = () => {
           <Header userEmail={session.data.user.email} onLogout={handleLogout} />
           <Content>
             <Container>
-              <Form onComplete={handleCompleted} />
+              <Form onComplete={isSubmitting ? noop : handleCompleted} />
             </Container>
           </Content>
         </>

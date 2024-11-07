@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import isString from 'lodash/isString';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import useTrackingStorage from 'src/hooks/use-tracking-storage';
 import Blur from '../components/blur';
 import ContainerBox from '../components/container-box';
 import EmailForm from '../components/email-form';
@@ -14,6 +18,20 @@ import PenguinWink from './components/penguin-wink';
 
 const Signup = () => {
   const { t } = useTranslation('authentication', { keyPrefix: 'sign-up' });
+  const { query, isReady } = useRouter();
+  const { update } = useTrackingStorage();
+
+  useEffect(() => {
+    if (isReady) {
+      update({
+        utmCampaign: isString(query.utm_campaign) ? query.utm_campaign : undefined,
+        utmContent: isString(query.utm_content) ? query.utm_content : undefined,
+        utmMedium: isString(query.utm_medium) ? query.utm_medium : undefined,
+        utmSource: isString(query.utm_source) ? query.utm_source : undefined,
+        utmTerm: isString(query.utm_term) ? query.utm_term : undefined,
+      });
+    }
+  }, [isReady, query, update]);
 
   return (
     <>

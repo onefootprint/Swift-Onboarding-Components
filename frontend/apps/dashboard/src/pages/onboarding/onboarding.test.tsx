@@ -15,6 +15,13 @@ import {
 } from './onboarding.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+jest.mock('./hooks/use-submit-hubspot-onboarding-form', () => ({
+  __esModule: true,
+  useSubmitHubspotOnboardingForm: () => ({
+    mutateAsync: () => Promise.resolve(),
+    isPending: false,
+  }),
+}));
 
 describe('<Onboarding />', () => {
   const renderOnboarding = () => customRender(<Onboarding />);
