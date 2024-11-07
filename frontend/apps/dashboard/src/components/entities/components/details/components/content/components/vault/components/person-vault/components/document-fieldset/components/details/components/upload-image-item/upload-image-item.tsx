@@ -1,44 +1,42 @@
-import type { DataIdentifier, DocumentUpload, EntityVault } from '@onefootprint/types';
-import { useObjectUrl } from '@onefootprint/ui';
-import Image from 'next/image';
+import type { DocumentUpload, EntityVault } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
+import UploadTitleCard from '../upload-title-card';
 import PdfThumbnail from './components/pdf-thumbnail';
-import UploadTitleCard from './components/upload-title-card';
+import StyledImage from './components/styled-image';
+import useUploadData from './hooks/use-upload-data/use-upload-data';
 
 type UploadImageItemProps = {
   upload: DocumentUpload & { isLatest: boolean };
   vault: EntityVault;
+  refCallback: (el: HTMLDivElement | null) => void;
+  imageOnly?: boolean;
 };
 
-const UploadImageItem = ({ upload, vault }: UploadImageItemProps) => {
-  const { identifier: di, version } = upload;
-  const vaultIndex = `${di}:${version}` as DataIdentifier;
-  const base64Data = (vault[vaultIndex] ?? vault[di]) as string;
-  const { objectUrl, mimeType } = useObjectUrl(base64Data);
-  const isPdf = mimeType === 'application/pdf';
+const UploadImageItem = ({ upload, vault, refCallback, imageOnly }: UploadImageItemProps) => {
+  const { objectUrl, isPdf, di } = useUploadData(upload, vault);
 
-  if (!objectUrl) {
-    return null;
-  }
+  if (!objectUrl) return null;
+  if (isPdf) return <PdfThumbnail src={objectUrl} />;
 
-  return isPdf ? (
-    <PdfThumbnail src={objectUrl} />
-  ) : (
-    <>
-      <UploadTitleCard upload={upload} />
-      <StyledImage src={objectUrl} width={0} height={0} alt={di} />
-    </>
+  return (
+    <Upload
+      key={`${upload.identifier}:${upload.version}`}
+      ref={el => refCallback(el)}
+      direction="column"
+      align="center"
+      gap={3}
+      width="100%"
+    >
+      {!imageOnly && <UploadTitleCard upload={upload} />}
+      <StyledImage alt={di} src={objectUrl} />
+    </Upload>
   );
 };
 
-const StyledImage = styled(Image)`
+const Upload = styled(Stack)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    box-shadow: ${theme.elevation[2]};
-    max-width: 100%;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
+    scroll-margin-top: ${theme.spacing[3]};
   `};
 `;
 

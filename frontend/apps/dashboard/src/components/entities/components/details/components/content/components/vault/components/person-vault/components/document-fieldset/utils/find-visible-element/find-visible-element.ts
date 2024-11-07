@@ -18,8 +18,7 @@ const findVisibleElement = (containerRect: DOMRect, elements: (ScrollElement | n
     if (Math.abs(center - containerCenter) < height) partiallyVisibleIndex = index;
   });
 
-  if (fullyVisibleIndex !== -1) return fullyVisibleIndex;
-  return partiallyVisibleIndex;
+  return fullyVisibleIndex === -1 ? partiallyVisibleIndex : fullyVisibleIndex;
 };
 
 export default findVisibleElement;

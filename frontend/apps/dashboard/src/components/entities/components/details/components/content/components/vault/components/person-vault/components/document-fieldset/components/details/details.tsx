@@ -69,7 +69,7 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
           drawerChildren={showDrawer && <DrawerContent document={document} vault={vault} />}
           ref={scrollContainerRef}
         >
-          <TableOfContents uploads={uploads} onClick={scrollToUpload} currentIndex={visibleUploadIndex} />
+          <TableOfContents uploads={uploads} onClick={scrollToUpload} visibleIndex={visibleUploadIndex} />
           <UploadsContainer direction="column" align="center" gap={8} width="70%">
             {uploads.map((upload, index) => (
               <UploadContainer
@@ -80,7 +80,11 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
                 gap={4}
                 width="100%"
               >
-                <UploadImageItem upload={upload as DocumentUpload & { isLatest: boolean }} vault={vault} />
+                <UploadImageItem
+                  upload={upload as DocumentUpload & { isLatest: boolean }}
+                  vault={vault}
+                  refCallback={el => (uploadRefs.current[index] = el)}
+                />
               </UploadContainer>
             ))}
           </UploadsContainer>

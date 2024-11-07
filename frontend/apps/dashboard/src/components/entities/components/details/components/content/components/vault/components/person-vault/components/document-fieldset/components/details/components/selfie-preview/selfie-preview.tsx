@@ -18,7 +18,7 @@ const SelfiePreview = ({ uploads, vault }: SelfiePreviewProps) => {
   if (!objectUrl) return null;
 
   return (
-    <Container position="fixed" alignSelf="flex-start">
+    <Container position="fixed" alignSelf="flex-start" zIndex="drawer">
       <StyledImage src={objectUrl} width={0} height={0} alt="selfie preview" />
     </Container>
   );

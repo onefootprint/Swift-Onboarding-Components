@@ -372,14 +372,20 @@
         },
         "status": {
           "success": "Success",
-          "failed": "Failed"
+          "failed": "Failed",
+          "failed-count": "Failed ({{count}})"
         },
         "side": {
           "front": "Front ID",
           "back": "Back ID",
           "selfie": "Selfie"
         },
-        "latest": "(Latest {{side}})",
+        "title-card": {
+          "attempts": "{{count}} attempts",
+          "latest": "(Latest {{side}})",
+          "show-all": "Show all",
+          "collapse": "Collapse"
+        },
         "table-of-contents": {
           "label": "{{side}} ⋅ {{status}}"
         },

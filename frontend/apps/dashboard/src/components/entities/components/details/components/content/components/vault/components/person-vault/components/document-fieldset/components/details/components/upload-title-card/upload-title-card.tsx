@@ -3,14 +3,18 @@ import type { DocumentUpload, IdDocImageProcessingError } from '@onefootprint/ty
 import { Stack, Text, Tooltip } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import useUploadSideText from '../../../../../../hooks/use-upload-side-text';
+import useUploadSideText from '../../../../hooks/use-upload-side-text';
 import useFailureReasonText from './hooks';
 
 export type UploadTitleCardProps = {
   upload: DocumentUpload & { isLatest: boolean };
+  rightChildren?: React.ReactNode;
 };
 
-const UploadTitleCard = ({ upload: { timestamp, failureReasons, isLatest, side } }: UploadTitleCardProps) => {
+const UploadTitleCard = ({
+  upload: { timestamp, failureReasons, isLatest, side },
+  rightChildren,
+}: UploadTitleCardProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset.documents.details' });
   const failureReasonT = useFailureReasonText();
   const sideT = useUploadSideText();
@@ -19,7 +23,8 @@ const UploadTitleCard = ({ upload: { timestamp, failureReasons, isLatest, side }
   return (
     <Stack
       maxWidth="100%"
-      width="500px"
+      width="100%"
+      justify="space-between"
       align="center"
       gap={2}
       borderRadius="default"
@@ -32,23 +37,26 @@ const UploadTitleCard = ({ upload: { timestamp, failureReasons, isLatest, side }
       paddingLeft={4}
       backgroundColor="primary"
     >
-      <Text variant="snippet-1">{format(new Date(timestamp), 'MM/dd/yy h:mma')}</Text>
-      <Text tag="span" variant="label-3">
-        ⋅
-      </Text>
-      <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
-        {isSuccess ? t('status.success') : t('status.failed')}
-      </Text>
-      {!isSuccess && (
-        <Tooltip text={failureReasonT(failureReasons[0] as IdDocImageProcessingError)}>
-          <IcoInfo16 color="tertiary" />
-        </Tooltip>
-      )}
-      {isLatest && (
-        <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
-          {t('latest', { side: sideT(side) })}
+      <Stack gap={2} align="center">
+        <Text variant="snippet-1">{format(new Date(timestamp), 'MM/dd/yy h:mma')}</Text>
+        <Text tag="span" variant="label-3">
+          ⋅
         </Text>
-      )}
+        <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
+          {isSuccess ? t('status.success') : t('status.failed')}
+        </Text>
+        {!isSuccess && (
+          <Tooltip text={failureReasonT(failureReasons[0] as IdDocImageProcessingError)}>
+            <IcoInfo16 color="tertiary" />
+          </Tooltip>
+        )}
+        {isLatest && (
+          <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
+            {t('title-card.latest', { side: sideT(side) })}
+          </Text>
+        )}
+      </Stack>
+      {rightChildren}
     </Stack>
   );
 };
