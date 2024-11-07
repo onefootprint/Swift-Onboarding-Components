@@ -23,7 +23,7 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
 
   return (
     <Stack direction="column" gap={5} align="flex-start">
-      <Stack gap={2} align="flex-start" justify="flex-start">
+      <Stack gap={2} align="flex-start" justify="flex-start" position="relative" left="-2px">
         <IcoSpeedometer24 />
         <Text variant="label-2">{t('title')}</Text>
       </Stack>

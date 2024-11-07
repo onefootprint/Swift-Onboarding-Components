@@ -32,7 +32,7 @@ const ExtractedDocumentData = ({ vault, documentType, activeDocumentVersion }: E
 
   return relevantKeys.length ? (
     <Stack direction="column" gap={5} align="flex-start">
-      <Stack gap={2} align="center" justify="flex-start">
+      <Stack gap={2} align="center" justify="flex-start" position="relative" left="-2px">
         <IcoFileText24 />
         <Text variant="label-2">{t('title')}</Text>
       </Stack>
