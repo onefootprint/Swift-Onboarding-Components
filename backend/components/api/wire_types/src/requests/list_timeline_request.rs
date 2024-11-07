@@ -6,6 +6,7 @@ use newtypes::DbUserTimelineEventKind;
 #[serde(rename_all = "snake_case")]
 pub struct ListTimelineRequest {
     #[serde(default)]
+    #[openapi(serialize_as = "Option<Vec<DbUserTimelineEventKind>>")]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     pub kinds: Vec<DbUserTimelineEventKind>,
 }

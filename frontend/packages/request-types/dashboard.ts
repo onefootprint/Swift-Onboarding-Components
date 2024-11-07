@@ -170,6 +170,7 @@ export type AuditEventDetail =
         firstName?: string;
         lastName?: string;
         scopes: Array<TenantScope>;
+        tenantName: string;
         tenantRoleId: string;
         tenantRoleName: string;
       };
@@ -6295,8 +6296,8 @@ export type GetEntitiesByFpIdTimelineData = {
   path: {
     fpId: string;
   };
-  query: {
-    kinds: Array<
+  query?: {
+    kinds?: Array<
       | 'data_collected'
       | 'identity_document_uploaded'
       | 'onboarding_decision'

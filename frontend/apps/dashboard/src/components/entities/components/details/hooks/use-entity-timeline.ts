@@ -21,7 +21,6 @@ const useEntityTimeline = (id: string) => {
   return useQuery({
     ...getEntitiesByFpIdTimelineOptions({
       path: { fpId: id },
-      // @ts-expect-error: remove once backend is fixed
       query: {},
     }),
     select: events => {

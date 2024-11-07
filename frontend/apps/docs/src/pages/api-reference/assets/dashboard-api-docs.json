@@ -2441,7 +2441,6 @@
                     {
                         "in": "query",
                         "name": "kinds",
-                        "required": true,
                         "schema": {
                             "type": "array",
                             "items": {
