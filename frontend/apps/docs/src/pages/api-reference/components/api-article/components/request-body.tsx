@@ -1,11 +1,11 @@
-import { Box, Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { ContentSchemaNoRef, RequestOrResponse } from 'src/pages/api-reference/api-reference.types';
 
 import Description from './description';
-import Schema from './schema';
+import { SchemaBody } from './schema';
 
 type RequestBodyProps = {
   requestBody: RequestOrResponse<ContentSchemaNoRef>;
@@ -31,9 +31,7 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
         )}
       </Stack>
       {requestBody.description && <Description>{requestBody.description}</Description>}
-      <Box marginLeft={3}>
-        <Schema schema={requestBody.content} isInBrackets />
-      </Box>
+      <SchemaBody schema={requestBody.content} isInBrackets />
     </Stack>
   ) : null;
 };

@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
 import styled, { css } from 'styled-components';
 
+// One day we could have better logic  here
+const plural = (v: string) => `${v}s`;
+
 type HeaderProps = {
   title: string;
   schema: ContentSchemaNoRef;
@@ -10,10 +13,7 @@ type HeaderProps = {
   isInBrackets?: boolean;
 };
 
-// One day we could have better logic  here
-const plural = (v: string) => `${v}s`;
-
-const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
+const Header = ({ title, schema, isRequired }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
 
   const typeLabelParts = [];
@@ -34,7 +34,7 @@ const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
 
   return (
     <StyledStack align="center" justify="flex-start" gap={3}>
-      <Column isInBrackets={isInBrackets}>
+      <Column>
         <CodeInline disabled>{title}</CodeInline>
         <Separator>·</Separator>
         <Text variant="snippet-2" color="quaternary">
@@ -53,28 +53,13 @@ const StyledStack = styled(Stack)`
   `}
 `;
 
-const Column = styled.div<{ isInBrackets?: boolean }>`
-  ${({ theme, isInBrackets }) => css`
+const Column = styled.div`
+  ${({ theme }) => css`
     align-items: center;
     color: ${theme.color.secondary};
     display: flex;
     gap: ${theme.spacing[2]};
     position: relative;
-
-    ${
-      isInBrackets &&
-      css`
-      &:before {
-        content: '';
-        background: ${theme.borderColor.tertiary};
-        height: ${theme.borderWidth[1]};
-        width: ${theme.spacing[4]};
-        left: calc(-1 * ${theme.spacing[4]});
-        position: absolute;
-        transform: translateY(-50%);
-        top: 50%;
-      }
-    `
     }
   `}
 `;

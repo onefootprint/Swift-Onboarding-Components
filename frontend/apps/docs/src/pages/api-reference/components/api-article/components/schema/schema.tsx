@@ -1,62 +1,130 @@
-import styled, { css } from 'styled-components';
-
+import { IcoChevronRight16 } from '@onefootprint/icons';
+import { Box, Stack } from '@onefootprint/ui';
+import { useState } from 'react';
 import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
-
-import { Stack } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 import Description from '../description';
+import Enum from './components/enum';
 import Header from './components/header';
-import Properties from './components/properties/properties';
 
 type SchemaProps = {
-  schema: ContentSchemaNoRef;
+  schemaData: {
+    title: string;
+    schema: ContentSchemaNoRef;
+    isRequired?: boolean;
+  };
   isInBrackets?: boolean;
+  level?: number;
 };
 
-/// Renders a schema's properties, whether the schema is an object or an array.
-/// Intended to be used as the top-level component to render a schema so each property in the schema.
-/// The top-level schema doesn't have a name
-const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
-  // Render array by rendering the array's elements
-  if (schema.type === 'array' && schema.items) {
-    return <Schema schema={schema.items} isInBrackets={isInBrackets} />;
-  }
-
-  // Render object by rendering each of its fields
-  const { properties, required = [] } = schema;
-
-  // We don't yet have any other top-level schema types (like an HTTP response that's just an enum)
-  if (schema.type !== 'object') {
-    console.warn('Cannot render schema', schema);
-  }
-
-  if (!properties) {
-    return null;
-  }
+/** Renders an open API schema, including its header (name, type, description) and body. If schema is an object type, the body is collapsible. */
+export const Schema = ({ schemaData, isInBrackets, level = 0 }: SchemaProps) => {
+  const { title, schema, isRequired } = schemaData;
+  // If the schema is not an object, it's always expanded
+  const isObjectSchema = !!schema.properties || !!schema.items?.properties;
+  // Minimize all objects past the first layer by default. And minimize the pagination
+  const minimizeByDefault = level > 1 || title === 'meta';
+  const [expanded, setExpanded] = useState(!isObjectSchema || !minimizeByDefault);
+  const handleToggle = () => {
+    setExpanded(currentExpanded => !currentExpanded);
+  };
 
   return (
-    <Stack direction="column" gap={2}>
-      {Object.entries(properties).map(([title, property]) => (
-        <BracketContainer
-          isInBrackets={isInBrackets}
-          key={title}
-          data-last-child={Object.keys(properties).indexOf(title) === Object.keys(properties).length - 1}
-          data-first-child={Object.keys(properties).indexOf(title) === 0}
-        >
-          <Grid>
-            <Header
-              title={title}
-              schema={property}
-              isRequired={required.length > 0 && required.includes(title)}
-              isInBrackets={isInBrackets}
-            />
-            {property.description && <Description>{property.description}</Description>}
-            <Properties schema={property} />
-          </Grid>
-        </BracketContainer>
-      ))}
+    <Stack direction="column">
+      <HeaderCollapsibleButton disabled={!isObjectSchema} onClick={handleToggle}>
+        {isInBrackets && <Connector data-has-children={isObjectSchema} />}
+        {isObjectSchema && (
+          <IconBounds expanded={expanded}>
+            <IcoChevronRight16 color="tertiary" />
+          </IconBounds>
+        )}
+        <Header title={title} schema={schema} isRequired={isRequired} isInBrackets={isInBrackets} />
+      </HeaderCollapsibleButton>
+      <Box marginLeft={isInBrackets ? 7 : 0}>
+        {schema.description && <Description>{schema.description}</Description>}
+        {expanded && <SchemaBody schema={schema} isInBrackets={isInBrackets} level={level} />}
+      </Box>
     </Stack>
   );
 };
+
+type SchemaBodyProps = {
+  schema: ContentSchemaNoRef;
+  isInBrackets?: boolean;
+  level?: number;
+};
+
+/** Renders details about an open API schema, not including its header (name, type, and description). */
+export const SchemaBody = ({ schema, isInBrackets = false, level = 0 }: SchemaBodyProps) => {
+  // Render array by rendering the array's elements
+  if (schema.type === 'array' && schema.items) {
+    return <SchemaBody schema={schema.items} isInBrackets={isInBrackets} />;
+  }
+
+  if (schema.enum) {
+    return <Enum enums={schema.enum} />;
+  }
+
+  if (schema.properties) {
+    const { properties, required = [] } = schema;
+    return (
+      <Stack direction="column" gap={2}>
+        {Object.entries(properties).map(([title, property]) => (
+          <BracketContainer
+            isInBrackets={isInBrackets}
+            key={title}
+            data-last-child={Object.keys(properties).indexOf(title) === Object.keys(properties).length - 1}
+            data-first-child={Object.keys(properties).indexOf(title) === 0}
+          >
+            <Schema
+              schemaData={{ title, schema: property, isRequired: required?.includes(title) }}
+              isInBrackets={isInBrackets}
+              level={level + 1}
+            />
+          </BracketContainer>
+        ))}
+      </Stack>
+    );
+  }
+
+  return null;
+};
+
+const Connector = styled.div`
+  ${({ theme }) => css`
+    background: ${theme.borderColor.tertiary};
+    height: ${theme.borderWidth[1]};
+    margin-left: calc(${theme.spacing[2]} * -1);
+    width: ${theme.spacing[3]};
+
+    &[data-has-children='false'] {
+      width: ${theme.spacing[5]};
+      margin-right: ${theme.spacing[3]};
+    }
+  `}
+`;
+
+const IconBounds = styled.div<{ expanded: boolean }>`
+  ${({ theme, expanded }) => css`
+    margin-right: ${theme.spacing[2]};
+    transform: rotate(${expanded ? '90deg' : '0deg'});
+    transition: transform 0.2s ease-in-out;
+  `}
+`;
+
+const HeaderCollapsibleButton = styled.button`
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    cursor: initial;
+  }
+`;
 
 const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
   ${({ theme, isInBrackets }) => css`
@@ -67,7 +135,7 @@ const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
     ${
       isInBrackets &&
       css`
-      padding-left: ${theme.spacing[4]};
+      padding-left: ${theme.spacing[2]};
 
       &[data-first-child='true'] {
         &:after {
@@ -85,7 +153,7 @@ const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
         &:before {
           content: '';
           background: ${theme.borderColor.tertiary};
-          height: calc(100% + ${theme.spacing[2]});
+          height: calc(100% + ${theme.spacing[1]});
           width: ${theme.borderWidth[1]};
           left: 0;
           position: absolute;
@@ -96,13 +164,3 @@ const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
     }
   `}
 `;
-
-const Grid = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
-  `}
-`;
-
-export default Schema;

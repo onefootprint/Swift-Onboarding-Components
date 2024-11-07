@@ -1,7 +1,7 @@
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import type { ContentSchemaNoRef, ResponseHeader } from 'src/pages/api-reference/api-reference.types';
-import Schema from './schema';
+import { SchemaBody } from './schema';
 
 type ResponseHeadersProps = {
   headers?: Record<string, ResponseHeader>;
@@ -34,7 +34,7 @@ const ResponseHeaders = ({ headers }: ResponseHeadersProps) => {
       <Text variant="label-1" color="secondary">
         {t('header-parameters')}
       </Text>
-      <Schema schema={headersSchema} />
+      <SchemaBody schema={headersSchema} />
     </Stack>
   );
 };

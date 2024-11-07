@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ParameterProps } from 'src/pages/api-reference/api-reference.types';
 
-import Schema from '../schema';
+import { SchemaBody } from '../schema';
 import useParametersGroupBySections from './hooks/use-parameters-grouped-by-section';
 
 const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
@@ -18,7 +18,7 @@ const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
           <Text variant="label-1" color="secondary">
             {t(section.title as ParseKeys<'common'>)}
           </Text>
-          <Schema schema={section.parameters} />
+          <SchemaBody schema={section.parameters} />
         </Stack>
       ))}
     </Stack>

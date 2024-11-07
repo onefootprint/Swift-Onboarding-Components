@@ -1,11 +1,11 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 import type { ContentSchemaNoRef, RequestOrResponse } from 'src/pages/api-reference/api-reference.types';
 
 import Description from './description';
 import ResponseHeaders from './response-headers';
-import Schema from './schema';
+import { SchemaBody } from './schema';
 
 export type ResponsesProps = {
   responses: Record<string, RequestOrResponse<ContentSchemaNoRef>>;
@@ -39,9 +39,7 @@ const Responses = ({ responses }: ResponsesProps) => {
           </Text>
         ) : null}
         {response.content.description && <Description>{response.content.description}</Description>}
-        <Box marginLeft={3}>
-          <Schema schema={response.content} isInBrackets />
-        </Box>
+        <SchemaBody schema={response.content} isInBrackets />
       </Stack>
       <ResponseHeaders headers={response.headers} />
     </Stack>

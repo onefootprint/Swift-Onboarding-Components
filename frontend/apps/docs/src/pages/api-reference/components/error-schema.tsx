@@ -1,6 +1,6 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import type { ContentSchemaNoRef } from '../api-reference.types';
-import Schema from './api-article/components/schema';
+import { SchemaBody } from './api-article/components/schema';
 
 const ERROR_OPEN_API_SPEC: ContentSchemaNoRef = {
   properties: {
@@ -25,9 +25,7 @@ const ErrorSchema = () => {
       <Text variant="label-1" color="secondary">
         Error responses
       </Text>
-      <Box marginLeft={3}>
-        <Schema isInBrackets schema={ERROR_OPEN_API_SPEC} />
-      </Box>
+      <SchemaBody isInBrackets schema={ERROR_OPEN_API_SPEC} />
     </Stack>
   );
 };
