@@ -2,7 +2,7 @@ from tests.utils import get
 
 
 def test_get_org_config(tenant, must_collect_data):
-    ob_config = get("org/onboarding_config", None, tenant.default_ob_config.key)
+    ob_config = get("hosted/onboarding/config", None, tenant.default_ob_config.key)
     assert ob_config["name"] == "Acme Bank Card"
     assert ob_config["org_name"] == tenant.name
 

@@ -1204,7 +1204,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     assert ob_config["status"] == new_status
 
     # Verify we can't use the disabled ob config for anything anymore
-    get("org/onboarding_config", None, ob_configuration.key, status_code=401)
+    get("hosted/onboarding/config", None, ob_configuration.key, status_code=401)
 
 
 def test_business_only_obc(sandbox_tenant):

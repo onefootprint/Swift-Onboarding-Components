@@ -34,6 +34,4 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(timeline::post)
         .service(session::get)
         .service(config::get);
-
-    config::configure_get_aliases(config);
 }

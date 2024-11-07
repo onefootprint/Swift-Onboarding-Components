@@ -17,7 +17,6 @@ use db::models::workflow_request::WorkflowRequest;
 use db::models::workflow_request_junction::WorkflowRequestJunction;
 use db::DbResult;
 use db::PgConn;
-use macros::route_alias;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
 use newtypes::RuleAction;
@@ -26,11 +25,6 @@ use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
 
-#[route_alias(get(
-    "/org/onboarding_config",
-    tags(Onboarding, Deprecated),
-    description = "Fetch an onboarding configuration",
-))] // TODO: remove alias once we migrate the endpoints
 #[api_v2_operation(
     tags(Onboarding, Organization, Hosted),
     description = "Get the details of an onboarding configuration."
