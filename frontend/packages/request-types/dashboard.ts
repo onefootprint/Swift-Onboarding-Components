@@ -67,7 +67,7 @@ export type AssumePartnerRoleRequest = {
 };
 export type AssumePartnerRoleResponse = {
   partnerTenant: PartnerOrganization;
-  token: SessionAuthToken;
+  token: string;
   user: OrganizationMember;
 };
 export type AssumeRoleRequest = {
@@ -75,7 +75,7 @@ export type AssumeRoleRequest = {
 };
 export type AssumeRoleResponse = {
   tenant: Organization;
-  token: SessionAuthToken;
+  token: string;
   user: OrganizationMember;
 };
 export type AttestedDeviceData = {
@@ -177,6 +177,13 @@ export type AuditEventDetail =
       kind: 'invite_org_member';
     }
   | {
+      data: {
+        firstName?: string;
+        lastName?: string;
+        newRole: OrganizationRole;
+        oldRole: OrganizationRole;
+        tenantUserId: string;
+      };
       kind: 'update_org_member';
     }
   | {
@@ -573,7 +580,7 @@ export type CreateEntityTokenResponse = {
   deliveryMethod?: ContactInfoKind;
   expiresAt: string;
   link: string;
-  token: SessionAuthToken;
+  token: string;
 };
 export type CreateKycLinksRequest = {
   /**
@@ -636,12 +643,9 @@ export type CreateOrgTenantTagRequest = {
   kind: VaultKind;
   tag: string;
 };
-/**
- * Create a new proxy configuration
- */
 export type CreateProxyConfigRequest = {
   /**
-   * access reason to use during proxy decryptions
+   * Access reason to use during proxy decryptions
    */
   accessReason?: string;
   clientIdentity?: ClientIdentity;
@@ -730,7 +734,12 @@ export type CreateTokenResponse = {
    * complete the flow. This is useful to send in an automated message to the end user.
    */
   link: string;
-  token: SessionAuthToken;
+  /**
+   * A short-lived token that can be passed into the Verify SDK to allow the user to complete the
+   * flow. This is useful when you'd like to open a native interface inside your app for the user
+   * to complete the flow.
+   */
+  token: string;
 };
 export type kind5 = 'trigger';
 /**
@@ -818,9 +827,6 @@ export type DataCollectedInfo = {
   isPrefill: boolean;
   targets: Array<DataIdentifier>;
 };
-/**
- * Represents a piece of data stored inside the vault.
- */
 export type DataIdentifier =
   | 'id.first_name'
   | 'id.middle_name'
@@ -1070,10 +1076,6 @@ export type DataIdentifier =
   | 'bank.*.ach_account_id'
   | 'bank.*.account_type'
   | 'bank.*.fingerprint';
-/**
- * Sequence number used to order DataLifetimes
- */
-export type DataLifetimeSeqno = number;
 export type DataLifetimeSource =
   | 'hosted'
   | 'components_sdk'
@@ -1133,11 +1135,11 @@ export type DeviceInsightOperation = {
 };
 export type DeviceType = 'ios' | 'android';
 export type DocsTokenResponse = {
-  token: SessionAuthToken;
+  token: string;
 };
 export type Document = {
-  completedVersion?: DataLifetimeSeqno;
-  curpCompletedVersion?: DataLifetimeSeqno;
+  completedVersion?: number;
+  curpCompletedVersion?: number;
   documentScore?: number;
   kind: DocumentKind;
   ocrConfidenceScore?: number;
@@ -1189,9 +1191,6 @@ export type DocumentImageError =
   | 'document_glare'
   | 'document_sharpness'
   | 'military_id_not_allowed';
-/**
- * The set of values we can use for identity_document.document_type
- */
 export type DocumentKind =
   | 'id_card'
   | 'drivers_license'
@@ -1259,7 +1258,7 @@ export type DocumentUpload = {
   isExtraCompressed: boolean;
   side: DocumentSide;
   timestamp: string;
-  version: DataLifetimeSeqno;
+  version: number;
 };
 export type DocumentUploadSettings = 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
 export type DocumentUploadedTimelineEvent = {
@@ -1392,7 +1391,7 @@ export type EntityOnboarding = {
   id: string;
   playbookKey: string;
   ruleSetResults: Array<EntityOnboardingRuleSetResult>;
-  seqno?: DataLifetimeSeqno;
+  seqno?: number;
   status: OnboardingStatus;
   timestamp: string;
 };
@@ -3009,9 +3008,6 @@ export type Iso3166TwoDigitCountryCode =
 export type LabelAdded = {
   kind: LabelKind;
 };
-/**
- * Label value to set. Unset by sending `null`
- */
 export type LabelKind = 'active' | 'offboard_fraud' | 'offboard_other';
 export type LineItem = {
   description?: string;
@@ -3305,9 +3301,6 @@ export type OnboardingConfiguration = {
   status: ApiKeyStatus;
   verificationChecks: Array<VerificationCheck>;
 };
-/**
- * The status of the onboarding
- */
 export type OnboardingStatus = 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 export type OnboardingTimelineInfo = {
   event: string;
@@ -3329,7 +3322,7 @@ export type OrgFrequentNote = {
   kind: TenantFrequentNoteKind;
 };
 export type OrgLoginResponse = {
-  authToken: SessionAuthToken;
+  authToken: string;
   /**
    * Whether a new tenant was created for the authed user
    */
@@ -3473,12 +3466,9 @@ export type PartnerOrganization = {
   name: string;
   websiteUrl?: string;
 };
-/**
- * Patch a new proxy configuration
- */
 export type PatchProxyConfigRequest = {
   /**
-   * access reason to use during proxy decryptions
+   * Access reason to use during proxy decryptions
    */
   accessReason?: string;
   /**
@@ -3500,7 +3490,7 @@ export type PatchProxyConfigRequest = {
    */
   method?: string;
   /**
-   * a friendly name for this proxy config
+   * A friendly name for this proxy config
    */
   name?: string;
   /**
@@ -3512,15 +3502,11 @@ export type PatchProxyConfigRequest = {
   pinnedServerCertificates?: Array<string>;
   status?: ApiKeyStatus;
   /**
-   * the proxy destination URL
-   * Can include path and query params
+   * The proxy destination URL. Can include path and query params
    */
   url?: string;
 };
 export type PhoneLookupAttributes = 'line_type_intelligence';
-/**
- * a plain header to forward to the proxy
- */
 export type PlainCustomHeader = {
   /**
    * header name
@@ -3570,7 +3556,7 @@ export type PrivateBusinessOwnerKycLink = {
   id: string;
   link: string;
   name?: string;
-  token: SessionAuthToken;
+  token: string;
 };
 export type PrivateOwnedBusiness = {
   id: string;
@@ -3636,12 +3622,9 @@ export type ProxyConfigDetailed = {
  * The content type expected to be received from responses from the upstream.
  */
 export type ProxyIngressContentType = 'json';
-/**
- * A proxy ingress parsing and vaulting rule
- */
 export type ProxyIngressRule = {
   /**
-   * the target path to extract
+   * The target path to extract
    */
   target: string;
   token: DataIdentifier;
@@ -4049,9 +4032,6 @@ export type ScoreBand = 'low' | 'medium' | 'high';
  * A secret api key wrapper around a string
  */
 export type SecretApiKey = string;
-/**
- * a secret header to forward to the proxy
- */
 export type SecretCustomHeader = {
   /**
    * header name
@@ -4077,10 +4057,6 @@ export type SentilinkScoreDetail = {
   score: number;
   scoreBand: ScoreBand;
 };
-/**
- * An cryptographically generated auth token to authenticate a session
- */
-export type SessionAuthToken = string;
 /**
  * Represents the granularity of data attributes that could be alerted on by a data vendor
  * NOTE: this is not the same as "data attributes we can collect from a user". Please see
@@ -4369,9 +4345,6 @@ export type UserAiSummary = {
   highLevelSummary: string;
   riskSignalSummary: string;
 };
-/**
- * Represents a piece of data stored inside the vault.
- */
 export type UserDataIdentifier =
   | 'id.first_name'
   | 'id.middle_name'
@@ -5133,7 +5106,7 @@ export type UserTag = {
 };
 export type UserTimeline = {
   event: UserTimelineEvent;
-  seqno: DataLifetimeSeqno;
+  seqno: number;
   timestamp: string;
 };
 export type UserTimelineEvent =
@@ -7305,9 +7278,6 @@ export type GetOrgProxyConfigsData = {
 export type GetOrgProxyConfigsResponse = Array<ProxyConfigBasic>;
 export type GetOrgProxyConfigsError = unknown;
 export type PostOrgProxyConfigsData = {
-  /**
-   * Create a new proxy configuration
-   */
   body: CreateProxyConfigRequest;
 };
 export type PostOrgProxyConfigsResponse = ProxyConfigDetailed;
@@ -7320,9 +7290,6 @@ export type GetOrgProxyConfigsByProxyConfigIdData = {
 export type GetOrgProxyConfigsByProxyConfigIdResponse = ProxyConfigDetailed;
 export type GetOrgProxyConfigsByProxyConfigIdError = unknown;
 export type PatchOrgProxyConfigsByProxyConfigIdData = {
-  /**
-   * Patch a new proxy configuration
-   */
   body: PatchProxyConfigRequest;
   path: {
     proxyConfigId: string;

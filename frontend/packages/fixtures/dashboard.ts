@@ -582,6 +582,16 @@ export const getAuditEvent = (props: Partial<AuditEvent>) =>
   merge(
     {
       detail: {
+        data: {
+          context: 'api',
+          decryptedFields: [
+            'document.permit.issuing_country',
+            'document.passport_card.expires_at',
+            'document.passport_card.front.mime_type',
+          ],
+          fpId: 'elit dolore exercitation non eu',
+          reason: 'Duis reprehenderit',
+        },
         kind: 'disable_playbook',
       },
       id: 'de6b07cb-5896-4ef5-89b9-832c93b3f7f9',
@@ -2972,7 +2982,12 @@ export const getEntityWorkflow = (props: Partial<EntityWorkflow>) =>
       insightEvent: {
         city: 'Koelpinborough',
         ipAddress: '94438 Abshire Overpass Suite 326',
+        latitude: -81692336.78012651,
+        metroCode: 'et',
+        postalCode: 'laboris',
         region: 'proident sint est',
+        regionName: 'Christina Hoeger',
+        timeZone: 'nostrud nulla dolor et deserunt',
         timestamp: '1921-10-24T14:22:51.0Z',
         userAgent: 'anim ullamco',
       },
@@ -3582,6 +3597,7 @@ export const getInsightRegistration = (props: Partial<InsightRegistration>) =>
           roles: 'tempor',
         },
       ],
+      registeredAgent: 'id exercitation ad',
       registrationDate: 'elit commodo esse ut',
       source: 'Duis dolore aliqua ex',
       state: 'Pennsylvania',
@@ -4087,7 +4103,9 @@ export const getListEvent = (props: Partial<ListEvent>) =>
       detail: {
         data: {
           entries: ['aute esse ut dolor', 'enim', 'dolor'],
+          entry: 'consectetur sed',
           listEntryCreationId: 'velit',
+          listEntryId: 'nisi',
           listId: 'nisi minim',
         },
         kind: 'create_list_entry',
@@ -4101,8 +4119,10 @@ export const getListEvent = (props: Partial<ListEvent>) =>
         longitude: -12904972.625014871,
         metroCode: 'Ut nulla dolore',
         postalCode: 'voluptate ad',
+        region: 'enim dolor',
         regionName: 'Wanda Hintz-Nitzsche',
         sessionId: 'e828fc89-13d9-4714-8b9a-77a2a8b9f239',
+        timeZone: 'Excepteur voluptate ut occaecat sed',
         timestamp: '1965-05-29T21:12:22.0Z',
         userAgent: 'sed dolore',
       },
@@ -5946,6 +5966,9 @@ export const getTriggerRequest = (props: Partial<TriggerRequest>) =>
               kind: 'proof_of_ssn',
             },
           ],
+          playbookId: 'consectetur',
+          recollectAttributes: ['business_address', 'email', 'business_tin'],
+          reuseExistingBoKyc: true,
         },
         kind: 'document',
       },
@@ -6256,6 +6279,7 @@ export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>) =>
         note: 'cillum do veniam reprehenderit',
         requestIsActive: true,
         sessionId: 'minim in culpa in sit',
+        source: 'privacy_pass',
         successful: false,
         targets: [
           'document.id_card.issuing_country',
@@ -6272,7 +6296,9 @@ export const getVaultCreated = (props: Partial<VaultCreated>) =>
     {
       actor: {
         email: 'consequat',
+        firstName: 'non eiusmod',
         kind: 'firm_employee',
+        lastName: 'dolore ea sed amet reprehenderit',
         member: 'dolore nostrud',
       },
     },

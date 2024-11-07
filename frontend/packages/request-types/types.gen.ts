@@ -76,13 +76,9 @@ export type _key_ =
   | 'business.formation_date'
   | 'custom.*';
 export type BusinessOnboardingResponse = {
-  authToken: SessionAuthToken;
+  authToken: string;
 };
 export type ChallengeKind = 'sms' | 'biometric' | 'email';
-/**
- * Opaque challenge state token
- */
-export type ChallengeToken = string;
 export type CheckSessionResponse = 'active' | 'expired' | 'unknown';
 /**
  * Represent the options of allowed CollectedData.
@@ -152,14 +148,17 @@ export type CreateSdkArgsTokenResponse = {
    * The time at which the token expires
    */
   expiresAt: string;
-  token: SessionAuthToken;
+  /**
+   * The short-lived token that gives temporary access to perform operations for this user
+   */
+  token: string;
 };
 export type CreateUserTokenRequest = {
   requestedScope: RequestedTokenScope;
 };
 export type CreateUserTokenResponse = {
   expiresAt: string;
-  token: SessionAuthToken;
+  token: string;
 };
 export type CustomDocumentConfig = {
   /**
@@ -178,7 +177,7 @@ export type D2pGenerateRequest = {
   meta?: HandoffMetadata;
 };
 export type D2pGenerateResponse = {
-  authToken: SessionAuthToken;
+  authToken: string;
 };
 export type D2pSessionStatus = 'waiting' | 'in_progress' | 'canceled' | 'failed' | 'completed';
 export type D2pSmsRequest = {
@@ -194,9 +193,6 @@ export type D2pStatusResponse = {
 export type D2pUpdateStatusRequest = {
   status: D2pSessionStatus;
 };
-/**
- * Represents a piece of data stored inside the vault.
- */
 export type DataIdentifier =
   | 'id.first_name'
   | 'id.middle_name'
@@ -505,9 +501,6 @@ export type DocumentImageError =
   | 'document_glare'
   | 'document_sharpness'
   | 'military_id_not_allowed';
-/**
- * The set of values we can use for identity_document.document_type
- */
 export type DocumentKind =
   | 'id_card'
   | 'drivers_license'
@@ -557,7 +550,10 @@ export type DocumentResponse = {
 export type DocumentSide = 'front' | 'back' | 'selfie';
 export type DocumentUploadSettings = 'prefer_capture' | 'prefer_upload' | 'capture_only_on_mobile';
 export type EmailVerifyRequest = {
-  data: SessionAuthToken;
+  /**
+   * The token data in the email link fragment
+   */
+  data: string;
 };
 /**
  * Empty JSON.
@@ -659,7 +655,7 @@ export type HostedBusinessOwner = {
   uuid: string;
 };
 export type HostedValidateResponse = {
-  validationToken: SessionAuthToken;
+  validationToken: string;
 };
 /**
  * Context on what information is specifically requested from the user, if any.
@@ -709,7 +705,7 @@ export type IdentifiedUser = {
    */
   scrubbedEmail?: string;
   scrubbedPhone?: string;
-  token: SessionAuthToken;
+  token: string;
   /**
    * The scopes of the returned token
    */
@@ -724,7 +720,7 @@ export type IdentifyChallengeResponse = {
   error?: string;
 };
 /**
- * TODO deprecate
+ * An identifier for the identify flow that will uniquely identify a user
  */
 export type IdentifyId =
   | {
@@ -745,11 +741,14 @@ export type IdentifyResponse = {
 export type IdentifyScope = 'my1fp' | 'onboarding' | 'auth';
 export type IdentifyVerifyRequest = {
   challengeResponse: string;
-  challengeToken: ChallengeToken;
+  /**
+   * Opaque challenge state token
+   */
+  challengeToken: string;
   scope: IdentifyScope;
 };
 export type IdentifyVerifyResponse = {
-  authToken: SessionAuthToken;
+  authToken: string;
 };
 /**
  * The primary business owner that invited you to fill out a KYC form
@@ -1014,7 +1013,7 @@ export type Iso3166TwoDigitCountryCode =
   | 'ZW'
   | 'AX';
 export type KbaResponse = {
-  token: SessionAuthToken;
+  token: string;
 };
 export type L10n = {
   language?: string;
@@ -1299,9 +1298,6 @@ export type ModernRawUserDataRequest = {
   'investor_profile.risk_tolerance'?: string;
   'investor_profile.senior_executive_symbols'?: string;
 };
-/**
- * A key-value map with the corresponding decrypted values
- */
 export type ModernUserDecryptResponse = {
   'bank.*.account_type'?: string;
   'bank.*.ach_account_id'?: string;
@@ -1543,7 +1539,7 @@ export type NeuroIdentityIdResponse = {
 };
 export type ObConfigurationKind = 'kyc' | 'kyb' | 'auth' | 'document';
 export type OnboardingResponse = {
-  authToken: SessionAuthToken;
+  authToken: string;
 };
 export type OnboardingSessionResponse = {
   bootstrapData: {
@@ -2132,10 +2128,6 @@ export type SdkArgs =
       kind: 'render_v1';
     };
 export type kind2 = 'verify_v1';
-/**
- * An cryptographically generated auth token to authenticate a session
- */
-export type SessionAuthToken = string;
 export type SignupChallengeRequest = {
   challengeKind: ChallengeKind;
   email?: {
@@ -2188,9 +2180,12 @@ export type UserAuthScope =
 export type UserChallengeData = {
   biometricChallengeJson?: string;
   challengeKind: ChallengeKind;
-  challengeToken: ChallengeToken;
+  challengeToken: string;
   timeBeforeRetryS: number;
-  token: SessionAuthToken;
+  /**
+   * Auth token to pass to the verify call
+   */
+  token: string;
 };
 export type UserChallengeRequest = {
   actionKind: ActionKind;
@@ -2209,7 +2204,10 @@ export type UserChallengeResponse = {
    * If the challenge kind is biometric, the challenge JSON for the browser
    */
   biometricChallengeJson?: string;
-  challengeToken: ChallengeToken;
+  /**
+   * Information saved client side and sent back with the challenge response
+   */
+  challengeToken: string;
   /**
    * The timeout until you're allowed to initiate another challenge
    */
@@ -2220,14 +2218,17 @@ export type UserChallengeVerifyRequest = {
    * The response to the challenge. Either SMS/email PIN code or passkey response
    */
   challengeResponse: string;
-  challengeToken: ChallengeToken;
+  /**
+   * The token given from initiating the challenge
+   */
+  challengeToken: string;
 };
 export type UserChallengeVerifyResponse = {
-  authToken: SessionAuthToken;
+  /**
+   * The new token issued after completing the challenge
+   */
+  authToken: string;
 };
-/**
- * Represents a piece of data stored inside the vault.
- */
 export type UserDataIdentifier =
   | 'id.first_name'
   | 'id.middle_name'
