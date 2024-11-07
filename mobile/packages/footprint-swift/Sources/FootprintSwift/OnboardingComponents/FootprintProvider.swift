@@ -446,17 +446,17 @@ public final class FootprintProvider {
         phone: String? = nil,
         onCancel: (() -> Void)? = nil,
         onAuthenticated: ((_ result: Verify) -> Void)? = nil,
-        onError: ((_ errorMessage: String) -> Void)? = nil
+        onError: ((_ error: FootprintHostedError) -> Void)? = nil
     ) async throws{
         guard let obConfigKind = self.onboardingConfig?.kind else {
-            onError?("Missing onboarding configuration kind")
+            onError?(FootprintHostedError(kind: .presentationError, message: "Missing onboarding configuration kind"))
             return
         }
         
         let hasEmailOrPhone = email != nil || phone != nil
         
         if hasEmailOrPhone && self.authToken != nil {
-            onError?("Please don't use both email/phone and auth token at the same time")
+            onError?(FootprintHostedError(kind: .authError, message: "Please don't use both email/phone and auth token at the same time"))
             return
         }
         
@@ -491,7 +491,7 @@ public final class FootprintProvider {
                     let verification = try await onAuth(authToken, vaultingToken)
                     onAuthenticated?(verification)
                 } catch {
-                    onError?(error.localizedDescription)
+                    onError?(FootprintHostedError(kind: .authError, message: error.localizedDescription)    )
                 }
             }
         }
@@ -524,7 +524,7 @@ public final class FootprintProvider {
     public func handoff(
         onCancel: (() -> Void)? = nil,
         onComplete: ((_ validationToken: String) -> Void)? = nil,
-        onError: ((_ errorMessage: String) -> Void)? = nil
+        onError: ((_ error: FootprintHostedError) -> Void)? = nil
     ) async throws {
         guard let authToken = self.verifiedAuthToken else {
             throw FootprintError(kind: .authError, message: "Missing authentication token")
