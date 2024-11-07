@@ -24,14 +24,19 @@ use idv::samba::common::SambaOrderRequest;
 use idv::samba::license_state_is_supported_for_license_validation;
 use idv::samba::response::CreateOrderResponse;
 use idv::samba::SambaAPIResponse;
+use itertools::Itertools;
 use newtypes::samba::SambaAddress;
 use newtypes::samba::SambaData;
 use newtypes::samba::SambaOrderKind;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::vendor_api_struct::SambaLicenseValidationCreate;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
+use newtypes::DocumentDiKind;
 use newtypes::DocumentId;
 use newtypes::DocumentKind;
+use newtypes::IdDocKind;
+use newtypes::OcrDataKind as ODK;
 use newtypes::SambaActivityHistoryCreate;
 use newtypes::UsStateAndTerritories;
 use newtypes::VendorAPI;
@@ -155,9 +160,8 @@ impl SambaOrderHelper {
     ) -> FpResult<(SambaOrderRequest<SambaActivityHistoryCreate>, Vec<DataLifetimeId>)> {
         let (request, lifetime_ids) = match &self.ctx {
             // we're in the context of a workflow
-            // TODO: change this to DIs
             CreateOrderContext::Workflow { .. } => {
-                let (data, lifetime_ids) = build_request_from_ocr_response(state, vw, doc_id).await?;
+                let (data, lifetime_ids) = build_request_from_data_identifiers(state, vw).await?;
                 let request = SambaOrderRequest::new(tvc.samba_credentials(), data);
                 (request, lifetime_ids)
             }
@@ -287,6 +291,73 @@ fn build_request(ocr_res: &FetchOCRResponse) -> FpResult<SambaData> {
     Ok(data)
 }
 
+
+const ODK_FIELDS: [ODK; 8] = [
+    ODK::FirstName,
+    ODK::LastName,
+    ODK::AddressLine1,
+    ODK::City,
+    ODK::State,
+    ODK::PostalCode,
+    ODK::Dob,
+    ODK::DocumentNumber,
+];
+
+fn dl_di(odk: &ODK) -> DataIdentifier {
+    DocumentDiKind::OcrData(IdDocKind::DriversLicense, *odk).into()
+}
+
+async fn build_request_from_data_identifiers(
+    state: &State,
+    vw: &VaultWrapper,
+) -> FpResult<(SambaData, Vec<DataLifetimeId>)> {
+    let odks = ODK_FIELDS.iter().map(dl_di).collect_vec();
+    let mut decrypted_values = vw.decrypt_unchecked(&state.enclave_client, &odks).await?;
+    let address_line1 = decrypted_values.remove(&dl_di(&ODK::AddressLine1).into());
+    let city = decrypted_values.remove(&dl_di(&ODK::City).into());
+    let state = decrypted_values.remove(&dl_di(&ODK::State).into());
+    let postal_code = decrypted_values.remove(&dl_di(&ODK::PostalCode).into());
+    let address =
+        address_line1
+            .zip(city)
+            .zip(state)
+            .zip(postal_code)
+            .map(|(((street, city), state), postal_code)| SambaAddress {
+                street,
+                city,
+                state,
+                zip_code: postal_code,
+            });
+    let data = SambaData {
+        first_name: decrypted_values
+            .remove(&dl_di(&ODK::FirstName).into())
+            .ok_or(AssertionError("missing first name"))?,
+        last_name: decrypted_values
+            .remove(&dl_di(&ODK::LastName).into())
+            .ok_or(AssertionError("missing last name"))?,
+        license_number: decrypted_values
+            .remove(&dl_di(&ODK::DocumentNumber).into())
+            .ok_or(AssertionError("missing license number"))?,
+        license_state: decrypted_values
+            .remove(&dl_di(&ODK::IssuingState).into())
+            .ok_or(AssertionError("missing license state"))?,
+
+        dob: decrypted_values.remove(&dl_di(&ODK::Dob).into()),
+        address,
+        ..Default::default()
+    };
+    let lifetimes = get_lifetimes(vw);
+
+    Ok((data, lifetimes))
+}
+
+fn get_lifetimes(vw: &VaultWrapper) -> Vec<DataLifetimeId> {
+    let odks = ODK_FIELDS.iter().map(dl_di).collect_vec();
+    odks.into_iter()
+        .filter_map(|di| vw.get_lifetime(&di).map(|l| l.id.clone()))
+        .collect()
+}
+
 #[derive(Clone, Debug)]
 pub struct SambaOrderConfig {
     pub states: Vec<UsStateAndTerritories>,
@@ -309,7 +380,7 @@ pub async fn run_samba_create_order(
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
-            let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
+            let vw: VaultWrapper = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
             // If we're running this in the context of a wf, only check documents collected in this workflow
             let doc = context2.get_document(conn.conn())?;
