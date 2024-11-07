@@ -13,9 +13,8 @@ const PdfThumbnail = ({ src }: PdfThumbnailProps) => (
 const PdfContainer = styled.div`
   ${({ theme }) => css`
     width: 100vw;
-    height: calc(100vh - 48px);
+    height: 100vh;
     margin: calc(-1 * ${theme.spacing[7]});
-    margin-bottom: calc(-1 * ${theme.spacing[5]});
   `};
 `;
 

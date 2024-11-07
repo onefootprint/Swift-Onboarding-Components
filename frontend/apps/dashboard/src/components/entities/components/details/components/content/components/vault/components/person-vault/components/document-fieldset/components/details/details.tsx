@@ -70,22 +70,14 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
           ref={scrollContainerRef}
         >
           <TableOfContents uploads={uploads} onClick={scrollToUpload} visibleIndex={visibleUploadIndex} />
-          <UploadsContainer direction="column" align="center" gap={8} width="70%">
+          <UploadsContainer direction="column" align="center" gap={8} width="70%" height="100%">
             {uploads.map((upload, index) => (
-              <UploadContainer
+              <UploadImageItem
                 key={`${upload.identifier}:${upload.version}`}
+                upload={upload as DocumentUpload & { isLatest: boolean }}
+                vault={vault}
                 ref={el => (uploadRefs.current[index] = el)}
-                direction="column"
-                align="center"
-                gap={4}
-                width="100%"
-              >
-                <UploadImageItem
-                  upload={upload as DocumentUpload & { isLatest: boolean }}
-                  vault={vault}
-                  refCallback={el => (uploadRefs.current[index] = el)}
-                />
-              </UploadContainer>
+              />
             ))}
           </UploadsContainer>
           {showSelfiePreview(uploads, visibleUploadIndex) && <SelfiePreview uploads={uploads} vault={vault} />}
@@ -102,12 +94,10 @@ const UploadsContainer = styled(Stack)`
     > *:last-child {
       padding-bottom: ${theme.spacing[7]};
     }
-  `};
-`;
 
-const UploadContainer = styled(Stack)`
-  ${({ theme }) => css`
-    scroll-margin-top: ${theme.spacing[3]};
+    > *:first-child {
+      padding-bottom: 0;
+    }
   `};
 `;
 
