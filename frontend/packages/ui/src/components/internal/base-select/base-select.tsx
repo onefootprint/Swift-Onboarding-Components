@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';
@@ -9,7 +9,6 @@ import type { ControlProps, GroupBase, MenuListProps, OptionProps } from 'react-
 import ReactSelect from 'react-select';
 import styled, { useTheme } from 'styled-components';
 
-import { useOnClickOutside } from 'usehooks-ts';
 import { createText } from '../../../utils/mixins';
 import Hint from '../../hint';
 import type { LabelTooltipProps } from '../../label';
@@ -87,11 +86,6 @@ const BaseSelect = <Option extends BaseSelectOption>({
     modifiers,
   });
   const isSearchable = options.length > 10;
-  const containerRef = useRef<HTMLDivElement>(null);
-  const handleClickOutside = () => {
-    closeDropdown();
-  };
-  useOnClickOutside(containerRef, handleClickOutside);
   const [updatedValue, setUpdatedValue] = useState<Option | undefined>(value);
   const [mobileSheetHeight, setMobileSheetHeight] = useState(0);
 
@@ -144,7 +138,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   );
 
   return (
-    <Container data-testid={testID} className="fp-dropdown" ref={containerRef}>
+    <Container data-testid={testID} className="fp-dropdown">
       {label && (
         <Label tooltip={labelTooltip} htmlFor={id}>
           {label}
