@@ -8,6 +8,7 @@ pub struct EmptyRequest {}
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
+#[openapi(inline)]
 // Don't want this to be a docstring or it will be visible in Apiv2Schema docs...
 // Contains all of the fields that are passed in the querystring for a cursor-paginated request.
 // Cursor pagination requests take in a cursor that identifies the start of the page (and is

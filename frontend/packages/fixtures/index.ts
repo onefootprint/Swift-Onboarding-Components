@@ -1,12 +1,21 @@
 import type {
+  ActionKind,
+  ApiKeyStatus,
+  ApiOnboardingRequirement,
   AuthMethod,
+  AuthMethodKind,
   AuthRequirementsResponse,
+  AuthV1Options,
+  AuthV1SdkArgs,
   AuthorizedOrg,
   BatchHostedBusinessOwnerRequest,
   BusinessDecryptResponse,
   BusinessOnboardingResponse,
+  ChallengeKind,
   CheckSessionResponse,
+  CollectedDataOption,
   ConsentRequest,
+  CountrySpecificDocumentMapping,
   CreateDeviceAttestationRequest,
   CreateDocumentRequest,
   CreateDocumentResponse,
@@ -14,37 +23,66 @@ import type {
   CreateSdkArgsTokenResponse,
   CreateUserTokenRequest,
   CreateUserTokenResponse,
+  CustomDocumentConfig,
   D2pGenerateRequest,
   D2pGenerateResponse,
+  D2pSessionStatus,
   D2pSmsRequest,
   D2pSmsResponse,
   D2pStatusResponse,
   D2pUpdateStatusRequest,
+  DataIdentifier,
+  DeleteHostedBusinessOwnerRequest,
   DeviceAttestationChallengeResponse,
+  DeviceAttestationType,
+  DeviceType,
+  DocumentAndCountryConfiguration,
+  DocumentFixtureResult,
+  DocumentImageError,
+  DocumentKind,
+  DocumentRequestConfig,
   DocumentResponse,
+  DocumentSide,
+  DocumentUploadSettings,
   EmailVerifyRequest,
   Empty,
+  FilterFunction,
   FingerprintVisitRequest,
+  FormV1Options,
+  FormV1SdkArgs,
   GetDeviceAttestationChallengeRequest,
   GetSdkArgsTokenResponse,
   GetUserTokenResponse,
+  HandoffMetadata,
   HostedBusiness,
   HostedBusinessDetail,
   HostedBusinessOwner,
   HostedValidateResponse,
+  HostedWorkflowRequest,
+  IdDocKind,
+  IdentifiedUser,
+  IdentifyAuthMethod,
   IdentifyChallengeResponse,
+  IdentifyId,
   IdentifyRequest,
   IdentifyResponse,
+  IdentifyScope,
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
+  Inviter,
+  Iso3166TwoDigitCountryCode,
   KbaResponse,
+  L10n,
+  L10nV1,
   LiteIdentifyRequest,
   LiteIdentifyResponse,
   LogBody,
   LoginChallengeRequest,
   ModernRawBusinessDataRequest,
   ModernRawUserDataRequest,
+  ModernUserDecryptResponse,
   NeuroIdentityIdResponse,
+  ObConfigurationKind,
   OnboardingResponse,
   OnboardingSessionResponse,
   OnboardingStatusResponse,
@@ -52,20 +90,46 @@ import type {
   PostOnboardingRequest,
   ProcessRequest,
   PublicOnboardingConfiguration,
+  RawUserDataRequest,
+  RegisterPasskeyAttemptContext,
+  RenderV1SdkArgs,
+  RequestedTokenScope,
   SdkArgs,
   SignupChallengeRequest,
+  SkipLivenessClientType,
+  SkipLivenessContext,
   SkipPasskeyRegisterRequest,
   SocureDeviceSessionIdRequest,
   StytchTelemetryRequest,
+  TaskStatus,
+  UpdateAuthMethodsV1SdkArgs,
+  UpdateOrCreateHostedBusinessOwnerRequest,
+  UserAuthScope,
+  UserChallengeData,
   UserChallengeRequest,
   UserChallengeResponse,
   UserChallengeVerifyRequest,
   UserChallengeVerifyResponse,
+  UserDataIdentifier,
   UserDecryptRequest,
   UserDecryptResponse,
+  VerifyResultV1SdkArgs,
+  VerifyV1Options,
+  VerifyV1SdkArgs,
+  WorkflowFixtureResult,
+  WorkflowRequestConfig,
 } from '@onefootprint/request-types';
 import merge from 'lodash/merge';
 
+export const getActionKind = (props: Partial<ActionKind>) => (props ?? 'add_primary') as ActionKind;
+export const getApiKeyStatus = (props: Partial<ApiKeyStatus>) => (props ?? 'disabled') as ApiKeyStatus;
+export const getApiOnboardingRequirement = (props: Partial<ApiOnboardingRequirement>) =>
+  merge(
+    {
+      isMet: false,
+    },
+    props,
+  ) as ApiOnboardingRequirement;
 export const getAuthMethod = (props: Partial<AuthMethod>) =>
   merge(
     {
@@ -75,6 +139,7 @@ export const getAuthMethod = (props: Partial<AuthMethod>) =>
     },
     props,
   ) as AuthMethod;
+export const getAuthMethodKind = (props: Partial<AuthMethodKind>) => (props ?? 'email') as AuthMethodKind;
 export const getAuthRequirementsResponse = (props: Partial<AuthRequirementsResponse>) =>
   merge(
     {
@@ -92,6 +157,28 @@ export const getAuthRequirementsResponse = (props: Partial<AuthRequirementsRespo
     },
     props,
   ) as AuthRequirementsResponse;
+export const getAuthV1Options = (props: Partial<AuthV1Options>) =>
+  merge(
+    {
+      showLogo: true,
+    },
+    props,
+  ) as AuthV1Options;
+export const getAuthV1SdkArgs = (props: Partial<AuthV1SdkArgs>) =>
+  merge(
+    {
+      l10N: {
+        language: 'en',
+        locale: 'en-US',
+      },
+      options: {
+        showLogo: true,
+      },
+      publicKey: '1f0b9966-a39d-499c-be1c-62994dbe3399',
+      userData: {},
+    },
+    props,
+  ) as AuthV1SdkArgs;
 export const getAuthorizedOrg = (props: Partial<AuthorizedOrg>) =>
   merge(
     {
@@ -118,8 +205,11 @@ export const getBusinessOnboardingResponse = (props: Partial<BusinessOnboardingR
     },
     props,
   ) as BusinessOnboardingResponse;
+export const getChallengeKind = (props: Partial<ChallengeKind>) => (props ?? 'sms') as ChallengeKind;
 export const getCheckSessionResponse = (props: Partial<CheckSessionResponse>) =>
   (props ?? 'unknown') as CheckSessionResponse;
+export const getCollectedDataOption = (props: Partial<CollectedDataOption>) =>
+  (props ?? 'business_tin') as CollectedDataOption;
 export const getConsentRequest = (props: Partial<ConsentRequest>) =>
   merge(
     {
@@ -128,6 +218,8 @@ export const getConsentRequest = (props: Partial<ConsentRequest>) =>
     },
     props,
   ) as ConsentRequest;
+export const getCountrySpecificDocumentMapping = (props: Partial<CountrySpecificDocumentMapping>) =>
+  merge({}, props) as CountrySpecificDocumentMapping;
 export const getCreateDeviceAttestationRequest = (props: Partial<CreateDeviceAttestationRequest>) =>
   merge(
     {
@@ -185,6 +277,17 @@ export const getCreateUserTokenResponse = (props: Partial<CreateUserTokenRespons
     },
     props,
   ) as CreateUserTokenResponse;
+export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>) =>
+  merge(
+    {
+      description: 'ea laborum',
+      identifier: 'ff917e18-3518-48d0-a5c1-6fdcbb86c757',
+      name: 'Charlie Stracke',
+      requiresHumanReview: true,
+      uploadSettings: 'prefer_capture',
+    },
+    props,
+  ) as CustomDocumentConfig;
 export const getD2pGenerateRequest = (props: Partial<D2pGenerateRequest>) =>
   merge(
     {
@@ -209,6 +312,7 @@ export const getD2pGenerateResponse = (props: Partial<D2pGenerateResponse>) =>
     },
     props,
   ) as D2pGenerateResponse;
+export const getD2pSessionStatus = (props: Partial<D2pSessionStatus>) => (props ?? 'failed') as D2pSessionStatus;
 export const getD2pSmsRequest = (props: Partial<D2pSmsRequest>) =>
   merge(
     {
@@ -248,6 +352,16 @@ export const getD2pUpdateStatusRequest = (props: Partial<D2pUpdateStatusRequest>
     },
     props,
   ) as D2pUpdateStatusRequest;
+export const getDataIdentifier = (props: Partial<DataIdentifier>) =>
+  (props ?? 'document.voter_identification.samba_activity_history_response') as DataIdentifier;
+export const getDeleteHostedBusinessOwnerRequest = (props: Partial<DeleteHostedBusinessOwnerRequest>) =>
+  merge(
+    {
+      op: 'delete',
+      uuid: '7587997d-dac1-4f16-a6ff-940cf3c04156',
+    },
+    props,
+  ) as DeleteHostedBusinessOwnerRequest;
 export const getDeviceAttestationChallengeResponse = (props: Partial<DeviceAttestationChallengeResponse>) =>
   merge(
     {
@@ -256,6 +370,41 @@ export const getDeviceAttestationChallengeResponse = (props: Partial<DeviceAttes
     },
     props,
   ) as DeviceAttestationChallengeResponse;
+export const getDeviceAttestationType = (props: Partial<DeviceAttestationType>) =>
+  (props ?? 'ios') as DeviceAttestationType;
+export const getDeviceType = (props: Partial<DeviceType>) => (props ?? 'ios') as DeviceType;
+export const getDocumentAndCountryConfiguration = (props: Partial<DocumentAndCountryConfiguration>) =>
+  merge(
+    {
+      countrySpecific: {},
+      global: ['drivers_license', 'permit', 'id_card'],
+    },
+    props,
+  ) as DocumentAndCountryConfiguration;
+export const getDocumentFixtureResult = (props: Partial<DocumentFixtureResult>) =>
+  (props ?? 'fail') as DocumentFixtureResult;
+export const getDocumentImageError = (props: Partial<DocumentImageError>) =>
+  (props ?? 'drivers_license_permit_not_allowed') as DocumentImageError;
+export const getDocumentKind = (props: Partial<DocumentKind>) => (props ?? 'id_card') as DocumentKind;
+export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>) =>
+  merge(
+    {
+      data: {
+        collectSelfie: false,
+        description: 'velit veniam quis',
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['drivers_license', 'residence_document', 'permit'],
+        },
+        identifier: 'business.state',
+        name: 'reprehenderit exercitation sunt Excepteur aliqua',
+        requiresHumanReview: true,
+        uploadSettings: 'prefer_upload',
+      },
+      kind: 'identity',
+    },
+    props,
+  ) as DocumentRequestConfig;
 export const getDocumentResponse = (props: Partial<DocumentResponse>) =>
   merge(
     {
@@ -265,6 +414,9 @@ export const getDocumentResponse = (props: Partial<DocumentResponse>) =>
     },
     props,
   ) as DocumentResponse;
+export const getDocumentSide = (props: Partial<DocumentSide>) => (props ?? 'back') as DocumentSide;
+export const getDocumentUploadSettings = (props: Partial<DocumentUploadSettings>) =>
+  (props ?? 'prefer_capture') as DocumentUploadSettings;
 export const getEmailVerifyRequest = (props: Partial<EmailVerifyRequest>) =>
   merge(
     {
@@ -273,6 +425,7 @@ export const getEmailVerifyRequest = (props: Partial<EmailVerifyRequest>) =>
     props,
   ) as EmailVerifyRequest;
 export const getEmpty = (props: Partial<Empty>) => merge({}, props) as Empty;
+export const getFilterFunction = (props: Partial<FilterFunction>) => (props ?? 'prefix(<n>)') as FilterFunction;
 export const getFingerprintVisitRequest = (props: Partial<FingerprintVisitRequest>) =>
   merge(
     {
@@ -282,6 +435,32 @@ export const getFingerprintVisitRequest = (props: Partial<FingerprintVisitReques
     },
     props,
   ) as FingerprintVisitRequest;
+export const getFormV1Options = (props: Partial<FormV1Options>) =>
+  merge(
+    {
+      hideButtons: false,
+      hideCancelButton: false,
+      hideFootprintLogo: false,
+    },
+    props,
+  ) as FormV1Options;
+export const getFormV1SdkArgs = (props: Partial<FormV1SdkArgs>) =>
+  merge(
+    {
+      authToken: 'f31bf795-9214-4a59-b7eb-fd3fbbcd4114',
+      l10N: {
+        language: 'en',
+        locale: 'en-US',
+      },
+      options: {
+        hideButtons: false,
+        hideCancelButton: true,
+        hideFootprintLogo: true,
+      },
+      title: 'dolor nisi irure',
+    },
+    props,
+  ) as FormV1SdkArgs;
 export const getGetDeviceAttestationChallengeRequest = (props: Partial<GetDeviceAttestationChallengeRequest>) =>
   merge(
     {
@@ -306,6 +485,21 @@ export const getGetUserTokenResponse = (props: Partial<GetUserTokenResponse>) =>
     },
     props,
   ) as GetUserTokenResponse;
+export const getHandoffMetadata = (props: Partial<HandoffMetadata>) =>
+  merge(
+    {
+      l10N: {
+        language: 'en',
+        locale: 'en-US',
+      },
+      opener: 'enim voluptate',
+      redirectUrl: 'https://delicious-turret.org/',
+      sandboxIdDocOutcome: 'd1b3fb93-3f5c-44df-a387-2c7cdb2c5455',
+      sessionId: '9a68e627-6c03-4754-b319-06f1957bfb02',
+      styleParams: 'sunt incididunt',
+    },
+    props,
+  ) as HandoffMetadata;
 export const getHostedBusiness = (props: Partial<HostedBusiness>) =>
   merge(
     {
@@ -363,6 +557,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.drivers_license.issuing_state': 'Washington',
         'document.drivers_license.nationality': 'pariatur',
         'document.drivers_license.ref_number': 'cillum pariatur Duis',
+        'document.drivers_license.samba_activity_history_response': 'Lorem irure ut',
         'document.drivers_license.selfie.image': 'eiusmod qui dolor pariatur nostrud',
         'document.drivers_license.selfie.mime_type': 'ullamco',
         'document.finra_compliance_letter': 'reprehenderit adipisicing',
@@ -385,6 +580,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.id_card.issuing_state': 'Ohio',
         'document.id_card.nationality': '5df95a58-0d18-437b-86cb-a5209d888b5e',
         'document.id_card.ref_number': '5ec82872-9ed9-40a2-b273-374cdd87af86',
+        'document.id_card.samba_activity_history_response': '88bb73b3-4bb3-4f58-85d0-62f4660935a1',
         'document.id_card.selfie.image': '64efeced-0d95-41bf-8b0e-71bdca91d92c',
         'document.id_card.selfie.mime_type': '2a80edf3-24c4-4fc8-8760-679f1ab2ede8',
         'document.passport.back.image': 'Lorem non nisi',
@@ -406,6 +602,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.passport.issuing_state': 'Virginia',
         'document.passport.nationality': 'dolor mollit',
         'document.passport.ref_number': 'dolore velit anim',
+        'document.passport.samba_activity_history_response': 'qui dolore id dolor',
         'document.passport.selfie.image': 'quis',
         'document.passport.selfie.mime_type': 'ad eiusmod sint',
         'document.passport_card.back.image': 'dolore nostrud qui esse',
@@ -448,6 +645,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.permit.issuing_state': 'Michigan',
         'document.permit.nationality': 'ipsum Lorem',
         'document.permit.ref_number': 'in elit ad amet',
+        'document.permit.samba_activity_history_response': 'amet sed elit aute',
         'document.permit.selfie.image': 'sunt irure',
         'document.permit.selfie.mime_type': 'ut aliqua dolor',
         'document.proof_of_address.image': '4308 Schamberger Fields Suite 163',
@@ -470,6 +668,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.residence_document.issuing_state': 'Maine',
         'document.residence_document.nationality': '6bbe763e-e45d-413c-90c8-eb4e6f44ac9c',
         'document.residence_document.ref_number': 'e87d4977-cfbe-406f-b739-f1b5bdae0702',
+        'document.residence_document.samba_activity_history_response': '795b0dff-5cf1-4db9-b550-24a084202559',
         'document.residence_document.selfie.image': 'c831fb23-e158-42f8-9003-4d27d798e5a2',
         'document.residence_document.selfie.mime_type': '34175032-08e4-4f3d-a8df-b23fa7bbaa74',
         'document.ssn_card.image': 'nulla dolore',
@@ -492,6 +691,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.visa.issuing_state': 'Hawaii',
         'document.visa.nationality': 'Duis commodo Excepteur dolor minim',
         'document.visa.ref_number': 'officia enim',
+        'document.visa.samba_activity_history_response': 'amet nulla',
         'document.visa.selfie.image': 'tempor dolore',
         'document.visa.selfie.mime_type': 'exercitation nulla et sunt',
         'document.voter_identification.back.image': '9e8b933b-de4c-4fad-815b-87432e42f8ca',
@@ -513,6 +713,7 @@ export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
         'document.voter_identification.issuing_state': 'North Dakota',
         'document.voter_identification.nationality': 'bf0fd55d-7e22-4adb-9073-fe5aea9dd94a',
         'document.voter_identification.ref_number': '87e14ffd-2008-4e5d-96ef-d2a6083b8485',
+        'document.voter_identification.samba_activity_history_response': '181aa71a-ae79-4617-a541-9c8b428faf86',
         'document.voter_identification.selfie.image': 'a6729e8f-305b-4d1f-90be-da1115496cab',
         'document.voter_identification.selfie.mime_type': 'fc2aa053-6aa9-4fd5-aba8-6cc22c159260',
         'id.address_line1': '354 Holden Junction Apt. 460',
@@ -603,6 +804,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.drivers_license.issuing_state': 'Iowa',
         'document.drivers_license.nationality': 'velit elit',
         'document.drivers_license.ref_number': 'non ut sint mollit ullamco',
+        'document.drivers_license.samba_activity_history_response': 'exercitation laborum non',
         'document.drivers_license.selfie.image': 'cupidatat consectetur',
         'document.drivers_license.selfie.mime_type': 'dolor ex et',
         'document.finra_compliance_letter': 'id deserunt proident',
@@ -625,6 +827,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.id_card.issuing_state': 'Alabama',
         'document.id_card.nationality': 'dcc958ab-c089-476c-882d-c9659e26dd9d',
         'document.id_card.ref_number': '9aafb125-91ff-4727-b5af-90e44b5d7a7f',
+        'document.id_card.samba_activity_history_response': 'ecaeebff-e642-46af-b59a-0855764da7da',
         'document.id_card.selfie.image': '002697aa-a3f6-4c44-9968-2eb98994422e',
         'document.id_card.selfie.mime_type': 'e50dd86b-3701-48e1-8ef3-2225265aebd0',
         'document.passport.back.image': 'dolore irure occaecat dolor',
@@ -646,6 +849,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.passport.issuing_state': 'Alabama',
         'document.passport.nationality': 'esse mollit anim',
         'document.passport.ref_number': 'et magna aliqua',
+        'document.passport.samba_activity_history_response': 'irure quis ea',
         'document.passport.selfie.image': 'reprehenderit incididunt ad magna',
         'document.passport.selfie.mime_type': 'consequat enim ipsum',
         'document.passport_card.back.image': 'Duis do tempor Ut Lorem',
@@ -667,6 +871,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.passport_card.issuing_state': 'Mississippi',
         'document.passport_card.nationality': 'Duis irure',
         'document.passport_card.ref_number': 'anim sint officia exercitation',
+        'document.passport_card.samba_activity_history_response': 'Excepteur deserunt',
         'document.passport_card.selfie.image': 'magna aliquip Lorem et ipsum',
         'document.passport_card.selfie.mime_type': 'ad velit proident',
         'document.permit.back.image': 'officia aliqua tempor',
@@ -688,6 +893,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.permit.issuing_state': 'Arkansas',
         'document.permit.nationality': 'id',
         'document.permit.ref_number': 'sit reprehenderit Ut est',
+        'document.permit.samba_activity_history_response': 'reprehenderit quis minim enim',
         'document.permit.selfie.image': 'ullamco',
         'document.permit.selfie.mime_type': 'Ut anim',
         'document.proof_of_address.image': '1824 Broad Street Apt. 318',
@@ -710,6 +916,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.residence_document.issuing_state': 'Colorado',
         'document.residence_document.nationality': '9d12e739-bcd9-41b3-b219-dd98f3fe875f',
         'document.residence_document.ref_number': '2d88cc1a-41a4-4cf2-9c01-07ab08e450df',
+        'document.residence_document.samba_activity_history_response': '81fb363e-af20-486c-9970-d673a4ddd08c',
         'document.residence_document.selfie.image': '880471b2-020e-4282-9b9e-85989efcbb7d',
         'document.residence_document.selfie.mime_type': 'b311f2c2-a06f-4769-b74f-fa65c11615a4',
         'document.ssn_card.image': 'id tempor nulla reprehenderit',
@@ -753,6 +960,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.voter_identification.issuing_state': 'Utah',
         'document.voter_identification.nationality': 'da68b81c-3c6b-41e7-895f-ce7e64614410',
         'document.voter_identification.ref_number': '860f9ae0-9edb-4b2f-aaa2-511642b05c80',
+        'document.voter_identification.samba_activity_history_response': '76043976-ea65-4ffd-9f91-8222455d7ce4',
         'document.voter_identification.selfie.image': 'c4a4662b-8d62-4817-9647-2112402f91a2',
         'document.voter_identification.selfie.mime_type': 'a30cede5-a6df-453c-9dd5-7bc6fecbd6a9',
         'id.address_line1': '569 Sarah Mountain Suite 447',
@@ -809,6 +1017,111 @@ export const getHostedValidateResponse = (props: Partial<HostedValidateResponse>
     },
     props,
   ) as HostedValidateResponse;
+export const getHostedWorkflowRequest = (props: Partial<HostedWorkflowRequest>) =>
+  merge(
+    {
+      config: {
+        data: {
+          businessConfigs: [
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_address',
+            },
+            {
+              data: {
+                collectSelfie: false,
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                description: 'enim minim consequat aliqua pariatur',
+                identifier: 'document.passport.full_address',
+                name: 'quis irure reprehenderit',
+                requiresHumanReview: true,
+                uploadSettings: 'prefer_capture',
+              },
+              kind: 'custom',
+            },
+          ],
+          configs: [
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_address',
+            },
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+            {
+              data: {
+                description: 'aliquip consectetur Duis',
+                identifier: 'id.first_name',
+                name: 'ut elit deserunt amet ea',
+                requiresHumanReview: true,
+                uploadSettings: 'capture_only_on_mobile',
+              },
+              kind: 'custom',
+            },
+          ],
+          playbookId: 'mollit ea dolor id Excepteur',
+          recollectAttributes: ['name', 'full_address', 'bank'],
+          reuseExistingBoKyc: false,
+        },
+        kind: 'document',
+      },
+      note: 'do',
+    },
+    props,
+  ) as HostedWorkflowRequest;
+export const getIdDocKind = (props: Partial<IdDocKind>) => (props ?? 'voter_identification') as IdDocKind;
+export const getIdentifiedUser = (props: Partial<IdentifiedUser>) =>
+  merge(
+    {
+      authMethods: [
+        {
+          isVerified: true,
+          kind: 'email',
+        },
+        {
+          isVerified: true,
+          kind: 'phone',
+        },
+        {
+          isVerified: false,
+          kind: 'phone',
+        },
+      ],
+      availableChallengeKinds: ['sms', 'email', 'sms'],
+      canInitiateSignupChallenge: true,
+      hasSyncablePasskey: true,
+      isUnverified: true,
+      matchingFps: [
+        'document.drivers_license.back.mime_type',
+        'document.visa.classified_document_type',
+        'document.voter_identification.curp_validation_response',
+      ],
+      scrubbedEmail: 'ramon_spencer@gmail.com',
+      scrubbedPhone: '+18502507286',
+      token: 'bf54cc30-c1c5-4b7c-9531-4dc8278ec19c',
+      tokenScopes: ['explicit_auth', 'vault_data', 'auth'],
+    },
+    props,
+  ) as IdentifiedUser;
+export const getIdentifyAuthMethod = (props: Partial<IdentifyAuthMethod>) =>
+  merge(
+    {
+      isVerified: false,
+      kind: 'phone',
+    },
+    props,
+  ) as IdentifyAuthMethod;
 export const getIdentifyChallengeResponse = (props: Partial<IdentifyChallengeResponse>) =>
   merge(
     {
@@ -823,6 +1136,14 @@ export const getIdentifyChallengeResponse = (props: Partial<IdentifyChallengeRes
     },
     props,
   ) as IdentifyChallengeResponse;
+export const getIdentifyId = (props: Partial<IdentifyId>) =>
+  merge(
+    {
+      email: 'consequat',
+      phoneNumber: 'qui irure dolor do dolor',
+    },
+    props,
+  ) as IdentifyId;
 export const getIdentifyRequest = (props: Partial<IdentifyRequest>) =>
   merge(
     {
@@ -864,6 +1185,7 @@ export const getIdentifyResponse = (props: Partial<IdentifyResponse>) =>
     },
     props,
   ) as IdentifyResponse;
+export const getIdentifyScope = (props: Partial<IdentifyScope>) => (props ?? 'onboarding') as IdentifyScope;
 export const getIdentifyVerifyRequest = (props: Partial<IdentifyVerifyRequest>) =>
   merge(
     {
@@ -880,6 +1202,16 @@ export const getIdentifyVerifyResponse = (props: Partial<IdentifyVerifyResponse>
     },
     props,
   ) as IdentifyVerifyResponse;
+export const getInviter = (props: Partial<Inviter>) =>
+  merge(
+    {
+      firstName: 'Rhea',
+      lastName: 'Reinger',
+    },
+    props,
+  ) as Inviter;
+export const getIso3166TwoDigitCountryCode = (props: Partial<Iso3166TwoDigitCountryCode>) =>
+  (props ?? 'PH') as Iso3166TwoDigitCountryCode;
 export const getKbaResponse = (props: Partial<KbaResponse>) =>
   merge(
     {
@@ -887,6 +1219,22 @@ export const getKbaResponse = (props: Partial<KbaResponse>) =>
     },
     props,
   ) as KbaResponse;
+export const getL10n = (props: Partial<L10n>) =>
+  merge(
+    {
+      language: 'en',
+      locale: 'en-US',
+    },
+    props,
+  ) as L10n;
+export const getL10nV1 = (props: Partial<L10nV1>) =>
+  merge(
+    {
+      language: 'en',
+      locale: 'en-US',
+    },
+    props,
+  ) as L10nV1;
 export const getLiteIdentifyRequest = (props: Partial<LiteIdentifyRequest>) =>
   merge(
     {
@@ -984,6 +1332,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.drivers_license.issuing_state': 'Nevada',
       'document.drivers_license.nationality': 'ea deserunt esse consectetur Duis',
       'document.drivers_license.ref_number': 'pariatur',
+      'document.drivers_license.samba_activity_history_response': 'nulla dolor ipsum',
       'document.drivers_license.selfie.image': 'exercitation occaecat',
       'document.drivers_license.selfie.mime_type': 'eu in cupidatat proident',
       'document.finra_compliance_letter': 'dolor ipsum',
@@ -1006,6 +1355,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.id_card.issuing_state': 'New Jersey',
       'document.id_card.nationality': '4440ef7e-fba1-4186-86b6-65c0c5e26b9a',
       'document.id_card.ref_number': '743d59db-5afe-4e2c-a3bf-8699d84ee458',
+      'document.id_card.samba_activity_history_response': '8995c2b4-f4d4-404a-b0c7-303ae4d31328',
       'document.id_card.selfie.image': 'fdaeb7e2-75ce-4c30-b25b-dad79d4fe3a0',
       'document.id_card.selfie.mime_type': '429b4c1c-f645-41aa-95b3-5e24dc677680',
       'document.passport.back.image': 'voluptate laborum',
@@ -1027,6 +1377,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.passport.issuing_state': 'Iowa',
       'document.passport.nationality': 'dolor consectetur',
       'document.passport.ref_number': 'adipisicing',
+      'document.passport.samba_activity_history_response': 'proident deserunt ipsum cupidatat',
       'document.passport.selfie.image': 'dolore Duis ea sit',
       'document.passport.selfie.mime_type': 'ex ut Ut voluptate',
       'document.passport_card.back.image': 'pariatur sed tempor consequat',
@@ -1048,6 +1399,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.passport_card.issuing_state': 'Rhode Island',
       'document.passport_card.nationality': 'ut dolor amet',
       'document.passport_card.ref_number': 'voluptate Excepteur ea sint amet',
+      'document.passport_card.samba_activity_history_response': 'id',
       'document.passport_card.selfie.image': 'non ad',
       'document.passport_card.selfie.mime_type': 'pariatur dolore elit',
       'document.permit.back.image': 'velit officia pariatur in',
@@ -1069,6 +1421,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.permit.issuing_state': 'West Virginia',
       'document.permit.nationality': 'voluptate dolore',
       'document.permit.ref_number': 'fugiat aliquip sint nostrud sit',
+      'document.permit.samba_activity_history_response': 'velit proident',
       'document.permit.selfie.image': 'laboris in consectetur non',
       'document.permit.selfie.mime_type': 'Duis ut elit cillum reprehenderit',
       'document.proof_of_address.image': '752 Boyle Trace Apt. 261',
@@ -1091,6 +1444,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.residence_document.issuing_state': 'Maine',
       'document.residence_document.nationality': 'cc5ad914-988e-4df4-a919-2a5a61d2dde9',
       'document.residence_document.ref_number': '0421ae3f-5901-41e2-a155-50bffdc0a6b8',
+      'document.residence_document.samba_activity_history_response': '2386f58d-15cf-46b3-a2e4-af49c6697f4f',
       'document.residence_document.selfie.image': '02773f0d-716f-47b5-aca1-97b24e86fdc0',
       'document.residence_document.selfie.mime_type': 'd2a96bae-6b3c-4b44-8c64-981701735c8f',
       'document.ssn_card.image': 'pariatur dolore laborum nostrud sunt',
@@ -1113,6 +1467,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.visa.issuing_state': 'New York',
       'document.visa.nationality': 'eu',
       'document.visa.ref_number': 'id deserunt aute',
+      'document.visa.samba_activity_history_response': 'pariatur',
       'document.visa.selfie.image': 'voluptate in aliqua in',
       'document.visa.selfie.mime_type': 'proident in est cupidatat',
       'document.voter_identification.back.image': 'c70348ca-15fe-44ae-8a62-ee41814c94c2',
@@ -1175,6 +1530,238 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
     },
     props,
   ) as ModernRawUserDataRequest;
+export const getModernUserDecryptResponse = (props: Partial<ModernUserDecryptResponse>) =>
+  merge(
+    {
+      'bank.*.account_type': 'ut exercitation aliqua in enim',
+      'bank.*.ach_account_id': '295b698f-51aa-4b05-a64e-5f042a939806',
+      'bank.*.ach_account_number': 'reprehenderit Lorem et sed',
+      'bank.*.ach_routing_number': 'laborum ut fugiat',
+      'bank.*.fingerprint': 'anim dolore mollit in dolor',
+      'bank.*.name': 'Crystal Dickens',
+      'card.*.billing_address.country': '76614 South Street Apt. 459',
+      'card.*.billing_address.zip': '27666 McCullough Circles Suite 470',
+      'card.*.cvc': 'minim adipisicing Lorem ex cupidatat',
+      'card.*.expiration': 'veniam enim',
+      'card.*.expiration_month': 'culpa',
+      'card.*.expiration_year': 'aliqua cupidatat aute reprehenderit',
+      'card.*.fingerprint': 'sint',
+      'card.*.issuer': 'sit magna non',
+      'card.*.name': 'Lisa Wyman',
+      'card.*.number': 'tempor enim',
+      'card.*.number_last4': 'adipisicing anim',
+      'custom.*': 'enim in irure laborum veniam',
+      'document.custom.*': 'in voluptate sed anim quis',
+      'document.drivers_license.back.image': 'veniam in ad qui aute',
+      'document.drivers_license.back.mime_type': 'non laboris id nulla fugiat',
+      'document.drivers_license.classified_document_type': 'ea',
+      'document.drivers_license.clave_de_elector': 'exercitation laboris',
+      'document.drivers_license.curp': 'ea eiusmod in velit pariatur',
+      'document.drivers_license.curp_validation_response': '5ece6be7-164d-4640-a947-d3072a6034f7',
+      'document.drivers_license.dob': 'ut enim ullamco eu amet',
+      'document.drivers_license.document_number': 'Duis incididunt in veniam',
+      'document.drivers_license.front.image': 'voluptate',
+      'document.drivers_license.front.mime_type': 'deserunt officia ullamco Excepteur',
+      'document.drivers_license.full_address': '2421 Thiel-Rempel Wells Suite 469',
+      'document.drivers_license.full_name': 'Ben Bashirian',
+      'document.drivers_license.gender': 'incididunt anim Duis aute',
+      'document.drivers_license.issued_at': 'aliqua',
+      'document.drivers_license.issuing_country': 'Liberia',
+      'document.drivers_license.issuing_state': 'Oklahoma',
+      'document.drivers_license.nationality': 'occaecat quis',
+      'document.drivers_license.ref_number': 'ex officia',
+      'document.drivers_license.samba_activity_history_response': 'ex proident',
+      'document.drivers_license.selfie.image': 'ipsum',
+      'document.drivers_license.selfie.mime_type': 'Excepteur',
+      'document.finra_compliance_letter': 'reprehenderit',
+      'document.id_card.back.image': 'a7234a77-a736-49d9-805a-699329be61fa',
+      'document.id_card.back.mime_type': '5d3a9ce1-ca73-47aa-9ed8-88550c4973e0',
+      'document.id_card.clave_de_elector': '94316ee5-7814-4060-b140-0e316380471b',
+      'document.id_card.curp': '35de796a-c0c4-4811-97a1-6b8532e2e845',
+      'document.id_card.dob': '40677ea3-f629-440c-a5b0-375f48e04f2b',
+      'document.id_card.document_number': '7d49f207-aad4-4e65-bb84-311cdd118261',
+      'document.id_card.expires_at': '15f42442-65fb-4965-90c5-55fbe83cb81c',
+      'document.id_card.front.image': '190e2eb7-829e-49c1-af07-bf5a649b7c60',
+      'document.id_card.front.mime_type': 'bf50ec04-adc8-4419-a937-c6d9d1b6a7c7',
+      'document.id_card.full_address': '7052 Jeffery Curve Suite 517',
+      'document.id_card.full_name': 'Mrs. Janis Stehr',
+      'document.id_card.gender': '70970c02-c442-46bf-8dd6-2356ad895d54',
+      'document.id_card.issued_at': 'bde1a62b-07c5-4bac-8cdf-936f36f47147',
+      'document.id_card.issuing_country': 'Togo',
+      'document.id_card.issuing_state': 'Nebraska',
+      'document.id_card.nationality': 'd1d3948c-728a-4a43-b396-3dab904419b6',
+      'document.id_card.ref_number': 'e06caece-e9f0-411a-b0ec-45337274f486',
+      'document.id_card.samba_activity_history_response': 'd54cab3d-6cf2-40d8-b94a-5e15cfb132ab',
+      'document.id_card.selfie.image': 'd86ed480-b18b-42ad-973c-53a6c8dd8ec5',
+      'document.id_card.selfie.mime_type': '70fb1b1d-8cd2-4a7e-951e-983815ea1b0a',
+      'document.passport.back.image': 'dolor dolore est pariatur sit',
+      'document.passport.back.mime_type': 'nisi adipisicing commodo',
+      'document.passport.classified_document_type': 'dolor amet Excepteur qui',
+      'document.passport.clave_de_elector': 'exercitation consectetur sunt minim commodo',
+      'document.passport.curp': 'irure labore minim cillum enim',
+      'document.passport.curp_validation_response': '3588a037-fa0e-4745-b9ae-ca0ecc5a32cb',
+      'document.passport.dob': 'aute enim veniam',
+      'document.passport.document_number': 'consequat',
+      'document.passport.expires_at': 'ex',
+      'document.passport.front.image': 'id ut dolore in mollit',
+      'document.passport.front.mime_type': 'ad quis',
+      'document.passport.full_address': '4403 Alysa Gardens Apt. 527',
+      'document.passport.gender': 'sed',
+      'document.passport.issued_at': 'Excepteur',
+      'document.passport.issuing_country': 'Germany',
+      'document.passport.issuing_state': 'Tennessee',
+      'document.passport.nationality': 'nostrud in',
+      'document.passport.ref_number': 'id pariatur fugiat',
+      'document.passport.samba_activity_history_response': 'dolore non magna do velit',
+      'document.passport.selfie.image': 'dolore consectetur dolor ad Duis',
+      'document.passport.selfie.mime_type': 'voluptate ut',
+      'document.passport_card.back.image': 'aute et eiusmod cupidatat',
+      'document.passport_card.back.mime_type': 'incididunt dolor sunt labore',
+      'document.passport_card.classified_document_type': 'adipisicing officia',
+      'document.passport_card.clave_de_elector': 'dolor reprehenderit officia qui',
+      'document.passport_card.curp': 'nisi amet aliqua dolor',
+      'document.passport_card.curp_validation_response': 'f5797ee2-b80c-4e9f-a055-f0c0b68d7909',
+      'document.passport_card.dob': 'sint anim dolore ex eiusmod',
+      'document.passport_card.document_number': 'pariatur eiusmod cupidatat non',
+      'document.passport_card.expires_at': 'ad reprehenderit',
+      'document.passport_card.front.image': 'et sunt enim eiusmod',
+      'document.passport_card.front.mime_type': 'Duis incididunt irure non',
+      'document.passport_card.full_address': '8503 Gleichner Row Suite 604',
+      'document.passport_card.full_name': 'Mr. Arnold Zemlak',
+      'document.passport_card.gender': 'elit',
+      'document.passport_card.issued_at': 'consequat',
+      'document.passport_card.issuing_country': 'Iran',
+      'document.passport_card.issuing_state': 'Wyoming',
+      'document.passport_card.nationality': 'quis ad exercitation',
+      'document.passport_card.ref_number': 'esse aute nostrud sit',
+      'document.passport_card.samba_activity_history_response': 'cillum aliquip laborum sint ipsum',
+      'document.passport_card.selfie.image': 'veniam aute Excepteur enim fugiat',
+      'document.passport_card.selfie.mime_type': 'eu commodo non esse',
+      'document.permit.back.image': 'elit eu velit',
+      'document.permit.back.mime_type': 'aute',
+      'document.permit.classified_document_type': 'ut Excepteur anim aliquip deserunt',
+      'document.permit.clave_de_elector': 'ea culpa aute consectetur',
+      'document.permit.curp': 'sint',
+      'document.permit.curp_validation_response': 'f196e39c-24ce-4049-9003-20d705974ec2',
+      'document.permit.dob': 'magna sit Duis in ut',
+      'document.permit.document_number': 'eiusmod ea sit esse pariatur',
+      'document.permit.expires_at': 'elit sint cillum',
+      'document.permit.front.image': 'in',
+      'document.permit.front.mime_type': 'non mollit in',
+      'document.permit.full_address': '8232 Wilhelm Light Suite 744',
+      'document.permit.full_name': 'Steve Hagenes',
+      'document.permit.gender': 'sit elit reprehenderit',
+      'document.permit.issued_at': 'Duis non est anim',
+      'document.permit.issuing_country': 'Belize',
+      'document.permit.issuing_state': 'Vermont',
+      'document.permit.nationality': 'cupidatat sunt esse',
+      'document.permit.ref_number': 'Duis fugiat do',
+      'document.permit.samba_activity_history_response': 'eu ipsum aute dolor sit',
+      'document.permit.selfie.image': 'aute in veniam',
+      'document.permit.selfie.mime_type': 'laboris',
+      'document.proof_of_address.image': '43725 Hamill Junctions Apt. 238',
+      'document.residence_document.back.image': '9c1187b5-a314-4c83-ac51-e3b83cbbaa9f',
+      'document.residence_document.back.mime_type': '9f77e8c8-f79e-4314-930e-10c84814a83d',
+      'document.residence_document.classified_document_type': 'e738cefb-b309-4e13-8d98-1a488cfeafee',
+      'document.residence_document.clave_de_elector': 'eec6f333-d94f-46af-99ea-0a5b3afc46e1',
+      'document.residence_document.curp': 'ac477a28-4678-4bda-88e9-fc37fb421c9b',
+      'document.residence_document.curp_validation_response': '64b01a8a-8551-4f1c-8c25-b84bafc17599',
+      'document.residence_document.dob': 'ab8dc46f-aaf0-4dd7-bde4-13de559c0434',
+      'document.residence_document.document_number': 'acfbc8d7-f2b2-4e7c-9b1c-db9b3d280dc5',
+      'document.residence_document.expires_at': 'ba2e6afb-999e-4952-8905-36d949682c83',
+      'document.residence_document.front.image': '88c09080-af0b-45c1-8519-d40e4b9632f9',
+      'document.residence_document.front.mime_type': '881ab079-aac9-4583-bb38-ad43f0c285dc',
+      'document.residence_document.full_address': '76343 King Street Apt. 284',
+      'document.residence_document.full_name': 'Ed Batz',
+      'document.residence_document.gender': 'cd26c5c2-d1c1-4cfc-b81f-61dd98562997',
+      'document.residence_document.issued_at': '3e5c6cd1-33a9-4968-96c8-d30931c38723',
+      'document.residence_document.issuing_country': 'Barbados',
+      'document.residence_document.issuing_state': 'Hawaii',
+      'document.residence_document.nationality': '0e80e387-2056-4de6-9168-c84e46fbef05',
+      'document.residence_document.ref_number': '455839c2-b7f6-40fd-b62c-af528daaa086',
+      'document.residence_document.samba_activity_history_response': '9f6c282a-c8cb-4cc3-9ffb-738bacffe30e',
+      'document.residence_document.selfie.image': '733ca25c-c9e7-49bf-8686-590a60928b76',
+      'document.residence_document.selfie.mime_type': 'd4acaeab-cad9-4906-8608-113e684e2c10',
+      'document.ssn_card.image': 'et ut reprehenderit',
+      'document.visa.back.image': 'id dolor',
+      'document.visa.back.mime_type': 'est eu anim',
+      'document.visa.classified_document_type': 'mollit sunt nulla irure',
+      'document.visa.curp': 'dolor anim elit',
+      'document.visa.curp_validation_response': 'f2482745-6d6c-4d8a-9057-f84093bfc5fa',
+      'document.visa.dob': 'eiusmod dolore sint culpa aliqua',
+      'document.visa.document_number': 'ut sed',
+      'document.visa.expires_at': 'incididunt aliqua cillum ad Ut',
+      'document.visa.front.image': 'Ut ad cupidatat',
+      'document.visa.front.mime_type': 'in ad sint in dolor',
+      'document.visa.full_address': '356 Tiara Crossroad Suite 667',
+      'document.visa.full_name': 'Jean Weissnat',
+      'document.visa.gender': 'labore',
+      'document.visa.issued_at': 'commodo sunt Lorem laborum',
+      'document.visa.issuing_country': 'Guernsey',
+      'document.visa.nationality': 'est cillum consectetur id in',
+      'document.visa.ref_number': 'eiusmod ullamco ad Ut',
+      'document.visa.samba_activity_history_response': 'enim voluptate dolor',
+      'document.visa.selfie.image': 'ut sunt Lorem et amet',
+      'document.visa.selfie.mime_type': 'dolor ullamco',
+      'document.voter_identification.back.image': '2d93e6ce-cd32-4783-868a-7d89a1f244cb',
+      'document.voter_identification.back.mime_type': '0ed1726e-fc7f-4d00-82e3-2da165f4600a',
+      'document.voter_identification.classified_document_type': 'a16d0540-5f0d-4e0b-94ab-911e5f8ab4e5',
+      'document.voter_identification.clave_de_elector': '4c20f640-acb5-4b00-a7d7-c7aef1d42f75',
+      'document.voter_identification.curp': 'db442504-f728-450a-9056-4e56c4de129a',
+      'document.voter_identification.curp_validation_response': 'f046b975-9b7c-4685-8ef8-1c7616f9f86f',
+      'document.voter_identification.dob': '9e0990ab-fc0e-4719-8bc7-a7f92ffda90f',
+      'document.voter_identification.document_number': '679b630c-3782-4ebc-8b49-84eb07640805',
+      'document.voter_identification.expires_at': '1f6b6e8c-a751-4c13-a303-df89756ab8ff',
+      'document.voter_identification.front.image': '1c6f700d-ef77-4849-8894-388f23d8511f',
+      'document.voter_identification.front.mime_type': '0ad89212-a447-4df8-aaaa-24e7f4072ee4',
+      'document.voter_identification.full_address': '848 Carleton Spurs Apt. 677',
+      'document.voter_identification.full_name': 'Betty Mertz PhD',
+      'document.voter_identification.gender': '2c973f42-bce2-4fbb-941a-8ed8ccd291e7',
+      'document.voter_identification.issued_at': 'a96a9bf7-734a-4b06-b6bc-6e464e57c104',
+      'document.voter_identification.issuing_country': 'Kazakhstan',
+      'document.voter_identification.issuing_state': 'Michigan',
+      'document.voter_identification.nationality': '7c8570e1-e913-4e17-9565-6d48de0f5134',
+      'document.voter_identification.ref_number': '1ea92b0c-12cb-4087-b94a-eb32252039a0',
+      'document.voter_identification.samba_activity_history_response': 'ff8397d6-ef23-41a7-bd9c-d736237a49ee',
+      'document.voter_identification.selfie.image': 'd9a54337-bb36-48ef-938c-ace9d3c9874a',
+      'document.voter_identification.selfie.mime_type': 'f0426c44-1ce5-4b30-a87c-45289b745823',
+      'id.address_line1': '1687 Rosanna Court Suite 535',
+      'id.address_line2': '52588 Haag Terrace Apt. 902',
+      'id.citizenships': 'fc75dcc8-3252-429d-b444-f0095b99c044',
+      'id.city': 'Kleinville',
+      'id.country': 'Saint Pierre and Miquelon',
+      'id.dob': 'dd86e844-8647-4846-9c96-61804139ca55',
+      'id.drivers_license_number': '67ecd57e-a574-406c-9352-06724bc348a8',
+      'id.drivers_license_state': 'Washington',
+      'id.email': 'magnolia.legros@gmail.com',
+      'id.first_name': 'Aurore',
+      'id.itin': '62538ffe-f8a2-4456-9747-7febcbdf1937',
+      'id.last_name': 'Ernser',
+      'id.middle_name': 'Roberto Hane',
+      'id.phone_number': '+19376259883',
+      'id.ssn4': '6f17b588-2a6a-4757-b873-af3686dcbd54',
+      'id.ssn9': 'a4e4a029-5baf-462e-8ff8-77d5d4ca87b7',
+      'id.state': 'North Dakota',
+      'id.us_legal_status': 'e32a0563-579c-42ea-8e78-3ded30310392',
+      'id.us_tax_id': '14511ed9-7a65-47ae-89da-b4bbcf84dc2a',
+      'id.visa_expiration_date': '6819364a-827f-4a91-b96b-3706a85fe03b',
+      'id.visa_kind': '975e6ca8-8d5a-4ea7-af92-5cfb31807dd2',
+      'id.zip': '37442',
+      'investor_profile.annual_income': 'qui proident tempor aute exercitation',
+      'investor_profile.brokerage_firm_employer': 'qui fugiat ex magna minim',
+      'investor_profile.employer': 'anim sit sed dolore',
+      'investor_profile.employment_status': 'qui anim velit',
+      'investor_profile.family_member_names': 'Jodi Bogisich',
+      'investor_profile.funding_sources': 'incididunt labore ullamco ad',
+      'investor_profile.investment_goals': 'incididunt eu amet ullamco ea',
+      'investor_profile.net_worth': 'pariatur qui amet Excepteur ad',
+      'investor_profile.occupation': 'magna tempor',
+      'investor_profile.political_organization': 'non',
+      'investor_profile.risk_tolerance': 'sint veniam',
+      'investor_profile.senior_executive_symbols': 'ut tempor',
+    },
+    props,
+  ) as ModernUserDecryptResponse;
 export const getNeuroIdentityIdResponse = (props: Partial<NeuroIdentityIdResponse>) =>
   merge(
     {
@@ -1182,6 +1769,7 @@ export const getNeuroIdentityIdResponse = (props: Partial<NeuroIdentityIdRespons
     },
     props,
   ) as NeuroIdentityIdResponse;
+export const getObConfigurationKind = (props: Partial<ObConfigurationKind>) => (props ?? 'kyc') as ObConfigurationKind;
 export const getOnboardingResponse = (props: Partial<OnboardingResponse>) =>
   merge(
     {
@@ -1402,6 +1990,36 @@ export const getPublicOnboardingConfiguration = (props: Partial<PublicOnboarding
     },
     props,
   ) as PublicOnboardingConfiguration;
+export const getRawUserDataRequest = (props: Partial<RawUserDataRequest>) =>
+  merge(
+    {
+      key: 'ff2158c6-2ada-4a61-a26d-aebe02ec76f2',
+      value: {},
+    },
+    props,
+  ) as RawUserDataRequest;
+export const getRegisterPasskeyAttemptContext = (props: Partial<RegisterPasskeyAttemptContext>) =>
+  merge(
+    {
+      elapsedTimeInOsPromptMs: 50865702,
+      errorMessage: 'nostrud esse sed Excepteur in',
+    },
+    props,
+  ) as RegisterPasskeyAttemptContext;
+export const getRenderV1SdkArgs = (props: Partial<RenderV1SdkArgs>) =>
+  merge(
+    {
+      authToken: 'e79cabae-e1cc-4c15-a03e-44236b034fed',
+      canCopy: true,
+      defaultHidden: false,
+      id: '107d8cc9-2bd2-47d5-b066-0b815c25935b',
+      label: 'labore aute pariatur',
+      showHiddenToggle: false,
+    },
+    props,
+  ) as RenderV1SdkArgs;
+export const getRequestedTokenScope = (props: Partial<RequestedTokenScope>) =>
+  (props ?? 'onboarding_components') as RequestedTokenScope;
 export const getSdkArgs = (props: Partial<SdkArgs>) => (props ?? 'magna exercitation aute minim incididunt') as SdkArgs;
 export const getSignupChallengeRequest = (props: Partial<SignupChallengeRequest>) =>
   merge(
@@ -1419,6 +2037,31 @@ export const getSignupChallengeRequest = (props: Partial<SignupChallengeRequest>
     },
     props,
   ) as SignupChallengeRequest;
+export const getSkipLivenessClientType = (props: Partial<SkipLivenessClientType>) =>
+  (props ?? 'web') as SkipLivenessClientType;
+export const getSkipLivenessContext = (props: Partial<SkipLivenessContext>) =>
+  merge(
+    {
+      attempts: [
+        {
+          elapsedTimeInOsPromptMs: -47743671,
+          errorMessage: 'dolore fugiat ut',
+        },
+        {
+          elapsedTimeInOsPromptMs: -42968746,
+          errorMessage: 'dolor voluptate exercitation minim',
+        },
+        {
+          elapsedTimeInOsPromptMs: -38283446,
+          errorMessage: 'velit',
+        },
+      ],
+      clientType: 'mobile',
+      numAttempts: -91200870,
+      reason: 'labore voluptate dolore',
+    },
+    props,
+  ) as SkipLivenessContext;
 export const getSkipPasskeyRegisterRequest = (props: Partial<SkipPasskeyRegisterRequest>) =>
   merge(
     {
@@ -1458,6 +2101,46 @@ export const getStytchTelemetryRequest = (props: Partial<StytchTelemetryRequest>
     },
     props,
   ) as StytchTelemetryRequest;
+export const getTaskStatus = (props: Partial<TaskStatus>) => (props ?? 'do mollit veniam') as TaskStatus;
+export const getUpdateAuthMethodsV1SdkArgs = (props: Partial<UpdateAuthMethodsV1SdkArgs>) =>
+  merge(
+    {
+      authToken: '7f839499-cf03-4427-9b7a-7c83da57628a',
+      l10N: {
+        language: 'en',
+        locale: 'en-US',
+      },
+      options: {
+        showLogo: true,
+      },
+    },
+    props,
+  ) as UpdateAuthMethodsV1SdkArgs;
+export const getUpdateOrCreateHostedBusinessOwnerRequest = (props: Partial<UpdateOrCreateHostedBusinessOwnerRequest>) =>
+  merge(
+    {
+      data: {
+        key: 'eaa36991-dc2a-4c88-9da3-fc13f38ad7a7',
+        value: {},
+      },
+      op: 'create',
+      ownershipStake: 68693524,
+      uuid: 'fc3126dc-ba49-4c5f-9c4f-ba36b3886552',
+    },
+    props,
+  ) as UpdateOrCreateHostedBusinessOwnerRequest;
+export const getUserAuthScope = (props: Partial<UserAuthScope>) => (props ?? 'explicit_auth') as UserAuthScope;
+export const getUserChallengeData = (props: Partial<UserChallengeData>) =>
+  merge(
+    {
+      biometricChallengeJson: 'laborum anim mollit reprehenderit',
+      challengeKind: 'biometric',
+      challengeToken: '4344f6d5-1b5b-4d1b-9527-bebb36614842',
+      timeBeforeRetryS: -26627198,
+      token: '670d1e95-5739-4ed5-a6b4-25ca661add5b',
+    },
+    props,
+  ) as UserChallengeData;
 export const getUserChallengeRequest = (props: Partial<UserChallengeRequest>) =>
   merge(
     {
@@ -1492,6 +2175,8 @@ export const getUserChallengeVerifyResponse = (props: Partial<UserChallengeVerif
     },
     props,
   ) as UserChallengeVerifyResponse;
+export const getUserDataIdentifier = (props: Partial<UserDataIdentifier>) =>
+  (props ?? 'document.drivers_license.back.mime_type') as UserDataIdentifier;
 export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>) =>
   merge(
     {
@@ -1514,3 +2199,54 @@ export const getUserDecryptResponse = (props: Partial<UserDecryptResponse>) =>
     },
     props,
   ) as UserDecryptResponse;
+export const getVerifyResultV1SdkArgs = (props: Partial<VerifyResultV1SdkArgs>) =>
+  merge(
+    {
+      authToken: 'be6eefd1-0ce1-4d7e-9fdb-22c3bfd0a6c3',
+      deviceResponse: 'dolore nostrud et',
+    },
+    props,
+  ) as VerifyResultV1SdkArgs;
+export const getVerifyV1Options = (props: Partial<VerifyV1Options>) =>
+  merge(
+    {
+      showCompletionPage: false,
+      showLogo: true,
+    },
+    props,
+  ) as VerifyV1Options;
+export const getVerifyV1SdkArgs = (props: Partial<VerifyV1SdkArgs>) =>
+  merge(
+    {
+      authToken: 'fd24a3b1-e41c-4813-b842-1ebcf762025f',
+      documentFixtureResult: 'fail',
+      fixtureResult: 'step_up',
+      isComponentsSdk: false,
+      l10N: {
+        language: 'en',
+        locale: 'en-US',
+      },
+      options: {
+        showLogo: true,
+      },
+      publicKey: '9591877f-b68f-4196-86c7-a4ea3bf1a735',
+      sandboxId: '0f3f9b78-224c-4cf3-82ed-c4bcc70da5c7',
+      shouldRelayToComponents: true,
+      userData: {},
+    },
+    props,
+  ) as VerifyV1SdkArgs;
+export const getWorkflowFixtureResult = (props: Partial<WorkflowFixtureResult>) =>
+  (props ?? 'fail') as WorkflowFixtureResult;
+export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>) =>
+  merge(
+    {
+      data: {
+        playbookId: 'velit officia esse pariatur eiusmod',
+        recollectAttributes: ['ssn4', 'business_tin', 'business_website'],
+        reuseExistingBoKyc: false,
+      },
+      kind: 'onboard',
+    },
+    props,
+  ) as WorkflowRequestConfig;

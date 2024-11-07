@@ -27,7 +27,6 @@ pub struct User {
     pub requires_additional_info: Option<PublicWorkflowRequest>,
 }
 
-/// Information on data requested from the user via the Footprint dashboard.
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicWorkflowRequest {
     /// The timestamp at which the additional info was requested.

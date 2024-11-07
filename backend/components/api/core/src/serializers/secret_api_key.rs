@@ -6,7 +6,7 @@ use newtypes::PiiString;
 
 type DbTenantApiKey = (TenantApiKey, TenantRole, PiiString, Option<SecretApiKey>);
 
-impl DbToApi<DbTenantApiKey> for api_wire_types::SecretApiKey {
+impl DbToApi<DbTenantApiKey> for api_wire_types::DashboardSecretApiKey {
     fn from_db((api_key, role, scrubbed_key, key): DbTenantApiKey) -> Self {
         let TenantApiKey {
             id,

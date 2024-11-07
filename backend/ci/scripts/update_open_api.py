@@ -131,6 +131,18 @@ def find_keys(node, key):
             yield node.get(key)
 
 
+def find_schema_refs(open_api_spec, entity_refs):
+    """
+    Given the initial list of schema refs explicitly used in endpoints, recursively crawls to find all names of nested schemas used.
+    """
+    used_entity_names = [schema_ref.split("/")[-1] for schema_ref in entity_refs]
+    for name in used_entity_names:
+        schema = open_api_spec["components"]["schemas"][name]
+        yield (name, schema)
+        nested_entity_refs = list(find_keys(schema, "$ref"))
+        yield from find_schema_refs(open_api_spec, nested_entity_refs)
+
+
 def get_apis(open_api_spec, tags):
     """
     Replace the paths in the open API spec with only the public paths, and validate the tags for
@@ -154,12 +166,15 @@ def get_apis(open_api_spec, tags):
             used_security_schemes |= set(
                 k for i in endpoint.security_schemes for k in i.keys()
             )
+
     # Create the final list of all schemas used by the matching endpoints
-    used_entity_names = [schema_ref.split("/")[-1] for schema_ref in used_entity_refs]
     used_schemas = {
-        name: open_api_spec["components"]["schemas"][name]
-        for name in sorted(used_entity_names)
+        k: v for (k, v) in find_schema_refs(open_api_spec, used_entity_refs)
     }
+    sorted_used_schemas = {
+        name: used_schemas[name] for name in sorted(used_schemas.keys())
+    }
+
     # Create final list of securitySchemes used by the matching endpoints
     used_security_schemes = {
         name: open_api_spec["components"]["securitySchemes"][name]
@@ -173,7 +188,7 @@ def get_apis(open_api_spec, tags):
         "components": {
             **open_api_spec["components"],
             "securitySchemes": used_security_schemes,
-            "schemas": used_schemas,
+            "schemas": sorted_used_schemas,
         },
         "paths": paths_dict,
         "info": info,

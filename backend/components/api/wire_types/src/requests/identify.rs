@@ -23,7 +23,7 @@ pub enum IdentifyId {
 #[derive(Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyRequest {
-    /// TODO deprecate
+    // TODO deprecate
     pub identifier: Option<IdentifyId>,
     pub email: Option<Email>,
     pub phone_number: Option<PhoneNumber>,
@@ -105,6 +105,7 @@ pub struct IdentifyChallengeResponse {
 }
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize, Clone)]
+#[openapi(inline)]
 pub struct SignupChallengeData<T> {
     pub value: T,
     #[serde(default)]

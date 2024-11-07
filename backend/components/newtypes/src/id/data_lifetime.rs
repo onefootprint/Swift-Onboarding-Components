@@ -6,7 +6,6 @@ use diesel::serialize::ToSql;
 use diesel::sql_types::BigInt;
 use paperclip::actix::Apiv2Schema;
 
-#[doc = "Sequence number used to order DataLifetimes"]
 #[derive(
     Debug,
     Clone,
@@ -29,6 +28,7 @@ use paperclip::actix::Apiv2Schema;
     FromSqlRow,
 )]
 #[serde(transparent)]
+#[openapi(inline)]
 #[diesel(sql_type = BigInt)]
 pub struct DataLifetimeSeqno(i64);
 

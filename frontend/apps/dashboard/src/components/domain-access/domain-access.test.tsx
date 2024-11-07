@@ -3,6 +3,7 @@ import { customRender, mockRequest, screen, userEvent, waitFor } from '@onefootp
 import mockRouter from 'next-router-mock';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
 
+import createStringList from '../../utils/create-string-list';
 import DomainAccess from './domain-access';
 import {
   orgAllowDomainFixture,
@@ -87,8 +88,9 @@ describe('<DomainAccess />', () => {
 
       await userEvent.hover(toggle);
       await waitFor(() => {
+        const domains = createStringList(orgDomainAlreadyClaimed.domains);
         const tooltip = screen.getByRole('tooltip', {
-          name: 'Domain access for footprint.com, ut and enim ex aute has already been claimed. Please contact your admin to invite you to the existing organization.',
+          name: `Domain access for ${domains} has already been claimed. Please contact your admin to invite you to the existing organization.`,
         });
         expect(tooltip).toBeInTheDocument();
       });

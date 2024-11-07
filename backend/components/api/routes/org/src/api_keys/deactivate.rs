@@ -25,7 +25,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
-) -> ApiResponse<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
     if let AuthActor::TenantApiKey(key_id) = auth.actor() {
@@ -46,7 +46,7 @@ pub async fn post(
         .into_iter()
         .next()
         .ok_or(AssertionError("No scrubbed key"))?;
-    Ok(api_wire_types::SecretApiKey::from_db((
+    Ok(api_wire_types::DashboardSecretApiKey::from_db((
         api_key,
         role,
         scrubbed_key,

@@ -65,7 +65,7 @@ pub struct ModernUserDecryptResponse(pub DecryptResponse);
 // NOTE: we are not serializing that this response can include versioned DIs
 impl_modern_map_apiv2_schema!(
     ModernUserDecryptResponse<UserDataIdentifier, Option<PiiString>>,
-    "A key-value map with the corresponding decrypted values",
+    "",
     { "id.first_name": "Jane", "id.last_name": "Doe" }
 );
 impl_response_type!(ModernUserDecryptResponse);

@@ -31,7 +31,6 @@ use strum_macros::EnumString;
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-/// The set of values we can use for identity_document.document_type
 pub enum DocumentKind {
     // TODO should we nest IdDocKind here?
     IdCard,

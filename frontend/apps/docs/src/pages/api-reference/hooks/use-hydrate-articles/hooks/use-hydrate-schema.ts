@@ -13,22 +13,27 @@ const useHydrateSchema = (openApiSpec: any) => {
     return schemas[key] as ContentSchemaNoRef | undefined;
   };
 
-  /** Open API request and response schemas may by defined either inline or by a reference to a list of schemas. This dereferenecs the referenced schema and returns a guaranteed schema definition. */
-  const dereferenceSchema = (schema: ContentSchema): ContentSchemaNoRef => {
+  /** Open API request and response schemas may by defined either inline or by a reference to a list of schemas. This recursively dereferenecs all referenced schema and returns a guaranteed schema definition. */
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const resolveAllSchemaRefs = (schema: any): any => {
+    if (typeof schema !== 'object' || Array.isArray(schema) || !schema) {
+      return schema;
+    }
+
+    let dereferencedSchema = schema;
     if (schema.$ref) {
-      const dereferencedSchema = evaluateSchemaRef(schema.$ref);
+      dereferencedSchema = evaluateSchemaRef(schema.$ref);
       if (!dereferencedSchema) {
         throw Error(`Couldn't dereference schema ${schema.$ref}`);
       }
-      return dereferencedSchema;
     }
-    if (schema.items?.$ref) {
-      return {
-        ...schema,
-        items: dereferenceSchema(schema.items),
-      };
-    }
-    return schema;
+
+    // Recursively crawl for any values that are schema references and resolve them
+    return Object.fromEntries(
+      Object.entries(dereferencedSchema).map(([k, v]) => {
+        return [k, resolveAllSchemaRefs(v)];
+      }),
+    );
   };
 
   /** Filters out feature-gated properties from the provided properties */
@@ -41,7 +46,7 @@ const useHydrateSchema = (openApiSpec: any) => {
 
   /** Given a schema (that may be a reference), looks up the full schema from the open API spec and applies any filtering to visibile properties on the schema. */
   const hydrateSchema = (schema: ContentSchema) => {
-    const dereferencedSchema = dereferenceSchema(schema);
+    const dereferencedSchema = resolveAllSchemaRefs(schema) as ContentSchemaNoRef;
     return {
       ...dereferencedSchema,
       properties: filterVisibleProperties(dereferencedSchema.properties),

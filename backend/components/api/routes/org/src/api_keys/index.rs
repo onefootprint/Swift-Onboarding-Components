@@ -30,7 +30,7 @@ use paperclip::actix::{
     self,
 };
 
-type ApiKeysResponse = Json<OffsetPaginatedResponse<api_wire_types::SecretApiKey>>;
+type ApiKeysResponse = Json<OffsetPaginatedResponse<api_wire_types::DashboardSecretApiKey>>;
 
 #[api_v2_operation(
     description = "Lists the tenant's secret API keys",
@@ -78,8 +78,8 @@ pub async fn get(
                 .ok_or(AssertionError("Missing scrubbed key"))?;
             Ok((key, role, scrubbed_key, None))
         })
-        .map_ok(api_wire_types::SecretApiKey::from_db)
-        .collect::<FpResult<Vec<api_wire_types::SecretApiKey>>>()?;
+        .map_ok(api_wire_types::DashboardSecretApiKey::from_db)
+        .collect::<FpResult<Vec<api_wire_types::DashboardSecretApiKey>>>()?;
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
@@ -99,7 +99,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     request: web::Json<CreateApiKeyRequest>,
-) -> ApiResponse<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
@@ -116,7 +116,7 @@ pub async fn post(
         })
         .await?;
 
-    Ok(api_wire_types::SecretApiKey::from_db((
+    Ok(api_wire_types::DashboardSecretApiKey::from_db((
         api_key,
         role,
         secret_key.scrub(),
@@ -142,7 +142,7 @@ pub async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
     request: web::Json<UpdateApiKeyRequest>,
-) -> ApiResponse<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
     if let AuthActor::TenantApiKey(key_id) = auth.actor() {
@@ -168,7 +168,7 @@ pub async fn patch(
         .next()
         .ok_or(AssertionError("No scrubbed key"))?;
 
-    Ok(api_wire_types::SecretApiKey::from_db((
+    Ok(api_wire_types::DashboardSecretApiKey::from_db((
         api_key,
         role,
         scrubbed_key,

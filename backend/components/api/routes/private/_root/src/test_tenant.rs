@@ -38,7 +38,7 @@ struct NewClientRequest {
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 struct NewClientResponse {
     org_id: TenantId,
-    keys: Vec<api_wire_types::SecretApiKey>,
+    keys: Vec<api_wire_types::DashboardSecretApiKey>,
     auth_token: SessionAuthToken,
     ro_auth_token: SessionAuthToken,
 }
@@ -199,7 +199,7 @@ async fn post(
             .await?;
         let p_api_key = SecretApiKey::from(p_api_key.leak().to_string());
         let serialized =
-            api_wire_types::SecretApiKey::from_db((key, role, p_api_key.scrub(), Some(p_api_key)));
+            api_wire_types::DashboardSecretApiKey::from_db((key, role, p_api_key.scrub(), Some(p_api_key)));
         keys.push(serialized);
     }
 

@@ -8,9 +8,9 @@ use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// An cryptographically generated auth token to authenticate a session
 #[derive(Clone, Hash, PartialEq, Eq, Display, Into, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(transparent)]
+#[openapi(inline)]
 pub struct SessionAuthToken(String);
 
 impl std::fmt::Debug for SessionAuthToken {

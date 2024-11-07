@@ -20,8 +20,10 @@ use strum_macros::EnumString;
     AsRefStr,
     PartialEq,
     Eq,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DocumentFixtureResult {
     /// Document was not verified (random failing reason codes are generated)

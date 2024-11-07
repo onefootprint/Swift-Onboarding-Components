@@ -10,7 +10,6 @@ use strum::EnumIter;
 use strum_macros::AsRefStr;
 use strum_macros::EnumString;
 
-/// The status of the onboarding
 #[derive(
     Debug,
     Clone,

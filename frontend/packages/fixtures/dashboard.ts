@@ -1,20 +1,54 @@
 import type {
+  ActionKind,
+  Actor,
+  AdverseMediaListKind,
   AmlDetail,
+  AmlHit,
+  AmlHitMedia,
+  AmlMatchKind,
   Annotation,
+  ApiKeyStatus,
   AssumePartnerRoleRequest,
   AssumePartnerRoleResponse,
   AssumeRoleRequest,
   AssumeRoleResponse,
+  AttestedDeviceData,
+  AuditEvent,
+  AuditEventDetail,
+  AuditEventName,
   AuthEvent,
+  AuthEventKind,
+  AuthMethodKind,
+  AuthMethodUpdated,
   AuthOrgMember,
+  BooleanOperator,
+  BusinessDetail,
   BusinessInsights,
+  BusinessOwnerKind,
+  BusinessOwnerSource,
+  CipKind,
   ClientDecryptRequest,
+  ClientIdentity,
+  CollectedDataOption,
+  CompanySize,
   ComplianceCompanySummary,
+  ComplianceDocData,
+  ComplianceDocDataKind,
   ComplianceDocEvent,
+  ComplianceDocEventAssigned,
+  ComplianceDocEventRequested,
+  ComplianceDocEventReviewed,
+  ComplianceDocEventSubmitted,
+  ComplianceDocEventType,
+  ComplianceDocReviewDecision,
+  ComplianceDocStatus,
   ComplianceDocSubmission,
   ComplianceDocSummary,
   ComplianceDocTemplate,
+  ComplianceDocTemplateVersion,
+  ContactInfoKind,
   CopyPlaybookRequest,
+  CountrySpecificDocumentMapping,
   CreateAnnotationRequest,
   CreateApiKeyRequest,
   CreateComplianceDocRequest,
@@ -29,75 +63,195 @@ import type {
   CreateOrgTenantTagRequest,
   CreateProxyConfigRequest,
   CreateReviewRequest,
+  CreateRule,
   CreateTagRequest,
   CreateTenantAndroidAppMetaRequest,
   CreateTenantIosAppMetaRequest,
   CreateTenantRoleRequest,
   CreateTenantUserRequest,
+  CreateTokenResponse,
   CursorPaginatedAuditEvent,
   CursorPaginatedEntity,
   CursorPaginatedListEvent,
+  CustomDocumentConfig,
+  DashboardSecretApiKey,
+  DataAttributeKind,
+  DataCollectedInfo,
+  DataIdentifier,
+  DataLifetimeSource,
+  DbActor,
+  DecisionStatus,
+  DecryptionContext,
   DeleteRequest,
+  DeviceFraudRiskLevel,
+  DeviceInsightField,
+  DeviceInsightOperation,
+  DeviceType,
   DocsTokenResponse,
   Document,
+  DocumentAndCountryConfiguration,
+  DocumentImageError,
+  DocumentKind,
+  DocumentRequest,
+  DocumentRequestConfig,
+  DocumentRequestKind,
+  DocumentReviewStatus,
+  DocumentSide,
+  DocumentStatus,
+  DocumentUpload,
+  DocumentUploadSettings,
+  DocumentUploadedTimelineEvent,
+  DupeKind,
   Dupes,
+  EditRule,
   Empty,
   EnclaveHealthResponse,
+  EnhancedAml,
   Entity,
+  EntityAction,
   EntityActionResponse,
   EntityActionsRequest,
   EntityAttribute,
+  EntityOnboarding,
+  EntityOnboardingRuleSetResult,
+  EntityStatus,
+  EntityWorkflow,
+  Equals,
   EvaluateRuleRequest,
+  ExternalIntegrationCalled,
+  ExternalIntegrationKind,
+  FieldValidation,
+  FieldValidationDetail,
+  FilterFunction,
+  FootprintReasonCode,
   GetClientTokenResponse,
+  GetClientTokenResponseTenant,
   GetFieldValidationResponse,
   GetUserVaultResponse,
+  IdDocKind,
+  IdentifyScope,
   InProgressOnboarding,
+  InProgressOnboardingTenant,
+  IngressSettings,
+  InsightAddress,
+  InsightBusinessName,
+  InsightEvent,
+  InsightPerson,
+  InsightPhone,
+  InsightRegistration,
+  InsightTin,
+  InsightWatchlist,
+  InsightWebsite,
   IntegrityRequest,
   IntegrityResponse,
   InvoicePreview,
+  InvokeVaultProxyPermission,
+  IsIn,
+  Iso3166TwoDigitCountryCode,
+  LabelAdded,
+  LabelKind,
+  LineItem,
   LinkAuthRequest,
   List,
   ListDetails,
   ListEntitiesSearchRequest,
   ListEntry,
+  ListEvent,
+  ListEventDetail,
+  ListKind,
+  ListPlaybookUsage,
+  LiteOrgMember,
+  LiteUserAndOrg,
+  LivenessAttributes,
   LivenessEvent,
+  LivenessIssuer,
+  LivenessSource,
+  ManualDecisionRequest,
+  ManualReview,
+  ManualReviewKind,
+  MatchLevel,
   MultiUpdateRuleRequest,
+  NumberOperator,
+  ObConfigurationKind,
+  Officer,
+  OffsetPaginatedDashboardSecretApiKey,
   OffsetPaginatedEntityOnboarding,
   OffsetPaginatedList,
   OffsetPaginatedOnboardingConfiguration,
   OffsetPaginatedOrganizationMember,
   OffsetPaginatedOrganizationRole,
-  OffsetPaginatedSecretApiKey,
+  OmittedSecretCustomHeader,
   OnboardingConfiguration,
+  OnboardingStatus,
+  OnboardingTimelineInfo,
   OrgClientSecurityConfig,
   OrgFrequentNote,
   OrgLoginResponse,
+  OrgMetrics,
   OrgMetricsResponse,
   OrgTenantTag,
   Organization,
   OrganizationMember,
   OrganizationRole,
+  OrganizationRolebinding,
+  OtherTenantDupes,
+  ParentOrganization,
   PartnerLoginRequest,
   PartnerOrganization,
   PatchProxyConfigRequest,
+  PhoneLookupAttributes,
+  PlainCustomHeader,
+  PreviewApi,
   PrivateBusinessOwner,
   PrivateBusinessOwnerKycLink,
   PrivateOwnedBusiness,
   ProxyConfigBasic,
   ProxyConfigDetailed,
+  ProxyIngressContentType,
+  ProxyIngressRule,
   RawUserDataRequest,
   ReuploadComplianceDocRequest,
+  RiskScore,
   RiskSignal,
   RiskSignalDetail,
+  RiskSignalGroupKind,
   Rule,
+  RuleAction,
+  RuleActionConfig,
+  RuleActionMigration,
+  RuleEvalResult,
   RuleEvalResults,
+  RuleEvalStats,
+  RuleExpression,
+  RuleExpressionCondition,
+  RuleInstanceKind,
+  RuleResult,
+  RuleSet,
   RuleSetResult,
+  SameTenantDupe,
+  ScoreBand,
   SecretApiKey,
+  SecretCustomHeader,
   SentilinkDetail,
+  SentilinkReasonCode,
+  SentilinkScoreDetail,
+  SignalScope,
+  SignalSeverity,
   SubmitExternalUrlRequest,
+  TaskStatus,
   TenantAndroidAppMeta,
+  TenantFrequentNoteKind,
   TenantIosAppMeta,
+  TenantKind,
   TenantLoginRequest,
+  TenantRoleKindDiscriminant,
+  TenantScope,
+  TerminalDecisionStatus,
+  TimelineOnboardingDecision,
+  TimelinePlaybook,
+  TokenOperationKind,
+  TriggerRequest,
+  UnvalidatedRuleExpression,
   UpdateAnnotationRequest,
   UpdateApiKeyRequest,
   UpdateClientSecurityConfig,
@@ -113,24 +267,60 @@ import type {
   UpdateTenantRoleRequest,
   UpdateTenantRolebindingRequest,
   UpdateTenantUserRequest,
+  UploadSource,
   UserAiSummary,
+  UserDataIdentifier,
   UserDecryptRequest,
   UserDecryptResponse,
   UserDeleteResponse,
   UserInsight,
+  UserInsightScope,
+  UserInsightUnit,
   UserLabel,
   UserTag,
   UserTimeline,
+  UserTimelineEvent,
+  VaultCreated,
   VaultDrAwsPreEnrollResponse,
   VaultDrEnrollRequest,
   VaultDrEnrollResponse,
+  VaultDrEnrolledStatus,
   VaultDrRevealWrappedRecordKeysRequest,
   VaultDrRevealWrappedRecordKeysResponse,
   VaultDrStatus,
+  VaultKind,
+  VaultOperation,
+  VerificationCheck,
+  WatchlistCheck,
+  WatchlistCheckStatusKind,
+  WatchlistEntry,
+  WatchlistHit,
   WebhookPortalResponse,
+  WorkflowKind,
+  WorkflowRequestConfig,
+  WorkflowSource,
+  WorkflowStarted,
+  WorkflowStartedEventKind,
+  WorkflowTriggered,
 } from '@onefootprint/request-types/dashboard';
 import merge from 'lodash/merge';
 
+export const getActionKind = (props: Partial<ActionKind>) => (props ?? 'replace') as ActionKind;
+export const getActor = (props: Partial<Actor>) =>
+  merge(
+    {
+      email: 'adipisicing ipsum',
+      firstName: 'dolor dolor',
+      id: 'ut',
+      kind: 'api_key',
+      lastName: 'sit occaecat non Ut dolor',
+      member: 'ullamco',
+      name: 'deserunt Duis Excepteur nisi sit',
+    },
+    props,
+  ) as Actor;
+export const getAdverseMediaListKind = (props: Partial<AdverseMediaListKind>) =>
+  (props ?? 'sexual_crime') as AdverseMediaListKind;
 export const getAmlDetail = (props: Partial<AmlDetail>) =>
   merge(
     {
@@ -221,6 +411,45 @@ export const getAmlDetail = (props: Partial<AmlDetail>) =>
     },
     props,
   ) as AmlDetail;
+export const getAmlHit = (props: Partial<AmlHit>) =>
+  merge(
+    {
+      fields: {},
+      matchTypes: ['nulla sint', 'sint aliqua ex dolore mollit', 'dolore aliqua'],
+      media: [
+        {
+          date: '1907-06-22T14:37:24.0Z',
+          pdfUrl: 'https://rowdy-illusion.biz/',
+          snippet: 'fugiat adipisicing culpa quis',
+          title: 'labore Duis dolore in',
+          url: 'https://accomplished-fat.org',
+        },
+        {
+          date: '1942-10-16T12:22:15.0Z',
+          snippet: 'mollit non velit commodo laboris',
+        },
+        {
+          date: '1899-08-30T21:06:45.0Z',
+          pdfUrl: 'https://rowdy-illusion.biz/',
+          title: 'sed sint',
+        },
+      ],
+      name: 'Dr. Clay Kuhlman',
+    },
+    props,
+  ) as AmlHit;
+export const getAmlHitMedia = (props: Partial<AmlHitMedia>) =>
+  merge(
+    {
+      date: '1905-12-25T06:25:09.0Z',
+      pdfUrl: 'https://content-yak.us',
+      snippet: 'in',
+      title: 'Excepteur sed consectetur enim',
+      url: 'https://all-ostrich.net/',
+    },
+    props,
+  ) as AmlHitMedia;
+export const getAmlMatchKind = (props: Partial<AmlMatchKind>) => (props ?? 'fuzzy_high') as AmlMatchKind;
 export const getAnnotation = (props: Partial<Annotation>) =>
   merge(
     {
@@ -232,6 +461,7 @@ export const getAnnotation = (props: Partial<Annotation>) =>
     },
     props,
   ) as Annotation;
+export const getApiKeyStatus = (props: Partial<ApiKeyStatus>) => (props ?? 'enabled') as ApiKeyStatus;
 export const getAssumePartnerRoleRequest = (props: Partial<AssumePartnerRoleRequest>) =>
   merge(
     {
@@ -337,6 +567,67 @@ export const getAssumeRoleResponse = (props: Partial<AssumeRoleResponse>) =>
     },
     props,
   ) as AssumeRoleResponse;
+export const getAttestedDeviceData = (props: Partial<AttestedDeviceData>) =>
+  merge(
+    {
+      appBundleId: '42e11e2e-bb85-40c5-8362-b49826349a5e',
+      deviceType: 'android',
+      fraudRisk: 'high',
+      model: 'est occaecat veniam',
+      os: 'et ut in cupidatat aliqua',
+    },
+    props,
+  ) as AttestedDeviceData;
+export const getAuditEvent = (props: Partial<AuditEvent>) =>
+  merge(
+    {
+      detail: {
+        kind: 'disable_playbook',
+      },
+      id: 'de6b07cb-5896-4ef5-89b9-832c93b3f7f9',
+      insightEvent: {
+        city: 'Predovicfort',
+        country: 'Republic of Korea',
+        ipAddress: '7148 Kling Estates Suite 178',
+        latitude: -78238643.2942368,
+        metroCode: 'dolore cupidatat culpa in minim',
+        postalCode: 'occaecat Lorem',
+        region: 'nostrud',
+        sessionId: '2573adf6-667d-4c4e-801f-0fc1aff2fd41',
+        timestamp: '1936-07-22T19:58:59.0Z',
+        userAgent: 'consequat quis labore',
+      },
+      name: 'Vickie Dach',
+      principal: {
+        email: 'id Ut',
+        firstName: 'est labore',
+        id: 'consequat in aute proident et',
+        kind: 'api_key',
+        lastName: 'quis aliqua ipsum',
+        member: 'non voluptate reprehenderit incididunt',
+        name: 'commodo est',
+      },
+      tenantId: '39b9a984-21b5-49e6-9dd1-ba99731ae94b',
+      timestamp: '1967-06-04T13:54:06.0Z',
+    },
+    props,
+  ) as AuditEvent;
+export const getAuditEventDetail = (props: Partial<AuditEventDetail>) =>
+  merge(
+    {
+      data: {
+        createdFields: [
+          'document.permit.back.image',
+          'document.residence_document.issuing_state',
+          'document.drivers_license.front.image',
+        ],
+        fpId: 'aute laborum irure',
+      },
+      kind: 'collect_user_document',
+    },
+    props,
+  ) as AuditEventDetail;
+export const getAuditEventName = (props: Partial<AuditEventName>) => (props ?? 'delete_user_data') as AuditEventName;
 export const getAuthEvent = (props: Partial<AuthEvent>) =>
   merge(
     {
@@ -384,6 +675,31 @@ export const getAuthEvent = (props: Partial<AuthEvent>) =>
     },
     props,
   ) as AuthEvent;
+export const getAuthEventKind = (props: Partial<AuthEventKind>) => (props ?? 'passkey') as AuthEventKind;
+export const getAuthMethodKind = (props: Partial<AuthMethodKind>) => (props ?? 'email') as AuthMethodKind;
+export const getAuthMethodUpdated = (props: Partial<AuthMethodUpdated>) =>
+  merge(
+    {
+      action: 'replace',
+      insightEvent: {
+        city: 'Ivaburgh',
+        country: 'Guam',
+        ipAddress: '26052 Valentine Plaza Suite 934',
+        latitude: 38438218.75770867,
+        longitude: -92356448.35866505,
+        metroCode: 'tempor sit',
+        postalCode: 'non sed',
+        region: 'irure ad ipsum consectetur deserunt',
+        regionName: 'Bridget Nader',
+        sessionId: '134e90a1-c024-48be-b618-1281dce3310c',
+        timeZone: 'consectetur',
+        timestamp: '1955-10-14T15:37:34.0Z',
+        userAgent: 'sit dolore nisi',
+      },
+      kind: 'passkey',
+    },
+    props,
+  ) as AuthMethodUpdated;
 export const getAuthOrgMember = (props: Partial<AuthOrgMember>) =>
   merge(
     {
@@ -422,6 +738,41 @@ export const getAuthOrgMember = (props: Partial<AuthOrgMember>) =>
     },
     props,
   ) as AuthOrgMember;
+export const getBooleanOperator = (props: Partial<BooleanOperator>) => (props ?? 'not_eq') as BooleanOperator;
+export const getBusinessDetail = (props: Partial<BusinessDetail>) =>
+  merge(
+    {
+      entityType: 'mollit adipisicing velit id anim',
+      formationDate: 'nulla cillum',
+      formationState: 'Hawaii',
+      phoneNumbers: [
+        {
+          phone: '+18326849141',
+          submitted: true,
+          verified: false,
+        },
+        {
+          phone: '+18326849141',
+          submitted: false,
+          verified: false,
+        },
+        {
+          phone: '+18326849141',
+          submitted: true,
+          verified: true,
+        },
+      ],
+      tin: {
+        tin: 'et',
+        verified: false,
+      },
+      website: {
+        url: 'https://shimmering-gallery.name/',
+        verified: false,
+      },
+    },
+    props,
+  ) as BusinessDetail;
 export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
   merge(
     {
@@ -888,6 +1239,10 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
     },
     props,
   ) as BusinessInsights;
+export const getBusinessOwnerKind = (props: Partial<BusinessOwnerKind>) => (props ?? 'secondary') as BusinessOwnerKind;
+export const getBusinessOwnerSource = (props: Partial<BusinessOwnerSource>) =>
+  (props ?? 'hosted') as BusinessOwnerSource;
+export const getCipKind = (props: Partial<CipKind>) => (props ?? 'alpaca') as CipKind;
 export const getClientDecryptRequest = (props: Partial<ClientDecryptRequest>) =>
   merge(
     {
@@ -897,6 +1252,17 @@ export const getClientDecryptRequest = (props: Partial<ClientDecryptRequest>) =>
     },
     props,
   ) as ClientDecryptRequest;
+export const getClientIdentity = (props: Partial<ClientIdentity>) =>
+  merge(
+    {
+      certificate: 'Duis tempor aliqua Excepteur ex',
+      key: 'e71134ad-ca43-41db-97ae-4414221ce956',
+    },
+    props,
+  ) as ClientIdentity;
+export const getCollectedDataOption = (props: Partial<CollectedDataOption>) =>
+  (props ?? 'business_website') as CollectedDataOption;
+export const getCompanySize = (props: Partial<CompanySize>) => (props ?? 's1_to10') as CompanySize;
 export const getComplianceCompanySummary = (props: Partial<ComplianceCompanySummary>) =>
   merge(
     {
@@ -908,6 +1274,20 @@ export const getComplianceCompanySummary = (props: Partial<ComplianceCompanySumm
     },
     props,
   ) as ComplianceCompanySummary;
+export const getComplianceDocData = (props: Partial<ComplianceDocData>) =>
+  merge(
+    {
+      data: {
+        data: 'exercitation officia',
+        filename: 'officia in elit',
+        url: 'dolor sunt',
+      },
+      kind: 'file_upload',
+    },
+    props,
+  ) as ComplianceDocData;
+export const getComplianceDocDataKind = (props: Partial<ComplianceDocDataKind>) =>
+  (props ?? 'file_upload') as ComplianceDocDataKind;
 export const getComplianceDocEvent = (props: Partial<ComplianceDocEvent>) =>
   merge(
     {
@@ -924,6 +1304,61 @@ export const getComplianceDocEvent = (props: Partial<ComplianceDocEvent>) =>
     },
     props,
   ) as ComplianceDocEvent;
+export const getComplianceDocEventAssigned = (props: Partial<ComplianceDocEventAssigned>) =>
+  merge(
+    {
+      assignedTo: {
+        org: 'est velit',
+        user: {
+          firstName: 'Roselyn',
+          id: '2897ea36-badf-40ff-bcd5-6addb93ed14b',
+          lastName: 'Goodwin',
+        },
+      },
+      kind: 'PartnerTenant',
+    },
+    props,
+  ) as ComplianceDocEventAssigned;
+export const getComplianceDocEventRequested = (props: Partial<ComplianceDocEventRequested>) =>
+  merge(
+    {
+      description: 'et id',
+      name: 'Johnny Mertz Sr.',
+      templateId: '80493a31-70b7-4d54-ba80-308fe8747f16',
+    },
+    props,
+  ) as ComplianceDocEventRequested;
+export const getComplianceDocEventReviewed = (props: Partial<ComplianceDocEventReviewed>) =>
+  merge(
+    {
+      decision: 'rejected',
+      note: 'qui Duis amet',
+    },
+    props,
+  ) as ComplianceDocEventReviewed;
+export const getComplianceDocEventSubmitted = (props: Partial<ComplianceDocEventSubmitted>) =>
+  merge(
+    {
+      kind: 'file_upload',
+      submissionId: '4342fa29-bbb9-45f0-9528-3d16022c9aa2',
+    },
+    props,
+  ) as ComplianceDocEventSubmitted;
+export const getComplianceDocEventType = (props: Partial<ComplianceDocEventType>) =>
+  merge(
+    {
+      data: {
+        kind: 'external_url',
+        submissionId: 'veniam id Lorem aute',
+      },
+      kind: 'request_retracted',
+    },
+    props,
+  ) as ComplianceDocEventType;
+export const getComplianceDocReviewDecision = (props: Partial<ComplianceDocReviewDecision>) =>
+  (props ?? 'accepted') as ComplianceDocReviewDecision;
+export const getComplianceDocStatus = (props: Partial<ComplianceDocStatus>) =>
+  (props ?? 'waiting_for_upload') as ComplianceDocStatus;
 export const getComplianceDocSubmission = (props: Partial<ComplianceDocSubmission>) =>
   merge(
     {
@@ -977,6 +1412,23 @@ export const getComplianceDocTemplate = (props: Partial<ComplianceDocTemplate>) 
     },
     props,
   ) as ComplianceDocTemplate;
+export const getComplianceDocTemplateVersion = (props: Partial<ComplianceDocTemplateVersion>) =>
+  merge(
+    {
+      createdAt: '1922-07-14T15:10:42.0Z',
+      createdByPartnerTenantUser: {
+        firstName: 'Eloise',
+        id: '7e077f5e-cf4d-40dd-8a51-1676b4435310',
+        lastName: 'Carter',
+      },
+      description: 'mollit',
+      id: 'fb8a7990-2cf3-4494-93c0-adfdcaa1de3a',
+      name: 'Mr. Steven Zemlak',
+      templateId: '3ec7a432-604d-40d6-80d6-41f96c4ddd10',
+    },
+    props,
+  ) as ComplianceDocTemplateVersion;
+export const getContactInfoKind = (props: Partial<ContactInfoKind>) => (props ?? 'phone') as ContactInfoKind;
 export const getCopyPlaybookRequest = (props: Partial<CopyPlaybookRequest>) =>
   merge(
     {
@@ -985,6 +1437,8 @@ export const getCopyPlaybookRequest = (props: Partial<CopyPlaybookRequest>) =>
     },
     props,
   ) as CopyPlaybookRequest;
+export const getCountrySpecificDocumentMapping = (props: Partial<CountrySpecificDocumentMapping>) =>
+  merge({}, props) as CountrySpecificDocumentMapping;
 export const getCreateAnnotationRequest = (props: Partial<CreateAnnotationRequest>) =>
   merge(
     {
@@ -1194,6 +1648,35 @@ export const getCreateReviewRequest = (props: Partial<CreateReviewRequest>) =>
     },
     props,
   ) as CreateReviewRequest;
+export const getCreateRule = (props: Partial<CreateRule>) =>
+  merge(
+    {
+      isShadow: true,
+      name: 'Kayla Hagenes PhD',
+      ruleAction: {
+        config: {},
+        kind: 'manual_review',
+      },
+      ruleExpression: [
+        {
+          field: 'document.residence_document.front.image',
+          op: 'eq',
+          value: 'tempor deserunt voluptate',
+        },
+        {
+          field: 'ip_address',
+          op: 'is_in',
+          value: 'labore',
+        },
+        {
+          field: 'document.residence_document.samba_activity_history_response',
+          op: 'not_eq',
+          value: 'elit nulla esse',
+        },
+      ],
+    },
+    props,
+  ) as CreateRule;
 export const getCreateTagRequest = (props: Partial<CreateTagRequest>) =>
   merge(
     {
@@ -1242,6 +1725,16 @@ export const getCreateTenantUserRequest = (props: Partial<CreateTenantUserReques
     },
     props,
   ) as CreateTenantUserRequest;
+export const getCreateTokenResponse = (props: Partial<CreateTokenResponse>) =>
+  merge(
+    {
+      expiresAt: '1954-07-10T18:20:23.0Z',
+      kind: 'trigger',
+      link: 'esse consequat Ut in',
+      token: '40d1bb3e-4b93-47c2-b5b4-cfb17d6b96a4',
+    },
+    props,
+  ) as CreateTokenResponse;
 export const getCursorPaginatedAuditEvent = (props: Partial<CursorPaginatedAuditEvent>) =>
   merge(
     {
@@ -1823,6 +2316,90 @@ export const getCursorPaginatedListEvent = (props: Partial<CursorPaginatedListEv
     },
     props,
   ) as CursorPaginatedListEvent;
+export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>) =>
+  merge(
+    {
+      description: 'reprehenderit occaecat',
+      identifier: '4893f10a-0eb0-451f-a341-f34224a3e83c',
+      name: 'Marion Gleichner',
+      requiresHumanReview: true,
+      uploadSettings: 'prefer_upload',
+    },
+    props,
+  ) as CustomDocumentConfig;
+export const getDashboardSecretApiKey = (props: Partial<DashboardSecretApiKey>) =>
+  merge(
+    {
+      createdAt: '1940-01-23T05:11:46.0Z',
+      id: 'ccdbd252-bc43-422c-95b8-5819ab8bd4e0',
+      isLive: true,
+      key: '48b7f6ab-e783-4b25-8b0b-5c191ee0c4e1',
+      lastUsedAt: '1931-06-27T10:37:20.0Z',
+      name: 'Brett Feeney',
+      role: {
+        createdAt: '1906-05-25T09:23:14.0Z',
+        id: '2f2f2591-3a76-41b1-abbd-b2ca35de0aee',
+        isImmutable: true,
+        kind: 'api_key',
+        name: 'Gordon Grady',
+        numActiveApiKeys: -86129004,
+        numActiveUsers: -9355232,
+        scopes: [
+          {
+            kind: 'onboarding',
+          },
+          {
+            kind: 'cip_integration',
+          },
+          {
+            kind: 'manual_review',
+          },
+        ],
+      },
+      scrubbedKey: '014b7c56-e717-4fbe-902e-b1f2f2dfbe55',
+      status: 'enabled',
+    },
+    props,
+  ) as DashboardSecretApiKey;
+export const getDataAttributeKind = (props: Partial<DataAttributeKind>) =>
+  (props ?? 'document_data') as DataAttributeKind;
+export const getDataCollectedInfo = (props: Partial<DataCollectedInfo>) =>
+  merge(
+    {
+      actor: {
+        email: 'laboris Duis nulla consectetur',
+        firstName: 'amet ipsum quis',
+        id: 'magna amet qui',
+        kind: 'organization',
+        lastName: 'laboris sint officia commodo ad',
+        member: 'dolor Lorem esse et sint',
+        name: 'cillum velit est tempor',
+      },
+      attributes: ['us_legal_status', 'business_tin', 'dob'],
+      isPrefill: false,
+      targets: [
+        'document.passport_card.expires_at',
+        'document.passport.issuing_country',
+        'document.permit.nationality',
+      ],
+    },
+    props,
+  ) as DataCollectedInfo;
+export const getDataIdentifier = (props: Partial<DataIdentifier>) => (props ?? 'business.website') as DataIdentifier;
+export const getDataLifetimeSource = (props: Partial<DataLifetimeSource>) => (props ?? 'vendor') as DataLifetimeSource;
+export const getDbActor = (props: Partial<DbActor>) =>
+  merge(
+    {
+      data: {
+        id: 'irure proident quis sint mollit',
+      },
+      kind: 'footprint',
+    },
+    props,
+  ) as DbActor;
+export const getDecisionStatus = (props: Partial<DecisionStatus>) => (props ?? 'fail') as DecisionStatus;
+export const getDecryptionContext = (props: Partial<DecryptionContext>) =>
+  (props ?? 'vault_proxy') as DecryptionContext;
 export const getDeleteRequest = (props: Partial<DeleteRequest>) =>
   merge(
     {
@@ -1835,6 +2412,20 @@ export const getDeleteRequest = (props: Partial<DeleteRequest>) =>
     },
     props,
   ) as DeleteRequest;
+export const getDeviceFraudRiskLevel = (props: Partial<DeviceFraudRiskLevel>) =>
+  (props ?? 'medium') as DeviceFraudRiskLevel;
+export const getDeviceInsightField = (props: Partial<DeviceInsightField>) =>
+  (props ?? 'ip_address') as DeviceInsightField;
+export const getDeviceInsightOperation = (props: Partial<DeviceInsightOperation>) =>
+  merge(
+    {
+      field: 'ip_address',
+      op: 'is_in',
+      value: 'do sit',
+    },
+    props,
+  ) as DeviceInsightOperation;
+export const getDeviceType = (props: Partial<DeviceType>) => (props ?? 'android') as DeviceType;
 export const getDocsTokenResponse = (props: Partial<DocsTokenResponse>) =>
   merge(
     {
@@ -1888,6 +2479,85 @@ export const getDocument = (props: Partial<Document>) =>
     },
     props,
   ) as Document;
+export const getDocumentAndCountryConfiguration = (props: Partial<DocumentAndCountryConfiguration>) =>
+  merge(
+    {
+      countrySpecific: {},
+      global: ['voter_identification', 'voter_identification', 'id_card'],
+    },
+    props,
+  ) as DocumentAndCountryConfiguration;
+export const getDocumentImageError = (props: Partial<DocumentImageError>) =>
+  (props ?? 'unknown_country_code') as DocumentImageError;
+export const getDocumentKind = (props: Partial<DocumentKind>) => (props ?? 'residence_document') as DocumentKind;
+export const getDocumentRequest = (props: Partial<DocumentRequest>) =>
+  merge(
+    {
+      kind: 'identity',
+      ruleSetResultId: '16f2beba-02c5-4698-8678-78912401d918',
+    },
+    props,
+  ) as DocumentRequest;
+export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>) =>
+  merge(
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['drivers_license', 'permit', 'passport_card'],
+        },
+        requiresHumanReview: true,
+      },
+      kind: 'identity',
+    },
+    props,
+  ) as DocumentRequestConfig;
+export const getDocumentRequestKind = (props: Partial<DocumentRequestKind>) =>
+  (props ?? 'custom') as DocumentRequestKind;
+export const getDocumentReviewStatus = (props: Partial<DocumentReviewStatus>) =>
+  (props ?? 'reviewed_by_human') as DocumentReviewStatus;
+export const getDocumentSide = (props: Partial<DocumentSide>) => (props ?? 'back') as DocumentSide;
+export const getDocumentStatus = (props: Partial<DocumentStatus>) => (props ?? 'pending') as DocumentStatus;
+export const getDocumentUpload = (props: Partial<DocumentUpload>) =>
+  merge(
+    {
+      failureReasons: ['wrong_one_sided_document', 'image_error', 'country_code_mismatch'],
+      identifier: '0c842a97-b03b-499e-9c21-6bd07c27294c',
+      isExtraCompressed: false,
+      side: 'f7aeb66c-b8eb-4f1d-a7b9-3020790ab0bc',
+      timestamp: '1924-02-01T21:31:25.0Z',
+      version: 83973737,
+    },
+    props,
+  ) as DocumentUpload;
+export const getDocumentUploadSettings = (props: Partial<DocumentUploadSettings>) =>
+  (props ?? 'prefer_upload') as DocumentUploadSettings;
+export const getDocumentUploadedTimelineEvent = (props: Partial<DocumentUploadedTimelineEvent>) =>
+  merge(
+    {
+      config: {
+        data: {
+          collectSelfie: false,
+          description: 'nisi ex nostrud laborum',
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['visa', 'passport', 'residence_document'],
+          },
+          identifier: 'document.voter_identification.classified_document_type',
+          name: 'consequat aliquip dolor',
+          requiresHumanReview: true,
+          uploadSettings: 'prefer_upload',
+        },
+        kind: 'identity',
+      },
+      deviceType: 'android',
+      documentType: 'passport_card',
+      status: 'pending',
+    },
+    props,
+  ) as DocumentUploadedTimelineEvent;
+export const getDupeKind = (props: Partial<DupeKind>) => (props ?? 'dob_ssn4') as DupeKind;
 export const getDupes = (props: Partial<Dupes>) =>
   merge(
     {
@@ -1987,6 +2657,30 @@ export const getDupes = (props: Partial<Dupes>) =>
     },
     props,
   ) as Dupes;
+export const getEditRule = (props: Partial<EditRule>) =>
+  merge(
+    {
+      ruleExpression: [
+        {
+          field: 'document.permit.issuing_state',
+          op: 'is_in',
+          value: 'Ut nulla cupidatat consequat',
+        },
+        {
+          field: 'dob_yob_matches',
+          op: 'not_eq',
+          value: false,
+        },
+        {
+          field: 'document_verified',
+          op: 'eq',
+          value: false,
+        },
+      ],
+      ruleId: 'c0d18417-f123-4236-b99d-eaa7d70f5cca',
+    },
+    props,
+  ) as EditRule;
 export const getEmpty = (props: Partial<Empty>) => merge({}, props) as Empty;
 export const getEnclaveHealthResponse = (props: Partial<EnclaveHealthResponse>) =>
   merge(
@@ -1997,6 +2691,17 @@ export const getEnclaveHealthResponse = (props: Partial<EnclaveHealthResponse>) 
     },
     props,
   ) as EnclaveHealthResponse;
+export const getEnhancedAml = (props: Partial<EnhancedAml>) =>
+  merge(
+    {
+      adverseMedia: false,
+      enhancedAml: true,
+      matchKind: 'fuzzy_medium',
+      ofac: false,
+      pep: true,
+    },
+    props,
+  ) as EnhancedAml;
 export const getEntity = (props: Partial<Entity>) =>
   merge(
     {
@@ -2137,6 +2842,74 @@ export const getEntity = (props: Partial<Entity>) =>
     },
     props,
   ) as Entity;
+export const getEntityAction = (props: Partial<EntityAction>) =>
+  merge(
+    {
+      annotation: {
+        isPinned: false,
+        note: 'ad',
+      },
+      fpBid: 'occaecat',
+      kind: 'manual_decision',
+      status: 'pass',
+      trigger: {
+        data: {
+          businessConfigs: [
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  global: ['residence_document', 'drivers_license', 'id_card'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                description: 'ipsum',
+                identifier: 'document.passport_card.nationality',
+                name: 'magna ipsum do aliqua',
+                requiresHumanReview: true,
+                uploadSettings: 'capture_only_on_mobile',
+              },
+              kind: 'custom',
+            },
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_address',
+            },
+          ],
+          configs: [
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  global: ['voter_identification', 'drivers_license', 'drivers_license'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_address',
+            },
+          ],
+        },
+        kind: 'document',
+      },
+    },
+    props,
+  ) as EntityAction;
 export const getEntityActionResponse = (props: Partial<EntityActionResponse>) =>
   (props ?? 'Lorem deserunt occaecat') as EntityActionResponse;
 export const getEntityActionsRequest = (props: Partial<EntityActionsRequest>) =>
@@ -2158,6 +2931,57 @@ export const getEntityAttribute = (props: Partial<EntityAttribute>) =>
     },
     props,
   ) as EntityAttribute;
+export const getEntityOnboarding = (props: Partial<EntityOnboarding>) =>
+  merge(
+    {
+      id: '80bf4267-0417-43d8-b6df-0bfe02ba1416',
+      playbookKey: '2f91a0af-2c20-4a5f-abc0-896a71a7fe48',
+      ruleSetResults: [
+        {
+          id: '1e0861c9-5ecf-4fbb-a11c-47ec0bca7464',
+          timestamp: '1905-01-14T17:39:19.0Z',
+        },
+        {
+          id: '1e0861c9-5ecf-4fbb-a11c-47ec0bca7464',
+          timestamp: '1928-04-03T18:21:21.0Z',
+        },
+        {
+          id: '1e0861c9-5ecf-4fbb-a11c-47ec0bca7464',
+          timestamp: '1912-12-20T17:20:50.0Z',
+        },
+      ],
+      seqno: 48149764,
+      status: 'pass',
+      timestamp: '1960-11-09T01:12:56.0Z',
+    },
+    props,
+  ) as EntityOnboarding;
+export const getEntityOnboardingRuleSetResult = (props: Partial<EntityOnboardingRuleSetResult>) =>
+  merge(
+    {
+      id: '2b7591dc-b5ef-48a6-9b4e-bf69e0febc39',
+      timestamp: '1964-08-08T08:32:26.0Z',
+    },
+    props,
+  ) as EntityOnboardingRuleSetResult;
+export const getEntityStatus = (props: Partial<EntityStatus>) => (props ?? 'in_progress') as EntityStatus;
+export const getEntityWorkflow = (props: Partial<EntityWorkflow>) =>
+  merge(
+    {
+      createdAt: '1898-10-30T13:28:25.0Z',
+      insightEvent: {
+        city: 'Koelpinborough',
+        ipAddress: '94438 Abshire Overpass Suite 326',
+        region: 'proident sint est',
+        timestamp: '1921-10-24T14:22:51.0Z',
+        userAgent: 'anim ullamco',
+      },
+      playbookId: '7948ad1e-2ac9-4431-a7c8-03b065b113d5',
+      status: 'pass',
+    },
+    props,
+  ) as EntityWorkflow;
+export const getEquals = (props: Partial<Equals>) => (props ?? 'not_eq') as Equals;
 export const getEvaluateRuleRequest = (props: Partial<EvaluateRuleRequest>) =>
   merge(
     {
@@ -2201,6 +3025,61 @@ export const getEvaluateRuleRequest = (props: Partial<EvaluateRuleRequest>) =>
     },
     props,
   ) as EvaluateRuleRequest;
+export const getExternalIntegrationCalled = (props: Partial<ExternalIntegrationCalled>) =>
+  merge(
+    {
+      externalId: 'ae2820dd-474c-4835-a2f1-2bc149ab08de',
+      integration: 'alpaca_cip',
+      successful: true,
+    },
+    props,
+  ) as ExternalIntegrationCalled;
+export const getExternalIntegrationKind = (props: Partial<ExternalIntegrationKind>) =>
+  (props ?? 'alpaca_cip') as ExternalIntegrationKind;
+export const getFieldValidation = (props: Partial<FieldValidation>) =>
+  merge(
+    {
+      matchLevel: 'no_match',
+      signals: [
+        {
+          description: 'qui veniam',
+          matchLevel: 'could_not_match',
+          note: 'exercitation cupidatat incididunt culpa',
+          reasonCode: 'business_address_not_deliverable',
+          severity: 'medium',
+        },
+        {
+          description: 'consectetur tempor dolor',
+          matchLevel: 'no_match',
+          note: 'Lorem sed incididunt',
+          reasonCode: 'address_input_is_not_standard_general_delivery',
+          severity: 'low',
+        },
+        {
+          description: 'ut magna eu',
+          matchLevel: 'could_not_match',
+          note: 'minim in occaecat',
+          reasonCode: 'business_address_similar_match',
+          severity: 'medium',
+        },
+      ],
+    },
+    props,
+  ) as FieldValidation;
+export const getFieldValidationDetail = (props: Partial<FieldValidationDetail>) =>
+  merge(
+    {
+      description: 'dolor id et fugiat aliqua',
+      matchLevel: 'exact',
+      note: 'nostrud quis incididunt',
+      reasonCode: 'tin_does_not_match',
+      severity: 'medium',
+    },
+    props,
+  ) as FieldValidationDetail;
+export const getFilterFunction = (props: Partial<FilterFunction>) => (props ?? 'to_lowercase') as FilterFunction;
+export const getFootprintReasonCode = (props: Partial<FootprintReasonCode>) =>
+  (props ?? 'ssn_does_not_match_within1_digit') as FootprintReasonCode;
 export const getGetClientTokenResponse = (props: Partial<GetClientTokenResponse>) =>
   merge(
     {
@@ -2216,6 +3095,13 @@ export const getGetClientTokenResponse = (props: Partial<GetClientTokenResponse>
     },
     props,
   ) as GetClientTokenResponse;
+export const getGetClientTokenResponseTenant = (props: Partial<GetClientTokenResponseTenant>) =>
+  merge(
+    {
+      name: 'Douglas Bernier',
+    },
+    props,
+  ) as GetClientTokenResponseTenant;
 export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationResponse>) =>
   merge(
     {
@@ -2568,6 +3454,8 @@ export const getGetUserVaultResponse = (props: Partial<GetUserVaultResponse>) =>
     },
     props,
   ) as GetUserVaultResponse;
+export const getIdDocKind = (props: Partial<IdDocKind>) => (props ?? 'visa') as IdDocKind;
+export const getIdentifyScope = (props: Partial<IdentifyScope>) => (props ?? 'onboarding') as IdentifyScope;
 export const getInProgressOnboarding = (props: Partial<InProgressOnboarding>) =>
   merge(
     {
@@ -2581,6 +3469,350 @@ export const getInProgressOnboarding = (props: Partial<InProgressOnboarding>) =>
     },
     props,
   ) as InProgressOnboarding;
+export const getInProgressOnboardingTenant = (props: Partial<InProgressOnboardingTenant>) =>
+  merge(
+    {
+      name: 'Barry Langosh',
+      websiteUrl: 'https://expensive-premeditation.biz/',
+    },
+    props,
+  ) as InProgressOnboardingTenant;
+export const getIngressSettings = (props: Partial<IngressSettings>) =>
+  merge(
+    {
+      contentType: 'json',
+      rules: [
+        {
+          target: 'dolore sed adipisicing elit',
+          token: 'd5714ae2-ccce-484d-be94-1c945a2f0289',
+        },
+        {
+          target: 'culpa veniam',
+          token: 'd5714ae2-ccce-484d-be94-1c945a2f0289',
+        },
+        {
+          target: 'Lorem exercitation',
+          token: 'd5714ae2-ccce-484d-be94-1c945a2f0289',
+        },
+      ],
+    },
+    props,
+  ) as IngressSettings;
+export const getInsightAddress = (props: Partial<InsightAddress>) =>
+  merge(
+    {
+      addressLine1: '8267 Ullrich Freeway Apt. 231',
+      addressLine2: '57275 S Walnut Street Apt. 513',
+      city: 'West Ricky',
+      cmra: true,
+      deliverable: true,
+      latitude: 96439234.34536284,
+      longitude: -14323234.321364492,
+      postalCode: 'qui',
+      propertyType: 'velit Lorem id',
+      sources: 'voluptate commodo',
+      state: 'Minnesota',
+      submitted: true,
+      verified: false,
+    },
+    props,
+  ) as InsightAddress;
+export const getInsightBusinessName = (props: Partial<InsightBusinessName>) =>
+  merge(
+    {
+      kind: 'consequat id pariatur',
+      name: 'Miss Colleen Sporer',
+      sources: 'cupidatat dolor',
+      subStatus: 'ullamco adipisicing dolore voluptate',
+      submitted: false,
+      verified: false,
+    },
+    props,
+  ) as InsightBusinessName;
+export const getInsightEvent = (props: Partial<InsightEvent>) =>
+  merge(
+    {
+      city: 'Ofeliahaven',
+      country: 'Norway',
+      ipAddress: '230 Kameron Rest Apt. 668',
+      latitude: 36658476.785675466,
+      longitude: -33494178.62011119,
+      metroCode: 'sed',
+      postalCode: 'sunt',
+      region: 'aliquip ut aliqua',
+      regionName: 'Ms. Genevieve Nitzsche',
+      sessionId: 'c19e4c0f-acf8-4c36-927e-d632d303251e',
+      timeZone: 'ad nostrud dolor id ex',
+      timestamp: '1951-04-06T12:41:13.0Z',
+      userAgent: 'reprehenderit ad est',
+    },
+    props,
+  ) as InsightEvent;
+export const getInsightPerson = (props: Partial<InsightPerson>) =>
+  merge(
+    {
+      associationVerified: false,
+      name: 'Mr. Stewart Connelly',
+      role: 'sint dolore',
+      sources: 'nulla ex magna ad irure',
+      submitted: false,
+    },
+    props,
+  ) as InsightPerson;
+export const getInsightPhone = (props: Partial<InsightPhone>) =>
+  merge(
+    {
+      phone: '+19067559801',
+      submitted: true,
+      verified: true,
+    },
+    props,
+  ) as InsightPhone;
+export const getInsightRegistration = (props: Partial<InsightRegistration>) =>
+  merge(
+    {
+      addresses: ['est commodo eiusmod id irure', 'pariatur in cillum qui dolore', 'non sit ipsum mollit Ut'],
+      entityType: 'Duis dolore Excepteur',
+      fileNumber: 'elit pariatur voluptate',
+      jurisdiction: 'cupidatat nisi officia Duis',
+      name: 'Julius Bogisich',
+      officers: [
+        {
+          name: 'Mr. Jake Armstrong',
+          roles: 'tempor',
+        },
+      ],
+      registrationDate: 'elit commodo esse ut',
+      source: 'Duis dolore aliqua ex',
+      state: 'Pennsylvania',
+      status: 'magna labore ut consequat Excepteur',
+      subStatus: 'magna',
+    },
+    props,
+  ) as InsightRegistration;
+export const getInsightTin = (props: Partial<InsightTin>) =>
+  merge(
+    {
+      tin: 'deserunt aliquip officia',
+      verified: false,
+    },
+    props,
+  ) as InsightTin;
+export const getInsightWatchlist = (props: Partial<InsightWatchlist>) =>
+  merge(
+    {
+      business: [
+        {
+          hits: [
+            {
+              agency: 'irure nulla eu dolor',
+              agencyAbbr: 'Ut in Duis ex elit',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['dolore', 'dolor culpa', 'ullamco esse anim ad'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+            {
+              entityAliases: ['in nostrud anim', 'amet exercitation adipisicing aliqua', 'cupidatat sit'],
+            },
+            {
+              agency: 'labore cupidatat aute ut',
+              agencyAbbr: 'pariatur esse elit id',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['minim', 'veniam sint ipsum elit ea', 'dolor voluptate ea'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+          ],
+          screenedEntityName: 'Esther Jacobs',
+        },
+        {
+          hits: [
+            {
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['mollit et sint aute', 'adipisicing Lorem', 'est proident ipsum laboris tempor'],
+              entityName: 'Sara Moore Sr.',
+              listName: 'Leo Rodriguez',
+            },
+            {
+              agency: 'irure ea',
+              agencyAbbr: 'magna sint',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['Excepteur nulla dolore', 'tempor pariatur dolore sed Ut', 'id do'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+            {
+              agency: 'dolor ea',
+              agencyAbbr: 'deserunt',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['Duis ex elit nulla', 'irure id et aliqua ad', 'ad'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+          ],
+          screenedEntityName: 'Esther Jacobs',
+        },
+        {
+          hits: [
+            {
+              agency: 'sunt quis magna officia',
+              agencyAbbr: 'quis nulla incididunt',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['dolore dolore pariatur consectetur', 'est magna', 'officia tempor eu'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+            {
+              agency: 'ex velit reprehenderit exercitation aliquip',
+              agencyAbbr: 'laboris mollit nisi deserunt',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              entityAliases: ['elit Lorem occaecat minim aute', 'dolore sunt', 'proident eu'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+            {
+              agencyAbbr: 'voluptate velit aliqua culpa',
+              agencyInformationUrl: 'https://upright-bob.us/',
+              agencyListUrl: 'https://amused-yin.com',
+              entityAliases: ['ut laborum nostrud Excepteur', 'consequat dolor in culpa', 'ipsum'],
+              entityName: 'Sara Moore Sr.',
+              listCountry: 'Vietnam',
+              listName: 'Leo Rodriguez',
+              url: 'https://questionable-atrium.name/',
+            },
+          ],
+          screenedEntityName: 'Esther Jacobs',
+        },
+      ],
+      hitCount: -90997451,
+      people: [
+        {
+          hits: [
+            {
+              agency: 'commodo voluptate',
+              agencyAbbr: 'laboris dolore dolor eu minim',
+              agencyListUrl: 'https://monstrous-midwife.net',
+              entityAliases: ['magna quis enim Excepteur', 'in', 'fugiat id dolor dolor'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              url: 'https://mindless-ostrich.name/',
+            },
+            {
+              agency: 'eiusmod ipsum occaecat ad',
+              agencyAbbr: 'laboris ea minim veniam nisi',
+              agencyInformationUrl: 'https://musty-co-producer.biz',
+              agencyListUrl: 'https://monstrous-midwife.net',
+              entityAliases: ['dolor amet ut Ut', 'cupidatat velit', 'mollit'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+              url: 'https://mindless-ostrich.name/',
+            },
+            {
+              agency: 'consequat quis in incididunt occaecat',
+              agencyAbbr: 'ut elit fugiat',
+              agencyInformationUrl: 'https://musty-co-producer.biz',
+              entityAliases: ['minim veniam Duis', 'in occaecat', 'est id in sit'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+            },
+          ],
+          screenedEntityName: 'Margaret Bradtke Sr.',
+        },
+        {
+          hits: [
+            {
+              agency: 'sed commodo',
+              agencyInformationUrl: 'https://musty-co-producer.biz',
+              agencyListUrl: 'https://monstrous-midwife.net',
+              entityAliases: ['pariatur et est occaecat', 'minim esse', 'cillum'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+              url: 'https://mindless-ostrich.name/',
+            },
+            {
+              agencyAbbr: 'adipisicing anim Duis',
+              entityAliases: [
+                'dolore proident nulla sed cillum',
+                'esse Excepteur',
+                'minim do aliquip reprehenderit cillum',
+              ],
+              listName: 'Domingo Bartoletti',
+            },
+            {
+              agency: 'ipsum',
+              agencyAbbr: 'labore',
+              agencyInformationUrl: 'https://musty-co-producer.biz',
+              agencyListUrl: 'https://monstrous-midwife.net',
+              entityAliases: ['officia culpa et elit', 'aliqua', 'qui ex elit'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+              url: 'https://mindless-ostrich.name/',
+            },
+          ],
+        },
+        {
+          hits: [
+            {
+              agency: 'adipisicing incididunt',
+              entityAliases: ['sit ullamco', 'in est culpa', 'veniam'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+            },
+            {
+              entityAliases: ['fugiat sint sunt', 'sint non aliqua cupidatat', 'minim voluptate'],
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+              url: 'https://mindless-ostrich.name/',
+            },
+            {
+              agency: 'in',
+              agencyAbbr: 'ea',
+              agencyInformationUrl: 'https://musty-co-producer.biz',
+              agencyListUrl: 'https://monstrous-midwife.net',
+              entityAliases: ['cillum id voluptate in veniam', 'incididunt', 'qui anim reprehenderit in'],
+              entityName: 'Miss Ruth Bashirian I',
+              listCountry: 'Dominica',
+              listName: 'Domingo Bartoletti',
+              url: 'https://mindless-ostrich.name/',
+            },
+          ],
+          screenedEntityName: 'Margaret Bradtke Sr.',
+        },
+      ],
+    },
+    props,
+  ) as InsightWatchlist;
+export const getInsightWebsite = (props: Partial<InsightWebsite>) =>
+  merge(
+    {
+      url: 'https://rigid-crest.org/',
+      verified: true,
+    },
+    props,
+  ) as InsightWebsite;
 export const getIntegrityRequest = (props: Partial<IntegrityRequest>) =>
   merge(
     {
@@ -2627,6 +3859,36 @@ export const getInvoicePreview = (props: Partial<InvoicePreview>) =>
     },
     props,
   ) as InvoicePreview;
+export const getInvokeVaultProxyPermission = (props: Partial<InvokeVaultProxyPermission>) =>
+  merge(
+    {
+      id: 'pariatur Excepteur nisi laboris',
+      kind: 'any',
+    },
+    props,
+  ) as InvokeVaultProxyPermission;
+export const getIsIn = (props: Partial<IsIn>) => (props ?? 'is_not_in') as IsIn;
+export const getIso3166TwoDigitCountryCode = (props: Partial<Iso3166TwoDigitCountryCode>) =>
+  (props ?? 'KN') as Iso3166TwoDigitCountryCode;
+export const getLabelAdded = (props: Partial<LabelAdded>) =>
+  merge(
+    {
+      kind: 'active',
+    },
+    props,
+  ) as LabelAdded;
+export const getLabelKind = (props: Partial<LabelKind>) => (props ?? 'offboard_other') as LabelKind;
+export const getLineItem = (props: Partial<LineItem>) =>
+  merge(
+    {
+      description: 'consectetur enim eu mollit amet',
+      id: 'fddc64f0-efa8-4ca2-adc8-34b86a99f246',
+      notionalCents: 59191244,
+      quantity: -66996728,
+      unitPriceCents: 'enim dolore aliqua commodo',
+    },
+    props,
+  ) as LineItem;
 export const getLinkAuthRequest = (props: Partial<LinkAuthRequest>) =>
   merge(
     {
@@ -2819,6 +4081,185 @@ export const getListEntry = (props: Partial<ListEntry>) =>
     },
     props,
   ) as ListEntry;
+export const getListEvent = (props: Partial<ListEvent>) =>
+  merge(
+    {
+      detail: {
+        data: {
+          entries: ['aute esse ut dolor', 'enim', 'dolor'],
+          listEntryCreationId: 'velit',
+          listId: 'nisi minim',
+        },
+        kind: 'create_list_entry',
+      },
+      id: 'f959364a-1ec5-4954-9210-6c3c97ddbf64',
+      insightEvent: {
+        city: 'Rollinfield',
+        country: 'Luxembourg',
+        ipAddress: '122 Bode Ridges Suite 374',
+        latitude: -21898968.467671588,
+        longitude: -12904972.625014871,
+        metroCode: 'Ut nulla dolore',
+        postalCode: 'voluptate ad',
+        regionName: 'Wanda Hintz-Nitzsche',
+        sessionId: 'e828fc89-13d9-4714-8b9a-77a2a8b9f239',
+        timestamp: '1965-05-29T21:12:22.0Z',
+        userAgent: 'sed dolore',
+      },
+      name: 'Maurice Boyer',
+      principal: {
+        email: 'sint',
+        id: 'proident esse sunt',
+        kind: 'organization',
+        member: 'dolore cupidatat ullamco Excepteur',
+        name: 'voluptate',
+      },
+      tenantId: '211529b6-94ee-4557-9d9e-f0c2aa8bf87d',
+      timestamp: '1968-11-14T23:55:46.0Z',
+    },
+    props,
+  ) as ListEvent;
+export const getListEventDetail = (props: Partial<ListEventDetail>) =>
+  merge(
+    {
+      data: {
+        entries: ['voluptate in proident', 'sint officia labore ut', 'cupidatat sit veniam'],
+        entry: 'exercitation dolore',
+        listEntryCreationId: 'sunt amet',
+        listEntryId: 'incididunt',
+        listId: 'ex laborum in dolor',
+      },
+      kind: 'create_list_entry',
+    },
+    props,
+  ) as ListEventDetail;
+export const getListKind = (props: Partial<ListKind>) => (props ?? 'email_domain') as ListKind;
+export const getListPlaybookUsage = (props: Partial<ListPlaybookUsage>) =>
+  merge(
+    {
+      id: 'f566072c-6c84-455c-a01d-448c91eb650f',
+      key: 'c8f6bb8a-9531-4006-869b-a3995baebc68',
+      name: 'Lydia Greenfelder',
+      rules: [
+        {
+          action: 'step_up.identity',
+          createdAt: '1918-02-02T21:24:10.0Z',
+          isShadow: true,
+          kind: 'Person',
+          name: 'Bradley Ullrich',
+          ruleAction: {
+            kind: 'pass_with_manual_review',
+          },
+          ruleExpression: [
+            {
+              field: 'experian_score',
+              op: 'lt',
+              value: -83197343,
+            },
+            {
+              field: 'ip_address',
+              op: 'is_not_in',
+              value: 'voluptate enim nisi',
+            },
+            {
+              field: 'device_velocity',
+              op: 'eq',
+              value: false,
+            },
+          ],
+          ruleId: '711ff17d-911c-4de3-9480-3d54dc8ce4c1',
+        },
+        {
+          action: 'step_up.custom',
+          createdAt: '1921-03-18T20:38:38.0Z',
+          isShadow: true,
+          kind: 'Business',
+          name: 'Bradley Ullrich',
+          ruleAction: {
+            kind: 'fail',
+          },
+          ruleExpression: [
+            {
+              field: 'us_tax_id_is_itin',
+              op: 'not_eq',
+              value: true,
+            },
+            {
+              field: 'behavior_fraud_ring_risk',
+              op: 'not_eq',
+              value: true,
+            },
+            {
+              field: 'ip_address',
+              op: 'is_not_in',
+              value: 'sed minim ut id laborum',
+            },
+          ],
+          ruleId: '711ff17d-911c-4de3-9480-3d54dc8ce4c1',
+        },
+        {
+          action: 'step_up.identity_proof_of_ssn_proof_of_address',
+          createdAt: '1926-08-01T18:13:26.0Z',
+          isShadow: true,
+          kind: 'Any',
+          name: 'Bradley Ullrich',
+          ruleAction: {
+            kind: 'fail',
+          },
+          ruleExpression: [
+            {
+              field: 'phone_located_name_matches',
+              op: 'eq',
+              value: false,
+            },
+            {
+              field: 'experian_score',
+              op: 'lt',
+              value: -12511998,
+            },
+            {
+              field: 'document_selfie_matches',
+              op: 'not_eq',
+              value: false,
+            },
+          ],
+          ruleId: '711ff17d-911c-4de3-9480-3d54dc8ce4c1',
+        },
+      ],
+    },
+    props,
+  ) as ListPlaybookUsage;
+export const getLiteOrgMember = (props: Partial<LiteOrgMember>) =>
+  merge(
+    {
+      firstName: 'Bill',
+      id: '82330490-2b6d-45f6-9bf9-ea7bbeacfb97',
+      lastName: 'Nolan',
+    },
+    props,
+  ) as LiteOrgMember;
+export const getLiteUserAndOrg = (props: Partial<LiteUserAndOrg>) =>
+  merge(
+    {
+      org: 'in occaecat',
+      user: {
+        firstName: 'Annabell',
+        id: '734999e1-5243-4376-86af-07d1a58804d1',
+        lastName: 'Wiza',
+      },
+    },
+    props,
+  ) as LiteUserAndOrg;
+export const getLivenessAttributes = (props: Partial<LivenessAttributes>) =>
+  merge(
+    {
+      device: 'amet aute',
+      issuers: ['apple', 'cloudflare', 'google'],
+      metadata: {},
+      os: 'anim cillum',
+    },
+    props,
+  ) as LivenessAttributes;
 export const getLivenessEvent = (props: Partial<LivenessEvent>) =>
   merge(
     {
@@ -2846,6 +4287,31 @@ export const getLivenessEvent = (props: Partial<LivenessEvent>) =>
     },
     props,
   ) as LivenessEvent;
+export const getLivenessIssuer = (props: Partial<LivenessIssuer>) => (props ?? 'google') as LivenessIssuer;
+export const getLivenessSource = (props: Partial<LivenessSource>) =>
+  (props ?? 'apple_device_attestation') as LivenessSource;
+export const getManualDecisionRequest = (props: Partial<ManualDecisionRequest>) =>
+  merge(
+    {
+      annotation: {
+        isPinned: false,
+        note: 'et nisi cupidatat non elit',
+      },
+      kind: 'manual_decision',
+      status: 'fail',
+    },
+    props,
+  ) as ManualDecisionRequest;
+export const getManualReview = (props: Partial<ManualReview>) =>
+  merge(
+    {
+      kind: 'document_needs_review',
+    },
+    props,
+  ) as ManualReview;
+export const getManualReviewKind = (props: Partial<ManualReviewKind>) =>
+  (props ?? 'document_needs_review') as ManualReviewKind;
+export const getMatchLevel = (props: Partial<MatchLevel>) => (props ?? 'partial') as MatchLevel;
 export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>) =>
   merge(
     {
@@ -2888,6 +4354,119 @@ export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>
     },
     props,
   ) as MultiUpdateRuleRequest;
+export const getNumberOperator = (props: Partial<NumberOperator>) => (props ?? 'lt') as NumberOperator;
+export const getObConfigurationKind = (props: Partial<ObConfigurationKind>) => (props ?? 'kyb') as ObConfigurationKind;
+export const getOfficer = (props: Partial<Officer>) =>
+  merge(
+    {
+      name: 'Melissa Kertzmann',
+      roles: 'Excepteur in ex',
+    },
+    props,
+  ) as Officer;
+export const getOffsetPaginatedDashboardSecretApiKey = (props: Partial<OffsetPaginatedDashboardSecretApiKey>) =>
+  merge(
+    {
+      data: [
+        {
+          createdAt: '1955-03-02T07:07:50.0Z',
+          id: 'd22aa3b2-9f64-4a84-8813-d0a8fd52bf75',
+          isLive: false,
+          key: '0de1db3c-c4d0-46ac-a977-595b95344af1',
+          lastUsedAt: '1923-10-03T12:30:31.0Z',
+          name: 'Dr. Marie Harris',
+          role: {
+            createdAt: '1931-07-15T18:55:13.0Z',
+            id: '42df1859-9e54-47c0-a981-4b73705b6eb5',
+            isImmutable: true,
+            kind: 'dashboard_user',
+            name: 'Pamela Murazik',
+            numActiveApiKeys: -23449424,
+            numActiveUsers: 43770259,
+            scopes: [
+              {
+                kind: 'compliance_partner_admin',
+              },
+              {
+                kind: 'trigger_kyb',
+              },
+              {
+                kind: 'write_lists',
+              },
+            ],
+          },
+          scrubbedKey: 'ba7240fc-ef6b-43c2-b559-19e8a2a83597',
+          status: 'enabled',
+        },
+        {
+          createdAt: '1926-05-10T22:22:37.0Z',
+          id: 'd22aa3b2-9f64-4a84-8813-d0a8fd52bf75',
+          isLive: false,
+          key: '0de1db3c-c4d0-46ac-a977-595b95344af1',
+          lastUsedAt: '1936-10-28T08:04:07.0Z',
+          name: 'Dr. Marie Harris',
+          role: {
+            createdAt: '1912-09-25T12:32:24.0Z',
+            id: '42df1859-9e54-47c0-a981-4b73705b6eb5',
+            isImmutable: false,
+            kind: 'dashboard_user',
+            name: 'Pamela Murazik',
+            numActiveApiKeys: -52416149,
+            numActiveUsers: -50534548,
+            scopes: [
+              {
+                kind: 'compliance_partner_manage_templates',
+              },
+              {
+                kind: 'compliance_partner_read',
+              },
+              {
+                kind: 'decrypt_custom',
+              },
+            ],
+          },
+          scrubbedKey: 'ba7240fc-ef6b-43c2-b559-19e8a2a83597',
+          status: 'enabled',
+        },
+        {
+          createdAt: '1955-12-31T14:06:28.0Z',
+          id: 'd22aa3b2-9f64-4a84-8813-d0a8fd52bf75',
+          isLive: true,
+          key: '0de1db3c-c4d0-46ac-a977-595b95344af1',
+          lastUsedAt: '1923-12-02T01:02:01.0Z',
+          name: 'Dr. Marie Harris',
+          role: {
+            createdAt: '1908-07-17T05:29:48.0Z',
+            id: '42df1859-9e54-47c0-a981-4b73705b6eb5',
+            isImmutable: false,
+            kind: 'api_key',
+            name: 'Pamela Murazik',
+            numActiveApiKeys: -79075089,
+            numActiveUsers: 35517835,
+            scopes: [
+              {
+                data: 'nationality',
+                kind: 'decrypt',
+              },
+              {
+                kind: 'api_keys',
+              },
+              {
+                kind: 'cip_integration',
+              },
+            ],
+          },
+          scrubbedKey: 'ba7240fc-ef6b-43c2-b559-19e8a2a83597',
+          status: 'enabled',
+        },
+      ],
+      meta: {
+        count: 31270206,
+        nextPage: -51254829,
+      },
+    },
+    props,
+  ) as OffsetPaginatedDashboardSecretApiKey;
 export const getOffsetPaginatedEntityOnboarding = (props: Partial<OffsetPaginatedEntityOnboarding>) =>
   merge(
     {
@@ -3272,78 +4851,14 @@ export const getOffsetPaginatedOrganizationRole = (props: Partial<OffsetPaginate
     },
     props,
   ) as OffsetPaginatedOrganizationRole;
-export const getOffsetPaginatedSecretApiKey = (props: Partial<OffsetPaginatedSecretApiKey>) =>
+export const getOmittedSecretCustomHeader = (props: Partial<OmittedSecretCustomHeader>) =>
   merge(
     {
-      data: [
-        {
-          createdAt: '1916-11-20T02:28:14.0Z',
-          id: '8bcf77ae-2eed-45b9-830b-214d75d73870',
-          isLive: false,
-          key: '24328626-66f3-4426-99e7-e0245038e8e4',
-          lastUsedAt: '1904-08-02T12:48:05.0Z',
-          name: 'Edwin Luettgen',
-          role: {
-            createdAt: '1925-08-10T21:29:20.0Z',
-            id: 'd28c7661-376b-4df7-a95e-f4aac838eb74',
-            isImmutable: false,
-            kind: 'CompliancePartnerDashboardUser',
-            name: 'Alexander West',
-            numActiveApiKeys: -12245898,
-            numActiveUsers: 73490987,
-            scopes: ['trigger_kyb', 'manage_compliance_doc_submission', 'compliance_partner_read'],
-          },
-          scrubbedKey: '74af22b5-b555-48c8-886c-76a19255751a',
-          status: 'disabled',
-        },
-        {
-          createdAt: '1956-11-20T11:36:45.0Z',
-          id: '8bcf77ae-2eed-45b9-830b-214d75d73870',
-          isLive: false,
-          key: '24328626-66f3-4426-99e7-e0245038e8e4',
-          lastUsedAt: '1968-01-19T12:35:51.0Z',
-          name: 'Edwin Luettgen',
-          role: {
-            createdAt: '1951-03-11T15:17:34.0Z',
-            id: 'd28c7661-376b-4df7-a95e-f4aac838eb74',
-            isImmutable: true,
-            kind: 'DashboardUser',
-            name: 'Alexander West',
-            numActiveApiKeys: 67653516,
-            numActiveUsers: -68738226,
-            scopes: ['admin', 'write_entities', 'compliance_partner_admin'],
-          },
-          scrubbedKey: '74af22b5-b555-48c8-886c-76a19255751a',
-          status: 'enabled',
-        },
-        {
-          createdAt: '1959-11-09T05:45:41.0Z',
-          id: '030018be-236c-4299-97a3-4ce29b6f625b',
-          isLive: true,
-          key: 'bc3ec628-27cf-4eab-9875-0413194ad1ec',
-          lastUsedAt: '1913-04-16T03:49:32.0Z',
-          name: 'Patti Stokes',
-          role: {
-            createdAt: '1956-07-22T10:13:02.0Z',
-            id: '05dac96b-20a0-4413-acda-de8b77b66980',
-            isImmutable: false,
-            kind: 'DashboardUser',
-            name: 'Jorge Goyette',
-            numActiveApiKeys: 45244568,
-            numActiveUsers: 97225312,
-            scopes: ['trigger_kyb', 'manual_review', 'auth_token'],
-          },
-          scrubbedKey: '3bad756a-2316-482e-a6c0-96650b078485',
-          status: 'disabled',
-        },
-      ],
-      meta: {
-        count: 39755126,
-        nextPage: 55327404,
-      },
+      id: '07f81dc2-bdd4-4f00-9cd8-9be8699bd05d',
+      name: 'Dr. Opal Sauer',
     },
     props,
-  ) as OffsetPaginatedSecretApiKey;
+  ) as OmittedSecretCustomHeader;
 export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguration>) =>
   merge(
     {
@@ -3394,6 +4909,15 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
     },
     props,
   ) as OnboardingConfiguration;
+export const getOnboardingStatus = (props: Partial<OnboardingStatus>) => (props ?? 'fail') as OnboardingStatus;
+export const getOnboardingTimelineInfo = (props: Partial<OnboardingTimelineInfo>) =>
+  merge(
+    {
+      event: 'minim ullamco',
+      sessionId: '2533ec97-fb7c-4f21-bda5-ad66256fee26',
+    },
+    props,
+  ) as OnboardingTimelineInfo;
 export const getOrgClientSecurityConfig = (props: Partial<OrgClientSecurityConfig>) =>
   merge(
     {
@@ -3478,6 +5002,17 @@ export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>) =>
     },
     props,
   ) as OrgLoginResponse;
+export const getOrgMetrics = (props: Partial<OrgMetrics>) =>
+  merge(
+    {
+      failOnboardings: -9197217,
+      incompleteOnboardings: 45046546,
+      newVaults: -66545990,
+      passOnboardings: 79358041,
+      totalOnboardings: -92878491,
+    },
+    props,
+  ) as OrgMetrics;
 export const getOrgMetricsResponse = (props: Partial<OrgMetricsResponse>) =>
   merge(
     {
@@ -3575,6 +5110,29 @@ export const getOrganizationRole = (props: Partial<OrganizationRole>) =>
     },
     props,
   ) as OrganizationRole;
+export const getOrganizationRolebinding = (props: Partial<OrganizationRolebinding>) =>
+  merge(
+    {
+      lastLoginAt: '1890-10-22T02:26:23.0Z',
+    },
+    props,
+  ) as OrganizationRolebinding;
+export const getOtherTenantDupes = (props: Partial<OtherTenantDupes>) =>
+  merge(
+    {
+      numMatches: 67566324,
+      numTenants: -40282709,
+    },
+    props,
+  ) as OtherTenantDupes;
+export const getParentOrganization = (props: Partial<ParentOrganization>) =>
+  merge(
+    {
+      id: 'c62e395a-fe1c-4aaa-bd93-62fe704ddea0',
+      name: 'Mario Hills',
+    },
+    props,
+  ) as ParentOrganization;
 export const getPartnerLoginRequest = (props: Partial<PartnerLoginRequest>) =>
   merge(
     {
@@ -3659,6 +5217,17 @@ export const getPatchProxyConfigRequest = (props: Partial<PatchProxyConfigReques
     },
     props,
   ) as PatchProxyConfigRequest;
+export const getPhoneLookupAttributes = (props: Partial<PhoneLookupAttributes>) =>
+  (props ?? 'line_type_intelligence') as PhoneLookupAttributes;
+export const getPlainCustomHeader = (props: Partial<PlainCustomHeader>) =>
+  merge(
+    {
+      name: 'Jonathon Stehr',
+      value: 'reprehenderit occaecat',
+    },
+    props,
+  ) as PlainCustomHeader;
+export const getPreviewApi = (props: Partial<PreviewApi>) => (props ?? 'auth_events_list') as PreviewApi;
 export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>) =>
   merge(
     {
@@ -3765,6 +5334,16 @@ export const getProxyConfigDetailed = (props: Partial<ProxyConfigDetailed>) =>
     },
     props,
   ) as ProxyConfigDetailed;
+export const getProxyIngressContentType = (props: Partial<ProxyIngressContentType>) =>
+  (props ?? 'json') as ProxyIngressContentType;
+export const getProxyIngressRule = (props: Partial<ProxyIngressRule>) =>
+  merge(
+    {
+      target: 'id voluptate nisi consequat',
+      token: 'd93bc819-bdac-4f7d-89e6-daa48dbbaa78',
+    },
+    props,
+  ) as ProxyIngressRule;
 export const getRawUserDataRequest = (props: Partial<RawUserDataRequest>) =>
   merge(
     {
@@ -3781,6 +5360,7 @@ export const getReuploadComplianceDocRequest = (props: Partial<ReuploadComplianc
     },
     props,
   ) as ReuploadComplianceDocRequest;
+export const getRiskScore = (props: Partial<RiskScore>) => (props ?? 'experian_score') as RiskScore;
 export const getRiskSignal = (props: Partial<RiskSignal>) =>
   merge(
     {
@@ -3812,6 +5392,8 @@ export const getRiskSignalDetail = (props: Partial<RiskSignalDetail>) =>
     },
     props,
   ) as RiskSignalDetail;
+export const getRiskSignalGroupKind = (props: Partial<RiskSignalGroupKind>) =>
+  (props ?? 'web_device') as RiskSignalGroupKind;
 export const getRule = (props: Partial<Rule>) =>
   merge(
     {
@@ -3826,6 +5408,55 @@ export const getRule = (props: Partial<Rule>) =>
     },
     props,
   ) as Rule;
+export const getRuleAction = (props: Partial<RuleAction>) => (props ?? 'pass_with_manual_review') as RuleAction;
+export const getRuleActionConfig = (props: Partial<RuleActionConfig>) =>
+  merge(
+    {
+      config: [
+        {
+          data: {
+            requiresHumanReview: false,
+          },
+          kind: 'proof_of_ssn',
+        },
+        {
+          data: {
+            requiresHumanReview: true,
+          },
+          kind: 'proof_of_address',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              global: ['residence_document', 'voter_identification', 'passport'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+      kind: 'step_up',
+    },
+    props,
+  ) as RuleActionConfig;
+export const getRuleActionMigration = (props: Partial<RuleActionMigration>) =>
+  merge(
+    {
+      config: {},
+      kind: 'pass_with_manual_review',
+    },
+    props,
+  ) as RuleActionMigration;
+export const getRuleEvalResult = (props: Partial<RuleEvalResult>) =>
+  merge(
+    {
+      backtestActionTriggered: 'step_up.identity_proof_of_ssn',
+      currentStatus: 'fail',
+      fpId: '6a47fabd-ab7b-4a6f-a6a2-ee0b31f5093f',
+      historicalActionTriggered: 'manual_review',
+    },
+    props,
+  ) as RuleEvalResult;
 export const getRuleEvalResults = (props: Partial<RuleEvalResults>) =>
   merge(
     {
@@ -3858,6 +5489,89 @@ export const getRuleEvalResults = (props: Partial<RuleEvalResults>) =>
     },
     props,
   ) as RuleEvalResults;
+export const getRuleEvalStats = (props: Partial<RuleEvalStats>) =>
+  merge(
+    {
+      countByBacktestActionTriggered: {},
+      countByHistoricalActionTriggered: {},
+      countByHistoricalAndBacktestActionTriggered: {},
+      total: 66979265,
+    },
+    props,
+  ) as RuleEvalStats;
+export const getRuleExpression = (props: Partial<RuleExpression>) =>
+  merge(
+    [
+      {
+        field: 'ip_address',
+        op: 'is_not_in',
+        value: 'in dolore occaecat',
+      },
+      {
+        field: 'experian_score',
+        op: 'gt',
+        value: -83904051,
+      },
+      {
+        field: 'address_does_not_match',
+        op: 'not_eq',
+        value: false,
+      },
+    ],
+    props,
+  ) as RuleExpression;
+export const getRuleExpressionCondition = (props: Partial<RuleExpressionCondition>) =>
+  merge(
+    {
+      field: 'ip_alert_high_risk_tor',
+      op: 'eq',
+      value: true,
+    },
+    props,
+  ) as RuleExpressionCondition;
+export const getRuleInstanceKind = (props: Partial<RuleInstanceKind>) => (props ?? 'Person') as RuleInstanceKind;
+export const getRuleResult = (props: Partial<RuleResult>) =>
+  merge(
+    {
+      result: true,
+      rule: {
+        action: 'fail',
+        createdAt: '1964-12-22T21:58:11.0Z',
+        isShadow: false,
+        kind: 'Any',
+        name: 'Dr. Rex Ritchie',
+        ruleAction: {
+          kind: 'pass_with_manual_review',
+        },
+        ruleExpression: [
+          {
+            field: 'curp_not_found',
+            op: 'not_eq',
+            value: true,
+          },
+          {
+            field: 'ip_address',
+            op: 'is_not_in',
+            value: 'aute ut aliqua ad',
+          },
+          {
+            field: 'document.passport.front.image',
+            op: 'is_not_in',
+            value: 'enim',
+          },
+        ],
+        ruleId: '0e8d6606-6c23-4de2-a495-47ea301a18db',
+      },
+    },
+    props,
+  ) as RuleResult;
+export const getRuleSet = (props: Partial<RuleSet>) =>
+  merge(
+    {
+      version: 42538418,
+    },
+    props,
+  ) as RuleSet;
 export const getRuleSetResult = (props: Partial<RuleSetResult>) =>
   merge(
     {
@@ -3909,6 +5623,43 @@ export const getRuleSetResult = (props: Partial<RuleSetResult>) =>
     },
     props,
   ) as RuleSetResult;
+export const getSameTenantDupe = (props: Partial<SameTenantDupe>) =>
+  merge(
+    {
+      data: [
+        {
+          dataKind: 'vault_data',
+          identifier: '1d9fc3fe-6720-4733-8331-e8f50a5d7397',
+          isDecryptable: true,
+          source: 'hosted',
+          transforms: {},
+          value: 'eu nostrud sit dolore sint',
+        },
+        {
+          dataKind: 'vault_data',
+          identifier: '1d9fc3fe-6720-4733-8331-e8f50a5d7397',
+          isDecryptable: true,
+          source: 'bootstrap',
+          transforms: {},
+          value: 'non in',
+        },
+        {
+          dataKind: 'vault_data',
+          identifier: '1d9fc3fe-6720-4733-8331-e8f50a5d7397',
+          isDecryptable: true,
+          source: 'tenant',
+          transforms: {},
+          value: 'Excepteur sint velit irure',
+        },
+      ],
+      dupeKinds: ['name_ssn4', 'ssn9', 'dob_ssn4'],
+      fpId: '5760e7ff-a46e-40c5-84b3-695bc38eb0f0',
+      startTimestamp: '1953-01-30T08:16:41.0Z',
+      status: 'none',
+    },
+    props,
+  ) as SameTenantDupe;
+export const getScoreBand = (props: Partial<ScoreBand>) => (props ?? 'high') as ScoreBand;
 export const getSecretApiKey = (props: Partial<SecretApiKey>) =>
   merge(
     {
@@ -3933,6 +5684,14 @@ export const getSecretApiKey = (props: Partial<SecretApiKey>) =>
     },
     props,
   ) as SecretApiKey;
+export const getSecretCustomHeader = (props: Partial<SecretCustomHeader>) =>
+  merge(
+    {
+      name: 'Preston Fisher',
+      value: 'nulla',
+    },
+    props,
+  ) as SecretCustomHeader;
 export const getSentilinkDetail = (props: Partial<SentilinkDetail>) =>
   merge(
     {
@@ -3987,6 +5746,46 @@ export const getSentilinkDetail = (props: Partial<SentilinkDetail>) =>
     },
     props,
   ) as SentilinkDetail;
+export const getSentilinkReasonCode = (props: Partial<SentilinkReasonCode>) =>
+  merge(
+    {
+      code: 'nisi non',
+      direction: 'veniam Ut',
+      explanation: 'Excepteur anim deserunt',
+      rank: -20212288,
+    },
+    props,
+  ) as SentilinkReasonCode;
+export const getSentilinkScoreDetail = (props: Partial<SentilinkScoreDetail>) =>
+  merge(
+    {
+      reasonCodes: [
+        {
+          code: 'irure est ex enim deserunt',
+          direction: 'sed labore amet',
+          explanation: 'officia veniam sed',
+          rank: 28009836,
+        },
+        {
+          code: 'ea sint proident Ut anim',
+          direction: 'eiusmod non amet veniam',
+          explanation: 'minim Excepteur amet exercitation mollit',
+          rank: -6334027,
+        },
+        {
+          code: 'in quis',
+          direction: 'quis sunt aliqua proident et',
+          explanation: 'aute',
+          rank: 49086156,
+        },
+      ],
+      score: -3695911,
+      scoreBand: 'low',
+    },
+    props,
+  ) as SentilinkScoreDetail;
+export const getSignalScope = (props: Partial<SignalScope>) => (props ?? 'ssn') as SignalScope;
+export const getSignalSeverity = (props: Partial<SignalSeverity>) => (props ?? 'high') as SignalSeverity;
 export const getSubmitExternalUrlRequest = (props: Partial<SubmitExternalUrlRequest>) =>
   merge(
     {
@@ -3994,6 +5793,7 @@ export const getSubmitExternalUrlRequest = (props: Partial<SubmitExternalUrlRequ
     },
     props,
   ) as SubmitExternalUrlRequest;
+export const getTaskStatus = (props: Partial<TaskStatus>) => (props ?? 'eu veniam irure sunt enim') as TaskStatus;
 export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>) =>
   merge(
     {
@@ -4006,6 +5806,8 @@ export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>) =>
     },
     props,
   ) as TenantAndroidAppMeta;
+export const getTenantFrequentNoteKind = (props: Partial<TenantFrequentNoteKind>) =>
+  (props ?? 'manual_review') as TenantFrequentNoteKind;
 export const getTenantIosAppMeta = (props: Partial<TenantIosAppMeta>) =>
   merge(
     {
@@ -4018,6 +5820,7 @@ export const getTenantIosAppMeta = (props: Partial<TenantIosAppMeta>) =>
     },
     props,
   ) as TenantIosAppMeta;
+export const getTenantKind = (props: Partial<TenantKind>) => (props ?? 'Tenant') as TenantKind;
 export const getTenantLoginRequest = (props: Partial<TenantLoginRequest>) =>
   merge(
     {
@@ -4026,6 +5829,150 @@ export const getTenantLoginRequest = (props: Partial<TenantLoginRequest>) =>
     },
     props,
   ) as TenantLoginRequest;
+export const getTenantRoleKindDiscriminant = (props: Partial<TenantRoleKindDiscriminant>) =>
+  (props ?? 'dashboard_user') as TenantRoleKindDiscriminant;
+export const getTenantScope = (props: Partial<TenantScope>) =>
+  merge(
+    {
+      data: 'dob',
+      kind: 'cip_integration',
+    },
+    props,
+  ) as TenantScope;
+export const getTerminalDecisionStatus = (props: Partial<TerminalDecisionStatus>) =>
+  (props ?? 'fail') as TerminalDecisionStatus;
+export const getTimelineOnboardingDecision = (props: Partial<TimelineOnboardingDecision>) =>
+  merge(
+    {
+      clearedManualReviews: [
+        {
+          kind: 'document_needs_review',
+        },
+        {
+          kind: 'document_needs_review',
+        },
+        {
+          kind: 'rule_triggered',
+        },
+      ],
+      id: 'e51a54f7-0c4f-40b1-9075-6c2c1c2dbb03',
+      obConfiguration: {
+        id: '5058e2ff-e77e-4cb3-9cff-76924fe6e2a9',
+        mustCollectData: ['business_kyced_beneficial_owners', 'ssn9', 'dob'],
+        name: 'Lola Schuster',
+      },
+      ranRulesInSandbox: true,
+      ruleSetResultId: 'f51f2d32-d6b1-4a0a-b4cb-463fae113f7a',
+      source: {
+        email: 'Duis in',
+        id: 'dolore qui Ut consectetur in',
+        kind: 'organization',
+        member: 'do irure',
+        name: 'do laboris magna ipsum mollit',
+      },
+      status: 'pass',
+      timestamp: '1941-05-11T19:19:34.0Z',
+      workflowKind: 'alpaca_kyc',
+    },
+    props,
+  ) as TimelineOnboardingDecision;
+export const getTimelinePlaybook = (props: Partial<TimelinePlaybook>) =>
+  merge(
+    {
+      id: 'de761d47-ec13-4e2a-92d7-eba4e75f0c07',
+      mustCollectData: ['nationality', 'ssn9', 'us_tax_id'],
+      name: 'Miss Elisa Reinger',
+    },
+    props,
+  ) as TimelinePlaybook;
+export const getTokenOperationKind = (props: Partial<TokenOperationKind>) =>
+  (props ?? 'update_auth_methods') as TokenOperationKind;
+export const getTriggerRequest = (props: Partial<TriggerRequest>) =>
+  merge(
+    {
+      fpBid: '193e91c7-b00e-4bb9-8252-4433c33494d1',
+      kind: 'trigger',
+      note: 'quis anim proident',
+      trigger: {
+        data: {
+          businessConfigs: [
+            {
+              data: {
+                identifier: 'document.passport_card.back.mime_type',
+                name: 'dolore cillum anim dolor',
+                requiresHumanReview: false,
+                uploadSettings: 'prefer_capture',
+              },
+              kind: 'custom',
+            },
+            {
+              data: {
+                description: 'officia tempor do et elit',
+                identifier: 'document.id_card.front.mime_type',
+                name: 'laborum dolore labore',
+                requiresHumanReview: false,
+                uploadSettings: 'capture_only_on_mobile',
+              },
+              kind: 'custom',
+            },
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_address',
+            },
+          ],
+          configs: [
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+            {
+              data: {
+                description: 'in sunt exercitation est aliquip',
+                identifier: 'document.passport_card.issuing_country',
+                name: 'sint aliquip consequat',
+                requiresHumanReview: false,
+                uploadSettings: 'prefer_capture',
+              },
+              kind: 'custom',
+            },
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+          ],
+        },
+        kind: 'document',
+      },
+    },
+    props,
+  ) as TriggerRequest;
+export const getUnvalidatedRuleExpression = (props: Partial<UnvalidatedRuleExpression>) =>
+  merge(
+    [
+      {
+        field: 'ip_address',
+        op: 'is_not_in',
+        value: 'aliqua sed',
+      },
+      {
+        field: 'incode_selfie_match_score',
+        op: 'gt',
+        value: 18484721,
+      },
+      {
+        field: 'id.drivers_license_number',
+        op: 'is_in',
+        value: 'in ea veniam',
+      },
+    ],
+    props,
+  ) as UnvalidatedRuleExpression;
 export const getUpdateAnnotationRequest = (props: Partial<UpdateAnnotationRequest>) =>
   merge(
     {
@@ -4159,6 +6106,7 @@ export const getUpdateTenantUserRequest = (props: Partial<UpdateTenantUserReques
     },
     props,
   ) as UpdateTenantUserRequest;
+export const getUploadSource = (props: Partial<UploadSource>) => (props ?? 'Desktop') as UploadSource;
 export const getUserAiSummary = (props: Partial<UserAiSummary>) =>
   merge(
     {
@@ -4169,6 +6117,8 @@ export const getUserAiSummary = (props: Partial<UserAiSummary>) =>
     },
     props,
   ) as UserAiSummary;
+export const getUserDataIdentifier = (props: Partial<UserDataIdentifier>) =>
+  (props ?? 'document.id_card.full_address') as UserDataIdentifier;
 export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>) =>
   merge(
     {
@@ -4206,6 +6156,8 @@ export const getUserInsight = (props: Partial<UserInsight>) =>
     },
     props,
   ) as UserInsight;
+export const getUserInsightScope = (props: Partial<UserInsightScope>) => (props ?? 'workflow') as UserInsightScope;
+export const getUserInsightUnit = (props: Partial<UserInsightUnit>) => (props ?? 'boolean') as UserInsightUnit;
 export const getUserLabel = (props: Partial<UserLabel>) =>
   merge(
     {
@@ -4232,6 +6184,100 @@ export const getUserTimeline = (props: Partial<UserTimeline>) =>
     },
     props,
   ) as UserTimeline;
+export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>) =>
+  merge(
+    {
+      data: {
+        actor: {
+          id: 'in',
+          kind: 'user',
+        },
+        attributes: ['business_tin', 'us_tax_id', 'ssn4'],
+        config: {
+          data: {
+            businessConfigs: [
+              {
+                data: {
+                  collectSelfie: true,
+                  documentTypesAndCountries: {
+                    global: ['passport', 'visa', 'visa'],
+                  },
+                },
+                kind: 'identity',
+              },
+              {
+                data: {
+                  requiresHumanReview: true,
+                },
+                kind: 'proof_of_ssn',
+              },
+              {
+                data: {
+                  requiresHumanReview: true,
+                },
+                kind: 'proof_of_ssn',
+              },
+            ],
+            configs: [
+              {
+                data: {
+                  description: 'adipisicing ullamco in',
+                  identifier: 'business.address_line1',
+                  name: 'culpa',
+                  requiresHumanReview: false,
+                  uploadSettings: 'capture_only_on_mobile',
+                },
+                kind: 'custom',
+              },
+              {
+                data: {
+                  collectSelfie: true,
+                  documentTypesAndCountries: {
+                    global: ['residence_document', 'drivers_license', 'visa'],
+                  },
+                },
+                kind: 'identity',
+              },
+              {
+                data: {
+                  requiresHumanReview: true,
+                },
+                kind: 'proof_of_ssn',
+              },
+            ],
+          },
+          kind: 'document',
+        },
+        event: 'ad laborum et',
+        externalId: 'qui Excepteur Ut',
+        fpId: 'fugiat ullamco',
+        integration: 'alpaca_cip',
+        isPrefill: true,
+        note: 'cillum do veniam reprehenderit',
+        requestIsActive: true,
+        sessionId: 'minim in culpa in sit',
+        successful: false,
+        targets: [
+          'document.id_card.issuing_country',
+          'document.drivers_license.front.image',
+          'document.voter_identification.back.image',
+        ],
+      },
+      kind: 'data_collected',
+    },
+    props,
+  ) as UserTimelineEvent;
+export const getVaultCreated = (props: Partial<VaultCreated>) =>
+  merge(
+    {
+      actor: {
+        email: 'consequat',
+        kind: 'firm_employee',
+        member: 'dolore nostrud',
+      },
+    },
+    props,
+  ) as VaultCreated;
 export const getVaultDrAwsPreEnrollResponse = (props: Partial<VaultDrAwsPreEnrollResponse>) =>
   merge(
     {
@@ -4252,6 +6298,20 @@ export const getVaultDrEnrollRequest = (props: Partial<VaultDrEnrollRequest>) =>
   ) as VaultDrEnrollRequest;
 export const getVaultDrEnrollResponse = (props: Partial<VaultDrEnrollResponse>) =>
   merge({}, props) as VaultDrEnrollResponse;
+export const getVaultDrEnrolledStatus = (props: Partial<VaultDrEnrolledStatus>) =>
+  merge(
+    {
+      awsAccountId: 'c50e96e2-3252-41fa-ab3b-538ee4a018aa',
+      awsRoleName: 'Erika Grimes',
+      backupLagSeconds: -92001142,
+      bucketPathNamespace: 'Holly West',
+      enrolledAt: '1968-04-19T06:01:27.0Z',
+      latestBackupRecordTimestamp: '1892-09-26T09:59:26.0Z',
+      orgPublicKeys: ['minim ut in sint reprehenderit', 'aute in adipisicing', 'aliqua sunt ad dolor eiusmod'],
+      s3BucketName: 'Mr. Jack Brown III',
+    },
+    props,
+  ) as VaultDrEnrolledStatus;
 export const getVaultDrRevealWrappedRecordKeysRequest = (props: Partial<VaultDrRevealWrappedRecordKeysRequest>) =>
   merge(
     {
@@ -4285,6 +6345,83 @@ export const getVaultDrStatus = (props: Partial<VaultDrStatus>) =>
     },
     props,
   ) as VaultDrStatus;
+export const getVaultKind = (props: Partial<VaultKind>) => (props ?? 'person') as VaultKind;
+export const getVaultOperation = (props: Partial<VaultOperation>) =>
+  merge(
+    {
+      field: 'document.passport_card.samba_activity_history_response',
+      op: 'not_eq',
+      value: 'Excepteur velit tempor aliqua consectetur',
+    },
+    props,
+  ) as VaultOperation;
+export const getVerificationCheck = (props: Partial<VerificationCheck>) =>
+  merge(
+    {
+      data: {
+        adverseMedia: true,
+        adverseMediaLists: ['sexual_crime', 'general_serious', 'terrorism'],
+        attributes: ['line_type_intelligence', 'line_type_intelligence', 'line_type_intelligence'],
+        continuousMonitoring: false,
+        matchKind: 'exact_name',
+        ofac: true,
+        pep: true,
+      },
+      kind: 'sentilink',
+    },
+    props,
+  ) as VerificationCheck;
+export const getWatchlistCheck = (props: Partial<WatchlistCheck>) =>
+  merge(
+    {
+      id: '41e025a9-ef3b-45db-a557-4194ed82efe7',
+      reasonCodes: ['document_photo_is_not_screen_capture', 'behavior_fraud_ring_risk', 'address_located_is_po_box'],
+      status: 'pending',
+    },
+    props,
+  ) as WatchlistCheck;
+export const getWatchlistCheckStatusKind = (props: Partial<WatchlistCheckStatusKind>) =>
+  (props ?? 'pass') as WatchlistCheckStatusKind;
+export const getWatchlistEntry = (props: Partial<WatchlistEntry>) =>
+  merge(
+    {
+      hits: [
+        {
+          agencyListUrl: 'https://pitiful-deed.org/',
+          entityAliases: ['aliquip', 'laborum elit esse nulla reprehenderit', 'aliqua'],
+        },
+        {
+          entityAliases: ['culpa velit officia', 'elit sunt sed pariatur', 'esse irure ex do'],
+          entityName: 'Sharon Feeney',
+          listName: 'Rex Batz',
+        },
+        {
+          agencyAbbr: 'consequat do deserunt',
+          agencyInformationUrl: 'https://bitter-exploration.net/',
+          entityAliases: ['sit pariatur sed nostrud non', 'exercitation anim', 'mollit'],
+          entityName: 'Sharon Feeney',
+          url: 'https://creamy-numeric.name/',
+        },
+      ],
+      screenedEntityName: 'Corey Heathcote',
+    },
+    props,
+  ) as WatchlistEntry;
+export const getWatchlistHit = (props: Partial<WatchlistHit>) =>
+  merge(
+    {
+      agency: 'laborum est minim irure',
+      agencyAbbr: 'non incididunt voluptate tempor sit',
+      agencyInformationUrl: 'https://graceful-behest.name',
+      agencyListUrl: 'https://crazy-hunger.com/',
+      entityAliases: ['ullamco deserunt ut do', 'aliqua aliquip enim sed exercitation', 'non ullamco ad'],
+      entityName: 'Christie Champlin III',
+      listCountry: 'Marshall Islands',
+      listName: 'Tom West',
+      url: 'https://black-bump.info',
+    },
+    props,
+  ) as WatchlistHit;
 export const getWebhookPortalResponse = (props: Partial<WebhookPortalResponse>) =>
   merge(
     {
@@ -4294,3 +6431,166 @@ export const getWebhookPortalResponse = (props: Partial<WebhookPortalResponse>) 
     },
     props,
   ) as WebhookPortalResponse;
+export const getWorkflowKind = (props: Partial<WorkflowKind>) => (props ?? 'document') as WorkflowKind;
+export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>) =>
+  merge(
+    {
+      data: {
+        businessConfigs: [
+          {
+            data: {
+              description: 'nisi',
+              identifier: 'business.website',
+              name: 'mollit anim sunt proident',
+              requiresHumanReview: true,
+              uploadSettings: 'prefer_upload',
+            },
+            kind: 'custom',
+          },
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                global: ['residence_document', 'drivers_license', 'visa'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              requiresHumanReview: false,
+            },
+            kind: 'proof_of_address',
+          },
+        ],
+        configs: [
+          {
+            data: {
+              requiresHumanReview: false,
+            },
+            kind: 'proof_of_ssn',
+          },
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                global: ['residence_document', 'voter_identification', 'permit'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              requiresHumanReview: true,
+            },
+            kind: 'proof_of_ssn',
+          },
+        ],
+      },
+      kind: 'document',
+    },
+    props,
+  ) as WorkflowRequestConfig;
+export const getWorkflowSource = (props: Partial<WorkflowSource>) => (props ?? 'unknown') as WorkflowSource;
+export const getWorkflowStarted = (props: Partial<WorkflowStarted>) =>
+  merge(
+    {
+      kind: 'playbook',
+      playbook: {
+        id: 'b8f91f2d-6ff6-4795-a31c-97f5f24a4e5a',
+        mustCollectData: ['us_legal_status', 'dob', 'dob'],
+        name: 'Roberta Jaskolski',
+      },
+    },
+    props,
+  ) as WorkflowStarted;
+export const getWorkflowStartedEventKind = (props: Partial<WorkflowStartedEventKind>) =>
+  (props ?? 'playbook') as WorkflowStartedEventKind;
+export const getWorkflowTriggered = (props: Partial<WorkflowTriggered>) =>
+  merge(
+    {
+      actor: {
+        email: 'nisi reprehenderit',
+        firstName: 'in',
+        id: 'veniam consectetur adipisicing qui',
+        kind: 'organization',
+        lastName: 'enim Ut incididunt in voluptate',
+        member: 'veniam tempor ea',
+        name: 'pariatur cupidatat nostrud sit',
+      },
+      config: {
+        data: {
+          businessConfigs: [
+            {
+              data: {
+                description: 'eu ea reprehenderit',
+                identifier: 'document.residence_document.back.mime_type',
+                name: 'Excepteur in',
+                requiresHumanReview: true,
+                uploadSettings: 'prefer_upload',
+              },
+              kind: 'custom',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  global: ['passport', 'voter_identification', 'passport_card'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_ssn',
+            },
+          ],
+          configs: [
+            {
+              data: {
+                collectSelfie: true,
+                documentTypesAndCountries: {
+                  global: ['drivers_license', 'passport', 'passport_card'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  global: ['permit', 'passport', 'drivers_license'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  global: ['voter_identification', 'id_card', 'residence_document'],
+                },
+              },
+              kind: 'identity',
+            },
+          ],
+          playbookId: 'laborum occaecat aute',
+          recollectAttributes: [
+            {
+              document: 'voluptate',
+            },
+            'business_website',
+            'card',
+          ],
+          reuseExistingBoKyc: false,
+        },
+        kind: 'document',
+      },
+      fpId: '6c4dc0bf-e378-47d8-93ce-becf73a97b31',
+      note: 'sit eiusmod dolore',
+      requestIsActive: true,
+    },
+    props,
+  ) as WorkflowTriggered;

@@ -3,6 +3,7 @@ import { mockRequest } from '@onefootprint/test-utils';
 
 export const orgAllowDomainFixture = getOrganization({
   allowDomainAccess: false,
+  isDomainAlreadyClaimed: false,
 });
 
 export const orgEnabledAllowDomainAccessFixture = getOrganization({

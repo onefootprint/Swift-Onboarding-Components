@@ -25,8 +25,8 @@ pub enum ChallengeKind {
     Email,
 }
 
-#[doc = "Encrypted, base64-encoded challenge information"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[openapi(inline)]
 #[serde(transparent)]
 pub struct ChallengeToken(pub String);
 

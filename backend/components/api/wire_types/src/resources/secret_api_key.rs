@@ -6,7 +6,7 @@ use newtypes::TenantApiKeyId;
 /// Secret API key
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
-pub struct SecretApiKey {
+pub struct DashboardSecretApiKey {
     pub id: TenantApiKeyId,
     pub name: String,
     pub status: ApiKeyStatus,

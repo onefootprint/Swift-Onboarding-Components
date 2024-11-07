@@ -57,7 +57,7 @@ impl paperclip::v2::schema::Apiv2Schema for DataIdentifier {
     }
 
     fn description() -> &'static str {
-        "Represents a piece of data stored inside the vault."
+        ""
     }
 
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
@@ -91,6 +91,7 @@ impl paperclip::v2::schema::Apiv2Schema for BusinessDataIdentifier {
             .filter(|did| did.is_allowed_for(VaultKind::Business))
             .collect();
         schema.enum_ = DataIdentifier::api_examples(dids);
+        schema.name = Self::name();
         schema
     }
 }
@@ -114,6 +115,7 @@ impl paperclip::v2::schema::Apiv2Schema for UserDataIdentifier {
             .filter(|did| did.is_allowed_for(VaultKind::Person))
             .collect();
         schema.enum_ = DataIdentifier::api_examples(dids);
+        schema.name = Self::name();
         schema
     }
 }

@@ -1,6 +1,5 @@
 use crate::*;
 
-/// Describes a device insight event with locations and IP of the event
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct InsightEvent {
@@ -19,7 +18,6 @@ pub struct InsightEvent {
     pub session_id: Option<String>,
 }
 
-/// Describes a device insight event with locations and IP of the event
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct PublicInsightEvent {

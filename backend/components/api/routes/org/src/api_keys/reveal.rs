@@ -30,7 +30,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: TenantSessionAuth,
-) -> ApiResponse<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
@@ -47,7 +47,7 @@ async fn post(
         .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key)
         .await?;
     let api_key = SecretApiKey::from(decrypted_secret_key);
-    Ok(api_wire_types::SecretApiKey::from_db((
+    Ok(api_wire_types::DashboardSecretApiKey::from_db((
         key,
         role,
         api_key.scrub(),

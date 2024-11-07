@@ -1,4 +1,15 @@
 export const persistedValues: Record<string, unknown> = {
+  'dashboard.ActionKind': 'replace',
+  'dashboard.Actor': {
+    email: 'adipisicing ipsum',
+    first_name: 'dolor dolor',
+    id: 'ut',
+    kind: 'api_key',
+    last_name: 'sit occaecat non Ut dolor',
+    member: 'ullamco',
+    name: 'deserunt Duis Excepteur nisi sit',
+  },
+  'dashboard.AdverseMediaListKind': 'sexual_crime',
   'dashboard.AmlDetail': {
     hits: [
       {
@@ -85,6 +96,37 @@ export const persistedValues: Record<string, unknown> = {
     ],
     share_url: 'https://infatuated-alb.org/',
   },
+  'dashboard.AmlHit': {
+    fields: {},
+    match_types: ['nulla sint', 'sint aliqua ex dolore mollit', 'dolore aliqua'],
+    media: [
+      {
+        date: '1907-06-22T14:37:24.0Z',
+        pdf_url: 'https://rowdy-illusion.biz/',
+        snippet: 'fugiat adipisicing culpa quis',
+        title: 'labore Duis dolore in',
+        url: 'https://accomplished-fat.org',
+      },
+      {
+        date: '1942-10-16T12:22:15.0Z',
+        snippet: 'mollit non velit commodo laboris',
+      },
+      {
+        date: '1899-08-30T21:06:45.0Z',
+        pdf_url: 'https://rowdy-illusion.biz/',
+        title: 'sed sint',
+      },
+    ],
+    name: 'Dr. Clay Kuhlman',
+  },
+  'dashboard.AmlHitMedia': {
+    date: '1905-12-25T06:25:09.0Z',
+    pdf_url: 'https://content-yak.us',
+    snippet: 'in',
+    title: 'Excepteur sed consectetur enim',
+    url: 'https://all-ostrich.net/',
+  },
+  'dashboard.AmlMatchKind': 'fuzzy_high',
   'dashboard.Annotation': {
     id: '56b9ec9e-f862-4e51-98cc-618ad46602c7',
     is_pinned: false,
@@ -92,6 +134,7 @@ export const persistedValues: Record<string, unknown> = {
     source: 'footprint',
     timestamp: '1901-05-11T18:31:56.0Z',
   },
+  'dashboard.ApiKeyStatus': 'enabled',
   'dashboard.AssumePartnerRoleRequest': {
     partner_tenant_id: 'a67fe17b-0b95-4f8f-99ea-c07c567fac43',
   },
@@ -181,6 +224,55 @@ export const persistedValues: Record<string, unknown> = {
       },
     },
   },
+  'dashboard.AttestedDeviceData': {
+    app_bundle_id: '42e11e2e-bb85-40c5-8362-b49826349a5e',
+    device_type: 'android',
+    fraud_risk: 'high',
+    model: 'est occaecat veniam',
+    os: 'et ut in cupidatat aliqua',
+  },
+  'dashboard.AuditEvent': {
+    detail: {
+      kind: 'disable_playbook',
+    },
+    id: 'de6b07cb-5896-4ef5-89b9-832c93b3f7f9',
+    insight_event: {
+      city: 'Predovicfort',
+      country: 'Republic of Korea',
+      ip_address: '7148 Kling Estates Suite 178',
+      latitude: -78238643.2942368,
+      metro_code: 'dolore cupidatat culpa in minim',
+      postal_code: 'occaecat Lorem',
+      region: 'nostrud',
+      session_id: '2573adf6-667d-4c4e-801f-0fc1aff2fd41',
+      timestamp: '1936-07-22T19:58:59.0Z',
+      user_agent: 'consequat quis labore',
+    },
+    name: 'Vickie Dach',
+    principal: {
+      email: 'id Ut',
+      first_name: 'est labore',
+      id: 'consequat in aute proident et',
+      kind: 'api_key',
+      last_name: 'quis aliqua ipsum',
+      member: 'non voluptate reprehenderit incididunt',
+      name: 'commodo est',
+    },
+    tenant_id: '39b9a984-21b5-49e6-9dd1-ba99731ae94b',
+    timestamp: '1967-06-04T13:54:06.0Z',
+  },
+  'dashboard.AuditEventDetail': {
+    data: {
+      created_fields: [
+        'document.permit.back.image',
+        'document.residence_document.issuing_state',
+        'document.drivers_license.front.image',
+      ],
+      fp_id: 'aute laborum irure',
+    },
+    kind: 'collect_user_document',
+  },
+  'dashboard.AuditEventName': 'delete_user_data',
   'dashboard.AuthEvent': {
     created_at: '1893-11-17T01:44:28.0Z',
     insight: {
@@ -224,6 +316,27 @@ export const persistedValues: Record<string, unknown> = {
     ],
     scope: 'my1fp',
   },
+  'dashboard.AuthEventKind': 'passkey',
+  'dashboard.AuthMethodKind': 'email',
+  'dashboard.AuthMethodUpdated': {
+    action: 'replace',
+    insight_event: {
+      city: 'Ivaburgh',
+      country: 'Guam',
+      ip_address: '26052 Valentine Plaza Suite 934',
+      latitude: 38438218.75770867,
+      longitude: -92356448.35866505,
+      metro_code: 'tempor sit',
+      postal_code: 'non sed',
+      region: 'irure ad ipsum consectetur deserunt',
+      region_name: 'Bridget Nader',
+      session_id: '134e90a1-c024-48be-b618-1281dce3310c',
+      time_zone: 'consectetur',
+      timestamp: '1955-10-14T15:37:34.0Z',
+      user_agent: 'sit dolore nisi',
+    },
+    kind: 'passkey',
+  },
   'dashboard.AuthOrgMember': {
     email: 'jaylen_wolf@gmail.com',
     first_name: 'Kylee',
@@ -256,6 +369,37 @@ export const persistedValues: Record<string, unknown> = {
       support_phone: '+15577111854',
       support_website: 'https://alienated-breastplate.org',
       website_url: 'https://metallic-humor.biz',
+    },
+  },
+  'dashboard.BooleanOperator': 'not_eq',
+  'dashboard.BusinessDetail': {
+    entity_type: 'mollit adipisicing velit id anim',
+    formation_date: 'nulla cillum',
+    formation_state: 'Hawaii',
+    phone_numbers: [
+      {
+        phone: '+18326849141',
+        submitted: true,
+        verified: false,
+      },
+      {
+        phone: '+18326849141',
+        submitted: false,
+        verified: false,
+      },
+      {
+        phone: '+18326849141',
+        submitted: true,
+        verified: true,
+      },
+    ],
+    tin: {
+      tin: 'et',
+      verified: false,
+    },
+    website: {
+      url: 'https://shimmering-gallery.name/',
+      verified: false,
     },
   },
   'dashboard.BusinessInsights': {
@@ -720,11 +864,20 @@ export const persistedValues: Record<string, unknown> = {
       ],
     },
   },
+  'dashboard.BusinessOwnerKind': 'secondary',
+  'dashboard.BusinessOwnerSource': 'hosted',
+  'dashboard.CipKind': 'alpaca',
   'dashboard.ClientDecryptRequest': {
     fields: ['document.permit.expires_at', 'document.finra_compliance_letter', 'document.drivers_license.gender'],
     reason: 'mollit qui et',
     transforms: ["hmac_sha256('<key>')", 'prefix(<n>)', "encrypt('<algorithm>','<public_key>')"],
   },
+  'dashboard.ClientIdentity': {
+    certificate: 'Duis tempor aliqua Excepteur ex',
+    key: 'e71134ad-ca43-41db-97ae-4414221ce956',
+  },
+  'dashboard.CollectedDataOption': 'business_website',
+  'dashboard.CompanySize': 's1_to10',
   'dashboard.ComplianceCompanySummary': {
     company_name: 'Everett Streich',
     id: 'f3abe848-e64b-41a9-b06f-6713a8e61c63',
@@ -732,6 +885,15 @@ export const persistedValues: Record<string, unknown> = {
     num_controls_complete: 70551037,
     num_controls_total: 99115741,
   },
+  'dashboard.ComplianceDocData': {
+    data: {
+      data: 'exercitation officia',
+      filename: 'officia in elit',
+      url: 'dolor sunt',
+    },
+    kind: 'file_upload',
+  },
+  'dashboard.ComplianceDocDataKind': 'file_upload',
   'dashboard.ComplianceDocEvent': {
     actor: {
       org: 'cupidatat elit',
@@ -744,6 +906,39 @@ export const persistedValues: Record<string, unknown> = {
     event: 'ipsum',
     timestamp: '1894-09-17T01:14:12.0Z',
   },
+  'dashboard.ComplianceDocEventAssigned': {
+    assigned_to: {
+      org: 'est velit',
+      user: {
+        first_name: 'Roselyn',
+        id: '2897ea36-badf-40ff-bcd5-6addb93ed14b',
+        last_name: 'Goodwin',
+      },
+    },
+    kind: 'PartnerTenant',
+  },
+  'dashboard.ComplianceDocEventRequested': {
+    description: 'et id',
+    name: 'Johnny Mertz Sr.',
+    template_id: '80493a31-70b7-4d54-ba80-308fe8747f16',
+  },
+  'dashboard.ComplianceDocEventReviewed': {
+    decision: 'rejected',
+    note: 'qui Duis amet',
+  },
+  'dashboard.ComplianceDocEventSubmitted': {
+    kind: 'file_upload',
+    submission_id: '4342fa29-bbb9-45f0-9528-3d16022c9aa2',
+  },
+  'dashboard.ComplianceDocEventType': {
+    data: {
+      kind: 'external_url',
+      submission_id: 'veniam id Lorem aute',
+    },
+    kind: 'request_retracted',
+  },
+  'dashboard.ComplianceDocReviewDecision': 'accepted',
+  'dashboard.ComplianceDocStatus': 'waiting_for_upload',
   'dashboard.ComplianceDocSubmission': {
     created_at: '1918-06-23T23:50:01.0Z',
     data: 'cillum non',
@@ -785,10 +980,24 @@ export const persistedValues: Record<string, unknown> = {
       template_id: 'dd8e0a9d-6eba-46ce-9dec-a1fc5d29db45',
     },
   },
+  'dashboard.ComplianceDocTemplateVersion': {
+    created_at: '1922-07-14T15:10:42.0Z',
+    created_by_partner_tenant_user: {
+      first_name: 'Eloise',
+      id: '7e077f5e-cf4d-40dd-8a51-1676b4435310',
+      last_name: 'Carter',
+    },
+    description: 'mollit',
+    id: 'fb8a7990-2cf3-4494-93c0-adfdcaa1de3a',
+    name: 'Mr. Steven Zemlak',
+    template_id: '3ec7a432-604d-40d6-80d6-41f96c4ddd10',
+  },
+  'dashboard.ContactInfoKind': 'phone',
   'dashboard.CopyPlaybookRequest': {
     is_live: false,
     name: 'Mr. Wilbur Hermiston DVM',
   },
+  'dashboard.CountrySpecificDocumentMapping': {},
   'dashboard.CreateAnnotationRequest': {
     is_pinned: true,
     note: 'aliquip minim ad',
@@ -942,6 +1151,31 @@ export const persistedValues: Record<string, unknown> = {
     note: 'ut mollit et',
     submission_id: '9a495328-55e8-4f8b-9a32-c6d466714031',
   },
+  'dashboard.CreateRule': {
+    is_shadow: true,
+    name: 'Kayla Hagenes PhD',
+    rule_action: {
+      config: {},
+      kind: 'manual_review',
+    },
+    rule_expression: [
+      {
+        field: 'document.residence_document.front.image',
+        op: 'eq',
+        value: 'tempor deserunt voluptate',
+      },
+      {
+        field: 'ip_address',
+        op: 'is_in',
+        value: 'labore',
+      },
+      {
+        field: 'document.residence_document.samba_activity_history_response',
+        op: 'not_eq',
+        value: 'elit nulla esse',
+      },
+    ],
+  },
   'dashboard.CreateTagRequest': {
     tag: 'eu ut occaecat',
   },
@@ -969,6 +1203,12 @@ export const persistedValues: Record<string, unknown> = {
     omit_email_invite: false,
     redirect_url: 'https://sparse-tackle.com/',
     role_id: '9c015c90-61f7-46c2-92e0-ce76d27f8967',
+  },
+  'dashboard.CreateTokenResponse': {
+    expires_at: '1954-07-10T18:20:23.0Z',
+    kind: 'trigger',
+    link: 'esse consequat Ut in',
+    token: '40d1bb3e-4b93-47c2-b5b4-cfb17d6b96a4',
   },
   'dashboard.CursorPaginatedAuditEvent': {
     data: [
@@ -1539,6 +1779,68 @@ export const persistedValues: Record<string, unknown> = {
       next: 'qui Lorem',
     },
   },
+  'dashboard.CustomDocumentConfig': {
+    description: 'reprehenderit occaecat',
+    identifier: '4893f10a-0eb0-451f-a341-f34224a3e83c',
+    name: 'Marion Gleichner',
+    requires_human_review: true,
+    upload_settings: 'prefer_upload',
+  },
+  'dashboard.DashboardSecretApiKey': {
+    created_at: '1940-01-23T05:11:46.0Z',
+    id: 'ccdbd252-bc43-422c-95b8-5819ab8bd4e0',
+    is_live: true,
+    key: '48b7f6ab-e783-4b25-8b0b-5c191ee0c4e1',
+    last_used_at: '1931-06-27T10:37:20.0Z',
+    name: 'Brett Feeney',
+    role: {
+      created_at: '1906-05-25T09:23:14.0Z',
+      id: '2f2f2591-3a76-41b1-abbd-b2ca35de0aee',
+      is_immutable: true,
+      kind: 'api_key',
+      name: 'Gordon Grady',
+      num_active_api_keys: -86129004,
+      num_active_users: -9355232,
+      scopes: [
+        {
+          kind: 'onboarding',
+        },
+        {
+          kind: 'cip_integration',
+        },
+        {
+          kind: 'manual_review',
+        },
+      ],
+    },
+    scrubbed_key: '014b7c56-e717-4fbe-902e-b1f2f2dfbe55',
+    status: 'enabled',
+  },
+  'dashboard.DataAttributeKind': 'document_data',
+  'dashboard.DataCollectedInfo': {
+    actor: {
+      email: 'laboris Duis nulla consectetur',
+      first_name: 'amet ipsum quis',
+      id: 'magna amet qui',
+      kind: 'organization',
+      last_name: 'laboris sint officia commodo ad',
+      member: 'dolor Lorem esse et sint',
+      name: 'cillum velit est tempor',
+    },
+    attributes: ['us_legal_status', 'business_tin', 'dob'],
+    is_prefill: false,
+    targets: ['document.passport_card.expires_at', 'document.passport.issuing_country', 'document.permit.nationality'],
+  },
+  'dashboard.DataIdentifier': 'business.website',
+  'dashboard.DataLifetimeSource': 'vendor',
+  'dashboard.DbActor': {
+    data: {
+      id: 'irure proident quis sint mollit',
+    },
+    kind: 'footprint',
+  },
+  'dashboard.DecisionStatus': 'fail',
+  'dashboard.DecryptionContext': 'vault_proxy',
   'dashboard.DeleteRequest': {
     delete_all: false,
     fields: [
@@ -1547,6 +1849,14 @@ export const persistedValues: Record<string, unknown> = {
       'document.drivers_license.selfie.mime_type',
     ],
   },
+  'dashboard.DeviceFraudRiskLevel': 'medium',
+  'dashboard.DeviceInsightField': 'ip_address',
+  'dashboard.DeviceInsightOperation': {
+    field: 'ip_address',
+    op: 'is_in',
+    value: 'do sit',
+  },
+  'dashboard.DeviceType': 'android',
   'dashboard.DocsTokenResponse': {
     token: 'e1852ee5-679d-4260-b92c-76e609c59641',
   },
@@ -1592,6 +1902,61 @@ export const persistedValues: Record<string, unknown> = {
       },
     ],
   },
+  'dashboard.DocumentAndCountryConfiguration': {
+    country_specific: {},
+    global: ['voter_identification', 'voter_identification', 'id_card'],
+  },
+  'dashboard.DocumentImageError': 'unknown_country_code',
+  'dashboard.DocumentKind': 'residence_document',
+  'dashboard.DocumentRequest': {
+    kind: 'identity',
+    rule_set_result_id: '16f2beba-02c5-4698-8678-78912401d918',
+  },
+  'dashboard.DocumentRequestConfig': {
+    data: {
+      collect_selfie: true,
+      document_types_and_countries: {
+        country_specific: {},
+        global: ['drivers_license', 'permit', 'passport_card'],
+      },
+      requires_human_review: true,
+    },
+    kind: 'identity',
+  },
+  'dashboard.DocumentRequestKind': 'custom',
+  'dashboard.DocumentReviewStatus': 'reviewed_by_human',
+  'dashboard.DocumentSide': 'back',
+  'dashboard.DocumentStatus': 'pending',
+  'dashboard.DocumentUpload': {
+    failure_reasons: ['wrong_one_sided_document', 'image_error', 'country_code_mismatch'],
+    identifier: '0c842a97-b03b-499e-9c21-6bd07c27294c',
+    is_extra_compressed: false,
+    side: 'f7aeb66c-b8eb-4f1d-a7b9-3020790ab0bc',
+    timestamp: '1924-02-01T21:31:25.0Z',
+    version: 83973737,
+  },
+  'dashboard.DocumentUploadSettings': 'prefer_upload',
+  'dashboard.DocumentUploadedTimelineEvent': {
+    config: {
+      data: {
+        collect_selfie: false,
+        description: 'nisi ex nostrud laborum',
+        document_types_and_countries: {
+          country_specific: {},
+          global: ['visa', 'passport', 'residence_document'],
+        },
+        identifier: 'document.voter_identification.classified_document_type',
+        name: 'consequat aliquip dolor',
+        requires_human_review: true,
+        upload_settings: 'prefer_upload',
+      },
+      kind: 'identity',
+    },
+    device_type: 'android',
+    document_type: 'passport_card',
+    status: 'pending',
+  },
+  'dashboard.DupeKind': 'dob_ssn4',
   'dashboard.Dupes': {
     other_tenant: {
       num_matches: 44068895,
@@ -1687,11 +2052,38 @@ export const persistedValues: Record<string, unknown> = {
       },
     ],
   },
+  'dashboard.EditRule': {
+    rule_expression: [
+      {
+        field: 'document.permit.issuing_state',
+        op: 'is_in',
+        value: 'Ut nulla cupidatat consequat',
+      },
+      {
+        field: 'dob_yob_matches',
+        op: 'not_eq',
+        value: false,
+      },
+      {
+        field: 'document_verified',
+        op: 'eq',
+        value: false,
+      },
+    ],
+    rule_id: 'c0d18417-f123-4236-b99d-eaa7d70f5cca',
+  },
   'dashboard.Empty': {},
   'dashboard.EnclaveHealthResponse': {
     decrypt_ms: -90080479,
     keypair_gen_ms: 88053880,
     success: false,
+  },
+  'dashboard.EnhancedAml': {
+    adverse_media: false,
+    enhanced_aml: true,
+    match_kind: 'fuzzy_medium',
+    ofac: false,
+    pep: true,
   },
   'dashboard.Entity': {
     attributes: ['card.*.expiration_month', 'investor_profile.declarations', 'id.us_tax_id'],
@@ -1825,6 +2217,70 @@ export const persistedValues: Record<string, unknown> = {
       },
     ],
   },
+  'dashboard.EntityAction': {
+    annotation: {
+      is_pinned: false,
+      note: 'ad',
+    },
+    fp_bid: 'occaecat',
+    kind: 'manual_decision',
+    status: 'pass',
+    trigger: {
+      data: {
+        business_configs: [
+          {
+            data: {
+              collect_selfie: false,
+              document_types_and_countries: {
+                global: ['residence_document', 'drivers_license', 'id_card'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              description: 'ipsum',
+              identifier: 'document.passport_card.nationality',
+              name: 'magna ipsum do aliqua',
+              requires_human_review: true,
+              upload_settings: 'capture_only_on_mobile',
+            },
+            kind: 'custom',
+          },
+          {
+            data: {
+              requires_human_review: false,
+            },
+            kind: 'proof_of_address',
+          },
+        ],
+        configs: [
+          {
+            data: {
+              requires_human_review: true,
+            },
+            kind: 'proof_of_ssn',
+          },
+          {
+            data: {
+              collect_selfie: false,
+              document_types_and_countries: {
+                global: ['voter_identification', 'drivers_license', 'drivers_license'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              requires_human_review: false,
+            },
+            kind: 'proof_of_address',
+          },
+        ],
+      },
+      kind: 'document',
+    },
+  },
   'dashboard.EntityActionResponse': 'Lorem deserunt occaecat',
   'dashboard.EntityActionsRequest': {
     actions: ['clear_review', 'clear_review', 'clear_review'],
@@ -1837,6 +2293,45 @@ export const persistedValues: Record<string, unknown> = {
     transforms: {},
     value: 'adipisicing',
   },
+  'dashboard.EntityOnboarding': {
+    id: '80bf4267-0417-43d8-b6df-0bfe02ba1416',
+    playbook_key: '2f91a0af-2c20-4a5f-abc0-896a71a7fe48',
+    rule_set_results: [
+      {
+        id: '1e0861c9-5ecf-4fbb-a11c-47ec0bca7464',
+        timestamp: '1905-01-14T17:39:19.0Z',
+      },
+      {
+        id: '1e0861c9-5ecf-4fbb-a11c-47ec0bca7464',
+        timestamp: '1928-04-03T18:21:21.0Z',
+      },
+      {
+        id: '1e0861c9-5ecf-4fbb-a11c-47ec0bca7464',
+        timestamp: '1912-12-20T17:20:50.0Z',
+      },
+    ],
+    seqno: 48149764,
+    status: 'pass',
+    timestamp: '1960-11-09T01:12:56.0Z',
+  },
+  'dashboard.EntityOnboardingRuleSetResult': {
+    id: '2b7591dc-b5ef-48a6-9b4e-bf69e0febc39',
+    timestamp: '1964-08-08T08:32:26.0Z',
+  },
+  'dashboard.EntityStatus': 'in_progress',
+  'dashboard.EntityWorkflow': {
+    created_at: '1898-10-30T13:28:25.0Z',
+    insight_event: {
+      city: 'Koelpinborough',
+      ip_address: '94438 Abshire Overpass Suite 326',
+      region: 'proident sint est',
+      timestamp: '1921-10-24T14:22:51.0Z',
+      user_agent: 'anim ullamco',
+    },
+    playbook_id: '7948ad1e-2ac9-4431-a7c8-03b065b113d5',
+    status: 'pass',
+  },
+  'dashboard.Equals': 'not_eq',
   'dashboard.EvaluateRuleRequest': {
     add: [
       {
@@ -1876,6 +2371,47 @@ export const persistedValues: Record<string, unknown> = {
     end_timestamp: '1937-11-01T03:51:47.0Z',
     start_timestamp: '1928-11-06T16:56:37.0Z',
   },
+  'dashboard.ExternalIntegrationCalled': {
+    external_id: 'ae2820dd-474c-4835-a2f1-2bc149ab08de',
+    integration: 'alpaca_cip',
+    successful: true,
+  },
+  'dashboard.ExternalIntegrationKind': 'alpaca_cip',
+  'dashboard.FieldValidation': {
+    match_level: 'no_match',
+    signals: [
+      {
+        description: 'qui veniam',
+        match_level: 'could_not_match',
+        note: 'exercitation cupidatat incididunt culpa',
+        reason_code: 'business_address_not_deliverable',
+        severity: 'medium',
+      },
+      {
+        description: 'consectetur tempor dolor',
+        match_level: 'no_match',
+        note: 'Lorem sed incididunt',
+        reason_code: 'address_input_is_not_standard_general_delivery',
+        severity: 'low',
+      },
+      {
+        description: 'ut magna eu',
+        match_level: 'could_not_match',
+        note: 'minim in occaecat',
+        reason_code: 'business_address_similar_match',
+        severity: 'medium',
+      },
+    ],
+  },
+  'dashboard.FieldValidationDetail': {
+    description: 'dolor id et fugiat aliqua',
+    match_level: 'exact',
+    note: 'nostrud quis incididunt',
+    reason_code: 'tin_does_not_match',
+    severity: 'medium',
+  },
+  'dashboard.FilterFunction': 'to_lowercase',
+  'dashboard.FootprintReasonCode': 'ssn_does_not_match_within1_digit',
   'dashboard.GetClientTokenResponse': {
     expires_at: '1939-08-05T22:20:03.0Z',
     tenant: {
@@ -1886,6 +2422,9 @@ export const persistedValues: Record<string, unknown> = {
       'document.voter_identification.full_name',
       'document.passport_card.issuing_country',
     ],
+  },
+  'dashboard.GetClientTokenResponseTenant': {
+    name: 'Douglas Bernier',
   },
   'dashboard.GetFieldValidationResponse': {
     address: {
@@ -2231,6 +2770,8 @@ export const persistedValues: Record<string, unknown> = {
     '<key>': 'ea9ccefd-19a7-43dc-8938-345ba7655f13',
     '<value>': false,
   },
+  'dashboard.IdDocKind': 'visa',
+  'dashboard.IdentifyScope': 'onboarding',
   'dashboard.InProgressOnboarding': {
     fp_id: 'dbfb5817-5e9a-4080-a701-447f3160cf1d',
     status: 'pending',
@@ -2239,6 +2780,306 @@ export const persistedValues: Record<string, unknown> = {
       website_url: 'https://bruised-making.us/',
     },
     timestamp: '1932-10-12T23:03:35.0Z',
+  },
+  'dashboard.InProgressOnboardingTenant': {
+    name: 'Barry Langosh',
+    website_url: 'https://expensive-premeditation.biz/',
+  },
+  'dashboard.IngressSettings': {
+    content_type: 'json',
+    rules: [
+      {
+        target: 'dolore sed adipisicing elit',
+        token: 'd5714ae2-ccce-484d-be94-1c945a2f0289',
+      },
+      {
+        target: 'culpa veniam',
+        token: 'd5714ae2-ccce-484d-be94-1c945a2f0289',
+      },
+      {
+        target: 'Lorem exercitation',
+        token: 'd5714ae2-ccce-484d-be94-1c945a2f0289',
+      },
+    ],
+  },
+  'dashboard.InsightAddress': {
+    address_line1: '8267 Ullrich Freeway Apt. 231',
+    address_line2: '57275 S Walnut Street Apt. 513',
+    city: 'West Ricky',
+    cmra: true,
+    deliverable: true,
+    latitude: 96439234.34536284,
+    longitude: -14323234.321364492,
+    postal_code: 'qui',
+    property_type: 'velit Lorem id',
+    sources: 'voluptate commodo',
+    state: 'Minnesota',
+    submitted: true,
+    verified: false,
+  },
+  'dashboard.InsightBusinessName': {
+    kind: 'consequat id pariatur',
+    name: 'Miss Colleen Sporer',
+    sources: 'cupidatat dolor',
+    sub_status: 'ullamco adipisicing dolore voluptate',
+    submitted: false,
+    verified: false,
+  },
+  'dashboard.InsightEvent': {
+    city: 'Ofeliahaven',
+    country: 'Norway',
+    ip_address: '230 Kameron Rest Apt. 668',
+    latitude: 36658476.785675466,
+    longitude: -33494178.62011119,
+    metro_code: 'sed',
+    postal_code: 'sunt',
+    region: 'aliquip ut aliqua',
+    region_name: 'Ms. Genevieve Nitzsche',
+    session_id: 'c19e4c0f-acf8-4c36-927e-d632d303251e',
+    time_zone: 'ad nostrud dolor id ex',
+    timestamp: '1951-04-06T12:41:13.0Z',
+    user_agent: 'reprehenderit ad est',
+  },
+  'dashboard.InsightPerson': {
+    association_verified: false,
+    name: 'Mr. Stewart Connelly',
+    role: 'sint dolore',
+    sources: 'nulla ex magna ad irure',
+    submitted: false,
+  },
+  'dashboard.InsightPhone': {
+    phone: '+19067559801',
+    submitted: true,
+    verified: true,
+  },
+  'dashboard.InsightRegistration': {
+    addresses: ['est commodo eiusmod id irure', 'pariatur in cillum qui dolore', 'non sit ipsum mollit Ut'],
+    entity_type: 'Duis dolore Excepteur',
+    file_number: 'elit pariatur voluptate',
+    jurisdiction: 'cupidatat nisi officia Duis',
+    name: 'Julius Bogisich',
+    officers: [
+      {
+        name: 'Mr. Jake Armstrong',
+        roles: 'tempor',
+      },
+    ],
+    registration_date: 'elit commodo esse ut',
+    source: 'Duis dolore aliqua ex',
+    state: 'Pennsylvania',
+    status: 'magna labore ut consequat Excepteur',
+    sub_status: 'magna',
+  },
+  'dashboard.InsightTin': {
+    tin: 'deserunt aliquip officia',
+    verified: false,
+  },
+  'dashboard.InsightWatchlist': {
+    business: [
+      {
+        hits: [
+          {
+            agency: 'irure nulla eu dolor',
+            agency_abbr: 'Ut in Duis ex elit',
+            agency_information_url: 'https://upright-bob.us/',
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['dolore', 'dolor culpa', 'ullamco esse anim ad'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+          {
+            entity_aliases: ['in nostrud anim', 'amet exercitation adipisicing aliqua', 'cupidatat sit'],
+          },
+          {
+            agency: 'labore cupidatat aute ut',
+            agency_abbr: 'pariatur esse elit id',
+            agency_information_url: 'https://upright-bob.us/',
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['minim', 'veniam sint ipsum elit ea', 'dolor voluptate ea'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+        ],
+        screened_entity_name: 'Esther Jacobs',
+      },
+      {
+        hits: [
+          {
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['mollit et sint aute', 'adipisicing Lorem', 'est proident ipsum laboris tempor'],
+            entity_name: 'Sara Moore Sr.',
+            list_name: 'Leo Rodriguez',
+          },
+          {
+            agency: 'irure ea',
+            agency_abbr: 'magna sint',
+            agency_information_url: 'https://upright-bob.us/',
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['Excepteur nulla dolore', 'tempor pariatur dolore sed Ut', 'id do'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+          {
+            agency: 'dolor ea',
+            agency_abbr: 'deserunt',
+            agency_information_url: 'https://upright-bob.us/',
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['Duis ex elit nulla', 'irure id et aliqua ad', 'ad'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+        ],
+        screened_entity_name: 'Esther Jacobs',
+      },
+      {
+        hits: [
+          {
+            agency: 'sunt quis magna officia',
+            agency_abbr: 'quis nulla incididunt',
+            agency_information_url: 'https://upright-bob.us/',
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['dolore dolore pariatur consectetur', 'est magna', 'officia tempor eu'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+          {
+            agency: 'ex velit reprehenderit exercitation aliquip',
+            agency_abbr: 'laboris mollit nisi deserunt',
+            agency_information_url: 'https://upright-bob.us/',
+            entity_aliases: ['elit Lorem occaecat minim aute', 'dolore sunt', 'proident eu'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+          {
+            agency_abbr: 'voluptate velit aliqua culpa',
+            agency_information_url: 'https://upright-bob.us/',
+            agency_list_url: 'https://amused-yin.com',
+            entity_aliases: ['ut laborum nostrud Excepteur', 'consequat dolor in culpa', 'ipsum'],
+            entity_name: 'Sara Moore Sr.',
+            list_country: 'Vietnam',
+            list_name: 'Leo Rodriguez',
+            url: 'https://questionable-atrium.name/',
+          },
+        ],
+        screened_entity_name: 'Esther Jacobs',
+      },
+    ],
+    hit_count: -90997451,
+    people: [
+      {
+        hits: [
+          {
+            agency: 'commodo voluptate',
+            agency_abbr: 'laboris dolore dolor eu minim',
+            agency_list_url: 'https://monstrous-midwife.net',
+            entity_aliases: ['magna quis enim Excepteur', 'in', 'fugiat id dolor dolor'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            url: 'https://mindless-ostrich.name/',
+          },
+          {
+            agency: 'eiusmod ipsum occaecat ad',
+            agency_abbr: 'laboris ea minim veniam nisi',
+            agency_information_url: 'https://musty-co-producer.biz',
+            agency_list_url: 'https://monstrous-midwife.net',
+            entity_aliases: ['dolor amet ut Ut', 'cupidatat velit', 'mollit'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+            url: 'https://mindless-ostrich.name/',
+          },
+          {
+            agency: 'consequat quis in incididunt occaecat',
+            agency_abbr: 'ut elit fugiat',
+            agency_information_url: 'https://musty-co-producer.biz',
+            entity_aliases: ['minim veniam Duis', 'in occaecat', 'est id in sit'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+          },
+        ],
+        screened_entity_name: 'Margaret Bradtke Sr.',
+      },
+      {
+        hits: [
+          {
+            agency: 'sed commodo',
+            agency_information_url: 'https://musty-co-producer.biz',
+            agency_list_url: 'https://monstrous-midwife.net',
+            entity_aliases: ['pariatur et est occaecat', 'minim esse', 'cillum'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+            url: 'https://mindless-ostrich.name/',
+          },
+          {
+            agency_abbr: 'adipisicing anim Duis',
+            entity_aliases: [
+              'dolore proident nulla sed cillum',
+              'esse Excepteur',
+              'minim do aliquip reprehenderit cillum',
+            ],
+            list_name: 'Domingo Bartoletti',
+          },
+          {
+            agency: 'ipsum',
+            agency_abbr: 'labore',
+            agency_information_url: 'https://musty-co-producer.biz',
+            agency_list_url: 'https://monstrous-midwife.net',
+            entity_aliases: ['officia culpa et elit', 'aliqua', 'qui ex elit'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+            url: 'https://mindless-ostrich.name/',
+          },
+        ],
+      },
+      {
+        hits: [
+          {
+            agency: 'adipisicing incididunt',
+            entity_aliases: ['sit ullamco', 'in est culpa', 'veniam'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+          },
+          {
+            entity_aliases: ['fugiat sint sunt', 'sint non aliqua cupidatat', 'minim voluptate'],
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+            url: 'https://mindless-ostrich.name/',
+          },
+          {
+            agency: 'in',
+            agency_abbr: 'ea',
+            agency_information_url: 'https://musty-co-producer.biz',
+            agency_list_url: 'https://monstrous-midwife.net',
+            entity_aliases: ['cillum id voluptate in veniam', 'incididunt', 'qui anim reprehenderit in'],
+            entity_name: 'Miss Ruth Bashirian I',
+            list_country: 'Dominica',
+            list_name: 'Domingo Bartoletti',
+            url: 'https://mindless-ostrich.name/',
+          },
+        ],
+        screened_entity_name: 'Margaret Bradtke Sr.',
+      },
+    ],
+  },
+  'dashboard.InsightWebsite': {
+    url: 'https://rigid-crest.org/',
+    verified: true,
   },
   'dashboard.IntegrityRequest': {
     fields: ['card.*.billing_address.zip', 'id.itin', 'document.passport.full_address'],
@@ -2273,6 +3114,23 @@ export const persistedValues: Record<string, unknown> = {
         unit_price_cents: 'ut amet aliqua proident',
       },
     ],
+  },
+  'dashboard.InvokeVaultProxyPermission': {
+    id: 'pariatur Excepteur nisi laboris',
+    kind: 'any',
+  },
+  'dashboard.IsIn': 'is_not_in',
+  'dashboard.Iso3166TwoDigitCountryCode': 'KN',
+  'dashboard.LabelAdded': {
+    kind: 'active',
+  },
+  'dashboard.LabelKind': 'offboard_other',
+  'dashboard.LineItem': {
+    description: 'consectetur enim eu mollit amet',
+    id: 'fddc64f0-efa8-4ca2-adc8-34b86a99f246',
+    notional_cents: 59191244,
+    quantity: -66996728,
+    unit_price_cents: 'enim dolore aliqua commodo',
   },
   'dashboard.LinkAuthRequest': {
     email_address: 'billie.gislason-huel11@gmail.com',
@@ -2442,6 +3300,161 @@ export const persistedValues: Record<string, unknown> = {
     data: 'laborum sint eiusmod',
     id: '251759f0-a087-45bb-80be-1398a86fbad6',
   },
+  'dashboard.ListEvent': {
+    detail: {
+      data: {
+        entries: ['aute esse ut dolor', 'enim', 'dolor'],
+        list_entry_creation_id: 'velit',
+        list_id: 'nisi minim',
+      },
+      kind: 'create_list_entry',
+    },
+    id: 'f959364a-1ec5-4954-9210-6c3c97ddbf64',
+    insight_event: {
+      city: 'Rollinfield',
+      country: 'Luxembourg',
+      ip_address: '122 Bode Ridges Suite 374',
+      latitude: -21898968.467671588,
+      longitude: -12904972.625014871,
+      metro_code: 'Ut nulla dolore',
+      postal_code: 'voluptate ad',
+      region_name: 'Wanda Hintz-Nitzsche',
+      session_id: 'e828fc89-13d9-4714-8b9a-77a2a8b9f239',
+      timestamp: '1965-05-29T21:12:22.0Z',
+      user_agent: 'sed dolore',
+    },
+    name: 'Maurice Boyer',
+    principal: {
+      email: 'sint',
+      id: 'proident esse sunt',
+      kind: 'organization',
+      member: 'dolore cupidatat ullamco Excepteur',
+      name: 'voluptate',
+    },
+    tenant_id: '211529b6-94ee-4557-9d9e-f0c2aa8bf87d',
+    timestamp: '1968-11-14T23:55:46.0Z',
+  },
+  'dashboard.ListEventDetail': {
+    data: {
+      entries: ['voluptate in proident', 'sint officia labore ut', 'cupidatat sit veniam'],
+      entry: 'exercitation dolore',
+      list_entry_creation_id: 'sunt amet',
+      list_entry_id: 'incididunt',
+      list_id: 'ex laborum in dolor',
+    },
+    kind: 'create_list_entry',
+  },
+  'dashboard.ListKind': 'email_domain',
+  'dashboard.ListPlaybookUsage': {
+    id: 'f566072c-6c84-455c-a01d-448c91eb650f',
+    key: 'c8f6bb8a-9531-4006-869b-a3995baebc68',
+    name: 'Lydia Greenfelder',
+    rules: [
+      {
+        action: 'step_up.identity',
+        created_at: '1918-02-02T21:24:10.0Z',
+        is_shadow: true,
+        kind: 'Person',
+        name: 'Bradley Ullrich',
+        rule_action: {
+          kind: 'pass_with_manual_review',
+        },
+        rule_expression: [
+          {
+            field: 'experian_score',
+            op: 'lt',
+            value: -83197343,
+          },
+          {
+            field: 'ip_address',
+            op: 'is_not_in',
+            value: 'voluptate enim nisi',
+          },
+          {
+            field: 'device_velocity',
+            op: 'eq',
+            value: false,
+          },
+        ],
+        rule_id: '711ff17d-911c-4de3-9480-3d54dc8ce4c1',
+      },
+      {
+        action: 'step_up.custom',
+        created_at: '1921-03-18T20:38:38.0Z',
+        is_shadow: true,
+        kind: 'Business',
+        name: 'Bradley Ullrich',
+        rule_action: {
+          kind: 'fail',
+        },
+        rule_expression: [
+          {
+            field: 'us_tax_id_is_itin',
+            op: 'not_eq',
+            value: true,
+          },
+          {
+            field: 'behavior_fraud_ring_risk',
+            op: 'not_eq',
+            value: true,
+          },
+          {
+            field: 'ip_address',
+            op: 'is_not_in',
+            value: 'sed minim ut id laborum',
+          },
+        ],
+        rule_id: '711ff17d-911c-4de3-9480-3d54dc8ce4c1',
+      },
+      {
+        action: 'step_up.identity_proof_of_ssn_proof_of_address',
+        created_at: '1926-08-01T18:13:26.0Z',
+        is_shadow: true,
+        kind: 'Any',
+        name: 'Bradley Ullrich',
+        rule_action: {
+          kind: 'fail',
+        },
+        rule_expression: [
+          {
+            field: 'phone_located_name_matches',
+            op: 'eq',
+            value: false,
+          },
+          {
+            field: 'experian_score',
+            op: 'lt',
+            value: -12511998,
+          },
+          {
+            field: 'document_selfie_matches',
+            op: 'not_eq',
+            value: false,
+          },
+        ],
+        rule_id: '711ff17d-911c-4de3-9480-3d54dc8ce4c1',
+      },
+    ],
+  },
+  'dashboard.LiteOrgMember': {
+    first_name: 'Bill',
+    id: '82330490-2b6d-45f6-9bf9-ea7bbeacfb97',
+    last_name: 'Nolan',
+  },
+  'dashboard.LiteUserAndOrg': {
+    org: 'in occaecat',
+    user: {
+      first_name: 'Annabell',
+      id: '734999e1-5243-4376-86af-07d1a58804d1',
+      last_name: 'Wiza',
+    },
+  },
+  'dashboard.LivenessAttributes': {
+    device: 'amet aute',
+    issuers: ['apple', 'cloudflare', 'google'],
+    metadata: {},
+    os: 'anim cillum',
+  },
   'dashboard.LivenessEvent': {
     attributes: {
       device: 'anim',
@@ -2465,6 +3478,21 @@ export const persistedValues: Record<string, unknown> = {
     },
     source: 'skipped',
   },
+  'dashboard.LivenessIssuer': 'google',
+  'dashboard.LivenessSource': 'apple_device_attestation',
+  'dashboard.ManualDecisionRequest': {
+    annotation: {
+      is_pinned: false,
+      note: 'et nisi cupidatat non elit',
+    },
+    kind: 'manual_decision',
+    status: 'fail',
+  },
+  'dashboard.ManualReview': {
+    kind: 'document_needs_review',
+  },
+  'dashboard.ManualReviewKind': 'document_needs_review',
+  'dashboard.MatchLevel': 'partial',
   'dashboard.MultiUpdateRuleRequest': {
     add: [
       {
@@ -2502,6 +3530,111 @@ export const persistedValues: Record<string, unknown> = {
       },
     ],
     expected_rule_set_version: 59357300,
+  },
+  'dashboard.NumberOperator': 'lt',
+  'dashboard.ObConfigurationKind': 'kyb',
+  'dashboard.Officer': {
+    name: 'Melissa Kertzmann',
+    roles: 'Excepteur in ex',
+  },
+  'dashboard.OffsetPaginatedDashboardSecretApiKey': {
+    data: [
+      {
+        created_at: '1955-03-02T07:07:50.0Z',
+        id: 'd22aa3b2-9f64-4a84-8813-d0a8fd52bf75',
+        is_live: false,
+        key: '0de1db3c-c4d0-46ac-a977-595b95344af1',
+        last_used_at: '1923-10-03T12:30:31.0Z',
+        name: 'Dr. Marie Harris',
+        role: {
+          created_at: '1931-07-15T18:55:13.0Z',
+          id: '42df1859-9e54-47c0-a981-4b73705b6eb5',
+          is_immutable: true,
+          kind: 'dashboard_user',
+          name: 'Pamela Murazik',
+          num_active_api_keys: -23449424,
+          num_active_users: 43770259,
+          scopes: [
+            {
+              kind: 'compliance_partner_admin',
+            },
+            {
+              kind: 'trigger_kyb',
+            },
+            {
+              kind: 'write_lists',
+            },
+          ],
+        },
+        scrubbed_key: 'ba7240fc-ef6b-43c2-b559-19e8a2a83597',
+        status: 'enabled',
+      },
+      {
+        created_at: '1926-05-10T22:22:37.0Z',
+        id: 'd22aa3b2-9f64-4a84-8813-d0a8fd52bf75',
+        is_live: false,
+        key: '0de1db3c-c4d0-46ac-a977-595b95344af1',
+        last_used_at: '1936-10-28T08:04:07.0Z',
+        name: 'Dr. Marie Harris',
+        role: {
+          created_at: '1912-09-25T12:32:24.0Z',
+          id: '42df1859-9e54-47c0-a981-4b73705b6eb5',
+          is_immutable: false,
+          kind: 'dashboard_user',
+          name: 'Pamela Murazik',
+          num_active_api_keys: -52416149,
+          num_active_users: -50534548,
+          scopes: [
+            {
+              kind: 'compliance_partner_manage_templates',
+            },
+            {
+              kind: 'compliance_partner_read',
+            },
+            {
+              kind: 'decrypt_custom',
+            },
+          ],
+        },
+        scrubbed_key: 'ba7240fc-ef6b-43c2-b559-19e8a2a83597',
+        status: 'enabled',
+      },
+      {
+        created_at: '1955-12-31T14:06:28.0Z',
+        id: 'd22aa3b2-9f64-4a84-8813-d0a8fd52bf75',
+        is_live: true,
+        key: '0de1db3c-c4d0-46ac-a977-595b95344af1',
+        last_used_at: '1923-12-02T01:02:01.0Z',
+        name: 'Dr. Marie Harris',
+        role: {
+          created_at: '1908-07-17T05:29:48.0Z',
+          id: '42df1859-9e54-47c0-a981-4b73705b6eb5',
+          is_immutable: false,
+          kind: 'api_key',
+          name: 'Pamela Murazik',
+          num_active_api_keys: -79075089,
+          num_active_users: 35517835,
+          scopes: [
+            {
+              data: 'nationality',
+              kind: 'decrypt',
+            },
+            {
+              kind: 'api_keys',
+            },
+            {
+              kind: 'cip_integration',
+            },
+          ],
+        },
+        scrubbed_key: 'ba7240fc-ef6b-43c2-b559-19e8a2a83597',
+        status: 'enabled',
+      },
+    ],
+    meta: {
+      count: 31270206,
+      next_page: -51254829,
+    },
   },
   'dashboard.OffsetPaginatedEntityOnboarding': {
     data: [
@@ -2871,73 +4004,9 @@ export const persistedValues: Record<string, unknown> = {
       next_page: -2794980,
     },
   },
-  'dashboard.OffsetPaginatedSecretApiKey': {
-    data: [
-      {
-        created_at: '1916-11-20T02:28:14.0Z',
-        id: '8bcf77ae-2eed-45b9-830b-214d75d73870',
-        is_live: false,
-        key: '24328626-66f3-4426-99e7-e0245038e8e4',
-        last_used_at: '1904-08-02T12:48:05.0Z',
-        name: 'Edwin Luettgen',
-        role: {
-          created_at: '1925-08-10T21:29:20.0Z',
-          id: 'd28c7661-376b-4df7-a95e-f4aac838eb74',
-          is_immutable: false,
-          kind: 'CompliancePartnerDashboardUser',
-          name: 'Alexander West',
-          num_active_api_keys: -12245898,
-          num_active_users: 73490987,
-          scopes: ['trigger_kyb', 'manage_compliance_doc_submission', 'compliance_partner_read'],
-        },
-        scrubbed_key: '74af22b5-b555-48c8-886c-76a19255751a',
-        status: 'disabled',
-      },
-      {
-        created_at: '1956-11-20T11:36:45.0Z',
-        id: '8bcf77ae-2eed-45b9-830b-214d75d73870',
-        is_live: false,
-        key: '24328626-66f3-4426-99e7-e0245038e8e4',
-        last_used_at: '1968-01-19T12:35:51.0Z',
-        name: 'Edwin Luettgen',
-        role: {
-          created_at: '1951-03-11T15:17:34.0Z',
-          id: 'd28c7661-376b-4df7-a95e-f4aac838eb74',
-          is_immutable: true,
-          kind: 'DashboardUser',
-          name: 'Alexander West',
-          num_active_api_keys: 67653516,
-          num_active_users: -68738226,
-          scopes: ['admin', 'write_entities', 'compliance_partner_admin'],
-        },
-        scrubbed_key: '74af22b5-b555-48c8-886c-76a19255751a',
-        status: 'enabled',
-      },
-      {
-        created_at: '1959-11-09T05:45:41.0Z',
-        id: '030018be-236c-4299-97a3-4ce29b6f625b',
-        is_live: true,
-        key: 'bc3ec628-27cf-4eab-9875-0413194ad1ec',
-        last_used_at: '1913-04-16T03:49:32.0Z',
-        name: 'Patti Stokes',
-        role: {
-          created_at: '1956-07-22T10:13:02.0Z',
-          id: '05dac96b-20a0-4413-acda-de8b77b66980',
-          is_immutable: false,
-          kind: 'DashboardUser',
-          name: 'Jorge Goyette',
-          num_active_api_keys: 45244568,
-          num_active_users: 97225312,
-          scopes: ['trigger_kyb', 'manual_review', 'auth_token'],
-        },
-        scrubbed_key: '3bad756a-2316-482e-a6c0-96650b078485',
-        status: 'disabled',
-      },
-    ],
-    meta: {
-      count: 39755126,
-      next_page: 55327404,
-    },
+  'dashboard.OmittedSecretCustomHeader': {
+    id: '07f81dc2-bdd4-4f00-9cd8-9be8699bd05d',
+    name: 'Dr. Opal Sauer',
   },
   'dashboard.OnboardingConfiguration': {
     allow_international_residents: false,
@@ -2984,6 +4053,11 @@ export const persistedValues: Record<string, unknown> = {
     skip_kyc: false,
     status: 'enabled',
     verification_checks: ['eiusmod ut', 'nisi Lorem', 'laboris ex'],
+  },
+  'dashboard.OnboardingStatus': 'fail',
+  'dashboard.OnboardingTimelineInfo': {
+    event: 'minim ullamco',
+    session_id: '2533ec97-fb7c-4f21-bda5-ad66256fee26',
   },
   'dashboard.OrgClientSecurityConfig': {
     allowed_origins: ['ut culpa ea eiusmod ipsum', 'pariatur cupidatat esse exercitation nostrud', 'veniam sed et'],
@@ -3056,6 +4130,13 @@ export const persistedValues: Record<string, unknown> = {
         last_login_at: '1939-09-28T16:58:01.0Z',
       },
     },
+  },
+  'dashboard.OrgMetrics': {
+    fail_onboardings: -9197217,
+    incomplete_onboardings: 45046546,
+    new_vaults: -66545990,
+    pass_onboardings: 79358041,
+    total_onboardings: -92878491,
   },
   'dashboard.OrgMetricsResponse': {
     business: {
@@ -3134,6 +4215,17 @@ export const persistedValues: Record<string, unknown> = {
     num_active_users: -13068454,
     scopes: ['write_lists', 'decrypt_document_and_selfie', 'compliance_partner_manage_reviews'],
   },
+  'dashboard.OrganizationRolebinding': {
+    last_login_at: '1890-10-22T02:26:23.0Z',
+  },
+  'dashboard.OtherTenantDupes': {
+    num_matches: 67566324,
+    num_tenants: -40282709,
+  },
+  'dashboard.ParentOrganization': {
+    id: 'c62e395a-fe1c-4aaa-bd93-62fe704ddea0',
+    name: 'Mario Hills',
+  },
   'dashboard.PartnerLoginRequest': {
     code: 'tempor laboris velit dolore sunt',
     request_org_id: '6bcb6744-5887-4859-bc65-78246aef9964',
@@ -3206,6 +4298,12 @@ export const persistedValues: Record<string, unknown> = {
     status: 'enabled',
     url: 'https://stunning-nudge.net/',
   },
+  'dashboard.PhoneLookupAttributes': 'line_type_intelligence',
+  'dashboard.PlainCustomHeader': {
+    name: 'Jonathon Stehr',
+    value: 'reprehenderit occaecat',
+  },
+  'dashboard.PreviewApi': 'auth_events_list',
   'dashboard.PrivateBusinessOwner': {
     fp_id: '3d6fd0a4-fa08-4431-938e-d4cc2858c04f',
     id: '6be30853-4437-4976-9e4f-822b903fe66e',
@@ -3292,6 +4390,11 @@ export const persistedValues: Record<string, unknown> = {
     status: 'disabled',
     url: 'https://failing-gymnast.us',
   },
+  'dashboard.ProxyIngressContentType': 'json',
+  'dashboard.ProxyIngressRule': {
+    target: 'id voluptate nisi consequat',
+    token: 'd93bc819-bdac-4f7d-89e6-daa48dbbaa78',
+  },
   'dashboard.RawUserDataRequest': {
     '<key>': '7dcf5610-3dd8-4323-9e34-ffd22c2a00cc',
     '<value>': {},
@@ -3300,6 +4403,7 @@ export const persistedValues: Record<string, unknown> = {
     description: 'dolore',
     name: 'Dan Kuvalis',
   },
+  'dashboard.RiskScore': 'experian_score',
   'dashboard.RiskSignal': {
     description: 'laborum in',
     group: 'native_device',
@@ -3323,6 +4427,7 @@ export const persistedValues: Record<string, unknown> = {
     severity: 'high',
     timestamp: '1966-06-16T07:25:32.0Z',
   },
+  'dashboard.RiskSignalGroupKind': 'web_device',
   'dashboard.Rule': {
     action: 'fail',
     created_at: '1955-02-28T12:17:26.0Z',
@@ -3332,6 +4437,43 @@ export const persistedValues: Record<string, unknown> = {
     rule_action: 'amet proident',
     rule_expression: ['esse tempor et', 'velit sit Ut ut', 'dolore exercitation laborum ullamco'],
     rule_id: '9c3d06fb-a530-400e-aa2a-bb7d7d854280',
+  },
+  'dashboard.RuleAction': 'pass_with_manual_review',
+  'dashboard.RuleActionConfig': {
+    config: [
+      {
+        data: {
+          requires_human_review: false,
+        },
+        kind: 'proof_of_ssn',
+      },
+      {
+        data: {
+          requires_human_review: true,
+        },
+        kind: 'proof_of_address',
+      },
+      {
+        data: {
+          collect_selfie: true,
+          document_types_and_countries: {
+            global: ['residence_document', 'voter_identification', 'passport'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+    kind: 'step_up',
+  },
+  'dashboard.RuleActionMigration': {
+    config: {},
+    kind: 'pass_with_manual_review',
+  },
+  'dashboard.RuleEvalResult': {
+    backtest_action_triggered: 'step_up.identity_proof_of_ssn',
+    current_status: 'fail',
+    fp_id: '6a47fabd-ab7b-4a6f-a6a2-ee0b31f5093f',
+    historical_action_triggered: 'manual_review',
   },
   'dashboard.RuleEvalResults': {
     results: [
@@ -3360,6 +4502,69 @@ export const persistedValues: Record<string, unknown> = {
       count_by_historical_and_backtest_action_triggered: {},
       total: -20716526,
     },
+  },
+  'dashboard.RuleEvalStats': {
+    count_by_backtest_action_triggered: {},
+    count_by_historical_action_triggered: {},
+    count_by_historical_and_backtest_action_triggered: {},
+    total: 66979265,
+  },
+  'dashboard.RuleExpression': [
+    {
+      field: 'ip_address',
+      op: 'is_not_in',
+      value: 'in dolore occaecat',
+    },
+    {
+      field: 'experian_score',
+      op: 'gt',
+      value: -83904051,
+    },
+    {
+      field: 'address_does_not_match',
+      op: 'not_eq',
+      value: false,
+    },
+  ],
+  'dashboard.RuleExpressionCondition': {
+    field: 'ip_alert_high_risk_tor',
+    op: 'eq',
+    value: true,
+  },
+  'dashboard.RuleInstanceKind': 'Person',
+  'dashboard.RuleResult': {
+    result: true,
+    rule: {
+      action: 'fail',
+      created_at: '1964-12-22T21:58:11.0Z',
+      is_shadow: false,
+      kind: 'Any',
+      name: 'Dr. Rex Ritchie',
+      rule_action: {
+        kind: 'pass_with_manual_review',
+      },
+      rule_expression: [
+        {
+          field: 'curp_not_found',
+          op: 'not_eq',
+          value: true,
+        },
+        {
+          field: 'ip_address',
+          op: 'is_not_in',
+          value: 'aute ut aliqua ad',
+        },
+        {
+          field: 'document.passport.front.image',
+          op: 'is_not_in',
+          value: 'enim',
+        },
+      ],
+      rule_id: '0e8d6606-6c23-4de2-a495-47ea301a18db',
+    },
+  },
+  'dashboard.RuleSet': {
+    version: 42538418,
   },
   'dashboard.RuleSetResult': {
     action_triggered: 'step_up.identity_proof_of_ssn_proof_of_address',
@@ -3408,6 +4613,39 @@ export const persistedValues: Record<string, unknown> = {
       },
     ],
   },
+  'dashboard.SameTenantDupe': {
+    data: [
+      {
+        data_kind: 'vault_data',
+        identifier: '1d9fc3fe-6720-4733-8331-e8f50a5d7397',
+        is_decryptable: true,
+        source: 'hosted',
+        transforms: {},
+        value: 'eu nostrud sit dolore sint',
+      },
+      {
+        data_kind: 'vault_data',
+        identifier: '1d9fc3fe-6720-4733-8331-e8f50a5d7397',
+        is_decryptable: true,
+        source: 'bootstrap',
+        transforms: {},
+        value: 'non in',
+      },
+      {
+        data_kind: 'vault_data',
+        identifier: '1d9fc3fe-6720-4733-8331-e8f50a5d7397',
+        is_decryptable: true,
+        source: 'tenant',
+        transforms: {},
+        value: 'Excepteur sint velit irure',
+      },
+    ],
+    dupe_kinds: ['name_ssn4', 'ssn9', 'dob_ssn4'],
+    fp_id: '5760e7ff-a46e-40c5-84b3-695bc38eb0f0',
+    start_timestamp: '1953-01-30T08:16:41.0Z',
+    status: 'none',
+  },
+  'dashboard.ScoreBand': 'high',
   'dashboard.SecretApiKey': {
     created_at: '1919-06-01T18:59:42.0Z',
     id: 'a63dee7d-43d7-4482-ab12-3316ceee73b8',
@@ -3427,6 +4665,10 @@ export const persistedValues: Record<string, unknown> = {
     },
     scrubbed_key: 'eafaafd3-ad07-48c2-8b4d-e17de97cce7f',
     status: 'enabled',
+  },
+  'dashboard.SecretCustomHeader': {
+    name: 'Preston Fisher',
+    value: 'nulla',
   },
   'dashboard.SentilinkDetail': {
     id_theft: {
@@ -3478,9 +4720,42 @@ export const persistedValues: Record<string, unknown> = {
       score_band: 'high',
     },
   },
+  'dashboard.SentilinkReasonCode': {
+    code: 'nisi non',
+    direction: 'veniam Ut',
+    explanation: 'Excepteur anim deserunt',
+    rank: -20212288,
+  },
+  'dashboard.SentilinkScoreDetail': {
+    reason_codes: [
+      {
+        code: 'irure est ex enim deserunt',
+        direction: 'sed labore amet',
+        explanation: 'officia veniam sed',
+        rank: 28009836,
+      },
+      {
+        code: 'ea sint proident Ut anim',
+        direction: 'eiusmod non amet veniam',
+        explanation: 'minim Excepteur amet exercitation mollit',
+        rank: -6334027,
+      },
+      {
+        code: 'in quis',
+        direction: 'quis sunt aliqua proident et',
+        explanation: 'aute',
+        rank: 49086156,
+      },
+    ],
+    score: -3695911,
+    score_band: 'low',
+  },
+  'dashboard.SignalScope': 'ssn',
+  'dashboard.SignalSeverity': 'high',
   'dashboard.SubmitExternalUrlRequest': {
     url: 'https://tough-strategy.org/',
   },
+  'dashboard.TaskStatus': 'eu veniam irure sunt enim',
   'dashboard.TenantAndroidAppMeta': {
     apk_cert_sha256s: ['nulla', 'enim ipsum', 'nisi aliqua'],
     id: '9a8ecf24-2eda-46e6-940f-a7a195220f0c',
@@ -3489,6 +4764,7 @@ export const persistedValues: Record<string, unknown> = {
     package_names: ['labore pariatur anim sint', 'deserunt magna labore in ullamco', 'aute'],
     tenant_id: '314e5435-c1f0-4b4a-b85b-e4fe7614cacd',
   },
+  'dashboard.TenantFrequentNoteKind': 'manual_review',
   'dashboard.TenantIosAppMeta': {
     app_bundle_ids: ['sed ex', 'adipisicing pariatur mollit nulla', 'velit aute fugiat officia'],
     device_check_key_id: 'c0996dd7-69d5-40d4-9b2b-fede001c2a3b',
@@ -3497,10 +4773,132 @@ export const persistedValues: Record<string, unknown> = {
     team_id: '21c13167-73f7-4c52-8492-2d4b3517e4ff',
     tenant_id: 'fc0e6362-e064-409c-89ae-63642524fbee',
   },
+  'dashboard.TenantKind': 'Tenant',
   'dashboard.TenantLoginRequest': {
     code: 'ut consectetur in Duis',
     request_org_id: '6cb9989a-2f3b-4238-b83d-07cd6c7f7ad0',
   },
+  'dashboard.TenantRoleKindDiscriminant': 'dashboard_user',
+  'dashboard.TenantScope': {
+    data: 'dob',
+    kind: 'cip_integration',
+  },
+  'dashboard.TerminalDecisionStatus': 'fail',
+  'dashboard.TimelineOnboardingDecision': {
+    cleared_manual_reviews: [
+      {
+        kind: 'document_needs_review',
+      },
+      {
+        kind: 'document_needs_review',
+      },
+      {
+        kind: 'rule_triggered',
+      },
+    ],
+    id: 'e51a54f7-0c4f-40b1-9075-6c2c1c2dbb03',
+    ob_configuration: {
+      id: '5058e2ff-e77e-4cb3-9cff-76924fe6e2a9',
+      must_collect_data: ['business_kyced_beneficial_owners', 'ssn9', 'dob'],
+      name: 'Lola Schuster',
+    },
+    ran_rules_in_sandbox: true,
+    rule_set_result_id: 'f51f2d32-d6b1-4a0a-b4cb-463fae113f7a',
+    source: {
+      email: 'Duis in',
+      id: 'dolore qui Ut consectetur in',
+      kind: 'organization',
+      member: 'do irure',
+      name: 'do laboris magna ipsum mollit',
+    },
+    status: 'pass',
+    timestamp: '1941-05-11T19:19:34.0Z',
+    workflow_kind: 'alpaca_kyc',
+  },
+  'dashboard.TimelinePlaybook': {
+    id: 'de761d47-ec13-4e2a-92d7-eba4e75f0c07',
+    must_collect_data: ['nationality', 'ssn9', 'us_tax_id'],
+    name: 'Miss Elisa Reinger',
+  },
+  'dashboard.TokenOperationKind': 'update_auth_methods',
+  'dashboard.TriggerRequest': {
+    fp_bid: '193e91c7-b00e-4bb9-8252-4433c33494d1',
+    kind: 'trigger',
+    note: 'quis anim proident',
+    trigger: {
+      data: {
+        business_configs: [
+          {
+            data: {
+              identifier: 'document.passport_card.back.mime_type',
+              name: 'dolore cillum anim dolor',
+              requires_human_review: false,
+              upload_settings: 'prefer_capture',
+            },
+            kind: 'custom',
+          },
+          {
+            data: {
+              description: 'officia tempor do et elit',
+              identifier: 'document.id_card.front.mime_type',
+              name: 'laborum dolore labore',
+              requires_human_review: false,
+              upload_settings: 'capture_only_on_mobile',
+            },
+            kind: 'custom',
+          },
+          {
+            data: {
+              requires_human_review: true,
+            },
+            kind: 'proof_of_address',
+          },
+        ],
+        configs: [
+          {
+            data: {
+              requires_human_review: true,
+            },
+            kind: 'proof_of_ssn',
+          },
+          {
+            data: {
+              description: 'in sunt exercitation est aliquip',
+              identifier: 'document.passport_card.issuing_country',
+              name: 'sint aliquip consequat',
+              requires_human_review: false,
+              upload_settings: 'prefer_capture',
+            },
+            kind: 'custom',
+          },
+          {
+            data: {
+              requires_human_review: true,
+            },
+            kind: 'proof_of_ssn',
+          },
+        ],
+      },
+      kind: 'document',
+    },
+  },
+  'dashboard.UnvalidatedRuleExpression': [
+    {
+      field: 'ip_address',
+      op: 'is_not_in',
+      value: 'aliqua sed',
+    },
+    {
+      field: 'incode_selfie_match_score',
+      op: 'gt',
+      value: 18484721,
+    },
+    {
+      field: 'id.drivers_license_number',
+      op: 'is_in',
+      value: 'in ea veniam',
+    },
+  ],
   'dashboard.UpdateAnnotationRequest': {
     is_pinned: false,
   },
@@ -3574,12 +4972,14 @@ export const persistedValues: Record<string, unknown> = {
     first_name: 'Barrett',
     last_name: 'Orn',
   },
+  'dashboard.UploadSource': 'Desktop',
   'dashboard.UserAiSummary': {
     conclusion: 'occaecat',
     detailed_summary: 'consectetur ut est',
     high_level_summary: 'cillum laboris',
     risk_signal_summary: 'pariatur reprehenderit cupidatat laborum',
   },
+  'dashboard.UserDataIdentifier': 'document.id_card.full_address',
   'dashboard.UserDecryptRequest': {
     fields: ['document.id_card.nationality', 'document.passport_card.clave_de_elector', 'id.email'],
     reason: 'ipsum exercitation',
@@ -3601,6 +5001,8 @@ export const persistedValues: Record<string, unknown> = {
     unit: 'DurationMs',
     value: 'amet enim proident dolor non',
   },
+  'dashboard.UserInsightScope': 'workflow',
+  'dashboard.UserInsightUnit': 'boolean',
   'dashboard.UserLabel': {
     created_at: '1949-04-29T15:52:03.0Z',
     kind: 'active',
@@ -3615,6 +5017,92 @@ export const persistedValues: Record<string, unknown> = {
     seqno: 2498105,
     timestamp: '1897-04-05T05:06:50.0Z',
   },
+  'dashboard.UserTimelineEvent': {
+    data: {
+      actor: {
+        id: 'in',
+        kind: 'user',
+      },
+      attributes: ['business_tin', 'us_tax_id', 'ssn4'],
+      config: {
+        data: {
+          business_configs: [
+            {
+              data: {
+                collect_selfie: true,
+                document_types_and_countries: {
+                  global: ['passport', 'visa', 'visa'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                requires_human_review: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+            {
+              data: {
+                requires_human_review: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+          ],
+          configs: [
+            {
+              data: {
+                description: 'adipisicing ullamco in',
+                identifier: 'business.address_line1',
+                name: 'culpa',
+                requires_human_review: false,
+                upload_settings: 'capture_only_on_mobile',
+              },
+              kind: 'custom',
+            },
+            {
+              data: {
+                collect_selfie: true,
+                document_types_and_countries: {
+                  global: ['residence_document', 'drivers_license', 'visa'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                requires_human_review: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+          ],
+        },
+        kind: 'document',
+      },
+      event: 'ad laborum et',
+      external_id: 'qui Excepteur Ut',
+      fp_id: 'fugiat ullamco',
+      integration: 'alpaca_cip',
+      is_prefill: true,
+      note: 'cillum do veniam reprehenderit',
+      request_is_active: true,
+      session_id: 'minim in culpa in sit',
+      successful: false,
+      targets: [
+        'document.id_card.issuing_country',
+        'document.drivers_license.front.image',
+        'document.voter_identification.back.image',
+      ],
+    },
+    kind: 'data_collected',
+  },
+  'dashboard.VaultCreated': {
+    actor: {
+      email: 'consequat',
+      kind: 'firm_employee',
+      member: 'dolore nostrud',
+    },
+  },
   'dashboard.VaultDrAwsPreEnrollResponse': {
     external_id: 'eba9d45c-cd75-41e6-84b9-5585d5ee2e6a',
   },
@@ -3626,6 +5114,16 @@ export const persistedValues: Record<string, unknown> = {
     s3_bucket_name: 'Dexter Casper',
   },
   'dashboard.VaultDrEnrollResponse': {},
+  'dashboard.VaultDrEnrolledStatus': {
+    aws_account_id: 'c50e96e2-3252-41fa-ab3b-538ee4a018aa',
+    aws_role_name: 'Erika Grimes',
+    backup_lag_seconds: -92001142,
+    bucket_path_namespace: 'Holly West',
+    enrolled_at: '1968-04-19T06:01:27.0Z',
+    latest_backup_record_timestamp: '1892-09-26T09:59:26.0Z',
+    org_public_keys: ['minim ut in sint reprehenderit', 'aute in adipisicing', 'aliqua sunt ad dolor eiusmod'],
+    s3_bucket_name: 'Mr. Jack Brown III',
+  },
   'dashboard.VaultDrRevealWrappedRecordKeysRequest': {
     record_paths: ['culpa in ut ad', 'minim deserunt', 'in enim'],
   },
@@ -3647,16 +5145,228 @@ export const persistedValues: Record<string, unknown> = {
     org_id: '5ad2f5aa-e5e5-4419-8884-7ad44d2edf3e',
     org_name: 'Paulette Davis',
   },
+  'dashboard.VaultKind': 'person',
+  'dashboard.VaultOperation': {
+    field: 'document.passport_card.samba_activity_history_response',
+    op: 'not_eq',
+    value: 'Excepteur velit tempor aliqua consectetur',
+  },
+  'dashboard.VerificationCheck': {
+    data: {
+      adverse_media: true,
+      adverse_media_lists: ['sexual_crime', 'general_serious', 'terrorism'],
+      attributes: ['line_type_intelligence', 'line_type_intelligence', 'line_type_intelligence'],
+      continuous_monitoring: false,
+      match_kind: 'exact_name',
+      ofac: true,
+      pep: true,
+    },
+    kind: 'sentilink',
+  },
+  'dashboard.WatchlistCheck': {
+    id: '41e025a9-ef3b-45db-a557-4194ed82efe7',
+    reason_codes: ['document_photo_is_not_screen_capture', 'behavior_fraud_ring_risk', 'address_located_is_po_box'],
+    status: 'pending',
+  },
+  'dashboard.WatchlistCheckStatusKind': 'pass',
+  'dashboard.WatchlistEntry': {
+    hits: [
+      {
+        agency_list_url: 'https://pitiful-deed.org/',
+        entity_aliases: ['aliquip', 'laborum elit esse nulla reprehenderit', 'aliqua'],
+      },
+      {
+        entity_aliases: ['culpa velit officia', 'elit sunt sed pariatur', 'esse irure ex do'],
+        entity_name: 'Sharon Feeney',
+        list_name: 'Rex Batz',
+      },
+      {
+        agency_abbr: 'consequat do deserunt',
+        agency_information_url: 'https://bitter-exploration.net/',
+        entity_aliases: ['sit pariatur sed nostrud non', 'exercitation anim', 'mollit'],
+        entity_name: 'Sharon Feeney',
+        url: 'https://creamy-numeric.name/',
+      },
+    ],
+    screened_entity_name: 'Corey Heathcote',
+  },
+  'dashboard.WatchlistHit': {
+    agency: 'laborum est minim irure',
+    agency_abbr: 'non incididunt voluptate tempor sit',
+    agency_information_url: 'https://graceful-behest.name',
+    agency_list_url: 'https://crazy-hunger.com/',
+    entity_aliases: ['ullamco deserunt ut do', 'aliqua aliquip enim sed exercitation', 'non ullamco ad'],
+    entity_name: 'Christie Champlin III',
+    list_country: 'Marshall Islands',
+    list_name: 'Tom West',
+    url: 'https://black-bump.info',
+  },
   'dashboard.WebhookPortalResponse': {
     app_id: '3372fc76-a739-4520-9689-3b5332c0c46e',
     token: '66cf6c1e-79b6-4c64-97af-595e0856ccbd',
     url: 'https://athletic-pressure.com/',
+  },
+  'dashboard.WorkflowKind': 'document',
+  'dashboard.WorkflowRequestConfig': {
+    data: {
+      business_configs: [
+        {
+          data: {
+            description: 'nisi',
+            identifier: 'business.website',
+            name: 'mollit anim sunt proident',
+            requires_human_review: true,
+            upload_settings: 'prefer_upload',
+          },
+          kind: 'custom',
+        },
+        {
+          data: {
+            collect_selfie: true,
+            document_types_and_countries: {
+              global: ['residence_document', 'drivers_license', 'visa'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            requires_human_review: false,
+          },
+          kind: 'proof_of_address',
+        },
+      ],
+      configs: [
+        {
+          data: {
+            requires_human_review: false,
+          },
+          kind: 'proof_of_ssn',
+        },
+        {
+          data: {
+            collect_selfie: true,
+            document_types_and_countries: {
+              global: ['residence_document', 'voter_identification', 'permit'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            requires_human_review: true,
+          },
+          kind: 'proof_of_ssn',
+        },
+      ],
+    },
+    kind: 'document',
+  },
+  'dashboard.WorkflowSource': 'unknown',
+  'dashboard.WorkflowStarted': {
+    kind: 'playbook',
+    playbook: {
+      id: 'b8f91f2d-6ff6-4795-a31c-97f5f24a4e5a',
+      must_collect_data: ['us_legal_status', 'dob', 'dob'],
+      name: 'Roberta Jaskolski',
+    },
+  },
+  'dashboard.WorkflowStartedEventKind': 'playbook',
+  'dashboard.WorkflowTriggered': {
+    actor: {
+      email: 'nisi reprehenderit',
+      first_name: 'in',
+      id: 'veniam consectetur adipisicing qui',
+      kind: 'organization',
+      last_name: 'enim Ut incididunt in voluptate',
+      member: 'veniam tempor ea',
+      name: 'pariatur cupidatat nostrud sit',
+    },
+    config: {
+      data: {
+        business_configs: [
+          {
+            data: {
+              description: 'eu ea reprehenderit',
+              identifier: 'document.residence_document.back.mime_type',
+              name: 'Excepteur in',
+              requires_human_review: true,
+              upload_settings: 'prefer_upload',
+            },
+            kind: 'custom',
+          },
+          {
+            data: {
+              collect_selfie: false,
+              document_types_and_countries: {
+                global: ['passport', 'voter_identification', 'passport_card'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              requires_human_review: false,
+            },
+            kind: 'proof_of_ssn',
+          },
+        ],
+        configs: [
+          {
+            data: {
+              collect_selfie: true,
+              document_types_and_countries: {
+                global: ['drivers_license', 'passport', 'passport_card'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collect_selfie: false,
+              document_types_and_countries: {
+                global: ['permit', 'passport', 'drivers_license'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collect_selfie: false,
+              document_types_and_countries: {
+                global: ['voter_identification', 'id_card', 'residence_document'],
+              },
+            },
+            kind: 'identity',
+          },
+        ],
+        playbook_id: 'laborum occaecat aute',
+        recollect_attributes: [
+          {
+            document: 'voluptate',
+          },
+          'business_website',
+          'card',
+        ],
+        reuse_existing_bo_kyc: false,
+      },
+      kind: 'document',
+    },
+    fp_id: '6c4dc0bf-e378-47d8-93ce-becf73a97b31',
+    note: 'sit eiusmod dolore',
+    request_is_active: true,
+  },
+  'hosted.ActionKind': 'add_primary',
+  'hosted.ApiKeyStatus': 'disabled',
+  'hosted.ApiOnboardingRequirement': {
+    is_met: false,
   },
   'hosted.AuthMethod': {
     can_update: true,
     is_verified: true,
     kind: 'phone',
   },
+  'hosted.AuthMethodKind': 'email',
   'hosted.AuthRequirementsResponse': {
     all_requirements: [
       {
@@ -3669,6 +5379,20 @@ export const persistedValues: Record<string, unknown> = {
         is_met: false,
       },
     ],
+  },
+  'hosted.AuthV1Options': {
+    show_logo: true,
+  },
+  'hosted.AuthV1SdkArgs': {
+    l10n: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      show_logo: true,
+    },
+    public_key: '1f0b9966-a39d-499c-be1c-62994dbe3399',
+    user_data: {},
   },
   'hosted.AuthorizedOrg': {
     can_access_data: ['UsTaxId', 'Ssn4', 'Name'],
@@ -3683,11 +5407,14 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.BusinessOnboardingResponse': {
     auth_token: 'f9e444cd-c04c-45cd-95bf-b84b1e4820fc',
   },
+  'hosted.ChallengeKind': 'sms',
   'hosted.CheckSessionResponse': 'unknown',
+  'hosted.CollectedDataOption': 'business_tin',
   'hosted.ConsentRequest': {
     consent_language_text: 'en',
     ml_consent: false,
   },
+  'hosted.CountrySpecificDocumentMapping': {},
   'hosted.CreateDeviceAttestationRequest': {
     attestation: 'non dolore ipsum',
     state: 'Alaska',
@@ -3717,6 +5444,13 @@ export const persistedValues: Record<string, unknown> = {
     expires_at: '1906-04-18T21:28:24.0Z',
     token: 'aba985d3-464c-4cb6-993b-b18dfee0ecc8',
   },
+  'hosted.CustomDocumentConfig': {
+    description: 'ea laborum',
+    identifier: 'ff917e18-3518-48d0-a5c1-6fdcbb86c757',
+    name: 'Charlie Stracke',
+    requires_human_review: true,
+    upload_settings: 'prefer_capture',
+  },
   'hosted.D2pGenerateRequest': {
     meta: {
       l10n: {
@@ -3733,6 +5467,7 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.D2pGenerateResponse': {
     auth_token: 'ba6fb7bf-f3e2-4ce1-aafe-21e6d01a5093',
   },
+  'hosted.D2pSessionStatus': 'failed',
   'hosted.D2pSmsRequest': {
     url: 'https://querulous-other.biz',
   },
@@ -3756,23 +5491,73 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.D2pUpdateStatusRequest': {
     status: 'in_progress',
   },
+  'hosted.DataIdentifier': 'document.voter_identification.samba_activity_history_response',
+  'hosted.DeleteHostedBusinessOwnerRequest': {
+    op: 'delete',
+    uuid: '7587997d-dac1-4f16-a6ff-940cf3c04156',
+  },
   'hosted.DeviceAttestationChallengeResponse': {
     attestation_challenge: 'cillum mollit elit adipisicing ea',
     state: 'Texas',
+  },
+  'hosted.DeviceAttestationType': 'ios',
+  'hosted.DeviceType': 'ios',
+  'hosted.DocumentAndCountryConfiguration': {
+    country_specific: {},
+    global: ['drivers_license', 'permit', 'id_card'],
+  },
+  'hosted.DocumentFixtureResult': 'fail',
+  'hosted.DocumentImageError': 'drivers_license_permit_not_allowed',
+  'hosted.DocumentKind': 'id_card',
+  'hosted.DocumentRequestConfig': {
+    data: {
+      collect_selfie: false,
+      description: 'velit veniam quis',
+      document_types_and_countries: {
+        country_specific: {},
+        global: ['drivers_license', 'residence_document', 'permit'],
+      },
+      identifier: 'business.state',
+      name: 'reprehenderit exercitation sunt Excepteur aliqua',
+      requires_human_review: true,
+      upload_settings: 'prefer_upload',
+    },
+    kind: 'identity',
   },
   'hosted.DocumentResponse': {
     errors: ['image_error', 'selfie_image_orientation_incorrect', 'selfie_image_orientation_incorrect'],
     is_retry_limit_exceeded: false,
     next_side_to_collect: 'fa8c31f4-34b3-4e1e-bdb4-1a1ba20f8728',
   },
+  'hosted.DocumentSide': 'back',
+  'hosted.DocumentUploadSettings': 'prefer_capture',
   'hosted.EmailVerifyRequest': {
     data: 'officia Duis voluptate irure',
   },
   'hosted.Empty': {},
+  'hosted.FilterFunction': 'prefix(<n>)',
   'hosted.FingerprintVisitRequest': {
     path: 'amet ut qui nisi et',
     request_id: 'dbc865d5-d99c-4a26-88c2-ad2001705ee0',
     visitor_id: '75d72fca-c326-4fc1-ba3e-5b7f82d08e81',
+  },
+  'hosted.FormV1Options': {
+    hide_buttons: false,
+    hide_cancel_button: false,
+    hide_footprint_logo: false,
+  },
+  'hosted.FormV1SdkArgs': {
+    auth_token: 'f31bf795-9214-4a59-b7eb-fd3fbbcd4114',
+    l10n: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      hide_buttons: false,
+      hide_cancel_button: true,
+      hide_footprint_logo: true,
+    },
+    title: 'dolor nisi irure',
   },
   'hosted.GetDeviceAttestationChallengeRequest': {
     android_package_name: 'Greg Greenholt',
@@ -3785,6 +5570,17 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.GetUserTokenResponse': {
     expires_at: '1928-08-07T11:24:54.0Z',
     scopes: ['explicit_auth', 'sensitive_profile', 'sign_up'],
+  },
+  'hosted.HandoffMetadata': {
+    l10n: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    opener: 'enim voluptate',
+    redirect_url: 'https://delicious-turret.org/',
+    sandbox_id_doc_outcome: 'd1b3fb93-3f5c-44df-a387-2c7cdb2c5455',
+    session_id: '9a68e627-6c03-4754-b319-06f1957bfb02',
+    style_params: 'sunt incididunt',
   },
   'hosted.HostedBusiness': {
     created_at: '1958-08-13T21:31:54.0Z',
@@ -3837,6 +5633,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.drivers_license.issuing_state': 'Washington',
       'document.drivers_license.nationality': 'pariatur',
       'document.drivers_license.ref_number': 'cillum pariatur Duis',
+      'document.drivers_license.samba_activity_history_response': 'Lorem irure ut',
       'document.drivers_license.selfie.image': 'eiusmod qui dolor pariatur nostrud',
       'document.drivers_license.selfie.mime_type': 'ullamco',
       'document.finra_compliance_letter': 'reprehenderit adipisicing',
@@ -3859,6 +5656,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.id_card.issuing_state': 'Ohio',
       'document.id_card.nationality': '5df95a58-0d18-437b-86cb-a5209d888b5e',
       'document.id_card.ref_number': '5ec82872-9ed9-40a2-b273-374cdd87af86',
+      'document.id_card.samba_activity_history_response': '88bb73b3-4bb3-4f58-85d0-62f4660935a1',
       'document.id_card.selfie.image': '64efeced-0d95-41bf-8b0e-71bdca91d92c',
       'document.id_card.selfie.mime_type': '2a80edf3-24c4-4fc8-8760-679f1ab2ede8',
       'document.passport.back.image': 'Lorem non nisi',
@@ -3880,6 +5678,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.passport.issuing_state': 'Virginia',
       'document.passport.nationality': 'dolor mollit',
       'document.passport.ref_number': 'dolore velit anim',
+      'document.passport.samba_activity_history_response': 'qui dolore id dolor',
       'document.passport.selfie.image': 'quis',
       'document.passport.selfie.mime_type': 'ad eiusmod sint',
       'document.passport_card.back.image': 'dolore nostrud qui esse',
@@ -3922,6 +5721,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.permit.issuing_state': 'Michigan',
       'document.permit.nationality': 'ipsum Lorem',
       'document.permit.ref_number': 'in elit ad amet',
+      'document.permit.samba_activity_history_response': 'amet sed elit aute',
       'document.permit.selfie.image': 'sunt irure',
       'document.permit.selfie.mime_type': 'ut aliqua dolor',
       'document.proof_of_address.image': '4308 Schamberger Fields Suite 163',
@@ -3944,6 +5744,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.residence_document.issuing_state': 'Maine',
       'document.residence_document.nationality': '6bbe763e-e45d-413c-90c8-eb4e6f44ac9c',
       'document.residence_document.ref_number': 'e87d4977-cfbe-406f-b739-f1b5bdae0702',
+      'document.residence_document.samba_activity_history_response': '795b0dff-5cf1-4db9-b550-24a084202559',
       'document.residence_document.selfie.image': 'c831fb23-e158-42f8-9003-4d27d798e5a2',
       'document.residence_document.selfie.mime_type': '34175032-08e4-4f3d-a8df-b23fa7bbaa74',
       'document.ssn_card.image': 'nulla dolore',
@@ -3966,6 +5767,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.visa.issuing_state': 'Hawaii',
       'document.visa.nationality': 'Duis commodo Excepteur dolor minim',
       'document.visa.ref_number': 'officia enim',
+      'document.visa.samba_activity_history_response': 'amet nulla',
       'document.visa.selfie.image': 'tempor dolore',
       'document.visa.selfie.mime_type': 'exercitation nulla et sunt',
       'document.voter_identification.back.image': '9e8b933b-de4c-4fad-815b-87432e42f8ca',
@@ -3987,6 +5789,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.voter_identification.issuing_state': 'North Dakota',
       'document.voter_identification.nationality': 'bf0fd55d-7e22-4adb-9073-fe5aea9dd94a',
       'document.voter_identification.ref_number': '87e14ffd-2008-4e5d-96ef-d2a6083b8485',
+      'document.voter_identification.samba_activity_history_response': '181aa71a-ae79-4617-a541-9c8b428faf86',
       'document.voter_identification.selfie.image': 'a6729e8f-305b-4d1f-90be-da1115496cab',
       'document.voter_identification.selfie.mime_type': 'fc2aa053-6aa9-4fd5-aba8-6cc22c159260',
       'id.address_line1': '354 Holden Junction Apt. 460',
@@ -4073,6 +5876,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.drivers_license.issuing_state': 'Iowa',
       'document.drivers_license.nationality': 'velit elit',
       'document.drivers_license.ref_number': 'non ut sint mollit ullamco',
+      'document.drivers_license.samba_activity_history_response': 'exercitation laborum non',
       'document.drivers_license.selfie.image': 'cupidatat consectetur',
       'document.drivers_license.selfie.mime_type': 'dolor ex et',
       'document.finra_compliance_letter': 'id deserunt proident',
@@ -4095,6 +5899,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.id_card.issuing_state': 'Alabama',
       'document.id_card.nationality': 'dcc958ab-c089-476c-882d-c9659e26dd9d',
       'document.id_card.ref_number': '9aafb125-91ff-4727-b5af-90e44b5d7a7f',
+      'document.id_card.samba_activity_history_response': 'ecaeebff-e642-46af-b59a-0855764da7da',
       'document.id_card.selfie.image': '002697aa-a3f6-4c44-9968-2eb98994422e',
       'document.id_card.selfie.mime_type': 'e50dd86b-3701-48e1-8ef3-2225265aebd0',
       'document.passport.back.image': 'dolore irure occaecat dolor',
@@ -4116,6 +5921,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.passport.issuing_state': 'Alabama',
       'document.passport.nationality': 'esse mollit anim',
       'document.passport.ref_number': 'et magna aliqua',
+      'document.passport.samba_activity_history_response': 'irure quis ea',
       'document.passport.selfie.image': 'reprehenderit incididunt ad magna',
       'document.passport.selfie.mime_type': 'consequat enim ipsum',
       'document.passport_card.back.image': 'Duis do tempor Ut Lorem',
@@ -4137,6 +5943,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.passport_card.issuing_state': 'Mississippi',
       'document.passport_card.nationality': 'Duis irure',
       'document.passport_card.ref_number': 'anim sint officia exercitation',
+      'document.passport_card.samba_activity_history_response': 'Excepteur deserunt',
       'document.passport_card.selfie.image': 'magna aliquip Lorem et ipsum',
       'document.passport_card.selfie.mime_type': 'ad velit proident',
       'document.permit.back.image': 'officia aliqua tempor',
@@ -4158,6 +5965,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.permit.issuing_state': 'Arkansas',
       'document.permit.nationality': 'id',
       'document.permit.ref_number': 'sit reprehenderit Ut est',
+      'document.permit.samba_activity_history_response': 'reprehenderit quis minim enim',
       'document.permit.selfie.image': 'ullamco',
       'document.permit.selfie.mime_type': 'Ut anim',
       'document.proof_of_address.image': '1824 Broad Street Apt. 318',
@@ -4180,6 +5988,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.residence_document.issuing_state': 'Colorado',
       'document.residence_document.nationality': '9d12e739-bcd9-41b3-b219-dd98f3fe875f',
       'document.residence_document.ref_number': '2d88cc1a-41a4-4cf2-9c01-07ab08e450df',
+      'document.residence_document.samba_activity_history_response': '81fb363e-af20-486c-9970-d673a4ddd08c',
       'document.residence_document.selfie.image': '880471b2-020e-4282-9b9e-85989efcbb7d',
       'document.residence_document.selfie.mime_type': 'b311f2c2-a06f-4769-b74f-fa65c11615a4',
       'document.ssn_card.image': 'id tempor nulla reprehenderit',
@@ -4223,6 +6032,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.voter_identification.issuing_state': 'Utah',
       'document.voter_identification.nationality': 'da68b81c-3c6b-41e7-895f-ce7e64614410',
       'document.voter_identification.ref_number': '860f9ae0-9edb-4b2f-aaa2-511642b05c80',
+      'document.voter_identification.samba_activity_history_response': '76043976-ea65-4ffd-9f91-8222455d7ce4',
       'document.voter_identification.selfie.image': 'c4a4662b-8d62-4817-9647-2112402f91a2',
       'document.voter_identification.selfie.mime_type': 'a30cede5-a6df-453c-9dd5-7bc6fecbd6a9',
       'id.address_line1': '569 Sarah Mountain Suite 447',
@@ -4273,6 +6083,99 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.HostedValidateResponse': {
     validation_token: 'b295d55d-514a-4b67-9e7f-d8d4148f48d8',
   },
+  'hosted.HostedWorkflowRequest': {
+    config: {
+      data: {
+        business_configs: [
+          {
+            data: {
+              requires_human_review: false,
+            },
+            kind: 'proof_of_address',
+          },
+          {
+            data: {
+              collect_selfie: false,
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              description: 'enim minim consequat aliqua pariatur',
+              identifier: 'document.passport.full_address',
+              name: 'quis irure reprehenderit',
+              requires_human_review: true,
+              upload_settings: 'prefer_capture',
+            },
+            kind: 'custom',
+          },
+        ],
+        configs: [
+          {
+            data: {
+              requires_human_review: true,
+            },
+            kind: 'proof_of_address',
+          },
+          {
+            data: {
+              requires_human_review: true,
+            },
+            kind: 'proof_of_ssn',
+          },
+          {
+            data: {
+              description: 'aliquip consectetur Duis',
+              identifier: 'id.first_name',
+              name: 'ut elit deserunt amet ea',
+              requires_human_review: true,
+              upload_settings: 'capture_only_on_mobile',
+            },
+            kind: 'custom',
+          },
+        ],
+        playbook_id: 'mollit ea dolor id Excepteur',
+        recollect_attributes: ['name', 'full_address', 'bank'],
+        reuse_existing_bo_kyc: false,
+      },
+      kind: 'document',
+    },
+    note: 'do',
+  },
+  'hosted.IdDocKind': 'voter_identification',
+  'hosted.IdentifiedUser': {
+    auth_methods: [
+      {
+        is_verified: true,
+        kind: 'email',
+      },
+      {
+        is_verified: true,
+        kind: 'phone',
+      },
+      {
+        is_verified: false,
+        kind: 'phone',
+      },
+    ],
+    available_challenge_kinds: ['sms', 'email', 'sms'],
+    can_initiate_signup_challenge: true,
+    has_syncable_passkey: true,
+    is_unverified: true,
+    matching_fps: [
+      'document.drivers_license.back.mime_type',
+      'document.visa.classified_document_type',
+      'document.voter_identification.curp_validation_response',
+    ],
+    scrubbed_email: 'ramon_spencer@gmail.com',
+    scrubbed_phone: '+18502507286',
+    token: 'bf54cc30-c1c5-4b7c-9531-4dc8278ec19c',
+    token_scopes: ['explicit_auth', 'vault_data', 'auth'],
+  },
+  'hosted.IdentifyAuthMethod': {
+    is_verified: false,
+    kind: 'phone',
+  },
   'hosted.IdentifyChallengeResponse': {
     challenge_data: {
       biometric_challenge_json: 'tempor est deserunt',
@@ -4282,6 +6185,10 @@ export const persistedValues: Record<string, unknown> = {
       token: '92bbc0c5-6f40-41bd-a5d2-5566992fb514',
     },
     error: 'occaecat',
+  },
+  'hosted.IdentifyId': {
+    email: 'consequat',
+    phone_number: 'qui irure dolor do dolor',
   },
   'hosted.IdentifyRequest': {
     email: 'viola.mante53@gmail.com',
@@ -4316,6 +6223,7 @@ export const persistedValues: Record<string, unknown> = {
       token_scopes: ['sign_up', 'auth', 'vault_data'],
     },
   },
+  'hosted.IdentifyScope': 'onboarding',
   'hosted.IdentifyVerifyRequest': {
     challenge_response: 'qui consectetur',
     challenge_token: 'c2aee28d-b08d-4de7-9272-79c2344ff393',
@@ -4324,8 +6232,21 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.IdentifyVerifyResponse': {
     auth_token: '69b6b608-fe0f-425d-a8a1-8865a1f32fc8',
   },
+  'hosted.Inviter': {
+    first_name: 'Rhea',
+    last_name: 'Reinger',
+  },
+  'hosted.Iso3166TwoDigitCountryCode': 'PH',
   'hosted.KbaResponse': {
     token: 'de3c7a52-470a-49c8-a22a-56e3401d2db5',
+  },
+  'hosted.L10n': {
+    language: 'en',
+    locale: 'en-US',
+  },
+  'hosted.L10nV1': {
+    language: 'en',
+    locale: 'en-US',
   },
   'hosted.LiteIdentifyRequest': {
     email: 'andreanne33@gmail.com',
@@ -4402,6 +6323,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.drivers_license.issuing_state': 'Nevada',
     'document.drivers_license.nationality': 'ea deserunt esse consectetur Duis',
     'document.drivers_license.ref_number': 'pariatur',
+    'document.drivers_license.samba_activity_history_response': 'nulla dolor ipsum',
     'document.drivers_license.selfie.image': 'exercitation occaecat',
     'document.drivers_license.selfie.mime_type': 'eu in cupidatat proident',
     'document.finra_compliance_letter': 'dolor ipsum',
@@ -4424,6 +6346,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.id_card.issuing_state': 'New Jersey',
     'document.id_card.nationality': '4440ef7e-fba1-4186-86b6-65c0c5e26b9a',
     'document.id_card.ref_number': '743d59db-5afe-4e2c-a3bf-8699d84ee458',
+    'document.id_card.samba_activity_history_response': '8995c2b4-f4d4-404a-b0c7-303ae4d31328',
     'document.id_card.selfie.image': 'fdaeb7e2-75ce-4c30-b25b-dad79d4fe3a0',
     'document.id_card.selfie.mime_type': '429b4c1c-f645-41aa-95b3-5e24dc677680',
     'document.passport.back.image': 'voluptate laborum',
@@ -4445,6 +6368,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.passport.issuing_state': 'Iowa',
     'document.passport.nationality': 'dolor consectetur',
     'document.passport.ref_number': 'adipisicing',
+    'document.passport.samba_activity_history_response': 'proident deserunt ipsum cupidatat',
     'document.passport.selfie.image': 'dolore Duis ea sit',
     'document.passport.selfie.mime_type': 'ex ut Ut voluptate',
     'document.passport_card.back.image': 'pariatur sed tempor consequat',
@@ -4466,6 +6390,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.passport_card.issuing_state': 'Rhode Island',
     'document.passport_card.nationality': 'ut dolor amet',
     'document.passport_card.ref_number': 'voluptate Excepteur ea sint amet',
+    'document.passport_card.samba_activity_history_response': 'id',
     'document.passport_card.selfie.image': 'non ad',
     'document.passport_card.selfie.mime_type': 'pariatur dolore elit',
     'document.permit.back.image': 'velit officia pariatur in',
@@ -4487,6 +6412,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.permit.issuing_state': 'West Virginia',
     'document.permit.nationality': 'voluptate dolore',
     'document.permit.ref_number': 'fugiat aliquip sint nostrud sit',
+    'document.permit.samba_activity_history_response': 'velit proident',
     'document.permit.selfie.image': 'laboris in consectetur non',
     'document.permit.selfie.mime_type': 'Duis ut elit cillum reprehenderit',
     'document.proof_of_address.image': '752 Boyle Trace Apt. 261',
@@ -4509,6 +6435,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.residence_document.issuing_state': 'Maine',
     'document.residence_document.nationality': 'cc5ad914-988e-4df4-a919-2a5a61d2dde9',
     'document.residence_document.ref_number': '0421ae3f-5901-41e2-a155-50bffdc0a6b8',
+    'document.residence_document.samba_activity_history_response': '2386f58d-15cf-46b3-a2e4-af49c6697f4f',
     'document.residence_document.selfie.image': '02773f0d-716f-47b5-aca1-97b24e86fdc0',
     'document.residence_document.selfie.mime_type': 'd2a96bae-6b3c-4b44-8c64-981701735c8f',
     'document.ssn_card.image': 'pariatur dolore laborum nostrud sunt',
@@ -4531,6 +6458,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.visa.issuing_state': 'New York',
     'document.visa.nationality': 'eu',
     'document.visa.ref_number': 'id deserunt aute',
+    'document.visa.samba_activity_history_response': 'pariatur',
     'document.visa.selfie.image': 'voluptate in aliqua in',
     'document.visa.selfie.mime_type': 'proident in est cupidatat',
     'document.voter_identification.back.image': 'c70348ca-15fe-44ae-8a62-ee41814c94c2',
@@ -4591,9 +6519,238 @@ export const persistedValues: Record<string, unknown> = {
     'investor_profile.risk_tolerance': 'fugiat ea minim',
     'investor_profile.senior_executive_symbols': 'mollit laborum',
   },
+  'hosted.ModernUserDecryptResponse': {
+    'bank.*.account_type': 'ut exercitation aliqua in enim',
+    'bank.*.ach_account_id': '295b698f-51aa-4b05-a64e-5f042a939806',
+    'bank.*.ach_account_number': 'reprehenderit Lorem et sed',
+    'bank.*.ach_routing_number': 'laborum ut fugiat',
+    'bank.*.fingerprint': 'anim dolore mollit in dolor',
+    'bank.*.name': 'Crystal Dickens',
+    'card.*.billing_address.country': '76614 South Street Apt. 459',
+    'card.*.billing_address.zip': '27666 McCullough Circles Suite 470',
+    'card.*.cvc': 'minim adipisicing Lorem ex cupidatat',
+    'card.*.expiration': 'veniam enim',
+    'card.*.expiration_month': 'culpa',
+    'card.*.expiration_year': 'aliqua cupidatat aute reprehenderit',
+    'card.*.fingerprint': 'sint',
+    'card.*.issuer': 'sit magna non',
+    'card.*.name': 'Lisa Wyman',
+    'card.*.number': 'tempor enim',
+    'card.*.number_last4': 'adipisicing anim',
+    'custom.*': 'enim in irure laborum veniam',
+    'document.custom.*': 'in voluptate sed anim quis',
+    'document.drivers_license.back.image': 'veniam in ad qui aute',
+    'document.drivers_license.back.mime_type': 'non laboris id nulla fugiat',
+    'document.drivers_license.classified_document_type': 'ea',
+    'document.drivers_license.clave_de_elector': 'exercitation laboris',
+    'document.drivers_license.curp': 'ea eiusmod in velit pariatur',
+    'document.drivers_license.curp_validation_response': '5ece6be7-164d-4640-a947-d3072a6034f7',
+    'document.drivers_license.dob': 'ut enim ullamco eu amet',
+    'document.drivers_license.document_number': 'Duis incididunt in veniam',
+    'document.drivers_license.front.image': 'voluptate',
+    'document.drivers_license.front.mime_type': 'deserunt officia ullamco Excepteur',
+    'document.drivers_license.full_address': '2421 Thiel-Rempel Wells Suite 469',
+    'document.drivers_license.full_name': 'Ben Bashirian',
+    'document.drivers_license.gender': 'incididunt anim Duis aute',
+    'document.drivers_license.issued_at': 'aliqua',
+    'document.drivers_license.issuing_country': 'Liberia',
+    'document.drivers_license.issuing_state': 'Oklahoma',
+    'document.drivers_license.nationality': 'occaecat quis',
+    'document.drivers_license.ref_number': 'ex officia',
+    'document.drivers_license.samba_activity_history_response': 'ex proident',
+    'document.drivers_license.selfie.image': 'ipsum',
+    'document.drivers_license.selfie.mime_type': 'Excepteur',
+    'document.finra_compliance_letter': 'reprehenderit',
+    'document.id_card.back.image': 'a7234a77-a736-49d9-805a-699329be61fa',
+    'document.id_card.back.mime_type': '5d3a9ce1-ca73-47aa-9ed8-88550c4973e0',
+    'document.id_card.clave_de_elector': '94316ee5-7814-4060-b140-0e316380471b',
+    'document.id_card.curp': '35de796a-c0c4-4811-97a1-6b8532e2e845',
+    'document.id_card.dob': '40677ea3-f629-440c-a5b0-375f48e04f2b',
+    'document.id_card.document_number': '7d49f207-aad4-4e65-bb84-311cdd118261',
+    'document.id_card.expires_at': '15f42442-65fb-4965-90c5-55fbe83cb81c',
+    'document.id_card.front.image': '190e2eb7-829e-49c1-af07-bf5a649b7c60',
+    'document.id_card.front.mime_type': 'bf50ec04-adc8-4419-a937-c6d9d1b6a7c7',
+    'document.id_card.full_address': '7052 Jeffery Curve Suite 517',
+    'document.id_card.full_name': 'Mrs. Janis Stehr',
+    'document.id_card.gender': '70970c02-c442-46bf-8dd6-2356ad895d54',
+    'document.id_card.issued_at': 'bde1a62b-07c5-4bac-8cdf-936f36f47147',
+    'document.id_card.issuing_country': 'Togo',
+    'document.id_card.issuing_state': 'Nebraska',
+    'document.id_card.nationality': 'd1d3948c-728a-4a43-b396-3dab904419b6',
+    'document.id_card.ref_number': 'e06caece-e9f0-411a-b0ec-45337274f486',
+    'document.id_card.samba_activity_history_response': 'd54cab3d-6cf2-40d8-b94a-5e15cfb132ab',
+    'document.id_card.selfie.image': 'd86ed480-b18b-42ad-973c-53a6c8dd8ec5',
+    'document.id_card.selfie.mime_type': '70fb1b1d-8cd2-4a7e-951e-983815ea1b0a',
+    'document.passport.back.image': 'dolor dolore est pariatur sit',
+    'document.passport.back.mime_type': 'nisi adipisicing commodo',
+    'document.passport.classified_document_type': 'dolor amet Excepteur qui',
+    'document.passport.clave_de_elector': 'exercitation consectetur sunt minim commodo',
+    'document.passport.curp': 'irure labore minim cillum enim',
+    'document.passport.curp_validation_response': '3588a037-fa0e-4745-b9ae-ca0ecc5a32cb',
+    'document.passport.dob': 'aute enim veniam',
+    'document.passport.document_number': 'consequat',
+    'document.passport.expires_at': 'ex',
+    'document.passport.front.image': 'id ut dolore in mollit',
+    'document.passport.front.mime_type': 'ad quis',
+    'document.passport.full_address': '4403 Alysa Gardens Apt. 527',
+    'document.passport.gender': 'sed',
+    'document.passport.issued_at': 'Excepteur',
+    'document.passport.issuing_country': 'Germany',
+    'document.passport.issuing_state': 'Tennessee',
+    'document.passport.nationality': 'nostrud in',
+    'document.passport.ref_number': 'id pariatur fugiat',
+    'document.passport.samba_activity_history_response': 'dolore non magna do velit',
+    'document.passport.selfie.image': 'dolore consectetur dolor ad Duis',
+    'document.passport.selfie.mime_type': 'voluptate ut',
+    'document.passport_card.back.image': 'aute et eiusmod cupidatat',
+    'document.passport_card.back.mime_type': 'incididunt dolor sunt labore',
+    'document.passport_card.classified_document_type': 'adipisicing officia',
+    'document.passport_card.clave_de_elector': 'dolor reprehenderit officia qui',
+    'document.passport_card.curp': 'nisi amet aliqua dolor',
+    'document.passport_card.curp_validation_response': 'f5797ee2-b80c-4e9f-a055-f0c0b68d7909',
+    'document.passport_card.dob': 'sint anim dolore ex eiusmod',
+    'document.passport_card.document_number': 'pariatur eiusmod cupidatat non',
+    'document.passport_card.expires_at': 'ad reprehenderit',
+    'document.passport_card.front.image': 'et sunt enim eiusmod',
+    'document.passport_card.front.mime_type': 'Duis incididunt irure non',
+    'document.passport_card.full_address': '8503 Gleichner Row Suite 604',
+    'document.passport_card.full_name': 'Mr. Arnold Zemlak',
+    'document.passport_card.gender': 'elit',
+    'document.passport_card.issued_at': 'consequat',
+    'document.passport_card.issuing_country': 'Iran',
+    'document.passport_card.issuing_state': 'Wyoming',
+    'document.passport_card.nationality': 'quis ad exercitation',
+    'document.passport_card.ref_number': 'esse aute nostrud sit',
+    'document.passport_card.samba_activity_history_response': 'cillum aliquip laborum sint ipsum',
+    'document.passport_card.selfie.image': 'veniam aute Excepteur enim fugiat',
+    'document.passport_card.selfie.mime_type': 'eu commodo non esse',
+    'document.permit.back.image': 'elit eu velit',
+    'document.permit.back.mime_type': 'aute',
+    'document.permit.classified_document_type': 'ut Excepteur anim aliquip deserunt',
+    'document.permit.clave_de_elector': 'ea culpa aute consectetur',
+    'document.permit.curp': 'sint',
+    'document.permit.curp_validation_response': 'f196e39c-24ce-4049-9003-20d705974ec2',
+    'document.permit.dob': 'magna sit Duis in ut',
+    'document.permit.document_number': 'eiusmod ea sit esse pariatur',
+    'document.permit.expires_at': 'elit sint cillum',
+    'document.permit.front.image': 'in',
+    'document.permit.front.mime_type': 'non mollit in',
+    'document.permit.full_address': '8232 Wilhelm Light Suite 744',
+    'document.permit.full_name': 'Steve Hagenes',
+    'document.permit.gender': 'sit elit reprehenderit',
+    'document.permit.issued_at': 'Duis non est anim',
+    'document.permit.issuing_country': 'Belize',
+    'document.permit.issuing_state': 'Vermont',
+    'document.permit.nationality': 'cupidatat sunt esse',
+    'document.permit.ref_number': 'Duis fugiat do',
+    'document.permit.samba_activity_history_response': 'eu ipsum aute dolor sit',
+    'document.permit.selfie.image': 'aute in veniam',
+    'document.permit.selfie.mime_type': 'laboris',
+    'document.proof_of_address.image': '43725 Hamill Junctions Apt. 238',
+    'document.residence_document.back.image': '9c1187b5-a314-4c83-ac51-e3b83cbbaa9f',
+    'document.residence_document.back.mime_type': '9f77e8c8-f79e-4314-930e-10c84814a83d',
+    'document.residence_document.classified_document_type': 'e738cefb-b309-4e13-8d98-1a488cfeafee',
+    'document.residence_document.clave_de_elector': 'eec6f333-d94f-46af-99ea-0a5b3afc46e1',
+    'document.residence_document.curp': 'ac477a28-4678-4bda-88e9-fc37fb421c9b',
+    'document.residence_document.curp_validation_response': '64b01a8a-8551-4f1c-8c25-b84bafc17599',
+    'document.residence_document.dob': 'ab8dc46f-aaf0-4dd7-bde4-13de559c0434',
+    'document.residence_document.document_number': 'acfbc8d7-f2b2-4e7c-9b1c-db9b3d280dc5',
+    'document.residence_document.expires_at': 'ba2e6afb-999e-4952-8905-36d949682c83',
+    'document.residence_document.front.image': '88c09080-af0b-45c1-8519-d40e4b9632f9',
+    'document.residence_document.front.mime_type': '881ab079-aac9-4583-bb38-ad43f0c285dc',
+    'document.residence_document.full_address': '76343 King Street Apt. 284',
+    'document.residence_document.full_name': 'Ed Batz',
+    'document.residence_document.gender': 'cd26c5c2-d1c1-4cfc-b81f-61dd98562997',
+    'document.residence_document.issued_at': '3e5c6cd1-33a9-4968-96c8-d30931c38723',
+    'document.residence_document.issuing_country': 'Barbados',
+    'document.residence_document.issuing_state': 'Hawaii',
+    'document.residence_document.nationality': '0e80e387-2056-4de6-9168-c84e46fbef05',
+    'document.residence_document.ref_number': '455839c2-b7f6-40fd-b62c-af528daaa086',
+    'document.residence_document.samba_activity_history_response': '9f6c282a-c8cb-4cc3-9ffb-738bacffe30e',
+    'document.residence_document.selfie.image': '733ca25c-c9e7-49bf-8686-590a60928b76',
+    'document.residence_document.selfie.mime_type': 'd4acaeab-cad9-4906-8608-113e684e2c10',
+    'document.ssn_card.image': 'et ut reprehenderit',
+    'document.visa.back.image': 'id dolor',
+    'document.visa.back.mime_type': 'est eu anim',
+    'document.visa.classified_document_type': 'mollit sunt nulla irure',
+    'document.visa.curp': 'dolor anim elit',
+    'document.visa.curp_validation_response': 'f2482745-6d6c-4d8a-9057-f84093bfc5fa',
+    'document.visa.dob': 'eiusmod dolore sint culpa aliqua',
+    'document.visa.document_number': 'ut sed',
+    'document.visa.expires_at': 'incididunt aliqua cillum ad Ut',
+    'document.visa.front.image': 'Ut ad cupidatat',
+    'document.visa.front.mime_type': 'in ad sint in dolor',
+    'document.visa.full_address': '356 Tiara Crossroad Suite 667',
+    'document.visa.full_name': 'Jean Weissnat',
+    'document.visa.gender': 'labore',
+    'document.visa.issued_at': 'commodo sunt Lorem laborum',
+    'document.visa.issuing_country': 'Guernsey',
+    'document.visa.nationality': 'est cillum consectetur id in',
+    'document.visa.ref_number': 'eiusmod ullamco ad Ut',
+    'document.visa.samba_activity_history_response': 'enim voluptate dolor',
+    'document.visa.selfie.image': 'ut sunt Lorem et amet',
+    'document.visa.selfie.mime_type': 'dolor ullamco',
+    'document.voter_identification.back.image': '2d93e6ce-cd32-4783-868a-7d89a1f244cb',
+    'document.voter_identification.back.mime_type': '0ed1726e-fc7f-4d00-82e3-2da165f4600a',
+    'document.voter_identification.classified_document_type': 'a16d0540-5f0d-4e0b-94ab-911e5f8ab4e5',
+    'document.voter_identification.clave_de_elector': '4c20f640-acb5-4b00-a7d7-c7aef1d42f75',
+    'document.voter_identification.curp': 'db442504-f728-450a-9056-4e56c4de129a',
+    'document.voter_identification.curp_validation_response': 'f046b975-9b7c-4685-8ef8-1c7616f9f86f',
+    'document.voter_identification.dob': '9e0990ab-fc0e-4719-8bc7-a7f92ffda90f',
+    'document.voter_identification.document_number': '679b630c-3782-4ebc-8b49-84eb07640805',
+    'document.voter_identification.expires_at': '1f6b6e8c-a751-4c13-a303-df89756ab8ff',
+    'document.voter_identification.front.image': '1c6f700d-ef77-4849-8894-388f23d8511f',
+    'document.voter_identification.front.mime_type': '0ad89212-a447-4df8-aaaa-24e7f4072ee4',
+    'document.voter_identification.full_address': '848 Carleton Spurs Apt. 677',
+    'document.voter_identification.full_name': 'Betty Mertz PhD',
+    'document.voter_identification.gender': '2c973f42-bce2-4fbb-941a-8ed8ccd291e7',
+    'document.voter_identification.issued_at': 'a96a9bf7-734a-4b06-b6bc-6e464e57c104',
+    'document.voter_identification.issuing_country': 'Kazakhstan',
+    'document.voter_identification.issuing_state': 'Michigan',
+    'document.voter_identification.nationality': '7c8570e1-e913-4e17-9565-6d48de0f5134',
+    'document.voter_identification.ref_number': '1ea92b0c-12cb-4087-b94a-eb32252039a0',
+    'document.voter_identification.samba_activity_history_response': 'ff8397d6-ef23-41a7-bd9c-d736237a49ee',
+    'document.voter_identification.selfie.image': 'd9a54337-bb36-48ef-938c-ace9d3c9874a',
+    'document.voter_identification.selfie.mime_type': 'f0426c44-1ce5-4b30-a87c-45289b745823',
+    'id.address_line1': '1687 Rosanna Court Suite 535',
+    'id.address_line2': '52588 Haag Terrace Apt. 902',
+    'id.citizenships': 'fc75dcc8-3252-429d-b444-f0095b99c044',
+    'id.city': 'Kleinville',
+    'id.country': 'Saint Pierre and Miquelon',
+    'id.dob': 'dd86e844-8647-4846-9c96-61804139ca55',
+    'id.drivers_license_number': '67ecd57e-a574-406c-9352-06724bc348a8',
+    'id.drivers_license_state': 'Washington',
+    'id.email': 'magnolia.legros@gmail.com',
+    'id.first_name': 'Aurore',
+    'id.itin': '62538ffe-f8a2-4456-9747-7febcbdf1937',
+    'id.last_name': 'Ernser',
+    'id.middle_name': 'Roberto Hane',
+    'id.phone_number': '+19376259883',
+    'id.ssn4': '6f17b588-2a6a-4757-b873-af3686dcbd54',
+    'id.ssn9': 'a4e4a029-5baf-462e-8ff8-77d5d4ca87b7',
+    'id.state': 'North Dakota',
+    'id.us_legal_status': 'e32a0563-579c-42ea-8e78-3ded30310392',
+    'id.us_tax_id': '14511ed9-7a65-47ae-89da-b4bbcf84dc2a',
+    'id.visa_expiration_date': '6819364a-827f-4a91-b96b-3706a85fe03b',
+    'id.visa_kind': '975e6ca8-8d5a-4ea7-af92-5cfb31807dd2',
+    'id.zip': '37442',
+    'investor_profile.annual_income': 'qui proident tempor aute exercitation',
+    'investor_profile.brokerage_firm_employer': 'qui fugiat ex magna minim',
+    'investor_profile.employer': 'anim sit sed dolore',
+    'investor_profile.employment_status': 'qui anim velit',
+    'investor_profile.family_member_names': 'Jodi Bogisich',
+    'investor_profile.funding_sources': 'incididunt labore ullamco ad',
+    'investor_profile.investment_goals': 'incididunt eu amet ullamco ea',
+    'investor_profile.net_worth': 'pariatur qui amet Excepteur ad',
+    'investor_profile.occupation': 'magna tempor',
+    'investor_profile.political_organization': 'non',
+    'investor_profile.risk_tolerance': 'sint veniam',
+    'investor_profile.senior_executive_symbols': 'ut tempor',
+  },
   'hosted.NeuroIdentityIdResponse': {
     id: 'c649b1b7-5107-44f5-98ab-b53bdf037e18',
   },
+  'hosted.ObConfigurationKind': 'kyc',
   'hosted.OnboardingResponse': {
     auth_token: '2c662728-a589-4815-a38c-231cfd2f12c5',
     onboarding_config: {
@@ -4786,6 +6943,23 @@ export const persistedValues: Record<string, unknown> = {
       note: 'sint ad officia Duis',
     },
   },
+  'hosted.RawUserDataRequest': {
+    '<key>': 'ff2158c6-2ada-4a61-a26d-aebe02ec76f2',
+    '<value>': {},
+  },
+  'hosted.RegisterPasskeyAttemptContext': {
+    elapsed_time_in_os_prompt_ms: 50865702,
+    error_message: 'nostrud esse sed Excepteur in',
+  },
+  'hosted.RenderV1SdkArgs': {
+    auth_token: 'e79cabae-e1cc-4c15-a03e-44236b034fed',
+    can_copy: true,
+    default_hidden: false,
+    id: '107d8cc9-2bd2-47d5-b066-0b815c25935b',
+    label: 'labore aute pariatur',
+    show_hidden_toggle: false,
+  },
+  'hosted.RequestedTokenScope': 'onboarding_components',
   'hosted.SdkArgs': 'magna exercitation aute minim incididunt',
   'hosted.SignupChallengeRequest': {
     challenge_kind: 'biometric',
@@ -4798,6 +6972,26 @@ export const persistedValues: Record<string, unknown> = {
       value: 'veniam ullamco',
     },
     scope: 'my1fp',
+  },
+  'hosted.SkipLivenessClientType': 'web',
+  'hosted.SkipLivenessContext': {
+    attempts: [
+      {
+        elapsed_time_in_os_prompt_ms: -47743671,
+        error_message: 'dolore fugiat ut',
+      },
+      {
+        elapsed_time_in_os_prompt_ms: -42968746,
+        error_message: 'dolor voluptate exercitation minim',
+      },
+      {
+        elapsed_time_in_os_prompt_ms: -38283446,
+        error_message: 'velit',
+      },
+    ],
+    client_type: 'mobile',
+    num_attempts: -91200870,
+    reason: 'labore voluptate dolore',
   },
   'hosted.SkipPasskeyRegisterRequest': {
     context: {
@@ -4826,6 +7020,34 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.StytchTelemetryRequest': {
     telemetry_id: '129cebec-cf19-4244-868e-8db1abe4b938',
   },
+  'hosted.TaskStatus': 'do mollit veniam',
+  'hosted.UpdateAuthMethodsV1SdkArgs': {
+    auth_token: '7f839499-cf03-4427-9b7a-7c83da57628a',
+    l10n: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      show_logo: true,
+    },
+  },
+  'hosted.UpdateOrCreateHostedBusinessOwnerRequest': {
+    data: {
+      '<key>': 'eaa36991-dc2a-4c88-9da3-fc13f38ad7a7',
+      '<value>': {},
+    },
+    op: 'create',
+    ownership_stake: 68693524,
+    uuid: 'fc3126dc-ba49-4c5f-9c4f-ba36b3886552',
+  },
+  'hosted.UserAuthScope': 'explicit_auth',
+  'hosted.UserChallengeData': {
+    biometric_challenge_json: 'laborum anim mollit reprehenderit',
+    challenge_kind: 'biometric',
+    challenge_token: '4344f6d5-1b5b-4d1b-9527-bebb36614842',
+    time_before_retry_s: -26627198,
+    token: '670d1e95-5739-4ed5-a6b4-25ca661add5b',
+  },
   'hosted.UserChallengeRequest': {
     action_kind: 'replace',
     email: 'dominic68@gmail.com',
@@ -4844,6 +7066,7 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.UserChallengeVerifyResponse': {
     auth_token: 'e4bafe3e-73a7-450f-965a-3422d08ea38a',
   },
+  'hosted.UserDataIdentifier': 'document.drivers_license.back.mime_type',
   'hosted.UserDecryptRequest': {
     fields: [
       'document.id_card.expires_at',
@@ -4857,5 +7080,39 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.UserDecryptResponse': {
     '<key>': 'b97707d6-2834-457d-b2f0-bfe69d2c057a',
     '<value>': {},
+  },
+  'hosted.VerifyResultV1SdkArgs': {
+    auth_token: 'be6eefd1-0ce1-4d7e-9fdb-22c3bfd0a6c3',
+    device_response: 'dolore nostrud et',
+  },
+  'hosted.VerifyV1Options': {
+    show_completion_page: false,
+    show_logo: true,
+  },
+  'hosted.VerifyV1SdkArgs': {
+    auth_token: 'fd24a3b1-e41c-4813-b842-1ebcf762025f',
+    document_fixture_result: 'fail',
+    fixture_result: 'step_up',
+    is_components_sdk: false,
+    l10n: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      show_logo: true,
+    },
+    public_key: '9591877f-b68f-4196-86c7-a4ea3bf1a735',
+    sandbox_id: '0f3f9b78-224c-4cf3-82ed-c4bcc70da5c7',
+    should_relay_to_components: true,
+    user_data: {},
+  },
+  'hosted.WorkflowFixtureResult': 'fail',
+  'hosted.WorkflowRequestConfig': {
+    data: {
+      playbook_id: 'velit officia esse pariatur eiusmod',
+      recollect_attributes: ['ssn4', 'business_tin', 'business_website'],
+      reuse_existing_bo_kyc: false,
+    },
+    kind: 'onboard',
   },
 };
