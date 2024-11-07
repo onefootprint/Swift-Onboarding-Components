@@ -56,6 +56,8 @@ pub enum CollectedDataOption {
     Nationality,
     UsLegalStatus,
 
+    /// This is being deprecated
+    #[openapi(skip)]
     Document(DocumentCdoInfo),
 
     // TODO: maybe nest these

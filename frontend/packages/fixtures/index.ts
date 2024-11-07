@@ -101,7 +101,6 @@ import type {
   SkipPasskeyRegisterRequest,
   SocureDeviceSessionIdRequest,
   StytchTelemetryRequest,
-  TaskStatus,
   UpdateAuthMethodsV1SdkArgs,
   UpdateOrCreateHostedBusinessOwnerRequest,
   UserAuthScope,
@@ -940,6 +939,7 @@ export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
         'document.visa.issuing_state': 'Colorado',
         'document.visa.nationality': 'adipisicing reprehenderit',
         'document.visa.ref_number': 'tempor est laborum',
+        'document.visa.samba_activity_history_response': 'sit cillum eu',
         'document.visa.selfie.image': 'esse aliquip anim mollit',
         'document.visa.selfie.mime_type': 'et dolore',
         'document.voter_identification.back.image': 'e1eb9b7c-cb1e-440b-bba6-dc922956e5e8',
@@ -1490,6 +1490,7 @@ export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequ
       'document.voter_identification.issuing_state': 'Wyoming',
       'document.voter_identification.nationality': 'aedeca19-72da-458a-895c-a357f3cedadd',
       'document.voter_identification.ref_number': 'e050acea-149f-49a1-8378-e5bdacb7b676',
+      'document.voter_identification.samba_activity_history_response': '2d346d9a-ec34-4a08-bf6c-7ab058d7e119',
       'document.voter_identification.selfie.image': 'af119a06-baa8-494d-99c1-2cdce4ad3e6f',
       'document.voter_identification.selfie.mime_type': '1cd8449c-2d4f-4568-b205-737831588f20',
       'id.address_line1': '63443 McKenzie Rue Suite 740',
@@ -2110,7 +2111,6 @@ export const getStytchTelemetryRequest = (props: Partial<StytchTelemetryRequest>
     },
     props,
   ) as StytchTelemetryRequest;
-export const getTaskStatus = (props: Partial<TaskStatus>) => (props ?? 'do mollit veniam') as TaskStatus;
 export const getUpdateAuthMethodsV1SdkArgs = (props: Partial<UpdateAuthMethodsV1SdkArgs>) =>
   merge(
     {

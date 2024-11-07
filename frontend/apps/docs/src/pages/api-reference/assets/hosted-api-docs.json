@@ -2547,145 +2547,29 @@
             },
             "CollectedDataOption": {
                 "description": "Represent the options of allowed CollectedData.\n Some CollectedData variants only have a single allowable CollectedDataOption.\n Other CollectedData variants may have multiple Options of assortments of data that can be\n collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by\n the CDO",
-                "anyOf": [
-                    {
-                        "type": "string",
-                        "enum": [
-                            "name"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "dob"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "ssn4"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "ssn9"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "full_address"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "email"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "phone_number"
-                        ]
-                    },
-                    {
-                        "description": "Deprecated for new playbooks, but we have a few legacy playbooks using this in prod",
-                        "type": "string",
-                        "enum": [
-                            "nationality"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "us_legal_status"
-                        ]
-                    },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "document": {
-                                "$ref": "#/components/schemas/TaskStatus"
-                            }
-                        },
-                        "required": [
-                            "document"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_name"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_tin"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_address"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_phone_number"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_website"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_beneficial_owners"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_kyced_beneficial_owners"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "business_corporation_type"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "investor_profile"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "card"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "us_tax_id"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "enum": [
-                            "bank"
-                        ]
-                    }
+                "type": "string",
+                "enum": [
+                    "name",
+                    "dob",
+                    "ssn4",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "nationality",
+                    "us_legal_status",
+                    "business_name",
+                    "business_tin",
+                    "business_address",
+                    "business_phone_number",
+                    "business_website",
+                    "business_beneficial_owners",
+                    "business_kyced_beneficial_owners",
+                    "business_corporation_type",
+                    "investor_profile",
+                    "card",
+                    "us_tax_id",
+                    "bank"
                 ]
             },
             "ConsentRequest": {
@@ -6501,9 +6385,6 @@
                 "required": [
                     "telemetry_id"
                 ]
-            },
-            "TaskStatus": {
-                "type": "string"
             },
             "UpdateAuthMethodsV1SdkArgs": {
                 "type": "object",

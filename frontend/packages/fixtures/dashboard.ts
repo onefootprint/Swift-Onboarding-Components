@@ -238,7 +238,6 @@ import type {
   SignalScope,
   SignalSeverity,
   SubmitExternalUrlRequest,
-  TaskStatus,
   TenantAndroidAppMeta,
   TenantFrequentNoteKind,
   TenantIosAppMeta,
@@ -591,6 +590,11 @@ export const getAuditEvent = (props: Partial<AuditEvent>) =>
           ],
           fpId: 'elit dolore exercitation non eu',
           reason: 'Duis reprehenderit',
+          updatedFields: [
+            'document.passport.classified_document_type',
+            'bank.*.ach_routing_number',
+            'document.drivers_license.gender',
+          ],
         },
         kind: 'disable_playbook',
       },
@@ -632,6 +636,8 @@ export const getAuditEventDetail = (props: Partial<AuditEventDetail>) =>
           'document.drivers_license.front.image',
         ],
         fpId: 'aute laborum irure',
+        listEntryId: 'sed sint et',
+        listId: 'Ut ea',
       },
       kind: 'collect_user_document',
     },
@@ -1358,7 +1364,9 @@ export const getComplianceDocEventType = (props: Partial<ComplianceDocEventType>
   merge(
     {
       data: {
+        decision: 'rejected',
         kind: 'external_url',
+        note: 'quis ut',
         submissionId: 'veniam id Lorem aute',
       },
       kind: 'request_retracted',
@@ -2983,10 +2991,12 @@ export const getEntityWorkflow = (props: Partial<EntityWorkflow>) =>
         city: 'Koelpinborough',
         ipAddress: '94438 Abshire Overpass Suite 326',
         latitude: -81692336.78012651,
+        longitude: -38631546.78142693,
         metroCode: 'et',
         postalCode: 'laboris',
         region: 'proident sint est',
         regionName: 'Christina Hoeger',
+        sessionId: '5a23d949-cd17-45dd-a674-0b75ce82fdef',
         timeZone: 'nostrud nulla dolor et deserunt',
         timestamp: '1921-10-24T14:22:51.0Z',
         userAgent: 'anim ullamco',
@@ -5813,7 +5823,6 @@ export const getSubmitExternalUrlRequest = (props: Partial<SubmitExternalUrlRequ
     },
     props,
   ) as SubmitExternalUrlRequest;
-export const getTaskStatus = (props: Partial<TaskStatus>) => (props ?? 'eu veniam irure sunt enim') as TaskStatus;
 export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>) =>
   merge(
     {

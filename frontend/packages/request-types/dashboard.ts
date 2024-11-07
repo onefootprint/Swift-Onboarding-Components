@@ -412,9 +412,6 @@ export type CollectedDataOption =
   | 'phone_number'
   | 'nationality'
   | 'us_legal_status'
-  | {
-      document: TaskStatus;
-    }
   | 'business_name'
   | 'business_tin'
   | 'business_address'
@@ -4093,7 +4090,6 @@ export type SignalSeverity = 'info' | 'low' | 'medium' | 'high';
 export type SubmitExternalUrlRequest = {
   url: string;
 };
-export type TaskStatus = string;
 export type TenantAndroidAppMeta = {
   apkCertSha256S: Array<string>;
   id: string;

@@ -97,9 +97,6 @@ export type CollectedDataOption =
   | 'phone_number'
   | 'nationality'
   | 'us_legal_status'
-  | {
-      document: TaskStatus;
-    }
   | 'business_name'
   | 'business_tin'
   | 'business_address'
@@ -2156,7 +2153,6 @@ export type SocureDeviceSessionIdRequest = {
 export type StytchTelemetryRequest = {
   telemetryId: string;
 };
-export type TaskStatus = string;
 export type UpdateAuthMethodsV1SdkArgs = {
   authToken: string;
   l10N?: L10nV1;

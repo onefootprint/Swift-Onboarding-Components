@@ -242,6 +242,11 @@ export const persistedValues: Record<string, unknown> = {
         ],
         fp_id: 'elit dolore exercitation non eu',
         reason: 'Duis reprehenderit',
+        updated_fields: [
+          'document.passport.classified_document_type',
+          'bank.*.ach_routing_number',
+          'document.drivers_license.gender',
+        ],
       },
       kind: 'disable_playbook',
     },
@@ -279,6 +284,8 @@ export const persistedValues: Record<string, unknown> = {
         'document.drivers_license.front.image',
       ],
       fp_id: 'aute laborum irure',
+      list_entry_id: 'sed sint et',
+      list_id: 'Ut ea',
     },
     kind: 'collect_user_document',
   },
@@ -942,7 +949,9 @@ export const persistedValues: Record<string, unknown> = {
   },
   'dashboard.ComplianceDocEventType': {
     data: {
+      decision: 'rejected',
       kind: 'external_url',
+      note: 'quis ut',
       submission_id: 'veniam id Lorem aute',
     },
     kind: 'request_retracted',
@@ -2335,10 +2344,12 @@ export const persistedValues: Record<string, unknown> = {
       city: 'Koelpinborough',
       ip_address: '94438 Abshire Overpass Suite 326',
       latitude: -81692336.78012651,
+      longitude: -38631546.78142693,
       metro_code: 'et',
       postal_code: 'laboris',
       region: 'proident sint est',
       region_name: 'Christina Hoeger',
+      session_id: '5a23d949-cd17-45dd-a674-0b75ce82fdef',
       time_zone: 'nostrud nulla dolor et deserunt',
       timestamp: '1921-10-24T14:22:51.0Z',
       user_agent: 'anim ullamco',
@@ -4775,7 +4786,6 @@ export const persistedValues: Record<string, unknown> = {
   'dashboard.SubmitExternalUrlRequest': {
     url: 'https://tough-strategy.org/',
   },
-  'dashboard.TaskStatus': 'eu veniam irure sunt enim',
   'dashboard.TenantAndroidAppMeta': {
     apk_cert_sha256s: ['nulla', 'enim ipsum', 'nisi aliqua'],
     id: '9a8ecf24-2eda-46e6-940f-a7a195220f0c',
@@ -6038,6 +6048,7 @@ export const persistedValues: Record<string, unknown> = {
       'document.visa.issuing_state': 'Colorado',
       'document.visa.nationality': 'adipisicing reprehenderit',
       'document.visa.ref_number': 'tempor est laborum',
+      'document.visa.samba_activity_history_response': 'sit cillum eu',
       'document.visa.selfie.image': 'esse aliquip anim mollit',
       'document.visa.selfie.mime_type': 'et dolore',
       'document.voter_identification.back.image': 'e1eb9b7c-cb1e-440b-bba6-dc922956e5e8',
@@ -6507,6 +6518,7 @@ export const persistedValues: Record<string, unknown> = {
     'document.voter_identification.issuing_state': 'Wyoming',
     'document.voter_identification.nationality': 'aedeca19-72da-458a-895c-a357f3cedadd',
     'document.voter_identification.ref_number': 'e050acea-149f-49a1-8378-e5bdacb7b676',
+    'document.voter_identification.samba_activity_history_response': '2d346d9a-ec34-4a08-bf6c-7ab058d7e119',
     'document.voter_identification.selfie.image': 'af119a06-baa8-494d-99c1-2cdce4ad3e6f',
     'document.voter_identification.selfie.mime_type': '1cd8449c-2d4f-4568-b205-737831588f20',
     'id.address_line1': '63443 McKenzie Rue Suite 740',
@@ -7055,7 +7067,6 @@ export const persistedValues: Record<string, unknown> = {
   'hosted.StytchTelemetryRequest': {
     telemetry_id: '129cebec-cf19-4244-868e-8db1abe4b938',
   },
-  'hosted.TaskStatus': 'do mollit veniam',
   'hosted.UpdateAuthMethodsV1SdkArgs': {
     auth_token: '7f839499-cf03-4427-9b7a-7c83da57628a',
     l10n: {
