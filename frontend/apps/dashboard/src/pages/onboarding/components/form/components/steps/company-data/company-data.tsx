@@ -3,13 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import Header from '../header';
-import Content from './components/content';
+import Content, { type CompanyFormData } from './components/content';
 import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 export type CompanyDataProps = {
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (data: CompanyFormData) => void;
 };
 
 const CompanyData = ({ onBack, onComplete }: CompanyDataProps) => {

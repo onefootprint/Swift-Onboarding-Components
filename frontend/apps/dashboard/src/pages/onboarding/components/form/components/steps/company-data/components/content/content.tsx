@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import useUpdateOrg from 'src/hooks/use-update-org';
 import styled, { css } from 'styled-components';
 
-export type FormData = {
+export type CompanyFormData = {
   name: string;
   website: string;
   size?: SelectOption<OrganizationSize>;
@@ -15,7 +15,7 @@ export type FormData = {
 
 export type ContentProps = {
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (data: CompanyFormData) => void;
   organization: Organization;
 };
 
@@ -31,7 +31,7 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<CompanyFormData>({
     defaultValues: {
       name: organization.name,
       website: organization.websiteUrl || '',
@@ -39,7 +39,7 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
     },
   });
 
-  const handleAfterSubmit = (formData: FormData) => {
+  const handleAfterSubmit = (formData: CompanyFormData) => {
     mutation.mutate(
       {
         name: formData.name,
@@ -47,7 +47,7 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
         companySize: formData.size ? formData.size.value : undefined,
       },
       {
-        onSuccess: onComplete,
+        onSuccess: () => onComplete(formData),
       },
     );
   };

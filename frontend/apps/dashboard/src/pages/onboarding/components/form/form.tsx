@@ -6,11 +6,17 @@ import styled, { css } from 'styled-components';
 
 import CompanyData from './components/steps/company-data';
 import Invite from './components/steps/invite';
-import UserData from './components/steps/user-data';
+import UserData, { type UserFormData } from './components/steps/user-data';
 import Welcome from './components/steps/welcome';
 
+type Company = {
+  companyName: string;
+  companySize: string;
+  companyWebsite: string;
+};
+export type FormData = Partial<UserFormData> & Partial<Company>;
 export type FormProps = {
-  onComplete: () => void;
+  onComplete: (data: FormData) => void;
 };
 
 const Form = ({ onComplete }: FormProps) => {
@@ -21,6 +27,8 @@ const Form = ({ onComplete }: FormProps) => {
     { value: 'company', label: t('company-data.nav') },
     { value: 'invite', label: t('invite.nav') },
   ];
+  const [userFormData, setUserFormData] = useState<UserFormData>();
+  const [companyFormData, setCompanyFormData] = useState<Company>();
   const [stepIndex, setStepIndex] = useState(0);
   const step = options[stepIndex];
   const maxStep = options.length - 1;
@@ -32,7 +40,7 @@ const Form = ({ onComplete }: FormProps) => {
 
   const handleComplete = () => {
     if (stepIndex === maxStep) {
-      onComplete();
+      onComplete({ ...userFormData, ...companyFormData });
     } else {
       setStepIndex(prevStep => prevStep + 1);
     }
@@ -56,8 +64,28 @@ const Form = ({ onComplete }: FormProps) => {
       </StepperContainer>
       <Content>
         {step.value === 'welcome' && <Welcome onComplete={handleComplete} />}
-        {step.value === 'user' && <UserData onComplete={handleComplete} onBack={handleBack} />}
-        {step.value === 'company' && <CompanyData onComplete={handleComplete} onBack={handleBack} />}
+        {step.value === 'user' && (
+          <UserData
+            onComplete={data => {
+              setUserFormData(data);
+              handleComplete();
+            }}
+            onBack={handleBack}
+          />
+        )}
+        {step.value === 'company' && (
+          <CompanyData
+            onComplete={data => {
+              setCompanyFormData({
+                companyName: data.name,
+                companySize: data.size?.value || '',
+                companyWebsite: data.website,
+              });
+              handleComplete();
+            }}
+            onBack={handleBack}
+          />
+        )}
         {step.value === 'invite' && <Invite onComplete={handleComplete} onBack={handleBack} />}
       </Content>
     </Container>

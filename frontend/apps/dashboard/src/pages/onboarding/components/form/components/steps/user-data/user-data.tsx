@@ -8,10 +8,10 @@ import Header from '../header';
 
 export type UserDataProps = {
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (data: UserFormData) => void;
 };
 
-type FormData = {
+export type UserFormData = {
   firstName: string;
   lastName: string;
 };
@@ -26,15 +26,15 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<UserFormData>({
     defaultValues: {
       firstName: data?.firstName || '',
       lastName: data?.lastName || '',
     },
   });
 
-  const handleSubmit = (formData: FormData) => {
-    mutation.mutate(formData, { onSuccess: onComplete });
+  const handleSubmit = (formData: UserFormData) => {
+    mutation.mutate(formData, { onSuccess: () => onComplete(formData) });
   };
 
   return (

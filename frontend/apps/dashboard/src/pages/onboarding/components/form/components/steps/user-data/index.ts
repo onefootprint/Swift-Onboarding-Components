@@ -1,1 +1,1 @@
-export { default } from './user-data';
+export { default, type UserFormData } from './user-data';
