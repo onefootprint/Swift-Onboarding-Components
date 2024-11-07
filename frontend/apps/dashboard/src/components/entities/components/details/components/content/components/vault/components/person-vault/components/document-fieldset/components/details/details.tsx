@@ -1,5 +1,6 @@
 import type { Document, DocumentUpload, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Dialog, Stack } from '@onefootprint/ui';
+import { partition } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
@@ -9,6 +10,7 @@ import showSelfiePreview from '../../utils/show-selfie-preview';
 import Decrypt from './components/decrypt/decrypt';
 import DetailsLayoutWrapper from './components/details-layout-wrapper';
 import DrawerContent from './components/drawer-content';
+import FailedUploads from './components/failed-uploads';
 import SelfiePreview from './components/selfie-preview';
 import TableOfContents from './components/table-of-contents';
 import UploadImageItem from './components/upload-image-item';
@@ -27,7 +29,9 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
   const { clear } = useDocumentsFilters();
   const { kind, uploads } = document;
   const showDrawer = hasDrawerContent(document, vault);
+  const [successfulUploads, failedUploads] = partition(uploads, upload => upload.failureReasons.length === 0);
 
+  // For the table of contents buttons and the selfie preview
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const uploadRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [visibleUploadIndex, setVisibleUploadIndex] = useState<number>(0);
@@ -71,7 +75,7 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
         >
           <TableOfContents uploads={uploads} onClick={scrollToUpload} visibleIndex={visibleUploadIndex} />
           <UploadsContainer direction="column" align="center" gap={8} width="70%" height="100%">
-            {uploads.map((upload, index) => (
+            {successfulUploads.map((upload, index) => (
               <UploadImageItem
                 key={`${upload.identifier}:${upload.version}`}
                 upload={upload as DocumentUpload & { isLatest: boolean }}
@@ -79,6 +83,13 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
                 ref={el => (uploadRefs.current[index] = el)}
               />
             ))}
+            {failedUploads.length > 0 && (
+              <FailedUploads
+                uploads={failedUploads as (DocumentUpload & { isLatest: boolean })[]}
+                vault={vault}
+                refCallback={(el, index) => (uploadRefs.current[successfulUploads.length + index] = el)}
+              />
+            )}
           </UploadsContainer>
           {showSelfiePreview(uploads, visibleUploadIndex) && <SelfiePreview uploads={uploads} vault={vault} />}
         </DetailsLayoutWrapper>

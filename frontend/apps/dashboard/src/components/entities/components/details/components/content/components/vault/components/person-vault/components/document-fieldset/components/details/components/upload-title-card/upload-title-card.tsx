@@ -38,11 +38,13 @@ const UploadTitleCard = ({
       backgroundColor="primary"
     >
       <Stack gap={2} align="center">
-        <Text variant="snippet-1">{format(new Date(timestamp), 'MM/dd/yy h:mma')}</Text>
+        <Text variant="snippet-1" truncate>
+          {format(new Date(timestamp), 'MM/dd/yy h:mma')}
+        </Text>
         <Text tag="span" variant="label-3">
           ⋅
         </Text>
-        <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
+        <Text variant="label-3" color={isSuccess ? 'primary' : 'error'} truncate>
           {isSuccess ? t('status.success') : t('status.failed')}
         </Text>
         {!isSuccess && (
@@ -51,7 +53,7 @@ const UploadTitleCard = ({
           </Tooltip>
         )}
         {isLatest && (
-          <Text variant="label-3" color={isSuccess ? 'primary' : 'error'}>
+          <Text variant="label-3" truncate>
             {t('title-card.latest', { side: sideT(side) })}
           </Text>
         )}
