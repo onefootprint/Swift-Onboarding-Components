@@ -8,12 +8,11 @@ use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::FpResult;
 use api_core::State;
-use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventRequest;
 use chrono::DateTime;
 use chrono::Utc;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::FilterQueryParams;
-use db::DbResult;
 use newtypes::AuditEventId;
 use newtypes::AuditEventName;
 use newtypes::DataIdentifier;
@@ -33,7 +32,7 @@ async fn get(
     filters: web::Query<AuditEventRequest>,
     pagination: web::Query<CursorPaginationRequest<Base64Cursor<AuditEventCursor>>>,
     auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<AuditEvent, Base64Cursor<AuditEventCursor>> {
+) -> CursorPaginatedResponse<api_wire_types::AuditEvent, Base64Cursor<AuditEventCursor>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
     let page_size = pagination.page_size(&state);
@@ -61,11 +60,8 @@ async fn get(
         list_id,
     };
 
-    let results = state
-        .db_query(move |conn| -> DbResult<_> {
-            use db::models::audit_event::AuditEvent;
-            AuditEvent::filter(conn, params, (page_size + 1) as i64)
-        })
+    let (results, secondary_data) = state
+        .db_query(move |conn| AuditEvent::filter(conn, params, (page_size + 1) as i64))
         .await?;
 
     // If there are more than page_size results, we should tell the client there's another page.
@@ -77,6 +73,7 @@ async fn get(
     });
     let response = results
         .into_iter()
+        .map(|e| (e, &secondary_data))
         .map(api_wire_types::AuditEvent::try_from_db)
         .collect::<FpResult<Vec<api_wire_types::AuditEvent>>>()?;
     CursorPaginatedResponseInner::ok(response, page_size, next_cursor, None)

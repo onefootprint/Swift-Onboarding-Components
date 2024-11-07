@@ -467,6 +467,20 @@ impl TenantRole {
             OrgIdentifierRef::PartnerTenantId(ptid) => Box::new(tenant_role::partner_tenant_id.eq(ptid)),
         }
     }
+
+    #[tracing::instrument("TenantRole::get_bulk", skip_all)]
+    pub fn get_bulk(
+        conn: &mut PgConn,
+        ids: Vec<&TenantRoleId>,
+    ) -> DbResult<HashMap<TenantRoleId, TenantRole>> {
+        let results = tenant_role::table
+            .filter(tenant_role::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|l| (l.id.clone(), l))
+            .collect();
+        Ok(results)
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]

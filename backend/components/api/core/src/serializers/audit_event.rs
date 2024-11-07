@@ -6,12 +6,15 @@ use api_wire_types::Actor;
 use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventDetail;
 use api_wire_types::InsightEvent;
+use db::models::audit_event::AuditEventBulkSecondaryData;
 use db::models::audit_event::JoinedAuditEvent;
 use newtypes::AuditEventMetadata;
 use newtypes::AuditEventName;
 
-impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
-    fn try_from_db(event: JoinedAuditEvent) -> FpResult<Self> {
+impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for AuditEvent {
+    fn try_from_db(
+        (event, secondary_data): (JoinedAuditEvent, &AuditEventBulkSecondaryData),
+    ) -> FpResult<Self> {
         let JoinedAuditEvent {
             audit_event,
             tenant,
@@ -97,14 +100,18 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                 }
             }
             AuditEventMetadata::UpdateOrgMember { old_tenant_role_id } => {
-                let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let new_tr =
+                    tenant_role.ok_or(AssertionError("new tenant role is not available for this event"))?;
+                let old_tr = (secondary_data.tenant_roles)
+                    .get(&old_tenant_role_id)
+                    .ok_or(AssertionError("old tenant role is not available for this event"))?;
                 let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
                 AuditEventDetail::UpdateOrgMember {
                     first_name: tu.first_name,
                     last_name: tu.last_name,
-                    old_tenant_role_id,
                     tenant_user_id: tu.id,
-                    new_role: api_wire_types::OrganizationRole::from_db(tr),
+                    new_role: api_wire_types::OrganizationRole::from_db(new_tr),
+                    old_role: api_wire_types::OrganizationRole::from_db(old_tr.clone()),
                 }
             }
             AuditEventMetadata::LoginOrgMember => AuditEventDetail::LoginOrgMember,

@@ -82,14 +82,12 @@ pub enum AuditEventDetail {
         scopes: Vec<TenantScope>,
     },
     UpdateOrgMember {
-        // TODO: hydrate old role name
-        old_tenant_role_id: TenantRoleId,
-
         first_name: Option<String>,
         last_name: Option<String>,
         tenant_user_id: TenantUserId,
 
         new_role: crate::OrganizationRole,
+        old_role: crate::OrganizationRole,
     },
     LoginOrgMember,
     RemoveOrgMember,

@@ -58,6 +58,7 @@ use newtypes::TenantApiKeyId;
 use newtypes::TenantId;
 use newtypes::TenantRoleId;
 use newtypes::TenantUserId;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = audit_event)]
@@ -243,29 +244,29 @@ impl AuditEvent {
         conn: &mut PgConn,
         params: FilterQueryParams,
         page_size: i64,
-    ) -> DbResult<Vec<JoinedAuditEvent>> {
+    ) -> DbResult<(Vec<JoinedAuditEvent>, AuditEventBulkSecondaryData)> {
         let mut results = audit_event::table
-                    // Required fields
-                    .inner_join(tenant::table)
-                    .inner_join(insight_event::table)
-                    // Nullable fields
-                    .left_join(scoped_vault::table)
-                    .left_join(ob_configuration::table)
-                    .left_join(document_data::table)
-                    .left_join(tenant_api_key::table)
-                    .left_join(tenant_user::table)
-                    .left_join(tenant_role::table)
-                    .left_join(list_entry_creation::table)
-                    .left_join(list_entry::table)
-                    .left_join(list::table)
-                    .order_by(audit_event::timestamp.desc())
-                    // Secondary sort by ID to support (timestamp, id) cursor.
-                    .then_order_by(audit_event::id.desc())
-                    // Include deactivated scoped vaults so deleting doesn't break old audit logs.
-                    .filter(audit_event::tenant_id.eq(params.tenant_id))
-                    .filter(audit_event::is_live.eq(params.is_live).or(audit_event::is_live.is_null()))
-                    .limit(page_size)
-                    .into_boxed();
+            .inner_join(tenant::table)
+            .inner_join(insight_event::table)
+            .left_join(scoped_vault::table)
+            .left_join(ob_configuration::table)
+            .left_join(document_data::table)
+            .left_join(tenant_api_key::table)
+            .left_join(tenant_user::table)
+            .left_join(tenant_role::table)
+            .left_join(list_entry_creation::table)
+            .left_join(list_entry::table)
+            .left_join(list::table)
+            .order_by(audit_event::timestamp.desc())
+            .then_order_by(audit_event::id.desc())
+            .filter(audit_event::tenant_id.eq(params.tenant_id))
+            .filter(
+                audit_event::is_live
+                    .eq(params.is_live)
+                    .or(audit_event::is_live.is_null()),
+            )
+            .limit(page_size)
+            .into_boxed();
 
         if let Some((cursor_ts, cursor_id)) = params.cursor {
             // Filter on (row_ts, row_id) <= (cursor_ts, cursor_id)
@@ -354,9 +355,12 @@ impl AuditEvent {
                     list,
                 }
             })
-            .collect();
+            .collect_vec();
 
-        Ok(events)
+        let aes = events.iter().map(|e| &e.audit_event).collect();
+        let secondary_data = AuditEventBulkSecondaryData::load(conn, aes)?;
+
+        Ok((events, secondary_data))
     }
 
     #[tracing::instrument("AuditEvent::count_hot_vaults", skip_all)]
@@ -392,6 +396,26 @@ impl AuditEvent {
         Ok(count)
     }
 }
+
+/// Some audit events have additional foreign keys provided in the metadata.
+/// This data is bulk loaded in separate queries for all events in a batch of audit events.
+pub struct AuditEventBulkSecondaryData {
+    pub tenant_roles: HashMap<TenantRoleId, TenantRole>,
+}
+
+impl AuditEventBulkSecondaryData {
+    pub fn load(conn: &mut PgConn, audit_events: Vec<&AuditEvent>) -> DbResult<Self> {
+        let tr_ids = audit_events.iter().flat_map(|ut| match &ut.metadata {
+            AuditEventMetadata::UpdateOrgMember { old_tenant_role_id } => Some(old_tenant_role_id),
+            _ => None,
+        });
+
+        let tenant_roles = TenantRole::get_bulk(conn, tr_ids.collect())?;
+
+        Ok(Self { tenant_roles })
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -476,7 +500,7 @@ mod tests {
 
         let insight_event = tests::fixtures::insight_event::create(conn);
 
-        let events = AuditEvent::filter(
+        let (events, _) = AuditEvent::filter(
             conn,
             FilterQueryParams {
                 cursor: None,
@@ -558,7 +582,7 @@ mod tests {
         };
         let id4 = AuditEvent::create(conn, event4).unwrap();
 
-        let events = AuditEvent::filter(
+        let (events, _) = AuditEvent::filter(
             conn,
             FilterQueryParams {
                 cursor: None,
@@ -577,7 +601,7 @@ mod tests {
         assert_eq!(events.len(), 3);
 
         for page_size in 0..=events.len() {
-            let partial_events = AuditEvent::filter(
+            let (partial_events, _) = AuditEvent::filter(
                 conn,
                 FilterQueryParams {
                     cursor: None,
@@ -841,7 +865,7 @@ mod tests {
         ];
 
         for (test_case, params, expect_ids) in tests {
-            let events = AuditEvent::filter(conn, params, 100).unwrap();
+            let (events, _) = AuditEvent::filter(conn, params, 100).unwrap();
             assert_eq!(
                 sorted(events.into_iter().map(|j| j.audit_event.id)).collect_vec(),
                 sorted(expect_ids).collect_vec(),
@@ -850,7 +874,7 @@ mod tests {
             );
         }
 
-        let events = AuditEvent::filter(
+        let (events, _) = AuditEvent::filter(
             conn,
             FilterQueryParams {
                 cursor: None,

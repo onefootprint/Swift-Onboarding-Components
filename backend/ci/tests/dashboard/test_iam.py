@@ -576,3 +576,4 @@ def test_member_update_audit_event(run_id, sandbox_tenant, admin_role, limited_r
         name="update_org_member",
     )
     assert event["detail"]["data"]["new_role"]["id"] == limited_role["id"]
+    assert event["detail"]["data"]["old_role"]["id"] == admin_role["id"]
