@@ -62,6 +62,7 @@ const Toast = ({
         )}
       </Stack>
       <button
+        // @ts-ignore: Type instantiation is excessively deep and possibly infinite
         aria-label={closeAriaLabel ?? (t('components.toast.close-aria-label-default') as string)}
         onClick={handleClose}
         tabIndex={0}
