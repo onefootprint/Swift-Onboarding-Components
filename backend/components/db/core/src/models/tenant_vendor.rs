@@ -167,11 +167,11 @@ mod test {
         assert!(tvc.sentilink_credentials.is_none());
         assert_eq!(tvc.middesk_api_key.as_ref(), Some(&middesk_api_key));
 
-        // Then, update the TVC. We should overlay the patch request over the existing TVC
+        // Then, update the TVC with sentilink and some other things. We should overlay the patch request
+        // over the existing TVC
         let args = UpdateTenantVendorControlArgs {
             idology_enabled: Some(false),
             neuro_enabled: Some(true),
-            middesk_api_key: Some(Some(middesk_api_key.clone())),
             sentilink_credentials: Some(Some(senti_creds.clone())),
             ..Default::default()
         };
@@ -181,6 +181,15 @@ mod test {
         assert!(!tvc.lexis_enabled);
         assert!(tvc.neuro_enabled);
         assert!(tvc.experian_subscriber_code.is_none());
+        assert_eq!(tvc.middesk_api_key.as_ref(), Some(&middesk_api_key));
+        assert_eq!(tvc.sentilink_credentials.as_ref(), Some(&senti_creds));
+
+        // Check this does not overwrite existing middesk and sentilink api keys
+        let args = UpdateTenantVendorControlArgs {
+            neuro_enabled: Some(false),
+            ..Default::default()
+        };
+        let tvc = TenantVendorControl::update_or_create(conn, &tenant_id, args).unwrap();
         assert_eq!(tvc.middesk_api_key.as_ref(), Some(&middesk_api_key));
         assert_eq!(tvc.sentilink_credentials.as_ref(), Some(&senti_creds));
 
@@ -196,7 +205,7 @@ mod test {
         // Other properties didn't change
         assert!(!tvc.idology_enabled);
         assert!(tvc.experian_enabled);
-        assert!(tvc.neuro_enabled);
+        assert!(!tvc.neuro_enabled);
         assert!(!tvc.lexis_enabled);
         assert!(tvc.experian_subscriber_code.is_none());
     }

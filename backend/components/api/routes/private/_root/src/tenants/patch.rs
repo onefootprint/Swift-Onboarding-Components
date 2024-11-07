@@ -49,8 +49,8 @@ async fn patch(
                         "Cannot enable lexis without adding TenantBusinessInfo first",
                     ))?;
                 }
-                let bp = TenantVendorControl::update_or_create(conn, &tenant.id, tvc_update)?;
-                Some(bp)
+                let t = TenantVendorControl::update_or_create(conn, &tenant.id, tvc_update)?;
+                Some(t)
             } else {
                 tvc
             };

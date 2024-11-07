@@ -103,6 +103,7 @@ pub struct PrivateUpdateTvc {
     #[serde(default)]
     pub middesk_api_key: Patch<PiiString>,
     pub neuro_enabled: Option<bool>,
+    #[serde(default)]
     pub sentilink_credentials: Patch<PrivateUpdateSentilinkCredentials>,
 }
 
