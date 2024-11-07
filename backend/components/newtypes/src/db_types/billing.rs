@@ -27,6 +27,7 @@ pub enum BillingEventKind {
     IdentityDocument,
     Kyb,
     KybEinOnly,
+    SambaActivityHistory,
 }
 
 impl BillingEventKind {
@@ -43,6 +44,7 @@ impl BillingEventKind {
             Self::IdentityDocument => BillingStrategy::Each,
             Self::Kyb => BillingStrategy::Each,
             Self::KybEinOnly => BillingStrategy::Each,
+            Self::SambaActivityHistory => BillingStrategy::Each,
         }
     }
 }
@@ -123,6 +125,8 @@ pub enum Product {
     HotProxyVaults,
     /// Number of vaults with decrypts this month
     HotVaults,
+    /// Number of Samba activity history requests this month
+    SambaActivityHistory,
 }
 
 impl Product {
@@ -147,6 +151,7 @@ impl Product {
             Self::ContinuousMonitoringPerYear => "prod_P6nPpoj4yjL3tj",
             Self::AdverseMediaPerYear => "prod_QS2lZZRG3QuzT8",
             Self::CurpVerification => "prod_QE6roGU9hUeA6m",
+            Self::SambaActivityHistory => "prod_RAVutLy5GihkDE",
 
             // TODO this isn't actually used
             Self::MonthlyMinimumOnIdentity => "prod_QPQlh7JsolnihQ",
@@ -174,6 +179,7 @@ impl Product {
             Self::ContinuousMonitoringPerYear => "Uncontracted ContinuousMonitoringPerYear",
             Self::AdverseMediaPerYear => "Uncontracted ContinuousMonitoringWithAdverseMediaPerYear",
             Self::CurpVerification => "Uncontracted CurpVerification",
+            Self::SambaActivityHistory => "Uncontracted SambaActivityHistory",
         }
     }
 
@@ -192,6 +198,7 @@ impl Product {
             | Self::AdverseMediaPerOnboarding
             | Self::ContinuousMonitoringPerYear
             | Self::AdverseMediaPerYear
+            | Self::SambaActivityHistory
             | Self::CurpVerification => true,
             Self::MonthlyPlatformFee
             | Self::MonthlyMinimumOnIdentity
@@ -219,6 +226,7 @@ impl Product {
             | Self::ContinuousMonitoringPerYear
             | Self::AdverseMediaPerYear
             | Self::CurpVerification
+            | Self::SambaActivityHistory
             | Self::MonthlyMinimumOnIdentity => RevenueCategory::Identity,
             Self::HotProxyVaults
             | Self::HotVaults
@@ -257,6 +265,7 @@ impl From<BillingEventKind> for Product {
             BillingEventKind::IdentityDocument => Product::IdDocs,
             BillingEventKind::Kyb => Product::Kyb,
             BillingEventKind::KybEinOnly => Product::KybEinOnly,
+            BillingEventKind::SambaActivityHistory => Product::SambaActivityHistory,
         }
     }
 }
