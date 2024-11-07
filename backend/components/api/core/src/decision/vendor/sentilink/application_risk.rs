@@ -8,14 +8,17 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
+use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::insight_event::InsightEvent;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use idv::sentilink::SentilinkApplicationRiskRequest;
 use newtypes::sentilink::SentilinkProduct;
+use newtypes::BillingEventKind;
 use newtypes::SentilinkApplicationRisk;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
@@ -116,6 +119,21 @@ pub async fn run_sentilink_application_risk(
         .map_err(into_fp_error)?;
 
     let validated = resp.validate().map_err(into_fp_error)?;
+
+
+    // Save billing event
+    let sv_id = di.scoped_vault_id.clone();
+    let wf_id3 = wf_id.clone();
+    state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
+            BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::SentilinkScore)?;
+
+
+            Ok(())
+        })
+        .await?;
 
     Ok(Some((validated, vres_id)))
 }

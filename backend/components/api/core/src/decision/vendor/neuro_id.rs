@@ -9,9 +9,11 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
+use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::neuro_id_analytics_event::NewNeuroIdAnalyticsEvent;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use idv::neuro_id::response::NeuroApiResponse;
@@ -21,6 +23,7 @@ use idv::neuro_id::NeuroIdAnalyticsRequest;
 use newtypes::vendor_api_struct::NeuroIdAnalytics;
 use newtypes::vendor_credentials::NeuroIdCredentials;
 use newtypes::vendor_credentials::NeuroIdSiteId;
+use newtypes::BillingEventKind;
 use newtypes::DecisionIntentId;
 use newtypes::NeuroIdentityId;
 use newtypes::ScopedVaultId;
@@ -139,6 +142,20 @@ pub async fn run_neuro_call(
 
     // save event for metrics/dupes/user insights
     save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres_id).await?;
+
+    // Save billing event
+    let sv_id = di.scoped_vault_id.clone();
+    let wf_id3 = wf_id.clone();
+    state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
+            BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::NeuroIdBehavioral)?;
+
+            Ok(())
+        })
+        .await?;
+
     Ok(Some((parsed, vres_id)))
 }
 
