@@ -28,6 +28,8 @@ pub enum BillingEventKind {
     Kyb,
     KybEinOnly,
     SambaActivityHistory,
+    NeuroIdBehavioral,
+    SentilinkScore,
 }
 
 impl BillingEventKind {
@@ -45,6 +47,8 @@ impl BillingEventKind {
             Self::Kyb => BillingStrategy::Each,
             Self::KybEinOnly => BillingStrategy::Each,
             Self::SambaActivityHistory => BillingStrategy::Each,
+            Self::NeuroIdBehavioral => BillingStrategy::Each,
+            Self::SentilinkScore => BillingStrategy::Each,
         }
     }
 }
@@ -127,6 +131,10 @@ pub enum Product {
     HotVaults,
     /// Number of Samba activity history requests this month
     SambaActivityHistory,
+    /// Sentilink Synthetic and ID Theft Scores
+    SentilinkScore,
+    /// Neuro ID Behavioral and Device Intelligence
+    NeuroIdBehavioral,
 }
 
 impl Product {
@@ -155,6 +163,8 @@ impl Product {
 
             // TODO this isn't actually used
             Self::MonthlyMinimumOnIdentity => "prod_QPQlh7JsolnihQ",
+            Self::SentilinkScore => "prod_RAsaWO48Zgbu6F",
+            Self::NeuroIdBehavioral => "prod_RAsb9TecOnqi4w",
         }
     }
 
@@ -180,6 +190,8 @@ impl Product {
             Self::AdverseMediaPerYear => "Uncontracted ContinuousMonitoringWithAdverseMediaPerYear",
             Self::CurpVerification => "Uncontracted CurpVerification",
             Self::SambaActivityHistory => "Uncontracted SambaActivityHistory",
+            Self::SentilinkScore => "Uncontracted SentilinkScore",
+            Self::NeuroIdBehavioral => "Uncontracted NeuroIDBehavioral",
         }
     }
 
@@ -199,6 +211,8 @@ impl Product {
             | Self::ContinuousMonitoringPerYear
             | Self::AdverseMediaPerYear
             | Self::SambaActivityHistory
+            | Self::SentilinkScore
+            | Self::NeuroIdBehavioral
             | Self::CurpVerification => true,
             Self::MonthlyPlatformFee
             | Self::MonthlyMinimumOnIdentity
@@ -227,6 +241,8 @@ impl Product {
             | Self::AdverseMediaPerYear
             | Self::CurpVerification
             | Self::SambaActivityHistory
+            | Self::SentilinkScore
+            | Self::NeuroIdBehavioral
             | Self::MonthlyMinimumOnIdentity => RevenueCategory::Identity,
             Self::HotProxyVaults
             | Self::HotVaults
@@ -266,6 +282,8 @@ impl From<BillingEventKind> for Product {
             BillingEventKind::Kyb => Product::Kyb,
             BillingEventKind::KybEinOnly => Product::KybEinOnly,
             BillingEventKind::SambaActivityHistory => Product::SambaActivityHistory,
+            BillingEventKind::NeuroIdBehavioral => Product::NeuroIdBehavioral,
+            BillingEventKind::SentilinkScore => Product::SentilinkScore,
         }
     }
 }

@@ -60,7 +60,9 @@ export enum TenantBillingProfileProduct {
   adverseMediaPerYear = 'adverseMediaPerYear',
   continuousMonitoringPerYear = 'continuousMonitoringPerYear',
   monthlyMinimumOnIdentity = 'monthlyMinimumOnIdentity',
-  sambaSafetyActivityHistory = 'sambaSafetyActivityHistory',
+  sambaActivityHistory = 'sambaActivityHistory',
+  neuroIdBehavioral = 'neuroIdBehavioral',
+  sentilinkScore = 'sentilinkScore',
 }
 
 /**

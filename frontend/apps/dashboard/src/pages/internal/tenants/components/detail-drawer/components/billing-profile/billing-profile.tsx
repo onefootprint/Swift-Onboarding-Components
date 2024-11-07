@@ -32,7 +32,9 @@ const OTHER_VERIFICATIONS = [
   TenantBillingProfileProduct.kyb,
   TenantBillingProfileProduct.kybEinOnly,
   TenantBillingProfileProduct.curpVerification,
-  TenantBillingProfileProduct.sambaSafetyActivityHistory,
+  TenantBillingProfileProduct.sambaActivityHistory,
+  TenantBillingProfileProduct.sentilinkScore,
+  TenantBillingProfileProduct.neuroIdBehavioral,
 ];
 
 const VAULTING = [
@@ -72,7 +74,9 @@ const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.adverseMediaPerOnboarding]: 'Adverse media (per user, legacy)',
   [TenantBillingProfileProduct.monthlyMinimumOnIdentity]: 'Monthly minimum',
   [TenantBillingProfileProduct.monthlyPlatformFee]: 'Monthly platform fee',
-  [TenantBillingProfileProduct.sambaSafetyActivityHistory]: 'Samba Safety Activity History',
+  [TenantBillingProfileProduct.sambaActivityHistory]: 'Samba Safety Activity History',
+  [TenantBillingProfileProduct.neuroIdBehavioral]: 'Neuro ID',
+  [TenantBillingProfileProduct.sentilinkScore]: 'Sentilink Synthetic and ID Theft',
 };
 
 const PRICE_SECTIONS = [
