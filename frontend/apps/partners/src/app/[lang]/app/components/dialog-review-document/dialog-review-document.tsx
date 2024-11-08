@@ -1,5 +1,4 @@
-import { Dialog, Stack, TextArea } from '@onefootprint/ui';
-import { Select } from '@onefootprint/ui/src/components';
+import { Dialog, Select, Stack, TextArea } from '@onefootprint/ui';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

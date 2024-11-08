@@ -1,5 +1,3 @@
-import './globals.css';
-
 import { cx } from 'class-variance-authority';
 import type { Metadata } from 'next';
 import { DM_Mono, DM_Sans } from 'next/font/google';

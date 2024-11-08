@@ -1,12 +1,11 @@
-import { TextInput } from '@onefootprint/ui';
-import Label from '@onefootprint/ui/src/components/label';
+import { Form } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
 
 import isValidUrl from './utils/is-valid-url';
 
-type FormProps = {
+type DomainFormFormProps = {
   onSubmit: (payload: { url: string }) => void;
 };
 
@@ -14,8 +13,8 @@ type FormData = {
   url: string;
 };
 
-const Form = ({ onSubmit }: FormProps) => {
-  const { t } = useTranslation('domain-restrictions');
+const DomainForm = ({ onSubmit }: DomainFormFormProps) => {
+  const { t } = useTranslation('domain-restrictions', { keyPrefix: 'create-dialog' });
   const {
     sandbox: { isSandbox },
   } = useOrgSession();
@@ -29,29 +28,30 @@ const Form = ({ onSubmit }: FormProps) => {
 
   return (
     <form id="create-domain-restriction" onSubmit={handleSubmit(onSubmit)}>
-      <Label>{t('create-dialog.title')}</Label>
-      <TextInput
-        autoFocus
-        label={t('create-dialog.input.label') as string}
-        placeholder={t('create-dialog.input.placeholder')}
-        hasError={!!errors.url}
-        mask={{ prefix }}
-        {...register('url', {
-          required: true,
-          pattern: {
-            value: /^\S*$/, // No spaces
-            message: t('create-dialog.input.errors.no-space'),
-          },
-          validate: url => isValidUrl(url),
-        })}
-        onChange={e => {
-          const input = e.target.value;
-          setValue('url', prefix + input.substring(prefix.length));
-        }}
-        hint={errors.url?.message}
-      />
+      <Form.Field>
+        <Form.Label>{t('input.label')}</Form.Label>
+        <Form.Input
+          autoFocus
+          placeholder={t('input.placeholder')}
+          hasError={!!errors.url}
+          mask={{ prefix }}
+          {...register('url', {
+            required: true,
+            pattern: {
+              value: /^\S*$/, // No spaces
+              message: t('input.errors.no-space'),
+            },
+            validate: url => isValidUrl(url),
+          })}
+          onChange={e => {
+            const input = e.target.value;
+            setValue('url', prefix + input.substring(prefix.length));
+          }}
+        />
+        <Form.Errors>{errors.url?.message}</Form.Errors>
+      </Form.Field>
     </form>
   );
 };
 
-export default Form;
+export default DomainForm;

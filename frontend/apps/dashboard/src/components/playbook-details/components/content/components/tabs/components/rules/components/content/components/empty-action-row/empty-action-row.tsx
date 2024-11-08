@@ -1,8 +1,7 @@
 import { IcoBroadcast16, IcoDotsHorizontal16, IcoShuffle16, IcoTrash16 } from '@onefootprint/icons';
 import type { ListRuleField, RiskSignalRuleField, RuleAction } from '@onefootprint/types';
 import { ListRuleOp, RiskSignalRuleOp } from '@onefootprint/types';
-import { Button, IconButton, Stack, Text } from '@onefootprint/ui';
-import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
+import { Button, IconButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ListRuleChip, RiskSignalRuleChip } from 'src/components/rules-action-row/components/rule-chip';

@@ -1,9 +1,9 @@
-import type { ConfirmationDialog } from '@onefootprint/ui/src/utils/confirmation-dialog-provider/hooks/use-confirmation-dialog';
 import type { TFunction } from 'i18next';
 
 type T = TFunction<'common'>;
 type EventFn = (e: Event) => void;
-type OpenConfirm = (x: ConfirmationDialog) => void;
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+type OpenConfirm = (x: any) => void;
 
 export type WithConfirm = (yesFn: EventFn) => (ev: Event) => void;
 

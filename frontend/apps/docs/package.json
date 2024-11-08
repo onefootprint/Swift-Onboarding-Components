@@ -44,6 +44,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@onefootprint/tailwind-config": "workspace:^",
     "@onefootprint/types": "workspace:*",
     "@types/glob": "^7.2.0",
     "@types/google.maps": "^3.55.11",
@@ -52,9 +53,12 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-scroll": "^1.8.7",
+    "autoprefixer": "^10.4.20",
     "glob": "^8.0.3",
     "gray-matter": "^4.0.3",
     "i18next-locales-sync": "^2.1.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
     "tsconfig": "workspace:*",
     "typescript": "^5.6.3"
   },

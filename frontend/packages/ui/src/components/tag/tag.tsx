@@ -1,25 +1,27 @@
-import type React from 'react';
-import styled, { css } from 'styled-components';
-
-import { createFontStyles } from '../../utils/mixins';
+import { cx } from 'class-variance-authority';
+import type { ReactNode } from 'react';
+import type { HTMLAttributes } from 'react';
 
 export type TagProps = {
-  children: React.ReactNode;
-};
+  children: ReactNode;
+} & HTMLAttributes<HTMLSpanElement>;
 
-const Tag = styled.span<TagProps>`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    align-items: center;
-    border-radius: ${theme.borderRadius.full};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    color: ${theme.color.neutral};
-    display: flex;
-    height: 24px;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    user-select: none;
-    white-space: nowrap;
-  `};
-`;
+const Tag = ({ children, className, ...props }: TagProps) => {
+  return (
+    <span
+      className={cx(
+        className,
+        'flex items-center h-6',
+        'text-caption-1 text-neutral whitespace-nowrap select-none',
+        'px-2 py-1',
+        'border border-solid border-primary',
+        'rounded-full',
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+};
 
 export default Tag;

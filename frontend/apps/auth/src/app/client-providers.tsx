@@ -1,6 +1,7 @@
 'use client';
 
 import { AppearanceProvider } from '@onefootprint/appearance';
+import '@onefootprint/ui/styles.css';
 import { Logger } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type React from 'react';

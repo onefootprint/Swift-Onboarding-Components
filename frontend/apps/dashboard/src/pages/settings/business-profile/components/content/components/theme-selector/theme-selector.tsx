@@ -1,5 +1,4 @@
-import { Stack, Text } from '@onefootprint/ui';
-import SelectCustom from '@onefootprint/ui/src/components/select-custom';
+import { SelectCustom, Stack, Text } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 

@@ -1,10 +1,9 @@
+import '@onefootprint/ui/styles.css';
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
-
+import type { AppProps } from 'next/app';
 import type React from 'react';
 import { HostedMachineProvider } from 'src/components/hosted-machine-provider';
-
-import type { AppProps } from 'next/app';
 import configureI18n from '../../config/initializers/i18next';
 import queryClient from '../../config/initializers/react-query';
 

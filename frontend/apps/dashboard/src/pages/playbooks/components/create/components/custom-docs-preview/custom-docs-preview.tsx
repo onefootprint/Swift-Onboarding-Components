@@ -1,5 +1,4 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
-import type { StackProps } from '@onefootprint/ui/src/components/stack';
+import { Box, Stack, type StackProps, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import type { CustomDoc } from '../custom-docs-form';
 

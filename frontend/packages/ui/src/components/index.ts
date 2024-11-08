@@ -104,6 +104,7 @@ export { default as Shimmer } from './shimmer';
 export type { SplitButtonProps } from './split-button';
 export { default as SplitButton } from './split-button';
 export { default as Stack } from './stack';
+export type { StackProps } from './stack';
 export type { StepperOption, StepperProps } from './stepper';
 export { default as Stepper } from './stepper';
 export type { TableProps, TableRow } from './table';
