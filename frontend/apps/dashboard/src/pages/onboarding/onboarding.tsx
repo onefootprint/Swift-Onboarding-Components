@@ -36,9 +36,9 @@ const Onboarding = () => {
   const submitOnboardingData = async (email: string, formData: FormData) => {
     try {
       await submitHubspotOnboardingForm({ ...trackingStorage.data, ...formData, email });
-      // Fire Google Analytics event here
+      trackGoogleConversion(trackingStorage.data);
     } catch (error) {
-      console.error('Error submitting to HubSpot:', error); // Don't block the user from completing the onboarding
+      console.error('Error submitting to HubSpot:', error);
     } finally {
       trackingStorage.reset();
     }
@@ -73,6 +73,20 @@ const Onboarding = () => {
       )}
     </>
   ) : null;
+};
+
+const trackGoogleConversion = (utmProps: Record<string, string | undefined>) => {
+  if (typeof window.gtag !== 'function') return;
+  const GOOGLE_TAG_CONVERSION_ID_AND_LABEL = 'AW-16622916059/ATjFCP6visEZENujtvY9';
+
+  window.gtag('event', 'conversion', {
+    send_to: GOOGLE_TAG_CONVERSION_ID_AND_LABEL,
+    ...(utmProps.utmSource && { utm_source: utmProps.utmSource }),
+    ...(utmProps.utmMedium && { utm_medium: utmProps.utmMedium }),
+    ...(utmProps.utmCampaign && { utm_campaign: utmProps.utmCampaign }),
+    ...(utmProps.utmTerm && { utm_term: utmProps.utmTerm }),
+    ...(utmProps.utmContent && { utm_content: utmProps.utmContent }),
+  });
 };
 
 const Content = styled.div`

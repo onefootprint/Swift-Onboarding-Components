@@ -13,20 +13,27 @@ const getNextConfig = () => {
 
   const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
 
-  const ContentSecurityPolicy = `
-    child-src onefootprint.com;
-    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${DATADOG_SRC} *.mapbox.com *.ghost.io *.hsforms.com api.hsforms.com;
-    default-src 'self' vitals.vercel-insights.com data:;
-    font-src 'self' fonts.googleapis.com fonts.gstatic.com;
-    form-action 'self';
-    frame-ancestors 'self';
-    frame-src 'self' vercel.live https://app.svix.com calendly.com data: blob:;
-    img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net *.ghost.io *.ggpht.com;
-    media-src 'self' https data:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${DATADOG_SRC};
-    style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
-    worker-src 'self' blob:;
-  `;
+  const ContentSecurityPolicy = {
+    'child-src': 'onefootprint.com',
+    'connect-src': `'self' ${DEV_CONNECT_SRC} ${DATADOG_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com *.mapbox.com *.ghost.io`,
+    'default-src': `'self' vitals.vercel-insights.com data:`,
+    'font-src': `'self' fonts.googleapis.com fonts.gstatic.com`,
+    'form-action': `'self'`,
+    'frame-ancestors': `'self'`,
+    'frame-src': `'self' vercel.live https://app.svix.com calendly.com data: blob:`,
+    'img-src': `'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net *.ghost.io *.ggpht.com`,
+    'media-src': `'self' https data:`,
+    'script-src': `'self' 'unsafe-inline' 'unsafe-eval' ${DATADOG_SRC} *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com`,
+    'style-src': `'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net`,
+    'worker-src': `'self' blob:`,
+  };
+
+  const ContentSecurityPolicyOnlyForOnboarding = {
+    'connect-src': '*.google.com *.googletagmanager.com *.hsforms.com api.hsforms.com',
+    'frame-src': '*.doubleclick.net *.googletagmanager.com',
+    'img-src': '*.doubleclick.net *.google.com.br *.google.com',
+    'script-src': '*.doubleclick.net *.google.com *.googletagmanager.com',
+  };
 
   const securityHeaders = [
     {
@@ -59,7 +66,7 @@ const getNextConfig = () => {
     },
     {
       key: 'Content-Security-Policy',
-      value: ContentSecurityPolicy.replace(/\s{2,}/g, ' ').trim(),
+      value: formatContentSecurityPolicy(ContentSecurityPolicy),
     },
   ];
 
@@ -94,9 +101,31 @@ const getNextConfig = () => {
     },
     async headers() {
       return [
+        /**
+         * * 1. Default routes ('/:path*'):
+         *    - Uses strict security headers that block external tracking and analytics
+         *    - Provides maximum security for authenticated user sessions
+         */
         {
           source: '/:path*',
           headers: securityHeaders,
+        },
+        /**
+         * This separation ensures we only allow tracking where absolutely necessary
+         * * 2. Onboarding routes ('/onboarding/:path*'):
+         *    - Includes additional CSP directives to allow Google Analytics/Tag Manager
+         *    - Relaxed specifically for onboarding to track conversion metrics
+         *    - Limited to unauthenticated user flows only
+         */
+        {
+          source: '/onboarding/:path*',
+          headers: [
+            ...securityHeaders.filter(header => header.key !== 'Content-Security-Policy'),
+            {
+              key: 'Content-Security-Policy',
+              value: getMergedContentSecurityPolicy(ContentSecurityPolicy, ContentSecurityPolicyOnlyForOnboarding),
+            },
+          ],
         },
       ];
     },
@@ -136,6 +165,49 @@ const getNextConfig = () => {
   }
 
   return defaultNextConfig;
+};
+
+/**
+ * Formats a Content Security Policy (CSP) object into a valid CSP string
+ * @param {Object.<string, string>} cspObject - An object containing CSP directive-value pairs
+ * @returns {string} A formatted CSP string with directives and values
+ *
+ * @example
+ * const csp = { 'script-src': "'self'", 'img-src': "example.com" };
+ * // Returns: "script-src 'self'; img-src example.com"
+ */
+const formatContentSecurityPolicy = cspObject => {
+  const TWO_OR_MORE_SPACES_REGEX = /\s{2,}/g;
+  return Object.entries(cspObject)
+    .map(([key, value]) => `${key} ${value}`)
+    .join('; ')
+    .replace(TWO_OR_MORE_SPACES_REGEX, ' ')
+    .trim();
+};
+
+/**
+ * Merges two Content Security Policy (CSP) objects and formats the result as a CSP string
+ * @param {Object.<string, string>} baseCSP - The base CSP object containing directive-value pairs
+ * @param {Object.<string, string>} extraCSP - Additional CSP object to merge with the base
+ * @returns {string} A formatted CSP string with merged directives
+ *
+ * @example
+ * const base = { 'script-src': "'self'", 'img-src': "example.com" };
+ * const extra = { 'script-src': "trusted.com", 'connect-src': "api.com" };
+ * // Returns: "script-src 'self' trusted.com; img-src example.com; connect-src api.com"
+ */
+const getMergedContentSecurityPolicy = (baseCSP, extraCSP) => {
+  const mergedCSP = { ...baseCSP };
+  for (const [key, value] of Object.entries(extraCSP)) {
+    if (mergedCSP[key]) {
+      const allValues = new Set([...mergedCSP[key].split(' '), ...value.split(' ')]);
+      mergedCSP[key] = Array.from(allValues).filter(Boolean).join(' ');
+    } else {
+      mergedCSP[key] = value;
+    }
+  }
+
+  return formatContentSecurityPolicy(mergedCSP);
 };
 
 module.exports = getNextConfig();
