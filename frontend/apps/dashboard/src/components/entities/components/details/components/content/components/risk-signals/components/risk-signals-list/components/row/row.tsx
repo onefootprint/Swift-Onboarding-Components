@@ -26,7 +26,7 @@ const Row = ({ riskSignal }: RowProps) => {
       <td>
         <Tooltip text={riskSignal.description} alignment="start">
           <RowData>
-            <Badge variant="info" maxWidth="95%">
+            <Badge variant="info" className="max-w-[95%]">
               <ReasonCode>{riskSignal.reasonCode}</ReasonCode>
             </Badge>
             <IcoInfo16 />

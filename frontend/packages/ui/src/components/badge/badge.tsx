@@ -1,35 +1,35 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { UIState } from '@onefootprint/design-tokens';
-import styled, { css } from 'styled-components';
+import { type VariantProps, cva } from 'class-variance-authority';
+import type { HTMLAttributes } from 'react';
 
-import { createFontStyles } from '../../utils/mixins';
-import type { BoxProps } from '../box';
-import Box from '../box';
+export type BadgeProps = HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badge>;
 
-export type BadgeProps = BoxProps & {
-  variant: UIState;
+const Badge = ({ children, className, variant, ...props }: BadgeProps) => {
+  return (
+    <span className={badge({ variant, className })} {...props}>
+      {children}
+    </span>
+  );
 };
 
-const Badge = ({ children, variant, ...props }: BadgeProps) => (
-  <StyledBadge $variant={variant} tag="span" {...props}>
-    {children}
-  </StyledBadge>
-);
-
-const StyledBadge = styled(Box)<{
-  $variant: UIState;
-}>`
-  ${({ theme, $variant }) => css`
-    ${createFontStyles('caption-1')};
-    align-items: center;
-    background-color: ${theme.backgroundColor[$variant]};
-    border-radius: ${theme.borderRadius.xl};
-    border: 0;
-    color: ${theme.color[$variant]};
-    display: inline-flex;
-    justify-content: center;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  `}
-`;
+const badge = cva(['inline-flex items-center justify-center', 'text-caption-1', 'rounded-lg', 'px-2 py-1'], {
+  variants: {
+    variant: {
+      accent: ['text-accent', 'bg-accent'],
+      error: ['text-error', 'bg-error'],
+      info: ['text-info', 'bg-info'],
+      neutral: ['text-neutral', 'bg-neutral'],
+      success: ['text-success', 'bg-success'],
+      warning: ['text-warning', 'bg-warning'],
+      successInverted: ['text-successInverted', 'bg-successInverted'],
+      warningInverted: ['text-warningInverted', 'bg-warningInverted'],
+      errorInverted: ['text-errorInverted', 'bg-errorInverted'],
+      infoInverted: ['text-infoInverted', 'bg-infoInverted'],
+      neutralInverted: ['text-neutralInverted', 'bg-neutralInverted'],
+    },
+  },
+  defaultVariants: {
+    variant: 'neutral',
+  },
+});
 
 export default Badge;

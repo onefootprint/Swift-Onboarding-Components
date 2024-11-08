@@ -3,6 +3,7 @@ import type { Decorator, Preview } from '@storybook/react';
 import { useEffect } from 'react';
 import { DesignSystemProvider } from '../src/utils/design-system-provider';
 import i18n from './i18n';
+import '../src/styles/tailwind.css';
 
 // Create a global variable called locale in storybook
 // and add a dropdown in the toolbar to change your locale

@@ -25,7 +25,7 @@ const StatusBadge = ({
 
   return (
     <Stack align="center">
-      <Badge variant={badgeVariant} whiteSpace="nowrap">
+      <Badge variant={badgeVariant} className="text-nowrap">
         <span>{t(status)}</span>
         {requiresManualReview && (
           <Stack marginLeft={2}>

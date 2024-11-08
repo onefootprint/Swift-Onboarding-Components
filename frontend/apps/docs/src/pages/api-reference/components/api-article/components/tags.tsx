@@ -33,7 +33,7 @@ const Tags = ({ article }: TagsProps) => {
       )}
       {!article.canAccessApi && (
         <Tooltip text={t('locked-tooltip')}>
-          <Badge variant="warning" whiteSpace="nowrap">
+          <Badge variant="warning" className="text-nowrap">
             <span>{t('locked')}</span>
             <PaddedIcoInfo16 color="warning" />
           </Badge>

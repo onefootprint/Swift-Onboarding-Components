@@ -2713,6 +2713,9 @@ importers:
       '@storybook/addon-links':
         specifier: ^8.4.2
         version: 8.4.2(react@18.3.1)(storybook@8.4.2)
+      '@storybook/addon-themes':
+        specifier: ^8.4.2
+        version: 8.4.2(storybook@8.4.2)
       '@storybook/blocks':
         specifier: ^8.4.2
         version: 8.4.2(react-dom@18.3.1)(react@18.3.1)(storybook@8.4.2)
@@ -10085,6 +10088,15 @@ packages:
       storybook: ^8.4.2
     dependencies:
       '@storybook/global': 5.0.0
+      storybook: 8.4.2
+      ts-dedent: 2.2.0
+    dev: true
+
+  /@storybook/addon-themes@8.4.2(storybook@8.4.2):
+    resolution: {integrity: sha512-SEeADvNxdkgfCEK4kxuV5w0ZFkdWQjJ3GySgLaXZM7FkEySfHyRIvkcoJml6Q0zJdChywVYNTRXonL0hmBlo7Q==}
+    peerDependencies:
+      storybook: ^8.4.2
+    dependencies:
       storybook: 8.4.2
       ts-dedent: 2.2.0
     dev: true
@@ -19505,7 +19517,7 @@ packages:
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.47)
       postcss: 8.4.47
-      postcss-selector-parser: 6.0.12
+      postcss-selector-parser: 6.1.2
       postcss-value-parser: 4.2.0
     dev: true
 
@@ -19516,7 +19528,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       postcss: 8.4.47
-      postcss-selector-parser: 6.0.12
+      postcss-selector-parser: 6.1.2
     dev: true
 
   /postcss-modules-values@4.0.0(postcss@8.4.47):

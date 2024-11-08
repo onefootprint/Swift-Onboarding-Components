@@ -52,6 +52,13 @@ const config: Omit<Config, 'content'> = {
       tertiary: 'var(--border-tertiary)',
       error: 'var(--border-error)',
     },
+    borderRadius: {
+      none: '0px',
+      sm: '4px',
+      DEFAULT: '6px',
+      lg: '20px',
+      rounded: '9999px',
+    },
     extend: {
       fontFamily: {
         sans: ['var(--font-family-default)'],
