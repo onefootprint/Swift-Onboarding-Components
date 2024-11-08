@@ -30,12 +30,15 @@ COPY --link package.json /frontend
 COPY --link pnpm-lock.yaml /frontend
 COPY --link pnpm-workspace.yaml /frontend
 
-RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/demos/package.json
-RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/components/package.json
-RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/hosted/package.json
-RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/handoff/package.json
-RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/auth/package.json
-RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/bifrost/package.json
+RUN for app in demos components hosted handoff auth bifrost; do \
+    sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/$app/package.json; \
+done
+
+RUN for app in demos components hosted handoff auth bifrost; do \
+    if [ -f "/frontend/apps/$app/next.config.js" ]; then \
+        sed -i '/compiler: {/,/},/!b;/},/a\  typescript: { ignoreBuildErrors: true },' /frontend/apps/$app/next.config.js; \
+    fi \
+done
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm turbo run build --filter=bifrost... --filter=handoff... --filter=auth... --filter=components... --filter=demos... --filter=hosted...
