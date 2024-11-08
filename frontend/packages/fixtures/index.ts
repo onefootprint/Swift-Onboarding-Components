@@ -9,7 +9,6 @@ import type {
   AuthV1SdkArgs,
   AuthorizedOrg,
   BatchHostedBusinessOwnerRequest,
-  BusinessDecryptResponse,
   BusinessOnboardingResponse,
   ChallengeKind,
   CheckSessionResponse,
@@ -57,6 +56,7 @@ import type {
   HostedBusiness,
   HostedBusinessDetail,
   HostedBusinessOwner,
+  HostedUserDecryptRequest,
   HostedValidateResponse,
   HostedWorkflowRequest,
   IdDocKind,
@@ -78,6 +78,7 @@ import type {
   LiteIdentifyResponse,
   LogBody,
   LoginChallengeRequest,
+  ModernBusinessDecryptResponse,
   ModernRawBusinessDataRequest,
   ModernRawUserDataRequest,
   ModernUserDecryptResponse,
@@ -90,7 +91,6 @@ import type {
   PostOnboardingRequest,
   ProcessRequest,
   PublicOnboardingConfiguration,
-  RawUserDataRequest,
   RegisterPasskeyAttemptContext,
   RenderV1SdkArgs,
   RequestedTokenScope,
@@ -111,7 +111,6 @@ import type {
   UserChallengeVerifyResponse,
   UserDataIdentifier,
   UserDecryptRequest,
-  UserDecryptResponse,
   VerifyResultV1SdkArgs,
   VerifyV1Options,
   VerifyV1SdkArgs,
@@ -120,31 +119,31 @@ import type {
 } from '@onefootprint/request-types';
 import merge from 'lodash/merge';
 
-export const getActionKind = (props: Partial<ActionKind>) => (props ?? 'add_primary') as ActionKind;
-export const getApiKeyStatus = (props: Partial<ApiKeyStatus>) => (props ?? 'enabled') as ApiKeyStatus;
-export const getApiOnboardingRequirement = (props: Partial<ApiOnboardingRequirement>) =>
-  merge(
+export const getActionKind = (props: ActionKind): ActionKind => props ?? 'replace';
+export const getApiKeyStatus = (props: ApiKeyStatus): ApiKeyStatus => props ?? 'disabled';
+export const getApiOnboardingRequirement = (props: Partial<ApiOnboardingRequirement>): ApiOnboardingRequirement =>
+  merge<ApiOnboardingRequirement, Partial<ApiOnboardingRequirement>>(
     {
-      isMet: true,
+      isMet: false,
     },
     props,
-  ) as ApiOnboardingRequirement;
-export const getAuthMethod = (props: Partial<AuthMethod>) =>
-  merge(
+  );
+export const getAuthMethod = (props: Partial<AuthMethod>): AuthMethod =>
+  merge<AuthMethod, Partial<AuthMethod>>(
     {
       canUpdate: true,
-      isVerified: true,
-      kind: 'passkey',
+      isVerified: false,
+      kind: 'phone',
     },
     props,
-  ) as AuthMethod;
-export const getAuthMethodKind = (props: Partial<AuthMethodKind>) => (props ?? 'phone') as AuthMethodKind;
-export const getAuthRequirementsResponse = (props: Partial<AuthRequirementsResponse>) =>
-  merge(
+  );
+export const getAuthMethodKind = (props: AuthMethodKind): AuthMethodKind => props ?? 'email';
+export const getAuthRequirementsResponse = (props: Partial<AuthRequirementsResponse>): AuthRequirementsResponse =>
+  merge<AuthRequirementsResponse, Partial<AuthRequirementsResponse>>(
     {
       allRequirements: [
         {
-          isMet: false,
+          isMet: true,
         },
         {
           isMet: true,
@@ -155,16 +154,16 @@ export const getAuthRequirementsResponse = (props: Partial<AuthRequirementsRespo
       ],
     },
     props,
-  ) as AuthRequirementsResponse;
-export const getAuthV1Options = (props: Partial<AuthV1Options>) =>
-  merge(
+  );
+export const getAuthV1Options = (props: Partial<AuthV1Options>): AuthV1Options =>
+  merge<AuthV1Options, Partial<AuthV1Options>>(
     {
       showLogo: true,
     },
     props,
-  ) as AuthV1Options;
-export const getAuthV1SdkArgs = (props: Partial<AuthV1SdkArgs>) =>
-  merge(
+  );
+export const getAuthV1SdkArgs = (props: Partial<AuthV1SdkArgs>): AuthV1SdkArgs =>
+  merge<AuthV1SdkArgs, Partial<AuthV1SdkArgs>>(
     {
       l10N: {
         language: 'en',
@@ -173,326 +172,611 @@ export const getAuthV1SdkArgs = (props: Partial<AuthV1SdkArgs>) =>
       options: {
         showLogo: false,
       },
-      publicKey: 'cf88fc25-47a2-4d6c-9b7d-723c0655326e',
+      publicKey: '7c1e3afb-b864-49ee-b5fa-18d31c9bf77b',
       userData: {},
     },
     props,
-  ) as AuthV1SdkArgs;
-export const getAuthorizedOrg = (props: Partial<AuthorizedOrg>) =>
-  merge(
+  );
+export const getAuthorizedOrg = (props: Partial<AuthorizedOrg>): AuthorizedOrg =>
+  merge<AuthorizedOrg, Partial<AuthorizedOrg>>(
     {
-      canAccessData: ['nationality', 'investor_profile', 'phone_number'],
-      logoUrl: 'https://grumpy-hawk.biz',
-      orgName: 'Joseph Kautzer',
+      canAccessData: ['card', 'investor_profile', 'ssn9'],
+      logoUrl: 'https://whimsical-hoof.net/',
+      orgName: 'Fredrick Dare',
     },
     props,
-  ) as AuthorizedOrg;
-export const getBatchHostedBusinessOwnerRequest = (props: Partial<BatchHostedBusinessOwnerRequest>) =>
-  merge(
+  );
+export const getBatchHostedBusinessOwnerRequest = (
+  props: Partial<BatchHostedBusinessOwnerRequest>,
+): BatchHostedBusinessOwnerRequest =>
+  merge<BatchHostedBusinessOwnerRequest, Partial<BatchHostedBusinessOwnerRequest>>(
     {
       data: {
-        'id.first_name': 'John',
-        'id.last_name': 'Doe',
+        'bank.*.account_type': 'Excepteur esse',
+        'bank.*.ach_account_id': '3b59ef3c-20fe-4d2b-8970-2881748f4774',
+        'bank.*.ach_account_number': 'non dolor proident consequat fugiat',
+        'bank.*.ach_routing_number': 'laborum dolore',
+        'bank.*.fingerprint': 'id occaecat mollit nulla ipsum',
+        'bank.*.name': 'Ruben Donnelly',
+        'card.*.billing_address.country': '9971 Lake Avenue Suite 603',
+        'card.*.billing_address.zip': '474 Yasmine Passage Suite 133',
+        'card.*.cvc': 'esse ipsum quis nulla',
+        'card.*.expiration': 'ut magna consequat',
+        'card.*.expiration_month': 'velit nostrud',
+        'card.*.expiration_year': 'commodo',
+        'card.*.fingerprint': 'qui esse ex et',
+        'card.*.issuer': 'ullamco anim veniam',
+        'card.*.name': 'Carol Von',
+        'card.*.number': 'mollit sint cillum sit enim',
+        'card.*.number_last4': 'ut',
+        'custom.*': 'ipsum cupidatat tempor quis qui',
+        'document.custom.*': 'Excepteur aliquip laboris non sunt',
+        'document.drivers_license.address_line1': '36203 College Avenue Apt. 844',
+        'document.drivers_license.back.image': 'commodo sed fugiat',
+        'document.drivers_license.back.mime_type': 'cupidatat ullamco',
+        'document.drivers_license.city': 'Fort Joany',
+        'document.drivers_license.classified_document_type': 'id sit Lorem',
+        'document.drivers_license.clave_de_elector': 'aute',
+        'document.drivers_license.curp': 'enim',
+        'document.drivers_license.curp_validation_response': '4b99b0ef-e288-43b4-b1b3-b8b977b12d98',
+        'document.drivers_license.dob': 'nulla',
+        'document.drivers_license.document_number': 'id deserunt',
+        'document.drivers_license.expires_at': 'fugiat aliqua proident',
+        'document.drivers_license.first_name': 'Camryn',
+        'document.drivers_license.front.image': 'amet culpa ipsum',
+        'document.drivers_license.front.mime_type': 'sit',
+        'document.drivers_license.full_address': '152 McKenzie Mission Suite 267',
+        'document.drivers_license.full_name': 'Todd Simonis',
+        'document.drivers_license.gender': 'do nulla labore id',
+        'document.drivers_license.issued_at': 'ut commodo veniam culpa dolor',
+        'document.drivers_license.issuing_country': 'Panama',
+        'document.drivers_license.issuing_state': 'New Jersey',
+        'document.drivers_license.last_name': 'Nader',
+        'document.drivers_license.nationality': 'sed consequat anim dolor cupidatat',
+        'document.drivers_license.postal_code': 'magna id esse',
+        'document.drivers_license.ref_number': 'fugiat voluptate amet commodo irure',
+        'document.drivers_license.samba_activity_history_response': 'proident nulla dolore',
+        'document.drivers_license.selfie.image': 'consequat',
+        'document.drivers_license.selfie.mime_type': 'adipisicing laboris incididunt reprehenderit exercitation',
+        'document.drivers_license.state': 'Wyoming',
+        'document.finra_compliance_letter': 'aliquip elit',
+        'document.id_card.address_line1': '651 Huel Shoals Suite 446',
+        'document.id_card.back.image': '47c4a5ec-3238-4143-aac9-cf4ee32bd324',
+        'document.id_card.back.mime_type': 'b8f51bc4-f448-43ad-a3bb-f445257f46c7',
+        'document.id_card.city': 'Port Aleenhaven',
+        'document.id_card.classified_document_type': '25861f70-7670-4923-b05f-084644e15486',
+        'document.id_card.clave_de_elector': '473a91d9-eccd-4ff2-8824-421fd9c90042',
+        'document.id_card.curp': 'ffaf39dd-cf26-4a0c-874a-dcca3e3895f6',
+        'document.id_card.curp_validation_response': '8d6ee8eb-fd1f-4881-ae71-3f77d83f7bc7',
+        'document.id_card.dob': 'ba512945-e2c4-45ca-a3f8-b5499550f695',
+        'document.id_card.document_number': 'b897adfd-b487-4ffb-b626-0d470a39af32',
+        'document.id_card.expires_at': '6b65bf6e-db8d-4216-821a-f7db1104aec2',
+        'document.id_card.first_name': 'Jerald',
+        'document.id_card.front.image': 'b962d438-3db7-4825-84ce-d65ee9ded2c9',
+        'document.id_card.front.mime_type': '270ecd38-d92a-4fa9-9ee4-badd3892d804',
+        'document.id_card.full_address': '33499 Wuckert Extension Apt. 377',
+        'document.id_card.full_name': 'Albert Hodkiewicz',
+        'document.id_card.gender': '673ea478-02f7-4606-b879-af9b400664c6',
+        'document.id_card.issued_at': 'b38b2d57-f69a-4667-b3b8-e38574c54462',
+        'document.id_card.issuing_country': 'Reunion',
+        'document.id_card.issuing_state': 'Ohio',
+        'document.id_card.last_name': 'Sporer',
+        'document.id_card.nationality': '16ac307a-308c-425d-9dfd-3e4da2a9d17a',
+        'document.id_card.postal_code': '3f1e3fc3-2694-4b3f-8fcb-fb3fa7d052ef',
+        'document.id_card.ref_number': '8d409f60-62db-4cec-98e2-b68e30b659aa',
+        'document.id_card.samba_activity_history_response': 'e777a889-6862-439a-9cd6-5556b22bd4c3',
+        'document.id_card.selfie.image': '22342d47-67b9-4317-b1be-f8d008c4e8a7',
+        'document.id_card.selfie.mime_type': '29dd0e9f-dc39-4793-9c86-c4bc22ea7e9c',
+        'document.id_card.state': 'Montana',
+        'document.passport.address_line1': '9601 Kilback Run Suite 248',
+        'document.passport.back.image': 'velit esse in',
+        'document.passport.back.mime_type': 'ullamco non in quis sunt',
+        'document.passport.city': 'Grimesmouth',
+        'document.passport.classified_document_type': 'Duis eu enim Ut proident',
+        'document.passport.clave_de_elector': 'laboris',
+        'document.passport.curp': 'irure occaecat ut non',
+        'document.passport.curp_validation_response': '42cae1fc-ea13-429f-bb68-21413276121c',
+        'document.passport.dob': 'adipisicing ipsum enim',
+        'document.passport.document_number': 'eu',
+        'document.passport.expires_at': 'irure Duis',
+        'document.passport.first_name': 'Clinton',
+        'document.passport.front.image': 'pariatur aliqua ex eu sunt',
+        'document.passport.front.mime_type': 'cillum dolore',
+        'document.passport.full_address': '4200 Mariam Gardens Suite 850',
+        'document.passport.full_name': 'Laverne Wuckert',
+        'document.passport.gender': 'aliqua deserunt dolore aliquip velit',
+        'document.passport.issued_at': 'ullamco Lorem et',
+        'document.passport.issuing_country': 'Jersey',
+        'document.passport.issuing_state': 'Michigan',
+        'document.passport.last_name': 'Marks',
+        'document.passport.nationality': 'Duis ut sint',
+        'document.passport.postal_code': 'consectetur exercitation',
+        'document.passport.ref_number': 'pariatur aliqua',
+        'document.passport.samba_activity_history_response': 'dolore officia culpa nostrud et',
+        'document.passport.selfie.image': 'veniam ad elit sit',
+        'document.passport.selfie.mime_type': 'in Duis',
+        'document.passport.state': 'South Dakota',
+        'document.passport_card.address_line1': '5452 Kianna Shoal Suite 752',
+        'document.passport_card.back.image': 'reprehenderit commodo ullamco in eiusmod',
+        'document.passport_card.back.mime_type': 'sit Lorem est in id',
+        'document.passport_card.city': 'Lake Rubye',
+        'document.passport_card.classified_document_type': 'cillum esse',
+        'document.passport_card.clave_de_elector': 'sint dolore pariatur sit',
+        'document.passport_card.curp': 'ea culpa ut reprehenderit',
+        'document.passport_card.curp_validation_response': '10bc0e9f-fdaf-4464-b76e-7b203edf1ce2',
+        'document.passport_card.dob': 'sint',
+        'document.passport_card.document_number': 'sunt culpa aliquip nulla do',
+        'document.passport_card.expires_at': 'proident laboris',
+        'document.passport_card.first_name': 'Hudson',
+        'document.passport_card.front.image': 'eiusmod incididunt ad anim enim',
+        'document.passport_card.front.mime_type': 'exercitation',
+        'document.passport_card.full_address': '72414 Purdy Isle Apt. 974',
+        'document.passport_card.full_name': 'Jacqueline Dicki',
+        'document.passport_card.gender': 'dolor adipisicing dolore',
+        'document.passport_card.issued_at': 'nostrud voluptate incididunt minim amet',
+        'document.passport_card.issuing_country': 'Gambia',
+        'document.passport_card.issuing_state': 'Wisconsin',
+        'document.passport_card.last_name': 'Gusikowski',
+        'document.passport_card.nationality': 'Lorem ullamco commodo enim',
+        'document.passport_card.postal_code': 'ex eiusmod officia adipisicing',
+        'document.passport_card.ref_number': 'magna',
+        'document.passport_card.samba_activity_history_response': 'quis',
+        'document.passport_card.selfie.image': 'veniam id magna',
+        'document.passport_card.selfie.mime_type': 'sint nisi laborum sed cupidatat',
+        'document.passport_card.state': 'Indiana',
+        'document.permit.address_line1': '6767 Jackson Walks Apt. 815',
+        'document.permit.back.image': 'ea Ut Excepteur',
+        'document.permit.back.mime_type': 'sunt sed',
+        'document.permit.city': 'Hermannworth',
+        'document.permit.classified_document_type': 'adipisicing',
+        'document.permit.clave_de_elector': 'anim non irure Lorem proident',
+        'document.permit.curp': 'ullamco nisi fugiat aliqua pariatur',
+        'document.permit.curp_validation_response': 'd81fd437-9764-41b1-8eb4-fdcfe4f77c31',
+        'document.permit.dob': 'reprehenderit culpa qui',
+        'document.permit.document_number': 'dolor tempor ea nulla consequat',
+        'document.permit.expires_at': 'ea nulla quis',
+        'document.permit.first_name': 'Dan',
+        'document.permit.front.image': 'culpa dolore enim magna',
+        'document.permit.front.mime_type': 'ea nostrud aliqua Excepteur qui',
+        'document.permit.full_address': '9693 Shad Ways Suite 475',
+        'document.permit.full_name': 'Miss Anna Gislason',
+        'document.permit.gender': 'culpa laborum consectetur',
+        'document.permit.issued_at': 'elit',
+        'document.permit.issuing_country': 'Venezuela',
+        'document.permit.issuing_state': 'Arizona',
+        'document.permit.last_name': 'Pfeffer',
+        'document.permit.nationality': 'quis mollit cupidatat aute',
+        'document.permit.postal_code': 'sit occaecat minim esse',
+        'document.permit.ref_number': 'Excepteur cupidatat velit',
+        'document.permit.samba_activity_history_response': 'sint dolore aute eu',
+        'document.permit.selfie.image': 'in officia laboris magna',
+        'document.permit.selfie.mime_type': 'anim',
+        'document.permit.state': 'Vermont',
+        'document.proof_of_address.image': '4677 Cumberland Street Suite 131',
+        'document.residence_document.address_line1': '4627 Barrows Avenue Suite 391',
+        'document.residence_document.back.image': '5907b815-8814-49f1-9c84-e7788fa728f7',
+        'document.residence_document.back.mime_type': 'b8248212-be6a-417d-bfa2-6dfa59343262',
+        'document.residence_document.city': 'Volkmanberg',
+        'document.residence_document.classified_document_type': '26e64748-302e-4c3f-9913-aed0c4880109',
+        'document.residence_document.clave_de_elector': '956b4d8c-1d52-4d1c-aa95-60c62481ce9c',
+        'document.residence_document.curp': 'f526ac6c-ca06-4eba-ab76-9d79b3aea5e3',
+        'document.residence_document.curp_validation_response': 'bc9c9136-9ec1-44fd-a235-ef380091bca5',
+        'document.residence_document.dob': '228c053d-193f-4f88-a4b8-d2457118a250',
+        'document.residence_document.document_number': 'a0154a61-a32f-45a2-97fc-a85337aa6c78',
+        'document.residence_document.expires_at': 'e1ef266a-b840-41f1-b4da-e96a6d3b6807',
+        'document.residence_document.first_name': 'Marisol',
+        'document.residence_document.front.image': '9f8f8915-5bf5-4793-9c48-361906e6d33c',
+        'document.residence_document.front.mime_type': 'feb22ef2-3c76-45b5-b27f-a61e5b67be2d',
+        'document.residence_document.full_address': '72465 McKenzie Crest Apt. 680',
+        'document.residence_document.full_name': 'Miss Diane Kohler PhD',
+        'document.residence_document.gender': '876c012c-450e-4176-ab2b-c5eeffb7d0ac',
+        'document.residence_document.issued_at': 'f2f1d2db-929e-4dbb-a16f-4be76d5f9ab3',
+        'document.residence_document.issuing_country': 'Germany',
+        'document.residence_document.issuing_state': 'Connecticut',
+        'document.residence_document.last_name': 'Larson',
+        'document.residence_document.nationality': 'a2e7647f-9b57-4494-a5b0-84f6aba65a82',
+        'document.residence_document.postal_code': 'b6ce8fc2-4c4b-4b88-bfef-71570bb98270',
+        'document.residence_document.ref_number': 'dc8c9e97-5830-48c7-86a9-2a4759fa2cec',
+        'document.residence_document.samba_activity_history_response': '41e2259e-fbef-4f96-903a-cb0fb0a051a2',
+        'document.residence_document.selfie.image': '4eb27b1d-da01-4801-a5ec-2c34eb0553d5',
+        'document.residence_document.selfie.mime_type': 'fb61b9ef-b887-4cac-8694-176108c5a4a5',
+        'document.residence_document.state': 'Pennsylvania',
+        'document.ssn_card.image': 'incididunt commodo dolor quis ad',
+        'document.visa.address_line1': '2548 4th Avenue Suite 860',
+        'document.visa.back.image': 'Lorem',
+        'document.visa.back.mime_type': 'occaecat sed sit pariatur',
+        'document.visa.city': 'Fort Theodoreborough',
+        'document.visa.classified_document_type': 'in ex aute elit',
+        'document.visa.clave_de_elector': 'sunt laboris aliquip labore proident',
+        'document.visa.curp': 'sunt dolor sit ad dolore',
+        'document.visa.curp_validation_response': '6bc25865-417a-411b-8bc9-4fc921114bcd',
+        'document.visa.dob': 'labore aliquip laboris sit',
+        'document.visa.document_number': 'et sint nisi',
+        'document.visa.expires_at': 'officia elit Duis',
+        'document.visa.first_name': 'Felicia',
+        'document.visa.front.image': 'Lorem sunt et nostrud Duis',
+        'document.visa.front.mime_type': 'ex',
+        'document.visa.full_address': '22828 E Grand Avenue Apt. 573',
+        'document.visa.full_name': 'Eloise Quigley',
+        'document.visa.gender': 'consequat dolore ipsum',
+        'document.visa.issued_at': 'dolor Excepteur',
+        'document.visa.issuing_country': 'Egypt',
+        'document.visa.issuing_state': 'Mississippi',
+        'document.visa.last_name': 'McClure',
+        'document.visa.nationality': 'sit magna',
+        'document.visa.postal_code': 'exercitation sed consequat ea amet',
+        'document.visa.ref_number': 'amet',
+        'document.visa.samba_activity_history_response': 'sed',
+        'document.visa.selfie.image': 'reprehenderit proident',
+        'document.visa.selfie.mime_type': 'adipisicing',
+        'document.visa.state': 'Kansas',
+        'document.voter_identification.address_line1': '132 Prospect Avenue Suite 794',
+        'document.voter_identification.back.image': 'fc3f09e9-0693-4c30-9dfb-3b8c00d55236',
+        'document.voter_identification.back.mime_type': 'c7450d05-c26b-4d7c-977a-97481bab3d07',
+        'document.voter_identification.city': 'Aramouth',
+        'document.voter_identification.classified_document_type': 'd959bab9-ebc6-42d8-bd1d-f96600889be7',
+        'document.voter_identification.clave_de_elector': '8b5f8c2a-0700-4bcc-842b-012e06b09160',
+        'document.voter_identification.curp': 'f6a9c084-26f5-4569-a86f-41c354a4c3eb',
+        'document.voter_identification.curp_validation_response': 'be4c7835-2f25-42c1-b9cc-545541c7757b',
+        'document.voter_identification.dob': '3b11de5d-c990-4bf0-965c-f46983f26f7c',
+        'document.voter_identification.document_number': '3947b5ad-89f7-4041-a4d3-d15785d18b37',
+        'document.voter_identification.expires_at': '8c6571af-4da6-46f4-89a1-30aa32738c20',
+        'document.voter_identification.first_name': 'Malinda',
+        'document.voter_identification.front.image': 'ffc2308f-ab69-4545-bc59-e89197903443',
+        'document.voter_identification.front.mime_type': 'a14d8dbb-3cf4-4885-a889-1c17a7f3ab94',
+        'document.voter_identification.full_address': '554 Hyatt Knoll Apt. 553',
+        'document.voter_identification.full_name': 'Alfred Morissette',
+        'document.voter_identification.gender': 'e2e9a432-0519-4081-abac-8b25b46cbf7b',
+        'document.voter_identification.issued_at': '15803661-4ca7-4390-b887-2ebbfc84d5d5',
+        'document.voter_identification.issuing_country': 'Brazil',
+        'document.voter_identification.issuing_state': 'New Jersey',
+        'document.voter_identification.last_name': 'Donnelly',
+        'document.voter_identification.nationality': '74274cef-872d-40df-b275-d2f7b34b4cbe',
+        'document.voter_identification.postal_code': '9b1417f0-71f5-4ce7-a917-a744b0860440',
+        'document.voter_identification.ref_number': 'd6b84bce-2c8f-47dd-aa93-dd246936af11',
+        'document.voter_identification.samba_activity_history_response': '2dc7a7f5-dd78-492d-83a9-4db1c2b4efd1',
+        'document.voter_identification.selfie.image': '66b34d79-d780-4af1-a678-129a2096dde1',
+        'document.voter_identification.selfie.mime_type': '69d3701d-cdb4-40c9-a91f-ccf447329e44',
+        'document.voter_identification.state': 'Alaska',
+        'id.address_line1': '62748 Hammes Trafficway Suite 286',
+        'id.address_line2': '51023 Lubowitz Glens Apt. 364',
+        'id.citizenships': 'd40e5aed-08f4-4d90-8caf-a4435320cf05',
+        'id.city': 'Fort Jordyn',
+        'id.country': 'Dominica',
+        'id.dob': 'bbfc5c85-9d68-4e8d-aab4-97a1e31f924e',
+        'id.drivers_license_number': '440442df-aefc-42dc-8af8-55c84dc2dce8',
+        'id.drivers_license_state': 'Louisiana',
+        'id.email': 'maurice61@gmail.com',
+        'id.first_name': 'Macie',
+        'id.itin': '94432aee-a432-45fc-a294-18b72de39343',
+        'id.last_name': 'Bednar',
+        'id.middle_name': 'Mrs. Ana McLaughlin',
+        'id.nationality': 'ad6cd182-baab-4299-b813-ac3a4eb5b43f',
+        'id.phone_number': '+19105451725',
+        'id.ssn4': 'b2585782-03bd-449b-aa20-2aabafc88cc2',
+        'id.ssn9': '54f437e2-c61d-4724-9f13-1428f45ee34d',
+        'id.state': 'Alabama',
+        'id.us_legal_status': '3777cccd-bd47-4d74-8964-8fec88e05c45',
+        'id.us_tax_id': 'c580ff1a-79c6-44ca-b692-e3839345f200',
+        'id.visa_expiration_date': '2e71c89f-547e-4946-8cc9-c90e8f748717',
+        'id.visa_kind': 'd72976a8-0cc8-4350-823c-4d04fee6052b',
+        'id.zip': '52756',
+        'investor_profile.annual_income': 'aliqua',
+        'investor_profile.brokerage_firm_employer': 'mollit',
+        'investor_profile.declarations': 'eu',
+        'investor_profile.employer': 'ullamco elit cupidatat sed',
+        'investor_profile.employment_status': 'eiusmod mollit nisi',
+        'investor_profile.family_member_names': 'Doyle Abshire',
+        'investor_profile.funding_sources': 'labore dolore ea elit Excepteur',
+        'investor_profile.investment_goals': 'sit',
+        'investor_profile.net_worth': 'mollit non',
+        'investor_profile.occupation': 'proident reprehenderit est',
+        'investor_profile.political_organization': 'ullamco dolor reprehenderit tempor dolor',
+        'investor_profile.risk_tolerance': 'pariatur ut aliquip',
+        'investor_profile.senior_executive_symbols': 'minim Lorem fugiat',
       },
       op: 'create',
-      ownershipStake: 30,
-      uuid: '73b7e274-8080-44d6-b160-86cbc9877a00',
+      ownershipStake: -98833602,
+      uuid: 'd393392a-1bb1-4389-a70e-1b4a749e0a30',
     },
     props,
-  ) as BatchHostedBusinessOwnerRequest;
-export const getBusinessDecryptResponse = (props: Partial<BusinessDecryptResponse>) =>
-  merge(
+  );
+export const getBusinessOnboardingResponse = (props: Partial<BusinessOnboardingResponse>): BusinessOnboardingResponse =>
+  merge<BusinessOnboardingResponse, Partial<BusinessOnboardingResponse>>(
     {
-      'business.name': 'Acme Bank',
-      'business.website': 'acmebank.org',
+      authToken: '41785484-4c34-4619-ab8c-7f7e496b5779',
     },
     props,
-  ) as BusinessDecryptResponse;
-export const getBusinessOnboardingResponse = (props: Partial<BusinessOnboardingResponse>) =>
-  merge(
-    {
-      authToken: '9aaa9593-2427-4270-b3cd-c5134af08932',
-    },
-    props,
-  ) as BusinessOnboardingResponse;
-export const getChallengeKind = (props: Partial<ChallengeKind>) => (props ?? 'sms') as ChallengeKind;
-export const getCheckSessionResponse = (props: Partial<CheckSessionResponse>) =>
-  (props ?? 'expired') as CheckSessionResponse;
-export const getCollectedDataOption = (props: Partial<CollectedDataOption>) => (props ?? 'dob') as CollectedDataOption;
-export const getConsentRequest = (props: Partial<ConsentRequest>) =>
-  merge(
+  );
+export const getChallengeKind = (props: ChallengeKind): ChallengeKind => props ?? 'email';
+export const getCheckSessionResponse = (props: CheckSessionResponse): CheckSessionResponse => props ?? 'active';
+export const getCollectedDataOption = (props: CollectedDataOption): CollectedDataOption =>
+  props ?? 'business_kyced_beneficial_owners';
+export const getConsentRequest = (props: Partial<ConsentRequest>): ConsentRequest =>
+  merge<ConsentRequest, Partial<ConsentRequest>>(
     {
       consentLanguageText: 'en',
-      mlConsent: true,
+      mlConsent: false,
     },
     props,
-  ) as ConsentRequest;
-export const getCountrySpecificDocumentMapping = (props: Partial<CountrySpecificDocumentMapping>) =>
-  merge({}, props) as CountrySpecificDocumentMapping;
-export const getCreateDeviceAttestationRequest = (props: Partial<CreateDeviceAttestationRequest>) =>
-  merge(
+  );
+export const getCountrySpecificDocumentMapping = (
+  props: Partial<CountrySpecificDocumentMapping>,
+): CountrySpecificDocumentMapping =>
+  merge<CountrySpecificDocumentMapping, Partial<CountrySpecificDocumentMapping>>({}, props);
+export const getCreateDeviceAttestationRequest = (
+  props: Partial<CreateDeviceAttestationRequest>,
+): CreateDeviceAttestationRequest =>
+  merge<CreateDeviceAttestationRequest, Partial<CreateDeviceAttestationRequest>>(
     {
-      attestation: 'incididunt in proident',
-      state: 'New York',
+      attestation: 'nostrud occaecat culpa',
+      state: 'Kentucky',
     },
     props,
-  ) as CreateDeviceAttestationRequest;
-export const getCreateDocumentRequest = (props: Partial<CreateDocumentRequest>) =>
-  merge(
+  );
+export const getCreateDocumentRequest = (props: Partial<CreateDocumentRequest>): CreateDocumentRequest =>
+  merge<CreateDocumentRequest, Partial<CreateDocumentRequest>>(
     {
-      countryCode: 'Mayotte',
+      countryCode: 'GP',
       deviceType: 'android',
-      documentType: 'custom',
-      fixtureResult: 'real',
-      requestId: 'd4af5c55-2ab6-4c22-8ae3-630d5c66d114',
+      documentType: 'drivers_license',
+      fixtureResult: 'fail',
+      requestId: 'ab9d1a23-39a7-4d37-bcd6-59d972912880',
       skipSelfie: true,
     },
     props,
-  ) as CreateDocumentRequest;
-export const getCreateDocumentResponse = (props: Partial<CreateDocumentResponse>) =>
-  merge(
+  );
+export const getCreateDocumentResponse = (props: Partial<CreateDocumentResponse>): CreateDocumentResponse =>
+  merge<CreateDocumentResponse, Partial<CreateDocumentResponse>>(
     {
-      id: '148f847b-c7de-452d-9b30-cba37c7ce7cc',
+      id: '2d0074de-10c4-44df-8ea8-95a4d9725b47',
     },
     props,
-  ) as CreateDocumentResponse;
-export const getCreateOnboardingTimelineRequest = (props: Partial<CreateOnboardingTimelineRequest>) =>
-  merge(
+  );
+export const getCreateOnboardingTimelineRequest = (
+  props: Partial<CreateOnboardingTimelineRequest>,
+): CreateOnboardingTimelineRequest =>
+  merge<CreateOnboardingTimelineRequest, Partial<CreateOnboardingTimelineRequest>>(
     {
-      event: 'in est eiusmod adipisicing dolor',
+      event: 'ut pariatur elit',
     },
     props,
-  ) as CreateOnboardingTimelineRequest;
-export const getCreateSdkArgsTokenResponse = (props: Partial<CreateSdkArgsTokenResponse>) =>
-  merge(
+  );
+export const getCreateSdkArgsTokenResponse = (props: Partial<CreateSdkArgsTokenResponse>): CreateSdkArgsTokenResponse =>
+  merge<CreateSdkArgsTokenResponse, Partial<CreateSdkArgsTokenResponse>>(
     {
-      expiresAt: '1957-03-17T05:34:51.0Z',
-      token: 'a5f37685-d00a-4238-b1a8-ed26afe1edaa',
+      expiresAt: '1918-04-23T06:50:23.0Z',
+      token: '5f08de9a-9b2a-4c48-9b09-7a80d2fe3cb7',
     },
     props,
-  ) as CreateSdkArgsTokenResponse;
-export const getCreateUserTokenRequest = (props: Partial<CreateUserTokenRequest>) =>
-  merge(
+  );
+export const getCreateUserTokenRequest = (props: Partial<CreateUserTokenRequest>): CreateUserTokenRequest =>
+  merge<CreateUserTokenRequest, Partial<CreateUserTokenRequest>>(
     {
-      requestedScope: 'my1fp',
+      requestedScope: 'onboarding',
     },
     props,
-  ) as CreateUserTokenRequest;
-export const getCreateUserTokenResponse = (props: Partial<CreateUserTokenResponse>) =>
-  merge(
+  );
+export const getCreateUserTokenResponse = (props: Partial<CreateUserTokenResponse>): CreateUserTokenResponse =>
+  merge<CreateUserTokenResponse, Partial<CreateUserTokenResponse>>(
     {
-      expiresAt: '1962-11-11T20:19:33.0Z',
-      token: '54b2fe9a-2393-4739-9827-bcd9eba514da',
+      expiresAt: '1946-03-19T23:52:55.0Z',
+      token: 'b5dee4ae-53af-42ea-9fd1-0642caad37f2',
     },
     props,
-  ) as CreateUserTokenResponse;
-export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>) =>
-  merge(
+  );
+export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>): CustomDocumentConfig =>
+  merge<CustomDocumentConfig, Partial<CustomDocumentConfig>>(
     {
-      description: 'ipsum pariatur mollit',
-      identifier: 'e8ec211b-217a-49fe-93ab-e6932e26b3f2',
-      name: 'Ken Nitzsche',
+      description: 'dolore fugiat',
+      identifier: 'document.passport.nationality',
+      name: 'Lynda Klein',
       requiresHumanReview: false,
-      uploadSettings: 'prefer_capture',
+      uploadSettings: 'capture_only_on_mobile',
     },
     props,
-  ) as CustomDocumentConfig;
-export const getD2pGenerateRequest = (props: Partial<D2pGenerateRequest>) =>
-  merge(
+  );
+export const getD2pGenerateRequest = (props: Partial<D2pGenerateRequest>): D2pGenerateRequest =>
+  merge<D2pGenerateRequest, Partial<D2pGenerateRequest>>(
     {
       meta: {
         l10N: {
           language: 'en',
           locale: 'en-US',
         },
-        opener: 'deserunt in',
-        redirectUrl: 'https://well-documented-squid.biz/',
-        sandboxIdDocOutcome: '2e7236ea-67cd-49f0-a00c-97c79c95baac',
-        sessionId: 'd9cd71fa-ee6b-4c8a-90a8-4eec405147d6',
-        styleParams: 'non proident',
+        opener: 'consectetur laborum non in dolor',
+        redirectUrl: 'https://faint-giggle.us/',
+        sandboxIdDocOutcome: '6e2fad94-e22d-457a-bbf1-4ee0106f125c',
+        sessionId: '0b397ee6-73c8-46f6-b0d3-eee65c7e74fb',
+        styleParams: 'ipsum adipisicing ullamco id',
       },
     },
     props,
-  ) as D2pGenerateRequest;
-export const getD2pGenerateResponse = (props: Partial<D2pGenerateResponse>) =>
-  merge(
+  );
+export const getD2pGenerateResponse = (props: Partial<D2pGenerateResponse>): D2pGenerateResponse =>
+  merge<D2pGenerateResponse, Partial<D2pGenerateResponse>>(
     {
-      authToken: 'f09a5845-0954-46ac-a419-60f118e9ff6a',
+      authToken: '9abeea8e-46db-4336-9c7e-40cd78bf1205',
     },
     props,
-  ) as D2pGenerateResponse;
-export const getD2pSessionStatus = (props: Partial<D2pSessionStatus>) => (props ?? 'waiting') as D2pSessionStatus;
-export const getD2pSmsRequest = (props: Partial<D2pSmsRequest>) =>
-  merge(
+  );
+export const getD2pSessionStatus = (props: D2pSessionStatus): D2pSessionStatus => props ?? 'waiting';
+export const getD2pSmsRequest = (props: Partial<D2pSmsRequest>): D2pSmsRequest =>
+  merge<D2pSmsRequest, Partial<D2pSmsRequest>>(
     {
-      url: 'https://enchanted-lift.name/',
+      url: 'https://empty-outlaw.name',
     },
     props,
-  ) as D2pSmsRequest;
-export const getD2pSmsResponse = (props: Partial<D2pSmsResponse>) =>
-  merge(
+  );
+export const getD2pSmsResponse = (props: Partial<D2pSmsResponse>): D2pSmsResponse =>
+  merge<D2pSmsResponse, Partial<D2pSmsResponse>>(
     {
-      timeBeforeRetryS: 57241023,
+      timeBeforeRetryS: 58425194,
     },
     props,
-  ) as D2pSmsResponse;
-export const getD2pStatusResponse = (props: Partial<D2pStatusResponse>) =>
-  merge(
+  );
+export const getD2pStatusResponse = (props: Partial<D2pStatusResponse>): D2pStatusResponse =>
+  merge<D2pStatusResponse, Partial<D2pStatusResponse>>(
     {
       meta: {
         l10N: {
           language: 'en',
           locale: 'en-US',
         },
-        opener: 'voluptate sint est veniam',
-        redirectUrl: 'https://accomplished-tail.biz/',
-        sandboxIdDocOutcome: 'dd8bac4c-ec91-4b40-b5a3-0bcfca079731',
-        sessionId: '55b42d8c-a6ce-42bd-9867-f6eb9d24323b',
-        styleParams: 'et cupidatat voluptate magna Lorem',
+        opener: 'do',
+        redirectUrl: 'https://kosher-eggplant.biz',
+        sandboxIdDocOutcome: 'ad4817cf-2313-49df-8475-54211f9b667d',
+        sessionId: 'd34532a0-478e-4b28-81f2-af1c2efd43a0',
+        styleParams: 'voluptate in ad',
       },
-      status: 'completed',
+      status: 'waiting',
     },
     props,
-  ) as D2pStatusResponse;
-export const getD2pUpdateStatusRequest = (props: Partial<D2pUpdateStatusRequest>) =>
-  merge(
+  );
+export const getD2pUpdateStatusRequest = (props: Partial<D2pUpdateStatusRequest>): D2pUpdateStatusRequest =>
+  merge<D2pUpdateStatusRequest, Partial<D2pUpdateStatusRequest>>(
     {
-      status: 'canceled',
+      status: 'waiting',
     },
     props,
-  ) as D2pUpdateStatusRequest;
-export const getDataIdentifier = (props: Partial<DataIdentifier>) =>
-  (props ?? 'investor_profile.employer') as DataIdentifier;
-export const getDeleteHostedBusinessOwnerRequest = (props: Partial<DeleteHostedBusinessOwnerRequest>) =>
-  merge(
+  );
+export const getDataIdentifier = (props: DataIdentifier): DataIdentifier =>
+  props ?? 'document.passport.curp_validation_response';
+export const getDeleteHostedBusinessOwnerRequest = (
+  props: Partial<DeleteHostedBusinessOwnerRequest>,
+): DeleteHostedBusinessOwnerRequest =>
+  merge<DeleteHostedBusinessOwnerRequest, Partial<DeleteHostedBusinessOwnerRequest>>(
     {
       op: 'delete',
-      uuid: '53440edf-c576-43af-81d9-ee4688d3cefc',
+      uuid: 'c7b1c5de-3b85-44a5-ad9d-2d92641f30d3',
     },
     props,
-  ) as DeleteHostedBusinessOwnerRequest;
-export const getDeviceAttestationChallengeResponse = (props: Partial<DeviceAttestationChallengeResponse>) =>
-  merge(
+  );
+export const getDeviceAttestationChallengeResponse = (
+  props: Partial<DeviceAttestationChallengeResponse>,
+): DeviceAttestationChallengeResponse =>
+  merge<DeviceAttestationChallengeResponse, Partial<DeviceAttestationChallengeResponse>>(
     {
-      attestationChallenge: 'elit eiusmod quis Excepteur pariatur',
-      state: 'Oklahoma',
+      attestationChallenge: 'proident laboris',
+      state: 'Maryland',
     },
     props,
-  ) as DeviceAttestationChallengeResponse;
-export const getDeviceAttestationType = (props: Partial<DeviceAttestationType>) =>
-  (props ?? 'android') as DeviceAttestationType;
-export const getDeviceType = (props: Partial<DeviceType>) => (props ?? 'android') as DeviceType;
-export const getDocumentAndCountryConfiguration = (props: Partial<DocumentAndCountryConfiguration>) =>
-  merge(
+  );
+export const getDeviceAttestationType = (props: DeviceAttestationType): DeviceAttestationType => props ?? 'android';
+export const getDeviceType = (props: DeviceType): DeviceType => props ?? 'ios';
+export const getDocumentAndCountryConfiguration = (
+  props: Partial<DocumentAndCountryConfiguration>,
+): DocumentAndCountryConfiguration =>
+  merge<DocumentAndCountryConfiguration, Partial<DocumentAndCountryConfiguration>>(
     {
       countrySpecific: {},
-      global: ['passport', 'drivers_license', 'voter_identification'],
+      global: ['id_card', 'id_card', 'id_card'],
     },
     props,
-  ) as DocumentAndCountryConfiguration;
-export const getDocumentFixtureResult = (props: Partial<DocumentFixtureResult>) =>
-  (props ?? 'real') as DocumentFixtureResult;
-export const getDocumentImageError = (props: Partial<DocumentImageError>) =>
-  (props ?? 'selfie_face_not_found') as DocumentImageError;
-export const getDocumentKind = (props: Partial<DocumentKind>) => (props ?? 'passport') as DocumentKind;
-export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>) =>
-  merge(
+  );
+export const getDocumentFixtureResult = (props: DocumentFixtureResult): DocumentFixtureResult => props ?? 'pass';
+export const getDocumentImageError = (props: DocumentImageError): DocumentImageError => props ?? 'image_too_small';
+export const getDocumentKind = (props: DocumentKind): DocumentKind => props ?? 'visa';
+export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>): DocumentRequestConfig =>
+  merge<DocumentRequestConfig, Partial<DocumentRequestConfig>>(
     {
       data: {
-        collectSelfie: false,
+        collectSelfie: true,
         documentTypesAndCountries: {
           countrySpecific: {},
-          global: ['visa', 'permit', 'visa'],
+          global: ['permit', 'visa', 'voter_identification'],
         },
       },
       kind: 'identity',
     },
     props,
-  ) as DocumentRequestConfig;
-export const getDocumentResponse = (props: Partial<DocumentResponse>) =>
-  merge(
+  );
+export const getDocumentResponse = (props: Partial<DocumentResponse>): DocumentResponse =>
+  merge<DocumentResponse, Partial<DocumentResponse>>(
     {
-      errors: ['wrong_one_sided_document', 'invalid_jpeg', 'unknown_error'],
-      isRetryLimitExceeded: false,
-      nextSideToCollect: '9ae2a7a0-9c28-4df9-a485-d5676ddfb02b',
+      errors: ['selfie_face_not_found', 'face_not_found', 'selfie_image_orientation_incorrect'],
+      isRetryLimitExceeded: true,
+      nextSideToCollect: 'front',
     },
     props,
-  ) as DocumentResponse;
-export const getDocumentSide = (props: Partial<DocumentSide>) => (props ?? 'back') as DocumentSide;
-export const getDocumentUploadSettings = (props: Partial<DocumentUploadSettings>) =>
-  (props ?? 'prefer_capture') as DocumentUploadSettings;
-export const getEmailVerifyRequest = (props: Partial<EmailVerifyRequest>) =>
-  merge(
+  );
+export const getDocumentSide = (props: DocumentSide): DocumentSide => props ?? 'front';
+export const getDocumentUploadSettings = (props: DocumentUploadSettings): DocumentUploadSettings =>
+  props ?? 'capture_only_on_mobile';
+export const getEmailVerifyRequest = (props: Partial<EmailVerifyRequest>): EmailVerifyRequest =>
+  merge<EmailVerifyRequest, Partial<EmailVerifyRequest>>(
     {
-      data: 'commodo',
+      data: 'dolor sed',
     },
     props,
-  ) as EmailVerifyRequest;
-export const getEmpty = (props: Partial<Empty>) => merge({}, props) as Empty;
-export const getFilterFunction = (props: Partial<FilterFunction>) => (props ?? 'suffix(<n>)') as FilterFunction;
-export const getFingerprintVisitRequest = (props: Partial<FingerprintVisitRequest>) =>
-  merge(
+  );
+export const getEmpty = (props: Partial<Empty>): Empty => merge<Empty, Partial<Empty>>({}, props);
+export const getFilterFunction = (props: FilterFunction): FilterFunction => props ?? "hmac_sha256('<key>')";
+export const getFingerprintVisitRequest = (props: Partial<FingerprintVisitRequest>): FingerprintVisitRequest =>
+  merge<FingerprintVisitRequest, Partial<FingerprintVisitRequest>>(
     {
-      path: 'velit Lorem',
-      requestId: 'e0895b0b-1af9-4b62-80ec-89f9cf8118ab',
-      visitorId: '4e399455-b307-449f-a762-bb3457098e4d',
+      path: 'incididunt laboris eu',
+      requestId: 'e2013841-bcda-4905-a9bf-20d30f169824',
+      visitorId: 'ad01bc50-8fd4-46b4-9509-2a9127b92eb2',
     },
     props,
-  ) as FingerprintVisitRequest;
-export const getFormV1Options = (props: Partial<FormV1Options>) =>
-  merge(
+  );
+export const getFormV1Options = (props: Partial<FormV1Options>): FormV1Options =>
+  merge<FormV1Options, Partial<FormV1Options>>(
     {
       hideButtons: true,
       hideCancelButton: true,
       hideFootprintLogo: false,
     },
     props,
-  ) as FormV1Options;
-export const getFormV1SdkArgs = (props: Partial<FormV1SdkArgs>) =>
-  merge(
+  );
+export const getFormV1SdkArgs = (props: Partial<FormV1SdkArgs>): FormV1SdkArgs =>
+  merge<FormV1SdkArgs, Partial<FormV1SdkArgs>>(
     {
-      authToken: 'e6cbefa6-828f-441a-a880-c2913e425328',
+      authToken: '22c2e643-7633-4e79-8d93-2ce94e8263be',
       l10N: {
         language: 'en',
         locale: 'en-US',
       },
       options: {
-        hideButtons: false,
-        hideCancelButton: false,
+        hideButtons: true,
+        hideCancelButton: true,
         hideFootprintLogo: true,
       },
-      title: 'pariatur irure ex laboris occaecat',
+      title: 'cillum aliqua dolor irure',
     },
     props,
-  ) as FormV1SdkArgs;
-export const getGetDeviceAttestationChallengeRequest = (props: Partial<GetDeviceAttestationChallengeRequest>) =>
-  merge(
+  );
+export const getGetDeviceAttestationChallengeRequest = (
+  props: Partial<GetDeviceAttestationChallengeRequest>,
+): GetDeviceAttestationChallengeRequest =>
+  merge<GetDeviceAttestationChallengeRequest, Partial<GetDeviceAttestationChallengeRequest>>(
     {
-      androidPackageName: 'Denise Sawayn',
-      deviceType: 'android',
-      iosBundleId: '2e7c7587-3fc3-49f4-98be-8eddbd86ced6',
+      androidPackageName: 'Brandon Mraz PhD',
+      deviceType: 'ios',
+      iosBundleId: '57de139d-f281-4e4a-b3ab-7a2eea39ab4f',
     },
     props,
-  ) as GetDeviceAttestationChallengeRequest;
-export const getGetSdkArgsTokenResponse = (props: Partial<GetSdkArgsTokenResponse>) =>
-  merge(
+  );
+export const getGetSdkArgsTokenResponse = (props: Partial<GetSdkArgsTokenResponse>): GetSdkArgsTokenResponse =>
+  merge<GetSdkArgsTokenResponse, Partial<GetSdkArgsTokenResponse>>(
     {
       args: {
         data: {
-          authToken: 'a50a4e7d-290e-435d-bd0a-510f284e3450',
+          authToken: 'a47b9d98-dba7-4a23-ab11-f874a787550e',
           documentFixtureResult: 'fail',
-          fixtureResult: 'manual_review',
-          isComponentsSdk: true,
+          fixtureResult: 'step_up',
+          isComponentsSdk: false,
           l10N: {
             language: 'en',
             locale: 'en-US',
           },
           options: {
             showCompletionPage: false,
-            showLogo: false,
+            showLogo: true,
           },
-          publicKey: 'a5361a14-6fab-46a3-b11b-5a3b699106a2',
-          sandboxId: '10d19097-e160-4e6a-8986-6abefcf9097c',
+          publicKey: '268c0656-28b2-487e-a955-3d2a1cd9c681',
+          sandboxId: '0d9bb13b-17de-4b7a-80ea-d6d9d3ff8857',
           shouldRelayToComponents: false,
           userData: {},
         },
@@ -500,341 +784,1508 @@ export const getGetSdkArgsTokenResponse = (props: Partial<GetSdkArgsTokenRespons
       },
     },
     props,
-  ) as GetSdkArgsTokenResponse;
-export const getGetUserTokenResponse = (props: Partial<GetUserTokenResponse>) =>
-  merge(
+  );
+export const getGetUserTokenResponse = (props: Partial<GetUserTokenResponse>): GetUserTokenResponse =>
+  merge<GetUserTokenResponse, Partial<GetUserTokenResponse>>(
     {
-      expiresAt: '1890-10-30T21:54:57.0Z',
-      scopes: ['sensitive_profile', 'handoff', 'sensitive_profile'],
+      expiresAt: '1938-03-18T10:30:50.0Z',
+      scopes: ['handoff', 'explicit_auth', 'explicit_auth'],
     },
     props,
-  ) as GetUserTokenResponse;
-export const getHandoffMetadata = (props: Partial<HandoffMetadata>) =>
-  merge(
+  );
+export const getHandoffMetadata = (props: Partial<HandoffMetadata>): HandoffMetadata =>
+  merge<HandoffMetadata, Partial<HandoffMetadata>>(
     {
       l10N: {
         language: 'en',
         locale: 'en-US',
       },
-      opener: 'esse est dolor',
-      redirectUrl: 'https://jaunty-compromise.com',
-      sandboxIdDocOutcome: '624d2a6b-d0b6-42c1-a188-a7d61872bd16',
-      sessionId: 'e2fe7bd5-57a3-4930-816d-7e819df13781',
-      styleParams: 'culpa',
+      opener: 'sint consectetur cupidatat pariatur',
+      redirectUrl: 'https://crafty-testimonial.net',
+      sandboxIdDocOutcome: '80c9ac6c-a57a-4ad3-9562-6364d6b12dc5',
+      sessionId: 'd9a74f03-0fe7-4ade-ba82-2e02abcf5cff',
+      styleParams: 'dolore amet et eu',
     },
     props,
-  ) as HandoffMetadata;
-export const getHostedBusiness = (props: Partial<HostedBusiness>) =>
-  merge(
+  );
+export const getHostedBusiness = (props: Partial<HostedBusiness>): HostedBusiness =>
+  merge<HostedBusiness, Partial<HostedBusiness>>(
     {
-      createdAt: '1907-01-07T20:58:08.0Z',
-      id: '0df915d8-6baa-486c-a15b-a0ea433b8c9d',
+      createdAt: '1923-01-19T01:20:20.0Z',
+      id: 'f803f6f3-08f4-4115-8e9c-ccd6621cf58a',
       isIncomplete: false,
-      lastActivityAt: '1932-02-05T12:12:33.0Z',
-      name: 'Sabrina Mertz',
+      lastActivityAt: '1943-06-28T17:22:04.0Z',
+      name: 'Marilyn Bogisich',
     },
     props,
-  ) as HostedBusiness;
-export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>) =>
-  merge(
+  );
+export const getHostedBusinessDetail = (props: Partial<HostedBusinessDetail>): HostedBusinessDetail =>
+  merge<HostedBusinessDetail, Partial<HostedBusinessDetail>>(
     {
       invitedData: {
-        'id.first_name': 'Jane',
-        'id.last_name': 'Doe',
+        'bank.*.account_type': 'dolore sed in ullamco',
+        'bank.*.ach_account_id': '006d20d9-405d-4530-827d-0904faba0e1b',
+        'bank.*.ach_account_number': 'sunt aute enim cupidatat',
+        'bank.*.ach_routing_number': 'cupidatat Lorem enim do ex',
+        'bank.*.fingerprint': 'tempor sint aliquip sunt elit',
+        'bank.*.name': 'Faye Ferry',
+        'card.*.billing_address.country': '95438 Kihn Via Suite 950',
+        'card.*.billing_address.zip': '6464 E 6th Street Suite 618',
+        'card.*.cvc': 'ullamco exercitation id commodo',
+        'card.*.expiration': 'in adipisicing consectetur culpa amet',
+        'card.*.expiration_month': 'laboris voluptate',
+        'card.*.expiration_year': 'Excepteur incididunt',
+        'card.*.fingerprint': 'incididunt qui mollit',
+        'card.*.issuer': 'do culpa dolore',
+        'card.*.name': 'Belinda Stark',
+        'card.*.number': 'elit deserunt occaecat ad',
+        'card.*.number_last4': 'esse in nulla',
+        'custom.*': 'in dolore culpa',
+        'document.custom.*': 'ad Excepteur',
+        'document.drivers_license.address_line1': '694 Adrien Brooks Apt. 747',
+        'document.drivers_license.back.image': 'do',
+        'document.drivers_license.back.mime_type': 'est in',
+        'document.drivers_license.city': 'Broderickview',
+        'document.drivers_license.classified_document_type': 'eiusmod',
+        'document.drivers_license.clave_de_elector': 'elit nisi enim',
+        'document.drivers_license.curp': 'magna cillum commodo ipsum',
+        'document.drivers_license.curp_validation_response': '66a1b2c1-efc3-4d84-9770-9a894b9d3e6b',
+        'document.drivers_license.dob': 'ut ad cillum nisi velit',
+        'document.drivers_license.document_number': 'exercitation minim',
+        'document.drivers_license.expires_at': 'aliquip eiusmod laboris dolor Ut',
+        'document.drivers_license.first_name': 'Ewell',
+        'document.drivers_license.front.image': 'Excepteur adipisicing elit ullamco in',
+        'document.drivers_license.front.mime_type': 'qui deserunt',
+        'document.drivers_license.full_address': '577 Parisian Parks Apt. 602',
+        'document.drivers_license.full_name': 'Miss Meredith Orn',
+        'document.drivers_license.gender': 'in consequat exercitation sunt et',
+        'document.drivers_license.issued_at': 'aliquip reprehenderit ut labore',
+        'document.drivers_license.issuing_country': 'Jersey',
+        'document.drivers_license.issuing_state': 'New Hampshire',
+        'document.drivers_license.last_name': 'Grimes',
+        'document.drivers_license.nationality': 'fugiat consequat cillum',
+        'document.drivers_license.postal_code': 'commodo dolore eu ipsum elit',
+        'document.drivers_license.ref_number': 'ullamco nostrud sed',
+        'document.drivers_license.samba_activity_history_response': 'eu qui officia consequat sit',
+        'document.drivers_license.selfie.image': 'aliqua veniam non aute',
+        'document.drivers_license.selfie.mime_type': 'in ut',
+        'document.drivers_license.state': 'California',
+        'document.finra_compliance_letter': 'amet nulla',
+        'document.id_card.address_line1': '4505 Mill Street Apt. 419',
+        'document.id_card.back.image': 'cb7cb0c7-c52d-48ba-ba09-cf8ffe77a858',
+        'document.id_card.back.mime_type': '86613c87-5cbc-4f8f-bfbd-7148f9311791',
+        'document.id_card.city': 'Myaborough',
+        'document.id_card.classified_document_type': 'fef34f83-6078-4cf8-8c2a-40c4c582edf0',
+        'document.id_card.clave_de_elector': '0d5b5d26-731f-4e72-9a71-5fe226769051',
+        'document.id_card.curp': 'd0e57f6b-954c-4368-aefb-571fda22ac84',
+        'document.id_card.curp_validation_response': '6b0bd9c9-e687-431f-90e2-c8a22c50fca9',
+        'document.id_card.dob': '862f13f6-b7de-4660-85e7-a03ef8dc5104',
+        'document.id_card.document_number': '61f8be28-646b-47b3-aff4-2b49cb0e8cca',
+        'document.id_card.expires_at': 'f1bb591a-f93b-451e-8caf-d789a24c2fe5',
+        'document.id_card.first_name': 'Jarvis',
+        'document.id_card.front.image': 'f9e4038a-cab8-40c6-bf37-715807477459',
+        'document.id_card.front.mime_type': '5d706e40-86c6-4af9-9068-3bb6f5963957',
+        'document.id_card.full_address': '63467 Mill Road Apt. 746',
+        'document.id_card.full_name': 'Erma Bartell-Wiza',
+        'document.id_card.gender': '8c07017f-52ba-4515-a5c3-3a33d369cbf8',
+        'document.id_card.issued_at': 'd73ed423-f902-4aed-a7d7-8b05d0289e6a',
+        'document.id_card.issuing_country': 'Austria',
+        'document.id_card.issuing_state': 'Rhode Island',
+        'document.id_card.last_name': 'Hauck',
+        'document.id_card.nationality': 'd6df89ad-aab3-4843-9e1e-2c0a251a74a3',
+        'document.id_card.postal_code': '62ca31f9-b47b-4d14-931b-6b3fb2cf8305',
+        'document.id_card.ref_number': '31e4c2c5-2634-4ed1-a4a7-aa6f0446eb27',
+        'document.id_card.samba_activity_history_response': '8b34068e-d06d-45ad-91e3-5ea76d72f67b',
+        'document.id_card.selfie.image': '8bd28a44-0b13-4667-b4af-7bad1005a052',
+        'document.id_card.selfie.mime_type': '261e185c-21aa-4174-85d8-503580621fb4',
+        'document.id_card.state': 'South Dakota',
+        'document.passport.address_line1': '217 Grady Fort Suite 686',
+        'document.passport.back.image': 'in cillum',
+        'document.passport.back.mime_type': 'consequat occaecat minim',
+        'document.passport.city': 'Fort Royville',
+        'document.passport.classified_document_type': 'nulla',
+        'document.passport.clave_de_elector': 'dolor pariatur',
+        'document.passport.curp': 'qui magna et ex',
+        'document.passport.curp_validation_response': '100831a1-7189-4a4d-b12e-771a0ddfe352',
+        'document.passport.dob': 'consectetur',
+        'document.passport.document_number': 'eu qui',
+        'document.passport.expires_at': 'dolore incididunt',
+        'document.passport.first_name': 'Mylene',
+        'document.passport.front.image': 'aute in velit',
+        'document.passport.front.mime_type': 'exercitation laboris esse aute',
+        'document.passport.full_address': '989 E Front Street Suite 378',
+        'document.passport.full_name': 'Celia Donnelly',
+        'document.passport.gender': 'ea',
+        'document.passport.issued_at': 'fugiat tempor et',
+        'document.passport.issuing_country': 'Niger',
+        'document.passport.issuing_state': 'New Hampshire',
+        'document.passport.last_name': 'Adams',
+        'document.passport.nationality': 'dolore',
+        'document.passport.postal_code': 'deserunt',
+        'document.passport.ref_number': 'aute',
+        'document.passport.samba_activity_history_response': 'esse labore elit voluptate eu',
+        'document.passport.selfie.image': 'esse Excepteur qui Ut',
+        'document.passport.selfie.mime_type': 'dolor sunt',
+        'document.passport.state': 'West Virginia',
+        'document.passport_card.address_line1': '9834 N Maple Street Suite 244',
+        'document.passport_card.back.image': 'officia ut ea consectetur aliquip',
+        'document.passport_card.back.mime_type': 'cupidatat',
+        'document.passport_card.city': 'Jaskolskistad',
+        'document.passport_card.classified_document_type': 'amet incididunt id nulla',
+        'document.passport_card.clave_de_elector': 'sint veniam nulla',
+        'document.passport_card.curp': 'cupidatat dolore Ut et ipsum',
+        'document.passport_card.curp_validation_response': '83768f95-ea84-4dfb-adc2-7e3836f7c5df',
+        'document.passport_card.dob': 'id exercitation',
+        'document.passport_card.document_number': 'esse veniam',
+        'document.passport_card.expires_at': 'voluptate non adipisicing',
+        'document.passport_card.first_name': 'Casimer',
+        'document.passport_card.front.image': 'in fugiat dolore',
+        'document.passport_card.front.mime_type': 'laboris et occaecat',
+        'document.passport_card.full_address': '426 S Main Avenue Suite 858',
+        'document.passport_card.full_name': 'Melody Rutherford',
+        'document.passport_card.gender': 'qui voluptate ut reprehenderit',
+        'document.passport_card.issued_at': 'ea in nulla pariatur',
+        'document.passport_card.issuing_country': 'Morocco',
+        'document.passport_card.issuing_state': 'Michigan',
+        'document.passport_card.last_name': 'Price',
+        'document.passport_card.nationality': 'quis culpa nulla',
+        'document.passport_card.postal_code': 'pariatur',
+        'document.passport_card.ref_number': 'dolor in proident',
+        'document.passport_card.samba_activity_history_response': 'id dolore magna tempor sed',
+        'document.passport_card.selfie.image': 'nulla dolor tempor voluptate',
+        'document.passport_card.selfie.mime_type': 'tempor reprehenderit',
+        'document.passport_card.state': 'Alabama',
+        'document.permit.address_line1': '20464 Maggio Mountain Suite 973',
+        'document.permit.back.image': 'nisi ut minim',
+        'document.permit.back.mime_type': 'deserunt',
+        'document.permit.city': 'Morarton',
+        'document.permit.classified_document_type': 'tempor eu sed',
+        'document.permit.clave_de_elector': 'amet in ullamco nostrud',
+        'document.permit.curp': 'sint aute cupidatat quis',
+        'document.permit.curp_validation_response': '7b2e42de-983e-41d2-8da7-6790a96a94e8',
+        'document.permit.dob': 'adipisicing non Duis',
+        'document.permit.document_number': 'sit reprehenderit sint qui nostrud',
+        'document.permit.expires_at': 'cupidatat ut nisi velit',
+        'document.permit.first_name': 'Howard',
+        'document.permit.front.image': 'eiusmod Lorem tempor cillum',
+        'document.permit.front.mime_type': 'deserunt',
+        'document.permit.full_address': '5820 Hahn Fork Suite 179',
+        'document.permit.full_name': 'Emmett Tremblay',
+        'document.permit.gender': 'aliqua dolor',
+        'document.permit.issued_at': 'labore',
+        'document.permit.issuing_country': 'Mauritius',
+        'document.permit.issuing_state': 'Mississippi',
+        'document.permit.last_name': 'Rowe',
+        'document.permit.nationality': 'reprehenderit nostrud mollit',
+        'document.permit.postal_code': 'nostrud elit',
+        'document.permit.ref_number': 'nostrud commodo dolor quis',
+        'document.permit.samba_activity_history_response': 'aliquip',
+        'document.permit.selfie.image': 'ad',
+        'document.permit.selfie.mime_type': 'ut consectetur officia occaecat',
+        'document.permit.state': 'Indiana',
+        'document.proof_of_address.image': '2918 Railroad Street Suite 473',
+        'document.residence_document.address_line1': '51939 S College Street Suite 278',
+        'document.residence_document.back.image': 'b315cc43-dc58-4f79-b81e-7b565b26a692',
+        'document.residence_document.back.mime_type': '311993f2-dbd1-4487-9bf9-1d1d7694fc22',
+        'document.residence_document.city': 'West Giovanna',
+        'document.residence_document.classified_document_type': '4302751f-06d0-4ba9-8c2c-a5123f38d986',
+        'document.residence_document.clave_de_elector': '090d6add-d273-4538-8833-e330262172a9',
+        'document.residence_document.curp': 'b34f2e50-4929-4a58-b6e9-2bd3c2e05eb5',
+        'document.residence_document.curp_validation_response': '73f072d1-6210-43da-a213-b4a9e26b6f2a',
+        'document.residence_document.dob': 'c2fcf4e5-7c9e-49ce-bac6-3cf0e8c29687',
+        'document.residence_document.document_number': '85cdb66d-7c21-422d-b553-8a6b7da0a88b',
+        'document.residence_document.expires_at': 'f625fd2a-1ba9-41c7-9830-801f0037d8fc',
+        'document.residence_document.first_name': 'Gilbert',
+        'document.residence_document.front.image': '3629bba5-94e8-4a76-8ab5-a7cdd1822d19',
+        'document.residence_document.front.mime_type': '677ecb41-2924-4689-930b-f9bde0c0623b',
+        'document.residence_document.full_address': '42913 Destinee Mount Suite 319',
+        'document.residence_document.full_name': 'Jeannie Beer',
+        'document.residence_document.gender': '9a8288c0-b705-472c-889a-fdfdd3eb73c4',
+        'document.residence_document.issued_at': '4323d903-8c9b-4bbd-aa07-ecc6368da8c6',
+        'document.residence_document.issuing_country': 'Mauritius',
+        'document.residence_document.issuing_state': 'Minnesota',
+        'document.residence_document.last_name': 'Crist',
+        'document.residence_document.nationality': 'ee83f670-ff9d-4dc6-836a-7f788b839318',
+        'document.residence_document.postal_code': '853fee15-d81e-4580-a98a-3ec2cf1bbfce',
+        'document.residence_document.ref_number': 'b8d461b0-e3a3-4857-868c-9c6057e8f316',
+        'document.residence_document.samba_activity_history_response': '9d02b0f2-21f8-4dcd-8a8d-c810542c6a27',
+        'document.residence_document.selfie.image': 'e1bd7e96-9cba-468e-a772-9bbd34b38101',
+        'document.residence_document.selfie.mime_type': 'f459f94d-fec9-4ecd-8812-aa97163593de',
+        'document.residence_document.state': 'Maryland',
+        'document.ssn_card.image': 'quis proident culpa',
+        'document.visa.address_line1': '971 Nader Heights Suite 176',
+        'document.visa.back.image': 'amet proident cupidatat in',
+        'document.visa.back.mime_type': 'cillum dolor',
+        'document.visa.city': 'East Simone',
+        'document.visa.classified_document_type': 'ad culpa',
+        'document.visa.clave_de_elector': 'voluptate magna ullamco',
+        'document.visa.curp': 'mollit nisi ut',
+        'document.visa.curp_validation_response': '83e20124-0a9a-444b-a60d-41f284da12c8',
+        'document.visa.dob': 'in dolore',
+        'document.visa.document_number': 'esse labore aliqua pariatur',
+        'document.visa.expires_at': 'ut adipisicing Ut',
+        'document.visa.first_name': 'Randall',
+        'document.visa.front.image': 'exercitation voluptate consectetur adipisicing nulla',
+        'document.visa.front.mime_type': 'sunt dolor elit esse',
+        'document.visa.full_address': '9115 Third Street Apt. 358',
+        'document.visa.full_name': 'Robert Franey',
+        'document.visa.gender': 'ut nulla eu velit aute',
+        'document.visa.issued_at': 'elit nulla commodo ea',
+        'document.visa.issuing_country': 'Peru',
+        'document.visa.issuing_state': 'Vermont',
+        'document.visa.last_name': 'Green',
+        'document.visa.nationality': 'dolor deserunt',
+        'document.visa.postal_code': 'commodo occaecat aliqua',
+        'document.visa.ref_number': 'reprehenderit sunt',
+        'document.visa.samba_activity_history_response': 'anim',
+        'document.visa.selfie.image': 'esse ut Ut irure officia',
+        'document.visa.selfie.mime_type': 'esse officia deserunt do consequat',
+        'document.visa.state': 'Tennessee',
+        'document.voter_identification.address_line1': '8700 N Main Street Suite 225',
+        'document.voter_identification.back.image': '2b5d8d9c-4b48-4f9a-a312-7596f805dcaf',
+        'document.voter_identification.back.mime_type': '8dd50334-9d91-4ca9-a102-732f9c64b887',
+        'document.voter_identification.city': 'Camilafort',
+        'document.voter_identification.classified_document_type': 'c6fddd77-15dd-442e-903f-c07fbe6ff086',
+        'document.voter_identification.clave_de_elector': '0aef8189-d436-4640-8c93-761b81fb0b42',
+        'document.voter_identification.curp': 'c8425d1f-9bf3-461a-9bb6-050105487c7a',
+        'document.voter_identification.curp_validation_response': '0a003fc6-371f-4e7e-99cd-7368173e648f',
+        'document.voter_identification.dob': '86d7b5cf-04fe-44b9-a528-216cfd393eef',
+        'document.voter_identification.document_number': 'e6312052-754c-4626-9e7d-50eb22853ceb',
+        'document.voter_identification.expires_at': '3a2ce6eb-634e-4074-9da6-1807b4c641d9',
+        'document.voter_identification.first_name': 'Otto',
+        'document.voter_identification.front.image': 'bc505604-8839-4fd7-a577-e2b3e4ce9dfc',
+        'document.voter_identification.front.mime_type': 'c7e3cd81-a1a3-499e-b806-bbc8ada739c3',
+        'document.voter_identification.full_address': '35706 Angel Mountain Apt. 347',
+        'document.voter_identification.full_name': 'Irvin Hermiston',
+        'document.voter_identification.gender': '36233eed-3ec8-46d6-bb93-cb7458623575',
+        'document.voter_identification.issued_at': 'a9e2cf55-3cf9-4cba-95c0-0e282e62052a',
+        'document.voter_identification.issuing_country': 'Qatar',
+        'document.voter_identification.issuing_state': 'New York',
+        'document.voter_identification.last_name': 'Torphy',
+        'document.voter_identification.nationality': 'e5bc77d4-a442-418f-b780-62241614ac09',
+        'document.voter_identification.postal_code': '9c1820c3-4349-4570-af42-ffed68bdf42e',
+        'document.voter_identification.ref_number': '80e2b188-35e2-44e1-bc03-8c7a637ecc59',
+        'document.voter_identification.samba_activity_history_response': '9c319d01-3c0c-40d4-a17f-f6f222f06ef7',
+        'document.voter_identification.selfie.image': '8dc672cf-f00d-4059-a4f6-8bcdaad0ec2f',
+        'document.voter_identification.selfie.mime_type': 'edb28e6b-3edb-47bd-bf03-06a7cb6c1c31',
+        'document.voter_identification.state': 'South Dakota',
+        'id.address_line1': '271 E Walnut Street Apt. 105',
+        'id.address_line2': '86185 N Poplar Street Suite 547',
+        'id.citizenships': '492441b9-d8fa-4600-be8f-b9c6fd1e64bd',
+        'id.city': 'North Jaquelineworth',
+        'id.country': 'Gambia',
+        'id.dob': 'ff38da03-fae6-4598-a952-4bb04347a101',
+        'id.drivers_license_number': 'de1e0027-a8b0-4f6b-9d24-ea1a8648f62c',
+        'id.drivers_license_state': 'Alabama',
+        'id.email': 'tremayne79@gmail.com',
+        'id.first_name': 'Rosamond',
+        'id.itin': '8ec41796-982a-4f64-89db-e9aeb0a655c6',
+        'id.last_name': 'Langworth',
+        'id.middle_name': 'Lynn Kuvalis',
+        'id.nationality': 'cab45bc9-374a-4c4d-a93f-4cdebda3bb69',
+        'id.phone_number': '+18649279979',
+        'id.ssn4': '584e6f77-a4d5-4372-80d1-cc722b362dac',
+        'id.ssn9': '207c985c-bf7f-40e2-b8ad-ca0434708228',
+        'id.state': 'Michigan',
+        'id.us_legal_status': 'f6857fcf-d11b-45ae-a7ad-3b968e5f5743',
+        'id.us_tax_id': '53727935-f789-45e9-a3b7-0c1eaed1a61b',
+        'id.visa_expiration_date': '39ba7716-155e-42e9-a2b2-8a72205f3a56',
+        'id.visa_kind': '2605dd77-2d3f-4719-9532-8da148d50a02',
+        'id.zip': '97600',
+        'investor_profile.annual_income': 'ullamco laborum esse Ut reprehenderit',
+        'investor_profile.brokerage_firm_employer': 'ut ad',
+        'investor_profile.declarations': 'ut',
+        'investor_profile.employer': 'consectetur',
+        'investor_profile.employment_status': 'deserunt Excepteur dolore consequat',
+        'investor_profile.family_member_names': 'Gerard Padberg',
+        'investor_profile.funding_sources': 'dolor ipsum',
+        'investor_profile.investment_goals': 'quis officia ipsum enim exercitation',
+        'investor_profile.net_worth': 'eu cupidatat',
+        'investor_profile.occupation': 'consequat ut ad commodo enim',
+        'investor_profile.political_organization': 'consequat laborum',
+        'investor_profile.risk_tolerance': 'cupidatat sint et id',
+        'investor_profile.senior_executive_symbols': 'commodo nulla cupidatat fugiat',
       },
       inviter: {
-        firstName: 'Luz',
-        lastName: 'Kutch',
+        firstName: 'Eddie',
+        lastName: 'Murray',
       },
-      name: 'Johnnie Russel IV',
+      name: 'Susan Braun',
     },
     props,
-  ) as HostedBusinessDetail;
-export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>) =>
-  merge(
+  );
+export const getHostedBusinessOwner = (props: Partial<HostedBusinessOwner>): HostedBusinessOwner =>
+  merge<HostedBusinessOwner, Partial<HostedBusinessOwner>>(
     {
-      createdAt: '1898-01-01T06:02:03.0Z',
+      createdAt: '1925-04-22T07:53:01.0Z',
       decryptedData: {
-        'id.first_name': 'Jane',
-        'id.last_name': 'Doe',
+        'bank.*.account_type': 'consectetur Excepteur',
+        'bank.*.ach_account_id': '5795d2b3-5e4e-443d-ba62-7b719a798f4c',
+        'bank.*.ach_account_number': 'cillum do et voluptate nisi',
+        'bank.*.ach_routing_number': 'pariatur irure dolore cillum',
+        'bank.*.fingerprint': 'laboris fugiat officia enim',
+        'bank.*.name': 'Kathy Gerlach V',
+        'card.*.billing_address.country': '528 Caroline Knoll Apt. 980',
+        'card.*.billing_address.zip': '9637 Schmitt Forge Apt. 140',
+        'card.*.cvc': 'ad in do id adipisicing',
+        'card.*.expiration': 'sed deserunt eu officia proident',
+        'card.*.expiration_month': 'enim anim deserunt dolore',
+        'card.*.expiration_year': 'pariatur ut in veniam Lorem',
+        'card.*.fingerprint': 'exercitation',
+        'card.*.issuer': 'consectetur amet',
+        'card.*.name': 'Clara Douglas',
+        'card.*.number': 'aute',
+        'card.*.number_last4': 'ut laborum',
+        'custom.*': 'sit labore non ut',
+        'document.custom.*': 'enim exercitation do incididunt',
+        'document.drivers_license.address_line1': '701 Doug Forges Apt. 999',
+        'document.drivers_license.back.image': 'consequat culpa ullamco sed',
+        'document.drivers_license.back.mime_type': 'ullamco in',
+        'document.drivers_license.city': 'South Sybleland',
+        'document.drivers_license.classified_document_type': 'reprehenderit aliqua',
+        'document.drivers_license.clave_de_elector': 'in est Excepteur esse deserunt',
+        'document.drivers_license.curp': 'magna in irure',
+        'document.drivers_license.curp_validation_response': 'bd4cb464-4305-4029-a63a-98fc4ef8618c',
+        'document.drivers_license.dob': 'eu enim dolor voluptate consequat',
+        'document.drivers_license.document_number': 'ut culpa',
+        'document.drivers_license.expires_at': 'aute aliqua deserunt irure',
+        'document.drivers_license.first_name': 'Alison',
+        'document.drivers_license.front.image': 'aute',
+        'document.drivers_license.front.mime_type': 'minim veniam sit Excepteur',
+        'document.drivers_license.full_address': '376 Gutkowski Streets Suite 401',
+        'document.drivers_license.full_name': 'Cesar Corwin',
+        'document.drivers_license.gender': 'laboris enim irure qui ullamco',
+        'document.drivers_license.issued_at': 'eu laboris',
+        'document.drivers_license.issuing_country': "Cote d'Ivoire",
+        'document.drivers_license.issuing_state': 'Texas',
+        'document.drivers_license.last_name': 'Becker',
+        'document.drivers_license.nationality': 'cupidatat deserunt ex consequat',
+        'document.drivers_license.postal_code': 'qui',
+        'document.drivers_license.ref_number': 'irure commodo',
+        'document.drivers_license.samba_activity_history_response': 'in sunt velit',
+        'document.drivers_license.selfie.image': 'officia',
+        'document.drivers_license.selfie.mime_type': 'commodo',
+        'document.drivers_license.state': 'Michigan',
+        'document.finra_compliance_letter': 'commodo esse',
+        'document.id_card.address_line1': '2213 Lake Road Suite 783',
+        'document.id_card.back.image': 'a91fce94-1c6a-4459-8d74-2e07c50d7d4e',
+        'document.id_card.back.mime_type': '8a679f5e-5956-47aa-a598-8d862c5b5f3c',
+        'document.id_card.city': 'Fort Bryon',
+        'document.id_card.classified_document_type': '91528650-122d-4a98-9ea9-a7363c4c6d7e',
+        'document.id_card.clave_de_elector': 'c8098f45-8227-4fce-8f64-54dc50d70be9',
+        'document.id_card.curp': 'bd03bb56-567a-4ee4-a09d-e95463c49043',
+        'document.id_card.curp_validation_response': 'ee8b4deb-8f40-4739-bcd7-caa41316f491',
+        'document.id_card.dob': '89f56f39-702f-4475-934b-0578c3c4ff0c',
+        'document.id_card.document_number': 'a8dc099b-3764-47dd-81a0-133850fdaef5',
+        'document.id_card.expires_at': '72dc0c6d-844d-4bc5-86c5-43f0ccbff370',
+        'document.id_card.first_name': 'Giovani',
+        'document.id_card.front.image': '7dab8e1f-10f5-4d0b-92eb-3d7661512527',
+        'document.id_card.front.mime_type': '6a05669a-adfe-47ba-a529-44cf8ea0a516',
+        'document.id_card.full_address': '173 North Street Apt. 264',
+        'document.id_card.full_name': 'Miss Lindsey Reynolds',
+        'document.id_card.gender': '823fe095-7845-4981-9a87-5a41b77573b6',
+        'document.id_card.issued_at': '5fe156bc-82f2-4d45-9de9-b5da689f9f33',
+        'document.id_card.issuing_country': 'Turks and Caicos Islands',
+        'document.id_card.issuing_state': 'Oklahoma',
+        'document.id_card.last_name': 'Lebsack',
+        'document.id_card.nationality': 'd5654d7e-c353-4d21-af2b-d698dd28315e',
+        'document.id_card.postal_code': 'a3009a23-5f81-4c37-b28a-f891a779ff76',
+        'document.id_card.ref_number': 'c83c0ec5-9f58-4c3b-9632-ae1e6f244f17',
+        'document.id_card.samba_activity_history_response': 'fe7cb05e-0634-471d-8f91-76fea732e2a8',
+        'document.id_card.selfie.image': '221db23e-4cdc-4564-8dec-5ef68ac3cd2a',
+        'document.id_card.selfie.mime_type': '1d96a333-f309-4c6f-bd76-59cc96edc9e5',
+        'document.id_card.state': 'Oregon',
+        'document.passport.address_line1': '155 Ankunding Ridges Suite 973',
+        'document.passport.back.image': 'elit reprehenderit et',
+        'document.passport.back.mime_type': 'est laboris',
+        'document.passport.city': 'New Kira',
+        'document.passport.classified_document_type': 'eiusmod irure nulla ullamco',
+        'document.passport.clave_de_elector': 'magna dolor nulla amet',
+        'document.passport.curp': 'laboris velit sed Ut',
+        'document.passport.curp_validation_response': '01e6ea38-c0d8-43f6-b9e5-d807fcbba793',
+        'document.passport.dob': 'in occaecat aute nulla',
+        'document.passport.document_number': 'quis',
+        'document.passport.expires_at': 'Ut',
+        'document.passport.first_name': 'Blanche',
+        'document.passport.front.image': 'incididunt',
+        'document.passport.front.mime_type': 'Duis fugiat proident ex',
+        'document.passport.full_address': '7206 Terry Viaduct Suite 411',
+        'document.passport.full_name': 'Patrick Spencer',
+        'document.passport.gender': 'officia consequat Lorem minim',
+        'document.passport.issued_at': 'do',
+        'document.passport.issuing_country': 'Senegal',
+        'document.passport.issuing_state': 'Illinois',
+        'document.passport.last_name': 'Terry',
+        'document.passport.nationality': 'dolor velit eiusmod',
+        'document.passport.postal_code': 'sunt consequat enim cillum ad',
+        'document.passport.ref_number': 'elit tempor',
+        'document.passport.samba_activity_history_response': 'ex',
+        'document.passport.selfie.image': 'proident cillum enim adipisicing eiusmod',
+        'document.passport.selfie.mime_type': 'officia non qui laboris',
+        'document.passport.state': 'Kentucky',
+        'document.passport_card.address_line1': '5326 Washington Road Apt. 347',
+        'document.passport_card.back.image': 'irure exercitation ullamco eiusmod quis',
+        'document.passport_card.back.mime_type': 'proident occaecat',
+        'document.passport_card.city': 'South Selina',
+        'document.passport_card.classified_document_type': 'nostrud anim reprehenderit',
+        'document.passport_card.clave_de_elector': 'ea dolor officia dolore',
+        'document.passport_card.curp': 'reprehenderit ullamco',
+        'document.passport_card.curp_validation_response': 'd7226120-c06d-4548-b300-ff29fdb7c236',
+        'document.passport_card.dob': 'anim ut consequat',
+        'document.passport_card.document_number': 'esse',
+        'document.passport_card.expires_at': 'cillum adipisicing',
+        'document.passport_card.first_name': 'Brandon',
+        'document.passport_card.front.image': 'enim in',
+        'document.passport_card.front.mime_type': 'id',
+        'document.passport_card.full_address': '6175 Zieme Flats Suite 654',
+        'document.passport_card.full_name': 'Anthony Weber',
+        'document.passport_card.gender': 'adipisicing dolor et in',
+        'document.passport_card.issued_at': 'cillum deserunt velit aute ea',
+        'document.passport_card.issuing_country': 'Namibia',
+        'document.passport_card.issuing_state': 'Idaho',
+        'document.passport_card.last_name': 'Jaskolski',
+        'document.passport_card.nationality': 'cupidatat ea eiusmod',
+        'document.passport_card.postal_code': 'ipsum deserunt veniam',
+        'document.passport_card.ref_number': 'in in',
+        'document.passport_card.samba_activity_history_response': 'tempor cillum',
+        'document.passport_card.selfie.image': 'dolore veniam elit',
+        'document.passport_card.selfie.mime_type': 'nulla non aliqua sint',
+        'document.passport_card.state': 'Maine',
+        'document.permit.address_line1': '18328 Chestnut Street Suite 491',
+        'document.permit.back.image': 'dolore nostrud',
+        'document.permit.back.mime_type': 'consectetur voluptate quis eu labore',
+        'document.permit.city': 'Wardhaven',
+        'document.permit.classified_document_type': 'est amet sed',
+        'document.permit.clave_de_elector': 'nisi',
+        'document.permit.curp': 'sunt esse eiusmod tempor',
+        'document.permit.curp_validation_response': '82df299f-4829-4cb4-88ab-2df2ef26e854',
+        'document.permit.dob': 'officia pariatur',
+        'document.permit.document_number': 'irure ut enim eu',
+        'document.permit.expires_at': 'consectetur fugiat',
+        'document.permit.first_name': 'Vada',
+        'document.permit.front.image': 'amet sunt anim qui',
+        'document.permit.front.mime_type': 'exercitation non Ut',
+        'document.permit.full_address': '3834 5th Street Apt. 507',
+        'document.permit.full_name': 'Monica Altenwerth-Thompson',
+        'document.permit.gender': 'in aliquip eu ad cillum',
+        'document.permit.issued_at': 'non aliqua',
+        'document.permit.issuing_country': 'Malta',
+        'document.permit.issuing_state': 'Indiana',
+        'document.permit.last_name': 'Howell',
+        'document.permit.nationality': 'quis nostrud in reprehenderit ut',
+        'document.permit.postal_code': 'dolore',
+        'document.permit.ref_number': 'aliquip cillum',
+        'document.permit.samba_activity_history_response': 'exercitation enim aliqua laborum proident',
+        'document.permit.selfie.image': 'magna commodo',
+        'document.permit.selfie.mime_type': 'laboris sit nulla cupidatat do',
+        'document.permit.state': 'Maryland',
+        'document.proof_of_address.image': '633 Williamson Loaf Suite 250',
+        'document.residence_document.address_line1': '8777 Wisozk Manor Apt. 141',
+        'document.residence_document.back.image': 'a0481358-8657-41b0-9d92-68bf1dc872e6',
+        'document.residence_document.back.mime_type': '9a5c0a63-df45-46bf-842a-da60c89cce8c',
+        'document.residence_document.city': 'South Jazlynchester',
+        'document.residence_document.classified_document_type': '2a951087-205e-49e0-97b1-f99063a3a0ad',
+        'document.residence_document.clave_de_elector': '463f1dc3-7023-410c-947e-eac24e6ceee1',
+        'document.residence_document.curp': '9c33574e-425d-4915-b26d-ead825f23700',
+        'document.residence_document.curp_validation_response': 'c7c91b83-577a-4865-95c6-38579a289be1',
+        'document.residence_document.dob': 'c447380f-502d-46c4-8c10-39ca300814ad',
+        'document.residence_document.document_number': '09f8ed65-20c6-4361-84c8-be4570dcb901',
+        'document.residence_document.expires_at': 'a9f79272-51af-4e28-ac52-240c5ca5303b',
+        'document.residence_document.first_name': 'Manley',
+        'document.residence_document.front.image': '49f4edfe-f3d0-435a-ace0-9788e694db33',
+        'document.residence_document.front.mime_type': '72ca7346-9319-489a-9317-a1ab096e30ba',
+        'document.residence_document.full_address': '506 N 1st Street Apt. 289',
+        'document.residence_document.full_name': 'Mr. Archie Hane',
+        'document.residence_document.gender': '5d69ab4c-2bc5-4497-974d-85a545fc425b',
+        'document.residence_document.issued_at': '325d5b4d-e793-4485-813b-699bd964a0d6',
+        'document.residence_document.issuing_country': 'Liechtenstein',
+        'document.residence_document.issuing_state': 'Idaho',
+        'document.residence_document.last_name': 'Dach',
+        'document.residence_document.nationality': '86dbab74-0fcc-4a0c-8e6f-21ce1388dd53',
+        'document.residence_document.postal_code': '094f8923-97a2-4d32-b875-9384f6cff3f3',
+        'document.residence_document.ref_number': 'b1e4dc38-9d33-4054-bbb0-32eda61ab522',
+        'document.residence_document.samba_activity_history_response': '8dd35381-ff66-4b89-81c3-f5100eab3f68',
+        'document.residence_document.selfie.image': '5236f579-f00c-415d-9851-1b6a8f3fb9b4',
+        'document.residence_document.selfie.mime_type': '6ee262b4-2e0d-4c96-8d69-5eda704d0ba6',
+        'document.residence_document.state': 'Illinois',
+        'document.ssn_card.image': 'in consequat eu veniam sed',
+        'document.visa.address_line1': '35625 Ferry Fall Suite 592',
+        'document.visa.back.image': 'nulla est',
+        'document.visa.back.mime_type': 'dolor consectetur dolore do',
+        'document.visa.city': 'Fort Brady',
+        'document.visa.classified_document_type': 'Excepteur sit pariatur',
+        'document.visa.clave_de_elector': 'in laboris',
+        'document.visa.curp': 'culpa tempor Duis anim veniam',
+        'document.visa.curp_validation_response': 'ab773bf4-eed3-4a1e-a7ac-514432c098c5',
+        'document.visa.dob': 'mollit cillum Ut',
+        'document.visa.document_number': 'in esse minim culpa',
+        'document.visa.expires_at': 'in',
+        'document.visa.first_name': 'Roderick',
+        'document.visa.front.image': 'aliquip quis dolor nostrud ut',
+        'document.visa.front.mime_type': 'quis proident officia',
+        'document.visa.full_address': '81328 W Center Street Apt. 407',
+        'document.visa.full_name': 'Bethany Mitchell',
+        'document.visa.gender': 'reprehenderit',
+        'document.visa.issued_at': 'laboris dolor',
+        'document.visa.issuing_country': 'Moldova',
+        'document.visa.issuing_state': 'Indiana',
+        'document.visa.last_name': 'Schaefer',
+        'document.visa.nationality': 'do nulla veniam velit',
+        'document.visa.postal_code': 'ut',
+        'document.visa.ref_number': 'eiusmod',
+        'document.visa.samba_activity_history_response': 'culpa reprehenderit nostrud',
+        'document.visa.selfie.image': 'incididunt aute sed reprehenderit',
+        'document.visa.selfie.mime_type': 'non magna Duis Excepteur voluptate',
+        'document.visa.state': 'Wyoming',
+        'document.voter_identification.address_line1': '261 Mill Street Apt. 138',
+        'document.voter_identification.back.image': '54dd51eb-bd7d-4be4-8fd9-05168f8d438e',
+        'document.voter_identification.back.mime_type': '6d33e022-c917-4488-9d3d-1a5f3ea6b53a',
+        'document.voter_identification.city': 'North Craig',
+        'document.voter_identification.classified_document_type': '0b03539a-c389-43fd-80bd-e2daa2dd4207',
+        'document.voter_identification.clave_de_elector': 'fbecf225-6bda-4893-8554-9a15fae8e1dc',
+        'document.voter_identification.curp': 'a0205f23-8b47-4a89-b0f8-a2b80cb710a0',
+        'document.voter_identification.curp_validation_response': '848e612e-5b71-4447-b1dc-c3e12a2def41',
+        'document.voter_identification.dob': '79269e18-f1c3-4983-8418-d8b5a3b25a54',
+        'document.voter_identification.document_number': 'b83319fb-016f-4dbd-97af-590e4edc5a66',
+        'document.voter_identification.expires_at': 'f9deb34e-d2ec-46d4-bd2b-cdcb1d95feb6',
+        'document.voter_identification.first_name': 'Judy',
+        'document.voter_identification.front.image': '5a0fa5a3-815b-4cbd-825e-1529d89212f8',
+        'document.voter_identification.front.mime_type': '074ca6be-9795-41aa-b511-17b7608a4d30',
+        'document.voter_identification.full_address': '4245 Macy Loop Suite 869',
+        'document.voter_identification.full_name': 'Ms. Christine Trantow Sr.',
+        'document.voter_identification.gender': 'faa0226d-e1ff-40d6-bf44-8311a072af9c',
+        'document.voter_identification.issued_at': '8c974397-eea9-4126-8743-bed696453deb',
+        'document.voter_identification.issuing_country': 'Guadeloupe',
+        'document.voter_identification.issuing_state': 'Connecticut',
+        'document.voter_identification.last_name': 'Shanahan',
+        'document.voter_identification.nationality': '51c2b675-1da1-424d-847f-9f821a2b7892',
+        'document.voter_identification.postal_code': '65e65090-47fc-48bf-a97f-58ffe95282f4',
+        'document.voter_identification.ref_number': '508d01f0-9142-4e4d-ae69-c77b45e3d389',
+        'document.voter_identification.samba_activity_history_response': '368cb6e5-eeb0-4c2a-9740-4fbdc97ca8f4',
+        'document.voter_identification.selfie.image': '4e70a922-561c-41f7-87c0-522bade4a54a',
+        'document.voter_identification.selfie.mime_type': '908e66f5-783d-4d68-94ed-754e3cc42465',
+        'document.voter_identification.state': 'Georgia',
+        'id.address_line1': '6615 Beer Villages Suite 133',
+        'id.address_line2': '5506 Kovacek Point Apt. 910',
+        'id.citizenships': 'fb813b81-f86d-4aae-b206-773ac10f25ba',
+        'id.city': 'Sporerfort',
+        'id.country': 'Mexico',
+        'id.dob': 'b24a4293-f39e-496f-a19d-e3e153bdcca3',
+        'id.drivers_license_number': '44fee36c-07cd-4de3-b627-e823dd797f8d',
+        'id.drivers_license_state': 'Pennsylvania',
+        'id.email': 'nikko_torphy-lowe6@gmail.com',
+        'id.first_name': 'Frida',
+        'id.itin': '00fa851c-2036-45bd-8951-04922a2f58c2',
+        'id.last_name': 'Roob',
+        'id.middle_name': 'Carole Schmidt',
+        'id.nationality': '69cfb9e5-710e-4938-8fa6-bb79c7d31786',
+        'id.phone_number': '+12246421008',
+        'id.ssn4': 'd4180328-9a8d-4239-a341-48af3ffa8227',
+        'id.ssn9': 'b379bbff-48d7-4acf-ab0c-4d0b977ef9ff',
+        'id.state': 'Vermont',
+        'id.us_legal_status': '4615cf6c-3327-4eb0-a5f5-b3ba51081cc2',
+        'id.us_tax_id': '5473e1b8-2c1b-4076-a7d4-d22b0e0af0a4',
+        'id.visa_expiration_date': 'ce1ade3c-eb27-48d6-9e4a-9f8574168e65',
+        'id.visa_kind': '28ffe77d-9b26-4de3-bbac-f8a155db1357',
+        'id.zip': '79389',
+        'investor_profile.annual_income': 'qui in ad',
+        'investor_profile.brokerage_firm_employer': 'Duis enim exercitation',
+        'investor_profile.declarations': 'eu',
+        'investor_profile.employer': 'tempor occaecat nulla culpa',
+        'investor_profile.employment_status': 'deserunt Duis ipsum Excepteur',
+        'investor_profile.family_member_names': 'Gretchen Hoppe',
+        'investor_profile.funding_sources': 'cillum consectetur',
+        'investor_profile.investment_goals': 'sint sit',
+        'investor_profile.net_worth': 'esse dolore ad qui',
+        'investor_profile.occupation': 'in nisi minim',
+        'investor_profile.political_organization': 'dolor dolor eu ullamco proident',
+        'investor_profile.risk_tolerance': 'ullamco in ea amet',
+        'investor_profile.senior_executive_symbols': 'in ut anim dolor',
       },
       hasLinkedUser: false,
       isAuthedUser: true,
-      isMutable: false,
-      linkId: 'f92bf243-f201-4e00-ad6f-609afcd25d66',
-      ownershipStake: -18949686,
+      isMutable: true,
+      linkId: '00489aa4-75a7-4a34-a94a-87f95d8f6185',
+      ownershipStake: 11065808,
       populatedData: [
-        'document.id_card.selfie.image',
-        'document.permit.samba_activity_history_response',
-        'document.passport_card.postal_code',
+        'document.passport_card.selfie.image',
+        'document.permit.back.image',
+        'document.residence_document.classified_document_type',
       ],
-      uuid: '87e42004-b234-4bc3-bb9b-d547960cee9e',
+      uuid: '8f53fd99-ad4d-4085-9f6e-15e5db0abc81',
     },
     props,
-  ) as HostedBusinessOwner;
-export const getHostedValidateResponse = (props: Partial<HostedValidateResponse>) =>
-  merge(
+  );
+export const getHostedUserDecryptRequest = (props: Partial<HostedUserDecryptRequest>): HostedUserDecryptRequest =>
+  merge<HostedUserDecryptRequest, Partial<HostedUserDecryptRequest>>(
     {
-      validationToken: '2a9d60db-58dc-46e5-8d9f-325277989696',
+      fields: [
+        'document.residence_document.front.mime_type',
+        'document.id_card.issued_at',
+        'document.voter_identification.samba_activity_history_response',
+      ],
     },
     props,
-  ) as HostedValidateResponse;
-export const getHostedWorkflowRequest = (props: Partial<HostedWorkflowRequest>) =>
-  merge(
+  );
+export const getHostedValidateResponse = (props: Partial<HostedValidateResponse>): HostedValidateResponse =>
+  merge<HostedValidateResponse, Partial<HostedValidateResponse>>(
+    {
+      validationToken: 'd13d31d5-5e9d-47c0-bf2d-56f7f0cdb569',
+    },
+    props,
+  );
+export const getHostedWorkflowRequest = (props: Partial<HostedWorkflowRequest>): HostedWorkflowRequest =>
+  merge<HostedWorkflowRequest, Partial<HostedWorkflowRequest>>(
     {
       config: {
         data: {
-          playbookId: '945fd699-b1d3-4192-8fb4-f3e7eea3eebe',
-          recollectAttributes: ['us_legal_status', 'full_address', 'bank'],
-          reuseExistingBoKyc: true,
+          playbookId: '9b547635-0bf1-4f83-9b08-85eca1161dad',
+          recollectAttributes: ['dob', 'business_address', 'email'],
+          reuseExistingBoKyc: false,
         },
         kind: 'onboard',
       },
-      note: 'enim veniam',
+      note: 'occaecat ullamco aliqua magna ipsum',
     },
     props,
-  ) as HostedWorkflowRequest;
-export const getIdDocKind = (props: Partial<IdDocKind>) => (props ?? 'passport_card') as IdDocKind;
-export const getIdentifiedUser = (props: Partial<IdentifiedUser>) =>
-  merge(
+  );
+export const getIdDocKind = (props: IdDocKind): IdDocKind => props ?? 'visa';
+export const getIdentifiedUser = (props: Partial<IdentifiedUser>): IdentifiedUser =>
+  merge<IdentifiedUser, Partial<IdentifiedUser>>(
     {
       authMethods: [
         {
-          isVerified: false,
+          isVerified: true,
           kind: 'passkey',
         },
         {
-          isVerified: false,
-          kind: 'email',
+          isVerified: true,
+          kind: 'passkey',
         },
         {
-          isVerified: false,
+          isVerified: true,
           kind: 'email',
         },
       ],
-      availableChallengeKinds: ['sms', 'sms', 'email'],
-      canInitiateSignupChallenge: true,
-      hasSyncablePasskey: false,
-      isUnverified: false,
-      matchingFps: ['bank.*.ach_account_number', 'id.drivers_license_number', 'document.passport_card.expires_at'],
-      scrubbedEmail: 'brice72@gmail.com',
-      scrubbedPhone: '+15349993776',
-      token: 'ea56a699-f5b3-43f9-b766-3eb0d0ecc009',
-      tokenScopes: ['auth', 'handoff', 'handoff'],
+      availableChallengeKinds: ['email', 'email', 'sms'],
+      canInitiateSignupChallenge: false,
+      hasSyncablePasskey: true,
+      isUnverified: true,
+      matchingFps: [
+        'document.residence_document.issuing_country',
+        'document.visa.front.image',
+        'document.visa.issued_at',
+      ],
+      scrubbedEmail: 'kyler.kub54@gmail.com',
+      scrubbedPhone: '+14805566942',
+      token: '7152c554-bf1c-4004-b943-d6af35c7978e',
+      tokenScopes: ['sensitive_profile', 'vault_data', 'handoff'],
     },
     props,
-  ) as IdentifiedUser;
-export const getIdentifyAuthMethod = (props: Partial<IdentifyAuthMethod>) =>
-  merge(
+  );
+export const getIdentifyAuthMethod = (props: Partial<IdentifyAuthMethod>): IdentifyAuthMethod =>
+  merge<IdentifyAuthMethod, Partial<IdentifyAuthMethod>>(
     {
       isVerified: false,
-      kind: 'passkey',
+      kind: 'email',
     },
     props,
-  ) as IdentifyAuthMethod;
-export const getIdentifyChallengeResponse = (props: Partial<IdentifyChallengeResponse>) =>
-  merge(
+  );
+export const getIdentifyChallengeResponse = (props: Partial<IdentifyChallengeResponse>): IdentifyChallengeResponse =>
+  merge<IdentifyChallengeResponse, Partial<IdentifyChallengeResponse>>(
     {
       challengeData: {
-        biometricChallengeJson: 'sunt',
-        challengeKind: 'biometric',
-        challengeToken: '6cc10f2e-8d85-44a6-adbd-729867904d90',
-        timeBeforeRetryS: -60711916,
-        token: 'ffe5951f-1d97-4621-8094-df64af17f6aa',
+        biometricChallengeJson: 'elit nulla',
+        challengeKind: 'sms',
+        challengeToken: '3b6445b8-f53d-45bc-a625-6df2900086ed',
+        timeBeforeRetryS: 69478703,
+        token: 'ec45b926-2295-4734-a86c-3ce1058d30e6',
       },
-      error: 'do esse magna pariatur qui',
+      error: 'consectetur exercitation ad',
     },
     props,
-  ) as IdentifyChallengeResponse;
-export const getIdentifyId = (props: Partial<IdentifyId>) =>
-  merge(
+  );
+export const getIdentifyId = (props: Partial<IdentifyId>): IdentifyId =>
+  merge<IdentifyId, Partial<IdentifyId>>(
     {
-      email: 'mayra37@gmail.com',
+      email: 'karlie69@gmail.com',
     },
     props,
-  ) as IdentifyId;
-export const getIdentifyRequest = (props: Partial<IdentifyRequest>) =>
-  merge(
+  );
+export const getIdentifyRequest = (props: Partial<IdentifyRequest>): IdentifyRequest =>
+  merge<IdentifyRequest, Partial<IdentifyRequest>>(
     {
-      email: 'kaylin.wiza49@gmail.com',
+      email: 'blanche_williamson15@gmail.com',
       identifier: {
-        email: 'easton_ebert@gmail.com',
+        email: 'zella88@gmail.com',
       },
-      phoneNumber: '+12995328882',
-      scope: 'my1fp',
+      phoneNumber: '+17578683740',
+      scope: 'onboarding',
     },
     props,
-  ) as IdentifyRequest;
-export const getIdentifyResponse = (props: Partial<IdentifyResponse>) =>
-  merge(
+  );
+export const getIdentifyResponse = (props: Partial<IdentifyResponse>): IdentifyResponse =>
+  merge<IdentifyResponse, Partial<IdentifyResponse>>(
     {
       user: {
         authMethods: [
           {
-            isVerified: false,
-            kind: 'email',
-          },
-          {
-            isVerified: false,
-            kind: 'phone',
-          },
-          {
             isVerified: true,
             kind: 'email',
           },
+          {
+            isVerified: false,
+            kind: 'passkey',
+          },
+          {
+            isVerified: false,
+            kind: 'email',
+          },
         ],
-        availableChallengeKinds: ['sms', 'email', 'biometric'],
-        canInitiateSignupChallenge: true,
-        hasSyncablePasskey: false,
-        isUnverified: true,
-        matchingFps: [
-          'document.permit.state',
-          'document.voter_identification.front.mime_type',
-          'document.drivers_license.dob',
-        ],
-        scrubbedEmail: 'brianne_strosin86@gmail.com',
-        scrubbedPhone: '+13092277571',
-        token: '1b001e6e-9963-4db3-bd9d-70e9c5c30c71',
-        tokenScopes: ['sign_up', 'sensitive_profile', 'auth'],
+        availableChallengeKinds: ['email', 'email', 'sms'],
+        canInitiateSignupChallenge: false,
+        hasSyncablePasskey: true,
+        isUnverified: false,
+        matchingFps: ['document.permit.full_name', 'business.country', 'document.permit.last_name'],
+        scrubbedEmail: 'antonetta_stark61@gmail.com',
+        scrubbedPhone: '+13234436218',
+        token: '2b2d5d52-c160-4a7c-a328-c870f690db2f',
+        tokenScopes: ['handoff', 'handoff', 'explicit_auth'],
       },
     },
     props,
-  ) as IdentifyResponse;
-export const getIdentifyScope = (props: Partial<IdentifyScope>) => (props ?? 'my1fp') as IdentifyScope;
-export const getIdentifyVerifyRequest = (props: Partial<IdentifyVerifyRequest>) =>
-  merge(
+  );
+export const getIdentifyScope = (props: IdentifyScope): IdentifyScope => props ?? 'onboarding';
+export const getIdentifyVerifyRequest = (props: Partial<IdentifyVerifyRequest>): IdentifyVerifyRequest =>
+  merge<IdentifyVerifyRequest, Partial<IdentifyVerifyRequest>>(
     {
-      challengeResponse: 'laboris tempor officia ex',
-      challengeToken: '3e92f283-f21f-41a2-ab1d-4069a4f41e74',
+      challengeResponse: 'pariatur Lorem occaecat',
+      challengeToken: '44adf55d-c5d3-4789-8ec5-63f5e3a2385e',
       scope: 'auth',
     },
     props,
-  ) as IdentifyVerifyRequest;
-export const getIdentifyVerifyResponse = (props: Partial<IdentifyVerifyResponse>) =>
-  merge(
+  );
+export const getIdentifyVerifyResponse = (props: Partial<IdentifyVerifyResponse>): IdentifyVerifyResponse =>
+  merge<IdentifyVerifyResponse, Partial<IdentifyVerifyResponse>>(
     {
-      authToken: '009e3f43-7379-4cef-beb5-a4176228874a',
+      authToken: 'b84bc949-4e0e-4b97-b44d-4159c6b8b20f',
     },
     props,
-  ) as IdentifyVerifyResponse;
-export const getInviter = (props: Partial<Inviter>) =>
-  merge(
+  );
+export const getInviter = (props: Partial<Inviter>): Inviter =>
+  merge<Inviter, Partial<Inviter>>(
     {
-      firstName: 'Violette',
-      lastName: 'Welch',
+      firstName: 'Trudie',
+      lastName: 'Rodriguez',
     },
     props,
-  ) as Inviter;
-export const getIso3166TwoDigitCountryCode = (props: Partial<Iso3166TwoDigitCountryCode>) =>
-  (props ?? 'BW') as Iso3166TwoDigitCountryCode;
-export const getKbaResponse = (props: Partial<KbaResponse>) =>
-  merge(
+  );
+export const getIso3166TwoDigitCountryCode = (props: Iso3166TwoDigitCountryCode): Iso3166TwoDigitCountryCode =>
+  props ?? 'IS';
+export const getKbaResponse = (props: Partial<KbaResponse>): KbaResponse =>
+  merge<KbaResponse, Partial<KbaResponse>>(
     {
-      token: 'b9e2babd-e591-4678-bbed-d16d5d714852',
+      token: 'ee243a48-29c4-4f59-915b-25166ac6b608',
     },
     props,
-  ) as KbaResponse;
-export const getL10n = (props: Partial<L10n>) =>
-  merge(
-    {
-      language: 'en',
-      locale: 'en-US',
-    },
-    props,
-  ) as L10n;
-export const getL10nV1 = (props: Partial<L10nV1>) =>
-  merge(
+  );
+export const getL10n = (props: Partial<L10n>): L10n =>
+  merge<L10n, Partial<L10n>>(
     {
       language: 'en',
       locale: 'en-US',
     },
     props,
-  ) as L10nV1;
-export const getLiteIdentifyRequest = (props: Partial<LiteIdentifyRequest>) =>
-  merge(
+  );
+export const getL10nV1 = (props: Partial<L10nV1>): L10nV1 =>
+  merge<L10nV1, Partial<L10nV1>>(
     {
-      email: 'elenor.vandervort@gmail.com',
-      phoneNumber: '+12339044984',
+      language: 'en',
+      locale: 'en-US',
     },
     props,
-  ) as LiteIdentifyRequest;
-export const getLiteIdentifyResponse = (props: Partial<LiteIdentifyResponse>) =>
-  merge(
+  );
+export const getLiteIdentifyRequest = (props: Partial<LiteIdentifyRequest>): LiteIdentifyRequest =>
+  merge<LiteIdentifyRequest, Partial<LiteIdentifyRequest>>(
+    {
+      email: 'alize49@gmail.com',
+      phoneNumber: '+13176501326',
+    },
+    props,
+  );
+export const getLiteIdentifyResponse = (props: Partial<LiteIdentifyResponse>): LiteIdentifyResponse =>
+  merge<LiteIdentifyResponse, Partial<LiteIdentifyResponse>>(
     {
       userFound: true,
     },
     props,
-  ) as LiteIdentifyResponse;
-export const getLogBody = (props: Partial<LogBody>) =>
-  merge(
+  );
+export const getLogBody = (props: Partial<LogBody>): LogBody =>
+  merge<LogBody, Partial<LogBody>>(
     {
-      logLevel: 'labore',
-      logMessage: 'in',
-      sdkKind: 'officia sed dolore Lorem',
-      sdkName: 'Dr. Delores Langworth',
-      sdkVersion: 'ea',
-      sessionId: 'cba3f4a5-5c15-4757-8b40-ff7835728f95',
-      tenantDomain: 'laboris eiusmod dolor laborum reprehenderit',
+      logLevel: 'incididunt sunt do magna',
+      logMessage: 'est tempor labore magna ut',
+      sdkKind: 'ad dolore',
+      sdkName: 'Mrs. Beth Rice I',
+      sdkVersion: 'quis',
+      sessionId: 'f01f580e-0fcc-465b-881c-b73136beba05',
+      tenantDomain: 'Excepteur irure veniam culpa',
     },
     props,
-  ) as LogBody;
-export const getLoginChallengeRequest = (props: Partial<LoginChallengeRequest>) =>
-  merge(
+  );
+export const getLoginChallengeRequest = (props: Partial<LoginChallengeRequest>): LoginChallengeRequest =>
+  merge<LoginChallengeRequest, Partial<LoginChallengeRequest>>(
     {
-      challengeKind: 'sms',
+      challengeKind: 'email',
     },
     props,
-  ) as LoginChallengeRequest;
-export const getModernRawBusinessDataRequest = (props: Partial<ModernRawBusinessDataRequest>) =>
-  merge(
+  );
+export const getModernBusinessDecryptResponse = (
+  props: Partial<ModernBusinessDecryptResponse>,
+): ModernBusinessDecryptResponse =>
+  merge<ModernBusinessDecryptResponse, Partial<ModernBusinessDecryptResponse>>(
     {
-      'business.name': 'Acme Bank',
-      'business.website': 'acmebank.org',
-      customAccountId: 'd0af81fc-41c2-46ca-8a8d-797b8e4d3146',
+      'business.address_line1': '1194 N Court Street Suite 320',
+      'business.address_line2': '3225 Delbert Crossing Suite 140',
+      'business.city': 'Yesseniabury',
+      'business.corporation_type': 'ipsum nisi pariatur proident',
+      'business.country': 'Senegal',
+      'business.dba': 'ipsum fugiat',
+      'business.formation_date': 'occaecat amet',
+      'business.formation_state': 'Arizona',
+      'business.name': 'Todd Hartmann',
+      'business.phone_number': '+18017239754',
+      'business.state': 'New York',
+      'business.tin': 'dolor magna enim',
+      'business.website': 'https://unrealistic-cosset.org',
+      'business.zip': '50055-8803',
+      'custom.*': 'aute nisi',
     },
     props,
-  ) as ModernRawBusinessDataRequest;
-export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequest>) =>
-  merge(
+  );
+export const getModernRawBusinessDataRequest = (
+  props: Partial<ModernRawBusinessDataRequest>,
+): ModernRawBusinessDataRequest =>
+  merge<ModernRawBusinessDataRequest, Partial<ModernRawBusinessDataRequest>>(
     {
-      customUserId: '7c50e2bc-c31f-42e3-b2b0-9852010cfd58',
-      'id.first_name': 'Jane',
-      'id.last_name': 'Doe',
+      'business.address_line1': '47138 Maxime Union Suite 245',
+      'business.address_line2': '2890 Schuyler Gateway Suite 197',
+      'business.city': 'Terencefield',
+      'business.corporation_type': 'adipisicing pariatur quis minim ullamco',
+      'business.country': 'Switzerland',
+      'business.dba': 'consequat in Excepteur',
+      'business.formation_date': 'pariatur deserunt Duis dolore nulla',
+      'business.formation_state': 'Delaware',
+      'business.name': 'David Mitchell',
+      'business.phone_number': '+19613372736',
+      'business.state': 'New Jersey',
+      'business.tin': 'occaecat laborum',
+      'business.website': 'https://smoggy-executor.com',
+      'business.zip': '04036-3379',
+      'custom.*': 'incididunt in',
     },
     props,
-  ) as ModernRawUserDataRequest;
-export const getModernUserDecryptResponse = (props: Partial<ModernUserDecryptResponse>) =>
-  merge(
+  );
+export const getModernRawUserDataRequest = (props: Partial<ModernRawUserDataRequest>): ModernRawUserDataRequest =>
+  merge<ModernRawUserDataRequest, Partial<ModernRawUserDataRequest>>(
     {
-      'id.first_name': 'Jane',
-      'id.last_name': 'Doe',
+      'bank.*.account_type': 'velit ipsum',
+      'bank.*.ach_account_id': '693103ae-9305-4b9d-a69f-5559e62ab9bf',
+      'bank.*.ach_account_number': 'sed',
+      'bank.*.ach_routing_number': 'adipisicing ut elit sunt',
+      'bank.*.fingerprint': 'officia',
+      'bank.*.name': 'Ralph Hills',
+      'card.*.billing_address.country': '8495 Carolanne Lock Apt. 677',
+      'card.*.billing_address.zip': '65493 N High Street Suite 373',
+      'card.*.cvc': 'Ut ut Lorem eiusmod id',
+      'card.*.expiration': 'est deserunt',
+      'card.*.expiration_month': 'dolor',
+      'card.*.expiration_year': 'mollit incididunt ex',
+      'card.*.fingerprint': 'magna cupidatat',
+      'card.*.issuer': 'ipsum Duis adipisicing anim',
+      'card.*.name': 'Chad Huels',
+      'card.*.number': 'culpa reprehenderit',
+      'card.*.number_last4': 'velit reprehenderit voluptate',
+      'custom.*': 'sint',
+      'document.custom.*': 'culpa',
+      'document.drivers_license.address_line1': '15783 River Road Suite 957',
+      'document.drivers_license.back.image': 'cupidatat',
+      'document.drivers_license.back.mime_type': 'nulla',
+      'document.drivers_license.city': 'Gerholdboro',
+      'document.drivers_license.classified_document_type': 'exercitation',
+      'document.drivers_license.clave_de_elector': 'eiusmod veniam dolore dolore',
+      'document.drivers_license.curp': 'eiusmod dolore anim minim',
+      'document.drivers_license.curp_validation_response': '56650e33-52ab-459b-b085-14335fe60803',
+      'document.drivers_license.dob': 'qui in',
+      'document.drivers_license.document_number': 'ut tempor cillum dolore ut',
+      'document.drivers_license.expires_at': 'fugiat eu',
+      'document.drivers_license.first_name': 'Judson',
+      'document.drivers_license.front.image': 'adipisicing veniam incididunt mollit ad',
+      'document.drivers_license.front.mime_type': 'nostrud consectetur incididunt sunt Lorem',
+      'document.drivers_license.full_address': '37904 Gusikowski Hills Apt. 289',
+      'document.drivers_license.full_name': 'Mrs. Elena Terry',
+      'document.drivers_license.gender': 'eiusmod commodo adipisicing occaecat',
+      'document.drivers_license.issued_at': 'dolor do nisi',
+      'document.drivers_license.issuing_country': 'Indonesia',
+      'document.drivers_license.issuing_state': 'Arkansas',
+      'document.drivers_license.last_name': 'Gutmann',
+      'document.drivers_license.nationality': 'ex non Excepteur',
+      'document.drivers_license.postal_code': 'et deserunt tempor qui',
+      'document.drivers_license.ref_number': 'sunt nisi in laborum',
+      'document.drivers_license.samba_activity_history_response': 'anim enim fugiat exercitation proident',
+      'document.drivers_license.selfie.image': 'reprehenderit Duis laborum amet',
+      'document.drivers_license.selfie.mime_type': 'minim anim nostrud',
+      'document.drivers_license.state': 'Florida',
+      'document.finra_compliance_letter': 'cupidatat commodo',
+      'document.id_card.address_line1': '11975 Bernhard Rest Suite 790',
+      'document.id_card.back.image': '0c2ffc48-d7b1-4d8a-820e-e06aedbd7111',
+      'document.id_card.back.mime_type': '29b26fba-116b-45a2-bc3d-e3729c60fccd',
+      'document.id_card.city': 'Fort Cynthiastead',
+      'document.id_card.classified_document_type': '0659b167-a09c-4a53-a7ed-5ad7ecc066ef',
+      'document.id_card.clave_de_elector': '42683985-2a27-47ea-acf9-5f75505c2403',
+      'document.id_card.curp': '95533978-051d-45a6-af0a-236317462a61',
+      'document.id_card.curp_validation_response': '17d99aee-1ee7-4ab0-af05-e40e8f65a2d3',
+      'document.id_card.dob': '735380f8-1783-412d-99b6-5fa300ee9c00',
+      'document.id_card.document_number': '37ac0cd9-8c12-42a9-bb3f-7bdf1f7ddf0e',
+      'document.id_card.expires_at': 'd63d93ec-abac-4ba1-b75a-20cdb8a9ac0b',
+      'document.id_card.first_name': 'Jessica',
+      'document.id_card.front.image': '0b605447-3e95-4baf-9327-aa3055ec78d2',
+      'document.id_card.front.mime_type': '9771d445-9ab8-43c4-9ba0-e77b49b3d638',
+      'document.id_card.full_address': '228 Cumberland Street Apt. 833',
+      'document.id_card.full_name': 'Mildred Spencer Jr.',
+      'document.id_card.gender': 'd97eddd5-ea6b-4d4f-8dc1-12f622811f90',
+      'document.id_card.issued_at': 'e8e4d344-991b-4f9b-8c35-4d77ed331f8d',
+      'document.id_card.issuing_country': 'Maldives',
+      'document.id_card.issuing_state': 'Maryland',
+      'document.id_card.last_name': "O'Keefe",
+      'document.id_card.nationality': 'f573851f-2c1f-4380-b53b-42d3eb044042',
+      'document.id_card.postal_code': '551a815a-f300-4e30-a351-df3fdc14f819',
+      'document.id_card.ref_number': '7a620b41-a9cc-4566-8cd0-039776ee1a9f',
+      'document.id_card.samba_activity_history_response': 'a3aeedb9-3510-4bd1-8f9f-d6422246806c',
+      'document.id_card.selfie.image': 'f146c7ba-0b18-4776-9763-b5be09b51c77',
+      'document.id_card.selfie.mime_type': 'd3f26446-e509-49be-acc4-17ed70ab35c6',
+      'document.id_card.state': 'Tennessee',
+      'document.passport.address_line1': '99140 W Central Avenue Suite 105',
+      'document.passport.back.image': 'dolore',
+      'document.passport.back.mime_type': 'ad non sint',
+      'document.passport.city': 'Port Laurel',
+      'document.passport.classified_document_type': 'reprehenderit aute incididunt anim',
+      'document.passport.clave_de_elector': 'proident ut consectetur ullamco',
+      'document.passport.curp': 'nulla ad',
+      'document.passport.curp_validation_response': '3ff68079-8328-4db7-aae8-ec4c17c20a92',
+      'document.passport.dob': 'velit ipsum cillum sint nisi',
+      'document.passport.document_number': 'Excepteur cupidatat',
+      'document.passport.expires_at': 'enim in eiusmod deserunt eu',
+      'document.passport.first_name': 'Carrie',
+      'document.passport.front.image': 'ad occaecat ea',
+      'document.passport.front.mime_type': 'ipsum consequat consectetur Duis',
+      'document.passport.full_address': '3779 E Union Street Apt. 945',
+      'document.passport.full_name': 'Todd Kris',
+      'document.passport.gender': 'culpa',
+      'document.passport.issued_at': 'sit deserunt',
+      'document.passport.issuing_country': 'Grenada',
+      'document.passport.issuing_state': 'Maryland',
+      'document.passport.last_name': 'Hamill',
+      'document.passport.nationality': 'dolor ut in',
+      'document.passport.postal_code': 'sit eu Ut dolore ad',
+      'document.passport.ref_number': 'aliqua laborum',
+      'document.passport.samba_activity_history_response': 'anim in',
+      'document.passport.selfie.image': 'dolor eiusmod incididunt in',
+      'document.passport.selfie.mime_type': 'in voluptate',
+      'document.passport.state': 'Virginia',
+      'document.passport_card.address_line1': '472 Haley Summit Apt. 418',
+      'document.passport_card.back.image': 'adipisicing do dolor',
+      'document.passport_card.back.mime_type': 'sit',
+      'document.passport_card.city': 'New Hershel',
+      'document.passport_card.classified_document_type': 'ad',
+      'document.passport_card.clave_de_elector': 'ea ut anim',
+      'document.passport_card.curp': 'ut sit anim',
+      'document.passport_card.curp_validation_response': 'c4535508-f0d9-462a-9a8f-cdf3586868fd',
+      'document.passport_card.dob': 'incididunt in nulla',
+      'document.passport_card.document_number': 'est proident reprehenderit eiusmod ad',
+      'document.passport_card.expires_at': 'in aliquip',
+      'document.passport_card.first_name': 'Elnora',
+      'document.passport_card.front.image': 'ad amet',
+      'document.passport_card.front.mime_type': 'laboris',
+      'document.passport_card.full_address': '88428 Clemens Canyon Apt. 993',
+      'document.passport_card.full_name': 'Fred Becker',
+      'document.passport_card.gender': 'nisi Lorem enim',
+      'document.passport_card.issued_at': 'ad',
+      'document.passport_card.issuing_country': 'Czechia',
+      'document.passport_card.issuing_state': 'North Dakota',
+      'document.passport_card.last_name': 'MacGyver',
+      'document.passport_card.nationality': 'reprehenderit',
+      'document.passport_card.postal_code': 'tempor',
+      'document.passport_card.ref_number': 'nostrud reprehenderit',
+      'document.passport_card.samba_activity_history_response': 'fugiat id',
+      'document.passport_card.selfie.image': 'consectetur',
+      'document.passport_card.selfie.mime_type': 'ea eu ipsum',
+      'document.passport_card.state': 'North Dakota',
+      'document.permit.address_line1': "77794 O'Kon-Rowe River Suite 248",
+      'document.permit.back.image': 'mollit id',
+      'document.permit.back.mime_type': 'eiusmod adipisicing reprehenderit',
+      'document.permit.city': 'Cassinport',
+      'document.permit.classified_document_type': 'deserunt sint in',
+      'document.permit.clave_de_elector': 'culpa et Excepteur',
+      'document.permit.curp': 'culpa adipisicing ullamco',
+      'document.permit.curp_validation_response': 'ea776cde-798c-4264-a16a-7fac5225198a',
+      'document.permit.dob': 'ex sint dolore sed in',
+      'document.permit.document_number': 'ad ea in',
+      'document.permit.expires_at': 'ipsum',
+      'document.permit.first_name': 'Hellen',
+      'document.permit.front.image': 'fugiat',
+      'document.permit.front.mime_type': 'eiusmod dolore',
+      'document.permit.full_address': '971 11th Street Apt. 601',
+      'document.permit.full_name': 'Carol Christiansen',
+      'document.permit.gender': 'cillum fugiat enim nulla',
+      'document.permit.issued_at': 'esse',
+      'document.permit.issuing_country': 'Mauritius',
+      'document.permit.issuing_state': 'Washington',
+      'document.permit.last_name': 'Upton',
+      'document.permit.nationality': 'magna incididunt reprehenderit dolore ut',
+      'document.permit.postal_code': 'cupidatat in aute est laborum',
+      'document.permit.ref_number': 'eu esse',
+      'document.permit.samba_activity_history_response': 'eu exercitation id Ut',
+      'document.permit.selfie.image': 'sint dolor ad',
+      'document.permit.selfie.mime_type': 'deserunt enim cillum',
+      'document.permit.state': 'Kentucky',
+      'document.proof_of_address.image': '74345 Nels Mount Apt. 988',
+      'document.residence_document.address_line1': '67695 Huels Club Apt. 572',
+      'document.residence_document.back.image': '2e2a536d-c16f-489d-bba3-14fcb2767244',
+      'document.residence_document.back.mime_type': 'c92ccd26-0212-4cfd-a491-d9b5180d4001',
+      'document.residence_document.city': 'Fort Jarret',
+      'document.residence_document.classified_document_type': '90e3716c-5fed-416e-894c-02ef73092806',
+      'document.residence_document.clave_de_elector': 'e41c0a86-347d-4ab9-b660-96c202f2f7af',
+      'document.residence_document.curp': '44afcd5c-fa3e-44f1-8ed0-01e3bb3477a5',
+      'document.residence_document.curp_validation_response': '1bd98e7b-72c3-4cf8-a317-edb0ace1feaf',
+      'document.residence_document.dob': '9ac84cef-17ea-4d38-b2fd-f59ccffc4a85',
+      'document.residence_document.document_number': 'a66bcb55-679e-4bc8-9986-0400f50a31a3',
+      'document.residence_document.expires_at': '8a58f881-ec49-46bd-b3ff-182d6e920859',
+      'document.residence_document.first_name': 'Adriana',
+      'document.residence_document.front.image': '5ae61616-d10d-4693-bb92-1596be60492b',
+      'document.residence_document.front.mime_type': '864273f7-2cfe-4f98-adba-94fac9a48fa4',
+      'document.residence_document.full_address': '323 Frami Meadow Apt. 519',
+      'document.residence_document.full_name': 'Dr. Betsy Kunze',
+      'document.residence_document.gender': 'a97c19d4-d886-4d18-b676-fdbe1e9965c4',
+      'document.residence_document.issued_at': '222f43c4-9a5d-48a7-b03f-73a696855379',
+      'document.residence_document.issuing_country': 'Dominica',
+      'document.residence_document.issuing_state': 'Ohio',
+      'document.residence_document.last_name': 'Haag',
+      'document.residence_document.nationality': '4b19379e-fff6-4551-a657-58799407b2d1',
+      'document.residence_document.postal_code': 'a0173272-9563-47db-a70e-5d95af0f26a7',
+      'document.residence_document.ref_number': '8ca35af2-ffef-4e94-88fc-b4f0b6da61f8',
+      'document.residence_document.samba_activity_history_response': 'a20bccf2-b92c-4a31-8e44-cfd9fcd87c19',
+      'document.residence_document.selfie.image': 'd2a64d63-b52d-43fe-862d-258fbd1e0103',
+      'document.residence_document.selfie.mime_type': '817e7abd-d952-4268-bc07-f39c9ae15282',
+      'document.residence_document.state': 'New Mexico',
+      'document.ssn_card.image': 'sed',
+      'document.visa.address_line1': '7179 W High Street Suite 520',
+      'document.visa.back.image': 'velit',
+      'document.visa.back.mime_type': 'nostrud pariatur amet culpa dolor',
+      'document.visa.city': 'East Nolan',
+      'document.visa.classified_document_type': 'Ut sed mollit aliqua',
+      'document.visa.clave_de_elector': 'quis anim',
+      'document.visa.curp': 'sed mollit esse ea',
+      'document.visa.curp_validation_response': 'f72e275b-3eb1-4b51-8633-ac813702717f',
+      'document.visa.dob': 'ullamco ad incididunt',
+      'document.visa.document_number': 'reprehenderit Lorem enim cillum ut',
+      'document.visa.expires_at': 'mollit',
+      'document.visa.first_name': 'Kody',
+      'document.visa.front.image': 'anim ea dolore ullamco',
+      'document.visa.front.mime_type': 'exercitation',
+      'document.visa.full_address': '785 Larry Motorway Suite 636',
+      'document.visa.full_name': 'Nettie Collier',
+      'document.visa.gender': 'aliqua officia',
+      'document.visa.issued_at': 'Ut ipsum non',
+      'document.visa.issuing_country': 'Heard Island and McDonald Islands',
+      'document.visa.issuing_state': 'Washington',
+      'document.visa.last_name': 'Wintheiser',
+      'document.visa.nationality': 'in et',
+      'document.visa.postal_code': 'culpa',
+      'document.visa.ref_number': 'anim',
+      'document.visa.samba_activity_history_response': 'cillum pariatur aliqua occaecat',
+      'document.visa.selfie.image': 'dolor ex aliqua aliquip incididunt',
+      'document.visa.selfie.mime_type': 'Ut aliquip proident nulla',
+      'document.visa.state': 'Washington',
+      'document.voter_identification.address_line1': '49066 E High Street Apt. 867',
+      'document.voter_identification.back.image': '22ceaab5-ace3-43c1-8746-aba9b9952d99',
+      'document.voter_identification.back.mime_type': 'b00188cd-1b56-449e-9601-a638e86d4f97',
+      'document.voter_identification.city': 'Port Ramiroburgh',
+      'document.voter_identification.classified_document_type': '2c496e3d-8829-49e8-af03-ca89e04b115f',
+      'document.voter_identification.clave_de_elector': '3bb10e91-3fdc-4d14-855c-be89fd9cb9ff',
+      'document.voter_identification.curp': 'faa4e850-b8da-44dd-b500-5b3fd244f6f5',
+      'document.voter_identification.curp_validation_response': 'bc9ea706-e064-4e4c-8acb-ac193a4a81bf',
+      'document.voter_identification.dob': 'a1553a86-2c79-46ae-aa2d-428822ee0719',
+      'document.voter_identification.document_number': '45d7fbf3-67c6-4074-9ae0-18d2ba76c289',
+      'document.voter_identification.expires_at': 'd1e6b7d0-3db4-418e-9cf4-bafc7f3feb3c',
+      'document.voter_identification.first_name': 'Erica',
+      'document.voter_identification.front.image': '192c1765-ff74-45c9-bb65-ca75f2249e8a',
+      'document.voter_identification.front.mime_type': '8873cb39-ad90-482a-aa4c-005b4d8ac9c0',
+      'document.voter_identification.full_address': '391 Buckridge Junction Suite 471',
+      'document.voter_identification.full_name': 'Sherri Denesik',
+      'document.voter_identification.gender': '4bfafe73-6638-48eb-b0e9-cf70e84cb247',
+      'document.voter_identification.issued_at': '542342f8-74e1-4d31-b5bf-8494588a3b49',
+      'document.voter_identification.issuing_country': 'Marshall Islands',
+      'document.voter_identification.issuing_state': 'New Jersey',
+      'document.voter_identification.last_name': 'Boehm',
+      'document.voter_identification.nationality': '5bebbb37-0da0-42ee-8773-b06fc2e7759f',
+      'document.voter_identification.postal_code': '80f6bb9c-0e22-417e-be37-c71171eca89a',
+      'document.voter_identification.ref_number': '559a6ef2-a5aa-4f16-90dc-914ff377b110',
+      'document.voter_identification.samba_activity_history_response': 'e40029c7-a21d-4bcb-a4c3-e9ad84c700cb',
+      'document.voter_identification.selfie.image': 'bf45c290-cec4-496c-86b2-f24ad9f10584',
+      'document.voter_identification.selfie.mime_type': '042f8669-54bc-42b9-9601-40f14ba94ed9',
+      'document.voter_identification.state': 'New Jersey',
+      'id.address_line1': '201 Graham Brook Suite 129',
+      'id.address_line2': '49330 Braun Loop Suite 678',
+      'id.citizenships': '199c5a53-4171-4932-b294-df88bc644b5b',
+      'id.city': 'Fort Carolynemouth',
+      'id.country': 'Slovenia',
+      'id.dob': '14e64c90-f96e-4487-ac77-64144a4432d1',
+      'id.drivers_license_number': '0d879983-3ef6-437f-901b-23af13854bce',
+      'id.drivers_license_state': 'Oklahoma',
+      'id.email': 'reid_ullrich18@gmail.com',
+      'id.first_name': 'Ford',
+      'id.itin': '4ea220b0-7aac-4cf2-ac7f-c4d927c85e00',
+      'id.last_name': 'White',
+      'id.middle_name': 'Allen Stokes MD',
+      'id.nationality': '8db093ed-368f-4313-9a89-222f9067f466',
+      'id.phone_number': '+18994161734',
+      'id.ssn4': 'a8544680-f5aa-432e-bbdd-8358bf0f9c74',
+      'id.ssn9': 'c5f30a44-36c9-4daa-b128-9d386433e493',
+      'id.state': 'Oklahoma',
+      'id.us_legal_status': '48abe3a0-da82-4201-9aab-706ab3c61089',
+      'id.us_tax_id': 'd926a2f4-df96-4b94-bcbc-ffdc5d3cb04d',
+      'id.visa_expiration_date': '3b3ca862-bb3d-434c-87ea-31f22d55f436',
+      'id.visa_kind': '3d5ba725-78c7-432b-ad24-31d1a383c729',
+      'id.zip': '72605-3708',
+      'investor_profile.annual_income': 'eu sed incididunt',
+      'investor_profile.brokerage_firm_employer': 'Lorem',
+      'investor_profile.declarations': 'minim',
+      'investor_profile.employer': 'ut incididunt minim mollit',
+      'investor_profile.employment_status': 'enim',
+      'investor_profile.family_member_names': 'Genevieve Weissnat',
+      'investor_profile.funding_sources': 'velit in elit sint',
+      'investor_profile.investment_goals': 'dolore deserunt anim exercitation ad',
+      'investor_profile.net_worth': 'eiusmod nulla esse',
+      'investor_profile.occupation': 'velit',
+      'investor_profile.political_organization': 'adipisicing',
+      'investor_profile.risk_tolerance': 'magna anim cupidatat non',
+      'investor_profile.senior_executive_symbols': 'occaecat do laborum',
     },
     props,
-  ) as ModernUserDecryptResponse;
-export const getNeuroIdentityIdResponse = (props: Partial<NeuroIdentityIdResponse>) =>
-  merge(
+  );
+export const getModernUserDecryptResponse = (props: Partial<ModernUserDecryptResponse>): ModernUserDecryptResponse =>
+  merge<ModernUserDecryptResponse, Partial<ModernUserDecryptResponse>>(
     {
-      id: '7e3ff214-3d4a-474c-b44b-ca217430706e',
+      'bank.*.account_type': 'magna',
+      'bank.*.ach_account_id': '4a1e12ea-21df-4306-ad1f-ae6f4ea79a51',
+      'bank.*.ach_account_number': 'esse do reprehenderit',
+      'bank.*.ach_routing_number': 'laboris ullamco',
+      'bank.*.fingerprint': 'ut ullamco elit',
+      'bank.*.name': 'Francis Robel',
+      'card.*.billing_address.country': '8284 Broadway Avenue Apt. 253',
+      'card.*.billing_address.zip': '8811 Bruce Knolls Apt. 891',
+      'card.*.cvc': 'mollit',
+      'card.*.expiration': 'pariatur velit',
+      'card.*.expiration_month': 'proident nostrud',
+      'card.*.expiration_year': 'Lorem',
+      'card.*.fingerprint': 'aute',
+      'card.*.issuer': 'sed amet ea laborum enim',
+      'card.*.name': 'Bill Vandervort',
+      'card.*.number': 'elit commodo',
+      'card.*.number_last4': 'magna et',
+      'custom.*': 'sed',
+      'document.custom.*': 'eu id irure ullamco esse',
+      'document.drivers_license.address_line1': '3756 W Washington Street Suite 710',
+      'document.drivers_license.back.image': 'culpa ut aute',
+      'document.drivers_license.back.mime_type': 'incididunt',
+      'document.drivers_license.city': 'East Amari',
+      'document.drivers_license.classified_document_type': 'cillum fugiat non',
+      'document.drivers_license.clave_de_elector': 'do',
+      'document.drivers_license.curp': 'in eiusmod aliqua consectetur elit',
+      'document.drivers_license.curp_validation_response': '75e130df-9890-491b-a425-d7415989e9a1',
+      'document.drivers_license.dob': 'eiusmod voluptate magna',
+      'document.drivers_license.document_number': 'ad et Ut',
+      'document.drivers_license.expires_at': 'eu labore sunt',
+      'document.drivers_license.first_name': 'Cristobal',
+      'document.drivers_license.front.image': 'occaecat mollit incididunt est',
+      'document.drivers_license.front.mime_type': 'fugiat sed dolor Duis in',
+      'document.drivers_license.full_address': '8181 Leila Fords Apt. 480',
+      'document.drivers_license.full_name': 'Meredith Streich',
+      'document.drivers_license.gender': 'quis laborum',
+      'document.drivers_license.issued_at': 'quis nisi dolore Lorem Duis',
+      'document.drivers_license.issuing_country': 'Tanzania',
+      'document.drivers_license.issuing_state': 'Vermont',
+      'document.drivers_license.last_name': 'Nader',
+      'document.drivers_license.nationality': 'eu do commodo ex est',
+      'document.drivers_license.postal_code': 'minim',
+      'document.drivers_license.ref_number': 'qui Excepteur ut',
+      'document.drivers_license.samba_activity_history_response': 'exercitation aliqua Duis reprehenderit',
+      'document.drivers_license.selfie.image': 'sint',
+      'document.drivers_license.selfie.mime_type': 'tempor',
+      'document.drivers_license.state': 'Nevada',
+      'document.finra_compliance_letter': 'eu non velit consequat in',
+      'document.id_card.address_line1': '45894 North Avenue Suite 651',
+      'document.id_card.back.image': 'a6b922da-bdba-43fc-aa26-ba3b803bdc50',
+      'document.id_card.back.mime_type': '90b5e27f-517e-4350-a2f4-12b378d5a124',
+      'document.id_card.city': 'New Charley',
+      'document.id_card.classified_document_type': 'aeff8535-4d9d-40fd-8676-0ce5d8066097',
+      'document.id_card.clave_de_elector': '232b94cb-59d0-46c1-9105-c6a40ead2b7b',
+      'document.id_card.curp': '62e90b04-d5d8-42e2-aa88-e7ccebb1b852',
+      'document.id_card.curp_validation_response': '33cf68a9-bfce-43d8-be44-cb1107d569ef',
+      'document.id_card.dob': '139a65ec-99fb-4ddc-b03b-841a87a242b7',
+      'document.id_card.document_number': '3fe1ed5d-13de-4848-899e-2f6cc03e0c21',
+      'document.id_card.expires_at': '0ba1d978-b9a6-4f49-8dc6-8a8a22bdf748',
+      'document.id_card.first_name': 'Beatrice',
+      'document.id_card.front.image': '3f912fec-001b-4f7f-b546-1827b11315e4',
+      'document.id_card.front.mime_type': 'ee39326b-d180-4a33-8723-6f9ffa29d9c3',
+      'document.id_card.full_address': '7445 Sipes Mills Apt. 357',
+      'document.id_card.full_name': 'Jeffery Kshlerin I',
+      'document.id_card.gender': 'b9a47a45-ba17-43bf-861c-550eadaec991',
+      'document.id_card.issued_at': '5c1e71df-f77a-4683-a214-2e755f557d0d',
+      'document.id_card.issuing_country': 'Russian Federation',
+      'document.id_card.issuing_state': 'Nebraska',
+      'document.id_card.last_name': 'Quigley',
+      'document.id_card.nationality': '6724d9d3-e35b-41df-ac24-356bb8e74b38',
+      'document.id_card.postal_code': '8b5c329a-5fcc-4988-a706-ab748f503f63',
+      'document.id_card.ref_number': '2b527bb2-d3b4-49a4-a5e5-6507e7181d2d',
+      'document.id_card.samba_activity_history_response': 'b3b52731-90fd-4de9-b63e-ad42ae272cab',
+      'document.id_card.selfie.image': '7d9fd663-13dc-4c66-af84-03802ac82182',
+      'document.id_card.selfie.mime_type': '9b891196-cf30-4691-a224-4b59ebf7d651',
+      'document.id_card.state': 'Virginia',
+      'document.passport.address_line1': '10278 State Road Apt. 450',
+      'document.passport.back.image': 'ullamco irure sint non est',
+      'document.passport.back.mime_type': 'minim laborum dolor cillum',
+      'document.passport.city': 'Jaydecester',
+      'document.passport.classified_document_type': 'incididunt',
+      'document.passport.clave_de_elector': 'nulla',
+      'document.passport.curp': 'veniam nisi velit sed sunt',
+      'document.passport.curp_validation_response': '6b6795d8-df83-4fca-89ad-7dc80f6796e8',
+      'document.passport.dob': 'dolore proident anim occaecat enim',
+      'document.passport.document_number': 'consequat',
+      'document.passport.expires_at': 'velit laboris ullamco consectetur minim',
+      'document.passport.first_name': 'Pietro',
+      'document.passport.front.image': 'consectetur ea cillum deserunt sint',
+      'document.passport.front.mime_type': 'laborum voluptate',
+      'document.passport.full_address': '38404 Robbie Pine Suite 430',
+      'document.passport.full_name': 'Noel Reilly IV',
+      'document.passport.gender': 'in cillum consequat ullamco proident',
+      'document.passport.issued_at': 'fugiat deserunt',
+      'document.passport.issuing_country': 'Djibouti',
+      'document.passport.issuing_state': 'Delaware',
+      'document.passport.last_name': 'Heller',
+      'document.passport.nationality': 'do ipsum nostrud',
+      'document.passport.postal_code': 'reprehenderit in laboris aute',
+      'document.passport.ref_number': 'veniam eu irure dolore ut',
+      'document.passport.samba_activity_history_response': 'laborum in ipsum',
+      'document.passport.selfie.image': 'reprehenderit id dolor mollit aliqua',
+      'document.passport.selfie.mime_type': 'non sit Excepteur reprehenderit qui',
+      'document.passport.state': 'Nebraska',
+      'document.passport_card.address_line1': '2415 Constantin Lock Suite 190',
+      'document.passport_card.back.image': 'consectetur',
+      'document.passport_card.back.mime_type': 'ex',
+      'document.passport_card.city': 'Fort Araceli',
+      'document.passport_card.classified_document_type': 'est ut',
+      'document.passport_card.clave_de_elector': 'exercitation culpa deserunt',
+      'document.passport_card.curp': 'commodo incididunt veniam',
+      'document.passport_card.curp_validation_response': '30852859-b7e4-4dfb-b204-1deb45fb962a',
+      'document.passport_card.dob': 'pariatur',
+      'document.passport_card.document_number': 'Lorem reprehenderit ad esse dolore',
+      'document.passport_card.expires_at': 'ut minim eu nulla in',
+      'document.passport_card.first_name': 'Alexandrea',
+      'document.passport_card.front.image': 'Excepteur reprehenderit deserunt',
+      'document.passport_card.front.mime_type': 'velit sunt dolore adipisicing',
+      'document.passport_card.full_address': '322 Marian Point Suite 964',
+      'document.passport_card.full_name': "Miss Olivia O'Hara",
+      'document.passport_card.gender': 'dolor mollit',
+      'document.passport_card.issued_at': 'deserunt laboris laborum do',
+      'document.passport_card.issuing_country': 'Saint Pierre and Miquelon',
+      'document.passport_card.issuing_state': 'Connecticut',
+      'document.passport_card.last_name': 'Hoeger-Waters',
+      'document.passport_card.nationality': 'minim in do',
+      'document.passport_card.postal_code': 'in',
+      'document.passport_card.ref_number': 'cupidatat labore',
+      'document.passport_card.samba_activity_history_response': 'do consequat ipsum',
+      'document.passport_card.selfie.image': 'do cupidatat',
+      'document.passport_card.selfie.mime_type': 'irure',
+      'document.passport_card.state': 'New York',
+      'document.permit.address_line1': '97446 Riverside Avenue Apt. 903',
+      'document.permit.back.image': 'veniam laborum',
+      'document.permit.back.mime_type': 'deserunt',
+      'document.permit.city': 'East Trentside',
+      'document.permit.classified_document_type': 'culpa minim adipisicing',
+      'document.permit.clave_de_elector': 'dolore sint',
+      'document.permit.curp': 'eu nulla',
+      'document.permit.curp_validation_response': '030d829f-3273-40ff-b821-6190d7e6a46b',
+      'document.permit.dob': 'consectetur',
+      'document.permit.document_number': 'sit et',
+      'document.permit.expires_at': 'ad',
+      'document.permit.first_name': 'Virgie',
+      'document.permit.front.image': 'enim fugiat',
+      'document.permit.front.mime_type': 'esse incididunt ea dolore mollit',
+      'document.permit.full_address': '76371 Goodwin Rest Suite 438',
+      'document.permit.full_name': 'Ora Kohler',
+      'document.permit.gender': 'ut',
+      'document.permit.issued_at': 'anim in mollit',
+      'document.permit.issuing_country': 'Martinique',
+      'document.permit.issuing_state': 'Massachusetts',
+      'document.permit.last_name': 'Green',
+      'document.permit.nationality': 'labore aute amet adipisicing',
+      'document.permit.postal_code': 'deserunt cupidatat',
+      'document.permit.ref_number': 'do nostrud',
+      'document.permit.samba_activity_history_response': 'nulla irure sunt commodo ut',
+      'document.permit.selfie.image': 'non proident laborum nostrud',
+      'document.permit.selfie.mime_type': 'eiusmod enim',
+      'document.permit.state': 'Illinois',
+      'document.proof_of_address.image': '47772 Jalen Gardens Apt. 127',
+      'document.residence_document.address_line1': '15660 Mill Road Apt. 993',
+      'document.residence_document.back.image': '0c0990cd-3c4c-4959-82a8-4f79b2928f78',
+      'document.residence_document.back.mime_type': '1a220248-0224-4b0a-9277-8931a8546002',
+      'document.residence_document.city': 'South Haileefield',
+      'document.residence_document.classified_document_type': '17fb4c6f-6ee2-4443-9705-a55fac0703e0',
+      'document.residence_document.clave_de_elector': '1f92f65c-61ee-4995-b321-29fc7ec9729b',
+      'document.residence_document.curp': '8cad8092-4628-4908-9e0f-d3ef748d2ef8',
+      'document.residence_document.curp_validation_response': '3b98cb62-ef3c-44c1-b13c-6812496065a4',
+      'document.residence_document.dob': '4e2dcdd5-68a7-4c7b-a4b5-9397c351da78',
+      'document.residence_document.document_number': 'f2674700-6f1d-4b4c-98d0-cd697ed25192',
+      'document.residence_document.expires_at': 'c0cd96e6-4d6b-4825-af5d-59d2e24e66c9',
+      'document.residence_document.first_name': 'Earnest',
+      'document.residence_document.front.image': '0f8697e4-194e-40b5-8d0f-e4d796c812da',
+      'document.residence_document.front.mime_type': '2e8b81f9-4053-44f9-b40b-f6bff21b09cc',
+      'document.residence_document.full_address': '4719 Darwin Junctions Apt. 132',
+      'document.residence_document.full_name': 'Miss Wilma Kuphal',
+      'document.residence_document.gender': '71d8707a-875f-4846-a839-7ec63e89c2fe',
+      'document.residence_document.issued_at': '7135193e-5708-4603-919a-04419a257870',
+      'document.residence_document.issuing_country': 'Syrian Arab Republic',
+      'document.residence_document.issuing_state': 'Wisconsin',
+      'document.residence_document.last_name': 'Huels',
+      'document.residence_document.nationality': '06c64072-ae85-4929-95ae-66e02af999c6',
+      'document.residence_document.postal_code': 'd5b731be-b0f2-4502-bd40-4e780add657c',
+      'document.residence_document.ref_number': 'cb0d8c41-043b-42bb-9c4b-76d5ef349c36',
+      'document.residence_document.samba_activity_history_response': 'bdd254a8-6517-41f5-8f57-2f09bee53673',
+      'document.residence_document.selfie.image': '1ae7275e-8a23-4dde-8b87-9ba131f2de79',
+      'document.residence_document.selfie.mime_type': 'b83cf761-ae60-4ab5-aa54-0900fdbd3b22',
+      'document.residence_document.state': 'Illinois',
+      'document.ssn_card.image': 'in ut cupidatat',
+      'document.visa.address_line1': '22104 Murray Roads Apt. 803',
+      'document.visa.back.image': 'labore sed',
+      'document.visa.back.mime_type': 'quis',
+      'document.visa.city': 'Kochboro',
+      'document.visa.classified_document_type': 'minim magna ut voluptate in',
+      'document.visa.clave_de_elector': 'pariatur laborum irure ut',
+      'document.visa.curp': 'cupidatat cillum esse Ut',
+      'document.visa.curp_validation_response': 'eb01dee9-040e-4977-961e-9d91b1428a97',
+      'document.visa.dob': 'eiusmod ad',
+      'document.visa.document_number': 'elit',
+      'document.visa.expires_at': 'Ut cupidatat elit reprehenderit nisi',
+      'document.visa.first_name': 'Meredith',
+      'document.visa.front.image': 'et esse aute velit minim',
+      'document.visa.front.mime_type': 'ullamco et',
+      'document.visa.full_address': '58026 Charlene Brooks Apt. 903',
+      'document.visa.full_name': 'Ed Schaefer',
+      'document.visa.gender': 'pariatur anim officia',
+      'document.visa.issued_at': 'pariatur non',
+      'document.visa.issuing_country': 'Denmark',
+      'document.visa.issuing_state': 'West Virginia',
+      'document.visa.last_name': 'Crona',
+      'document.visa.nationality': 'nostrud elit consequat',
+      'document.visa.postal_code': 'quis dolore Lorem',
+      'document.visa.ref_number': 'eu commodo',
+      'document.visa.samba_activity_history_response': 'esse dolore eu ipsum deserunt',
+      'document.visa.selfie.image': 'laboris reprehenderit',
+      'document.visa.selfie.mime_type': 'ex labore',
+      'document.visa.state': 'Mississippi',
+      'document.voter_identification.address_line1': '1769 Dangelo Lakes Apt. 779',
+      'document.voter_identification.back.image': '14a2400b-f930-41e5-b8c3-ffc98e573e7d',
+      'document.voter_identification.back.mime_type': 'c6153af2-50aa-4974-9a14-ae5afc3cf22a',
+      'document.voter_identification.city': 'Arnoldoville',
+      'document.voter_identification.classified_document_type': '299c751a-fc13-4586-960f-3427f18d5fb6',
+      'document.voter_identification.clave_de_elector': '84c9a6c9-4bec-4446-a583-c910ff66455e',
+      'document.voter_identification.curp': '49082a77-3294-43e0-b1dd-25fd7b9fdf94',
+      'document.voter_identification.curp_validation_response': 'e91124dd-759d-4462-9c95-f5c97877e47c',
+      'document.voter_identification.dob': '7ebe28b9-2e88-4f3b-836d-6275651adc09',
+      'document.voter_identification.document_number': 'e1cc6f7f-6b56-4bf5-84a3-ed898a01d784',
+      'document.voter_identification.expires_at': 'c64d5ab7-1dda-45e1-a094-fc439260f52b',
+      'document.voter_identification.first_name': 'Raymundo',
+      'document.voter_identification.front.image': '2268e77a-edb8-40e2-911b-d6cc801dc398',
+      'document.voter_identification.front.mime_type': '36b6f3a7-4a19-4d2c-aa64-9c55b75f2cf7',
+      'document.voter_identification.full_address': '973 Zulauf Island Suite 282',
+      'document.voter_identification.full_name': 'Adam Kuphal',
+      'document.voter_identification.gender': 'b20fb0fa-226e-44bf-9c94-130180ed251e',
+      'document.voter_identification.issued_at': 'd453f3d2-ccf1-4a5b-a247-4f108a7b0cdd',
+      'document.voter_identification.issuing_country': 'Switzerland',
+      'document.voter_identification.issuing_state': 'Nevada',
+      'document.voter_identification.last_name': 'Balistreri',
+      'document.voter_identification.nationality': '90726cd4-e76b-4246-9be8-8c65e13f00f5',
+      'document.voter_identification.postal_code': '6c9602ff-74be-4062-829e-88ae740e66e1',
+      'document.voter_identification.ref_number': '8d83bf2f-748a-4dd9-874d-b810c27627aa',
+      'document.voter_identification.samba_activity_history_response': '9b285252-0001-42db-89dc-20b8aec5be17',
+      'document.voter_identification.selfie.image': 'f3141dae-bcbe-481e-9542-3be8fd9a24b9',
+      'document.voter_identification.selfie.mime_type': '1e05acf6-7455-4106-978b-d0c93eb523f2',
+      'document.voter_identification.state': 'Kansas',
+      'id.address_line1': '5047 S Center Street Apt. 110',
+      'id.address_line2': '2000 1st Street Suite 604',
+      'id.citizenships': '30513756-888f-4b50-bc53-4cb56bf23092',
+      'id.city': 'Dietrichworth',
+      'id.country': 'Lebanon',
+      'id.dob': '665ad4f3-f1c0-4a8f-8810-436f4be58f1c',
+      'id.drivers_license_number': '519440c5-1e3a-4c24-a09e-2fdc78c6caf4',
+      'id.drivers_license_state': 'New Hampshire',
+      'id.email': 'margarett57@gmail.com',
+      'id.first_name': 'Rosetta',
+      'id.itin': '4674fbb8-c3c2-4bd0-b329-66c896355da8',
+      'id.last_name': 'Cartwright',
+      'id.middle_name': "Nora O'Connell",
+      'id.nationality': '7398d193-3356-4551-bace-0aa2a87425e1',
+      'id.phone_number': '+18925454753',
+      'id.ssn4': 'f2b6b867-9f27-4e29-be2b-8d4f866eec7f',
+      'id.ssn9': '2e48e547-66a3-4624-b9f8-9e92edf4f915',
+      'id.state': 'North Dakota',
+      'id.us_legal_status': 'e4467740-9536-4a10-a9e8-6410778344c8',
+      'id.us_tax_id': '2ee95c33-c756-4531-ad45-9ad974f4bd89',
+      'id.visa_expiration_date': 'ec2b71b7-00f0-4006-97fa-d22b075b39d2',
+      'id.visa_kind': '5979e57b-aa0d-4a94-86d7-1b429688e52e',
+      'id.zip': '94782-8986',
+      'investor_profile.annual_income': 'enim consectetur magna consequat exercitation',
+      'investor_profile.brokerage_firm_employer': 'occaecat',
+      'investor_profile.declarations': 'dolore ea sed amet',
+      'investor_profile.employer': 'irure Duis dolor fugiat do',
+      'investor_profile.employment_status': 'aliquip qui',
+      'investor_profile.family_member_names': 'Mr. Geoffrey Bauch',
+      'investor_profile.funding_sources': 'ut',
+      'investor_profile.investment_goals': 'exercitation dolore in ad',
+      'investor_profile.net_worth': 'veniam incididunt ex sed fugiat',
+      'investor_profile.occupation': 'in anim',
+      'investor_profile.political_organization': 'occaecat laboris ut do',
+      'investor_profile.risk_tolerance': 'laborum in',
+      'investor_profile.senior_executive_symbols': 'sed eiusmod veniam dolor',
     },
     props,
-  ) as NeuroIdentityIdResponse;
-export const getObConfigurationKind = (props: Partial<ObConfigurationKind>) => (props ?? 'auth') as ObConfigurationKind;
-export const getOnboardingResponse = (props: Partial<OnboardingResponse>) =>
-  merge(
+  );
+export const getNeuroIdentityIdResponse = (props: Partial<NeuroIdentityIdResponse>): NeuroIdentityIdResponse =>
+  merge<NeuroIdentityIdResponse, Partial<NeuroIdentityIdResponse>>(
     {
-      authToken: '4b7e3ebe-7881-4e14-ac86-8e85fe90f5fe',
+      id: '2aac561e-b62a-4362-9120-92c3d84dcb6f',
     },
     props,
-  ) as OnboardingResponse;
-export const getOnboardingSessionResponse = (props: Partial<OnboardingSessionResponse>) =>
-  merge(
+  );
+export const getObConfigurationKind = (props: ObConfigurationKind): ObConfigurationKind => props ?? 'document';
+export const getOnboardingResponse = (props: Partial<OnboardingResponse>): OnboardingResponse =>
+  merge<OnboardingResponse, Partial<OnboardingResponse>>(
+    {
+      authToken: '47a04282-eeab-4b1b-8620-2201f48afa8f',
+    },
+    props,
+  );
+export const getOnboardingSessionResponse = (props: Partial<OnboardingSessionResponse>): OnboardingSessionResponse =>
+  merge<OnboardingSessionResponse, Partial<OnboardingSessionResponse>>(
     {
       bootstrapData: {},
     },
     props,
-  ) as OnboardingSessionResponse;
-export const getOnboardingStatusResponse = (props: Partial<OnboardingStatusResponse>) =>
-  merge(
+  );
+export const getOnboardingStatusResponse = (props: Partial<OnboardingStatusResponse>): OnboardingStatusResponse =>
+  merge<OnboardingStatusResponse, Partial<OnboardingStatusResponse>>(
     {
       allRequirements: [
         {
@@ -844,357 +2295,627 @@ export const getOnboardingStatusResponse = (props: Partial<OnboardingStatusRespo
           isMet: true,
         },
         {
-          isMet: true,
+          isMet: false,
         },
       ],
     },
     props,
-  ) as OnboardingStatusResponse;
-export const getPostBusinessOnboardingRequest = (props: Partial<PostBusinessOnboardingRequest>) =>
-  merge(
+  );
+export const getPostBusinessOnboardingRequest = (
+  props: Partial<PostBusinessOnboardingRequest>,
+): PostBusinessOnboardingRequest =>
+  merge<PostBusinessOnboardingRequest, Partial<PostBusinessOnboardingRequest>>(
     {
-      inheritBusinessId: '4073d73e-a332-4d58-a3cc-58a3f5e3f358',
-      kybFixtureResult: 'step_up',
+      inheritBusinessId: 'f6863402-d987-4c0d-bb28-6f65d008a1ef',
+      kybFixtureResult: 'manual_review',
     },
     props,
-  ) as PostBusinessOnboardingRequest;
-export const getPostOnboardingRequest = (props: Partial<PostOnboardingRequest>) =>
-  merge(
-    {
-      fixtureResult: 'pass',
-    },
-    props,
-  ) as PostOnboardingRequest;
-export const getProcessRequest = (props: Partial<ProcessRequest>) =>
-  merge(
+  );
+export const getPostOnboardingRequest = (props: Partial<PostOnboardingRequest>): PostOnboardingRequest =>
+  merge<PostOnboardingRequest, Partial<PostOnboardingRequest>>(
     {
       fixtureResult: 'manual_review',
     },
     props,
-  ) as ProcessRequest;
-export const getPublicOnboardingConfiguration = (props: Partial<PublicOnboardingConfiguration>) =>
-  merge(
+  );
+export const getProcessRequest = (props: Partial<ProcessRequest>): ProcessRequest =>
+  merge<ProcessRequest, Partial<ProcessRequest>>(
+    {
+      fixtureResult: 'pass',
+    },
+    props,
+  );
+export const getPublicOnboardingConfiguration = (
+  props: Partial<PublicOnboardingConfiguration>,
+): PublicOnboardingConfiguration =>
+  merge<PublicOnboardingConfiguration, Partial<PublicOnboardingConfiguration>>(
     {
       allowInternationalResidents: false,
-      allowedOrigins: ['voluptate officia', 'eu laboris ut eiusmod', 'nisi enim voluptate'],
-      appClipExperienceId: '95361e9d-cde9-45fe-a4b9-7d86c3b344b6',
+      allowedOrigins: ['enim quis consectetur', 'aliqua ut Duis et do', 'veniam dolore elit fugiat'],
+      appClipExperienceId: 'db359bd3-ee8a-4fef-b50d-92d64e777bcc',
       appearance: {},
-      canMakeRealDocScanCallsInSandbox: true,
+      canMakeRealDocScanCallsInSandbox: false,
       isAppClipEnabled: true,
       isInstantAppEnabled: false,
       isKyb: true,
-      isLive: true,
+      isLive: false,
       isNoPhoneFlow: true,
-      isStepupEnabled: true,
-      key: '9bea5353-14fa-406d-86ef-bf03e1f84f2f',
-      kind: 'kyb',
-      logoUrl: 'https://delicious-injunction.biz/',
-      name: 'Jaime Harvey V',
+      isStepupEnabled: false,
+      key: 'e4d7583c-9731-4364-9ef8-da5ecf8a1364',
+      kind: 'auth',
+      logoUrl: 'https://wry-creator.net/',
+      name: 'Ramon Schmeler',
       nidEnabled: true,
-      orgId: '373d5cd0-a5e1-4118-a814-da9ed75e6f6e',
-      orgName: 'Penny Barrows',
-      privacyPolicyUrl: 'https://close-ostrich.com',
-      requiredAuthMethods: ['passkey', 'email', 'passkey'],
+      orgId: '8484d541-2eae-4585-91a6-d374f5b8d937',
+      orgName: 'Darrel Thiel',
+      privacyPolicyUrl: 'https://jaunty-husband.org/',
+      requiredAuthMethods: ['passkey', 'passkey', 'email'],
       requiresIdDoc: true,
       skipConfirm: true,
       status: 'disabled',
-      supportEmail: 'lucy22@gmail.com',
-      supportPhone: '+15507516797',
-      supportWebsite: 'https://shady-pillow.us/',
-      supportedCountries: ['HM', 'SM', 'ML'],
+      supportEmail: 'lafayette75@gmail.com',
+      supportPhone: '+16923112870',
+      supportWebsite: 'https://inconsequential-tarragon.name/',
+      supportedCountries: ['QA', 'GU', 'MD'],
       workflowRequest: {
         config: {
           data: {
-            playbookId: '39b93be9-b9b1-4061-b4c0-4ea33aa7b280',
-            recollectAttributes: ['ssn9', 'dob', 'business_tin'],
+            playbookId: '2ef183f9-4fee-4c7e-afde-ff90b25503af',
+            recollectAttributes: ['email', 'bank', 'full_address'],
             reuseExistingBoKyc: true,
           },
           kind: 'onboard',
         },
-        note: 'elit sunt incididunt nostrud',
+        note: 'sed quis exercitation et',
       },
     },
     props,
-  ) as PublicOnboardingConfiguration;
-export const getRawUserDataRequest = (props: Partial<RawUserDataRequest>) =>
-  merge(
+  );
+export const getRegisterPasskeyAttemptContext = (
+  props: Partial<RegisterPasskeyAttemptContext>,
+): RegisterPasskeyAttemptContext =>
+  merge<RegisterPasskeyAttemptContext, Partial<RegisterPasskeyAttemptContext>>(
     {
-      customUserId: '7c50e2bc-c31f-42e3-b2b0-9852010cfd58',
-      'id.first_name': 'Jane',
-      'id.last_name': 'Doe',
+      elapsedTimeInOsPromptMs: 50920410,
+      errorMessage: 'ipsum enim',
     },
     props,
-  ) as RawUserDataRequest;
-export const getRegisterPasskeyAttemptContext = (props: Partial<RegisterPasskeyAttemptContext>) =>
-  merge(
+  );
+export const getRenderV1SdkArgs = (props: Partial<RenderV1SdkArgs>): RenderV1SdkArgs =>
+  merge<RenderV1SdkArgs, Partial<RenderV1SdkArgs>>(
     {
-      elapsedTimeInOsPromptMs: 934319,
-      errorMessage: 'nulla aliqua Excepteur Duis aute',
-    },
-    props,
-  ) as RegisterPasskeyAttemptContext;
-export const getRenderV1SdkArgs = (props: Partial<RenderV1SdkArgs>) =>
-  merge(
-    {
-      authToken: '5e63603a-2368-4a90-841b-ace7d3b0fa6b',
+      authToken: '20ab2344-79b9-4157-864f-6a2d827c4cdb',
       canCopy: false,
-      defaultHidden: false,
-      id: '7b0bbf21-e1f4-4103-8d63-65709693b197',
-      label: 'quis exercitation velit ipsum commodo',
+      defaultHidden: true,
+      id: 'document.passport.back.image',
+      label: 'anim ad',
       showHiddenToggle: true,
     },
     props,
-  ) as RenderV1SdkArgs;
-export const getRequestedTokenScope = (props: Partial<RequestedTokenScope>) =>
-  (props ?? 'onboarding_components') as RequestedTokenScope;
-export const getSdkArgs = (props: Partial<SdkArgs>) =>
-  merge(
+  );
+export const getRequestedTokenScope = (props: RequestedTokenScope): RequestedTokenScope => props ?? 'auth';
+export const getSdkArgs = (props: Partial<SdkArgs>): SdkArgs =>
+  merge<SdkArgs, Partial<SdkArgs>>(
     {
       data: {
-        authToken: '97cc2471-6a61-462d-b427-4a84e21b93aa',
+        authToken: 'ca2782a5-a6f0-41e9-86a8-44270f743174',
         documentFixtureResult: 'pass',
         fixtureResult: 'pass',
-        isComponentsSdk: true,
+        isComponentsSdk: false,
         l10N: {
           language: 'en',
           locale: 'en-US',
         },
         options: {
-          showCompletionPage: false,
+          showCompletionPage: true,
           showLogo: false,
         },
-        publicKey: 'b9db826d-1725-44a1-a08a-1e0961b62814',
-        sandboxId: 'fb68ec32-49fc-433f-84bd-86ac74afa566',
+        publicKey: '5aa8dcbf-1691-4fbb-90af-614e08428f1a',
+        sandboxId: '65880c05-2939-4082-967a-f003e1be2d79',
         shouldRelayToComponents: false,
         userData: {},
       },
       kind: 'verify_v1',
     },
     props,
-  ) as SdkArgs;
-export const getSignupChallengeRequest = (props: Partial<SignupChallengeRequest>) =>
-  merge(
+  );
+export const getSignupChallengeRequest = (props: Partial<SignupChallengeRequest>): SignupChallengeRequest =>
+  merge<SignupChallengeRequest, Partial<SignupChallengeRequest>>(
     {
       challengeKind: 'biometric',
       email: {
         isBootstrap: true,
-        value: 'tempor',
+        value: 'ad voluptate aliqua',
       },
       phoneNumber: {
-        isBootstrap: true,
-        value: 'reprehenderit esse culpa fugiat incididunt',
+        isBootstrap: false,
+        value: 'sed consequat proident',
       },
       scope: 'auth',
     },
     props,
-  ) as SignupChallengeRequest;
-export const getSkipLivenessClientType = (props: Partial<SkipLivenessClientType>) =>
-  (props ?? 'web') as SkipLivenessClientType;
-export const getSkipLivenessContext = (props: Partial<SkipLivenessContext>) =>
-  merge(
+  );
+export const getSkipLivenessClientType = (props: SkipLivenessClientType): SkipLivenessClientType => props ?? 'mobile';
+export const getSkipLivenessContext = (props: Partial<SkipLivenessContext>): SkipLivenessContext =>
+  merge<SkipLivenessContext, Partial<SkipLivenessContext>>(
     {
       attempts: [
         {
-          elapsedTimeInOsPromptMs: -23610738,
-          errorMessage: 'velit dolore aliqua tempor anim',
+          elapsedTimeInOsPromptMs: -60840819,
+          errorMessage: 'nostrud',
         },
         {
-          elapsedTimeInOsPromptMs: 38602297,
-          errorMessage: 'cupidatat',
+          elapsedTimeInOsPromptMs: 53713776,
+          errorMessage: 'sed',
         },
         {
-          elapsedTimeInOsPromptMs: 67384042,
-          errorMessage: 'reprehenderit in in consequat culpa',
+          elapsedTimeInOsPromptMs: -46265364,
+          errorMessage: 'quis occaecat',
         },
       ],
       clientType: 'mobile',
-      numAttempts: 66696031,
-      reason: 'pariatur cillum officia',
+      numAttempts: -70626919,
+      reason: 'exercitation pariatur ad voluptate',
     },
     props,
-  ) as SkipLivenessContext;
-export const getSkipPasskeyRegisterRequest = (props: Partial<SkipPasskeyRegisterRequest>) =>
-  merge(
+  );
+export const getSkipPasskeyRegisterRequest = (props: Partial<SkipPasskeyRegisterRequest>): SkipPasskeyRegisterRequest =>
+  merge<SkipPasskeyRegisterRequest, Partial<SkipPasskeyRegisterRequest>>(
     {
       context: {
         attempts: [
           {
-            elapsedTimeInOsPromptMs: -16203914,
-            errorMessage: 'est occaecat cupidatat',
+            elapsedTimeInOsPromptMs: 60574509,
+            errorMessage: 'eu officia',
           },
           {
-            elapsedTimeInOsPromptMs: 34142437,
-            errorMessage: 'nostrud minim tempor consequat',
+            elapsedTimeInOsPromptMs: 22745737,
+            errorMessage: 'Duis eu et',
           },
           {
-            elapsedTimeInOsPromptMs: -29503222,
-            errorMessage: 'magna deserunt ex sit',
+            elapsedTimeInOsPromptMs: 38177811,
+            errorMessage: 'est',
           },
         ],
         clientType: 'web',
-        numAttempts: -32489082,
-        reason: 'ullamco eu ipsum',
+        numAttempts: -16413372,
+        reason: 'nostrud fugiat minim',
       },
     },
     props,
-  ) as SkipPasskeyRegisterRequest;
-export const getSocureDeviceSessionIdRequest = (props: Partial<SocureDeviceSessionIdRequest>) =>
-  merge(
+  );
+export const getSocureDeviceSessionIdRequest = (
+  props: Partial<SocureDeviceSessionIdRequest>,
+): SocureDeviceSessionIdRequest =>
+  merge<SocureDeviceSessionIdRequest, Partial<SocureDeviceSessionIdRequest>>(
     {
-      deviceSessionId: '12e690e8-9c2e-43fa-b786-ed37819bc649',
+      deviceSessionId: 'aabc0131-5d76-4f0b-9592-6ff8f90596b0',
     },
     props,
-  ) as SocureDeviceSessionIdRequest;
-export const getStytchTelemetryRequest = (props: Partial<StytchTelemetryRequest>) =>
-  merge(
+  );
+export const getStytchTelemetryRequest = (props: Partial<StytchTelemetryRequest>): StytchTelemetryRequest =>
+  merge<StytchTelemetryRequest, Partial<StytchTelemetryRequest>>(
     {
-      telemetryId: '51086c58-2bba-4855-a43f-cc0001e4e37b',
+      telemetryId: '7fab7c7a-7b8f-4b18-9d88-9c7afd4623ff',
     },
     props,
-  ) as StytchTelemetryRequest;
-export const getUpdateAuthMethodsV1SdkArgs = (props: Partial<UpdateAuthMethodsV1SdkArgs>) =>
-  merge(
+  );
+export const getUpdateAuthMethodsV1SdkArgs = (props: Partial<UpdateAuthMethodsV1SdkArgs>): UpdateAuthMethodsV1SdkArgs =>
+  merge<UpdateAuthMethodsV1SdkArgs, Partial<UpdateAuthMethodsV1SdkArgs>>(
     {
-      authToken: 'ae10a24b-0d1d-461d-9de5-ad0fd4f8cbfd',
+      authToken: '85699da6-181e-4da0-97a4-df1ebe0a6499',
       l10N: {
         language: 'en',
         locale: 'en-US',
       },
       options: {
-        showLogo: false,
+        showLogo: true,
       },
     },
     props,
-  ) as UpdateAuthMethodsV1SdkArgs;
-export const getUpdateOrCreateHostedBusinessOwnerRequest = (props: Partial<UpdateOrCreateHostedBusinessOwnerRequest>) =>
-  merge(
+  );
+export const getUpdateOrCreateHostedBusinessOwnerRequest = (
+  props: Partial<UpdateOrCreateHostedBusinessOwnerRequest>,
+): UpdateOrCreateHostedBusinessOwnerRequest =>
+  merge<UpdateOrCreateHostedBusinessOwnerRequest, Partial<UpdateOrCreateHostedBusinessOwnerRequest>>(
     {
       data: {
-        customUserId: '7c50e2bc-c31f-42e3-b2b0-9852010cfd58',
-        'id.first_name': 'Jane',
-        'id.last_name': 'Doe',
+        'bank.*.account_type': 'pariatur eu reprehenderit cupidatat',
+        'bank.*.ach_account_id': 'c3b47ed4-3f11-4380-bec1-d9df2ca35f5a',
+        'bank.*.ach_account_number': 'non pariatur',
+        'bank.*.ach_routing_number': 'aliqua officia deserunt',
+        'bank.*.fingerprint': 'ea in mollit proident',
+        'bank.*.name': 'Alison Wintheiser',
+        'card.*.billing_address.country': '7323 Wade Cove Suite 423',
+        'card.*.billing_address.zip': '94317 Lowe Pike Apt. 553',
+        'card.*.cvc': 'irure Ut in tempor dolore',
+        'card.*.expiration': 'aute incididunt amet dolor',
+        'card.*.expiration_month': 'ut elit occaecat',
+        'card.*.expiration_year': 'ex nostrud',
+        'card.*.fingerprint': 'Duis nostrud eu ut',
+        'card.*.issuer': 'fugiat',
+        'card.*.name': 'Mario Kuvalis',
+        'card.*.number': 'reprehenderit do deserunt enim',
+        'card.*.number_last4': 'minim esse',
+        'custom.*': 'et',
+        'document.custom.*': 'non pariatur quis exercitation qui',
+        'document.drivers_license.address_line1': '903 Yundt Crescent Apt. 674',
+        'document.drivers_license.back.image': 'eiusmod et',
+        'document.drivers_license.back.mime_type': 'cupidatat',
+        'document.drivers_license.city': 'Fort Moseschester',
+        'document.drivers_license.classified_document_type': 'enim ex amet',
+        'document.drivers_license.clave_de_elector': 'officia sed',
+        'document.drivers_license.curp': 'tempor enim',
+        'document.drivers_license.curp_validation_response': '5c429b88-8302-4627-af65-cc3a57e80e7c',
+        'document.drivers_license.dob': 'proident nostrud',
+        'document.drivers_license.document_number': 'aute Lorem quis',
+        'document.drivers_license.expires_at': 'irure cillum labore elit veniam',
+        'document.drivers_license.first_name': 'Dexter',
+        'document.drivers_license.front.image': 'nostrud',
+        'document.drivers_license.front.mime_type': 'anim sed ipsum ad',
+        'document.drivers_license.full_address': '5087 Karl Forest Suite 939',
+        'document.drivers_license.full_name': "Lela O'Hara-Keeling",
+        'document.drivers_license.gender': 'sed sint quis dolore velit',
+        'document.drivers_license.issued_at': 'sint labore',
+        'document.drivers_license.issuing_country': 'United Kingdom',
+        'document.drivers_license.issuing_state': 'Florida',
+        'document.drivers_license.last_name': 'Spinka',
+        'document.drivers_license.nationality': 'minim officia sit enim',
+        'document.drivers_license.postal_code': 'ea',
+        'document.drivers_license.ref_number': 'aliquip mollit pariatur in sed',
+        'document.drivers_license.samba_activity_history_response': 'irure laboris sint',
+        'document.drivers_license.selfie.image': 'consectetur amet',
+        'document.drivers_license.selfie.mime_type': 'tempor ut irure',
+        'document.drivers_license.state': 'Pennsylvania',
+        'document.finra_compliance_letter': 'quis',
+        'document.id_card.address_line1': '1857 Al Course Apt. 815',
+        'document.id_card.back.image': '0fac034b-3d74-4125-85d3-92102d5471be',
+        'document.id_card.back.mime_type': '832f07a4-954a-4432-97d4-8d8b13ab7daa',
+        'document.id_card.city': 'Bellamouth',
+        'document.id_card.classified_document_type': '84a2e1a2-d1ea-4916-a31b-de0dda95891b',
+        'document.id_card.clave_de_elector': 'feb9c48a-e409-4569-b73c-f07e94110045',
+        'document.id_card.curp': 'a9dd9076-339b-4a17-8445-f591dd4737e1',
+        'document.id_card.curp_validation_response': '978de5bc-54d7-466b-8c64-8a333796f116',
+        'document.id_card.dob': 'e44be8a1-f9df-4d11-b1c1-629ce0aaf872',
+        'document.id_card.document_number': '8b4dc959-499b-4453-8e39-99b3e56f7bc5',
+        'document.id_card.expires_at': 'fa81ece8-8f9e-40ec-84b1-576fa53fa4c9',
+        'document.id_card.first_name': 'Deon',
+        'document.id_card.front.image': 'e418714e-07d5-4799-8a3c-4ed0fe70e8d5',
+        'document.id_card.front.mime_type': '056e2072-7d56-4daa-9a9f-2b5f922a31d9',
+        'document.id_card.full_address': '821 S Main Suite 573',
+        'document.id_card.full_name': 'Gretchen Osinski',
+        'document.id_card.gender': 'c208924e-ab2e-40f9-81c2-1e001cd01c08',
+        'document.id_card.issued_at': '985decba-c31c-43f1-a0dd-bfa949070787',
+        'document.id_card.issuing_country': 'Poland',
+        'document.id_card.issuing_state': 'Kansas',
+        'document.id_card.last_name': 'Waelchi',
+        'document.id_card.nationality': 'e42b7d36-228d-4b3b-b2eb-8b9cc7cce8f2',
+        'document.id_card.postal_code': 'db90b7a7-cad1-4444-a37a-bc3a2cf1dd06',
+        'document.id_card.ref_number': '1ea801b8-3670-451e-b4e3-e53af85dd43b',
+        'document.id_card.samba_activity_history_response': '3d21fe95-16bf-4b4d-ae62-6e863aad0395',
+        'document.id_card.selfie.image': '21eed194-bacb-4865-8507-bf4eaaaacda8',
+        'document.id_card.selfie.mime_type': '4d2f561c-1ec4-420a-9cb6-4676d4bec0f9',
+        'document.id_card.state': 'Colorado',
+        'document.passport.address_line1': '470 Main Street W Suite 336',
+        'document.passport.back.image': 'voluptate qui dolor et labore',
+        'document.passport.back.mime_type': 'mollit ut',
+        'document.passport.city': 'Port Stephanystead',
+        'document.passport.classified_document_type': 'sint nostrud incididunt',
+        'document.passport.clave_de_elector': 'esse',
+        'document.passport.curp': 'enim ipsum do veniam dolore',
+        'document.passport.curp_validation_response': '8da9e1db-5330-44ff-ad26-7ab6a8b87144',
+        'document.passport.dob': 'fugiat',
+        'document.passport.document_number': 'amet non est',
+        'document.passport.expires_at': 'deserunt eiusmod aute anim',
+        'document.passport.first_name': 'Darwin',
+        'document.passport.front.image': 'adipisicing ut sed',
+        'document.passport.front.mime_type': 'velit consequat',
+        'document.passport.full_address': '95998 E 8th Street Apt. 607',
+        'document.passport.full_name': 'Zachary Lebsack IV',
+        'document.passport.gender': 'amet',
+        'document.passport.issued_at': 'irure sint nisi consequat dolore',
+        'document.passport.issuing_country': 'Saint Pierre and Miquelon',
+        'document.passport.issuing_state': 'Vermont',
+        'document.passport.last_name': 'Gleichner',
+        'document.passport.nationality': 'pariatur quis',
+        'document.passport.postal_code': 'minim deserunt aliquip mollit nostrud',
+        'document.passport.ref_number': 'consequat veniam ex',
+        'document.passport.samba_activity_history_response': 'reprehenderit commodo Excepteur Duis esse',
+        'document.passport.selfie.image': 'aliquip in commodo ut',
+        'document.passport.selfie.mime_type': 'ut minim culpa dolor irure',
+        'document.passport.state': 'Wyoming',
+        'document.passport_card.address_line1': '92508 S Maple Street Apt. 177',
+        'document.passport_card.back.image': 'do fugiat labore laborum Duis',
+        'document.passport_card.back.mime_type': 'do ad laboris quis in',
+        'document.passport_card.city': 'East Verda',
+        'document.passport_card.classified_document_type': 'Ut esse dolore in labore',
+        'document.passport_card.clave_de_elector': 'eu ut ipsum',
+        'document.passport_card.curp': 'Duis non nostrud id',
+        'document.passport_card.curp_validation_response': 'b115e7be-9b4b-40a3-a09e-56ad8223db1f',
+        'document.passport_card.dob': 'qui quis labore dolore id',
+        'document.passport_card.document_number': 'dolore tempor anim',
+        'document.passport_card.expires_at': 'in aliquip laborum',
+        'document.passport_card.first_name': 'Isabelle',
+        'document.passport_card.front.image': 'esse non sint',
+        'document.passport_card.front.mime_type': 'ipsum velit',
+        'document.passport_card.full_address': '754 Jast Views Suite 925',
+        'document.passport_card.full_name': 'Phil Boehm-Pfannerstill',
+        'document.passport_card.gender': 'eu consectetur non sed',
+        'document.passport_card.issued_at': 'dolor cillum ex nulla',
+        'document.passport_card.issuing_country': 'Portugal',
+        'document.passport_card.issuing_state': 'Vermont',
+        'document.passport_card.last_name': 'Gerhold',
+        'document.passport_card.nationality': 'deserunt ut',
+        'document.passport_card.postal_code': 'tempor',
+        'document.passport_card.ref_number': 'consectetur pariatur amet fugiat Excepteur',
+        'document.passport_card.samba_activity_history_response': 'Lorem nulla proident',
+        'document.passport_card.selfie.image': 'occaecat ea quis',
+        'document.passport_card.selfie.mime_type': 'dolor tempor minim consequat sint',
+        'document.passport_card.state': 'Virginia',
+        'document.permit.address_line1': '57162 Francesca Ridge Apt. 837',
+        'document.permit.back.image': 'Lorem consectetur magna',
+        'document.permit.back.mime_type': 'enim dolore',
+        'document.permit.city': 'Kenworth',
+        'document.permit.classified_document_type': 'esse adipisicing irure dolore',
+        'document.permit.clave_de_elector': 'laborum',
+        'document.permit.curp': 'amet mollit laboris eu',
+        'document.permit.curp_validation_response': '46d5653f-e625-4066-bbe0-17691906904d',
+        'document.permit.dob': 'occaecat sint',
+        'document.permit.document_number': 'tempor et',
+        'document.permit.expires_at': 'sed irure deserunt exercitation',
+        'document.permit.first_name': 'Cullen',
+        'document.permit.front.image': 'aliqua dolor consectetur dolore',
+        'document.permit.front.mime_type': 'sunt',
+        'document.permit.full_address': '470 Walter Trail Suite 298',
+        'document.permit.full_name': 'Michael Hayes Jr.',
+        'document.permit.gender': 'enim',
+        'document.permit.issued_at': 'minim ea laboris do',
+        'document.permit.issuing_country': 'United Arab Emirates',
+        'document.permit.issuing_state': 'Nebraska',
+        'document.permit.last_name': 'Dach-Bergstrom',
+        'document.permit.nationality': 'pariatur ea dolor',
+        'document.permit.postal_code': 'qui consectetur ullamco',
+        'document.permit.ref_number': 'magna cillum ad dolore',
+        'document.permit.samba_activity_history_response': 'laborum Ut eiusmod',
+        'document.permit.selfie.image': 'non incididunt do',
+        'document.permit.selfie.mime_type': 'voluptate Duis ad consequat consectetur',
+        'document.permit.state': 'South Dakota',
+        'document.proof_of_address.image': '68684 Jannie Ports Apt. 492',
+        'document.residence_document.address_line1': '9222 12th Street Apt. 103',
+        'document.residence_document.back.image': 'df1baef3-7c65-4691-bf3b-b38ffcb4274a',
+        'document.residence_document.back.mime_type': 'd4275c02-60ab-46be-817a-9cb530a1c435',
+        'document.residence_document.city': 'Taliatown',
+        'document.residence_document.classified_document_type': '1c26ff1f-b463-481a-9d02-aaeb1241297d',
+        'document.residence_document.clave_de_elector': '8282e2c2-b405-494f-8ae9-d164ed7440eb',
+        'document.residence_document.curp': '1f052704-799b-4c1c-b050-e543688b03df',
+        'document.residence_document.curp_validation_response': 'ebc4707e-9858-48da-ad87-71e34eed321f',
+        'document.residence_document.dob': '34b618d2-35f0-43de-bcf1-96f94e3ba302',
+        'document.residence_document.document_number': '38a6f9f2-bedf-4151-b550-d2772994beab',
+        'document.residence_document.expires_at': 'd5913254-c693-478d-a7b6-4df7145aadab',
+        'document.residence_document.first_name': 'Leann',
+        'document.residence_document.front.image': '94d1d6d9-a59b-4281-b491-e7d98cc48abb',
+        'document.residence_document.front.mime_type': '87592282-1ad7-42ab-8f91-60aef04fa731',
+        'document.residence_document.full_address': '4944 Williamson Burg Suite 517',
+        'document.residence_document.full_name': 'Lori Wolf',
+        'document.residence_document.gender': 'abacf971-5da5-4d27-8bed-63baa723a3fd',
+        'document.residence_document.issued_at': 'c33de017-77c3-4a16-8132-22e1b2463a22',
+        'document.residence_document.issuing_country': 'Bangladesh',
+        'document.residence_document.issuing_state': 'Arkansas',
+        'document.residence_document.last_name': 'Marks',
+        'document.residence_document.nationality': '6db72b56-d093-437a-8cf1-2f14cadc4224',
+        'document.residence_document.postal_code': 'e5fd923b-bee0-42be-9d79-e40b1a5e2099',
+        'document.residence_document.ref_number': 'a0c1ae08-162f-45d4-b8e7-75be212f04d7',
+        'document.residence_document.samba_activity_history_response': '645da6ea-e8c2-4af2-abe3-59193e3ef64b',
+        'document.residence_document.selfie.image': 'fce14d86-b9d1-4799-82c7-14dd8c76357e',
+        'document.residence_document.selfie.mime_type': 'bb6f2a24-dd9e-4abf-9ebb-794783668712',
+        'document.residence_document.state': 'Kansas',
+        'document.ssn_card.image': 'adipisicing anim ut enim aliquip',
+        'document.visa.address_line1': '5450 E Jefferson Street Apt. 203',
+        'document.visa.back.image': 'ipsum in dolor et labore',
+        'document.visa.back.mime_type': 'Excepteur eu ad amet minim',
+        'document.visa.city': 'Carmencester',
+        'document.visa.classified_document_type': 'minim adipisicing sunt aliquip',
+        'document.visa.clave_de_elector': 'officia',
+        'document.visa.curp': 'in dolore ipsum fugiat consequat',
+        'document.visa.curp_validation_response': '884fc769-5572-489d-9820-acdffdb9c867',
+        'document.visa.dob': 'nisi do',
+        'document.visa.document_number': 'nulla occaecat sunt',
+        'document.visa.expires_at': 'mollit non qui nulla eiusmod',
+        'document.visa.first_name': 'Kiley',
+        'document.visa.front.image': 'adipisicing mollit',
+        'document.visa.front.mime_type': 'occaecat aliqua',
+        'document.visa.full_address': '7833 County Line Road Apt. 341',
+        'document.visa.full_name': 'Minnie Koepp',
+        'document.visa.gender': 'in',
+        'document.visa.issued_at': 'Excepteur in proident ea',
+        'document.visa.issuing_country': 'Turkey',
+        'document.visa.issuing_state': 'Washington',
+        'document.visa.last_name': 'Hintz',
+        'document.visa.nationality': 'deserunt nulla',
+        'document.visa.postal_code': 'est in quis',
+        'document.visa.ref_number': 'culpa in qui',
+        'document.visa.samba_activity_history_response': 'velit deserunt nisi voluptate anim',
+        'document.visa.selfie.image': 'sed dolor est et cillum',
+        'document.visa.selfie.mime_type': 'sit ad reprehenderit irure',
+        'document.visa.state': 'Oregon',
+        'document.voter_identification.address_line1': '317 W 1st Street Suite 153',
+        'document.voter_identification.back.image': '65b75b8f-dea8-43d3-9ec1-c33dcc8cded5',
+        'document.voter_identification.back.mime_type': '06a69f19-6fda-45e0-acde-e440b6cb8e2b',
+        'document.voter_identification.city': 'Luigiview',
+        'document.voter_identification.classified_document_type': '0cae6462-bddc-476f-aa18-ceacfc86a5f2',
+        'document.voter_identification.clave_de_elector': '4bf6fd46-dbf0-485c-89a0-143fb0f95807',
+        'document.voter_identification.curp': 'e6298ad0-ca7e-4917-a229-2fda0753e760',
+        'document.voter_identification.curp_validation_response': '31e06af7-45d4-4855-8ab5-b916b59ca7ae',
+        'document.voter_identification.dob': 'a9667195-4d07-4337-9d4f-8105c35abed4',
+        'document.voter_identification.document_number': '318ee39e-a3bd-425f-b4f0-016aee1a70b8',
+        'document.voter_identification.expires_at': '2bfe87db-6da9-404d-af55-f42fe41cb188',
+        'document.voter_identification.first_name': 'Abbey',
+        'document.voter_identification.front.image': '5833da00-96a9-4046-9262-d9ba5493499f',
+        'document.voter_identification.front.mime_type': 'd597d2e8-d5fe-40ab-8606-494fbb70986e',
+        'document.voter_identification.full_address': '6053 Eusebio Falls Suite 563',
+        'document.voter_identification.full_name': 'Mrs. Kayla Fahey',
+        'document.voter_identification.gender': 'ab56e050-62d8-4804-b840-3e9988a6ddc3',
+        'document.voter_identification.issued_at': '0dbc3181-6a4b-4dc9-adc3-b88bb64c62ef',
+        'document.voter_identification.issuing_country': 'Zambia',
+        'document.voter_identification.issuing_state': 'Minnesota',
+        'document.voter_identification.last_name': 'Pagac',
+        'document.voter_identification.nationality': 'd0e2b6f3-0577-47ac-b761-01dd2ac77c53',
+        'document.voter_identification.postal_code': 'bc8ac70e-d398-4834-acc6-55d8e31a515a',
+        'document.voter_identification.ref_number': 'c0d37987-c1c5-412f-a348-d61970785f05',
+        'document.voter_identification.samba_activity_history_response': '52fd9d2b-f93a-44d4-8e62-8549098cdad7',
+        'document.voter_identification.selfie.image': '614e1a78-7feb-498f-8b5a-5dd45ef3d9e0',
+        'document.voter_identification.selfie.mime_type': '6923e2ae-c679-4704-848d-5a391de6c1d8',
+        'document.voter_identification.state': 'Oregon',
+        'id.address_line1': '57573 Kelley Causeway Apt. 915',
+        'id.address_line2': '652 Chestnut Street Suite 587',
+        'id.citizenships': '357e27cb-2cde-4d19-8760-f63122813a93',
+        'id.city': 'East Ubaldofort',
+        'id.country': 'Guinea-Bissau',
+        'id.dob': 'd9c1533c-d14b-4abc-b6a6-8ecbe98a5f0c',
+        'id.drivers_license_number': '19390a8b-9a66-4481-8d65-1a043c6d2dcb',
+        'id.drivers_license_state': 'Indiana',
+        'id.email': 'vince.mraz22@gmail.com',
+        'id.first_name': 'Colby',
+        'id.itin': '3bd79b5a-741e-4b7b-abef-12048e662295',
+        'id.last_name': 'Friesen',
+        'id.middle_name': 'Eunice Friesen',
+        'id.nationality': '4088f0b8-460b-49d2-a09f-1a2cff464bc1',
+        'id.phone_number': '+18533177735',
+        'id.ssn4': '6ca76d12-e6fa-4329-9467-4e4c4429e889',
+        'id.ssn9': '69e93e8e-83e2-4128-beb2-6ab6e32cbdbb',
+        'id.state': 'Oklahoma',
+        'id.us_legal_status': 'd4517d41-a1df-49a6-b2aa-4461dde8aa4b',
+        'id.us_tax_id': 'c9605548-d7e3-46ce-98dd-71bad8dacaf3',
+        'id.visa_expiration_date': '552de6a4-50ee-4658-8280-9f930e25f2cc',
+        'id.visa_kind': '310484a6-6135-450d-a3fe-743b3f99dc79',
+        'id.zip': '79428',
+        'investor_profile.annual_income': 'laborum dolore',
+        'investor_profile.brokerage_firm_employer': 'labore',
+        'investor_profile.declarations': 'elit aute',
+        'investor_profile.employer': 'sit',
+        'investor_profile.employment_status': 'sit dolor',
+        'investor_profile.family_member_names': 'Billie Mills',
+        'investor_profile.funding_sources': 'Duis amet velit ut dolore',
+        'investor_profile.investment_goals': 'Ut mollit dolore incididunt minim',
+        'investor_profile.net_worth': 'laborum',
+        'investor_profile.occupation': 'do aute',
+        'investor_profile.political_organization': 'laborum qui nisi aute cillum',
+        'investor_profile.risk_tolerance': 'cillum',
+        'investor_profile.senior_executive_symbols': 'ea',
       },
       op: 'create',
-      ownershipStake: -12874911,
-      uuid: '0948b0f3-444c-4b75-abe0-6e9b6bef21eb',
+      ownershipStake: 77074481,
+      uuid: '5801ab10-beb7-4447-91bc-031c4e582ad2',
     },
     props,
-  ) as UpdateOrCreateHostedBusinessOwnerRequest;
-export const getUserAuthScope = (props: Partial<UserAuthScope>) => (props ?? 'sign_up') as UserAuthScope;
-export const getUserChallengeData = (props: Partial<UserChallengeData>) =>
-  merge(
+  );
+export const getUserAuthScope = (props: UserAuthScope): UserAuthScope => props ?? 'explicit_auth';
+export const getUserChallengeData = (props: Partial<UserChallengeData>): UserChallengeData =>
+  merge<UserChallengeData, Partial<UserChallengeData>>(
     {
-      biometricChallengeJson: 'fugiat deserunt eu laborum',
-      challengeKind: 'biometric',
-      challengeToken: 'e4bb8bcc-75d3-4791-84d5-1c3fc7a3cc8e',
-      timeBeforeRetryS: 86817343,
-      token: 'f1d840da-837e-4c02-9cde-3c34b1c68fb2',
+      biometricChallengeJson: 'quis id dolore fugiat mollit',
+      challengeKind: 'sms',
+      challengeToken: '5cd67c7b-e409-4322-8088-c0605fdb2cff',
+      timeBeforeRetryS: 99732452,
+      token: 'b5471bda-9197-42d3-8509-e830179cf3f1',
     },
     props,
-  ) as UserChallengeData;
-export const getUserChallengeRequest = (props: Partial<UserChallengeRequest>) =>
-  merge(
+  );
+export const getUserChallengeRequest = (props: Partial<UserChallengeRequest>): UserChallengeRequest =>
+  merge<UserChallengeRequest, Partial<UserChallengeRequest>>(
     {
-      actionKind: 'add_primary',
-      email: 'jillian_kovacek@gmail.com',
-      kind: 'email',
-      phoneNumber: '+12403856728',
+      actionKind: 'replace',
+      email: 'natalia.dicki@gmail.com',
+      kind: 'passkey',
+      phoneNumber: '+16262204670',
     },
     props,
-  ) as UserChallengeRequest;
-export const getUserChallengeResponse = (props: Partial<UserChallengeResponse>) =>
-  merge(
+  );
+export const getUserChallengeResponse = (props: Partial<UserChallengeResponse>): UserChallengeResponse =>
+  merge<UserChallengeResponse, Partial<UserChallengeResponse>>(
     {
-      biometricChallengeJson: 'cupidatat eiusmod dolor',
-      challengeToken: 'd79d9064-bb3b-4d36-afc4-405e9d6f923e',
-      timeBeforeRetryS: -26370578,
+      biometricChallengeJson: 'in',
+      challengeToken: '8d76e550-2547-4fb3-b49e-1446f09fd22f',
+      timeBeforeRetryS: 81762098,
     },
     props,
-  ) as UserChallengeResponse;
-export const getUserChallengeVerifyRequest = (props: Partial<UserChallengeVerifyRequest>) =>
-  merge(
+  );
+export const getUserChallengeVerifyRequest = (props: Partial<UserChallengeVerifyRequest>): UserChallengeVerifyRequest =>
+  merge<UserChallengeVerifyRequest, Partial<UserChallengeVerifyRequest>>(
     {
-      challengeResponse: 'est pariatur Excepteur enim',
-      challengeToken: '263d7baf-37af-4e67-ac3b-44445889a6ea',
+      challengeResponse: 'amet consequat in',
+      challengeToken: 'ae283eed-992f-469c-ae7a-5efceee26a77',
     },
     props,
-  ) as UserChallengeVerifyRequest;
-export const getUserChallengeVerifyResponse = (props: Partial<UserChallengeVerifyResponse>) =>
-  merge(
+  );
+export const getUserChallengeVerifyResponse = (
+  props: Partial<UserChallengeVerifyResponse>,
+): UserChallengeVerifyResponse =>
+  merge<UserChallengeVerifyResponse, Partial<UserChallengeVerifyResponse>>(
     {
-      authToken: '1bb1eea1-7b1e-4223-b0c4-4f016fbb7ac0',
+      authToken: '624998ae-34ed-496b-89df-d67ff0734dd5',
     },
     props,
-  ) as UserChallengeVerifyResponse;
-export const getUserDataIdentifier = (props: Partial<UserDataIdentifier>) =>
-  (props ?? 'document.visa.dob') as UserDataIdentifier;
-export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>) =>
-  merge(
+  );
+export const getUserDataIdentifier = (props: UserDataIdentifier): UserDataIdentifier => props ?? 'card.*.expiration';
+export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>): UserDecryptRequest =>
+  merge<UserDecryptRequest, Partial<UserDecryptRequest>>(
     {
-      fields: ['id.first_name', 'id.last_name'],
-      reason: 'Lorem ipsum dolor',
-      transforms: null,
-      versionAt: null,
+      fields: ['id.address_line1', 'document.passport_card.nationality', 'document.drivers_license.full_name'],
+      reason: 'sunt adipisicing deserunt',
+      transforms: ['prefix(<n>)', 'to_lowercase', 'prefix(<n>)'],
+      versionAt: '1911-08-13T18:10:09.0Z',
     },
     props,
-  ) as UserDecryptRequest;
-export const getUserDecryptResponse = (props: Partial<UserDecryptResponse>) =>
-  merge(
+  );
+export const getVerifyResultV1SdkArgs = (props: Partial<VerifyResultV1SdkArgs>): VerifyResultV1SdkArgs =>
+  merge<VerifyResultV1SdkArgs, Partial<VerifyResultV1SdkArgs>>(
     {
-      'id.first_name': 'Jane',
-      'id.last_name': 'Doe',
+      authToken: '79b3047d-ce81-4bb3-b509-e39bc26fa006',
+      deviceResponse: 'dolor mollit et laborum',
     },
     props,
-  ) as UserDecryptResponse;
-export const getVerifyResultV1SdkArgs = (props: Partial<VerifyResultV1SdkArgs>) =>
-  merge(
-    {
-      authToken: 'b817de0e-f13f-4dc5-92f8-b1892a7692ae',
-      deviceResponse: 'commodo cillum non dolore nulla',
-    },
-    props,
-  ) as VerifyResultV1SdkArgs;
-export const getVerifyV1Options = (props: Partial<VerifyV1Options>) =>
-  merge(
+  );
+export const getVerifyV1Options = (props: Partial<VerifyV1Options>): VerifyV1Options =>
+  merge<VerifyV1Options, Partial<VerifyV1Options>>(
     {
       showCompletionPage: false,
-      showLogo: true,
+      showLogo: false,
     },
     props,
-  ) as VerifyV1Options;
-export const getVerifyV1SdkArgs = (props: Partial<VerifyV1SdkArgs>) =>
-  merge(
+  );
+export const getVerifyV1SdkArgs = (props: Partial<VerifyV1SdkArgs>): VerifyV1SdkArgs =>
+  merge<VerifyV1SdkArgs, Partial<VerifyV1SdkArgs>>(
     {
-      authToken: '2e49aca6-05ba-49b8-8d26-0717c7dbe1a0',
-      documentFixtureResult: 'pass',
-      fixtureResult: 'manual_review',
+      authToken: 'eb3a06a8-74fa-4f88-9b91-3550e495f613',
+      documentFixtureResult: 'fail',
+      fixtureResult: 'step_up',
       isComponentsSdk: true,
       l10N: {
         language: 'en',
         locale: 'en-US',
       },
       options: {
-        showCompletionPage: false,
-        showLogo: false,
+        showCompletionPage: true,
+        showLogo: true,
       },
-      publicKey: '9b197793-6390-4aae-8dd7-b5b43e64b51c',
-      sandboxId: '9c91717e-f673-43f4-8260-4b1cdcdeb251',
-      shouldRelayToComponents: true,
+      publicKey: '25a6275b-bebd-4779-a3ac-21dc260bcd88',
+      sandboxId: 'd1c74d2a-eaad-4a25-af9e-cc286ae2572a',
+      shouldRelayToComponents: false,
       userData: {},
     },
     props,
-  ) as VerifyV1SdkArgs;
-export const getWorkflowFixtureResult = (props: Partial<WorkflowFixtureResult>) =>
-  (props ?? 'pass') as WorkflowFixtureResult;
-export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>) =>
-  merge(
+  );
+export const getWorkflowFixtureResult = (props: WorkflowFixtureResult): WorkflowFixtureResult => props ?? 'pass';
+export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>): WorkflowRequestConfig =>
+  merge<WorkflowRequestConfig, Partial<WorkflowRequestConfig>>(
     {
       data: {
-        playbookId: 'a039b76f-97fc-4423-b8c2-1cb34c19c9af',
-        recollectAttributes: ['business_tin', 'business_tin', 'business_beneficial_owners'],
-        reuseExistingBoKyc: true,
+        playbookId: '44a4e9db-810e-460c-843b-c148ba5b40a7',
+        recollectAttributes: ['bank', 'business_website', 'us_legal_status'],
+        reuseExistingBoKyc: false,
       },
       kind: 'onboard',
     },
     props,
-  ) as WorkflowRequestConfig;
+  );

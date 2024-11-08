@@ -3,15 +3,7 @@ import path from 'path';
 import { runBiome } from '@onefootprint/request-types/config/run-biome';
 import _, { camelCase } from 'lodash';
 
-const excludePrefixes: string[] = [
-  'bank.*',
-  'document.',
-  'id.',
-  'card.*',
-  'investor_profile.',
-  'custom.*',
-  'business.',
-];
+const excludePrefixes: string[] = ['bank.', 'document.', 'id.', 'card.', 'investor_profile.', 'custom.', 'business.'];
 
 export function toCamelCase(obj: unknown): unknown {
   if (_.isArray(obj)) {
@@ -44,13 +36,10 @@ export function sortObjectKeys(obj: unknown): unknown {
   return obj;
 }
 
-export const createDictionaryFile = (dictionary: Record<string, unknown>) => {
+export const createDictionaryFile = (newPersistedValues: string) => {
   const filePath = path.resolve('config/persisted-values.ts');
 
-  fs.writeFileSync(
-    filePath,
-    `export const persistedValues: Record<string, unknown> = ${JSON.stringify(dictionary, null, 2)}`,
-  );
+  fs.writeFileSync(filePath, newPersistedValues);
 
   runBiome(filePath);
 };

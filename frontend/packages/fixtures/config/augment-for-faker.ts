@@ -42,8 +42,8 @@ export function augmentForFaker(schema: OpenAPIV3.SchemaObject): OpenAPIV3.Schem
 
         // If the property's name matches a faker key, generate a default value that looks more plausible for this type of field
         const matchingKey = Object.keys(propertyFakerMap).find(fakerKey => key.includes(fakerKey));
-        if (!property.example && matchingKey && property.type === 'string') {
-          property.example = propertyFakerMap[matchingKey]();
+        if (!property.default && !property.enum && matchingKey && property.type === 'string') {
+          property.default = propertyFakerMap[matchingKey]();
         }
 
         // Recursively update the child schema in case it's a complex type

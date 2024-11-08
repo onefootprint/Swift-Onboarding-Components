@@ -7,19 +7,22 @@ import { JSONSchemaFaker } from 'json-schema-faker';
 import _ from 'lodash';
 import type { OpenAPIV3 } from 'openapi-types';
 import { augmentForFaker } from './augment-for-faker';
-import { persistedValues } from './persisted-values';
+import * as persistedValues from './persisted-values';
 import { createDictionaryFile, sortObjectKeys, toCamelCase } from './utils';
 
 JSONSchemaFaker.option({
   minItems: 3,
   maxItems: 3,
   fillProperties: false,
-  useExamplesValue: true,
+  // TODO: eventually would be nice to reuse the `example` for each field. The backend does provide an example for some
+  useDefaultValue: true,
   // Needed to generate stable results
   alwaysFakeOptionals: true,
 });
 
 const dictionary: Record<string, unknown> = {};
+let newPersistedValuesImports = '';
+let newPersistedValues = '';
 
 // NOTE: there is one flaw in fixture generation: removing a field from the open API spec will not remove it
 // from the generated fixtures.
@@ -58,28 +61,32 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
       imports += `${name},\n`;
       const example = await JSONSchemaFaker.resolve(schema, enhancedSchemas);
 
-      const index = `${type}.${name}`;
+      const index = `${type}_${name}`;
 
-      dictionary[index] = persistedValues[index]
-        ? _.isObject(persistedValues[index])
-          ? deepmerge(example as Record<string, unknown>, persistedValues[index] as Record<string, unknown>, {
+      const persistedValue = persistedValues[index as keyof typeof persistedValues];
+
+      dictionary[index] = persistedValue
+        ? _.isObject(persistedValue)
+          ? deepmerge(example as Record<string, unknown>, persistedValue as Record<string, unknown>, {
               arrayMerge: (_, sourceArray) => sourceArray,
             })
-          : persistedValues[index]
+          : persistedValue
         : example;
 
       const mocks = _.isObject(dictionary[index]) ? sortObjectKeys(toCamelCase(dictionary[index])) : dictionary[index];
 
       if (_.isObject(dictionary[index])) {
-        examples += `export const get${name[0].toUpperCase() + name.slice(1)} = (props: Partial<${name}>) => merge(${JSON.stringify(mocks, null, 2)}, props) as ${name};\n`;
+        examples += `export const get${name[0].toUpperCase() + name.slice(1)} = (props: Partial<${name}>): ${name} => merge<${name}, Partial<${name}>>(${JSON.stringify(mocks, null, 2)}, props);\n`;
       } else {
-        examples += `export const get${name[0].toUpperCase() + name.slice(1)} = (props: Partial<${name}>) => (props ?? ${JSON.stringify(mocks, null, 2)}) as ${name};\n`;
+        examples += `export const get${name[0].toUpperCase() + name.slice(1)} = (props: ${name}): ${name} => (props ?? ${JSON.stringify(mocks, null, 2)});\n`;
       }
+
+      newPersistedValues += `export const ${index} : ${name} = ${JSON.stringify(mocks, null, 2)};\n`;
     }
   }
   imports += `} from "${config.import}";\n\n`;
 
-  createDictionaryFile(sortObjectKeys(dictionary) as Record<string, unknown>);
+  newPersistedValuesImports += imports;
 
   // Ensure parent directory of output file exists
   const outputDir = path.dirname(config.outputPath);
@@ -93,6 +100,8 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
 const generate = async () => {
   await generateFixtures('hosted');
   await generateFixtures('dashboard');
+
+  createDictionaryFile(newPersistedValuesImports + newPersistedValues);
   runBiome(path.resolve('./index.ts'));
   runBiome(path.resolve('./dashboard.ts'));
 };

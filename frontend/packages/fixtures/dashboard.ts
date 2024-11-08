@@ -170,6 +170,7 @@ import type {
   ManualReview,
   ManualReviewKind,
   MatchLevel,
+  ModernEntityDecryptResponse,
   MultiUpdateRuleRequest,
   NumberOperator,
   ObConfigurationKind,
@@ -304,205 +305,204 @@ import type {
 } from '@onefootprint/request-types/dashboard';
 import merge from 'lodash/merge';
 
-export const getActionKind = (props: Partial<ActionKind>) => (props ?? 'add_primary') as ActionKind;
-export const getActor = (props: Partial<Actor>) =>
-  merge(
+export const getActionKind = (props: ActionKind): ActionKind => props ?? 'add_primary';
+export const getActor = (props: Partial<Actor>): Actor =>
+  merge<Actor, Partial<Actor>>(
     {
-      id: '854798bd-fb5e-4eee-bcac-3fabddb382df',
+      id: '790e0e91-7999-45b8-92d6-2c9b6115af8e',
       kind: 'user',
     },
     props,
-  ) as Actor;
-export const getAdverseMediaListKind = (props: Partial<AdverseMediaListKind>) =>
-  (props ?? 'narcotics') as AdverseMediaListKind;
-export const getAmlDetail = (props: Partial<AmlDetail>) =>
-  merge(
+  );
+export const getAdverseMediaListKind = (props: AdverseMediaListKind): AdverseMediaListKind => props ?? 'cyber_crime';
+export const getAmlDetail = (props: Partial<AmlDetail>): AmlDetail =>
+  merge<AmlDetail, Partial<AmlDetail>>(
     {
       hits: [
         {
           fields: {},
-          matchTypes: ['qui', 'incididunt in laborum', 'qui'],
+          matchTypes: ['qui in sit', 'labore sunt', 'sint'],
           media: [
             {
-              date: '1945-08-09T01:38:46.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'eiusmod do adipisicing exercitation',
-              title: 'et esse reprehenderit',
-              url: 'https://enraged-bin.us',
+              date: '1924-12-16T03:09:53.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'non nulla',
+              title: 'dolor cillum',
+              url: 'https://esteemed-republican.org',
             },
             {
-              date: '1938-07-12T23:58:46.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'non elit occaecat voluptate mollit',
-              title: 'fugiat nulla commodo',
-              url: 'https://enraged-bin.us',
+              date: '1920-11-18T10:26:51.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'sed',
+              title: 'voluptate',
+              url: 'https://esteemed-republican.org',
             },
             {
-              date: '1897-05-18T12:12:38.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'culpa esse officia incididunt occaecat',
-              title: 'non Excepteur',
-              url: 'https://enraged-bin.us',
+              date: '1961-12-14T05:37:56.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'labore deserunt consequat',
+              title: 'in anim tempor incididunt do',
+              url: 'https://esteemed-republican.org',
             },
           ],
-          name: 'Mrs. Shelley Pouros',
+          name: 'Beulah Rosenbaum',
         },
         {
           fields: {},
-          matchTypes: ['et', 'laborum pariatur in', 'et'],
+          matchTypes: ['aliquip', 'consequat Excepteur dolore nisi ea', 'Duis esse elit'],
           media: [
             {
-              date: '1953-11-07T21:56:40.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'ipsum',
-              title: 'veniam ex eu',
-              url: 'https://enraged-bin.us',
+              date: '1969-02-17T06:25:26.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'laboris',
+              title: 'proident sint dolore',
+              url: 'https://esteemed-republican.org',
             },
             {
-              date: '1915-09-12T10:44:17.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'pariatur',
-              title: 'minim cupidatat non nostrud',
-              url: 'https://enraged-bin.us',
+              date: '1900-08-07T16:48:17.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'in deserunt consequat',
+              title: 'deserunt',
+              url: 'https://esteemed-republican.org',
             },
             {
-              date: '1948-06-05T05:33:51.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'aute aliquip sit nostrud',
-              title: 'incididunt',
-              url: 'https://enraged-bin.us',
+              date: '1941-04-13T03:23:03.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'exercitation Lorem cupidatat consectetur non',
+              title: 'ullamco nulla minim',
+              url: 'https://esteemed-republican.org',
             },
           ],
-          name: 'Mrs. Shelley Pouros',
+          name: 'Beulah Rosenbaum',
         },
         {
           fields: {},
-          matchTypes: ['culpa', 'dolore commodo elit', 'non cillum veniam occaecat id'],
+          matchTypes: ['aute ut ullamco velit', 'ex', 'Lorem est Duis dolor aute'],
           media: [
             {
-              date: '1894-05-09T19:17:48.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'sit ut ea',
-              title: 'id esse culpa ullamco cupidatat',
-              url: 'https://enraged-bin.us',
+              date: '1948-12-28T13:31:45.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'ipsum tempor',
+              title: 'Lorem magna ipsum',
+              url: 'https://esteemed-republican.org',
             },
             {
-              date: '1920-04-08T19:32:03.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'id',
-              title: 'pariatur',
-              url: 'https://enraged-bin.us',
+              date: '1909-02-17T14:14:30.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'fugiat velit aliquip',
+              title: 'nulla cillum tempor minim',
+              url: 'https://esteemed-republican.org',
             },
             {
-              date: '1910-05-16T04:45:54.0Z',
-              pdfUrl: 'https://pastel-tusk.us/',
-              snippet: 'aliquip',
-              title: 'ut nulla',
-              url: 'https://enraged-bin.us',
+              date: '1931-12-05T07:07:14.0Z',
+              pdfUrl: 'https://poor-colon.name',
+              snippet: 'in ut Lorem ullamco ex',
+              title: 'aute ut tempor',
+              url: 'https://esteemed-republican.org',
             },
           ],
-          name: 'Mrs. Shelley Pouros',
+          name: 'Beulah Rosenbaum',
         },
       ],
-      shareUrl: 'https://handsome-tapioca.com',
+      shareUrl: 'https://assured-jogging.us',
     },
     props,
-  ) as AmlDetail;
-export const getAmlHit = (props: Partial<AmlHit>) =>
-  merge(
+  );
+export const getAmlHit = (props: Partial<AmlHit>): AmlHit =>
+  merge<AmlHit, Partial<AmlHit>>(
     {
       fields: {},
-      matchTypes: ['dolore', 'incididunt eiusmod deserunt magna', 'et dolor qui ea occaecat'],
+      matchTypes: ['non', 'consequat dolore nisi dolore', 'incididunt'],
       media: [
         {
-          date: '1960-11-06T04:39:30.0Z',
-          pdfUrl: 'https://variable-populist.net',
-          snippet: 'Excepteur eu Ut in',
-          title: 'eiusmod proident laboris minim',
-          url: 'https://standard-flood.biz',
+          date: '1931-07-28T11:32:49.0Z',
+          pdfUrl: 'https://tasty-soybean.name',
+          snippet: 'culpa ullamco elit',
+          title: 'pariatur consequat',
+          url: 'https://old-fashioned-creature.us/',
         },
         {
-          date: '1945-11-20T21:01:49.0Z',
-          pdfUrl: 'https://variable-populist.net',
-          snippet: 'in sunt aute reprehenderit',
-          title: 'quis laboris occaecat eiusmod consequat',
-          url: 'https://standard-flood.biz',
+          date: '1955-12-21T04:57:44.0Z',
+          pdfUrl: 'https://tasty-soybean.name',
+          snippet: 'magna quis',
+          title: 'tempor in enim',
+          url: 'https://old-fashioned-creature.us/',
         },
         {
-          date: '1891-09-30T12:39:31.0Z',
-          pdfUrl: 'https://variable-populist.net',
-          snippet: 'non consectetur',
-          title: 'ut deserunt Lorem reprehenderit ullamco',
-          url: 'https://standard-flood.biz',
+          date: '1956-12-09T01:58:03.0Z',
+          pdfUrl: 'https://tasty-soybean.name',
+          snippet: 'dolor est voluptate dolor',
+          title: 'nulla',
+          url: 'https://old-fashioned-creature.us/',
         },
       ],
-      name: 'Samantha Bartoletti',
+      name: 'Gwendolyn Von Sr.',
     },
     props,
-  ) as AmlHit;
-export const getAmlHitMedia = (props: Partial<AmlHitMedia>) =>
-  merge(
+  );
+export const getAmlHitMedia = (props: Partial<AmlHitMedia>): AmlHitMedia =>
+  merge<AmlHitMedia, Partial<AmlHitMedia>>(
     {
-      date: '1956-12-21T03:07:32.0Z',
-      pdfUrl: 'https://ironclad-testimonial.com',
-      snippet: 'tempor enim',
-      title: 'exercitation commodo',
-      url: 'https://agile-sock.us',
+      date: '1962-09-15T20:24:01.0Z',
+      pdfUrl: 'https://inexperienced-league.us',
+      snippet: 'anim ut',
+      title: 'officia',
+      url: 'https://agreeable-stool.us/',
     },
     props,
-  ) as AmlHitMedia;
-export const getAmlMatchKind = (props: Partial<AmlMatchKind>) => (props ?? 'fuzzy_high') as AmlMatchKind;
-export const getAnnotation = (props: Partial<Annotation>) =>
-  merge(
+  );
+export const getAmlMatchKind = (props: AmlMatchKind): AmlMatchKind => props ?? 'exact_name';
+export const getAnnotation = (props: Partial<Annotation>): Annotation =>
+  merge<Annotation, Partial<Annotation>>(
     {
-      id: '4a1976b7-77ea-479e-b359-5b675d60947e',
-      isPinned: true,
-      note: 'nisi irure Ut velit minim',
+      id: 'a715ef5a-5c3f-4ffa-8b33-e723e22a5ef2',
+      isPinned: false,
+      note: 'aute minim voluptate anim occaecat',
       source: {
-        id: '651a20ff-03df-4a27-9d07-bd42893453a7',
+        id: '3968d23c-b399-43d0-a7f0-781488f80219',
         kind: 'user',
       },
-      timestamp: '1946-09-08T22:55:54.0Z',
+      timestamp: '1905-01-20T23:57:01.0Z',
     },
     props,
-  ) as Annotation;
-export const getApiKeyStatus = (props: Partial<ApiKeyStatus>) => (props ?? 'enabled') as ApiKeyStatus;
-export const getAssumePartnerRoleRequest = (props: Partial<AssumePartnerRoleRequest>) =>
-  merge(
+  );
+export const getApiKeyStatus = (props: ApiKeyStatus): ApiKeyStatus => props ?? 'enabled';
+export const getAssumePartnerRoleRequest = (props: Partial<AssumePartnerRoleRequest>): AssumePartnerRoleRequest =>
+  merge<AssumePartnerRoleRequest, Partial<AssumePartnerRoleRequest>>(
     {
-      partnerTenantId: '8e481214-2619-4b3d-8cb4-60cf927b3edc',
+      partnerTenantId: 'b2d2c462-066a-43cc-9379-06374ec042c3',
     },
     props,
-  ) as AssumePartnerRoleRequest;
-export const getAssumePartnerRoleResponse = (props: Partial<AssumePartnerRoleResponse>) =>
-  merge(
+  );
+export const getAssumePartnerRoleResponse = (props: Partial<AssumePartnerRoleResponse>): AssumePartnerRoleResponse =>
+  merge<AssumePartnerRoleResponse, Partial<AssumePartnerRoleResponse>>(
     {
       partnerTenant: {
         allowDomainAccess: true,
-        domains: ['ad', 'dolor anim do', 'qui minim fugiat pariatur'],
-        id: '85aa9b97-0472-4332-82f2-0d256cb41bb6',
-        isAuthMethodSupported: false,
-        isDomainAlreadyClaimed: true,
-        logoUrl: 'https://ample-season.org',
-        name: 'Inez Brown',
-        websiteUrl: 'https://utilized-freight.us/',
+        domains: ['laborum reprehenderit eu pariatur', 'ut irure commodo minim', 'consectetur laboris cupidatat'],
+        id: '682e0022-dc3d-4a3b-b4f5-76c2c8fbf178',
+        isAuthMethodSupported: true,
+        isDomainAlreadyClaimed: false,
+        logoUrl: 'https://bleak-pantyhose.name/',
+        name: 'Jody Schimmel Sr.',
+        websiteUrl: 'https://uncommon-trash.us/',
       },
-      token: '40a145be-794e-46fa-ab9f-824c9075599c',
+      token: '07022868-c818-41d7-bf34-4164e0b83c5c',
       user: {
-        createdAt: '1916-07-04T14:18:49.0Z',
-        email: 'mckayla59@gmail.com',
-        firstName: 'Stone',
-        id: '999d1d00-0a48-4d25-94cb-ea3f371952bc',
-        isFirmEmployee: false,
-        lastName: 'Collins',
+        createdAt: '1926-08-04T19:05:24.0Z',
+        email: 'freda.rogahn@gmail.com',
+        firstName: 'Easter',
+        id: '81ce518e-f6dd-4d37-80f3-dc27e8519832',
+        isFirmEmployee: true,
+        lastName: 'Kautzer',
         role: {
-          createdAt: '1960-01-18T19:21:10.0Z',
-          id: 'a5c8291b-6595-47d2-81ef-3f7854b86755',
+          createdAt: '1963-07-27T01:14:55.0Z',
+          id: 'a21f1c11-e813-4b0f-8f7b-3c63dad69f30',
           isImmutable: true,
-          kind: 'dashboard_user',
-          name: 'Leona Wunsch',
-          numActiveApiKeys: -63682847,
-          numActiveUsers: 34386206,
+          kind: 'api_key',
+          name: 'Delia Fadel Sr.',
+          numActiveApiKeys: -50988420,
+          numActiveUsers: -1736012,
           scopes: [
             {
               kind: 'read',
@@ -516,63 +516,63 @@ export const getAssumePartnerRoleResponse = (props: Partial<AssumePartnerRoleRes
           ],
         },
         rolebinding: {
-          lastLoginAt: '1914-10-14T13:10:09.0Z',
+          lastLoginAt: '1932-11-06T06:19:46.0Z',
         },
       },
     },
     props,
-  ) as AssumePartnerRoleResponse;
-export const getAssumeRoleRequest = (props: Partial<AssumeRoleRequest>) =>
-  merge(
+  );
+export const getAssumeRoleRequest = (props: Partial<AssumeRoleRequest>): AssumeRoleRequest =>
+  merge<AssumeRoleRequest, Partial<AssumeRoleRequest>>(
     {
-      tenantId: '8b775ec9-576d-45b1-ae03-3da415e64ad4',
+      tenantId: 'f2787f8f-ede9-4215-b8bc-72a3ea02d468',
     },
     props,
-  ) as AssumeRoleRequest;
-export const getAssumeRoleResponse = (props: Partial<AssumeRoleResponse>) =>
-  merge(
+  );
+export const getAssumeRoleResponse = (props: Partial<AssumeRoleResponse>): AssumeRoleResponse =>
+  merge<AssumeRoleResponse, Partial<AssumeRoleResponse>>(
     {
       tenant: {
         allowDomainAccess: false,
-        allowedPreviewApis: ['tags', 'vault_disaster_recovery', 'legacy_onboarding_status_webhook'],
-        companySize: 's51_to100',
-        domains: ['deserunt mollit cillum aliquip qui', 'dolor sunt', 'dolor non sint'],
-        id: '79917aaa-0111-4f0f-9640-25572835abe5',
-        isAuthMethodSupported: true,
+        allowedPreviewApis: ['vault_proxy_jit', 'client_vaulting_docs', 'liveness_list'],
+        companySize: 's1_to10',
+        domains: ['eu', 'in magna reprehenderit veniam', 'dolor esse dolore cillum nisi'],
+        id: '503a6a65-c3c2-4cd2-8a60-9151e28f5846',
+        isAuthMethodSupported: false,
         isDomainAlreadyClaimed: true,
-        isProdAuthPlaybookRestricted: true,
+        isProdAuthPlaybookRestricted: false,
         isProdKybPlaybookRestricted: true,
         isProdKycPlaybookRestricted: true,
         isProdNeuroEnabled: false,
         isProdSentilinkEnabled: false,
-        isSandboxRestricted: true,
-        logoUrl: 'https://grumpy-hepatitis.org/',
-        name: 'Neal Barrows',
+        isSandboxRestricted: false,
+        logoUrl: 'https://probable-intervention.com',
+        name: 'Ross Feeney',
         parent: {
-          id: 'bfdead98-71a4-4ba6-9c7a-9cdcd332d30a',
-          name: 'Jeanne Lowe',
+          id: '942f1f0e-c04c-49b0-96a2-ad11c75f1213',
+          name: 'Darlene Kovacek',
         },
-        supportEmail: 'winston_champlin58@gmail.com',
-        supportPhone: '+17673380659',
-        supportWebsite: 'https://dense-coin.name/',
-        websiteUrl: 'https://profuse-reach.biz/',
+        supportEmail: 'tommie63@gmail.com',
+        supportPhone: '+17172633968',
+        supportWebsite: 'https://aware-cosset.biz/',
+        websiteUrl: 'https://courageous-entry.info',
       },
-      token: '27730d79-2143-4308-bda5-e9b783c94257',
+      token: '3aabc6a8-8f0a-4d8d-b696-d9fcd880c12b',
       user: {
-        createdAt: '1944-06-13T18:05:27.0Z',
-        email: 'bria_treutel@gmail.com',
-        firstName: 'Edna',
-        id: 'adc8c19c-74cc-42ca-8d74-7de7dcb9f764',
+        createdAt: '1906-12-23T02:15:51.0Z',
+        email: 'bart52@gmail.com',
+        firstName: 'Katarina',
+        id: '9e13cd6e-73c9-4353-8cf8-a403324fc888',
         isFirmEmployee: false,
-        lastName: 'Franey',
+        lastName: 'Yost',
         role: {
-          createdAt: '1908-03-10T21:13:01.0Z',
-          id: 'd62772dc-aeb6-46d5-bff6-86a3a691fa7c',
+          createdAt: '1942-05-25T08:32:45.0Z',
+          id: '08dd8a61-41bb-4e8b-af42-9225c904daa7',
           isImmutable: false,
-          kind: 'compliance_partner_dashboard_user',
-          name: 'David Pfannerstill I',
-          numActiveApiKeys: 84390315,
-          numActiveUsers: 48205111,
+          kind: 'dashboard_user',
+          name: 'Antoinette Robel',
+          numActiveApiKeys: 62132850,
+          numActiveUsers: 79210313,
           scopes: [
             {
               kind: 'read',
@@ -586,152 +586,160 @@ export const getAssumeRoleResponse = (props: Partial<AssumeRoleResponse>) =>
           ],
         },
         rolebinding: {
-          lastLoginAt: '1907-12-04T07:51:31.0Z',
+          lastLoginAt: '1926-11-28T18:46:29.0Z',
         },
       },
     },
     props,
-  ) as AssumeRoleResponse;
-export const getAttestedDeviceData = (props: Partial<AttestedDeviceData>) =>
-  merge(
+  );
+export const getAttestedDeviceData = (props: Partial<AttestedDeviceData>): AttestedDeviceData =>
+  merge<AttestedDeviceData, Partial<AttestedDeviceData>>(
     {
-      appBundleId: '12e23fbf-c7bb-4877-ad00-0d9e945eaf65',
+      appBundleId: '88358cb7-d458-4ea2-a7f2-c3969b28ddd3',
       deviceType: 'ios',
-      fraudRisk: 'high',
-      model: 'adipisicing',
-      os: 'nisi amet',
+      fraudRisk: 'low',
+      model: 'Lorem dolore',
+      os: 'ea aliqua ullamco',
     },
     props,
-  ) as AttestedDeviceData;
-export const getAuditEvent = (props: Partial<AuditEvent>) =>
-  merge(
+  );
+export const getAuditEvent = (props: Partial<AuditEvent>): AuditEvent =>
+  merge<AuditEvent, Partial<AuditEvent>>(
     {
       detail: {
         data: {
-          createdFields: ['document.permit.selfie.mime_type', 'document.id_card.issuing_state', 'id.email'],
-          fpId: '8c7b2bfc-c81f-4587-8a10-a3d9f715c283',
+          createdFields: [
+            'document.visa.full_address',
+            'document.visa.front.mime_type',
+            'document.residence_document.classified_document_type',
+          ],
+          fpId: '01e5abc4-7769-4430-9331-33f085ea0e1f',
         },
         kind: 'create_user',
       },
-      id: 'f8a2faba-870e-4ef8-83bf-7c426c8b2b91',
+      id: '518d11a5-e49e-4d5c-bd71-c8c91c31efdb',
       insightEvent: {
-        city: 'Prestonbury',
-        country: 'Niue',
-        ipAddress: '594 Sporer Flat Suite 180',
-        latitude: 50446306.67734215,
-        longitude: -26658599.66064717,
-        metroCode: 'proident et tempor deserunt',
-        postalCode: 'reprehenderit ad',
-        region: 'laboris velit dolore',
-        regionName: 'Sabrina Gutmann',
-        sessionId: '663152e5-b2fa-4b93-b3d1-6c3da51f0db8',
-        timeZone: 'cupidatat elit aliquip eu qui',
-        timestamp: '1967-09-28T09:44:15.0Z',
-        userAgent: 'sed',
+        city: 'Vestafurt',
+        country: 'Namibia',
+        ipAddress: '25033 Upton Stravenue Apt. 330',
+        latitude: -79200561.28420985,
+        longitude: -44825337.29091127,
+        metroCode: 'fugiat non nulla in',
+        postalCode: 'et anim reprehenderit ea',
+        region: 'dolore et nulla',
+        regionName: 'Dianna Schiller',
+        sessionId: 'c84a42d4-ec37-44ed-8cd9-243d040c4451',
+        timeZone: 'culpa elit officia qui',
+        timestamp: '1909-01-10T01:24:17.0Z',
+        userAgent: 'nostrud culpa',
       },
-      name: 'Bryan Feeney',
+      name: 'decrypt_org_api_key',
       principal: {
-        id: '0b4811b1-81bd-410e-9012-9d321690259f',
+        id: '7962338d-b413-469b-abb9-e12670732d88',
         kind: 'user',
       },
-      tenantId: '66713d96-dc9e-4531-a26f-23efb9af7de9',
-      timestamp: '1911-12-03T23:59:54.0Z',
+      tenantId: '8f10e964-e03d-40c6-82cd-3274f0486bcd',
+      timestamp: '1933-12-29T01:34:52.0Z',
     },
     props,
-  ) as AuditEvent;
-export const getAuditEventDetail = (props: Partial<AuditEventDetail>) =>
-  merge(
+  );
+export const getAuditEventDetail = (props: Partial<AuditEventDetail>): AuditEventDetail =>
+  merge<AuditEventDetail, Partial<AuditEventDetail>>(
     {
       data: {
-        createdFields: ['business.corporation_type', 'id.visa_expiration_date', 'document.passport_card.selfie.image'],
-        fpId: '16bc7ee9-555a-438d-aba5-495d585b8001',
+        createdFields: [
+          'document.id_card.issuing_country',
+          'document.passport_card.front.image',
+          'business.corporation_type',
+        ],
+        fpId: '1595ebc7-1aa3-492e-a40c-8042c7745d87',
       },
       kind: 'create_user',
     },
     props,
-  ) as AuditEventDetail;
-export const getAuditEventName = (props: Partial<AuditEventName>) => (props ?? 'update_org_settings') as AuditEventName;
-export const getAuthEvent = (props: Partial<AuthEvent>) =>
-  merge(
+  );
+export const getAuditEventName = (props: AuditEventName): AuditEventName => props ?? 'decrypt_user_data';
+export const getAuthEvent = (props: Partial<AuthEvent>): AuthEvent =>
+  merge<AuthEvent, Partial<AuthEvent>>(
     {
-      createdAt: '1901-01-07T07:59:41.0Z',
+      createdAt: '1946-07-01T06:18:21.0Z',
       insight: {
-        city: 'North April',
-        country: 'French Southern Territories',
-        ipAddress: '85447 Myron Coves Apt. 731',
-        latitude: 65729191.560064256,
-        longitude: -24130240.72241497,
-        metroCode: 'adipisicing amet deserunt sunt aliquip',
-        postalCode: 'occaecat nulla deserunt reprehenderit',
-        region: 'occaecat mollit dolor',
-        regionName: 'Jon Weimann',
-        sessionId: '37dbda7c-2d32-43d0-9e80-518f05f55bd5',
-        timeZone: 'sed fugiat id eiusmod aute',
-        timestamp: '1940-10-02T20:35:58.0Z',
-        userAgent: 'anim incididunt non',
+        city: 'DuBuquefield',
+        country: 'Papua New Guinea',
+        ipAddress: '1844 Maximo Islands Apt. 257',
+        latitude: -69998091.03417057,
+        longitude: 69464871.63437709,
+        metroCode: 'ea non ex',
+        postalCode: 'tempor fugiat eiusmod',
+        region: 'nostrud',
+        regionName: 'Sophia Hintz',
+        sessionId: '573a500d-7fe4-483f-a43c-de9287ec402b',
+        timeZone: 'Lorem mollit',
+        timestamp: '1922-11-28T18:22:01.0Z',
+        userAgent: 'Lorem id qui pariatur eiusmod',
       },
-      kind: 'email',
+      kind: 'third_party',
       linkedAttestations: [
         {
-          appBundleId: '43d9b925-f4e5-4a74-b929-8182a8a49e64',
+          appBundleId: '46554598-1c7c-4be5-8c8c-f6cca36dcda2',
           deviceType: 'android',
-          fraudRisk: 'high',
-          model: 'dolor adipisicing incididunt',
-          os: 'anim',
+          fraudRisk: 'medium',
+          model: 'incididunt id labore laborum sint',
+          os: 'sunt velit Ut commodo enim',
         },
         {
-          appBundleId: '43d9b925-f4e5-4a74-b929-8182a8a49e64',
-          deviceType: 'ios',
+          appBundleId: '46554598-1c7c-4be5-8c8c-f6cca36dcda2',
+          deviceType: 'android',
           fraudRisk: 'low',
-          model: 'dolor',
-          os: 'aliquip pariatur consequat enim',
+          model: 'voluptate sunt amet in',
+          os: 'sunt',
         },
         {
-          appBundleId: '43d9b925-f4e5-4a74-b929-8182a8a49e64',
-          deviceType: 'ios',
-          fraudRisk: 'low',
-          model: 'quis id sunt dolor',
-          os: 'qui sed eu et',
+          appBundleId: '46554598-1c7c-4be5-8c8c-f6cca36dcda2',
+          deviceType: 'android',
+          fraudRisk: 'medium',
+          model: 'ea minim',
+          os: 'ullamco',
         },
       ],
-      scope: 'auth',
+      scope: 'onboarding',
     },
     props,
-  ) as AuthEvent;
-export const getAuthEventKind = (props: Partial<AuthEventKind>) => (props ?? 'email') as AuthEventKind;
-export const getAuthMethodKind = (props: Partial<AuthMethodKind>) => (props ?? 'email') as AuthMethodKind;
-export const getAuthMethodUpdated = (props: Partial<AuthMethodUpdated>) =>
-  merge(
+  );
+export const getAuthEventKind = (props: AuthEventKind): AuthEventKind => props ?? 'third_party';
+export const getAuthMethodKind = (props: AuthMethodKind): AuthMethodKind => props ?? 'email';
+export const getAuthMethodUpdated = (props: Partial<AuthMethodUpdated>): AuthMethodUpdated =>
+  merge<AuthMethodUpdated, Partial<AuthMethodUpdated>>(
     {
-      action: 'replace',
+      action: 'add_primary',
       insightEvent: {
-        city: 'Lake Emerson',
-        country: 'Central African Republic',
-        ipAddress: '5862 6th Avenue Suite 592',
-        latitude: 56534296.86767891,
-        longitude: -69328968.06895012,
-        metroCode: 'labore occaecat cupidatat ad',
-        postalCode: 'dolor',
-        region: 'consectetur ut',
-        regionName: 'Timmy Grant',
-        sessionId: '75ef382c-523f-44eb-803d-f2b460b5cea8',
-        timeZone: 'consectetur tempor',
-        timestamp: '1905-09-10T15:24:02.0Z',
-        userAgent: 'voluptate nostrud',
+        city: 'Lake Haskell',
+        country: 'Luxembourg',
+        ipAddress: '548 W Union Street Suite 936',
+        latitude: 93342112.87336248,
+        longitude: 24824770.824572086,
+        metroCode: 'ad et Ut fugiat',
+        postalCode: 'ullamco',
+        region: 'incididunt eu in dolore cupidatat',
+        regionName: 'Ms. Katrina Nienow',
+        sessionId: '93895012-5f34-4814-a303-049b9f7af892',
+        timeZone: 'voluptate consectetur',
+        timestamp: '1923-05-07T23:55:37.0Z',
+        userAgent: 'amet in',
       },
-      kind: 'passkey',
+      kind: 'email',
     },
     props,
-  ) as AuthMethodUpdated;
-export const getAuthOrgMember = (props: Partial<AuthOrgMember>) =>
-  merge(
+  );
+export const getAuthOrgMember = (props: Partial<AuthOrgMember>): AuthOrgMember =>
+  merge<AuthOrgMember, Partial<AuthOrgMember>>(
     {
-      email: 'robbie9@gmail.com',
-      firstName: 'Efren',
-      id: '69100a03-3320-49db-8d5b-c142c225b279',
+      email: 'macey98@gmail.com',
+      firstName: 'Laurie',
+      id: '4c00b8e6-9078-47a2-a8b9-cef7856b3a09',
       isAssumedSession: true,
-      isFirmEmployee: false,
-      lastName: 'Howell',
+      isFirmEmployee: true,
+      lastName: 'Stehr',
       scopes: [
         {
           kind: 'read',
@@ -745,277 +753,277 @@ export const getAuthOrgMember = (props: Partial<AuthOrgMember>) =>
       ],
       tenant: {
         allowDomainAccess: true,
-        allowedPreviewApis: ['vault_integrity', 'vault_disaster_recovery', 'vault_versioning'],
-        companySize: 's51_to100',
-        domains: ['nostrud officia Duis fugiat', 'aliquip amet Excepteur non', 'sed sit mollit'],
-        id: 'd9b0807d-518a-4f3b-9b2a-f2a33b1eb1cb',
+        allowedPreviewApis: ['create_user_decision', 'create_user_decision', 'list_duplicate_users'],
+        companySize: 's1001_plus',
+        domains: ['adipisicing in laboris officia', 'ex', 'Ut cillum'],
+        id: '61851d03-82c0-46c9-aca1-67796b0c49d6',
         isAuthMethodSupported: false,
         isDomainAlreadyClaimed: true,
         isProdAuthPlaybookRestricted: false,
-        isProdKybPlaybookRestricted: false,
-        isProdKycPlaybookRestricted: true,
-        isProdNeuroEnabled: false,
-        isProdSentilinkEnabled: true,
-        isSandboxRestricted: true,
-        logoUrl: 'https://fond-draft.net/',
-        name: 'Edna Bergnaum',
+        isProdKybPlaybookRestricted: true,
+        isProdKycPlaybookRestricted: false,
+        isProdNeuroEnabled: true,
+        isProdSentilinkEnabled: false,
+        isSandboxRestricted: false,
+        logoUrl: 'https://considerate-typewriter.us/',
+        name: 'Marcella Cremin',
         parent: {
-          id: 'ef677e83-638b-4242-acf2-1450a47de0be',
-          name: 'Patti Schinner MD',
+          id: '4c2e0df3-1017-405c-bf59-0c90cf812aef',
+          name: 'Kristina Green',
         },
-        supportEmail: 'tate18@gmail.com',
-        supportPhone: '+13994827911',
-        supportWebsite: 'https://noxious-printer.info/',
-        websiteUrl: 'https://variable-slide.com/',
+        supportEmail: 'aniyah14@gmail.com',
+        supportPhone: '+17977726005',
+        supportWebsite: 'https://sniveling-elevation.com',
+        websiteUrl: 'https://biodegradable-adaptation.com/',
       },
     },
     props,
-  ) as AuthOrgMember;
-export const getBooleanOperator = (props: Partial<BooleanOperator>) => (props ?? 'not_eq') as BooleanOperator;
-export const getBusinessDetail = (props: Partial<BusinessDetail>) =>
-  merge(
+  );
+export const getBooleanOperator = (props: BooleanOperator): BooleanOperator => props ?? 'not_eq';
+export const getBusinessDetail = (props: Partial<BusinessDetail>): BusinessDetail =>
+  merge<BusinessDetail, Partial<BusinessDetail>>(
     {
-      entityType: 'dolor voluptate nulla ex',
-      formationDate: 'dolore veniam ut laborum',
-      formationState: 'Arkansas',
+      entityType: 'dolore',
+      formationDate: 'Excepteur cupidatat consequat ipsum in',
+      formationState: 'Illinois',
       phoneNumbers: [
         {
-          phone: '+17015482953',
-          submitted: false,
-          verified: true,
-        },
-        {
-          phone: '+17015482953',
+          phone: '+16302754032',
           submitted: false,
           verified: false,
         },
         {
-          phone: '+17015482953',
+          phone: '+16302754032',
+          submitted: false,
+          verified: false,
+        },
+        {
+          phone: '+16302754032',
           submitted: true,
           verified: true,
         },
       ],
       tin: {
-        tin: 'irure Lorem sint est nisi',
-        verified: false,
+        tin: 'pariatur est culpa Duis amet',
+        verified: true,
       },
       website: {
-        url: 'https://orderly-bowler.info/',
+        url: 'https://wonderful-swim.info/',
         verified: true,
       },
     },
     props,
-  ) as BusinessDetail;
-export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
-  merge(
+  );
+export const getBusinessInsights = (props: Partial<BusinessInsights>): BusinessInsights =>
+  merge<BusinessInsights, Partial<BusinessInsights>>(
     {
       addresses: [
         {
-          addressLine1: '955 Else Fords Suite 434',
-          addressLine2: '7197 Alanna Green Suite 118',
-          city: 'Bartolettiborough',
-          cmra: false,
+          addressLine1: '412 West Road Apt. 685',
+          addressLine2: '48290 Kristopher Oval Apt. 680',
+          city: 'South Rolando',
+          cmra: true,
           deliverable: false,
-          latitude: 61438263.7966063,
-          longitude: 4457951.768473923,
-          postalCode: 'dolore eu velit ullamco id',
-          propertyType: 'anim',
-          sources: 'occaecat Excepteur Ut in ea',
-          state: 'North Dakota',
+          latitude: -25344546.385856807,
+          longitude: -5466956.412466124,
+          postalCode: 'velit eu consectetur',
+          propertyType: 'deserunt commodo et',
+          sources: 'id sit eiusmod',
+          state: 'Vermont',
           submitted: false,
           verified: true,
         },
         {
-          addressLine1: '955 Else Fords Suite 434',
-          addressLine2: '7197 Alanna Green Suite 118',
-          city: 'Bartolettiborough',
+          addressLine1: '412 West Road Apt. 685',
+          addressLine2: '48290 Kristopher Oval Apt. 680',
+          city: 'South Rolando',
           cmra: false,
-          deliverable: false,
-          latitude: -64001289.03724207,
-          longitude: -29275031.179681316,
-          postalCode: 'exercitation est Lorem sed aliqua',
-          propertyType: 'mollit incididunt ipsum',
-          sources: 'Ut id irure est velit',
-          state: 'North Dakota',
+          deliverable: true,
+          latitude: -69862990.10343364,
+          longitude: -92085395.18558764,
+          postalCode: 'eiusmod sunt sit aliquip nostrud',
+          propertyType: 'exercitation aliqua qui ad ut',
+          sources: 'ullamco veniam',
+          state: 'Vermont',
           submitted: false,
           verified: false,
         },
         {
-          addressLine1: '955 Else Fords Suite 434',
-          addressLine2: '7197 Alanna Green Suite 118',
-          city: 'Bartolettiborough',
-          cmra: false,
-          deliverable: false,
-          latitude: 13562179.037463233,
-          longitude: 27046088.981884748,
-          postalCode: 'ea Lorem',
-          propertyType: 'nulla',
-          sources: 'sunt',
-          state: 'North Dakota',
-          submitted: true,
+          addressLine1: '412 West Road Apt. 685',
+          addressLine2: '48290 Kristopher Oval Apt. 680',
+          city: 'South Rolando',
+          cmra: true,
+          deliverable: true,
+          latitude: 92484949.30356136,
+          longitude: 87914696.77622992,
+          postalCode: 'do laboris Lorem',
+          propertyType: 'dolor cillum',
+          sources: 'do dolor laborum',
+          state: 'Vermont',
+          submitted: false,
           verified: false,
         },
       ],
       details: {
-        entityType: 'dolore',
-        formationDate: 'sed ea',
-        formationState: 'Iowa',
+        entityType: 'consectetur anim reprehenderit dolor id',
+        formationDate: 'qui',
+        formationState: 'Texas',
         phoneNumbers: [
           {
-            phone: '+14597131340',
+            phone: '+19027321416',
             submitted: false,
             verified: false,
           },
           {
-            phone: '+14597131340',
-            submitted: false,
-            verified: false,
-          },
-          {
-            phone: '+14597131340',
+            phone: '+19027321416',
             submitted: true,
             verified: true,
           },
+          {
+            phone: '+19027321416',
+            submitted: false,
+            verified: false,
+          },
         ],
         tin: {
-          tin: 'sed est ea',
-          verified: false,
+          tin: 'elit',
+          verified: true,
         },
         website: {
-          url: 'https://strong-label.name',
+          url: 'https://fortunate-swim.us/',
           verified: true,
         },
       },
       names: [
         {
-          kind: 'cupidatat laborum nulla',
-          name: 'Leland Aufderhar',
-          sources: 'consectetur proident nisi elit in',
-          subStatus: 'incididunt',
-          submitted: false,
-          verified: false,
-        },
-        {
-          kind: 'elit in officia consectetur',
-          name: 'Leland Aufderhar',
+          kind: 'et',
+          name: 'Freddie Reynolds Jr.',
           sources: 'mollit',
-          subStatus: 'adipisicing ut Lorem dolore culpa',
-          submitted: true,
+          subStatus: 'reprehenderit mollit eu',
+          submitted: false,
           verified: false,
         },
         {
-          kind: 'in sed ad',
-          name: 'Leland Aufderhar',
-          sources: 'in',
-          subStatus: 'et sint pariatur quis tempor',
+          kind: 'et irure laboris',
+          name: 'Freddie Reynolds Jr.',
+          sources: 'ullamco deserunt reprehenderit adipisicing',
+          subStatus: 'proident id',
           submitted: false,
           verified: false,
+        },
+        {
+          kind: 'Excepteur commodo Duis nulla',
+          name: 'Freddie Reynolds Jr.',
+          sources: 'sed veniam commodo',
+          subStatus: 'quis nisi esse culpa',
+          submitted: false,
+          verified: true,
         },
       ],
       people: [
         {
           associationVerified: false,
-          name: 'Timothy Kuhlman',
-          role: 'ut',
-          sources: 'proident',
+          name: 'Glenda McCullough',
+          role: 'qui nisi Lorem amet magna',
+          sources: 'Lorem proident voluptate esse',
           submitted: false,
         },
         {
           associationVerified: true,
-          name: 'Timothy Kuhlman',
-          role: 'ad occaecat eiusmod sit',
-          sources: 'velit',
+          name: 'Glenda McCullough',
+          role: 'sint irure in veniam',
+          sources: 'laboris Lorem esse',
           submitted: true,
         },
         {
           associationVerified: true,
-          name: 'Timothy Kuhlman',
-          role: 'elit qui Ut dolore',
-          sources: 'proident adipisicing aute magna',
+          name: 'Glenda McCullough',
+          role: 'sit ipsum non anim',
+          sources: 'Duis irure dolore veniam nostrud',
           submitted: false,
         },
       ],
       registrations: [
         {
-          addresses: ['aliquip exercitation', 'anim velit reprehenderit aute', 'qui ex'],
-          entityType: 'quis ut id deserunt consectetur',
-          fileNumber: 'in magna',
-          jurisdiction: 'mollit magna',
-          name: 'Gregg Hammes',
+          addresses: ['aute dolore Ut mollit laboris', 'minim labore', 'cupidatat et Excepteur eiusmod'],
+          entityType: 'fugiat enim consectetur laborum',
+          fileNumber: 'ut officia',
+          jurisdiction: 'consectetur laboris Ut fugiat quis',
+          name: 'Lynn Mueller',
           officers: [
             {
-              name: 'Linda McLaughlin',
-              roles: 'dolore occaecat',
+              name: 'Tom Bins',
+              roles: 'eu amet consequat cupidatat magna',
             },
             {
-              name: 'Linda McLaughlin',
-              roles: 'qui dolore ullamco eiusmod',
+              name: 'Tom Bins',
+              roles: 'sunt in qui anim',
             },
             {
-              name: 'Linda McLaughlin',
-              roles: 'Duis eiusmod',
+              name: 'Tom Bins',
+              roles: 'non',
             },
           ],
-          registeredAgent: 'in',
-          registrationDate: 'pariatur sunt',
-          source: 'sed eiusmod',
-          state: 'Maine',
-          status: 'ut',
-          subStatus: 'nisi adipisicing ea ullamco anim',
+          registeredAgent: 'voluptate est incididunt laborum cillum',
+          registrationDate: 'dolore irure Ut in',
+          source: 'sed sunt Lorem',
+          state: 'Idaho',
+          status: 'nisi sunt eiusmod culpa aliqua',
+          subStatus: 'et',
         },
         {
-          addresses: ['tempor ex deserunt nostrud aliquip', 'minim quis laboris ea', 'anim dolore ipsum'],
-          entityType: 'velit in esse',
-          fileNumber: 'mollit',
-          jurisdiction: 'labore fugiat',
-          name: 'Gregg Hammes',
+          addresses: ['fugiat eu irure nulla veniam', 'veniam', 'dolore irure cupidatat qui magna'],
+          entityType: 'dolore velit',
+          fileNumber: 'laborum minim sed esse',
+          jurisdiction: 'in',
+          name: 'Lynn Mueller',
           officers: [
             {
-              name: 'Linda McLaughlin',
-              roles: 'cillum aliquip ut Lorem irure',
+              name: 'Tom Bins',
+              roles: 'pariatur',
             },
             {
-              name: 'Linda McLaughlin',
-              roles: 'ad do',
+              name: 'Tom Bins',
+              roles: 'laborum dolore cupidatat nulla',
             },
             {
-              name: 'Linda McLaughlin',
-              roles: 'qui',
+              name: 'Tom Bins',
+              roles: 'sunt',
             },
           ],
-          registeredAgent: 'ullamco dolore esse irure sint',
-          registrationDate: 'qui dolore tempor',
-          source: 'aliquip laboris voluptate sit est',
-          state: 'Maine',
-          status: 'tempor aliquip',
-          subStatus: 'aute irure',
+          registeredAgent: 'laboris adipisicing occaecat',
+          registrationDate: 'irure pariatur ad et tempor',
+          source: 'ut officia sint incididunt',
+          state: 'Idaho',
+          status: 'ullamco qui',
+          subStatus: 'aliquip elit sunt pariatur tempor',
         },
         {
-          addresses: ['nostrud ad fugiat est dolore', 'incididunt amet', 'sint ea ex'],
-          entityType: 'veniam est',
-          fileNumber: 'ut laborum',
-          jurisdiction: 'Ut culpa in cupidatat id',
-          name: 'Gregg Hammes',
+          addresses: ['labore', 'sint mollit', 'dolor incididunt proident voluptate'],
+          entityType: 'in irure',
+          fileNumber: 'ut commodo',
+          jurisdiction: 'ad reprehenderit laboris in proident',
+          name: 'Lynn Mueller',
           officers: [
             {
-              name: 'Linda McLaughlin',
-              roles: 'ut',
+              name: 'Tom Bins',
+              roles: 'reprehenderit commodo ea',
             },
             {
-              name: 'Linda McLaughlin',
-              roles: 'officia elit',
+              name: 'Tom Bins',
+              roles: 'labore magna deserunt',
             },
             {
-              name: 'Linda McLaughlin',
-              roles: 'velit sint irure consequat',
+              name: 'Tom Bins',
+              roles: 'dolore ea',
             },
           ],
-          registeredAgent: 'in',
-          registrationDate: 'consectetur non commodo Excepteur',
-          source: 'adipisicing ad proident culpa',
-          state: 'Maine',
-          status: 'magna amet voluptate quis nostrud',
-          subStatus: 'incididunt',
+          registeredAgent: 'nostrud sit',
+          registrationDate: 'eiusmod quis nostrud',
+          source: 'dolor id et anim cillum',
+          state: 'Idaho',
+          status: 'voluptate',
+          subStatus: 'esse in et eiusmod adipisicing',
         },
       ],
       watchlist: {
@@ -1023,539 +1031,553 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>) =>
           {
             hits: [
               {
-                agency: 'eiusmod velit',
-                agencyAbbr: 'irure labore mollit anim',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['in dolor Excepteur', 'eiusmod ut Duis voluptate sunt', 'Excepteur'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
+                agency: 'cupidatat reprehenderit id consectetur',
+                agencyAbbr: 'dolore incididunt velit',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['tempor deserunt Ut', 'nulla', 'laboris esse consectetur quis est'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
               },
               {
-                agency: 'cillum aute et id est',
-                agencyAbbr: 'et culpa dolore laborum nostrud',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['non tempor dolor', 'proident', 'et'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
+                agency: 'commodo laboris consectetur',
+                agencyAbbr: 'aute aliquip exercitation',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['enim', 'velit', 'elit'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
               },
               {
-                agency: 'incididunt dolore',
-                agencyAbbr: 'deserunt Lorem reprehenderit esse eiusmod',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['sunt quis est ipsum', 'amet culpa velit occaecat minim', 'dolor'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
+                agency: 'ad enim',
+                agencyAbbr: 'esse ea',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['aute nostrud', 'deserunt', 'aute cupidatat sit Excepteur'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
               },
             ],
-            screenedEntityName: 'Mrs. Jessie Dickens',
+            screenedEntityName: 'Roderick Rosenbaum',
           },
           {
             hits: [
               {
-                agency: 'in sunt',
-                agencyAbbr: 'elit Ut',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['Lorem', 'Ut dolore Duis velit', 'nisi dolor quis'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
+                agency: 'consequat ad',
+                agencyAbbr: 'veniam ut',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['adipisicing proident ut laboris dolor', 'Duis nulla nostrud enim', 'labore'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
               },
               {
-                agency: 'elit amet',
-                agencyAbbr: 'id laborum ullamco laboris eiusmod',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['dolore', 'cillum nostrud minim officia nisi', 'fugiat'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
-              },
-              {
-                agency: 'reprehenderit minim nostrud Ut',
-                agencyAbbr: 'ex magna',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['anim officia', 'non', 'adipisicing'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
-              },
-            ],
-            screenedEntityName: 'Mrs. Jessie Dickens',
-          },
-          {
-            hits: [
-              {
-                agency: 'cupidatat',
-                agencyAbbr: 'voluptate irure Excepteur dolore',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
+                agency: 'commodo',
+                agencyAbbr: 'enim elit do nisi',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
                 entityAliases: [
-                  'dolore reprehenderit incididunt fugiat deserunt',
-                  'ut nostrud irure',
-                  'incididunt cupidatat',
+                  'aliqua voluptate dolore Lorem laborum',
+                  'dolore consequat sint ullamco',
+                  'ut irure exercitation',
                 ],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
               },
               {
-                agency: 'sit aliquip dolor in nisi',
-                agencyAbbr: 'dolor est Lorem esse tempor',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['est labore', 'irure laborum minim', 'laborum sed'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
-              },
-              {
-                agency: 'Lorem',
-                agencyAbbr: 'anim irure',
-                agencyInformationUrl: 'https://linear-humidity.name/',
-                agencyListUrl: 'https://unsung-bench.name/',
-                entityAliases: ['amet dolor', 'nisi quis dolor dolor', 'sunt non'],
-                entityName: 'Jeremy Ebert',
-                listCountry: 'Northern Mariana Islands',
-                listName: 'Helen Green',
-                url: 'https://rundown-poppy.us',
+                agency: 'sunt ut culpa aliqua',
+                agencyAbbr: 'id ullamco nulla eiusmod',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['anim laboris in', 'pariatur', 'velit ullamco officia dolor'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
               },
             ],
-            screenedEntityName: 'Mrs. Jessie Dickens',
+            screenedEntityName: 'Roderick Rosenbaum',
+          },
+          {
+            hits: [
+              {
+                agency: 'aliquip qui sed sint dolore',
+                agencyAbbr: 'in dolore',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['laboris', 'pariatur velit', 'nulla'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
+              },
+              {
+                agency: 'quis ea incididunt culpa in',
+                agencyAbbr: 'dolore commodo esse tempor sit',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['elit do ut', 'consequat pariatur minim tempor', 'non eu'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
+              },
+              {
+                agency: 'aliquip Ut do ipsum',
+                agencyAbbr: 'reprehenderit in',
+                agencyInformationUrl: 'https://rotating-fibre.name',
+                agencyListUrl: 'https://harmful-sailor.biz/',
+                entityAliases: ['Duis aliquip', 'ipsum reprehenderit mollit sint', 'et veniam sit dolor'],
+                entityName: 'Sue Senger',
+                listCountry: 'Niue',
+                listName: 'Audrey Huels',
+                url: 'https://willing-bathhouse.biz',
+              },
+            ],
+            screenedEntityName: 'Roderick Rosenbaum',
           },
         ],
-        hitCount: 94217827,
+        hitCount: 23715690,
         people: [
           {
             hits: [
               {
-                agency: 'in magna veniam mollit velit',
-                agencyAbbr: 'nulla occaecat labore',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['tempor enim ea qui', 'culpa', 'anim dolore Duis'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'minim aliqua exercitation adipisicing',
+                agencyAbbr: 'ut',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['exercitation ut', 'sed veniam nulla aliqua non', 'occaecat veniam non sunt'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
               {
-                agency: 'ea adipisicing',
-                agencyAbbr: 'adipisicing id consequat',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
+                agency: 'veniam dolor eiusmod laboris',
+                agencyAbbr: 'elit pariatur eiusmod dolor occaecat',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
                 entityAliases: [
-                  'consectetur sed irure',
-                  'consectetur quis aliquip veniam',
-                  'Lorem adipisicing magna in',
+                  'quis ullamco dolore dolor',
+                  'fugiat ex esse eiusmod',
+                  'nostrud et Duis eiusmod incididunt',
                 ],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
               {
-                agency: 'ipsum veniam aute',
-                agencyAbbr: 'fugiat aliqua',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['in et non', 'labore ipsum Duis', 'cillum nostrud proident'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'dolor dolor culpa',
+                agencyAbbr: 'non aute proident quis culpa',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: [
+                  'ea ut deserunt',
+                  'sed ipsum Duis',
+                  'tempor eiusmod adipisicing exercitation voluptate',
+                ],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
             ],
-            screenedEntityName: 'Gloria Wehner',
+            screenedEntityName: 'Amy Beahan',
           },
           {
             hits: [
               {
-                agency: 'occaecat irure commodo nulla in',
-                agencyAbbr: 'sint Ut ex',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['tempor', 'adipisicing sunt aliquip', 'in officia'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'non',
+                agencyAbbr: 'sunt nulla ipsum',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['ea', 'sint Duis nulla non dolor', 'in anim in magna veniam'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
               {
-                agency: 'culpa dolore et',
-                agencyAbbr: 'ipsum sunt',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['ullamco Lorem Duis', 'aute nostrud reprehenderit adipisicing', 'officia'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'quis',
+                agencyAbbr: 'magna mollit adipisicing quis ullamco',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['Ut esse mollit consequat', 'sunt', 'commodo ipsum reprehenderit cupidatat fugiat'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
               {
-                agency: 'do voluptate sed veniam',
-                agencyAbbr: 'proident',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['nulla', 'consequat tempor', 'est adipisicing exercitation'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'Ut',
+                agencyAbbr: 'sint irure anim',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['ut magna', 'laborum magna id adipisicing', 'in consectetur labore'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
             ],
-            screenedEntityName: 'Gloria Wehner',
+            screenedEntityName: 'Amy Beahan',
           },
           {
             hits: [
               {
-                agency: 'est incididunt',
-                agencyAbbr: 'tempor',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['in irure', 'ullamco tempor sed aliquip', 'mollit fugiat consequat pariatur cillum'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'ea et pariatur cupidatat',
+                agencyAbbr: 'veniam ipsum',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['culpa veniam', 'ullamco ex', 'in laboris aute'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
               {
-                agency: 'nostrud esse nulla laboris',
-                agencyAbbr: 'mollit enim elit',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['ipsum', 'elit velit', 'exercitation Lorem dolore commodo'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'nisi',
+                agencyAbbr: 'eu',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['dolore officia non cupidatat ex', 'laborum commodo', 'velit'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
               {
-                agency: 'culpa dolore cillum velit dolore',
-                agencyAbbr: 'consequat cillum eiusmod ipsum aute',
-                agencyInformationUrl: 'https://posh-worth.org/',
-                agencyListUrl: 'https://naughty-heartache.net/',
-                entityAliases: ['aliqua consequat esse dolor ut', 'deserunt sunt', 'incididunt dolore ut ea consequat'],
-                entityName: 'Leroy Rogahn',
-                listCountry: 'Thailand',
-                listName: "Marilyn D'Amore",
-                url: 'https://superficial-midwife.org',
+                agency: 'pariatur cupidatat',
+                agencyAbbr: 'dolore',
+                agencyInformationUrl: 'https://angelic-word.org',
+                agencyListUrl: 'https://athletic-lobster.biz',
+                entityAliases: ['in', 'elit', 'sit'],
+                entityName: 'Taylor Ondricka',
+                listCountry: 'Botswana',
+                listName: 'Toni Streich DDS',
+                url: 'https://tangible-newsletter.name',
               },
             ],
-            screenedEntityName: 'Gloria Wehner',
+            screenedEntityName: 'Amy Beahan',
           },
         ],
       },
     },
     props,
-  ) as BusinessInsights;
-export const getBusinessOwnerKind = (props: Partial<BusinessOwnerKind>) => (props ?? 'primary') as BusinessOwnerKind;
-export const getBusinessOwnerSource = (props: Partial<BusinessOwnerSource>) =>
-  (props ?? 'tenant') as BusinessOwnerSource;
-export const getCipKind = (props: Partial<CipKind>) => (props ?? 'alpaca') as CipKind;
-export const getClientDecryptRequest = (props: Partial<ClientDecryptRequest>) =>
-  merge(
+  );
+export const getBusinessOwnerKind = (props: BusinessOwnerKind): BusinessOwnerKind => props ?? 'primary';
+export const getBusinessOwnerSource = (props: BusinessOwnerSource): BusinessOwnerSource => props ?? 'hosted';
+export const getCipKind = (props: CipKind): CipKind => props ?? 'alpaca';
+export const getClientDecryptRequest = (props: Partial<ClientDecryptRequest>): ClientDecryptRequest =>
+  merge<ClientDecryptRequest, Partial<ClientDecryptRequest>>(
     {
-      fields: ['id.first_name', 'id.last_name'],
-      reason: 'Lorem ipsum dolor',
-      transforms: null,
+      fields: ['id.first_name', 'document.drivers_license.selfie.mime_type', 'document.id_card.front.image'],
+      reason: 'eiusmod',
+      transforms: ['to_uppercase', 'suffix(<n>)', 'to_uppercase'],
     },
     props,
-  ) as ClientDecryptRequest;
-export const getClientIdentity = (props: Partial<ClientIdentity>) =>
-  merge(
+  );
+export const getClientIdentity = (props: Partial<ClientIdentity>): ClientIdentity =>
+  merge<ClientIdentity, Partial<ClientIdentity>>(
     {
-      certificate: 'reprehenderit in in ea',
-      key: '860a93d5-ba15-433a-b6a9-924b2d293fd8',
+      certificate: 'culpa occaecat Excepteur',
+      key: 'f7752ed0-942f-445a-9c3a-b5f33f488892',
     },
     props,
-  ) as ClientIdentity;
-export const getCollectedDataOption = (props: Partial<CollectedDataOption>) => (props ?? 'dob') as CollectedDataOption;
-export const getCompanySize = (props: Partial<CompanySize>) => (props ?? 's1_to10') as CompanySize;
-export const getComplianceCompanySummary = (props: Partial<ComplianceCompanySummary>) =>
-  merge(
+  );
+export const getCollectedDataOption = (props: CollectedDataOption): CollectedDataOption => props ?? 'ssn4';
+export const getCompanySize = (props: CompanySize): CompanySize => props ?? 's101_to1000';
+export const getComplianceCompanySummary = (props: Partial<ComplianceCompanySummary>): ComplianceCompanySummary =>
+  merge<ComplianceCompanySummary, Partial<ComplianceCompanySummary>>(
     {
-      companyName: 'Jimmy Botsford MD',
-      id: 'edf2558e-d4fa-4426-be81-b4310f15288f',
-      numActivePlaybooks: 94968794,
-      numControlsComplete: 8259615,
-      numControlsTotal: -71318476,
+      companyName: 'Essie Blanda',
+      id: 'f08e780f-8e88-4e96-9dc0-782e12f26287',
+      numActivePlaybooks: 28298580,
+      numControlsComplete: 41501285,
+      numControlsTotal: -13167131,
     },
     props,
-  ) as ComplianceCompanySummary;
-export const getComplianceDocData = (props: Partial<ComplianceDocData>) =>
-  merge(
+  );
+export const getComplianceDocData = (props: Partial<ComplianceDocData>): ComplianceDocData =>
+  merge<ComplianceDocData, Partial<ComplianceDocData>>(
     {
       data: {
-        url: 'https://self-assured-developmental.name/',
+        url: 'https://hateful-shipper.name',
       },
       kind: 'external_url',
     },
     props,
-  ) as ComplianceDocData;
-export const getComplianceDocDataKind = (props: Partial<ComplianceDocDataKind>) =>
-  (props ?? 'file_upload') as ComplianceDocDataKind;
-export const getComplianceDocEvent = (props: Partial<ComplianceDocEvent>) =>
-  merge(
+  );
+export const getComplianceDocDataKind = (props: ComplianceDocDataKind): ComplianceDocDataKind => props ?? 'file_upload';
+export const getComplianceDocEvent = (props: Partial<ComplianceDocEvent>): ComplianceDocEvent =>
+  merge<ComplianceDocEvent, Partial<ComplianceDocEvent>>(
     {
       actor: {
-        org: 'ut',
+        org: 'sed aliquip et eiusmod',
         user: {
-          firstName: 'Hortense',
-          id: '7bc8205d-ab0a-473f-91e2-fbce0129a93b',
-          lastName: 'Langworth',
+          firstName: 'Hermina',
+          id: 'cc67fea9-7fb1-4551-8188-891db828747e',
+          lastName: 'McLaughlin',
         },
       },
       event: {
         data: {
-          description: 'aute id culpa in in',
-          name: 'Willie Dietrich',
-          templateId: '8857d463-ea3e-4784-a025-a1fee24618e0',
+          description: 'in ullamco ut dolore',
+          name: 'Sandra Herzog III',
+          templateId: 'ca66c58c-6496-46c8-b04b-ad823cdedb6d',
         },
         kind: 'requested',
       },
-      timestamp: '1940-05-30T21:21:16.0Z',
+      timestamp: '1896-09-05T16:01:04.0Z',
     },
     props,
-  ) as ComplianceDocEvent;
-export const getComplianceDocEventAssigned = (props: Partial<ComplianceDocEventAssigned>) =>
-  merge(
+  );
+export const getComplianceDocEventAssigned = (props: Partial<ComplianceDocEventAssigned>): ComplianceDocEventAssigned =>
+  merge<ComplianceDocEventAssigned, Partial<ComplianceDocEventAssigned>>(
     {
       assignedTo: {
-        org: 'ad qui eu ea enim',
+        org: 'quis',
         user: {
-          firstName: 'Justina',
-          id: '03ae6780-8b3b-4b29-88e9-6968f9e6fa7e',
-          lastName: 'Thiel',
+          firstName: 'Stanford',
+          id: 'a33f0671-3ae3-4acc-9300-aecf75ec7b87',
+          lastName: 'Gottlieb',
         },
       },
-      kind: 'partner_tenant',
+      kind: 'tenant',
     },
     props,
-  ) as ComplianceDocEventAssigned;
-export const getComplianceDocEventRequested = (props: Partial<ComplianceDocEventRequested>) =>
-  merge(
+  );
+export const getComplianceDocEventRequested = (
+  props: Partial<ComplianceDocEventRequested>,
+): ComplianceDocEventRequested =>
+  merge<ComplianceDocEventRequested, Partial<ComplianceDocEventRequested>>(
     {
-      description: 'deserunt',
-      name: 'Lynne Gusikowski',
-      templateId: '1184e180-3756-480a-a408-4bba45444841',
+      description: 'veniam esse',
+      name: 'Darrell Bergstrom',
+      templateId: '86b944f9-84a9-4744-b433-6c6e1f9dce83',
     },
     props,
-  ) as ComplianceDocEventRequested;
-export const getComplianceDocEventReviewed = (props: Partial<ComplianceDocEventReviewed>) =>
-  merge(
+  );
+export const getComplianceDocEventReviewed = (props: Partial<ComplianceDocEventReviewed>): ComplianceDocEventReviewed =>
+  merge<ComplianceDocEventReviewed, Partial<ComplianceDocEventReviewed>>(
     {
       decision: 'accepted',
-      note: 'aliqua est laboris',
+      note: 'et eu tempor',
     },
     props,
-  ) as ComplianceDocEventReviewed;
-export const getComplianceDocEventSubmitted = (props: Partial<ComplianceDocEventSubmitted>) =>
-  merge(
+  );
+export const getComplianceDocEventSubmitted = (
+  props: Partial<ComplianceDocEventSubmitted>,
+): ComplianceDocEventSubmitted =>
+  merge<ComplianceDocEventSubmitted, Partial<ComplianceDocEventSubmitted>>(
     {
-      kind: 'external_url',
-      submissionId: 'e6730008-f84c-4201-a514-fc3e2a8bfda0',
+      kind: 'file_upload',
+      submissionId: '1b58bf09-c7cb-49ac-afce-f7cb07638dc0',
     },
     props,
-  ) as ComplianceDocEventSubmitted;
-export const getComplianceDocEventType = (props: Partial<ComplianceDocEventType>) =>
-  merge(
+  );
+export const getComplianceDocEventType = (props: Partial<ComplianceDocEventType>): ComplianceDocEventType =>
+  merge<ComplianceDocEventType, Partial<ComplianceDocEventType>>(
     {
       data: {
-        description: 'tempor Duis exercitation sunt',
-        name: 'Freda Mitchell',
-        templateId: 'e5d2d7bb-56b6-458f-85c8-13c3a0f78597',
+        description: 'elit occaecat magna',
+        name: 'Marcella Beatty',
+        templateId: 'f824ba64-b197-4620-b9cc-5403e7a66bdd',
       },
       kind: 'requested',
     },
     props,
-  ) as ComplianceDocEventType;
-export const getComplianceDocReviewDecision = (props: Partial<ComplianceDocReviewDecision>) =>
-  (props ?? 'rejected') as ComplianceDocReviewDecision;
-export const getComplianceDocStatus = (props: Partial<ComplianceDocStatus>) =>
-  (props ?? 'not_requested') as ComplianceDocStatus;
-export const getComplianceDocSubmission = (props: Partial<ComplianceDocSubmission>) =>
-  merge(
+  );
+export const getComplianceDocReviewDecision = (props: ComplianceDocReviewDecision): ComplianceDocReviewDecision =>
+  props ?? 'rejected';
+export const getComplianceDocStatus = (props: ComplianceDocStatus): ComplianceDocStatus =>
+  props ?? 'waiting_for_upload';
+export const getComplianceDocSubmission = (props: Partial<ComplianceDocSubmission>): ComplianceDocSubmission =>
+  merge<ComplianceDocSubmission, Partial<ComplianceDocSubmission>>(
     {
-      createdAt: '1956-05-17T17:13:22.0Z',
+      createdAt: '1895-09-11T09:40:07.0Z',
       data: {
         data: {
-          url: 'https://misguided-boyfriend.name/',
+          url: 'https://earnest-casket.info/',
         },
         kind: 'external_url',
       },
-      id: '583705a6-7b6f-4076-9fbf-28b37130d1d9',
+      id: 'dcca6c41-182f-4c7d-b303-fc7253ca63e5',
     },
     props,
-  ) as ComplianceDocSubmission;
-export const getComplianceDocSummary = (props: Partial<ComplianceDocSummary>) =>
-  merge(
+  );
+export const getComplianceDocSummary = (props: Partial<ComplianceDocSummary>): ComplianceDocSummary =>
+  merge<ComplianceDocSummary, Partial<ComplianceDocSummary>>(
     {
-      activeRequestId: 'd6a13f47-c6c7-40fe-a7fd-9595d0e48433',
-      activeReviewId: 'a93a4a4c-a624-44e7-93c2-4ad00ac0a3f1',
-      activeSubmissionId: '1674a543-fc5a-42da-969c-108b235ef133',
-      description: 'labore qui',
-      id: '5800c909-35c2-4cb0-b5ce-b55e47fb66fd',
-      lastUpdated: '1918-11-09T03:52:09.0Z',
-      name: 'Theresa Boehm',
+      activeRequestId: 'cd1d76a7-5fc2-4a63-a587-4e8583aeaa6e',
+      activeReviewId: '276cab32-ed9a-441f-9513-7231811e93ee',
+      activeSubmissionId: 'ae2b70c8-b43a-42a8-a998-7f617858c85b',
+      description: 'mollit laboris amet',
+      id: '504dd487-04eb-4200-bc3e-84205ad1ca50',
+      lastUpdated: '1926-12-10T09:56:07.0Z',
+      name: 'Noah Marvin',
       partnerTenantAssignee: {
-        firstName: 'Dianna',
-        id: '512badb7-d319-4383-a4aa-e89c42f3563e',
-        lastName: 'Mann',
+        firstName: 'Ulises',
+        id: 'cbb5fb83-b9b1-4eec-aa29-8db37d9e4ec8',
+        lastName: 'Murphy',
       },
-      status: 'waiting_for_upload',
-      templateId: '0d29299f-538d-4263-a0ad-17772626e7fb',
+      status: 'not_requested',
+      templateId: '0bbce9af-1731-410a-8980-33c801d77ed0',
       tenantAssignee: {
-        firstName: 'Theron',
-        id: 'f6c8fe21-b824-455a-9e42-74c7021304c0',
-        lastName: 'Frami',
+        firstName: 'Pierce',
+        id: 'bc0589ac-d02c-4e89-938a-78ce73eefa6b',
+        lastName: 'Gislason',
       },
     },
     props,
-  ) as ComplianceDocSummary;
-export const getComplianceDocTemplate = (props: Partial<ComplianceDocTemplate>) =>
-  merge(
+  );
+export const getComplianceDocTemplate = (props: Partial<ComplianceDocTemplate>): ComplianceDocTemplate =>
+  merge<ComplianceDocTemplate, Partial<ComplianceDocTemplate>>(
     {
-      id: '816a2bb6-a479-439c-a991-af43356bb7e7',
+      id: '19f24e5b-347b-49fc-a1f8-197d01952aa7',
       latestVersion: {
-        createdAt: '1954-08-16T16:26:11.0Z',
+        createdAt: '1937-11-23T23:14:02.0Z',
         createdByPartnerTenantUser: {
-          firstName: 'Afton',
-          id: '475e9511-b1e2-499e-a49a-a63d10ed0dc3',
-          lastName: 'Yost',
+          firstName: 'Mariah',
+          id: 'f17809ac-8229-41b2-aa62-6e14a3ff660f',
+          lastName: 'Cummings',
         },
-        description: 'ut cupidatat culpa dolor cillum',
-        id: '9e8a9d16-6141-4b88-9ee6-916d2f309d37',
-        name: 'Penny Corwin',
-        templateId: '2e7150ee-c306-4c7b-b80a-42cb29142f2e',
+        description: 'velit',
+        id: 'b803a0b6-01e5-4c2c-b582-3c2db5e5785a',
+        name: 'Lawrence Windler',
+        templateId: '62c3b6bd-29d7-4b74-ba8d-323d0abfcda1',
       },
     },
     props,
-  ) as ComplianceDocTemplate;
-export const getComplianceDocTemplateVersion = (props: Partial<ComplianceDocTemplateVersion>) =>
-  merge(
+  );
+export const getComplianceDocTemplateVersion = (
+  props: Partial<ComplianceDocTemplateVersion>,
+): ComplianceDocTemplateVersion =>
+  merge<ComplianceDocTemplateVersion, Partial<ComplianceDocTemplateVersion>>(
     {
-      createdAt: '1927-06-22T17:43:41.0Z',
+      createdAt: '1938-05-23T12:51:13.0Z',
       createdByPartnerTenantUser: {
-        firstName: 'Adele',
-        id: '9a6d4dfa-5e01-42a3-9b36-bb395b25119e',
-        lastName: 'Waelchi',
+        firstName: 'Brook',
+        id: '2afe8771-22d7-4549-8443-acfc6398ee58',
+        lastName: 'Funk',
       },
-      description: 'occaecat esse',
-      id: 'b8069fed-4c43-4b14-ae0d-4b06156f40bf',
-      name: 'Angie Trantow',
-      templateId: 'ea2a6af3-566e-45ba-a8b1-7bef137d48fc',
+      description: 'sit laboris ipsum in irure',
+      id: 'ab49509b-e991-4260-87cf-13bf60547f1f',
+      name: 'Phyllis Bruen',
+      templateId: '7ff998e6-d4b3-4830-a332-21f7261b7048',
     },
     props,
-  ) as ComplianceDocTemplateVersion;
-export const getContactInfoKind = (props: Partial<ContactInfoKind>) => (props ?? 'email') as ContactInfoKind;
-export const getCopyPlaybookRequest = (props: Partial<CopyPlaybookRequest>) =>
-  merge(
+  );
+export const getContactInfoKind = (props: ContactInfoKind): ContactInfoKind => props ?? 'email';
+export const getCopyPlaybookRequest = (props: Partial<CopyPlaybookRequest>): CopyPlaybookRequest =>
+  merge<CopyPlaybookRequest, Partial<CopyPlaybookRequest>>(
     {
-      isLive: false,
-      name: 'Courtney Lockman',
+      isLive: true,
+      name: 'Elsa Pfeffer',
     },
     props,
-  ) as CopyPlaybookRequest;
-export const getCountrySpecificDocumentMapping = (props: Partial<CountrySpecificDocumentMapping>) =>
-  merge({}, props) as CountrySpecificDocumentMapping;
-export const getCreateAnnotationRequest = (props: Partial<CreateAnnotationRequest>) =>
-  merge(
+  );
+export const getCountrySpecificDocumentMapping = (
+  props: Partial<CountrySpecificDocumentMapping>,
+): CountrySpecificDocumentMapping =>
+  merge<CountrySpecificDocumentMapping, Partial<CountrySpecificDocumentMapping>>({}, props);
+export const getCreateAnnotationRequest = (props: Partial<CreateAnnotationRequest>): CreateAnnotationRequest =>
+  merge<CreateAnnotationRequest, Partial<CreateAnnotationRequest>>(
     {
-      isPinned: true,
-      note: 'consectetur',
+      isPinned: false,
+      note: 'culpa occaecat',
     },
     props,
-  ) as CreateAnnotationRequest;
-export const getCreateApiKeyRequest = (props: Partial<CreateApiKeyRequest>) =>
-  merge(
+  );
+export const getCreateApiKeyRequest = (props: Partial<CreateApiKeyRequest>): CreateApiKeyRequest =>
+  merge<CreateApiKeyRequest, Partial<CreateApiKeyRequest>>(
     {
-      name: 'Nicholas Schuppe',
-      roleId: '35f752de-0834-40ba-a98c-6c2e801d21f1',
+      name: 'Mark Effertz',
+      roleId: 'eb28970f-0d62-4233-851d-6ebe78dac89a',
     },
     props,
-  ) as CreateApiKeyRequest;
-export const getCreateComplianceDocRequest = (props: Partial<CreateComplianceDocRequest>) =>
-  merge(
+  );
+export const getCreateComplianceDocRequest = (props: Partial<CreateComplianceDocRequest>): CreateComplianceDocRequest =>
+  merge<CreateComplianceDocRequest, Partial<CreateComplianceDocRequest>>(
     {
-      description: 'in ea',
-      name: 'Wesley Greenfelder',
-      templateVersionId: '67910d0a-26c9-45c9-92da-114698ecd4a7',
+      description: 'in tempor consequat',
+      name: 'Mrs. Kristie Konopelski II',
+      templateVersionId: '120ae062-b678-420c-b9dd-b75d74a4f5ae',
     },
     props,
-  ) as CreateComplianceDocRequest;
-export const getCreateComplianceDocTemplateRequest = (props: Partial<CreateComplianceDocTemplateRequest>) =>
-  merge(
+  );
+export const getCreateComplianceDocTemplateRequest = (
+  props: Partial<CreateComplianceDocTemplateRequest>,
+): CreateComplianceDocTemplateRequest =>
+  merge<CreateComplianceDocTemplateRequest, Partial<CreateComplianceDocTemplateRequest>>(
     {
-      description: 'aliquip cillum voluptate ullamco proident',
-      name: 'Sonya Herman',
+      description: 'Duis enim',
+      name: 'Stephen Douglas',
     },
     props,
-  ) as CreateComplianceDocTemplateRequest;
-export const getCreateEntityTokenRequest = (props: Partial<CreateEntityTokenRequest>) =>
-  merge(
+  );
+export const getCreateEntityTokenRequest = (props: Partial<CreateEntityTokenRequest>): CreateEntityTokenRequest =>
+  merge<CreateEntityTokenRequest, Partial<CreateEntityTokenRequest>>(
     {
-      key: 'eca635e0-a843-4a35-9b11-558f97e098c3',
-      kind: 'update_auth_methods',
-      sendLink: false,
+      key: 'a2952dd1-4d4c-4016-be89-ddf23dc6f803',
+      kind: 'user',
+      sendLink: true,
     },
     props,
-  ) as CreateEntityTokenRequest;
-export const getCreateEntityTokenResponse = (props: Partial<CreateEntityTokenResponse>) =>
-  merge(
+  );
+export const getCreateEntityTokenResponse = (props: Partial<CreateEntityTokenResponse>): CreateEntityTokenResponse =>
+  merge<CreateEntityTokenResponse, Partial<CreateEntityTokenResponse>>(
     {
       deliveryMethod: 'phone',
-      expiresAt: '1963-11-25T22:10:26.0Z',
-      link: 'dolore',
-      token: 'cc5078b5-e8b7-4656-973c-4c8a89feee4c',
+      expiresAt: '1948-05-11T18:27:40.0Z',
+      link: 'voluptate',
+      token: 'f1c6c7c1-c8bc-45db-9adc-56b9ec4bf71f',
     },
     props,
-  ) as CreateEntityTokenResponse;
-export const getCreateKycLinksRequest = (props: Partial<CreateKycLinksRequest>) =>
-  merge(
+  );
+export const getCreateKycLinksRequest = (props: Partial<CreateKycLinksRequest>): CreateKycLinksRequest =>
+  merge<CreateKycLinksRequest, Partial<CreateKycLinksRequest>>(
     {
-      sendToBoIds: ['bo_EBYciq9X2bkIPMMqnL4R9P'],
+      sendToBoIds: ['Lorem', 'occaecat sit in nostrud', 'amet'],
     },
     props,
-  ) as CreateKycLinksRequest;
-export const getCreateListEntryRequest = (props: Partial<CreateListEntryRequest>) =>
-  merge(
+  );
+export const getCreateListEntryRequest = (props: Partial<CreateListEntryRequest>): CreateListEntryRequest =>
+  merge<CreateListEntryRequest, Partial<CreateListEntryRequest>>(
     {
-      entries: ['exercitation cupidatat Ut Excepteur', 'dolor id sit', 'mollit exercitation tempor laboris do'],
+      entries: ['ut magna in ut Duis', 'nostrud aliqua sit aliquip magna', 'sit occaecat exercitation'],
     },
     props,
-  ) as CreateListEntryRequest;
-export const getCreateListRequest = (props: Partial<CreateListRequest>) =>
-  merge(
+  );
+export const getCreateListRequest = (props: Partial<CreateListRequest>): CreateListRequest =>
+  merge<CreateListRequest, Partial<CreateListRequest>>(
     {
-      alias: 'qui',
-      entries: ['qui id deserunt ut', 'dolore', 'mollit in'],
-      kind: 'ip_address',
-      name: 'Mrs. Kari Block',
+      alias: 'nisi et ut exercitation',
+      entries: ['elit nulla', 'in', 'irure enim exercitation'],
+      kind: 'phone_country_code',
+      name: "Terri D'Amore",
     },
     props,
-  ) as CreateListRequest;
-export const getCreateOnboardingConfigurationRequest = (props: Partial<CreateOnboardingConfigurationRequest>) =>
-  merge(
+  );
+export const getCreateOnboardingConfigurationRequest = (
+  props: Partial<CreateOnboardingConfigurationRequest>,
+): CreateOnboardingConfigurationRequest =>
+  merge<CreateOnboardingConfigurationRequest, Partial<CreateOnboardingConfigurationRequest>>(
     {
-      allowInternationalResidents: true,
-      allowReonboard: true,
-      allowUsResidents: false,
+      allowInternationalResidents: false,
+      allowReonboard: false,
+      allowUsResidents: true,
       allowUsTerritories: false,
       businessDocumentsToCollect: [
         {
@@ -1563,7 +1585,17 @@ export const getCreateOnboardingConfigurationRequest = (props: Partial<CreateOnb
             collectSelfie: false,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['passport', 'id_card', 'residence_document'],
+              global: ['passport_card', 'visa', 'permit'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['permit', 'passport', 'passport'],
             },
           },
           kind: 'identity',
@@ -1573,37 +1605,37 @@ export const getCreateOnboardingConfigurationRequest = (props: Partial<CreateOnb
             collectSelfie: false,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['residence_document', 'drivers_license', 'voter_identification'],
-            },
-          },
-          kind: 'identity',
-        },
-        {
-          data: {
-            collectSelfie: false,
-            documentTypesAndCountries: {
-              countrySpecific: {},
-              global: ['passport_card', 'voter_identification', 'visa'],
+              global: ['id_card', 'drivers_license', 'residence_document'],
             },
           },
           kind: 'identity',
         },
       ],
       cipKind: 'alpaca',
-      curpValidationEnabled: true,
-      deprecatedCanAccessData: ['us_legal_status', 'business_tin', 'business_name'],
-      docScanForOptionalSsn: 'business_kyced_beneficial_owners',
+      curpValidationEnabled: false,
+      deprecatedCanAccessData: ['email', 'full_address', 'dob'],
+      docScanForOptionalSsn: 'business_name',
       documentTypesAndCountries: {
         countrySpecific: {},
-        global: ['id_card', 'voter_identification', 'permit'],
+        global: ['passport', 'visa', 'passport_card'],
       },
       documentsToCollect: [
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['passport_card', 'passport', 'drivers_license'],
+            },
+          },
+          kind: 'identity',
+        },
         {
           data: {
             collectSelfie: false,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['drivers_license', 'passport_card', 'drivers_license'],
+              global: ['visa', 'residence_document', 'passport'],
             },
           },
           kind: 'identity',
@@ -1613,41 +1645,37 @@ export const getCreateOnboardingConfigurationRequest = (props: Partial<CreateOnb
             collectSelfie: true,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['passport_card', 'id_card', 'id_card'],
-            },
-          },
-          kind: 'identity',
-        },
-        {
-          data: {
-            collectSelfie: true,
-            documentTypesAndCountries: {
-              countrySpecific: {},
-              global: ['voter_identification', 'residence_document', 'voter_identification'],
+              global: ['passport_card', 'passport', 'visa'],
             },
           },
           kind: 'identity',
         },
       ],
       enhancedAml: {
-        adverseMedia: false,
+        adverseMedia: true,
         enhancedAml: false,
-        matchKind: 'exact_name_and_dob_year',
+        matchKind: 'fuzzy_medium',
         ofac: true,
         pep: false,
       },
-      internationalCountryRestrictions: ['GI', 'MK', 'PW'],
+      internationalCountryRestrictions: ['LR', 'CL', 'NF'],
       isDocFirstFlow: true,
-      isNoPhoneFlow: true,
-      kind: 'document',
-      mustCollectData: ['dob', 'us_tax_id', 'email'],
-      name: 'Guadalupe Kuphal',
-      optionalData: ['card', 'card', 'ssn9'],
-      promptForPasskey: false,
-      requiredAuthMethods: ['phone', 'phone', 'email'],
+      isNoPhoneFlow: false,
+      kind: 'kyb',
+      mustCollectData: ['phone_number', 'dob', 'dob'],
+      name: 'Bill Bayer',
+      optionalData: ['business_corporation_type', 'ssn4', 'business_address'],
+      promptForPasskey: true,
+      requiredAuthMethods: ['email', 'email', 'phone'],
       skipConfirm: true,
-      skipKyc: true,
+      skipKyc: false,
       verificationChecks: [
+        {
+          data: {
+            einOnly: false,
+          },
+          kind: 'kyb',
+        },
         {
           data: {
             einOnly: true,
@@ -1656,163 +1684,163 @@ export const getCreateOnboardingConfigurationRequest = (props: Partial<CreateOnb
         },
         {
           data: {
-            einOnly: false,
-          },
-          kind: 'kyb',
-        },
-        {
-          data: {
-            einOnly: false,
+            einOnly: true,
           },
           kind: 'kyb',
         },
       ],
     },
     props,
-  ) as CreateOnboardingConfigurationRequest;
-export const getCreateOrgFrequentNoteRequest = (props: Partial<CreateOrgFrequentNoteRequest>) =>
-  merge(
+  );
+export const getCreateOrgFrequentNoteRequest = (
+  props: Partial<CreateOrgFrequentNoteRequest>,
+): CreateOrgFrequentNoteRequest =>
+  merge<CreateOrgFrequentNoteRequest, Partial<CreateOrgFrequentNoteRequest>>(
     {
-      content: 'ut',
-      kind: 'manual_review',
+      content: 'Excepteur culpa',
+      kind: 'annotation',
     },
     props,
-  ) as CreateOrgFrequentNoteRequest;
-export const getCreateOrgTenantTagRequest = (props: Partial<CreateOrgTenantTagRequest>) =>
-  merge(
+  );
+export const getCreateOrgTenantTagRequest = (props: Partial<CreateOrgTenantTagRequest>): CreateOrgTenantTagRequest =>
+  merge<CreateOrgTenantTagRequest, Partial<CreateOrgTenantTagRequest>>(
     {
       kind: 'person',
-      tag: 'sunt qui eiusmod pariatur magna',
+      tag: 'nulla est anim',
     },
     props,
-  ) as CreateOrgTenantTagRequest;
-export const getCreateProxyConfigRequest = (props: Partial<CreateProxyConfigRequest>) =>
-  merge(
+  );
+export const getCreateProxyConfigRequest = (props: Partial<CreateProxyConfigRequest>): CreateProxyConfigRequest =>
+  merge<CreateProxyConfigRequest, Partial<CreateProxyConfigRequest>>(
     {
-      accessReason: 'nostrud cillum qui consequat',
+      accessReason: 'adipisicing labore dolore irure velit',
       clientIdentity: {
-        certificate: 'cillum labore',
-        key: '400eae3b-9666-47da-937e-beb2a6b87aa8',
+        certificate: 'ipsum',
+        key: 'fc08605d-df2f-4f9c-8645-56f783b5de0e',
       },
       headers: [
         {
-          name: 'Guy Kuvalis',
-          value: 'in',
+          name: 'Rachel Friesen',
+          value: 'Ut',
         },
         {
-          name: 'Guy Kuvalis',
-          value: 'consequat ex adipisicing',
+          name: 'Rachel Friesen',
+          value: 'fugiat in esse',
         },
         {
-          name: 'Guy Kuvalis',
-          value: 'cupidatat sit do',
+          name: 'Rachel Friesen',
+          value: 'sed id aliquip exercitation Ut',
         },
       ],
       ingressSettings: {
         contentType: 'json',
         rules: [
           {
-            target: 'qui anim',
-            token: 'e4b6253b-ca7c-4807-897d-7bd92b5ccdd5',
+            target: 'id ad mollit',
+            token: 'document.permit.back.image',
           },
           {
-            target: 'Ut aliquip',
-            token: 'e4b6253b-ca7c-4807-897d-7bd92b5ccdd5',
+            target: 'sint ut',
+            token: 'id.citizenships',
           },
           {
-            target: 'culpa nisi non fugiat',
-            token: 'e4b6253b-ca7c-4807-897d-7bd92b5ccdd5',
+            target: 'occaecat laboris',
+            token: 'document.id_card.ref_number',
           },
         ],
       },
-      method: 'consequat adipisicing Excepteur laboris',
-      name: 'Adrienne Crist V',
-      pinnedServerCertificates: ['anim', 'minim', 'incididunt ullamco irure Ut aliquip'],
+      method: 'nisi',
+      name: 'Lee Bahringer',
+      pinnedServerCertificates: ['reprehenderit incididunt voluptate pariatur', 'ea eu est', 'pariatur id'],
       secretHeaders: [
         {
-          name: 'Mark Emmerich',
-          value: 'aute ullamco',
+          name: 'Pablo Frami V',
+          value: 'in sed esse cupidatat occaecat',
         },
         {
-          name: 'Mark Emmerich',
-          value: 'ipsum deserunt eiusmod',
+          name: 'Pablo Frami V',
+          value: 'nostrud et sint culpa',
         },
         {
-          name: 'Mark Emmerich',
-          value: 'culpa labore id fugiat',
+          name: 'Pablo Frami V',
+          value: 'ut ullamco aliqua aliquip amet',
         },
       ],
-      url: 'https://far-flung-airline.net/',
+      url: 'https://taut-scrap.biz/',
     },
     props,
-  ) as CreateProxyConfigRequest;
-export const getCreateReviewRequest = (props: Partial<CreateReviewRequest>) =>
-  merge(
+  );
+export const getCreateReviewRequest = (props: Partial<CreateReviewRequest>): CreateReviewRequest =>
+  merge<CreateReviewRequest, Partial<CreateReviewRequest>>(
     {
       decision: 'accepted',
-      note: 'proident qui Duis elit',
-      submissionId: '17145710-66e3-490d-bb46-f8695a0060e7',
+      note: 'occaecat Duis',
+      submissionId: 'fa0c75cb-76ca-4d65-ac83-3c126f28cd34',
     },
     props,
-  ) as CreateReviewRequest;
-export const getCreateRule = (props: Partial<CreateRule>) =>
-  merge(
+  );
+export const getCreateRule = (props: Partial<CreateRule>): CreateRule =>
+  merge<CreateRule, Partial<CreateRule>>(
     {
-      isShadow: false,
-      name: 'Michael Conroy',
-      ruleAction: 'step_up.identity_proof_of_ssn',
+      isShadow: true,
+      name: 'Fannie Greenholt',
+      ruleAction: 'step_up.identity',
       ruleExpression: [
         {
-          field: 'document_possible_fake_image',
-          op: 'eq',
+          field: 'document_barcode_content_matches',
+          op: 'not_eq',
           value: true,
         },
         {
-          field: 'ssn_not_on_file',
-          op: 'eq',
-          value: true,
-        },
-        {
-          field: 'business_name_alternate_match',
+          field: 'dob_yob_matches',
           op: 'not_eq',
           value: false,
         },
+        {
+          field: 'dob_located_coppa_alert',
+          op: 'eq',
+          value: true,
+        },
       ],
     },
     props,
-  ) as CreateRule;
-export const getCreateTagRequest = (props: Partial<CreateTagRequest>) =>
-  merge(
+  );
+export const getCreateTagRequest = (props: Partial<CreateTagRequest>): CreateTagRequest =>
+  merge<CreateTagRequest, Partial<CreateTagRequest>>(
     {
-      tag: 'transaction_chargeback',
+      tag: 'veniam et do',
     },
     props,
-  ) as CreateTagRequest;
-export const getCreateTenantAndroidAppMetaRequest = (props: Partial<CreateTenantAndroidAppMetaRequest>) =>
-  merge(
+  );
+export const getCreateTenantAndroidAppMetaRequest = (
+  props: Partial<CreateTenantAndroidAppMetaRequest>,
+): CreateTenantAndroidAppMetaRequest =>
+  merge<CreateTenantAndroidAppMetaRequest, Partial<CreateTenantAndroidAppMetaRequest>>(
     {
-      apkCertSha256S: ['ad', 'sint', 'quis do cupidatat dolor Duis'],
-      integrityDecryptionKey: '32e4cf34-afe9-4077-bcf4-e5b2e0f55f8f',
-      integrityVerificationKey: '95f9d6ab-ee80-4e3e-a241-b6f9ce73c908',
-      packageNames: ['exercitation in Ut', 'Lorem exercitation magna', 'eu Ut adipisicing laboris'],
+      apkCertSha256S: ['est voluptate occaecat eu amet', 'nostrud proident', 'Lorem'],
+      integrityDecryptionKey: '534aaa55-b14f-47d2-bf10-2a4a3ee045aa',
+      integrityVerificationKey: '696bb606-c86d-40c6-a513-84ed5431aca2',
+      packageNames: ['tempor', 'consectetur', 'Excepteur quis pariatur mollit'],
     },
     props,
-  ) as CreateTenantAndroidAppMetaRequest;
-export const getCreateTenantIosAppMetaRequest = (props: Partial<CreateTenantIosAppMetaRequest>) =>
-  merge(
+  );
+export const getCreateTenantIosAppMetaRequest = (
+  props: Partial<CreateTenantIosAppMetaRequest>,
+): CreateTenantIosAppMetaRequest =>
+  merge<CreateTenantIosAppMetaRequest, Partial<CreateTenantIosAppMetaRequest>>(
     {
-      appBundleIds: ['laborum', 'id eiusmod', 'laborum'],
-      deviceCheckKeyId: '189cd392-3c0a-4782-b9c4-0981aaa999a8',
-      deviceCheckPrivateKey: 'ab024154-a122-4f06-91b0-66e67d14624f',
-      teamId: '7130f26b-11f9-4739-9d78-a9c11f7d5bde',
+      appBundleIds: ['exercitation ea ullamco adipisicing', 'aliquip', 'laboris minim tempor'],
+      deviceCheckKeyId: 'f63d8231-1bcc-41ff-931e-75974574a3b7',
+      deviceCheckPrivateKey: 'e0dec18f-7cdf-41a6-bad8-f970cd272da9',
+      teamId: '028fb068-cfe1-4ada-a0e3-e06d5f8869e5',
     },
     props,
-  ) as CreateTenantIosAppMetaRequest;
-export const getCreateTenantRoleRequest = (props: Partial<CreateTenantRoleRequest>) =>
-  merge(
+  );
+export const getCreateTenantRoleRequest = (props: Partial<CreateTenantRoleRequest>): CreateTenantRoleRequest =>
+  merge<CreateTenantRoleRequest, Partial<CreateTenantRoleRequest>>(
     {
-      kind: 'dashboard_user',
-      name: 'Karla Farrell',
+      kind: 'api_key',
+      name: 'Geoffrey Abshire',
       scopes: [
         {
           kind: 'read',
@@ -1826,728 +1854,732 @@ export const getCreateTenantRoleRequest = (props: Partial<CreateTenantRoleReques
       ],
     },
     props,
-  ) as CreateTenantRoleRequest;
-export const getCreateTenantUserRequest = (props: Partial<CreateTenantUserRequest>) =>
-  merge(
+  );
+export const getCreateTenantUserRequest = (props: Partial<CreateTenantUserRequest>): CreateTenantUserRequest =>
+  merge<CreateTenantUserRequest, Partial<CreateTenantUserRequest>>(
     {
-      email: 'vicky_hodkiewicz@gmail.com',
-      firstName: 'Landen',
-      lastName: 'Streich',
-      omitEmailInvite: false,
-      redirectUrl: 'https://minor-lifestyle.us',
-      roleId: '52d952e1-ef33-4010-88e3-eb688d944361',
+      email: 'maeve94@gmail.com',
+      firstName: 'Ewell',
+      lastName: 'Hagenes',
+      omitEmailInvite: true,
+      redirectUrl: 'https://gullible-soup.net',
+      roleId: '1947aac2-7c90-4c10-8cc0-ae78cfb206ad',
     },
     props,
-  ) as CreateTenantUserRequest;
-export const getCreateTokenResponse = (props: Partial<CreateTokenResponse>) =>
-  merge(
+  );
+export const getCreateTokenResponse = (props: Partial<CreateTokenResponse>): CreateTokenResponse =>
+  merge<CreateTokenResponse, Partial<CreateTokenResponse>>(
     {
-      expiresAt: '1943-07-30T01:24:12.0Z',
+      expiresAt: '1916-08-06T07:48:41.0Z',
       kind: 'trigger',
-      link: 'https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt',
-      token: 'utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt',
+      link: 'minim id',
+      token: '0e29d8e2-2ac6-496d-bab1-c8b6373287a3',
     },
     props,
-  ) as CreateTokenResponse;
-export const getCursorPaginatedAuditEvent = (props: Partial<CursorPaginatedAuditEvent>) =>
-  merge(
+  );
+export const getCursorPaginatedAuditEvent = (props: Partial<CursorPaginatedAuditEvent>): CursorPaginatedAuditEvent =>
+  merge<CursorPaginatedAuditEvent, Partial<CursorPaginatedAuditEvent>>(
     {
       data: [
         {
           detail: {
             data: {
               createdFields: [
-                'document.residence_document.curp',
-                'document.passport_card.nationality',
-                'document.voter_identification.first_name',
+                'document.passport_card.gender',
+                'document.residence_document.samba_activity_history_response',
+                'document.id_card.selfie.image',
               ],
-              fpId: '1464a5d0-dfa3-47bd-8800-6c194c167881',
+              fpId: '90a3f49e-f974-469e-bf80-a38392065241',
             },
             kind: 'create_user',
           },
-          id: '43da3360-ccb2-4bc8-a9c5-d4774c63ceba',
+          id: 'ba1decac-a722-4d40-86ce-e92aaef2d4eb',
           insightEvent: {
-            city: 'Aftonfield',
-            country: 'Slovakia',
-            ipAddress: '9590 Park Street Suite 334',
-            latitude: -4863572.370384842,
-            longitude: -32644510.035669863,
-            metroCode: 'ipsum',
-            postalCode: 'incididunt anim sunt',
-            region: 'culpa eu',
-            regionName: 'Janice Weber',
-            sessionId: 'b05b2b7c-6c87-43b0-a18c-38f02fc35c3d',
-            timeZone: 'id exercitation pariatur',
-            timestamp: '1942-06-01T07:02:22.0Z',
-            userAgent: 'eiusmod minim',
+            city: 'Mosheport',
+            country: 'Cape Verde',
+            ipAddress: '94533 Amelie Alley Apt. 609',
+            latitude: 16317883.090590164,
+            longitude: 6252570.432305619,
+            metroCode: 'Excepteur',
+            postalCode: 'cillum',
+            region: 'reprehenderit sint non',
+            regionName: 'Ellis Bauch',
+            sessionId: 'dcdd5776-90d7-451f-898d-0250a63ed509',
+            timeZone: 'ullamco nisi fugiat adipisicing',
+            timestamp: '1893-01-27T04:47:01.0Z',
+            userAgent: 'id sint quis aute cupidatat',
           },
-          name: 'Rosemary Wisozk',
+          name: 'complete_user_verification',
           principal: {
-            id: 'b0674a6a-7178-4fff-b89f-4ef1868e9e27',
+            id: '761de038-3777-436a-b04e-873651348342',
             kind: 'user',
           },
-          tenantId: '71a2a286-c332-4944-9810-14b885a596bb',
-          timestamp: '1940-08-05T10:29:01.0Z',
+          tenantId: '1a136940-9cfb-4661-b373-1a99fc75fef6',
+          timestamp: '1920-01-20T19:43:27.0Z',
         },
         {
           detail: {
             data: {
               createdFields: [
-                'bank.*.ach_routing_number',
-                'document.voter_identification.classified_document_type',
-                'id.visa_expiration_date',
+                'document.residence_document.classified_document_type',
+                'document.id_card.postal_code',
+                'document.residence_document.postal_code',
               ],
-              fpId: '1464a5d0-dfa3-47bd-8800-6c194c167881',
+              fpId: '90a3f49e-f974-469e-bf80-a38392065241',
             },
             kind: 'create_user',
           },
-          id: '43da3360-ccb2-4bc8-a9c5-d4774c63ceba',
+          id: 'ba1decac-a722-4d40-86ce-e92aaef2d4eb',
           insightEvent: {
-            city: 'Aftonfield',
-            country: 'Slovakia',
-            ipAddress: '9590 Park Street Suite 334',
-            latitude: -38453806.31230899,
-            longitude: -56483110.50001147,
-            metroCode: 'occaecat voluptate sint pariatur',
-            postalCode: 'in',
-            region: 'dolor eu culpa',
-            regionName: 'Janice Weber',
-            sessionId: 'b05b2b7c-6c87-43b0-a18c-38f02fc35c3d',
-            timeZone: 'in sit est aliqua dolore',
-            timestamp: '1911-04-08T02:01:50.0Z',
-            userAgent: 'sunt veniam',
+            city: 'Mosheport',
+            country: 'Cape Verde',
+            ipAddress: '94533 Amelie Alley Apt. 609',
+            latitude: 70925011.95629266,
+            longitude: 25351171.735766843,
+            metroCode: 'veniam Ut ut ex in',
+            postalCode: 'adipisicing',
+            region: 'ipsum velit aliquip exercitation laborum',
+            regionName: 'Ellis Bauch',
+            sessionId: 'dcdd5776-90d7-451f-898d-0250a63ed509',
+            timeZone: 'Ut',
+            timestamp: '1927-07-17T01:15:10.0Z',
+            userAgent: 'sed amet velit',
           },
-          name: 'Rosemary Wisozk',
+          name: 'decrypt_user_data',
           principal: {
-            id: 'b0674a6a-7178-4fff-b89f-4ef1868e9e27',
+            id: '761de038-3777-436a-b04e-873651348342',
             kind: 'user',
           },
-          tenantId: '71a2a286-c332-4944-9810-14b885a596bb',
-          timestamp: '1962-03-20T06:58:16.0Z',
+          tenantId: '1a136940-9cfb-4661-b373-1a99fc75fef6',
+          timestamp: '1909-07-02T08:11:47.0Z',
         },
         {
           detail: {
             data: {
               createdFields: [
-                'document.residence_document.selfie.mime_type',
-                'investor_profile.political_organization',
-                'document.visa.back.image',
+                'document.residence_document.full_address',
+                'document.voter_identification.city',
+                'document.residence_document.front.image',
               ],
-              fpId: '1464a5d0-dfa3-47bd-8800-6c194c167881',
+              fpId: '90a3f49e-f974-469e-bf80-a38392065241',
             },
             kind: 'create_user',
           },
-          id: '43da3360-ccb2-4bc8-a9c5-d4774c63ceba',
+          id: 'ba1decac-a722-4d40-86ce-e92aaef2d4eb',
           insightEvent: {
-            city: 'Aftonfield',
-            country: 'Slovakia',
-            ipAddress: '9590 Park Street Suite 334',
-            latitude: -26741273.763514474,
-            longitude: -95315787.81703036,
-            metroCode: 'ut ipsum',
-            postalCode: 'id culpa pariatur sunt labore',
-            region: 'laboris amet est Duis',
-            regionName: 'Janice Weber',
-            sessionId: 'b05b2b7c-6c87-43b0-a18c-38f02fc35c3d',
-            timeZone: 'Ut magna',
-            timestamp: '1926-08-04T16:18:01.0Z',
-            userAgent: 'Duis in',
+            city: 'Mosheport',
+            country: 'Cape Verde',
+            ipAddress: '94533 Amelie Alley Apt. 609',
+            latitude: -28563598.92794606,
+            longitude: -8800647.202693403,
+            metroCode: 'ut sit qui',
+            postalCode: 'mollit',
+            region: 'dolore labore incididunt cupidatat ut',
+            regionName: 'Ellis Bauch',
+            sessionId: 'dcdd5776-90d7-451f-898d-0250a63ed509',
+            timeZone: 'labore',
+            timestamp: '1967-07-07T11:32:01.0Z',
+            userAgent: 'Duis ex',
           },
-          name: 'Rosemary Wisozk',
+          name: 'complete_user_verification',
           principal: {
-            id: 'b0674a6a-7178-4fff-b89f-4ef1868e9e27',
+            id: '761de038-3777-436a-b04e-873651348342',
             kind: 'user',
           },
-          tenantId: '71a2a286-c332-4944-9810-14b885a596bb',
-          timestamp: '1936-07-18T23:36:36.0Z',
+          tenantId: '1a136940-9cfb-4661-b373-1a99fc75fef6',
+          timestamp: '1931-08-28T08:52:30.0Z',
         },
       ],
       meta: {
-        count: 10000,
-        next: 1234,
+        count: 53773273,
+        next: 'nisi ad nostrud',
       },
     },
     props,
-  ) as CursorPaginatedAuditEvent;
-export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>) =>
-  merge(
+  );
+export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>): CursorPaginatedEntity =>
+  merge<CursorPaginatedEntity, Partial<CursorPaginatedEntity>>(
     {
       data: [
         {
           attributes: [
-            'document.id_card.classified_document_type',
-            'document.passport.expires_at',
-            'document.drivers_license.selfie.image',
+            'document.visa.expires_at',
+            'document.passport_card.samba_activity_history_response',
+            'document.visa.clave_de_elector',
           ],
           data: [
             {
               dataKind: 'vault_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: true,
-              source: 'bootstrap',
-              transforms: {},
-              value: 'consequat Ut eiusmod quis',
-            },
-            {
-              dataKind: 'vault_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: true,
-              source: 'bootstrap',
-              transforms: {},
-              value: 'laboris',
-            },
-            {
-              dataKind: 'vault_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: true,
-              source: 'bootstrap',
-              transforms: {},
-              value: 'sed sit',
-            },
-          ],
-          decryptableAttributes: [
-            'document.residence_document.address_line1',
-            'document.id_card.issuing_country',
-            'document.passport_card.front.mime_type',
-          ],
-          decryptedAttributes: {},
-          externalId: 'dd020fde-b84d-47a7-8b39-b450f2d52c4f',
-          hasOutstandingWorkflowRequest: false,
-          id: '589b5aec-0f21-4bda-bbd4-959206136416',
-          isCreatedViaApi: true,
-          isIdentifiable: false,
-          isPortable: true,
-          kind: 'person',
-          label: 'offboard_other',
-          lastActivityAt: '1918-04-02T12:14:11.0Z',
-          manualReviewKinds: ['document_needs_review', 'document_needs_review', 'rule_triggered'],
-          orderingId: -11588051,
-          requiresManualReview: true,
-          sandboxId: 'd2c58015-3119-466a-8c0b-8223c26f5f8a',
-          startTimestamp: '1948-02-16T16:12:44.0Z',
-          status: 'in_progress',
-          svId: 'c3f674a9-de07-4a77-9c58-2e51f027f5dd',
-          tags: [
-            {
-              createdAt: '1920-01-08T08:16:11.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
-            },
-            {
-              createdAt: '1956-09-27T16:22:45.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
-            },
-            {
-              createdAt: '1897-08-16T06:21:50.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
-            },
-          ],
-          vId: '69ff0cec-ca20-47ea-9dc8-4fe1242dbb4b',
-          watchlistCheck: {
-            id: 'e091122d-1ce0-4456-b0ea-096f3f8fbdaf',
-            reasonCodes: ['subject_deceased', 'document_visible_photo_features_verified', 'address_risk_alert'],
-            status: 'fail',
-          },
-          workflows: [
-            {
-              createdAt: '1933-08-25T07:11:32.0Z',
-              insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: 36272852.78435272,
-                longitude: 66316548.834290326,
-                metroCode: 'ea dolore tempor ex amet',
-                postalCode: 'laboris consectetur irure sint dolore',
-                region: 'mollit reprehenderit',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'nulla mollit eu cillum incididunt',
-                timestamp: '1945-11-08T21:58:46.0Z',
-                userAgent: 'do consectetur in officia velit',
-              },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'incomplete',
-            },
-            {
-              createdAt: '1945-11-29T10:47:54.0Z',
-              insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: -18304522.837033182,
-                longitude: 89202951.67105728,
-                metroCode: 'deserunt elit laboris laborum veniam',
-                postalCode: 'Duis in',
-                region: 'pariatur',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'est commodo',
-                timestamp: '1908-04-28T19:55:13.0Z',
-                userAgent: 'ut nulla dolore sit',
-              },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'none',
-            },
-            {
-              createdAt: '1933-09-22T16:47:55.0Z',
-              insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: -31087101.618756562,
-                longitude: 26407738.890069157,
-                metroCode: 'velit deserunt ut',
-                postalCode: 'dolor ex',
-                region: 'esse cupidatat Excepteur ipsum in',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'in cillum eiusmod occaecat',
-                timestamp: '1928-11-02T17:27:12.0Z',
-                userAgent: 'mollit ut consequat dolore',
-              },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'pass',
-            },
-          ],
-        },
-        {
-          attributes: ['document.permit.postal_code', 'document.passport.address_line1', 'card.*.number'],
-          data: [
-            {
-              dataKind: 'document_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: true,
-              source: 'tenant',
-              transforms: {},
-              value: 'eiusmod veniam',
-            },
-            {
-              dataKind: 'document_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
+              identifier: 'document.visa.nationality',
               isDecryptable: false,
-              source: 'client_tenant',
+              source: 'vendor',
               transforms: {},
-              value: 'eiusmod nisi labore',
+              value: 'ad officia reprehenderit commodo',
+            },
+            {
+              dataKind: 'document_data',
+              identifier: 'business.dba',
+              isDecryptable: false,
+              source: 'bootstrap',
+              transforms: {},
+              value: 'qui nisi fugiat minim mollit',
             },
             {
               dataKind: 'vault_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: true,
-              source: 'components_sdk',
+              identifier: 'id.address_line2',
+              isDecryptable: false,
+              source: 'ocr',
               transforms: {},
-              value: 'enim dolor sit ut esse',
+              value: 'cupidatat ut sunt',
             },
           ],
           decryptableAttributes: [
-            'document.ssn_card.image',
-            'document.residence_document.back.image',
-            'document.passport_card.state',
+            'document.voter_identification.full_name',
+            'document.permit.back.image',
+            'document.visa.back.image',
           ],
           decryptedAttributes: {},
-          externalId: 'dd020fde-b84d-47a7-8b39-b450f2d52c4f',
+          externalId: '9289f8d0-52e3-41c5-b7e0-25ac5ad8021f',
           hasOutstandingWorkflowRequest: false,
-          id: '589b5aec-0f21-4bda-bbd4-959206136416',
+          id: 'ea0f0ae7-3d54-4764-a644-6d46aeec4a14',
           isCreatedViaApi: false,
-          isIdentifiable: false,
+          isIdentifiable: true,
           isPortable: false,
-          kind: 'business',
+          kind: 'person',
           label: 'offboard_fraud',
-          lastActivityAt: '1912-08-27T13:12:22.0Z',
-          manualReviewKinds: ['rule_triggered', 'document_needs_review', 'rule_triggered'],
-          orderingId: 78473148,
-          requiresManualReview: true,
-          sandboxId: 'd2c58015-3119-466a-8c0b-8223c26f5f8a',
-          startTimestamp: '1942-02-08T10:42:45.0Z',
-          status: 'none',
-          svId: 'c3f674a9-de07-4a77-9c58-2e51f027f5dd',
+          lastActivityAt: '1908-09-14T11:09:30.0Z',
+          manualReviewKinds: ['rule_triggered', 'rule_triggered', 'rule_triggered'],
+          orderingId: -41231822,
+          requiresManualReview: false,
+          sandboxId: 'c4925264-d709-4c75-9d3a-b3e9ebd1af58',
+          startTimestamp: '1940-11-26T01:13:32.0Z',
+          status: 'pending',
+          svId: '626e58ef-842e-450d-be79-7e6759b9b48d',
           tags: [
             {
-              createdAt: '1914-03-15T11:53:44.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
+              createdAt: '1919-10-06T03:38:20.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'adipisicing',
             },
             {
-              createdAt: '1905-01-17T06:05:01.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
+              createdAt: '1913-10-16T23:08:39.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'in Ut',
             },
             {
-              createdAt: '1931-09-13T10:13:40.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
+              createdAt: '1933-08-17T19:44:11.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'pariatur do mollit',
             },
           ],
-          vId: '69ff0cec-ca20-47ea-9dc8-4fe1242dbb4b',
+          vId: 'f5c860e6-8869-4ef5-b440-1bb50db1f3fa',
           watchlistCheck: {
-            id: 'e091122d-1ce0-4456-b0ea-096f3f8fbdaf',
-            reasonCodes: [
-              'synthetic_identity_low_risk',
-              'ip_state_does_not_match',
-              'sos_domestic_filing_partially_active',
-            ],
+            id: '68b88494-3263-4d2b-ad80-3cc5750d2257',
+            reasonCodes: ['dob_mob_does_not_match', 'phone_number_input_invalid', 'document_requires_review'],
             status: 'pass',
           },
           workflows: [
             {
-              createdAt: '1948-10-26T20:58:51.0Z',
+              createdAt: '1907-05-23T04:58:33.0Z',
               insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: 13325498.405402675,
-                longitude: -16740605.598774612,
-                metroCode: 'qui esse Excepteur',
-                postalCode: 'culpa laboris adipisicing',
-                region: 'Duis',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'commodo esse',
-                timestamp: '1938-04-25T23:05:47.0Z',
-                userAgent: 'elit dolor',
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: 64004267.70723376,
+                longitude: -81961596.09417637,
+                metroCode: 'irure',
+                postalCode: 'laborum adipisicing pariatur nulla dolor',
+                region: 'adipisicing in ipsum incididunt',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'commodo aute ut velit',
+                timestamp: '1951-06-04T08:59:20.0Z',
+                userAgent: 'anim',
               },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'pass',
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'none',
             },
             {
-              createdAt: '1925-10-02T18:56:16.0Z',
+              createdAt: '1895-10-12T17:36:56.0Z',
               insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: -6716226.058190957,
-                longitude: 22804207.346521333,
-                metroCode: 'ex aute amet',
-                postalCode: 'commodo aliqua consequat in eiusmod',
-                region: 'id cupidatat ex Duis',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'ad et adipisicing',
-                timestamp: '1938-10-12T05:34:47.0Z',
-                userAgent: 'laboris in',
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: -51189154.3184412,
+                longitude: -5236781.348334134,
+                metroCode: 'enim commodo',
+                postalCode: 'ex',
+                region: 'sed occaecat amet consequat',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'mollit',
+                timestamp: '1955-02-08T01:42:33.0Z',
+                userAgent: 'occaecat',
               },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'fail',
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'none',
             },
             {
-              createdAt: '1963-12-20T17:36:42.0Z',
+              createdAt: '1931-11-27T20:13:55.0Z',
               insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: 46734099.58162317,
-                longitude: -69124238.13487631,
-                metroCode: 'sit sed',
-                postalCode: 'Lorem Ut dolor nulla',
-                region: 'occaecat ex aliquip',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'ex laborum nulla',
-                timestamp: '1958-04-04T02:22:14.0Z',
-                userAgent: 'et esse cupidatat proident ex',
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: -40671998.46378951,
+                longitude: 48127892.37149885,
+                metroCode: 'sed amet',
+                postalCode: 'non dolore elit',
+                region: 'dolore esse aute veniam in',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'Ut sunt',
+                timestamp: '1953-10-20T11:27:16.0Z',
+                userAgent: 'ullamco Excepteur',
               },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'pass',
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'none',
             },
           ],
         },
         {
           attributes: [
-            'document.passport.curp_validation_response',
-            'document.voter_identification.selfie.image',
-            'document.permit.dob',
+            'document.passport.full_address',
+            'document.passport_card.samba_activity_history_response',
+            'document.passport_card.full_address',
           ],
           data: [
             {
               dataKind: 'vault_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: false,
-              source: 'prefill',
-              transforms: {},
-              value: 'exercitation',
-            },
-            {
-              dataKind: 'document_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
+              identifier: 'document.drivers_license.nationality',
               isDecryptable: true,
               source: 'client_tenant',
               transforms: {},
-              value: 'minim cupidatat elit',
+              value: 'ut qui quis',
+            },
+            {
+              dataKind: 'document_data',
+              identifier: 'document.drivers_license.curp_validation_response',
+              isDecryptable: false,
+              source: 'prefill',
+              transforms: {},
+              value: 'aute sint',
             },
             {
               dataKind: 'vault_data',
-              identifier: 'ce30bc49-3de9-465a-bb3c-a79375a96b63',
-              isDecryptable: true,
-              source: 'bootstrap',
+              identifier: 'document.passport_card.issuing_country',
+              isDecryptable: false,
+              source: 'client_tenant',
               transforms: {},
-              value: 'sed',
+              value: 'Duis quis',
             },
           ],
           decryptableAttributes: [
-            'id.middle_name',
-            'document.voter_identification.front.mime_type',
-            'document.permit.state',
+            'document.passport_card.dob',
+            'document.visa.dob',
+            'document.residence_document.front.mime_type',
           ],
           decryptedAttributes: {},
-          externalId: 'dd020fde-b84d-47a7-8b39-b450f2d52c4f',
+          externalId: '9289f8d0-52e3-41c5-b7e0-25ac5ad8021f',
           hasOutstandingWorkflowRequest: true,
-          id: '589b5aec-0f21-4bda-bbd4-959206136416',
-          isCreatedViaApi: false,
-          isIdentifiable: false,
+          id: 'ea0f0ae7-3d54-4764-a644-6d46aeec4a14',
+          isCreatedViaApi: true,
+          isIdentifiable: true,
           isPortable: false,
-          kind: 'person',
+          kind: 'business',
           label: 'active',
-          lastActivityAt: '1900-11-27T17:18:17.0Z',
-          manualReviewKinds: ['rule_triggered', 'document_needs_review', 'rule_triggered'],
-          orderingId: -8220112,
-          requiresManualReview: false,
-          sandboxId: 'd2c58015-3119-466a-8c0b-8223c26f5f8a',
-          startTimestamp: '1939-01-18T09:06:20.0Z',
-          status: 'pending',
-          svId: 'c3f674a9-de07-4a77-9c58-2e51f027f5dd',
+          lastActivityAt: '1961-04-06T06:01:24.0Z',
+          manualReviewKinds: ['rule_triggered', 'rule_triggered', 'document_needs_review'],
+          orderingId: 58100611,
+          requiresManualReview: true,
+          sandboxId: 'c4925264-d709-4c75-9d3a-b3e9ebd1af58',
+          startTimestamp: '1927-03-08T06:11:16.0Z',
+          status: 'fail',
+          svId: '626e58ef-842e-450d-be79-7e6759b9b48d',
           tags: [
             {
-              createdAt: '1896-03-01T15:17:23.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
+              createdAt: '1918-09-26T15:10:55.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'nisi',
             },
             {
-              createdAt: '1943-11-24T10:53:31.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
+              createdAt: '1967-06-21T05:01:50.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'laborum occaecat consectetur mollit officia',
             },
             {
-              createdAt: '1923-12-26T01:15:23.0Z',
-              id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-              tag: 'transaction_chargeback',
+              createdAt: '1931-09-26T23:27:13.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'ex incididunt cillum veniam dolore',
             },
           ],
-          vId: '69ff0cec-ca20-47ea-9dc8-4fe1242dbb4b',
+          vId: 'f5c860e6-8869-4ef5-b440-1bb50db1f3fa',
           watchlistCheck: {
-            id: 'e091122d-1ce0-4456-b0ea-096f3f8fbdaf',
+            id: '68b88494-3263-4d2b-ad80-3cc5750d2257',
             reasonCodes: [
-              'phone_located_matches',
-              'document_ocr_dob_could_not_match',
-              'input_phone_number_does_not_match_located_state_history',
+              'business_address_deliverable',
+              'document_selfie_used_with_different_information',
+              'business_address_close_match',
             ],
             status: 'not_needed',
           },
           workflows: [
             {
-              createdAt: '1969-10-22T14:38:47.0Z',
+              createdAt: '1909-08-02T07:12:44.0Z',
               insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: 48513436.242325395,
-                longitude: 99130839.16304201,
-                metroCode: 'dolore Duis consequat Ut tempor',
-                postalCode: 'aliquip eiusmod cupidatat',
-                region: 'Lorem reprehenderit mollit',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'veniam ut',
-                timestamp: '1900-04-28T09:42:10.0Z',
-                userAgent: 'officia minim ad adipisicing',
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: -90473768.02415976,
+                longitude: -44252600.15946431,
+                metroCode: 'commodo incididunt do aliqua',
+                postalCode: 'nisi ad',
+                region: 'laborum occaecat sint',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'nisi Duis eu consectetur consequat',
+                timestamp: '1950-10-27T22:24:51.0Z',
+                userAgent: 'ex laborum',
               },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'fail',
-            },
-            {
-              createdAt: '1906-08-14T21:24:27.0Z',
-              insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: -1476336.9476662874,
-                longitude: -21807425.663483888,
-                metroCode: 'dolor ut sed',
-                postalCode: 'Duis veniam labore pariatur',
-                region: 'Lorem',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'nulla officia sint esse',
-                timestamp: '1967-06-29T08:36:34.0Z',
-                userAgent: 'nulla nisi minim sed',
-              },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
-              status: 'none',
-            },
-            {
-              createdAt: '1905-09-10T06:48:59.0Z',
-              insightEvent: {
-                city: 'Fort Arjunfield',
-                country: 'Mauritania',
-                ipAddress: '90510 Jerry Route Suite 505',
-                latitude: -53452846.00441142,
-                longitude: 10844889.651044413,
-                metroCode: 'Lorem',
-                postalCode: 'culpa Lorem commodo sint',
-                region: 'amet eu deserunt',
-                regionName: 'Jenna Ryan',
-                sessionId: 'bcb73635-fd7a-4dcb-adcf-a8e7c59dd73e',
-                timeZone: 'deserunt eiusmod do ullamco ut',
-                timestamp: '1958-05-02T12:37:16.0Z',
-                userAgent: 'Duis est',
-              },
-              playbookId: '8d33e5f7-33b0-4af7-a05c-1af7c57e3266',
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
               status: 'pending',
+            },
+            {
+              createdAt: '1926-07-27T18:46:30.0Z',
+              insightEvent: {
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: 88549466.96799296,
+                longitude: 866128.112760961,
+                metroCode: 'ad',
+                postalCode: 'adipisicing labore in do',
+                region: 'adipisicing ad',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'irure',
+                timestamp: '1945-05-03T04:22:47.0Z',
+                userAgent: 'veniam dolor',
+              },
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'incomplete',
+            },
+            {
+              createdAt: '1922-11-19T18:49:05.0Z',
+              insightEvent: {
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: 89693969.3520234,
+                longitude: -41952736.72679911,
+                metroCode: 'anim fugiat',
+                postalCode: 'proident ea anim',
+                region: 'commodo Excepteur magna',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'laboris',
+                timestamp: '1960-08-16T21:34:14.0Z',
+                userAgent: 'do enim fugiat esse',
+              },
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'incomplete',
+            },
+          ],
+        },
+        {
+          attributes: [
+            'document.passport.clave_de_elector',
+            'card.*.expiration',
+            'document.voter_identification.selfie.mime_type',
+          ],
+          data: [
+            {
+              dataKind: 'vault_data',
+              identifier: 'document.drivers_license.issuing_country',
+              isDecryptable: false,
+              source: 'client_tenant',
+              transforms: {},
+              value: 'Duis',
+            },
+            {
+              dataKind: 'vault_data',
+              identifier: 'business.formation_state',
+              isDecryptable: true,
+              source: 'bootstrap',
+              transforms: {},
+              value: 'incididunt non veniam',
+            },
+            {
+              dataKind: 'document_data',
+              identifier: 'document.drivers_license.curp_validation_response',
+              isDecryptable: true,
+              source: 'ocr',
+              transforms: {},
+              value: 'ut',
+            },
+          ],
+          decryptableAttributes: [
+            'document.visa.issuing_state',
+            'document.visa.last_name',
+            'document.voter_identification.last_name',
+          ],
+          decryptedAttributes: {},
+          externalId: '9289f8d0-52e3-41c5-b7e0-25ac5ad8021f',
+          hasOutstandingWorkflowRequest: false,
+          id: 'ea0f0ae7-3d54-4764-a644-6d46aeec4a14',
+          isCreatedViaApi: false,
+          isIdentifiable: false,
+          isPortable: true,
+          kind: 'person',
+          label: 'active',
+          lastActivityAt: '1894-06-21T04:03:02.0Z',
+          manualReviewKinds: ['document_needs_review', 'document_needs_review', 'document_needs_review'],
+          orderingId: -44060489,
+          requiresManualReview: false,
+          sandboxId: 'c4925264-d709-4c75-9d3a-b3e9ebd1af58',
+          startTimestamp: '1911-04-08T06:52:54.0Z',
+          status: 'in_progress',
+          svId: '626e58ef-842e-450d-be79-7e6759b9b48d',
+          tags: [
+            {
+              createdAt: '1943-02-08T09:44:56.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'sint minim sunt',
+            },
+            {
+              createdAt: '1920-03-30T16:06:39.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'magna laborum',
+            },
+            {
+              createdAt: '1942-04-12T22:54:04.0Z',
+              id: '10c74658-f0ca-44b5-b853-6535a24d9518',
+              tag: 'adipisicing',
+            },
+          ],
+          vId: 'f5c860e6-8869-4ef5-b440-1bb50db1f3fa',
+          watchlistCheck: {
+            id: '68b88494-3263-4d2b-ad80-3cc5750d2257',
+            reasonCodes: [
+              'document_pdf417_data_is_not_valid',
+              'email_high_risk_domain',
+              'sentilink_identity_theft_high_risk',
+            ],
+            status: 'fail',
+          },
+          workflows: [
+            {
+              createdAt: '1951-11-16T13:19:54.0Z',
+              insightEvent: {
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: -10005315.03755942,
+                longitude: -6482704.771369591,
+                metroCode: 'ea aliquip culpa mollit commodo',
+                postalCode: 'velit incididunt commodo',
+                region: 'cupidatat laboris consequat est',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'eiusmod culpa',
+                timestamp: '1905-06-02T12:29:10.0Z',
+                userAgent: 'sint aute officia',
+              },
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'pending',
+            },
+            {
+              createdAt: '1931-11-10T12:43:29.0Z',
+              insightEvent: {
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: 17452308.723555937,
+                longitude: -81743623.95349015,
+                metroCode: 'laborum Ut ea',
+                postalCode: 'reprehenderit dolore qui',
+                region: 'in exercitation id',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'ad',
+                timestamp: '1913-08-26T11:02:45.0Z',
+                userAgent: 'ut sint dolore est',
+              },
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'pending',
+            },
+            {
+              createdAt: '1932-06-12T14:18:17.0Z',
+              insightEvent: {
+                city: 'Port Wilford',
+                country: 'Israel',
+                ipAddress: '863 Walker Via Suite 857',
+                latitude: -85134998.47388029,
+                longitude: 11050552.94648993,
+                metroCode: 'tempor ad',
+                postalCode: 'in Duis ut occaecat ut',
+                region: 'pariatur do adipisicing officia',
+                regionName: 'Isaac MacGyver',
+                sessionId: '17eec8aa-21f5-496f-8f08-b4c88b2702d9',
+                timeZone: 'laboris',
+                timestamp: '1912-02-01T19:25:56.0Z',
+                userAgent: 'proident eiusmod nulla velit dolor',
+              },
+              playbookId: '035fb141-36b6-49cf-9ceb-4b1977af0fa8',
+              status: 'incomplete',
             },
           ],
         },
       ],
       meta: {
-        count: 10000,
-        next: 1234,
+        count: 63130031,
+        next: 69965528,
       },
     },
     props,
-  ) as CursorPaginatedEntity;
-export const getCursorPaginatedListEvent = (props: Partial<CursorPaginatedListEvent>) =>
-  merge(
+  );
+export const getCursorPaginatedListEvent = (props: Partial<CursorPaginatedListEvent>): CursorPaginatedListEvent =>
+  merge<CursorPaginatedListEvent, Partial<CursorPaginatedListEvent>>(
     {
       data: [
         {
           detail: {
             data: {
-              entries: ['enim consequat in magna consectetur', 'consequat ut Ut', 'cillum ex in'],
-              listEntryCreationId: '02c78ef9-6552-47b5-828f-cfe5df43bca0',
-              listId: 'cd5121d7-1176-4aad-8b8d-49af111b2551',
+              entries: ['sunt eu veniam', 'in dolore', 'elit non culpa dolore'],
+              listEntryCreationId: '1405edd8-1a95-4909-af17-d5a1eb29459b',
+              listId: 'c7473bd8-3f76-441c-ac26-7b6a061c2983',
             },
             kind: 'create_list_entry',
           },
-          id: 'bfacfc50-5cb3-4060-935d-d8e2560cf55a',
+          id: '28785149-c832-48e9-abc9-36b7831704b1',
           insightEvent: {
-            city: 'Maribelfield',
-            country: 'Algeria',
-            ipAddress: '5326 E Market Street Suite 346',
-            latitude: -46334987.40301678,
-            longitude: 23226492.77249016,
-            metroCode: 'consectetur irure',
-            postalCode: 'dolore nisi',
-            region: 'amet Duis aute',
-            regionName: 'Alicia Pollich',
-            sessionId: '55360417-561b-457a-b0a1-ed73d79d9eac',
-            timeZone: 'nostrud proident',
-            timestamp: '1936-12-13T07:27:56.0Z',
-            userAgent: 'dolore',
+            city: 'Jovannychester',
+            country: 'Japan',
+            ipAddress: '23758 S East Street Apt. 528',
+            latitude: -51115591.16157909,
+            longitude: -84605910.83890852,
+            metroCode: 'Lorem deserunt ullamco',
+            postalCode: 'pariatur',
+            region: 'velit adipisicing cillum',
+            regionName: 'Horace Ullrich',
+            sessionId: '527b7e58-5313-4051-a932-da35a16f39f9',
+            timeZone: 'ut nostrud elit',
+            timestamp: '1960-05-07T22:37:40.0Z',
+            userAgent: 'laboris irure proident',
           },
-          name: 'Angelo Bergstrom',
+          name: 'start_user_verification',
           principal: {
-            id: '4a155ff1-04d5-4dc8-aa05-f7caa1235308',
+            id: '7cfe3128-ae5a-4c2f-9d18-a6c4a8b19140',
             kind: 'user',
           },
-          tenantId: 'fd899442-15eb-4545-9c57-76d06182ceb8',
-          timestamp: '1957-01-06T09:45:55.0Z',
+          tenantId: 'b72a9ba9-482a-4eb0-9470-4009c2f1ac37',
+          timestamp: '1912-08-13T08:38:43.0Z',
         },
         {
           detail: {
             data: {
-              entries: ['Lorem', 'cupidatat amet quis in', 'aliquip'],
-              listEntryCreationId: '02c78ef9-6552-47b5-828f-cfe5df43bca0',
-              listId: 'cd5121d7-1176-4aad-8b8d-49af111b2551',
+              entries: ['laboris', 'Duis ut occaecat cupidatat', 'minim'],
+              listEntryCreationId: '1405edd8-1a95-4909-af17-d5a1eb29459b',
+              listId: 'c7473bd8-3f76-441c-ac26-7b6a061c2983',
             },
             kind: 'create_list_entry',
           },
-          id: 'bfacfc50-5cb3-4060-935d-d8e2560cf55a',
+          id: '28785149-c832-48e9-abc9-36b7831704b1',
           insightEvent: {
-            city: 'Maribelfield',
-            country: 'Algeria',
-            ipAddress: '5326 E Market Street Suite 346',
-            latitude: 83974443.73231822,
-            longitude: -67762046.05887286,
-            metroCode: 'cillum Lorem',
-            postalCode: 'consectetur ut',
-            region: 'ut',
-            regionName: 'Alicia Pollich',
-            sessionId: '55360417-561b-457a-b0a1-ed73d79d9eac',
-            timeZone: 'quis aliquip',
-            timestamp: '1910-09-06T12:08:22.0Z',
-            userAgent: 'pariatur minim',
+            city: 'Jovannychester',
+            country: 'Japan',
+            ipAddress: '23758 S East Street Apt. 528',
+            latitude: 31106326.981500894,
+            longitude: -5668702.988168523,
+            metroCode: 'sed minim ea nulla Excepteur',
+            postalCode: 'esse minim adipisicing',
+            region: 'occaecat id sed adipisicing',
+            regionName: 'Horace Ullrich',
+            sessionId: '527b7e58-5313-4051-a932-da35a16f39f9',
+            timeZone: 'sed minim',
+            timestamp: '1943-07-17T12:31:48.0Z',
+            userAgent: 'eu',
           },
-          name: 'Angelo Bergstrom',
+          name: 'start_user_verification',
           principal: {
-            id: '4a155ff1-04d5-4dc8-aa05-f7caa1235308',
+            id: '7cfe3128-ae5a-4c2f-9d18-a6c4a8b19140',
             kind: 'user',
           },
-          tenantId: 'fd899442-15eb-4545-9c57-76d06182ceb8',
-          timestamp: '1954-07-08T22:08:10.0Z',
+          tenantId: 'b72a9ba9-482a-4eb0-9470-4009c2f1ac37',
+          timestamp: '1947-09-10T06:14:35.0Z',
         },
         {
           detail: {
             data: {
               entries: [
-                'adipisicing voluptate est veniam mollit',
-                'ipsum mollit eu Excepteur',
-                'amet adipisicing id aliqua aliquip',
+                'aute aliqua incididunt anim nisi',
+                'labore laborum deserunt adipisicing consequat',
+                'et consequat non',
               ],
-              listEntryCreationId: '02c78ef9-6552-47b5-828f-cfe5df43bca0',
-              listId: 'cd5121d7-1176-4aad-8b8d-49af111b2551',
+              listEntryCreationId: '1405edd8-1a95-4909-af17-d5a1eb29459b',
+              listId: 'c7473bd8-3f76-441c-ac26-7b6a061c2983',
             },
             kind: 'create_list_entry',
           },
-          id: 'bfacfc50-5cb3-4060-935d-d8e2560cf55a',
+          id: '28785149-c832-48e9-abc9-36b7831704b1',
           insightEvent: {
-            city: 'Maribelfield',
-            country: 'Algeria',
-            ipAddress: '5326 E Market Street Suite 346',
-            latitude: 5055137.417143658,
-            longitude: -62616431.842770435,
-            metroCode: 'aliqua ut',
-            postalCode: 'proident reprehenderit commodo',
-            region: 'ex',
-            regionName: 'Alicia Pollich',
-            sessionId: '55360417-561b-457a-b0a1-ed73d79d9eac',
-            timeZone: 'ullamco Lorem',
-            timestamp: '1936-07-26T07:16:01.0Z',
-            userAgent: 'tempor ut',
+            city: 'Jovannychester',
+            country: 'Japan',
+            ipAddress: '23758 S East Street Apt. 528',
+            latitude: 18036513.38034822,
+            longitude: 60934163.44517127,
+            metroCode: 'Ut',
+            postalCode: 'est et consectetur',
+            region: 'voluptate cupidatat',
+            regionName: 'Horace Ullrich',
+            sessionId: '527b7e58-5313-4051-a932-da35a16f39f9',
+            timeZone: 'sunt qui eu in',
+            timestamp: '1940-11-08T11:21:52.0Z',
+            userAgent: 'velit aliqua sunt',
           },
-          name: 'Angelo Bergstrom',
+          name: 'login_org_member',
           principal: {
-            id: '4a155ff1-04d5-4dc8-aa05-f7caa1235308',
+            id: '7cfe3128-ae5a-4c2f-9d18-a6c4a8b19140',
             kind: 'user',
           },
-          tenantId: 'fd899442-15eb-4545-9c57-76d06182ceb8',
-          timestamp: '1938-11-09T08:17:35.0Z',
+          tenantId: 'b72a9ba9-482a-4eb0-9470-4009c2f1ac37',
+          timestamp: '1934-07-06T05:59:12.0Z',
         },
       ],
       meta: {
-        count: 10000,
-        next: 1234,
+        count: 44265973,
+        next: 'in et id sed minim',
       },
     },
     props,
-  ) as CursorPaginatedListEvent;
-export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>) =>
-  merge(
+  );
+export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>): CustomDocumentConfig =>
+  merge<CustomDocumentConfig, Partial<CustomDocumentConfig>>(
     {
-      description: 'est',
-      identifier: 'e7851afa-3aa2-40e1-a07e-b79350936ac2',
-      name: 'Tommy Quitzon',
-      requiresHumanReview: true,
-      uploadSettings: 'prefer_upload',
+      description: 'voluptate veniam',
+      identifier: 'document.id_card.clave_de_elector',
+      name: 'Nicolas Ward',
+      requiresHumanReview: false,
+      uploadSettings: 'capture_only_on_mobile',
     },
     props,
-  ) as CustomDocumentConfig;
-export const getDashboardSecretApiKey = (props: Partial<DashboardSecretApiKey>) =>
-  merge(
+  );
+export const getDashboardSecretApiKey = (props: Partial<DashboardSecretApiKey>): DashboardSecretApiKey =>
+  merge<DashboardSecretApiKey, Partial<DashboardSecretApiKey>>(
     {
-      createdAt: '1943-08-29T14:16:32.0Z',
-      id: '994dbc70-78e5-4ca0-bfa2-f675be0148ae',
-      isLive: true,
-      key: '03191914-eef3-4bd0-af06-fc81a99363b3',
-      lastUsedAt: '1914-01-10T02:27:08.0Z',
-      name: 'May Schulist',
+      createdAt: '1895-05-24T13:57:26.0Z',
+      id: '62ba2982-9416-4192-9d8d-ce1a73d05a05',
+      isLive: false,
+      key: 'a9e6aa87-72fe-40b5-9eab-ba39f3cc25fd',
+      lastUsedAt: '1949-03-14T08:29:01.0Z',
+      name: 'Dr. Ricardo Langosh',
       role: {
-        createdAt: '1964-11-26T18:30:25.0Z',
-        id: '9d755d32-d282-488f-9faf-c9b56ab05614',
+        createdAt: '1945-03-31T20:51:07.0Z',
+        id: '5cab1dc1-bf4c-4a6a-9d01-aec0c3a4b7ac',
         isImmutable: true,
-        kind: 'api_key',
-        name: 'Ollie Stroman',
-        numActiveApiKeys: 47552634,
-        numActiveUsers: -14998917,
+        kind: 'compliance_partner_dashboard_user',
+        name: 'Mrs. Brittany Connelly',
+        numActiveApiKeys: 77628462,
+        numActiveUsers: 1019348,
         scopes: [
           {
             kind: 'read',
@@ -2560,549 +2592,554 @@ export const getDashboardSecretApiKey = (props: Partial<DashboardSecretApiKey>) 
           },
         ],
       },
-      scrubbedKey: 'a73d8810-84f8-4266-adfa-f7cafd4d38f2',
-      status: 'enabled',
+      scrubbedKey: '661bdfd1-cb1a-4d44-afd5-a615a17dadb6',
+      status: 'disabled',
     },
     props,
-  ) as DashboardSecretApiKey;
-export const getDataAttributeKind = (props: Partial<DataAttributeKind>) =>
-  (props ?? 'document_data') as DataAttributeKind;
-export const getDataCollectedInfo = (props: Partial<DataCollectedInfo>) =>
-  merge(
+  );
+export const getDataAttributeKind = (props: DataAttributeKind): DataAttributeKind => props ?? 'document_data';
+export const getDataCollectedInfo = (props: Partial<DataCollectedInfo>): DataCollectedInfo =>
+  merge<DataCollectedInfo, Partial<DataCollectedInfo>>(
     {
       actor: {
-        id: '6017e49d-278b-423c-a064-0062f1c29b7b',
+        id: 'c008bcac-4e4a-41d7-902e-f3f3cfd08264',
         kind: 'user',
       },
-      attributes: ['email', 'name', 'business_address'],
+      attributes: ['business_tin', 'business_address', 'dob'],
       isPrefill: false,
       targets: [
-        'document.voter_identification.classified_document_type',
-        'document.voter_identification.curp_validation_response',
-        'document.passport.full_address',
+        'document.voter_identification.full_address',
+        'document.drivers_license.nationality',
+        'document.passport_card.curp_validation_response',
       ],
     },
     props,
-  ) as DataCollectedInfo;
-export const getDataIdentifier = (props: Partial<DataIdentifier>) =>
-  (props ?? 'document.permit.issuing_state') as DataIdentifier;
-export const getDataLifetimeSource = (props: Partial<DataLifetimeSource>) =>
-  (props ?? 'bootstrap') as DataLifetimeSource;
-export const getDbActor = (props: Partial<DbActor>) =>
-  merge(
+  );
+export const getDataIdentifier = (props: DataIdentifier): DataIdentifier => props ?? 'business.formation_date';
+export const getDataLifetimeSource = (props: DataLifetimeSource): DataLifetimeSource => props ?? 'client_tenant';
+export const getDbActor = (props: Partial<DbActor>): DbActor =>
+  merge<DbActor, Partial<DbActor>>(
     {
       data: {
-        id: '50e18067-7c70-4db9-9099-53249dca5ece',
+        id: '719f959a-47e9-457f-9fae-cf2cd8b5226b',
       },
       kind: 'user',
     },
     props,
-  ) as DbActor;
-export const getDecisionStatus = (props: Partial<DecisionStatus>) => (props ?? 'fail') as DecisionStatus;
-export const getDecryptionContext = (props: Partial<DecryptionContext>) => (props ?? 'api') as DecryptionContext;
-export const getDeleteRequest = (props: Partial<DeleteRequest>) =>
-  merge(
+  );
+export const getDecisionStatus = (props: DecisionStatus): DecisionStatus => props ?? 'fail';
+export const getDecryptionContext = (props: DecryptionContext): DecryptionContext => props ?? 'vault_proxy';
+export const getDeleteRequest = (props: Partial<DeleteRequest>): DeleteRequest =>
+  merge<DeleteRequest, Partial<DeleteRequest>>(
     {
-      deleteAll: null,
-      fields: ['id.first_name', 'id.last_name'],
+      deleteAll: false,
+      fields: [
+        'document.residence_document.full_name',
+        'document.residence_document.selfie.mime_type',
+        'document.id_card.curp_validation_response',
+      ],
     },
     props,
-  ) as DeleteRequest;
-export const getDeviceFraudRiskLevel = (props: Partial<DeviceFraudRiskLevel>) =>
-  (props ?? 'medium') as DeviceFraudRiskLevel;
-export const getDeviceInsightField = (props: Partial<DeviceInsightField>) =>
-  (props ?? 'ip_address') as DeviceInsightField;
-export const getDeviceInsightOperation = (props: Partial<DeviceInsightOperation>) =>
-  merge(
+  );
+export const getDeviceFraudRiskLevel = (props: DeviceFraudRiskLevel): DeviceFraudRiskLevel => props ?? 'medium';
+export const getDeviceInsightField = (props: DeviceInsightField): DeviceInsightField => props ?? 'ip_address';
+export const getDeviceInsightOperation = (props: Partial<DeviceInsightOperation>): DeviceInsightOperation =>
+  merge<DeviceInsightOperation, Partial<DeviceInsightOperation>>(
     {
       field: 'ip_address',
       op: 'is_in',
-      value: 'ullamco in',
+      value: 'anim commodo nulla dolor consectetur',
     },
     props,
-  ) as DeviceInsightOperation;
-export const getDeviceType = (props: Partial<DeviceType>) => (props ?? 'ios') as DeviceType;
-export const getDocsTokenResponse = (props: Partial<DocsTokenResponse>) =>
-  merge(
+  );
+export const getDeviceType = (props: DeviceType): DeviceType => props ?? 'android';
+export const getDocsTokenResponse = (props: Partial<DocsTokenResponse>): DocsTokenResponse =>
+  merge<DocsTokenResponse, Partial<DocsTokenResponse>>(
     {
-      token: 'c436c08d-6658-43ab-b494-61bb46afa2f6',
+      token: 'ad6eb44f-437d-4e0d-8189-d159bb330d6f',
     },
     props,
-  ) as DocsTokenResponse;
-export const getDocument = (props: Partial<Document>) =>
-  merge(
+  );
+export const getDocument = (props: Partial<Document>): Document =>
+  merge<Document, Partial<Document>>(
     {
-      completedVersion: 44193978,
-      curpCompletedVersion: -92036354,
-      documentScore: 65150579.97464609,
-      kind: 'visa',
-      ocrConfidenceScore: 52819051.13430011,
-      reviewStatus: 'not_needed',
-      sambaActivityHistoryCompletedVersion: -31657323,
-      selfieScore: 20262955.390802205,
-      startedAt: '1912-08-16T12:55:31.0Z',
-      status: 'pending',
-      uploadSource: 'desktop',
+      completedVersion: 84443820,
+      curpCompletedVersion: -2350034,
+      documentScore: -57050975.59157788,
+      kind: 'voter_identification',
+      ocrConfidenceScore: -78310906.76388204,
+      reviewStatus: 'unreviewed',
+      sambaActivityHistoryCompletedVersion: -2698363,
+      selfieScore: -74362032.63221093,
+      startedAt: '1951-04-09T08:03:59.0Z',
+      status: 'complete',
+      uploadSource: 'mobile',
       uploads: [
         {
-          failureReasons: ['selfie_blurry', 'wrong_document_side', 'selfie_image_orientation_incorrect'],
-          identifier: '154f6da0-2902-4538-8b81-a41dfa8dc4c7',
-          isExtraCompressed: true,
-          side: 'ae52e936-9934-410b-84f6-138b31e15e26',
-          timestamp: '1946-07-24T11:57:36.0Z',
-          version: -56947063,
-        },
-        {
-          failureReasons: ['unknown_document_type', 'barcode_not_detected', 'document_missing_four_corners'],
-          identifier: '154f6da0-2902-4538-8b81-a41dfa8dc4c7',
+          failureReasons: ['selfie_too_dark', 'barcode_not_detected', 'selfie_image_orientation_incorrect'],
+          identifier: 'document.voter_identification.clave_de_elector',
           isExtraCompressed: false,
-          side: 'ae52e936-9934-410b-84f6-138b31e15e26',
-          timestamp: '1894-05-06T07:21:12.0Z',
-          version: -8080924,
+          side: 'back',
+          timestamp: '1936-10-03T03:28:53.0Z',
+          version: -78084870,
         },
         {
-          failureReasons: ['document_too_small', 'document_border_too_small', 'face_not_found'],
-          identifier: '154f6da0-2902-4538-8b81-a41dfa8dc4c7',
+          failureReasons: ['wrong_document_side', 'drivers_license_permit_not_allowed', 'selfie_low_confidence'],
+          identifier: 'document.voter_identification.postal_code',
           isExtraCompressed: true,
-          side: 'ae52e936-9934-410b-84f6-138b31e15e26',
-          timestamp: '1919-05-28T09:42:33.0Z',
-          version: 93856416,
+          side: 'front',
+          timestamp: '1952-12-26T17:43:12.0Z',
+          version: 70681143,
+        },
+        {
+          failureReasons: ['selfie_has_face_mask', 'unsupported_document_type', 'selfie_blurry'],
+          identifier: 'document.residence_document.issuing_country',
+          isExtraCompressed: true,
+          side: 'selfie',
+          timestamp: '1893-02-14T10:27:17.0Z',
+          version: -79673818,
         },
       ],
     },
     props,
-  ) as Document;
-export const getDocumentAndCountryConfiguration = (props: Partial<DocumentAndCountryConfiguration>) =>
-  merge(
+  );
+export const getDocumentAndCountryConfiguration = (
+  props: Partial<DocumentAndCountryConfiguration>,
+): DocumentAndCountryConfiguration =>
+  merge<DocumentAndCountryConfiguration, Partial<DocumentAndCountryConfiguration>>(
     {
       countrySpecific: {},
-      global: ['voter_identification', 'residence_document', 'voter_identification'],
+      global: ['visa', 'voter_identification', 'passport_card'],
     },
     props,
-  ) as DocumentAndCountryConfiguration;
-export const getDocumentImageError = (props: Partial<DocumentImageError>) =>
-  (props ?? 'document_border_too_small') as DocumentImageError;
-export const getDocumentKind = (props: Partial<DocumentKind>) => (props ?? 'custom') as DocumentKind;
-export const getDocumentRequest = (props: Partial<DocumentRequest>) =>
-  merge(
+  );
+export const getDocumentImageError = (props: DocumentImageError): DocumentImageError => props ?? 'barcode_not_detected';
+export const getDocumentKind = (props: DocumentKind): DocumentKind => props ?? 'drivers_license';
+export const getDocumentRequest = (props: Partial<DocumentRequest>): DocumentRequest =>
+  merge<DocumentRequest, Partial<DocumentRequest>>(
     {
-      kind: 'identity',
-      ruleSetResultId: '17d97d9f-a7f2-4c1f-8735-a4ff1d0e98aa',
+      kind: 'proof_of_ssn',
+      ruleSetResultId: 'b72de1a0-be5c-46e8-9d0e-e87526c715de',
     },
     props,
-  ) as DocumentRequest;
-export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>) =>
-  merge(
+  );
+export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>): DocumentRequestConfig =>
+  merge<DocumentRequestConfig, Partial<DocumentRequestConfig>>(
     {
       data: {
         collectSelfie: true,
         documentTypesAndCountries: {
           countrySpecific: {},
-          global: ['passport_card', 'residence_document', 'passport_card'],
+          global: ['voter_identification', 'id_card', 'passport'],
         },
       },
       kind: 'identity',
     },
     props,
-  ) as DocumentRequestConfig;
-export const getDocumentRequestKind = (props: Partial<DocumentRequestKind>) =>
-  (props ?? 'proof_of_address') as DocumentRequestKind;
-export const getDocumentReviewStatus = (props: Partial<DocumentReviewStatus>) =>
-  (props ?? 'reviewed_by_machine') as DocumentReviewStatus;
-export const getDocumentSide = (props: Partial<DocumentSide>) => (props ?? 'selfie') as DocumentSide;
-export const getDocumentStatus = (props: Partial<DocumentStatus>) => (props ?? 'pending') as DocumentStatus;
-export const getDocumentUpload = (props: Partial<DocumentUpload>) =>
-  merge(
+  );
+export const getDocumentRequestKind = (props: DocumentRequestKind): DocumentRequestKind => props ?? 'identity';
+export const getDocumentReviewStatus = (props: DocumentReviewStatus): DocumentReviewStatus =>
+  props ?? 'pending_human_review';
+export const getDocumentSide = (props: DocumentSide): DocumentSide => props ?? 'selfie';
+export const getDocumentStatus = (props: DocumentStatus): DocumentStatus => props ?? 'pending';
+export const getDocumentUpload = (props: Partial<DocumentUpload>): DocumentUpload =>
+  merge<DocumentUpload, Partial<DocumentUpload>>(
     {
-      failureReasons: ['unknown_error', 'document_glare', 'document_missing_four_corners'],
-      identifier: '25872977-6721-4dff-a5d6-efa386c08dff',
+      failureReasons: ['selfie_face_not_found', 'image_error', 'invalid_jpeg'],
+      identifier: 'document.residence_document.gender',
       isExtraCompressed: false,
-      side: 'c640d9e2-7d0e-43a5-a84f-d497ef65d3d6',
-      timestamp: '1904-12-20T16:21:42.0Z',
-      version: -81387940,
+      side: 'front',
+      timestamp: '1953-12-02T15:26:23.0Z',
+      version: 93080216,
     },
     props,
-  ) as DocumentUpload;
-export const getDocumentUploadSettings = (props: Partial<DocumentUploadSettings>) =>
-  (props ?? 'prefer_upload') as DocumentUploadSettings;
-export const getDocumentUploadedTimelineEvent = (props: Partial<DocumentUploadedTimelineEvent>) =>
-  merge(
+  );
+export const getDocumentUploadSettings = (props: DocumentUploadSettings): DocumentUploadSettings =>
+  props ?? 'prefer_capture';
+export const getDocumentUploadedTimelineEvent = (
+  props: Partial<DocumentUploadedTimelineEvent>,
+): DocumentUploadedTimelineEvent =>
+  merge<DocumentUploadedTimelineEvent, Partial<DocumentUploadedTimelineEvent>>(
     {
       config: {
         data: {
-          collectSelfie: true,
+          collectSelfie: false,
           documentTypesAndCountries: {
             countrySpecific: {},
-            global: ['id_card', 'id_card', 'id_card'],
+            global: ['passport', 'permit', 'drivers_license'],
           },
         },
         kind: 'identity',
       },
       deviceType: 'ios',
-      documentType: 'permit',
+      documentType: 'id_card',
       status: 'pending',
     },
     props,
-  ) as DocumentUploadedTimelineEvent;
-export const getDupeKind = (props: Partial<DupeKind>) => (props ?? 'selfie') as DupeKind;
-export const getDupes = (props: Partial<Dupes>) =>
-  merge(
+  );
+export const getDupeKind = (props: DupeKind): DupeKind => props ?? 'cookie_id';
+export const getDupes = (props: Partial<Dupes>): Dupes =>
+  merge<Dupes, Partial<Dupes>>(
     {
       otherTenant: {
-        numMatches: 97442323,
-        numTenants: -65512022,
+        numMatches: -27344066,
+        numTenants: -43899790,
       },
       sameTenant: [
         {
           data: [
             {
               dataKind: 'document_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: true,
-              source: 'ocr',
-              transforms: {},
-              value: 'sed',
-            },
-            {
-              dataKind: 'document_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: true,
+              identifier: 'document.id_card.nationality',
+              isDecryptable: false,
               source: 'components_sdk',
               transforms: {},
-              value: 'reprehenderit velit adipisicing culpa',
+              value: 'sint pariatur culpa',
             },
             {
-              dataKind: 'vault_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: true,
-              source: 'prefill',
-              transforms: {},
-              value: 'irure ut',
-            },
-          ],
-          dupeKinds: ['card_number_cvc', 'selfie', 'name_ssn4'],
-          fpId: '687a7568-226c-4280-a700-071a6c7ce88d',
-          startTimestamp: '1939-03-20T02:58:13.0Z',
-          status: 'pending',
-        },
-        {
-          data: [
-            {
-              dataKind: 'vault_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
+              dataKind: 'document_data',
+              identifier: 'investor_profile.senior_executive_symbols',
               isDecryptable: true,
               source: 'ocr',
               transforms: {},
-              value: 'laborum labore nulla magna aliqua',
-            },
-            {
-              dataKind: 'document_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: true,
-              source: 'prefill',
-              transforms: {},
-              value: 'elit veniam commodo do labore',
+              value: 'Duis',
             },
             {
               dataKind: 'vault_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: true,
+              identifier: 'document.residence_document.selfie.mime_type',
+              isDecryptable: false,
               source: 'bootstrap',
               transforms: {},
-              value: 'consequat dolor',
+              value: 'dolor elit in',
             },
           ],
-          dupeKinds: ['name_dob', 'bank_routing_account', 'phone_number'],
-          fpId: '687a7568-226c-4280-a700-071a6c7ce88d',
-          startTimestamp: '1944-10-25T21:50:35.0Z',
-          status: 'incomplete',
+          dupeKinds: ['cookie_id', 'cookie_id', 'ssn9'],
+          fpId: '1d37dbdf-8b5c-4b12-924d-032deba2df5b',
+          startTimestamp: '1955-02-19T01:41:52.0Z',
+          status: 'in_progress',
         },
         {
           data: [
             {
               dataKind: 'document_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: false,
-              source: 'prefill',
-              transforms: {},
-              value: 'in et',
-            },
-            {
-              dataKind: 'vault_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
+              identifier: 'document.visa.classified_document_type',
               isDecryptable: false,
               source: 'tenant',
               transforms: {},
-              value: 'occaecat',
+              value: 'aliquip aliqua enim cillum',
+            },
+            {
+              dataKind: 'document_data',
+              identifier: 'document.voter_identification.back.mime_type',
+              isDecryptable: false,
+              source: 'prefill',
+              transforms: {},
+              value: 'dolor sunt laborum do',
+            },
+            {
+              dataKind: 'document_data',
+              identifier: 'document.passport_card.issuing_state',
+              isDecryptable: false,
+              source: 'ocr',
+              transforms: {},
+              value: 'nisi mollit cillum nulla sit',
+            },
+          ],
+          dupeKinds: ['cookie_id', 'ssn9', 'bank_routing_account'],
+          fpId: '1d37dbdf-8b5c-4b12-924d-032deba2df5b',
+          startTimestamp: '1950-07-26T09:01:41.0Z',
+          status: 'none',
+        },
+        {
+          data: [
+            {
+              dataKind: 'vault_data',
+              identifier: 'document.residence_document.expires_at',
+              isDecryptable: false,
+              source: 'bootstrap',
+              transforms: {},
+              value: 'pariatur in eiusmod',
             },
             {
               dataKind: 'vault_data',
-              identifier: '08b1f3fe-f724-4c72-b29e-12cd32873755',
-              isDecryptable: true,
-              source: 'components_sdk',
+              identifier: 'id.drivers_license_state',
+              isDecryptable: false,
+              source: 'client_tenant',
               transforms: {},
-              value: 'dolore',
+              value: 'culpa',
+            },
+            {
+              dataKind: 'document_data',
+              identifier: 'card.*.billing_address.country',
+              isDecryptable: false,
+              source: 'tenant',
+              transforms: {},
+              value: 'voluptate',
             },
           ],
-          dupeKinds: ['bank_routing_account', 'name_ssn4', 'ssn9'],
-          fpId: '687a7568-226c-4280-a700-071a6c7ce88d',
-          startTimestamp: '1937-03-26T13:28:28.0Z',
-          status: 'in_progress',
+          dupeKinds: ['device_id', 'card_number_cvc', 'bank_routing_account'],
+          fpId: '1d37dbdf-8b5c-4b12-924d-032deba2df5b',
+          startTimestamp: '1910-06-22T22:13:39.0Z',
+          status: 'pass',
         },
       ],
     },
     props,
-  ) as Dupes;
-export const getEditRule = (props: Partial<EditRule>) =>
-  merge(
+  );
+export const getEditRule = (props: Partial<EditRule>): EditRule =>
+  merge<EditRule, Partial<EditRule>>(
     {
       ruleExpression: [
         {
-          field: 'business_name_similar_match',
-          op: 'eq',
-          value: true,
-        },
-        {
-          field: 'browser_automation',
+          field: 'ssn_located_issue_date_cannot_be_verified',
           op: 'not_eq',
-          value: true,
+          value: false,
         },
         {
-          field: 'business_address_deliverable',
+          field: 'ssn_potentially_belongs_to_another',
+          op: 'eq',
+          value: false,
+        },
+        {
+          field: 'document_ocr_name_matches',
           op: 'eq',
           value: true,
         },
       ],
-      ruleId: '972ffa9f-68bd-4333-9f25-6d1783bdd919',
+      ruleId: 'f3f80328-4e1a-4e29-b702-ed62b60265a7',
     },
     props,
-  ) as EditRule;
-export const getEmpty = (props: Partial<Empty>) => merge({}, props) as Empty;
-export const getEnclaveHealthResponse = (props: Partial<EnclaveHealthResponse>) =>
-  merge(
+  );
+export const getEmpty = (props: Partial<Empty>): Empty => merge<Empty, Partial<Empty>>({}, props);
+export const getEnclaveHealthResponse = (props: Partial<EnclaveHealthResponse>): EnclaveHealthResponse =>
+  merge<EnclaveHealthResponse, Partial<EnclaveHealthResponse>>(
     {
-      decryptMs: 32030326,
-      keypairGenMs: 30250206,
-      success: true,
+      decryptMs: -18567333,
+      keypairGenMs: -41244421,
+      success: false,
     },
     props,
-  ) as EnclaveHealthResponse;
-export const getEnhancedAml = (props: Partial<EnhancedAml>) =>
-  merge(
+  );
+export const getEnhancedAml = (props: Partial<EnhancedAml>): EnhancedAml =>
+  merge<EnhancedAml, Partial<EnhancedAml>>(
     {
       adverseMedia: false,
-      enhancedAml: false,
+      enhancedAml: true,
       matchKind: 'fuzzy_medium',
-      ofac: true,
-      pep: false,
+      ofac: false,
+      pep: true,
     },
     props,
-  ) as EnhancedAml;
-export const getEntity = (props: Partial<Entity>) =>
-  merge(
+  );
+export const getEntity = (props: Partial<Entity>): Entity =>
+  merge<Entity, Partial<Entity>>(
     {
       attributes: [
-        'document.passport_card.full_address',
-        'document.visa.classified_document_type',
-        'document.id_card.address_line1',
+        'document.permit.issuing_country',
+        'document.passport.full_name',
+        'document.residence_document.full_address',
       ],
       data: [
         {
-          dataKind: 'document_data',
-          identifier: 'e02e12db-8a38-4b81-9a6c-0fdce1798996',
+          dataKind: 'vault_data',
+          identifier: 'card.*.expiration_year',
           isDecryptable: false,
+          source: 'hosted',
+          transforms: {},
+          value: 'exercitation',
+        },
+        {
+          dataKind: 'document_data',
+          identifier: 'document.visa.first_name',
+          isDecryptable: true,
           source: 'client_tenant',
           transforms: {},
-          value: 'fugiat est in cillum',
+          value: 'nulla cupidatat dolore adipisicing exercitation',
         },
         {
-          dataKind: 'vault_data',
-          identifier: 'e02e12db-8a38-4b81-9a6c-0fdce1798996',
+          dataKind: 'document_data',
+          identifier: 'investor_profile.occupation',
           isDecryptable: true,
-          source: 'bootstrap',
-          transforms: {},
-          value: 'nulla',
-        },
-        {
-          dataKind: 'vault_data',
-          identifier: 'e02e12db-8a38-4b81-9a6c-0fdce1798996',
-          isDecryptable: false,
           source: 'tenant',
           transforms: {},
-          value: 'sunt laborum eiusmod do',
+          value: 'laborum Duis',
         },
       ],
-      decryptableAttributes: ['document.id_card.state', 'document.residence_document.last_name', 'id.us_legal_status'],
+      decryptableAttributes: [
+        'document.residence_document.front.mime_type',
+        'document.residence_document.gender',
+        'document.id_card.samba_activity_history_response',
+      ],
       decryptedAttributes: {},
-      externalId: 'b8b0ef2b-c25f-4d6d-bd0a-d5b069233af0',
+      externalId: '3fad5ed9-77cc-46ce-930d-5b2793f8b48e',
       hasOutstandingWorkflowRequest: true,
-      id: '66e306a9-3f30-4ef8-8705-153ec443c672',
-      isCreatedViaApi: false,
+      id: '277e0b1c-59ba-402b-835f-cf922c24f69e',
+      isCreatedViaApi: true,
       isIdentifiable: true,
       isPortable: false,
-      kind: 'person',
+      kind: 'business',
       label: 'offboard_fraud',
-      lastActivityAt: '1949-07-18T22:54:19.0Z',
-      manualReviewKinds: ['document_needs_review', 'document_needs_review', 'rule_triggered'],
-      orderingId: -93048219,
-      requiresManualReview: true,
-      sandboxId: 'fc56a856-c466-46f6-82ce-d6e958ae5041',
-      startTimestamp: '1902-11-25T20:22:38.0Z',
-      status: 'pass',
-      svId: '4c9c3fec-7024-493f-9973-b940fa906303',
+      lastActivityAt: '1890-07-15T01:01:56.0Z',
+      manualReviewKinds: ['rule_triggered', 'rule_triggered', 'document_needs_review'],
+      orderingId: -35621100,
+      requiresManualReview: false,
+      sandboxId: '92eb538b-8483-4e7d-b536-9081f1008519',
+      startTimestamp: '1921-01-18T23:55:51.0Z',
+      status: 'fail',
+      svId: '0521736c-40ff-418a-8211-fdec41b28b8e',
       tags: [
         {
-          createdAt: '1925-07-06T09:47:21.0Z',
-          id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-          tag: 'transaction_chargeback',
+          createdAt: '1902-12-03T05:52:51.0Z',
+          id: '13f896a0-b930-4afb-ace7-7651a3135f2e',
+          tag: 'Excepteur Lorem',
         },
         {
-          createdAt: '1901-09-07T11:38:59.0Z',
-          id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-          tag: 'transaction_chargeback',
+          createdAt: '1904-01-18T12:30:09.0Z',
+          id: '13f896a0-b930-4afb-ace7-7651a3135f2e',
+          tag: 'labore',
         },
         {
-          createdAt: '1906-06-21T16:51:48.0Z',
-          id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-          tag: 'transaction_chargeback',
+          createdAt: '1905-06-06T15:24:02.0Z',
+          id: '13f896a0-b930-4afb-ace7-7651a3135f2e',
+          tag: 'consequat veniam dolore voluptate',
         },
       ],
-      vId: '0adbde5a-836b-41ef-b197-1701a4665890',
+      vId: 'b72f7b2a-1f6f-41e7-b018-333f1702a46c',
       watchlistCheck: {
-        id: '9ed638f6-831e-4b72-bc20-61d82c23c732',
-        reasonCodes: ['document_low_match_score_with_selfie', 'ssn_input_is_invalid', 'ip_vpn'],
-        status: 'fail',
+        id: '9494a19e-ac68-4655-bc20-e88337ab107d',
+        reasonCodes: ['curp_service_not_available', 'name_does_not_match', 'business_website_unverified'],
+        status: 'pass',
       },
       workflows: [
         {
-          createdAt: '1931-05-25T02:38:51.0Z',
+          createdAt: '1906-11-27T01:46:33.0Z',
           insightEvent: {
-            city: 'Fort Corenecester',
-            country: 'Nepal',
-            ipAddress: '500 E Central Avenue Suite 694',
-            latitude: 57690017.07432139,
-            longitude: 68465125.73705131,
-            metroCode: 'voluptate',
-            postalCode: 'sint ea',
-            region: 'id eiusmod aute sed',
-            regionName: "Maggie D'Amore",
-            sessionId: '12154d6f-8cb2-45e2-870a-f7ff4c33e855',
-            timeZone: 'ut mollit qui anim',
-            timestamp: '1899-05-20T02:05:57.0Z',
-            userAgent: 'aute velit',
+            city: 'Stammfield',
+            country: 'Switzerland',
+            ipAddress: '17971 Eleazar Lake Suite 248',
+            latitude: 91091649.84232688,
+            longitude: -43037931.67959897,
+            metroCode: 'culpa adipisicing',
+            postalCode: 'nulla tempor',
+            region: 'Duis non',
+            regionName: 'Erin Swaniawski',
+            sessionId: 'a5c0f86a-5f67-484b-98c8-14e0b3177348',
+            timeZone: 'et',
+            timestamp: '1908-07-25T12:04:52.0Z',
+            userAgent: 'dolor commodo incididunt voluptate',
           },
-          playbookId: '8965e32c-94d8-44ef-bbe3-4ec49010be72',
+          playbookId: '857e680c-cf2b-4e5b-957d-20221ff7668f',
+          status: 'none',
+        },
+        {
+          createdAt: '1961-10-10T05:16:42.0Z',
+          insightEvent: {
+            city: 'Stammfield',
+            country: 'Switzerland',
+            ipAddress: '17971 Eleazar Lake Suite 248',
+            latitude: 11100256.469420299,
+            longitude: -50318453.17635351,
+            metroCode: 'laboris pariatur',
+            postalCode: 'dolor cupidatat enim officia nisi',
+            region: 'ipsum dolore id sed consequat',
+            regionName: 'Erin Swaniawski',
+            sessionId: 'a5c0f86a-5f67-484b-98c8-14e0b3177348',
+            timeZone: 'nulla quis',
+            timestamp: '1908-06-14T01:21:46.0Z',
+            userAgent: 'ea aliquip pariatur irure est',
+          },
+          playbookId: '857e680c-cf2b-4e5b-957d-20221ff7668f',
+          status: 'fail',
+        },
+        {
+          createdAt: '1944-05-24T22:46:56.0Z',
+          insightEvent: {
+            city: 'Stammfield',
+            country: 'Switzerland',
+            ipAddress: '17971 Eleazar Lake Suite 248',
+            latitude: -25182833.238609254,
+            longitude: 50345231.4855378,
+            metroCode: 'non irure',
+            postalCode: 'ipsum eu minim',
+            region: 'in cupidatat',
+            regionName: 'Erin Swaniawski',
+            sessionId: 'a5c0f86a-5f67-484b-98c8-14e0b3177348',
+            timeZone: 'exercitation magna laboris occaecat amet',
+            timestamp: '1949-03-22T13:39:21.0Z',
+            userAgent: 'proident anim tempor',
+          },
+          playbookId: '857e680c-cf2b-4e5b-957d-20221ff7668f',
           status: 'pending',
-        },
-        {
-          createdAt: '1953-02-16T20:20:36.0Z',
-          insightEvent: {
-            city: 'Fort Corenecester',
-            country: 'Nepal',
-            ipAddress: '500 E Central Avenue Suite 694',
-            latitude: 62327468.18875113,
-            longitude: 68770276.09436256,
-            metroCode: 'laborum',
-            postalCode: 'Excepteur',
-            region: 'exercitation',
-            regionName: "Maggie D'Amore",
-            sessionId: '12154d6f-8cb2-45e2-870a-f7ff4c33e855',
-            timeZone: 'cillum Excepteur laboris magna ipsum',
-            timestamp: '1942-10-11T21:20:26.0Z',
-            userAgent: 'Duis dolor',
-          },
-          playbookId: '8965e32c-94d8-44ef-bbe3-4ec49010be72',
-          status: 'pass',
-        },
-        {
-          createdAt: '1899-09-13T07:23:09.0Z',
-          insightEvent: {
-            city: 'Fort Corenecester',
-            country: 'Nepal',
-            ipAddress: '500 E Central Avenue Suite 694',
-            latitude: -25700.494573310018,
-            longitude: 27226806.094379306,
-            metroCode: 'dolor Ut',
-            postalCode: 'irure',
-            region: 'ullamco',
-            regionName: "Maggie D'Amore",
-            sessionId: '12154d6f-8cb2-45e2-870a-f7ff4c33e855',
-            timeZone: 'ad sit aliquip deserunt',
-            timestamp: '1955-02-14T17:26:31.0Z',
-            userAgent: 'commodo',
-          },
-          playbookId: '8965e32c-94d8-44ef-bbe3-4ec49010be72',
-          status: 'incomplete',
         },
       ],
     },
     props,
-  ) as Entity;
-export const getEntityAction = (props: Partial<EntityAction>) =>
-  merge(
+  );
+export const getEntityAction = (props: Partial<EntityAction>): EntityAction =>
+  merge<EntityAction, Partial<EntityAction>>(
     {
-      fpBid: '8bcb52ef-3199-499f-8545-1d829843d7cc',
+      fpBid: '2785553b-dc76-460c-8164-d64e1787be6e',
       kind: 'trigger',
-      note: 'ut',
+      note: 'Duis qui',
       trigger: {
         data: {
-          playbookId: 'f98181b9-7667-4d78-bea8-594aaa7e4184',
-          recollectAttributes: ['ssn4', 'business_kyced_beneficial_owners', 'name'],
+          playbookId: 'cd831b57-f413-4486-91af-5090f3fd0127',
+          recollectAttributes: ['nationality', 'ssn4', 'business_address'],
           reuseExistingBoKyc: true,
         },
         kind: 'onboard',
       },
     },
     props,
-  ) as EntityAction;
-export const getEntityActionResponse = (props: Partial<EntityActionResponse>) =>
-  merge(
+  );
+export const getEntityActionResponse = (props: Partial<EntityActionResponse>): EntityActionResponse =>
+  merge<EntityActionResponse, Partial<EntityActionResponse>>(
     {
-      expiresAt: '1955-06-26T14:27:14.0Z',
+      expiresAt: '1917-10-30T15:03:11.0Z',
       kind: 'trigger',
-      link: 'https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt',
-      token: 'utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt',
+      link: 'fugiat adipisicing anim et enim',
+      token: 'de8a5133-091c-4879-b82e-d3e27a7def31',
     },
     props,
-  ) as EntityActionResponse;
-export const getEntityActionsRequest = (props: Partial<EntityActionsRequest>) =>
-  merge(
+  );
+export const getEntityActionsRequest = (props: Partial<EntityActionsRequest>): EntityActionsRequest =>
+  merge<EntityActionsRequest, Partial<EntityActionsRequest>>(
     {
       actions: [
         {
-          fpBid: '2008faaa-a4b3-427e-adbe-b33c4bedf7fa',
+          fpBid: '98aef0f8-a261-4906-8805-5934a4149c4e',
           kind: 'trigger',
-          note: 'sit',
+          note: 'exercitation deserunt minim nulla',
           trigger: {
             data: {
-              playbookId: 'cd0fec6b-f3aa-437e-9504-3c90b2d7530b',
-              recollectAttributes: ['business_phone_number', 'name', 'business_address'],
+              playbookId: 'f7677c88-b13a-4762-9dc6-a1363a704fa5',
+              recollectAttributes: ['ssn4', 'business_phone_number', 'phone_number'],
               reuseExistingBoKyc: true,
             },
             kind: 'onboard',
           },
         },
         {
-          fpBid: '2008faaa-a4b3-427e-adbe-b33c4bedf7fa',
+          fpBid: '98aef0f8-a261-4906-8805-5934a4149c4e',
           kind: 'trigger',
-          note: 'dolor',
+          note: 'tempor ut enim',
           trigger: {
             data: {
-              playbookId: 'cd0fec6b-f3aa-437e-9504-3c90b2d7530b',
-              recollectAttributes: ['business_beneficial_owners', 'business_website', 'bank'],
+              playbookId: 'f7677c88-b13a-4762-9dc6-a1363a704fa5',
+              recollectAttributes: ['email', 'email', 'business_address'],
               reuseExistingBoKyc: false,
             },
             kind: 'onboard',
           },
         },
         {
-          fpBid: '2008faaa-a4b3-427e-adbe-b33c4bedf7fa',
+          fpBid: '98aef0f8-a261-4906-8805-5934a4149c4e',
           kind: 'trigger',
-          note: 'est',
+          note: 'eiusmod qui',
           trigger: {
             data: {
-              playbookId: 'cd0fec6b-f3aa-437e-9504-3c90b2d7530b',
-              recollectAttributes: ['us_tax_id', 'name', 'full_address'],
+              playbookId: 'f7677c88-b13a-4762-9dc6-a1363a704fa5',
+              recollectAttributes: ['us_tax_id', 'business_phone_number', 'email'],
               reuseExistingBoKyc: true,
             },
             kind: 'onboard',
@@ -3111,607 +3148,611 @@ export const getEntityActionsRequest = (props: Partial<EntityActionsRequest>) =>
       ],
     },
     props,
-  ) as EntityActionsRequest;
-export const getEntityAttribute = (props: Partial<EntityAttribute>) =>
-  merge(
+  );
+export const getEntityAttribute = (props: Partial<EntityAttribute>): EntityAttribute =>
+  merge<EntityAttribute, Partial<EntityAttribute>>(
     {
       dataKind: 'document_data',
-      identifier: '9607baaf-bf40-4eae-b941-24ce162efd9a',
+      identifier: 'document.visa.full_name',
       isDecryptable: true,
-      source: 'components_sdk',
+      source: 'vendor',
       transforms: {},
-      value: 'voluptate ea nostrud cupidatat officia',
+      value: 'tempor consequat',
     },
     props,
-  ) as EntityAttribute;
-export const getEntityOnboarding = (props: Partial<EntityOnboarding>) =>
-  merge(
+  );
+export const getEntityOnboarding = (props: Partial<EntityOnboarding>): EntityOnboarding =>
+  merge<EntityOnboarding, Partial<EntityOnboarding>>(
     {
-      id: '6f762f24-0080-4295-9351-2206c26f869c',
-      playbookKey: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
+      id: 'cfa455b0-a178-4dab-a96e-b505c29965d0',
+      playbookKey: '2c6b1579-a878-4723-a5b6-968b0d666bac',
       ruleSetResults: [
         {
-          id: 'a94f93df-85c0-4d6f-8f34-970a84cf1a16',
-          timestamp: '1906-12-16T05:42:14.0Z',
+          id: 'c0f89046-673b-408f-ba38-54d43b1a29cd',
+          timestamp: '1953-07-10T04:23:51.0Z',
         },
         {
-          id: 'a94f93df-85c0-4d6f-8f34-970a84cf1a16',
-          timestamp: '1946-01-05T21:57:15.0Z',
+          id: 'c0f89046-673b-408f-ba38-54d43b1a29cd',
+          timestamp: '1927-12-02T20:01:46.0Z',
         },
         {
-          id: 'a94f93df-85c0-4d6f-8f34-970a84cf1a16',
-          timestamp: '1957-12-05T18:53:48.0Z',
+          id: 'c0f89046-673b-408f-ba38-54d43b1a29cd',
+          timestamp: '1921-04-21T21:26:33.0Z',
         },
       ],
-      seqno: -43778718,
-      status: 'fail',
-      timestamp: '1931-12-05T22:19:55.0Z',
+      seqno: -23781818,
+      status: 'incomplete',
+      timestamp: '1932-12-13T13:55:15.0Z',
     },
     props,
-  ) as EntityOnboarding;
-export const getEntityOnboardingRuleSetResult = (props: Partial<EntityOnboardingRuleSetResult>) =>
-  merge(
+  );
+export const getEntityOnboardingRuleSetResult = (
+  props: Partial<EntityOnboardingRuleSetResult>,
+): EntityOnboardingRuleSetResult =>
+  merge<EntityOnboardingRuleSetResult, Partial<EntityOnboardingRuleSetResult>>(
     {
-      id: '2e06775c-9e50-4828-994d-63a056db853f',
-      timestamp: '1965-01-06T20:28:08.0Z',
+      id: 'd63c3f7e-bc44-49fc-80ed-ff85ba335f82',
+      timestamp: '1911-04-21T17:21:45.0Z',
     },
     props,
-  ) as EntityOnboardingRuleSetResult;
-export const getEntityStatus = (props: Partial<EntityStatus>) => (props ?? 'none') as EntityStatus;
-export const getEntityWorkflow = (props: Partial<EntityWorkflow>) =>
-  merge(
+  );
+export const getEntityStatus = (props: EntityStatus): EntityStatus => props ?? 'pass';
+export const getEntityWorkflow = (props: Partial<EntityWorkflow>): EntityWorkflow =>
+  merge<EntityWorkflow, Partial<EntityWorkflow>>(
     {
-      createdAt: '1948-06-18T20:45:26.0Z',
+      createdAt: '1957-05-15T02:18:42.0Z',
       insightEvent: {
-        city: 'East Dock',
-        country: 'Angola',
-        ipAddress: '2533 Jared Pike Suite 452',
-        latitude: -31923249.14921026,
-        longitude: 12186130.982524455,
-        metroCode: 'dolor eu ullamco veniam',
-        postalCode: 'in exercitation',
-        region: 'fugiat consequat',
-        regionName: 'Derrick Cole',
-        sessionId: 'acc26057-611b-45fb-ab5a-1257ab398b4d',
-        timeZone: 'elit',
-        timestamp: '1937-07-15T11:19:03.0Z',
-        userAgent: 'fugiat',
+        city: 'Schaeferfort',
+        country: 'Yemen',
+        ipAddress: '8890 Shirley Ways Apt. 125',
+        latitude: 62887500.43035951,
+        longitude: -22899305.07545437,
+        metroCode: 'eiusmod laboris in cillum sed',
+        postalCode: 'elit minim',
+        region: 'consequat sunt aliquip',
+        regionName: 'Dr. Rufus Pouros',
+        sessionId: 'f4179fbb-8326-4e69-a4b3-e3e94b4812ae',
+        timeZone: 'tempor mollit velit nostrud',
+        timestamp: '1921-12-03T21:13:08.0Z',
+        userAgent: 'enim',
       },
-      playbookId: '742f3a98-2b89-4324-9631-2820a01f2f88',
+      playbookId: 'cf4a48a7-943a-48cf-9e9b-9fcee6d45732',
       status: 'pending',
     },
     props,
-  ) as EntityWorkflow;
-export const getEquals = (props: Partial<Equals>) => (props ?? 'eq') as Equals;
-export const getEvaluateRuleRequest = (props: Partial<EvaluateRuleRequest>) =>
-  merge(
+  );
+export const getEquals = (props: Equals): Equals => props ?? 'not_eq';
+export const getEvaluateRuleRequest = (props: Partial<EvaluateRuleRequest>): EvaluateRuleRequest =>
+  merge<EvaluateRuleRequest, Partial<EvaluateRuleRequest>>(
     {
       add: [
         {
+          isShadow: true,
+          name: 'Charlene Tromp',
+          ruleAction: 'step_up.identity_proof_of_ssn',
+          ruleExpression: [
+            {
+              field: 'document_not_fake_image',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'document_full_name_crosscheck_does_not_match',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'document_selfie_mask',
+              op: 'eq',
+              value: true,
+            },
+          ],
+        },
+        {
           isShadow: false,
-          name: 'Travis Mueller',
-          ruleAction: 'step_up.identity',
-          ruleExpression: [
-            {
-              field: 'sos_active_filing_found',
-              op: 'not_eq',
-              value: true,
-            },
-            {
-              field: 'us_tax_id_is_itin',
-              op: 'eq',
-              value: false,
-            },
-            {
-              field: 'document_country_code_mismatch',
-              op: 'not_eq',
-              value: true,
-            },
-          ],
-        },
-        {
-          isShadow: true,
-          name: 'Travis Mueller',
-          ruleAction: 'step_up.identity',
-          ruleExpression: [
-            {
-              field: 'document_photo_is_paper_capture',
-              op: 'eq',
-              value: true,
-            },
-            {
-              field: 'document_ocr_dob_matches',
-              op: 'eq',
-              value: false,
-            },
-            {
-              field: 'sos_domestic_filing_status_pending_inactive',
-              op: 'eq',
-              value: false,
-            },
-          ],
-        },
-        {
-          isShadow: true,
-          name: 'Travis Mueller',
+          name: 'Charlene Tromp',
           ruleAction: 'manual_review',
           ruleExpression: [
             {
-              field: 'document_not_live_capture',
+              field: 'device_high_risk',
               op: 'eq',
               value: true,
             },
             {
-              field: 'sentilink_identity_theft_high_risk',
+              field: 'curp_service_not_available',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'beneficial_owners_match',
               op: 'not_eq',
               value: true,
             },
+          ],
+        },
+        {
+          isShadow: true,
+          name: 'Charlene Tromp',
+          ruleAction: 'step_up.proof_of_address',
+          ruleExpression: [
             {
-              field: 'document_not_verified',
+              field: 'document_live_capture_failed',
               op: 'eq',
+              value: false,
+            },
+            {
+              field: 'business_address_commercial',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'address_street_number_matches',
+              op: 'not_eq',
               value: false,
             },
           ],
         },
       ],
-      delete: ['deserunt ea esse reprehenderit', 'anim qui minim irure labore', 'laborum Lorem fugiat aute nostrud'],
+      delete: ['quis in sed', 'nisi fugiat aliqua officia', 'aliqua nostrud'],
       edit: [
         {
           ruleExpression: [
-            {
-              field: 'address_input_is_not_standard_prison',
-              op: 'eq',
-              value: false,
-            },
             {
               field: 'subject_deceased',
               op: 'eq',
               value: true,
             },
             {
-              field: 'ssn_input_is_itin',
+              field: 'name_matches',
               op: 'eq',
-              value: true,
-            },
-          ],
-          ruleId: '5dffef05-c7f1-4fa2-9ebd-01d899bdd4c0',
-        },
-        {
-          ruleExpression: [
-            {
-              field: 'business_name_no_watchlist_hits',
-              op: 'eq',
-              value: true,
-            },
-            {
-              field: 'beneficial_owners_do_not_match',
-              op: 'not_eq',
-              value: true,
-            },
-            {
-              field: 'email_high_risk_fraud',
-              op: 'eq',
-              value: true,
-            },
-          ],
-          ruleId: '5dffef05-c7f1-4fa2-9ebd-01d899bdd4c0',
-        },
-        {
-          ruleExpression: [
-            {
-              field: 'address_input_is_not_standard_university',
-              op: 'not_eq',
               value: false,
             },
             {
-              field: 'dob_matches',
-              op: 'not_eq',
-              value: true,
-            },
-            {
-              field: 'address_located_is_not_standard_campground',
+              field: 'curp_not_valid',
               op: 'not_eq',
               value: true,
             },
           ],
-          ruleId: '5dffef05-c7f1-4fa2-9ebd-01d899bdd4c0',
+          ruleId: '0f8d698f-a396-4103-8c99-71b42b10755a',
+        },
+        {
+          ruleExpression: [
+            {
+              field: 'tin_does_not_match',
+              op: 'not_eq',
+              value: true,
+            },
+            {
+              field: 'document_ocr_name_does_not_match',
+              op: 'eq',
+              value: false,
+            },
+            {
+              field: 'watchlist_hit_ofac',
+              op: 'eq',
+              value: false,
+            },
+          ],
+          ruleId: '0f8d698f-a396-4103-8c99-71b42b10755a',
+        },
+        {
+          ruleExpression: [
+            {
+              field: 'curp_not_valid',
+              op: 'eq',
+              value: true,
+            },
+            {
+              field: 'itin_is_expired',
+              op: 'eq',
+              value: false,
+            },
+            {
+              field: 'phone_located_name_matches',
+              op: 'eq',
+              value: true,
+            },
+          ],
+          ruleId: '0f8d698f-a396-4103-8c99-71b42b10755a',
         },
       ],
-      endTimestamp: '1895-02-03T08:07:57.0Z',
-      startTimestamp: '1951-07-22T02:47:11.0Z',
+      endTimestamp: '1903-03-05T10:23:17.0Z',
+      startTimestamp: '1927-09-24T16:58:10.0Z',
     },
     props,
-  ) as EvaluateRuleRequest;
-export const getExternalIntegrationCalled = (props: Partial<ExternalIntegrationCalled>) =>
-  merge(
+  );
+export const getExternalIntegrationCalled = (props: Partial<ExternalIntegrationCalled>): ExternalIntegrationCalled =>
+  merge<ExternalIntegrationCalled, Partial<ExternalIntegrationCalled>>(
     {
-      externalId: '3308ca64-34ed-452b-a220-b98be66b67d7',
+      externalId: 'b4baf450-9bee-457b-8c56-352779ab941c',
       integration: 'alpaca_cip',
-      successful: false,
+      successful: true,
     },
     props,
-  ) as ExternalIntegrationCalled;
-export const getExternalIntegrationKind = (props: Partial<ExternalIntegrationKind>) =>
-  (props ?? 'alpaca_cip') as ExternalIntegrationKind;
-export const getFieldValidation = (props: Partial<FieldValidation>) =>
-  merge(
+  );
+export const getExternalIntegrationKind = (props: ExternalIntegrationKind): ExternalIntegrationKind =>
+  props ?? 'alpaca_cip';
+export const getFieldValidation = (props: Partial<FieldValidation>): FieldValidation =>
+  merge<FieldValidation, Partial<FieldValidation>>(
     {
-      matchLevel: 'no_match',
+      matchLevel: 'partial',
       signals: [
         {
-          description: 'cillum sunt consectetur',
-          matchLevel: 'partial',
-          note: 'tempor dolore',
-          reasonCode: 'document_selfie_does_not_match',
-          severity: 'high',
-        },
-        {
-          description: 'amet sit ea',
-          matchLevel: 'exact',
-          note: 'ut aute exercitation occaecat ipsum',
-          reasonCode: 'device_gps_spoofing',
-          severity: 'high',
-        },
-        {
-          description: 'sint dolor aute eiusmod',
+          description: 'id in',
           matchLevel: 'no_match',
-          note: 'sit tempor consectetur quis',
-          reasonCode: 'document_possible_image_alteration',
+          note: 'non',
+          reasonCode: 'address_alert_stability',
+          severity: 'info',
+        },
+        {
+          description: 'ut dolor elit cupidatat',
+          matchLevel: 'partial',
+          note: 'non do',
+          reasonCode: 'document_dob_check_digit_matches',
+          severity: 'low',
+        },
+        {
+          description: 'esse dolore pariatur',
+          matchLevel: 'could_not_match',
+          note: 'nisi dolor',
+          reasonCode: 'subject_deceased',
           severity: 'medium',
         },
       ],
     },
     props,
-  ) as FieldValidation;
-export const getFieldValidationDetail = (props: Partial<FieldValidationDetail>) =>
-  merge(
+  );
+export const getFieldValidationDetail = (props: Partial<FieldValidationDetail>): FieldValidationDetail =>
+  merge<FieldValidationDetail, Partial<FieldValidationDetail>>(
     {
-      description: 'culpa ad',
+      description: 'elit do',
       matchLevel: 'no_match',
-      note: 'cillum qui',
-      reasonCode: 'attested_device_android_risky',
-      severity: 'info',
+      note: 'aliquip',
+      reasonCode: 'document_possible_image_alteration_back',
+      severity: 'low',
     },
     props,
-  ) as FieldValidationDetail;
-export const getFilterFunction = (props: Partial<FilterFunction>) =>
-  (props ?? "encrypt('<algorithm>','<public_key>')") as FilterFunction;
-export const getFootprintReasonCode = (props: Partial<FootprintReasonCode>) =>
-  (props ?? 'address_city_matches') as FootprintReasonCode;
-export const getGetClientTokenResponse = (props: Partial<GetClientTokenResponse>) =>
-  merge(
+  );
+export const getFilterFunction = (props: FilterFunction): FilterFunction =>
+  props ?? "encrypt('<algorithm>','<public_key>')";
+export const getFootprintReasonCode = (props: FootprintReasonCode): FootprintReasonCode =>
+  props ?? 'watchlist_hit_ofac';
+export const getGetClientTokenResponse = (props: Partial<GetClientTokenResponse>): GetClientTokenResponse =>
+  merge<GetClientTokenResponse, Partial<GetClientTokenResponse>>(
     {
-      expiresAt: '1914-10-15T18:15:17.0Z',
+      expiresAt: '1903-12-25T09:17:55.0Z',
       tenant: {
-        name: 'Pablo Murazik',
+        name: 'Della Friesen',
       },
       vaultFields: [
-        'document.passport.back.mime_type',
-        'document.id_card.postal_code',
-        'document.voter_identification.selfie.mime_type',
+        'document.voter_identification.last_name',
+        'document.residence_document.curp',
+        'document.id_card.issued_at',
       ],
     },
     props,
-  ) as GetClientTokenResponse;
-export const getGetClientTokenResponseTenant = (props: Partial<GetClientTokenResponseTenant>) =>
-  merge(
+  );
+export const getGetClientTokenResponseTenant = (
+  props: Partial<GetClientTokenResponseTenant>,
+): GetClientTokenResponseTenant =>
+  merge<GetClientTokenResponseTenant, Partial<GetClientTokenResponseTenant>>(
     {
-      name: 'Cecil Turcotte',
+      name: 'Doyle Thompson',
     },
     props,
-  ) as GetClientTokenResponseTenant;
-export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationResponse>) =>
-  merge(
+  );
+export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationResponse>): GetFieldValidationResponse =>
+  merge<GetFieldValidationResponse, Partial<GetFieldValidationResponse>>(
     {
       address: {
-        matchLevel: 'exact',
+        matchLevel: 'partial',
         signals: [
           {
-            description: 'culpa velit veniam sint',
+            description: 'pariatur exercitation non est',
             matchLevel: 'no_match',
-            note: 'Excepteur quis velit fugiat',
-            reasonCode: 'sos_domestic_filing_status_pending_inactive',
-            severity: 'medium',
+            note: 'eiusmod dolor nostrud nulla',
+            reasonCode: 'document_ocr_dob_matches',
+            severity: 'low',
           },
           {
-            description: 'consequat aute deserunt cillum',
-            matchLevel: 'no_match',
-            note: 'in Excepteur commodo ex',
-            reasonCode: 'document_ocr_not_successful',
-            severity: 'medium',
+            description: 'Ut',
+            matchLevel: 'exact',
+            note: 'Ut',
+            reasonCode: 'document_visible_photo_features_verified',
+            severity: 'low',
           },
           {
-            description: 'sit mollit eu',
-            matchLevel: 'partial',
-            note: 'in Ut',
-            reasonCode: 'ip_not_located',
-            severity: 'high',
+            description: 'exercitation ut nulla commodo laborum',
+            matchLevel: 'exact',
+            note: 'qui',
+            reasonCode: 'business_address_close_match',
+            severity: 'info',
           },
         ],
       },
       businessAddress: {
-        matchLevel: 'exact',
+        matchLevel: 'no_match',
         signals: [
           {
-            description: 'consectetur enim laboris cupidatat',
+            description: 'nisi ut sed Ut',
             matchLevel: 'no_match',
-            note: 'id eiusmod eu dolor',
-            reasonCode: 'document_selfie_bad_quality',
-            severity: 'medium',
-          },
-          {
-            description: 'magna elit labore',
-            matchLevel: 'could_not_match',
-            note: 'culpa',
-            reasonCode: 'device_gps_spoofing',
+            note: 'ut',
+            reasonCode: 'document_is_permit_or_provisional_license',
             severity: 'info',
           },
           {
-            description: 'ullamco ut cupidatat dolore',
-            matchLevel: 'exact',
-            note: 'officia id cillum irure dolore',
-            reasonCode: 'multiple_records_found',
+            description: 'amet esse culpa Duis cupidatat',
+            matchLevel: 'partial',
+            note: 'Duis occaecat sunt laboris',
+            reasonCode: 'document_possible_image_alteration_front',
             severity: 'low',
+          },
+          {
+            description: 'Ut incididunt id',
+            matchLevel: 'exact',
+            note: 'sint consectetur ad officia',
+            reasonCode: 'sos_filing_not_found',
+            severity: 'medium',
           },
         ],
       },
       businessBeneficialOwners: {
-        matchLevel: 'exact',
+        matchLevel: 'could_not_match',
         signals: [
           {
-            description: 'irure ut voluptate non',
-            matchLevel: 'could_not_match',
-            note: 'minim labore et',
-            reasonCode: 'sos_domestic_active_filing_found',
-            severity: 'info',
-          },
-          {
-            description: 'et Duis labore do incididunt',
-            matchLevel: 'could_not_match',
-            note: 'enim ex ad',
-            reasonCode: 'business_address_not_deliverable',
-            severity: 'high',
-          },
-          {
-            description: 'eiusmod',
-            matchLevel: 'could_not_match',
-            note: 'ipsum quis sunt',
-            reasonCode: 'document_photo_is_not_screen_capture',
+            description: 'est ullamco cillum sit',
+            matchLevel: 'partial',
+            note: 'aute sint',
+            reasonCode: 'business_name_no_watchlist_hits',
             severity: 'low',
+          },
+          {
+            description: 'sit esse consectetur enim',
+            matchLevel: 'partial',
+            note: 'quis pariatur nisi in',
+            reasonCode: 'tin_not_found',
+            severity: 'low',
+          },
+          {
+            description: 'occaecat consectetur dolore esse',
+            matchLevel: 'no_match',
+            note: 'proident',
+            reasonCode: 'browser_tampering',
+            severity: 'info',
           },
         ],
       },
       businessDba: {
-        matchLevel: 'partial',
+        matchLevel: 'exact',
         signals: [
           {
-            description: 'laborum nostrud ipsum',
-            matchLevel: 'exact',
-            note: 'voluptate exercitation tempor',
-            reasonCode: 'id_flagged',
+            description: 'laborum',
+            matchLevel: 'no_match',
+            note: 'in nisi',
+            reasonCode: 'document_ocr_successful',
+            severity: 'medium',
+          },
+          {
+            description: 'Ut occaecat officia',
+            matchLevel: 'no_match',
+            note: 'nisi cillum pariatur ad',
+            reasonCode: 'visa_is_other',
             severity: 'info',
           },
           {
-            description: 'velit officia id',
-            matchLevel: 'exact',
-            note: 'nulla ut',
-            reasonCode: 'document_visible_photo_features_not_verified',
+            description: 'non',
+            matchLevel: 'could_not_match',
+            note: 'laboris pariatur',
+            reasonCode: 'document_ocr_address_could_not_match',
             severity: 'high',
           },
+        ],
+      },
+      businessName: {
+        matchLevel: 'exact',
+        signals: [
           {
-            description: 'voluptate irure amet consectetur dolore',
+            description: 'laboris est',
+            matchLevel: 'could_not_match',
+            note: 'cupidatat',
+            reasonCode: 'email_domain_corporate',
+            severity: 'info',
+          },
+          {
+            description: 'ut ullamco',
             matchLevel: 'no_match',
-            note: 'dolore elit',
+            note: 'id exercitation',
+            reasonCode: 'business_website_parking_page',
+            severity: 'info',
+          },
+          {
+            description: 'reprehenderit dolore magna',
+            matchLevel: 'could_not_match',
+            note: 'in ut',
             reasonCode: 'tin_does_not_match',
             severity: 'low',
           },
         ],
       },
-      businessName: {
+      businessPhoneNumber: {
         matchLevel: 'could_not_match',
         signals: [
           {
-            description: 'Lorem consequat reprehenderit ea eiusmod',
+            description: 'labore non dolor laboris',
             matchLevel: 'exact',
-            note: 'in id nostrud',
-            reasonCode: 'document_ocr_last_name_does_not_match',
-            severity: 'info',
-          },
-          {
-            description: 'dolor laboris mollit sed culpa',
-            matchLevel: 'exact',
-            note: 'aute enim',
-            reasonCode: 'attested_device_android',
-            severity: 'info',
-          },
-          {
-            description: 'ullamco Ut consequat deserunt',
-            matchLevel: 'could_not_match',
-            note: 'dolore',
-            reasonCode: 'ssn_issue_date_cannot_be_verified',
-            severity: 'low',
-          },
-        ],
-      },
-      businessPhoneNumber: {
-        matchLevel: 'no_match',
-        signals: [
-          {
-            description: 'enim occaecat labore esse',
-            matchLevel: 'partial',
-            note: 'consequat',
-            reasonCode: 'phone_located_name_does_not_match',
-            severity: 'medium',
-          },
-          {
-            description: 'elit deserunt reprehenderit eiusmod',
-            matchLevel: 'could_not_match',
-            note: 'consectetur sint',
-            reasonCode: 'input_phone_number_does_not_match_ip_state',
+            note: 'quis',
+            reasonCode: 'curp_multiple_results_for_data',
             severity: 'high',
           },
           {
-            description: 'ipsum sit',
-            matchLevel: 'no_match',
-            note: 'et enim nostrud',
-            reasonCode: 'curp_input_curp_invalid',
-            severity: 'medium',
+            description: 'id dolor culpa',
+            matchLevel: 'partial',
+            note: 'labore minim aliquip reprehenderit consequat',
+            reasonCode: 'document_ocr_dob_matches',
+            severity: 'high',
+          },
+          {
+            description: 'dolore id laboris',
+            matchLevel: 'could_not_match',
+            note: 'minim ea cillum non ut',
+            reasonCode: 'business_dba_match',
+            severity: 'info',
           },
         ],
       },
       businessTin: {
-        matchLevel: 'exact',
+        matchLevel: 'partial',
         signals: [
           {
-            description: 'laboris adipisicing',
-            matchLevel: 'no_match',
-            note: 'consectetur',
-            reasonCode: 'phone_located_name_partially_matches',
+            description: 'culpa aliquip consectetur cillum',
+            matchLevel: 'partial',
+            note: 'in qui incididunt',
+            reasonCode: 'email_address_invalid',
             severity: 'low',
           },
           {
-            description: 'culpa deserunt qui quis',
-            matchLevel: 'no_match',
-            note: 'enim occaecat',
-            reasonCode: 'business_address_does_not_match',
-            severity: 'low',
+            description: 'est',
+            matchLevel: 'partial',
+            note: 'est',
+            reasonCode: 'sentilink_identity_theft_low_risk',
+            severity: 'medium',
           },
           {
-            description: 'ad nisi adipisicing cupidatat',
-            matchLevel: 'could_not_match',
-            note: 'eiusmod enim amet reprehenderit',
-            reasonCode: 'dob_matches',
-            severity: 'high',
+            description: 'Lorem amet esse',
+            matchLevel: 'no_match',
+            note: 'Excepteur nisi laboris',
+            reasonCode: 'document_selfie_glasses',
+            severity: 'info',
           },
         ],
       },
       dob: {
-        matchLevel: 'partial',
+        matchLevel: 'could_not_match',
         signals: [
           {
-            description: 'anim dolor Excepteur elit consectetur',
+            description: 'ea elit in consectetur pariatur',
             matchLevel: 'could_not_match',
-            note: 'ipsum et in',
-            reasonCode: 'tin_match',
-            severity: 'medium',
-          },
-          {
-            description: 'irure incididunt ea aliqua',
-            matchLevel: 'no_match',
-            note: 'eiusmod sed eu',
-            reasonCode: 'phone_located_name_partially_matches',
-            severity: 'medium',
-          },
-          {
-            description: 'nisi minim adipisicing proident Duis',
-            matchLevel: 'exact',
-            note: 'amet Excepteur proident aliquip ut',
-            reasonCode: 'dob_does_not_match',
+            note: 'ad',
+            reasonCode: 'document_selfie_does_not_match',
             severity: 'low',
+          },
+          {
+            description: 'id minim sed mollit sit',
+            matchLevel: 'partial',
+            note: 'aliqua ex',
+            reasonCode: 'document_selfie_does_not_match',
+            severity: 'medium',
+          },
+          {
+            description: 'incididunt irure aute nulla dolor',
+            matchLevel: 'no_match',
+            note: 'sint',
+            reasonCode: 'input_phone_number_does_not_match_input_state',
+            severity: 'medium',
           },
         ],
       },
       document: {
-        matchLevel: 'partial',
+        matchLevel: 'could_not_match',
         signals: [
           {
-            description: 'ipsum nisi Duis',
+            description: 'dolore et Duis amet',
             matchLevel: 'partial',
-            note: 'voluptate',
-            reasonCode: 'document_barcode_could_not_be_detected',
+            note: 'sunt adipisicing laborum',
+            reasonCode: 'name_matches',
             severity: 'low',
           },
           {
-            description: 'consequat',
+            description: 'non',
             matchLevel: 'partial',
-            note: 'occaecat est nisi dolor dolore',
-            reasonCode: 'phone_located_address_does_not_match',
-            severity: 'info',
+            note: 'in ipsum',
+            reasonCode: 'dob_yob_matches',
+            severity: 'low',
           },
           {
-            description: 'ut',
-            matchLevel: 'partial',
-            note: 'in',
-            reasonCode: 'dob_yob_does_not_match',
-            severity: 'low',
+            description: 'est',
+            matchLevel: 'could_not_match',
+            note: 'ea cupidatat voluptate enim',
+            reasonCode: 'beneficial_owners_do_not_match',
+            severity: 'medium',
           },
         ],
       },
       email: {
-        matchLevel: 'could_not_match',
+        matchLevel: 'no_match',
         signals: [
           {
-            description: 'in mollit elit Lorem',
+            description: 'cupidatat incididunt Lorem mollit irure',
+            matchLevel: 'could_not_match',
+            note: 'Lorem Duis labore do dolor',
+            reasonCode: 'document_barcode_content_matches',
+            severity: 'info',
+          },
+          {
+            description: 'cillum',
             matchLevel: 'no_match',
-            note: 'esse velit Ut tempor elit',
-            reasonCode: 'document_barcode_could_be_read',
+            note: 'esse sit consectetur',
+            reasonCode: 'document_full_name_crosscheck_matches',
             severity: 'high',
           },
           {
-            description: 'id sed in fugiat',
+            description: 'sed labore',
             matchLevel: 'could_not_match',
-            note: 'ad sint qui',
-            reasonCode: 'watchlist_hit_warning',
-            severity: 'medium',
-          },
-          {
-            description: 'Lorem laboris eiusmod quis',
-            matchLevel: 'exact',
-            note: 'eiusmod',
-            reasonCode: 'document_ocr_first_name_does_not_match',
-            severity: 'medium',
+            note: 'fugiat aute adipisicing Ut enim',
+            reasonCode: 'ip_state_matches',
+            severity: 'low',
           },
         ],
       },
       name: {
-        matchLevel: 'exact',
+        matchLevel: 'no_match',
         signals: [
           {
-            description: 'proident nisi et',
-            matchLevel: 'could_not_match',
-            note: 'irure sunt in magna',
-            reasonCode: 'email_domain_private',
-            severity: 'low',
+            description: 'sunt fugiat',
+            matchLevel: 'partial',
+            note: 'Duis',
+            reasonCode: 'business_address_close_match',
+            severity: 'medium',
           },
           {
-            description: 'tempor dolore in',
-            matchLevel: 'partial',
-            note: 'officia commodo et dolore eu',
-            reasonCode: 'dob_mob_not_available',
-            severity: 'low',
-          },
-          {
-            description: 'qui eu aliqua Ut',
-            matchLevel: 'partial',
-            note: 'Ut nulla nisi laborum',
-            reasonCode: 'document_pdf417_data_is_valid',
+            description: 'esse ipsum non eu dolore',
+            matchLevel: 'exact',
+            note: 'adipisicing do ut irure',
+            reasonCode: 'id_flagged',
             severity: 'info',
+          },
+          {
+            description: 'et occaecat consequat dolore',
+            matchLevel: 'partial',
+            note: 'laborum voluptate magna laboris tempor',
+            reasonCode: 'document_barcode_could_not_be_read',
+            severity: 'low',
           },
         ],
       },
       phone: {
-        matchLevel: 'could_not_match',
+        matchLevel: 'exact',
         signals: [
           {
-            description: 'dolor eu aute consectetur incididunt',
+            description: 'quis cillum sit nisi sint',
             matchLevel: 'exact',
-            note: 'Excepteur tempor id',
-            reasonCode: 'address_city_does_not_match',
-            severity: 'low',
+            note: 'ad enim in ullamco',
+            reasonCode: 'address_input_not_on_file',
+            severity: 'info',
           },
           {
-            description: 'Ut ipsum',
+            description: 'anim Excepteur incididunt',
             matchLevel: 'no_match',
-            note: 'voluptate',
-            reasonCode: 'curp_malformed',
+            note: 'Excepteur eu',
+            reasonCode: 'document_country_code_mismatch',
             severity: 'medium',
           },
           {
-            description: 'consectetur id aliquip et',
-            matchLevel: 'exact',
-            note: 'commodo cillum et laboris',
-            reasonCode: 'id_not_located',
-            severity: 'high',
+            description: 'dolor ea mollit magna',
+            matchLevel: 'no_match',
+            note: 'in non proident',
+            reasonCode: 'name_does_not_match',
+            severity: 'info',
           },
         ],
       },
@@ -3719,1287 +3760,1613 @@ export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationR
         matchLevel: 'no_match',
         signals: [
           {
-            description: 'veniam in',
+            description: 'dolor magna aliqua ex',
             matchLevel: 'partial',
-            note: 'in adipisicing pariatur',
-            reasonCode: 'phone_located_does_not_match',
-            severity: 'low',
-          },
-          {
-            description: 'in ut sint dolor sit',
-            matchLevel: 'could_not_match',
-            note: 'eu ut',
-            reasonCode: 'document_visible_photo_features_not_verified',
+            note: 'nulla anim officia proident voluptate',
+            reasonCode: 'ip_location_not_available',
             severity: 'high',
           },
           {
-            description: 'esse velit mollit',
+            description: 'sed ea',
             matchLevel: 'exact',
-            note: 'ad dolore',
-            reasonCode: 'sentilink_synthetic_identity_medium_risk',
+            note: 'esse exercitation labore ullamco',
+            reasonCode: 'phone_number_mobile_account_status_suspended',
+            severity: 'low',
+          },
+          {
+            description: 'ex deserunt',
+            matchLevel: 'partial',
+            note: 'laborum dolor non esse',
+            reasonCode: 'watchlist_hit_ofac',
             severity: 'high',
           },
         ],
       },
     },
     props,
-  ) as GetFieldValidationResponse;
-export const getGetUserVaultResponse = (props: Partial<GetUserVaultResponse>) =>
-  merge(
+  );
+export const getGetUserVaultResponse = (props: Partial<GetUserVaultResponse>): GetUserVaultResponse =>
+  merge<GetUserVaultResponse, Partial<GetUserVaultResponse>>(
     {
-      customCreditCard: true,
-      'id.dob': false,
-      'id.first_name': true,
-      'id.ssn9': true,
+      key: 'document.visa.issuing_state',
+      value: true,
     },
     props,
-  ) as GetUserVaultResponse;
-export const getIdDocKind = (props: Partial<IdDocKind>) => (props ?? 'permit') as IdDocKind;
-export const getIdentifyScope = (props: Partial<IdentifyScope>) => (props ?? 'auth') as IdentifyScope;
-export const getInProgressOnboarding = (props: Partial<InProgressOnboarding>) =>
-  merge(
+  );
+export const getIdDocKind = (props: IdDocKind): IdDocKind => props ?? 'voter_identification';
+export const getIdentifyScope = (props: IdentifyScope): IdentifyScope => props ?? 'auth';
+export const getInProgressOnboarding = (props: Partial<InProgressOnboarding>): InProgressOnboarding =>
+  merge<InProgressOnboarding, Partial<InProgressOnboarding>>(
     {
-      fpId: 'c982ac8e-49a2-4c42-9d8f-78bc5c37138a',
-      status: 'incomplete',
+      fpId: '8b0242b1-7860-4fd8-aa48-efe5b89adad2',
+      status: 'pending',
       tenant: {
-        name: 'Jake Fisher-Little',
-        websiteUrl: 'https://soggy-academics.biz/',
+        name: 'Robert Prohaska',
+        websiteUrl: 'https://considerate-nightlife.net',
       },
-      timestamp: '1952-06-08T17:12:42.0Z',
+      timestamp: '1909-10-13T04:50:14.0Z',
     },
     props,
-  ) as InProgressOnboarding;
-export const getInProgressOnboardingTenant = (props: Partial<InProgressOnboardingTenant>) =>
-  merge(
+  );
+export const getInProgressOnboardingTenant = (props: Partial<InProgressOnboardingTenant>): InProgressOnboardingTenant =>
+  merge<InProgressOnboardingTenant, Partial<InProgressOnboardingTenant>>(
     {
-      name: 'Brittany Donnelly',
-      websiteUrl: 'https://outlandish-order.info',
+      name: 'George Kutch',
+      websiteUrl: 'https://comfortable-plastic.biz',
     },
     props,
-  ) as InProgressOnboardingTenant;
-export const getIngressSettings = (props: Partial<IngressSettings>) =>
-  merge(
+  );
+export const getIngressSettings = (props: Partial<IngressSettings>): IngressSettings =>
+  merge<IngressSettings, Partial<IngressSettings>>(
     {
       contentType: 'json',
       rules: [
         {
-          target: 'aute',
-          token: 'b43c983e-c68a-43ae-95e6-be170502967d',
+          target: 'laboris est',
+          token: 'document.passport.nationality',
         },
         {
-          target: 'ad',
-          token: 'b43c983e-c68a-43ae-95e6-be170502967d',
+          target: 'do Lorem nisi non incididunt',
+          token: 'document.passport.issuing_state',
         },
         {
-          target: 'dolore sed nisi sunt ad',
-          token: 'b43c983e-c68a-43ae-95e6-be170502967d',
+          target: 'tempor adipisicing consectetur',
+          token: 'document.residence_document.issued_at',
         },
       ],
     },
     props,
-  ) as IngressSettings;
-export const getInsightAddress = (props: Partial<InsightAddress>) =>
-  merge(
+  );
+export const getInsightAddress = (props: Partial<InsightAddress>): InsightAddress =>
+  merge<InsightAddress, Partial<InsightAddress>>(
     {
-      addressLine1: '5595 Cherry Street Suite 935',
-      addressLine2: '527 Schneider Dam Apt. 353',
-      city: 'East Victorland',
+      addressLine1: '5610 W Center Street Apt. 209',
+      addressLine2: '2051 Cleveland Street Suite 283',
+      city: 'West Hannah',
       cmra: false,
       deliverable: true,
-      latitude: 11652623.372281298,
-      longitude: 1254768.914360091,
-      postalCode: 'sit ad consequat occaecat',
-      propertyType: 'reprehenderit occaecat consequat sunt proident',
-      sources: 'sed',
-      state: 'California',
+      latitude: -87765151.87582743,
+      longitude: -8848938.284412086,
+      postalCode: 'mollit',
+      propertyType: 'in dolore officia',
+      sources: 'proident dolor mollit nulla Duis',
+      state: 'North Carolina',
       submitted: false,
-      verified: true,
+      verified: false,
     },
     props,
-  ) as InsightAddress;
-export const getInsightBusinessName = (props: Partial<InsightBusinessName>) =>
-  merge(
+  );
+export const getInsightBusinessName = (props: Partial<InsightBusinessName>): InsightBusinessName =>
+  merge<InsightBusinessName, Partial<InsightBusinessName>>(
     {
-      kind: 'dolore sint voluptate Ut ex',
-      name: 'Edwin Becker',
-      sources: 'ut',
-      subStatus: 'Duis do aliqua in',
-      submitted: true,
-      verified: true,
+      kind: 'ea',
+      name: 'Archie Walter Jr.',
+      sources: 'est exercitation sed',
+      subStatus: 'occaecat dolor enim',
+      submitted: false,
+      verified: false,
     },
     props,
-  ) as InsightBusinessName;
-export const getInsightEvent = (props: Partial<InsightEvent>) =>
-  merge(
+  );
+export const getInsightEvent = (props: Partial<InsightEvent>): InsightEvent =>
+  merge<InsightEvent, Partial<InsightEvent>>(
     {
-      city: 'New Laceyberg',
-      country: 'Belgium',
-      ipAddress: '3895 Jacobson Skyway Apt. 143',
-      latitude: 51378495.41721636,
-      longitude: -67563959.24112004,
-      metroCode: 'esse Ut',
-      postalCode: 'sint Ut id',
-      region: 'nulla aliqua proident Excepteur enim',
-      regionName: 'Dr. Wanda Will',
-      sessionId: 'd12c6448-68f4-4720-a8d6-753cbea72a65',
-      timeZone: 'incididunt velit magna ut in',
-      timestamp: '1930-02-03T21:37:29.0Z',
-      userAgent: 'dolore esse magna adipisicing ipsum',
+      city: 'East Odieville',
+      country: 'Reunion',
+      ipAddress: '261 Luella Shoals Suite 750',
+      latitude: -8200168.500285894,
+      longitude: 4879121.965058848,
+      metroCode: 'in dolore',
+      postalCode: 'laborum culpa',
+      region: 'ex',
+      regionName: 'Roosevelt Toy',
+      sessionId: '9ebcd6f3-ed59-4612-bc39-383ce40c3a3c',
+      timeZone: 'sit nisi',
+      timestamp: '1934-06-11T11:10:41.0Z',
+      userAgent: 'aliquip sit officia proident',
     },
     props,
-  ) as InsightEvent;
-export const getInsightPerson = (props: Partial<InsightPerson>) =>
-  merge(
+  );
+export const getInsightPerson = (props: Partial<InsightPerson>): InsightPerson =>
+  merge<InsightPerson, Partial<InsightPerson>>(
     {
       associationVerified: false,
-      name: 'Dwayne Moen',
-      role: 'dolor',
-      sources: 'velit reprehenderit laboris aliqua',
-      submitted: true,
+      name: 'Deborah DuBuque',
+      role: 'proident consectetur exercitation',
+      sources: 'officia',
+      submitted: false,
     },
     props,
-  ) as InsightPerson;
-export const getInsightPhone = (props: Partial<InsightPhone>) =>
-  merge(
+  );
+export const getInsightPhone = (props: Partial<InsightPhone>): InsightPhone =>
+  merge<InsightPhone, Partial<InsightPhone>>(
     {
-      phone: '+17653903043',
-      submitted: false,
+      phone: '+16544282343',
+      submitted: true,
       verified: false,
     },
     props,
-  ) as InsightPhone;
-export const getInsightRegistration = (props: Partial<InsightRegistration>) =>
-  merge(
+  );
+export const getInsightRegistration = (props: Partial<InsightRegistration>): InsightRegistration =>
+  merge<InsightRegistration, Partial<InsightRegistration>>(
     {
-      addresses: ['minim consectetur dolor Lorem fugiat', 'id occaecat in dolor', 'veniam fugiat dolore aute'],
-      entityType: 'velit',
-      fileNumber: 'nulla dolor aute labore sunt',
-      jurisdiction: 'eu reprehenderit in et',
-      name: 'Van Schoen',
+      addresses: ['aliqua nulla', 'mollit', 'culpa'],
+      entityType: 'ut ullamco',
+      fileNumber: 'laboris quis',
+      jurisdiction: 'in',
+      name: 'Darin Schamberger',
       officers: [
         {
-          name: 'Laverne Cassin',
-          roles: 'ut dolor',
+          name: 'Carl Sauer II',
+          roles: 'sit',
         },
         {
-          name: 'Laverne Cassin',
-          roles: 'veniam',
+          name: 'Carl Sauer II',
+          roles: 'reprehenderit aliqua',
         },
         {
-          name: 'Laverne Cassin',
-          roles: 'qui anim',
+          name: 'Carl Sauer II',
+          roles: 'aliqua pariatur qui ex adipisicing',
         },
       ],
-      registeredAgent: 'Duis adipisicing',
-      registrationDate: 'laboris deserunt aliquip amet',
-      source: 'aliquip commodo elit',
-      state: 'Alabama',
-      status: 'minim deserunt esse quis ullamco',
-      subStatus: 'nostrud ut',
+      registeredAgent: 'enim',
+      registrationDate: 'cillum voluptate fugiat enim',
+      source: 'Lorem deserunt fugiat',
+      state: 'Maryland',
+      status: 'nostrud Excepteur voluptate',
+      subStatus: 'consectetur ullamco cillum',
     },
     props,
-  ) as InsightRegistration;
-export const getInsightTin = (props: Partial<InsightTin>) =>
-  merge(
+  );
+export const getInsightTin = (props: Partial<InsightTin>): InsightTin =>
+  merge<InsightTin, Partial<InsightTin>>(
     {
-      tin: 'veniam officia do',
-      verified: false,
+      tin: 'laborum',
+      verified: true,
     },
     props,
-  ) as InsightTin;
-export const getInsightWatchlist = (props: Partial<InsightWatchlist>) =>
-  merge(
+  );
+export const getInsightWatchlist = (props: Partial<InsightWatchlist>): InsightWatchlist =>
+  merge<InsightWatchlist, Partial<InsightWatchlist>>(
     {
       business: [
         {
           hits: [
             {
-              agency: 'ad',
-              agencyAbbr: 'eiusmod et aute fugiat eu',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['nulla', 'laborum', 'dolor sit'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'incididunt in',
+              agencyAbbr: 'sint nostrud id',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['dolore mollit nulla esse in', 'est quis labore', 'aliqua ex veniam voluptate labore'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
             {
-              agency: 'veniam id in magna sunt',
-              agencyAbbr: 'officia commodo',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['in dolore in incididunt', 'proident reprehenderit', 'sit pariatur nostrud'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'quis adipisicing ut Lorem',
+              agencyAbbr: 'sunt Ut',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['aliqua in ex qui pariatur', 'cupidatat reprehenderit', 'magna'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
             {
-              agency: 'dolor in esse',
-              agencyAbbr: 'officia',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['irure', 'cupidatat', 'culpa Duis'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'adipisicing',
+              agencyAbbr: 'exercitation irure do',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['eu incididunt dolor', 'labore ullamco elit laborum', 'pariatur in aute eiusmod'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
           ],
-          screenedEntityName: 'Lindsey Considine',
+          screenedEntityName: 'Naomi McDermott',
         },
         {
           hits: [
             {
-              agency: 'in cillum velit commodo',
-              agencyAbbr: 'pariatur ad deserunt exercitation commodo',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['mollit laboris eiusmod qui', 'dolor', 'dolore id laboris non'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'ut in cillum sed',
+              agencyAbbr: 'non exercitation',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['eiusmod', 'ullamco quis aute', 'laboris'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
             {
-              agency: 'consequat sint mollit',
-              agencyAbbr: 'dolor deserunt dolor',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['mollit do cillum irure qui', 'occaecat nisi velit exercitation dolor', 'cillum irure'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'veniam commodo do',
+              agencyAbbr: 'dolore reprehenderit',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['Ut laboris pariatur labore nulla', 'nisi qui Excepteur commodo', 'pariatur quis'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
             {
-              agency: 'fugiat cupidatat',
-              agencyAbbr: 'Duis dolor occaecat Ut',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['culpa fugiat mollit', 'et laboris', 'consectetur aliqua id magna'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'sed nulla quis anim Lorem',
+              agencyAbbr: 'cupidatat',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['in occaecat', 'aliquip eu aute', 'veniam reprehenderit ea velit'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
           ],
-          screenedEntityName: 'Lindsey Considine',
+          screenedEntityName: 'Naomi McDermott',
         },
         {
           hits: [
             {
-              agency: 'voluptate non ea sunt Duis',
-              agencyAbbr: 'proident',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['magna irure', 'qui laboris', 'reprehenderit'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'in sed reprehenderit',
+              agencyAbbr: 'nisi adipisicing fugiat esse',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['culpa', 'anim', 'cillum'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
             {
-              agency: 'sit ut laboris fugiat Ut',
-              agencyAbbr: 'minim labore sit dolor',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['sed', 'ad anim proident id', 'dolore'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'ea sint aute',
+              agencyAbbr: 'occaecat consectetur',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['fugiat Ut anim exercitation dolore', 'laborum amet', 'amet anim dolore'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
             {
-              agency: 'Excepteur',
-              agencyAbbr: 'non enim',
-              agencyInformationUrl: 'https://imaginative-crocodile.us/',
-              agencyListUrl: 'https://shameful-trolley.name/',
-              entityAliases: ['sit et quis ad dolore', 'voluptate aliquip', 'ut proident'],
-              entityName: 'Christy Baumbach',
-              listCountry: 'Algeria',
-              listName: 'Ralph Howell',
-              url: 'https://splendid-address.info',
+              agency: 'ut do consectetur',
+              agencyAbbr: 'nostrud sunt',
+              agencyInformationUrl: 'https://smart-gloom.name',
+              agencyListUrl: 'https://long-resolve.net',
+              entityAliases: ['enim do aliquip ex labore', 'sed voluptate proident in ad', 'in non ad'],
+              entityName: 'Victoria Dooley',
+              listCountry: 'Trinidad and Tobago',
+              listName: 'Dr. Erik Connelly',
+              url: 'https://burdensome-napkin.org',
             },
           ],
-          screenedEntityName: 'Lindsey Considine',
+          screenedEntityName: 'Naomi McDermott',
         },
       ],
-      hitCount: 37470799,
+      hitCount: 67598993,
       people: [
         {
           hits: [
             {
-              agency: 'voluptate',
-              agencyAbbr: 'consectetur proident nisi culpa',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['cupidatat', 'amet reprehenderit ipsum ea irure', 'id non'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'cillum in consectetur veniam tempor',
+              agencyAbbr: 'ut ea incididunt proident irure',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['nulla aliquip reprehenderit', 'Excepteur sunt ad', 'est exercitation ullamco sint Ut'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
             {
-              agency: 'sit culpa ipsum in',
-              agencyAbbr: 'est in',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['deserunt incididunt esse sint', 'et in non ut minim', 'aliquip deserunt qui ut'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'incididunt tempor enim esse non',
+              agencyAbbr: 'incididunt dolor',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['sit pariatur', 'mollit', 'cillum voluptate occaecat anim dolor'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
             {
-              agency: 'non reprehenderit',
-              agencyAbbr: 'laboris ullamco labore sunt',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['eiusmod', 'id esse', 'Excepteur voluptate enim dolore'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'qui pariatur dolor officia',
+              agencyAbbr: 'anim',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['commodo Lorem magna', 'nulla eiusmod consectetur esse veniam', 'sunt pariatur'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
           ],
-          screenedEntityName: 'Ismael Graham',
+          screenedEntityName: 'Jeffrey Mraz',
         },
         {
           hits: [
             {
-              agency: 'voluptate',
-              agencyAbbr: 'velit laboris Excepteur ipsum',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['elit dolore tempor commodo sint', 'ut ut commodo', 'nostrud labore ea id'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'ut',
+              agencyAbbr: 'non in eu Ut',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['labore sed', 'fugiat dolore eiusmod', 'quis voluptate fugiat elit dolore'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
             {
-              agency: 'amet id adipisicing',
-              agencyAbbr: 'id ad',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['eiusmod', 'cupidatat', 'officia elit sint ut Excepteur'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'in',
+              agencyAbbr: 'occaecat',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['ipsum fugiat ut esse', 'magna ullamco', 'Ut consequat minim dolor voluptate'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
             {
-              agency: 'est',
-              agencyAbbr: 'amet deserunt dolore incididunt',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['sunt veniam laboris Lorem', 'veniam', 'Ut est mollit'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'quis aliquip dolor Duis',
+              agencyAbbr: 'aliqua anim',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['veniam pariatur', 'ullamco aliquip sit', 'quis cupidatat in sint'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
           ],
-          screenedEntityName: 'Ismael Graham',
+          screenedEntityName: 'Jeffrey Mraz',
         },
         {
           hits: [
             {
-              agency: 'mollit Duis sunt',
-              agencyAbbr: 'ut elit incididunt qui mollit',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['pariatur', 'occaecat laborum consequat quis', 'laborum veniam quis non'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'nisi laboris consectetur',
+              agencyAbbr: 'magna laborum reprehenderit amet elit',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['laboris tempor enim Lorem ipsum', 'ad deserunt ullamco', 'culpa Duis incididunt'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
             {
-              agency: 'esse enim ut dolore',
-              agencyAbbr: 'Lorem consectetur ipsum tempor',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['id laborum labore', 'ad', 'sunt ut nulla tempor fugiat'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'elit est',
+              agencyAbbr: 'dolore pariatur',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['enim do in', 'veniam mollit', 'pariatur id'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
             {
-              agency: 'et',
-              agencyAbbr: 'anim exercitation deserunt do',
-              agencyInformationUrl: 'https://warlike-hello.name',
-              agencyListUrl: 'https://amazing-desk.name',
-              entityAliases: ['nisi sint enim', 'est amet exercitation', 'nulla labore deserunt dolor et'],
-              entityName: 'Aubrey Jerde DDS',
-              listCountry: 'Virgin Islands, U.S.',
-              listName: 'Melissa Huel',
-              url: 'https://radiant-institute.biz',
+              agency: 'in nostrud dolor sint commodo',
+              agencyAbbr: 'fugiat laboris',
+              agencyInformationUrl: 'https://kaleidoscopic-nightlife.info/',
+              agencyListUrl: 'https://sore-commercial.info',
+              entityAliases: ['exercitation', 'non ea sit nostrud laborum', 'elit esse'],
+              entityName: 'Patty Franey',
+              listCountry: 'Panama',
+              listName: 'Danielle Stiedemann',
+              url: 'https://gripping-emergent.info',
             },
           ],
-          screenedEntityName: 'Ismael Graham',
+          screenedEntityName: 'Jeffrey Mraz',
         },
       ],
     },
     props,
-  ) as InsightWatchlist;
-export const getInsightWebsite = (props: Partial<InsightWebsite>) =>
-  merge(
+  );
+export const getInsightWebsite = (props: Partial<InsightWebsite>): InsightWebsite =>
+  merge<InsightWebsite, Partial<InsightWebsite>>(
     {
-      url: 'https://left-nougat.name',
-      verified: false,
+      url: 'https://helpful-finding.org/',
+      verified: true,
     },
     props,
-  ) as InsightWebsite;
-export const getIntegrityRequest = (props: Partial<IntegrityRequest>) =>
-  merge(
+  );
+export const getIntegrityRequest = (props: Partial<IntegrityRequest>): IntegrityRequest =>
+  merge<IntegrityRequest, Partial<IntegrityRequest>>(
     {
-      fields: [
-        'document.permit.clave_de_elector',
-        'document.drivers_license.clave_de_elector',
-        'document.visa.back.mime_type',
-      ],
-      signingKey: 'e8456e96-6efe-46fa-8482-d8f078426e75',
+      fields: ['document.voter_identification.issuing_country', 'document.passport.selfie.mime_type', 'id.ssn9'],
+      signingKey: 'bdbd5cd5-598e-41d1-96a5-1caea3889034',
     },
     props,
-  ) as IntegrityRequest;
-export const getIntegrityResponse = (props: Partial<IntegrityResponse>) =>
-  merge(
+  );
+export const getIntegrityResponse = (props: Partial<IntegrityResponse>): IntegrityResponse =>
+  merge<IntegrityResponse, Partial<IntegrityResponse>>(
     {
-      customCreditCard: 'f7dbdc6...',
-      'id.last_name': 'f7ee801830...',
-      'id.ssn9': '1cefe40fa...',
+      key: 'card.*.number_last4',
+      value: {},
     },
     props,
-  ) as IntegrityResponse;
-export const getInvoicePreview = (props: Partial<InvoicePreview>) =>
-  merge(
+  );
+export const getInvoicePreview = (props: Partial<InvoicePreview>): InvoicePreview =>
+  merge<InvoicePreview, Partial<InvoicePreview>>(
     {
-      lastUpdatedAt: '1893-10-31T01:01:21.0Z',
+      lastUpdatedAt: '1966-05-02T13:06:51.0Z',
       lineItems: [
         {
-          description: 'incididunt ad irure ipsum adipisicing',
-          id: '43cbb2b5-e0ae-469c-81b9-6c16f567fc9e',
-          notionalCents: 72952582,
-          quantity: 69321701,
-          unitPriceCents: 'velit et deserunt dolor labore',
+          description: 'aliquip et',
+          id: 'ffd73533-6a6d-4856-b37d-8aa61790dfd8',
+          notionalCents: -12906532,
+          quantity: -26703468,
+          unitPriceCents: 'veniam irure in reprehenderit ipsum',
         },
         {
-          description: 'incididunt enim',
-          id: '43cbb2b5-e0ae-469c-81b9-6c16f567fc9e',
-          notionalCents: 10056964,
-          quantity: -33989985,
-          unitPriceCents: 'et ut',
+          description: 'in magna',
+          id: 'ffd73533-6a6d-4856-b37d-8aa61790dfd8',
+          notionalCents: 98074205,
+          quantity: 64789278,
+          unitPriceCents: 'culpa minim ut ex tempor',
         },
         {
-          description: 'in adipisicing non dolor',
-          id: '43cbb2b5-e0ae-469c-81b9-6c16f567fc9e',
-          notionalCents: 12325420,
-          quantity: 56592365,
-          unitPriceCents: 'cupidatat',
+          description: 'enim',
+          id: 'ffd73533-6a6d-4856-b37d-8aa61790dfd8',
+          notionalCents: 59354896,
+          quantity: -3712286,
+          unitPriceCents: 'minim',
         },
       ],
     },
     props,
-  ) as InvoicePreview;
-export const getInvokeVaultProxyPermission = (props: Partial<InvokeVaultProxyPermission>) =>
-  merge(
+  );
+export const getInvokeVaultProxyPermission = (props: Partial<InvokeVaultProxyPermission>): InvokeVaultProxyPermission =>
+  merge<InvokeVaultProxyPermission, Partial<InvokeVaultProxyPermission>>(
     {
       kind: 'any',
     },
     props,
-  ) as InvokeVaultProxyPermission;
-export const getIsIn = (props: Partial<IsIn>) => (props ?? 'is_not_in') as IsIn;
-export const getIso3166TwoDigitCountryCode = (props: Partial<Iso3166TwoDigitCountryCode>) =>
-  (props ?? 'MQ') as Iso3166TwoDigitCountryCode;
-export const getLabelAdded = (props: Partial<LabelAdded>) =>
-  merge(
+  );
+export const getIsIn = (props: IsIn): IsIn => props ?? 'is_not_in';
+export const getIso3166TwoDigitCountryCode = (props: Iso3166TwoDigitCountryCode): Iso3166TwoDigitCountryCode =>
+  props ?? 'GN';
+export const getLabelAdded = (props: Partial<LabelAdded>): LabelAdded =>
+  merge<LabelAdded, Partial<LabelAdded>>(
     {
       kind: 'active',
     },
     props,
-  ) as LabelAdded;
-export const getLabelKind = (props: Partial<LabelKind>) => (props ?? 'active') as LabelKind;
-export const getLineItem = (props: Partial<LineItem>) =>
-  merge(
+  );
+export const getLabelKind = (props: LabelKind): LabelKind => props ?? 'active';
+export const getLineItem = (props: Partial<LineItem>): LineItem =>
+  merge<LineItem, Partial<LineItem>>(
     {
-      description: 'culpa est officia qui mollit',
-      id: '9ae4570a-1ec0-4019-8665-b3aa7b7d0ed1',
-      notionalCents: -9629722,
-      quantity: 46032130,
-      unitPriceCents: 'laboris irure dolore sed ut',
+      description: 'nostrud in nisi dolor',
+      id: '8a2b1e49-8194-4d0b-9e06-8022959cd848',
+      notionalCents: -46474882,
+      quantity: 31246058,
+      unitPriceCents: 'eu Excepteur laboris velit',
     },
     props,
-  ) as LineItem;
-export const getLinkAuthRequest = (props: Partial<LinkAuthRequest>) =>
-  merge(
+  );
+export const getLinkAuthRequest = (props: Partial<LinkAuthRequest>): LinkAuthRequest =>
+  merge<LinkAuthRequest, Partial<LinkAuthRequest>>(
     {
-      emailAddress: 'gideon19@gmail.com',
-      redirectUrl: 'https://wealthy-pliers.name/',
+      emailAddress: 'jaylen.fahey@gmail.com',
+      redirectUrl: 'https://hasty-humor.name',
     },
     props,
-  ) as LinkAuthRequest;
-export const getList = (props: Partial<List>) =>
-  merge(
+  );
+export const getList = (props: Partial<List>): List =>
+  merge<List, Partial<List>>(
     {
       actor: {
         data: {
-          id: 'd5f6524b-d480-4c89-8212-9052ae8a784c',
+          id: 'e212187f-e336-4736-88d4-812d57b69b9b',
         },
         kind: 'user',
       },
-      alias: 'minim occaecat labore',
-      createdAt: '1911-10-26T17:46:24.0Z',
-      entriesCount: 77929902,
-      id: '8f2f8eaf-06ad-4419-9aff-c789a53b0e69',
+      alias: 'laborum voluptate ad consectetur',
+      createdAt: '1956-07-15T19:22:49.0Z',
+      entriesCount: -36189841,
+      id: 'ec7feede-6ecc-473d-bcd3-403b72700473',
       kind: 'ip_address',
-      name: 'Sally Robel MD',
+      name: 'Keith Shields II',
       usedInPlaybook: true,
     },
     props,
-  ) as List;
-export const getListDetails = (props: Partial<ListDetails>) =>
-  merge(
+  );
+export const getListDetails = (props: Partial<ListDetails>): ListDetails =>
+  merge<ListDetails, Partial<ListDetails>>(
     {
       actor: {
         data: {
-          id: '65f44ad5-2d63-4209-8e88-a32c724bf5b4',
+          id: '410de101-3846-4cc8-a26e-196bf1580579',
         },
         kind: 'user',
       },
-      alias: 'Excepteur voluptate aute sunt aliqua',
-      createdAt: '1928-07-22T22:48:19.0Z',
-      id: '09c59ba2-a8c8-46c5-abbc-94f684d8ed20',
-      kind: 'phone_country_code',
-      name: 'Alexis Swaniawski',
+      alias: 'in incididunt cupidatat consectetur fugiat',
+      createdAt: '1894-09-10T08:38:41.0Z',
+      id: '8adfd079-8425-48a3-ae52-5f29e659359d',
+      kind: 'phone_number',
+      name: 'Brandi Reinger',
       playbooks: [
         {
-          id: '8e373c80-285d-4a14-862b-dba047194339',
-          key: 'e638bfd4-0ee1-43bb-bf87-b2eca5490525',
-          name: 'Alyssa Bins',
+          id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
+          key: '9480d365-60d6-4a34-ab50-9debeca50d62',
+          name: 'Gilbert Kuhlman',
           rules: [
             {
-              action: 'step_up.proof_of_address',
-              createdAt: '1947-08-19T17:53:44.0Z',
+              action: 'pass_with_manual_review',
+              createdAt: '1953-02-14T02:05:53.0Z',
               isShadow: true,
               kind: 'business',
-              name: 'Carrie Osinski',
+              name: 'Austin McKenzie',
               ruleAction: {
                 config: {},
                 kind: 'pass_with_manual_review',
               },
               ruleExpression: [
                 {
-                  field: 'tin_match',
-                  op: 'eq',
-                  value: true,
-                },
-                {
-                  field: 'business_name_no_watchlist_hits',
+                  field: 'document_ocr_name_could_not_match',
                   op: 'not_eq',
                   value: true,
                 },
                 {
-                  field: 'ip_proxy',
+                  field: 'phone_number_mobile_account_status_deactivated',
                   op: 'not_eq',
                   value: false,
                 },
-              ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
-            },
-            {
-              action: 'step_up.identity',
-              createdAt: '1920-09-21T01:46:20.0Z',
-              isShadow: true,
-              kind: 'business',
-              name: 'Carrie Osinski',
-              ruleAction: {
-                config: {},
-                kind: 'pass_with_manual_review',
-              },
-              ruleExpression: [
                 {
-                  field: 'attested_device_fraud_duplicate_risk_medium',
-                  op: 'eq',
-                  value: true,
-                },
-                {
-                  field: 'sos_domestic_filing_status_not_in_good_standing',
-                  op: 'eq',
-                  value: true,
-                },
-                {
-                  field: 'ssn_not_on_file',
+                  field: 'document_sex_crosscheck_does_not_match',
                   op: 'not_eq',
-                  value: false,
+                  value: true,
                 },
               ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
             },
             {
-              action: 'step_up.proof_of_address',
-              createdAt: '1960-01-04T13:28:54.0Z',
-              isShadow: true,
+              action: 'step_up.identity_proof_of_ssn_proof_of_address',
+              createdAt: '1945-07-14T10:11:01.0Z',
+              isShadow: false,
               kind: 'any',
-              name: 'Carrie Osinski',
+              name: 'Austin McKenzie',
               ruleAction: {
                 config: {},
                 kind: 'pass_with_manual_review',
               },
               ruleExpression: [
                 {
-                  field: 'sos_domestic_filing_status_not_provided_by_state',
-                  op: 'not_eq',
+                  field: 'beneficial_owners_do_not_match',
+                  op: 'eq',
                   value: false,
                 },
                 {
-                  field: 'us_tax_id_is_itin',
+                  field: 'dob_mob_matches',
                   op: 'eq',
                   value: true,
                 },
                 {
-                  field: 'document_ocr_not_successful',
-                  op: 'eq',
-                  value: false,
+                  field: 'address_input_is_not_deliverable',
+                  op: 'not_eq',
+                  value: true,
                 },
               ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
+            },
+            {
+              action: 'fail',
+              createdAt: '1947-11-29T16:50:58.0Z',
+              isShadow: false,
+              kind: 'any',
+              name: 'Austin McKenzie',
+              ruleAction: {
+                config: {},
+                kind: 'pass_with_manual_review',
+              },
+              ruleExpression: [
+                {
+                  field: 'sos_filing_no_status',
+                  op: 'not_eq',
+                  value: true,
+                },
+                {
+                  field: 'address_located_is_not_standard_general_delivery',
+                  op: 'not_eq',
+                  value: true,
+                },
+                {
+                  field: 'address_input_is_not_standard_mail_drop',
+                  op: 'not_eq',
+                  value: true,
+                },
+              ],
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
             },
           ],
         },
         {
-          id: '8e373c80-285d-4a14-862b-dba047194339',
-          key: 'e638bfd4-0ee1-43bb-bf87-b2eca5490525',
-          name: 'Alyssa Bins',
-          rules: [
-            {
-              action: 'step_up.proof_of_address',
-              createdAt: '1965-01-13T07:01:45.0Z',
-              isShadow: false,
-              kind: 'any',
-              name: 'Carrie Osinski',
-              ruleAction: {
-                config: {},
-                kind: 'pass_with_manual_review',
-              },
-              ruleExpression: [
-                {
-                  field: 'business_phone_number_match',
-                  op: 'eq',
-                  value: true,
-                },
-                {
-                  field: 'document_not_verified',
-                  op: 'not_eq',
-                  value: false,
-                },
-                {
-                  field: 'beneficial_owner_failed_kyc',
-                  op: 'eq',
-                  value: true,
-                },
-              ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
-            },
-            {
-              action: 'manual_review',
-              createdAt: '1945-07-20T11:40:33.0Z',
-              isShadow: true,
-              kind: 'any',
-              name: 'Carrie Osinski',
-              ruleAction: {
-                config: {},
-                kind: 'pass_with_manual_review',
-              },
-              ruleExpression: [
-                {
-                  field: 'document_number_check_digit_does_not_match',
-                  op: 'not_eq',
-                  value: true,
-                },
-                {
-                  field: 'ssn_located_is_itin',
-                  op: 'eq',
-                  value: true,
-                },
-                {
-                  field: 'dob_does_not_match',
-                  op: 'eq',
-                  value: false,
-                },
-              ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
-            },
-            {
-              action: 'step_up.proof_of_address',
-              createdAt: '1897-09-09T07:08:27.0Z',
-              isShadow: false,
-              kind: 'any',
-              name: 'Carrie Osinski',
-              ruleAction: {
-                config: {},
-                kind: 'pass_with_manual_review',
-              },
-              ruleExpression: [
-                {
-                  field: 'dob_located_age_below_minimum',
-                  op: 'not_eq',
-                  value: false,
-                },
-                {
-                  field: 'ip_alert_data_center',
-                  op: 'not_eq',
-                  value: true,
-                },
-                {
-                  field: 'business_website_verified',
-                  op: 'not_eq',
-                  value: false,
-                },
-              ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
-            },
-          ],
-        },
-        {
-          id: '8e373c80-285d-4a14-862b-dba047194339',
-          key: 'e638bfd4-0ee1-43bb-bf87-b2eca5490525',
-          name: 'Alyssa Bins',
+          id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
+          key: '9480d365-60d6-4a34-ab50-9debeca50d62',
+          name: 'Gilbert Kuhlman',
           rules: [
             {
               action: 'step_up.identity_proof_of_ssn',
-              createdAt: '1900-05-26T05:27:42.0Z',
+              createdAt: '1933-12-25T15:23:47.0Z',
               isShadow: false,
               kind: 'person',
-              name: 'Carrie Osinski',
+              name: 'Austin McKenzie',
               ruleAction: {
                 config: {},
                 kind: 'pass_with_manual_review',
               },
               ruleExpression: [
                 {
-                  field: 'document_barcode_content_does_not_match',
+                  field: 'browser_automation',
+                  op: 'not_eq',
+                  value: false,
+                },
+                {
+                  field: 'document_ocr_last_name_matches',
                   op: 'not_eq',
                   value: true,
                 },
                 {
-                  field: 'dob_located_age_above_maximum',
+                  field: 'name_matches',
                   op: 'eq',
-                  value: true,
-                },
-                {
-                  field: 'input_phone_number_does_not_match_ip_state',
-                  op: 'eq',
-                  value: true,
+                  value: false,
                 },
               ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
             },
             {
               action: 'step_up.custom',
-              createdAt: '1925-01-12T10:57:01.0Z',
-              isShadow: false,
-              kind: 'person',
-              name: 'Carrie Osinski',
+              createdAt: '1903-10-08T19:08:29.0Z',
+              isShadow: true,
+              kind: 'any',
+              name: 'Austin McKenzie',
               ruleAction: {
                 config: {},
                 kind: 'pass_with_manual_review',
               },
               ruleExpression: [
                 {
-                  field: 'document_dob_crosscheck_does_not_match',
-                  op: 'eq',
+                  field: 'business_dba_does_not_match',
+                  op: 'not_eq',
+                  value: false,
+                },
+                {
+                  field: 'document_photo_is_screen_capture',
+                  op: 'not_eq',
                   value: true,
                 },
                 {
-                  field: 'document_ocr_first_name_matches',
-                  op: 'eq',
+                  field: 'behavior_fraud_ring_risk',
+                  op: 'not_eq',
                   value: false,
                 },
+              ],
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
+            },
+            {
+              action: 'pass_with_manual_review',
+              createdAt: '1921-10-27T17:10:35.0Z',
+              isShadow: false,
+              kind: 'person',
+              name: 'Austin McKenzie',
+              ruleAction: {
+                config: {},
+                kind: 'pass_with_manual_review',
+              },
+              ruleExpression: [
                 {
                   field: 'sos_business_address_filing_not_found',
                   op: 'not_eq',
                   value: false,
                 },
+                {
+                  field: 'credit_established_before_ssn_date',
+                  op: 'not_eq',
+                  value: true,
+                },
+                {
+                  field: 'address_state_matches',
+                  op: 'eq',
+                  value: true,
+                },
               ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
             },
+          ],
+        },
+        {
+          id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
+          key: '9480d365-60d6-4a34-ab50-9debeca50d62',
+          name: 'Gilbert Kuhlman',
+          rules: [
             {
-              action: 'step_up.proof_of_address',
-              createdAt: '1916-07-28T15:38:53.0Z',
-              isShadow: false,
-              kind: 'person',
-              name: 'Carrie Osinski',
+              action: 'step_up.identity',
+              createdAt: '1900-10-13T13:32:44.0Z',
+              isShadow: true,
+              kind: 'any',
+              name: 'Austin McKenzie',
               ruleAction: {
                 config: {},
                 kind: 'pass_with_manual_review',
               },
               ruleExpression: [
                 {
-                  field: 'curp_input_curp_invalid',
-                  op: 'eq',
+                  field: 'document_invalid_issuance_or_expiration_date',
+                  op: 'not_eq',
                   value: false,
                 },
                 {
-                  field: 'curp_multiple_results_for_data',
-                  op: 'eq',
+                  field: 'address_input_is_not_standard_uspo',
+                  op: 'not_eq',
                   value: true,
                 },
                 {
-                  field: 'device_velocity',
+                  field: 'ssn_issue_date_cannot_be_verified',
                   op: 'not_eq',
                   value: false,
                 },
               ],
-              ruleId: 'b3e477ac-1266-4e91-b3d2-abcba8041599',
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
+            },
+            {
+              action: 'manual_review',
+              createdAt: '1916-10-02T21:22:08.0Z',
+              isShadow: true,
+              kind: 'any',
+              name: 'Austin McKenzie',
+              ruleAction: {
+                config: {},
+                kind: 'pass_with_manual_review',
+              },
+              ruleExpression: [
+                {
+                  field: 'sos_filing_not_found',
+                  op: 'eq',
+                  value: false,
+                },
+                {
+                  field: 'sos_filing_no_status',
+                  op: 'not_eq',
+                  value: false,
+                },
+                {
+                  field: 'behavior_automatic_activity',
+                  op: 'eq',
+                  value: true,
+                },
+              ],
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
+            },
+            {
+              action: 'step_up.proof_of_address',
+              createdAt: '1897-03-12T12:33:52.0Z',
+              isShadow: true,
+              kind: 'person',
+              name: 'Austin McKenzie',
+              ruleAction: {
+                config: {},
+                kind: 'pass_with_manual_review',
+              },
+              ruleExpression: [
+                {
+                  field: 'name_last_matches',
+                  op: 'eq',
+                  value: false,
+                },
+                {
+                  field: 'document_ocr_name_could_not_match',
+                  op: 'not_eq',
+                  value: true,
+                },
+                {
+                  field: 'device_multiple_users',
+                  op: 'eq',
+                  value: false,
+                },
+              ],
+              ruleId: 'ca368b30-a791-4211-aec4-820e31cd2aeb',
             },
           ],
         },
       ],
     },
     props,
-  ) as ListDetails;
-export const getListEntitiesSearchRequest = (props: Partial<ListEntitiesSearchRequest>) =>
-  merge(
+  );
+export const getListEntitiesSearchRequest = (props: Partial<ListEntitiesSearchRequest>): ListEntitiesSearchRequest =>
+  merge<ListEntitiesSearchRequest, Partial<ListEntitiesSearchRequest>>(
     {
-      externalId: '327f1b8f-22b7-4d29-b9fe-4dec0f01216a',
+      externalId: '28495320-873c-4a3a-b564-c6aab37fab65',
       hasOutstandingWorkflowRequest: true,
-      kind: 'business',
-      labels: ['offboard_fraud', 'active', 'offboard_other'],
+      kind: 'person',
+      labels: ['active', 'offboard_other', 'offboard_other'],
       pagination: {
-        cursor: null,
-        pageSize: 10,
+        cursor: -95898485,
+        pageSize: 32404382,
       },
-      playbookIds: ['quis aliquip ad ipsum non', 'sed ipsum non', 'quis Duis reprehenderit amet'],
-      requiresManualReview: false,
-      search: 'id et veniam consequat cillum',
-      showAll: true,
-      statuses: ['none', 'none', 'pass'],
-      tags: ['culpa Excepteur reprehenderit ut consectetur', 'adipisicing', 'aute magna voluptate'],
-      timestampGte: '1893-03-11T01:12:36.0Z',
-      timestampLte: '1917-10-31T03:41:35.0Z',
+      playbookIds: ['amet sed', 'dolore magna minim', 'do sed'],
+      requiresManualReview: true,
+      search: 'reprehenderit dolor magna velit',
+      showAll: false,
+      statuses: ['none', 'fail', 'fail'],
+      tags: ['labore in dolore dolor consequat', 'est mollit', 'in ullamco'],
+      timestampGte: '1902-03-24T09:59:12.0Z',
+      timestampLte: '1914-04-29T08:20:30.0Z',
       watchlistHit: true,
     },
     props,
-  ) as ListEntitiesSearchRequest;
-export const getListEntry = (props: Partial<ListEntry>) =>
-  merge(
+  );
+export const getListEntry = (props: Partial<ListEntry>): ListEntry =>
+  merge<ListEntry, Partial<ListEntry>>(
     {
       actor: {
         data: {
-          id: '7613bc77-8ab5-40d1-be3f-d6578cee7479',
+          id: '5b092022-7dcf-42a1-a3ef-078fec2ace0e',
         },
         kind: 'user',
       },
-      createdAt: '1952-10-03T10:14:01.0Z',
-      data: 'esse minim ex cupidatat',
-      id: '6ddfd770-7145-445b-a3cd-bd8bc622a84a',
+      createdAt: '1894-01-30T09:56:30.0Z',
+      data: 'tempor',
+      id: '10cde94f-4060-4a7a-8d83-14ece0d97093',
     },
     props,
-  ) as ListEntry;
-export const getListEvent = (props: Partial<ListEvent>) =>
-  merge(
+  );
+export const getListEvent = (props: Partial<ListEvent>): ListEvent =>
+  merge<ListEvent, Partial<ListEvent>>(
     {
       detail: {
         data: {
-          entries: ['aute ut dolore', 'sit dolore eu sed', 'deserunt sint qui sed ipsum'],
-          listEntryCreationId: '916e558d-b40f-4c61-bedf-99a7326349f5',
-          listId: '3fef960d-b34c-4b1f-bc78-bd292d23cf2a',
+          entries: ['culpa ipsum', 'tempor sed minim do cillum', 'reprehenderit mollit'],
+          listEntryCreationId: 'ae79fb8d-4ba4-4094-8b3f-889bf70a7bff',
+          listId: 'e2aa4ac2-9bd8-414a-b469-cdd3516142b6',
         },
         kind: 'create_list_entry',
       },
-      id: '0dbdc0a3-d03d-4f0e-a01f-febace4c00ce',
+      id: 'bd976a4f-d507-48c1-b9c3-42a2474850a0',
       insightEvent: {
-        city: 'Port Ikefurt',
-        country: 'Malta',
-        ipAddress: '68117 Litzy Heights Apt. 284',
-        latitude: 63900560.2915653,
-        longitude: -8975770.494365156,
-        metroCode: 'elit enim non pariatur',
-        postalCode: 'anim dolore mollit deserunt dolor',
-        region: 'sint Excepteur',
-        regionName: 'Jaime Hirthe',
-        sessionId: '0f6b5c58-923e-4f8a-aa31-14537c13dc4e',
-        timeZone: 'laborum velit',
-        timestamp: '1935-02-05T08:38:46.0Z',
-        userAgent: 'sit irure commodo ad esse',
+        city: 'Bernhardside',
+        country: 'Bahrain',
+        ipAddress: '30005 Breitenberg Square Suite 696',
+        latitude: -98245848.95283137,
+        longitude: 84780595.64372176,
+        metroCode: 'mollit amet',
+        postalCode: 'do est ad',
+        region: 'magna qui consequat',
+        regionName: 'Sonya Stokes',
+        sessionId: '9fb98317-1e60-4f3c-bd9d-89e987906a96',
+        timeZone: 'officia pariatur dolore Excepteur',
+        timestamp: '1944-10-30T05:19:49.0Z',
+        userAgent: 'dolor ipsum elit dolore adipisicing',
       },
-      name: 'Maxine Reichert',
+      name: 'complete_user_check_liveness',
       principal: {
-        id: 'c8bb4fdc-f3bf-4d19-8daa-63ff1dafec93',
+        id: '7ef2f35b-73ab-46ba-8d07-52ae6bf62df6',
         kind: 'user',
       },
-      tenantId: 'e9de1ebc-a20d-41a4-88cd-0eb00d62cfbb',
-      timestamp: '1949-10-03T12:41:30.0Z',
+      tenantId: 'e20344d3-0b59-472a-85b5-4fec67a5ab76',
+      timestamp: '1947-07-12T05:28:51.0Z',
     },
     props,
-  ) as ListEvent;
-export const getListEventDetail = (props: Partial<ListEventDetail>) =>
-  merge(
+  );
+export const getListEventDetail = (props: Partial<ListEventDetail>): ListEventDetail =>
+  merge<ListEventDetail, Partial<ListEventDetail>>(
     {
       data: {
-        entries: ['pariatur anim', 'cillum', 'et magna sit'],
-        listEntryCreationId: '674e5f8f-00f8-4cf6-9404-ad47a1fb9c40',
-        listId: '66e138e4-d3af-4c79-8f08-ad580492aa8f',
+        entries: ['consectetur dolor deserunt', 'nostrud dolore id Ut', 'in pariatur sunt ea'],
+        listEntryCreationId: 'a2d743f7-337a-4300-9d74-72000c803ad7',
+        listId: '2a21540f-209c-4391-8845-a8b9dba4fabc',
       },
       kind: 'create_list_entry',
     },
     props,
-  ) as ListEventDetail;
-export const getListKind = (props: Partial<ListKind>) => (props ?? 'email_domain') as ListKind;
-export const getListPlaybookUsage = (props: Partial<ListPlaybookUsage>) =>
-  merge(
+  );
+export const getListKind = (props: ListKind): ListKind => props ?? 'ip_address';
+export const getListPlaybookUsage = (props: Partial<ListPlaybookUsage>): ListPlaybookUsage =>
+  merge<ListPlaybookUsage, Partial<ListPlaybookUsage>>(
     {
-      id: '9f1fb051-d64a-47a6-a448-cb313283a042',
-      key: 'c0568a35-2843-43ba-85f1-5e922cee6b45',
-      name: 'Marilyn Nader',
+      id: 'bae5b7ec-995e-463d-8e98-9795d18843d3',
+      key: '10f5ca34-343e-47ca-af95-c6e03c95e5ab',
+      name: 'Raul Herzog III',
       rules: [
         {
-          action: 'fail',
-          createdAt: '1896-08-19T21:42:11.0Z',
-          isShadow: false,
-          kind: 'person',
-          name: 'Dr. April Hauck',
-          ruleAction: {
-            config: {},
-            kind: 'pass_with_manual_review',
-          },
-          ruleExpression: [
-            {
-              field: 'document_visible_photo_features_not_verified',
-              op: 'eq',
-              value: true,
-            },
-            {
-              field: 'sos_domestic_filing_status_pending_active',
-              op: 'eq',
-              value: true,
-            },
-            {
-              field: 'sos_business_address_active_filing_found',
-              op: 'not_eq',
-              value: false,
-            },
-          ],
-          ruleId: 'e2283b5e-3833-482a-8cd2-41288aa59851',
-        },
-        {
-          action: 'step_up.identity_proof_of_ssn_proof_of_address',
-          createdAt: '1925-06-05T03:06:11.0Z',
+          action: 'step_up.custom',
+          createdAt: '1915-05-05T08:03:23.0Z',
           isShadow: true,
           kind: 'business',
-          name: 'Dr. April Hauck',
+          name: 'Cary Simonis-Casper',
           ruleAction: {
             config: {},
             kind: 'pass_with_manual_review',
           },
           ruleExpression: [
             {
-              field: 'email_high_risk_fraud',
-              op: 'not_eq',
-              value: true,
-            },
-            {
-              field: 'beneficial_owners_partial_match',
-              op: 'not_eq',
-              value: true,
-            },
-            {
-              field: 'address_input_is_not_standard_university',
+              field: 'ip_input_invalid',
               op: 'eq',
+              value: true,
+            },
+            {
+              field: 'sos_filing_not_found',
+              op: 'not_eq',
+              value: true,
+            },
+            {
+              field: 'business_name_similar_match',
+              op: 'not_eq',
               value: false,
             },
           ],
-          ruleId: 'e2283b5e-3833-482a-8cd2-41288aa59851',
+          ruleId: '09785287-5804-4d7b-b1d0-fcd62f6e3d5a',
         },
         {
-          action: 'pass_with_manual_review',
-          createdAt: '1931-04-04T17:20:40.0Z',
+          action: 'manual_review',
+          createdAt: '1923-06-12T22:51:47.0Z',
           isShadow: true,
-          kind: 'person',
-          name: 'Dr. April Hauck',
+          kind: 'any',
+          name: 'Cary Simonis-Casper',
           ruleAction: {
             config: {},
             kind: 'pass_with_manual_review',
           },
           ruleExpression: [
             {
-              field: 'business_address_commercial',
-              op: 'eq',
+              field: 'phone_located_name_does_not_match',
+              op: 'not_eq',
               value: true,
             },
             {
-              field: 'tin_match',
-              op: 'eq',
+              field: 'curp_not_valid',
+              op: 'not_eq',
               value: false,
             },
             {
-              field: 'document_selfie_used_with_different_information',
-              op: 'eq',
-              value: true,
+              field: 'document_selfie_was_skipped',
+              op: 'not_eq',
+              value: false,
             },
           ],
-          ruleId: 'e2283b5e-3833-482a-8cd2-41288aa59851',
+          ruleId: '09785287-5804-4d7b-b1d0-fcd62f6e3d5a',
+        },
+        {
+          action: 'step_up.identity_proof_of_ssn',
+          createdAt: '1964-01-06T13:46:32.0Z',
+          isShadow: false,
+          kind: 'any',
+          name: 'Cary Simonis-Casper',
+          ruleAction: {
+            config: {},
+            kind: 'pass_with_manual_review',
+          },
+          ruleExpression: [
+            {
+              field: 'document_barcode_could_not_be_detected',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'email_domain_recently_created',
+              op: 'not_eq',
+              value: true,
+            },
+            {
+              field: 'document_barcode_could_not_be_read',
+              op: 'not_eq',
+              value: false,
+            },
+          ],
+          ruleId: '09785287-5804-4d7b-b1d0-fcd62f6e3d5a',
         },
       ],
     },
     props,
-  ) as ListPlaybookUsage;
-export const getLiteOrgMember = (props: Partial<LiteOrgMember>) =>
-  merge(
+  );
+export const getLiteOrgMember = (props: Partial<LiteOrgMember>): LiteOrgMember =>
+  merge<LiteOrgMember, Partial<LiteOrgMember>>(
     {
-      firstName: 'Krystina',
-      id: '3de30dc6-3c0e-45b9-af91-c076225e7292',
-      lastName: 'Ruecker',
+      firstName: 'Jarret',
+      id: '16a13601-e37a-4d2c-9cd6-6c244d9be86e',
+      lastName: 'Hirthe',
     },
     props,
-  ) as LiteOrgMember;
-export const getLiteUserAndOrg = (props: Partial<LiteUserAndOrg>) =>
-  merge(
+  );
+export const getLiteUserAndOrg = (props: Partial<LiteUserAndOrg>): LiteUserAndOrg =>
+  merge<LiteUserAndOrg, Partial<LiteUserAndOrg>>(
     {
-      org: 'culpa',
+      org: 'in id sed nisi',
       user: {
-        firstName: 'Daija',
-        id: '9b30bb70-cfff-4439-9c7f-7ba083361b20',
-        lastName: 'Osinski',
+        firstName: 'Evie',
+        id: '062a9170-3a03-4526-8f22-e1bc3c8c84dd',
+        lastName: 'Pouros',
       },
     },
     props,
-  ) as LiteUserAndOrg;
-export const getLivenessAttributes = (props: Partial<LivenessAttributes>) =>
-  merge(
+  );
+export const getLivenessAttributes = (props: Partial<LivenessAttributes>): LivenessAttributes =>
+  merge<LivenessAttributes, Partial<LivenessAttributes>>(
     {
-      device: 'adipisicing pariatur',
-      issuers: ['google', 'cloudflare', 'apple'],
+      device: 'mollit do',
+      issuers: ['google', 'footprint', 'apple'],
       metadata: {},
-      os: 'eiusmod nostrud aliqua veniam',
+      os: 'ex magna culpa',
     },
     props,
-  ) as LivenessAttributes;
-export const getLivenessEvent = (props: Partial<LivenessEvent>) =>
-  merge(
+  );
+export const getLivenessEvent = (props: Partial<LivenessEvent>): LivenessEvent =>
+  merge<LivenessEvent, Partial<LivenessEvent>>(
     {
       attributes: {
-        device: 'fugiat deserunt labore sunt',
-        issuers: ['google', 'google', 'cloudflare'],
+        device: 'dolor enim commodo anim in',
+        issuers: ['google', 'footprint', 'apple'],
         metadata: {},
-        os: 'dolor culpa consequat ullamco',
+        os: 'veniam',
       },
       insightEvent: {
-        city: 'Kautzerchester',
-        country: 'Lithuania',
-        ipAddress: '44228 Medhurst Corner Apt. 413',
-        latitude: 11889804.400364265,
-        longitude: 64909680.6193521,
-        metroCode: 'commodo laboris in irure',
-        postalCode: 'Ut eiusmod deserunt sunt adipisicing',
-        region: 'aliquip fugiat do non irure',
-        regionName: 'Bobbie Ebert',
-        sessionId: '51dbdcfe-1e32-4c0e-bcd6-8b74b1c60b06',
-        timeZone: 'adipisicing minim deserunt',
-        timestamp: '1955-03-02T22:32:38.0Z',
-        userAgent: 'ut',
+        city: 'South Paulineland',
+        country: 'Isle of Man',
+        ipAddress: '926 Kaia Bypass Suite 980',
+        latitude: -77072562.98655905,
+        longitude: -43104757.70910647,
+        metroCode: 'ex',
+        postalCode: 'elit ex',
+        region: 'ad commodo',
+        regionName: 'Rudolph Schamberger III',
+        sessionId: '10a9ff1b-d62e-4d68-8506-0e91a5f17b0c',
+        timeZone: 'mollit officia elit ad pariatur',
+        timestamp: '1940-12-05T18:56:59.0Z',
+        userAgent: 'esse ullamco ad laborum deserunt',
       },
-      source: 'google_device_attestation',
+      source: 'privacy_pass',
     },
     props,
-  ) as LivenessEvent;
-export const getLivenessIssuer = (props: Partial<LivenessIssuer>) => (props ?? 'cloudflare') as LivenessIssuer;
-export const getLivenessSource = (props: Partial<LivenessSource>) =>
-  (props ?? 'webauthn_attestation') as LivenessSource;
-export const getManualDecisionRequest = (props: Partial<ManualDecisionRequest>) =>
-  merge(
+  );
+export const getLivenessIssuer = (props: LivenessIssuer): LivenessIssuer => props ?? 'google';
+export const getLivenessSource = (props: LivenessSource): LivenessSource => props ?? 'google_device_attestation';
+export const getManualDecisionRequest = (props: Partial<ManualDecisionRequest>): ManualDecisionRequest =>
+  merge<ManualDecisionRequest, Partial<ManualDecisionRequest>>(
     {
       annotation: {
-        isPinned: true,
-        note: 'et mollit Duis',
+        isPinned: false,
+        note: 'occaecat ut laboris qui sit',
       },
       kind: 'manual_decision',
       status: 'pass',
     },
     props,
-  ) as ManualDecisionRequest;
-export const getManualReview = (props: Partial<ManualReview>) =>
-  merge(
+  );
+export const getManualReview = (props: Partial<ManualReview>): ManualReview =>
+  merge<ManualReview, Partial<ManualReview>>(
     {
-      kind: 'rule_triggered',
+      kind: 'document_needs_review',
     },
     props,
-  ) as ManualReview;
-export const getManualReviewKind = (props: Partial<ManualReviewKind>) =>
-  (props ?? 'document_needs_review') as ManualReviewKind;
-export const getMatchLevel = (props: Partial<MatchLevel>) => (props ?? 'exact') as MatchLevel;
-export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>) =>
-  merge(
+  );
+export const getManualReviewKind = (props: ManualReviewKind): ManualReviewKind => props ?? 'rule_triggered';
+export const getMatchLevel = (props: MatchLevel): MatchLevel => props ?? 'exact';
+export const getModernEntityDecryptResponse = (
+  props: Partial<ModernEntityDecryptResponse>,
+): ModernEntityDecryptResponse =>
+  merge<ModernEntityDecryptResponse, Partial<ModernEntityDecryptResponse>>(
+    {
+      'bank.*.account_type': 'ex sunt',
+      'bank.*.ach_account_id': '01d07fd4-7415-4690-a242-8f75201ca711',
+      'bank.*.ach_account_number': 'quis',
+      'bank.*.ach_routing_number': 'non',
+      'bank.*.fingerprint': 'sed ea',
+      'bank.*.name': 'Norma Ritchie',
+      'business.address_line1': '775 Abshire Prairie Apt. 578',
+      'business.address_line2': '4760 Legros Meadow Suite 674',
+      'business.city': 'Purdyton',
+      'business.corporation_type': 'aute',
+      'business.country': 'Madagascar',
+      'business.dba': 'Duis eiusmod',
+      'business.formation_date': 'Lorem elit',
+      'business.formation_state': 'Virginia',
+      'business.name': 'Olga Harvey-Reinger',
+      'business.phone_number': '+17978292070',
+      'business.state': 'Nebraska',
+      'business.tin': 'qui pariatur nostrud',
+      'business.website': 'https://vivacious-fraudster.info/',
+      'business.zip': '24392-5424',
+      'card.*.billing_address.country': '721 Kreiger Square Apt. 307',
+      'card.*.billing_address.zip': "415 O'Hara Circles Apt. 191",
+      'card.*.cvc': 'non do qui',
+      'card.*.expiration': 'magna deserunt enim',
+      'card.*.expiration_month': 'velit Excepteur in eu incididunt',
+      'card.*.expiration_year': 'quis',
+      'card.*.fingerprint': 'sint eiusmod Duis',
+      'card.*.issuer': 'id irure',
+      'card.*.name': 'Dr. Garry Hammes',
+      'card.*.number': 'Excepteur',
+      'card.*.number_last4': 'pariatur laboris',
+      'custom.*': 'reprehenderit Ut elit dolore',
+      'document.custom.*': 'ut consequat',
+      'document.drivers_license.address_line1': '8110 S Jefferson Street Suite 591',
+      'document.drivers_license.back.image': 'mollit',
+      'document.drivers_license.back.mime_type': 'consequat ea ex ad',
+      'document.drivers_license.city': 'Carmenside',
+      'document.drivers_license.classified_document_type': 'aute id laborum in et',
+      'document.drivers_license.clave_de_elector': 'minim exercitation cupidatat adipisicing ut',
+      'document.drivers_license.curp': 'eu mollit consectetur dolore velit',
+      'document.drivers_license.curp_validation_response': 'e8a5e88f-e423-4a29-b849-6b255296b750',
+      'document.drivers_license.dob': 'deserunt',
+      'document.drivers_license.document_number': 'et culpa tempor dolor elit',
+      'document.drivers_license.expires_at': 'occaecat commodo dolor consequat',
+      'document.drivers_license.first_name': 'Icie',
+      'document.drivers_license.front.image': 'id',
+      'document.drivers_license.front.mime_type': 'reprehenderit sit',
+      'document.drivers_license.full_address': '37619 W Church Street Suite 473',
+      'document.drivers_license.full_name': 'Lula Greenholt',
+      'document.drivers_license.gender': 'ut nostrud aute consequat',
+      'document.drivers_license.issued_at': 'amet laboris',
+      'document.drivers_license.issuing_country': 'Curacao',
+      'document.drivers_license.issuing_state': 'Indiana',
+      'document.drivers_license.last_name': 'Wisozk',
+      'document.drivers_license.nationality': 'laborum exercitation commodo',
+      'document.drivers_license.postal_code': 'anim minim',
+      'document.drivers_license.ref_number': 'tempor elit in deserunt Ut',
+      'document.drivers_license.samba_activity_history_response': 'aliquip mollit dolor do',
+      'document.drivers_license.selfie.image': 'qui officia',
+      'document.drivers_license.selfie.mime_type': 'ipsum culpa tempor non ex',
+      'document.drivers_license.state': 'Missouri',
+      'document.finra_compliance_letter': 'eiusmod ullamco nisi labore',
+      'document.id_card.address_line1': '2194 Sipes Flats Suite 894',
+      'document.id_card.back.image': 'ca49eab8-d85b-44c0-bf4d-d3d5c8c2dba3',
+      'document.id_card.back.mime_type': '07255268-9485-49e9-b871-91ccec1a5878',
+      'document.id_card.city': 'West Elizabethfield',
+      'document.id_card.classified_document_type': 'd2a6c3e9-4682-46bb-bfbb-3047432a9010',
+      'document.id_card.clave_de_elector': '4fb04e0d-19bd-48a7-9817-ba0f66bf39e3',
+      'document.id_card.curp': '954010a5-001a-4760-8b43-c617a436b8d4',
+      'document.id_card.curp_validation_response': 'e21b337d-cc33-4907-ba39-bbdf04f191f4',
+      'document.id_card.dob': '0cab4ee7-b24b-4627-a8e4-b646fde8fcb7',
+      'document.id_card.document_number': 'c0efdb7d-b5d3-481c-bd6b-f8b11315f137',
+      'document.id_card.expires_at': '6fdef801-0765-433b-8153-735b7ccad035',
+      'document.id_card.first_name': 'Emie',
+      'document.id_card.front.image': '90f57391-a043-4167-8890-5e075e2255d6',
+      'document.id_card.front.mime_type': '9d7c543f-1189-4f3d-a2a7-441dc43bdba7',
+      'document.id_card.full_address': '4079 Schmidt Freeway Apt. 320',
+      'document.id_card.full_name': 'Clifton Torp',
+      'document.id_card.gender': '725e77db-2e6b-4309-b9ef-4df9c24a935b',
+      'document.id_card.issued_at': '78fd212b-5636-4995-8169-c187d9c79b6d',
+      'document.id_card.issuing_country': 'Cuba',
+      'document.id_card.issuing_state': 'Montana',
+      'document.id_card.last_name': 'Schaefer',
+      'document.id_card.nationality': '4bf34745-2440-485f-8762-5beb03fc4a7e',
+      'document.id_card.postal_code': '3d02a16e-1cef-4642-9e0d-2d2193d9cf7d',
+      'document.id_card.ref_number': '6376dffc-f519-439b-b7fa-5fedc202a55d',
+      'document.id_card.samba_activity_history_response': '0fde5427-dfeb-4608-a231-93112061bf11',
+      'document.id_card.selfie.image': 'c15e997b-80a9-4a00-a356-7f1f28858dc5',
+      'document.id_card.selfie.mime_type': 'de4a5247-e26b-44bf-acdf-4f5685070f06',
+      'document.id_card.state': 'Alaska',
+      'document.passport.address_line1': '37338 Hessel Prairie Apt. 655',
+      'document.passport.back.image': 'laborum',
+      'document.passport.back.mime_type': 'et sit esse adipisicing in',
+      'document.passport.city': 'East Timmothy',
+      'document.passport.classified_document_type': 'veniam',
+      'document.passport.clave_de_elector': 'qui voluptate veniam',
+      'document.passport.curp': 'sint',
+      'document.passport.curp_validation_response': '08e764a5-e7df-4fc1-be45-b1a2d04dcfbf',
+      'document.passport.dob': 'non et',
+      'document.passport.document_number': 'ullamco anim commodo pariatur amet',
+      'document.passport.expires_at': 'ex et dolore',
+      'document.passport.first_name': 'Wilfrid',
+      'document.passport.front.image': 'eu deserunt',
+      'document.passport.front.mime_type': 'exercitation',
+      'document.passport.full_address': '293 S Center Street Suite 763',
+      'document.passport.full_name': 'Debra McGlynn',
+      'document.passport.gender': 'sunt dolore dolore mollit',
+      'document.passport.issued_at': 'dolore laborum aliquip ullamco pariatur',
+      'document.passport.issuing_country': 'Saint Kitts and Nevis',
+      'document.passport.issuing_state': 'Connecticut',
+      'document.passport.last_name': 'Heidenreich',
+      'document.passport.nationality': 'ea eu in sit elit',
+      'document.passport.postal_code': 'ullamco laborum commodo nulla culpa',
+      'document.passport.ref_number': 'ut Duis',
+      'document.passport.samba_activity_history_response': 'pariatur officia',
+      'document.passport.selfie.image': 'mollit dolor cillum',
+      'document.passport.selfie.mime_type': 'deserunt incididunt dolore in aliquip',
+      'document.passport.state': 'Massachusetts',
+      'document.passport_card.address_line1': '78170 Baumbach Street Suite 991',
+      'document.passport_card.back.image': 'qui ex',
+      'document.passport_card.back.mime_type': 'laborum',
+      'document.passport_card.city': 'South Abelfurt',
+      'document.passport_card.classified_document_type': 'proident nisi aliquip mollit commodo',
+      'document.passport_card.clave_de_elector': 'labore exercitation occaecat laboris',
+      'document.passport_card.curp': 'elit ullamco proident',
+      'document.passport_card.curp_validation_response': 'b1b3da4c-0c26-478f-9bda-84514c7a9e4a',
+      'document.passport_card.dob': 'sed',
+      'document.passport_card.document_number': 'velit dolor quis',
+      'document.passport_card.expires_at': 'dolore in velit',
+      'document.passport_card.first_name': 'Rico',
+      'document.passport_card.front.image': 'irure',
+      'document.passport_card.front.mime_type': 'sunt ut Lorem in',
+      'document.passport_card.full_address': '86896 W State Street Apt. 127',
+      'document.passport_card.full_name': 'Walter Hermiston-Bosco MD',
+      'document.passport_card.gender': 'in ea Ut',
+      'document.passport_card.issued_at': 'velit ea Lorem in labore',
+      'document.passport_card.issuing_country': 'Israel',
+      'document.passport_card.issuing_state': 'Pennsylvania',
+      'document.passport_card.last_name': 'Rowe',
+      'document.passport_card.nationality': 'est proident',
+      'document.passport_card.postal_code': 'cupidatat ut ut',
+      'document.passport_card.ref_number': 'anim cillum',
+      'document.passport_card.samba_activity_history_response': 'culpa sint',
+      'document.passport_card.selfie.image': 'fugiat occaecat ut id',
+      'document.passport_card.selfie.mime_type': 'ut',
+      'document.passport_card.state': 'New Hampshire',
+      'document.permit.address_line1': '720 N Bridge Street Apt. 639',
+      'document.permit.back.image': 'ut eu cupidatat',
+      'document.permit.back.mime_type': 'Duis',
+      'document.permit.city': 'New Victorfield',
+      'document.permit.classified_document_type': 'proident eu',
+      'document.permit.clave_de_elector': 'aliquip',
+      'document.permit.curp': 'in sit elit anim quis',
+      'document.permit.curp_validation_response': '9bba4683-1662-4517-9c1d-48eaaa186a5e',
+      'document.permit.dob': 'cillum commodo veniam in cupidatat',
+      'document.permit.document_number': 'Lorem dolore',
+      'document.permit.expires_at': 'ex reprehenderit esse dolor',
+      'document.permit.first_name': 'Joaquin',
+      'document.permit.front.image': 'aute quis ex',
+      'document.permit.front.mime_type': 'ad dolor irure aute do',
+      'document.permit.full_address': '21417 E 6th Street Suite 812',
+      'document.permit.full_name': 'Rodolfo Schamberger',
+      'document.permit.gender': 'ut reprehenderit magna nulla Ut',
+      'document.permit.issued_at': 'nulla in',
+      'document.permit.issuing_country': 'Senegal',
+      'document.permit.issuing_state': 'Idaho',
+      'document.permit.last_name': 'Mann',
+      'document.permit.nationality': 'exercitation ad enim',
+      'document.permit.postal_code': 'id commodo dolore pariatur exercitation',
+      'document.permit.ref_number': 'dolore aute occaecat et deserunt',
+      'document.permit.samba_activity_history_response': 'consectetur aliquip laboris',
+      'document.permit.selfie.image': 'nisi officia ex adipisicing cupidatat',
+      'document.permit.selfie.mime_type': 'ea eiusmod qui minim fugiat',
+      'document.permit.state': 'Oregon',
+      'document.proof_of_address.image': '6088 E 4th Street Apt. 380',
+      'document.residence_document.address_line1': '5330 Ferry Locks Suite 668',
+      'document.residence_document.back.image': '9f270a47-c328-4b9c-9f83-6ad558ee64fe',
+      'document.residence_document.back.mime_type': 'e7ff56dc-3a4c-4e38-ac7b-45757668b2e8',
+      'document.residence_document.city': 'Orvilleburgh',
+      'document.residence_document.classified_document_type': 'fe4f8d7c-ca35-4212-87bb-cf3689972fc8',
+      'document.residence_document.clave_de_elector': 'eb6c0834-b4e7-4e31-a029-2070bde2306b',
+      'document.residence_document.curp': '79bae1e4-ee4c-4fb9-8f9b-c42b93dff4dd',
+      'document.residence_document.curp_validation_response': 'c97e828c-a93d-477e-911b-0e9249ea1b3c',
+      'document.residence_document.dob': '79cd9547-cfae-4c46-921f-eb759f3b8c8f',
+      'document.residence_document.document_number': '24be021c-8d9c-4e86-b216-3208e9ebfdf7',
+      'document.residence_document.expires_at': 'e79ec7aa-64fc-4ee5-88dd-3e39849d8e5b',
+      'document.residence_document.first_name': 'Vladimir',
+      'document.residence_document.front.image': '883cc900-14bf-4c18-af7e-8cdc6f906508',
+      'document.residence_document.front.mime_type': '754cf4c9-8968-4906-b32d-497a7a7177ce',
+      'document.residence_document.full_address': '7061 Kay Lane Apt. 452',
+      'document.residence_document.full_name': 'Sally Terry',
+      'document.residence_document.gender': 'aab05828-3163-4e2f-b328-e5b485591dc8',
+      'document.residence_document.issued_at': '62d50db1-10f1-44f0-8afa-f328ba9d0fcf',
+      'document.residence_document.issuing_country': 'Madagascar',
+      'document.residence_document.issuing_state': 'Arizona',
+      'document.residence_document.last_name': 'Graham-Hilpert',
+      'document.residence_document.nationality': '14a02aec-c827-46b0-b212-cd665e51b69b',
+      'document.residence_document.postal_code': '324ff136-cf99-474d-ae05-e6d3a9712254',
+      'document.residence_document.ref_number': 'e036d96d-caeb-4e55-ba36-ad9eea06e8a4',
+      'document.residence_document.samba_activity_history_response': 'e03bdda5-c542-422d-808f-354c86307435',
+      'document.residence_document.selfie.image': '91190621-6a11-4b54-9aa9-b4c9e277998a',
+      'document.residence_document.selfie.mime_type': 'a48aff70-6dbd-4350-bb80-66244edd5ea1',
+      'document.residence_document.state': 'Delaware',
+      'document.ssn_card.image': 'et consequat',
+      'document.visa.address_line1': '594 Parisian Rue Suite 334',
+      'document.visa.back.image': 'proident aute do tempor pariatur',
+      'document.visa.back.mime_type': 'quis cillum',
+      'document.visa.city': 'Port Bonitacester',
+      'document.visa.classified_document_type': 'sint anim quis',
+      'document.visa.clave_de_elector': 'dolor',
+      'document.visa.curp': 'magna ut eu',
+      'document.visa.curp_validation_response': '1f9e586c-8029-4e56-b6af-5160c673c108',
+      'document.visa.dob': 'nulla',
+      'document.visa.document_number': 'nulla',
+      'document.visa.expires_at': 'deserunt eu ad Excepteur pariatur',
+      'document.visa.first_name': 'Clint',
+      'document.visa.front.image': 'exercitation velit',
+      'document.visa.front.mime_type': 'in anim dolore',
+      'document.visa.full_address': '9812 Swaniawski Cliff Suite 469',
+      'document.visa.full_name': 'Christopher Schimmel',
+      'document.visa.gender': 'eu commodo est',
+      'document.visa.issued_at': 'Excepteur sint Duis',
+      'document.visa.issuing_country': 'Australia',
+      'document.visa.issuing_state': 'Idaho',
+      'document.visa.last_name': 'Johnson-Prosacco',
+      'document.visa.nationality': 'laborum',
+      'document.visa.postal_code': 'anim mollit est ipsum',
+      'document.visa.ref_number': 'ut pariatur dolor in',
+      'document.visa.samba_activity_history_response': 'sunt sit anim enim',
+      'document.visa.selfie.image': 'anim cupidatat',
+      'document.visa.selfie.mime_type': 'pariatur Lorem commodo eiusmod',
+      'document.visa.state': 'Arkansas',
+      'document.voter_identification.address_line1': '996 S Division Street Suite 607',
+      'document.voter_identification.back.image': '4211e634-2b25-4052-b88e-652fc5aed578',
+      'document.voter_identification.back.mime_type': '4d78ea1b-1907-4a32-971b-d12e8b56f599',
+      'document.voter_identification.city': 'West Tierra',
+      'document.voter_identification.classified_document_type': 'e6e9078e-6a14-4355-9395-bb5da231b42f',
+      'document.voter_identification.clave_de_elector': '4de807d7-4173-4766-a068-d1c29c8b7f04',
+      'document.voter_identification.curp': 'dac9c4c4-3414-4378-9b9c-4068741bde84',
+      'document.voter_identification.curp_validation_response': '291b6f48-4050-48c1-90e5-3819510297c8',
+      'document.voter_identification.dob': 'bca42de6-db2d-40c4-93b7-59128c8735ce',
+      'document.voter_identification.document_number': 'fc19f692-49a9-4b7b-a4cb-7c7106abcc7f',
+      'document.voter_identification.expires_at': '5aebf9d3-e20e-4b9c-bd37-dbadc0d9267c',
+      'document.voter_identification.first_name': 'Alba',
+      'document.voter_identification.front.image': '35ee8f09-e262-4ac0-94f1-1ac75ed8c3d8',
+      'document.voter_identification.front.mime_type': 'e2e6cd29-3307-45e9-9c56-7e169ce2fb74',
+      'document.voter_identification.full_address': '1397 Luettgen-Conn Valley Apt. 644',
+      'document.voter_identification.full_name': 'Mr. Angel Goyette',
+      'document.voter_identification.gender': 'd90f6528-fe33-4a08-bdf0-0a8ee1205c96',
+      'document.voter_identification.issued_at': '0d8d97ba-ea33-42d2-b24e-b92d93656a99',
+      'document.voter_identification.issuing_country': 'Dominican Republic',
+      'document.voter_identification.issuing_state': 'Idaho',
+      'document.voter_identification.last_name': 'Hessel',
+      'document.voter_identification.nationality': '579bd981-6365-43e6-9952-c338264a89cc',
+      'document.voter_identification.postal_code': 'dff877b9-b355-482b-9524-afe4b2df11d4',
+      'document.voter_identification.ref_number': '3aad76b0-405e-4a60-bc2f-25c6ddb14bf8',
+      'document.voter_identification.samba_activity_history_response': 'd974f46a-5260-4210-9e00-b89459f98140',
+      'document.voter_identification.selfie.image': '8ce161eb-9cc4-4109-a7de-a15eb870d7dc',
+      'document.voter_identification.selfie.mime_type': '2111d51a-3b6a-4075-ac56-3a224e316c02',
+      'document.voter_identification.state': 'Missouri',
+      'id.address_line1': '706 S Broadway Street Suite 105',
+      'id.address_line2': '8405 McKenzie Bypass Suite 689',
+      'id.citizenships': 'fa76ec2d-faca-4b94-b1d3-347126b66e0e',
+      'id.city': 'Ferryfield',
+      'id.country': 'Uruguay',
+      'id.dob': '0430a70e-96c8-45fc-9c56-06e1e6dfd618',
+      'id.drivers_license_number': 'e553bacc-1aeb-4e7b-934c-42576ef5336f',
+      'id.drivers_license_state': 'Maine',
+      'id.email': 'maia21@gmail.com',
+      'id.first_name': 'Mae',
+      'id.itin': 'e04fda04-1a25-44e2-a2a3-0e113ab345e7',
+      'id.last_name': 'Jacobs',
+      'id.middle_name': 'Grace Schaden',
+      'id.nationality': 'd7c291f9-ff82-42bb-b445-2e8adb596fc2',
+      'id.phone_number': '+16878616855',
+      'id.ssn4': '144e4cc5-a455-494d-8cf8-4e26e81104b6',
+      'id.ssn9': '46808916-456e-41f8-989a-c47f60b21774',
+      'id.state': 'Louisiana',
+      'id.us_legal_status': 'bf7ab1ba-88bc-48cc-a425-93574f649117',
+      'id.us_tax_id': '82ea6306-a8c8-48d8-9db9-c313ae1d4e59',
+      'id.visa_expiration_date': '2c4ab09b-4ca1-40a7-a04d-53fbfe3010f8',
+      'id.visa_kind': '7b182140-d49a-455a-befb-2f92ae11474d',
+      'id.zip': '70917-8363',
+      'investor_profile.annual_income': 'quis ex officia nisi',
+      'investor_profile.brokerage_firm_employer': 'commodo dolor ipsum',
+      'investor_profile.declarations': 'irure dolor ut',
+      'investor_profile.employer': 'nostrud pariatur Excepteur',
+      'investor_profile.employment_status': 'ipsum commodo',
+      'investor_profile.family_member_names': 'Alma Schultz',
+      'investor_profile.funding_sources': 'reprehenderit nostrud ipsum sit cupidatat',
+      'investor_profile.investment_goals': 'officia culpa fugiat nisi',
+      'investor_profile.net_worth': 'sint ad Ut exercitation',
+      'investor_profile.occupation': 'exercitation aliqua',
+      'investor_profile.political_organization': 'nisi do minim',
+      'investor_profile.risk_tolerance': 'adipisicing consectetur Excepteur do',
+      'investor_profile.senior_executive_symbols': 'proident id culpa ut sed',
+    },
+    props,
+  );
+export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>): MultiUpdateRuleRequest =>
+  merge<MultiUpdateRuleRequest, Partial<MultiUpdateRuleRequest>>(
     {
       add: [
         {
-          isShadow: true,
-          name: 'Elizabeth Fritsch',
-          ruleAction: 'pass_with_manual_review',
+          isShadow: false,
+          name: 'Cory Wisoky',
+          ruleAction: 'step_up.identity',
           ruleExpression: [
             {
-              field: 'address_alert_single_address_in_file',
-              op: 'not_eq',
+              field: 'address_input_is_po_box',
+              op: 'eq',
               value: false,
             },
             {
-              field: 'bureau_deleted_record',
-              op: 'not_eq',
+              field: 'address_alert_stability',
+              op: 'eq',
               value: false,
             },
             {
-              field: 'email_address_invalid',
-              op: 'not_eq',
+              field: 'device_bot_risk',
+              op: 'eq',
               value: false,
             },
           ],
         },
         {
-          isShadow: true,
-          name: 'Elizabeth Fritsch',
+          isShadow: false,
+          name: 'Cory Wisoky',
           ruleAction: 'step_up.identity_proof_of_ssn_proof_of_address',
           ruleExpression: [
             {
-              field: 'ssn_input_is_invalid',
+              field: 'address_street_name_partially_matches',
               op: 'eq',
               value: true,
             },
             {
-              field: 'email_domain_recently_created',
+              field: 'address_street_name_does_not_match',
               op: 'eq',
-              value: true,
+              value: false,
             },
             {
-              field: 'document_expiration_date_crosscheck_matches',
-              op: 'eq',
-              value: true,
+              field: 'dob_mob_does_not_match',
+              op: 'not_eq',
+              value: false,
             },
           ],
         },
         {
           isShadow: true,
-          name: 'Elizabeth Fritsch',
-          ruleAction: 'fail',
+          name: 'Cory Wisoky',
+          ruleAction: 'step_up.identity_proof_of_ssn',
           ruleExpression: [
+            {
+              field: 'input_phone_number_does_not_match_ip_state',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'name_matches',
+              op: 'not_eq',
+              value: false,
+            },
+            {
+              field: 'beneficial_owners_do_not_match',
+              op: 'not_eq',
+              value: true,
+            },
+          ],
+        },
+      ],
+      delete: ['in sed', 'Lorem veniam', 'dolore elit aute ipsum'],
+      edit: [
+        {
+          ruleExpression: [
+            {
+              field: 'curp_service_not_available',
+              op: 'not_eq',
+              value: false,
+            },
             {
               field: 'name_does_not_match',
               op: 'eq',
               value: false,
             },
             {
-              field: 'document_field_crosscheck_failed',
+              field: 'document_alignment_failed',
+              op: 'eq',
+              value: true,
+            },
+          ],
+          ruleId: 'f7d53aa4-6344-4f53-b8a9-cb5ca107c16d',
+        },
+        {
+          ruleExpression: [
+            {
+              field: 'business_dba_does_not_match',
+              op: 'eq',
+              value: false,
+            },
+            {
+              field: 'document_type_not_allowed',
               op: 'not_eq',
               value: false,
             },
             {
-              field: 'address_located_is_not_standard_general_delivery',
+              field: 'address_input_is_not_standard_hospital',
               op: 'eq',
-              value: false,
+              value: true,
             },
           ],
+          ruleId: 'f7d53aa4-6344-4f53-b8a9-cb5ca107c16d',
+        },
+        {
+          ruleExpression: [
+            {
+              field: 'document_selfie_matches',
+              op: 'eq',
+              value: true,
+            },
+            {
+              field: 'address_located_is_high_risk_address',
+              op: 'not_eq',
+              value: true,
+            },
+            {
+              field: 'address_input_is_not_standard_mail_drop',
+              op: 'not_eq',
+              value: true,
+            },
+          ],
+          ruleId: 'f7d53aa4-6344-4f53-b8a9-cb5ca107c16d',
         },
       ],
-      delete: ['ea Duis', 'Duis', 'officia tempor pariatur Ut'],
-      edit: [
-        {
-          ruleExpression: [
-            {
-              field: 'address_input_not_on_file',
-              op: 'not_eq',
-              value: false,
-            },
-            {
-              field: 'ip_not_located',
-              op: 'eq',
-              value: true,
-            },
-            {
-              field: 'address_input_is_non_residential',
-              op: 'not_eq',
-              value: true,
-            },
-          ],
-          ruleId: 'a0c0ddc3-623c-4a23-a8a2-50461a328b4d',
-        },
-        {
-          ruleExpression: [
-            {
-              field: 'business_address_close_match',
-              op: 'not_eq',
-              value: false,
-            },
-            {
-              field: 'phone_located_address_matches',
-              op: 'not_eq',
-              value: false,
-            },
-            {
-              field: 'document_full_name_crosscheck_does_not_match',
-              op: 'eq',
-              value: false,
-            },
-          ],
-          ruleId: 'a0c0ddc3-623c-4a23-a8a2-50461a328b4d',
-        },
-        {
-          ruleExpression: [
-            {
-              field: 'ip_proxy',
-              op: 'eq',
-              value: true,
-            },
-            {
-              field: 'address_matches',
-              op: 'eq',
-              value: false,
-            },
-            {
-              field: 'sos_business_address_filing_not_found',
-              op: 'eq',
-              value: false,
-            },
-          ],
-          ruleId: 'a0c0ddc3-623c-4a23-a8a2-50461a328b4d',
-        },
-      ],
-      expectedRuleSetVersion: -2451440,
+      expectedRuleSetVersion: 73467657,
     },
     props,
-  ) as MultiUpdateRuleRequest;
-export const getNumberOperator = (props: Partial<NumberOperator>) => (props ?? 'lt') as NumberOperator;
-export const getObConfigurationKind = (props: Partial<ObConfigurationKind>) =>
-  (props ?? 'document') as ObConfigurationKind;
-export const getOfficer = (props: Partial<Officer>) =>
-  merge(
+  );
+export const getNumberOperator = (props: NumberOperator): NumberOperator => props ?? 'lt';
+export const getObConfigurationKind = (props: ObConfigurationKind): ObConfigurationKind => props ?? 'kyc';
+export const getOfficer = (props: Partial<Officer>): Officer =>
+  merge<Officer, Partial<Officer>>(
     {
-      name: 'Cory Goldner',
-      roles: 'id esse in sed',
+      name: 'Evelyn Green',
+      roles: 'ut officia',
     },
     props,
-  ) as Officer;
-export const getOffsetPaginatedDashboardSecretApiKey = (props: Partial<OffsetPaginatedDashboardSecretApiKey>) =>
-  merge(
+  );
+export const getOffsetPaginatedDashboardSecretApiKey = (
+  props: Partial<OffsetPaginatedDashboardSecretApiKey>,
+): OffsetPaginatedDashboardSecretApiKey =>
+  merge<OffsetPaginatedDashboardSecretApiKey, Partial<OffsetPaginatedDashboardSecretApiKey>>(
     {
       data: [
         {
-          createdAt: '1898-10-22T15:36:43.0Z',
-          id: '5efc1e67-b61c-465b-8759-9f67719e0e3d',
-          isLive: true,
-          key: '983e2a92-0d3b-4df6-a14d-2f08d5061b89',
-          lastUsedAt: '1891-06-15T20:07:33.0Z',
-          name: 'Darla Rice IV',
+          createdAt: '1944-05-21T04:10:38.0Z',
+          id: '7651ec54-a80a-43f5-a899-454ce65909fd',
+          isLive: false,
+          key: '4564060c-a83b-4d0d-85a9-84b245ae113e',
+          lastUsedAt: '1956-06-30T19:28:18.0Z',
+          name: 'Dr. Reginald Beatty',
           role: {
-            createdAt: '1945-03-15T01:53:01.0Z',
-            id: 'cbfef214-2ae3-4923-94c7-9209631c6ed2',
+            createdAt: '1925-04-16T03:14:28.0Z',
+            id: '0f546d32-3989-4aac-9b2d-5ad1a555bc71',
+            isImmutable: true,
+            kind: 'compliance_partner_dashboard_user',
+            name: 'Mr. Billy Roob',
+            numActiveApiKeys: 78687977,
+            numActiveUsers: -30258195,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+          scrubbedKey: '96e31ef2-82a4-476a-97ce-3a6b85ef869d',
+          status: 'enabled',
+        },
+        {
+          createdAt: '1922-08-16T07:41:12.0Z',
+          id: '7651ec54-a80a-43f5-a899-454ce65909fd',
+          isLive: false,
+          key: '4564060c-a83b-4d0d-85a9-84b245ae113e',
+          lastUsedAt: '1944-03-03T19:11:27.0Z',
+          name: 'Dr. Reginald Beatty',
+          role: {
+            createdAt: '1915-04-13T21:20:11.0Z',
+            id: '0f546d32-3989-4aac-9b2d-5ad1a555bc71',
             isImmutable: false,
             kind: 'dashboard_user',
-            name: 'Mona Kreiger DVM',
-            numActiveApiKeys: -36815535,
-            numActiveUsers: -73938919,
+            name: 'Mr. Billy Roob',
+            numActiveApiKeys: 48270321,
+            numActiveUsers: -16567046,
             scopes: [
               {
                 kind: 'read',
@@ -5012,54 +5379,24 @@ export const getOffsetPaginatedDashboardSecretApiKey = (props: Partial<OffsetPag
               },
             ],
           },
-          scrubbedKey: '4fd2f31d-bf79-4fe8-bf92-505922e2385f',
-          status: 'disabled',
-        },
-        {
-          createdAt: '1924-02-08T18:20:39.0Z',
-          id: '5efc1e67-b61c-465b-8759-9f67719e0e3d',
-          isLive: true,
-          key: '983e2a92-0d3b-4df6-a14d-2f08d5061b89',
-          lastUsedAt: '1957-03-27T01:59:51.0Z',
-          name: 'Darla Rice IV',
-          role: {
-            createdAt: '1915-12-03T02:16:24.0Z',
-            id: 'cbfef214-2ae3-4923-94c7-9209631c6ed2',
-            isImmutable: true,
-            kind: 'dashboard_user',
-            name: 'Mona Kreiger DVM',
-            numActiveApiKeys: -45116585,
-            numActiveUsers: 63136631,
-            scopes: [
-              {
-                kind: 'read',
-              },
-              {
-                kind: 'read',
-              },
-              {
-                kind: 'read',
-              },
-            ],
-          },
-          scrubbedKey: '4fd2f31d-bf79-4fe8-bf92-505922e2385f',
+          scrubbedKey: '96e31ef2-82a4-476a-97ce-3a6b85ef869d',
           status: 'enabled',
         },
         {
-          createdAt: '1966-11-18T10:28:03.0Z',
-          id: '5efc1e67-b61c-465b-8759-9f67719e0e3d',
-          isLive: false,
-          key: '983e2a92-0d3b-4df6-a14d-2f08d5061b89',
-          lastUsedAt: '1898-02-19T18:37:01.0Z',
-          name: 'Darla Rice IV',
+          createdAt: '1946-04-21T20:09:03.0Z',
+          id: '7651ec54-a80a-43f5-a899-454ce65909fd',
+          isLive: true,
+          key: '4564060c-a83b-4d0d-85a9-84b245ae113e',
+          lastUsedAt: '1946-06-29T07:02:16.0Z',
+          name: 'Dr. Reginald Beatty',
           role: {
-            createdAt: '1933-09-11T04:40:46.0Z',
-            id: 'cbfef214-2ae3-4923-94c7-9209631c6ed2',
-            isImmutable: true,
-            kind: 'api_key',
-            name: 'Mona Kreiger DVM',
-            numActiveApiKeys: 67537695,
-            numActiveUsers: 56160070,
+            createdAt: '1905-03-02T21:18:26.0Z',
+            id: '0f546d32-3989-4aac-9b2d-5ad1a555bc71',
+            isImmutable: false,
+            kind: 'compliance_partner_dashboard_user',
+            name: 'Mr. Billy Roob',
+            numActiveApiKeys: 3124223,
+            numActiveUsers: 7338810,
             scopes: [
               {
                 kind: 'read',
@@ -5072,168 +5409,172 @@ export const getOffsetPaginatedDashboardSecretApiKey = (props: Partial<OffsetPag
               },
             ],
           },
-          scrubbedKey: '4fd2f31d-bf79-4fe8-bf92-505922e2385f',
+          scrubbedKey: '96e31ef2-82a4-476a-97ce-3a6b85ef869d',
           status: 'enabled',
         },
       ],
       meta: {
-        count: 10000,
-        nextPage: 2,
+        count: -20539151,
+        nextPage: 19473597,
       },
     },
     props,
-  ) as OffsetPaginatedDashboardSecretApiKey;
-export const getOffsetPaginatedEntityOnboarding = (props: Partial<OffsetPaginatedEntityOnboarding>) =>
-  merge(
+  );
+export const getOffsetPaginatedEntityOnboarding = (
+  props: Partial<OffsetPaginatedEntityOnboarding>,
+): OffsetPaginatedEntityOnboarding =>
+  merge<OffsetPaginatedEntityOnboarding, Partial<OffsetPaginatedEntityOnboarding>>(
     {
       data: [
         {
-          id: '077aad89-395b-4b5e-a239-d79908ebb90e',
-          playbookKey: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
+          id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
+          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
           ruleSetResults: [
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1940-11-25T15:50:27.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1949-07-23T10:38:04.0Z',
             },
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1920-03-11T13:45:12.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1891-07-18T02:12:29.0Z',
             },
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1903-07-25T08:30:02.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1900-07-15T09:23:13.0Z',
             },
           ],
-          seqno: -27371663,
-          status: 'none',
-          timestamp: '1915-11-04T14:56:40.0Z',
+          seqno: 43797063,
+          status: 'fail',
+          timestamp: '1962-06-13T06:33:18.0Z',
         },
         {
-          id: '077aad89-395b-4b5e-a239-d79908ebb90e',
-          playbookKey: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
+          id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
+          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
           ruleSetResults: [
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1939-07-12T19:43:04.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1947-11-12T20:01:50.0Z',
             },
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1968-08-16T18:18:34.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1948-06-12T15:48:42.0Z',
             },
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1939-06-27T08:45:42.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1920-09-16T14:26:17.0Z',
             },
           ],
-          seqno: 80133951,
-          status: 'incomplete',
-          timestamp: '1924-10-06T18:26:33.0Z',
+          seqno: -4726749,
+          status: 'pending',
+          timestamp: '1899-04-27T06:52:49.0Z',
         },
         {
-          id: '077aad89-395b-4b5e-a239-d79908ebb90e',
-          playbookKey: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
+          id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
+          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
           ruleSetResults: [
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1961-06-04T01:53:45.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1927-02-18T12:29:56.0Z',
             },
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1923-12-26T02:45:02.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1903-04-03T12:51:39.0Z',
             },
             {
-              id: 'e8552635-c367-42cd-b79e-fe8c2924ef64',
-              timestamp: '1903-07-28T05:01:51.0Z',
+              id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
+              timestamp: '1918-10-27T01:51:42.0Z',
             },
           ],
-          seqno: 23215327,
+          seqno: -17580459,
           status: 'pass',
-          timestamp: '1961-02-03T22:35:24.0Z',
+          timestamp: '1919-12-27T09:46:49.0Z',
         },
       ],
       meta: {
-        nextPage: 2,
+        nextPage: 26570948,
       },
     },
     props,
-  ) as OffsetPaginatedEntityOnboarding;
-export const getOffsetPaginatedList = (props: Partial<OffsetPaginatedList>) =>
-  merge(
+  );
+export const getOffsetPaginatedList = (props: Partial<OffsetPaginatedList>): OffsetPaginatedList =>
+  merge<OffsetPaginatedList, Partial<OffsetPaginatedList>>(
     {
       data: [
         {
           actor: {
             data: {
-              id: 'd0bd25ea-a192-40c7-b061-f2735d9f1d08',
+              id: '8bc1ec79-7565-4e65-9bcc-dd8181d2743b',
             },
             kind: 'user',
           },
-          alias: 'exercitation',
-          createdAt: '1920-08-13T02:55:01.0Z',
-          entriesCount: 35262639,
-          id: '881128f5-1a37-4929-8632-b6c714158216',
+          alias: 'velit',
+          createdAt: '1957-03-28T13:49:59.0Z',
+          entriesCount: 93453427,
+          id: '0b49bb29-170f-48c0-b641-e18e5a998ff6',
+          kind: 'email_domain',
+          name: 'Jorge Schumm',
+          usedInPlaybook: true,
+        },
+        {
+          actor: {
+            data: {
+              id: '8bc1ec79-7565-4e65-9bcc-dd8181d2743b',
+            },
+            kind: 'user',
+          },
+          alias: 'fugiat quis cillum reprehenderit pariatur',
+          createdAt: '1954-05-07T04:42:39.0Z',
+          entriesCount: -58665568,
+          id: '0b49bb29-170f-48c0-b641-e18e5a998ff6',
           kind: 'ip_address',
-          name: 'Shelly Smith',
+          name: 'Jorge Schumm',
           usedInPlaybook: false,
         },
         {
           actor: {
             data: {
-              id: 'd0bd25ea-a192-40c7-b061-f2735d9f1d08',
+              id: '8bc1ec79-7565-4e65-9bcc-dd8181d2743b',
             },
             kind: 'user',
           },
-          alias: 'ut reprehenderit irure deserunt',
-          createdAt: '1909-07-10T05:48:40.0Z',
-          entriesCount: -46408731,
-          id: '881128f5-1a37-4929-8632-b6c714158216',
-          kind: 'ssn9',
-          name: 'Shelly Smith',
-          usedInPlaybook: true,
-        },
-        {
-          actor: {
-            data: {
-              id: 'd0bd25ea-a192-40c7-b061-f2735d9f1d08',
-            },
-            kind: 'user',
-          },
-          alias: 'elit dolor',
-          createdAt: '1890-01-06T23:01:10.0Z',
-          entriesCount: -9470628,
-          id: '881128f5-1a37-4929-8632-b6c714158216',
-          kind: 'ssn9',
-          name: 'Shelly Smith',
-          usedInPlaybook: true,
+          alias: 'reprehenderit dolore pariatur in',
+          createdAt: '1923-08-27T11:15:53.0Z',
+          entriesCount: -19804152,
+          id: '0b49bb29-170f-48c0-b641-e18e5a998ff6',
+          kind: 'email_address',
+          name: 'Jorge Schumm',
+          usedInPlaybook: false,
         },
       ],
       meta: {
-        count: 10000,
-        nextPage: 2,
+        count: 58908476,
+        nextPage: -76200070,
       },
     },
     props,
-  ) as OffsetPaginatedList;
-export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetPaginatedOnboardingConfiguration>) =>
-  merge(
+  );
+export const getOffsetPaginatedOnboardingConfiguration = (
+  props: Partial<OffsetPaginatedOnboardingConfiguration>,
+): OffsetPaginatedOnboardingConfiguration =>
+  merge<OffsetPaginatedOnboardingConfiguration, Partial<OffsetPaginatedOnboardingConfiguration>>(
     {
       data: [
         {
           allowInternationalResidents: true,
-          allowReonboard: true,
+          allowReonboard: false,
           allowUsResidents: false,
-          allowUsTerritoryResidents: false,
+          allowUsTerritoryResidents: true,
           author: {
-            id: '25fcadb1-110c-4e83-a596-48366e78ce62',
+            id: '7eca9203-f949-4779-b00a-920ec0d3abcd',
             kind: 'user',
           },
           businessDocumentsToCollect: [
             {
               data: {
-                collectSelfie: true,
+                collectSelfie: false,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['drivers_license', 'residence_document', 'voter_identification'],
+                  global: ['drivers_license', 'passport', 'visa'],
                 },
               },
               kind: 'identity',
@@ -5243,7 +5584,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: true,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['drivers_license', 'passport_card', 'residence_document'],
+                  global: ['voter_identification', 'visa', 'passport'],
                 },
               },
               kind: 'identity',
@@ -5253,37 +5594,27 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: true,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['id_card', 'permit', 'drivers_license'],
+                  global: ['voter_identification', 'drivers_license', 'voter_identification'],
                 },
               },
               kind: 'identity',
             },
           ],
-          canAccessData: ['business_website', 'business_tin', 'phone_number'],
-          cipKind: 'apex',
-          createdAt: '1953-02-23T14:54:21.0Z',
+          canAccessData: ['nationality', 'dob', 'business_phone_number'],
+          cipKind: 'alpaca',
+          createdAt: '1919-08-21T09:24:23.0Z',
           curpValidationEnabled: false,
           documentTypesAndCountries: {
             countrySpecific: {},
-            global: ['passport_card', 'passport', 'residence_document'],
+            global: ['drivers_license', 'drivers_license', 'voter_identification'],
           },
           documentsToCollect: [
             {
               data: {
-                collectSelfie: true,
+                collectSelfie: false,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['visa', 'drivers_license', 'permit'],
-                },
-              },
-              kind: 'identity',
-            },
-            {
-              data: {
-                collectSelfie: true,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['residence_document', 'permit', 'passport'],
+                  global: ['passport', 'voter_identification', 'residence_document'],
                 },
               },
               kind: 'identity',
@@ -5293,163 +5624,44 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: false,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['passport', 'drivers_license', 'voter_identification'],
+                  global: ['passport_card', 'id_card', 'voter_identification'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['id_card', 'visa', 'drivers_license'],
                 },
               },
               kind: 'identity',
             },
           ],
           enhancedAml: {
-            adverseMedia: true,
-            enhancedAml: false,
+            adverseMedia: false,
+            enhancedAml: true,
             matchKind: 'fuzzy_low',
             ofac: true,
             pep: false,
           },
-          id: '6e33c75c-31ee-4956-8fac-3ed47755d1b7',
-          internationalCountryRestrictions: ['MP', 'AR', 'SX'],
+          id: 'e93c09c3-c61b-4db3-8e1d-4d836e884c38',
+          internationalCountryRestrictions: ['MR', 'MY', 'ST'],
           isDocFirstFlow: false,
-          isLive: false,
-          isNoPhoneFlow: false,
+          isLive: true,
+          isNoPhoneFlow: true,
           isRulesEnabled: false,
-          key: '15d32e29-5bc3-4dc8-a3ad-6a7fc4a0be6e',
-          kind: 'kyc',
-          mustCollectData: ['business_kyced_beneficial_owners', 'business_beneficial_owners', 'ssn9'],
-          name: 'Cristina Bailey',
-          optionalData: ['us_legal_status', 'ssn9', 'business_corporation_type'],
+          key: 'a813d49d-d44f-4a09-a909-715257c0b9d0',
+          kind: 'document',
+          mustCollectData: ['nationality', 'us_legal_status', 'name'],
+          name: 'Devin Connelly',
+          optionalData: ['ssn9', 'us_legal_status', 'card'],
           promptForPasskey: false,
-          requiredAuthMethods: ['passkey', 'passkey', 'phone'],
+          requiredAuthMethods: ['passkey', 'email', 'email'],
           ruleSet: {
-            version: -93521090,
-          },
-          skipConfirm: false,
-          skipKyb: false,
-          skipKyc: true,
-          status: 'enabled',
-          verificationChecks: [
-            {
-              data: {
-                einOnly: true,
-              },
-              kind: 'kyb',
-            },
-            {
-              data: {
-                einOnly: false,
-              },
-              kind: 'kyb',
-            },
-            {
-              data: {
-                einOnly: true,
-              },
-              kind: 'kyb',
-            },
-          ],
-        },
-        {
-          allowInternationalResidents: false,
-          allowReonboard: true,
-          allowUsResidents: false,
-          allowUsTerritoryResidents: true,
-          author: {
-            id: '25fcadb1-110c-4e83-a596-48366e78ce62',
-            kind: 'user',
-          },
-          businessDocumentsToCollect: [
-            {
-              data: {
-                collectSelfie: false,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['passport', 'id_card', 'permit'],
-                },
-              },
-              kind: 'identity',
-            },
-            {
-              data: {
-                collectSelfie: false,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['passport', 'passport', 'drivers_license'],
-                },
-              },
-              kind: 'identity',
-            },
-            {
-              data: {
-                collectSelfie: false,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['passport_card', 'voter_identification', 'voter_identification'],
-                },
-              },
-              kind: 'identity',
-            },
-          ],
-          canAccessData: ['email', 'bank', 'full_address'],
-          cipKind: 'apex',
-          createdAt: '1966-01-13T22:36:58.0Z',
-          curpValidationEnabled: false,
-          documentTypesAndCountries: {
-            countrySpecific: {},
-            global: ['drivers_license', 'passport', 'drivers_license'],
-          },
-          documentsToCollect: [
-            {
-              data: {
-                collectSelfie: true,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['permit', 'voter_identification', 'residence_document'],
-                },
-              },
-              kind: 'identity',
-            },
-            {
-              data: {
-                collectSelfie: false,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['passport', 'passport_card', 'visa'],
-                },
-              },
-              kind: 'identity',
-            },
-            {
-              data: {
-                collectSelfie: true,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['permit', 'id_card', 'drivers_license'],
-                },
-              },
-              kind: 'identity',
-            },
-          ],
-          enhancedAml: {
-            adverseMedia: true,
-            enhancedAml: false,
-            matchKind: 'fuzzy_low',
-            ofac: false,
-            pep: false,
-          },
-          id: '6e33c75c-31ee-4956-8fac-3ed47755d1b7',
-          internationalCountryRestrictions: ['NZ', 'ST', 'NG'],
-          isDocFirstFlow: false,
-          isLive: false,
-          isNoPhoneFlow: false,
-          isRulesEnabled: true,
-          key: '15d32e29-5bc3-4dc8-a3ad-6a7fc4a0be6e',
-          kind: 'kyb',
-          mustCollectData: ['business_corporation_type', 'ssn4', 'ssn4'],
-          name: 'Cristina Bailey',
-          optionalData: ['investor_profile', 'business_beneficial_owners', 'bank'],
-          promptForPasskey: false,
-          requiredAuthMethods: ['passkey', 'email', 'phone'],
-          ruleSet: {
-            version: -98952522,
+            version: 7723693,
           },
           skipConfirm: false,
           skipKyb: true,
@@ -5464,7 +5676,136 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
             },
             {
               data: {
+                einOnly: true,
+              },
+              kind: 'kyb',
+            },
+            {
+              data: {
                 einOnly: false,
+              },
+              kind: 'kyb',
+            },
+          ],
+        },
+        {
+          allowInternationalResidents: true,
+          allowReonboard: true,
+          allowUsResidents: true,
+          allowUsTerritoryResidents: false,
+          author: {
+            id: '7eca9203-f949-4779-b00a-920ec0d3abcd',
+            kind: 'user',
+          },
+          businessDocumentsToCollect: [
+            {
+              data: {
+                collectSelfie: true,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['permit', 'visa', 'passport'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['residence_document', 'passport_card', 'id_card'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: true,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['passport_card', 'voter_identification', 'permit'],
+                },
+              },
+              kind: 'identity',
+            },
+          ],
+          canAccessData: ['business_website', 'business_phone_number', 'name'],
+          cipKind: 'apex',
+          createdAt: '1938-01-08T17:46:59.0Z',
+          curpValidationEnabled: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['permit', 'id_card', 'visa'],
+          },
+          documentsToCollect: [
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['visa', 'residence_document', 'visa'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['permit', 'voter_identification', 'visa'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                collectSelfie: false,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['voter_identification', 'drivers_license', 'passport_card'],
+                },
+              },
+              kind: 'identity',
+            },
+          ],
+          enhancedAml: {
+            adverseMedia: false,
+            enhancedAml: true,
+            matchKind: 'fuzzy_medium',
+            ofac: false,
+            pep: true,
+          },
+          id: 'e93c09c3-c61b-4db3-8e1d-4d836e884c38',
+          internationalCountryRestrictions: ['UA', 'LC', 'MQ'],
+          isDocFirstFlow: false,
+          isLive: true,
+          isNoPhoneFlow: false,
+          isRulesEnabled: true,
+          key: 'a813d49d-d44f-4a09-a909-715257c0b9d0',
+          kind: 'kyc',
+          mustCollectData: ['full_address', 'dob', 'card'],
+          name: 'Devin Connelly',
+          optionalData: ['dob', 'email', 'business_website'],
+          promptForPasskey: true,
+          requiredAuthMethods: ['phone', 'passkey', 'phone'],
+          ruleSet: {
+            version: 83574655,
+          },
+          skipConfirm: true,
+          skipKyb: false,
+          skipKyc: true,
+          status: 'enabled',
+          verificationChecks: [
+            {
+              data: {
+                einOnly: true,
+              },
+              kind: 'kyb',
+            },
+            {
+              data: {
+                einOnly: true,
               },
               kind: 'kyb',
             },
@@ -5478,11 +5819,11 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
         },
         {
           allowInternationalResidents: true,
-          allowReonboard: false,
+          allowReonboard: true,
           allowUsResidents: false,
-          allowUsTerritoryResidents: false,
+          allowUsTerritoryResidents: true,
           author: {
-            id: '25fcadb1-110c-4e83-a596-48366e78ce62',
+            id: '7eca9203-f949-4779-b00a-920ec0d3abcd',
             kind: 'user',
           },
           businessDocumentsToCollect: [
@@ -5491,7 +5832,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: false,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['permit', 'voter_identification', 'drivers_license'],
+                  global: ['residence_document', 'permit', 'id_card'],
                 },
               },
               kind: 'identity',
@@ -5501,7 +5842,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: true,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['id_card', 'permit', 'voter_identification'],
+                  global: ['permit', 'permit', 'passport'],
                 },
               },
               kind: 'identity',
@@ -5511,19 +5852,19 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: false,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['residence_document', 'passport_card', 'passport_card'],
+                  global: ['visa', 'drivers_license', 'residence_document'],
                 },
               },
               kind: 'identity',
             },
           ],
-          canAccessData: ['business_address', 'ssn9', 'ssn4'],
-          cipKind: 'alpaca',
-          createdAt: '1927-10-01T05:08:47.0Z',
-          curpValidationEnabled: false,
+          canAccessData: ['nationality', 'full_address', 'bank'],
+          cipKind: 'apex',
+          createdAt: '1952-03-31T15:55:43.0Z',
+          curpValidationEnabled: true,
           documentTypesAndCountries: {
             countrySpecific: {},
-            global: ['passport_card', 'permit', 'drivers_license'],
+            global: ['voter_identification', 'voter_identification', 'permit'],
           },
           documentsToCollect: [
             {
@@ -5531,7 +5872,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: true,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['id_card', 'permit', 'permit'],
+                  global: ['permit', 'permit', 'permit'],
                 },
               },
               kind: 'identity',
@@ -5541,159 +5882,99 @@ export const getOffsetPaginatedOnboardingConfiguration = (props: Partial<OffsetP
                 collectSelfie: false,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['passport', 'permit', 'residence_document'],
+                  global: ['visa', 'residence_document', 'drivers_license'],
                 },
               },
               kind: 'identity',
             },
             {
               data: {
-                collectSelfie: false,
+                collectSelfie: true,
                 documentTypesAndCountries: {
                   countrySpecific: {},
-                  global: ['voter_identification', 'voter_identification', 'voter_identification'],
+                  global: ['visa', 'drivers_license', 'id_card'],
                 },
               },
               kind: 'identity',
             },
           ],
           enhancedAml: {
-            adverseMedia: false,
-            enhancedAml: false,
-            matchKind: 'fuzzy_high',
-            ofac: true,
-            pep: false,
+            adverseMedia: true,
+            enhancedAml: true,
+            matchKind: 'exact_name',
+            ofac: false,
+            pep: true,
           },
-          id: '6e33c75c-31ee-4956-8fac-3ed47755d1b7',
-          internationalCountryRestrictions: ['JO', 'BH', 'HT'],
-          isDocFirstFlow: true,
+          id: 'e93c09c3-c61b-4db3-8e1d-4d836e884c38',
+          internationalCountryRestrictions: ['EC', 'SN', 'LV'],
+          isDocFirstFlow: false,
           isLive: true,
-          isNoPhoneFlow: true,
+          isNoPhoneFlow: false,
           isRulesEnabled: false,
-          key: '15d32e29-5bc3-4dc8-a3ad-6a7fc4a0be6e',
-          kind: 'kyb',
-          mustCollectData: ['ssn4', 'phone_number', 'full_address'],
-          name: 'Cristina Bailey',
-          optionalData: ['nationality', 'ssn9', 'bank'],
-          promptForPasskey: true,
-          requiredAuthMethods: ['phone', 'passkey', 'phone'],
+          key: 'a813d49d-d44f-4a09-a909-715257c0b9d0',
+          kind: 'document',
+          mustCollectData: ['business_website', 'bank', 'bank'],
+          name: 'Devin Connelly',
+          optionalData: ['ssn9', 'phone_number', 'bank'],
+          promptForPasskey: false,
+          requiredAuthMethods: ['passkey', 'passkey', 'phone'],
           ruleSet: {
-            version: -54696608,
+            version: -32586226,
           },
           skipConfirm: false,
           skipKyb: true,
-          skipKyc: true,
+          skipKyc: false,
           status: 'enabled',
           verificationChecks: [
-            {
-              data: {
-                einOnly: false,
-              },
-              kind: 'kyb',
-            },
-            {
-              data: {
-                einOnly: false,
-              },
-              kind: 'kyb',
-            },
             {
               data: {
                 einOnly: true,
               },
               kind: 'kyb',
             },
+            {
+              data: {
+                einOnly: false,
+              },
+              kind: 'kyb',
+            },
+            {
+              data: {
+                einOnly: false,
+              },
+              kind: 'kyb',
+            },
           ],
         },
       ],
       meta: {
-        count: 10000,
-        nextPage: 2,
+        count: 1690841,
+        nextPage: -78488081,
       },
     },
     props,
-  ) as OffsetPaginatedOnboardingConfiguration;
-export const getOffsetPaginatedOrganizationMember = (props: Partial<OffsetPaginatedOrganizationMember>) =>
-  merge(
+  );
+export const getOffsetPaginatedOrganizationMember = (
+  props: Partial<OffsetPaginatedOrganizationMember>,
+): OffsetPaginatedOrganizationMember =>
+  merge<OffsetPaginatedOrganizationMember, Partial<OffsetPaginatedOrganizationMember>>(
     {
       data: [
         {
-          createdAt: '1956-06-29T11:12:07.0Z',
-          email: 'heidi_abshire45@gmail.com',
-          firstName: 'Aaron',
-          id: '2b16dd7c-eb70-4144-9fad-60363a8743ab',
+          createdAt: '1954-07-11T04:55:04.0Z',
+          email: 'lawrence.hagenes21@gmail.com',
+          firstName: 'Edna',
+          id: 'd4adfe26-f057-44b5-8182-f95d0ea48db4',
           isFirmEmployee: false,
-          lastName: 'Reilly-Kovacek',
+          lastName: 'West',
           role: {
-            createdAt: '1931-10-08T02:49:02.0Z',
-            id: 'e3a30568-7db5-427f-8ccd-e2d2b6462f13',
-            isImmutable: false,
-            kind: 'compliance_partner_dashboard_user',
-            name: "Courtney O'Keefe-Heathcote",
-            numActiveApiKeys: 84125047,
-            numActiveUsers: 53867267,
-            scopes: [
-              {
-                kind: 'read',
-              },
-              {
-                kind: 'read',
-              },
-              {
-                kind: 'read',
-              },
-            ],
-          },
-          rolebinding: {
-            lastLoginAt: '1949-11-17T13:26:56.0Z',
-          },
-        },
-        {
-          createdAt: '1931-03-07T09:03:39.0Z',
-          email: 'heidi_abshire45@gmail.com',
-          firstName: 'Aaron',
-          id: '2b16dd7c-eb70-4144-9fad-60363a8743ab',
-          isFirmEmployee: true,
-          lastName: 'Reilly-Kovacek',
-          role: {
-            createdAt: '1927-11-02T01:10:39.0Z',
-            id: 'e3a30568-7db5-427f-8ccd-e2d2b6462f13',
-            isImmutable: true,
-            kind: 'dashboard_user',
-            name: "Courtney O'Keefe-Heathcote",
-            numActiveApiKeys: 92487107,
-            numActiveUsers: 69538557,
-            scopes: [
-              {
-                kind: 'read',
-              },
-              {
-                kind: 'read',
-              },
-              {
-                kind: 'read',
-              },
-            ],
-          },
-          rolebinding: {
-            lastLoginAt: '1897-07-16T10:10:20.0Z',
-          },
-        },
-        {
-          createdAt: '1895-01-29T01:05:58.0Z',
-          email: 'heidi_abshire45@gmail.com',
-          firstName: 'Aaron',
-          id: '2b16dd7c-eb70-4144-9fad-60363a8743ab',
-          isFirmEmployee: false,
-          lastName: 'Reilly-Kovacek',
-          role: {
-            createdAt: '1912-09-03T01:21:55.0Z',
-            id: 'e3a30568-7db5-427f-8ccd-e2d2b6462f13',
+            createdAt: '1925-04-09T09:56:15.0Z',
+            id: '46fb89e4-ea0a-4995-a644-109f8422d918',
             isImmutable: false,
             kind: 'api_key',
-            name: "Courtney O'Keefe-Heathcote",
-            numActiveApiKeys: -30992189,
-            numActiveUsers: -27725384,
+            name: 'Darnell Lynch',
+            numActiveApiKeys: -19605513,
+            numActiveUsers: -98230669,
             scopes: [
               {
                 kind: 'read',
@@ -5707,29 +5988,93 @@ export const getOffsetPaginatedOrganizationMember = (props: Partial<OffsetPagina
             ],
           },
           rolebinding: {
-            lastLoginAt: '1896-09-03T02:15:39.0Z',
+            lastLoginAt: '1968-07-07T11:15:39.0Z',
+          },
+        },
+        {
+          createdAt: '1937-10-07T01:46:25.0Z',
+          email: 'lawrence.hagenes21@gmail.com',
+          firstName: 'Edna',
+          id: 'd4adfe26-f057-44b5-8182-f95d0ea48db4',
+          isFirmEmployee: false,
+          lastName: 'West',
+          role: {
+            createdAt: '1969-03-31T11:06:34.0Z',
+            id: '46fb89e4-ea0a-4995-a644-109f8422d918',
+            isImmutable: true,
+            kind: 'dashboard_user',
+            name: 'Darnell Lynch',
+            numActiveApiKeys: 12065992,
+            numActiveUsers: 66466195,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+          rolebinding: {
+            lastLoginAt: '1916-05-08T07:55:18.0Z',
+          },
+        },
+        {
+          createdAt: '1911-09-22T10:42:44.0Z',
+          email: 'lawrence.hagenes21@gmail.com',
+          firstName: 'Edna',
+          id: 'd4adfe26-f057-44b5-8182-f95d0ea48db4',
+          isFirmEmployee: false,
+          lastName: 'West',
+          role: {
+            createdAt: '1915-09-30T18:55:57.0Z',
+            id: '46fb89e4-ea0a-4995-a644-109f8422d918',
+            isImmutable: true,
+            kind: 'api_key',
+            name: 'Darnell Lynch',
+            numActiveApiKeys: -58368066,
+            numActiveUsers: -43163533,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+          rolebinding: {
+            lastLoginAt: '1950-07-22T10:19:18.0Z',
           },
         },
       ],
       meta: {
-        count: 10000,
-        nextPage: 2,
+        count: 23917935,
+        nextPage: -35360318,
       },
     },
     props,
-  ) as OffsetPaginatedOrganizationMember;
-export const getOffsetPaginatedOrganizationRole = (props: Partial<OffsetPaginatedOrganizationRole>) =>
-  merge(
+  );
+export const getOffsetPaginatedOrganizationRole = (
+  props: Partial<OffsetPaginatedOrganizationRole>,
+): OffsetPaginatedOrganizationRole =>
+  merge<OffsetPaginatedOrganizationRole, Partial<OffsetPaginatedOrganizationRole>>(
     {
       data: [
         {
-          createdAt: '1947-03-15T09:54:58.0Z',
-          id: '60ec984c-adf3-4f21-84e3-4144a284768b',
+          createdAt: '1960-01-14T04:40:45.0Z',
+          id: 'aad6683d-84f0-4586-b5be-007c3136d6ee',
           isImmutable: true,
           kind: 'dashboard_user',
-          name: 'Tricia Rowe',
-          numActiveApiKeys: -23928596,
-          numActiveUsers: -6740034,
+          name: 'Clint Mohr',
+          numActiveApiKeys: 30362222,
+          numActiveUsers: 53961487,
           scopes: [
             {
               kind: 'read',
@@ -5743,13 +6088,13 @@ export const getOffsetPaginatedOrganizationRole = (props: Partial<OffsetPaginate
           ],
         },
         {
-          createdAt: '1963-06-13T07:37:21.0Z',
-          id: '60ec984c-adf3-4f21-84e3-4144a284768b',
-          isImmutable: false,
+          createdAt: '1946-02-26T20:06:33.0Z',
+          id: 'aad6683d-84f0-4586-b5be-007c3136d6ee',
+          isImmutable: true,
           kind: 'dashboard_user',
-          name: 'Tricia Rowe',
-          numActiveApiKeys: 72791024,
-          numActiveUsers: -60632713,
+          name: 'Clint Mohr',
+          numActiveApiKeys: 98583300,
+          numActiveUsers: 62948498,
           scopes: [
             {
               kind: 'read',
@@ -5763,13 +6108,13 @@ export const getOffsetPaginatedOrganizationRole = (props: Partial<OffsetPaginate
           ],
         },
         {
-          createdAt: '1931-12-24T15:16:23.0Z',
-          id: '60ec984c-adf3-4f21-84e3-4144a284768b',
-          isImmutable: false,
-          kind: 'dashboard_user',
-          name: 'Tricia Rowe',
-          numActiveApiKeys: 81958821,
-          numActiveUsers: 2109240,
+          createdAt: '1938-11-11T03:45:30.0Z',
+          id: 'aad6683d-84f0-4586-b5be-007c3136d6ee',
+          isImmutable: true,
+          kind: 'api_key',
+          name: 'Clint Mohr',
+          numActiveApiKeys: -6440623,
+          numActiveUsers: 43865274,
           scopes: [
             {
               kind: 'read',
@@ -5784,29 +6129,29 @@ export const getOffsetPaginatedOrganizationRole = (props: Partial<OffsetPaginate
         },
       ],
       meta: {
-        count: 10000,
-        nextPage: 2,
+        count: -61548331,
+        nextPage: -72132177,
       },
     },
     props,
-  ) as OffsetPaginatedOrganizationRole;
-export const getOmittedSecretCustomHeader = (props: Partial<OmittedSecretCustomHeader>) =>
-  merge(
+  );
+export const getOmittedSecretCustomHeader = (props: Partial<OmittedSecretCustomHeader>): OmittedSecretCustomHeader =>
+  merge<OmittedSecretCustomHeader, Partial<OmittedSecretCustomHeader>>(
     {
-      id: 'b6791999-ef72-4159-b9f2-b69cf01c5283',
-      name: 'Erica Macejkovic DVM',
+      id: '7821881f-74f5-4b6a-b24f-db7bde49e90f',
+      name: 'Eleanor Hane',
     },
     props,
-  ) as OmittedSecretCustomHeader;
-export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguration>) =>
-  merge(
+  );
+export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguration>): OnboardingConfiguration =>
+  merge<OnboardingConfiguration, Partial<OnboardingConfiguration>>(
     {
-      allowInternationalResidents: false,
-      allowReonboard: false,
+      allowInternationalResidents: true,
+      allowReonboard: true,
       allowUsResidents: false,
       allowUsTerritoryResidents: true,
       author: {
-        id: 'fe0e0963-9e90-4bda-b243-ce3f1f20c5b6',
+        id: '4c3b8c09-fde8-410a-aca4-b0d112343deb',
         kind: 'user',
       },
       businessDocumentsToCollect: [
@@ -5815,7 +6160,7 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
             collectSelfie: false,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['drivers_license', 'passport_card', 'visa'],
+              global: ['passport_card', 'drivers_license', 'passport_card'],
             },
           },
           kind: 'identity',
@@ -5825,37 +6170,7 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
             collectSelfie: true,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['passport_card', 'voter_identification', 'voter_identification'],
-            },
-          },
-          kind: 'identity',
-        },
-        {
-          data: {
-            collectSelfie: true,
-            documentTypesAndCountries: {
-              countrySpecific: {},
-              global: ['id_card', 'passport', 'id_card'],
-            },
-          },
-          kind: 'identity',
-        },
-      ],
-      canAccessData: ['email', 'full_address', 'ssn9'],
-      cipKind: 'apex',
-      createdAt: '1942-07-28T18:04:48.0Z',
-      curpValidationEnabled: true,
-      documentTypesAndCountries: {
-        countrySpecific: {},
-        global: ['permit', 'drivers_license', 'id_card'],
-      },
-      documentsToCollect: [
-        {
-          data: {
-            collectSelfie: true,
-            documentTypesAndCountries: {
-              countrySpecific: {},
-              global: ['residence_document', 'permit', 'visa'],
+              global: ['drivers_license', 'drivers_license', 'voter_identification'],
             },
           },
           kind: 'identity',
@@ -5865,7 +6180,37 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
             collectSelfie: false,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['permit', 'visa', 'voter_identification'],
+              global: ['permit', 'passport', 'voter_identification'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+      canAccessData: ['business_name', 'full_address', 'nationality'],
+      cipKind: 'alpaca',
+      createdAt: '1919-03-24T05:04:03.0Z',
+      curpValidationEnabled: false,
+      documentTypesAndCountries: {
+        countrySpecific: {},
+        global: ['visa', 'residence_document', 'passport'],
+      },
+      documentsToCollect: [
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['voter_identification', 'residence_document', 'residence_document'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: false,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['drivers_license', 'permit', 'visa'],
             },
           },
           kind: 'identity',
@@ -5875,7 +6220,7 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
             collectSelfie: true,
             documentTypesAndCountries: {
               countrySpecific: {},
-              global: ['visa', 'residence_document', 'residence_document'],
+              global: ['voter_identification', 'passport_card', 'passport'],
             },
           },
           kind: 'identity',
@@ -5884,34 +6229,34 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
       enhancedAml: {
         adverseMedia: true,
         enhancedAml: true,
-        matchKind: 'exact_name',
+        matchKind: 'fuzzy_low',
         ofac: true,
         pep: false,
       },
-      id: '05406547-9e9f-447a-bfc0-e52cc568722a',
-      internationalCountryRestrictions: ['GP', 'TJ', 'ZA'],
+      id: '8ba86e5f-07e1-42e4-a919-820477e6f085',
+      internationalCountryRestrictions: ['AU', 'PY', 'NI'],
       isDocFirstFlow: true,
-      isLive: false,
+      isLive: true,
       isNoPhoneFlow: false,
-      isRulesEnabled: false,
-      key: '77a3de12-fb5f-4910-bf52-151764d51e04',
-      kind: 'kyb',
-      mustCollectData: ['business_kyced_beneficial_owners', 'nationality', 'nationality'],
-      name: 'Amy Roob',
-      optionalData: ['business_kyced_beneficial_owners', 'name', 'business_tin'],
+      isRulesEnabled: true,
+      key: '792f73c0-dc71-4207-a457-091e366ef20c',
+      kind: 'auth',
+      mustCollectData: ['name', 'email', 'business_beneficial_owners'],
+      name: 'Lorenzo Abshire',
+      optionalData: ['business_beneficial_owners', 'business_name', 'us_tax_id'],
       promptForPasskey: true,
-      requiredAuthMethods: ['email', 'phone', 'passkey'],
+      requiredAuthMethods: ['passkey', 'email', 'phone'],
       ruleSet: {
-        version: 84989566,
+        version: 32856698,
       },
       skipConfirm: true,
-      skipKyb: false,
-      skipKyc: false,
-      status: 'enabled',
+      skipKyb: true,
+      skipKyc: true,
+      status: 'disabled',
       verificationChecks: [
         {
           data: {
-            einOnly: true,
+            einOnly: false,
           },
           kind: 'kyb',
         },
@@ -5923,102 +6268,102 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
         },
         {
           data: {
-            einOnly: true,
+            einOnly: false,
           },
           kind: 'kyb',
         },
       ],
     },
     props,
-  ) as OnboardingConfiguration;
-export const getOnboardingStatus = (props: Partial<OnboardingStatus>) => (props ?? 'none') as OnboardingStatus;
-export const getOnboardingTimelineInfo = (props: Partial<OnboardingTimelineInfo>) =>
-  merge(
+  );
+export const getOnboardingStatus = (props: OnboardingStatus): OnboardingStatus => props ?? 'pass';
+export const getOnboardingTimelineInfo = (props: Partial<OnboardingTimelineInfo>): OnboardingTimelineInfo =>
+  merge<OnboardingTimelineInfo, Partial<OnboardingTimelineInfo>>(
     {
-      event: 'eiusmod Ut incididunt aliquip',
-      sessionId: '59f6d954-d9e1-496b-a823-7da5b7fd25c7',
+      event: 'sint',
+      sessionId: '67060f97-ad17-4a25-818c-c0f5aac0373e',
     },
     props,
-  ) as OnboardingTimelineInfo;
-export const getOrgClientSecurityConfig = (props: Partial<OrgClientSecurityConfig>) =>
-  merge(
+  );
+export const getOrgClientSecurityConfig = (props: Partial<OrgClientSecurityConfig>): OrgClientSecurityConfig =>
+  merge<OrgClientSecurityConfig, Partial<OrgClientSecurityConfig>>(
     {
       allowedOrigins: [
-        'incididunt Duis nostrud culpa enim',
-        'incididunt dolore ut',
-        'sunt quis dolore dolor reprehenderit',
+        'quis officia non irure commodo',
+        'ipsum cillum sunt nostrud labore',
+        'consequat consectetur esse Duis',
       ],
-      isLive: false,
+      isLive: true,
     },
     props,
-  ) as OrgClientSecurityConfig;
-export const getOrgFrequentNote = (props: Partial<OrgFrequentNote>) =>
-  merge(
+  );
+export const getOrgFrequentNote = (props: Partial<OrgFrequentNote>): OrgFrequentNote =>
+  merge<OrgFrequentNote, Partial<OrgFrequentNote>>(
     {
-      content: 'id',
-      id: '030f6857-de14-4cfc-8f9e-3529b9aef846',
+      content: 'ullamco',
+      id: '161c635d-7729-4416-972e-050b884a6c4a',
       kind: 'trigger',
     },
     props,
-  ) as OrgFrequentNote;
-export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>) =>
-  merge(
+  );
+export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>): OrgLoginResponse =>
+  merge<OrgLoginResponse, Partial<OrgLoginResponse>>(
     {
-      authToken: '24a5960a-7f4a-4080-a126-810e283a10cd',
-      createdNewTenant: false,
+      authToken: '3d8739b4-e4d0-42d1-81bc-465066353609',
+      createdNewTenant: true,
       isFirstLogin: false,
       isMissingRequestedOrg: true,
       partnerTenant: {
         allowDomainAccess: true,
-        domains: ['id tempor voluptate labore ut', 'minim', 'cillum irure'],
-        id: 'd2a62a33-53c5-4505-90a4-0f4eed11a8b5',
+        domains: ['consequat ut', 'Excepteur reprehenderit quis', 'Ut'],
+        id: 'c5f8123c-1fc2-4ad2-b7b8-d7b65e4fab2d',
         isAuthMethodSupported: true,
         isDomainAlreadyClaimed: true,
-        logoUrl: 'https://noxious-flu.com',
-        name: 'Lucy Bogisich',
-        websiteUrl: 'https://untried-depot.us/',
+        logoUrl: 'https://darling-replacement.name/',
+        name: 'Wayne Cassin',
+        websiteUrl: 'https://enraged-railway.com/',
       },
-      requiresOnboarding: true,
+      requiresOnboarding: false,
       tenant: {
-        allowDomainAccess: false,
-        allowedPreviewApis: ['list_business_owners', 'decisions_list', 'implicit_auth'],
-        companySize: 's101_to1000',
-        domains: ['dolore ea', 'et voluptate dolore occaecat', 'sunt mollit non tempor ut'],
-        id: 'bc3ec5eb-7741-4fea-bc63-01cb3cbc7117',
-        isAuthMethodSupported: false,
+        allowDomainAccess: true,
+        allowedPreviewApis: ['tags', 'documents_list', 'legacy_onboarding_status_webhook'],
+        companySize: 's51_to100',
+        domains: ['nulla aute reprehenderit', 'tempor consectetur fugiat', 'est'],
+        id: '56212b5c-6737-4672-bcd0-70311e7052da',
+        isAuthMethodSupported: true,
         isDomainAlreadyClaimed: true,
         isProdAuthPlaybookRestricted: true,
-        isProdKybPlaybookRestricted: false,
+        isProdKybPlaybookRestricted: true,
         isProdKycPlaybookRestricted: true,
         isProdNeuroEnabled: true,
-        isProdSentilinkEnabled: true,
-        isSandboxRestricted: false,
-        logoUrl: 'https://rough-bracelet.org/',
-        name: 'Mandy Gerhold',
+        isProdSentilinkEnabled: false,
+        isSandboxRestricted: true,
+        logoUrl: 'https://multicolored-shipper.net/',
+        name: 'Alex Labadie I',
         parent: {
-          id: '20a42ed2-2729-41c5-a022-1896276d4fb7',
-          name: 'Miss Sheri Jacobs',
+          id: '321c6b71-7d62-4a29-b2f4-0189179466a8',
+          name: 'Angelica Nienow',
         },
-        supportEmail: 'calista41@gmail.com',
-        supportPhone: '+17598230671',
-        supportWebsite: 'https://avaricious-forage.org/',
-        websiteUrl: 'https://witty-comparison.net',
+        supportEmail: 'blanche_kuhic41@gmail.com',
+        supportPhone: '+14315826038',
+        supportWebsite: 'https://livid-declaration.us/',
+        websiteUrl: 'https://ignorant-heating.us',
       },
       user: {
-        createdAt: '1896-11-17T05:38:56.0Z',
-        email: 'emmet.mitchell@gmail.com',
-        firstName: 'Winfield',
-        id: '083364c8-c714-4df8-8351-bbab34d4d5ca',
+        createdAt: '1926-08-12T08:29:17.0Z',
+        email: 'osvaldo81@gmail.com',
+        firstName: 'Maya',
+        id: '77e3f190-32f5-464d-95d3-77ac79a2a3a1',
         isFirmEmployee: true,
-        lastName: 'Lang',
+        lastName: 'Wolf',
         role: {
-          createdAt: '1967-04-22T14:53:47.0Z',
-          id: '3244c030-1e02-4933-b6f4-c454119f2a4d',
+          createdAt: '1928-05-30T04:28:51.0Z',
+          id: 'dc83a049-d3dc-4355-94ab-01184eddbb2d',
           isImmutable: false,
-          kind: 'dashboard_user',
-          name: 'Tara Bednar IV',
-          numActiveApiKeys: -55929747,
-          numActiveUsers: 36812971,
+          kind: 'compliance_partner_dashboard_user',
+          name: 'Jill Spinka IV',
+          numActiveApiKeys: -60908963,
+          numActiveUsers: 89034736,
           scopes: [
             {
               kind: 'read',
@@ -6032,98 +6377,98 @@ export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>) =>
           ],
         },
         rolebinding: {
-          lastLoginAt: '1928-08-03T14:08:52.0Z',
+          lastLoginAt: '1904-11-11T18:43:35.0Z',
         },
       },
     },
     props,
-  ) as OrgLoginResponse;
-export const getOrgMetrics = (props: Partial<OrgMetrics>) =>
-  merge(
+  );
+export const getOrgMetrics = (props: Partial<OrgMetrics>): OrgMetrics =>
+  merge<OrgMetrics, Partial<OrgMetrics>>(
     {
-      failOnboardings: 73131126,
-      incompleteOnboardings: -49382531,
-      newVaults: 64732321,
-      passOnboardings: -40019372,
-      totalOnboardings: 90656076,
+      failOnboardings: 24386977,
+      incompleteOnboardings: 46734391,
+      newVaults: 63547062,
+      passOnboardings: 60601036,
+      totalOnboardings: 98260186,
     },
     props,
-  ) as OrgMetrics;
-export const getOrgMetricsResponse = (props: Partial<OrgMetricsResponse>) =>
-  merge(
+  );
+export const getOrgMetricsResponse = (props: Partial<OrgMetricsResponse>): OrgMetricsResponse =>
+  merge<OrgMetricsResponse, Partial<OrgMetricsResponse>>(
     {
       business: {
-        failOnboardings: -26988259,
-        incompleteOnboardings: 17041198,
-        newVaults: -41965997,
-        passOnboardings: -84013443,
-        totalOnboardings: -39972304,
+        failOnboardings: 57028148,
+        incompleteOnboardings: -90724613,
+        newVaults: 82075100,
+        passOnboardings: -5676351,
+        totalOnboardings: -47259764,
       },
       user: {
-        failOnboardings: -39071383,
-        incompleteOnboardings: -8947197,
-        newVaults: -85746452,
-        passOnboardings: -75871457,
-        totalOnboardings: -11126411,
+        failOnboardings: -75145434,
+        incompleteOnboardings: 3752657,
+        newVaults: -95263133,
+        passOnboardings: -88999068,
+        totalOnboardings: -55439229,
       },
     },
     props,
-  ) as OrgMetricsResponse;
-export const getOrgTenantTag = (props: Partial<OrgTenantTag>) =>
-  merge(
+  );
+export const getOrgTenantTag = (props: Partial<OrgTenantTag>): OrgTenantTag =>
+  merge<OrgTenantTag, Partial<OrgTenantTag>>(
     {
-      id: 'd6d44116-959f-40db-b230-024aa70fbc6c',
+      id: '17d19602-9a8e-40ac-bee2-5e44ef2c3a3f',
       kind: 'business',
-      tag: 'non Lorem officia cupidatat fugiat',
+      tag: 'ut ea laborum ullamco',
     },
     props,
-  ) as OrgTenantTag;
-export const getOrganization = (props: Partial<Organization>) =>
-  merge(
+  );
+export const getOrganization = (props: Partial<Organization>): Organization =>
+  merge<Organization, Partial<Organization>>(
     {
       allowDomainAccess: false,
-      allowedPreviewApis: ['client_vaulting_docs', 'decisions_list', 'implicit_auth'],
+      allowedPreviewApis: ['implicit_auth', 'risk_signals_list', 'labels'],
       companySize: 's1001_plus',
-      domains: ['tempor nostrud culpa', 'nulla occaecat ullamco culpa', 'exercitation aute'],
-      id: '77f290ca-ad5a-45cd-8f7b-09544ccfef37',
+      domains: ['consectetur fugiat', 'occaecat anim', 'fugiat laboris nisi Lorem in'],
+      id: 'c0ccc556-8c45-4e86-905c-e4e72ee3e1ec',
       isAuthMethodSupported: true,
       isDomainAlreadyClaimed: true,
       isProdAuthPlaybookRestricted: true,
       isProdKybPlaybookRestricted: false,
       isProdKycPlaybookRestricted: true,
       isProdNeuroEnabled: true,
-      isProdSentilinkEnabled: true,
-      isSandboxRestricted: false,
-      logoUrl: 'https://webbed-postbox.name/',
-      name: 'Mr. Bernard Swift',
+      isProdSentilinkEnabled: false,
+      isSandboxRestricted: true,
+      logoUrl: 'https://expert-equal.org/',
+      name: 'Elbert Beatty',
       parent: {
-        id: 'ab332ae8-f467-4305-8fec-226837a20db8',
-        name: 'Mr. Ben Murray',
+        id: '7cc01dca-b4ab-41c1-9896-12545a50cc88',
+        name: 'Sonya Sanford',
       },
-      supportEmail: 'mervin_littel10@gmail.com',
-      supportPhone: '+13774917840',
-      supportWebsite: 'https://tragic-dime.org/',
-      websiteUrl: 'https://pale-shark.com/',
+      supportEmail: 'cleve.bauch@gmail.com',
+      supportPhone: '+16609304274',
+      supportWebsite: 'https://lonely-outrun.name/',
+      websiteUrl: 'https://tough-term.com/',
     },
     props,
-  ) as Organization;
-export const getOrganizationMember = (props: Partial<OrganizationMember>) =>
-  merge(
+  );
+export const getOrganizationMember = (props: Partial<OrganizationMember>): OrganizationMember =>
+  merge<OrganizationMember, Partial<OrganizationMember>>(
     {
-      createdAt: '1940-02-19T20:32:02.0Z',
-      email: 'benton_ruecker@gmail.com',
-      firstName: 'Clint',
-      id: '2d063d75-c297-406d-b649-8953ab7c842e',
-      isFirmEmployee: false,
-      lastName: 'Wisozk-Aufderhar',
+      createdAt: '1949-04-22T13:10:10.0Z',
+      email: 'brenda.christiansen@gmail.com',
+      firstName: 'Ottilie',
+      id: '9f00036a-a101-46a9-9519-5b0f4dfe1a4b',
+      isFirmEmployee: true,
+      lastName: 'Leuschke',
       role: {
-        createdAt: '1935-07-08T21:24:37.0Z',
-        id: 'd688d206-90dc-48b9-8e00-f329efd35074',
-        isImmutable: false,
-        kind: 'compliance_partner_dashboard_user',
-        name: 'David Heidenreich',
-        numActiveApiKeys: 3449874,
-        numActiveUsers: 54404806,
+        createdAt: '1919-04-05T06:51:40.0Z',
+        id: '8ca4c7c3-7fd4-49ef-bac2-a1127bf6b80e',
+        isImmutable: true,
+        kind: 'dashboard_user',
+        name: 'Josefina Veum',
+        numActiveApiKeys: 42832278,
+        numActiveUsers: -90804217,
         scopes: [
           {
             kind: 'read',
@@ -6137,21 +6482,21 @@ export const getOrganizationMember = (props: Partial<OrganizationMember>) =>
         ],
       },
       rolebinding: {
-        lastLoginAt: '1895-01-21T15:45:43.0Z',
+        lastLoginAt: '1935-09-19T09:49:01.0Z',
       },
     },
     props,
-  ) as OrganizationMember;
-export const getOrganizationRole = (props: Partial<OrganizationRole>) =>
-  merge(
+  );
+export const getOrganizationRole = (props: Partial<OrganizationRole>): OrganizationRole =>
+  merge<OrganizationRole, Partial<OrganizationRole>>(
     {
-      createdAt: '1938-07-05T22:10:19.0Z',
-      id: '0ee9dd72-fd2c-4327-b7d7-2ab0bd4f3309',
+      createdAt: '1895-01-08T09:07:28.0Z',
+      id: '538d0041-c1da-4aa4-9636-7a8c3bb92754',
       isImmutable: true,
-      kind: 'dashboard_user',
-      name: 'Amelia Pagac',
-      numActiveApiKeys: -98465260,
-      numActiveUsers: 77710474,
+      kind: 'api_key',
+      name: 'Marjorie Ortiz',
+      numActiveApiKeys: 79026303,
+      numActiveUsers: 8837918,
       scopes: [
         {
           kind: 'read',
@@ -6165,959 +6510,967 @@ export const getOrganizationRole = (props: Partial<OrganizationRole>) =>
       ],
     },
     props,
-  ) as OrganizationRole;
-export const getOrganizationRolebinding = (props: Partial<OrganizationRolebinding>) =>
-  merge(
+  );
+export const getOrganizationRolebinding = (props: Partial<OrganizationRolebinding>): OrganizationRolebinding =>
+  merge<OrganizationRolebinding, Partial<OrganizationRolebinding>>(
     {
-      lastLoginAt: '1934-03-22T07:13:44.0Z',
+      lastLoginAt: '1892-02-13T20:44:46.0Z',
     },
     props,
-  ) as OrganizationRolebinding;
-export const getOtherTenantDupes = (props: Partial<OtherTenantDupes>) =>
-  merge(
+  );
+export const getOtherTenantDupes = (props: Partial<OtherTenantDupes>): OtherTenantDupes =>
+  merge<OtherTenantDupes, Partial<OtherTenantDupes>>(
     {
-      numMatches: -29687210,
-      numTenants: 10462955,
+      numMatches: -48416503,
+      numTenants: -75290789,
     },
     props,
-  ) as OtherTenantDupes;
-export const getParentOrganization = (props: Partial<ParentOrganization>) =>
-  merge(
+  );
+export const getParentOrganization = (props: Partial<ParentOrganization>): ParentOrganization =>
+  merge<ParentOrganization, Partial<ParentOrganization>>(
     {
-      id: 'cf97e373-5cf6-4131-9180-a1ca3073700b',
-      name: 'Dale Greenfelder',
+      id: '7d4b127d-e29b-4b44-ae3b-0c228c9eb00e',
+      name: 'Bruce Metz',
     },
     props,
-  ) as ParentOrganization;
-export const getPartnerLoginRequest = (props: Partial<PartnerLoginRequest>) =>
-  merge(
+  );
+export const getPartnerLoginRequest = (props: Partial<PartnerLoginRequest>): PartnerLoginRequest =>
+  merge<PartnerLoginRequest, Partial<PartnerLoginRequest>>(
     {
-      code: 'ipsum',
-      requestOrgId: 'dc232011-3dcf-4650-9890-f7efa50ee3c4',
+      code: 'non velit do',
+      requestOrgId: 'f20831d1-5c6b-4ae7-9888-156c7b6b7c8a',
     },
     props,
-  ) as PartnerLoginRequest;
-export const getPartnerOrganization = (props: Partial<PartnerOrganization>) =>
-  merge(
+  );
+export const getPartnerOrganization = (props: Partial<PartnerOrganization>): PartnerOrganization =>
+  merge<PartnerOrganization, Partial<PartnerOrganization>>(
     {
-      allowDomainAccess: true,
-      domains: ['commodo nisi exercitation proident', 'ullamco dolor', 'occaecat veniam ut cillum laborum'],
-      id: '29732b91-51c0-47b4-ad44-2b76fd65334d',
+      allowDomainAccess: false,
+      domains: ['fugiat nostrud', 'et id sint ut', 'ut dolor'],
+      id: 'bcf685ff-2ccb-4d7f-817a-b466bd63fcd5',
       isAuthMethodSupported: false,
-      isDomainAlreadyClaimed: true,
-      logoUrl: 'https://steel-viability.info',
-      name: 'Lloyd Conn',
-      websiteUrl: 'https://wide-eyed-charlatan.info',
+      isDomainAlreadyClaimed: false,
+      logoUrl: 'https://minor-precedent.name',
+      name: 'Freddie Orn',
+      websiteUrl: 'https://terrible-deduction.org',
     },
     props,
-  ) as PartnerOrganization;
-export const getPatchProxyConfigRequest = (props: Partial<PatchProxyConfigRequest>) =>
-  merge(
+  );
+export const getPatchProxyConfigRequest = (props: Partial<PatchProxyConfigRequest>): PatchProxyConfigRequest =>
+  merge<PatchProxyConfigRequest, Partial<PatchProxyConfigRequest>>(
     {
-      accessReason: 'cillum',
+      accessReason: 'culpa',
       addSecretHeaders: [
         {
-          name: 'Whitney Smith',
-          value: 'in tempor',
+          name: 'Jo Wiza',
+          value: 'ut ullamco pariatur dolor',
         },
         {
-          name: 'Whitney Smith',
-          value: 'labore irure',
+          name: 'Jo Wiza',
+          value: 'dolor fugiat ex',
         },
         {
-          name: 'Whitney Smith',
-          value: 'aliquip ea nulla dolor',
+          name: 'Jo Wiza',
+          value: 'magna cillum reprehenderit',
         },
       ],
       clientIdentity: {
-        certificate: 'sint',
-        key: 'dd0c0adb-a7f4-4986-a9f0-b1ee5679e347',
+        certificate: 'eiusmod quis',
+        key: '4763135f-29a0-44ec-aaa3-f75f82e5cd9d',
       },
-      deleteSecretHeaders: ['ipsum officia magna dolore labore', 'voluptate', 'laboris occaecat'],
+      deleteSecretHeaders: ['dolor veniam', 'Lorem et consectetur', 'reprehenderit'],
       headers: [
         {
-          name: 'Milton McClure',
-          value: 'cupidatat aliqua minim Duis exercitation',
+          name: 'Amy Roberts',
+          value: 'nisi consectetur non cillum',
         },
         {
-          name: 'Milton McClure',
-          value: 'adipisicing aute Duis Lorem',
+          name: 'Amy Roberts',
+          value: 'ad',
         },
         {
-          name: 'Milton McClure',
-          value: 'reprehenderit enim cupidatat ipsum in',
+          name: 'Amy Roberts',
+          value: 'consectetur tempor veniam adipisicing',
         },
       ],
       ingressSettings: {
         contentType: 'json',
         rules: [
           {
-            target: 'dolore consectetur sint in',
-            token: '47bdf51a-98f4-482f-b7bd-84b57a2f617a',
+            target: 'labore dolore ipsum laboris',
+            token: 'document.drivers_license.issued_at',
           },
           {
-            target: 'veniam anim exercitation',
-            token: '47bdf51a-98f4-482f-b7bd-84b57a2f617a',
+            target: 'dolore non',
+            token: 'id.phone_number',
           },
           {
-            target: 'minim quis',
-            token: '47bdf51a-98f4-482f-b7bd-84b57a2f617a',
+            target: 'sed exercitation Excepteur',
+            token: 'document.voter_identification.document_number',
           },
         ],
       },
-      method: 'et est ea',
-      name: 'Billy Treutel',
-      pinnedServerCertificates: ['elit exercitation', 'ad exercitation do', 'dolore consequat reprehenderit ex'],
-      status: 'enabled',
-      url: 'https://average-appliance.com/',
-    },
-    props,
-  ) as PatchProxyConfigRequest;
-export const getPhoneLookupAttributes = (props: Partial<PhoneLookupAttributes>) =>
-  (props ?? 'line_type_intelligence') as PhoneLookupAttributes;
-export const getPlainCustomHeader = (props: Partial<PlainCustomHeader>) =>
-  merge(
-    {
-      name: 'Joanne Mosciski IV',
-      value: 'Duis Excepteur exercitation deserunt',
-    },
-    props,
-  ) as PlainCustomHeader;
-export const getPreviewApi = (props: Partial<PreviewApi>) => (props ?? 'vault_proxy') as PreviewApi;
-export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>) =>
-  merge(
-    {
-      fpId: '67ac5d3c-a783-4921-b34e-48e9d3ad8752',
-      id: '4a3624e3-9e8e-4d57-9187-a17e1675c3ab',
-      kind: 'secondary',
-      name: 'Dawn Schmitt',
-      ownershipStake: 66236386,
-      ownershipStakeDi: 'document.voter_identification.selfie.mime_type',
-      source: 'hosted',
-      status: 'pending',
-    },
-    props,
-  ) as PrivateBusinessOwner;
-export const getPrivateBusinessOwnerKycLink = (props: Partial<PrivateBusinessOwnerKycLink>) =>
-  merge(
-    {
-      id: 'bo_EBYciq9X2bkIPMMqnL4R9P',
-      link: 'https://api.onefootprint.com?type=bo&r=380#botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR',
-      name: 'Jane D.',
-      token: 'botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR',
-    },
-    props,
-  ) as PrivateBusinessOwnerKycLink;
-export const getPrivateOwnedBusiness = (props: Partial<PrivateOwnedBusiness>) =>
-  merge(
-    {
-      id: '9241585d-7e90-4a1b-9fb9-61e9c549c44b',
-      status: 'pass',
-    },
-    props,
-  ) as PrivateOwnedBusiness;
-export const getProxyConfigBasic = (props: Partial<ProxyConfigBasic>) =>
-  merge(
-    {
-      createdAt: '1927-02-22T06:29:22.0Z',
-      deactivatedAt: '1930-04-01T07:52:06.0Z',
-      id: '15af53c6-5e03-4f41-80c2-81c04d4c0835',
-      isLive: false,
-      method: 'dolore ea proident non ad',
-      name: 'Stella Pfannerstill',
+      method: 'Excepteur magna',
+      name: 'Meredith Franecki MD',
+      pinnedServerCertificates: ['sed magna', 'cupidatat exercitation', 'ipsum'],
       status: 'disabled',
-      url: 'https://square-eyebrow.net/',
+      url: 'https://shabby-tail.net/',
     },
     props,
-  ) as ProxyConfigBasic;
-export const getProxyConfigDetailed = (props: Partial<ProxyConfigDetailed>) =>
-  merge(
+  );
+export const getPhoneLookupAttributes = (props: PhoneLookupAttributes): PhoneLookupAttributes =>
+  props ?? 'line_type_intelligence';
+export const getPlainCustomHeader = (props: Partial<PlainCustomHeader>): PlainCustomHeader =>
+  merge<PlainCustomHeader, Partial<PlainCustomHeader>>(
     {
-      accessReason: 'Excepteur dolor ut dolore deserunt',
-      clientCertificate: 'non',
-      createdAt: '1955-01-06T06:29:42.0Z',
-      deactivatedAt: '1940-09-28T06:01:54.0Z',
+      name: 'Pat Hane',
+      value: 'dolor consectetur',
+    },
+    props,
+  );
+export const getPreviewApi = (props: PreviewApi): PreviewApi => props ?? 'decisions_list';
+export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>): PrivateBusinessOwner =>
+  merge<PrivateBusinessOwner, Partial<PrivateBusinessOwner>>(
+    {
+      fpId: 'af38c335-844c-4bcc-b380-fa0a21e03e81',
+      id: '60bd9d13-4b29-4879-a6af-6b29c73107e2',
+      kind: 'primary',
+      name: 'Leslie Waelchi',
+      ownershipStake: -10665692,
+      ownershipStakeDi: 'document.id_card.back.mime_type',
+      source: 'hosted',
+      status: 'fail',
+    },
+    props,
+  );
+export const getPrivateBusinessOwnerKycLink = (
+  props: Partial<PrivateBusinessOwnerKycLink>,
+): PrivateBusinessOwnerKycLink =>
+  merge<PrivateBusinessOwnerKycLink, Partial<PrivateBusinessOwnerKycLink>>(
+    {
+      id: '2cce5dda-1edc-41b8-9c93-39fd506d3e30',
+      link: 'voluptate aute',
+      name: 'Lora Nikolaus',
+      token: '94f45ffb-484a-4ae6-b5c3-0b1bbca8d54e',
+    },
+    props,
+  );
+export const getPrivateOwnedBusiness = (props: Partial<PrivateOwnedBusiness>): PrivateOwnedBusiness =>
+  merge<PrivateOwnedBusiness, Partial<PrivateOwnedBusiness>>(
+    {
+      id: '5b617a49-a919-4bec-8f67-f7184379c1b0',
+      status: 'fail',
+    },
+    props,
+  );
+export const getProxyConfigBasic = (props: Partial<ProxyConfigBasic>): ProxyConfigBasic =>
+  merge<ProxyConfigBasic, Partial<ProxyConfigBasic>>(
+    {
+      createdAt: '1969-07-10T01:25:35.0Z',
+      deactivatedAt: '1921-07-17T16:07:48.0Z',
+      id: 'ef47b848-4507-4a30-9436-b7a5d36f9f02',
+      isLive: true,
+      method: 'aute Duis aliqua Ut cupidatat',
+      name: 'Steve Klocko',
+      status: 'disabled',
+      url: 'https://sudden-yogurt.us/',
+    },
+    props,
+  );
+export const getProxyConfigDetailed = (props: Partial<ProxyConfigDetailed>): ProxyConfigDetailed =>
+  merge<ProxyConfigDetailed, Partial<ProxyConfigDetailed>>(
+    {
+      accessReason: 'enim consectetur',
+      clientCertificate: 'irure',
+      createdAt: '1919-01-04T07:01:36.0Z',
+      deactivatedAt: '1969-11-27T10:25:03.0Z',
       headers: [
         {
-          name: 'Mr. Fredrick Bernier',
-          value: 'dolor id',
+          name: 'Craig Bogisich',
+          value: 'enim exercitation in do',
         },
         {
-          name: 'Mr. Fredrick Bernier',
-          value: 'Lorem commodo laborum ea',
+          name: 'Craig Bogisich',
+          value: 'non ex mollit',
         },
         {
-          name: 'Mr. Fredrick Bernier',
-          value: 'in Excepteur ullamco',
+          name: 'Craig Bogisich',
+          value: 'enim proident sit adipisicing quis',
         },
       ],
-      id: '8085cc85-f45e-49c7-8606-7fd667214e5e',
+      id: '0890d5c5-56ef-400c-b218-0c9834f5b321',
       ingressContentType: 'json',
       ingressRules: [
         {
-          target: 'id ullamco labore Ut',
-          token: '703e96df-f0ef-4b51-83b8-88eb341f6f8f',
+          target: 'exercitation sed occaecat sit reprehenderit',
+          token: 'document.visa.full_address',
         },
         {
-          target: 'Excepteur',
-          token: '703e96df-f0ef-4b51-83b8-88eb341f6f8f',
+          target: 'culpa',
+          token: 'document.residence_document.curp_validation_response',
         },
         {
-          target: 'fugiat',
-          token: '703e96df-f0ef-4b51-83b8-88eb341f6f8f',
+          target: 'sunt',
+          token: 'document.voter_identification.front.image',
         },
       ],
       isLive: true,
-      method: 'consequat ullamco dolore in',
-      name: 'Perry Daugherty',
-      pinnedServerCertificates: ['sit ex', 'non ea eiusmod consequat laborum', 'dolore fugiat'],
+      method: 'labore dolore ex dolore',
+      name: 'Brent Towne',
+      pinnedServerCertificates: ['dolore aliqua', 'Ut non ea in culpa', 'est tempor Excepteur in'],
       secretHeaders: [
         {
-          id: '36cceb6f-6b93-41cb-bad2-a23c81c52654',
-          name: 'Ms. Anita Schaden',
+          id: 'e97fa3b9-5d4b-4b82-b260-ce6eeb363e46',
+          name: 'Lillie Ryan',
         },
         {
-          id: '36cceb6f-6b93-41cb-bad2-a23c81c52654',
-          name: 'Ms. Anita Schaden',
+          id: 'e97fa3b9-5d4b-4b82-b260-ce6eeb363e46',
+          name: 'Lillie Ryan',
         },
         {
-          id: '36cceb6f-6b93-41cb-bad2-a23c81c52654',
-          name: 'Ms. Anita Schaden',
+          id: 'e97fa3b9-5d4b-4b82-b260-ce6eeb363e46',
+          name: 'Lillie Ryan',
         },
       ],
       status: 'enabled',
-      url: 'https://familiar-masterpiece.name',
+      url: 'https://crazy-procurement.biz',
     },
     props,
-  ) as ProxyConfigDetailed;
-export const getProxyIngressContentType = (props: Partial<ProxyIngressContentType>) =>
-  (props ?? 'json') as ProxyIngressContentType;
-export const getProxyIngressRule = (props: Partial<ProxyIngressRule>) =>
-  merge(
+  );
+export const getProxyIngressContentType = (props: ProxyIngressContentType): ProxyIngressContentType => props ?? 'json';
+export const getProxyIngressRule = (props: Partial<ProxyIngressRule>): ProxyIngressRule =>
+  merge<ProxyIngressRule, Partial<ProxyIngressRule>>(
     {
-      target: 'culpa',
-      token: '72895270-d89b-4f7f-b60a-a6dc49527b71',
+      target: 'ea',
+      token: 'document.drivers_license.front.image',
     },
     props,
-  ) as ProxyIngressRule;
-export const getRawUserDataRequest = (props: Partial<RawUserDataRequest>) =>
-  merge(
+  );
+export const getRawUserDataRequest = (props: Partial<RawUserDataRequest>): RawUserDataRequest =>
+  merge<RawUserDataRequest, Partial<RawUserDataRequest>>(
     {
-      customUserId: '7c50e2bc-c31f-42e3-b2b0-9852010cfd58',
-      'id.first_name': 'Jane',
-      'id.last_name': 'Doe',
+      key: 'bank.*.ach_account_id',
+      value: {},
     },
     props,
-  ) as RawUserDataRequest;
-export const getReuploadComplianceDocRequest = (props: Partial<ReuploadComplianceDocRequest>) =>
-  merge(
+  );
+export const getReuploadComplianceDocRequest = (
+  props: Partial<ReuploadComplianceDocRequest>,
+): ReuploadComplianceDocRequest =>
+  merge<ReuploadComplianceDocRequest, Partial<ReuploadComplianceDocRequest>>(
     {
-      description: 'sed est voluptate Lorem cillum',
-      name: 'Olga Harris',
+      description: 'quis aute',
+      name: 'Donnie Bechtelar',
     },
     props,
-  ) as ReuploadComplianceDocRequest;
-export const getRiskScore = (props: Partial<RiskScore>) => (props ?? 'incode_selfie_match_score') as RiskScore;
-export const getRiskSignal = (props: Partial<RiskSignal>) =>
-  merge(
+  );
+export const getRiskScore = (props: RiskScore): RiskScore => props ?? 'experian_score';
+export const getRiskSignal = (props: Partial<RiskSignal>): RiskSignal =>
+  merge<RiskSignal, Partial<RiskSignal>>(
     {
-      description: 'id reprehenderit sint exercitation',
+      description: 'tempor qui dolor fugiat',
       group: 'phone',
-      id: '9d9bcd67-0bbf-4aec-8542-b4f741687ee8',
-      note: 'ex ullamco amet',
-      onboardingDecisionId: '74f79979-467b-449a-8d3a-4f1fb2e53d56',
-      reasonCode: 'sos_business_address_filing_status_not_available',
-      scopes: ['selfie', 'document', 'dob'],
-      severity: 'info',
-      timestamp: '1953-06-05T01:56:59.0Z',
+      id: '284ea003-4911-46f8-beb0-d4f0a7418014',
+      note: 'ullamco',
+      onboardingDecisionId: '2d7de04c-ccc8-4252-a23a-a0ee934953b2',
+      reasonCode: 'document_barcode_content_does_not_match',
+      scopes: ['business_phone_number', 'street_address', 'street_address'],
+      severity: 'low',
+      timestamp: '1960-04-07T16:37:50.0Z',
     },
     props,
-  ) as RiskSignal;
-export const getRiskSignalDetail = (props: Partial<RiskSignalDetail>) =>
-  merge(
+  );
+export const getRiskSignalDetail = (props: Partial<RiskSignalDetail>): RiskSignalDetail =>
+  merge<RiskSignalDetail, Partial<RiskSignalDetail>>(
     {
-      description: 'elit ut aliquip Duis',
+      description: 'dolor ut adipisicing',
       hasAmlHits: true,
-      hasSentilinkDetail: true,
-      id: 'b87dcbe8-7a79-4693-b080-c2ac6bb0e087',
-      note: 'ad Excepteur ullamco dolore',
-      onboardingDecisionId: '00d2dd91-5aec-4317-9ed9-82665c5ac35b',
-      reasonCode: 'document_type_not_allowed',
-      scopes: ['business_tin', 'native_device', 'beneficial_owners'],
-      severity: 'high',
-      timestamp: '1940-08-16T01:09:01.0Z',
+      hasSentilinkDetail: false,
+      id: '0eabb0b1-6dba-4234-aa9b-ed942d603c12',
+      note: 'ipsum eu mollit',
+      onboardingDecisionId: '287e494c-5dc2-452f-b692-a3189f8f1050',
+      reasonCode: 'document_ocr_last_name_matches',
+      scopes: ['country', 'behavior', 'business_address'],
+      severity: 'low',
+      timestamp: '1905-08-09T05:47:11.0Z',
     },
     props,
-  ) as RiskSignalDetail;
-export const getRiskSignalGroupKind = (props: Partial<RiskSignalGroupKind>) => (props ?? 'doc') as RiskSignalGroupKind;
-export const getRule = (props: Partial<Rule>) =>
-  merge(
+  );
+export const getRiskSignalGroupKind = (props: RiskSignalGroupKind): RiskSignalGroupKind => props ?? 'native_device';
+export const getRule = (props: Partial<Rule>): Rule =>
+  merge<Rule, Partial<Rule>>(
     {
-      action: 'manual_review',
-      createdAt: '1919-06-02T16:56:02.0Z',
-      isShadow: false,
-      kind: 'any',
-      name: 'Amelia Hand',
+      action: 'step_up.identity_proof_of_ssn_proof_of_address',
+      createdAt: '1948-11-29T17:34:56.0Z',
+      isShadow: true,
+      kind: 'person',
+      name: 'Stacy Heller',
       ruleAction: {
         config: {},
         kind: 'pass_with_manual_review',
       },
       ruleExpression: [
         {
-          field: 'document_not_live_capture',
+          field: 'ip_alert_high_risk_tor',
+          op: 'not_eq',
+          value: true,
+        },
+        {
+          field: 'email_domain_corporate',
           op: 'eq',
           value: false,
         },
         {
-          field: 'ssn_not_on_file',
+          field: 'ip_alert_high_risk_proxy',
           op: 'not_eq',
-          value: false,
-        },
-        {
-          field: 'attested_device_fraud_duplicate_risk_medium',
-          op: 'not_eq',
-          value: false,
+          value: true,
         },
       ],
-      ruleId: '63bed8a8-b9b8-4383-a12e-0eac99f08fa0',
+      ruleId: '408e3083-38db-49a0-98cf-e87fef631997',
     },
     props,
-  ) as Rule;
-export const getRuleAction = (props: Partial<RuleAction>) => (props ?? 'pass_with_manual_review') as RuleAction;
-export const getRuleActionConfig = (props: Partial<RuleActionConfig>) =>
-  merge(
+  );
+export const getRuleAction = (props: RuleAction): RuleAction => props ?? 'step_up.custom';
+export const getRuleActionConfig = (props: Partial<RuleActionConfig>): RuleActionConfig =>
+  merge<RuleActionConfig, Partial<RuleActionConfig>>(
     {
       config: {},
       kind: 'pass_with_manual_review',
     },
     props,
-  ) as RuleActionConfig;
-export const getRuleActionMigration = (props: Partial<RuleActionMigration>) =>
-  (props ?? 'step_up.proof_of_address') as RuleActionMigration;
-export const getRuleEvalResult = (props: Partial<RuleEvalResult>) =>
-  merge(
+  );
+export const getRuleActionMigration = (props: RuleActionMigration): RuleActionMigration => props ?? 'manual_review';
+export const getRuleEvalResult = (props: Partial<RuleEvalResult>): RuleEvalResult =>
+  merge<RuleEvalResult, Partial<RuleEvalResult>>(
     {
-      backtestActionTriggered: 'pass_with_manual_review',
-      currentStatus: 'incomplete',
-      fpId: '3b490dff-e87f-4dfb-b706-bf601da6b68b',
-      historicalActionTriggered: 'step_up.identity_proof_of_ssn',
+      backtestActionTriggered: 'step_up.identity_proof_of_ssn',
+      currentStatus: 'pass',
+      fpId: '3b6bfdfe-0232-4a1c-8366-8306d23a9478',
+      historicalActionTriggered: 'step_up.identity',
     },
     props,
-  ) as RuleEvalResult;
-export const getRuleEvalResults = (props: Partial<RuleEvalResults>) =>
-  merge(
+  );
+export const getRuleEvalResults = (props: Partial<RuleEvalResults>): RuleEvalResults =>
+  merge<RuleEvalResults, Partial<RuleEvalResults>>(
     {
       results: [
         {
-          backtestActionTriggered: 'step_up.custom',
-          currentStatus: 'fail',
-          fpId: '4d03f052-2582-4e90-a8f9-30659928032d',
+          backtestActionTriggered: 'step_up.identity_proof_of_ssn',
+          currentStatus: 'pass',
+          fpId: '1a68bb1a-fe9e-4f86-9ce6-704751d8bd05',
           historicalActionTriggered: 'manual_review',
         },
         {
-          backtestActionTriggered: 'manual_review',
-          currentStatus: 'pending',
-          fpId: '4d03f052-2582-4e90-a8f9-30659928032d',
-          historicalActionTriggered: 'step_up.identity_proof_of_ssn_proof_of_address',
+          backtestActionTriggered: 'step_up.identity',
+          currentStatus: 'fail',
+          fpId: '1a68bb1a-fe9e-4f86-9ce6-704751d8bd05',
+          historicalActionTriggered: 'pass_with_manual_review',
         },
         {
-          backtestActionTriggered: 'step_up.proof_of_address',
-          currentStatus: 'pending',
-          fpId: '4d03f052-2582-4e90-a8f9-30659928032d',
-          historicalActionTriggered: 'step_up.identity_proof_of_ssn',
+          backtestActionTriggered: 'pass_with_manual_review',
+          currentStatus: 'pass',
+          fpId: '1a68bb1a-fe9e-4f86-9ce6-704751d8bd05',
+          historicalActionTriggered: 'step_up.custom',
         },
       ],
       stats: {
         countByBacktestActionTriggered: {},
         countByHistoricalActionTriggered: {},
         countByHistoricalAndBacktestActionTriggered: {},
-        total: 30634894,
+        total: 82853894,
       },
     },
     props,
-  ) as RuleEvalResults;
-export const getRuleEvalStats = (props: Partial<RuleEvalStats>) =>
-  merge(
+  );
+export const getRuleEvalStats = (props: Partial<RuleEvalStats>): RuleEvalStats =>
+  merge<RuleEvalStats, Partial<RuleEvalStats>>(
     {
       countByBacktestActionTriggered: {},
       countByHistoricalActionTriggered: {},
       countByHistoricalAndBacktestActionTriggered: {},
-      total: 10421375,
+      total: -61560433,
     },
     props,
-  ) as RuleEvalStats;
-export const getRuleExpression = (props: Partial<RuleExpression>) =>
-  merge(
+  );
+export const getRuleExpression = (props: Partial<RuleExpression>): RuleExpression =>
+  merge<RuleExpression, Partial<RuleExpression>>(
     [
       {
-        field: 'multiple_records_found',
+        field: 'address_state_matches',
         op: 'eq',
-        value: false,
+        value: true,
       },
       {
-        field: 'document_full_name_crosscheck_does_not_match',
+        field: 'document_visible_photo_features_not_verified',
         op: 'eq',
-        value: false,
+        value: true,
       },
       {
-        field: 'watchlist_hit_pep',
-        op: 'not_eq',
+        field: 'dob_yob_not_available',
+        op: 'eq',
         value: false,
       },
     ],
     props,
-  ) as RuleExpression;
-export const getRuleExpressionCondition = (props: Partial<RuleExpressionCondition>) =>
-  merge(
+  );
+export const getRuleExpressionCondition = (props: Partial<RuleExpressionCondition>): RuleExpressionCondition =>
+  merge<RuleExpressionCondition, Partial<RuleExpressionCondition>>(
     {
-      field: 'curp_malformed',
-      op: 'eq',
+      field: 'drivers_license_number_not_valid',
+      op: 'not_eq',
       value: false,
     },
     props,
-  ) as RuleExpressionCondition;
-export const getRuleInstanceKind = (props: Partial<RuleInstanceKind>) => (props ?? 'any') as RuleInstanceKind;
-export const getRuleResult = (props: Partial<RuleResult>) =>
-  merge(
+  );
+export const getRuleInstanceKind = (props: RuleInstanceKind): RuleInstanceKind => props ?? 'business';
+export const getRuleResult = (props: Partial<RuleResult>): RuleResult =>
+  merge<RuleResult, Partial<RuleResult>>(
     {
-      result: true,
+      result: false,
       rule: {
-        action: 'step_up.proof_of_address',
-        createdAt: '1905-10-07T08:26:19.0Z',
+        action: 'fail',
+        createdAt: '1905-01-03T02:22:19.0Z',
         isShadow: true,
         kind: 'any',
-        name: 'Iris Borer',
+        name: 'Mr. Roberto Casper',
         ruleAction: {
           config: {},
           kind: 'pass_with_manual_review',
         },
         ruleExpression: [
           {
-            field: 'business_address_does_not_match',
-            op: 'eq',
-            value: false,
+            field: 'address_input_is_not_deliverable',
+            op: 'not_eq',
+            value: true,
           },
           {
-            field: 'sos_business_address_filing_not_found',
+            field: 'ip_proxy',
+            op: 'not_eq',
+            value: true,
+          },
+          {
+            field: 'document_ocr_first_name_does_not_match',
             op: 'not_eq',
             value: false,
           },
-          {
-            field: 'business_dba_match',
-            op: 'eq',
-            value: true,
-          },
         ],
-        ruleId: '2412ab6f-65b0-4cf3-82dc-b3193a85a9f7',
+        ruleId: '99815f1a-c984-4ffe-915e-9e1efa279810',
       },
     },
     props,
-  ) as RuleResult;
-export const getRuleSet = (props: Partial<RuleSet>) =>
-  merge(
+  );
+export const getRuleSet = (props: Partial<RuleSet>): RuleSet =>
+  merge<RuleSet, Partial<RuleSet>>(
     {
-      version: -92189603,
+      version: -67232831,
     },
     props,
-  ) as RuleSet;
-export const getRuleSetResult = (props: Partial<RuleSetResult>) =>
-  merge(
+  );
+export const getRuleSetResult = (props: Partial<RuleSetResult>): RuleSetResult =>
+  merge<RuleSetResult, Partial<RuleSetResult>>(
     {
-      actionTriggered: 'fail',
-      createdAt: '1910-09-25T11:40:47.0Z',
-      obConfigurationId: '13c75146-4a1c-4e10-af65-1663b4b19bf9',
+      actionTriggered: 'pass_with_manual_review',
+      createdAt: '1910-07-09T10:01:49.0Z',
+      obConfigurationId: 'a7317a71-c422-4124-b998-14f5d4cd43f8',
       ruleActionTriggered: {
         config: {},
         kind: 'pass_with_manual_review',
       },
       ruleResults: [
         {
-          result: false,
+          result: true,
           rule: {
-            action: 'fail',
-            createdAt: '1965-07-02T07:58:26.0Z',
+            action: 'step_up.identity_proof_of_ssn_proof_of_address',
+            createdAt: '1949-04-08T03:50:25.0Z',
             isShadow: true,
             kind: 'any',
-            name: 'Aubrey Rath-VonRueden II',
+            name: 'Mrs. Priscilla Rutherford',
             ruleAction: {
               config: {},
               kind: 'pass_with_manual_review',
             },
             ruleExpression: [
               {
-                field: 'device_reputation',
-                op: 'not_eq',
-                value: false,
-              },
-              {
-                field: 'bureau_deleted_record',
-                op: 'not_eq',
-                value: true,
-              },
-              {
-                field: 'sos_filing_not_found',
-                op: 'not_eq',
-                value: true,
-              },
-            ],
-            ruleId: '52452363-2fff-415a-a733-d28422aa12a0',
-          },
-        },
-        {
-          result: false,
-          rule: {
-            action: 'manual_review',
-            createdAt: '1909-09-08T18:22:01.0Z',
-            isShadow: true,
-            kind: 'person',
-            name: 'Aubrey Rath-VonRueden II',
-            ruleAction: {
-              config: {},
-              kind: 'pass_with_manual_review',
-            },
-            ruleExpression: [
-              {
-                field: 'document_possible_image_alteration',
-                op: 'eq',
-                value: true,
-              },
-              {
-                field: 'business_address_not_deliverable',
+                field: 'business_name_no_watchlist_hits',
                 op: 'eq',
                 value: false,
               },
               {
-                field: 'business_address_similar_match',
+                field: 'document_barcode_detected',
                 op: 'not_eq',
                 value: true,
               },
+              {
+                field: 'ip_alert_high_risk_spam',
+                op: 'not_eq',
+                value: false,
+              },
             ],
-            ruleId: '52452363-2fff-415a-a733-d28422aa12a0',
+            ruleId: 'b59229ee-71d7-4421-916a-3cc31fa7a706',
           },
         },
         {
           result: true,
           rule: {
-            action: 'pass_with_manual_review',
-            createdAt: '1905-05-05T05:12:39.0Z',
+            action: 'step_up.custom',
+            createdAt: '1961-09-26T01:48:41.0Z',
             isShadow: true,
-            kind: 'person',
-            name: 'Aubrey Rath-VonRueden II',
+            kind: 'any',
+            name: 'Mrs. Priscilla Rutherford',
             ruleAction: {
               config: {},
               kind: 'pass_with_manual_review',
             },
             ruleExpression: [
               {
-                field: 'business_website_parking_page',
-                op: 'not_eq',
+                field: 'curp_service_not_available',
+                op: 'eq',
                 value: false,
               },
               {
-                field: 'document_dob_crosscheck_matches',
-                op: 'not_eq',
-                value: false,
+                field: 'business_name_no_watchlist_hits',
+                op: 'eq',
+                value: true,
               },
               {
-                field: 'business_website_online',
+                field: 'document_selfie_not_live_image',
+                op: 'eq',
+                value: false,
+              },
+            ],
+            ruleId: 'b59229ee-71d7-4421-916a-3cc31fa7a706',
+          },
+        },
+        {
+          result: false,
+          rule: {
+            action: 'step_up.custom',
+            createdAt: '1895-12-20T05:07:55.0Z',
+            isShadow: false,
+            kind: 'person',
+            name: 'Mrs. Priscilla Rutherford',
+            ruleAction: {
+              config: {},
+              kind: 'pass_with_manual_review',
+            },
+            ruleExpression: [
+              {
+                field: 'document_photo_is_not_paper_capture',
+                op: 'eq',
+                value: true,
+              },
+              {
+                field: 'document_sex_crosscheck_matches',
+                op: 'not_eq',
+                value: true,
+              },
+              {
+                field: 'phone_number_mobile_account_status_absent',
                 op: 'not_eq',
                 value: true,
               },
             ],
-            ruleId: '52452363-2fff-415a-a733-d28422aa12a0',
+            ruleId: 'b59229ee-71d7-4421-916a-3cc31fa7a706',
           },
         },
       ],
     },
     props,
-  ) as RuleSetResult;
-export const getSameTenantDupe = (props: Partial<SameTenantDupe>) =>
-  merge(
+  );
+export const getSameTenantDupe = (props: Partial<SameTenantDupe>): SameTenantDupe =>
+  merge<SameTenantDupe, Partial<SameTenantDupe>>(
     {
       data: [
         {
-          dataKind: 'document_data',
-          identifier: '4ce11bc4-ba07-486d-baf5-850e059d1f1d',
+          dataKind: 'vault_data',
+          identifier: 'document.permit.curp_validation_response',
           isDecryptable: true,
-          source: 'client_tenant',
+          source: 'prefill',
           transforms: {},
-          value: 'id',
+          value: 'dolore sed amet ullamco',
         },
         {
           dataKind: 'vault_data',
-          identifier: '4ce11bc4-ba07-486d-baf5-850e059d1f1d',
-          isDecryptable: false,
-          source: 'components_sdk',
+          identifier: 'document.visa.state',
+          isDecryptable: true,
+          source: 'prefill',
           transforms: {},
-          value: 'irure do',
+          value: 'in et ullamco',
         },
         {
           dataKind: 'document_data',
-          identifier: '4ce11bc4-ba07-486d-baf5-850e059d1f1d',
-          isDecryptable: false,
-          source: 'tenant',
+          identifier: 'business.city',
+          isDecryptable: true,
+          source: 'bootstrap',
           transforms: {},
-          value: 'elit dolor amet dolore',
+          value: 'ex proident Ut magna non',
         },
       ],
-      dupeKinds: ['name_dob', 'name_dob', 'card_number_cvc'],
-      fpId: '93fdb5b4-e1a2-418c-a1fa-7157edc55921',
-      startTimestamp: '1917-01-02T03:50:17.0Z',
-      status: 'none',
+      dupeKinds: ['dob_ssn4', 'cookie_id', 'phone_number'],
+      fpId: '8b552a04-fb13-4769-bc6a-5a23fcc559c4',
+      startTimestamp: '1904-01-21T04:30:04.0Z',
+      status: 'fail',
     },
     props,
-  ) as SameTenantDupe;
-export const getScoreBand = (props: Partial<ScoreBand>) => (props ?? 'medium') as ScoreBand;
-export const getSecretApiKey = (props: Partial<SecretApiKey>) => (props ?? 'sint nisi') as SecretApiKey;
-export const getSecretCustomHeader = (props: Partial<SecretCustomHeader>) =>
-  merge(
+  );
+export const getScoreBand = (props: ScoreBand): ScoreBand => props ?? 'low';
+export const getSecretApiKey = (props: SecretApiKey): SecretApiKey => props ?? 'commodo laboris sunt';
+export const getSecretCustomHeader = (props: Partial<SecretCustomHeader>): SecretCustomHeader =>
+  merge<SecretCustomHeader, Partial<SecretCustomHeader>>(
     {
-      name: 'Maria Carroll III',
-      value: 'mollit cupidatat enim deserunt irure',
+      name: 'Lynda Wisozk',
+      value: 'velit voluptate',
     },
     props,
-  ) as SecretCustomHeader;
-export const getSentilinkDetail = (props: Partial<SentilinkDetail>) =>
-  merge(
+  );
+export const getSentilinkDetail = (props: Partial<SentilinkDetail>): SentilinkDetail =>
+  merge<SentilinkDetail, Partial<SentilinkDetail>>(
     {
       idTheft: {
         reasonCodes: [
           {
-            code: 'id',
-            direction: 'velit ullamco',
-            explanation: 'est Ut in',
-            rank: 36318547,
+            code: 'consectetur irure sit dolor Lorem',
+            direction: 'ea dolor qui',
+            explanation: 'voluptate deserunt dolor',
+            rank: -57084716,
           },
           {
-            code: 'laboris anim laborum officia et',
-            direction: 'non dolor officia',
-            explanation: 'in irure tempor sit laboris',
-            rank: -30278280,
+            code: 'commodo incididunt qui',
+            direction: 'aliquip amet sit',
+            explanation: 'ut et',
+            rank: -47593839,
           },
           {
-            code: 'ut fugiat dolore pariatur qui',
-            direction: 'voluptate minim aliquip',
-            explanation: 'ut tempor',
-            rank: 12049826,
+            code: 'labore commodo',
+            direction: 'ea quis Duis dolor elit',
+            explanation: 'occaecat',
+            rank: 42114060,
           },
         ],
-        score: 40289081,
-        scoreBand: 'high',
+        score: -99098767,
+        scoreBand: 'low',
       },
       synthetic: {
         reasonCodes: [
           {
-            code: 'eiusmod id laboris voluptate',
-            direction: 'dolor quis commodo officia',
-            explanation: 'cillum magna irure dolore',
-            rank: 79111532,
+            code: 'id',
+            direction: 'Ut Duis occaecat id proident',
+            explanation: 'velit in deserunt in anim',
+            rank: -61561460,
           },
           {
-            code: 'et do adipisicing',
-            direction: 'Duis cillum nulla voluptate',
-            explanation: 'dolor',
-            rank: 52697240,
+            code: 'qui ut ea sint',
+            direction: 'deserunt exercitation',
+            explanation: 'esse',
+            rank: -56311024,
           },
           {
-            code: 'in voluptate fugiat sint',
-            direction: 'mollit reprehenderit minim',
-            explanation: 'Lorem',
-            rank: 92214040,
+            code: 'exercitation',
+            direction: 'nisi sit',
+            explanation: 'esse ut cillum pariatur minim',
+            rank: 79731876,
           },
         ],
-        score: -36696653,
-        scoreBand: 'high',
+        score: 46312870,
+        scoreBand: 'medium',
       },
     },
     props,
-  ) as SentilinkDetail;
-export const getSentilinkReasonCode = (props: Partial<SentilinkReasonCode>) =>
-  merge(
+  );
+export const getSentilinkReasonCode = (props: Partial<SentilinkReasonCode>): SentilinkReasonCode =>
+  merge<SentilinkReasonCode, Partial<SentilinkReasonCode>>(
     {
-      code: 'Duis aliqua sit',
-      direction: 'consectetur culpa veniam',
-      explanation: 'exercitation non',
-      rank: -11856647,
+      code: 'id',
+      direction: 'in dolore dolor adipisicing',
+      explanation: 'ut nisi laboris consectetur',
+      rank: 41960061,
     },
     props,
-  ) as SentilinkReasonCode;
-export const getSentilinkScoreDetail = (props: Partial<SentilinkScoreDetail>) =>
-  merge(
+  );
+export const getSentilinkScoreDetail = (props: Partial<SentilinkScoreDetail>): SentilinkScoreDetail =>
+  merge<SentilinkScoreDetail, Partial<SentilinkScoreDetail>>(
     {
       reasonCodes: [
         {
-          code: 'magna aliqua minim',
-          direction: 'dolore anim et',
-          explanation: 'nostrud',
-          rank: -69041267,
+          code: 'Duis officia do',
+          direction: 'dolore quis laboris non',
+          explanation: 'mollit et magna elit',
+          rank: -25870150,
         },
         {
-          code: 'in',
-          direction: 'velit consequat',
-          explanation: 'non enim Lorem elit',
-          rank: 14776302,
+          code: 'nulla ut exercitation do ea',
+          direction: 'eu ad officia et consectetur',
+          explanation: 'ipsum veniam exercitation laboris',
+          rank: -10022883,
         },
         {
-          code: 'dolor tempor Excepteur',
-          direction: 'consequat',
-          explanation: 'commodo aute Lorem fugiat eu',
-          rank: 58310396,
+          code: 'Duis ipsum',
+          direction: 'occaecat incididunt',
+          explanation: 'Excepteur amet elit',
+          rank: -2986178,
         },
       ],
-      score: -12607508,
-      scoreBand: 'low',
+      score: -11455846,
+      scoreBand: 'high',
     },
     props,
-  ) as SentilinkScoreDetail;
-export const getSignalScope = (props: Partial<SignalScope>) => (props ?? 'business_name') as SignalScope;
-export const getSignalSeverity = (props: Partial<SignalSeverity>) => (props ?? 'medium') as SignalSeverity;
-export const getSubmitExternalUrlRequest = (props: Partial<SubmitExternalUrlRequest>) =>
-  merge(
+  );
+export const getSignalScope = (props: SignalScope): SignalScope => props ?? 'state';
+export const getSignalSeverity = (props: SignalSeverity): SignalSeverity => props ?? 'info';
+export const getSubmitExternalUrlRequest = (props: Partial<SubmitExternalUrlRequest>): SubmitExternalUrlRequest =>
+  merge<SubmitExternalUrlRequest, Partial<SubmitExternalUrlRequest>>(
     {
-      url: 'https://negligible-beret.us/',
+      url: 'https://ornate-contrail.org/',
     },
     props,
-  ) as SubmitExternalUrlRequest;
-export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>) =>
-  merge(
+  );
+export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>): TenantAndroidAppMeta =>
+  merge<TenantAndroidAppMeta, Partial<TenantAndroidAppMeta>>(
     {
-      apkCertSha256S: ['qui enim sunt ad ut', 'anim', 'sint adipisicing'],
-      id: '89c89ef1-dce4-4be5-bda1-bc68c5b15258',
-      integrityDecryptionKey: 'eef825b5-e218-44f3-ac30-170f5e49280d',
-      integrityVerificationKey: 'd5cc0f38-65e6-4197-92c4-d6922d55ddc5',
-      packageNames: ['sed dolor incididunt do', 'magna esse', 'Ut exercitation commodo eu'],
-      tenantId: '67a86b6e-125f-42eb-8cc3-e0ae711a5315',
+      apkCertSha256S: ['sint', 'in dolore', 'id cupidatat'],
+      id: 'e66847fb-5123-41c6-9348-ae80fe3c0e98',
+      integrityDecryptionKey: '735cbd77-6ec3-4944-847f-44e9795770f9',
+      integrityVerificationKey: '70487420-08ab-498a-bc5c-02ad2754cbcc',
+      packageNames: ['irure exercitation non nulla incididunt', 'amet commodo veniam', 'aliqua in pariatur Ut'],
+      tenantId: 'f0e8ce5e-e21d-4f4f-bd5a-81b205efa8c0',
     },
     props,
-  ) as TenantAndroidAppMeta;
-export const getTenantFrequentNoteKind = (props: Partial<TenantFrequentNoteKind>) =>
-  (props ?? 'annotation') as TenantFrequentNoteKind;
-export const getTenantIosAppMeta = (props: Partial<TenantIosAppMeta>) =>
-  merge(
+  );
+export const getTenantFrequentNoteKind = (props: TenantFrequentNoteKind): TenantFrequentNoteKind =>
+  props ?? 'annotation';
+export const getTenantIosAppMeta = (props: Partial<TenantIosAppMeta>): TenantIosAppMeta =>
+  merge<TenantIosAppMeta, Partial<TenantIosAppMeta>>(
     {
-      appBundleIds: ['aliqua non ipsum', 'Duis eiusmod veniam aliquip eu', 'nulla tempor do'],
-      deviceCheckKeyId: '71a16e5f-4a0a-46a5-9e2f-7f808e2fe7b9',
-      deviceCheckPrivateKey: '3b42ab1a-7a3c-4bd7-a4d4-aaf7e2cd7493',
-      id: 'acf61867-cb34-45ee-b399-2418feb697af',
-      teamId: '676f29bb-c23a-43a4-a606-d657931d5955',
-      tenantId: '81631296-b945-44dd-813b-41db404b60ce',
+      appBundleIds: ['veniam commodo do', 'id consectetur ut', 'in veniam'],
+      deviceCheckKeyId: '4b854c10-41f4-4d28-bda5-c52c9fd91a66',
+      deviceCheckPrivateKey: '1d272c27-653d-4d9e-93eb-2c94f1931a19',
+      id: '1f74f145-8b2c-486a-8570-326f0b58cfc8',
+      teamId: '6009a99d-55b7-4dd9-a6ad-789660ecb694',
+      tenantId: 'f112063f-0f8d-491e-a030-78622dbb4e16',
     },
     props,
-  ) as TenantIosAppMeta;
-export const getTenantKind = (props: Partial<TenantKind>) => (props ?? 'partner_tenant') as TenantKind;
-export const getTenantLoginRequest = (props: Partial<TenantLoginRequest>) =>
-  merge(
+  );
+export const getTenantKind = (props: TenantKind): TenantKind => props ?? 'tenant';
+export const getTenantLoginRequest = (props: Partial<TenantLoginRequest>): TenantLoginRequest =>
+  merge<TenantLoginRequest, Partial<TenantLoginRequest>>(
     {
-      code: 'consectetur cillum in',
-      requestOrgId: '8249f540-6528-4cb8-992b-be67b33a53b6',
+      code: 'et Lorem est',
+      requestOrgId: 'eefc02b5-0ac0-4247-96c4-69d703fd3be7',
     },
     props,
-  ) as TenantLoginRequest;
-export const getTenantRoleKindDiscriminant = (props: Partial<TenantRoleKindDiscriminant>) =>
-  (props ?? 'api_key') as TenantRoleKindDiscriminant;
-export const getTenantScope = (props: Partial<TenantScope>) =>
-  merge(
+  );
+export const getTenantRoleKindDiscriminant = (props: TenantRoleKindDiscriminant): TenantRoleKindDiscriminant =>
+  props ?? 'api_key';
+export const getTenantScope = (props: Partial<TenantScope>): TenantScope =>
+  merge<TenantScope, Partial<TenantScope>>(
     {
       kind: 'read',
     },
     props,
-  ) as TenantScope;
-export const getTerminalDecisionStatus = (props: Partial<TerminalDecisionStatus>) =>
-  (props ?? 'fail') as TerminalDecisionStatus;
-export const getTimelineOnboardingDecision = (props: Partial<TimelineOnboardingDecision>) =>
-  merge(
+  );
+export const getTerminalDecisionStatus = (props: TerminalDecisionStatus): TerminalDecisionStatus => props ?? 'pass';
+export const getTimelineOnboardingDecision = (props: Partial<TimelineOnboardingDecision>): TimelineOnboardingDecision =>
+  merge<TimelineOnboardingDecision, Partial<TimelineOnboardingDecision>>(
     {
       clearedManualReviews: [
         {
-          kind: 'rule_triggered',
+          kind: 'document_needs_review',
         },
         {
-          kind: 'rule_triggered',
+          kind: 'document_needs_review',
         },
         {
           kind: 'document_needs_review',
         },
       ],
-      id: '65dd426d-779a-42dc-a5f3-0204509558af',
+      id: 'a879cd2d-fb65-4fc0-b790-6700284dd6ac',
       obConfiguration: {
-        id: '321c039e-1d2f-4d58-a830-e5d5a99597ec',
-        mustCollectData: ['phone_number', 'nationality', 'full_address'],
-        name: 'Roberto Rempel V',
+        id: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
+        mustCollectData: ['business_address', 'ssn4', 'full_address'],
+        name: 'Elmer Green-Bode',
       },
       ranRulesInSandbox: true,
-      ruleSetResultId: '8791b0d3-aabd-43f7-b9a8-deb83336fe7c',
+      ruleSetResultId: '52f17b12-f513-4d68-8267-fab717c02d03',
       source: {
-        id: '09eecea7-b910-4754-9b6b-e857280f8ee1',
+        id: '6aaee309-1208-40e5-944c-ea4186032cdb',
         kind: 'user',
       },
-      status: 'none',
-      timestamp: '1943-12-23T14:36:56.0Z',
-      workflowKind: 'kyc',
+      status: 'pass',
+      timestamp: '1932-01-04T03:24:49.0Z',
+      workflowKind: 'alpaca_kyc',
     },
     props,
-  ) as TimelineOnboardingDecision;
-export const getTimelinePlaybook = (props: Partial<TimelinePlaybook>) =>
-  merge(
+  );
+export const getTimelinePlaybook = (props: Partial<TimelinePlaybook>): TimelinePlaybook =>
+  merge<TimelinePlaybook, Partial<TimelinePlaybook>>(
     {
-      id: 'ab9392ce-28b8-4d89-b7fa-65faea16e222',
-      mustCollectData: ['phone_number', 'business_phone_number', 'business_corporation_type'],
-      name: 'Chester Hickle',
+      id: '367621e6-a7ff-43f5-9764-6199e904bb6a',
+      mustCollectData: ['business_phone_number', 'business_address', 'business_website'],
+      name: 'Clara Herzog',
     },
     props,
-  ) as TimelinePlaybook;
-export const getTokenOperationKind = (props: Partial<TokenOperationKind>) => (props ?? 'inherit') as TokenOperationKind;
-export const getTriggerRequest = (props: Partial<TriggerRequest>) =>
-  merge(
+  );
+export const getTokenOperationKind = (props: TokenOperationKind): TokenOperationKind => props ?? 'update_auth_methods';
+export const getTriggerRequest = (props: Partial<TriggerRequest>): TriggerRequest =>
+  merge<TriggerRequest, Partial<TriggerRequest>>(
     {
-      fpBid: '7bf7793f-cecd-4796-b955-0c3983d68e23',
+      fpBid: '54bda7fa-e958-4aaa-b672-6dbbca8b515a',
       kind: 'trigger',
-      note: 'in sunt occaecat',
+      note: 'minim dolore consequat commodo',
       trigger: {
         data: {
-          playbookId: 'fed107f9-ebd5-4d97-b890-647c5eb29b76',
-          recollectAttributes: ['business_kyced_beneficial_owners', 'phone_number', 'us_tax_id'],
-          reuseExistingBoKyc: false,
+          playbookId: 'ef1a3dd4-7bc3-4a73-8ba2-f6606c165557',
+          recollectAttributes: ['nationality', 'business_beneficial_owners', 'bank'],
+          reuseExistingBoKyc: true,
         },
         kind: 'onboard',
       },
     },
     props,
-  ) as TriggerRequest;
-export const getUnvalidatedRuleExpression = (props: Partial<UnvalidatedRuleExpression>) =>
-  merge(
+  );
+export const getUnvalidatedRuleExpression = (props: Partial<UnvalidatedRuleExpression>): UnvalidatedRuleExpression =>
+  merge<UnvalidatedRuleExpression, Partial<UnvalidatedRuleExpression>>(
     [
       {
-        field: 'address_street_name_does_not_match',
-        op: 'not_eq',
-        value: true,
-      },
-      {
-        field: 'watchlist_hit_ofac',
+        field: 'business_address_match',
         op: 'eq',
         value: false,
       },
       {
-        field: 'document_photo_is_not_paper_capture',
+        field: 'document_no_image_alteration_front',
+        op: 'not_eq',
+        value: false,
+      },
+      {
+        field: 'document_full_name_crosscheck_does_not_match',
         op: 'not_eq',
         value: true,
       },
     ],
     props,
-  ) as UnvalidatedRuleExpression;
-export const getUpdateAnnotationRequest = (props: Partial<UpdateAnnotationRequest>) =>
-  merge(
+  );
+export const getUpdateAnnotationRequest = (props: Partial<UpdateAnnotationRequest>): UpdateAnnotationRequest =>
+  merge<UpdateAnnotationRequest, Partial<UpdateAnnotationRequest>>(
     {
       isPinned: true,
     },
     props,
-  ) as UpdateAnnotationRequest;
-export const getUpdateApiKeyRequest = (props: Partial<UpdateApiKeyRequest>) =>
-  merge(
+  );
+export const getUpdateApiKeyRequest = (props: Partial<UpdateApiKeyRequest>): UpdateApiKeyRequest =>
+  merge<UpdateApiKeyRequest, Partial<UpdateApiKeyRequest>>(
     {
-      name: 'Edna Reilly',
-      roleId: 'fb761523-bdf7-47fd-bb93-f6cee84a1ff1',
+      name: 'Krystal Balistreri',
+      roleId: 'd1c4ee93-c3c4-46ba-afcf-6ada2a81b8fb',
       status: 'enabled',
     },
     props,
-  ) as UpdateApiKeyRequest;
-export const getUpdateClientSecurityConfig = (props: Partial<UpdateClientSecurityConfig>) =>
-  merge(
+  );
+export const getUpdateClientSecurityConfig = (props: Partial<UpdateClientSecurityConfig>): UpdateClientSecurityConfig =>
+  merge<UpdateClientSecurityConfig, Partial<UpdateClientSecurityConfig>>(
     {
-      allowedOrigins: ['cillum amet in sed esse', 'deserunt ex in dolor', 'consectetur culpa'],
+      allowedOrigins: ['aliquip', 'commodo cupidatat culpa', 'cupidatat pariatur minim nisi cillum'],
     },
     props,
-  ) as UpdateClientSecurityConfig;
-export const getUpdateComplianceDocAssignmentRequest = (props: Partial<UpdateComplianceDocAssignmentRequest>) =>
-  merge(
+  );
+export const getUpdateComplianceDocAssignmentRequest = (
+  props: Partial<UpdateComplianceDocAssignmentRequest>,
+): UpdateComplianceDocAssignmentRequest =>
+  merge<UpdateComplianceDocAssignmentRequest, Partial<UpdateComplianceDocAssignmentRequest>>(
     {
-      userId: 'f9183408-3e79-4459-b495-b18d82ab7fe1',
+      userId: 'a2daf3bc-b7fd-42bf-a604-4c23b889275b',
     },
     props,
-  ) as UpdateComplianceDocAssignmentRequest;
-export const getUpdateComplianceDocTemplateRequest = (props: Partial<UpdateComplianceDocTemplateRequest>) =>
-  merge(
+  );
+export const getUpdateComplianceDocTemplateRequest = (
+  props: Partial<UpdateComplianceDocTemplateRequest>,
+): UpdateComplianceDocTemplateRequest =>
+  merge<UpdateComplianceDocTemplateRequest, Partial<UpdateComplianceDocTemplateRequest>>(
     {
-      description: 'eu tempor',
-      name: 'Luther Prosacco',
+      description: 'nulla anim',
+      name: 'Kayla Hartmann IV',
     },
     props,
-  ) as UpdateComplianceDocTemplateRequest;
-export const getUpdateLabelRequest = (props: Partial<UpdateLabelRequest>) =>
-  merge(
+  );
+export const getUpdateLabelRequest = (props: Partial<UpdateLabelRequest>): UpdateLabelRequest =>
+  merge<UpdateLabelRequest, Partial<UpdateLabelRequest>>(
     {
-      kind: 'offboard_other',
+      kind: 'offboard_fraud',
     },
     props,
-  ) as UpdateLabelRequest;
-export const getUpdateListRequest = (props: Partial<UpdateListRequest>) =>
-  merge(
+  );
+export const getUpdateListRequest = (props: Partial<UpdateListRequest>): UpdateListRequest =>
+  merge<UpdateListRequest, Partial<UpdateListRequest>>(
     {
-      alias: 'in laborum sit Duis mollit',
-      name: 'Jeremy Koss',
+      alias: 'aliqua et',
+      name: 'Grady Lind',
     },
     props,
-  ) as UpdateListRequest;
-export const getUpdateObConfigRequest = (props: Partial<UpdateObConfigRequest>) =>
-  merge(
+  );
+export const getUpdateObConfigRequest = (props: Partial<UpdateObConfigRequest>): UpdateObConfigRequest =>
+  merge<UpdateObConfigRequest, Partial<UpdateObConfigRequest>>(
     {
       allowReonboard: true,
-      name: 'Mildred Bosco',
+      name: 'Patsy Funk',
       promptForPasskey: false,
-      skipConfirm: false,
+      skipConfirm: true,
       status: 'disabled',
     },
     props,
-  ) as UpdateObConfigRequest;
-export const getUpdatePartnerTenantRequest = (props: Partial<UpdatePartnerTenantRequest>) =>
-  merge(
+  );
+export const getUpdatePartnerTenantRequest = (props: Partial<UpdatePartnerTenantRequest>): UpdatePartnerTenantRequest =>
+  merge<UpdatePartnerTenantRequest, Partial<UpdatePartnerTenantRequest>>(
     {
       allowDomainAccess: false,
-      name: 'Adrian Okuneva',
-      websiteUrl: 'https://good-natured-mallard.info/',
+      name: 'Dr. Deanna Morissette',
+      websiteUrl: 'https://polite-bookend.com/',
     },
     props,
-  ) as UpdatePartnerTenantRequest;
-export const getUpdateTenantAndroidAppMetaRequest = (props: Partial<UpdateTenantAndroidAppMetaRequest>) =>
-  merge(
+  );
+export const getUpdateTenantAndroidAppMetaRequest = (
+  props: Partial<UpdateTenantAndroidAppMetaRequest>,
+): UpdateTenantAndroidAppMetaRequest =>
+  merge<UpdateTenantAndroidAppMetaRequest, Partial<UpdateTenantAndroidAppMetaRequest>>(
     {
-      apkCertSha256S: ['mollit dolor voluptate', 'sunt', 'dolor dolor in'],
-      integrityDecryptionKey: '3095afdc-2ac3-43fa-a29d-e5a78e36fe81',
-      integrityVerificationKey: 'ad5daec4-2301-460a-8f22-efa1ded79f5a',
-      packageNames: ['incididunt est in voluptate', 'non sed Ut enim amet', 'Ut sit incididunt aliqua ut'],
+      apkCertSha256S: ['anim aliquip', 'nulla sint', 'voluptate dolore Excepteur est'],
+      integrityDecryptionKey: 'aaec2951-dbb1-4547-ac67-c3f3605e1d28',
+      integrityVerificationKey: '0378eb27-50a7-43b9-8d67-dfcbce53f720',
+      packageNames: ['incididunt', 'labore id', 'dolore ullamco'],
     },
     props,
-  ) as UpdateTenantAndroidAppMetaRequest;
-export const getUpdateTenantIosAppMetaRequest = (props: Partial<UpdateTenantIosAppMetaRequest>) =>
-  merge(
+  );
+export const getUpdateTenantIosAppMetaRequest = (
+  props: Partial<UpdateTenantIosAppMetaRequest>,
+): UpdateTenantIosAppMetaRequest =>
+  merge<UpdateTenantIosAppMetaRequest, Partial<UpdateTenantIosAppMetaRequest>>(
     {
-      appBundleIds: ['aliqua esse eu aliquip', 'ea in deserunt culpa', 'dolor ad veniam'],
-      deviceCheckKeyId: '56455ef5-15f7-4730-8fed-d1a89c3c2578',
-      deviceCheckPrivateKey: '14e23ad1-5297-496f-9e90-5926ddf4d4a0',
-      teamId: 'e20d4330-23da-4075-b7da-610340883e6d',
+      appBundleIds: ['ullamco ipsum', 'anim laborum aliqua', 'culpa'],
+      deviceCheckKeyId: '3d268de5-62d0-4d80-8d33-ebab0f939753',
+      deviceCheckPrivateKey: '6a4af98c-62cc-44bd-8d98-febe320265d8',
+      teamId: '6d929467-2946-4a9f-afda-40dc44e4ade3',
     },
     props,
-  ) as UpdateTenantIosAppMetaRequest;
-export const getUpdateTenantRequest = (props: Partial<UpdateTenantRequest>) =>
-  merge(
+  );
+export const getUpdateTenantRequest = (props: Partial<UpdateTenantRequest>): UpdateTenantRequest =>
+  merge<UpdateTenantRequest, Partial<UpdateTenantRequest>>(
     {
-      allowDomainAccess: true,
+      allowDomainAccess: false,
       clearSupportEmail: false,
-      clearSupportPhone: true,
-      clearSupportWebsite: true,
-      companySize: 's51_to100',
-      name: 'Dr. Oscar Waelchi',
-      privacyPolicyUrl: 'https://dutiful-peninsula.us',
-      supportEmail: 'grayson.kovacek27@gmail.com',
-      supportPhone: '+19308040874',
-      supportWebsite: 'https://giving-swing.name/',
-      websiteUrl: 'https://concrete-essence.net',
+      clearSupportPhone: false,
+      clearSupportWebsite: false,
+      companySize: 's1001_plus',
+      name: 'Wesley Tillman',
+      privacyPolicyUrl: 'https://beloved-meal.name',
+      supportEmail: 'norbert12@gmail.com',
+      supportPhone: '+13177702663',
+      supportWebsite: 'https://nifty-forage.biz',
+      websiteUrl: 'https://unimportant-term.net',
     },
     props,
-  ) as UpdateTenantRequest;
-export const getUpdateTenantRoleRequest = (props: Partial<UpdateTenantRoleRequest>) =>
-  merge(
+  );
+export const getUpdateTenantRoleRequest = (props: Partial<UpdateTenantRoleRequest>): UpdateTenantRoleRequest =>
+  merge<UpdateTenantRoleRequest, Partial<UpdateTenantRoleRequest>>(
     {
-      name: 'Laurie Wuckert',
+      name: 'Ramon Bashirian',
       scopes: [
         {
           kind: 'read',
@@ -7131,351 +7484,370 @@ export const getUpdateTenantRoleRequest = (props: Partial<UpdateTenantRoleReques
       ],
     },
     props,
-  ) as UpdateTenantRoleRequest;
-export const getUpdateTenantRolebindingRequest = (props: Partial<UpdateTenantRolebindingRequest>) =>
-  merge(
+  );
+export const getUpdateTenantRolebindingRequest = (
+  props: Partial<UpdateTenantRolebindingRequest>,
+): UpdateTenantRolebindingRequest =>
+  merge<UpdateTenantRolebindingRequest, Partial<UpdateTenantRolebindingRequest>>(
     {
-      roleId: 'c37e37d1-3dc6-49bd-a628-b0adea809704',
+      roleId: '91e4a4f5-7f3b-415f-9ae0-6dcb818777d4',
     },
     props,
-  ) as UpdateTenantRolebindingRequest;
-export const getUpdateTenantUserRequest = (props: Partial<UpdateTenantUserRequest>) =>
-  merge(
+  );
+export const getUpdateTenantUserRequest = (props: Partial<UpdateTenantUserRequest>): UpdateTenantUserRequest =>
+  merge<UpdateTenantUserRequest, Partial<UpdateTenantUserRequest>>(
     {
-      firstName: 'Ludie',
-      lastName: 'McDermott',
+      firstName: 'Amaya',
+      lastName: 'Beer',
     },
     props,
-  ) as UpdateTenantUserRequest;
-export const getUploadSource = (props: Partial<UploadSource>) => (props ?? 'mobile') as UploadSource;
-export const getUserAiSummary = (props: Partial<UserAiSummary>) =>
-  merge(
+  );
+export const getUploadSource = (props: UploadSource): UploadSource => props ?? 'mobile';
+export const getUserAiSummary = (props: Partial<UserAiSummary>): UserAiSummary =>
+  merge<UserAiSummary, Partial<UserAiSummary>>(
     {
-      conclusion: 'non',
-      detailedSummary: 'cupidatat laborum cillum deserunt dolor',
-      highLevelSummary: 'Ut',
-      riskSignalSummary: 'aliqua',
+      conclusion: 'aliqua eu',
+      detailedSummary: 'nisi velit labore cillum ipsum',
+      highLevelSummary: 'consequat labore eu aliqua',
+      riskSignalSummary: 'magna',
     },
     props,
-  ) as UserAiSummary;
-export const getUserDataIdentifier = (props: Partial<UserDataIdentifier>) =>
-  (props ?? 'document.voter_identification.full_address') as UserDataIdentifier;
-export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>) =>
-  merge(
+  );
+export const getUserDataIdentifier = (props: UserDataIdentifier): UserDataIdentifier => props ?? 'id.country';
+export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>): UserDecryptRequest =>
+  merge<UserDecryptRequest, Partial<UserDecryptRequest>>(
     {
-      fields: ['id.first_name', 'id.last_name'],
-      reason: 'Lorem ipsum dolor',
-      transforms: null,
-      versionAt: null,
+      fields: [
+        'document.passport_card.curp_validation_response',
+        'document.voter_identification.selfie.mime_type',
+        'card.*.expiration',
+      ],
+      reason: 'eu aute velit laborum dolore',
+      transforms: ["date_format('<from_format>','<to_format>')", 'prefix(<n>)', 'suffix(<n>)'],
+      versionAt: '1891-03-31T04:49:11.0Z',
     },
     props,
-  ) as UserDecryptRequest;
-export const getUserDecryptResponse = (props: Partial<UserDecryptResponse>) =>
-  merge(
+  );
+export const getUserDecryptResponse = (props: Partial<UserDecryptResponse>): UserDecryptResponse =>
+  merge<UserDecryptResponse, Partial<UserDecryptResponse>>(
     {
-      'id.first_name': 'Jane',
-      'id.last_name': 'Doe',
+      key: 'document.permit.postal_code',
+      value: {},
     },
     props,
-  ) as UserDecryptResponse;
-export const getUserDeleteResponse = (props: Partial<UserDeleteResponse>) =>
-  merge(
+  );
+export const getUserDeleteResponse = (props: Partial<UserDeleteResponse>): UserDeleteResponse =>
+  merge<UserDeleteResponse, Partial<UserDeleteResponse>>(
     {
-      'id.first_name': true,
-      'id.last_name': false,
+      key: 'id.ssn4',
+      value: false,
     },
     props,
-  ) as UserDeleteResponse;
-export const getUserInsight = (props: Partial<UserInsight>) =>
-  merge(
+  );
+export const getUserInsight = (props: Partial<UserInsight>): UserInsight =>
+  merge<UserInsight, Partial<UserInsight>>(
     {
-      description: 'mollit ut',
-      name: 'Thomas Parker',
-      scope: 'device',
-      unit: 'string',
-      value: 'aliquip mollit veniam in',
+      description: 'in aliqua magna',
+      name: 'Karen McClure',
+      scope: 'workflow',
+      unit: 'duration_ms',
+      value: 'proident tempor ipsum qui',
     },
     props,
-  ) as UserInsight;
-export const getUserInsightScope = (props: Partial<UserInsightScope>) => (props ?? 'workflow') as UserInsightScope;
-export const getUserInsightUnit = (props: Partial<UserInsightUnit>) => (props ?? 'string') as UserInsightUnit;
-export const getUserLabel = (props: Partial<UserLabel>) =>
-  merge(
+  );
+export const getUserInsightScope = (props: UserInsightScope): UserInsightScope => props ?? 'behavior';
+export const getUserInsightUnit = (props: UserInsightUnit): UserInsightUnit => props ?? 'boolean';
+export const getUserLabel = (props: Partial<UserLabel>): UserLabel =>
+  merge<UserLabel, Partial<UserLabel>>(
     {
-      createdAt: '1956-06-08T12:53:19.0Z',
-      kind: 'offboard_fraud',
+      createdAt: '1927-07-17T14:20:28.0Z',
+      kind: 'active',
     },
     props,
-  ) as UserLabel;
-export const getUserTag = (props: Partial<UserTag>) =>
-  merge(
+  );
+export const getUserTag = (props: Partial<UserTag>): UserTag =>
+  merge<UserTag, Partial<UserTag>>(
     {
-      createdAt: '1920-10-30T15:19:36.0Z',
-      id: 'tag_2ZwAl6LyHB6l7Ap2Ksdw8X',
-      tag: 'transaction_chargeback',
+      createdAt: '1918-02-19T23:26:14.0Z',
+      id: 'b4cba478-b6ec-4e41-995e-e875a841f2a4',
+      tag: 'voluptate',
     },
     props,
-  ) as UserTag;
-export const getUserTimeline = (props: Partial<UserTimeline>) =>
-  merge(
+  );
+export const getUserTimeline = (props: Partial<UserTimeline>): UserTimeline =>
+  merge<UserTimeline, Partial<UserTimeline>>(
     {
       event: {
         data: {
           actor: {
-            id: 'd49043f6-97e0-429a-a5aa-1e79dc651009',
+            id: 'c59be8cf-faff-4af4-9d2d-2555534a130d',
             kind: 'user',
           },
-          attributes: ['ssn4', 'dob', 'card'],
-          isPrefill: true,
-          targets: [
-            'document.drivers_license.clave_de_elector',
-            'document.permit.expires_at',
-            'document.passport.back.image',
-          ],
+          attributes: ['business_corporation_type', 'investor_profile', 'business_kyced_beneficial_owners'],
+          isPrefill: false,
+          targets: ['document.drivers_license.city', 'document.visa.back.image', 'document.permit.state'],
         },
         kind: 'data_collected',
       },
-      seqno: 97596995,
-      timestamp: '1936-12-15T17:32:44.0Z',
+      seqno: -6635230,
+      timestamp: '1940-05-01T04:09:38.0Z',
     },
     props,
-  ) as UserTimeline;
-export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>) =>
-  merge(
+  );
+export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>): UserTimelineEvent =>
+  merge<UserTimelineEvent, Partial<UserTimelineEvent>>(
     {
       data: {
         actor: {
-          id: '7ac1ec4a-afc9-483d-a1ac-a8421b53927b',
+          id: 'a49c6ae8-bbb6-478e-8e3e-ba2d39e00e53',
           kind: 'user',
         },
-        attributes: ['us_legal_status', 'investor_profile', 'ssn9'],
-        isPrefill: false,
-        targets: ['document.permit.selfie.mime_type', 'document.passport_card.selfie.image', 'document.visa.curp'],
+        attributes: ['ssn9', 'us_tax_id', 'business_tin'],
+        isPrefill: true,
+        targets: [
+          'document.voter_identification.full_name',
+          'card.*.billing_address.country',
+          'document.passport.address_line1',
+        ],
       },
       kind: 'data_collected',
     },
     props,
-  ) as UserTimelineEvent;
-export const getVaultCreated = (props: Partial<VaultCreated>) =>
-  merge(
+  );
+export const getVaultCreated = (props: Partial<VaultCreated>): VaultCreated =>
+  merge<VaultCreated, Partial<VaultCreated>>(
     {
       actor: {
-        id: '06dc1bb5-2e14-4727-8851-c2391270c498',
+        id: '305157cd-57d4-45f1-ac4c-a1fb5890f411',
         kind: 'user',
       },
     },
     props,
-  ) as VaultCreated;
-export const getVaultDrAwsPreEnrollResponse = (props: Partial<VaultDrAwsPreEnrollResponse>) =>
-  merge(
+  );
+export const getVaultDrAwsPreEnrollResponse = (
+  props: Partial<VaultDrAwsPreEnrollResponse>,
+): VaultDrAwsPreEnrollResponse =>
+  merge<VaultDrAwsPreEnrollResponse, Partial<VaultDrAwsPreEnrollResponse>>(
     {
-      externalId: 'bf990054-70af-4031-982a-cce1550bcd48',
+      externalId: 'f63833cc-3972-434a-b459-e2ef366e6d82',
     },
     props,
-  ) as VaultDrAwsPreEnrollResponse;
-export const getVaultDrEnrollRequest = (props: Partial<VaultDrEnrollRequest>) =>
-  merge(
+  );
+export const getVaultDrEnrollRequest = (props: Partial<VaultDrEnrollRequest>): VaultDrEnrollRequest =>
+  merge<VaultDrEnrollRequest, Partial<VaultDrEnrollRequest>>(
     {
-      awsAccountId: 'e3e45923-8dd7-4135-b0cb-f151785ff389',
-      awsRoleName: 'Courtney Abshire',
-      orgPublicKeys: ['ipsum dolore', 'ut sit eiusmod sunt id', 'dolore labore minim magna'],
+      awsAccountId: '0dd2eb44-b005-4ae5-be24-dbcbfb26d442',
+      awsRoleName: 'Sandy Hermann',
+      orgPublicKeys: ['exercitation in', 'quis dolore deserunt', 'id'],
       reEnroll: false,
-      s3BucketName: 'Lonnie Kassulke MD',
+      s3BucketName: 'Lewis Denesik',
     },
     props,
-  ) as VaultDrEnrollRequest;
-export const getVaultDrEnrollResponse = (props: Partial<VaultDrEnrollResponse>) =>
-  merge({}, props) as VaultDrEnrollResponse;
-export const getVaultDrEnrolledStatus = (props: Partial<VaultDrEnrolledStatus>) =>
-  merge(
+  );
+export const getVaultDrEnrollResponse = (props: Partial<VaultDrEnrollResponse>): VaultDrEnrollResponse =>
+  merge<VaultDrEnrollResponse, Partial<VaultDrEnrollResponse>>({}, props);
+export const getVaultDrEnrolledStatus = (props: Partial<VaultDrEnrolledStatus>): VaultDrEnrolledStatus =>
+  merge<VaultDrEnrolledStatus, Partial<VaultDrEnrolledStatus>>(
     {
-      awsAccountId: '49eecf87-b4e9-462b-9e6b-fe85ec6ed165',
-      awsRoleName: 'Lila Muller',
-      backupLagSeconds: -16326331,
-      bucketPathNamespace: 'Deborah Buckridge',
-      enrolledAt: '1960-08-12T21:31:53.0Z',
-      latestBackupRecordTimestamp: '1969-08-08T22:03:09.0Z',
-      orgPublicKeys: ['fugiat sint cillum laboris', 'veniam irure eu', 'dolor exercitation amet'],
-      s3BucketName: 'Johnny Boehm',
+      awsAccountId: 'b8f5478e-a0c9-4928-835a-5f56de060185',
+      awsRoleName: 'Percy Haag',
+      backupLagSeconds: -84102994,
+      bucketPathNamespace: 'Mr. Francisco Welch',
+      enrolledAt: '1905-03-25T15:57:19.0Z',
+      latestBackupRecordTimestamp: '1952-12-19T17:05:32.0Z',
+      orgPublicKeys: [
+        'aute exercitation veniam incididunt velit',
+        'non ea aliquip ut labore',
+        'magna in quis proident exercitation',
+      ],
+      s3BucketName: 'Harold Aufderhar',
     },
     props,
-  ) as VaultDrEnrolledStatus;
-export const getVaultDrRevealWrappedRecordKeysRequest = (props: Partial<VaultDrRevealWrappedRecordKeysRequest>) =>
-  merge(
+  );
+export const getVaultDrRevealWrappedRecordKeysRequest = (
+  props: Partial<VaultDrRevealWrappedRecordKeysRequest>,
+): VaultDrRevealWrappedRecordKeysRequest =>
+  merge<VaultDrRevealWrappedRecordKeysRequest, Partial<VaultDrRevealWrappedRecordKeysRequest>>(
     {
-      recordPaths: ['officia esse nostrud eiusmod', 'et consequat voluptate', 'velit'],
+      recordPaths: ['Lorem esse dolor ea', 'non voluptate', 'in aliquip cupidatat dolor dolor'],
     },
     props,
-  ) as VaultDrRevealWrappedRecordKeysRequest;
-export const getVaultDrRevealWrappedRecordKeysResponse = (props: Partial<VaultDrRevealWrappedRecordKeysResponse>) =>
-  merge(
+  );
+export const getVaultDrRevealWrappedRecordKeysResponse = (
+  props: Partial<VaultDrRevealWrappedRecordKeysResponse>,
+): VaultDrRevealWrappedRecordKeysResponse =>
+  merge<VaultDrRevealWrappedRecordKeysResponse, Partial<VaultDrRevealWrappedRecordKeysResponse>>(
     {
       wrappedRecordKeys: {},
     },
     props,
-  ) as VaultDrRevealWrappedRecordKeysResponse;
-export const getVaultDrStatus = (props: Partial<VaultDrStatus>) =>
-  merge(
+  );
+export const getVaultDrStatus = (props: Partial<VaultDrStatus>): VaultDrStatus =>
+  merge<VaultDrStatus, Partial<VaultDrStatus>>(
     {
       enrolledStatus: {
-        awsAccountId: 'c7753259-9dda-4655-a68b-04adb651eb89',
-        awsRoleName: 'Ramiro Williamson',
-        backupLagSeconds: -78032834,
-        bucketPathNamespace: 'Jane Altenwerth',
-        enrolledAt: '1901-04-08T05:32:01.0Z',
-        latestBackupRecordTimestamp: '1928-02-14T15:14:19.0Z',
-        orgPublicKeys: ['qui ut', 'amet reprehenderit', 'adipisicing magna in non tempor'],
-        s3BucketName: 'Myrtle Turner',
+        awsAccountId: '78e661ad-21a5-4008-bcf1-86b5e8f697c0',
+        awsRoleName: 'Myra Cole',
+        backupLagSeconds: -30089490,
+        bucketPathNamespace: 'Tyrone Howe',
+        enrolledAt: '1904-10-31T07:42:11.0Z',
+        latestBackupRecordTimestamp: '1956-04-30T22:01:25.0Z',
+        orgPublicKeys: ['aliquip ea eiusmod in enim', 'ut', 'incididunt nisi exercitation'],
+        s3BucketName: 'Miss Bonnie Rowe',
       },
-      isLive: true,
-      orgId: '46f4b064-9023-4950-98c0-b120182aa92f',
-      orgName: 'Myra Schmitt',
+      isLive: false,
+      orgId: '215bcc4a-72c0-4229-a18a-74dd4c3d5aa3',
+      orgName: 'Marian Towne',
     },
     props,
-  ) as VaultDrStatus;
-export const getVaultKind = (props: Partial<VaultKind>) => (props ?? 'business') as VaultKind;
-export const getVaultOperation = (props: Partial<VaultOperation>) =>
-  merge(
+  );
+export const getVaultKind = (props: VaultKind): VaultKind => props ?? 'business';
+export const getVaultOperation = (props: Partial<VaultOperation>): VaultOperation =>
+  merge<VaultOperation, Partial<VaultOperation>>(
     {
-      field: 'document.permit.full_name',
+      field: 'investor_profile.occupation',
       op: 'eq',
-      value: 'labore sint nulla',
+      value: 'pariatur laboris',
     },
     props,
-  ) as VaultOperation;
-export const getVerificationCheck = (props: Partial<VerificationCheck>) =>
-  merge(
+  );
+export const getVerificationCheck = (props: Partial<VerificationCheck>): VerificationCheck =>
+  merge<VerificationCheck, Partial<VerificationCheck>>(
     {
       data: {
-        einOnly: false,
+        einOnly: true,
       },
       kind: 'kyb',
     },
     props,
-  ) as VerificationCheck;
-export const getWatchlistCheck = (props: Partial<WatchlistCheck>) =>
-  merge(
+  );
+export const getWatchlistCheck = (props: Partial<WatchlistCheck>): WatchlistCheck =>
+  merge<WatchlistCheck, Partial<WatchlistCheck>>(
     {
-      id: 'fef6b6e8-a5fa-4681-b4e3-0741a5370b5e',
-      reasonCodes: ['business_phone_number_does_not_match', 'document_selfie_glasses', 'document_not_live_capture'],
-      status: 'error',
+      id: '5d06a348-6b39-4dbe-bce3-0aeda9dcecc5',
+      reasonCodes: [
+        'address_zip_code_does_not_match',
+        'document_low_match_score_with_selfie',
+        'name_last_does_not_match',
+      ],
+      status: 'pending',
     },
     props,
-  ) as WatchlistCheck;
-export const getWatchlistCheckStatusKind = (props: Partial<WatchlistCheckStatusKind>) =>
-  (props ?? 'not_needed') as WatchlistCheckStatusKind;
-export const getWatchlistEntry = (props: Partial<WatchlistEntry>) =>
-  merge(
+  );
+export const getWatchlistCheckStatusKind = (props: WatchlistCheckStatusKind): WatchlistCheckStatusKind =>
+  props ?? 'error';
+export const getWatchlistEntry = (props: Partial<WatchlistEntry>): WatchlistEntry =>
+  merge<WatchlistEntry, Partial<WatchlistEntry>>(
     {
       hits: [
         {
-          agency: 'sunt dolore incididunt',
-          agencyAbbr: 'tempor proident ad dolor nisi',
-          agencyInformationUrl: 'https://skeletal-meander.org',
-          agencyListUrl: 'https://pleasant-tackle.org/',
-          entityAliases: ['elit cillum consequat Duis quis', 'ut', 'ipsum nostrud'],
-          entityName: 'Miss Kay Mraz',
-          listCountry: 'Belize',
-          listName: 'Don Mayer-Steuber',
-          url: 'https://clueless-saw.org',
+          agency: 'sunt Ut',
+          agencyAbbr: 'elit incididunt dolor reprehenderit exercitation',
+          agencyInformationUrl: 'https://tender-concentration.name/',
+          agencyListUrl: 'https://oddball-populist.info/',
+          entityAliases: ['sint amet et ex', 'dolor eu magna proident irure', 'Ut'],
+          entityName: 'Margaret Boyer',
+          listCountry: 'Turkey',
+          listName: 'Guadalupe Hintz',
+          url: 'https://orderly-step.name',
         },
         {
-          agency: 'ea sed anim do esse',
-          agencyAbbr: 'elit Ut occaecat',
-          agencyInformationUrl: 'https://skeletal-meander.org',
-          agencyListUrl: 'https://pleasant-tackle.org/',
-          entityAliases: ['enim sed est ut eu', 'cupidatat nostrud cillum Excepteur', 'incididunt ut'],
-          entityName: 'Miss Kay Mraz',
-          listCountry: 'Belize',
-          listName: 'Don Mayer-Steuber',
-          url: 'https://clueless-saw.org',
+          agency: 'Lorem tempor',
+          agencyAbbr: 'esse tempor proident consequat',
+          agencyInformationUrl: 'https://tender-concentration.name/',
+          agencyListUrl: 'https://oddball-populist.info/',
+          entityAliases: ['in sint', 'aliqua sint Ut eiusmod et', 'labore dolore culpa ut'],
+          entityName: 'Margaret Boyer',
+          listCountry: 'Turkey',
+          listName: 'Guadalupe Hintz',
+          url: 'https://orderly-step.name',
         },
         {
-          agency: 'ad aliquip',
-          agencyAbbr: 'officia deserunt tempor',
-          agencyInformationUrl: 'https://skeletal-meander.org',
-          agencyListUrl: 'https://pleasant-tackle.org/',
-          entityAliases: ['mollit dolore in do sit', 'Excepteur', 'eu laborum do et'],
-          entityName: 'Miss Kay Mraz',
-          listCountry: 'Belize',
-          listName: 'Don Mayer-Steuber',
-          url: 'https://clueless-saw.org',
+          agency: 'ea',
+          agencyAbbr: 'reprehenderit magna consectetur',
+          agencyInformationUrl: 'https://tender-concentration.name/',
+          agencyListUrl: 'https://oddball-populist.info/',
+          entityAliases: ['nisi ut et sunt laborum', 'eu nulla', 'in quis in'],
+          entityName: 'Margaret Boyer',
+          listCountry: 'Turkey',
+          listName: 'Guadalupe Hintz',
+          url: 'https://orderly-step.name',
         },
       ],
-      screenedEntityName: 'Lola Pollich',
+      screenedEntityName: 'Kristi Mitchell',
     },
     props,
-  ) as WatchlistEntry;
-export const getWatchlistHit = (props: Partial<WatchlistHit>) =>
-  merge(
+  );
+export const getWatchlistHit = (props: Partial<WatchlistHit>): WatchlistHit =>
+  merge<WatchlistHit, Partial<WatchlistHit>>(
     {
-      agency: 'et in Duis in non',
-      agencyAbbr: 'adipisicing culpa quis ex',
-      agencyInformationUrl: 'https://winged-guard.net',
-      agencyListUrl: 'https://forsaken-fat.name/',
-      entityAliases: ['nisi dolore', 'Lorem in nisi', 'dolor reprehenderit Duis Excepteur'],
-      entityName: 'Kathleen McDermott',
-      listCountry: 'Syrian Arab Republic',
-      listName: 'Maxine Gutkowski',
-      url: 'https://shiny-comparison.org',
+      agency: 'occaecat minim Excepteur elit dolore',
+      agencyAbbr: 'dolor',
+      agencyInformationUrl: 'https://frugal-humidity.com/',
+      agencyListUrl: 'https://sick-disconnection.name/',
+      entityAliases: ['id dolor est consectetur', 'id cillum in', 'Ut eiusmod irure esse'],
+      entityName: 'Joseph Powlowski',
+      listCountry: 'Greenland',
+      listName: 'Luz Olson',
+      url: 'https://indelible-custody.net',
     },
     props,
-  ) as WatchlistHit;
-export const getWebhookPortalResponse = (props: Partial<WebhookPortalResponse>) =>
-  merge(
+  );
+export const getWebhookPortalResponse = (props: Partial<WebhookPortalResponse>): WebhookPortalResponse =>
+  merge<WebhookPortalResponse, Partial<WebhookPortalResponse>>(
     {
-      appId: 'a98aef21-2767-4879-8d3d-8e7c52892305',
-      token: 'db5606ab-ae1b-421c-8aa8-7321ae68e7e6',
-      url: 'https://warlike-scratch.com',
+      appId: '9f4b76dd-4350-4675-82a6-0fb914b928e8',
+      token: '4be15425-befa-4709-ada0-d8733cfe03fd',
+      url: 'https://silver-dredger.name/',
     },
     props,
-  ) as WebhookPortalResponse;
-export const getWorkflowKind = (props: Partial<WorkflowKind>) => (props ?? 'document') as WorkflowKind;
-export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>) =>
-  merge(
+  );
+export const getWorkflowKind = (props: WorkflowKind): WorkflowKind => props ?? 'kyb';
+export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>): WorkflowRequestConfig =>
+  merge<WorkflowRequestConfig, Partial<WorkflowRequestConfig>>(
     {
       data: {
-        playbookId: '676232d0-ffb0-4726-9817-7fc792b49792',
-        recollectAttributes: ['investor_profile', 'business_kyced_beneficial_owners', 'ssn9'],
+        playbookId: 'd8e6617d-30c7-4c60-877f-e9917c128abc',
+        recollectAttributes: ['dob', 'business_beneficial_owners', 'us_tax_id'],
         reuseExistingBoKyc: true,
       },
       kind: 'onboard',
     },
     props,
-  ) as WorkflowRequestConfig;
-export const getWorkflowSource = (props: Partial<WorkflowSource>) => (props ?? 'unknown') as WorkflowSource;
-export const getWorkflowStarted = (props: Partial<WorkflowStarted>) =>
-  merge(
+  );
+export const getWorkflowSource = (props: WorkflowSource): WorkflowSource => props ?? 'unknown';
+export const getWorkflowStarted = (props: Partial<WorkflowStarted>): WorkflowStarted =>
+  merge<WorkflowStarted, Partial<WorkflowStarted>>(
     {
       kind: 'document',
       playbook: {
-        id: 'f60c9504-a7b9-44eb-8b33-675f6b3ad984',
-        mustCollectData: ['us_legal_status', 'business_name', 'business_tin'],
-        name: 'Mr. Laurence Kemmer',
+        id: 'b1526656-9e3e-4a7b-810b-02974920798a',
+        mustCollectData: ['business_address', 'ssn9', 'bank'],
+        name: 'Glenn Balistreri',
       },
     },
     props,
-  ) as WorkflowStarted;
-export const getWorkflowStartedEventKind = (props: Partial<WorkflowStartedEventKind>) =>
-  (props ?? 'playbook') as WorkflowStartedEventKind;
-export const getWorkflowTriggered = (props: Partial<WorkflowTriggered>) =>
-  merge(
+  );
+export const getWorkflowStartedEventKind = (props: WorkflowStartedEventKind): WorkflowStartedEventKind =>
+  props ?? 'playbook';
+export const getWorkflowTriggered = (props: Partial<WorkflowTriggered>): WorkflowTriggered =>
+  merge<WorkflowTriggered, Partial<WorkflowTriggered>>(
     {
       actor: {
-        id: '98502151-a24e-4e12-9e87-19710c772701',
+        id: '21200ed0-b4d0-44d6-a342-9f9d2827e58d',
         kind: 'user',
       },
       config: {
         data: {
-          playbookId: '6e70d563-b310-41e0-9cc3-ad4a06283765',
-          recollectAttributes: ['email', 'business_name', 'phone_number'],
-          reuseExistingBoKyc: true,
+          playbookId: 'ab17bbfa-4bc8-47b9-968b-b9fd6138018a',
+          recollectAttributes: ['business_phone_number', 'us_legal_status', 'us_legal_status'],
+          reuseExistingBoKyc: false,
         },
         kind: 'onboard',
       },
-      fpId: '70289f84-99c9-4e26-b612-c239a4a070e7',
-      note: 'tempor incididunt eu',
-      requestIsActive: false,
+      fpId: '37abc640-ae65-4b3d-97e4-6dab15498974',
+      note: 'ullamco ex aute amet aliqua',
+      requestIsActive: true,
     },
     props,
-  ) as WorkflowTriggered;
+  );
