@@ -23,7 +23,7 @@ const Item = ({ children, status, position, onClick, isLastItem, hasSubOptions, 
       </Container>
       {showLineContainer && (
         <LineContainer>
-          <Line status={status} />
+          <Line $status={status} />
         </LineContainer>
       )}
     </li>
@@ -46,13 +46,13 @@ const Container = styled.button`
   `}
 `;
 
-const Line = styled.div<{ status: StepperStatus }>`
-  ${({ theme, status }) => {
+const Line = styled.div<{ $status: StepperStatus }>`
+  ${({ theme, $status }) => {
     const getLineColor = () => {
-      if (status === 'completed') {
+      if ($status === 'completed') {
         return theme.color.success;
       }
-      if (status === 'selected') {
+      if ($status === 'selected') {
         return theme.color.accent;
       }
       return theme.color.secondary;

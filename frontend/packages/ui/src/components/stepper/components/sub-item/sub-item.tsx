@@ -17,7 +17,7 @@ const SubItem = ({ status, onClick, children, isLastOption, disabled }: SubItemP
         <SubDot status={status} />
         <SubLabel status={status}>{children}</SubLabel>
       </Container>
-      {!isLastOption && <LineContainer>{<Line status={status} />}</LineContainer>}
+      {!isLastOption && <LineContainer>{<Line $status={status} />}</LineContainer>}
     </li>
   );
 };
@@ -39,13 +39,13 @@ const Container = styled.button`
   `};
 `;
 
-const Line = styled.div<{ status: StepperStatus }>`
-  ${({ theme, status }) => {
+const Line = styled.div<{ $status: StepperStatus }>`
+  ${({ theme, $status }) => {
     const getLineColor = () => {
-      if (status === 'completed') {
+      if ($status === 'completed') {
         return theme.color.accent;
       }
-      if (status === 'selected') {
+      if ($status === 'selected') {
         return theme.color.secondary;
       }
       return theme.color.secondary;
