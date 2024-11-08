@@ -4,7 +4,7 @@ use crate::State;
 use api_core::auth::user::UserBizWfAuthContext;
 use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
-use api_wire_types::BusinessDecryptResponse;
+use api_wire_types::ModernBusinessDecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::VersionedDataIdentifier as VDI;
@@ -31,7 +31,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<UserDecryptRequest>,
     user_auth: UserBizWfAuthContext,
-) -> ApiResponse<BusinessDecryptResponse> {
+) -> ApiResponse<ModernBusinessDecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
     let sb_id = user_auth.sb_id().clone();

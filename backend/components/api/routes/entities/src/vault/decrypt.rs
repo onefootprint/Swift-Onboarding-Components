@@ -25,6 +25,7 @@ use api_core::utils::vault_wrapper::TenantVw;
 use api_core::FpResult;
 use api_wire_types::BusinessDecryptResponse;
 use api_wire_types::DecryptResponse;
+use api_wire_types::ModernEntityDecryptResponse;
 use api_wire_types::UserDecryptResponse;
 use chrono::DateTime;
 use chrono::Utc;
@@ -115,17 +116,12 @@ pub struct ClientDecryptRequest {
     transforms: Option<Vec<FilterFunction>>,
 }
 
-#[route_alias(post(
-    "/users/{fp_id}/vault/decrypt",
+#[api_v2_operation(
     tags(Users, Vault, PublicApi),
     description = "Decrypts the specified list of fields from the provided user vault."
-))]
-#[api_v2_operation(
-    tags(Vault, Entities, Private),
-    description = "Works for either person or business entities. Decrypts the specified list of fields from the provided vault."
 )]
-#[post("/entities/{fp_id}/vault/decrypt")]
-pub async fn post(
+#[post("/users/{fp_id}/vault/decrypt")]
+pub async fn post_user(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<UserDecryptRequest>,
@@ -149,6 +145,39 @@ pub async fn post(
     let result = post_inner(&state, path, request, vault_version, auth, insights, root_span).await?;
     Ok(WithVaultVersionHeader::new(
         UserDecryptResponse(result),
+        vault_version,
+    ))
+}
+
+#[api_v2_operation(
+    tags(Vault, Entities, Private),
+    description = "Works for either person or business entities. Decrypts the specified list of fields from the provided vault."
+)]
+#[post("/entities/{fp_id}/vault/decrypt")]
+pub async fn post(
+    state: web::Data<State>,
+    path: FpIdPath,
+    request: Json<UserDecryptRequest>,
+    vault_version: VaultVersion,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
+    insights: InsightHeaders,
+    root_span: RootSpan,
+) -> ApiResponse<WithVaultVersionHeader<ModernEntityDecryptResponse>> {
+    let request = request.into_inner();
+    let dis = request.fields.iter().map(|id| id.di.clone()).collect();
+    let auth = auth.check_guard(CanDecrypt::new(dis))?;
+
+    let vault_version = if auth.tenant().can_access_preview(&PreviewApi::VaultVersioning) {
+        vault_version.into_inner()
+    } else {
+        None
+    };
+
+    let path = path.into_inner();
+    let auth = BasicTenantAuthWrapper(auth);
+    let result = post_inner(&state, path, request, vault_version, auth, insights, root_span).await?;
+    Ok(WithVaultVersionHeader::new(
+        ModernEntityDecryptResponse(result),
         vault_version,
     ))
 }

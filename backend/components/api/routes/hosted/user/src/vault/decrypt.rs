@@ -6,7 +6,7 @@ use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
-use api_wire_types::UserDecryptResponse;
+use api_wire_types::ModernUserDecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::VersionedDataIdentifier as VDI;
@@ -20,7 +20,7 @@ use paperclip::actix::{
 use std::collections::HashSet;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
-pub struct UserDecryptRequest {
+pub struct HostedUserDecryptRequest {
     fields: HashSet<DataIdentifier>,
 }
 
@@ -31,9 +31,9 @@ pub struct UserDecryptRequest {
 #[actix::post("/hosted/user/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
-    request: Json<UserDecryptRequest>,
+    request: Json<HostedUserDecryptRequest>,
     user_auth: UserAuthContext,
-) -> ApiResponse<UserDecryptResponse> {
+) -> ApiResponse<ModernUserDecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
 

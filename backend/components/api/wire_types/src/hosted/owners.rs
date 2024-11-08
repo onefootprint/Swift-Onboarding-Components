@@ -1,7 +1,7 @@
 use crate::ModernUserDecryptResponse;
 use chrono::DateTime;
 use chrono::Utc;
-use newtypes::put_data_request::RawUserDataRequest;
+use newtypes::put_data_request::ModernRawUserDataRequest;
 use newtypes::BoLinkId;
 use newtypes::DataIdentifier;
 use paperclip::actix::Apiv2Response;
@@ -29,7 +29,7 @@ pub struct HostedBusinessOwner {
 pub struct UpdateOrCreateHostedBusinessOwnerRequest {
     pub uuid: Uuid,
     #[serde(default)]
-    pub data: RawUserDataRequest,
+    pub data: ModernRawUserDataRequest,
     pub ownership_stake: Option<u32>,
 }
 

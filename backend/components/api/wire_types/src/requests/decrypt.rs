@@ -2,6 +2,7 @@ use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_modern_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::BusinessDataIdentifier;
+use newtypes::DataIdentifier;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::UserDataIdentifier;
@@ -61,6 +62,17 @@ impl_collect!(BusinessDecryptResponse);
 // while the legacy response types use weird `<key>` and `<value>` placeholders.
 // But we'll have to update the docs site to use these updated open API specs first.
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+pub struct ModernEntityDecryptResponse(pub DecryptResponse);
+// NOTE: we are not serializing that this response can include versioned DIs
+impl_modern_map_apiv2_schema!(
+    ModernEntityDecryptResponse<DataIdentifier, Option<PiiString>>,
+    "",
+    { "id.first_name": "Jane", "id.last_name": "Doe" }
+);
+impl_response_type!(ModernEntityDecryptResponse);
+impl_collect!(ModernEntityDecryptResponse);
+
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct ModernUserDecryptResponse(pub DecryptResponse);
 // NOTE: we are not serializing that this response can include versioned DIs
 impl_modern_map_apiv2_schema!(
@@ -70,3 +82,14 @@ impl_modern_map_apiv2_schema!(
 );
 impl_response_type!(ModernUserDecryptResponse);
 impl_collect!(ModernUserDecryptResponse);
+
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+pub struct ModernBusinessDecryptResponse(pub DecryptResponse);
+// NOTE: we are not serializing that this response can include versioned DIs
+impl_modern_map_apiv2_schema!(
+    ModernBusinessDecryptResponse<BusinessDataIdentifier, Option<PiiString>>,
+    "",
+    { "business.name": "Acme Bank", "business.website": "acmebank.org" }
+);
+impl_response_type!(ModernBusinessDecryptResponse);
+impl_collect!(ModernBusinessDecryptResponse);
