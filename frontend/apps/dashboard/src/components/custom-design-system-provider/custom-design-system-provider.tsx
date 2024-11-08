@@ -13,6 +13,8 @@ const CustomDesignSystemProvider = ({ children }: CustomDesignSystemProviderProp
   </ThemeProvider>
 );
 
+console.log(themes.light);
+
 const DesignSystemProviderWrapper = ({ children }: CustomDesignSystemProviderProps) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';

@@ -14,18 +14,14 @@
     "typecheck": "pnpm tsc --noEmit"
   },
   "dependencies": {
+    "@onefootprint/axios": "workspace:*",
     "@onefootprint/design-tokens": "workspace:*",
-    "@onefootprint/global-constants": "workspace:*",
-    "@onefootprint/hooks": "workspace:*",
     "@onefootprint/icons": "workspace:*",
-    "@onefootprint/request": "workspace:*",
-    "@onefootprint/types": "workspace:*",
+    "@onefootprint/request-types": "workspace:*",
     "@onefootprint/ui": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
-    "axios": "^1.7.4",
-    "axios-case-converter": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
     "i18next": "^23.16.0",
-    "lodash": "^4.17.21",
     "next": "^14.2.12",
     "react": "^18",
     "react-dom": "^18",
@@ -33,12 +29,15 @@
     "styled-components": "^6"
   },
   "devDependencies": {
+    "@onefootprint/tailwind-config": "workspace:*",
     "@types/google.maps": "^3.55.11",
     "@types/lodash": "^4.14.194",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "i18next-locales-sync": "^2.1.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.1",
     "tsconfig": "workspace:*",
     "typescript": "^5.6.3"
   }

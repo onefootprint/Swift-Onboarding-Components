@@ -1,3 +1,5 @@
+'use client';
+
 import { Buffer } from 'buffer';
 import { useMemo, useState } from 'react';
 

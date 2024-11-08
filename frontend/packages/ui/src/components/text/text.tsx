@@ -1,3 +1,5 @@
+'use client';
+
 import type { FontVariant } from '@onefootprint/design-tokens';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';

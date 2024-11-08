@@ -1,3 +1,5 @@
+'use client';
+
 import Addon from './components/form-addon';
 import Checkbox from './components/form-checkbox';
 import Errors from './components/form-errors';

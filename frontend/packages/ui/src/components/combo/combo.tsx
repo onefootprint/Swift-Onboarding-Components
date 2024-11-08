@@ -1,3 +1,5 @@
+'use client';
+
 import * as Popover from '@radix-ui/react-popover';
 import ComboContent from './components/combo-content';
 import ComboGroup from './components/combo-group';
