@@ -22,30 +22,32 @@ const propertyFakerMap: Record<string, () => string> = {
   language: () => 'en',
 };
 
-export function injectFaker(schema: OpenAPIV3.SchemaObject, name: string): OpenAPIV3.SchemaObject {
+/** Augments an open API spec to improve the quality of the generated fake values. First, we add default values for fields that appear to be certain types, like phone numbers. Second, we mutate the schema to help ensure that fake schema generation is idempotent and stable for consecutive runs. */
+export function augmentForFaker(schema: OpenAPIV3.SchemaObject): OpenAPIV3.SchemaObject {
   const enhancedSchema = { ...schema };
+
+  if (enhancedSchema.type === 'array' && enhancedSchema.items) {
+    enhancedSchema.items = augmentForFaker(enhancedSchema.items as OpenAPIV3.SchemaObject);
+  }
+
+  if (enhancedSchema.anyOf?.length) {
+    // In order to generate stable faker values, only select the first option of an anyOf.
+    enhancedSchema.anyOf = [augmentForFaker(enhancedSchema.anyOf[0] as OpenAPIV3.SchemaObject)];
+  }
 
   if (schema.properties) {
     enhancedSchema.properties = Object.entries(schema.properties).reduce(
       (acc, [key, prop]) => {
         const property = { ...prop } as OpenAPIV3.SchemaObject;
 
+        // If the property's name matches a faker key, generate a default value that looks more plausible for this type of field
         const matchingKey = Object.keys(propertyFakerMap).find(fakerKey => key.includes(fakerKey));
-        if (matchingKey && property.type === 'string') {
-          (property as { default: string }).default = propertyFakerMap[matchingKey]();
+        if (!property.example && matchingKey && property.type === 'string') {
+          property.example = propertyFakerMap[matchingKey]();
         }
 
-        // Handle nested objects
-        if (property.type === 'object' && property.properties) {
-          acc![key] = injectFaker(property, name);
-        }
-        // Handle arrays
-        else if (property.type === 'array' && property.items) {
-          property.items = injectFaker(property.items as OpenAPIV3.SchemaObject, name);
-          acc![key] = property;
-        } else {
-          acc![key] = property;
-        }
+        // Recursively update the child schema in case it's a complex type
+        acc![key] = augmentForFaker(property);
 
         return acc;
       },
