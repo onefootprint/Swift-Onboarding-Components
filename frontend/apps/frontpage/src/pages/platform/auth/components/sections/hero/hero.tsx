@@ -24,8 +24,8 @@ const Hero = () => {
       <Buttons>
         <Ctas
           labels={{
-            primary: t('sign-up-for-free'),
-            secondary: t('book-a-demo'),
+            primary: t('book-a-demo'),
+            secondary: t('sign-up-for-free'),
           }}
         />
       </Buttons>

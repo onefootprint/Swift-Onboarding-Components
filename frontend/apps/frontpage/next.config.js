@@ -100,6 +100,7 @@ const MARKETING_SOURCES = {
     '*.google.com.br',
     '*.googleadservices.com',
     '*.googletagmanager.com',
+    '*.linkedin.com',
     '*.usefathom.com',
     'alb.reddit.com',
     'cdn.jsdelivr.net',
@@ -112,6 +113,7 @@ const MARKETING_SOURCES = {
     'px4.ads.linkedin.com',
     'track.hubspot.com',
     'www.google.com',
+    'www.linkedin.com',
   ],
   styleSrc: ['*.tagmanager.google.com', 'fonts.googleapis.com', 'cdn.jsdelivr.net'],
 };
