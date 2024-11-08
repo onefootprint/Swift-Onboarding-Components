@@ -81,8 +81,9 @@ const createMustCollect = ({ person, investor, gov }: DetailsFormData) => {
   if (ssn.collect && ssn.kind && !ssn.optional) {
     if (ssn.kind === CollectedKycDataOption.ssn9 && usTaxIdAcceptable) {
       mustCollectData.push(CollectedKycDataOption.usTaxId);
+    } else {
+      mustCollectData.push(ssn.kind);
     }
-    mustCollectData.push(ssn.kind);
   } else {
     optionalData.push(ssn.kind);
   }
