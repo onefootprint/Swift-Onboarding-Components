@@ -98,6 +98,7 @@ export enum DocumentDI {
   driversLicenseClassifiedDocumentType = 'document.drivers_license.classifed_document_type',
   driversLicenseCurp = 'document.drivers_license.curp',
   driversLicenseCurpValidationResponse = 'document.drivers_license.curp_validation_response',
+  driversLicenseSambaActivityHistoryResponse = 'document.drivers_license.samba_activity_history_response',
 
   latestIdCardFront = 'document.id_card.front.latest_upload',
   latestIdCardBack = 'document.id_card.back.latest_upload',

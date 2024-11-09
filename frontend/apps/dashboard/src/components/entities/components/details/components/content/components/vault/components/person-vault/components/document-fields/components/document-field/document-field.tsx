@@ -35,7 +35,6 @@ const DocumentField = ({ documentType, vault, documents }: DocumentFieldProps) =
       currentDocument = documents[docIndex];
     }
   }
-  const curpCompletedVersion = currentDocument?.curpCompletedVersion;
 
   return documentType ? (
     <Container>
@@ -63,7 +62,7 @@ const DocumentField = ({ documentType, vault, documents }: DocumentFieldProps) =
             activeDocumentVersion={activeDocumentVersion}
           />
           <Uploads currentDocument={currentDocument} vault={vault} />
-          <RawJsonData vault={vault} documentType={documentType} curpCompletedVersion={curpCompletedVersion} />
+          {currentDocument && <RawJsonData vault={vault} documentType={documentType} document={currentDocument} />}
         </DrawerItems>
       </Drawer>
     </Container>

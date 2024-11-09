@@ -1,5 +1,5 @@
 import { IcoFileText24 } from '@onefootprint/icons';
-import type { DocumentDI, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
+import type { Document, DocumentDI, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { RawJsonKinds } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
@@ -10,19 +10,23 @@ import CollapsibleSection from './components/collapsible-section';
 type RawJsonDataProps = {
   vault: EntityVault;
   documentType: SupportedIdDocTypes;
-  curpCompletedVersion?: string | null;
+  document: Document;
 };
 
-const getRawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDataProps) => {
+const getRawJsonData = ({ vault, documentType, document }: RawJsonDataProps) => {
   const rawJsonKinds: RawJsonKinds[] = Object.values(RawJsonKinds);
   const rawJsonData: {
     rawJsonKind: RawJsonKinds;
     rawJsonData: string;
   }[] = [];
+  const { curpCompletedVersion, sambaActivityHistoryCompletedVersion: sambaCompletedVersion } = document;
   rawJsonKinds.forEach(kind => {
     let di = `document.${documentType}.${kind}` as DocumentDI;
-    if (curpCompletedVersion) {
+    if (kind === RawJsonKinds.CurpValidationResponse && curpCompletedVersion) {
       di = `document.${documentType}.${kind}:${curpCompletedVersion}` as DocumentDI;
+    }
+    if (kind === RawJsonKinds.SambaActivityHistoryResponse && sambaCompletedVersion) {
+      di = `document.${documentType}.${kind}:${sambaCompletedVersion}` as DocumentDI;
     }
     if (typeof vault[di] === 'string') {
       rawJsonData.push({
@@ -34,14 +38,14 @@ const getRawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDa
   return rawJsonData;
 };
 
-const RawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDataProps) => {
+const RawJsonData = ({ vault, documentType, document }: RawJsonDataProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'fieldset.document.drawer.raw-json-data',
   });
   const rawJsonData = getRawJsonData({
     vault,
     documentType,
-    curpCompletedVersion,
+    document,
   });
   if (!rawJsonData.length) {
     return null;

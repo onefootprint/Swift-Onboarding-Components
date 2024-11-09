@@ -39,8 +39,10 @@ export type Document = {
   ocrConfidenceScore: number | null;
   uploadSource: UploadSource;
   curpCompletedVersion?: string | null;
+  sambaActivityHistoryCompletedVersion?: string | null;
 };
 
 export enum RawJsonKinds {
   CurpValidationResponse = 'curp_validation_response',
+  SambaActivityHistoryResponse = 'samba_activity_history_response',
 }

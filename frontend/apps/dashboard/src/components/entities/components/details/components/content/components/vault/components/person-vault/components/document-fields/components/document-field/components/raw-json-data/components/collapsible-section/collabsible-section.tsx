@@ -17,6 +17,7 @@ type CollapsibleSectionProps = {
 
 const jsonKindToTranslationKey: Record<RawJsonKinds, string> = {
   [RawJsonKinds.CurpValidationResponse]: 'curp-validation-response',
+  [RawJsonKinds.SambaActivityHistoryResponse]: 'samba-activity-history-response',
 };
 
 const CollapsibleSection = ({ rawJsonKind, rawJsonData }: CollapsibleSectionProps) => {

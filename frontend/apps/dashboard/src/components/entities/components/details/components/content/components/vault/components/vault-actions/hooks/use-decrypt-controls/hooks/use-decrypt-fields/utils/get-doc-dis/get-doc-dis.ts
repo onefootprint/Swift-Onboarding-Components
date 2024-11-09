@@ -35,6 +35,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.driversLicenseClassifiedDocumentType,
     DocumentDI.driversLicenseCurp,
     DocumentDI.driversLicenseCurpValidationResponse,
+    DocumentDI.driversLicenseSambaActivityHistoryResponse,
   ],
   [SupportedIdDocTypes.passport]: [
     DocumentDI.passportFullName,
@@ -154,6 +155,11 @@ const getDocDis = ({ documentKinds, documents, vaultData }: GetDocDIsProps) => {
             const curpVersion = document.curpCompletedVersion ?? '';
             const versionedCurpDI = curpVersion ? `${di}:${curpVersion}` : di;
             dis.push(versionedCurpDI as DataIdentifier);
+          }
+          if (di.includes(RawJsonKinds.SambaActivityHistoryResponse)) {
+            const sambaVersion = document.sambaActivityHistoryCompletedVersion ?? '';
+            const versionedSambaDI = sambaVersion ? `${di}:${sambaVersion}` : di;
+            dis.push(versionedSambaDI as DataIdentifier);
           }
           dis.push(`${di}:${completedVersion}` as DataIdentifier);
         }
