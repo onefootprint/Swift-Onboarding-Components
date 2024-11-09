@@ -91,8 +91,9 @@ export const SchemaBody = ({ schema, isInBrackets = false, level = 0 }: SchemaBo
   if (schema.anyOf) {
     const { anyOf } = schema;
     return anyOf.map(option => {
-      // By convention, all of our anyOf options have a `kind` property that is an enum with a single value
-      const kind = option.properties?.kind?.enum?.[0];
+      // By convention, all of our anyOf options have a `kind` property that is an enum with a single value.
+      // Only one has an `op` property.
+      const kind = option.properties?.kind?.enum?.[0] || option.properties?.op?.enum?.[0];
       return (
         <BracketContainer isInBrackets={isInBrackets} key={kind}>
           <Schema
