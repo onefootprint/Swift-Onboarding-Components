@@ -25,7 +25,12 @@ const List = ({ children, title, subtitle, kind, basePath, defaultFilters }: Lis
   const session = useSession();
   const { data: response, isPending, errorMessage, pagination } = useEntities(kind, defaultFilters);
 
-  const handleRowClick = (entity: Entity) => {
+  const handleRowClick = (entity: Entity, event: React.MouseEvent<HTMLTableRowElement>) => {
+    if (event.metaKey || event.ctrlKey) {
+      // Emulate the behavior of a native anchor tag to open in a new tab
+      window.open(`/${basePath}/${entity.id}`, '_blank');
+      return;
+    }
     const mode = session.isLive ? 'live' : 'sandbox';
     router.push({
       pathname: `/${basePath}/${entity.id}`,

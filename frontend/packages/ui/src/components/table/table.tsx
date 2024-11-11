@@ -35,7 +35,7 @@ export type TableProps<T> = {
   isLoading?: boolean;
   items?: Array<T>;
   onChangeSearchText?: (text: string) => void;
-  onRowClick?: (item: T) => void;
+  onRowClick?: (item: T, event: React.MouseEvent<HTMLTableRowElement>) => void;
   renderActions?: () => React.ReactNode;
   renderSubActions?: () => React.ReactNode;
   renderTr: (row: TableRow<T>) => JSX.Element;
@@ -135,8 +135,8 @@ const Table = <T,>({
                   aria-label={getAriaLabelForRow ? getAriaLabelForRow(item) : getKeyForRow(item)}
                   data-clickable={!!onRowClick}
                   key={getKeyForRow(item)}
-                  onClick={() => {
-                    onRowClick?.(item);
+                  onClick={event => {
+                    onRowClick?.(item, event);
                   }}
                   color={hasRowEmphasis?.(item) ? 'warning' : undefined}
                 >

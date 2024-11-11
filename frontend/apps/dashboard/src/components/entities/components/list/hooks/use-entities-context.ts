@@ -7,7 +7,7 @@ type UseEntitiesContext = {
   errorMessage?: string;
   initialSearch?: string;
   isPending: boolean;
-  onRowClick: (entity: Entity) => void;
+  onRowClick: (entity: Entity, event: React.MouseEvent<HTMLTableRowElement>) => void;
   onSearchChange: (search: string) => void;
 };
 
