@@ -485,6 +485,7 @@ export const getBusinessOnboardingResponse = (props: Partial<BusinessOnboardingR
   merge<BusinessOnboardingResponse, Partial<BusinessOnboardingResponse>>(
     {
       authToken: '41785484-4c34-4619-ab8c-7f7e496b5779',
+      isNewBusiness: false,
     },
     props,
   );

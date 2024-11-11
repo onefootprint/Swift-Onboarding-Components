@@ -48,6 +48,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         };
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.key)?;
 
+        // TODO log token hash here
         tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "ob_session authenticated");
 
         Ok(ParsedOnboardingSession {

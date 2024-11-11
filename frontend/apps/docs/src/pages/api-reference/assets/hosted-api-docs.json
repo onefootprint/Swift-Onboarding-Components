@@ -2567,10 +2567,14 @@
                 "properties": {
                     "auth_token": {
                         "type": "string"
+                    },
+                    "is_new_business": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
-                    "auth_token"
+                    "auth_token",
+                    "is_new_business"
                 ]
             },
             "ChallengeKind": {

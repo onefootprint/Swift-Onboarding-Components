@@ -9,4 +9,5 @@ pub struct OnboardingResponse {
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct BusinessOnboardingResponse {
     pub auth_token: SessionAuthToken,
+    pub is_new_business: bool,
 }

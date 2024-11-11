@@ -44,7 +44,7 @@ pub async fn post(
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
-    let auth_token = state
+    let (auth_token, is_new_sb) = state
         .db_transaction(move |conn| -> Result<_, FpError> {
             let wfr = (user_auth.wfr_id.as_ref())
                 .map(|wfr_id| WorkflowRequest::get(conn, wfr_id, &user_auth.scoped_user.id))
@@ -74,7 +74,8 @@ pub async fn post(
                 fixture_result: kyb_fixture_result,
                 scoped_vault_action,
             };
-            let (biz_wf, _) = get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
+            let (biz_wf, _, is_new_sb) =
+                get_or_create_business_wf(conn, common_args, maybe_new_biz_keypair, args)?;
 
             // Regardless of whether the business workflow is new, we might need to tie this user workflow
             // to it.
@@ -93,9 +94,12 @@ pub async fn post(
             // We need to keep mutating the existing session for backwards compatibility,
             // but we should deprecate this eventually
             user_auth.update_session(conn, &session_key, session)?;
-            Ok(auth_token)
+            Ok((auth_token, is_new_sb))
         })
         .await?;
 
-    Ok(BusinessOnboardingResponse { auth_token })
+    Ok(BusinessOnboardingResponse {
+        auth_token,
+        is_new_business: is_new_sb,
+    })
 }

@@ -217,7 +217,7 @@ fn get_or_create_business(
     obc: &ObConfiguration,
     sv_action: ScopedVaultAction,
     new_biz_keypair: VaultKeyPair,
-) -> FpResult<ScopedVaultId> {
+) -> FpResult<(ScopedVaultId, IsNew)> {
     if let Some(sb_id) = user_auth.sb_id.clone() {
         // A scoped business has been attached to this session already. This happens in secondary beneficial
         // owner tokens or in user-specific sessions with an `fp_bid`
@@ -225,7 +225,7 @@ fn get_or_create_business(
             return ValidationError("Cannot provide business ID when a scoped business is already attached")
                 .into();
         }
-        return Ok(sb_id);
+        return Ok((sb_id, false));
     }
 
     if user_auth.is_secondary_bo() {
@@ -242,7 +242,7 @@ fn get_or_create_business(
         let sb = ScopedVault::get(conn, id).optional()?.ok_or(ValidationError(
             "Could not find the requested business owned by the user.",
         ))?;
-        return Ok(sb.id);
+        return Ok((sb.id, false));
     }
 
     // Otherwise, make a new business vault and scoped vault owned by the currently authed user
@@ -287,7 +287,7 @@ fn get_or_create_business(
             .into();
         }
     }
-    Ok(sb.id)
+    Ok((sb.id, is_new))
 }
 
 #[tracing::instrument("get_or_create_business_wf", skip_all)]
@@ -296,7 +296,7 @@ pub fn get_or_create_business_wf<'a>(
     common_args: CommonWfArgs,
     kp: VaultKeyPair,
     args: CreateBusinessWfArgs<'a>,
-) -> FpResult<(Workflow, IsNew)> {
+) -> FpResult<(Workflow, IsNew, IsNew)> {
     let CommonWfArgs {
         obc,
         insight_event,
@@ -318,14 +318,14 @@ pub fn get_or_create_business_wf<'a>(
         .transpose()?;
     if let Some(wf) = wfr_junction.and_then(|(_, wf)| wf) {
         // This request has already been used to make a Workflow. Return that workflow.
-        return Ok((wf, false));
+        return Ok((wf, false, false));
     }
 
     if let Some(biz_wf_id) = user_auth.biz_wf_id.as_ref() {
         // Either a duplicate call to `POST /hosted/onboarding`, or we're using a secondary beneficial owner
         // token and the business has already been created
         let biz_wf = Workflow::get(conn, biz_wf_id)?;
-        return Ok((biz_wf, false));
+        return Ok((biz_wf, false, false));
     };
 
     if obc.kind != ObConfigurationKind::Kyb {
@@ -333,7 +333,7 @@ pub fn get_or_create_business_wf<'a>(
     }
 
     Vault::lock(conn, &su.vault_id)?;
-    let sb_id = get_or_create_business(conn, user_auth, obc, scoped_vault_action, kp)?;
+    let (sb_id, is_new_sb) = get_or_create_business(conn, user_auth, obc, scoped_vault_action, kp)?;
     ScopedVault::lock(conn, &sb_id)?;
 
 
@@ -399,7 +399,7 @@ pub fn get_or_create_business_wf<'a>(
         WorkflowRequestJunction::set_wf_id(conn, &wfr.id, &biz_wf)?;
     }
 
-    Ok((biz_wf, is_new_wf))
+    Ok((biz_wf, is_new_wf, is_new_sb))
 }
 
 pub fn create_biz_wfl_if_not_exists(

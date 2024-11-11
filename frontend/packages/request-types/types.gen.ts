@@ -37,6 +37,7 @@ export type BatchHostedBusinessOwnerRequest =
   | DeleteHostedBusinessOwnerRequest;
 export type BusinessOnboardingResponse = {
   authToken: string;
+  isNewBusiness: boolean;
 };
 export type ChallengeKind = 'sms' | 'biometric' | 'email';
 export type CheckSessionResponse = 'active' | 'expired' | 'unknown';

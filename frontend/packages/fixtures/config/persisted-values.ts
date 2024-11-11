@@ -734,6 +734,7 @@ export const hosted_BatchHostedBusinessOwnerRequest: BatchHostedBusinessOwnerReq
 };
 export const hosted_BusinessOnboardingResponse: BusinessOnboardingResponse = {
   authToken: '41785484-4c34-4619-ab8c-7f7e496b5779',
+  isNewBusiness: false,
 };
 export const hosted_ChallengeKind: ChallengeKind = 'email';
 export const hosted_CheckSessionResponse: CheckSessionResponse = 'active';
