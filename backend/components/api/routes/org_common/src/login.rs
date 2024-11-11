@@ -5,6 +5,7 @@ use api_core::errors::workos::WorkOsError;
 use api_core::errors::AssertionError;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::email_domain;
+use api_core::utils::headers::InsightHeaders;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
@@ -14,6 +15,9 @@ use api_wire_types::OrganizationMember;
 use api_wire_types::PartnerOrganization;
 use chrono::Duration;
 use db::helpers::TenantOrPartnerTenant;
+use db::models::audit_event::AuditEvent;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::partner_tenant::NewPartnerTenant;
 use db::models::partner_tenant::PartnerTenant;
 use db::models::tenant::NewTenant;
@@ -21,6 +25,8 @@ use db::models::tenant::Tenant;
 use db::models::tenant_rolebinding::TenantRbLoginResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
+use newtypes::AuditEventDetail;
+use newtypes::DbActor;
 use newtypes::OrgIdentifier;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantKind;
@@ -38,7 +44,7 @@ use workos::sso::Profile;
 use workos::KnownOrUnknown;
 
 fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> FpResult<WorkosAuthMethod> {
-    // To protect against MagcicLink becoming a known type, check based on the string representation
+    // To protect against MaggicLink becoming a known type, check based on the string representation
     // of the connection type. Sadly, Display isn't implemented so have to check the serialization
     let connection_type = serde_json::ser::to_string(&connection_type)?;
     let result = match connection_type.as_ref() {
@@ -54,6 +60,7 @@ pub async fn handle_login<T>(
     code: String,
     request_org_id: Option<T>,
     tenant_kind: TenantKind,
+    insight: InsightHeaders,
 ) -> FpResult<OrgLoginResponse>
 where
     T: Into<OrgIdentifier>,
@@ -128,9 +135,29 @@ where
         let user_id = user.id.clone();
         let org_id = t_pt.id().clone_into();
         let rb = state
-            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &org_id))
+            .db_transaction(
+                move |conn| -> FpResult<(TenantRolebinding, TenantOrPartnerTenant)> {
+                    let rb = TenantRolebinding::create_for_login(conn, user_id, &org_id)?;
+                    let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                    // Create audit event for both tenant and partner tenant cases
+                    if let OrgIdentifier::TenantId(tenant_id) = org_id {
+                        let detail = AuditEventDetail::OrgMemberJoined {
+                            tenant_role_id: rb.tenant_role_id.clone(),
+                            tenant_user_id: user.id.clone(),
+                        };
+                        let audit_event = NewAuditEvent {
+                            principal_actor: DbActor::TenantUser { id: user.id },
+                            insight_event_id,
+                            tenant_id,
+                            detail,
+                        };
+                        AuditEvent::create(conn, audit_event)?;
+                    }
+                    Ok((rb, t_pt))
+                },
+            )
             .await?;
-        (vec![(rb, t_pt)], created_new_tenant)
+        (vec![(rb.0, rb.1)], created_new_tenant)
     } else {
         (vec![], false)
     };

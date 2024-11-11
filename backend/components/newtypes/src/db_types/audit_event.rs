@@ -72,6 +72,10 @@ pub enum AuditEventDetail {
         last_name: Option<String>,
         tenant_role_id: TenantRoleId,
     },
+    OrgMemberJoined {
+        tenant_role_id: TenantRoleId,
+        tenant_user_id: TenantUserId,
+    },
     UpdateOrgMember {
         new_tenant_role_id: TenantRoleId,
         old_tenant_role_id: TenantRoleId,
@@ -244,6 +248,17 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
             AuditEventDetail::CreateOrgAPIKey => todo!(),
             AuditEventDetail::DecryptOrgAPIKey => todo!(),
             AuditEventDetail::UpdateOrgAPIKey => todo!(),
+            AuditEventDetail::OrgMemberJoined {
+                tenant_role_id,
+                tenant_user_id,
+            } => Self {
+                metadata: AuditEventMetadata::OrgMemberJoined,
+                args: AuditEventOptionalArgs {
+                    tenant_role_id: Some(tenant_role_id),
+                    tenant_user_id: Some(tenant_user_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::InviteOrgMember {
                 email,
                 tenant_role_id,
@@ -383,6 +398,7 @@ pub enum AuditEventMetadata {
     CompleteUserVerification,
     CollectUserDocument, // TODO: is there a better name for this?
     CreateOrgApiKey,
+    OrgMemberJoined,
     DecryptOrgApiKey,
     UpdateOrgApiKey,
     InviteOrgMember {

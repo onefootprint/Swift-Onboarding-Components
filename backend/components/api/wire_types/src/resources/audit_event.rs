@@ -121,4 +121,10 @@ pub enum AuditEventDetail {
         role_name: String,
         scopes: Vec<TenantScope>,
     },
+    OrgMemberJoined {
+        tenant_role: crate::OrganizationRole,
+        first_name: Option<String>,
+        last_name: Option<String>,
+        email: OrgMemberEmail,
+    },
 }

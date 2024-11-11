@@ -1,4 +1,5 @@
 use api_core::types::ApiResponse;
+use api_core::utils::headers::InsightHeaders;
 use api_core::State;
 use api_wire_types::OrgLoginResponse;
 use api_wire_types::PartnerLoginRequest;
@@ -16,6 +17,7 @@ use paperclip::actix::web;
 async fn handler(
     state: web::Data<State>,
     request: web::Json<PartnerLoginRequest>,
+    insight: InsightHeaders,
 ) -> ApiResponse<OrgLoginResponse> {
     let request = request.into_inner();
     let data = api_route_org_common::login::handle_login(
@@ -23,6 +25,7 @@ async fn handler(
         request.code,
         request.request_org_id,
         TenantKind::PartnerTenant,
+        insight,
     )
     .await?;
     Ok(data)

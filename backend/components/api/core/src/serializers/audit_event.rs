@@ -168,6 +168,16 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook,
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
+            AuditEventMetadata::OrgMemberJoined => {
+                let tr = tenant_role2.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
+                AuditEventDetail::OrgMemberJoined {
+                    tenant_role: api_wire_types::OrganizationRole::from_db(tr),
+                    first_name: tu.first_name,
+                    last_name: tu.last_name,
+                    email: tu.email,
+                }
+            }
         };
 
         Ok(api_wire_types::AuditEvent {
