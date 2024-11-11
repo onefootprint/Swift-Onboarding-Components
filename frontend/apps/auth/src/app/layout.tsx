@@ -1,3 +1,5 @@
+import '../static/globals.css';
+
 import type { Metadata } from 'next';
 import { DM_Mono, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
