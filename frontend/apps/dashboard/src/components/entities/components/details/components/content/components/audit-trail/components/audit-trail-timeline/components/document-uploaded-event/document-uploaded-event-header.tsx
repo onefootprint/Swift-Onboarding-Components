@@ -18,6 +18,7 @@ const DocumentUploadedEventHeader = ({ data }: DocumentUploadedEventHeaderProps)
     [IdDocStatus.complete]: entityT('title.complete'),
     [IdDocStatus.pending]: entityT('title.pending'),
     [IdDocStatus.failed]: entityT('title.failed'),
+    [IdDocStatus.abandoned]: entityT('title.abandoned'),
   };
 
   let documentType;

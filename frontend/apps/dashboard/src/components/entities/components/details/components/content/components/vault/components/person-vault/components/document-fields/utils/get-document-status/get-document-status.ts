@@ -13,6 +13,7 @@ type GetDocumentStatusProps = {
 export enum DocumentStatus {
   UploadFailed = 'upload_failed',
   UploadIncomplete = 'upload_incomplete',
+  UploadAbandoned = 'upload_abandoned',
   UploadedViaApi = 'uploaded_via_api',
   PendingMachineReview = 'pending_machine_review',
   ReviewedByMachine = 'reviewed_by_machine',
@@ -45,6 +46,9 @@ export const computeSingleDocumentStatus = (document: Document) => {
   }
   if (document.status === IdDocStatus.pending) {
     return DocumentStatus.UploadIncomplete;
+  }
+  if (document.status === IdDocStatus.abandoned) {
+    return DocumentStatus.UploadAbandoned;
   }
 
   // Then, if the upload is complete, show a status badge that depends on the review status

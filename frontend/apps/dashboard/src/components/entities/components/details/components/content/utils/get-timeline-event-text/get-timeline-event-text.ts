@@ -122,6 +122,7 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
       [IdDocStatus.complete]: 'Collected',
       [IdDocStatus.pending]: 'Started collecting',
       [IdDocStatus.failed]: 'Unable to collect',
+      [IdDocStatus.abandoned]: 'Abandoned collecting',
     };
     let documentType;
     if (eventData.config.kind === DocumentRequestKind.Custom) {

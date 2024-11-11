@@ -30,4 +30,5 @@ export enum IdDocStatus {
   failed = 'failed',
   pending = 'pending',
   complete = 'complete',
+  abandoned = 'abandoned',
 }

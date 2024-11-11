@@ -14,6 +14,7 @@ type DocumentBadgeStatusProps = {
 const DocStatusToUIState: Record<DocumentStatus, keyof UIStates> = {
   [DocumentStatus.UploadedViaApi]: 'neutral',
   [DocumentStatus.UploadFailed]: 'error',
+  [DocumentStatus.UploadAbandoned]: 'neutral',
   [DocumentStatus.UploadIncomplete]: 'warning',
   [DocumentStatus.PendingMachineReview]: 'warning',
   [DocumentStatus.ReviewedByMachine]: 'neutral',

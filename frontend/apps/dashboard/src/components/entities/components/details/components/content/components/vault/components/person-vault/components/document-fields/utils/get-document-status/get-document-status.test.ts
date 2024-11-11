@@ -51,6 +51,11 @@ describe('computeSingleDocumentStatus', () => {
       x: DocumentStatus.ReviewedByMachine,
     },
     {
+      status: IdDocStatus.abandoned,
+      reviewStatus: null,
+      x: DocumentStatus.UploadAbandoned,
+    },
+    {
       status: null,
       reviewStatus: null,
       x: DocumentStatus.UploadedViaApi,

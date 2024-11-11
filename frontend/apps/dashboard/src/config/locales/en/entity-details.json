@@ -356,6 +356,7 @@
       "status": {
         "upload_failed": "Upload failed",
         "upload_incomplete": "Upload pending",
+        "upload_abandoned": "Abandoned",
         "uploaded_via_api": "Uploaded manually",
         "pending_machine_review": "Pending",
         "reviewed_by_machine": "Processed",
@@ -589,6 +590,7 @@
     "status": {
       "upload_failed": "Upload failed",
       "upload_incomplete": "Upload pending",
+      "upload_abandoned": "Abandoned",
       "uploaded_via_api": "Uploaded manually",
       "pending_machine_review": "Pending",
       "reviewed_by_machine": "Processed",
@@ -898,7 +900,8 @@
           "complete": "Collected ",
           "success": "Collected ",
           "pending": "Started collecting ",
-          "failed": "Unable to collect "
+          "failed": "Unable to collect ",
+          "abandoned": "Abandoned collecting "
         }
       },
       "label-added-event": {

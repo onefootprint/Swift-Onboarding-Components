@@ -5,6 +5,7 @@ import { DocumentReviewStatus, IdDocStatus } from '@onefootprint/types';
 export enum DocumentStatus {
   UploadFailed = 'upload_failed',
   UploadIncomplete = 'upload_incomplete',
+  UploadAbandoned = 'upload_abandoned',
   UploadedViaApi = 'uploaded_via_api',
   PendingMachineReview = 'pending_machine_review',
   ReviewedByMachine = 'reviewed_by_machine',
@@ -21,6 +22,9 @@ export const getDocumentStatus = (document: Omit<Document, 'uploads'>) => {
   }
   if (document.status === IdDocStatus.pending) {
     return DocumentStatus.UploadIncomplete;
+  }
+  if (document.status === IdDocStatus.abandoned) {
+    return DocumentStatus.UploadAbandoned;
   }
 
   // If the upload is complete, show a status badge that depends on the review status
