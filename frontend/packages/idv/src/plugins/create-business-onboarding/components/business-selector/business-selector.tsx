@@ -11,10 +11,9 @@ export type BusinessSelectorProps = {
   businesses: HostedBusiness[];
   onSelect: (id: string) => void;
   onAddNew: () => void;
-  isBusy?: boolean;
 };
 
-const BusinessSelector = ({ businesses, onSelect, onAddNew, isBusy }: BusinessSelectorProps) => {
+const BusinessSelector = ({ businesses, onSelect, onAddNew }: BusinessSelectorProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.business-selector' });
   const formatRelative = useFormatRelative();
 
@@ -54,7 +53,7 @@ const BusinessSelector = ({ businesses, onSelect, onAddNew, isBusy }: BusinessSe
           </Text>
           <Divider />
         </Stack>
-        <Button onClick={onAddNew} fullWidth size="large" loading={isBusy}>
+        <Button onClick={onAddNew} fullWidth size="large">
           {t('cta')}
         </Button>
       </Stack>

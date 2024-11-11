@@ -17,6 +17,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
     async ([secretKey, pbKey, backendUrl, personal, business]) => {
       const id = personal as typeof PERSONAL;
       const biz = business as typeof BUSINESS;
+      const businessExternalId = `e2e-${Math.floor(Math.random() * 1000000000) + 1}`;
       const response = await fetch(`${backendUrl}/onboarding/session`, {
         method: 'POST',
         headers: {
@@ -25,6 +26,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
         },
         body: JSON.stringify({
           key: pbKey,
+          business_external_id: businessExternalId,
           bootstrap_data: {
             'business.address_line1': biz.addressLine1,
             'business.address_line2': biz.addressLine2,
@@ -97,10 +99,11 @@ test('KYB pbtok_ happy path #ci', async ({ page, isMobile }) => {
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  const letsKYB = frame.getByText("Let's get to know your business!").first();
-  await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
+  // TODO: uncomment once we show the business introduction screen
+  // const letsKYB = frame.getByText("Let's get to know your business!").first();
+  // await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
+  // await clickOnContinue(frame);
+  // await page.waitForLoadState();
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);

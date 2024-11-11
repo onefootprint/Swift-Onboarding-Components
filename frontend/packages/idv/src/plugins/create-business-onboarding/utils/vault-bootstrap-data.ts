@@ -10,14 +10,10 @@ import type {
   ModernRawBusinessDataRequest,
   ModernRawUserDataRequest,
 } from '@onefootprint/request-types';
-import { useMutation } from '@tanstack/react-query';
 
 import type { BootstrapBusinessData, BootstrapUserData } from '../../../types';
-import { getLogger } from '../../../utils';
 
-const { logError } = getLogger({ location: 'vault-business-bootstrap-data' });
-
-const vault = async (
+const vaultBootstrapData = async (
   {
     bootstrapUserData,
     bootstrapBusinessData,
@@ -142,21 +138,4 @@ const getUserPayload = (userData: BootstrapUserData) => {
   );
 };
 
-const useVaultBootstrapData = ({ authToken }: { authToken: string }) => {
-  return useMutation({
-    mutationFn: ({
-      bootstrapUserData,
-      bootstrapBusinessData,
-    }: {
-      bootstrapUserData: BootstrapUserData;
-      bootstrapBusinessData: BootstrapBusinessData;
-    }) => {
-      return vault({ bootstrapUserData, bootstrapBusinessData }, { authToken });
-    },
-    onError: error => {
-      logError('Bootstrap business failed', error);
-    },
-  });
-};
-
-export default useVaultBootstrapData;
+export default vaultBootstrapData;
