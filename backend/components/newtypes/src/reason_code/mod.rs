@@ -36,7 +36,7 @@ macro_rules! vendor_reason_code_enum {
     ) => {
         $(#[$macros])*
         pub enum $name {
-            $(#[doc=$description] #[strum(to_string = $ser)] $item,)*
+            $(#[strum(to_string = $ser)] $item,)*
         }
 
         impl $name {
