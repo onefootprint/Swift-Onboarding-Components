@@ -80,6 +80,10 @@ class BootstrappedFields(BaseAuth):
     HEADER_NAME = "x-fp-bootstrapped-fields"
 
 
+class IsBootstrap(BaseAuth):
+    HEADER_NAME = "x-fp-is-bootstrap"
+
+
 class SessionId(BaseAuth):
     HEADER_NAME = "x-fp-session-id"
 

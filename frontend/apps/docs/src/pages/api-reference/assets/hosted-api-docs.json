@@ -105,6 +105,17 @@
                     "Hosted"
                 ],
                 "description": "Applies multiple operations in batch to update or create business owners. NOTE: the open API documentation for the request is extremely incorrect for this API.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-is-bootstrap",
+                        "description": "Provide `true` if the data in the request is bootstrap data.",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -223,6 +234,17 @@
                     "Vault"
                 ],
                 "description": "Checks if provided vault data is valid before adding it to the business vault",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-is-bootstrap",
+                        "description": "Provide `true` if the data in the request is bootstrap data.",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
@@ -2148,6 +2170,17 @@
                     "Users"
                 ],
                 "description": "Updates data in a user vault",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-is-bootstrap",
+                        "description": "Provide `true` if the data in the request is bootstrap data.",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {

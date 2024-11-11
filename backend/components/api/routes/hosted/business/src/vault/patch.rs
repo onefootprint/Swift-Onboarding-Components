@@ -5,11 +5,13 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserBizWfAuthContext;
+use api_core::utils::headers::IsBootstrapHeader;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::TenantVw;
 use newtypes::put_data_request::ModernRawBusinessDataRequest;
 use newtypes::put_data_request::PatchDataRequest;
+use newtypes::DataLifetimeSource;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
@@ -28,6 +30,7 @@ pub async fn post_validate(
     state: web::Data<State>,
     user_auth: UserBizWfAuthContext,
     request: Json<ModernRawBusinessDataRequest>,
+    is_bootstrap: IsBootstrapHeader,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_biz_workflow_guard(WorkflowGuard::AddData)?;
@@ -40,7 +43,10 @@ pub async fn post_validate(
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
 
-    let source = user_auth.user_session.dl_source();
+    let source = match *is_bootstrap {
+        true => DataLifetimeSource::LikelyBootstrap,
+        false => user_auth.user_session.dl_source(),
+    };
     state
         .db_query(move |conn| -> FpResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;

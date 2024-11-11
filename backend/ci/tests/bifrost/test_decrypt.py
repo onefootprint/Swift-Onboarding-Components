@@ -2,7 +2,7 @@ import pytest
 from tests.bifrost_client import BifrostClient
 from tests.utils import patch, post, get
 from tests.identify_client import IdentifyClient
-from tests.headers import BootstrappedFields
+from tests.headers import BootstrappedFields, IsBootstrap
 
 
 @pytest.fixture(scope="module")
@@ -74,8 +74,16 @@ def test_bootstrapped_data(sandbox_tenant):
     bootstrapped_fields_h = BootstrappedFields(
         ",".join(["id.first_name", "id.last_name"])
     )
-
     patch("hosted/user/vault", data, bifrost.auth_token, bootstrapped_fields_h)
+
+    # And modern format
+    data = {
+        "id.dob": "1990-01-01",
+        "id.ssn9": "123-12-1234",
+    }
+    is_bootstrapped_h = IsBootstrap("true")
+    patch("hosted/user/vault", data, bifrost.auth_token, is_bootstrapped_h)
+
     user = bifrost.run()
 
     # Make sure the data source is bootstrap
@@ -83,6 +91,8 @@ def test_bootstrapped_data(sandbox_tenant):
     expected = [
         ("id.first_name", "bootstrap"),
         ("id.last_name", "bootstrap"),
+        ("id.dob", "bootstrap"),
+        ("id.ssn9", "bootstrap"),
         ("id.middle_name", "hosted"),
     ]
     for di, source in expected:

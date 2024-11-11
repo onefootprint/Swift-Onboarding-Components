@@ -5,6 +5,7 @@ use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::utils::headers::BootstrapFieldsHeader;
+use api_core::utils::headers::IsBootstrapHeader;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::DlSourceWithOverrides;
@@ -71,6 +72,7 @@ pub async fn patch(
     request: Json<ModernRawUserDataRequest>,
     user_wf_auth: UserWfAuthContext,
     bootstrap_fields: BootstrapFieldsHeader,
+    is_bootstrap: IsBootstrapHeader,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
@@ -87,16 +89,18 @@ pub async fn patch(
     let updates = FingerprintedDataRequest::build(&state, updates, sv_id).await?;
 
     let su_id = user_auth.scoped_user.id.clone();
-    let source = user_auth.user_session.dl_source();
+    let source = match *is_bootstrap {
+        true => DataLifetimeSource::LikelyBootstrap,
+        false => user_auth.user_session.dl_source(),
+    };
+    let overrides = (bootstrap_fields.0)
+        .into_iter()
+        .map(|di| (di, DataLifetimeSource::LikelyBootstrap))
+        .collect();
     state
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
 
-            let overrides = bootstrap_fields
-                .0
-                .into_iter()
-                .map(|di| (di, DataLifetimeSource::LikelyBootstrap))
-                .collect();
             let sources = DlSourceWithOverrides {
                 default: source,
                 overrides,

@@ -6,6 +6,7 @@ use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::IsBootstrapHeader;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::BusinessOwnerInfo;
 use api_core::utils::vault_wrapper::DataRequestSource;
@@ -23,6 +24,7 @@ use newtypes::BoLinkId;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
 use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::Uuid;
@@ -41,6 +43,7 @@ pub async fn patch(
     state: web::Data<State>,
     user_auth: UserBizWfAuthContext,
     request: web::Json<Vec<BatchHostedBusinessOwnerRequest>>,
+    is_bootstrap: IsBootstrapHeader,
 ) -> ApiListResponse<api_wire_types::HostedBusinessOwner> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_biz_workflow_guard(WorkflowGuard::AddData)?;
@@ -80,7 +83,7 @@ pub async fn patch(
         .db_transaction(move |conn| -> FpResult<_> {
             let link_ids = ops
                 .into_iter()
-                .map(|req| req.process(conn, &user_auth))
+                .map(|req| req.process(conn, &user_auth, *is_bootstrap))
                 .collect::<FpResult<Vec<_>>>()?;
             // Reload the VW to get the updated BOs
             let bvw = VaultWrapper::build_for_tenant(conn, &bvw.scoped_vault.id)?;
@@ -196,9 +199,13 @@ impl BatchRequest {
         self,
         conn: &mut TxnPgConn,
         user_auth: &CheckUserBizWfAuthContext,
+        is_bootstrap: bool,
     ) -> FpResult<Option<BoLinkId>> {
         let sb_id = user_auth.sb_id.clone();
-        let source = user_auth.user_session.dl_source();
+        let source = match is_bootstrap {
+            true => DataLifetimeSource::LikelyBootstrap,
+            false => user_auth.user_session.dl_source(),
+        };
 
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
         let bv_id = &bvw.vault.id;
