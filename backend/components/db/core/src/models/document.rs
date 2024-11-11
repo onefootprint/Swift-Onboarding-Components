@@ -195,7 +195,7 @@ impl Document {
             .filter(identity_document::request_id.eq(&request_id))
             // TODO it might be nice to use the deactivated_at model here too
             .filter(identity_document::status.eq(DocumentStatus::Pending))
-            .set(identity_document::status.eq(DocumentStatus::Failed))
+            .set(identity_document::status.eq(DocumentStatus::Abandoned))
             .execute(conn.conn())?;
         let new = NewDocumentRow {
             request_id,

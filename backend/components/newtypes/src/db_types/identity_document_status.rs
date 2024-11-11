@@ -35,6 +35,9 @@ pub enum DocumentStatus {
     Failed,
     /// Processed response from vendor and they told us they could extract info from the image
     Complete,
+    /// A user started uploading a document but did not complete the upload either because the
+    /// workflow was abandoned or the user started uploading a different document type mid-workflow
+    Abandoned,
 }
 crate::util::impl_enum_str_diesel!(DocumentStatus);
 
@@ -42,8 +45,19 @@ impl DocumentStatus {
     pub fn is_terminal(&self) -> bool {
         match self {
             Self::Pending => false,
-            Self::Failed | Self::Complete => true,
+            Self::Failed | Self::Complete | Self::Abandoned => true,
         }
+    }
+
+    pub fn description(&self) -> String {
+        let s = match self {
+            Self::Pending => "Awaiting in process of uploading a document",
+            Self::Failed => "User failed to upload a document successfully",
+            Self::Complete => "User completed uploading the document",
+            Self::Abandoned => "User started uploading but did not complete",
+        };
+
+        s.to_string()
     }
 }
 

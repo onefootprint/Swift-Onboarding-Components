@@ -4,7 +4,6 @@ use newtypes::DocumentId;
 use newtypes::DocumentKind;
 use newtypes::DocumentRequestId;
 use newtypes::DocumentSide;
-use newtypes::DocumentStatus;
 use newtypes::IncodeFailureReason;
 use newtypes::Iso3166TwoDigitCountryCode;
 use paperclip::actix::Apiv2Response;
@@ -26,26 +25,6 @@ pub struct CreateDocumentResponse {
     pub id: DocumentId,
 }
 
-/// Status of identity document collection
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, PartialEq, Eq)]
-#[serde(tag = "kind")]
-#[serde(rename_all = "snake_case")]
-pub enum DocumentResponseStatus {
-    Pending,
-    Complete,
-    Error,
-}
-
-// This is temporary
-impl From<DocumentStatus> for DocumentResponseStatus {
-    fn from(document_request_status: DocumentStatus) -> Self {
-        match document_request_status {
-            DocumentStatus::Pending => Self::Pending,
-            DocumentStatus::Failed => Self::Error,
-            DocumentStatus::Complete => Self::Complete,
-        }
-    }
-}
 
 /// Response for a identity document request. Errors are non-optional if the identity vendor.
 /// Requires additional images be collected.

@@ -1,3 +1,5 @@
+use super::document::Document;
+use super::document::DocumentUpdate;
 use super::fingerprint::Fingerprint;
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReviewDelta;
@@ -19,6 +21,7 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::identity_document;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
@@ -28,6 +31,7 @@ use newtypes::AlpacaKycState;
 use newtypes::ApiKeyStatus;
 use newtypes::DocumentConfig;
 use newtypes::DocumentState;
+use newtypes::DocumentStatus;
 use newtypes::Fingerprint as FingerprintData;
 use newtypes::InsightEventId;
 use newtypes::KybConfig;
@@ -164,11 +168,33 @@ impl Workflow {
     pub fn insert(conn: &mut TxnPgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
         // Deactivate existing workflow, if any. We also set the deactivated_at of the previous
         // workflow to the created_at of the new workflow, just for convenience
-        diesel::update(workflow::table)
+        let deactivated_wf = diesel::update(workflow::table)
             .filter(workflow::scoped_vault_id.eq(&new_workflow.scoped_vault_id))
             .filter(workflow::deactivated_at.is_null())
             .set(workflow::deactivated_at.eq(new_workflow.created_at))
-            .execute(conn.conn())?;
+            .returning(workflow::id)
+            .get_result::<WorkflowId>(conn.conn())
+            .optional()?;
+
+        if let Some(deactivated_wf_id) = deactivated_wf {
+            let documents_to_update = Document::list_by_wf_id(conn, &deactivated_wf_id)?
+                .into_iter()
+                .filter(|(d, _)| !d.status.is_terminal())
+                .map(|(d, _)| d.id)
+                .collect_vec();
+
+            // Bulk update documents to Abandoned status
+            if !documents_to_update.is_empty() {
+                let update = DocumentUpdate {
+                    status: Some(DocumentStatus::Abandoned),
+                    ..Default::default()
+                };
+                diesel::update(identity_document::table)
+                    .filter(identity_document::id.eq_any(documents_to_update))
+                    .set(update)
+                    .execute(conn.conn())?;
+            }
+        }
 
         let res: Self = diesel::insert_into(workflow::table)
             .values(new_workflow)

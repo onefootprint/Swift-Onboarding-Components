@@ -33,6 +33,7 @@ pub struct Document {
     pub started_at: Option<DateTime<Utc>>,
     /// Non-null for images uploaded via bifrost
     pub status: Option<DocumentStatus>,
+    pub status_description: Option<String>,
     /// Non-null for images uploaded via bifrost
     pub review_status: Option<DocumentReviewStatus>,
     pub completed_version: Option<DataLifetimeSeqno>,
