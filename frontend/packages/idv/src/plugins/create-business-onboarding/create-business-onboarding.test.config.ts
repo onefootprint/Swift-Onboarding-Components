@@ -49,11 +49,11 @@ export const withBusinessOwners = () => {
   });
 };
 
-export const withBusinessOnboarding = () => {
+export const withBusinessOnboarding = (isNewBusiness: boolean) => {
   mockRequest({
     method: 'post',
     path: '/hosted/business/onboarding',
-    response: {},
+    response: { isNewBusiness },
   });
 };
 

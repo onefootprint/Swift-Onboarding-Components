@@ -32,14 +32,25 @@ const CreateBusinessOnboarding = ({ idvContext, context, onDone, onError }: Crea
     bootstrapBusinessData,
   } = context;
 
+  const [shouldShowIntroduction, setShowIntroduction] = useState(false);
   const startOnboardingMutation = useStartBusinessOnboarding(
     authToken,
     { bootstrapUserData, bootstrapBusinessData },
     onError,
-    onDone,
   );
   const startOnboarding = (inheritBusinessId?: string) => {
-    startOnboardingMutation.mutate({ body: { inheritBusinessId, kybFixtureResult } });
+    startOnboardingMutation.mutate(
+      { body: { inheritBusinessId, kybFixtureResult } },
+      {
+        onSuccess: ({ isNewBusiness }) => {
+          if (isNewBusiness) {
+            setShowIntroduction(true);
+          } else {
+            onDone();
+          }
+        },
+      },
+    );
   };
 
   const sharedState = {
@@ -47,6 +58,9 @@ const CreateBusinessOnboarding = ({ idvContext, context, onDone, onError }: Crea
     startOnboarding,
     isLoading: startOnboardingMutation.isPending,
   };
+  if (shouldShowIntroduction) {
+    return <NewBusinessIntroduction onDone={onDone} />;
+  }
   if (requiresBusinessSelection) {
     return <BusinessSelectionContent state={sharedState} />;
   }
@@ -56,8 +70,6 @@ const CreateBusinessOnboarding = ({ idvContext, context, onDone, onError }: Crea
 const StartOnboardingWithoutSelection = ({ state }: { state: SharedState }) => {
   const { startOnboarding } = state;
 
-  // TODO: in a future PR, we should maybe show the new business introduction screen if the backend reports
-  // that the business is new.
   useEffect(() => {
     startOnboarding();
   }, []);
@@ -79,7 +91,7 @@ const BusinessSelectionContent = ({
     return <Loading />;
   }
   if (businessesQuery.data && businessesQuery.data.length === 0) {
-    return <NoBusinessesFlow state={state} />;
+    return <StartOnboardingWithoutSelection state={state} />;
   }
   if (businessesQuery.data && businessesQuery.data.length > 0) {
     return <BusinessSelectionFlow state={state} businesses={businessesQuery.data} />;
@@ -87,24 +99,10 @@ const BusinessSelectionContent = ({
   return null;
 };
 
-const NoBusinessesFlow = ({ state: { startOnboarding, isLoading } }: { state: SharedState }) => {
-  const handleDone = async () => {
-    startOnboarding();
-  };
-
-  return <NewBusinessIntroduction isBusy={isLoading} onDone={handleDone} />;
-};
-
 const BusinessSelectionFlow = ({
   businesses,
   state: { startOnboarding, isLoading },
 }: { businesses: HostedBusiness[]; state: SharedState }) => {
-  const [shouldShowIntroduction, setShowIntroduction] = useState(() => businesses.length === 0);
-
-  const handleNewBusiness = () => {
-    setShowIntroduction(true);
-  };
-
   const handleSelectBusiness = (businessId: string) => {
     startOnboarding(businessId);
   };
@@ -113,10 +111,13 @@ const BusinessSelectionFlow = ({
     startOnboarding();
   };
 
-  return shouldShowIntroduction ? (
-    <NewBusinessIntroduction isBusy={isLoading} onDone={handleStartNewBusiness} />
-  ) : (
-    <BusinessSelector businesses={businesses} onAddNew={handleNewBusiness} onSelect={handleSelectBusiness} />
+  return (
+    <BusinessSelector
+      businesses={businesses}
+      onAddNew={handleStartNewBusiness}
+      onSelect={handleSelectBusiness}
+      isBusy={isLoading}
+    />
   );
 };
 

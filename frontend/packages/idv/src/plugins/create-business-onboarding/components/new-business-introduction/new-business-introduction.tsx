@@ -4,11 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { HeaderTitle, InfoBox, NavigationHeader } from '../../../../components';
 
 export type NewBusinessIntroductionProps = {
-  isBusy?: boolean;
   onDone: () => void;
 };
 
-const NewBusinessIntroduction = ({ isBusy, onDone }: NewBusinessIntroductionProps) => {
+const NewBusinessIntroduction = ({ onDone }: NewBusinessIntroductionProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages' });
 
   return (
@@ -35,7 +34,7 @@ const NewBusinessIntroduction = ({ isBusy, onDone }: NewBusinessIntroductionProp
         ]}
         variant="default"
       />
-      <Button fullWidth onClick={onDone} size="large" loading={isBusy}>
+      <Button fullWidth onClick={onDone} size="large">
         {t('cta.continue')}
       </Button>
     </Stack>

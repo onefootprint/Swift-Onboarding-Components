@@ -23,20 +23,19 @@ const startOnboardingAndVaultBootstrap = async (
     // We only need to save the bootstrap data if the business is new
     await vaultBootstrapData(bootstrapData, { authToken });
   }
+  return data;
 };
 
 const useStartBusinessOnboarding = (
   authToken: string,
   bootstrapData: BootstrapData,
   onError: (error: unknown) => void,
-  onDone: () => void,
 ) => {
   return useMutation({
     mutationFn: (onboardingData: PostHostedBusinessOnboardingData) => {
       return startOnboardingAndVaultBootstrap(authToken, onboardingData, bootstrapData);
     },
     onError,
-    onSuccess: onDone,
   });
 };
 
