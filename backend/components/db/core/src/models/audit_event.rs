@@ -569,14 +569,14 @@ mod tests {
         };
         let id3 = AuditEvent::create(conn, event3).unwrap();
 
+        let tenant_user = tests::fixtures::tenant_user::create(conn);
+
         let event4 = NewAuditEvent {
             tenant_id: tenant.id.clone(),
             principal_actor: DbActor::Footprint,
             insight_event_id: insight_event.id.clone(),
             detail: AuditEventDetail::InviteOrgMember {
-                email: "email@onefootprint.com".parse().unwrap(),
-                first_name: None,
-                last_name: None,
+                tenant_user_id: tenant_user.id,
                 tenant_role_id: tenant_role.id,
             },
         };

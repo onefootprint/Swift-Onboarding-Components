@@ -6,7 +6,6 @@ use crate::ListEntryCreationId;
 use crate::ListEntryId;
 use crate::ListId;
 use crate::ObConfigurationId;
-use crate::OrgMemberEmail;
 use crate::ScopedVaultId;
 use crate::TenantApiKeyId;
 use crate::TenantRoleId;
@@ -67,9 +66,7 @@ pub enum AuditEventDetail {
     DecryptOrgAPIKey,
     UpdateOrgAPIKey,
     InviteOrgMember {
-        email: OrgMemberEmail,
-        first_name: Option<String>,
-        last_name: Option<String>,
+        tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
     },
     OrgMemberJoined {
@@ -260,17 +257,12 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 },
             },
             AuditEventDetail::InviteOrgMember {
-                email,
+                tenant_user_id,
                 tenant_role_id,
-                first_name,
-                last_name,
             } => Self {
-                metadata: AuditEventMetadata::InviteOrgMember {
-                    email,
-                    first_name,
-                    last_name,
-                },
+                metadata: AuditEventMetadata::InviteOrgMember,
                 args: AuditEventOptionalArgs {
+                    tenant_user_id: Some(tenant_user_id),
                     tenant_role_id: Some(tenant_role_id),
                     ..Default::default()
                 },
@@ -401,11 +393,7 @@ pub enum AuditEventMetadata {
     OrgMemberJoined,
     DecryptOrgApiKey,
     UpdateOrgApiKey,
-    InviteOrgMember {
-        email: OrgMemberEmail,
-        first_name: Option<String>,
-        last_name: Option<String>,
-    },
+    InviteOrgMember,
     UpdateOrgMember {
         old_tenant_role_id: TenantRoleId,
     },

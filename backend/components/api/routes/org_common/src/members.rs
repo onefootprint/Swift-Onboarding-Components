@@ -111,9 +111,7 @@ pub async fn post(
             if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident {
                 let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
                 let detail = AuditEventDetail::InviteOrgMember {
-                    email: email2,
-                    first_name,
-                    last_name,
+                    tenant_user_id: user.id.clone(),
                     tenant_role_id: role.id.clone(),
                 };
                 let audit_event = NewAuditEvent {

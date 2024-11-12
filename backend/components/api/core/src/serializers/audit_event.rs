@@ -85,17 +85,14 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::CreateOrgApiKey => AuditEventDetail::CreateOrgApiKey,
             AuditEventMetadata::DecryptOrgApiKey => AuditEventDetail::DecryptOrgApiKey,
             AuditEventMetadata::UpdateOrgApiKey => AuditEventDetail::UpdateOrgApiKey,
-            AuditEventMetadata::InviteOrgMember {
-                email,
-                first_name,
-                last_name,
-            } => {
+            AuditEventMetadata::InviteOrgMember => {
                 let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
                 AuditEventDetail::InviteOrgMember {
-                    email,
-                    first_name,
-                    last_name,
+                    email: tu.email,
                     tenant_name: tenant.name,
+                    first_name: tu.first_name,
+                    last_name: tu.last_name,
                     tenant_role_id: tr.id,
                     tenant_role_name: tr.name,
                     scopes: tr.scopes,
