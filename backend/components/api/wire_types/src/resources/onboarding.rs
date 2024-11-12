@@ -1,8 +1,8 @@
 use chrono::DateTime;
 use chrono::Utc;
 use newtypes::FpId;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingStatus;
+use newtypes::PublishablePlaybookKey;
 use paperclip::actix::Apiv2Response;
 use serde::Serialize;
 
@@ -10,7 +10,7 @@ use serde::Serialize;
 
 pub struct PublicOnboarding {
     #[openapi(example = "pb_live_fZvYlX3JpanlQ3MAwE45g0")]
-    pub playbook_key: ObConfigurationKey,
+    pub playbook_key: PublishablePlaybookKey,
     pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,
 }

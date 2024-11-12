@@ -7,9 +7,9 @@ use db::models::tenant_client_config::TenantClientConfig;
 use newtypes::DataIdentifier;
 use newtypes::DocumentFixtureResult;
 use newtypes::EncryptedVaultPrivateKey;
-use newtypes::ObConfigurationKey;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
+use newtypes::PublishablePlaybookKey;
 use newtypes::SandboxId;
 use newtypes::SealedVaultBytes;
 use newtypes::SessionAuthToken;
@@ -42,7 +42,7 @@ pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_token: Option<PiiString>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub public_key: Option<ObConfigurationKey>,
+    pub public_key: Option<PublishablePlaybookKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_data: Option<UserDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,7 +77,7 @@ pub struct AuthV1Options {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct AuthV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub public_key: Option<ObConfigurationKey>,
+    pub public_key: Option<PublishablePlaybookKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_data: Option<UserDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -1,16 +1,16 @@
 use crate::*;
-use newtypes::ObConfigurationKey;
+use newtypes::PublishablePlaybookKey;
 use newtypes::WorkflowFixtureResult;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKycRequest {
     #[openapi(skip)]
-    pub onboarding_config_key: Option<ObConfigurationKey>,
+    pub onboarding_config_key: Option<PublishablePlaybookKey>,
     #[openapi(required)]
     /// The publishable key of the playbook onto which you would like this user to onboard. The
     /// playbook will specify required information and the rules by which to make a KYC decision.
-    pub key: Option<ObConfigurationKey>,
+    pub key: Option<PublishablePlaybookKey>,
     /// (only valid for sandbox users) choose the desired KYC outcome.
     #[openapi(example = "null")]
     pub fixture_result: Option<SimpleFixtureResult>,
@@ -42,12 +42,12 @@ impl From<SimpleFixtureResult> for WorkflowFixtureResult {
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKybRequest {
     #[openapi(skip)]
-    pub onboarding_config_key: Option<ObConfigurationKey>,
+    pub onboarding_config_key: Option<PublishablePlaybookKey>,
     #[openapi(required)]
     /// The publishable key of the playbook onto which you would like this business to onboard.
     /// The playbook will specify required information and the rules by which to make a KYB
     /// decision.
-    pub key: Option<ObConfigurationKey>,
+    pub key: Option<PublishablePlaybookKey>,
     /// (only valid for sandbox businesses) choose the desired KYB outcome
     #[openapi(example = "null")]
     pub fixture_result: Option<SimpleFixtureResult>,

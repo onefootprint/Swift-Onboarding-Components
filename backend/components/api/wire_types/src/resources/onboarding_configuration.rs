@@ -9,8 +9,8 @@ use newtypes::DocumentRequestConfig;
 use newtypes::EnhancedAml;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationId;
-use newtypes::ObConfigurationKey;
 use newtypes::ObConfigurationKind;
+use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
 use newtypes::VerificationCheck;
 use newtypes::WorkflowRequestConfig;
@@ -21,7 +21,7 @@ use newtypes::WorkflowRequestConfig;
 pub struct OnboardingConfiguration {
     pub id: ObConfigurationId,
     pub name: String,
-    pub key: ObConfigurationKey,
+    pub key: PublishablePlaybookKey,
     pub is_live: bool,
     pub created_at: DateTime<Utc>,
     pub status: ApiKeyStatus,
@@ -64,7 +64,7 @@ pub struct OnboardingConfiguration {
 
 pub struct PublicOnboardingConfiguration {
     pub name: String,
-    pub key: ObConfigurationKey,
+    pub key: PublishablePlaybookKey,
     pub org_id: TenantId,
     pub org_name: String,
     pub logo_url: Option<String>,

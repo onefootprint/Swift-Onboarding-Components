@@ -2,9 +2,9 @@ use crate::*;
 use newtypes::AuthMethodKind;
 use newtypes::ContactInfoKind;
 use newtypes::FpId;
-use newtypes::ObConfigurationKey;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
+use newtypes::PublishablePlaybookKey;
 use newtypes::SessionAuthToken;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
@@ -33,7 +33,7 @@ pub struct CreateTokenRequest {
     /// onboard. The user will be asked to provide any missing information required by playbook. If
     /// you provide the key here, you can omit providing it in the frontend Footprint.js SDK
     /// integration.
-    pub key: Option<ObConfigurationKey>,
+    pub key: Option<PublishablePlaybookKey>,
 
     /// The existing business to be linked to this user's onboarding session. Only takes effect when
     /// onboarding onto a KYB playbook.
@@ -130,7 +130,7 @@ impl TokenOperationKind {
 #[serde(rename_all = "snake_case")]
 pub struct CreateEntityTokenRequest {
     pub kind: TokenOperationKind,
-    pub key: Option<ObConfigurationKey>,
+    pub key: Option<PublishablePlaybookKey>,
     #[serde(default)]
     pub send_link: bool,
 }

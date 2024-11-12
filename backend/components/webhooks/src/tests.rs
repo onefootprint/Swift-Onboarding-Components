@@ -1,8 +1,8 @@
 use crate::events::*;
 use chrono::Utc;
 use newtypes::FpId;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingStatus;
+use newtypes::PublishablePlaybookKey;
 use schemars::gen::SchemaSettings;
 use std::collections::HashMap;
 use strum::EnumMessage;
@@ -15,7 +15,7 @@ fn test_raw() {
         fp_id: FpId::from("test".to_string()),
         timestamp: Utc::now(),
         status: OnboardingStatus::Pass,
-        playbook_key: ObConfigurationKey::test_data("pb_test_QoEYTOve49Q2IAmaKVYnPs".into()),
+        playbook_key: PublishablePlaybookKey::test_data("pb_test_QoEYTOve49Q2IAmaKVYnPs".into()),
         requires_manual_review: false,
         is_live: false,
     });

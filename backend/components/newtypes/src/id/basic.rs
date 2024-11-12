@@ -70,9 +70,9 @@ define_newtype_id!(
     "Internal identifier for a an onboarding configuration"
 );
 define_newtype_id!(
-    ObConfigurationKey,
+    PublishablePlaybookKey,
     String,
-    "Public identifier for a an onboarding configuration"
+    "Public identifier/key for a playbook"
 );
 define_newtype_id!(PasskeyId, String, "Identifier for a webauthn credential");
 define_newtype_id!(InsightEventId, String, "Identifier for an insight event");

@@ -4,8 +4,8 @@ use newtypes::CollectedDataOption;
 use newtypes::DecisionStatus;
 use newtypes::ManualReviewKind;
 use newtypes::ObConfigurationId;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingDecisionId;
+use newtypes::PublishablePlaybookKey;
 use newtypes::RuleSetResultId;
 use newtypes::WorkflowKind;
 
@@ -45,7 +45,7 @@ pub struct TimelinePlaybook {
 pub struct PublicOnboardingDecision {
     pub status: DecisionStatus,
     pub timestamp: DateTime<Utc>,
-    pub playbook_key: Option<ObConfigurationKey>,
+    pub playbook_key: Option<PublishablePlaybookKey>,
     pub kind: OnboardingDecisionKind,
 }
 

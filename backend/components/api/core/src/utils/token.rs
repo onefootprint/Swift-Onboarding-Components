@@ -22,7 +22,7 @@ use db::TxnPgConn;
 use newtypes::AuthMethodKind;
 use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
-use newtypes::ObConfigurationKey;
+use newtypes::PublishablePlaybookKey;
 use newtypes::ScopedVaultId;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
@@ -32,7 +32,7 @@ pub struct CreateTokenArgs<'a> {
     pub vw: &'a TenantVw<Any>,
     pub sb_id: Option<ScopedVaultId>,
     pub kind: TokenOperationKind,
-    pub key: Option<ObConfigurationKey>,
+    pub key: Option<PublishablePlaybookKey>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,

@@ -1,6 +1,6 @@
-use newtypes::ObConfigurationKey;
 use newtypes::OrgMemberEmail;
 use newtypes::PiiString;
+use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
 use serde_json::json;
@@ -14,17 +14,17 @@ pub enum BoolFlag<'a> {
     #[strum(to_string = "TenantCanViewSocureRiskSignal")]
     CanViewSocureRiskSignals(&'a TenantId),
     #[strum(to_string = "EnableIdologyIdvCallsInNonProdEnvironment")]
-    EnableIdologyInNonProd(&'a ObConfigurationKey),
+    EnableIdologyInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "EnableSocureIdvCallsInNonProdEnvironment")]
-    EnableSocureInNonProd(&'a ObConfigurationKey),
+    EnableSocureInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "EnableScanOnboardingCallsInNonProdEnvironment")]
-    EnableScanOnboardingInNonProd(&'a ObConfigurationKey),
+    EnableScanOnboardingInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "EnableMiddeskInNonProdEnvironment")]
-    EnableMiddeskInNonProd(&'a ObConfigurationKey),
+    EnableMiddeskInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "EnableExperianIdvCallsInNonProdEnvironment")]
-    EnableExperianInNonProd(&'a ObConfigurationKey),
+    EnableExperianInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "EnableLexisInNonProd")]
-    EnableLexisInNonProd(&'a ObConfigurationKey),
+    EnableLexisInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "DisableAllSocureIdvCalls")]
     DisableAllSocure,
     #[strum(to_string = "DisableSelfieChecking")]
@@ -34,7 +34,7 @@ pub enum BoolFlag<'a> {
     #[strum(to_string = "CanCleanUpTenant")]
     CanCleanUpTenant(&'a TenantId),
     #[strum(to_string = "CreateOnboardingWorkflows")]
-    CreateOnboardingWorkflows(&'a ObConfigurationKey),
+    CreateOnboardingWorkflows(&'a PublishablePlaybookKey),
     #[strum(to_string = "IsAlpacaTenant")]
     IsAlpacaTenant(&'a TenantId),
     #[strum(to_string = "IsAppClipEnabled")]
@@ -60,7 +60,7 @@ pub enum BoolFlag<'a> {
     #[strum(to_string = "DisallowDriverLicensePermits")]
     DisallowDriverLicensePermits(&'a TenantId),
     #[strum(to_string = "EnableIncodeWatchlistCheckInNonProd")]
-    EnableIncodeWatchlistCheckInNonProd(&'a ObConfigurationKey),
+    EnableIncodeWatchlistCheckInNonProd(&'a PublishablePlaybookKey),
     #[strum(to_string = "UseIncodeDemoCredentialsInLivemode")]
     UseIncodeDemoCredentialsInLivemode(&'a TenantId),
     #[strum(to_string = "IsKycWaterfallOnRuleFailureEnabled")]
@@ -70,11 +70,11 @@ pub enum BoolFlag<'a> {
     #[strum(to_string = "RunAwsRekognition")]
     RunAwsRekognition(&'a TenantId),
     #[strum(to_string = "CreateKycWorkflowForAlpacaOnboardings")]
-    CreateKycWorkflowForAlpacaOnboardings(&'a ObConfigurationKey),
+    CreateKycWorkflowForAlpacaOnboardings(&'a PublishablePlaybookKey),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
     #[strum(to_string = "RequireCaptureOnStepUp")]
-    RequireCaptureOnStepUp(&'a ObConfigurationKey),
+    RequireCaptureOnStepUp(&'a PublishablePlaybookKey),
     #[strum(to_string = "UseKycWaterfallV2Rollout")]
     UseKycWaterfallV2Rollout(&'a TenantId),
 
@@ -89,12 +89,12 @@ pub enum BoolFlag<'a> {
     #[strum(to_string = "CanSendSmsToHighFraudCountries")]
     CanSendSmsToHighFraudCountries(&'a TenantId),
     #[strum(to_string = "RunSentilinkForPlaybookTemporary")]
-    RunSentilinkForPlaybookTemporary(&'a ObConfigurationKey),
+    RunSentilinkForPlaybookTemporary(&'a PublishablePlaybookKey),
 
     #[strum(to_string = "DisableVaultDisasterRecoveryWorker")]
     DisableVaultDisasterRecoveryWorker(&'a VaultDrConfigId),
     #[strum(to_string = "RunSambaActivityHistoryForPlaybook")]
-    RunSambaActivityHistoryForPlaybook(&'a ObConfigurationKey),
+    RunSambaActivityHistoryForPlaybook(&'a PublishablePlaybookKey),
 }
 
 impl<'a> BoolFlag<'a> {

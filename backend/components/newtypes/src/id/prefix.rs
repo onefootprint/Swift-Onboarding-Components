@@ -4,8 +4,8 @@ use crate::BusinessOwnerKind;
 use crate::FingerprintId;
 use crate::FpId;
 use crate::NtResult;
-use crate::ObConfigurationKey;
 use crate::PartnerTenantId;
+use crate::PublishablePlaybookKey;
 use crate::RuleId;
 use crate::ScopedVaultId;
 use crate::TenantId;
@@ -22,7 +22,7 @@ fn generate_random_id(prefix: &str, length: usize) -> String {
     )
 }
 
-impl ObConfigurationKey {
+impl PublishablePlaybookKey {
     const LENGTH: usize = 22;
     /// prefixed on LIVE keys
     pub const LIVE_PREFIX: &'static str = "pb_live";

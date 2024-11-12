@@ -60,9 +60,9 @@ use newtypes::IncodeEnvironment;
 use newtypes::IncodeVerificationSessionId;
 use newtypes::IncodeVerificationSessionKind;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::ObConfigurationKey;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
+use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
 use newtypes::WorkflowSource;
 use std::time::Duration;
@@ -226,7 +226,7 @@ async fn handle_forcing_failure(
 #[derive(Debug, serde::Deserialize)]
 pub struct AdhocCreateDocumentRequest {
     pub document_type: DocumentKind,
-    pub playbook_key: ObConfigurationKey,
+    pub playbook_key: PublishablePlaybookKey,
     pub country_code: Option<Iso3166TwoDigitCountryCode>,
     pub fp_id: FpId,
     pub tenant_id: TenantId,

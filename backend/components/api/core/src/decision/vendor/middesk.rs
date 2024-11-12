@@ -62,10 +62,10 @@ use newtypes::DataRequest;
 use newtypes::DecisionIntentKind;
 use newtypes::EinOnly;
 use newtypes::MiddeskRequestState;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingStatus;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
+use newtypes::PublishablePlaybookKey;
 use newtypes::RiskSignalGroupKind;
 use newtypes::TenantId;
 use newtypes::ValidateArgs;
@@ -730,7 +730,7 @@ async fn send_middesk_call(
     config: &Config,
     enclave_client: &EnclaveClient,
     business_data: BusinessDataForRequest,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
     tenant_id: &TenantId,
 ) -> FpResult<MiddeskCreateBusinessResponse> {
     if config.service_config.is_production()

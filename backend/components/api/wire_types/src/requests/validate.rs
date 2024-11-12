@@ -2,8 +2,8 @@ use crate::*;
 use newtypes::FpId;
 use newtypes::ModernAuthEventKind;
 use newtypes::ObConfigurationId;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingStatus;
+use newtypes::PublishablePlaybookKey;
 use newtypes::SessionAuthToken;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
@@ -41,7 +41,7 @@ pub struct EntityValidateResponse {
     pub requires_manual_review: bool,
     /// The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).
     pub status: OnboardingStatus,
-    pub playbook_key: ObConfigurationKey,
+    pub playbook_key: PublishablePlaybookKey,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]

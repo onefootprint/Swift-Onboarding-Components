@@ -10,8 +10,8 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::ApiKeyStatus;
 use newtypes::Locked;
-use newtypes::ObConfigurationKey;
 use newtypes::PlaybookId;
+use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
 
 /// A Playbook row groups together all versions of an ObConfiguration across edits.
@@ -21,7 +21,7 @@ pub struct Playbook {
     pub id: PlaybookId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub key: ObConfigurationKey,
+    pub key: PublishablePlaybookKey,
     pub tenant_id: TenantId,
     pub is_live: IsLive,
     /// Currently unused.
@@ -32,7 +32,7 @@ pub struct Playbook {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = playbook)]
 pub struct NewPlaybook {
-    pub key: ObConfigurationKey,
+    pub key: PublishablePlaybookKey,
     pub tenant_id: TenantId,
     pub is_live: IsLive,
     pub status: ApiKeyStatus,
@@ -47,7 +47,7 @@ impl Playbook {
         obc_args: NewObConfigurationArgs,
     ) -> DbResult<(Locked<Self>, ObConfiguration)> {
         let new_playbook = NewPlaybook {
-            key: ObConfigurationKey::generate(is_live),
+            key: PublishablePlaybookKey::generate(is_live),
             tenant_id: tenant_id.clone(),
             is_live,
             status: ApiKeyStatus::Enabled,

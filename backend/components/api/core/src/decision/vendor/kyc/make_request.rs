@@ -25,7 +25,7 @@ use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::DecisionIntentId;
 use newtypes::IdvData;
-use newtypes::ObConfigurationKey;
+use newtypes::PublishablePlaybookKey;
 use newtypes::ScopedVaultId;
 use std::sync::Arc;
 
@@ -37,7 +37,7 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     tvc: &TenantVendorControl,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
     vendor_api: WaterfallVendorAPI,
 ) -> FpResult<(
     VerificationRequest,
@@ -84,7 +84,7 @@ pub async fn make_idv_vendor_call_save_vreq(
     tvc: &TenantVendorControl,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
     vendor_api: WaterfallVendorAPI,
 ) -> FpResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
     let sv_id = sv_id.clone();
@@ -112,7 +112,7 @@ pub async fn send_idv_request(
     tvc: &TenantVendorControl,
     vendor_api: WaterfallVendorAPI,
     idv_data: IdvData,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
 ) -> Result<VendorResponse, VendorAPIError> {
     let is_production = state.config.service_config.is_production();
     match vendor_api {
@@ -181,7 +181,7 @@ pub async fn send_idv_request(
 pub async fn send_idology_idv_request(
     request: IdologyExpectIDRequest,
     is_production: bool,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
     idology_api_call: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -220,7 +220,7 @@ pub async fn send_idology_idv_request(
 pub async fn send_experian_idv_request(
     request: ExperianCrossCoreRequest,
     is_production: bool,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
     experian_api_call: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
@@ -257,7 +257,7 @@ pub async fn send_experian_idv_request(
 pub async fn send_lexis_flex_id_request(
     request: LexisFlexIdRequest,
     is_production: bool,
-    ob_configuration_key: ObConfigurationKey,
+    ob_configuration_key: PublishablePlaybookKey,
     client: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error>,
     ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
@@ -310,7 +310,7 @@ mod tests {
         flag_value: bool,
         expect_api_call: bool,
     ) {
-        let ob_configuration_key = ObConfigurationKey::from_str("obc123").unwrap();
+        let ob_configuration_key = PublishablePlaybookKey::from_str("obc123").unwrap();
         let mut mock_ff_client = MockFFClient::new();
         let mut mock_api = MockVendorAPICall::<
             IdologyExpectIDRequest,

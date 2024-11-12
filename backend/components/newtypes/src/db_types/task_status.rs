@@ -1,7 +1,7 @@
 use crate::DataIdentifier;
 use crate::FpId;
-use crate::ObConfigurationKey;
 use crate::OnboardingStatus;
+use crate::PublishablePlaybookKey;
 use crate::ScopedVaultId;
 use crate::TenantId;
 use crate::WatchlistCheckError;
@@ -178,7 +178,7 @@ pub struct OnboardingCompletedPayload {
     pub status: OnboardingStatus,
     pub requires_manual_review: bool,
     pub is_live: bool,
-    pub playbook_key: ObConfigurationKey,
+    pub playbook_key: PublishablePlaybookKey,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]

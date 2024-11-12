@@ -38,9 +38,9 @@ use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::Locked;
 use newtypes::ObConfigurationId;
-use newtypes::ObConfigurationKey;
 use newtypes::ObConfigurationKind;
 use newtypes::PlaybookId;
+use newtypes::PublishablePlaybookKey;
 use newtypes::ScopedVaultId;
 use newtypes::SupportedDocumentAndCountryMappingForBifrost;
 use newtypes::TenantId;
@@ -58,7 +58,7 @@ pub type IsLive = bool;
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
-    pub key: ObConfigurationKey,
+    pub key: PublishablePlaybookKey,
     pub name: String,
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
@@ -355,7 +355,7 @@ impl SupportedCountriesForDocType for Default {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = ob_configuration)]
 struct NewObConfiguration {
-    key: ObConfigurationKey,
+    key: PublishablePlaybookKey,
     created_at: DateTime<Utc>,
     status: ApiKeyStatus,
 
@@ -414,14 +414,14 @@ pub struct NewObConfigurationArgs {
 #[derive(Debug, derive_more::From)]
 pub enum ObConfigIdentifier<'a> {
     Id(&'a ObConfigurationId),
-    Key(&'a ObConfigurationKey),
+    Key(&'a PublishablePlaybookKey),
     Tenant {
         id: &'a ObConfigurationId,
         tenant_id: &'a TenantId,
         is_live: bool,
     },
     TenantKey {
-        key: &'a ObConfigurationKey,
+        key: &'a PublishablePlaybookKey,
         tenant_id: &'a TenantId,
         is_live: bool,
     },

@@ -2,10 +2,10 @@ use chrono::DateTime;
 use chrono::Utc;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingCompletedPayload as NTOnboardingCompletedPayload;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload;
+use newtypes::PublishablePlaybookKey;
 use newtypes::UserSpecificWebhookPayload;
 use newtypes::UserVaultUpdateSource;
 use newtypes::UserVaultUpdatedPayload as NTUserVaultUpdatedPayload;
@@ -91,7 +91,7 @@ pub struct OnboardingCompletedPayload {
     #[schemars(with = "OnboardingStatusShadow")]
     pub status: OnboardingStatus,
     #[schemars(with = "String")]
-    pub playbook_key: ObConfigurationKey,
+    pub playbook_key: PublishablePlaybookKey,
     pub requires_manual_review: bool,
     pub is_live: bool,
 }
@@ -213,7 +213,7 @@ pub enum UserVaultUpdateSourceShadow {
 
 mod examples {
     use super::*;
-    use newtypes::ObConfigurationKey;
+    use newtypes::PublishablePlaybookKey;
 
     impl OnboardingCompletedPayload {
         pub fn example() -> Self {
@@ -222,7 +222,7 @@ mod examples {
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
                 status: OnboardingStatus::Pass,
-                playbook_key: ObConfigurationKey::test_data("pb_test_QoEYTOve49Q2IAmaKVYnPs".into()),
+                playbook_key: PublishablePlaybookKey::test_data("pb_test_QoEYTOve49Q2IAmaKVYnPs".into()),
                 requires_manual_review: false,
                 is_live: false,
             }

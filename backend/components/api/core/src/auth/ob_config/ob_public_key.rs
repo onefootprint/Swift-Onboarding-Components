@@ -55,7 +55,7 @@ impl FromRequest for PublicOnboardingContext {
                 .await
                 .map_err(|_| AssertionError("Cannot extract root span"))?;
 
-            let key = newtypes::ObConfigurationKey::from(config_key?);
+            let key = newtypes::PublishablePlaybookKey::from(config_key?);
             let key2 = key.clone();
             let (ob_config, tenant) = state
                 .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })

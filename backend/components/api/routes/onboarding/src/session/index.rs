@@ -14,7 +14,7 @@ use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::preview_api;
 use newtypes::ExternalId;
-use newtypes::ObConfigurationKey;
+use newtypes::PublishablePlaybookKey;
 use newtypes::SessionAuthToken;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -26,7 +26,7 @@ use paperclip::actix::Apiv2Schema;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
     /// The playbook key that should be used for the onboarding.
-    pub key: ObConfigurationKey,
+    pub key: PublishablePlaybookKey,
     /// Optionally, any user or business bootstrap data that you would like to pass into the
     /// onboarding flow.
     /// For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).

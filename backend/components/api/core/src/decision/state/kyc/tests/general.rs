@@ -53,8 +53,8 @@ use newtypes::DocumentCdoInfo;
 use newtypes::FootprintReasonCode;
 use newtypes::KycConfig;
 use newtypes::KycState;
-use newtypes::ObConfigurationKey;
 use newtypes::OnboardingStatus;
+use newtypes::PublishablePlaybookKey;
 use newtypes::RiskSignalGroupKind;
 use newtypes::Selfie;
 use newtypes::SignalSeverity;
@@ -597,7 +597,7 @@ async fn redo_and_pass(
     prior_wf: &Workflow,
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
-    ob_config_key: &ObConfigurationKey,
+    ob_config_key: &PublishablePlaybookKey,
     previous_risk_signals: Vec<RiskSignal>,
     doc_requested: bool,
 ) {
