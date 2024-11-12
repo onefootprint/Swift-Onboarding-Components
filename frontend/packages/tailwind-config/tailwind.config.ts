@@ -57,7 +57,7 @@ const config: Omit<Config, 'content'> = {
       sm: '4px',
       DEFAULT: '6px',
       lg: '20px',
-      rounded: '9999px',
+      full: '9999px',
     },
     extend: {
       fontFamily: {
