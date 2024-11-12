@@ -28,12 +28,12 @@ const StatusBadge = ({
       <Badge variant={badgeVariant} className="text-nowrap">
         <span>{t(status)}</span>
         {requiresManualReview && (
-          <Stack marginLeft={2}>
+          <Stack marginLeft={1} position="relative" top="-1px">
             <IcoWarningSmall16 color={badgeVariant} testID="manualReviewIcon" />
           </Stack>
         )}
       </Badge>
-      <Stack gap={2} align="center">
+      <Stack gap={1} align="center">
         {isOnWatchlist && (
           <>
             <Tooltip text={watchlistLabel} disabled={shouldShowWatchlistLabel}>
