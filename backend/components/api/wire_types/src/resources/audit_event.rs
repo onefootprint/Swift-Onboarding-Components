@@ -129,7 +129,6 @@ pub enum AuditEventDetail {
     },
 }
 
-
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct AuditEventApiKey {
     pub name: String,
