@@ -152,7 +152,9 @@ const Register = ({
     <Container>
       <Box>
         <NavigationHeader />
-        <Box marginBottom={3}>{icon}</Box>
+        <Stack center marginBottom={3}>
+          {icon}
+        </Stack>
         <HeaderTitle title={headerTitle} subtitle={headerSubtitle} />
         <Stack direction="column" marginTop={7} width="100%" gap={4}>
           {primaryButtonText && (
