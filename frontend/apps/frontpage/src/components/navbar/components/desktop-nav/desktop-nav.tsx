@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Box, Button, Container, createFontStyles, media } from '@onefootprint/ui';
+import { Box, Container, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,14 +24,10 @@ type DesktopNavProps = {
 
 const handleLoginClick = () => {
   window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-  const urlWithParams = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-in`);
-  window.open(urlWithParams, '_blank');
 };
 
 const handleSignUpClick = () => {
   window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-  const urlWithParams = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
-  window.open(urlWithParams, '_blank');
 };
 
 const DesktopNav = ({ entries }: DesktopNavProps) => {
@@ -65,8 +61,20 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
             })}
           </MainNav>
           <SecondaryNav>
-            <Login onClick={handleLoginClick}>{t('login')}</Login>
-            <Button onClick={handleSignUpClick}>{t('sign-up')}</Button>
+            <Login
+              href={addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-in`)}
+              target="_blank"
+              onClick={handleLoginClick}
+            >
+              {t('login')}
+            </Login>
+            <Signup
+              onClick={handleSignUpClick}
+              href={addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`)}
+              target="_blank"
+            >
+              {t('sign-up')}
+            </Signup>
           </SecondaryNav>
         </StyledContainer>
       </NavContainer>
@@ -142,6 +150,31 @@ const Login = styled.a`
       opacity: 0.7;
     }
   `}
+`;
+
+const Signup = styled.a`
+  ${({ theme }) => {
+    const { button } = theme.components;
+
+    return css`
+      ${createFontStyles('label-3')};
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s ease-in-out;
+      padding: ${theme.spacing[3]} ${theme.spacing[4]};
+      background-color: ${button.variant.primary.bg};
+      color: ${button.variant.primary.color};
+      transition: ${button.transition};
+      border-radius: ${button.borderRadius};
+
+      &:hover:enabled {
+        background-color: ${button.variant.primary.hover.bg};
+        border-color: ${button.variant.primary.hover.borderColor};
+        color: ${button.variant.primary.hover.color};
+        box-shadow: ${button.variant.primary.hover.boxShadow};
+      }
+  `;
+  }}
 `;
 
 export default DesktopNav;
