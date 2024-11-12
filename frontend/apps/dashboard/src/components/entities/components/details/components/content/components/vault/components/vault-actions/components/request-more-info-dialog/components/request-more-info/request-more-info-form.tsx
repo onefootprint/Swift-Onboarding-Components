@@ -1,7 +1,7 @@
-import { EntityStatus, OrgFrequentNoteKind } from '@onefootprint/types';
-import { Divider, Hint, Radio, Stack, Toggle, Tooltip } from '@onefootprint/ui';
+import { OrgFrequentNoteKind } from '@onefootprint/types';
+import { Divider, Hint, Radio, Stack, Toggle } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
@@ -47,15 +47,6 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
     formState: { errors },
   } = methods;
   const playbook = watch('playbook');
-  const hasCompletedOnboarding =
-    entity.data?.status === EntityStatus.pass || entity.data?.status === EntityStatus.failed;
-
-  useEffect(() => {
-    if (!hasCompletedOnboarding) {
-      setRequestVariant('onboard');
-      setValue('kinds', [RequestMoreInfoKind.Onboard]);
-    }
-  }, [hasCompletedOnboarding, setValue]);
 
   const handleBeforeSubmit = (data: TriggerFormData) => {
     if (requestVariant === 'document' && data.kinds.length === 0) {
@@ -99,19 +90,11 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)} ref={formRef}>
         <Stack direction="column" gap={4}>
-          <Tooltip
-            text={t('kind.cannot-request-document')}
-            alignment="start"
-            disabled={hasCompletedOnboarding}
-            collisionBoundary={formRef.current}
-          >
-            <Radio
-              label={t('request-variant.document')}
-              checked={requestVariant === 'document'}
-              onChange={() => handleRequestVariantSelect('document')}
-              disabled={!hasCompletedOnboarding}
-            />
-          </Tooltip>
+          <Radio
+            label={t('request-variant.document')}
+            checked={requestVariant === 'document'}
+            onChange={() => handleRequestVariantSelect('document')}
+          />
           <Radio
             label={t('request-variant.onboard')}
             checked={requestVariant === 'onboard'}
