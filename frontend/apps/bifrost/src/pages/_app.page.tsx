@@ -25,7 +25,7 @@ const codeFont = DM_Mono({
   fallback: ['Courier New'],
 });
 
-// Don't enable log rocket until we know we are in a live onboarding
+// Don't enable logger replay until we know we are in a live onboarding
 Logger.init('bifrost', /* deferSessionRecord */ true);
 
 const App = ({ Component, pageProps }: AppProps) => (
