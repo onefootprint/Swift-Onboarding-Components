@@ -206,8 +206,7 @@ pub async fn post(
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, is_live, &tvc)?;
     let (obc, actor, rs) = state
         .db_transaction(move |conn| -> FpResult<_> {
-            let playbook = Playbook::create(conn, &tenant_id, is_live)?;
-            let obc = ObConfiguration::create(conn, &playbook, args)?;
+            let (_, obc) = Playbook::create(conn, &tenant_id, is_live, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;

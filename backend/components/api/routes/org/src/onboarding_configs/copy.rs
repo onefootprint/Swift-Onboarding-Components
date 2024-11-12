@@ -98,8 +98,7 @@ async fn post(
     let (obc, actor, rs) = state
         .db_transaction(move |conn| -> FpResult<_> {
             // Create the copied playbook
-            let playbook = Playbook::create(conn, &target_tenant_id, target_is_live)?;
-            let obc = ObConfiguration::create(conn, &playbook, args)?;
+            let (_, obc) = Playbook::create(conn, &target_tenant_id, target_is_live, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 
             // And add the copied rules into the new playbook

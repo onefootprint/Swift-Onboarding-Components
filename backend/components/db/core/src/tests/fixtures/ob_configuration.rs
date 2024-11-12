@@ -38,8 +38,9 @@ pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: bool) -> ObCo
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    let playbook = Playbook::create(conn, tenant_id, is_live).expect("Could not create ob config history");
-    ObConfiguration::create(conn, &playbook, args).expect("Could not create ob config")
+    let (_, obc) =
+        Playbook::create(conn, tenant_id, is_live, args).expect("Could not create ob config history");
+    obc
 }
 
 pub struct ObConfigurationOpts {
@@ -143,6 +144,6 @@ pub fn create_with_opts(
         allow_reonboard: false,
     };
 
-    let playbook = Playbook::create(conn, tenant_id, is_live).unwrap();
-    ObConfiguration::create(conn, &playbook, args).expect("Could not create ob config")
+    let (_, obc) = Playbook::create(conn, tenant_id, is_live, args).unwrap();
+    obc
 }

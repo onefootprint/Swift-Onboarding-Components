@@ -89,8 +89,7 @@ fn test_ob_config_international_countries(
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
-    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
+    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
     assert_have_same_elements(
         obc.supported_countries_for_residential_address(),
@@ -132,8 +131,8 @@ fn obc_with_doc_cdo(
     };
 
     let tenant_id = TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap();
-    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
-    ObConfiguration::create(conn, &playbook, args).unwrap()
+    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
+    obc
 }
 
 #[db_test_case(None)]
@@ -397,8 +396,7 @@ fn test_cip_kind_documents(
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
-    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
+    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country).0;
     if let Some(c) = cip {
@@ -473,8 +471,7 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
-    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
+    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
 
     let mapping = obc.supported_country_mapping_for_document(None).0;
@@ -522,8 +519,7 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
-    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
+    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
     // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
     let mapping = obc

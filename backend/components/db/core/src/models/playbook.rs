@@ -1,4 +1,6 @@
 use super::ob_configuration::IsLive;
+use super::ob_configuration::NewObConfigurationArgs;
+use super::ob_configuration::ObConfiguration;
 use crate::DbResult;
 use crate::TxnPgConn;
 use chrono::DateTime;
@@ -38,7 +40,12 @@ pub struct NewPlaybook {
 
 impl Playbook {
     #[tracing::instrument("Playbook::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: IsLive) -> DbResult<Locked<Self>> {
+    pub fn create(
+        conn: &mut TxnPgConn,
+        tenant_id: &TenantId,
+        is_live: IsLive,
+        obc_args: NewObConfigurationArgs,
+    ) -> DbResult<(Locked<Self>, ObConfiguration)> {
         let new_playbook = NewPlaybook {
             key: ObConfigurationKey::generate(is_live),
             tenant_id: tenant_id.clone(),
@@ -46,10 +53,14 @@ impl Playbook {
             status: ApiKeyStatus::Enabled,
         };
 
-        let result = diesel::insert_into(playbook::table)
+        let result: Playbook = diesel::insert_into(playbook::table)
             .values(&new_playbook)
             .get_result(conn.conn())?;
-        Ok(Locked::new(result))
+        let pb = Locked::new(result);
+
+        let obc = ObConfiguration::create(conn, &pb, obc_args)?;
+
+        Ok((pb, obc))
     }
 
     #[tracing::instrument("Playbook::lock", skip_all)]
