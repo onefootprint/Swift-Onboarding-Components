@@ -8,6 +8,8 @@ use api_wire_types::AuditEventDetail;
 use api_wire_types::InsightEvent;
 use db::models::audit_event::AuditEventBulkSecondaryData;
 use db::models::audit_event::JoinedAuditEvent;
+use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_role::TenantRole;
 use newtypes::AuditEventMetadata;
 use newtypes::AuditEventName;
 
@@ -189,5 +191,15 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             insight_event: insight_event.map(InsightEvent::from_db),
             detail,
         })
+    }
+}
+
+
+impl DbToApi<(TenantApiKey, TenantRole)> for api_wire_types::AuditEventApiKey {
+    fn from_db((api_key, role): (TenantApiKey, TenantRole)) -> Self {
+        api_wire_types::AuditEventApiKey {
+            name: api_key.name,
+            role: api_wire_types::OrganizationRole::from_db(role),
+        }
     }
 }

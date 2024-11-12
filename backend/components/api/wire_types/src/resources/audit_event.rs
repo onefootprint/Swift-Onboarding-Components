@@ -128,3 +128,10 @@ pub enum AuditEventDetail {
         email: OrgMemberEmail,
     },
 }
+
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct AuditEventApiKey {
+    pub name: String,
+    pub role: crate::OrganizationRole,
+}
