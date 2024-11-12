@@ -152,6 +152,7 @@ pub(super) fn apply_trigger_request(
                     status: Some(ApiKeyStatus::Enabled),
                     kinds: Some(kinds),
                     search: None,
+                    include_deactivated_versions: false,
                 };
 
                 let (obcs, _) = ObConfiguration::list(conn, &query, OffsetPagination::page(1))?;

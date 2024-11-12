@@ -45,6 +45,7 @@ async fn get_list(
         status,
         search,
         kinds,
+        include_deactivated_versions: false,
     };
     let (results, next_page, count) = state
         .db_query(move |conn| -> Result<_, DbError> {
