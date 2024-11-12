@@ -1,7 +1,8 @@
 use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::models::ob_configuration::VerificationChecks;
-use crate::PgConn;
+use crate::models::playbook::Playbook;
+use crate::TxnPgConn;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::CollectedDataOptionKind as CDOK;
@@ -13,14 +14,12 @@ use newtypes::ObConfigurationKind;
 use newtypes::TenantId;
 use newtypes::VerificationCheck;
 
-pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfiguration {
+pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: bool) -> ObConfiguration {
     let args = NewObConfigurationArgs {
         name: "Flerp config".to_owned(),
-        tenant_id: tenant_id.clone(),
         must_collect_data: vec![CDO::PhoneNumber],
         optional_data: vec![],
         can_access_data: vec![CDO::PhoneNumber],
-        is_live,
         cip_kind: None,
         is_no_phone_flow: false,
         is_doc_first: false,
@@ -39,7 +38,8 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    ObConfiguration::create(conn, args).expect("Could not create ob config")
+    let playbook = Playbook::create(conn, tenant_id, is_live).expect("Could not create ob config history");
+    ObConfiguration::create(conn, &playbook, args).expect("Could not create ob config")
 }
 
 pub struct ObConfigurationOpts {
@@ -85,7 +85,7 @@ impl Default for ObConfigurationOpts {
 }
 
 pub fn create_with_opts(
-    conn: &mut PgConn,
+    conn: &mut TxnPgConn,
     tenant_id: &TenantId,
     opts: ObConfigurationOpts,
 ) -> ObConfiguration {
@@ -121,11 +121,9 @@ pub fn create_with_opts(
     );
     let args = NewObConfigurationArgs {
         name,
-        tenant_id: tenant_id.clone(),
         must_collect_data,
         optional_data,
         can_access_data,
-        is_live,
         cip_kind,
         is_no_phone_flow,
         is_doc_first,
@@ -144,5 +142,7 @@ pub fn create_with_opts(
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    ObConfiguration::create(conn, args).expect("Could not create ob config")
+
+    let playbook = Playbook::create(conn, tenant_id, is_live).unwrap();
+    ObConfiguration::create(conn, &playbook, args).expect("Could not create ob config")
 }

@@ -13,7 +13,6 @@ use newtypes::DocumentRequestConfig;
 use newtypes::DocumentUploadSettings;
 use newtypes::ObConfigurationKind;
 use newtypes::Selfie;
-use newtypes::TenantId;
 use newtypes::VerificationCheck;
 use std::str::FromStr;
 use test_case::test_case;
@@ -40,8 +39,6 @@ use test_case::test_case;
 fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {
     let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
-        tenant_id: TenantId::test_data("flerp".into()),
-        is_live: true,
         author: DbActor::Footprint,
         must_collect_data,
         optional_data,
@@ -77,8 +74,6 @@ fn test_is_no_phone_flow(
 ) -> bool {
     let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
-        tenant_id: TenantId::test_data("flerp".into()),
-        is_live: true,
         author: DbActor::Footprint,
         must_collect_data,
         optional_data,
@@ -110,8 +105,6 @@ fn test_is_no_phone_flow(
 fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool {
     let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
-        tenant_id: TenantId::test_data("flerp".into()),
-        is_live: true,
         author: DbActor::Footprint,
         must_collect_data,
         optional_data: vec![],
@@ -147,8 +140,6 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
 fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
     let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
-        tenant_id: TenantId::test_data("flerp".into()),
-        is_live: true,
         author: DbActor::Footprint,
         must_collect_data: vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber],
         optional_data: vec![],
@@ -181,8 +172,6 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
 fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
     let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
-        tenant_id: TenantId::test_data("flerp".into()),
-        is_live: true,
         author: DbActor::Footprint,
         must_collect_data,
         optional_data: vec![],

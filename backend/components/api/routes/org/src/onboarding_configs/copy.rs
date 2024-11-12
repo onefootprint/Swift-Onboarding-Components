@@ -18,13 +18,13 @@ use api_wire_types::MultiUpdateRuleRequest;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
+use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_version::RuleSetVersion;
 use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
-use newtypes::TenantId;
 use newtypes::UnvalidatedRuleExpression;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -73,7 +73,6 @@ async fn post(
         name,
     } = request.into_inner();
 
-    let target_tenant_id = target_tenant.id.clone();
     let (obc, rules) = state
         .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
@@ -82,6 +81,7 @@ async fn post(
         })
         .await?;
 
+    let target_tenant_id = target_tenant.id.clone();
     let tvc = TenantVendorControl::new(
         target_tenant_id.clone(),
         &state.db_pool,
@@ -90,16 +90,16 @@ async fn post(
     )
     .await?;
 
-    let tt_id = target_tenant.id.clone();
-    let args = copy_playbook(obc, target_actor.clone().into(), tt_id, target_is_live, name);
-    let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant, &tvc)?;
+    let args = copy_playbook(obc, target_actor.clone().into(), name);
+    let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant, target_is_live, &tvc)?;
 
     let rules = rules.into_iter().map(copy_rule).collect_vec();
 
     let (obc, actor, rs) = state
         .db_transaction(move |conn| -> FpResult<_> {
             // Create the copied playbook
-            let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
+            let playbook = Playbook::create(conn, &target_tenant_id, target_is_live)?;
+            let obc = ObConfiguration::create(conn, &playbook, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 
             // And add the copied rules into the new playbook
@@ -157,13 +157,7 @@ fn copy_rule(r: RuleInstance) -> CreateRule {
     }
 }
 
-fn copy_playbook(
-    pb: ObConfiguration,
-    author: DbActor,
-    target_tenant_id: TenantId,
-    target_is_live: bool,
-    name: String,
-) -> NewObConfigurationArgs {
+fn copy_playbook(pb: ObConfiguration, author: DbActor, name: String) -> NewObConfigurationArgs {
     let verification_checks = VerificationChecks::from_existing(&pb);
     let ObConfiguration {
         must_collect_data,
@@ -207,8 +201,6 @@ fn copy_playbook(
 
     NewObConfigurationArgs {
         author,
-        tenant_id: target_tenant_id,
-        is_live: target_is_live,
         name,
         // Copied fields
         must_collect_data,

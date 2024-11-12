@@ -7,6 +7,7 @@ use db_schema::schema::playbook;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::ApiKeyStatus;
+use newtypes::Locked;
 use newtypes::ObConfigurationKey;
 use newtypes::PlaybookId;
 use newtypes::TenantId;
@@ -36,7 +37,8 @@ pub struct NewPlaybook {
 }
 
 impl Playbook {
-    pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: IsLive) -> DbResult<Self> {
+    #[tracing::instrument("Playbook::create", skip_all)]
+    pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: IsLive) -> DbResult<Locked<Self>> {
         let new_playbook = NewPlaybook {
             key: ObConfigurationKey::generate(is_live),
             tenant_id: tenant_id.clone(),
@@ -47,6 +49,15 @@ impl Playbook {
         let result = diesel::insert_into(playbook::table)
             .values(&new_playbook)
             .get_result(conn.conn())?;
-        Ok(result)
+        Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument("Playbook::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, playbook_id: &PlaybookId) -> DbResult<Locked<Self>> {
+        let result = playbook::table
+            .filter(playbook::id.eq(playbook_id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
     }
 }

@@ -1,3 +1,4 @@
+use super::playbook::Playbook;
 use super::rule_set_version::RuleSetVersion;
 use super::tenant::Tenant;
 use super::workflow::Workflow;
@@ -382,12 +383,11 @@ struct NewObConfiguration {
     required_auth_methods: Option<Vec<AuthMethodKind>>,
     prompt_for_passkey: bool,
     allow_reonboard: bool,
+    playbook_id: PlaybookId,
 }
 
 pub struct NewObConfigurationArgs {
     pub name: String,
-    pub tenant_id: TenantId,
-    pub is_live: bool,
     pub must_collect_data: Vec<CDO>,
     pub can_access_data: Vec<CDO>,
     pub cip_kind: Option<CipKind>,
@@ -603,15 +603,27 @@ impl ObConfiguration {
 
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("ObConfiguration::create", skip_all)]
-    pub fn create(conn: &mut PgConn, args: NewObConfigurationArgs) -> DbResult<Self> {
+    pub fn create(
+        conn: &mut TxnPgConn,
+        playbook: &Locked<Playbook>,
+        args: NewObConfigurationArgs,
+    ) -> DbResult<Self> {
+        let Playbook {
+            id: playbook_id,
+            _created_at: _,
+            _updated_at: _,
+            key,
+            tenant_id,
+            is_live,
+            status: _,
+        } = (*playbook).clone();
+
         let enhanced_aml = args.verification_checks.enhanced_aml();
         let NewObConfigurationArgs {
             name,
-            tenant_id,
             must_collect_data,
             optional_data,
             can_access_data,
-            is_live,
             cip_kind,
             is_no_phone_flow,
             is_doc_first,
@@ -631,7 +643,7 @@ impl ObConfiguration {
             allow_reonboard,
         } = args;
         let config = NewObConfiguration {
-            key: ObConfigurationKey::generate(is_live),
+            key,
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
             name,
@@ -658,10 +670,11 @@ impl ObConfiguration {
             required_auth_methods,
             prompt_for_passkey,
             allow_reonboard,
+            playbook_id,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
-            .get_result::<ObConfiguration>(conn)?;
+            .get_result::<ObConfiguration>(conn.conn())?;
         Ok(obc)
     }
 

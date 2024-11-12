@@ -13,6 +13,7 @@ use api_wire_types::Patch;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
+use db::models::playbook::Playbook;
 use db::models::rule_set_version::RuleSetVersion;
 use itertools::chain;
 use newtypes::AuthMethodKind;
@@ -92,7 +93,7 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let is_live = auth.is_live()?;
     let tenant = auth.tenant().clone();
-    let tenant_id = &tenant.id;
+    let tenant_id = tenant.id.clone();
     let actor = auth.actor().into();
 
     let pb_request = request.into_inner().validate()?;
@@ -139,7 +140,7 @@ pub async fn post(
     // VERIFICATION CHECK MIGRATION: construct verification checks
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
     let verification_checks = VerificationChecks::new(
-        tenant_id,
+        &tenant_id,
         verification_checks,
         skip_kyc,
         db_enhanced_aml.clone(),
@@ -172,11 +173,9 @@ pub async fn post(
 
     let args = NewObConfigurationArgs {
         name,
-        tenant_id: tenant_id.clone(),
         must_collect_data,
         optional_data,
         can_access_data,
-        is_live,
         cip_kind,
         is_no_phone_flow,
         is_doc_first: is_doc_first_flow,
@@ -204,10 +203,11 @@ pub async fn post(
         &state.enclave_client,
     )
     .await?;
-    let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, &tvc)?;
+    let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, is_live, &tvc)?;
     let (obc, actor, rs) = state
         .db_transaction(move |conn| -> FpResult<_> {
-            let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
+            let playbook = Playbook::create(conn, &tenant_id, is_live)?;
+            let obc = ObConfiguration::create(conn, &playbook, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;

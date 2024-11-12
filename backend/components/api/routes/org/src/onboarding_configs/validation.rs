@@ -6,6 +6,7 @@ use api_core::errors::ValidationError;
 use api_core::FpError;
 use api_core::FpResult;
 use api_core::State;
+use db::models::ob_configuration::IsLive;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
@@ -39,6 +40,7 @@ impl ObConfigurationArgsToValidate {
         state: &State,
         args: NewObConfigurationArgs,
         tenant: &Tenant,
+        is_live: IsLive,
         tvc: &TenantVendorControl,
     ) -> FpResult<NewObConfigurationArgs> {
         let args: ObConfigurationArgsToValidate = Self(args);
@@ -46,8 +48,8 @@ impl ObConfigurationArgsToValidate {
         args.validate_inner()?;
         args.validate_kind()?;
         args.validate_flags(state, &tenant.id)?;
-        args.validate_tenant_restrictions(tenant)?;
-        args.validate_checks(tvc, args.is_live)?;
+        args.validate_tenant_restrictions(tenant, is_live)?;
+        args.validate_checks(tvc, is_live)?;
         args.validate_required_auth_methods()?;
         Ok(args.0)
     }
@@ -459,7 +461,7 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    pub(super) fn validate_tenant_restrictions(&self, tenant: &Tenant) -> FpResult<()> {
+    pub(super) fn validate_tenant_restrictions(&self, tenant: &Tenant, is_live: IsLive) -> FpResult<()> {
         let restrictions = vec![
             (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Kyc),
             (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Document), // Separate flag?
@@ -467,7 +469,7 @@ impl ObConfigurationArgsToValidate {
             (tenant.is_prod_auth_playbook_restricted, ObConfigurationKind::Auth),
         ];
         for (is_restricted, restricted_kind) in restrictions {
-            if self.is_live && is_restricted && self.kind == restricted_kind {
+            if is_live && is_restricted && self.kind == restricted_kind {
                 return Err(TenantError::CannotCreateProdPlaybook(self.kind).into());
             }
         }

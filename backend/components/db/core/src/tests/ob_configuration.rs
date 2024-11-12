@@ -3,6 +3,7 @@ use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::models::ob_configuration::ObConfigurationUpdate;
 use crate::models::ob_configuration::VerificationChecks;
+use crate::models::playbook::Playbook;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -65,8 +66,6 @@ fn test_ob_config_international_countries(
 ) {
     let args = NewObConfigurationArgs {
         name: "obc".into(),
-        tenant_id: TenantId::from_str("t_1234").unwrap(),
-        is_live: true,
         must_collect_data: vec![],
         can_access_data: vec![],
         cip_kind: None,
@@ -88,7 +87,10 @@ fn test_ob_config_international_countries(
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    let obc = ObConfiguration::create(conn, args).unwrap();
+
+    let tenant_id = TenantId::from_str("t_1234").unwrap();
+    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
+    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
 
     assert_have_same_elements(
         obc.supported_countries_for_residential_address(),
@@ -97,15 +99,14 @@ fn test_ob_config_international_countries(
 }
 
 fn obc_with_doc_cdo(
+    conn: &mut TestPgConn,
     allow_international: bool,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     doc_cdo: &str,
     tenant_id: Option<&str>,
-) -> NewObConfigurationArgs {
-    NewObConfigurationArgs {
+) -> ObConfiguration {
+    let args = NewObConfigurationArgs {
         name: "obc".into(),
-        tenant_id: TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap(),
-        is_live: true,
         must_collect_data: vec![CollectedDataOption::Document(
             DocumentCdoInfo::from_str(doc_cdo).unwrap(),
         )],
@@ -128,7 +129,11 @@ fn obc_with_doc_cdo(
         required_auth_methods: None,
         prompt_for_passkey: true,
         allow_reonboard: false,
-    }
+    };
+
+    let tenant_id = TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap();
+    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
+    ObConfiguration::create(conn, &playbook, args).unwrap()
 }
 
 #[db_test_case(None)]
@@ -141,13 +146,13 @@ fn test_supported_country_mapping_us_only(
     //
     // We expect by default to return US with the indicated doc types
     //  every other country with just passport
-    let args = obc_with_doc_cdo(
+    let obc = obc_with_doc_cdo(
+        conn,
         false,
         None,
         "document.drivers_license,passport,id_card.none.require_selfie",
         None,
     );
-    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country);
 
@@ -164,13 +169,13 @@ fn test_supported_country_mapping_us_only(
 
 #[db_test]
 fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
-    let args = obc_with_doc_cdo(
+    let obc = obc_with_doc_cdo(
+        conn,
         false,
         None,
         "document.drivers_license,passport,voter_identification.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
-    let obc = ObConfiguration::create(conn, args).unwrap();
 
     Iso3166TwoDigitCountryCode::iter()
         .filter(|c| *c != Iso3166TwoDigitCountryCode::MX)
@@ -189,13 +194,13 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         ],
     );
     // Second form of ID: Mexican Resident Card
-    let args = obc_with_doc_cdo(
+    let obc = obc_with_doc_cdo(
+        conn,
         false,
         None,
         "document.residence_document.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
-    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let all_supported = obc.supported_country_mapping_for_document(None);
     assert_eq!(all_supported.keys().len(), 1);
@@ -214,13 +219,13 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
     );
 
     // Second form of ID: Any additional document (voters ID, drivers license, etc)
-    let args = obc_with_doc_cdo(
+    let obc = obc_with_doc_cdo(
+        conn,
         false,
         None,
         "document.drivers_license,voter_identification,visa,id_card,residence_document.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
-    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let all_supported = obc.supported_country_mapping_for_document(None);
     assert_eq!(all_supported.keys().len(), 1);
@@ -251,13 +256,13 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
     );
 
     // Second form of ID: Driver's license
-    let args = obc_with_doc_cdo(
+    let obc = obc_with_doc_cdo(
+        conn,
         false,
         None,
         "document.drivers_license.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
-    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let all_supported = obc.supported_country_mapping_for_document(None);
     assert_eq!(all_supported.keys().len(), 1);
@@ -312,13 +317,13 @@ fn test_supported_country_mapping_allow_international(
     //
     // Note: international country restrictions do not affect the countries you can submit a passport
     // for, this just controls residential address - there are integration tests testing this part
-    let args = obc_with_doc_cdo(
+    let obc = obc_with_doc_cdo(
+        conn,
         true,
         international_country_restrictions,
         "document.drivers_license,passport.none.require_selfie",
         None,
     );
-    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country);
 
@@ -368,8 +373,6 @@ fn test_cip_kind_documents(
 ) {
     let args = NewObConfigurationArgs {
         name: "obc".into(),
-        tenant_id: TenantId::from_str("t_1234").unwrap(),
-        is_live: true,
         must_collect_data: vec![],
         can_access_data: vec![],
         // Testing this!!!
@@ -392,7 +395,10 @@ fn test_cip_kind_documents(
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    let obc = ObConfiguration::create(conn, args).unwrap();
+
+    let tenant_id = TenantId::from_str("t_1234").unwrap();
+    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
+    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country).0;
     if let Some(c) = cip {
@@ -443,8 +449,6 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
     };
     let args = NewObConfigurationArgs {
         name: "obc".into(),
-        tenant_id: TenantId::from_str("t_1234").unwrap(),
-        is_live: true,
         must_collect_data: vec![],
         can_access_data: vec![],
         cip_kind: None,
@@ -467,7 +471,10 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    let obc = ObConfiguration::create(conn, args).unwrap();
+
+    let tenant_id = TenantId::from_str("t_1234").unwrap();
+    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
+    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
 
 
     let mapping = obc.supported_country_mapping_for_document(None).0;
@@ -490,8 +497,6 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
     };
     let args = NewObConfigurationArgs {
         name: "obc".into(),
-        tenant_id: TenantId::from_str("t_1234").unwrap(),
-        is_live: true,
         must_collect_data: vec![],
         can_access_data: vec![],
         // TESTING THIS
@@ -515,7 +520,10 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    let obc = ObConfiguration::create(conn, args).unwrap();
+
+    let tenant_id = TenantId::from_str("t_1234").unwrap();
+    let playbook = Playbook::create(conn, &tenant_id, true).unwrap();
+    let obc = ObConfiguration::create(conn, &playbook, args).unwrap();
 
     // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
     let mapping = obc
