@@ -9583,6 +9583,42 @@
                             "data",
                             "kind"
                         ]
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "tenant_role": {
+                                        "$ref": "#/components/schemas/OrganizationRole"
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "tenant_role"
+                                ]
+                            },
+                            "kind": {
+                                "type": "string",
+                                "enum": [
+                                    "org_member_joined"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "data",
+                            "kind"
+                        ]
                     }
                 ]
             },
@@ -9603,6 +9639,7 @@
                     "complete_user_verification",
                     "collect_user_document",
                     "create_org_api_key",
+                    "org_member_joined",
                     "decrypt_org_api_key",
                     "update_org_api_key",
                     "invite_org_member",
@@ -11675,6 +11712,9 @@
                     "status": {
                         "$ref": "#/components/schemas/DocumentStatus"
                     },
+                    "status_description": {
+                        "type": "string"
+                    },
                     "upload_source": {
                         "$ref": "#/components/schemas/UploadSource"
                     },
@@ -11918,7 +11958,8 @@
                 "enum": [
                     "pending",
                     "failed",
-                    "complete"
+                    "complete",
+                    "abandoned"
                 ]
             },
             "DocumentUpload": {
@@ -16676,6 +16717,7 @@
                     "documents_list",
                     "onboarding_session_token",
                     "vault_integrity",
+                    "soft_delete_users",
                     "client_vaulting_docs",
                     "list_duplicate_users"
                 ]

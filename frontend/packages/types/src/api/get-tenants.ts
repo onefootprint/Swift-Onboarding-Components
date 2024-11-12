@@ -38,6 +38,7 @@ export enum TenantPreviewApi {
   ClientVaultingDocs = 'client_vaulting_docs',
   ListDuplicateUsers = 'list_duplicate_users',
   ManageVerifiedContactInfo = 'manage_verified_contact_info',
+  SoftDeleteUsers = 'soft_delete_users',
 }
 
 export enum TenantBillingProfileProduct {
