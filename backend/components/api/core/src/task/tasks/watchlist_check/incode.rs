@@ -73,7 +73,7 @@ pub async fn complete_vendor_call(
     };
 
     let (vres_id, res) =
-        decision::vendor::incode::incode_watchlist::run_watchlist_check(state, &di, &obc.key, kind.clone())
+        decision::vendor::incode::incode_watchlist::run_watchlist_check(state, &di, obc, kind.clone())
             .await?;
 
     let reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(

@@ -40,7 +40,6 @@ use newtypes::IdvData;
 use newtypes::IncodeConfigurationId;
 use newtypes::IncodeEnvironment;
 use newtypes::IncodeWatchlistResultRef;
-use newtypes::ObConfigurationKey;
 use newtypes::PiiJsonValue;
 use newtypes::ScopedVaultId;
 use newtypes::VaultPublicKey;
@@ -227,29 +226,30 @@ impl From<WatchlistCheckKind> for VendorAPI {
 pub async fn run_watchlist_check(
     state: &State,
     di: &DecisionIntent,
-    obc_key: &ObConfigurationKey,
+    obc: &ObConfiguration,
     kind: WatchlistCheckKind,
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
-    let svid = di.scoped_vault_id.clone();
-    let obc_key = obc_key.clone();
-    let (tenant_id, vw, obc) = state
+    let sv_id = di.scoped_vault_id.clone();
+
+    let obc_id = obc.id.clone();
+    let adverse_media = match obc.verification_checks().enhanced_aml() {
+        EnhancedAmlOption::Yes { adverse_media, .. } => adverse_media,
+        EnhancedAmlOption::No => false,
+    };
+
+    let (tenant_id, vw) = state
         .db_transaction(move |conn| -> FpResult<_> {
-            let sv = ScopedVault::get(conn, &svid)?;
+            let sv = ScopedVault::get(conn, &sv_id)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-            let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
 
             // Create a BillingEvent once per year for this user
-            let adverse_media = match obc.verification_checks().enhanced_aml() {
-                EnhancedAmlOption::Yes { adverse_media, .. } => adverse_media,
-                EnhancedAmlOption::No => false,
-            };
             if adverse_media {
-                BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::AdverseMediaPerYear)?;
-                BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::AdverseMediaPerUser)?;
+                BillingEvent::create(conn, &sv.id, Some(&obc_id), BEK::AdverseMediaPerYear)?;
+                BillingEvent::create(conn, &sv.id, Some(&obc_id), BEK::AdverseMediaPerUser)?;
             }
-            BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::ContinuousMonitoringPerYear)?;
+            BillingEvent::create(conn, &sv.id, Some(&obc_id), BEK::ContinuousMonitoringPerYear)?;
 
-            Ok((sv.tenant_id, vw, obc))
+            Ok((sv.tenant_id, vw))
         })
         .await?;
 

@@ -285,7 +285,7 @@ pub async fn run_aml_call(
         vendor::incode::incode_watchlist::run_watchlist_check(
             state,
             &di,
-            &obc.key,
+            &obc,
             WatchlistCheckKind::MakeNewSearch,
         )
         .await
