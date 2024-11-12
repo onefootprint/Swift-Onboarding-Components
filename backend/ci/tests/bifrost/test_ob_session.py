@@ -84,6 +84,7 @@ def test_business_external_id(sandbox_tenant, kyb_sandbox_ob_config):
 
     # Onboard a user with this ob session token
     bifrost = BifrostClient.new_user(obc, override_ob_config_auth=ob_token)
+    assert bifrost.is_new_business
     user = bifrost.run()
 
     # Since the business external ID is provided, we didn't need to select a business. We will select it
@@ -104,6 +105,7 @@ def test_business_external_id(sandbox_tenant, kyb_sandbox_ob_config):
     bifrost = BifrostClient.login_user(
         obc, bifrost.sandbox_id, override_ob_config_auth=ob_token
     )
+    assert not bifrost.is_new_business
     user = bifrost.run()
     assert user.fp_bid == user.fp_bid
 

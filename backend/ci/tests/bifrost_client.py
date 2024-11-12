@@ -281,7 +281,7 @@ class BifrostClient:
             kyb_fixture_result=self.kyb_fixture_result,
         )
         body = post("/hosted/business/onboarding", data, self.auth_token)
-        self.auth_token = FpAuth(body["auth_token"])
+        self.is_new_business = body["is_new_business"]
 
     def handle_collect_business(self, requirement):
         """

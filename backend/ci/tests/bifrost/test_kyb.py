@@ -256,12 +256,14 @@ def test_kyb_select_existing_business(sandbox_tenant, kyb_sandbox_ob_config):
     """
     # Make a user with biz1
     bifrost1 = BifrostClient.new_user(kyb_sandbox_ob_config)
+    assert bifrost1.is_new_business
     bifrost1.data["business.name"] = "Biz 1"
     user1 = bifrost1.run()
     user1_info = get("hosted/user/private/token", None, bifrost1.auth_token)
 
     # Log into the same user and make biz2
     bifrost2 = BifrostClient.login_user(kyb_sandbox_ob_config, bifrost1.sandbox_id)
+    assert bifrost2.is_new_business
     bifrost2.data["business.name"] = "Biz 2"
     bifrost2.handle_one_requirement("collect_business_data")
     user2_info = get("hosted/user/private/token", None, bifrost2.auth_token)
@@ -287,6 +289,7 @@ def test_kyb_select_existing_business(sandbox_tenant, kyb_sandbox_ob_config):
         bifrost = BifrostClient.login_user(
             kyb_sandbox_ob_config, bifrost1.sandbox_id, inherit_business_id=biz_id
         )
+        assert not bifrost.is_new_business
         user_second_run = bifrost.run()
         req = next(
             i
