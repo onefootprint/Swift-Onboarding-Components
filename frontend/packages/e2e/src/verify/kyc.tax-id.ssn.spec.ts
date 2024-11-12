@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  clickOn,
   clickOnContinue,
   fillTaxId,
   selectOutcomeOptional,
@@ -12,7 +11,7 @@ import {
 import { PERSONAL } from '../utils/constants';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYC_ITIN || 'pb_test_84lqIB3DpsQUKgEQhAKGEt';
+const key = process.env.E2E_OB_KYC_ITIN || 'pb_test_bi2EIXG5ZucOejispk2xUE';
 
 const userData = encodeURIComponent(
   JSON.stringify({
@@ -67,9 +66,6 @@ test('KYC Tax ID/SSN #ci', async ({ page, isMobile }) => {
   await frame.getByRole('button').filter({ hasText: 'Reveal' }).first().click();
   await expect(frame.getByText('418-43-7970').first()).toBeAttached();
   await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await clickOn(/continue on desktop/i, frame);
   await page.waitForLoadState();
 
   await expect(page.getByTestId('result').first()).toContainText('_', { timeout: 5000 });

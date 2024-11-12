@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.43.0-jammy
+FROM mcr.microsoft.com/playwright:v1.48.1-jammy
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -19,7 +19,7 @@ ARG E2E_OB_KYC pb_test_MrO9iLr9QyJ25GwIeJDdCV
 ARG E2E_OB_KYC_CUSTOM_DOC pb_test_GTqQz8i263hV9lBv3nKQxj
 ARG E2E_OB_KYC_DOC pb_test_Bmb3bDufq7THKCHsCExcJg
 ARG E2E_OB_KYC_DOC_FIRST pb_test_HMo2GpDNb4HIGWdhk1RfAX
-ARG E2E_OB_KYC_ITIN pb_test_84lqIB3DpsQUKgEQhAKGEt
+ARG E2E_OB_KYC_ITIN pb_test_bi2EIXG5ZucOejispk2xUE
 ARG E2E_OB_KYC_LEGAL_STATUS pb_test_fUJuQT0YzLB8N1LmQwTN1K
 ARG E2E_OB_KYC_NO_PHONE pb_test_uDiD4cdG8iNsIXF2JjemAJ
 ARG E2E_OB_KYC_NON_US pb_test_N1PvhexakRkydx2t9dTl1m
@@ -50,6 +50,6 @@ ENV E2E_UPDATE_UTOKEN $E2E_UPDATE_UTOKEN
 
 COPY --link ./packages/e2e /e2e
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install && pnpm install:playwright
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
 
 CMD npx playwright test --workers=8 -g "#ci"
