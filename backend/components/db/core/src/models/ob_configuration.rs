@@ -696,6 +696,7 @@ impl ObConfiguration {
             .filter(ob_configuration::id.eq(id))
             .filter(ob_configuration::tenant_id.eq(tenant_id))
             .filter(ob_configuration::is_live.eq(is_live))
+            .filter(ob_configuration::deactivated_at.is_null())
             .set(update)
             .load(conn.conn())?;
 
