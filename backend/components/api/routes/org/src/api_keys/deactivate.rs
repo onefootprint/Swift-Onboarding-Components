@@ -7,6 +7,7 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::InsightHeaders;
 use api_core::State;
 use chrono::Utc;
 use db::models::tenant_api_key::TenantApiKey;
@@ -25,6 +26,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();

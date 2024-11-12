@@ -3,6 +3,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
 use db::models::tenant_api_key::TenantApiKey;
@@ -30,6 +31,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: TenantSessionAuth,
+    _insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
