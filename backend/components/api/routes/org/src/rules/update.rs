@@ -47,6 +47,10 @@ pub async fn multi_update_rules(
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 
+            if obc.deactivated_at.is_some() {
+                return ValidationError("Cannot update rules for an outdated playbook version").into();
+            }
+
             RuleInstance::bulk_edit(conn, &obc, &actor.into(), update)?;
             // retrieve and return full latest list of Rules for FE for convenience
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
