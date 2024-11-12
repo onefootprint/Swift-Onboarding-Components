@@ -162,7 +162,7 @@ const Form = ({ onSuccess }: FormProps) => {
 const Content = styled.div`
   ${({ theme }) => css`
     img {
-      margin-bottom: ${theme.spacing[7]};
+      margin: 0 auto ${theme.spacing[7]};
     }
 
     h1,
