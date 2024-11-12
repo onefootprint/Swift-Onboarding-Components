@@ -416,6 +416,88 @@ def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
     assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
+def test_collect_business_documents_no_onboarding(sandbox_tenant):
+    document_configs = [
+        dict(
+            kind="custom",
+            data=dict(
+                name="My special business doc",
+                identifier="document.custom.my_special_business_doc",
+            ),
+        )
+    ]
+
+    expected_docs = ["custom"]
+
+    # create a business via API
+    data = {
+        "business.name": "Footprint",
+        "business.dba": "Printfoot",
+        "business.tin": "123121234",
+        "business.zip": "12345",
+    }
+    fp_bid = post("businesses/", None, sandbox_tenant.sk.key)["id"]
+    patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
+    # link BO via API
+    data = {
+        "id.first_name": "Piip",
+        "id.last_name": "Businessowner",
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": FIXTURE_EMAIL,
+    }
+    body = post("users", data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+    sandbox_id = body["sandbox_id"]
+    data = dict(fp_id=fp_id, ownership_stake=100)
+    post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+
+    # Trigger recollect document
+    trigger = dict(
+        kind="document",
+        data=dict(
+            configs=[],
+            business_configs=document_configs,
+        ),
+    )
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=fp_bid)
+
+    # re-run Bifrost with the token from the link we sent to user
+    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+    # OBC here isn't actually correct
+    bifrost = BifrostClient.raw_auth(
+        sandbox_tenant.default_ob_config, auth_token, sandbox_id
+    )
+
+    # Check that requirements are what we expect
+    requirements = bifrost.get_status()["all_requirements"]
+    assert any(i["kind"] == "collect_document" for i in requirements)
+    assert set(
+        i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
+    ) == set(i["kind"] for i in document_configs)
+    assert all(not i["is_met"] for i in requirements if i["kind"] == "collect_document")
+
+    bifrost.handle_all_requirements()
+    bifrost.validate()
+
+    # Test tenant-facing API
+    body = get(f"users/{fp_bid}/documents", None, sandbox_tenant.sk.key)
+    assert set(i["document_type"] for i in body) == set(expected_docs)
+
+    # And dashboard-facing API
+    body = get(f"entities/{fp_bid}/documents", None, *sandbox_tenant.db_auths)
+    assert set(i["kind"] for i in body) == set(expected_docs)
+    assert all(i["review_status"] == "pending_human_review" for i in body)
+
+    body = get(f"entities/{fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "none", "Status shouldn't have changed from doc"
+
+    # All adhoc document triggers should put the business into manual review since there are no rules to execute
+    assert body["requires_manual_review"]
+    assert body["manual_review_kinds"] == ["document_needs_review"]
+
+
 @pytest.mark.parametrize(
     "trigger",
     [

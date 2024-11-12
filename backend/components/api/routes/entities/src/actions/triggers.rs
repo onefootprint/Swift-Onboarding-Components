@@ -134,14 +134,23 @@ pub(super) fn apply_trigger_request(
             if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &su.id, false)? {
                 obc
             } else {
-                // This is a hack: these triggers all need a playbook associated to display various tenant
+                // Overall hack: these triggers all need a playbook associated to display various tenant
                 // information. Select the most recently created playbook to randomly associate with this
                 // workflow. Its rules will not be used...
+
+                // KYB specific hack: if `fp_bid` is provided, we're in the context of requesting a document
+                // about a business from a BO. We have validations that we can only create biz
+                // wfs for KYB playbooks, so we need to inject that here
+                let kinds = if fp_bid.is_some() {
+                    vec![ObConfigurationKind::Kyb]
+                } else {
+                    ObConfigurationKind::reonboardable()
+                };
                 let query = ObConfigurationQuery {
                     tenant_id: su.tenant_id.clone(),
                     is_live: su.is_live,
                     status: Some(ApiKeyStatus::Enabled),
-                    kinds: Some(ObConfigurationKind::reonboardable()),
+                    kinds: Some(kinds),
                     search: None,
                 };
 
