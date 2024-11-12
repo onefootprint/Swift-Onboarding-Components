@@ -136,17 +136,17 @@
   --text-quinary: var(--gray-0);
   --text-senary: var(--brand-think-500);
   --text-septenary: var(--brand-go-500);
-  --text-accent: var(--purple-500);
+  --text-accent: var(--purple-50);
   --text-error: var(--red-600);
   --text-info: var(--blue-600);
   --text-success: var(--green-600);
   --text-warning: var(--yellow-800);
   --text-neutral: var(--gray-800);
-  --text-success-inverted: var(--green-700);
-  --text-warning-inverted: var(--yellow-700);
-  --text-error-inverted: var(--red-700);
-  --text-info-inverted: var(--blue-700);
-  --text-neutral-inverted: var(--gray-700);
+  --text-success-inverted: var(--green-50);
+  --text-warning-inverted: var(--yellow-50);
+  --text-error-inverted: var(--red-50);
+  --text-info-inverted: var(--blue-50);
+  --text-neutral-inverted: var(--gray-50);
 
   /* Border Colors */
   --border-transparent: transparent;
@@ -185,16 +185,16 @@
   --text-quinary: var(--gray-1000);
   --text-senary: var(--brand-think-800);
   --text-septenary: var(--brand-go-800);
-  --text-accent: var(--purple-300);
+  --text-accent: var(--purple-800);
   --text-error: var(--red-25);
   --text-info: var(--blue-25);
   --text-success: var(--green-25);
   --text-warning: var(--yellow-25);
   --text-neutral: var(--gray-50);
-  --text-success-inverted: var(--green-700);
+  --text-success-inverted: var(--green-800);
   --text-warning-inverted: var(--yellow-800);
-  --text-error-inverted: var(--red-700);
-  --text-info-inverted: var(--blue-700);
+  --text-error-inverted: var(--red-800);
+  --text-info-inverted: var(--blue-800);
   --text-neutral-inverted: var(--gray-800);
 
   /* Border Colors */

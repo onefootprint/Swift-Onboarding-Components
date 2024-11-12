@@ -12,14 +12,42 @@ function getAbsolutePath(value: string) {
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
   addons: [
-    '@chromatic-com/storybook',
-    '@storybook/addon-actions',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-    '@storybook/addon-links',
-    '@storybook/addon-themes',
-    'storybook-addon-pseudo-states',
-  ].map(getAbsolutePath),
+    ...[
+      '@chromatic-com/storybook',
+      '@storybook/addon-actions',
+      '@storybook/addon-essentials',
+      '@storybook/addon-interactions',
+      '@storybook/addon-links',
+      '@storybook/addon-themes',
+      'storybook-addon-pseudo-states',
+    ].map(getAbsolutePath),
+    {
+      name: getAbsolutePath('@storybook/addon-styling-webpack'),
+      options: {
+        rules: [
+          {
+            test: /\.css$/,
+            sideEffects: true,
+            use: [
+              require.resolve('style-loader'),
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  importLoaders: 1,
+                },
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: {
+                  implementation: require.resolve('postcss'),
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
   framework: {
     name: '@storybook/nextjs',
     options: {},
