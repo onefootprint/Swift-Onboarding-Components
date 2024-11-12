@@ -794,7 +794,7 @@ diesel::table! {
         required_auth_methods -> Nullable<Array<Nullable<Text>>>,
         prompt_for_passkey -> Bool,
         allow_reonboard -> Bool,
-        playbook_id -> Nullable<Text>,
+        playbook_id -> Text,
         deactivated_at -> Nullable<Timestamptz>,
     }
 }

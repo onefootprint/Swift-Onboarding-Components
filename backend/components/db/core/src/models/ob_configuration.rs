@@ -110,7 +110,7 @@ pub struct ObConfiguration {
     /// When true, allows users who have already onboarded onto this playbook to reonboard onto the
     /// playbook in hosted bifrost.
     pub allow_reonboard: bool,
-    pub playbook_id: Option<PlaybookId>,
+    pub playbook_id: PlaybookId,
     pub deactivated_at: Option<DateTime<Utc>>,
 }
 
