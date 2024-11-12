@@ -794,6 +794,8 @@ diesel::table! {
         required_auth_methods -> Nullable<Array<Nullable<Text>>>,
         prompt_for_passkey -> Bool,
         allow_reonboard -> Bool,
+        playbook_id -> Nullable<Text>,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 
@@ -841,6 +843,20 @@ diesel::table! {
         allow_domain_access -> Bool,
         logo_url -> Nullable<Text>,
         website_url -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    playbook (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        key -> Text,
+        tenant_id -> Text,
+        is_live -> Bool,
+        status -> Text,
     }
 }
 
@@ -1936,11 +1952,13 @@ diesel::joinable!(neuro_id_analytics_event -> tenant (tenant_id));
 diesel::joinable!(neuro_id_analytics_event -> verification_result (verification_result_id));
 diesel::joinable!(neuro_id_analytics_event -> workflow (workflow_id));
 diesel::joinable!(ob_configuration -> appearance (appearance_id));
+diesel::joinable!(ob_configuration -> playbook (playbook_id));
 diesel::joinable!(ob_configuration -> tenant (tenant_id));
 diesel::joinable!(onboarding_decision -> rule_set_result (rule_set_result_id));
 diesel::joinable!(onboarding_decision -> workflow (workflow_id));
 diesel::joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 diesel::joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
+diesel::joinable!(playbook -> tenant (tenant_id));
 diesel::joinable!(proxy_config -> tenant (tenant_id));
 diesel::joinable!(proxy_config_header -> proxy_config (config_id));
 diesel::joinable!(proxy_config_ingress_rule -> proxy_config (config_id));
@@ -2084,6 +2102,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     onboarding_decision,
     onboarding_decision_verification_result_junction,
     partner_tenant,
+    playbook,
     proxy_config,
     proxy_config_header,
     proxy_config_ingress_rule,

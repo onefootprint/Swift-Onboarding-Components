@@ -40,6 +40,7 @@ pub mod ob_configuration;
 pub mod onboarding_decision;
 pub mod partner_tenant;
 pub mod passkey;
+pub mod playbook;
 pub mod proxy_config;
 pub mod proxy_request_log;
 pub mod risk_signal;

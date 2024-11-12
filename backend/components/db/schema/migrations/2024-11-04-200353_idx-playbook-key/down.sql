@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY playbook_key;

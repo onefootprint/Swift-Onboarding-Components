@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY playbook_tenant_id_is_live;

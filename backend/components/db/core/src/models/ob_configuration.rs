@@ -39,6 +39,7 @@ use newtypes::Locked;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKey;
 use newtypes::ObConfigurationKind;
+use newtypes::PlaybookId;
 use newtypes::ScopedVaultId;
 use newtypes::SupportedDocumentAndCountryMappingForBifrost;
 use newtypes::TenantId;
@@ -50,6 +51,8 @@ use strum::IntoEnumIterator;
 
 pub type IsLive = bool;
 
+/// An ObConfiguration (onboarding configuration) is in most places synonymous with a playbook. In
+/// the data model, it represents a discrete version of a Playbook.
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
@@ -106,6 +109,8 @@ pub struct ObConfiguration {
     /// When true, allows users who have already onboarded onto this playbook to reonboard onto the
     /// playbook in hosted bifrost.
     pub allow_reonboard: bool,
+    pub playbook_id: Option<PlaybookId>,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 impl ObConfiguration {
