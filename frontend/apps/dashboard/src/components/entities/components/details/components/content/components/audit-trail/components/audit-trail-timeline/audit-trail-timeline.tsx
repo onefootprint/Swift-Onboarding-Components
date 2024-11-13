@@ -55,7 +55,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
 
   const items: TimelineItem[] = [];
   timeline.forEach(event => {
-    console.log(event);
     const {
       event: { kind, data },
       time,
