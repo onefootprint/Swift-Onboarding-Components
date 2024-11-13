@@ -8,17 +8,23 @@ use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::ServerErr;
 use api_wire_types::ApiKeyFilters;
+use db::models::audit_event::AuditEvent;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_api_key::TenantApiKeyIdentifier;
 use db::models::tenant_role::TenantRole;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::ApiKeyStatus;
+use newtypes::AuditEventDetail;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantRoleId;
 use paperclip::actix::api_v2_operation;
@@ -142,6 +148,7 @@ pub async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
     request: web::Json<UpdateApiKeyRequest>,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
@@ -157,9 +164,27 @@ pub async fn patch(
         status,
         role_id,
     } = request.into_inner();
+    let auth_actor = auth.actor();
     let (api_key, role) = state
         .db_transaction(move |conn| {
-            TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id, None)
+            if let Some(new_role_id) = role_id.clone() {
+                let (_, old_role) =
+                    TenantApiKey::get(conn, TenantApiKeyIdentifier::Id(&id, &tenant_id, is_live))?;
+                let detail = AuditEventDetail::UpdateOrgApiKeyRole {
+                    old_tenant_role_id: old_role.id,
+                    tenant_api_key_id: id.clone(),
+                    new_tenant_role_id: new_role_id,
+                };
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                let audit_event = NewAuditEvent {
+                    tenant_id: tenant_id.clone(),
+                    principal_actor: auth_actor.into(),
+                    insight_event_id,
+                    detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
+            TenantApiKey::update(conn, id, tenant_id.clone(), is_live, name, status, role_id, None)
         })
         .await?;
     let scrubbed_key = decrypt_scrubbed_api_keys(&state, auth.tenant(), vec![&api_key]).await?;

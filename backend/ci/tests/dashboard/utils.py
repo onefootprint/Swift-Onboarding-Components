@@ -1,4 +1,4 @@
-from tests.utils import get, patch
+from tests.utils import get, patch, post, _gen_random_n_digit_number
 
 
 def latest_audit_event_for(fp_id, tenant):
@@ -7,13 +7,34 @@ def latest_audit_event_for(fp_id, tenant):
     return audit_events[0]
 
 
-def get_audit_event_with_details(tenant, name, **kwargs):
+def list_audit_events_with_details(tenant, name, **kwargs):
     data = dict(names=[name])
     audit_events = get("org/audit_events", data, *tenant.db_auths)
     for event in audit_events["data"]:
-        if all(event["detail"]["data"].get(k, None) == v for (k, v) in kwargs.items()):
-            return event
-    return None
+        matches = True
+        for key, value in kwargs.items():
+            if isinstance(value, dict):
+                # Handle nested dictionary matching
+                event_value = event["detail"]["data"].get(key)
+                if not event_value or not isinstance(event_value, dict):
+                    matches = False
+                    break
+                # Check all nested key/values match
+                for nested_key, nested_value in value.items():
+                    if event_value.get(nested_key) != nested_value:
+                        matches = False
+                        break
+            else:
+                # Handle flat key/value matching
+                if event["detail"]["data"].get(key) != value:
+                    matches = False
+                    break
+        if matches:
+            yield event
+
+
+def get_audit_event_with_details(tenant, name, **kwargs):
+    return next(list_audit_events_with_details(tenant, name, **kwargs), None)
 
 
 def assert_has_audit_event_with_details(tenant, name, **kwargs):
@@ -21,6 +42,16 @@ def assert_has_audit_event_with_details(tenant, name, **kwargs):
     assert (
         event
     ), f"Expected to find audit event with name={name} and details={kwargs} but found none"
+
+
+def generate_role(tenant, scopes, kind="api_key"):
+    """Create a role with given scopes and kind for testing purposes"""
+    suffix = _gen_random_n_digit_number(10)
+    return post(
+        "org/roles",
+        dict(name=f"Test role {suffix}", scopes=scopes, kind=kind),
+        *tenant.db_auths,
+    )
 
 
 def update_rules(

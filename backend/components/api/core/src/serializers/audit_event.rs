@@ -98,7 +98,26 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     )),
                 }
             }
-            AuditEventMetadata::UpdateOrgApiKey => AuditEventDetail::UpdateOrgApiKey,
+            AuditEventMetadata::UpdateOrgApiKeyRole { old_tenant_role_id } => {
+                let tenant_api_key =
+                    tenant_api_key.ok_or(ServerErr("tenant api key is not available for this event"))?;
+                let old_tr = (secondary_data.tenant_roles)
+                    .get(&old_tenant_role_id)
+                    .ok_or(ServerErr("old tenant role is not available for this event"))?;
+                let new_tenant_role =
+                    tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let current_role = (secondary_data.tenant_roles)
+                    .get(&tenant_api_key.role_id)
+                    .ok_or(ServerErr("current api key role is not available for this event"))?;
+                AuditEventDetail::UpdateOrgApiKeyRole {
+                    old_role: api_wire_types::OrganizationRole::from_db(old_tr.clone()),
+                    new_role: api_wire_types::OrganizationRole::from_db(new_tenant_role.to_owned()),
+                    api_key: api_wire_types::AuditEventApiKey::from_db((
+                        tenant_api_key,
+                        current_role.to_owned(),
+                    )),
+                }
+            }
             AuditEventMetadata::InviteOrgMember => {
                 let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
@@ -203,6 +222,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
 impl DbToApi<(TenantApiKey, TenantRole)> for api_wire_types::AuditEventApiKey {
     fn from_db((api_key, role): (TenantApiKey, TenantRole)) -> Self {
         api_wire_types::AuditEventApiKey {
+            id: api_key.id,
             name: api_key.name,
             role: OrganizationRole::from_db(role),
         }

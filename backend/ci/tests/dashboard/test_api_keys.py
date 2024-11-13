@@ -8,6 +8,8 @@ from tests.utils import (
 )
 from tests.dashboard.utils import (
     assert_has_audit_event_with_details,
+    list_audit_events_with_details,
+    generate_role,
 )
 
 
@@ -206,6 +208,7 @@ def test_api_key_reveal(secret_key, sandbox_tenant, admin_role):
         tenant=sandbox_tenant,
         name="decrypt_org_api_key",
         api_key={
+            "id": secret_key.id,
             "name": secret_key.name,
             "role": {
                 "id": admin_role["id"],
@@ -243,3 +246,73 @@ def test_api_key_update(sandbox_tenant, secret_key):
         secret_key.key,
         status_code=401,
     )
+
+
+def test_api_key_role_update(sandbox_tenant):
+    # Create three roles with different scopes
+    role_1 = generate_role(sandbox_tenant, [{"kind": "read"}])
+    role_2 = generate_role(
+        sandbox_tenant, [{"kind": "write_entities"}, {"kind": "read"}]
+    )
+    role_3 = generate_role(
+        sandbox_tenant, [{"kind": "decrypt", "data": "ssn9"}, {"kind": "read"}]
+    )
+
+    # Create API key with role_1
+    data = dict(name="Test API key for role updates", role_id=role_1["id"])
+    api_key = post("org/api_keys", data, *sandbox_tenant.db_auths)
+
+    # Verify initial state
+    body = get(
+        "org/api_keys",
+        dict(ids=[api_key["id"]], status=None, search=None),
+        *sandbox_tenant.db_auths,
+    )
+    # Verify initial state is role_1
+    assert body["data"][0]["role"]["id"] == role_1["id"]
+
+    # Update role_1 -> role_2
+    patch(
+        f"org/api_keys/{api_key['id']}",
+        dict(role_id=role_2["id"]),
+        *sandbox_tenant.db_auths,
+    )
+
+    # Get all role update events for this API key
+    events = list(
+        list_audit_events_with_details(
+            sandbox_tenant, "update_org_api_key_role", api_key={"id": api_key["id"]}
+        )
+    )
+    assert len(events) == 1
+
+    # Verify first update event (role_1 -> role_2)
+    first_event = events[0]
+    assert first_event["detail"]["data"]["old_role"]["id"] == role_1["id"]
+    assert first_event["detail"]["data"]["new_role"]["id"] == role_2["id"]
+    assert first_event["detail"]["data"]["api_key"]["role"]["id"] == role_2["id"]
+
+    # Update role_2 -> role_3
+    patch(
+        f"org/api_keys/{api_key['id']}",
+        dict(role_id=role_3["id"]),
+        *sandbox_tenant.db_auths,
+    )
+
+    # Get all role update events for this API key
+    events = list(
+        list_audit_events_with_details(
+            sandbox_tenant, "update_org_api_key_role", api_key={"id": api_key["id"]}
+        )
+    )
+    assert len(events) == 2
+
+    # Most recent event: role_2 -> role_3 (current role is role_3)
+    assert events[0]["detail"]["data"]["old_role"]["id"] == role_2["id"]
+    assert events[0]["detail"]["data"]["new_role"]["id"] == role_3["id"]
+    assert events[0]["detail"]["data"]["api_key"]["role"]["id"] == role_3["id"]
+
+    # First event: role_1 -> role_2 (current role is now also role_3)
+    assert events[1]["detail"]["data"]["old_role"]["id"] == role_1["id"]
+    assert events[1]["detail"]["data"]["new_role"]["id"] == role_2["id"]
+    assert events[1]["detail"]["data"]["api_key"]["role"]["id"] == role_3["id"]

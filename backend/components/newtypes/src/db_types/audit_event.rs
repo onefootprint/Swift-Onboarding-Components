@@ -66,7 +66,11 @@ pub enum AuditEventDetail {
     DecryptOrgAPIKey {
         tenant_api_key_id: TenantApiKeyId,
     },
-    UpdateOrgAPIKey,
+    UpdateOrgApiKeyRole {
+        old_tenant_role_id: TenantRoleId,
+        tenant_api_key_id: TenantApiKeyId,
+        new_tenant_role_id: TenantRoleId,
+    },
     InviteOrgMember {
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
@@ -252,7 +256,6 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
-            AuditEventDetail::UpdateOrgAPIKey => todo!(),
             AuditEventDetail::OrgMemberJoined {
                 tenant_role_id,
                 tenant_user_id,
@@ -261,6 +264,18 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 args: AuditEventOptionalArgs {
                     tenant_role_id: Some(tenant_role_id),
                     tenant_user_id: Some(tenant_user_id),
+                    ..Default::default()
+                },
+            },
+            AuditEventDetail::UpdateOrgApiKeyRole {
+                new_tenant_role_id,
+                old_tenant_role_id,
+                tenant_api_key_id,
+            } => Self {
+                metadata: AuditEventMetadata::UpdateOrgApiKeyRole { old_tenant_role_id },
+                args: AuditEventOptionalArgs {
+                    tenant_role_id: Some(new_tenant_role_id),
+                    tenant_api_key_id: Some(tenant_api_key_id),
                     ..Default::default()
                 },
             },
@@ -399,9 +414,11 @@ pub enum AuditEventMetadata {
     CollectUserDocument, // TODO: is there a better name for this?
     CreateOrgApiKey,
     DecryptOrgApiKey,
-    OrgMemberJoined,
-    UpdateOrgApiKey,
+    UpdateOrgApiKeyRole {
+        old_tenant_role_id: TenantRoleId,
+    },
     InviteOrgMember,
+    OrgMemberJoined,
     UpdateOrgMember {
         old_tenant_role_id: TenantRoleId,
     },

@@ -8,6 +8,7 @@ use newtypes::ListEntryCreationId;
 use newtypes::ListEntryId;
 use newtypes::ListId;
 use newtypes::OrgMemberEmail;
+use newtypes::TenantApiKeyId;
 use newtypes::TenantId;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
@@ -73,7 +74,11 @@ pub enum AuditEventDetail {
     DecryptOrgApiKey {
         api_key: AuditEventApiKey,
     },
-    UpdateOrgApiKey,
+    UpdateOrgApiKeyRole {
+        api_key: AuditEventApiKey,
+        old_role: crate::OrganizationRole,
+        new_role: crate::OrganizationRole,
+    },
     InviteOrgMember {
         email: OrgMemberEmail,
         first_name: Option<String>,
@@ -133,6 +138,7 @@ pub enum AuditEventDetail {
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct AuditEventApiKey {
+    pub id: TenantApiKeyId,
     pub name: String,
     pub role: crate::OrganizationRole,
 }
