@@ -30,7 +30,7 @@ pub async fn get_business_insights(
     request: FpIdPath,
     auth: TenantSessionAuth,
 ) -> ApiResponse<BusinessInsights> {
-    let auth = auth.check_guard(CanDecrypt::new(BDK::non_bo_variants()))?;
+    let auth = auth.check_guard(CanDecrypt::new(BDK::api_examples()))?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

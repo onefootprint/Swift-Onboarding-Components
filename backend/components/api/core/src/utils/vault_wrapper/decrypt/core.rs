@@ -13,7 +13,6 @@ use enclave_proxy::DataTransformer;
 use futures_util::StreamExt;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier;
 use newtypes::DocumentDiKind;
 use newtypes::EncryptedVaultPrivateKey;
@@ -156,16 +155,6 @@ pub(in crate::utils::vault_wrapper) async fn batch_execute_decrypt_requests<'a, 
 where
     T: std::hash::Hash + Eq + Clone,
 {
-    for (_, r) in data.iter().filter(|(_, r)| {
-        matches!(
-            r.1.identifier,
-            DataIdentifier::Business(BDK::BeneficialOwners)
-                | DataIdentifier::Business(BDK::KycedBeneficialOwners)
-        )
-    }) {
-        tracing::info!(di=%r.1.identifier, "Decrypting legacy beneficial owner DI");
-    }
-
     // Split data into p_data, e_data, e_large_data, as each have different "decryption" methods
     let (p_data, e_data): (Vec<_>, Vec<_>) =
         data.into_iter()

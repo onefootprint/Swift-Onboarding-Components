@@ -39,10 +39,6 @@ impl CleanAndValidate for BDK {
             BDK::State => validate_state(value.as_string()?, all_data.get(&BDK::Country.into()))?,
             BDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
             BDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
-            BDK::BeneficialOwners => return Err(NtValidationError("Cannot vault beneficial owners").into()),
-            BDK::KycedBeneficialOwners => {
-                return Err(NtValidationError("Cannot vault beneficial owners").into())
-            }
             BDK::BeneficialOwnerData(_, di) => {
                 clean_and_validate_beneficial_owner_data(*di.clone(), args, value, all_data)?
             }

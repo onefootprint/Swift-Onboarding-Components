@@ -86,11 +86,7 @@ def test_prefill_timeline_events(
 
     # There should be two timeline events showing data was prefilled into the new tenant.
     # The first event shows the contact info being prefilled, and the second shows the data
-    body = get(
-        f"entities/{foo_fp_id}/timeline",
-        None,
-        *foo_sandbox_tenant.db_auths,
-    )
+    body = get(f"entities/{foo_fp_id}/timeline", None, *foo_sandbox_tenant.db_auths)
     collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
     assert len(collect_data_events) == 2
     assert all(e["event"]["data"]["is_prefill"] for e in collect_data_events)

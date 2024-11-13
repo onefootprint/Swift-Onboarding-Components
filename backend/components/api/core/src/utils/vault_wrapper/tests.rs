@@ -545,7 +545,6 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     // We should have cleared out dba in the last update
     assert!(!bvw.has_field(&BDK::Dba.into()));
-    assert!(!bvw.has_field(&BDK::BeneficialOwners.into()));
 }
 
 #[db_test]

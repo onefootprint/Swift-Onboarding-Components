@@ -26,16 +26,9 @@ pub enum BusinessDataKind {
     State,
     Zip,
     Country,
-    /// A JSON-serialized list of beneficial owners. Very interestingly, the primary BO exists in
-    /// this JSON blob _and_ in the BusinessOwner table in the database.
-    BeneficialOwners,
     /// The ownership stake percentage of each linked beneficial owner. This has special
     /// serialization.
     BeneficialOwnerStake(BoLinkId),
-    /// Very similar to BeneficialOwners, but with a few additional fields required to KYC the
-    /// secondary BOs. Every record in this JSON blob will also have a corresponding BusinessOwner
-    /// row in the database
-    KycedBeneficialOwners,
     /// Note: this variant has a special serialization.
     /// Serializes any data identifier (mostly just identity data) for a given beneficial owner.
     BeneficialOwnerData(BoLinkId, Box<DataIdentifier>),
@@ -76,9 +69,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::State => CollectedData::BusinessAddress,
             Self::Zip => CollectedData::BusinessAddress,
             Self::Country => CollectedData::BusinessAddress,
-            Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BeneficialOwnerStake(_) => CollectedData::BusinessBeneficialOwners,
-            Self::KycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BeneficialOwnerData(_, _) => CollectedData::BusinessBeneficialOwners,
             Self::BeneficialOwnerExplanationMessage => return None,
             Self::CorporationType => CollectedData::BusinessCorporationType,
@@ -94,10 +85,9 @@ impl BusinessDataKind {
         vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Tin]
     }
 
-    pub fn non_bo_variants() -> Vec<Self> {
+    pub fn api_examples() -> Vec<Self> {
         BusinessDataKindDiscriminant::iter()
             .filter_map(|i| Self::try_from(i).ok())
-            .filter(|i| !matches!(i, Self::BeneficialOwners | Self::KycedBeneficialOwners))
             .collect()
     }
 
@@ -122,11 +112,9 @@ impl TryFrom<BusinessDataKindDiscriminant> for BusinessDataKind {
             BusinessDataKindDiscriminant::State => Self::State,
             BusinessDataKindDiscriminant::Zip => Self::Zip,
             BusinessDataKindDiscriminant::Country => Self::Country,
-            BusinessDataKindDiscriminant::BeneficialOwners => Self::BeneficialOwners,
             BusinessDataKindDiscriminant::BeneficialOwnerStake => {
                 return Err(strum::ParseError::VariantNotFound)
             }
-            BusinessDataKindDiscriminant::KycedBeneficialOwners => Self::KycedBeneficialOwners,
             BusinessDataKindDiscriminant::BeneficialOwnerExplanationMessage => {
                 Self::BeneficialOwnerExplanationMessage
             }

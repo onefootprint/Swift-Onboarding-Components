@@ -25,7 +25,7 @@ impl DataIdentifier {
                     .map(DataIdentifier::from)
                     .filter(|di| !di.is_verified_ci())
                     .collect_vec(),
-                DataIdentifierDiscriminant::Business => BusinessDataKind::non_bo_variants()
+                DataIdentifierDiscriminant::Business => BusinessDataKind::api_examples()
                     .into_iter()
                     .filter(|bdk| !matches!(bdk, BusinessDataKind::BeneficialOwnerExplanationMessage))
                     .map(DataIdentifier::from)

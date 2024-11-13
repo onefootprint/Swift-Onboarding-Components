@@ -238,7 +238,7 @@ pub async fn build_business_data_from_verification_request(
 
 
     // Get remaining Business vault data
-    let all_bdks: Vec<_> = BDK::non_bo_variants()
+    let all_bdks: Vec<_> = BDK::api_examples()
         .into_iter()
         .map(DataIdentifier::from)
         .collect();

@@ -60,9 +60,7 @@ fn can_decrypt(di: &DataIdentifier, token_scopes: &[UserAuthScope]) -> bool {
             | BDK::State
             | BDK::Zip
             | BDK::Country
-            | BDK::BeneficialOwners
             | BDK::BeneficialOwnerStake(_)
-            | BDK::KycedBeneficialOwners
             | BDK::BeneficialOwnerExplanationMessage
             | BDK::CorporationType
             | BDK::FormationDate

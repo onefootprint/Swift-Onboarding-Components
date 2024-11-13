@@ -235,14 +235,23 @@ impl OnboardingRequirement {
                 missing_attributes: cdos,
                 populated_attributes: _,
                 recollect_attributes: _,
-            } => format!(
-                "Missing {}. At a minimum, the following vault data must be provided: {}",
-                cdos.iter().map(|c| c.to_string()).join(", "),
-                cdos.iter()
+            } => {
+                let required_dis = cdos
+                    .iter()
                     .flat_map(|c| c.required_data_identifiers())
                     .map(|c| c.to_string())
-                    .join(", ")
-            ),
+                    .join(", ");
+                let required_dis_str = if required_dis.is_empty() {
+                    "".to_string()
+                } else {
+                    format!(
+                        " At a minimum, the following vault data must be provided: {}",
+                        required_dis
+                    )
+                };
+                let cdos_str = cdos.iter().map(|c| c.to_string()).join(", ");
+                format!("Missing {}.{}", cdos_str, required_dis_str)
+            }
             Self::CreateBusinessOnboarding {
                 requires_business_selection: _,
             } => "Missing business onboarding".into(),

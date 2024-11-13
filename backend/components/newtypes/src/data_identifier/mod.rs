@@ -410,8 +410,6 @@ impl DataIdentifier {
         matches!(
             self,
             DataIdentifier::Id(IdentityDataKind::Citizenships)
-                | DataIdentifier::Business(BusinessDataKind::BeneficialOwners)
-                | DataIdentifier::Business(BusinessDataKind::KycedBeneficialOwners)
                 | DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals)
                 | DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations)
                 | DataIdentifier::InvestorProfile(InvestorProfileKind::SeniorExecutiveSymbols)
@@ -439,7 +437,6 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
-    #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwners) => "business.beneficial_owners")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerStake(BoLinkId::escape_hatch("link_id".to_owned()))) => "business.beneficial_owners.link_id.ownership_stake")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Id(IdentityDataKind::FirstName)))) => "business.beneficial_owners.link_id.id.first_name")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned()))))) => "business.beneficial_owners.link_id.custom.flerp")]
@@ -461,7 +458,6 @@ mod tests {
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
-    #[test_case("business.beneficial_owners" => DataIdentifier::Business(BusinessDataKind::BeneficialOwners))]
     #[test_case("business.beneficial_owners.link_id.ownership_stake" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerStake(BoLinkId::escape_hatch("link_id".to_owned()))))]
     #[test_case("business.beneficial_owners.link_id.id.first_name" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Id(IdentityDataKind::FirstName)))))]
     #[test_case("business.beneficial_owners.link_id.custom.flerp" => DataIdentifier::Business(BusinessDataKind::BeneficialOwnerData(BoLinkId::escape_hatch("link_id".to_owned()), Box::new(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned()))))))]
@@ -500,7 +496,7 @@ mod tests {
                 .map(DataIdentifier::from)
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            BusinessDataKind::non_bo_variants()
+            BusinessDataKind::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
@@ -545,7 +541,7 @@ mod tests {
                 .map(DataIdentifier::from)
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            BusinessDataKind::non_bo_variants()
+            BusinessDataKind::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),

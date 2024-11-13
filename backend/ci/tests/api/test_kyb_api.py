@@ -120,7 +120,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     )
     assert (
         body["message"]
-        == "Cannot run kyb playbook due to unmet requirements. Missing business_kyced_beneficial_owners. At a minimum, the following vault data must be provided: business.kyced_beneficial_owners"
+        == "Cannot run kyb playbook due to unmet requirements. Missing business_kyced_beneficial_owners."
     )
 
     # Link the BO, then should be able to KYB

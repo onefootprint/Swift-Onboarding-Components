@@ -27,7 +27,6 @@ use newtypes::AuthMethodKind;
 use newtypes::AuthorizeFields;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::CollectDocumentConfig;
-use newtypes::CollectedData;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier;
@@ -199,8 +198,8 @@ struct RequirementProgress {
 /// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
 /// requirements that are a function of data in the vault - you must pass in the pre-decrypted
 /// values as well
-fn is_cdo_met<Type>(vw: &VaultWrapper<Type>, cdo: &CDO, decrypted_values: &UserDecryptResultForReqs) -> bool {
-    if should_skip_us_only_cdos(cdo, decrypted_values) {
+fn is_cdo_met<Type>(ctx: RequirementContext, vw: &VaultWrapper<Type>, cdo: &CDO) -> bool {
+    if should_skip_us_only_cdos(cdo, ctx.user_values) {
         return true;
     }
 
@@ -208,7 +207,7 @@ fn is_cdo_met<Type>(vw: &VaultWrapper<Type>, cdo: &CDO, decrypted_values: &UserD
     // Also check if optional DIs (based on selected values) are met
     match cdo {
         CDO::UsLegalStatus => {
-            let legal_status = decrypted_values
+            let legal_status = (ctx.user_values)
                 .get(&IDK::UsLegalStatus.into())
                 .and_then(|a| a.parse_into::<UsLegalStatus>().ok());
             match legal_status {
@@ -229,7 +228,7 @@ fn is_cdo_met<Type>(vw: &VaultWrapper<Type>, cdo: &CDO, decrypted_values: &UserD
             }
         }
         CDO::FullAddress => {
-            let country = decrypted_values
+            let country = (ctx.user_values)
                 .get(&IDK::Country.into())
                 .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
             if country.map(|c| c.is_us_territory()).unwrap_or(false) {
@@ -244,6 +243,25 @@ fn is_cdo_met<Type>(vw: &VaultWrapper<Type>, cdo: &CDO, decrypted_values: &UserD
             }
             // Non-US addresses will have the full address in AddressLine1 and as many other
             // fields extracted as possible
+        }
+        CDO::BusinessKycedBeneficialOwners => {
+            let is_not_empty = !ctx.business_owners.is_empty();
+            let are_bos_populated = ctx.business_owners.iter().all(|bo| {
+                let vd_exists =
+                    (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
+                let stake_di = DataIdentifier::Business(BDK::BeneficialOwnerStake(bo.bo.link_id.clone()));
+                let ownership_stake_exists = vw.has_field(&stake_di);
+
+                if bo.has_linked_user() {
+                    // Once there's a user linked, this BO's data will be collected by a CollectData
+                    // requirement. We just have to make sure the ownership stake is set
+                    ownership_stake_exists
+                } else {
+                    // If we haven't yet linked a user, we need phone / email to send a link to the BO
+                    ownership_stake_exists && vd_exists
+                }
+            });
+            return is_not_empty && are_bos_populated;
         }
         _ => (),
     }
@@ -266,32 +284,27 @@ pub(crate) fn should_skip_us_only_cdos(cdo: &CDO, decrypted_values: &UserDecrypt
 }
 
 fn get_data_collection_progress<Type>(
+    ctx: RequirementContext,
     vw: &VaultWrapper<Type>,
     wf: &Workflow,
-    ob_config: &ObConfiguration,
     di_kind: DID,
-    decrypted_values: &UserDecryptResultForReqs,
 ) -> Option<RequirementProgress> {
-    if !ob_config.must_collect_data.iter().any(|cdo| cdo.matches(di_kind)) {
+    if !(ctx.obc.must_collect_data.iter()).any(|cdo| cdo.matches(di_kind)) {
         return None;
     }
 
     let relevant_attrs = |cdos: Vec<CDO>| cdos.into_iter().filter(move |cdo| cdo.matches(di_kind));
 
     // Kind of unintuitive: optional_data is not a subset of must_collect_data
-    let all_attrs = chain!(
-        ob_config.must_collect_data.clone(),
-        ob_config.optional_data.clone()
-    )
-    .collect();
+    let all_attrs = chain!(ctx.obc.must_collect_data.clone(), ctx.obc.optional_data.clone()).collect();
     let populated_attributes = relevant_attrs(all_attrs)
-        .filter(|cdo| is_cdo_met(vw, cdo, decrypted_values))
+        .filter(|cdo| is_cdo_met(ctx, vw, cdo))
         .collect_vec();
-    let missing_required_attributes = relevant_attrs(ob_config.must_collect_data.clone())
-        .filter(|cdo| !is_cdo_met(vw, cdo, decrypted_values))
+    let missing_required_attributes = relevant_attrs(ctx.obc.must_collect_data.clone())
+        .filter(|cdo| !is_cdo_met(ctx, vw, cdo))
         .collect_vec();
-    let missing_optional_attributes = relevant_attrs(ob_config.optional_data.clone())
-        .filter(|cdo| !is_cdo_met(vw, cdo, decrypted_values))
+    let missing_optional_attributes = relevant_attrs(ctx.obc.optional_data.clone())
+        .filter(|cdo| !is_cdo_met(ctx, vw, cdo))
         .collect_vec();
     let recollect_attributes = relevant_attrs(wf.config.recollect_attributes().to_vec()).collect_vec();
 
@@ -354,7 +367,7 @@ fn get_collect_kyc_data_requirement<T>(
         missing_attributes,
         optional_attributes,
         recollect_attributes,
-    }) = get_data_collection_progress(uvw, user_wf, ctx.obc, DID::Id, ctx.user_values)
+    }) = get_data_collection_progress(ctx, uvw, user_wf, DID::Id)
     else {
         return Ok(None);
     };
@@ -378,7 +391,7 @@ fn get_collect_investor_profile_requirement<T>(
         populated_attributes,
         missing_attributes,
         ..
-    }) = get_data_collection_progress(uvw, user_wf, ctx.obc, DID::InvestorProfile, ctx.user_values)
+    }) = get_data_collection_progress(ctx, uvw, user_wf, DID::InvestorProfile)
     else {
         return Ok(None);
     };
@@ -407,11 +420,11 @@ fn get_collect_kyb_data_requirement<T>(
     biz_wf: &Workflow,
 ) -> FpResult<Option<OnboardingRequirement>> {
     let Some(RequirementProgress {
-        mut populated_attributes,
+        populated_attributes,
         optional_attributes: _,
-        mut missing_attributes,
+        missing_attributes,
         recollect_attributes,
-    }) = get_data_collection_progress(bvw, biz_wf, ctx.obc, DID::Business, ctx.user_values)
+    }) = get_data_collection_progress(ctx, bvw, biz_wf, DID::Business)
     else {
         return Ok(None);
     };
@@ -422,35 +435,6 @@ fn get_collect_kyb_data_requirement<T>(
         return Ok(None);
     }
 
-    let bo_cdo = (ctx.obc.must_collect_data.iter())
-        .find(|cdo| cdo.parent() == CollectedData::BusinessBeneficialOwners);
-    if let Some(bo_cdo) = bo_cdo {
-        let are_all_bos_complete = {
-            let is_not_empty = !ctx.business_owners.is_empty();
-            let are_bos_populated = ctx.business_owners.iter().all(|bo| {
-                let vd_exists =
-                    (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
-                let stake_di = DataIdentifier::Business(BDK::BeneficialOwnerStake(bo.bo.link_id.clone()));
-                let ownership_stake_exists = bvw.has_field(&stake_di);
-
-                if bo.has_linked_user() {
-                    // Once there's a user linked, this BO's data will be collected by a CollectData
-                    // requirement. We just have to make sure the ownership stake is set
-                    ownership_stake_exists
-                } else {
-                    // If we haven't yet linked a user, we need phone / email to send a link to the BO
-                    ownership_stake_exists && vd_exists
-                }
-            });
-            is_not_empty && are_bos_populated
-        };
-        let is_missing_bo = missing_attributes.contains(bo_cdo);
-        if are_all_bos_complete && is_missing_bo {
-            // BOs linked manually via API meet the BeneficialOwners requirement
-            missing_attributes.retain(|missing_cdo| missing_cdo != bo_cdo);
-            populated_attributes.push(bo_cdo.clone());
-        }
-    }
     let req = OnboardingRequirement::CollectBusinessData {
         missing_attributes,
         populated_attributes,

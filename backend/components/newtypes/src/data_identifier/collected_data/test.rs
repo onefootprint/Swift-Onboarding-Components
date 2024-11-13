@@ -46,7 +46,7 @@ fn test_cdo_parent() {
 }
 
 #[test_case(IDK::iter().collect_vec())]
-#[test_case(BDK::non_bo_variants())]
+#[test_case(BDK::api_examples())]
 #[test_case(IPK::iter().collect_vec())]
 fn test_parent<T>(dis: Vec<T>)
 where
@@ -94,13 +94,12 @@ fn test_discriminant(di: DI) {
 #[test_case(vec![BDK::AddressLine1.into(), BDK::AddressLine2.into(), BDK::City.into(), BDK::State.into(), BDK::Zip.into(), BDK::Country.into()] => HashSet::from_iter([CDO::BusinessAddress]))]
 #[test_case(vec![BDK::PhoneNumber.into()] => HashSet::from_iter([CDO::BusinessPhoneNumber]))]
 #[test_case(vec![BDK::Website.into()] => HashSet::from_iter([CDO::BusinessWebsite]))]
-#[test_case(vec![BDK::BeneficialOwners.into()] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
 #[test_case(vec![IPK::Occupation.into(), IPK::BrokerageFirmEmployer.into(), IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
 #[test_case(vec![IPK::Occupation.into(), IPK::BrokerageFirmEmployer.into(), IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into(), DK::FinraComplianceLetter.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
 #[test_case(vec![IPK::AnnualIncome.into(), IPK::NetWorth.into(), IPK::InvestmentGoals.into(), IPK::RiskTolerance.into(), IPK::Declarations.into()] => HashSet::from_iter([CDO::InvestorProfile]))]
 // Mixed
-#[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Ssn4)] => HashSet::from_iter([CDO::BusinessBeneficialOwners, CDO::Ssn4]))]
-#[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Zip), DI::from(IDK::Country)] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
+#[test_case(vec![DI::from(BDK::Name), DI::from(IDK::Ssn4)] => HashSet::from_iter([CDO::BusinessName, CDO::Ssn4]))]
+#[test_case(vec![DI::from(BDK::Name), DI::from(IDK::Zip), DI::from(IDK::Country)] => HashSet::from_iter([CDO::BusinessName]))]
 fn test_parse_list_of_kinds(kinds: Vec<DI>) -> HashSet<CDO> {
     CDO::list_from(kinds)
 }
