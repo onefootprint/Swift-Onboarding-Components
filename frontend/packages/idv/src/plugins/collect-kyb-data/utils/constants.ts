@@ -23,7 +23,6 @@ export const BENEFICIAL_OWNER_ATTRIBUTE: Record<IdField, BeneficialOwnerDataAttr
 export const BusinessFields: Exclude<`${BusinessDI}`, 'business.tin'>[] = [
   'business.address_line1',
   'business.address_line2',
-  'business.beneficial_owners',
   'business.city',
   'business.corporation_type',
   'business.country',
