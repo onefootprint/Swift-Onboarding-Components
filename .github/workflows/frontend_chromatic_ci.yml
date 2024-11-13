@@ -47,11 +47,11 @@ jobs:
 
       - name: 📥 Install node_modules
         working-directory: ./frontend
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: 🏗️ Build Storybook
         working-directory: ./frontend
-        run: yarn build:storybook --filter=@onefootprint/ui
+        run: pnpm build:storybook --filter=@onefootprint/ui
 
       - name: ⚡ Run Chromatic on UI
         uses: chromaui/action@b984808b772126a9f44b2b7737b131b68a2ede32 # ratchet:chromaui/action@latest
