@@ -1,10 +1,10 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Person;
@@ -14,14 +14,18 @@ use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
+use newtypes::preview_api;
 use newtypes::AuditEventDetail;
 use newtypes::DbActor;
+use paperclip::actix;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
-use paperclip::actix::{
-    self,
-};
 
+
+// We really shouldn't give this API to tenants. It only soft deletes users and hides them from the
+// dashboard. So there's a lot of weird behavior that's not entirely tested for users who are
+// deleted this way. We should generally just encourage tenants to delete the _vault_ data for
+// users. https://onefootprint.slack.com/archives/C04RHCM8FU0/p1731099510770239
 #[route_alias(actix::delete(
     "/businesses/{fp_bid}",
     tags(Businesses, Deprecated),
@@ -32,7 +36,7 @@ use paperclip::actix::{
 pub async fn delete(
     state: web::Data<State>,
     path: FpIdPath,
-    auth: TenantApiKeyAuth,
+    auth: TenantApiKeyGated<preview_api::SoftDeleteUsers>,
     insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
     let fp_id = path.into_inner();
