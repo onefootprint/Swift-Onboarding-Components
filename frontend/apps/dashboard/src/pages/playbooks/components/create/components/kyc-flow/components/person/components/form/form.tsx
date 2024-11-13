@@ -53,15 +53,15 @@ const Form = ({ onClose }: FormProps) => {
   return (
     <Stack flexDirection="column" gap={8}>
       {showNoPhoneFlow && (
-        <Section>
+        <Stack flexDirection="column" gap={5}>
           <Text paddingBottom={2} variant="label-1">
             {t('basic-information.title')}
           </Text>
           <Text variant="label-3">{t('phone.title')}</Text>
           <Checkbox label={t('phone.label')} {...register('person.phoneNumber')} />
-        </Section>
+        </Stack>
       )}
-      <Section>
+      <Stack flexDirection="column" gap={5}>
         <Text paddingBottom={3} variant="label-1">
           {t('us-residents.title')}
         </Text>
@@ -109,11 +109,11 @@ const Form = ({ onClose }: FormProps) => {
             )}
           </>
         )}
-      </Section>
-      <Section>
+      </Stack>
+      <Stack flexDirection="column" gap={5}>
         <Text variant="label-3">{t('us-legal-status.title')}</Text>
         <Checkbox label={t('us-legal-status.label')} {...register('person.usLegalStatus')} />
-      </Section>
+      </Stack>
       <Stack flexDirection="column" gap={4}>
         <Button fullWidth variant="primary" onClick={handleSave}>
           {allT('save')}
@@ -125,13 +125,6 @@ const Form = ({ onClose }: FormProps) => {
     </Stack>
   );
 };
-
-const Section = styled(Stack)`
-  ${({ theme }) => css`
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-  `}
-`;
 
 const Subsection = styled.div`
   ${({ theme }) => css`

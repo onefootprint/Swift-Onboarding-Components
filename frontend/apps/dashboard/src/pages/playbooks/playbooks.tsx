@@ -49,17 +49,17 @@ const Playbooks = () => {
   };
 
   return (
-    <Container>
+    <Stack flexDirection="column" gap={8}>
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <HeaderContainer>
-        <Title>
+      <Stack flexDirection="row" justifyContent="space-between" alignItems="center">
+        <Stack flexDirection="column" gap={2} maxWidth="650px">
           <Text variant="heading-2">{t('header.title')}</Text>
           <Text variant="body-2" color="secondary">
             {t('header.subtitle')}
           </Text>
-        </Title>
+        </Stack>
         <Wrapper>
           <Stack position="relative">
             {!hasHadPlaybook && <Highlighter variants={highlighterAnimation} initial="initial" animate="animate" />}
@@ -68,7 +68,7 @@ const Playbooks = () => {
             </PermissionGate>
           </Stack>
         </Wrapper>
-      </HeaderContainer>
+      </Stack>
       <Stack direction="column">
         <Table data={response?.data} errorMessage={errorMessage} isPending={isPending} />
         {response && response.meta.count > 0 && (
@@ -84,7 +84,7 @@ const Playbooks = () => {
         )}
       </Stack>
       <Create open={dialogOpen} onClose={handleClose} onDone={handleCreate} />
-    </Container>
+    </Stack>
   );
 };
 
@@ -102,30 +102,6 @@ const Highlighter = styled(motion.span)<{ shouldHighlight?: boolean }>`
     background-color: ${theme.backgroundColor.accent};
     border-radius: ${theme.borderRadius.default};
   `}
-`;
-
-const Title = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-    max-width: 650px;
-  `};
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[8]};
-  `};
-`;
-
-const HeaderContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 const Wrapper = styled.div`
