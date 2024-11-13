@@ -1,10 +1,10 @@
 use crate::config::Config;
 use crate::errors::enclave::EnclaveError;
-use crate::errors::AssertionError;
 use crate::proxy::to_data_transforms;
 use crate::s3::S3Client;
 use crate::FpResult;
 use api_errors::FpError;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
@@ -389,9 +389,10 @@ impl EnclaveClient {
 
         let results = self.batch_decrypt_documents(documents).await?;
 
-        Ok(results.into_values().next().ok_or(AssertionError(
-            "missing static key in batch_decrypt_documents result",
-        ))?)
+        let results = (results.into_values())
+            .next()
+            .ok_or(ServerErr("missing static key in batch_decrypt_documents result"))?;
+        Ok(results)
     }
 
     #[tracing::instrument(skip_all)]

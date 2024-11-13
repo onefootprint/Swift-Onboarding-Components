@@ -19,6 +19,7 @@ use crate::utils::vault_wrapper::PatchDataResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequestInto;
 use api_errors::FpError;
 use api_wire_types::UpdateEntityRequest;
 use db::models::audit_event::AuditEvent;
@@ -71,7 +72,7 @@ pub async fn create_non_portable_vault(
     let sandbox_id = sandbox_id.0;
     let sandbox_id = if is_live {
         if sandbox_id.is_some() {
-            return Err(ValidationError("Cannot provide a sandbox ID outside of live mode").into());
+            return BadRequestInto("Cannot provide a sandbox ID outside of live mode");
         }
         None
     } else {

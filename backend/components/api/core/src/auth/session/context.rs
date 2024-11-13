@@ -3,7 +3,6 @@ use super::ExtractableAuthSession;
 use super::GetSessionForUpdate;
 use crate::auth::tenant::InvalidateAuth;
 use crate::auth::AuthError;
-use crate::errors::AssertionError;
 use crate::utils::session::AuthSession;
 use crate::ApiError;
 use crate::ApiResponse;
@@ -12,6 +11,7 @@ use crate::State;
 use actix_web::http::header::HeaderMap;
 use actix_web::web;
 use actix_web::FromRequest;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use chrono::DateTime;
 use chrono::Duration;
@@ -144,7 +144,7 @@ where
         let extractor = async move {
             let root_span = root_span
                 .await
-                .map_err(|_| AssertionError("Cannot extract root span"))?;
+                .map_err(|_| ServerErr("Cannot extract root span"))?;
 
             let allowed_headers = T::header_names_for_err()
                 .into_iter()

@@ -1,9 +1,9 @@
 use crate::auth::AuthError;
-use crate::errors::AssertionError;
 use crate::telemetry::RootSpan;
 use crate::State;
 use actix_web::web;
 use actix_web::FromRequest;
+use api_errors::ServerErr;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::DbError;
@@ -53,7 +53,7 @@ impl FromRequest for PublicOnboardingContext {
         let extractor = async move {
             let root_span = root_span
                 .await
-                .map_err(|_| AssertionError("Cannot extract root span"))?;
+                .map_err(|_| ServerErr("Cannot extract root span"))?;
 
             let key = newtypes::PublishablePlaybookKey::from(config_key?);
             let key2 = key.clone();

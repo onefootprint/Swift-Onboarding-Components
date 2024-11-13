@@ -1,5 +1,5 @@
-use crate::errors::ValidationError;
 use crate::FpResult;
+use api_errors::BadRequestInto;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
@@ -157,7 +157,7 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
             .unwrap_or("None".into());
         tracing::info!(%auth_token_hash, %public_key, "Verify args");
         if self.auth_token.is_none() && self.public_key.is_none() {
-            return Err(ValidationError("Either auth token or public key must be provided").into());
+            return BadRequestInto("Either auth token or public key must be provided");
         }
 
         let show_completion_page = self
@@ -179,7 +179,7 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
             .unwrap_or("None".into());
         tracing::info!(%public_key, "Auth args");
         if self.public_key.is_none() {
-            return Err(ValidationError("Public key must be provided").into());
+            return BadRequestInto("Public key must be provided");
         }
         Ok(())
     }
@@ -200,7 +200,7 @@ impl ValidateSdkArgs for FormV1SdkArgs {
             .unwrap_or("None".into());
         tracing::info!(%auth_token_hash, "Auth args");
         if self.auth_token.is_none() {
-            return Err(ValidationError("Auth token must be provided").into());
+            return BadRequestInto("Auth token must be provided");
         }
         Ok(())
     }

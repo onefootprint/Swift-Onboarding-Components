@@ -3,9 +3,9 @@ use crate::FpResult;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
-use api_core::errors::ValidationError;
 use api_core::utils::vault_wrapper::BusinessOwnerInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_errors::BadRequest;
 use api_errors::BadRequestWithCode;
 use api_errors::FpErrorCode;
 use api_wire_types::hosted::business::HostedBusinessDetail;
@@ -57,7 +57,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
         .find(|b| b.bo.link_id == bo_auth.bo.link_id)
         .ok_or(BusinessError::LinkedBoNotFound)?;
 
-    let (first_name, last_name) = primary_bo.name().ok_or(ValidationError("No name"))?;
+    let (first_name, last_name) = primary_bo.name().ok_or(BadRequest("No name"))?;
     let inviter = Inviter {
         first_name,
         last_name,
@@ -74,7 +74,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
 
     let business_name = bvw
         .get_p_data(&BDK::Name.into())
-        .ok_or(ValidationError("No business name"))?;
+        .ok_or(BadRequest("No business name"))?;
     let result = HostedBusinessDetail {
         name: business_name.clone(),
         inviter,

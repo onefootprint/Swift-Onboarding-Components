@@ -1,5 +1,6 @@
 use crate::errors::ValidationError;
 use crate::FpResult;
+use api_errors::BadRequestInto;
 use api_wire_types::MultiUpdateRuleRequest;
 use db::models::list::List;
 use db::models::rule_instance::MultiRuleUpdate;
@@ -103,11 +104,7 @@ pub fn validate_rule_expression(
                     value,
                 } => {
                     if !di_supports_equality_rules(field) {
-                        return ValidationError(&format!(
-                            "Vaulted field {} does not support equality rules",
-                            field
-                        ))
-                        .into();
+                        return BadRequestInto!("Vaulted field {} does not support equality rules", field);
                     }
                     let all_data = AllData::new();
                     field.clone().clean_and_validate(
@@ -126,11 +123,11 @@ pub fn validate_rule_expression(
                     ref value,
                 } => {
                     let Some(list) = lists.get(value) else {
-                        return ValidationError(&format!("List with ID {} not found", value)).into();
+                        return BadRequestInto!("List with ID {} not found", value);
                     };
 
                     if list.is_live != is_live {
-                        return ValidationError("List is_live does not match is_live context").into();
+                        return BadRequestInto("List is_live does not match is_live context");
                     }
 
                     let di_matches_list_kind = match list.kind {
@@ -158,14 +155,11 @@ pub fn validate_rule_expression(
                     };
 
                     if !di_matches_list_kind {
-                        return ValidationError(
-                            format!(
-                                "Vaulted field {} can not be matched against list with kind {}",
-                                field, list.kind
-                            )
-                            .as_str(),
-                        )
-                        .into();
+                        return BadRequestInto!(
+                            "Vaulted field {} can not be matched against list with kind {}",
+                            field,
+                            list.kind
+                        );
                     }
                 }
             },
@@ -176,11 +170,11 @@ pub fn validate_rule_expression(
                     ref value,
                 } => {
                     let Some(list) = lists.get(value) else {
-                        return ValidationError(&format!("List with ID {} not found", value)).into();
+                        return BadRequestInto!("List with ID {} not found", value);
                     };
 
                     if list.is_live != is_live {
-                        return ValidationError("List is_live does not match is_live context").into();
+                        return BadRequestInto("List is_live does not match is_live context");
                     }
 
                     let di_matches_list_kind = match list.kind {
@@ -193,14 +187,11 @@ pub fn validate_rule_expression(
                     };
 
                     if !di_matches_list_kind {
-                        return ValidationError(
-                            format!(
-                                "Device Insight field {} can not be matched against list with kind {}",
-                                field, list.kind
-                            )
-                            .as_str(),
-                        )
-                        .into();
+                        return BadRequestInto!(
+                            "Device Insight field {} can not be matched against list with kind {}",
+                            field,
+                            list.kind
+                        );
                     }
                 }
             },
@@ -387,7 +378,7 @@ mod tests {
     }
 
     fn validation_error(s: &str) -> FpError {
-        ValidationError(s).into()
+        BadRequestInto(s)
     }
 
     #[test_case(vec![

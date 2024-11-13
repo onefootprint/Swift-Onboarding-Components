@@ -65,8 +65,7 @@ impl std::error::Error for FpError {
 mod base;
 mod code;
 
-pub use base::AssertionError;
-pub use base::ValidationError;
+pub use base::*;
 pub use code::BadRequestWithCode;
 pub use code::FpErrorCode;
 
