@@ -105,19 +105,32 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     request: web::Json<CreateApiKeyRequest>,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
-    let tenant = auth.tenant();
-    let tenant_id = tenant.id.clone();
+    let tenant = auth.tenant().clone();
     let sh_key = secret_key.fingerprint(state.as_ref()).await?;
     let e_key = secret_key.seal_to(&tenant.public_key)?;
+    let actor = auth.actor();
     let CreateApiKeyRequest { name, role_id } = request.into_inner();
     let (api_key, role) = state
         .db_transaction(move |conn| -> FpResult<_> {
-            let api_key = TenantApiKey::create(conn, name, sh_key, e_key, tenant_id, is_live, role_id)?;
+            let api_key =
+                TenantApiKey::create(conn, name, sh_key, e_key, tenant.id.clone(), is_live, role_id)?;
             let role = TenantRole::get(conn, &api_key.role_id)?;
+            let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+            let detail = AuditEventDetail::CreateOrgApiKey {
+                tenant_api_key_id: api_key.id.clone(),
+            };
+            let audit_event = NewAuditEvent {
+                tenant_id: tenant.id,
+                principal_actor: actor.into(),
+                insight_event_id,
+                detail,
+            };
+            AuditEvent::create(conn, audit_event)?;
             Ok((api_key, role))
         })
         .await?;

@@ -145,6 +145,13 @@ def test_client_token_perms(limited_role, sandbox_tenant, sandbox_user, admin_ro
     body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     key = SecretApiKey.from_response(body)
 
+    # An audit event should be created
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="create_org_api_key",
+        api_key={"id": key.id},
+    )
+
     # Try creating a client token with missing permissions
     fp_id = sandbox_user.fp_id
     decrypt_datas = [
@@ -209,15 +216,6 @@ def test_api_key_reveal(secret_key, sandbox_tenant, admin_role):
         name="decrypt_org_api_key",
         api_key={
             "id": secret_key.id,
-            "name": secret_key.name,
-            "role": {
-                "id": admin_role["id"],
-                "name": admin_role["name"],
-                "scopes": admin_role["scopes"],
-                "is_immutable": admin_role["is_immutable"],
-                "created_at": admin_role["created_at"],
-                "kind": admin_role["kind"],
-            },
         },
     )
 

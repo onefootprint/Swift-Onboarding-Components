@@ -420,6 +420,11 @@ impl AuditEventBulkSecondaryData {
                     }
                     ids
                 }
+                AuditEventMetadata::CreateOrgApiKey => je
+                    .tenant_api_key
+                    .as_ref()
+                    .map(|k| vec![&k.role_id])
+                    .unwrap_or_default(),
                 _ => vec![],
             });
         let tenant_roles = TenantRole::get_bulk(conn, tr_ids.collect())?;

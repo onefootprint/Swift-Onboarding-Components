@@ -44,7 +44,7 @@ use workos::sso::Profile;
 use workos::KnownOrUnknown;
 
 fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> FpResult<WorkosAuthMethod> {
-    // To protect against MaggicLink becoming a known type, check based on the string representation
+    // To protect against MagicLink becoming a known type, check based on the string representation
     // of the connection type. Sadly, Display isn't implemented so have to check the serialization
     let connection_type = serde_json::ser::to_string(&connection_type)?;
     let result = match connection_type.as_ref() {

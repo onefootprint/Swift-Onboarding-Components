@@ -84,10 +84,22 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::StartUserVerification => AuditEventDetail::StartUserVerification,
             AuditEventMetadata::CompleteUserVerification => AuditEventDetail::CompleteUserVerification,
             AuditEventMetadata::CollectUserDocument => AuditEventDetail::CollectUserDocument,
-            AuditEventMetadata::CreateOrgApiKey => AuditEventDetail::CreateOrgApiKey,
+            AuditEventMetadata::CreateOrgApiKey => {
+                let tenant_api_key =
+                    tenant_api_key.ok_or(ServerErr("tenant api key is not available for this event"))?;
+                let current_api_key_role = (secondary_data.tenant_roles)
+                    .get(&tenant_api_key.role_id)
+                    .ok_or(ServerErr("tenant role is not available for this event"))?;
+                AuditEventDetail::CreateOrgApiKey {
+                    api_key: api_wire_types::AuditEventApiKey::from_db((
+                        tenant_api_key,
+                        current_api_key_role.to_owned(),
+                    )),
+                }
+            }
             AuditEventMetadata::DecryptOrgApiKey => {
                 let tenant_api_key =
-                    tenant_api_key.ok_or(ServerErr("tenant role is not available for this event"))?;
+                    tenant_api_key.ok_or(ServerErr("tenant api key is not available for this event"))?;
                 let tenant_role = (secondary_data.tenant_roles)
                     .get(&tenant_api_key.role_id)
                     .ok_or(ServerErr("tenant role is not available for this event"))?;
