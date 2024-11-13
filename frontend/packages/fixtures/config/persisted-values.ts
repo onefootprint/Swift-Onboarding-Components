@@ -4889,6 +4889,7 @@ export const dashboard_Document: Document = {
   selfieScore: -74362032.63221093,
   startedAt: '1951-04-09T08:03:59.0Z',
   status: 'complete',
+  statusDescription: 'laboris voluptate',
   uploadSource: 'mobile',
   uploads: [
     {

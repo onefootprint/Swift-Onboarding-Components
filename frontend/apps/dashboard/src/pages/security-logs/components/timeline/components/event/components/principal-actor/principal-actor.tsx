@@ -1,5 +1,4 @@
-import type { AccessEvent, Actor } from '@onefootprint/types';
-import { ActorKind } from '@onefootprint/types';
+import type { Actor, AuditEvent } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import * as HoverCard from '@radix-ui/react-hover-card';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +7,7 @@ import InsightEventDisplay from './components/insight-event-display';
 
 type PrincipalActorProps = {
   principal: Actor;
-  insightEvent: AccessEvent['insightEvent'];
+  insightEvent: AuditEvent['insightEvent'];
 };
 
 const PrincipalActor = ({ principal, insightEvent }: PrincipalActorProps) => {
@@ -19,18 +18,18 @@ const PrincipalActor = ({ principal, insightEvent }: PrincipalActorProps) => {
       <Stack gap={2} cursor="default">
         <HoverCard.Trigger asChild>
           <Text variant="label-3" textDecoration="underline">
-            {principal.kind === ActorKind.footprint && t('footprint')}
-            {principal.kind === ActorKind.firmEmployee && t('firm-employee')}
-            {principal.kind === ActorKind.organization &&
+            {principal.kind === 'footprint' && t('footprint')}
+            {principal.kind === 'firm_employee' && t('firm-employee')}
+            {principal.kind === 'organization' &&
               (principal?.firstName || principal?.lastName
                 ? `${principal?.firstName ?? ''} ${principal?.lastName ?? ''}`
                 : t('employees'))}
-            {principal.kind === ActorKind.apiKey && `${t('api-key')}`}
-            {principal.kind === ActorKind.user && t('user')}
+            {principal.kind === 'api_key' && `${t('api-key')}`}
+            {principal.kind === 'user' && t('user')}
           </Text>
         </HoverCard.Trigger>
-        {principal.kind === ActorKind.organization && <Text variant="body-3">({principal.email})</Text>}
-        {principal.kind === ActorKind.apiKey && <Text variant="body-3">({principal.name})</Text>}
+        {principal.kind === 'organization' && <Text variant="body-3">({principal.email})</Text>}
+        {principal.kind === 'api_key' && <Text variant="body-3">({principal.name})</Text>}
       </Stack>
 
       {insightEvent && (

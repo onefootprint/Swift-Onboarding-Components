@@ -1,16 +1,16 @@
-import { type AccessEvent, AccessEventKind, type DecryptUserDataDetail } from '@onefootprint/types';
+import type { AuditEvent, AuditEventDetail } from '@onefootprint/request-types/dashboard';
 import DecryptionReason from './components/decryption-reason';
 
 type EventBodyProps = {
-  accessEvent: AccessEvent;
+  auditEvent: AuditEvent;
 };
 
-const EventBody = ({ accessEvent }: EventBodyProps) => {
-  const { detail } = accessEvent;
+const EventBody = ({ auditEvent }: EventBodyProps) => {
+  const { detail } = auditEvent;
   const { kind } = detail;
 
-  if (kind === AccessEventKind.DecryptUserData) {
-    return <DecryptionReason detail={detail as DecryptUserDataDetail} />;
+  if (kind === 'decrypt_user_data') {
+    return <DecryptionReason detail={detail as AuditEventDetail} />;
   }
   return null;
 };

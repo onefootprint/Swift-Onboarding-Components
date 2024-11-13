@@ -1,5 +1,5 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import type { AccessEvent } from '@onefootprint/types';
+import type { AuditEvent } from '@onefootprint/request-types/dashboard';
 import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
@@ -21,11 +21,11 @@ export const getKeyForItemTime = (time: string) => {
 };
 
 type TimelineProps = {
-  accessEvents: AccessEvent[];
+  auditEvents: AuditEvent[];
   isLoading: boolean;
 };
 
-const Timeline = ({ accessEvents, isLoading }: TimelineProps) => {
+const Timeline = ({ auditEvents, isLoading }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   const filters = useSecurityLogsFilters();
 
@@ -33,16 +33,16 @@ const Timeline = ({ accessEvents, isLoading }: TimelineProps) => {
     return <Loading />;
   }
 
-  if (!accessEvents.length) {
+  if (!auditEvents.length) {
     return <Text variant="body-3">{t('empty')}</Text>;
   }
 
   return (
     <>
       <Stack direction="column">
-        {accessEvents.map((accessEvent, i) => {
+        {auditEvents.map((accessEvent, i) => {
           const key = `${getKeyForItemTime(accessEvent.timestamp)}-${i}`;
-          const last = i === accessEvents.length - 1;
+          const last = i === auditEvents.length - 1;
 
           return (
             <Grid.Container
@@ -82,10 +82,10 @@ const Timeline = ({ accessEvents, isLoading }: TimelineProps) => {
                 gap={3}
               >
                 <Grid.Item gridArea="header" align="flex-stat" justify="start" display="flex" alignItems="flex-start">
-                  <Event accessEvent={accessEvent} />
+                  <Event auditEvent={accessEvent} />
                 </Grid.Item>
                 <Box height="auto" tag="span" marginTop={3}>
-                  <EventBody accessEvent={accessEvent} />
+                  <EventBody auditEvent={accessEvent} />
                 </Box>
               </Grid.Container>
             </Grid.Container>

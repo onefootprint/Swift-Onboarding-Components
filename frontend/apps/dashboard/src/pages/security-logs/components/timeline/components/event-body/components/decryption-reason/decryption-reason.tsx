@@ -1,16 +1,19 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import type { DecryptUserDataDetail } from '@onefootprint/types';
+import type { AuditEventDetail } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type DecryptionReasonProps = {
-  detail: DecryptUserDataDetail;
+  detail: AuditEventDetail;
 };
 
 const DecryptionReason = ({ detail }: DecryptionReasonProps) => {
   const { t } = useTranslation('security-logs', {
     keyPrefix: 'events.body.decryption-reason',
   });
+  if (detail.kind !== 'decrypt_user_data') {
+    return null;
+  }
   const { reason } = detail.data;
 
   return (

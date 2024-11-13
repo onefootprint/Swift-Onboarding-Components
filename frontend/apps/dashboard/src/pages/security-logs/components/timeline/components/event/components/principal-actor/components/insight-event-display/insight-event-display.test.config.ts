@@ -1,39 +1,26 @@
-import type { InsightEvent } from '@onefootprint/types';
+import { getInsightEvent } from '@onefootprint/fixtures/dashboard';
+import type { InsightEvent } from '@onefootprint/request-types/dashboard';
 
-export const insightEventFixture: InsightEvent = {
-  region: 'California',
-  country: 'United States',
-  postalCode: '94105',
-  ipAddress: '192.168.1.1',
-  userAgent:
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-  city: 'San Francisco',
-  latitude: 37.7749,
-  longitude: -122.4194,
-  metroCode: '807',
-  regionName: 'California',
-  timeZone: 'America/Los_Angeles',
-  timestamp: '2023-06-15T12:00:00Z',
-};
+export const insightEventFixture: InsightEvent = getInsightEvent({});
 
 export const partialInsightEvent: InsightEvent = {
   ...insightEventFixture,
-  region: null,
-  country: null,
-  postalCode: null,
+  region: undefined,
+  country: undefined,
+  postalCode: undefined,
 };
 
 export const emptyInsightEvent: InsightEvent = {
-  region: null,
-  country: null,
-  postalCode: null,
-  ipAddress: null,
-  userAgent: null,
-  city: null,
-  latitude: null,
-  longitude: null,
-  metroCode: null,
-  regionName: null,
-  timeZone: null,
+  region: undefined,
+  country: undefined,
+  postalCode: undefined,
+  ipAddress: undefined,
+  userAgent: undefined,
+  city: undefined,
+  latitude: undefined,
+  longitude: undefined,
+  metroCode: undefined,
+  regionName: undefined,
+  timeZone: undefined,
   timestamp: '2023-06-15T12:00:00Z',
 };

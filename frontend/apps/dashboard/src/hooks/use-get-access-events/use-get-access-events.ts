@@ -1,9 +1,19 @@
 import type { PaginatedRequestResponse } from '@onefootprint/request';
 import request from '@onefootprint/request';
-import type { GetAccessEventsRequest, GetAccessEventsResponse } from '@onefootprint/types';
+import type { AuditEvent } from '@onefootprint/request-types/dashboard';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
+
+export type GetAccessEventsRequest = {
+  cursor?: string;
+  search?: string;
+  targets?: string[];
+  timestamp_gte?: string; // from
+  timestamp_lte?: string; // to
+};
+
+export type GetAccessEventsResponse = AuditEvent[];
 
 import useSecurityLogsFilters from '../use-security-logs-filters';
 

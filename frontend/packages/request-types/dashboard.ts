@@ -248,6 +248,15 @@ export type AuditEventDetail =
         tenantRoleId: string;
       };
       kind: 'deactivate_org_role';
+    }
+  | {
+      data: {
+        email: string;
+        firstName?: string;
+        lastName?: string;
+        tenantRole: OrganizationRole;
+      };
+      kind: 'org_member_joined';
     };
 export type kind2 = 'create_user';
 /**
@@ -267,6 +276,7 @@ export type AuditEventName =
   | 'complete_user_verification'
   | 'collect_user_document'
   | 'create_org_api_key'
+  | 'org_member_joined'
   | 'decrypt_org_api_key'
   | 'update_org_api_key'
   | 'invite_org_member'
@@ -1193,6 +1203,7 @@ export type Document = {
   selfieScore?: number;
   startedAt?: string;
   status?: DocumentStatus;
+  statusDescription?: string;
   uploads: Array<DocumentUpload>;
   uploadSource: UploadSource;
 };
@@ -1293,7 +1304,7 @@ export type DocumentReviewStatus =
   | 'pending_human_review'
   | 'reviewed_by_human';
 export type DocumentSide = 'front' | 'back' | 'selfie';
-export type DocumentStatus = 'pending' | 'failed' | 'complete';
+export type DocumentStatus = 'pending' | 'failed' | 'complete' | 'abandoned';
 export type DocumentUpload = {
   failureReasons: Array<DocumentImageError>;
   identifier: DataIdentifier;
@@ -4028,6 +4039,7 @@ export type PreviewApi =
   | 'documents_list'
   | 'onboarding_session_token'
   | 'vault_integrity'
+  | 'soft_delete_users'
   | 'client_vaulting_docs'
   | 'list_duplicate_users';
 export type PrivateBusinessOwner = {

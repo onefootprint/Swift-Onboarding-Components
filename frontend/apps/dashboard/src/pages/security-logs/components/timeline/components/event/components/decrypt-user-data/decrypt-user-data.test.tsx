@@ -21,6 +21,7 @@ describe('<DecryptUserData />', () => {
     const text = screen.getByText('First name and Last name');
     expect(text).toBeInTheDocument();
   });
+
   it('should render correctly with three fields', () => {
     customRender(<DecryptUserData detail={threeFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');

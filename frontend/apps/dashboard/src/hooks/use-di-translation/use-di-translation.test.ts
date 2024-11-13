@@ -1,68 +1,69 @@
+import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { renderHook } from '@onefootprint/test-utils';
-import { BusinessDI, type DataIdentifier, DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 import useDITranslation from './use-di-translation';
 
 describe('useDITranslation', () => {
   describe('ID DIs', () => {
     it('translates first name', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(IdDI.firstName)).toBe('First name');
+      expect(result.current.translateDI('id.first_name')).toBe('First name');
     });
 
     it('translates last name', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(IdDI.lastName)).toBe('Last name');
+      expect(result.current.translateDI('id.last_name')).toBe('Last name');
     });
 
     it('translates email', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(IdDI.email)).toBe('Email');
+      expect(result.current.translateDI('id.email')).toBe('Email');
     });
   });
 
   describe('Business DIs', () => {
     it('translates business name', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(BusinessDI.name)).toBe('Business name');
+      expect(result.current.translateDI('business.name')).toBe('Business name');
     });
 
     it('translates DBA', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(BusinessDI.doingBusinessAs)).toBe('Doing Business As');
+      expect(result.current.translateDI('business.dba')).toBe('Doing Business As');
     });
 
     it('translates TIN', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(BusinessDI.tin)).toBe('TIN (EIN)');
+      expect(result.current.translateDI('business.tin')).toBe('TIN (EIN)');
     });
   });
 
   describe('Investor Profile DIs', () => {
     it('translates employment status', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(InvestorProfileDI.employmentStatus)).toBe('Employment status');
+      expect(result.current.translateDI('investor_profile.employment_status')).toBe('Employment status');
     });
 
     it('translates occupation', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(InvestorProfileDI.occupation)).toBe('Occupation');
+      expect(result.current.translateDI('investor_profile.occupation')).toBe('Occupation');
     });
   });
 
   describe('Document DIs', () => {
     it('translates passport', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(DocumentDI.latestPassport)).toBe('Passport');
+      expect(result.current.translateDI('document.passport.front.image')).toBe('Passport');
     });
 
     it('translates passport selfie', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(DocumentDI.latestPassportSelfie)).toBe('Passport selfie');
+      expect(result.current.translateDI('document.passport.selfie.image')).toBe('Selfie');
     });
 
     it('handles versioned documents', () => {
       const { result } = renderHook(() => useDITranslation());
-      expect(result.current.translateDI(`${DocumentDI.latestPassport}:v1` as DataIdentifier)).toBe('Passport');
+      expect(result.current.translateDI('document.passport.front.image:v1' as DataIdentifier)).toBe('Passport');
+      expect(result.current.translateDI('document.passport.selfie.image:v2' as DataIdentifier)).toBe('Selfie');
     });
   });
 

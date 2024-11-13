@@ -1,4 +1,4 @@
-import type { RoleScope } from '@onefootprint/types';
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import * as HoverCard from '@radix-ui/react-hover-card';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import RolePermissions from './components/role-permissions';
 type RoleDisplayProps = {
   isNew?: boolean;
   name: string;
-  scopes: RoleScope[];
+  scopes: TenantScope[];
 };
 
 const RoleDisplay = ({ isNew, name, scopes }: RoleDisplayProps) => {

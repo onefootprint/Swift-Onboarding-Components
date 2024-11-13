@@ -1,5 +1,5 @@
 import { IcoSparkles16 } from '@onefootprint/icons';
-import type { InsightEvent } from '@onefootprint/types';
+import type { InsightEvent } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

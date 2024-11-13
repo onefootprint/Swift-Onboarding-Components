@@ -23,17 +23,15 @@ describe('<InsightEvent />', () => {
   it('renders all values when provided', () => {
     customRender(<InsightEventDisplay insightEvent={insightEventFixture} />);
 
-    const region = screen.getByText('California');
+    const region = screen.getByText('ex');
     expect(region).toBeInTheDocument();
-    const country = screen.getByText('United States');
+    const country = screen.getByText('Reunion');
     expect(country).toBeInTheDocument();
-    const zipCode = screen.getByText('94105');
+    const zipCode = screen.getByText('laborum culpa');
     expect(zipCode).toBeInTheDocument();
-    const ipAddress = screen.getByText('192.168.1.1');
+    const ipAddress = screen.getByText('261 Luella Shoals Suite 750');
     expect(ipAddress).toBeInTheDocument();
-    const userAgent = screen.getByText(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    );
+    const userAgent = screen.getByText('aliquip sit officia proident');
     expect(userAgent).toBeInTheDocument();
   });
 
@@ -49,11 +47,9 @@ describe('<InsightEvent />', () => {
 
     const dashes = screen.getAllByText('-');
     expect(dashes).toHaveLength(3);
-    const ipAddress = screen.getByText('192.168.1.1');
+    const ipAddress = screen.getByText('261 Luella Shoals Suite 750');
     expect(ipAddress).toBeInTheDocument();
-    const userAgent = screen.getByText(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    );
+    const userAgent = screen.getByText('aliquip sit officia proident');
     expect(userAgent).toBeInTheDocument();
   });
 

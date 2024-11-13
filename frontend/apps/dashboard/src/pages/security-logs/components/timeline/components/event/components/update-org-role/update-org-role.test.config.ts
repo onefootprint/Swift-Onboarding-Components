@@ -1,31 +1,18 @@
-import { AccessEventKind, RoleScopeKind, type UpdateOrgRoleDetail } from '@onefootprint/types';
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 
-export const updateOrgRoleFixture: UpdateOrgRoleDetail = {
-  kind: AccessEventKind.UpdateOrgRole,
-  data: {
-    roleName: 'Admin',
-    prevScopes: [
-      {
-        kind: RoleScopeKind.invokeVaultProxy as const,
-        data: {
-          kind: 'id',
-          id: 'users',
-        },
-      },
-      {
-        kind: RoleScopeKind.invokeVaultProxy as const,
-        data: {
-          kind: 'id',
-          id: 'users',
-        },
-      },
-    ],
-    newScopes: [
-      {
-        kind: RoleScopeKind.invokeVaultProxy as const,
-        data: { kind: 'id', id: 'users' },
-      },
-    ],
-    tenantRoleId: '123',
-  },
+export const roleFixture = {
+  roleName: 'string',
+  prevScopes: [
+    {
+      kind: 'decrypt' as const,
+      data: 'name' as const,
+    },
+  ] as TenantScope[],
+  newScopes: [
+    {
+      kind: 'decrypt' as const,
+      data: 'name' as const,
+    },
+  ] as TenantScope[],
+  tenantRoleId: 'string',
 };

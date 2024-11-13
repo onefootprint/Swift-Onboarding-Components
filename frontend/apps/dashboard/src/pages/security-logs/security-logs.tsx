@@ -1,4 +1,4 @@
-import { type AccessEvent, AccessEventKind } from '@onefootprint/types';
+import type { AuditEvent } from '@onefootprint/request-types/dashboard';
 import { Divider, SearchInput, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
@@ -10,12 +10,12 @@ const SecurityLogs = () => {
   const { t } = useTranslation('security-logs');
 
   const getAccessEvents = useGetAccessEvents();
-  const accessEvents: AccessEvent[] =
-    getAccessEvents.data?.pages.reduce<AccessEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
+  const auditEvents: AuditEvent[] =
+    getAccessEvents.data?.pages.reduce<AuditEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
 
   const accessEventsToShow = [
-    AccessEventKind.DecryptUserData,
+    'decrypt_user_data',
     // coming soon - keep in for dev
     // AccessEventKind.CreateOrgRole,
     // AccessEventKind.UpdateOrgRole,
@@ -24,7 +24,7 @@ const SecurityLogs = () => {
 
   // NOTE: placeholder for now
   // include other events as we add UI support for them
-  const filteredAccessEvents = accessEvents.filter(accessEvent => accessEventsToShow.includes(accessEvent.name));
+  const filteredAuditEvents = auditEvents.filter(auditEvent => accessEventsToShow.includes(auditEvent.name));
 
   return (
     <>
@@ -44,7 +44,7 @@ const SecurityLogs = () => {
         />
         <SecurityLogsFilters />
         <Divider />
-        <Timeline accessEvents={filteredAccessEvents} isLoading={getAccessEvents.isLoading} />
+        <Timeline auditEvents={filteredAuditEvents} isLoading={getAccessEvents.isLoading} />
       </Stack>
     </>
   );

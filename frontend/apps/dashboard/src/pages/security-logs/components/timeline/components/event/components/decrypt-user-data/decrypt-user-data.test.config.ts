@@ -1,74 +1,78 @@
-import { IdDI } from '@onefootprint/types';
+import { getAuditEventDetail } from '@onefootprint/fixtures/dashboard';
 
-import { AccessEventKind } from '@onefootprint/types';
-
-export const oneFieldFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const oneFieldFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
-    decryptedFields: [IdDI.firstName],
-    fpId: '123',
+    context: 'api',
+    decryptedFields: ['id.first_name'],
+    fpId: '1234',
     reason: 'Testing',
   },
-};
+});
 
-export const twoFieldsFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const twoFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
-    decryptedFields: [IdDI.firstName, IdDI.lastName],
-    fpId: '123',
+    context: 'api',
+    decryptedFields: ['id.first_name', 'id.last_name'],
+    fpId: '1234',
     reason: 'Testing',
   },
-};
+});
 
-export const threeFieldsFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const threeFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
-    decryptedFields: [IdDI.firstName, IdDI.lastName, IdDI.dob],
-    fpId: '123',
+    context: 'api',
+    decryptedFields: ['id.first_name', 'id.last_name', 'id.dob'],
+    fpId: '1234',
     reason: 'Testing',
   },
-};
+});
 
-export const fourFieldsFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const fourFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
-    decryptedFields: [IdDI.firstName, IdDI.lastName, IdDI.dob, IdDI.email],
-    fpId: '123',
+    context: 'api',
+    decryptedFields: ['id.first_name', 'id.last_name', 'id.dob', 'id.email'],
+    fpId: '1234',
     reason: 'Testing',
   },
-};
+});
 
-export const fiveFieldsFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const fiveFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
-    decryptedFields: [IdDI.firstName, IdDI.lastName, IdDI.dob, IdDI.email, IdDI.phoneNumber],
-    fpId: '123',
+    context: 'api',
+    decryptedFields: ['id.first_name', 'id.last_name', 'id.dob', 'id.email', 'id.phone_number'],
+    fpId: '1234',
     reason: 'Testing',
   },
-};
+});
 
-export const sixteenFieldsFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const sixteenFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
+    context: 'api',
     decryptedFields: [
-      IdDI.firstName,
-      IdDI.lastName,
-      IdDI.dob,
-      IdDI.email,
-      IdDI.phoneNumber,
-      IdDI.nationality,
-      IdDI.country,
-      IdDI.nationality,
-      IdDI.ssn4,
-      IdDI.citizenships,
-      IdDI.usTaxId,
-      IdDI.addressLine1,
-      IdDI.usLegalStatus,
-      IdDI.visaExpirationDate,
-      IdDI.visaKind,
-      IdDI.zip,
+      'id.first_name',
+      'id.last_name',
+      'id.dob',
+      'id.email',
+      'id.phone_number',
+      'id.nationality',
+      'id.country',
+      'id.nationality',
+      'id.ssn4',
+      'id.citizenships',
+      'id.us_tax_id',
+      'id.address_line1',
+      'id.us_legal_status',
+      'id.visa_expiration_date',
+      'id.visa_kind',
+      'id.zip',
     ],
-    fpId: '123',
+    fpId: '1234',
     reason: 'Testing',
   },
-};
+});

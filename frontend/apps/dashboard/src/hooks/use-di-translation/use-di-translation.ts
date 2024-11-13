@@ -1,4 +1,4 @@
-import { BusinessDI, type DataIdentifier, DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { useTranslation } from 'react-i18next';
 
 const useDITranslation = () => {
@@ -11,75 +11,83 @@ const useDITranslation = () => {
     }
 
     // Handle ID DIs
-    if (di === IdDI.firstName) return t('id.first_name');
-    if (di === IdDI.middleName) return t('id.middle_name');
-    if (di === IdDI.lastName) return t('id.last_name');
-    if (di === IdDI.email) return t('id.email');
-    if (di === IdDI.phoneNumber) return t('id.phone_number');
-    if (di === IdDI.dob) return t('id.dob');
-    if (di === IdDI.ssn9) return t('id.ssn9');
-    if (di === IdDI.ssn4) return t('id.ssn4');
-    if (di === IdDI.addressLine1) return t('id.address_line1');
-    if (di === IdDI.addressLine2) return t('id.address_line2');
-    if (di === IdDI.city) return t('id.city');
-    if (di === IdDI.state) return t('id.state');
-    if (di === IdDI.country) return t('id.country');
-    if (di === IdDI.zip) return t('id.zip');
-    if (di === IdDI.nationality) return t('id.nationality');
-    if (di === IdDI.usLegalStatus) return t('id.us_legal_status');
-    if (di === IdDI.visaKind) return t('id.visa_kind');
-    if (di === IdDI.visaExpirationDate) return t('id.visa_expiration_date');
-    if (di === IdDI.citizenships) return t('id.citizenships');
-    if (di === IdDI.usTaxId) return t('id.us_tax_id');
-    if (di === IdDI.itin) return t('id.itin');
+    if (di === 'id.first_name') return t('id.first_name');
+    if (di === 'id.middle_name') return t('id.middle_name');
+    if (di === 'id.last_name') return t('id.last_name');
+    if (di === 'id.email') return t('id.email');
+    if (di === 'id.phone_number') return t('id.phone_number');
+    if (di === 'id.dob') return t('id.dob');
+    if (di === 'id.ssn9') return t('id.ssn9');
+    if (di === 'id.ssn4') return t('id.ssn4');
+    if (di === 'id.address_line1') return t('id.address_line1');
+    if (di === 'id.address_line2') return t('id.address_line2');
+    if (di === 'id.city') return t('id.city');
+    if (di === 'id.state') return t('id.state');
+    if (di === 'id.country') return t('id.country');
+    if (di === 'id.zip') return t('id.zip');
+    if (di === 'id.nationality') return t('id.nationality');
+    if (di === 'id.us_legal_status') return t('id.us_legal_status');
+    if (di === 'id.visa_kind') return t('id.visa_kind');
+    if (di === 'id.visa_expiration_date') return t('id.visa_expiration_date');
+    if (di === 'id.citizenships') return t('id.citizenships');
+    if (di === 'id.us_tax_id') return t('id.us_tax_id');
+    if (di === 'id.itin') return t('id.tin');
 
     // Handle Business DIs
-    if (di === BusinessDI.name) return t('business.name');
-    if (di === BusinessDI.doingBusinessAs) return t('business.dba');
-    if (di === BusinessDI.website) return t('business.website');
-    if (di === BusinessDI.phoneNumber) return t('business.phone_number');
-    if (di === BusinessDI.tin) return t('business.tin');
-    if (di === BusinessDI.corporationType) return t('business.corporation_type');
-    if (di === BusinessDI.beneficialOwners) return t('business.beneficial_owners');
-    if (di === BusinessDI.kycedBeneficialOwners) return t('business.kyced_beneficial_owners');
-    if (di === BusinessDI.addressLine1) return t('business.address_line1');
-    if (di === BusinessDI.addressLine2) return t('business.address_line2');
-    if (di === BusinessDI.city) return t('business.city');
-    if (di === BusinessDI.state) return t('business.state');
-    if (di === BusinessDI.country) return t('business.country');
-    if (di === BusinessDI.zip) return t('business.zip');
-    if (di === BusinessDI.formationState) return t('business.formation_state');
-    if (di === BusinessDI.formationDate) return t('business.formation_date');
+    if (di === 'business.name') return t('business.name');
+    if (di === 'business.dba') return t('business.dba');
+    if (di === 'business.website') return t('business.website');
+    if (di === 'business.phone_number') return t('business.phone_number');
+    if (di === 'business.tin') return t('business.tin');
+    if (di === 'business.corporation_type') return t('business.corporation_type');
+    if (di === 'business.address_line1') return t('business.address_line1');
+    if (di === 'business.address_line2') return t('business.address_line2');
+    if (di === 'business.city') return t('business.city');
+    if (di === 'business.state') return t('business.state');
+    if (di === 'business.country') return t('business.country');
+    if (di === 'business.zip') return t('business.zip');
+    if (di === 'business.formation_state') return t('business.formation_state');
+    if (di === 'business.formation_date') return t('business.formation_date');
 
     // Handle Investor Profile DIs
-    if (di === InvestorProfileDI.employmentStatus) return t('investor_profile.employment_status');
-    if (di === InvestorProfileDI.occupation) return t('investor_profile.occupation');
-    if (di === InvestorProfileDI.employer) return t('investor_profile.employer');
-    if (di === InvestorProfileDI.annualIncome) return t('investor_profile.annual_income');
-    if (di === InvestorProfileDI.netWorth) return t('investor_profile.net_worth');
-    if (di === InvestorProfileDI.investmentGoals) return t('investor_profile.investment_goals');
-    if (di === InvestorProfileDI.riskTolerance) return t('investor_profile.risk_tolerance');
-    if (di === InvestorProfileDI.declarations) return t('investor_profile.declarations');
-    if (di === InvestorProfileDI.seniorExecutiveSymbols) return t('investor_profile.senior_executive_symbols');
-    if (di === InvestorProfileDI.familyMemberNames) return t('investor_profile.family_member_names');
-    if (di === InvestorProfileDI.politicalOrganization) return t('investor_profile.political_organization');
-    if (di === InvestorProfileDI.brokerageFirmEmployer) return t('investor_profile.brokerage_firm_employer');
-    if (di === InvestorProfileDI.fundingSources) return t('investor_profile.funding_sources');
+    if (di === 'investor_profile.employment_status') return t('investor_profile.employment_status');
+    if (di === 'investor_profile.occupation') return t('investor_profile.occupation');
+    if (di === 'investor_profile.employer') return t('investor_profile.employer');
+    if (di === 'investor_profile.annual_income') return t('investor_profile.annual_income');
+    if (di === 'investor_profile.net_worth') return t('investor_profile.net_worth');
+    if (di === 'investor_profile.investment_goals') return t('investor_profile.investment_goals');
+    if (di === 'investor_profile.risk_tolerance') return t('investor_profile.risk_tolerance');
+    if (di === 'investor_profile.declarations') return t('investor_profile.declarations');
+    if (di === 'investor_profile.senior_executive_symbols') return t('investor_profile.senior_executive_symbols');
+    if (di === 'investor_profile.family_member_names') return t('investor_profile.family_member_names');
+    if (di === 'investor_profile.political_organization') return t('investor_profile.political_organization');
+    if (di === 'investor_profile.brokerage_firm_employer') return t('investor_profile.brokerage_firm_employer');
+    if (di === 'investor_profile.funding_sources') return t('investor_profile.funding_sources');
 
     // Handle Document DIs
-    if (di === DocumentDI.finraComplianceLetter) return 'FINRA Compliance Letter';
-    if (di === DocumentDI.latestPassport) return 'Passport';
-    if (di === DocumentDI.latestPassportSelfie) return 'Passport selfie';
-    if (di === DocumentDI.latestDriversLicenseFront) return "Driver's License";
-    if (di === DocumentDI.latestDriversLicenseBack) return "Driver's License (Back)";
-    if (di === DocumentDI.latestIdCardFront) return 'ID Card';
-    if (di === DocumentDI.latestIdCardBack) return 'ID Card (Back)';
-    if (di === DocumentDI.latestVisa) return 'Visa';
-    if (di === DocumentDI.latestLeaseFront) return 'Lease';
-    if (di === DocumentDI.latestBankStatementFront) return 'Bank Statement';
-    if (di === DocumentDI.latestUtilityBillFront) return 'Utility Bill';
-    if (di === DocumentDI.ssnCard) return 'SSN Card';
-    if (di === DocumentDI.proofOfAddress) return 'Proof of Address';
+    const documentMappings: Record<string, string> = {
+      'document.finra_compliance_letter': 'document.finra_compliance_letter',
+      'document.ssn_card.image': 'document.ssn_card',
+      'document.proof_of_address.image': 'document.proof_of_address.image',
+    };
+
+    if (documentMappings[di]) return t(documentMappings[di]);
+
+    // Handle specific document fields
+    const documentTypes = ['drivers_license', 'passport', 'passport_card', 'custom'];
+    for (const type of documentTypes) {
+      const prefix = `document.${type}.`;
+      if (di.startsWith(prefix)) {
+        const field = di.replace(prefix, '');
+        return t(`document.${type}.${field}`);
+      }
+    }
+
+    // Handle verified fields
+    if (di.startsWith('id.verified_')) {
+      const field = di.replace('id.verified_', '');
+      return t(`id.${field}`);
+    }
 
     // Handle Card DIs
     if (di.startsWith('card.') && di.includes('.name')) return t('card.name');

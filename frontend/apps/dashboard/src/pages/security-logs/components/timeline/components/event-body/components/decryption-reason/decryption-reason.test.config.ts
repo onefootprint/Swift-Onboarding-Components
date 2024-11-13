@@ -1,10 +1,11 @@
-import { AccessEventKind } from '@onefootprint/types';
+import { getAuditEventDetail } from '@onefootprint/fixtures/dashboard';
 
-export const decryptUserDataFixture = {
-  kind: AccessEventKind.DecryptUserData,
+export const auditEventFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
   data: {
-    fpId: '123',
+    context: 'api',
+    decryptedFields: ['id.email'],
+    fpId: 'fp_123',
     reason: 'Test reason',
-    decryptedFields: [],
   },
-};
+});

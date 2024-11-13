@@ -1,4 +1,4 @@
-import type { DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useDITranslation from 'src/hooks/use-di-translation';
