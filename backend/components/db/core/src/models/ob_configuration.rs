@@ -556,6 +556,8 @@ impl ObConfiguration {
 
     #[tracing::instrument("ObConfiguration::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, obc_id: &ObConfigurationId) -> DbResult<Locked<Self>> {
+        Playbook::lock(conn, obc_id)?;
+
         let result = ob_configuration::table
             .filter(ob_configuration::id.eq(obc_id))
             .for_no_key_update()

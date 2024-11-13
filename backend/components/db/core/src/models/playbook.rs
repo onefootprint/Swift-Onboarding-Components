@@ -12,15 +12,17 @@ use db_schema::schema::ob_configuration;
 use db_schema::schema::playbook;
 use db_schema::schema::tenant;
 use diesel::prelude::*;
+use diesel::sql_types::Bool;
 use diesel::Queryable;
 use newtypes::ApiKeyStatus;
 use newtypes::Locked;
+use newtypes::ObConfigurationId;
 use newtypes::PlaybookId;
 use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
 
 /// A Playbook row groups together all versions of an ObConfiguration across edits.
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = playbook)]
 pub struct Playbook {
     pub id: PlaybookId,
@@ -53,6 +55,30 @@ pub enum PlaybookIdentifier<'a> {
     },
 }
 
+impl<'a> PlaybookIdentifier<'a> {
+    pub fn filter<'b, QS>(&self) -> Box<dyn BoxableExpression<QS, diesel::pg::Pg, SqlType = Bool> + 'b>
+    where
+        playbook::tenant_id: SelectableExpression<QS>,
+        playbook::is_live: SelectableExpression<QS>,
+        playbook::key: SelectableExpression<QS>,
+    {
+        match self {
+            PlaybookIdentifier::Key(key) => Box::new(playbook::key.eq((*key).clone())),
+            PlaybookIdentifier::TenantKey {
+                key,
+                tenant_id,
+                is_live,
+            } => Box::new(
+                playbook::key
+                    .eq((*key).clone())
+                    .and(playbook::tenant_id.eq((*tenant_id).clone()))
+                    .and(playbook::is_live.eq(*is_live)),
+            ),
+        }
+    }
+}
+
+
 impl Playbook {
     #[tracing::instrument("Playbook::create", skip_all)]
     pub fn create(
@@ -79,11 +105,14 @@ impl Playbook {
     }
 
     #[tracing::instrument("Playbook::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, playbook_id: &PlaybookId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &ObConfigurationId) -> DbResult<Locked<Self>> {
         let result = playbook::table
-            .filter(playbook::id.eq(playbook_id))
+            .inner_join(ob_configuration::table)
+            .filter(ob_configuration::id.eq(id))
             .for_no_key_update()
+            .select(Playbook::as_select())
             .get_result(conn.conn())?;
+
         Ok(Locked::new(result))
     }
 
@@ -93,24 +122,11 @@ impl Playbook {
     where
         T: Into<PlaybookIdentifier<'a>>,
     {
-        let query = ob_configuration::table
-            .inner_join(playbook::table)
-            .inner_join(tenant::table)
-            .into_boxed();
+        let id: PlaybookIdentifier = id.into();
 
-        let query = match id.into() {
-            PlaybookIdentifier::Key(key) => query.filter(playbook::key.eq(key)),
-            PlaybookIdentifier::TenantKey {
-                key,
-                tenant_id,
-                is_live,
-            } => query
-                .filter(playbook::key.eq(key))
-                .filter(playbook::tenant_id.eq(tenant_id))
-                .filter(playbook::is_live.eq(is_live)),
-        };
-
-        let result = query
+        let result = ob_configuration::table
+            .inner_join(playbook::table.inner_join(tenant::table))
+            .filter(id.filter())
             .filter(ob_configuration::deactivated_at.is_null())
             .select((
                 playbook::all_columns,
