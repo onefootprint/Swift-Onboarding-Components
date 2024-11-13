@@ -107,6 +107,8 @@ import type {
   GetEntitiesClientTokenResponse,
   GetEntitiesVaultDecryptByTokenData,
   GetError,
+  GetHealthEnclaveData,
+  GetHealthEnclaveDecryptData,
   GetHealthEnclaveDecryptError,
   GetHealthEnclaveDecryptResponse,
   GetHealthEnclaveError,
@@ -114,22 +116,28 @@ import type {
   GetOrgApiKeysData,
   GetOrgApiKeysError,
   GetOrgApiKeysResponse,
+  GetOrgAppMetaAndroidData,
   GetOrgAppMetaAndroidError,
   GetOrgAppMetaAndroidResponse,
+  GetOrgAppMetaIosData,
   GetOrgAppMetaIosError,
   GetOrgAppMetaIosResponse,
   GetOrgAuditEventsData,
   GetOrgAuditEventsError,
   GetOrgAuditEventsResponse,
   GetOrgAuthGoogleOauthData,
+  GetOrgAuthRolesData,
   GetOrgAuthRolesError,
   GetOrgAuthRolesResponse,
+  GetOrgClientSecurityConfigData,
   GetOrgClientSecurityConfigError,
   GetOrgClientSecurityConfigResponse,
+  GetOrgData,
   GetOrgError,
   GetOrgFrequentNotesData,
   GetOrgFrequentNotesError,
   GetOrgFrequentNotesResponse,
+  GetOrgInvoicePreviewData,
   GetOrgInvoicePreviewError,
   GetOrgInvoicePreviewResponse,
   GetOrgListsByIdTimelineData,
@@ -144,6 +152,7 @@ import type {
   GetOrgListsData,
   GetOrgListsError,
   GetOrgListsResponse,
+  GetOrgMemberData,
   GetOrgMemberError,
   GetOrgMemberInProgressOnboardingsData,
   GetOrgMemberInProgressOnboardingsError,
@@ -177,15 +186,21 @@ import type {
   GetOrgTagsData,
   GetOrgTagsError,
   GetOrgTagsResponse,
+  GetOrgVaultDrAwsPreEnrollmentData,
   GetOrgVaultDrAwsPreEnrollmentError,
   GetOrgVaultDrAwsPreEnrollmentResponse,
+  GetOrgVaultDrStatusData,
   GetOrgVaultDrStatusError,
   GetOrgVaultDrStatusResponse,
+  GetOrgWebhookPortalData,
   GetOrgWebhookPortalError,
   GetOrgWebhookPortalResponse,
   GetPartnerAuthGoogleOauthData,
+  GetPartnerAuthRolesData,
   GetPartnerAuthRolesError,
   GetPartnerAuthRolesResponse,
+  GetPartnerData,
+  GetPartnerDocTemplatesData,
   GetPartnerDocTemplatesError,
   GetPartnerDocTemplatesResponse,
   GetPartnerError,
@@ -201,6 +216,7 @@ import type {
   GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdData,
   GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdError,
   GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdResponse,
+  GetPartnerPartnershipsData,
   GetPartnerPartnershipsError,
   GetPartnerPartnershipsResponse,
   GetPartnerResponse,
@@ -340,11 +356,13 @@ import type {
   PostOrgAuthAssumeRoleData,
   PostOrgAuthAssumeRoleError,
   PostOrgAuthAssumeRoleResponse,
+  PostOrgAuthDocsTokenData,
   PostOrgAuthDocsTokenError,
   PostOrgAuthDocsTokenResponse,
   PostOrgAuthLoginData,
   PostOrgAuthLoginError,
   PostOrgAuthLoginResponse,
+  PostOrgAuthLogoutData,
   PostOrgAuthLogoutError,
   PostOrgAuthLogoutResponse,
   PostOrgAuthMagicLinkData,
@@ -398,6 +416,7 @@ import type {
   PostOrgTagsData,
   PostOrgTagsError,
   PostOrgTagsResponse,
+  PostOrgVaultDrAwsPreEnrollmentData,
   PostOrgVaultDrAwsPreEnrollmentError,
   PostOrgVaultDrAwsPreEnrollmentResponse,
   PostOrgVaultDrEnrollData,
@@ -412,6 +431,7 @@ import type {
   PostPartnerAuthLoginData,
   PostPartnerAuthLoginError,
   PostPartnerAuthLoginResponse,
+  PostPartnerAuthLogoutData,
   PostPartnerAuthLogoutError,
   PostPartnerAuthLogoutResponse,
   PostPartnerAuthMagicLinkData,
@@ -451,11 +471,13 @@ import type {
   PostWebhooksSambaHandleWebhookResponse,
   PostWebhooksTwilioStatusCallbackError,
   PostWebhooksTwilioStatusCallbackResponse,
+  PutOrgLogoData,
   PutOrgLogoError,
   PutOrgLogoResponse,
   PutPartnerDocTemplatesByTemplateIdData,
   PutPartnerDocTemplatesByTemplateIdError,
   PutPartnerDocTemplatesByTemplateIdResponse,
+  PutPartnerLogoData,
   PutPartnerLogoError,
   PutPartnerLogoResponse,
 } from '@onefootprint/request-types/dashboard';
@@ -1205,7 +1227,9 @@ export const getHealth = <ThrowOnError extends boolean = false>(options?: Option
 /**
  * Returns enclave health
  */
-export const getHealthEnclave = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getHealthEnclave = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHealthEnclaveData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetHealthEnclaveResponse, GetHealthEnclaveError, ThrowOnError>({
     ...options,
     url: '/health/enclave',
@@ -1216,7 +1240,7 @@ export const getHealthEnclave = <ThrowOnError extends boolean = false>(options?:
  * Checks health of enclave decrypt operation
  */
 export const getHealthEnclaveDecrypt = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHealthEnclaveDecryptData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetHealthEnclaveDecryptResponse, GetHealthEnclaveDecryptError, ThrowOnError>({
     ...options,
@@ -1227,7 +1251,7 @@ export const getHealthEnclaveDecrypt = <ThrowOnError extends boolean = false>(
 /**
  * Returns basic info about the authed tenant
  */
-export const getOrg = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrg = <ThrowOnError extends boolean = false>(options?: Options<GetOrgData, ThrowOnError>) => {
   return (options?.client ?? client).get<GetOrgResponse, GetOrgError, ThrowOnError>({
     ...options,
     url: '/org',
@@ -1317,7 +1341,7 @@ export const postOrgApiKeysByIdReveal = <ThrowOnError extends boolean = false>(
  * Returns a list of metadata for tenant Android apps.
  */
 export const getOrgAppMetaAndroid = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetOrgAppMetaAndroidData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetOrgAppMetaAndroidResponse, GetOrgAppMetaAndroidError, ThrowOnError>({
     ...options,
@@ -1389,7 +1413,9 @@ export const postOrgAppMetaAndroidByMetaIdReveal = <ThrowOnError extends boolean
 /**
  * Returns a list of metadata for tenant ios apps.
  */
-export const getOrgAppMetaIos = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrgAppMetaIos = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgAppMetaIosData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetOrgAppMetaIosResponse, GetOrgAppMetaIosError, ThrowOnError>({
     ...options,
     url: '/org/app_meta/ios',
@@ -1486,7 +1512,7 @@ export const postOrgAuthAssumeRole = <ThrowOnError extends boolean = false>(
  * Create a token scoped for use on the docs site
  */
 export const postOrgAuthDocsToken = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<PostOrgAuthDocsTokenData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<PostOrgAuthDocsTokenResponse, PostOrgAuthDocsTokenError, ThrowOnError>({
     ...options,
@@ -1521,7 +1547,9 @@ export const postOrgAuthLogin = <ThrowOnError extends boolean = false>(
 /**
  * Logs out the authenticated principal and invalidates the session
  */
-export const postOrgAuthLogout = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const postOrgAuthLogout = <ThrowOnError extends boolean = false>(
+  options?: Options<PostOrgAuthLogoutData, ThrowOnError>,
+) => {
   return (options?.client ?? client).post<PostOrgAuthLogoutResponse, PostOrgAuthLogoutError, ThrowOnError>({
     ...options,
     url: '/org/auth/logout',
@@ -1543,7 +1571,9 @@ export const postOrgAuthMagicLink = <ThrowOnError extends boolean = false>(
 /**
  * Return the list of tenants that can be inherited by the authed user
  */
-export const getOrgAuthRoles = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrgAuthRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgAuthRolesData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetOrgAuthRolesResponse, GetOrgAuthRolesError, ThrowOnError>({
     ...options,
     url: '/org/auth/roles',
@@ -1554,7 +1584,7 @@ export const getOrgAuthRoles = <ThrowOnError extends boolean = false>(options?: 
  * Get the client security configuration.
  */
 export const getOrgClientSecurityConfig = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetOrgClientSecurityConfigData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetOrgClientSecurityConfigResponse,
@@ -1626,7 +1656,7 @@ export const deleteOrgFrequentNotesByFrequentNoteId = <ThrowOnError extends bool
  * Returns a preview of the in-progress invoice for the month, if exists
  */
 export const getOrgInvoicePreview = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetOrgInvoicePreviewData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetOrgInvoicePreviewResponse, GetOrgInvoicePreviewError, ThrowOnError>({
     ...options,
@@ -1755,7 +1785,7 @@ export const deleteOrgListsByListIdEntriesByListEntryId = <ThrowOnError extends 
 /**
  * Upload a new logo for the organization.
  */
-export const putOrgLogo = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const putOrgLogo = <ThrowOnError extends boolean = false>(options?: Options<PutOrgLogoData, ThrowOnError>) => {
   return (options?.client ?? client).put<PutOrgLogoResponse, PutOrgLogoError, ThrowOnError>({
     ...options,
     url: '/org/logo',
@@ -1765,7 +1795,9 @@ export const putOrgLogo = <ThrowOnError extends boolean = false>(options?: Optio
 /**
  * Returns info on the authed user.
  */
-export const getOrgMember = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrgMember = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgMemberData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetOrgMemberResponse, GetOrgMemberError, ThrowOnError>({
     ...options,
     url: '/org/member',
@@ -2204,7 +2236,7 @@ export const deleteOrgTagsByTagId = <ThrowOnError extends boolean = false>(
  * Returns the AWS external ID for the tenant if it exists
  */
 export const getOrgVaultDrAwsPreEnrollment = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetOrgVaultDrAwsPreEnrollmentData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetOrgVaultDrAwsPreEnrollmentResponse,
@@ -2220,7 +2252,7 @@ export const getOrgVaultDrAwsPreEnrollment = <ThrowOnError extends boolean = fal
  * Generates an AWS external ID for the tenant if necessary.
  */
 export const postOrgVaultDrAwsPreEnrollment = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<PostOrgVaultDrAwsPreEnrollmentData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     PostOrgVaultDrAwsPreEnrollmentResponse,
@@ -2263,7 +2295,9 @@ export const postOrgVaultDrRevealWrappedRecordKeys = <ThrowOnError extends boole
 /**
  * Returns the status of Vault Disaster Recovery for the authenticated organization
  */
-export const getOrgVaultDrStatus = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrgVaultDrStatus = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgVaultDrStatusData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetOrgVaultDrStatusResponse, GetOrgVaultDrStatusError, ThrowOnError>({
     ...options,
     url: '/org/vault_dr/status',
@@ -2273,7 +2307,9 @@ export const getOrgVaultDrStatus = <ThrowOnError extends boolean = false>(option
 /**
  * Returns the webhook portal url.
  */
-export const getOrgWebhookPortal = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrgWebhookPortal = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgWebhookPortalData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetOrgWebhookPortalResponse, GetOrgWebhookPortalError, ThrowOnError>({
     ...options,
     url: '/org/webhook_portal',
@@ -2283,7 +2319,7 @@ export const getOrgWebhookPortal = <ThrowOnError extends boolean = false>(option
 /**
  * Returns basic info about the authed partner tenant
  */
-export const getPartner = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getPartner = <ThrowOnError extends boolean = false>(options?: Options<GetPartnerData, ThrowOnError>) => {
   return (options?.client ?? client).get<GetPartnerResponse, GetPartnerError, ThrowOnError>({
     ...options,
     url: '/partner',
@@ -2347,7 +2383,7 @@ export const postPartnerAuthLogin = <ThrowOnError extends boolean = false>(
  * Logs out the authenticated principal and invalidates the session
  */
 export const postPartnerAuthLogout = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<PostPartnerAuthLogoutData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<PostPartnerAuthLogoutResponse, PostPartnerAuthLogoutError, ThrowOnError>({
     ...options,
@@ -2374,7 +2410,9 @@ export const postPartnerAuthMagicLink = <ThrowOnError extends boolean = false>(
 /**
  * Return the list of partner tenants that can be inherited by the authed user
  */
-export const getPartnerAuthRoles = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getPartnerAuthRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<GetPartnerAuthRolesData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetPartnerAuthRolesResponse, GetPartnerAuthRolesError, ThrowOnError>({
     ...options,
     url: '/partner/auth/roles',
@@ -2385,7 +2423,7 @@ export const getPartnerAuthRoles = <ThrowOnError extends boolean = false>(option
  * Lists compliance document templates.
  */
 export const getPartnerDocTemplates = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetPartnerDocTemplatesData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetPartnerDocTemplatesResponse, GetPartnerDocTemplatesError, ThrowOnError>({
     ...options,
@@ -2440,7 +2478,9 @@ export const deletePartnerDocTemplatesByTemplateId = <ThrowOnError extends boole
 /**
  * Upload a new logo for the partner organization.
  */
-export const putPartnerLogo = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const putPartnerLogo = <ThrowOnError extends boolean = false>(
+  options?: Options<PutPartnerLogoData, ThrowOnError>,
+) => {
   return (options?.client ?? client).put<PutPartnerLogoResponse, PutPartnerLogoError, ThrowOnError>({
     ...options,
     url: '/partner/logo',
@@ -2507,7 +2547,7 @@ export const postPartnerMembersByTenantUserIdDeactivate = <ThrowOnError extends 
  * Returns a summary of partnered companies for a compliance partner.
  */
 export const getPartnerPartnerships = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetPartnerPartnershipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetPartnerPartnershipsResponse, GetPartnerPartnershipsError, ThrowOnError>({
     ...options,

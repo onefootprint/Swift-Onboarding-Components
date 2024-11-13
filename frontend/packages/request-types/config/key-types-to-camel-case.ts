@@ -11,7 +11,7 @@ const excludePrefixes: string[] = [
   'investor_profile.',
   'custom.*',
   'business.',
-  'x-',
+  'X-',
   '/',
 ];
 

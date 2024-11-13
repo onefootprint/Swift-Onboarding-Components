@@ -2,12 +2,28 @@
 
 import type { Options } from '@hey-api/client-axios';
 import type {
+  GetHostedBusinessData,
+  GetHostedBusinessOwnersData,
+  GetHostedBusinessesData,
+  GetHostedCheckSessionData,
+  GetHostedOnboardingConfigData,
+  GetHostedOnboardingNidData,
+  GetHostedOnboardingPrivacyPassData,
+  GetHostedOnboardingSessionData,
+  GetHostedOnboardingStatusData,
+  GetHostedUserAuthMethodsData,
+  GetHostedUserAuthRequirementsData,
+  GetHostedUserAuthorizedOrgsData,
+  GetHostedUserPrivateTokenData,
+  GetHostedUserTokenData,
+  GetOrgSdkArgsData,
   HostedOnboardingD2pGenerateData,
   HostedOnboardingD2pGenerateError,
   HostedOnboardingD2pGenerateResponse,
   HostedOnboardingD2pSmsData,
   HostedOnboardingD2pSmsError,
   HostedOnboardingD2pSmsResponse,
+  HostedOnboardingD2pStatusData,
   HostedOnboardingD2pStatusPostData,
   HostedOnboardingD2pStatusPostError,
   HostedOnboardingD2pStatusPostResponse,
@@ -53,11 +69,13 @@ import type {
   PostHostedIdentifySignupChallengeData,
   PostHostedIdentifySignupChallengeError,
   PostHostedIdentifySignupChallengeResponse,
+  PostHostedIdentifyValidationTokenData,
   PostHostedIdentifyValidationTokenError,
   PostHostedIdentifyValidationTokenResponse,
   PostHostedIdentifyVerifyData,
   PostHostedIdentifyVerifyError,
   PostHostedIdentifyVerifyResponse,
+  PostHostedOnboardingAuthorizeData,
   PostHostedOnboardingAuthorizeError,
   PostHostedOnboardingAuthorizeResponse,
   PostHostedOnboardingData,
@@ -81,6 +99,7 @@ import type {
   PostHostedOnboardingTimelineData,
   PostHostedOnboardingTimelineError,
   PostHostedOnboardingTimelineResponse,
+  PostHostedOnboardingValidateData,
   PostHostedOnboardingValidateError,
   PostHostedOnboardingValidateResponse,
   PostHostedUserAttestDeviceChallengeData,
@@ -228,9 +247,11 @@ const createQueryKey = <TOptions extends Options>(
   return params;
 };
 
-export const getHostedBusinessQueryKey = (options?: Options) => [createQueryKey('getHostedBusiness', options)];
+export const getHostedBusinessQueryKey = (options?: Options<GetHostedBusinessData>) => [
+  createQueryKey('getHostedBusiness', options),
+];
 
-export const getHostedBusinessOptions = (options?: Options) => {
+export const getHostedBusinessOptions = (options?: Options<GetHostedBusinessData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedBusiness({
@@ -282,11 +303,11 @@ export const postHostedBusinessOnboardingMutation = (options?: Partial<Options<P
   return mutationOptions;
 };
 
-export const getHostedBusinessOwnersQueryKey = (options?: Options) => [
+export const getHostedBusinessOwnersQueryKey = (options?: Options<GetHostedBusinessOwnersData>) => [
   createQueryKey('getHostedBusinessOwners', options),
 ];
 
-export const getHostedBusinessOwnersOptions = (options?: Options) => {
+export const getHostedBusinessOwnersOptions = (options?: Options<GetHostedBusinessOwnersData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedBusinessOwners({
@@ -415,9 +436,11 @@ export const postHostedBusinessVaultValidateMutation = (
   return mutationOptions;
 };
 
-export const getHostedBusinessesQueryKey = (options?: Options) => [createQueryKey('getHostedBusinesses', options)];
+export const getHostedBusinessesQueryKey = (options?: Options<GetHostedBusinessesData>) => [
+  createQueryKey('getHostedBusinesses', options),
+];
 
-export const getHostedBusinessesOptions = (options?: Options) => {
+export const getHostedBusinessesOptions = (options?: Options<GetHostedBusinessesData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedBusinesses({
@@ -432,9 +455,11 @@ export const getHostedBusinessesOptions = (options?: Options) => {
   });
 };
 
-export const getHostedCheckSessionQueryKey = (options?: Options) => [createQueryKey('getHostedCheckSession', options)];
+export const getHostedCheckSessionQueryKey = (options?: Options<GetHostedCheckSessionData>) => [
+  createQueryKey('getHostedCheckSession', options),
+];
 
-export const getHostedCheckSessionOptions = (options?: Options) => {
+export const getHostedCheckSessionOptions = (options?: Options<GetHostedCheckSessionData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedCheckSession({
@@ -755,11 +780,11 @@ export const postHostedIdentifySignupChallengeMutation = (
   return mutationOptions;
 };
 
-export const postHostedIdentifyValidationTokenQueryKey = (options?: Options) => [
+export const postHostedIdentifyValidationTokenQueryKey = (options?: Options<PostHostedIdentifyValidationTokenData>) => [
   createQueryKey('postHostedIdentifyValidationToken', options),
 ];
 
-export const postHostedIdentifyValidationTokenOptions = (options?: Options) => {
+export const postHostedIdentifyValidationTokenOptions = (options?: Options<PostHostedIdentifyValidationTokenData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedIdentifyValidationToken({
@@ -774,11 +799,13 @@ export const postHostedIdentifyValidationTokenOptions = (options?: Options) => {
   });
 };
 
-export const postHostedIdentifyValidationTokenMutation = (options?: Partial<Options>) => {
+export const postHostedIdentifyValidationTokenMutation = (
+  options?: Partial<Options<PostHostedIdentifyValidationTokenData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     PostHostedIdentifyValidationTokenResponse,
     AxiosError<PostHostedIdentifyValidationTokenError>,
-    Options
+    Options<PostHostedIdentifyValidationTokenData>
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedIdentifyValidationToken({
@@ -866,11 +893,11 @@ export const postHostedOnboardingMutation = (options?: Partial<Options<PostHoste
   return mutationOptions;
 };
 
-export const postHostedOnboardingAuthorizeQueryKey = (options?: Options) => [
+export const postHostedOnboardingAuthorizeQueryKey = (options?: Options<PostHostedOnboardingAuthorizeData>) => [
   createQueryKey('postHostedOnboardingAuthorize', options),
 ];
 
-export const postHostedOnboardingAuthorizeOptions = (options?: Options) => {
+export const postHostedOnboardingAuthorizeOptions = (options?: Options<PostHostedOnboardingAuthorizeData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingAuthorize({
@@ -885,11 +912,13 @@ export const postHostedOnboardingAuthorizeOptions = (options?: Options) => {
   });
 };
 
-export const postHostedOnboardingAuthorizeMutation = (options?: Partial<Options>) => {
+export const postHostedOnboardingAuthorizeMutation = (
+  options?: Partial<Options<PostHostedOnboardingAuthorizeData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     PostHostedOnboardingAuthorizeResponse,
     AxiosError<PostHostedOnboardingAuthorizeError>,
-    Options
+    Options<PostHostedOnboardingAuthorizeData>
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedOnboardingAuthorize({
@@ -903,11 +932,11 @@ export const postHostedOnboardingAuthorizeMutation = (options?: Partial<Options>
   return mutationOptions;
 };
 
-export const getHostedOnboardingConfigQueryKey = (options?: Options) => [
+export const getHostedOnboardingConfigQueryKey = (options?: Options<GetHostedOnboardingConfigData>) => [
   createQueryKey('getHostedOnboardingConfig', options),
 ];
 
-export const getHostedOnboardingConfigOptions = (options?: Options) => {
+export const getHostedOnboardingConfigOptions = (options?: Options<GetHostedOnboardingConfigData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingConfig({
@@ -996,11 +1025,11 @@ export const hostedOnboardingD2pSmsMutation = (options?: Partial<Options<HostedO
   return mutationOptions;
 };
 
-export const hostedOnboardingD2pStatusQueryKey = (options?: Options) => [
+export const hostedOnboardingD2pStatusQueryKey = (options?: Options<HostedOnboardingD2pStatusData>) => [
   createQueryKey('hostedOnboardingD2pStatus', options),
 ];
 
-export const hostedOnboardingD2pStatusOptions = (options?: Options) => {
+export const hostedOnboardingD2pStatusOptions = (options?: Options<HostedOnboardingD2pStatusData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await hostedOnboardingD2pStatus({
@@ -1091,11 +1120,11 @@ export const postHostedOnboardingFpMutation = (options?: Partial<Options<PostHos
   return mutationOptions;
 };
 
-export const getHostedOnboardingNidQueryKey = (options?: Options) => [
+export const getHostedOnboardingNidQueryKey = (options?: Options<GetHostedOnboardingNidData>) => [
   createQueryKey('getHostedOnboardingNid', options),
 ];
 
-export const getHostedOnboardingNidOptions = (options?: Options) => {
+export const getHostedOnboardingNidOptions = (options?: Options<GetHostedOnboardingNidData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingNid({
@@ -1110,11 +1139,11 @@ export const getHostedOnboardingNidOptions = (options?: Options) => {
   });
 };
 
-export const getHostedOnboardingPrivacyPassQueryKey = (options?: Options) => [
+export const getHostedOnboardingPrivacyPassQueryKey = (options?: Options<GetHostedOnboardingPrivacyPassData>) => [
   createQueryKey('getHostedOnboardingPrivacyPass', options),
 ];
 
-export const getHostedOnboardingPrivacyPassOptions = (options?: Options) => {
+export const getHostedOnboardingPrivacyPassOptions = (options?: Options<GetHostedOnboardingPrivacyPassData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingPrivacyPass({
@@ -1203,11 +1232,11 @@ export const postHostedOnboardingSdsMutation = (options?: Partial<Options<PostHo
   return mutationOptions;
 };
 
-export const getHostedOnboardingSessionQueryKey = (options?: Options) => [
+export const getHostedOnboardingSessionQueryKey = (options?: Options<GetHostedOnboardingSessionData>) => [
   createQueryKey('getHostedOnboardingSession', options),
 ];
 
-export const getHostedOnboardingSessionOptions = (options?: Options) => {
+export const getHostedOnboardingSessionOptions = (options?: Options<GetHostedOnboardingSessionData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingSession({
@@ -1263,11 +1292,11 @@ export const postHostedOnboardingSkipPasskeyRegisterMutation = (
   return mutationOptions;
 };
 
-export const getHostedOnboardingStatusQueryKey = (options?: Options) => [
+export const getHostedOnboardingStatusQueryKey = (options?: Options<GetHostedOnboardingStatusData>) => [
   createQueryKey('getHostedOnboardingStatus', options),
 ];
 
-export const getHostedOnboardingStatusOptions = (options?: Options) => {
+export const getHostedOnboardingStatusOptions = (options?: Options<GetHostedOnboardingStatusData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedOnboardingStatus({
@@ -1356,11 +1385,11 @@ export const postHostedOnboardingTimelineMutation = (options?: Partial<Options<P
   return mutationOptions;
 };
 
-export const postHostedOnboardingValidateQueryKey = (options?: Options) => [
+export const postHostedOnboardingValidateQueryKey = (options?: Options<PostHostedOnboardingValidateData>) => [
   createQueryKey('postHostedOnboardingValidate', options),
 ];
 
-export const postHostedOnboardingValidateOptions = (options?: Options) => {
+export const postHostedOnboardingValidateOptions = (options?: Options<PostHostedOnboardingValidateData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postHostedOnboardingValidate({
@@ -1375,11 +1404,11 @@ export const postHostedOnboardingValidateOptions = (options?: Options) => {
   });
 };
 
-export const postHostedOnboardingValidateMutation = (options?: Partial<Options>) => {
+export const postHostedOnboardingValidateMutation = (options?: Partial<Options<PostHostedOnboardingValidateData>>) => {
   const mutationOptions: UseMutationOptions<
     PostHostedOnboardingValidateResponse,
     AxiosError<PostHostedOnboardingValidateError>,
-    Options
+    Options<PostHostedOnboardingValidateData>
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedOnboardingValidate({
@@ -1471,11 +1500,11 @@ export const postHostedUserAttestDeviceChallengeMutation = (
   return mutationOptions;
 };
 
-export const getHostedUserAuthMethodsQueryKey = (options?: Options) => [
+export const getHostedUserAuthMethodsQueryKey = (options?: Options<GetHostedUserAuthMethodsData>) => [
   createQueryKey('getHostedUserAuthMethods', options),
 ];
 
-export const getHostedUserAuthMethodsOptions = (options?: Options) => {
+export const getHostedUserAuthMethodsOptions = (options?: Options<GetHostedUserAuthMethodsData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserAuthMethods({
@@ -1490,11 +1519,11 @@ export const getHostedUserAuthMethodsOptions = (options?: Options) => {
   });
 };
 
-export const getHostedUserAuthRequirementsQueryKey = (options?: Options) => [
+export const getHostedUserAuthRequirementsQueryKey = (options?: Options<GetHostedUserAuthRequirementsData>) => [
   createQueryKey('getHostedUserAuthRequirements', options),
 ];
 
-export const getHostedUserAuthRequirementsOptions = (options?: Options) => {
+export const getHostedUserAuthRequirementsOptions = (options?: Options<GetHostedUserAuthRequirementsData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserAuthRequirements({
@@ -1509,11 +1538,11 @@ export const getHostedUserAuthRequirementsOptions = (options?: Options) => {
   });
 };
 
-export const getHostedUserAuthorizedOrgsQueryKey = (options?: Options) => [
+export const getHostedUserAuthorizedOrgsQueryKey = (options?: Options<GetHostedUserAuthorizedOrgsData>) => [
   createQueryKey('getHostedUserAuthorizedOrgs', options),
 ];
 
-export const getHostedUserAuthorizedOrgsOptions = (options?: Options) => {
+export const getHostedUserAuthorizedOrgsOptions = (options?: Options<GetHostedUserAuthorizedOrgsData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserAuthorizedOrgs({
@@ -1795,11 +1824,11 @@ export const postHostedUserEmailVerifyMutation = (options?: Partial<Options<Post
   return mutationOptions;
 };
 
-export const getHostedUserPrivateTokenQueryKey = (options?: Options) => [
+export const getHostedUserPrivateTokenQueryKey = (options?: Options<GetHostedUserPrivateTokenData>) => [
   createQueryKey('getHostedUserPrivateToken', options),
 ];
 
-export const getHostedUserPrivateTokenOptions = (options?: Options) => {
+export const getHostedUserPrivateTokenOptions = (options?: Options<GetHostedUserPrivateTokenData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserPrivateToken({
@@ -1814,9 +1843,11 @@ export const getHostedUserPrivateTokenOptions = (options?: Options) => {
   });
 };
 
-export const getHostedUserTokenQueryKey = (options?: Options) => [createQueryKey('getHostedUserToken', options)];
+export const getHostedUserTokenQueryKey = (options?: Options<GetHostedUserTokenData>) => [
+  createQueryKey('getHostedUserToken', options),
+];
 
-export const getHostedUserTokenOptions = (options?: Options) => {
+export const getHostedUserTokenOptions = (options?: Options<GetHostedUserTokenData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHostedUserToken({
@@ -2001,9 +2032,11 @@ export const postHostedUserVaultValidateMutation = (options?: Partial<Options<Po
   return mutationOptions;
 };
 
-export const getOrgSdkArgsQueryKey = (options?: Options) => [createQueryKey('getOrgSdkArgs', options)];
+export const getOrgSdkArgsQueryKey = (options?: Options<GetOrgSdkArgsData>) => [
+  createQueryKey('getOrgSdkArgs', options),
+];
 
-export const getOrgSdkArgsOptions = (options?: Options) => {
+export const getOrgSdkArgsOptions = (options?: Options<GetOrgSdkArgsData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgSdkArgs({

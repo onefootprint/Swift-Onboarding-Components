@@ -6,30 +6,45 @@ import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
 import type {
+  GetHostedBusinessData,
   GetHostedBusinessError,
+  GetHostedBusinessOwnersData,
   GetHostedBusinessOwnersError,
   GetHostedBusinessOwnersResponse,
   GetHostedBusinessResponse,
+  GetHostedBusinessesData,
   GetHostedBusinessesError,
   GetHostedBusinessesResponse,
+  GetHostedCheckSessionData,
   GetHostedCheckSessionError,
   GetHostedCheckSessionResponse,
+  GetHostedOnboardingConfigData,
   GetHostedOnboardingConfigError,
   GetHostedOnboardingConfigResponse,
+  GetHostedOnboardingNidData,
   GetHostedOnboardingNidError,
   GetHostedOnboardingNidResponse,
+  GetHostedOnboardingPrivacyPassData,
+  GetHostedOnboardingSessionData,
   GetHostedOnboardingSessionError,
   GetHostedOnboardingSessionResponse,
+  GetHostedOnboardingStatusData,
   GetHostedOnboardingStatusError,
   GetHostedOnboardingStatusResponse,
+  GetHostedUserAuthMethodsData,
   GetHostedUserAuthMethodsError,
   GetHostedUserAuthMethodsResponse,
+  GetHostedUserAuthRequirementsData,
   GetHostedUserAuthRequirementsError,
   GetHostedUserAuthRequirementsResponse,
+  GetHostedUserAuthorizedOrgsData,
   GetHostedUserAuthorizedOrgsError,
   GetHostedUserAuthorizedOrgsResponse,
+  GetHostedUserPrivateTokenData,
+  GetHostedUserTokenData,
   GetHostedUserTokenError,
   GetHostedUserTokenResponse,
+  GetOrgSdkArgsData,
   GetOrgSdkArgsError,
   GetOrgSdkArgsResponse,
   HostedOnboardingD2pGenerateData,
@@ -38,6 +53,7 @@ import type {
   HostedOnboardingD2pSmsData,
   HostedOnboardingD2pSmsError,
   HostedOnboardingD2pSmsResponse,
+  HostedOnboardingD2pStatusData,
   HostedOnboardingD2pStatusError,
   HostedOnboardingD2pStatusPostData,
   HostedOnboardingD2pStatusPostError,
@@ -85,11 +101,13 @@ import type {
   PostHostedIdentifySignupChallengeData,
   PostHostedIdentifySignupChallengeError,
   PostHostedIdentifySignupChallengeResponse,
+  PostHostedIdentifyValidationTokenData,
   PostHostedIdentifyValidationTokenError,
   PostHostedIdentifyValidationTokenResponse,
   PostHostedIdentifyVerifyData,
   PostHostedIdentifyVerifyError,
   PostHostedIdentifyVerifyResponse,
+  PostHostedOnboardingAuthorizeData,
   PostHostedOnboardingAuthorizeError,
   PostHostedOnboardingAuthorizeResponse,
   PostHostedOnboardingData,
@@ -113,6 +131,7 @@ import type {
   PostHostedOnboardingTimelineData,
   PostHostedOnboardingTimelineError,
   PostHostedOnboardingTimelineResponse,
+  PostHostedOnboardingValidateData,
   PostHostedOnboardingValidateError,
   PostHostedOnboardingValidateResponse,
   PostHostedUserAttestDeviceChallengeData,
@@ -175,7 +194,9 @@ export const client = createClient(
 /**
  * Get information about the business for which we started a KYC of a beneficial owner
  */
-export const getHostedBusiness = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getHostedBusiness = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHostedBusinessData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetHostedBusinessResponse, GetHostedBusinessError, ThrowOnError>({
     ...options,
     url: '/hosted/business',
@@ -202,7 +223,7 @@ export const postHostedBusinessOnboarding = <ThrowOnError extends boolean = fals
  * Get information about the beneficial owners of this business
  */
 export const getHostedBusinessOwners = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedBusinessOwnersData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetHostedBusinessOwnersResponse, GetHostedBusinessOwnersError, ThrowOnError>({
     ...options,
@@ -277,7 +298,9 @@ export const postHostedBusinessVaultValidate = <ThrowOnError extends boolean = f
 /**
  * Get information about the businesses owned by the authenticated user
  */
-export const getHostedBusinesses = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getHostedBusinesses = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHostedBusinessesData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetHostedBusinessesResponse, GetHostedBusinessesError, ThrowOnError>({
     ...options,
     url: '/hosted/businesses',
@@ -288,7 +311,7 @@ export const getHostedBusinesses = <ThrowOnError extends boolean = false>(option
  * Checks a hosted session token for expiration/validity
  */
 export const getHostedCheckSession = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedCheckSessionData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetHostedCheckSessionResponse, GetHostedCheckSessionError, ThrowOnError>({
     ...options,
@@ -412,7 +435,7 @@ export const postHostedIdentifySignupChallenge = <ThrowOnError extends boolean =
  * Generate a validation token after the user finishes the identify flow.
  */
 export const postHostedIdentifyValidationToken = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<PostHostedIdentifyValidationTokenData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     PostHostedIdentifyValidationTokenResponse,
@@ -456,7 +479,7 @@ export const postHostedOnboarding = <ThrowOnError extends boolean = false>(
  * Mark the onboarding as authorized and initiate IDV checks
  */
 export const postHostedOnboardingAuthorize = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<PostHostedOnboardingAuthorizeData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     PostHostedOnboardingAuthorizeResponse,
@@ -472,7 +495,7 @@ export const postHostedOnboardingAuthorize = <ThrowOnError extends boolean = fal
  * Get the details of an onboarding configuration.
  */
 export const getHostedOnboardingConfig = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedOnboardingConfigData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHostedOnboardingConfigResponse,
@@ -516,7 +539,7 @@ export const hostedOnboardingD2pSms = <ThrowOnError extends boolean = false>(
  * Gets the status of the provided d2p session. Requires the d2p session token as the auth header.
  */
 export const hostedOnboardingD2pStatus = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<HostedOnboardingD2pStatusData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     HostedOnboardingD2pStatusResponse,
@@ -560,7 +583,7 @@ export const postHostedOnboardingFp = <ThrowOnError extends boolean = false>(
  * Retrieve identifier used for NeuroId
  */
 export const getHostedOnboardingNid = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedOnboardingNidData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetHostedOnboardingNidResponse, GetHostedOnboardingNidError, ThrowOnError>({
     ...options,
@@ -572,7 +595,7 @@ export const getHostedOnboardingNid = <ThrowOnError extends boolean = false>(
  * initiates privacy pass protocol.
  */
 export const getHostedOnboardingPrivacyPass = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedOnboardingPrivacyPassData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<void, unknown, ThrowOnError>({
     ...options,
@@ -612,7 +635,7 @@ export const postHostedOnboardingSds = <ThrowOnError extends boolean = false>(
  * Fetch information from an existing onboarding session token.
  */
 export const getHostedOnboardingSession = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedOnboardingSessionData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHostedOnboardingSessionResponse,
@@ -644,7 +667,7 @@ export const postHostedOnboardingSkipPasskeyRegister = <ThrowOnError extends boo
  * Returns the remaining onboarding requirements to complete the onboarding.
  */
 export const getHostedOnboardingStatus = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedOnboardingStatusData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHostedOnboardingStatusResponse,
@@ -688,7 +711,7 @@ export const postHostedOnboardingTimeline = <ThrowOnError extends boolean = fals
  * Finish onboarding the user. Returns the validation token that can be exchanged for a permanent Footprint user token.
  */
 export const postHostedOnboardingValidate = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<PostHostedOnboardingValidateData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     PostHostedOnboardingValidateResponse,
@@ -738,7 +761,7 @@ export const postHostedUserAttestDeviceChallenge = <ThrowOnError extends boolean
  * Returns information about the auth methods this user has registered.
  */
 export const getHostedUserAuthMethods = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedUserAuthMethodsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<GetHostedUserAuthMethodsResponse, GetHostedUserAuthMethodsError, ThrowOnError>(
     {
@@ -752,7 +775,7 @@ export const getHostedUserAuthMethods = <ThrowOnError extends boolean = false>(
  * Returns the set of auth requirements to satisfy the auth portion of the playbook in the provided session
  */
 export const getHostedUserAuthRequirements = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedUserAuthRequirementsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHostedUserAuthRequirementsResponse,
@@ -768,7 +791,7 @@ export const getHostedUserAuthRequirements = <ThrowOnError extends boolean = fal
  * Returns a list of organizations onto which the user has onboarded
  */
 export const getHostedUserAuthorizedOrgs = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedUserAuthorizedOrgsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHostedUserAuthorizedOrgsResponse,
@@ -884,7 +907,7 @@ export const postHostedUserEmailVerify = <ThrowOnError extends boolean = false>(
  * Returns information about the auth token. Can only be used in sandbox mode for demo tenants.
  */
 export const getHostedUserPrivateToken = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>,
+  options?: Options<GetHostedUserPrivateTokenData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<void, unknown, ThrowOnError>({
     ...options,
@@ -895,7 +918,9 @@ export const getHostedUserPrivateToken = <ThrowOnError extends boolean = false>(
 /**
  * Returns information about a given auth token.
  */
-export const getHostedUserToken = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getHostedUserToken = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHostedUserTokenData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetHostedUserTokenResponse, GetHostedUserTokenError, ThrowOnError>({
     ...options,
     url: '/hosted/user/token',
@@ -977,7 +1002,9 @@ export const postHostedUserVaultValidate = <ThrowOnError extends boolean = false
 /**
  * Fetch information from an existing SDK args session.
  */
-export const getOrgSdkArgs = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) => {
+export const getOrgSdkArgs = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgSdkArgsData, ThrowOnError>,
+) => {
   return (options?.client ?? client).get<GetOrgSdkArgsResponse, GetOrgSdkArgsError, ThrowOnError>({
     ...options,
     url: '/org/sdk_args',

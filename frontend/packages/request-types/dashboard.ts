@@ -6098,6 +6098,14 @@ export type PostBusinessesByFpBidVaultByIdentifierUploadData = {
      * Specify the content type of the object like `application/json` or `image/png`
      */
     contentType?: string;
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
   };
   path: {
     fpBid: string;
@@ -6407,13 +6415,19 @@ export type GetEntitiesClientTokenData = {
     /**
      * Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.
      */
-    'x-fp-authorization': string;
+    'X-Fp-Authorization': string;
   };
 };
 export type GetEntitiesClientTokenResponse = GetClientTokenResponse;
 export type GetEntitiesClientTokenError = unknown;
 export type PostEntitiesSearchData = {
   body?: ListEntitiesSearchRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostEntitiesSearchResponse = CursorPaginatedEntity;
 export type PostEntitiesSearchError = unknown;
@@ -6426,7 +6440,7 @@ export type PatchEntitiesVaultData = {
     /**
      * Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.
      */
-    'x-fp-authorization': string;
+    'X-Fp-Authorization': string;
   };
 };
 export type PatchEntitiesVaultResponse = Empty;
@@ -6437,7 +6451,7 @@ export type PostEntitiesVaultDecryptData = {
     /**
      * Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.
      */
-    'x-fp-authorization': string;
+    'X-Fp-Authorization': string;
   };
 };
 export type PostEntitiesVaultDecryptResponse = UserDecryptResponse;
@@ -6459,7 +6473,7 @@ export type PostEntitiesVaultValidateData = {
     /**
      * Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.
      */
-    'x-fp-authorization': string;
+    'X-Fp-Authorization': string;
   };
 };
 export type PostEntitiesVaultValidateResponse = Empty;
@@ -6477,7 +6491,7 @@ export type PostEntitiesVaultByIdentifierUploadData = {
     /**
      * Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.
      */
-    'x-fp-authorization': string;
+    'X-Fp-Authorization': string;
   };
   path: {
     identifier:
@@ -6782,6 +6796,12 @@ export type PostEntitiesVaultByIdentifierUploadData = {
 export type PostEntitiesVaultByIdentifierUploadResponse = Empty;
 export type PostEntitiesVaultByIdentifierUploadError = unknown;
 export type GetEntitiesByFpBidBusinessInsightsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpBid: string;
   };
@@ -6789,6 +6809,12 @@ export type GetEntitiesByFpBidBusinessInsightsData = {
 export type GetEntitiesByFpBidBusinessInsightsResponse = BusinessInsights;
 export type GetEntitiesByFpBidBusinessInsightsError = unknown;
 export type GetEntitiesByFpIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6796,6 +6822,12 @@ export type GetEntitiesByFpIdData = {
 export type GetEntitiesByFpIdResponse = Entity;
 export type GetEntitiesByFpIdError = unknown;
 export type GetEntitiesByFpIdLabelData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6804,6 +6836,12 @@ export type GetEntitiesByFpIdLabelResponse = UserLabel;
 export type GetEntitiesByFpIdLabelError = unknown;
 export type PostEntitiesByFpIdLabelData = {
   body: UpdateLabelRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6811,6 +6849,12 @@ export type PostEntitiesByFpIdLabelData = {
 export type PostEntitiesByFpIdLabelResponse = Empty;
 export type PostEntitiesByFpIdLabelError = unknown;
 export type GetEntitiesByFpIdTagsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6819,6 +6863,12 @@ export type GetEntitiesByFpIdTagsResponse = Array<UserTag>;
 export type GetEntitiesByFpIdTagsError = unknown;
 export type PostEntitiesByFpIdTagsData = {
   body: CreateTagRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6826,6 +6876,12 @@ export type PostEntitiesByFpIdTagsData = {
 export type PostEntitiesByFpIdTagsResponse = UserTag;
 export type PostEntitiesByFpIdTagsError = unknown;
 export type DeleteEntitiesByFpIdTagsByTagIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
     tagId: string;
@@ -6835,6 +6891,12 @@ export type DeleteEntitiesByFpIdTagsByTagIdResponse = Empty;
 export type DeleteEntitiesByFpIdTagsByTagIdError = unknown;
 export type PostEntitiesByFpIdActionsData = {
   body: EntityActionsRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6842,6 +6904,12 @@ export type PostEntitiesByFpIdActionsData = {
 export type PostEntitiesByFpIdActionsResponse = Array<EntityActionResponse>;
 export type PostEntitiesByFpIdActionsError = unknown;
 export type PostEntitiesByFpIdAiSummarizeData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6849,6 +6917,12 @@ export type PostEntitiesByFpIdAiSummarizeData = {
 export type PostEntitiesByFpIdAiSummarizeResponse = UserAiSummary;
 export type PostEntitiesByFpIdAiSummarizeError = unknown;
 export type GetEntitiesByFpIdAnnotationsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6860,6 +6934,12 @@ export type GetEntitiesByFpIdAnnotationsResponse = Array<Annotation>;
 export type GetEntitiesByFpIdAnnotationsError = unknown;
 export type PostEntitiesByFpIdAnnotationsData = {
   body: CreateAnnotationRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6868,6 +6948,12 @@ export type PostEntitiesByFpIdAnnotationsResponse = Annotation;
 export type PostEntitiesByFpIdAnnotationsError = unknown;
 export type PatchEntitiesByFpIdAnnotationsByAnnotationIdData = {
   body: UpdateAnnotationRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     annotationId: string;
     fpId: string;
@@ -6876,6 +6962,16 @@ export type PatchEntitiesByFpIdAnnotationsByAnnotationIdData = {
 export type PatchEntitiesByFpIdAnnotationsByAnnotationIdResponse = Empty;
 export type PatchEntitiesByFpIdAnnotationsByAnnotationIdError = unknown;
 export type GetEntitiesByFpIdAuthEventsData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6883,6 +6979,12 @@ export type GetEntitiesByFpIdAuthEventsData = {
 export type GetEntitiesByFpIdAuthEventsResponse = Array<AuthEvent>;
 export type GetEntitiesByFpIdAuthEventsError = unknown;
 export type GetEntitiesByFpIdBusinessOwnersData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6891,6 +6993,12 @@ export type GetEntitiesByFpIdBusinessOwnersResponse = Array<PrivateBusinessOwner
 export type GetEntitiesByFpIdBusinessOwnersError = unknown;
 export type PostEntitiesByFpIdBusinessOwnersKycLinksData = {
   body: CreateKycLinksRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6898,6 +7006,12 @@ export type PostEntitiesByFpIdBusinessOwnersKycLinksData = {
 export type PostEntitiesByFpIdBusinessOwnersKycLinksResponse = Array<PrivateBusinessOwnerKycLink>;
 export type PostEntitiesByFpIdBusinessOwnersKycLinksError = unknown;
 export type GetEntitiesByFpIdBusinessesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6905,6 +7019,12 @@ export type GetEntitiesByFpIdBusinessesData = {
 export type GetEntitiesByFpIdBusinessesResponse = Array<PrivateOwnedBusiness>;
 export type GetEntitiesByFpIdBusinessesError = unknown;
 export type GetEntitiesByFpIdDataData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6918,6 +7038,12 @@ export type GetEntitiesByFpIdDataData = {
 export type GetEntitiesByFpIdDataResponse = Array<EntityAttribute>;
 export type GetEntitiesByFpIdDataError = unknown;
 export type PostEntitiesByFpIdDecryptAmlHitsBySignalIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
     signalId: string;
@@ -6926,6 +7052,12 @@ export type PostEntitiesByFpIdDecryptAmlHitsBySignalIdData = {
 export type PostEntitiesByFpIdDecryptAmlHitsBySignalIdResponse = AmlDetail;
 export type PostEntitiesByFpIdDecryptAmlHitsBySignalIdError = unknown;
 export type GetEntitiesByFpIdDocumentsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6939,6 +7071,16 @@ export type GetEntitiesByFpIdDocumentsData = {
 export type GetEntitiesByFpIdDocumentsResponse = Array<Document>;
 export type GetEntitiesByFpIdDocumentsError = unknown;
 export type GetEntitiesByFpIdDupesData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6946,6 +7088,16 @@ export type GetEntitiesByFpIdDupesData = {
 export type GetEntitiesByFpIdDupesResponse = Dupes;
 export type GetEntitiesByFpIdDupesError = unknown;
 export type GetEntitiesByFpIdLivenessData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6953,6 +7105,16 @@ export type GetEntitiesByFpIdLivenessData = {
 export type GetEntitiesByFpIdLivenessResponse = Array<LivenessEvent>;
 export type GetEntitiesByFpIdLivenessError = unknown;
 export type GetEntitiesByFpIdMatchSignalsData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6960,6 +7122,12 @@ export type GetEntitiesByFpIdMatchSignalsData = {
 export type GetEntitiesByFpIdMatchSignalsResponse = GetFieldValidationResponse;
 export type GetEntitiesByFpIdMatchSignalsError = unknown;
 export type GetEntitiesByFpIdOnboardingsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -6971,6 +7139,12 @@ export type GetEntitiesByFpIdOnboardingsData = {
 export type GetEntitiesByFpIdOnboardingsResponse = OffsetPaginatedEntityOnboarding;
 export type GetEntitiesByFpIdOnboardingsError = unknown;
 export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
     onboardingId: string;
@@ -6979,6 +7153,16 @@ export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData = {
 export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsResponse = Array<RiskSignal>;
 export type GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsError = unknown;
 export type GetEntitiesByFpIdRiskSignalsData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7022,6 +7206,12 @@ export type GetEntitiesByFpIdRiskSignalsData = {
 export type GetEntitiesByFpIdRiskSignalsResponse = Array<RiskSignal>;
 export type GetEntitiesByFpIdRiskSignalsError = unknown;
 export type GetEntitiesByFpIdRiskSignalsBySignalIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
     signalId: string;
@@ -7030,6 +7220,12 @@ export type GetEntitiesByFpIdRiskSignalsBySignalIdData = {
 export type GetEntitiesByFpIdRiskSignalsBySignalIdResponse = RiskSignalDetail;
 export type GetEntitiesByFpIdRiskSignalsBySignalIdError = unknown;
 export type GetEntitiesByFpIdRuleSetResultData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7037,6 +7233,12 @@ export type GetEntitiesByFpIdRuleSetResultData = {
 export type GetEntitiesByFpIdRuleSetResultResponse = RuleSetResult;
 export type GetEntitiesByFpIdRuleSetResultError = unknown;
 export type GetEntitiesByFpIdRuleSetResultByRuleSetResultIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
     ruleSetResultId: string;
@@ -7045,6 +7247,12 @@ export type GetEntitiesByFpIdRuleSetResultByRuleSetResultIdData = {
 export type GetEntitiesByFpIdRuleSetResultByRuleSetResultIdResponse = RuleSetResult;
 export type GetEntitiesByFpIdRuleSetResultByRuleSetResultIdError = unknown;
 export type PostEntitiesByFpIdSentilinkBySignalIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
     signalId: string;
@@ -7053,6 +7261,12 @@ export type PostEntitiesByFpIdSentilinkBySignalIdData = {
 export type PostEntitiesByFpIdSentilinkBySignalIdResponse = SentilinkDetail;
 export type PostEntitiesByFpIdSentilinkBySignalIdError = unknown;
 export type GetEntitiesByFpIdTimelineData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7080,6 +7294,12 @@ export type GetEntitiesByFpIdTimelineResponse = Array<UserTimeline>;
 export type GetEntitiesByFpIdTimelineError = unknown;
 export type PostEntitiesByFpIdTokenData = {
   body: CreateEntityTokenRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7087,6 +7307,12 @@ export type PostEntitiesByFpIdTokenData = {
 export type PostEntitiesByFpIdTokenResponse = CreateEntityTokenResponse;
 export type PostEntitiesByFpIdTokenError = unknown;
 export type GetEntitiesByFpIdUserInsightsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7096,9 +7322,17 @@ export type GetEntitiesByFpIdUserInsightsError = unknown;
 export type GetEntitiesByFpIdVaultData = {
   headers?: {
     /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+    /**
      * When provided, specifies the vault version to use for the given request.
      */
-    'x-fp-vault-version'?: string;
+    'X-Fp-Vault-Version'?: string;
   };
   path: {
     fpId: string;
@@ -7398,6 +7632,16 @@ export type GetEntitiesByFpIdVaultResponse = GetUserVaultResponse;
 export type GetEntitiesByFpIdVaultError = unknown;
 export type DeleteEntitiesByFpIdVaultData = {
   body: DeleteRequest;
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived auth token for a firm-employee dashboard user assuming a tenant.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7409,6 +7653,16 @@ export type PatchEntitiesByFpIdVaultData = {
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: RawUserDataRequest;
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7419,9 +7673,17 @@ export type PostEntitiesByFpIdVaultDecryptData = {
   body: UserDecryptRequest;
   headers?: {
     /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+    /**
      * When provided, specifies the vault version to use for the given request.
      */
-    'x-fp-vault-version'?: string;
+    'X-Fp-Vault-Version'?: string;
   };
   path: {
     fpId: string;
@@ -7431,6 +7693,12 @@ export type PostEntitiesByFpIdVaultDecryptResponse = ModernEntityDecryptResponse
 export type PostEntitiesByFpIdVaultDecryptError = unknown;
 export type PostEntitiesByFpIdVaultIntegrityData = {
   body: IntegrityRequest;
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7442,6 +7710,16 @@ export type PostEntitiesByFpIdVaultValidateData = {
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: RawUserDataRequest;
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived auth token for a firm-employee dashboard user assuming a tenant.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     fpId: string;
   };
@@ -7458,6 +7736,14 @@ export type PostEntitiesByFpIdVaultByIdentifierUploadData = {
      * Specify the content type of the object like `application/json` or `image/png`
      */
     contentType?: string;
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
   };
   path: {
     fpId: string;
@@ -7762,18 +8048,54 @@ export type PostEntitiesByFpIdVaultByIdentifierUploadData = {
 };
 export type PostEntitiesByFpIdVaultByIdentifierUploadResponse = Empty;
 export type PostEntitiesByFpIdVaultByIdentifierUploadError = unknown;
+export type GetHealthEnclaveData = {
+  headers?: {
+    /**
+     * The custodian key
+     */
+    'X-Fp-Protected-Custodian-Key'?: string;
+  };
+};
 export type GetHealthEnclaveResponse = EnclaveHealthResponse;
 export type GetHealthEnclaveError = unknown;
+export type GetHealthEnclaveDecryptData = {
+  headers?: {
+    /**
+     * The custodian key
+     */
+    'X-Fp-Protected-Custodian-Key'?: string;
+  };
+};
 export type GetHealthEnclaveDecryptResponse = EnclaveHealthResponse;
 export type GetHealthEnclaveDecryptError = unknown;
+export type GetOrgData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgResponse = Organization;
 export type GetOrgError = unknown;
 export type PatchOrgData = {
   body: UpdateTenantRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PatchOrgResponse = Organization;
 export type PatchOrgError = unknown;
 export type GetOrgApiKeysData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     page?: number;
     pageSize?: number;
@@ -7786,11 +8108,23 @@ export type GetOrgApiKeysResponse = OffsetPaginatedDashboardSecretApiKey;
 export type GetOrgApiKeysError = unknown;
 export type PostOrgApiKeysData = {
   body: CreateApiKeyRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgApiKeysResponse = DashboardSecretApiKey;
 export type PostOrgApiKeysError = unknown;
 export type PatchOrgApiKeysByIdData = {
   body: UpdateApiKeyRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -7798,6 +8132,12 @@ export type PatchOrgApiKeysByIdData = {
 export type PatchOrgApiKeysByIdResponse = DashboardSecretApiKey;
 export type PatchOrgApiKeysByIdError = unknown;
 export type PostOrgApiKeysByIdDeactivateData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -7805,6 +8145,12 @@ export type PostOrgApiKeysByIdDeactivateData = {
 export type PostOrgApiKeysByIdDeactivateResponse = DashboardSecretApiKey;
 export type PostOrgApiKeysByIdDeactivateError = unknown;
 export type PostOrgApiKeysByIdRevealData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     /**
      * secret org api key
@@ -7814,14 +8160,34 @@ export type PostOrgApiKeysByIdRevealData = {
 };
 export type PostOrgApiKeysByIdRevealResponse = DashboardSecretApiKey;
 export type PostOrgApiKeysByIdRevealError = unknown;
+export type GetOrgAppMetaAndroidData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgAppMetaAndroidResponse = Array<TenantAndroidAppMeta>;
 export type GetOrgAppMetaAndroidError = unknown;
 export type PostOrgAppMetaAndroidData = {
   body: CreateTenantAndroidAppMetaRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgAppMetaAndroidResponse = TenantAndroidAppMeta;
 export type PostOrgAppMetaAndroidError = unknown;
 export type DeleteOrgAppMetaAndroidByMetaIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     metaId: string;
   };
@@ -7830,6 +8196,12 @@ export type DeleteOrgAppMetaAndroidByMetaIdResponse = Empty;
 export type DeleteOrgAppMetaAndroidByMetaIdError = unknown;
 export type PatchOrgAppMetaAndroidByMetaIdData = {
   body: UpdateTenantAndroidAppMetaRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     metaId: string;
   };
@@ -7837,20 +8209,46 @@ export type PatchOrgAppMetaAndroidByMetaIdData = {
 export type PatchOrgAppMetaAndroidByMetaIdResponse = TenantAndroidAppMeta;
 export type PatchOrgAppMetaAndroidByMetaIdError = unknown;
 export type PostOrgAppMetaAndroidByMetaIdRevealData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     metaId: string;
   };
 };
 export type PostOrgAppMetaAndroidByMetaIdRevealResponse = TenantAndroidAppMeta;
 export type PostOrgAppMetaAndroidByMetaIdRevealError = unknown;
+export type GetOrgAppMetaIosData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgAppMetaIosResponse = Array<TenantIosAppMeta>;
 export type GetOrgAppMetaIosError = unknown;
 export type PostOrgAppMetaIosData = {
   body: CreateTenantIosAppMetaRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgAppMetaIosResponse = TenantIosAppMeta;
 export type PostOrgAppMetaIosError = unknown;
 export type DeleteOrgAppMetaIosByMetaIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     metaId: string;
   };
@@ -7859,6 +8257,12 @@ export type DeleteOrgAppMetaIosByMetaIdResponse = Empty;
 export type DeleteOrgAppMetaIosByMetaIdError = unknown;
 export type PatchOrgAppMetaIosByMetaIdData = {
   body: UpdateTenantIosAppMetaRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     metaId: string;
   };
@@ -7866,6 +8270,12 @@ export type PatchOrgAppMetaIosByMetaIdData = {
 export type PatchOrgAppMetaIosByMetaIdResponse = TenantIosAppMeta;
 export type PatchOrgAppMetaIosByMetaIdError = unknown;
 export type PostOrgAppMetaIosByMetaIdRevealData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     metaId: string;
   };
@@ -7873,6 +8283,12 @@ export type PostOrgAppMetaIosByMetaIdRevealData = {
 export type PostOrgAppMetaIosByMetaIdRevealResponse = TenantIosAppMeta;
 export type PostOrgAppMetaIosByMetaIdRevealError = unknown;
 export type GetOrgAuditEventsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     cursor?: string;
     listId?: string;
@@ -7888,9 +8304,23 @@ export type GetOrgAuditEventsResponse = CursorPaginatedAuditEvent;
 export type GetOrgAuditEventsError = unknown;
 export type PostOrgAuthAssumeRoleData = {
   body: AssumeRoleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgAuthAssumeRoleResponse = AssumeRoleResponse;
 export type PostOrgAuthAssumeRoleError = unknown;
+export type PostOrgAuthDocsTokenData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type PostOrgAuthDocsTokenResponse = DocsTokenResponse;
 export type PostOrgAuthDocsTokenError = unknown;
 export type GetOrgAuthGoogleOauthData = {
@@ -7903,6 +8333,14 @@ export type PostOrgAuthLoginData = {
 };
 export type PostOrgAuthLoginResponse = OrgLoginResponse;
 export type PostOrgAuthLoginError = unknown;
+export type PostOrgAuthLogoutData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type PostOrgAuthLogoutResponse = Empty;
 export type PostOrgAuthLogoutError = unknown;
 export type PostOrgAuthMagicLinkData = {
@@ -7910,16 +8348,44 @@ export type PostOrgAuthMagicLinkData = {
 };
 export type PostOrgAuthMagicLinkResponse = Empty;
 export type PostOrgAuthMagicLinkError = unknown;
+export type GetOrgAuthRolesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgAuthRolesResponse = Array<Organization>;
 export type GetOrgAuthRolesError = unknown;
+export type GetOrgClientSecurityConfigData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgClientSecurityConfigResponse = OrgClientSecurityConfig;
 export type GetOrgClientSecurityConfigError = unknown;
 export type PatchOrgClientSecurityConfigData = {
   body: UpdateClientSecurityConfig;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PatchOrgClientSecurityConfigResponse = OrgClientSecurityConfig;
 export type PatchOrgClientSecurityConfigError = unknown;
 export type GetOrgFrequentNotesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query: {
     kind: 'manual_review' | 'annotation' | 'trigger';
   };
@@ -7928,19 +8394,45 @@ export type GetOrgFrequentNotesResponse = Array<OrgFrequentNote>;
 export type GetOrgFrequentNotesError = unknown;
 export type PostOrgFrequentNotesData = {
   body: CreateOrgFrequentNoteRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgFrequentNotesResponse = OrgFrequentNote;
 export type PostOrgFrequentNotesError = unknown;
 export type DeleteOrgFrequentNotesByFrequentNoteIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     frequentNoteId: string;
   };
 };
 export type DeleteOrgFrequentNotesByFrequentNoteIdResponse = Empty;
 export type DeleteOrgFrequentNotesByFrequentNoteIdError = unknown;
+export type GetOrgInvoicePreviewData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgInvoicePreviewResponse = InvoicePreview;
 export type GetOrgInvoicePreviewError = unknown;
 export type GetOrgListsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     page?: number;
     pageSize?: number;
@@ -7950,10 +8442,22 @@ export type GetOrgListsResponse = OffsetPaginatedList;
 export type GetOrgListsError = unknown;
 export type PostOrgListsData = {
   body: CreateListRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgListsResponse = List;
 export type PostOrgListsError = unknown;
 export type GetOrgListsByIdTimelineData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -7965,6 +8469,12 @@ export type GetOrgListsByIdTimelineData = {
 export type GetOrgListsByIdTimelineResponse = CursorPaginatedListEvent;
 export type GetOrgListsByIdTimelineError = unknown;
 export type GetOrgListsByListIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     listId: string;
   };
@@ -7972,6 +8482,12 @@ export type GetOrgListsByListIdData = {
 export type GetOrgListsByListIdResponse = ListDetails;
 export type GetOrgListsByListIdError = unknown;
 export type DeleteOrgListsByListIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     listId: string;
   };
@@ -7980,6 +8496,12 @@ export type DeleteOrgListsByListIdResponse = Empty;
 export type DeleteOrgListsByListIdError = unknown;
 export type PatchOrgListsByListIdData = {
   body: UpdateListRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     listId: string;
   };
@@ -7987,6 +8509,12 @@ export type PatchOrgListsByListIdData = {
 export type PatchOrgListsByListIdResponse = Empty;
 export type PatchOrgListsByListIdError = unknown;
 export type GetOrgListsByListIdEntriesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     listId: string;
   };
@@ -7995,6 +8523,12 @@ export type GetOrgListsByListIdEntriesResponse = Array<ListEntry>;
 export type GetOrgListsByListIdEntriesError = unknown;
 export type PostOrgListsByListIdEntriesData = {
   body: CreateListEntryRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     listId: string;
   };
@@ -8002,6 +8536,12 @@ export type PostOrgListsByListIdEntriesData = {
 export type PostOrgListsByListIdEntriesResponse = Array<ListEntry>;
 export type PostOrgListsByListIdEntriesError = unknown;
 export type DeleteOrgListsByListIdEntriesByListEntryIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     listEntryId: string;
     listId: string;
@@ -8009,16 +8549,44 @@ export type DeleteOrgListsByListIdEntriesByListEntryIdData = {
 };
 export type DeleteOrgListsByListIdEntriesByListEntryIdResponse = Empty;
 export type DeleteOrgListsByListIdEntriesByListEntryIdError = unknown;
+export type PutOrgLogoData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type PutOrgLogoResponse = Organization;
 export type PutOrgLogoError = unknown;
+export type GetOrgMemberData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgMemberResponse = AuthOrgMember;
 export type GetOrgMemberError = unknown;
 export type PatchOrgMemberData = {
   body: UpdateTenantUserRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PatchOrgMemberResponse = AuthOrgMember;
 export type PatchOrgMemberError = unknown;
 export type GetOrgMemberInProgressOnboardingsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query: {
     isLive: boolean;
   };
@@ -8026,6 +8594,12 @@ export type GetOrgMemberInProgressOnboardingsData = {
 export type GetOrgMemberInProgressOnboardingsResponse = Array<InProgressOnboarding>;
 export type GetOrgMemberInProgressOnboardingsError = unknown;
 export type GetOrgMembersData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     isInvitePending?: boolean;
     page?: number;
@@ -8038,11 +8612,23 @@ export type GetOrgMembersResponse = OffsetPaginatedOrganizationMember;
 export type GetOrgMembersError = unknown;
 export type PostOrgMembersData = {
   body: CreateTenantUserRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgMembersResponse = OrganizationMember;
 export type PostOrgMembersError = unknown;
 export type PatchOrgMembersByTenantUserIdData = {
   body: UpdateTenantRolebindingRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantUserId: string;
   };
@@ -8050,6 +8636,12 @@ export type PatchOrgMembersByTenantUserIdData = {
 export type PatchOrgMembersByTenantUserIdResponse = OrganizationMember;
 export type PatchOrgMembersByTenantUserIdError = unknown;
 export type PostOrgMembersByTenantUserIdDeactivateData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantUserId: string;
   };
@@ -8057,6 +8649,12 @@ export type PostOrgMembersByTenantUserIdDeactivateData = {
 export type PostOrgMembersByTenantUserIdDeactivateResponse = Empty;
 export type PostOrgMembersByTenantUserIdDeactivateError = unknown;
 export type GetOrgMetricsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     playbookId?: string;
     timestampGte?: string;
@@ -8066,6 +8664,12 @@ export type GetOrgMetricsData = {
 export type GetOrgMetricsResponse = OrgMetricsResponse;
 export type GetOrgMetricsError = unknown;
 export type GetOrgOnboardingConfigsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     kinds?: string;
     page?: number;
@@ -8078,10 +8682,22 @@ export type GetOrgOnboardingConfigsResponse = OffsetPaginatedOnboardingConfigura
 export type GetOrgOnboardingConfigsError = unknown;
 export type PostOrgOnboardingConfigsData = {
   body: CreateOnboardingConfigurationRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgOnboardingConfigsResponse = OnboardingConfiguration;
 export type PostOrgOnboardingConfigsError = unknown;
 export type GetOrgOnboardingConfigsByIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -8090,6 +8706,12 @@ export type GetOrgOnboardingConfigsByIdResponse = OnboardingConfiguration;
 export type GetOrgOnboardingConfigsByIdError = unknown;
 export type PatchOrgOnboardingConfigsByIdData = {
   body: UpdateObConfigRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -8098,6 +8720,12 @@ export type PatchOrgOnboardingConfigsByIdResponse = OnboardingConfiguration;
 export type PatchOrgOnboardingConfigsByIdError = unknown;
 export type PostOrgOnboardingConfigsByIdCopyData = {
   body: CopyPlaybookRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -8105,6 +8733,12 @@ export type PostOrgOnboardingConfigsByIdCopyData = {
 export type PostOrgOnboardingConfigsByIdCopyResponse = OnboardingConfiguration;
 export type PostOrgOnboardingConfigsByIdCopyError = unknown;
 export type GetOrgOnboardingConfigsByObcIdRulesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     obcId: string;
   };
@@ -8113,6 +8747,12 @@ export type GetOrgOnboardingConfigsByObcIdRulesResponse = Array<Rule>;
 export type GetOrgOnboardingConfigsByObcIdRulesError = unknown;
 export type PatchOrgOnboardingConfigsByObcIdRulesData = {
   body: MultiUpdateRuleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     obcId: string;
   };
@@ -8121,6 +8761,12 @@ export type PatchOrgOnboardingConfigsByObcIdRulesResponse = Array<Rule>;
 export type PatchOrgOnboardingConfigsByObcIdRulesError = unknown;
 export type PostOrgOnboardingConfigsByObcIdRulesEvaluateData = {
   body: EvaluateRuleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     obcId: string;
   };
@@ -8129,6 +8775,12 @@ export type PostOrgOnboardingConfigsByObcIdRulesEvaluateResponse = RuleEvalResul
 export type PostOrgOnboardingConfigsByObcIdRulesEvaluateError = unknown;
 export type PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsData = {
   body: UpdateComplianceDocAssignmentRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     documentId: string;
     partnershipId: string;
@@ -8138,6 +8790,12 @@ export type PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsRespon
 export type PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsError = unknown;
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsData = {
   body: SubmitExternalUrlRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     partnershipId: string;
     requestId: string;
@@ -8146,6 +8804,12 @@ export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsData = {
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsResponse = Empty;
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsError = unknown;
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     partnershipId: string;
     requestId: string;
@@ -8154,6 +8818,12 @@ export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadDa
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadResponse = Empty;
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadError = unknown;
 export type GetOrgProxyConfigsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     status?: 'disabled' | 'enabled';
   };
@@ -8162,10 +8832,22 @@ export type GetOrgProxyConfigsResponse = Array<ProxyConfigBasic>;
 export type GetOrgProxyConfigsError = unknown;
 export type PostOrgProxyConfigsData = {
   body: CreateProxyConfigRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgProxyConfigsResponse = ProxyConfigDetailed;
 export type PostOrgProxyConfigsError = unknown;
 export type GetOrgProxyConfigsByProxyConfigIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     proxyConfigId: string;
   };
@@ -8174,6 +8856,12 @@ export type GetOrgProxyConfigsByProxyConfigIdResponse = ProxyConfigDetailed;
 export type GetOrgProxyConfigsByProxyConfigIdError = unknown;
 export type PatchOrgProxyConfigsByProxyConfigIdData = {
   body: PatchProxyConfigRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     proxyConfigId: string;
   };
@@ -8181,6 +8869,12 @@ export type PatchOrgProxyConfigsByProxyConfigIdData = {
 export type PatchOrgProxyConfigsByProxyConfigIdResponse = ProxyConfigDetailed;
 export type PatchOrgProxyConfigsByProxyConfigIdError = unknown;
 export type PostOrgProxyConfigsByProxyConfigIdDeactivateData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     proxyConfigId: string;
   };
@@ -8188,6 +8882,12 @@ export type PostOrgProxyConfigsByProxyConfigIdDeactivateData = {
 export type PostOrgProxyConfigsByProxyConfigIdDeactivateResponse = Empty;
 export type PostOrgProxyConfigsByProxyConfigIdDeactivateError = unknown;
 export type GetOrgRolesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     /**
      * Auto-generated discriminant enum variants
@@ -8202,11 +8902,23 @@ export type GetOrgRolesResponse = OffsetPaginatedOrganizationRole;
 export type GetOrgRolesError = unknown;
 export type PostOrgRolesData = {
   body: CreateTenantRoleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgRolesResponse = OrganizationRole;
 export type PostOrgRolesError = unknown;
 export type PatchOrgRolesByTenantRoleIdData = {
   body: UpdateTenantRoleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantRoleId: string;
   };
@@ -8214,6 +8926,12 @@ export type PatchOrgRolesByTenantRoleIdData = {
 export type PatchOrgRolesByTenantRoleIdResponse = OrganizationRole;
 export type PatchOrgRolesByTenantRoleIdError = unknown;
 export type PostOrgRolesByTenantRoleIdDeactivateData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantRoleId: string;
   };
@@ -8221,6 +8939,12 @@ export type PostOrgRolesByTenantRoleIdDeactivateData = {
 export type PostOrgRolesByTenantRoleIdDeactivateResponse = OrganizationRole;
 export type PostOrgRolesByTenantRoleIdDeactivateError = unknown;
 export type GetOrgTagsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query: {
     kind: 'person' | 'business';
   };
@@ -8229,43 +8953,119 @@ export type GetOrgTagsResponse = Array<OrgTenantTag>;
 export type GetOrgTagsError = unknown;
 export type PostOrgTagsData = {
   body: CreateOrgTenantTagRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostOrgTagsResponse = OrgTenantTag;
 export type PostOrgTagsError = unknown;
 export type DeleteOrgTagsByTagIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tagId: string;
   };
 };
 export type DeleteOrgTagsByTagIdResponse = Empty;
 export type DeleteOrgTagsByTagIdError = unknown;
+export type GetOrgVaultDrAwsPreEnrollmentData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+  };
+};
 export type GetOrgVaultDrAwsPreEnrollmentResponse = VaultDrAwsPreEnrollResponse;
 export type GetOrgVaultDrAwsPreEnrollmentError = unknown;
+export type PostOrgVaultDrAwsPreEnrollmentData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+  };
+};
 export type PostOrgVaultDrAwsPreEnrollmentResponse = VaultDrAwsPreEnrollResponse;
 export type PostOrgVaultDrAwsPreEnrollmentError = unknown;
 export type PostOrgVaultDrEnrollData = {
   body: VaultDrEnrollRequest;
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+  };
 };
 export type PostOrgVaultDrEnrollResponse = VaultDrEnrollResponse;
 export type PostOrgVaultDrEnrollError = unknown;
 export type PostOrgVaultDrRevealWrappedRecordKeysData = {
   body: VaultDrRevealWrappedRecordKeysRequest;
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+  };
 };
 export type PostOrgVaultDrRevealWrappedRecordKeysResponse = VaultDrRevealWrappedRecordKeysResponse;
 export type PostOrgVaultDrRevealWrappedRecordKeysError = unknown;
+export type GetOrgVaultDrStatusData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+  };
+};
 export type GetOrgVaultDrStatusResponse = VaultDrStatus;
 export type GetOrgVaultDrStatusError = unknown;
+export type GetOrgWebhookPortalData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgWebhookPortalResponse = WebhookPortalResponse;
 export type GetOrgWebhookPortalError = unknown;
+export type GetPartnerData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetPartnerResponse = PartnerOrganization;
 export type GetPartnerError = unknown;
 export type PatchPartnerData = {
   body: UpdatePartnerTenantRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PatchPartnerResponse = PartnerOrganization;
 export type PatchPartnerError = unknown;
 export type PostPartnerAuthAssumeRoleData = {
   body: AssumePartnerRoleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostPartnerAuthAssumeRoleResponse = AssumePartnerRoleResponse;
 export type PostPartnerAuthAssumeRoleError = unknown;
@@ -8279,6 +9079,14 @@ export type PostPartnerAuthLoginData = {
 };
 export type PostPartnerAuthLoginResponse = OrgLoginResponse;
 export type PostPartnerAuthLoginError = unknown;
+export type PostPartnerAuthLogoutData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type PostPartnerAuthLogoutResponse = Empty;
 export type PostPartnerAuthLogoutError = unknown;
 export type PostPartnerAuthMagicLinkData = {
@@ -8286,17 +9094,45 @@ export type PostPartnerAuthMagicLinkData = {
 };
 export type PostPartnerAuthMagicLinkResponse = Empty;
 export type PostPartnerAuthMagicLinkError = unknown;
+export type GetPartnerAuthRolesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetPartnerAuthRolesResponse = Array<PartnerOrganization>;
 export type GetPartnerAuthRolesError = unknown;
+export type GetPartnerDocTemplatesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetPartnerDocTemplatesResponse = Array<ComplianceDocTemplate>;
 export type GetPartnerDocTemplatesError = unknown;
 export type PostPartnerDocTemplatesData = {
   body: CreateComplianceDocTemplateRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostPartnerDocTemplatesResponse = ComplianceDocTemplate;
 export type PostPartnerDocTemplatesError = unknown;
 export type PutPartnerDocTemplatesByTemplateIdData = {
   body: UpdateComplianceDocTemplateRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     templateId: string;
   };
@@ -8304,15 +9140,35 @@ export type PutPartnerDocTemplatesByTemplateIdData = {
 export type PutPartnerDocTemplatesByTemplateIdResponse = ComplianceDocTemplate;
 export type PutPartnerDocTemplatesByTemplateIdError = unknown;
 export type DeletePartnerDocTemplatesByTemplateIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     templateId: string;
   };
 };
 export type DeletePartnerDocTemplatesByTemplateIdResponse = Empty;
 export type DeletePartnerDocTemplatesByTemplateIdError = unknown;
+export type PutPartnerLogoData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type PutPartnerLogoResponse = PartnerOrganization;
 export type PutPartnerLogoError = unknown;
 export type GetPartnerMembersData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     isInvitePending?: boolean;
     page?: number;
@@ -8325,11 +9181,23 @@ export type GetPartnerMembersResponse = OffsetPaginatedOrganizationMember;
 export type GetPartnerMembersError = unknown;
 export type PostPartnerMembersData = {
   body: CreateTenantUserRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostPartnerMembersResponse = OrganizationMember;
 export type PostPartnerMembersError = unknown;
 export type PatchPartnerMembersByTenantUserIdData = {
   body: UpdateTenantRolebindingRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantUserId: string;
   };
@@ -8337,15 +9205,35 @@ export type PatchPartnerMembersByTenantUserIdData = {
 export type PatchPartnerMembersByTenantUserIdResponse = OrganizationMember;
 export type PatchPartnerMembersByTenantUserIdError = unknown;
 export type PostPartnerMembersByTenantUserIdDeactivateData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantUserId: string;
   };
 };
 export type PostPartnerMembersByTenantUserIdDeactivateResponse = Empty;
 export type PostPartnerMembersByTenantUserIdDeactivateError = unknown;
+export type GetPartnerPartnershipsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetPartnerPartnershipsResponse = Array<ComplianceCompanySummary>;
 export type GetPartnerPartnershipsError = unknown;
 export type GetPartnerPartnershipsByPartnershipIdDocumentsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     partnershipId: string;
   };
@@ -8354,6 +9242,12 @@ export type GetPartnerPartnershipsByPartnershipIdDocumentsResponse = Array<Compl
 export type GetPartnerPartnershipsByPartnershipIdDocumentsError = unknown;
 export type PostPartnerPartnershipsByPartnershipIdDocumentsData = {
   body: CreateComplianceDocRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     partnershipId: string;
   };
@@ -8362,6 +9256,12 @@ export type PostPartnerPartnershipsByPartnershipIdDocumentsResponse = Compliance
 export type PostPartnerPartnershipsByPartnershipIdDocumentsError = unknown;
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdAssignmentsData = {
   body: UpdateComplianceDocAssignmentRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     documentId: string;
     partnershipId: string;
@@ -8370,6 +9270,12 @@ export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdAssignmen
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdAssignmentsResponse = Empty;
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdAssignmentsError = unknown;
 export type GetPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdEventsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     documentId: string;
     partnershipId: string;
@@ -8379,6 +9285,12 @@ export type GetPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdEventsResp
 export type GetPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdEventsError = unknown;
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReuploadData = {
   body: ReuploadComplianceDocRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     documentId: string;
     partnershipId: string;
@@ -8388,6 +9300,12 @@ export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReuploadR
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReuploadError = unknown;
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReviewsData = {
   body: CreateReviewRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     documentId: string;
     partnershipId: string;
@@ -8396,6 +9314,12 @@ export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReviewsDa
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReviewsResponse = Empty;
 export type PostPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReviewsError = unknown;
 export type DeletePartnerPartnershipsByPartnershipIdRequestsByRequestIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     partnershipId: string;
     requestId: string;
@@ -8404,6 +9328,12 @@ export type DeletePartnerPartnershipsByPartnershipIdRequestsByRequestIdData = {
 export type DeletePartnerPartnershipsByPartnershipIdRequestsByRequestIdResponse = Empty;
 export type DeletePartnerPartnershipsByPartnershipIdRequestsByRequestIdError = unknown;
 export type GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     partnershipId: string;
     submissionId: string;
@@ -8412,6 +9342,12 @@ export type GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdData =
 export type GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdResponse = ComplianceDocSubmission;
 export type GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdError = unknown;
 export type GetPartnerRolesData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   query?: {
     /**
      * Auto-generated discriminant enum variants
@@ -8426,11 +9362,23 @@ export type GetPartnerRolesResponse = OffsetPaginatedOrganizationRole;
 export type GetPartnerRolesError = unknown;
 export type PostPartnerRolesData = {
   body: CreateTenantRoleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
 };
 export type PostPartnerRolesResponse = OrganizationRole;
 export type PostPartnerRolesError = unknown;
 export type PatchPartnerRolesByTenantRoleIdData = {
   body: UpdateTenantRoleRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantRoleId: string;
   };
@@ -8438,6 +9386,12 @@ export type PatchPartnerRolesByTenantRoleIdData = {
 export type PatchPartnerRolesByTenantRoleIdResponse = OrganizationRole;
 export type PatchPartnerRolesByTenantRoleIdError = unknown;
 export type PostPartnerRolesByTenantRoleIdDeactivateData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
   path: {
     tenantRoleId: string;
   };
@@ -8969,6 +9923,7 @@ export type $OpenApiTs = {
   };
   '/health/enclave': {
     get: {
+      req: GetHealthEnclaveData;
       res: {
         /**
          * OK
@@ -8979,6 +9934,7 @@ export type $OpenApiTs = {
   };
   '/health/enclave_decrypt': {
     get: {
+      req: GetHealthEnclaveDecryptData;
       res: {
         /**
          * OK
@@ -8989,6 +9945,7 @@ export type $OpenApiTs = {
   };
   '/org': {
     get: {
+      req: GetOrgData;
       res: {
         /**
          * OK
@@ -9061,6 +10018,7 @@ export type $OpenApiTs = {
   };
   '/org/app_meta/android': {
     get: {
+      req: GetOrgAppMetaAndroidData;
       res: {
         /**
          * OK
@@ -9111,6 +10069,7 @@ export type $OpenApiTs = {
   };
   '/org/app_meta/ios': {
     get: {
+      req: GetOrgAppMetaIosData;
       res: {
         /**
          * OK
@@ -9183,6 +10142,7 @@ export type $OpenApiTs = {
   };
   '/org/auth/docs_token': {
     post: {
+      req: PostOrgAuthDocsTokenData;
       res: {
         /**
          * OK
@@ -9209,6 +10169,7 @@ export type $OpenApiTs = {
   };
   '/org/auth/logout': {
     post: {
+      req: PostOrgAuthLogoutData;
       res: {
         /**
          * OK
@@ -9230,6 +10191,7 @@ export type $OpenApiTs = {
   };
   '/org/auth/roles': {
     get: {
+      req: GetOrgAuthRolesData;
       res: {
         /**
          * OK
@@ -9240,6 +10202,7 @@ export type $OpenApiTs = {
   };
   '/org/client_security_config': {
     get: {
+      req: GetOrgClientSecurityConfigData;
       res: {
         /**
          * OK
@@ -9290,6 +10253,7 @@ export type $OpenApiTs = {
   };
   '/org/invoice_preview': {
     get: {
+      req: GetOrgInvoicePreviewData;
       res: {
         /**
          * OK
@@ -9391,6 +10355,7 @@ export type $OpenApiTs = {
   };
   '/org/logo': {
     put: {
+      req: PutOrgLogoData;
       res: {
         /**
          * OK
@@ -9401,6 +10366,7 @@ export type $OpenApiTs = {
   };
   '/org/member': {
     get: {
+      req: GetOrgMemberData;
       res: {
         /**
          * OK
@@ -9723,6 +10689,7 @@ export type $OpenApiTs = {
   };
   '/org/vault_dr/aws_pre_enrollment': {
     get: {
+      req: GetOrgVaultDrAwsPreEnrollmentData;
       res: {
         /**
          * OK
@@ -9731,6 +10698,7 @@ export type $OpenApiTs = {
       };
     };
     post: {
+      req: PostOrgVaultDrAwsPreEnrollmentData;
       res: {
         /**
          * OK
@@ -9763,6 +10731,7 @@ export type $OpenApiTs = {
   };
   '/org/vault_dr/status': {
     get: {
+      req: GetOrgVaultDrStatusData;
       res: {
         /**
          * OK
@@ -9773,6 +10742,7 @@ export type $OpenApiTs = {
   };
   '/org/webhook_portal': {
     get: {
+      req: GetOrgWebhookPortalData;
       res: {
         /**
          * OK
@@ -9783,6 +10753,7 @@ export type $OpenApiTs = {
   };
   '/partner': {
     get: {
+      req: GetPartnerData;
       res: {
         /**
          * OK
@@ -9829,6 +10800,7 @@ export type $OpenApiTs = {
   };
   '/partner/auth/logout': {
     post: {
+      req: PostPartnerAuthLogoutData;
       res: {
         /**
          * OK
@@ -9850,6 +10822,7 @@ export type $OpenApiTs = {
   };
   '/partner/auth/roles': {
     get: {
+      req: GetPartnerAuthRolesData;
       res: {
         /**
          * OK
@@ -9860,6 +10833,7 @@ export type $OpenApiTs = {
   };
   '/partner/doc_templates': {
     get: {
+      req: GetPartnerDocTemplatesData;
       res: {
         /**
          * OK
@@ -9899,6 +10873,7 @@ export type $OpenApiTs = {
   };
   '/partner/logo': {
     put: {
+      req: PutPartnerLogoData;
       res: {
         /**
          * OK
@@ -9951,6 +10926,7 @@ export type $OpenApiTs = {
   };
   '/partner/partnerships': {
     get: {
+      req: GetPartnerPartnershipsData;
       res: {
         /**
          * OK

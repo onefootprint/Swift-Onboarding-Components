@@ -1,9 +1,9 @@
-import fs from 'fs';
 import path from 'path';
 import { createClient } from '@hey-api/openapi-ts';
+import fs from 'fs/promises';
 import { keyTypestoCamelCase } from './key-types-to-camel-case';
 import { runBiome } from './run-biome';
-import { cleanupTempFile, updateOpenApi } from './update-openapi';
+import { updateOpenApi } from './update-openapi';
 
 const createSDKTypes = async () => {
   const clientDir = path.resolve('./');
@@ -22,7 +22,7 @@ const createSDKTypes = async () => {
   runBiome(path.resolve(clientDir, 'types.gen.ts'));
   runBiome(path.resolve(clientDir, 'index.ts'));
 
-  await cleanupTempFile(tempPath);
+  await fs.unlink(tempPath);
 };
 
 const createDashboardTypes = async () => {
@@ -42,19 +42,15 @@ const createDashboardTypes = async () => {
 
   await keyTypestoCamelCase(generatedTypesPath);
 
-  if (!fs.existsSync(dashboardTypesPath)) {
-    fs.writeFileSync(dashboardTypesPath, '');
-  }
-  fs.rename(generatedTypesPath, dashboardTypesPath, err => {
-    if (err) {
-      console.error('Error renaming file:', err);
-    } else {
-      runBiome(dashboardTypesPath);
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
+  await fs.writeFile(dashboardTypesPath, '');
 
-  cleanupTempFile(tempPath);
+  await fs.rename(generatedTypesPath, dashboardTypesPath);
+
+  runBiome(dashboardTypesPath);
+
+  await fs.rm(tempDir, { recursive: true, force: true });
+
+  await fs.unlink(tempPath);
 };
 
 const generate = async () => {

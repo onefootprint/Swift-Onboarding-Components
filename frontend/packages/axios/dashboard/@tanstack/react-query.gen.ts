@@ -46,8 +46,6 @@ import type {
   GetEntitiesByFpIdMatchSignalsData,
   GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData,
   GetEntitiesByFpIdOnboardingsData,
-  GetEntitiesByFpIdOnboardingsError,
-  GetEntitiesByFpIdOnboardingsResponse,
   GetEntitiesByFpIdRiskSignalsBySignalIdData,
   GetEntitiesByFpIdRiskSignalsData,
   GetEntitiesByFpIdRuleSetResultByRuleSetResultIdData,
@@ -58,48 +56,46 @@ import type {
   GetEntitiesByFpIdVaultData,
   GetEntitiesClientTokenData,
   GetEntitiesVaultDecryptByTokenData,
+  GetHealthEnclaveData,
+  GetHealthEnclaveDecryptData,
   GetOrgApiKeysData,
-  GetOrgApiKeysError,
-  GetOrgApiKeysResponse,
+  GetOrgAppMetaAndroidData,
+  GetOrgAppMetaIosData,
   GetOrgAuditEventsData,
-  GetOrgAuditEventsError,
-  GetOrgAuditEventsResponse,
   GetOrgAuthGoogleOauthData,
+  GetOrgAuthRolesData,
+  GetOrgClientSecurityConfigData,
+  GetOrgData,
   GetOrgFrequentNotesData,
+  GetOrgInvoicePreviewData,
   GetOrgListsByIdTimelineData,
-  GetOrgListsByIdTimelineError,
-  GetOrgListsByIdTimelineResponse,
   GetOrgListsByListIdData,
   GetOrgListsByListIdEntriesData,
   GetOrgListsData,
-  GetOrgListsError,
-  GetOrgListsResponse,
+  GetOrgMemberData,
   GetOrgMemberInProgressOnboardingsData,
   GetOrgMembersData,
-  GetOrgMembersError,
-  GetOrgMembersResponse,
   GetOrgMetricsData,
   GetOrgOnboardingConfigsByIdData,
   GetOrgOnboardingConfigsByObcIdRulesData,
   GetOrgOnboardingConfigsData,
-  GetOrgOnboardingConfigsError,
-  GetOrgOnboardingConfigsResponse,
   GetOrgProxyConfigsByProxyConfigIdData,
   GetOrgProxyConfigsData,
   GetOrgRolesData,
-  GetOrgRolesError,
-  GetOrgRolesResponse,
   GetOrgTagsData,
+  GetOrgVaultDrAwsPreEnrollmentData,
+  GetOrgVaultDrStatusData,
+  GetOrgWebhookPortalData,
   GetPartnerAuthGoogleOauthData,
+  GetPartnerAuthRolesData,
+  GetPartnerData,
+  GetPartnerDocTemplatesData,
   GetPartnerMembersData,
-  GetPartnerMembersError,
-  GetPartnerMembersResponse,
   GetPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdEventsData,
   GetPartnerPartnershipsByPartnershipIdDocumentsData,
   GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdData,
+  GetPartnerPartnershipsData,
   GetPartnerRolesData,
-  GetPartnerRolesError,
-  GetPartnerRolesResponse,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdData,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdError,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdResponse,
@@ -232,11 +228,13 @@ import type {
   PostOrgAuthAssumeRoleData,
   PostOrgAuthAssumeRoleError,
   PostOrgAuthAssumeRoleResponse,
+  PostOrgAuthDocsTokenData,
   PostOrgAuthDocsTokenError,
   PostOrgAuthDocsTokenResponse,
   PostOrgAuthLoginData,
   PostOrgAuthLoginError,
   PostOrgAuthLoginResponse,
+  PostOrgAuthLogoutData,
   PostOrgAuthLogoutError,
   PostOrgAuthLogoutResponse,
   PostOrgAuthMagicLinkData,
@@ -290,6 +288,7 @@ import type {
   PostOrgTagsData,
   PostOrgTagsError,
   PostOrgTagsResponse,
+  PostOrgVaultDrAwsPreEnrollmentData,
   PostOrgVaultDrAwsPreEnrollmentError,
   PostOrgVaultDrAwsPreEnrollmentResponse,
   PostOrgVaultDrEnrollData,
@@ -304,6 +303,7 @@ import type {
   PostPartnerAuthLoginData,
   PostPartnerAuthLoginError,
   PostPartnerAuthLoginResponse,
+  PostPartnerAuthLogoutData,
   PostPartnerAuthLogoutError,
   PostPartnerAuthLogoutResponse,
   PostPartnerAuthMagicLinkData,
@@ -343,15 +343,17 @@ import type {
   PostWebhooksSambaHandleWebhookResponse,
   PostWebhooksTwilioStatusCallbackError,
   PostWebhooksTwilioStatusCallbackResponse,
+  PutOrgLogoData,
   PutOrgLogoError,
   PutOrgLogoResponse,
   PutPartnerDocTemplatesByTemplateIdData,
   PutPartnerDocTemplatesByTemplateIdError,
   PutPartnerDocTemplatesByTemplateIdResponse,
+  PutPartnerLogoData,
   PutPartnerLogoError,
   PutPartnerLogoResponse,
 } from '@onefootprint/request-types/dashboard';
-import { type InfiniteData, type UseMutationOptions, infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
+import { type UseMutationOptions, queryOptions } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import {
   client,
@@ -1401,81 +1403,6 @@ export const getEntitiesByFpIdOnboardingsOptions = (options: Options<GetEntities
   });
 };
 
-const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(
-  queryKey: QueryKey<Options>,
-  page: K,
-) => {
-  const params = queryKey[0];
-  if (page.body) {
-    params.body = {
-      ...(queryKey[0].body as any),
-      ...(page.body as any),
-    };
-  }
-  if (page.headers) {
-    params.headers = {
-      ...queryKey[0].headers,
-      ...page.headers,
-    };
-  }
-  if (page.path) {
-    params.path = {
-      ...queryKey[0].path,
-      ...page.path,
-    };
-  }
-  if (page.query) {
-    params.query = {
-      ...queryKey[0].query,
-      ...page.query,
-    };
-  }
-  return params as unknown as typeof page;
-};
-
-export const getEntitiesByFpIdOnboardingsInfiniteQueryKey = (
-  options: Options<GetEntitiesByFpIdOnboardingsData>,
-): QueryKey<Options<GetEntitiesByFpIdOnboardingsData>> => [
-  createQueryKey('getEntitiesByFpIdOnboardings', options, true),
-];
-
-export const getEntitiesByFpIdOnboardingsInfiniteOptions = (options: Options<GetEntitiesByFpIdOnboardingsData>) => {
-  return infiniteQueryOptions<
-    GetEntitiesByFpIdOnboardingsResponse,
-    AxiosError<GetEntitiesByFpIdOnboardingsError>,
-    InfiniteData<GetEntitiesByFpIdOnboardingsResponse>,
-    QueryKey<Options<GetEntitiesByFpIdOnboardingsData>>,
-    number | Pick<QueryKey<Options<GetEntitiesByFpIdOnboardingsData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetEntitiesByFpIdOnboardingsData>>[0],
-          'body' | 'headers' | 'path' | 'query'
-        > =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getEntitiesByFpIdOnboardings({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getEntitiesByFpIdOnboardingsInfiniteQueryKey(options),
-    },
-  );
-};
-
 export const getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsQueryKey = (
   options: Options<GetEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsData>,
 ) => [createQueryKey('getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignals', options)];
@@ -1957,9 +1884,11 @@ export const getHealthOptions = (options?: Options) => {
   });
 };
 
-export const getHealthEnclaveQueryKey = (options?: Options) => [createQueryKey('getHealthEnclave', options)];
+export const getHealthEnclaveQueryKey = (options?: Options<GetHealthEnclaveData>) => [
+  createQueryKey('getHealthEnclave', options),
+];
 
-export const getHealthEnclaveOptions = (options?: Options) => {
+export const getHealthEnclaveOptions = (options?: Options<GetHealthEnclaveData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHealthEnclave({
@@ -1974,11 +1903,11 @@ export const getHealthEnclaveOptions = (options?: Options) => {
   });
 };
 
-export const getHealthEnclaveDecryptQueryKey = (options?: Options) => [
+export const getHealthEnclaveDecryptQueryKey = (options?: Options<GetHealthEnclaveDecryptData>) => [
   createQueryKey('getHealthEnclaveDecrypt', options),
 ];
 
-export const getHealthEnclaveDecryptOptions = (options?: Options) => {
+export const getHealthEnclaveDecryptOptions = (options?: Options<GetHealthEnclaveDecryptData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHealthEnclaveDecrypt({
@@ -1993,9 +1922,9 @@ export const getHealthEnclaveDecryptOptions = (options?: Options) => {
   });
 };
 
-export const getOrgQueryKey = (options?: Options) => [createQueryKey('getOrg', options)];
+export const getOrgQueryKey = (options?: Options<GetOrgData>) => [createQueryKey('getOrg', options)];
 
-export const getOrgOptions = (options?: Options) => {
+export const getOrgOptions = (options?: Options<GetOrgData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrg({
@@ -2041,44 +1970,6 @@ export const getOrgApiKeysOptions = (options?: Options<GetOrgApiKeysData>) => {
     },
     queryKey: getOrgApiKeysQueryKey(options),
   });
-};
-
-export const getOrgApiKeysInfiniteQueryKey = (
-  options?: Options<GetOrgApiKeysData>,
-): QueryKey<Options<GetOrgApiKeysData>> => [createQueryKey('getOrgApiKeys', options, true)];
-
-export const getOrgApiKeysInfiniteOptions = (options?: Options<GetOrgApiKeysData>) => {
-  return infiniteQueryOptions<
-    GetOrgApiKeysResponse,
-    AxiosError<GetOrgApiKeysError>,
-    InfiniteData<GetOrgApiKeysResponse>,
-    QueryKey<Options<GetOrgApiKeysData>>,
-    number | Pick<QueryKey<Options<GetOrgApiKeysData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgApiKeysData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgApiKeys({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgApiKeysInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const postOrgApiKeysQueryKey = (options: Options<PostOrgApiKeysData>) => [
@@ -2210,9 +2101,11 @@ export const postOrgApiKeysByIdRevealMutation = (options?: Partial<Options<PostO
   return mutationOptions;
 };
 
-export const getOrgAppMetaAndroidQueryKey = (options?: Options) => [createQueryKey('getOrgAppMetaAndroid', options)];
+export const getOrgAppMetaAndroidQueryKey = (options?: Options<GetOrgAppMetaAndroidData>) => [
+  createQueryKey('getOrgAppMetaAndroid', options),
+];
 
-export const getOrgAppMetaAndroidOptions = (options?: Options) => {
+export const getOrgAppMetaAndroidOptions = (options?: Options<GetOrgAppMetaAndroidData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgAppMetaAndroid({
@@ -2345,9 +2238,11 @@ export const postOrgAppMetaAndroidByMetaIdRevealMutation = (
   return mutationOptions;
 };
 
-export const getOrgAppMetaIosQueryKey = (options?: Options) => [createQueryKey('getOrgAppMetaIos', options)];
+export const getOrgAppMetaIosQueryKey = (options?: Options<GetOrgAppMetaIosData>) => [
+  createQueryKey('getOrgAppMetaIos', options),
+];
 
-export const getOrgAppMetaIosOptions = (options?: Options) => {
+export const getOrgAppMetaIosOptions = (options?: Options<GetOrgAppMetaIosData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgAppMetaIos({
@@ -2493,44 +2388,6 @@ export const getOrgAuditEventsOptions = (options?: Options<GetOrgAuditEventsData
   });
 };
 
-export const getOrgAuditEventsInfiniteQueryKey = (
-  options?: Options<GetOrgAuditEventsData>,
-): QueryKey<Options<GetOrgAuditEventsData>> => [createQueryKey('getOrgAuditEvents', options, true)];
-
-export const getOrgAuditEventsInfiniteOptions = (options?: Options<GetOrgAuditEventsData>) => {
-  return infiniteQueryOptions<
-    GetOrgAuditEventsResponse,
-    AxiosError<GetOrgAuditEventsError>,
-    InfiniteData<GetOrgAuditEventsResponse>,
-    QueryKey<Options<GetOrgAuditEventsData>>,
-    string | Pick<QueryKey<Options<GetOrgAuditEventsData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgAuditEventsData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  cursor: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgAuditEvents({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgAuditEventsInfiniteQueryKey(options),
-    },
-  );
-};
-
 export const postOrgAuthAssumeRoleQueryKey = (options: Options<PostOrgAuthAssumeRoleData>) => [
   createQueryKey('postOrgAuthAssumeRole', options),
 ];
@@ -2568,9 +2425,11 @@ export const postOrgAuthAssumeRoleMutation = (options?: Partial<Options<PostOrgA
   return mutationOptions;
 };
 
-export const postOrgAuthDocsTokenQueryKey = (options?: Options) => [createQueryKey('postOrgAuthDocsToken', options)];
+export const postOrgAuthDocsTokenQueryKey = (options?: Options<PostOrgAuthDocsTokenData>) => [
+  createQueryKey('postOrgAuthDocsToken', options),
+];
 
-export const postOrgAuthDocsTokenOptions = (options?: Options) => {
+export const postOrgAuthDocsTokenOptions = (options?: Options<PostOrgAuthDocsTokenData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postOrgAuthDocsToken({
@@ -2585,11 +2444,11 @@ export const postOrgAuthDocsTokenOptions = (options?: Options) => {
   });
 };
 
-export const postOrgAuthDocsTokenMutation = (options?: Partial<Options>) => {
+export const postOrgAuthDocsTokenMutation = (options?: Partial<Options<PostOrgAuthDocsTokenData>>) => {
   const mutationOptions: UseMutationOptions<
     PostOrgAuthDocsTokenResponse,
     AxiosError<PostOrgAuthDocsTokenError>,
-    Options
+    Options<PostOrgAuthDocsTokenData>
   > = {
     mutationFn: async localOptions => {
       const { data } = await postOrgAuthDocsToken({
@@ -2659,9 +2518,11 @@ export const postOrgAuthLoginMutation = (options?: Partial<Options<PostOrgAuthLo
   return mutationOptions;
 };
 
-export const postOrgAuthLogoutQueryKey = (options?: Options) => [createQueryKey('postOrgAuthLogout', options)];
+export const postOrgAuthLogoutQueryKey = (options?: Options<PostOrgAuthLogoutData>) => [
+  createQueryKey('postOrgAuthLogout', options),
+];
 
-export const postOrgAuthLogoutOptions = (options?: Options) => {
+export const postOrgAuthLogoutOptions = (options?: Options<PostOrgAuthLogoutData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postOrgAuthLogout({
@@ -2676,8 +2537,12 @@ export const postOrgAuthLogoutOptions = (options?: Options) => {
   });
 };
 
-export const postOrgAuthLogoutMutation = (options?: Partial<Options>) => {
-  const mutationOptions: UseMutationOptions<PostOrgAuthLogoutResponse, AxiosError<PostOrgAuthLogoutError>, Options> = {
+export const postOrgAuthLogoutMutation = (options?: Partial<Options<PostOrgAuthLogoutData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PostOrgAuthLogoutResponse,
+    AxiosError<PostOrgAuthLogoutError>,
+    Options<PostOrgAuthLogoutData>
+  > = {
     mutationFn: async localOptions => {
       const { data } = await postOrgAuthLogout({
         ...options,
@@ -2727,9 +2592,11 @@ export const postOrgAuthMagicLinkMutation = (options?: Partial<Options<PostOrgAu
   return mutationOptions;
 };
 
-export const getOrgAuthRolesQueryKey = (options?: Options) => [createQueryKey('getOrgAuthRoles', options)];
+export const getOrgAuthRolesQueryKey = (options?: Options<GetOrgAuthRolesData>) => [
+  createQueryKey('getOrgAuthRoles', options),
+];
 
-export const getOrgAuthRolesOptions = (options?: Options) => {
+export const getOrgAuthRolesOptions = (options?: Options<GetOrgAuthRolesData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgAuthRoles({
@@ -2744,11 +2611,11 @@ export const getOrgAuthRolesOptions = (options?: Options) => {
   });
 };
 
-export const getOrgClientSecurityConfigQueryKey = (options?: Options) => [
+export const getOrgClientSecurityConfigQueryKey = (options?: Options<GetOrgClientSecurityConfigData>) => [
   createQueryKey('getOrgClientSecurityConfig', options),
 ];
 
-export const getOrgClientSecurityConfigOptions = (options?: Options) => {
+export const getOrgClientSecurityConfigOptions = (options?: Options<GetOrgClientSecurityConfigData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgClientSecurityConfig({
@@ -2857,9 +2724,11 @@ export const deleteOrgFrequentNotesByFrequentNoteIdMutation = (
   return mutationOptions;
 };
 
-export const getOrgInvoicePreviewQueryKey = (options?: Options) => [createQueryKey('getOrgInvoicePreview', options)];
+export const getOrgInvoicePreviewQueryKey = (options?: Options<GetOrgInvoicePreviewData>) => [
+  createQueryKey('getOrgInvoicePreview', options),
+];
 
-export const getOrgInvoicePreviewOptions = (options?: Options) => {
+export const getOrgInvoicePreviewOptions = (options?: Options<GetOrgInvoicePreviewData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgInvoicePreview({
@@ -2889,44 +2758,6 @@ export const getOrgListsOptions = (options?: Options<GetOrgListsData>) => {
     },
     queryKey: getOrgListsQueryKey(options),
   });
-};
-
-export const getOrgListsInfiniteQueryKey = (options?: Options<GetOrgListsData>): QueryKey<Options<GetOrgListsData>> => [
-  createQueryKey('getOrgLists', options, true),
-];
-
-export const getOrgListsInfiniteOptions = (options?: Options<GetOrgListsData>) => {
-  return infiniteQueryOptions<
-    GetOrgListsResponse,
-    AxiosError<GetOrgListsError>,
-    InfiniteData<GetOrgListsResponse>,
-    QueryKey<Options<GetOrgListsData>>,
-    number | Pick<QueryKey<Options<GetOrgListsData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgListsData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgLists({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgListsInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const postOrgListsQueryKey = (options: Options<PostOrgListsData>) => [createQueryKey('postOrgLists', options)];
@@ -2981,44 +2812,6 @@ export const getOrgListsByIdTimelineOptions = (options: Options<GetOrgListsByIdT
     },
     queryKey: getOrgListsByIdTimelineQueryKey(options),
   });
-};
-
-export const getOrgListsByIdTimelineInfiniteQueryKey = (
-  options: Options<GetOrgListsByIdTimelineData>,
-): QueryKey<Options<GetOrgListsByIdTimelineData>> => [createQueryKey('getOrgListsByIdTimeline', options, true)];
-
-export const getOrgListsByIdTimelineInfiniteOptions = (options: Options<GetOrgListsByIdTimelineData>) => {
-  return infiniteQueryOptions<
-    GetOrgListsByIdTimelineResponse,
-    AxiosError<GetOrgListsByIdTimelineError>,
-    InfiniteData<GetOrgListsByIdTimelineResponse>,
-    QueryKey<Options<GetOrgListsByIdTimelineData>>,
-    string | Pick<QueryKey<Options<GetOrgListsByIdTimelineData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgListsByIdTimelineData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  cursor: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgListsByIdTimeline({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgListsByIdTimelineInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const getOrgListsByListIdQueryKey = (options: Options<GetOrgListsByListIdData>) => [
@@ -3152,8 +2945,12 @@ export const deleteOrgListsByListIdEntriesByListEntryIdMutation = (
   return mutationOptions;
 };
 
-export const putOrgLogoMutation = (options?: Partial<Options>) => {
-  const mutationOptions: UseMutationOptions<PutOrgLogoResponse, AxiosError<PutOrgLogoError>, Options> = {
+export const putOrgLogoMutation = (options?: Partial<Options<PutOrgLogoData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PutOrgLogoResponse,
+    AxiosError<PutOrgLogoError>,
+    Options<PutOrgLogoData>
+  > = {
     mutationFn: async localOptions => {
       const { data } = await putOrgLogo({
         ...options,
@@ -3166,9 +2963,9 @@ export const putOrgLogoMutation = (options?: Partial<Options>) => {
   return mutationOptions;
 };
 
-export const getOrgMemberQueryKey = (options?: Options) => [createQueryKey('getOrgMember', options)];
+export const getOrgMemberQueryKey = (options?: Options<GetOrgMemberData>) => [createQueryKey('getOrgMember', options)];
 
-export const getOrgMemberOptions = (options?: Options) => {
+export const getOrgMemberOptions = (options?: Options<GetOrgMemberData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgMember({
@@ -3237,44 +3034,6 @@ export const getOrgMembersOptions = (options?: Options<GetOrgMembersData>) => {
     },
     queryKey: getOrgMembersQueryKey(options),
   });
-};
-
-export const getOrgMembersInfiniteQueryKey = (
-  options?: Options<GetOrgMembersData>,
-): QueryKey<Options<GetOrgMembersData>> => [createQueryKey('getOrgMembers', options, true)];
-
-export const getOrgMembersInfiniteOptions = (options?: Options<GetOrgMembersData>) => {
-  return infiniteQueryOptions<
-    GetOrgMembersResponse,
-    AxiosError<GetOrgMembersError>,
-    InfiniteData<GetOrgMembersResponse>,
-    QueryKey<Options<GetOrgMembersData>>,
-    number | Pick<QueryKey<Options<GetOrgMembersData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgMembersData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgMembers({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgMembersInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const postOrgMembersQueryKey = (options: Options<PostOrgMembersData>) => [
@@ -3411,44 +3170,6 @@ export const getOrgOnboardingConfigsOptions = (options?: Options<GetOrgOnboardin
     },
     queryKey: getOrgOnboardingConfigsQueryKey(options),
   });
-};
-
-export const getOrgOnboardingConfigsInfiniteQueryKey = (
-  options?: Options<GetOrgOnboardingConfigsData>,
-): QueryKey<Options<GetOrgOnboardingConfigsData>> => [createQueryKey('getOrgOnboardingConfigs', options, true)];
-
-export const getOrgOnboardingConfigsInfiniteOptions = (options?: Options<GetOrgOnboardingConfigsData>) => {
-  return infiniteQueryOptions<
-    GetOrgOnboardingConfigsResponse,
-    AxiosError<GetOrgOnboardingConfigsError>,
-    InfiniteData<GetOrgOnboardingConfigsResponse>,
-    QueryKey<Options<GetOrgOnboardingConfigsData>>,
-    number | Pick<QueryKey<Options<GetOrgOnboardingConfigsData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgOnboardingConfigsData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgOnboardingConfigs({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgOnboardingConfigsInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const postOrgOnboardingConfigsQueryKey = (options: Options<PostOrgOnboardingConfigsData>) => [
@@ -3924,44 +3645,6 @@ export const getOrgRolesOptions = (options?: Options<GetOrgRolesData>) => {
   });
 };
 
-export const getOrgRolesInfiniteQueryKey = (options?: Options<GetOrgRolesData>): QueryKey<Options<GetOrgRolesData>> => [
-  createQueryKey('getOrgRoles', options, true),
-];
-
-export const getOrgRolesInfiniteOptions = (options?: Options<GetOrgRolesData>) => {
-  return infiniteQueryOptions<
-    GetOrgRolesResponse,
-    AxiosError<GetOrgRolesError>,
-    InfiniteData<GetOrgRolesResponse>,
-    QueryKey<Options<GetOrgRolesData>>,
-    number | Pick<QueryKey<Options<GetOrgRolesData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetOrgRolesData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getOrgRoles({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getOrgRolesInfiniteQueryKey(options),
-    },
-  );
-};
-
 export const postOrgRolesQueryKey = (options: Options<PostOrgRolesData>) => [createQueryKey('postOrgRoles', options)];
 
 export const postOrgRolesOptions = (options: Options<PostOrgRolesData>) => {
@@ -4126,11 +3809,11 @@ export const deleteOrgTagsByTagIdMutation = (options?: Partial<Options<DeleteOrg
   return mutationOptions;
 };
 
-export const getOrgVaultDrAwsPreEnrollmentQueryKey = (options?: Options) => [
+export const getOrgVaultDrAwsPreEnrollmentQueryKey = (options?: Options<GetOrgVaultDrAwsPreEnrollmentData>) => [
   createQueryKey('getOrgVaultDrAwsPreEnrollment', options),
 ];
 
-export const getOrgVaultDrAwsPreEnrollmentOptions = (options?: Options) => {
+export const getOrgVaultDrAwsPreEnrollmentOptions = (options?: Options<GetOrgVaultDrAwsPreEnrollmentData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgVaultDrAwsPreEnrollment({
@@ -4145,11 +3828,11 @@ export const getOrgVaultDrAwsPreEnrollmentOptions = (options?: Options) => {
   });
 };
 
-export const postOrgVaultDrAwsPreEnrollmentQueryKey = (options?: Options) => [
+export const postOrgVaultDrAwsPreEnrollmentQueryKey = (options?: Options<PostOrgVaultDrAwsPreEnrollmentData>) => [
   createQueryKey('postOrgVaultDrAwsPreEnrollment', options),
 ];
 
-export const postOrgVaultDrAwsPreEnrollmentOptions = (options?: Options) => {
+export const postOrgVaultDrAwsPreEnrollmentOptions = (options?: Options<PostOrgVaultDrAwsPreEnrollmentData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postOrgVaultDrAwsPreEnrollment({
@@ -4164,11 +3847,13 @@ export const postOrgVaultDrAwsPreEnrollmentOptions = (options?: Options) => {
   });
 };
 
-export const postOrgVaultDrAwsPreEnrollmentMutation = (options?: Partial<Options>) => {
+export const postOrgVaultDrAwsPreEnrollmentMutation = (
+  options?: Partial<Options<PostOrgVaultDrAwsPreEnrollmentData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     PostOrgVaultDrAwsPreEnrollmentResponse,
     AxiosError<PostOrgVaultDrAwsPreEnrollmentError>,
-    Options
+    Options<PostOrgVaultDrAwsPreEnrollmentData>
   > = {
     mutationFn: async localOptions => {
       const { data } = await postOrgVaultDrAwsPreEnrollment({
@@ -4260,9 +3945,11 @@ export const postOrgVaultDrRevealWrappedRecordKeysMutation = (
   return mutationOptions;
 };
 
-export const getOrgVaultDrStatusQueryKey = (options?: Options) => [createQueryKey('getOrgVaultDrStatus', options)];
+export const getOrgVaultDrStatusQueryKey = (options?: Options<GetOrgVaultDrStatusData>) => [
+  createQueryKey('getOrgVaultDrStatus', options),
+];
 
-export const getOrgVaultDrStatusOptions = (options?: Options) => {
+export const getOrgVaultDrStatusOptions = (options?: Options<GetOrgVaultDrStatusData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgVaultDrStatus({
@@ -4277,9 +3964,11 @@ export const getOrgVaultDrStatusOptions = (options?: Options) => {
   });
 };
 
-export const getOrgWebhookPortalQueryKey = (options?: Options) => [createQueryKey('getOrgWebhookPortal', options)];
+export const getOrgWebhookPortalQueryKey = (options?: Options<GetOrgWebhookPortalData>) => [
+  createQueryKey('getOrgWebhookPortal', options),
+];
 
-export const getOrgWebhookPortalOptions = (options?: Options) => {
+export const getOrgWebhookPortalOptions = (options?: Options<GetOrgWebhookPortalData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrgWebhookPortal({
@@ -4294,9 +3983,9 @@ export const getOrgWebhookPortalOptions = (options?: Options) => {
   });
 };
 
-export const getPartnerQueryKey = (options?: Options) => [createQueryKey('getPartner', options)];
+export const getPartnerQueryKey = (options?: Options<GetPartnerData>) => [createQueryKey('getPartner', options)];
 
-export const getPartnerOptions = (options?: Options) => {
+export const getPartnerOptions = (options?: Options<GetPartnerData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getPartner({
@@ -4422,9 +4111,11 @@ export const postPartnerAuthLoginMutation = (options?: Partial<Options<PostPartn
   return mutationOptions;
 };
 
-export const postPartnerAuthLogoutQueryKey = (options?: Options) => [createQueryKey('postPartnerAuthLogout', options)];
+export const postPartnerAuthLogoutQueryKey = (options?: Options<PostPartnerAuthLogoutData>) => [
+  createQueryKey('postPartnerAuthLogout', options),
+];
 
-export const postPartnerAuthLogoutOptions = (options?: Options) => {
+export const postPartnerAuthLogoutOptions = (options?: Options<PostPartnerAuthLogoutData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await postPartnerAuthLogout({
@@ -4439,11 +4130,11 @@ export const postPartnerAuthLogoutOptions = (options?: Options) => {
   });
 };
 
-export const postPartnerAuthLogoutMutation = (options?: Partial<Options>) => {
+export const postPartnerAuthLogoutMutation = (options?: Partial<Options<PostPartnerAuthLogoutData>>) => {
   const mutationOptions: UseMutationOptions<
     PostPartnerAuthLogoutResponse,
     AxiosError<PostPartnerAuthLogoutError>,
-    Options
+    Options<PostPartnerAuthLogoutData>
   > = {
     mutationFn: async localOptions => {
       const { data } = await postPartnerAuthLogout({
@@ -4494,9 +4185,11 @@ export const postPartnerAuthMagicLinkMutation = (options?: Partial<Options<PostP
   return mutationOptions;
 };
 
-export const getPartnerAuthRolesQueryKey = (options?: Options) => [createQueryKey('getPartnerAuthRoles', options)];
+export const getPartnerAuthRolesQueryKey = (options?: Options<GetPartnerAuthRolesData>) => [
+  createQueryKey('getPartnerAuthRoles', options),
+];
 
-export const getPartnerAuthRolesOptions = (options?: Options) => {
+export const getPartnerAuthRolesOptions = (options?: Options<GetPartnerAuthRolesData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getPartnerAuthRoles({
@@ -4511,11 +4204,11 @@ export const getPartnerAuthRolesOptions = (options?: Options) => {
   });
 };
 
-export const getPartnerDocTemplatesQueryKey = (options?: Options) => [
+export const getPartnerDocTemplatesQueryKey = (options?: Options<GetPartnerDocTemplatesData>) => [
   createQueryKey('getPartnerDocTemplates', options),
 ];
 
-export const getPartnerDocTemplatesOptions = (options?: Options) => {
+export const getPartnerDocTemplatesOptions = (options?: Options<GetPartnerDocTemplatesData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getPartnerDocTemplates({
@@ -4607,8 +4300,12 @@ export const deletePartnerDocTemplatesByTemplateIdMutation = (
   return mutationOptions;
 };
 
-export const putPartnerLogoMutation = (options?: Partial<Options>) => {
-  const mutationOptions: UseMutationOptions<PutPartnerLogoResponse, AxiosError<PutPartnerLogoError>, Options> = {
+export const putPartnerLogoMutation = (options?: Partial<Options<PutPartnerLogoData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PutPartnerLogoResponse,
+    AxiosError<PutPartnerLogoError>,
+    Options<PutPartnerLogoData>
+  > = {
     mutationFn: async localOptions => {
       const { data } = await putPartnerLogo({
         ...options,
@@ -4638,44 +4335,6 @@ export const getPartnerMembersOptions = (options?: Options<GetPartnerMembersData
     },
     queryKey: getPartnerMembersQueryKey(options),
   });
-};
-
-export const getPartnerMembersInfiniteQueryKey = (
-  options?: Options<GetPartnerMembersData>,
-): QueryKey<Options<GetPartnerMembersData>> => [createQueryKey('getPartnerMembers', options, true)];
-
-export const getPartnerMembersInfiniteOptions = (options?: Options<GetPartnerMembersData>) => {
-  return infiniteQueryOptions<
-    GetPartnerMembersResponse,
-    AxiosError<GetPartnerMembersError>,
-    InfiniteData<GetPartnerMembersResponse>,
-    QueryKey<Options<GetPartnerMembersData>>,
-    number | Pick<QueryKey<Options<GetPartnerMembersData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetPartnerMembersData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getPartnerMembers({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getPartnerMembersInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const postPartnerMembersQueryKey = (options: Options<PostPartnerMembersData>) => [
@@ -4776,11 +4435,11 @@ export const postPartnerMembersByTenantUserIdDeactivateMutation = (
   return mutationOptions;
 };
 
-export const getPartnerPartnershipsQueryKey = (options?: Options) => [
+export const getPartnerPartnershipsQueryKey = (options?: Options<GetPartnerPartnershipsData>) => [
   createQueryKey('getPartnerPartnerships', options),
 ];
 
-export const getPartnerPartnershipsOptions = (options?: Options) => {
+export const getPartnerPartnershipsOptions = (options?: Options<GetPartnerPartnershipsData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getPartnerPartnerships({
@@ -5059,44 +4718,6 @@ export const getPartnerRolesOptions = (options?: Options<GetPartnerRolesData>) =
     },
     queryKey: getPartnerRolesQueryKey(options),
   });
-};
-
-export const getPartnerRolesInfiniteQueryKey = (
-  options?: Options<GetPartnerRolesData>,
-): QueryKey<Options<GetPartnerRolesData>> => [createQueryKey('getPartnerRoles', options, true)];
-
-export const getPartnerRolesInfiniteOptions = (options?: Options<GetPartnerRolesData>) => {
-  return infiniteQueryOptions<
-    GetPartnerRolesResponse,
-    AxiosError<GetPartnerRolesError>,
-    InfiniteData<GetPartnerRolesResponse>,
-    QueryKey<Options<GetPartnerRolesData>>,
-    number | Pick<QueryKey<Options<GetPartnerRolesData>>[0], 'body' | 'headers' | 'path' | 'query'>
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetPartnerRolesData>>[0], 'body' | 'headers' | 'path' | 'query'> =
-          typeof pageParam === 'object'
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getPartnerRoles({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: getPartnerRolesInfiniteQueryKey(options),
-    },
-  );
 };
 
 export const postPartnerRolesQueryKey = (options: Options<PostPartnerRolesData>) => [

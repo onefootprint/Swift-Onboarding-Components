@@ -58,7 +58,7 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
   const handleSubmit = (phoneFromForm: string) => {
     mutIdentify.mutate({
       body: { phoneNumber: phoneFromForm, scope },
-      headers: { ...obConfigAuth, 'x-sandbox-id': sandboxId },
+      headers: { ...obConfigAuth, 'X-Sandbox-Id': sandboxId },
     });
   };
 

@@ -2249,17 +2249,49 @@ export type WorkflowRequestConfig =
  * This allows editing data, re-verifies data, and then re-triggers decision engine
  */
 export type kind3 = 'onboard';
+export type GetHostedBusinessData = {
+  headers?: {
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+  };
+};
 export type GetHostedBusinessResponse = HostedBusinessDetail;
 export type GetHostedBusinessError = unknown;
 export type PostHostedBusinessOnboardingData = {
   body: PostBusinessOnboardingRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedBusinessOnboardingResponse = BusinessOnboardingResponse;
 export type PostHostedBusinessOnboardingError = unknown;
+export type GetHostedBusinessOwnersData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedBusinessOwnersResponse = Array<HostedBusinessOwner>;
 export type GetHostedBusinessOwnersError = unknown;
 export type PatchHostedBusinessOwnersData = {
   body: Array<BatchHostedBusinessOwnerRequest>;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+    /**
+     * Provide `true` if the data in the request is bootstrap data.
+     */
+    'X-Fp-Is-Bootstrap'?: boolean;
+  };
 };
 export type PatchHostedBusinessOwnersResponse = Array<HostedBusinessOwner>;
 export type PatchHostedBusinessOwnersError = unknown;
@@ -2268,11 +2300,23 @@ export type PatchHostedBusinessVaultData = {
    * Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: ModernRawBusinessDataRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PatchHostedBusinessVaultResponse = Empty;
 export type PatchHostedBusinessVaultError = unknown;
 export type PostHostedBusinessVaultDecryptData = {
   body: UserDecryptRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedBusinessVaultDecryptResponse = ModernBusinessDecryptResponse;
 export type PostHostedBusinessVaultDecryptError = unknown;
@@ -2281,19 +2325,57 @@ export type PostHostedBusinessVaultValidateData = {
    * Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: ModernRawBusinessDataRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+    /**
+     * Provide `true` if the data in the request is bootstrap data.
+     */
+    'X-Fp-Is-Bootstrap'?: boolean;
+  };
 };
 export type PostHostedBusinessVaultValidateResponse = Empty;
 export type PostHostedBusinessVaultValidateError = unknown;
+export type GetHostedBusinessesData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedBusinessesResponse = Array<HostedBusiness>;
 export type GetHostedBusinessesError = unknown;
+export type GetHostedCheckSessionData = {
+  headers?: {
+    /**
+     * Session token.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedCheckSessionResponse = CheckSessionResponse;
 export type GetHostedCheckSessionError = unknown;
 export type PostHostedDocumentsData = {
   body: CreateDocumentRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedDocumentsResponse = CreateDocumentResponse;
 export type PostHostedDocumentsError = unknown;
 export type PostHostedDocumentsByIdProcessData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -2301,6 +2383,12 @@ export type PostHostedDocumentsByIdProcessData = {
 export type PostHostedDocumentsByIdProcessResponse = DocumentResponse;
 export type PostHostedDocumentsByIdProcessError = unknown;
 export type PostHostedDocumentsByIdUploadBySideData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
   path: {
     id: string;
     side: 'front' | 'back' | 'selfie';
@@ -2312,10 +2400,22 @@ export type PostHostedIdentifyData = {
   body: IdentifyRequest;
   headers?: {
     /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+    /**
+     * Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard.
+     */
+    'X-Onboarding-Config-Key'?: string;
+    /**
      * When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
      *
      */
-    'x-sandbox-id'?: string;
+    'X-Sandbox-Id'?: string;
   };
 };
 export type PostHostedIdentifyResponse = IdentifyResponse;
@@ -2325,16 +2425,38 @@ export type PostHostedIdentifyKbaData = {
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: ModernRawUserDataRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedIdentifyKbaResponse = KbaResponse;
 export type PostHostedIdentifyKbaError = unknown;
 export type PostHostedIdentifyLiteData = {
   body: LiteIdentifyRequest;
+  headers?: {
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+    /**
+     * Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard.
+     */
+    'X-Onboarding-Config-Key'?: string;
+  };
 };
 export type PostHostedIdentifyLiteResponse = LiteIdentifyResponse;
 export type PostHostedIdentifyLiteError = unknown;
 export type PostHostedIdentifyLoginChallengeData = {
   body: LoginChallengeRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedIdentifyLoginChallengeResponse = IdentifyChallengeResponse;
 export type PostHostedIdentifyLoginChallengeError = unknown;
@@ -2344,124 +2466,352 @@ export type PostHostedIdentifySignupChallengeData = {
     /**
      * When a non-empty value is provided, indicates that the request is originating from the components SDK
      */
-    'x-fp-is-components-sdk'?: boolean;
+    'X-Fp-Is-Components-Sdk'?: boolean;
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+    /**
+     * Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard.
+     */
+    'X-Onboarding-Config-Key'?: string;
     /**
      * When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
      *
      */
-    'x-sandbox-id'?: string;
+    'X-Sandbox-Id'?: string;
   };
 };
 export type PostHostedIdentifySignupChallengeResponse = IdentifyChallengeResponse;
 export type PostHostedIdentifySignupChallengeError = unknown;
+export type PostHostedIdentifyValidationTokenData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type PostHostedIdentifyValidationTokenResponse = HostedValidateResponse;
 export type PostHostedIdentifyValidationTokenError = unknown;
 export type PostHostedIdentifyVerifyData = {
   body: IdentifyVerifyRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedIdentifyVerifyResponse = IdentifyVerifyResponse;
 export type PostHostedIdentifyVerifyError = unknown;
 export type PostHostedOnboardingData = {
   body?: PostOnboardingRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+    /**
+     * Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard.
+     */
+    'X-Onboarding-Config-Key'?: string;
+  };
 };
 export type PostHostedOnboardingResponse = OnboardingResponse;
 export type PostHostedOnboardingError = unknown;
+export type PostHostedOnboardingAuthorizeData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type PostHostedOnboardingAuthorizeResponse = Empty;
 export type PostHostedOnboardingAuthorizeError = unknown;
+export type GetHostedOnboardingConfigData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+    /**
+     * Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard.
+     */
+    'X-Onboarding-Config-Key'?: string;
+  };
+};
 export type GetHostedOnboardingConfigResponse = PublicOnboardingConfiguration;
 export type GetHostedOnboardingConfigError = unknown;
 export type HostedOnboardingD2pGenerateData = {
   body: D2pGenerateRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type HostedOnboardingD2pGenerateResponse = D2pGenerateResponse;
 export type HostedOnboardingD2pGenerateError = unknown;
 export type HostedOnboardingD2pSmsData = {
   body: D2pSmsRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type HostedOnboardingD2pSmsResponse = D2pSmsResponse;
 export type HostedOnboardingD2pSmsError = unknown;
+export type HostedOnboardingD2pStatusData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type HostedOnboardingD2pStatusResponse = D2pStatusResponse;
 export type HostedOnboardingD2pStatusError = unknown;
 export type HostedOnboardingD2pStatusPostData = {
   body: D2pUpdateStatusRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type HostedOnboardingD2pStatusPostResponse = Empty;
 export type HostedOnboardingD2pStatusPostError = unknown;
 export type PostHostedOnboardingFpData = {
   body: FingerprintVisitRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedOnboardingFpResponse = Empty;
 export type PostHostedOnboardingFpError = unknown;
+export type GetHostedOnboardingNidData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedOnboardingNidResponse = NeuroIdentityIdResponse;
 export type GetHostedOnboardingNidError = unknown;
+export type GetHostedOnboardingPrivacyPassData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type PostHostedOnboardingProcessData = {
   body?: ProcessRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedOnboardingProcessResponse = Empty;
 export type PostHostedOnboardingProcessError = unknown;
 export type PostHostedOnboardingSdsData = {
   body: SocureDeviceSessionIdRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedOnboardingSdsResponse = Empty;
 export type PostHostedOnboardingSdsError = unknown;
+export type GetHostedOnboardingSessionData = {
+  headers?: {
+    /**
+     * Short-lived token representing a playbook.
+     */
+    'X-Onboarding-Config-Key'?: string;
+  };
+};
 export type GetHostedOnboardingSessionResponse = OnboardingSessionResponse;
 export type GetHostedOnboardingSessionError = unknown;
 export type PostHostedOnboardingSkipPasskeyRegisterData = {
   body: SkipPasskeyRegisterRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedOnboardingSkipPasskeyRegisterResponse = Empty;
 export type PostHostedOnboardingSkipPasskeyRegisterError = unknown;
+export type GetHostedOnboardingStatusData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedOnboardingStatusResponse = OnboardingStatusResponse;
 export type GetHostedOnboardingStatusError = unknown;
 export type PostHostedOnboardingTelData = {
   body: StytchTelemetryRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedOnboardingTelResponse = Empty;
 export type PostHostedOnboardingTelError = unknown;
 export type PostHostedOnboardingTimelineData = {
   body: CreateOnboardingTimelineRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedOnboardingTimelineResponse = Empty;
 export type PostHostedOnboardingTimelineError = unknown;
+export type PostHostedOnboardingValidateData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type PostHostedOnboardingValidateResponse = HostedValidateResponse;
 export type PostHostedOnboardingValidateError = unknown;
 export type PostHostedUserAttestDeviceData = {
   body: CreateDeviceAttestationRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserAttestDeviceResponse = Empty;
 export type PostHostedUserAttestDeviceError = unknown;
 export type PostHostedUserAttestDeviceChallengeData = {
   body: GetDeviceAttestationChallengeRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserAttestDeviceChallengeResponse = DeviceAttestationChallengeResponse;
 export type PostHostedUserAttestDeviceChallengeError = unknown;
+export type GetHostedUserAuthMethodsData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedUserAuthMethodsResponse = Array<AuthMethod>;
 export type GetHostedUserAuthMethodsError = unknown;
+export type GetHostedUserAuthRequirementsData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedUserAuthRequirementsResponse = AuthRequirementsResponse;
 export type GetHostedUserAuthRequirementsError = unknown;
+export type GetHostedUserAuthorizedOrgsData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedUserAuthorizedOrgsResponse = Array<AuthorizedOrg>;
 export type GetHostedUserAuthorizedOrgsError = unknown;
 export type PostHostedUserChallengeData = {
   body: UserChallengeRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserChallengeResponse = UserChallengeResponse;
 export type PostHostedUserChallengeError = unknown;
 export type PostHostedUserChallengeVerifyData = {
   body: UserChallengeVerifyRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserChallengeVerifyResponse = UserChallengeVerifyResponse;
 export type PostHostedUserChallengeVerifyError = unknown;
 export type PostHostedUserConsentData = {
   body: ConsentRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserConsentResponse = Empty;
 export type PostHostedUserConsentError = unknown;
 export type PostHostedUserDocumentsData = {
   body: CreateDocumentRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserDocumentsResponse = CreateDocumentResponse;
 export type PostHostedUserDocumentsError = unknown;
 export type PostHostedUserDocumentsByIdProcessData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
   path: {
     id: string;
   };
@@ -2469,6 +2819,12 @@ export type PostHostedUserDocumentsByIdProcessData = {
 export type PostHostedUserDocumentsByIdProcessResponse = DocumentResponse;
 export type PostHostedUserDocumentsByIdProcessError = unknown;
 export type PostHostedUserDocumentsByIdUploadBySideData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
   path: {
     id: string;
     side: 'front' | 'back' | 'selfie';
@@ -2481,14 +2837,42 @@ export type PostHostedUserEmailVerifyData = {
 };
 export type PostHostedUserEmailVerifyResponse = Empty;
 export type PostHostedUserEmailVerifyError = unknown;
+export type GetHostedUserPrivateTokenData = {
+  headers?: {
+    /**
+     * Short-lived auth token for an integration testing user during bifrost.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type GetHostedUserTokenData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
 export type GetHostedUserTokenResponse = GetUserTokenResponse;
 export type GetHostedUserTokenError = unknown;
 export type PostHostedUserTokensData = {
   body: CreateUserTokenRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserTokensResponse = CreateUserTokenResponse;
 export type PostHostedUserTokensError = unknown;
 export type PostHostedUserUploadByDocumentIdentifierData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
   path: {
     documentIdentifier:
       | 'id.first_name'
@@ -2796,11 +3180,27 @@ export type PatchHostedUserVaultData = {
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: ModernRawUserDataRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+    /**
+     * Provide `true` if the data in the request is bootstrap data.
+     */
+    'X-Fp-Is-Bootstrap'?: boolean;
+  };
 };
 export type PatchHostedUserVaultResponse = Empty;
 export type PatchHostedUserVaultError = unknown;
 export type PostHostedUserVaultDecryptData = {
   body: HostedUserDecryptRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserVaultDecryptResponse = ModernUserDecryptResponse;
 export type PostHostedUserVaultDecryptError = unknown;
@@ -2809,9 +3209,23 @@ export type PostHostedUserVaultValidateData = {
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
   body: ModernRawUserDataRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
 };
 export type PostHostedUserVaultValidateResponse = Empty;
 export type PostHostedUserVaultValidateError = unknown;
+export type GetOrgSdkArgsData = {
+  headers?: {
+    /**
+     * Short-lived token representing arguments for our SDK.
+     */
+    'X-Fp-Sdk-Args-Token'?: string;
+  };
+};
 export type GetOrgSdkArgsResponse = GetSdkArgsTokenResponse;
 export type GetOrgSdkArgsError = unknown;
 export type PostOrgSdkArgsData = {
@@ -2827,6 +3241,7 @@ export type PostOrgSdkTelemetryError = unknown;
 export type $OpenApiTs = {
   '/hosted/business': {
     get: {
+      req: GetHostedBusinessData;
       res: {
         /**
          * OK
@@ -2848,6 +3263,7 @@ export type $OpenApiTs = {
   };
   '/hosted/business/owners': {
     get: {
+      req: GetHostedBusinessOwnersData;
       res: {
         /**
          * OK
@@ -2900,6 +3316,7 @@ export type $OpenApiTs = {
   };
   '/hosted/businesses': {
     get: {
+      req: GetHostedBusinessesData;
       res: {
         /**
          * OK
@@ -2910,6 +3327,7 @@ export type $OpenApiTs = {
   };
   '/hosted/check_session': {
     get: {
+      req: GetHostedCheckSessionData;
       res: {
         /**
          * OK
@@ -3008,6 +3426,7 @@ export type $OpenApiTs = {
   };
   '/hosted/identify/validation_token': {
     post: {
+      req: PostHostedIdentifyValidationTokenData;
       res: {
         /**
          * OK
@@ -3040,6 +3459,7 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/authorize': {
     post: {
+      req: PostHostedOnboardingAuthorizeData;
       res: {
         /**
          * OK
@@ -3050,6 +3470,7 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/config': {
     get: {
+      req: GetHostedOnboardingConfigData;
       res: {
         /**
          * OK
@@ -3082,6 +3503,7 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/d2p/status': {
     get: {
+      req: HostedOnboardingD2pStatusData;
       res: {
         /**
          * OK
@@ -3112,12 +3534,18 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/nid': {
     get: {
+      req: GetHostedOnboardingNidData;
       res: {
         /**
          * OK
          */
         '200': NeuroIdentityIdResponse;
       };
+    };
+  };
+  '/hosted/onboarding/privacy_pass': {
+    get: {
+      req: GetHostedOnboardingPrivacyPassData;
     };
   };
   '/hosted/onboarding/process': {
@@ -3144,6 +3572,7 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/session': {
     get: {
+      req: GetHostedOnboardingSessionData;
       res: {
         /**
          * OK
@@ -3165,6 +3594,7 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/status': {
     get: {
+      req: GetHostedOnboardingStatusData;
       res: {
         /**
          * OK
@@ -3197,6 +3627,7 @@ export type $OpenApiTs = {
   };
   '/hosted/onboarding/validate': {
     post: {
+      req: PostHostedOnboardingValidateData;
       res: {
         /**
          * OK
@@ -3229,6 +3660,7 @@ export type $OpenApiTs = {
   };
   '/hosted/user/auth_methods': {
     get: {
+      req: GetHostedUserAuthMethodsData;
       res: {
         /**
          * OK
@@ -3239,6 +3671,7 @@ export type $OpenApiTs = {
   };
   '/hosted/user/auth_requirements': {
     get: {
+      req: GetHostedUserAuthRequirementsData;
       res: {
         /**
          * OK
@@ -3249,6 +3682,7 @@ export type $OpenApiTs = {
   };
   '/hosted/user/authorized_orgs': {
     get: {
+      req: GetHostedUserAuthorizedOrgsData;
       res: {
         /**
          * OK
@@ -3334,8 +3768,14 @@ export type $OpenApiTs = {
       };
     };
   };
+  '/hosted/user/private/token': {
+    get: {
+      req: GetHostedUserPrivateTokenData;
+    };
+  };
   '/hosted/user/token': {
     get: {
+      req: GetHostedUserTokenData;
       res: {
         /**
          * OK
@@ -3401,6 +3841,7 @@ export type $OpenApiTs = {
   };
   '/org/sdk_args': {
     get: {
+      req: GetOrgSdkArgsData;
       res: {
         /**
          * OK

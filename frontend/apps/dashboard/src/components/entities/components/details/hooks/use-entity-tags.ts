@@ -6,7 +6,10 @@ const useEntityTags = (id: string) => {
   const { authHeaders } = useSession();
 
   return useQuery({
-    ...getEntitiesByFpIdTagsOptions({ path: { fpId: id }, headers: authHeaders }),
+    ...getEntitiesByFpIdTagsOptions({
+      path: { fpId: id },
+      headers: { 'X-Fp-Dashboard-Authorization': authHeaders['x-fp-dashboard-authorization'] },
+    }),
     enabled: !!id,
   });
 };

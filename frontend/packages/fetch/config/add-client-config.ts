@@ -27,7 +27,7 @@ export const client = createClient(createConfig({
   // Transform URL parameters from camelCase to snake_case
   content = content.replace(/\{(\w+)\}/g, (_, p1) => {
     // Convert the snake_case string (p1) to camelCase
-    return `{${p1.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())}}`;
+    return `{${p1.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase())}}`;
   });
 
   // Replace the existing client creation with the new configuration
