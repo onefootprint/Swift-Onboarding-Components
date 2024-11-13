@@ -66,7 +66,6 @@ pub enum CollectedDataOption {
     BusinessAddress,
     BusinessPhoneNumber,
     BusinessWebsite,
-    BusinessBeneficialOwners,
     BusinessKycedBeneficialOwners,
     BusinessCorporationType,
 
@@ -95,6 +94,10 @@ impl std::str::FromStr for CollectedDataOption {
     type Err = strum::ParseError;
 
     fn from_str(s: &str) -> Result<CollectedDataOption, Self::Err> {
+        if s == "business_beneficial_owners" {
+            tracing::warn!("Found deprecated business_beneficial_owners CDO");
+            return Ok(Self::BusinessKycedBeneficialOwners);
+        }
         let res = match CollectedDataOptionKind::from_str(s) {
             Err(_) | Ok(CollectedDataOptionKind::Document) => Self::Document(DocumentCdoInfo::from_str(s)?),
             Ok(cdo_kind) => Self::try_from(cdo_kind).map_err(|_| strum::ParseError::VariantNotFound)?,
@@ -121,7 +124,6 @@ impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
             CollectedDataOptionKind::BusinessAddress => Self::BusinessAddress,
             CollectedDataOptionKind::BusinessPhoneNumber => Self::BusinessPhoneNumber,
             CollectedDataOptionKind::BusinessWebsite => Self::BusinessWebsite,
-            CollectedDataOptionKind::BusinessBeneficialOwners => Self::BusinessBeneficialOwners,
             CollectedDataOptionKind::BusinessKycedBeneficialOwners => Self::BusinessKycedBeneficialOwners,
             CollectedDataOptionKind::BusinessCorporationType => Self::BusinessCorporationType,
             CollectedDataOptionKind::InvestorProfile => Self::InvestorProfile,
@@ -153,7 +155,6 @@ impl CollectedDataOption {
             Self::BusinessAddress => CollectedData::BusinessAddress,
             Self::BusinessPhoneNumber => CollectedData::BusinessPhoneNumber,
             Self::BusinessWebsite => CollectedData::BusinessWebsite,
-            Self::BusinessBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BusinessKycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
@@ -202,7 +203,6 @@ impl CollectedDataOption {
             ]),
             Self::BusinessPhoneNumber => Some(vec![BDK::PhoneNumber.into()]),
             Self::BusinessWebsite => Some(vec![BDK::Website.into()]),
-            Self::BusinessBeneficialOwners => None,
             Self::BusinessKycedBeneficialOwners => None,
             Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
             // Can we stick the investor profile identifier in here? Even if it's a different DI variant...
@@ -255,7 +255,6 @@ impl CollectedDataOption {
             ],
             Self::BusinessPhoneNumber => vec![BDK::PhoneNumber.into()],
             Self::BusinessWebsite => vec![BDK::Website.into()],
-            Self::BusinessBeneficialOwners => vec![],
             Self::BusinessKycedBeneficialOwners => vec![],
             Self::BusinessCorporationType => vec![BDK::CorporationType.into()],
             Self::InvestorProfile => IPK::iter()
@@ -308,7 +307,6 @@ impl CollectedDataOption {
     pub fn full_variant(&self) -> Option<Self> {
         match self {
             Self::Ssn4 => Some(Self::Ssn9),
-            Self::BusinessBeneficialOwners => Some(Self::BusinessKycedBeneficialOwners),
             _ => None,
         }
     }

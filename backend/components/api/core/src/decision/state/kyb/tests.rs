@@ -67,7 +67,7 @@ async fn setup(
         Some(CDO::PhoneNumber),
         Some(CDO::FullAddress),
         Some(CDO::BusinessName),
-        Some(CDO::BusinessBeneficialOwners),
+        Some(CDO::BusinessKycedBeneficialOwners),
         (!ein_only).then_some(CDO::BusinessAddress),
         Some(CDO::BusinessTin),
     ]

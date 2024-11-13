@@ -8895,6 +8895,21 @@
                     "timestamp"
                 ]
             },
+            "AuditEventApiKey": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "$ref": "#/components/schemas/OrganizationRole"
+                    }
+                },
+                "required": [
+                    "name",
+                    "role"
+                ]
+            },
             "AuditEventDetail": {
                 "anyOf": [
                     {
@@ -9178,6 +9193,17 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "api_key": {
+                                        "$ref": "#/components/schemas/AuditEventApiKey"
+                                    }
+                                },
+                                "required": [
+                                    "api_key"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -9186,6 +9212,7 @@
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },
@@ -9639,8 +9666,8 @@
                     "complete_user_verification",
                     "collect_user_document",
                     "create_org_api_key",
-                    "org_member_joined",
                     "decrypt_org_api_key",
+                    "org_member_joined",
                     "update_org_api_key",
                     "invite_org_member",
                     "update_org_member",
@@ -9939,7 +9966,6 @@
                     "business_address",
                     "business_phone_number",
                     "business_website",
-                    "business_beneficial_owners",
                     "business_kyced_beneficial_owners",
                     "business_corporation_type",
                     "investor_profile",

@@ -55,7 +55,7 @@ impl CollectedData {
             Self::BusinessAddress => vec![BusinessAddress],
             Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
             Self::BusinessWebsite => vec![BusinessWebsite],
-            Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners, BusinessKycedBeneficialOwners],
+            Self::BusinessBeneficialOwners => vec![BusinessKycedBeneficialOwners],
             Self::BusinessCorporationType => vec![BusinessCorporationType],
             Self::InvestorProfile => vec![InvestorProfile],
             Self::Card => vec![Card],

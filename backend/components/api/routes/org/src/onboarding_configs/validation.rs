@@ -276,10 +276,7 @@ impl ObConfigurationArgsToValidate {
 
         // KYB playbooks have some additional rules around collecting KYC data
         if self.kind == ObConfigurationKind::Kyb {
-            let has_bo_cdo = self.must_collect_data.contains(&CDO::BusinessBeneficialOwners)
-                || self
-                    .must_collect_data
-                    .contains(&CDO::BusinessKycedBeneficialOwners);
+            let has_bo_cdo = (self.must_collect_data).contains(&CDO::BusinessKycedBeneficialOwners);
             let collecting_kyc_data = self.must_collect_data.iter().any(|cdo| cdo.matches(DID::Id));
 
             if !self.verification_checks.skip_kyc() && !has_bo_cdo {
