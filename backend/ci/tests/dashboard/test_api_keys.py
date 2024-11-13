@@ -6,6 +6,9 @@ from tests.utils import (
     patch,
     _gen_random_n_digit_number,
 )
+from tests.dashboard.utils import (
+    assert_has_audit_event_with_details,
+)
 
 
 @pytest.fixture(scope="session")
@@ -183,7 +186,7 @@ def test_deactivate_api_key_role(limited_role, sandbox_tenant):
     post(f"org/roles/{role_id}/deactivate", None, *sandbox_tenant.db_auths)
 
 
-def test_api_key_reveal(secret_key, sandbox_tenant):
+def test_api_key_reveal(secret_key, sandbox_tenant, admin_role):
     body = post(f"org/api_keys/{secret_key.id}/reveal", None, *sandbox_tenant.db_auths)
     key = body
     assert key["key"] == secret_key.key.value
@@ -197,6 +200,22 @@ def test_api_key_reveal(secret_key, sandbox_tenant):
         None,
         sandbox_tenant.sk.key,
         status_code=401,
+    )
+    # Make sure we have an audit event
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="decrypt_org_api_key",
+        api_key={
+            "name": secret_key.name,
+            "role": {
+                "id": admin_role["id"],
+                "name": admin_role["name"],
+                "scopes": admin_role["scopes"],
+                "is_immutable": admin_role["is_immutable"],
+                "created_at": admin_role["created_at"],
+                "kind": admin_role["kind"],
+            },
+        },
     )
 
 

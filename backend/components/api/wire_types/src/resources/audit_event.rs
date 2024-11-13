@@ -70,7 +70,9 @@ pub enum AuditEventDetail {
     CompleteUserVerification,
     CollectUserDocument, // TODO: is there a better name for this?
     CreateOrgApiKey,
-    DecryptOrgApiKey,
+    DecryptOrgApiKey {
+        api_key: AuditEventApiKey,
+    },
     UpdateOrgApiKey,
     InviteOrgMember {
         email: OrgMemberEmail,

@@ -6,8 +6,12 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
+use db::models::audit_event::AuditEvent;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
+use newtypes::AuditEventDetail;
 use newtypes::TenantApiKeyId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -31,14 +35,26 @@ async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: TenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
+    let actor = auth.actor().clone();
     let (key, role) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
+            let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+            let detail = AuditEventDetail::DecryptOrgAPIKey {
+                tenant_api_key_id: key.id.clone(),
+            };
+            let audit_event = NewAuditEvent {
+                tenant_id,
+                principal_actor: actor.into(),
+                insight_event_id,
+                detail,
+            };
+            AuditEvent::create(conn, audit_event)?;
             Ok((key, role))
         })
         .await?;

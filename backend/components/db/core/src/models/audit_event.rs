@@ -357,9 +357,7 @@ impl AuditEvent {
             })
             .collect_vec();
 
-        let aes = events.iter().map(|e| &e.audit_event).collect();
-        let secondary_data = AuditEventBulkSecondaryData::load(conn, aes)?;
-
+        let secondary_data = AuditEventBulkSecondaryData::load(conn, &events)?;
         Ok((events, secondary_data))
     }
 
@@ -404,12 +402,14 @@ pub struct AuditEventBulkSecondaryData {
 }
 
 impl AuditEventBulkSecondaryData {
-    pub fn load(conn: &mut PgConn, audit_events: Vec<&AuditEvent>) -> DbResult<Self> {
-        let tr_ids = audit_events.iter().flat_map(|ut| match &ut.metadata {
-            AuditEventMetadata::UpdateOrgMember { old_tenant_role_id } => Some(old_tenant_role_id),
-            _ => None,
-        });
-
+    pub fn load(conn: &mut PgConn, joined_events: &[JoinedAuditEvent]) -> DbResult<Self> {
+        let tr_ids = joined_events
+            .iter()
+            .flat_map(|je| match &je.audit_event.metadata {
+                AuditEventMetadata::UpdateOrgMember { old_tenant_role_id } => Some(old_tenant_role_id),
+                AuditEventMetadata::DecryptOrgApiKey => je.tenant_api_key.as_ref().map(|k| &k.role_id),
+                _ => None,
+            });
         let tenant_roles = TenantRole::get_bulk(conn, tr_ids.collect())?;
 
         Ok(Self { tenant_roles })

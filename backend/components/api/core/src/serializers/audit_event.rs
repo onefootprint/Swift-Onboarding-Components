@@ -7,6 +7,7 @@ use api_wire_types::Actor;
 use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventDetail;
 use api_wire_types::InsightEvent;
+use api_wire_types::OrganizationRole;
 use db::models::audit_event::AuditEventBulkSecondaryData;
 use db::models::audit_event::JoinedAuditEvent;
 use db::models::tenant_api_key::TenantApiKey;
@@ -26,7 +27,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             scoped_vault,
             ob_configuration: _,
             document_data: _,
-            tenant_api_key: _,
+            tenant_api_key,
             tenant_user,
             tenant_role,
             list_entry_creation,
@@ -84,7 +85,19 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::CompleteUserVerification => AuditEventDetail::CompleteUserVerification,
             AuditEventMetadata::CollectUserDocument => AuditEventDetail::CollectUserDocument,
             AuditEventMetadata::CreateOrgApiKey => AuditEventDetail::CreateOrgApiKey,
-            AuditEventMetadata::DecryptOrgApiKey => AuditEventDetail::DecryptOrgApiKey,
+            AuditEventMetadata::DecryptOrgApiKey => {
+                let tenant_api_key =
+                    tenant_api_key.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let tenant_role = (secondary_data.tenant_roles)
+                    .get(&tenant_api_key.role_id)
+                    .ok_or(ServerErr("tenant role is not available for this event"))?;
+                AuditEventDetail::DecryptOrgApiKey {
+                    api_key: api_wire_types::AuditEventApiKey::from_db((
+                        tenant_api_key,
+                        tenant_role.to_owned(),
+                    )),
+                }
+            }
             AuditEventMetadata::UpdateOrgApiKey => AuditEventDetail::UpdateOrgApiKey,
             AuditEventMetadata::InviteOrgMember => {
                 let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
@@ -191,7 +204,7 @@ impl DbToApi<(TenantApiKey, TenantRole)> for api_wire_types::AuditEventApiKey {
     fn from_db((api_key, role): (TenantApiKey, TenantRole)) -> Self {
         api_wire_types::AuditEventApiKey {
             name: api_key.name,
-            role: api_wire_types::OrganizationRole::from_db(role),
+            role: OrganizationRole::from_db(role),
         }
     }
 }
