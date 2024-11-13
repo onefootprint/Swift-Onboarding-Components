@@ -25,7 +25,7 @@ use api_wire_types::TriggerKybRequest;
 use db::models::data_lifetime::DataLifetime;
 use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
@@ -111,8 +111,11 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let (biz_wf, obc) = state
         .db_transaction(move |conn| -> FpResult<_> {
-            let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
-                .map_err(|_| DbError::PlaybookNotFound)?;
+            let (_, obc, _) = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live))
+                .map_err(|e| match e {
+                    DbError::DataNotFound => DbError::PlaybookNotFound,
+                    e => e,
+                })?;
             tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
             if obc.kind != ObConfigurationKind::Kyb {
                 return BadRequestInto("Must use playbook of kind KYB");

@@ -45,6 +45,7 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::verification_request::VerificationRequest;
@@ -254,8 +255,14 @@ pub async fn adhoc_create_document_and_workflow(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sv.id, seqno))?;
 
-            let (obc, _) = ObConfiguration::get_enabled(conn, (&playbook_key, &tenant_id, is_live))
-                .map_err(|_| DbError::PlaybookNotFound)?;
+            let (_, obc, _) =
+                Playbook::get_latest_version_if_enabled(conn, (&playbook_key, &tenant_id, is_live)).map_err(
+                    |e| match e {
+                        DbError::DataNotFound => DbError::PlaybookNotFound,
+                        e => e,
+                    },
+                )?;
+
 
             if obc.kind != ObConfigurationKind::Document && !obc.is_doc_first {
                 return ServerErrInto("Must use playbook of kind Document or Document-First");
@@ -419,8 +426,11 @@ pub async fn adhoc_document_process(
             }
             .insert(conn)?;
 
-            let (obc, _) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)
-                .map_err(|_| DbError::PlaybookNotFound)?;
+            let (obc, _) =
+                ObConfiguration::get_enabled(conn, &wf.ob_configuration_id).map_err(|e| match e {
+                    DbError::DataNotFound => DbError::PlaybookNotFound,
+                    e => e,
+                })?;
 
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let uvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, seqno)?;

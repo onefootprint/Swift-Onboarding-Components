@@ -414,14 +414,8 @@ pub struct NewObConfigurationArgs {
 #[derive(Debug, derive_more::From)]
 pub enum ObConfigIdentifier<'a> {
     Id(&'a ObConfigurationId),
-    Key(&'a PublishablePlaybookKey),
     Tenant {
         id: &'a ObConfigurationId,
-        tenant_id: &'a TenantId,
-        is_live: bool,
-    },
-    TenantKey {
-        key: &'a PublishablePlaybookKey,
         tenant_id: &'a TenantId,
         is_live: bool,
     },
@@ -537,7 +531,6 @@ impl ObConfiguration {
 
         match id.into() {
             ObConfigIdentifier::Id(id) => query = query.filter(ob_configuration::id.eq(id)),
-            ObConfigIdentifier::Key(key) => query = query.filter(ob_configuration::key.eq(key)),
             ObConfigIdentifier::Tenant {
                 id,
                 tenant_id,
@@ -545,16 +538,6 @@ impl ObConfiguration {
             } => {
                 query = query
                     .filter(ob_configuration::id.eq(id))
-                    .filter(ob_configuration::tenant_id.eq(tenant_id))
-                    .filter(ob_configuration::is_live.eq(is_live))
-            }
-            ObConfigIdentifier::TenantKey {
-                key,
-                tenant_id,
-                is_live,
-            } => {
-                query = query
-                    .filter(ob_configuration::key.eq(key))
                     .filter(ob_configuration::tenant_id.eq(tenant_id))
                     .filter(ob_configuration::is_live.eq(is_live))
             }
@@ -595,6 +578,8 @@ impl ObConfiguration {
         Ok(results)
     }
 
+    /// Gets the OBC, if it's enabled.
+    /// The OBC may be deactivated (i.e. not the latest version of the playbook).
     #[tracing::instrument("ObConfiguration::get_enabled", skip_all)]
     pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where

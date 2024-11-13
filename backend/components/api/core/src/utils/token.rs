@@ -14,7 +14,7 @@ use api_errors::BadRequestInto;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::session::Session;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
@@ -107,7 +107,7 @@ pub fn create_token(
         }
         TokenOperationKind::Onboard => {
             let key = key.ok_or(BadRequest("key must be provided for a token of kind onboard"))?;
-            let (obc, _) = ObConfiguration::get(conn, (&key, &su.tenant_id, su.is_live))?;
+            let (_, obc, _) = Playbook::get_latest_version(conn, (&key, &su.tenant_id, su.is_live))?;
             if !obc.kind.can_onboard() {
                 return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
             }

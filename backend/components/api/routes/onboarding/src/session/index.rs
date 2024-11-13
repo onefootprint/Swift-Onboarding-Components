@@ -11,7 +11,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_errors::BadRequestInto;
 use chrono::DateTime;
 use chrono::Utc;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use newtypes::preview_api;
 use newtypes::ExternalId;
 use newtypes::PublishablePlaybookKey;
@@ -82,7 +82,7 @@ pub async fn post(
     let (token, session) = state
         .db_query(move |conn| -> FpResult<_> {
             // Check ownership of Playbook
-            let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;
+            let (_, obc, _) = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant.id, is_live))?;
             if business_external_id.is_some() && !obc.kind.is_kyb() {
                 return BadRequestInto("business_external_id is only supported for KYB playbooks");
             }

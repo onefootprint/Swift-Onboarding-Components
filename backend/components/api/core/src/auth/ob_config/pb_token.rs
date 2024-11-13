@@ -6,6 +6,7 @@ use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::tenant::Tenant;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
@@ -46,7 +47,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.key)?;
+        let (_, ob_config, tenant) = Playbook::get_latest_version_if_enabled(conn, &data.key)?;
 
         // TODO log token hash here
         tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "ob_session authenticated");

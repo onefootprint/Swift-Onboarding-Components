@@ -5,6 +5,7 @@ use actix_web::web;
 use actix_web::FromRequest;
 use api_errors::ServerErr;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::tenant::Tenant;
 use db::DbError;
 use db::DbResult;
@@ -57,8 +58,8 @@ impl FromRequest for PublicOnboardingContext {
 
             let key = newtypes::PublishablePlaybookKey::from(config_key?);
             let key2 = key.clone();
-            let (ob_config, tenant) = state
-                .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })
+            let (_, ob_config, tenant) = state
+                .db_query(move |conn| -> DbResult<_> { Playbook::get_latest_version_if_enabled(conn, &key) })
                 .await
                 .map_err(|e| -> Self::Error {
                     match e {
