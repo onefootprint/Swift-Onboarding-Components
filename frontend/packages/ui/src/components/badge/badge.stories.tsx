@@ -43,6 +43,13 @@ const meta: Meta<typeof Badge> = {
 
 type Story = StoryObj<typeof Badge>;
 
+export const Neutral: Story = {
+  args: {
+    children: 'Neutral',
+    variant: 'neutral',
+  },
+};
+
 export const Accent: Story = {
   args: {
     children: 'Accent',
@@ -61,13 +68,6 @@ export const Info: Story = {
   args: {
     children: 'Info',
     variant: 'info',
-  },
-};
-
-export const Neutral: Story = {
-  args: {
-    children: 'Neutral',
-    variant: 'neutral',
   },
 };
 

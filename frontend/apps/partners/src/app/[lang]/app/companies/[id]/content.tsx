@@ -110,7 +110,7 @@ const CompanyPageContent = ({
   return (
     <>
       <Box tag="main">
-        <Breadcrumb.List aria-label={t('companies.company-details-breadcrumb')} marginBottom={7}>
+        <Breadcrumb.List aria-label={t('companies.company-details-breadcrumb')} className="mb-6">
           <Breadcrumb.Item href="/app/companies" as={Link}>
             {t('companies.companies')}
           </Breadcrumb.Item>

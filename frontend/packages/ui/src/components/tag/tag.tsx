@@ -11,7 +11,7 @@ const Tag = ({ children, className, ...props }: TagProps) => {
     <span
       className={cx(
         className,
-        'flex items-center h-6',
+        'inline-flex items-center h-6',
         'text-caption-1 text-neutral whitespace-nowrap',
         'px-2 py-1',
         'border border-solid border-primary',
