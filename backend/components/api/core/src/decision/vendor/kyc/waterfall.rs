@@ -16,7 +16,7 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::ApiCoreError;
 use crate::FpResult;
 use crate::State;
-use api_errors::AssertionError;
+use api_errors::ServerErrInto;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
@@ -59,7 +59,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
 
     let ordered_apis = WaterfallVendorAPI::available_ordered_apis(vw.populated().as_slice(), &tvc);
     if ordered_apis.is_empty() {
-        return Err(AssertionError("Not enough information to send to any vendors").into());
+        return ServerErrInto("Not enough information to send to any vendors");
     }
 
     let ordered_apis2 = ordered_apis.clone();

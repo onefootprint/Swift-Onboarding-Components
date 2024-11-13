@@ -3,8 +3,8 @@ use crate::BResult;
 use crate::BillingClient;
 use crate::BillingCounts;
 use crate::BillingInfo;
+use api_errors::BadRequestInto;
 use api_errors::FpResult;
-use api_errors::ValidationError;
 use chrono::NaiveDate;
 use db::models::billing_profile::BillingProfile;
 use db::models::tenant::Tenant;
@@ -29,7 +29,7 @@ pub async fn generate_invoice_for_tenant(
         .db_query(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             if tenant.super_tenant_id.is_some() {
-                return ValidationError("Cannot generate invoice for subtenant").into();
+                return BadRequestInto("Cannot generate invoice for subtenant");
             }
             let children = Tenant::list_children(conn, &tenant_id)?;
             let billing_profile = BillingProfile::get(conn, &tenant_id)?;

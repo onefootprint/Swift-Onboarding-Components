@@ -3,13 +3,14 @@ use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::get_config_id;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::incode::IncodeStateMachine;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
 use api_errors::FpErrorCode;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use api_wire_types::DocumentImageError;
 use api_wire_types::DocumentResponse;
 use db::models::document::Document;
@@ -100,7 +101,7 @@ pub async fn handle_incode_request(
         Err(_) => {
             on_incode_hard_error(
                 &state.db_pool,
-                AssertionError("timeout running Incode machine").into(),
+                ServerErr("timeout running Incode machine"),
                 &identity_document_id,
             )
             .await?;
@@ -120,7 +121,7 @@ pub async fn handle_incode_request(
                                                                            * out while polling Incode */
             // We shouldn't cleanly break from the machine in any other state
             s => {
-                return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into())
+                return ServerErrInto!("Can't determine next document side from {}", s);
             }
         };
         let is_retry_limit_exceeded = machine_state_name == IncodeVerificationSessionState::Fail;

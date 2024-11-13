@@ -7,10 +7,10 @@ use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use db::models::tenant::NewTenant;
 use db::models::tenant::Tenant;
 use newtypes::CompanySize;
@@ -53,7 +53,7 @@ pub async fn post(
     let token = state
         .db_transaction(move |conn| -> FpResult<_> {
             if Tenant::is_domain_already_claimed(conn, &domains)? {
-                return ValidationError("Tenant for this domain already exists").into();
+                return BadRequestInto("Tenant for this domain already exists");
             }
             let website_url = domains.first().cloned();
             let new_tenant = NewTenant {

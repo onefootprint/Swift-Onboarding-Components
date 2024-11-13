@@ -13,7 +13,8 @@ use api_core::utils::vault_wrapper::MimeTypedPii;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::FpResult;
 use api_core::State;
-use api_errors::AssertionError;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::primitives::SdkBody;
 use db::errors::FpOptionalExtension;
@@ -278,13 +279,13 @@ impl VaultDrWriter {
         let blob_futs = pii_by_dl
             .into_iter()
             .map(|(dl_id, pii)| {
-                let dl = dls_by_id.remove(&dl_id).ok_or(AssertionError(
+                let dl = dls_by_id.remove(&dl_id).ok_or(ServerErr(
                     "Got DL ID in bulk_decrypt_dls_unchecked that was not present in dls_by_id",
                 ))?;
 
                 let fp_id = sv_id_to_fp_id
                     .get(&dl.scoped_vault_id)
-                    .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?
+                    .ok_or(ServerErr("Got DL with SV ID not in sv_id_to_fp_id"))?
                     .clone();
 
                 let writer = self.clone();
@@ -601,11 +602,11 @@ impl VaultDrWriter {
 
         let manifest_count = new_manifests.len();
         if manifest_count != expected_manifest_count {
-            return AssertionError(&format!(
+            return ServerErrInto!(
                 "Expected {} manifests to be written, but {} were written",
-                expected_manifest_count, manifest_count,
-            ))
-            .into();
+                expected_manifest_count,
+                manifest_count,
+            );
         }
 
         tracing::info!(
@@ -666,7 +667,7 @@ impl VaultDrWriter {
             .map(|svv| -> FpResult<_> {
                 let fp_id = sv_id_to_fp_id
                     .get(&svv.scoped_vault_id)
-                    .ok_or(AssertionError("sv_id not in sv_id_to_fp_id"))?;
+                    .ok_or(ServerErr("sv_id not in sv_id_to_fp_id"))?;
                 Ok((svv.id.clone(), fp_id.clone()))
             })
             .collect::<FpResult<HashMap<_, _>>>()?;
@@ -677,12 +678,12 @@ impl VaultDrWriter {
             futures::stream::iter(svv_id_to_blobs.into_iter()).map(move |(svv_id, blobs)| -> FpResult<_> {
                 let fp_id = svv_id_to_fp_id
                     .get(&svv_id)
-                    .ok_or(AssertionError("svv_id not in svv_id_to_fp_id"))?
+                    .ok_or(ServerErr("svv_id not in svv_id_to_fp_id"))?
                     .clone();
 
                 let svv = svvs_by_id
                     .get(&svv_id)
-                    .ok_or(AssertionError("svv_id not in svvs_by_id"))?
+                    .ok_or(ServerErr("svv_id not in svvs_by_id"))?
                     .clone();
                 let seqno = svv.seqno;
 
@@ -813,7 +814,7 @@ fn fp_id_path(bucket_path_namespace: &str, fp_id: &FpId) -> FpResult<String> {
     let fp_id = fp_id.to_string();
     let parts: Vec<&str> = fp_id.split('_').collect();
 
-    let id = parts.last().ok_or(AssertionError("fp_id is empty"))?;
+    let id = parts.last().ok_or(ServerErr("fp_id is empty"))?;
     let id_first_two = id.chars().take(2).collect::<String>();
 
     let prefix = parts.into_iter().rev().skip(1).rev().join("_");
@@ -834,10 +835,9 @@ fn blob_key(bucket_path_namespace: &str, fp_id: &FpId, dl: &DataLifetime) -> FpR
     let created_ts = dl.created_at.timestamp().to_string();
     if created_ts.len() != 10 {
         // By year 2286, this code will surely be dead :)
-        return AssertionError(
-            "Timestamp is not 10 characters long. Timestamps between 2001 and 2286 should all be 10 characters.",
-        )
-        .into();
+        return ServerErrInto(
+            "Timestamp is not 10 characters long. Timestamps between 2001 and 2286 should all be 10 characters."
+        );
     }
 
     // For a given VDR config, blobs correspond 1:1 to DLs, so we take the hash of the DL ID as an
@@ -862,7 +862,7 @@ fn manifest_key(
     let version = match version {
         Some(v) => {
             if v <= ScopedVaultVersionNumber::from(0) {
-                return AssertionError("Manifest version must be a positive integer").into();
+                return ServerErrInto("Manifest version must be a positive integer");
             }
             v.to_string()
         }

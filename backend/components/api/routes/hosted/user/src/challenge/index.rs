@@ -7,14 +7,15 @@ use api_core::auth::user::load_auth_events;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::sms::send_sms_challenge_non_blocking;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use api_wire_types::UserChallengeRequest;
 use api_wire_types::UserChallengeResponse;
 use itertools::Itertools;
@@ -47,7 +48,7 @@ pub async fn post(
         action_kind,
     } = request.into_inner();
     if action_kind == ActionKind::Replace && !user_auth.data.is_from_api() {
-        return ValidationError("Can only replace auth methods using auth issued via API").into();
+        return BadRequestInto("Can only replace auth methods using auth issued via API");
     }
 
     let auth_events = user_auth.auth_events.clone();
@@ -60,7 +61,7 @@ pub async fn post(
         .unique()
         .collect_vec();
     if !allowed_challenge_kinds.contains(&kind) {
-        return ValidationError(&format!("Cannot initiate challenge of kind {}", kind)).into();
+        return BadRequestInto!("Cannot initiate challenge of kind {}", kind);
     }
     let limit_auth_methods = user_auth
         .data
@@ -72,7 +73,7 @@ pub async fn post(
         })
         .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec());
     if limit_auth_methods.is_some_and(|l| !l.contains(&kind)) {
-        return ValidationError(&format!("Token cannot initiate challenge of kind {}", kind)).into();
+        return BadRequestInto!("Token cannot initiate challenge of kind {}", kind);
     }
 
     let tenant = user_auth.tenant.as_ref();
@@ -81,9 +82,8 @@ pub async fn post(
     let (rx, data, time_before_retry_s, biometric_challenge_json) = match kind {
         AuthMethodKind::Phone => {
             // Expect a phone number and initiate an SMS challenge
-            let parsed_phone = phone_number.ok_or(ValidationError(
-                "Phone number required to initiate sign up challenge",
-            ))?;
+            let parsed_phone =
+                phone_number.ok_or(BadRequest("Phone number required to initiate sign up challenge"))?;
             let phone_number = parsed_phone.e164();
             let (rx, h_code) =
                 send_sms_challenge_non_blocking(&state, tenant, parsed_phone, uv.sandbox_id, Some(uv.id))
@@ -94,10 +94,10 @@ pub async fn post(
             (Some(rx), challenge_data, time_between_challenges, None)
         }
         AuthMethodKind::Email => {
-            let email = email.ok_or(ValidationError(
+            let email = email.ok_or(BadRequest(
                 "Email must be provided for no-phone signup challenges",
             ))?;
-            let tenant = tenant.ok_or(AssertionError("Need tenant to initiate email challenge for now"))?;
+            let tenant = tenant.ok_or(ServerErr("Need tenant to initiate email challenge for now"))?;
 
             let (rx, h_code) = send_email_challenge_non_blocking(&state, &email, tenant, uv.sandbox_id)?;
             let email = email.email;

@@ -3,7 +3,6 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::config::LinkKind;
 use api_core::decision::biz_risk::KybBoFeatures;
-use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -12,6 +11,7 @@ use api_core::utils::kyb_utils::send_missing_secondary_bo_links;
 use api_core::web::Json;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::CreateKycLinksRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
@@ -48,7 +48,7 @@ pub async fn post(
         .await?;
 
     if !sb.kind.is_business() {
-        return ValidationError("Can only create KYC links for business scoped vaults").into();
+        return BadRequestInto("Can only create KYC links for business scoped vaults");
     }
 
     let KybBoFeatures { bvw, bos } = KybBoFeatures::build(&state, &biz_wf.id).await?;

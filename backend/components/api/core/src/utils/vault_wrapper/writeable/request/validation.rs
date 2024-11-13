@@ -5,7 +5,7 @@ use crate::utils::vault_wrapper::PrefillData;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
-use api_errors::ValidationError;
+use api_errors::BadRequestInto;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
 use db::models::tenant::Tenant;
@@ -162,7 +162,7 @@ impl<Type> TenantVw<Type> {
         let can_set_verified_ci_dis = matches!(request_source, DataRequestSource::OtpVerified);
         let is_setting_verified_ci_dis = data.iter().any(|d| d.kind.is_verified_ci());
         if is_setting_verified_ci_dis && !can_set_verified_ci_dis {
-            return ValidationError("Can only set verified CI DIs in challenge verification flow").into();
+            return BadRequestInto("Can only set verified CI DIs in challenge verification flow");
         }
 
         let can_update_verified_ci = match request_source {

@@ -1,11 +1,11 @@
 use actix_web::patch;
 use actix_web::web;
 use api_core::auth::protected_auth::ProtectedAuth;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::web::Json;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationUpdate;
 use newtypes::ObConfigurationId;
@@ -48,10 +48,9 @@ async fn update_verification_checks(
             for vc in add {
                 let kind = vc.clone().into();
                 if new_checks_kinds.contains(&kind) {
-                    return Err(ValidationError(
+                    return BadRequestInto(
                         "verification checks already contains kind, you must remove it first",
-                    )
-                    .into());
+                    );
                 }
 
                 new_checks.push(vc)

@@ -4,9 +4,9 @@ use crate::DeviceInsightField;
 use crate::FootprintReasonCode;
 use crate::ListId;
 use crate::PiiString;
-use api_errors::AssertionError;
+use api_errors::BadRequestInto;
 use api_errors::FpResult;
-use api_errors::ValidationError;
+use api_errors::ServerErr;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
@@ -31,10 +31,9 @@ impl UnvalidatedRuleExpression {
             .partition(|rik| matches!(rik, RuleInstanceKind::Person));
 
         if !person_rules.is_empty() && !business_rules.is_empty() {
-            return ValidationError(
+            return BadRequestInto(
                 "Cannot make a rule expression that includes both Person and Business signals",
-            )
-            .into();
+            );
         };
 
 
@@ -42,7 +41,7 @@ impl UnvalidatedRuleExpression {
             .iter()
             .map(|c| c.kind())
             .min()
-            .ok_or(AssertionError("unable to compute rule instance kind"))?;
+            .ok_or(ServerErr("unable to compute rule instance kind"))?;
 
         Ok(RuleExpression(self.0))
     }

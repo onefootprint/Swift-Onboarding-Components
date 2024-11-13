@@ -10,8 +10,6 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
@@ -24,6 +22,8 @@ use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::WriteableVw;
 use api_core::FpResult;
+use api_errors::BadRequest;
+use api_errors::ServerErr;
 use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
@@ -140,8 +140,7 @@ pub async fn post(
                 if is_new_su {
                     // If the scoped vault is brand new, prefill its data
                     let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
-                    let prefill_data =
-                        prefill_data.ok_or(AssertionError("Missing prefill data for new SV"))?;
+                    let prefill_data = prefill_data.ok_or(ServerErr("Missing prefill data for new SV"))?;
                     tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
                     Passkey::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
                 }
@@ -222,7 +221,7 @@ pub async fn post(
             // Token-specific handling
             let su_id = match scope {
                 IdentifyScope::Auth => {
-                    let su = su.ok_or(ValidationError("No scoped vault available"))?;
+                    let su = su.ok_or(BadRequest("No scoped vault available"))?;
                     if !user_auth.user.is_portable {
                         // If this is an auth playbook and the user was previously non-portable, we are
                         // currently portablizing an NYPID.
@@ -242,7 +241,7 @@ pub async fn post(
                     Some(su.id)
                 }
                 IdentifyScope::Onboarding => {
-                    let su = su.ok_or(ValidationError("No scoped vault available"))?;
+                    let su = su.ok_or(BadRequest("No scoped vault available"))?;
                     if let Some(bo_id) = user_auth.bo_id.as_ref() {
                         register_business_owner(conn, &su, bo_id)?;
                     }

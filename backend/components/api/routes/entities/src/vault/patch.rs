@@ -12,7 +12,6 @@ use api_core::auth::tenant::ClientTenantAuthContext;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::CanVault;
 use api_core::auth::Either;
-use api_core::errors::AssertionError;
 use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::IgnoreLuhnValidation;
@@ -21,6 +20,7 @@ use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::DeleteDataResult;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::PatchDataResult;
+use api_errors::ServerErr;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -174,7 +174,7 @@ async fn patch_inner(
             let existing_ssn4 = uvw
                 .decrypt_unchecked_single(&state.enclave_client, ssn4.clone())
                 .await?
-                .ok_or(AssertionError("No ssn4 found"))?;
+                .ok_or(ServerErr("No ssn4 found"))?;
             // If the ssn4 being added to the vault exactly matches the ssn4 on the vault, remove
             // it from the request to be added to the vault.
             // This is a special request from grid to prevent us from erroring when an ssn4 is

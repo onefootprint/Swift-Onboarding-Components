@@ -3,7 +3,6 @@ use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::FpResult;
 use crate::PhoneEmailChallengeState;
-use api_core::errors::ValidationError;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::identify::AuthMethod;
@@ -12,6 +11,8 @@ use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::sms::send_sms_challenge_non_blocking;
 use api_core::State;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_wire_types::IdentifyChallengeResponse;
 use api_wire_types::UserChallengeData;
 use db::models::passkey::Passkey;
@@ -56,7 +57,7 @@ pub(crate) async fn initiate_challenge(
             (Some(rx), challenge_data, time_before_retry, None)
         }
         AuthMethodInfo::Email { email, lifetime_id } => {
-            let tenant = tenant.ok_or(ValidationError(
+            let tenant = tenant.ok_or(BadRequest(
                 "Tenant not present when initiating an email challenge",
             ))?;
             let (rx, h_code) = send_email_challenge_non_blocking(state, &email, tenant, sandbox_id)?;
@@ -100,7 +101,7 @@ struct BiometricChallenge {
 
 fn initiate_passkey_login_challenge(state: &State, creds: Vec<Passkey>) -> FpResult<BiometricChallenge> {
     if creds.is_empty() {
-        return ValidationError("No passkey available for login challenge").into();
+        return BadRequestInto("No passkey available for login challenge");
     }
 
     // convert these creds to webauthn rs type

@@ -5,10 +5,10 @@ use crate::State;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::decision;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ValidationError;
 use api_core::task;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use api_wire_types::CreateUserDecisionRequest;
 use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
@@ -47,14 +47,13 @@ pub async fn post(
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
             if !sv.status.is_terminal() {
-                return Err(ValidationError(
+                return BadRequestInto(
                     "Cannot create a manual decision when the user's status is not already terminal",
-                )
-                .into());
+                );
             }
             let vault = Vault::get(conn, &sv.vault_id)?;
             if vault.kind != VaultKind::Person {
-                return Err(ValidationError("Can only create a manual decision for a user").into());
+                return BadRequestInto("Can only create a manual decision for a user");
             }
             let wf = Workflow::get_active(conn, &sv.id)
                 .optional()?

@@ -5,7 +5,7 @@ use crate::utils::vault_wrapper::TenantVw;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
-use api_errors::AssertionError;
+use api_errors::ServerErr;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::DbError;
@@ -120,7 +120,7 @@ impl TenantVw<Business> {
                 let ownership_stake: i32 = pii
                     .leak() // Ownership stake is not sensitive data.
                     .parse()
-                    .map_err(|_| AssertionError("failed to parse vaulted ownership stake as i32"))?;
+                    .map_err(|_| ServerErr("failed to parse vaulted ownership stake as i32"))?;
 
                 Ok((di, ownership_stake))
             })
@@ -149,7 +149,7 @@ impl TenantVw<Business> {
                 let (su, _) = linked_user.unzip();
                 let data = if let Some(su) = su.as_ref() {
                     // There is a linked user, so all data should come from the vault directly
-                    user_data.remove(&su.id).ok_or(AssertionError("Missing data"))?
+                    user_data.remove(&su.id).ok_or(ServerErr("Missing data"))?
                 } else {
                     // There is no linked user, so we fall back to read the vault data on the business vault
                     biz_data

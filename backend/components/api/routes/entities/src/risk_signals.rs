@@ -10,8 +10,6 @@ use api_core::auth::CanDecrypt;
 use api_core::decision;
 use api_core::decision::features::sentilink;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -20,6 +18,8 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
+use api_errors::BadRequest;
+use api_errors::ServerErr;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
@@ -257,7 +257,7 @@ pub async fn decrypt_aml_hits(
     let (_rs, aml_detail, _) =
         get_risk_signal_and_maybe_detail(&state, risk_signal_id, fp_id, tenant_id.clone(), is_live).await?;
     let Some((aml_detail, vreq)) = aml_detail else {
-        Err(AssertionError("No AML hit data for risk signal"))?
+        Err(ServerErr("No AML hit data for risk signal"))?
     };
 
     // Populate the vault with the seqno of the time of the AML call we made and figure out which of
@@ -338,7 +338,7 @@ pub async fn get_sentilink_detail(
                 conn,
                 &rs.verification_result_id
                     .clone()
-                    .ok_or(AssertionError("missing vres_id"))?,
+                    .ok_or(ServerErr("missing vres_id"))?,
             )?;
             let vw = VaultWrapper::<Any>::build(
                 conn,
@@ -350,7 +350,7 @@ pub async fn get_sentilink_detail(
         .await?;
 
     if !matches!(rs.vendor_api.into(), Vendor::Sentilink) {
-        return Err(ValidationError("Risk signal is not from sentilink").into());
+        return Err(BadRequest("Risk signal is not from sentilink").into());
     }
 
 
@@ -375,7 +375,7 @@ async fn get_synthetic_reason_codes_for_risk_signal(
     .ok();
 
     let Some((response, _)) = res else {
-        Err(AssertionError("No sentilink result found"))?
+        Err(ServerErr("No sentilink result found"))?
     };
 
     let synthetic = response
@@ -434,7 +434,7 @@ async fn get_risk_signal_and_maybe_detail(
                     conn,
                     &rs.verification_result_id
                         .clone()
-                        .ok_or(AssertionError("missing vres_id"))?,
+                        .ok_or(ServerErr("missing vres_id"))?,
                 )?;
                 let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &vreq.scoped_vault_id)?;
                 if let Some(obc) = obc {

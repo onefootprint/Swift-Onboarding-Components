@@ -6,9 +6,9 @@ use actix_web::web::Json;
 use api_core::auth::session::sdk_args::SdkArgs;
 use api_core::auth::session::sdk_args::SdkArgsData;
 use api_core::auth::session::AuthSessionData;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::ApiCoreError;
+use api_errors::BadRequest;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::session::Session;
@@ -56,7 +56,7 @@ pub async fn post(
     let token_hash = match (token, hash) {
         (Some(token), None) => token.id(),
         (None, Some(hash)) => hash,
-        _ => return Err(ValidationError("Must provide only one of token or hash").into()),
+        _ => return Err(BadRequest("Must provide only one of token or hash").into()),
     };
     let session = state.db_query(move |conn| Session::get(conn, token_hash)).await?;
 

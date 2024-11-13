@@ -1,7 +1,6 @@
 use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
@@ -10,6 +9,7 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErrInto;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::samba_order::SambaOrder;
@@ -44,7 +44,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
         .get_link(link_type)
         .map(|l| SambaReportId::from(l.report_id))
     else {
-        return Err(AssertionError("missing report id").into());
+        return ServerErrInto("missing report id");
     };
 
     let order_id = webhook.data.order_id.clone();

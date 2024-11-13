@@ -5,7 +5,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::SessionContext;
 use crate::FpResult;
-use api_errors::ValidationError;
+use api_errors::BadRequestInto;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use paperclip::actix::Apiv2Security;
@@ -40,10 +40,10 @@ impl ExtractableAuthSession for ParsedItUserSession {
         // This auth extractor is only used for integration tests to be able to get an fp_id from an
         // incomplete session. NOTE: Do not remove these validations below.
         if !user_session.0.tenant.as_ref().is_some_and(|t| t.is_demo_tenant) {
-            return ValidationError("Can only use for demo tenants").into();
+            return BadRequestInto("Can only use for demo tenants");
         }
         if user_session.0.user.is_live {
-            return ValidationError("Can only use in sandbox mode").into();
+            return BadRequestInto("Can only use in sandbox mode");
         }
 
         Ok(ParsedItUserSession(user_session))

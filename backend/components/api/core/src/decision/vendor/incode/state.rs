@@ -11,9 +11,9 @@ use super::states::ProcessId;
 use super::states::VerificationSession;
 use super::IncodeContext;
 use crate::decision::state::StateError;
-use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use db::models::document_upload::DocumentUpload;
 use db::models::incode_verification_session::IncodeVerificationSession;
@@ -209,7 +209,7 @@ where
                             .first()
                             .cloned()
                             // TODO: if there's an issue with StartOnboarding and we fail, then this will error, fix in upstack
-                            .ok_or(AssertionError(
+                            .ok_or(ServerErr(
                                 "cannot find incode vres for doc upload failed FRC",
                             ))?;
                             // Fail if theres an unhandled error

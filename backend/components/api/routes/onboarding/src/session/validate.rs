@@ -6,12 +6,12 @@ use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::requirements::requires_biz_workflow;
 use api_core::FpResult;
+use api_errors::BadRequest;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::UserAuthResponse;
 use api_wire_types::ValidateAuthEvent;
@@ -66,7 +66,7 @@ pub async fn post(
                 let user_mrs = ManualReview::get(conn, &sv.id, mr_filters.clone())?;
                 let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let biz_wf = if requires_biz_workflow(&wf, &obc)? {
-                    let biz_wf_id = biz_wf_id.ok_or(ValidationError("Missing business workflow"))?;
+                    let biz_wf_id = biz_wf_id.ok_or(BadRequest("Missing business workflow"))?;
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf_id)?;
                     let biz_mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;
                     Some((biz_sv, biz_wf, biz_mrs, obc.clone()))

@@ -3,10 +3,10 @@ use api_core::auth::session::user::AssociatedAuthEventKind;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::load_auth_events;
 use api_core::auth::Any;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::hosted::tokens::CreateUserTokenRequest;
 use api_wire_types::hosted::tokens::CreateUserTokenResponse;
 use api_wire_types::hosted::tokens::GetUserTokenResponse;
@@ -61,7 +61,7 @@ pub async fn post(
                 // particularly for tokens given to the components SDK that intentially have
                 // fewer scopes than their auth methods allow.
                 // Do not remove this validation unless you know what you're doing.
-                return ValidationError("Cannot request additional scopes").into();
+                return BadRequestInto("Cannot request additional scopes");
             }
             let purpose = requested_scope.into();
             let session = user_auth.reduce_scopes(new_scopes, purpose)?;

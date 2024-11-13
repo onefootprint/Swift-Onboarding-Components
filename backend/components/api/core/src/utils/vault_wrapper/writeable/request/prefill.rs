@@ -2,12 +2,12 @@ use super::super::PatchDataResult;
 use super::Fingerprints;
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErrInto;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
 use db::models::ob_configuration::ObConfiguration;
@@ -91,10 +91,10 @@ impl<Type> VaultWrapper<Type> {
         let destination_vw = destination_vw.as_ref();
 
         if destination_vw.is_some_and(|vw| vw.scoped_vault.vault_id != self.vault.id) {
-            return Err(AssertionError("Cannot prefill data into a separate vault").into());
+            return ServerErrInto("Cannot prefill data into a separate vault");
         }
         if self.vault.kind != VaultKind::Person {
-            return Err(AssertionError("Can't prefill business vaults").into());
+            return ServerErrInto("Can't prefill business vaults");
         }
 
         // Collect all of the portable data that we can prefill

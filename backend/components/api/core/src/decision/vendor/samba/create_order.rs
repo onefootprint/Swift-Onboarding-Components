@@ -5,12 +5,13 @@ use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -205,7 +206,7 @@ impl SambaOrderHelper {
     }
 
     fn validate_state(&self, state: Option<UsStateAndTerritories>) -> FpResult<()> {
-        let state = state.ok_or(AssertionError("missing license state"))?; // maybe should be 400?
+        let state = state.ok_or(ServerErr("missing license state"))?; // maybe should be 400?
         match self.kind {
             SambaOrderKind::LicenseValidation => {
                 if license_state_is_supported_for_license_validation(state) {
@@ -258,7 +259,7 @@ async fn build_request_from_ocr_response(
     doc_id: Option<DocumentId>,
 ) -> FpResult<(SambaData, Vec<DataLifetimeId>)> {
     let Some(did) = doc_id else {
-        return Err(AssertionError("missing document id").into());
+        return ServerErrInto("missing document id");
     };
 
     let Some((ocr_res, _)) = load_response_for_vendor_api(
@@ -269,7 +270,7 @@ async fn build_request_from_ocr_response(
     )
     .await?
     .ok() else {
-        return Err(AssertionError("missing fetch ocr res").into());
+        return ServerErrInto("missing fetch ocr res");
     };
 
     let data = build_request(&ocr_res)?;
@@ -292,16 +293,16 @@ fn build_request(ocr_res: &FetchOCRResponse) -> FpResult<SambaData> {
     let data = SambaData {
         first_name: fields
             .get_value(IncodeOcrField::FirstName)
-            .ok_or(AssertionError("missing first name"))?,
+            .ok_or(ServerErr("missing first name"))?,
         last_name: fields
             .get_value(IncodeOcrField::LastName)
-            .ok_or(AssertionError("missing last name"))?,
+            .ok_or(ServerErr("missing last name"))?,
         license_number: fields
             .get_value(IncodeOcrField::DriversLicenseNumber)
-            .ok_or(AssertionError("missing license number"))?,
+            .ok_or(ServerErr("missing license number"))?,
         license_state: fields
             .get_value(IncodeOcrField::DriversLicenseState)
-            .ok_or(AssertionError("missing license state"))?,
+            .ok_or(ServerErr("missing license state"))?,
 
         dob: fields.get_value(IncodeOcrField::Dob),
         address,
@@ -351,16 +352,16 @@ async fn build_request_from_data_identifiers(
     let data = SambaData {
         first_name: decrypted_values
             .remove(&dl_di(&ODK::FirstName).into())
-            .ok_or(AssertionError("missing first name"))?,
+            .ok_or(ServerErr("missing first name"))?,
         last_name: decrypted_values
             .remove(&dl_di(&ODK::LastName).into())
-            .ok_or(AssertionError("missing last name"))?,
+            .ok_or(ServerErr("missing last name"))?,
         license_number: decrypted_values
             .remove(&dl_di(&ODK::DocumentNumber).into())
-            .ok_or(AssertionError("missing license number"))?,
+            .ok_or(ServerErr("missing license number"))?,
         license_state: decrypted_values
             .remove(&dl_di(&ODK::IssuingState).into())
-            .ok_or(AssertionError("missing license state"))?,
+            .ok_or(ServerErr("missing license state"))?,
 
         dob: decrypted_values.remove(&dl_di(&ODK::Dob).into()),
         address,
@@ -410,7 +411,7 @@ pub async fn run_samba_create_order(
         .await?;
 
     if doc.is_none() && !context.is_adhoc_with_data() {
-        return Err(AssertionError("no data to call samba").into());
+        return ServerErrInto("no data to call samba");
     }
 
     let doc_id = doc.as_ref().map(|d| d.id.clone());

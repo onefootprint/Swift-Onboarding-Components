@@ -11,7 +11,6 @@ use crate::decision::{
     self,
 };
 use crate::enclave_client::EnclaveClient;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
@@ -20,6 +19,7 @@ use crate::vendor_clients::VendorClient;
 use crate::State;
 use api_errors::FpError;
 use api_errors::FpErrorCode;
+use api_errors::ServerErrInto;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -278,7 +278,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
             obc.verification_checks().get(VerificationCheckKind::Kyb)
         else {
             // todo make this into a proper variant
-            return Err(AssertionError("no kyb check configured").into());
+            return ServerErrInto("no kyb check configured");
         };
 
         // Validate we have the appropriate data for the call we're making
@@ -589,13 +589,13 @@ impl MiddeskState<Complete> {
                     obc.verification_checks().get(VerificationCheckKind::Kyb)
                 {
                     if ein_only {
-                        Ok(BillingEventKind::KybEinOnly)
+                        BillingEventKind::KybEinOnly
                     } else {
-                        Ok(BillingEventKind::Kyb)
+                        BillingEventKind::Kyb
                     }
                 } else {
-                    Err(AssertionError("no kyb check configured"))
-                }?;
+                    return ServerErrInto("no kyb check configured");
+                };
 
                 let has_aml_checks = obc
                     .verification_checks()

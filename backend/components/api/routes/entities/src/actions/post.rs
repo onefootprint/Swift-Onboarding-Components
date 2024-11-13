@@ -6,10 +6,10 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use api_wire_types::EntityActionResponse;
 use api_wire_types::EntityActionsRequest;
 use db::models::scoped_vault::ScopedVault;
@@ -41,7 +41,7 @@ pub async fn post(
     let EntityActionsRequest { actions } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
     if actions.is_empty() {
-        return ValidationError("Must provide at least one action").into();
+        return BadRequestInto("Must provide at least one action");
     }
 
     let outcomes = state
@@ -54,7 +54,7 @@ pub async fn post(
                     let action = match a {
                         EntityAction::Trigger(t) => {
                             if sv.kind != VaultKind::Person {
-                                return Err(ValidationError("Must be a person vault").into());
+                                return BadRequestInto("Must be a person vault");
                             }
                             apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
                         }

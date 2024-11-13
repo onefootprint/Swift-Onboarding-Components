@@ -2,7 +2,6 @@ use crate::State;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
-use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
 use api_core::utils::token::create_token;
 use api_core::utils::token::CreateTokenArgs;
@@ -10,6 +9,7 @@ use api_core::utils::token::CreateTokenResult;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::EntityActionResponse;
 use api_wire_types::TokenOperationKind;
@@ -54,19 +54,18 @@ fn validate(
         } => {
             let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
             if attrs.iter().any(|cdo| !obc.must_collect_data.contains(cdo)) {
-                return ValidationError("recollect_attributes must be a subset of the playbook's data")
-                    .into();
+                return BadRequestInto("recollect_attributes must be a subset of the playbook's data");
             }
             let is_kyb = obc.kind == ObConfigurationKind::Kyb;
             if *reuse_existing_bo_kyc && !is_kyb {
-                return ValidationError("reuse_existing_bo_kyc can only be used with KYB playbooks").into();
+                return BadRequestInto("reuse_existing_bo_kyc can only be used with KYB playbooks");
             }
             if has_sb && !is_kyb {
-                return ValidationError("Must provide a KYB playbook when providing fp_bid").into();
+                return BadRequestInto("Must provide a KYB playbook when providing fp_bid");
             }
             // Temporary until we implement this
             if has_sb && !*reuse_existing_bo_kyc {
-                return ValidationError("Must provide reuse_existing_bo_kyc for KYB flows").into();
+                return BadRequestInto("Must provide reuse_existing_bo_kyc for KYB flows");
             }
         }
         WorkflowRequestConfig::Document {
@@ -76,11 +75,11 @@ fn validate(
             DocumentRequestConfig::validate(configs)?;
             DocumentRequestConfig::validate(business_configs)?;
             if business_configs.iter().any(|c| !c.is_custom()) {
-                return ValidationError("business_configs can only contain custom document requests").into();
+                return BadRequestInto("business_configs can only contain custom document requests");
             }
             let has_business_configs = !business_configs.is_empty();
             if has_sb != has_business_configs {
-                return ValidationError("fp_bid and business_configs must both be provided together").into();
+                return BadRequestInto("fp_bid and business_configs must both be provided together");
             }
         }
     }
@@ -166,7 +165,7 @@ pub(super) fn apply_trigger_request(
         }
     };
     if obc.kind == ObConfigurationKind::Auth {
-        return ValidationError("Cannot trigger onboarding onto an auth playbook").into();
+        return BadRequestInto("Cannot trigger onboarding onto an auth playbook");
     }
 
     let wfr_args = NewWorkflowRequestArgs {

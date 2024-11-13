@@ -3,10 +3,10 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::AssertionError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
+use api_errors::ServerErr;
 use chrono::Utc;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
 use db::models::compliance_doc_template::NewComplianceDocTemplate;
@@ -59,7 +59,7 @@ pub async fn get(
                 .map(|u| -> FpResult<_> {
                     Ok(users
                         .get(u)
-                        .ok_or(AssertionError("missing tenant user ID after get_bulk"))?
+                        .ok_or(ServerErr("missing tenant user ID after get_bulk"))?
                         .clone())
                 })
                 .transpose()?;

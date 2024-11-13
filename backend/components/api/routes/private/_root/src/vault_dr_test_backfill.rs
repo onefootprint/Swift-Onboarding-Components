@@ -4,7 +4,7 @@ use actix_web::web::Json;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::ApiResponse;
 use api_core::State;
-use api_errors::AssertionError;
+use api_errors::ServerErrInto;
 use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
@@ -55,7 +55,7 @@ pub async fn post(
     _auth: CustodianAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     if !state.config.service_config.is_local() {
-        return AssertionError("This endpoint is only usable in integration tests").into();
+        return ServerErrInto("This endpoint is only usable in integration tests");
     }
 
     let fp_ids = request.into_inner();

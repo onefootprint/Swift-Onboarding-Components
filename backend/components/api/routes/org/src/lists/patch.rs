@@ -1,10 +1,10 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::UpdateListRequest;
 use db::models::list::List;
 use newtypes::ListId;
@@ -30,7 +30,7 @@ pub async fn patch(
     state
         .db_transaction(move |conn| -> FpResult<_> {
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
-                return Err(ValidationError("List with that name already exists").into());
+                return BadRequestInto("List with that name already exists");
             }
             List::update(conn, &tenant_id, is_live, &list_id, name, alias)?;
             Ok(())

@@ -4,11 +4,11 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::State;
+use api_errors::ServerErr;
 use chrono::Utc;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::TenantApiKeyId;
@@ -47,7 +47,7 @@ pub async fn post(
     let (_, scrubbed_key) = scrubbed_key
         .into_iter()
         .next()
-        .ok_or(AssertionError("No scrubbed key"))?;
+        .ok_or(ServerErr("No scrubbed key"))?;
     Ok(api_wire_types::DashboardSecretApiKey::from_db((
         api_key,
         role,

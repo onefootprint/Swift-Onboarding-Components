@@ -8,9 +8,9 @@ use super::VaultWrapper;
 use super::WriteableVw;
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
-use crate::errors::AssertionError;
 use crate::telemetry::RootSpan;
 use crate::FpResult;
+use api_errors::ServerErrInto;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -78,9 +78,7 @@ impl VaultWrapper<Person> {
         }
 
         if data.iter().any(|(di, _)| !di.is_unverified_ci()) {
-            return Err(
-                AssertionError("Cannot create vault with initial data other than phone/email").into(),
-            );
+            return ServerErrInto("Cannot create vault with initial data other than phone/email");
         }
 
         if let Some(duplicate_of_id) = duplicate_of_id.as_ref() {

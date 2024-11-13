@@ -8,7 +8,7 @@ use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
-use api_errors::AssertionError;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
@@ -46,7 +46,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
         let front_upload = doc_uploads
             .iter()
             .find(|d| d.side.is_front())
-            .ok_or(AssertionError("missing front upload"))?;
+            .ok_or(ServerErr("missing front upload"))?;
         let document_could_not_be_processed = front_upload
             .failure_reasons
             .iter()

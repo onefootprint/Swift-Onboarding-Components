@@ -4,7 +4,8 @@ use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use api_errors::ValidationError;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -27,13 +28,13 @@ impl BoWithKycInfo {
         let Self(wf_obd, bo) = self;
         let (wf, obd) = wf_obd
             .as_ref()
-            .ok_or(ValidationError("Beneficial owner hasn't started onboarding"))?;
+            .ok_or(BadRequest("Beneficial owner hasn't started onboarding"))?;
         let obd = obd
             .as_ref()
-            .ok_or(ValidationError("Beneficial owner hasn't finished onboarding"))?;
+            .ok_or(BadRequest("Beneficial owner hasn't finished onboarding"))?;
         if !OnboardingStatus::from(obd.status).is_terminal() {
             // This is only for verrrrry legacy OBDs that could have an OBD in status `step_up`
-            return ValidationError("Beneficial owner's onboarding isn't complete").into();
+            return BadRequestInto("Beneficial owner's onboarding isn't complete");
         }
         Ok((wf, obd, bo))
     }

@@ -7,8 +7,8 @@ use crate::ApiResponse;
 use crate::State;
 use actix_web::HttpResponseBuilder;
 use api_core::auth::user::UserAuthScope;
-use api_core::errors::AssertionError;
 use api_core::FpResult;
+use api_errors::ServerErr;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
@@ -75,7 +75,7 @@ async fn authorize_privacy_pass(
 ) -> ApiResponse<HttpResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let scoped_user_id =
-        (user_auth.su_id.clone()).ok_or(AssertionError("User not initialized for privacy pass"))?;
+        (user_auth.su_id.clone()).ok_or(ServerErr("User not initialized for privacy pass"))?;
     let nonce = user_auth.auth_token.hash_bytes();
 
     let challenge = privacy_pass::TokenChallenge::new(state.config.rp_id.clone(), nonce);

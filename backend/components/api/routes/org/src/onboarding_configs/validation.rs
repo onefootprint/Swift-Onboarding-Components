@@ -1,11 +1,11 @@
 use super::post::CreateOnboardingConfigurationRequest;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::FpError;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use db::models::ob_configuration::IsLive;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::tenant::Tenant;
@@ -70,7 +70,7 @@ impl ObConfigurationArgsToValidate {
                 ))
                 .into())
             } else {
-                let cdo = cdos.into_iter().next().ok_or(AssertionError("No CDO for CD"))?;
+                let cdo = cdos.into_iter().next().ok_or(ServerErr("No CDO for CD"))?;
                  Ok((cd, cdo))
             }})
             // Find the CDO parents that have more than one option specified
@@ -207,10 +207,9 @@ impl ObConfigurationArgsToValidate {
             .iter()
             .any(|d| matches!(d, DocumentRequestConfig::Identity { .. }))
         {
-            return ValidationError(
+            return BadRequestInto(
                 "Cannot yet provide ID document configs here. Please use must_collect_data instead.",
-            )
-            .into();
+            );
         }
 
         DocumentRequestConfig::validate(&self.documents_to_collect)?;
@@ -245,7 +244,7 @@ impl ObConfigurationArgsToValidate {
         }
 
         if self.kind == ObConfigurationKind::Document && !self.collects_document() {
-            return ValidationError("Playbook of kind document must collect document").into();
+            return BadRequestInto("Playbook of kind document must collect document");
         }
 
         // Check for disallowed fields based on playbook kind
@@ -272,7 +271,7 @@ impl ObConfigurationArgsToValidate {
 
         // Document playbooks must not run KYC
         if self.kind == ObConfigurationKind::Document && !self.verification_checks.skip_kyc() {
-            return Err(ValidationError("Playbook of kind document must skip KYC").into());
+            return BadRequestInto("Playbook of kind document must skip KYC");
         }
 
         // KYB playbooks have some additional rules around collecting KYC data
@@ -284,15 +283,15 @@ impl ObConfigurationArgsToValidate {
             let collecting_kyc_data = self.must_collect_data.iter().any(|cdo| cdo.matches(DID::Id));
 
             if !self.verification_checks.skip_kyc() && !has_bo_cdo {
-                return ValidationError("Must skip KYC if not collecting BOs").into();
+                return BadRequestInto("Must skip KYC if not collecting BOs");
             }
             if !self.verification_checks.skip_kyc() && !collecting_kyc_data {
-                return ValidationError("Must skip KYC if not collecting KYC data").into();
+                return BadRequestInto("Must skip KYC if not collecting KYC data");
             }
         }
 
         if !self.business_documents_to_collect.is_empty() && self.kind != ObConfigurationKind::Kyb {
-            return ValidationError("Cannot collect business documents in non-KYB playbook").into();
+            return BadRequestInto("Cannot collect business documents in non-KYB playbook");
         }
 
         Ok(())
@@ -671,22 +670,22 @@ impl ObConfigurationArgsToValidate {
         };
         if matches!(self.kind, ObConfigurationKind::Document) {
             // TODO we could in theory support document playbooks one day, but it's kind of weird
-            return ValidationError("Cannot required auth methods for playbook of kind document").into();
+            return BadRequestInto("Cannot required auth methods for playbook of kind document");
         }
         if reqd_methods.iter().unique().count() != reqd_methods.len() {
-            return ValidationError("Cannot provide duplicates in required auth methods").into();
+            return BadRequestInto("Cannot provide duplicates in required auth methods");
         }
         if reqd_methods.iter().any(|r| r == &AuthMethodKind::Passkey) {
-            return ValidationError("Cannot yet require passkey as an auth method").into();
+            return BadRequestInto("Cannot yet require passkey as an auth method");
         }
         if reqd_methods.iter().any(|r| r == &AuthMethodKind::Phone) && self.is_no_phone_flow {
-            return ValidationError("Cannot require phone auth method in no phone flow").into();
+            return BadRequestInto("Cannot require phone auth method in no phone flow");
         }
         if reqd_methods.is_empty() {
-            return ValidationError("Must have at least one required auth method if provided").into();
+            return BadRequestInto("Must have at least one required auth method if provided");
         }
         if self.prompt_for_passkey && self.kind == ObConfigurationKind::Auth {
-            return ValidationError("Cannot require passkey on an auth playbook").into();
+            return BadRequestInto("Cannot require passkey on an auth playbook");
         }
         Ok(())
     }

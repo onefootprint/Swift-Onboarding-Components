@@ -3,7 +3,8 @@ use crate::enclave_client::DecryptReq;
 use crate::enclave_client::EnclaveClient;
 use crate::utils;
 use crate::FpResult;
-use api_errors::AssertionError;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
@@ -163,11 +164,11 @@ impl TenantVendorControl {
                 base_url: config.sentilink_config.base_url.clone(),
                 auth_username: sentilink
                     .get(&SentilinkCreds::AuthUsername)
-                    .ok_or(AssertionError("Missing decrypt field: SentilinkAuthUsername"))?
+                    .ok_or(ServerErr("Missing decrypt field: SentilinkAuthUsername"))?
                     .clone(),
                 auth_password: sentilink
                     .get(&SentilinkCreds::AuthPassword)
-                    .ok_or(AssertionError("Missing decrypt field: SentilinkAuthPassword"))?
+                    .ok_or(ServerErr("Missing decrypt field: SentilinkAuthPassword"))?
                     .clone(),
             };
             CredentialType::TenantSpecific(creds)
@@ -433,9 +434,7 @@ where
 {
     pub fn try_into_tenant_specific_credentials(self) -> FpResult<T> {
         match self {
-            CredentialType::Default(_) => {
-                Err(AssertionError("could not convert to tenant specific credentials").into())
-            }
+            CredentialType::Default(_) => ServerErrInto("could not convert to tenant specific credentials"),
             CredentialType::TenantSpecific(t) => Ok(t),
         }
     }

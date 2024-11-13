@@ -9,7 +9,7 @@ use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use api_errors::AssertionError;
+use api_errors::ServerErrInto;
 use db::models::contact_info::ContactInfo;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
@@ -166,7 +166,7 @@ pub fn requires_biz_workflow(person_wf: &Workflow, person_obc: &ObConfiguration)
     let requires_biz_workflow = match &person_wf.config {
         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => person_obc.kind.is_kyb(),
         WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => !business_configs.is_empty(),
-        WorkflowConfig::Kyb(_) => return AssertionError("Person workflow cannot have kind KYB").into(),
+        WorkflowConfig::Kyb(_) => return ServerErrInto("Person workflow cannot have kind KYB"),
     };
     Ok(requires_biz_workflow)
 }

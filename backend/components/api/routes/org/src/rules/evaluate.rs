@@ -9,12 +9,12 @@ use api_core::decision::state::common::saturate_list_entries;
 use api_core::decision::{
     self,
 };
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
 use api_wire_types::EvaluateRuleRequest;
 use api_wire_types::RuleEvalResult;
 use api_wire_types::RuleEvalStats;
@@ -182,7 +182,7 @@ pub async fn evaluate_rule(
         for rule_id in delete {
             current_rules
                 .remove(&rule_id)
-                .ok_or(AssertionError(&format!("Rule not found: {}", rule_id)))?;
+                .ok_or(ServerErr!("Rule not found: {}", rule_id))?;
         }
     }
 
@@ -191,7 +191,7 @@ pub async fn evaluate_rule(
     for (edit_rule_id, edit_rule_expression) in edits {
         let curr_rule = current_rules
             .remove(&edit_rule_id)
-            .ok_or(AssertionError(&format!("Rule not found: {}", edit_rule_id)))?;
+            .ok_or(ServerErr!("Rule not found: {}", edit_rule_id))?;
         let expression = edit_rule_expression;
 
         edit_rules.push(Rule {

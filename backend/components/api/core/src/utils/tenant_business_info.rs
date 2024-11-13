@@ -1,7 +1,7 @@
 use crate::enclave_client::DecryptReq;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::AssertionError;
 use crate::FpResult;
+use api_errors::ServerErr;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 
@@ -39,27 +39,27 @@ pub async fn decrypt_tenant_business_info(
     Ok(newtypes::TenantBusinessInfo {
         company_name: decrypted_fields
             .get(&BusinessInfoField::CompanyName)
-            .ok_or(AssertionError("Missing decrypt field: CompanyName"))?
+            .ok_or(ServerErr("Missing decrypt field: CompanyName"))?
             .clone(),
         address_line1: decrypted_fields
             .get(&BusinessInfoField::AddressLine1)
-            .ok_or(AssertionError("Missing decrypt field: AddressLine1"))?
+            .ok_or(ServerErr("Missing decrypt field: AddressLine1"))?
             .clone(),
         city: decrypted_fields
             .get(&BusinessInfoField::City)
-            .ok_or(AssertionError("Missing decrypt field: City"))?
+            .ok_or(ServerErr("Missing decrypt field: City"))?
             .clone(),
         state: decrypted_fields
             .get(&BusinessInfoField::State)
-            .ok_or(AssertionError("Missing decrypt field: State"))?
+            .ok_or(ServerErr("Missing decrypt field: State"))?
             .clone(),
         zip: decrypted_fields
             .get(&BusinessInfoField::Zip)
-            .ok_or(AssertionError("Missing decrypt field: Zip"))?
+            .ok_or(ServerErr("Missing decrypt field: Zip"))?
             .clone(),
         phone: decrypted_fields
             .get(&BusinessInfoField::Phone)
-            .ok_or(AssertionError("Missing decrypt field: Phone"))?
+            .ok_or(ServerErr("Missing decrypt field: Phone"))?
             .clone(),
     })
 }

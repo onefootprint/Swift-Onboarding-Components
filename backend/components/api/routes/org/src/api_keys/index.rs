@@ -4,13 +4,13 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
 use api_wire_types::ApiKeyFilters;
 use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
@@ -75,7 +75,7 @@ pub async fn get(
         .map(|(key, role)| {
             let scrubbed_key = scrubbed_keys
                 .remove(&key.id)
-                .ok_or(AssertionError("Missing scrubbed key"))?;
+                .ok_or(ServerErr("Missing scrubbed key"))?;
             Ok((key, role, scrubbed_key, None))
         })
         .map_ok(api_wire_types::DashboardSecretApiKey::from_db)
@@ -166,7 +166,7 @@ pub async fn patch(
     let (_, scrubbed_key) = scrubbed_key
         .into_iter()
         .next()
-        .ok_or(AssertionError("No scrubbed key"))?;
+        .ok_or(ServerErr("No scrubbed key"))?;
 
     Ok(api_wire_types::DashboardSecretApiKey::from_db((
         api_key,

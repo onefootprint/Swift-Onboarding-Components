@@ -1,10 +1,10 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
@@ -50,7 +50,7 @@ pub async fn post(
 
             let Some(req) = ComplianceDocRequest::get_active(conn, &doc)?.filter(|req| req.id == request_id)
             else {
-                return ValidationError("Can only submit documents for the latest request").into();
+                return BadRequestInto("Can only submit documents for the latest request");
             };
 
             let doc_data = ComplianceDocData::ExternalUrl { url };

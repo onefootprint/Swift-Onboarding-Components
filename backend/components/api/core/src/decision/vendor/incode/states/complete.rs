@@ -10,7 +10,6 @@ use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiCoreError;
-use crate::errors::AssertionError;
 use crate::utils::file_upload::mime_type_to_extension;
 use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
@@ -21,6 +20,7 @@ use crate::utils::vault_wrapper::WriteableVw;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
@@ -208,7 +208,7 @@ pub(super) fn compute_risk_signals<'a>(
     // means we are _just_ collecting document, we don't have any data to actually match to
     let pii_matching_ocr_reason_codes = if !(obc.is_doc_first || obc.kind == ObConfigurationKind::Document) {
         // Only calculate OCR reason codes if we have already collected ID data
-        let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
+        let vault_data = vault_data.ok_or(ServerErr("Vault data not provided"))?;
         incode_docv::pii_matching_reason_codes_from_ocr_response(fetch_ocr_response, vault_data)
             .into_iter()
             .map(|r| (r, VendorAPI::IncodeFetchOcr, ocr_vres_id.clone()))

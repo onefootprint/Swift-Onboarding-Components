@@ -1,8 +1,8 @@
 use super::onboarding::OnboardingSessionTrustedMetadata;
 use super::AuthSessionData;
 use crate::errors::user::UserError;
-use crate::errors::ValidationError;
 use crate::FpResult;
+use api_errors::BadRequestInto;
 use itertools::Itertools;
 use newtypes::AuthEventId;
 use newtypes::AuthMethodKind;
@@ -283,7 +283,7 @@ impl UserSession {
             // particularly for tokens given to the components SDK that intentially have
             // fewer scopes than their auth methods allow.
             // Do not remove this validation unless you know what you're doing.
-            return ValidationError("Cannot use reduce_scopes to add additional scopes").into();
+            return BadRequestInto("Cannot use reduce_scopes to add additional scopes");
         }
         let args = NewUserSessionArgs {
             user_vault_id: old.user_vault_id,
@@ -299,8 +299,7 @@ impl UserSession {
     /// a new auth token.
     fn validate_not_derived_from_components(&self) -> FpResult<()> {
         if self.is_derived_from_components() {
-            return ValidationError("Cannot create a new token from one issued for the components SDK")
-                .into();
+            return BadRequestInto("Cannot create a new token from one issued for the components SDK");
         }
         Ok(())
     }

@@ -1,9 +1,9 @@
 use super::DataRequestSource;
 use super::FingerprintedDataRequest;
 use super::WriteableVw;
-use crate::errors::ValidationError;
 use crate::FpResult;
-use api_errors::AssertionError;
+use api_errors::BadRequestInto;
+use api_errors::ServerErrInto;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
 use db::models::data_lifetime::DataLifetimeSeqnoTxn;
@@ -31,14 +31,14 @@ impl<Type> WriteableVw<Type> {
             .keys()
             .any(|di| !di.is_verified_ci() && !di.is_unverified_ci())
         {
-            return ValidationError("Can only replace_ci with phone or email").into();
+            return BadRequestInto("Can only replace_ci with phone or email");
         }
 
         let request = self.validate_request(conn, request, &DataRequestSource::OtpVerified)?;
         let result = self.internal_save_data(conn, request, None)?;
 
         let Some(updates) = result.updates else {
-            return AssertionError("No vault updates in save_ci_after_otp").into();
+            return ServerErrInto("No vault updates in save_ci_after_otp");
         };
 
         // Since the data saved here is always OTP verified, immediately portablize the new DLs and mark the

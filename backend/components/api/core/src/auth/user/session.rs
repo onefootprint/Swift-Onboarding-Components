@@ -9,7 +9,7 @@ use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
 use crate::FpResult;
-use api_errors::ValidationError;
+use api_errors::BadRequestInto;
 use db::models::auth_event::AuthEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -140,10 +140,9 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
 
                 if let Some(obc) = obc.as_ref() {
                     if obc.is_live != vault.is_live {
-                        return ValidationError(
+                        return BadRequestInto(
                             "Invalid auth session: playbook live mode does not match user live mode",
-                        )
-                        .into();
+                        );
                     }
                 }
 

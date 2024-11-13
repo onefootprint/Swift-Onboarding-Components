@@ -1,9 +1,9 @@
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::onboarding_validate::HostedValidateResponse;
 use newtypes::ObConfigurationKind;
@@ -28,7 +28,7 @@ pub async fn post(
         if obc.kind == ObConfigurationKind::Auth {
             // The auth component doesn't need to fetch an identify validation token - it should
             // just fetch the normal validation token from /hosted/onboarding/validate
-            return ValidationError("Cannot invoke this endpoint for an auth playbook").into();
+            return BadRequestInto("Cannot invoke this endpoint for an auth playbook");
         }
     }
 

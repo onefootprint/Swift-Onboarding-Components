@@ -97,42 +97,6 @@ define_err_type!(Unauthorized, UNAUTHORIZED);
 define_err_type!(Forbidden, FORBIDDEN);
 define_err_type!(ServerErr, INTERNAL_SERVER_ERROR);
 
-#[derive(Debug)]
-/// Shorthand to make it convenient to make an HTTP 500 assertion error.
-/// Use this when an application-level invariant isn't met. This should only be returned when
-/// there's a problem with our code that needs to be addressed - maybe a codepath hit that should
-/// never occur in production.
-pub struct AssertionError<'a>(pub &'a str);
-
-impl<'a> From<AssertionError<'a>> for FpError {
-    fn from(value: AssertionError<'a>) -> Self {
-        FpError::from(ServerErrInternal(value.0.to_string()))
-    }
-}
-
-// Shorthand to easily an AssertionError into a Result easily
-impl<'a, T, E: From<FpError>> From<AssertionError<'a>> for Result<T, E> {
-    fn from(value: AssertionError<'a>) -> Self {
-        Err(E::from(FpError::from(value)))
-    }
-}
-
-#[derive(Debug)]
-/// Shorthand to make it convenient to make an HTTP 400 validation error.
-pub struct ValidationError<'a>(pub &'a str);
-
-impl<'a> From<ValidationError<'a>> for FpError {
-    fn from(value: ValidationError<'a>) -> Self {
-        FpError::from(BadRequestInternal(value.0.to_string()))
-    }
-}
-
-impl<'a, T, E: From<FpError>> From<ValidationError<'a>> for Result<T, E> {
-    fn from(value: ValidationError<'a>) -> Self {
-        Err(E::from(FpError::from(value)))
-    }
-}
-
 macro_rules! fp_error_trait_impl {
     ($typ:ty, $status_code: tt) => {
         impl $crate::FpErrorTrait for $typ {

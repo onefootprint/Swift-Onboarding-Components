@@ -3,11 +3,11 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
 use newtypes::put_data_request::ModernRawUserDataRequest;
@@ -42,7 +42,7 @@ pub async fn post(
     // Limit which fields can be used for KBA
     let allowable_kba_dis = [DataIdentifier::Id(IDK::PhoneNumber)];
     if let Some(k) = data.keys().find(|k| !allowable_kba_dis.iter().contains(k)) {
-        return ValidationError(&format!("KBA not allowed for {}", k)).into();
+        return BadRequestInto!("KBA not allowed for {}", k);
     }
 
     let id = user_auth.user_identifier();
@@ -61,7 +61,7 @@ pub async fn post(
         .map(|(di, kba_response)| -> FpResult<_> {
             let actual = decrypted.get_di(di.clone())?;
             if !crypto::safe_compare(actual.leak().as_bytes(), kba_response.leak().as_bytes()) {
-                return ValidationError(&format!("Incorrect KBA response for {}", di)).into();
+                return BadRequestInto!("Incorrect KBA response for {}", di);
             }
             Ok(di.clone())
         })

@@ -9,6 +9,7 @@ doctest = false
 
 [dependencies]
 api_core = { path = "../../../core" }
+api_errors = { path = "../../../errors" }
 api_route_hosted_core = { path = "../core" }
 crypto = { path = "../../../../enclave/crypto" }
 enclave_proxy = { path = "../../../../enclave/proxy" }

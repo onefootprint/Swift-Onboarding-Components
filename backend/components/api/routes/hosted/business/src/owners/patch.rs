@@ -2,8 +2,6 @@ use actix_web::web;
 use api_core::auth::user::CheckUserBizWfAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::user::UserBizWfAuthContext;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::IsBootstrapHeader;
@@ -14,6 +12,8 @@ use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use api_wire_types::BatchHostedBusinessOwnerRequest;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::NewSecondaryBo;
@@ -96,7 +96,7 @@ pub async fn patch(
     let results = link_ids
         .into_iter()
         .flatten()
-        .map(|id| dbos.remove(&id).ok_or(AssertionError("Cannot find updated BO")))
+        .map(|id| dbos.remove(&id).ok_or(ServerErr("Cannot find updated BO")))
         .map_ok(|bo| api_wire_types::HostedBusinessOwner::from_db((bo, &user_auth)))
         .collect::<Result<_, _>>()?;
     Ok(results)
@@ -152,14 +152,13 @@ pub(super) fn validate_collective_bos(
     }
     // Assert validations on the end state of all BOs after applying the operations
     if is_live && !bo_phones.values().all_unique() {
-        return ValidationError("Phone numbers of beneficial owners must be unique").into();
+        return BadRequestInto("Phone numbers of beneficial owners must be unique");
     }
     if is_live && !bo_emails.values().all_unique() {
-        return ValidationError("Emails of beneficial owners must be unique").into();
+        return BadRequestInto("Emails of beneficial owners must be unique");
     }
     if ownerships.values().sum::<u32>() > 100 {
-        return ValidationError("Cumulative ownership stake for all beneficial owners cannot exceed 100%")
-            .into();
+        return BadRequestInto("Cumulative ownership stake for all beneficial owners cannot exceed 100%");
     }
     Ok(())
 }
@@ -218,8 +217,7 @@ impl BatchRequest {
             } => {
                 let bo = BusinessOwner::get(conn, (bv_id, &uuid))?;
                 if !data.is_empty() && bo.has_linked_user() {
-                    return ValidationError("This owner is already linked to a user and cannot be updated")
-                        .into();
+                    return BadRequestInto("This owner is already linked to a user and cannot be updated");
                 }
 
                 let data = create_fingerprinted_data_request(&bo.link_id, data, ownership_stake)?;

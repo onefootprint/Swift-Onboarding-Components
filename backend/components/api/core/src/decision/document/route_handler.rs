@@ -2,7 +2,6 @@ use super::meta_headers::MetaHeaders;
 use crate::decision;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ValidationError;
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::seal_file_and_upload_to_s3;
 use crate::utils::vault_wrapper::Any;
@@ -11,6 +10,8 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_wire_types::CreateDocumentRequest;
 use api_wire_types::DocumentResponse;
 use db::models::data_lifetime::DataLifetime;
@@ -86,7 +87,7 @@ pub async fn handle_document_create(
         .await?;
 
     if DocumentRequestKind::from(document_type) != dr.kind {
-        return ValidationError("Document type not compatible with document request kind").into();
+        return BadRequestInto("Document type not compatible with document request kind");
     }
 
     if !dr.kind.is_identity() {
@@ -122,7 +123,7 @@ pub async fn handle_document_create(
     let id_doc = state
         .db_transaction(move |conn| -> FpResult<_> {
             let country_code =
-                country_code.ok_or(ValidationError("Identity document requires country code"))?;
+                country_code.ok_or(BadRequest("Identity document requires country code"))?;
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             crate::decision::vendor::incode::validate_doc_type_is_allowed(
                 &obc,

@@ -1,6 +1,6 @@
 use api_core::auth::user::UserAuthContext;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
+use api_errors::ServerErr;
 use api_wire_types::hosted::neuro_id::NeuroIdentityIdResponse;
 use newtypes::NeuroIdentityId;
 use newtypes::UserAuthScope;
@@ -17,7 +17,7 @@ use paperclip::actix::{
 pub async fn get(user_auth: UserAuthContext) -> ApiResponse<NeuroIdentityIdResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
-    let wf_id = (user_auth.wf_id.clone()).ok_or(AssertionError("auth missing wf_id"))?;
+    let wf_id = (user_auth.wf_id.clone()).ok_or(ServerErr("auth missing wf_id"))?;
 
     let id = NeuroIdentityId::from(wf_id);
 

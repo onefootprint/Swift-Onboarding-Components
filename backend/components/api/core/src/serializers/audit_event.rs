@@ -1,7 +1,8 @@
-use crate::errors::AssertionError;
 use crate::utils::db2api::DbToApi;
 use crate::utils::db2api::TryDbToApi;
 use crate::FpResult;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use api_wire_types::Actor;
 use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventDetail;
@@ -34,7 +35,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
         } = event;
 
         if audit_event.name != AuditEventName::from(&audit_event.metadata) {
-            return Err(AssertionError("audit event name does not match metadata kind").into());
+            return ServerErrInto("audit event name does not match metadata kind");
         }
 
         let tenant_role2 = tenant_role.clone();
@@ -42,19 +43,19 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
         let detail: AuditEventDetail = match audit_event.metadata {
             AuditEventMetadata::CreateUser { fields } => AuditEventDetail::CreateUser {
                 fp_id: scoped_vault
-                    .ok_or(AssertionError("scoped vault is not available for this event"))?
+                    .ok_or(ServerErr("scoped vault is not available for this event"))?
                     .fp_id,
                 created_fields: fields,
             },
             AuditEventMetadata::UpdateUserData { fields } => AuditEventDetail::UpdateUserData {
                 fp_id: scoped_vault
-                    .ok_or(AssertionError("scoped vault is not available for this event"))?
+                    .ok_or(ServerErr("scoped vault is not available for this event"))?
                     .fp_id,
                 updated_fields: fields,
             },
             AuditEventMetadata::DeleteUserData { fields } => AuditEventDetail::DeleteUserData {
                 fp_id: scoped_vault
-                    .ok_or(AssertionError("scoped vault is not available for this event"))?
+                    .ok_or(ServerErr("scoped vault is not available for this event"))?
                     .fp_id,
                 deleted_fields: fields,
             },
@@ -64,7 +65,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                 fields,
             } => AuditEventDetail::DecryptUserData {
                 fp_id: scoped_vault
-                    .ok_or(AssertionError("scoped vault is not available for this event"))?
+                    .ok_or(ServerErr("scoped vault is not available for this event"))?
                     .fp_id,
                 reason,
                 context,
@@ -72,7 +73,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             },
             AuditEventMetadata::DeleteUser => AuditEventDetail::DeleteUser {
                 fp_id: scoped_vault
-                    .ok_or(AssertionError("scoped vault is not available for this event"))?
+                    .ok_or(ServerErr("scoped vault is not available for this event"))?
                     .fp_id,
             },
             AuditEventMetadata::CreateUserAnnotation => AuditEventDetail::CreateUserAnnotation,
@@ -86,8 +87,8 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::DecryptOrgApiKey => AuditEventDetail::DecryptOrgApiKey,
             AuditEventMetadata::UpdateOrgApiKey => AuditEventDetail::UpdateOrgApiKey,
             AuditEventMetadata::InviteOrgMember => {
-                let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
-                let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
+                let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
                 AuditEventDetail::InviteOrgMember {
                     email: tu.email,
                     tenant_name: tenant.name,
@@ -100,11 +101,11 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             }
             AuditEventMetadata::UpdateOrgMember { old_tenant_role_id } => {
                 let new_tr =
-                    tenant_role.ok_or(AssertionError("new tenant role is not available for this event"))?;
+                    tenant_role.ok_or(ServerErr("new tenant role is not available for this event"))?;
                 let old_tr = (secondary_data.tenant_roles)
                     .get(&old_tenant_role_id)
-                    .ok_or(AssertionError("old tenant role is not available for this event"))?;
-                let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
+                    .ok_or(ServerErr("old tenant role is not available for this event"))?;
+                let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
                 AuditEventDetail::UpdateOrgMember {
                     first_name: tu.first_name,
                     last_name: tu.last_name,
@@ -118,7 +119,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::CreateOrg => AuditEventDetail::CreateOrg,
             AuditEventMetadata::UpdateOrgSettings => AuditEventDetail::UpdateOrgSettings,
             AuditEventMetadata::CreateOrgRole { scopes } => {
-                let tr = tenant_role2.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let tr = tenant_role2.ok_or(ServerErr("tenant role is not available for this event"))?;
                 AuditEventDetail::CreateOrgRole {
                     role_name: tr.name,
                     scopes,
@@ -126,7 +127,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                 }
             }
             AuditEventMetadata::DeactivateOrgRole => {
-                let tr = tenant_role.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 AuditEventDetail::DeactivateOrgRole {
                     tenant_role_id: tr.id,
                     scopes: tr.scopes,
@@ -137,7 +138,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                 prev_scopes,
                 new_scopes,
             } => {
-                let tr = tenant_role2.ok_or(AssertionError("tenant role is not available for this event"))?;
+                let tr = tenant_role2.ok_or(ServerErr("tenant role is not available for this event"))?;
                 AuditEventDetail::UpdateOrgRole {
                     prev_scopes,
                     new_scopes,
@@ -146,21 +147,15 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                 }
             }
             AuditEventMetadata::CreateListEntry => AuditEventDetail::CreateListEntry {
-                list_id: list
-                    .ok_or(AssertionError("list is not available for this event"))?
-                    .id,
+                list_id: list.ok_or(ServerErr("list is not available for this event"))?.id,
                 list_entry_creation_id: list_entry_creation
-                    .ok_or(AssertionError(
-                        "list_entry_creation is not available for this event",
-                    ))?
+                    .ok_or(ServerErr("list_entry_creation is not available for this event"))?
                     .id,
             },
             AuditEventMetadata::DeleteListEntry => AuditEventDetail::DeleteListEntry {
-                list_id: list
-                    .ok_or(AssertionError("list is not available for this event"))?
-                    .id,
+                list_id: list.ok_or(ServerErr("list is not available for this event"))?.id,
                 list_entry_id: list_entry
-                    .ok_or(AssertionError("list_entry is not available for this event"))?
+                    .ok_or(ServerErr("list_entry is not available for this event"))?
                     .id,
             },
             AuditEventMetadata::CreatePlaybook => AuditEventDetail::CreatePlaybook,
@@ -168,8 +163,8 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
             AuditEventMetadata::OrgMemberJoined => {
-                let tr = tenant_role2.ok_or(AssertionError("tenant role is not available for this event"))?;
-                let tu = tenant_user.ok_or(AssertionError("tenant user is not available for this event"))?;
+                let tr = tenant_role2.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
                 AuditEventDetail::OrgMemberJoined {
                     tenant_role: api_wire_types::OrganizationRole::from_db(tr),
                     first_name: tu.first_name,

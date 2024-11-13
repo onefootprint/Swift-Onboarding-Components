@@ -6,8 +6,9 @@ use api_core::types::ApiResponse;
 use api_core::utils::headers::get_header;
 use api_core::FpResult;
 use api_core::State;
-use api_errors::AssertionError;
-use api_errors::ValidationError;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use db::models::twilio_message_log::TwilioMessageLog;
 use itertools::Itertools;
 use paperclip::actix::api_v2_operation;
@@ -77,7 +78,7 @@ impl FromRequest for VerifiedTwilioWebhook {
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
         let signature: FpResult<_> = get_header("X-Twilio-Signature", req.headers())
-            .ok_or(ValidationError("Missing X-Twilio-Signature header").into());
+            .ok_or(BadRequest("Missing X-Twilio-Signature header"));
 
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap();
@@ -93,13 +94,13 @@ impl FromRequest for VerifiedTwilioWebhook {
         let uri = state
             .config
             .twilio_status_callback_url()
-            .ok_or(AssertionError("No twilio callback URL configured"));
+            .ok_or(ServerErr("No twilio callback URL configured"));
 
         Box::pin(async move {
             let signature = signature?;
             let params = form
                 .await
-                .map_err(|_| ValidationError("Invalid twilio callback request body"))?
+                .map_err(|_| BadRequest("Invalid twilio callback request body"))?
                 .into_inner();
 
             let message = verify_twilio_webhook(uri?, signature, params.other, clients)?;
@@ -137,5 +138,5 @@ fn verify_twilio_webhook(
         }
     }
 
-    Err(ValidationError("Invalid Twilio signature").into())
+    BadRequestInto("Invalid Twilio signature")
 }

@@ -4,11 +4,11 @@ use super::SavedData;
 use super::ValidatedDataRequest;
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::AssertionError;
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErr;
 use chrono::Utc;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::contact_info::ContactInfo;
@@ -237,10 +237,7 @@ impl WriteableVw<Person> {
         };
 
         let docs = self.put_documents_unsafe(conn, sv_txn, vec![new_doc], actor, make_timeline_event)?;
-        let doc = docs
-            .into_iter()
-            .next()
-            .ok_or(AssertionError("No document inserted"))?;
+        let doc = docs.into_iter().next().ok_or(ServerErr("No document inserted"))?;
 
         Ok(doc)
     }

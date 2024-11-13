@@ -5,8 +5,8 @@ use crate::decision::{
 };
 use crate::task::ExecuteTask;
 use crate::State;
-use api_errors::AssertionError;
 use api_errors::FpResult;
+use api_errors::ServerErrInto;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
 use db::models::workflow::Workflow;
@@ -37,10 +37,10 @@ impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
         let run = decision::state::run_incode_machine_and_workflow(&state, ww, deadline).await?;
         match run {
             RunIncodeMachineAndWorkflowResult::IncodeStuck => {
-                return AssertionError("IncodeStuck").into();
+                return ServerErrInto("IncodeStuck");
             }
             RunIncodeMachineAndWorkflowResult::WorkflowTimedOut => {
-                return AssertionError("WorkflowTimedOut").into();
+                return ServerErrInto("WorkflowTimedOut");
             }
             RunIncodeMachineAndWorkflowResult::WorkflowRan => Ok(()),
         }

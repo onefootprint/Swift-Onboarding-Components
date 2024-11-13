@@ -22,9 +22,9 @@ use super::session::AuthSessionData;
 use super::AuthError;
 use super::Either;
 use super::IsGuardMet;
-use crate::errors::ValidationError;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequestInto;
 use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
@@ -176,7 +176,7 @@ impl AuthActor {
     pub fn tenant_user_id(&self) -> FpResult<&TenantUserId> {
         match self {
             AuthActor::TenantUser(tu_id) | AuthActor::FirmEmployee(tu_id) => Ok(tu_id),
-            _ => ValidationError("Non-user principal").into(),
+            _ => BadRequestInto("Non-user principal"),
         }
     }
 }

@@ -8,10 +8,11 @@ use crate::auth::user::UserSessionContext;
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
 use crate::FpResult;
-use api_errors::AssertionError;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_errors::BadRequestWithCode;
 use api_errors::FpErrorCode;
-use api_errors::ValidationError;
+use api_errors::ServerErrInto;
 use db::errors::FpOptionalExtension;
 use db::models::business_owner::BoIdentifier;
 use db::models::business_owner::BusinessOwner;
@@ -222,14 +223,13 @@ fn get_or_create_business(
         // A scoped business has been attached to this session already. This happens in secondary beneficial
         // owner tokens or in user-specific sessions with an `fp_bid`
         if sv_action.is_inherit_id() {
-            return ValidationError("Cannot provide business ID when a scoped business is already attached")
-                .into();
+            return BadRequestInto("Cannot provide business ID when a scoped business is already attached");
         }
         return Ok((sb_id, false));
     }
 
     if user_auth.is_secondary_bo() {
-        return AssertionError("Secondary BO should already have associated business").into();
+        return ServerErrInto("Secondary BO should already have associated business");
     }
 
     if let ScopedVaultAction::InheritId(bo_id) = &sv_action {
@@ -239,7 +239,7 @@ fn get_or_create_business(
             uv_id: &user_auth.user.id,
             t_id: &obc.tenant_id,
         };
-        let sb = ScopedVault::get(conn, id).optional()?.ok_or(ValidationError(
+        let sb = ScopedVault::get(conn, id).optional()?.ok_or(BadRequest(
             "Could not find the requested business owned by the user.",
         ))?;
         return Ok((sb.id, false));
@@ -329,7 +329,7 @@ pub fn get_or_create_business_wf<'a>(
     };
 
     if obc.kind != ObConfigurationKind::Kyb {
-        return ValidationError("Cannot onboard a business to a non-KYB playbook").into();
+        return BadRequestInto("Cannot onboard a business to a non-KYB playbook");
     }
 
     Vault::lock(conn, &su.vault_id)?;
@@ -410,7 +410,7 @@ pub fn create_biz_wfl_if_not_exists(
     let sb = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
     let su = ScopedVault::get(conn, &user_wf.scoped_vault_id)?;
     if sb.kind != VaultKind::Business || su.kind != VaultKind::Person {
-        return AssertionError("Invalid scoped vaults for business workflow link").into();
+        return ServerErrInto("Invalid scoped vaults for business workflow link");
     }
 
     let bo_id = BoIdentifier::Vaults {

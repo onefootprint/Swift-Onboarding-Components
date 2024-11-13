@@ -1,11 +1,11 @@
 use crate::auth::user::UserAuthContext;
 use crate::State;
 use api_core::auth::Any;
-use api_core::errors::ValidationError;
 use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiResponse;
 use api_core::FpResult;
+use api_errors::BadRequest;
 use api_wire_types::hosted::onboarding_status::ApiOnboardingRequirement;
 use api_wire_types::hosted::onboarding_status::AuthRequirementsResponse;
 use itertools::Itertools;
@@ -25,8 +25,8 @@ pub async fn get(
     user_auth: UserAuthContext,
 ) -> ApiResponse<AuthRequirementsResponse> {
     let user_auth = user_auth.check_guard(api_core::auth::Any)?;
-    let obc = (user_auth.obc.clone()).ok_or(ValidationError("No playbook associated with this session"))?;
-    let sv_id = (user_auth.su_id.clone()).ok_or(ValidationError("No scoped user associated with session"))?;
+    let obc = (user_auth.obc.clone()).ok_or(BadRequest("No playbook associated with this session"))?;
+    let sv_id = (user_auth.su_id.clone()).ok_or(BadRequest("No scoped user associated with session"))?;
 
     let requirements = state
         .db_query(move |conn| -> FpResult<_> {

@@ -15,7 +15,6 @@ use api_core::decision::state::WorkflowActions;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::decision::vendor::incode::states::Fail;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::onboarding::get_or_create_user_workflow;
@@ -31,6 +30,8 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use api_wire_types::CreateDocumentResponse;
 use api_wire_types::DocumentResponse;
 use chrono::Utc;
@@ -102,19 +103,14 @@ pub async fn rerun_machine(
     let force_failure = force_failure.unwrap_or(false);
     if force_failure {
         if !i_know_what_im_doing_to_force_a_failure.unwrap_or_default() {
-            return Err(AssertionError(
-                "Please acknowledge that you know what you are doing to force a failure",
-            )
-            .into());
+            return ServerErrInto("Please acknowledge that you know what you are doing to force a failure");
         }
         let res = handle_forcing_failure(&state, id).await?;
         return Ok(res);
     }
 
     if !i_acknowledge_that_i_re_enabled_my_upload.unwrap_or_default() {
-        return Err(
-            AssertionError("Please acknowledge that you re-enabled the relevant DocumentUpload").into(),
-        );
+        return ServerErrInto("Please acknowledge that you re-enabled the relevant DocumentUpload");
     }
 
     let force_no_selfie = force_no_selfie.unwrap_or_default();
@@ -122,7 +118,7 @@ pub async fn rerun_machine(
     let (id_doc, dr, su, di, uvw, obc) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
-                IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
+                IncodeVerificationSession::get(conn, &id)?.ok_or(ServerErr("No session found"))?;
             let (id_doc, dr) = Document::get(conn, &old_session.identity_document_id)?;
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
             let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
@@ -186,7 +182,7 @@ async fn handle_forcing_failure(
     state
         .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
-                IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
+                IncodeVerificationSession::get(conn, &id)?.ok_or(ServerErr("No session found"))?;
             let (_, dr) = Document::get(conn, &old_session.identity_document_id)?;
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
             let (vres_id, vendor_api) = VerificationRequest::list_for_user_temp(conn, &su.id)?
@@ -197,7 +193,7 @@ async fn handle_forcing_failure(
             .first()
             .cloned()
             // TODO: if there's an issue with StartOnboarding and we fail, then this will error, fix in upstack
-            .ok_or(AssertionError(
+            .ok_or(ServerErr(
                 "cannot find incode vres for doc upload failed FRC",
             ))?;
 
@@ -262,7 +258,7 @@ pub async fn adhoc_create_document_and_workflow(
                 .map_err(|_| DbError::PlaybookNotFound)?;
 
             if obc.kind != ObConfigurationKind::Document && !obc.is_doc_first {
-                return Err(AssertionError("Must use playbook of kind Document or Document-First").into());
+                return ServerErrInto("Must use playbook of kind Document or Document-First");
             }
 
             let common_args = CommonWfArgs {
@@ -285,7 +281,7 @@ pub async fn adhoc_create_document_and_workflow(
             let (wf, _) = get_or_create_user_workflow(conn, common_args, args)?;
             let document_request =
                 DocumentRequest::get(conn, &wf.id, DocumentRequestIdentifier::Kind(doc_kind))?
-                    .ok_or(AssertionError("No document request found"))?;
+                    .ok_or(ServerErr("No document request found"))?;
 
             Ok((uvw, document_request, wf.id))
         })
@@ -293,7 +289,7 @@ pub async fn adhoc_create_document_and_workflow(
 
     // check NPV
     if !vw.vault.is_created_via_api {
-        return Err(AssertionError("Cannot run for a portable vault").into());
+        return ServerErrInto("Cannot run for a portable vault");
     }
 
     // check we've vaulted the fields, could probably ignore this in the req maybe
@@ -301,7 +297,7 @@ pub async fn adhoc_create_document_and_workflow(
         let ocr_comparison_fields =
             IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
         if ocr_comparison_fields == IncodeOcrComparisonDataFields::default() {
-            return Err(AssertionError("id data not vaulted").into());
+            return ServerErrInto("id data not vaulted");
         }
     }
 
@@ -393,7 +389,7 @@ pub async fn adhoc_upload_and_process(
 
     if !response.errors.is_empty() {
         // shouldn't have any errors if we set IsRerun(true)
-        return Err(AssertionError("unexpected errors received while processing side").into());
+        return ServerErrInto("unexpected errors received while processing side");
     }
 
     Ok(api_wire_types::Empty)
@@ -442,7 +438,7 @@ pub async fn adhoc_document_process(
     } else if matches!(ww.state, WorkflowKind::Kyc(KycState::Complete(_))) {
     } else {
         tracing::info!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "adhoc document process workflow in wrong state");
-        return Err(AssertionError("adhoc document process workflow in wrong state").into());
+        return ServerErrInto("adhoc document process workflow in wrong state");
     }
     // log unmet reqs for debugging
     let decrypted_values = UserDecryptResultForReqs::get_decrypted_values(&state, &uvw).await?;

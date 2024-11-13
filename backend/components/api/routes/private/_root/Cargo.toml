@@ -9,6 +9,7 @@ doctest = false
 
 [dependencies]
 api_core = { path = "../../../core" }
+api_errors = { path = "../../../errors" }
 crypto = { path = "../../../../enclave/crypto" }
 newtypes = { path = "../../../../newtypes" }
 selfie_doc = { path = "../../../../selfie_doc" }
@@ -17,7 +18,6 @@ api_wire_types = { path = "../../../wire_types" }
 feature_flag = { path = "../../../../feature_flag" }
 billing = { path = "../../../../billing" }
 macros = { path = "../../../../macros" }
-api_errors = { path = "../../../errors" }
 vault_dr = { path = "../../../../vault_dr" }
 
 actix-web = { workspace = true }

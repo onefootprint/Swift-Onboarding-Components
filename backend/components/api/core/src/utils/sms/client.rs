@@ -1,12 +1,13 @@
 use super::super::challenge_rate_limit::RateLimit;
 use super::vendors::SmsVendorKind;
 use crate::errors::user::UserError;
-use crate::errors::AssertionError;
 use crate::utils::sms::vendors::SmsSendStatus;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequestInto;
 use api_errors::FpError;
-use api_errors::ValidationError;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
@@ -55,7 +56,7 @@ impl SmsClient {
     ) -> FpResult<Self> {
         let twilio_client = twilio
             .make_client()
-            .ok_or(AssertionError("Unable to make twilio client"))?;
+            .ok_or(ServerErr("Unable to make twilio client"))?;
         let twilio_client_backup = twilio_backup.make_client();
         // TODO stop hardcoding this
         // TODO also change the sending number based on environment
@@ -118,13 +119,13 @@ impl SmsClient {
         .await?;
         if destination.is_high_fraud_risk_country() {
             let Some(t_id) = t_id else {
-                return ValidationError("Cannot send SMS to high-risk country").into();
+                return BadRequestInto("Cannot send SMS to high-risk country");
             };
             if !state
                 .ff_client
                 .flag(BoolFlag::CanSendSmsToHighFraudCountries(t_id))
             {
-                return ValidationError("Organization cannot send SMS to high-risk country").into();
+                return BadRequestInto("Organization cannot send SMS to high-risk country");
             }
         }
         Ok(true)
@@ -229,7 +230,7 @@ impl SmsClient {
             })
             .collect_vec();
         if vendors.is_empty() {
-            return AssertionError("No OTP vendors available").into();
+            return ServerErrInto("No OTP vendors available");
         }
 
         let mut err = None;

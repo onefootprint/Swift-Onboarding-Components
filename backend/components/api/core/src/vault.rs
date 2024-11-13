@@ -2,7 +2,6 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
-use crate::errors::ValidationError;
 use crate::telemetry::RootSpan;
 use crate::types::ApiResponse;
 use crate::types::WithVaultVersionHeader;
@@ -19,6 +18,7 @@ use crate::utils::vault_wrapper::PatchDataResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequest;
 use api_errors::BadRequestInto;
 use api_errors::FpError;
 use api_wire_types::UpdateEntityRequest;
@@ -191,7 +191,7 @@ pub async fn patch_vault(
             };
             let sv = ScopedVault::update(conn, &sv.id, update).map_err(|e| -> FpError {
                 if matches!(e, DbError::UniqueConstraintViolation(_)) {
-                    ValidationError("User or business with this external ID already exists").into()
+                    BadRequest("User or business with this external ID already exists")
                 } else {
                     e.into()
                 }

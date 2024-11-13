@@ -16,7 +16,6 @@ use crate::decision::vendor::vendor_api::loaders;
 use crate::decision::vendor::verification_result::save_vreq_and_vres;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::VendorAPIError;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
@@ -25,6 +24,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 use crate::ApiCoreError;
 use crate::FpResult;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -156,7 +156,7 @@ impl IncodeStateTransition for FetchScores {
                 ValidatedIdDocKind(
                     ctx.docv_data
                         .document_type
-                        .ok_or(AssertionError("Docv data has no document_type"))?,
+                        .ok_or(ServerErr("Docv data has no document_type"))?,
                 )
             }
         };

@@ -7,7 +7,6 @@ use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::TfError;
-use api_core::errors::ValidationError;
 use api_core::task;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
@@ -19,6 +18,8 @@ use api_core::utils::requirements::UserDecryptResultForReqs;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKybRequest;
 use db::models::data_lifetime::DataLifetime;
@@ -72,7 +73,7 @@ pub async fn post(
     };
     let key = key
         .or(onboarding_config_key)
-        .ok_or(ValidationError("Missing required field key"))?;
+        .ok_or(BadRequest("Missing required field key"))?;
 
     if fixture_result.is_some() && is_live {
         return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
@@ -114,10 +115,10 @@ pub async fn post(
                 .map_err(|_| DbError::PlaybookNotFound)?;
             tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
             if obc.kind != ObConfigurationKind::Kyb {
-                return ValidationError("Must use playbook of kind KYB").into();
+                return BadRequestInto("Must use playbook of kind KYB");
             }
             if !obc.verification_checks().skip_kyc() {
-                return ValidationError("Cannot manually trigger KYB on a playbook that requires KYC").into();
+                return BadRequestInto("Cannot manually trigger KYB on a playbook that requires KYC");
             }
 
             let unaccessable_cdos: Vec<_> = obc

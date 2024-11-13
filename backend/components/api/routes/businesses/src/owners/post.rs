@@ -1,7 +1,6 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Business;
@@ -10,6 +9,7 @@ use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::NewBusinessOwnerRequest;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
@@ -45,7 +45,7 @@ pub async fn post(
 
     let ownership_stake_u32: u32 = match ownership_stake.try_into() {
         Ok(stake) if (0..=100).contains(&stake) => FpResult::Ok(stake),
-        _ => ValidationError("ownership_stake must be between 0 and 100").into(),
+        _ => BadRequestInto("ownership_stake must be between 0 and 100"),
     }?;
 
     state
@@ -53,28 +53,26 @@ pub async fn post(
             let sb = ScopedVault::lock(conn, (&fp_bid, &tenant_id, is_live))?;
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id)?;
             if sb.kind != VaultKind::Business {
-                return ValidationError("Provided fp_bid does not correspond to a business").into();
+                return BadRequestInto("Provided fp_bid does not correspond to a business");
             }
 
             let bv = Vault::get(conn, &sb.vault_id)?;
             if !bv.is_created_via_api {
-                return ValidationError(
+                return BadRequestInto(
                     "Provided business was created by onboarding onto a playbook. Business owners are managed automatically by the playbook, so they cannot be mutated.",
-                )
-                .into();
+                );
             }
 
             let owner_su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             if owner_su.kind != VaultKind::Person {
-                return ValidationError("Provided fp_id does not correspond to a person").into();
+                return BadRequestInto("Provided fp_id does not correspond to a person");
             }
 
             let result = BusinessOwner::create_tenant_api(conn, sb, owner_su.vault_id);
             let bo = match result {
                 Ok(bo) => bo,
                 Err(DbError::UniqueConstraintViolation(_)) => {
-                    return ValidationError("The provided user is already an owner of the provided business")
-                        .into()
+                    return BadRequestInto("The provided user is already an owner of the provided business");
                 }
                 Err(e) => return Err(e.into()),
             };

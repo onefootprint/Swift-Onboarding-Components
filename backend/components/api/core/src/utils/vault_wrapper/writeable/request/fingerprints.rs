@@ -1,7 +1,7 @@
-use crate::errors::AssertionError;
-use crate::errors::ValidationError;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
+use api_errors::BadRequestInto;
+use api_errors::ServerErrInto;
 use db::models::fingerprint::Fingerprint as DbFingerprint;
 use db::models::fingerprint::FingerprintDataValue;
 use db::models::fingerprint::NewFingerprintArgs;
@@ -54,10 +54,9 @@ impl Fingerprints {
             let new_dl_id = vw.get_lifetime(&salt.di()).map(|dl| &dl.id);
             if new_dl_id != Some(dl_id) {
                 tracing::error!(di=%salt.di(), old_dl_id=%dl_id, ?new_dl_id, "Aborted data update due to stale transient fingerprint");
-                return ValidationError(
+                return BadRequestInto(
                     "Operation aborted due to a concurrent update on this user. Please retry this request",
-                )
-                .into();
+                );
             }
         }
 
@@ -146,8 +145,7 @@ impl ValidatedFingerprints {
                     cfp.salts().into_iter().flat_map(|salt| salt_to_dl_id.get(&salt));
                 let lifetime_ids = chain(new_vd_lifetime_ids, existing_vd_lifetime_ids).collect_vec();
                 if lifetime_ids.len() != cfp.salts().len() {
-                    return AssertionError("Need exactly one lifetime ID for each transient fingerprint")
-                        .into();
+                    return ServerErrInto("Need exactly one lifetime ID for each transient fingerprint");
                 }
                 let cfpk = CompositeFingerprintKind::from(&cfp);
                 let d = FingerprintData {

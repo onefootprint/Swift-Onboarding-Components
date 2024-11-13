@@ -7,10 +7,10 @@ use api_core::auth::user::UserSessionContext;
 use api_core::auth::SessionContext;
 use api_core::decision;
 use api_core::decision::vendor;
-use api_core::errors::AssertionError;
 use api_core::utils::headers::TelemetryHeaders;
 use api_core::FpError;
 use api_core::FpResult;
+use api_errors::ServerErr;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -81,7 +81,7 @@ async fn post_inner(
     };
 
     let uv_id = user_auth.user.id.clone();
-    let su_id = (user_auth.su_id.clone()).ok_or(AssertionError("auth missing scoped_user_id"))?;
+    let su_id = (user_auth.su_id.clone()).ok_or(ServerErr("auth missing scoped_user_id"))?;
     let wf_id = user_auth.wf_id.clone();
 
     // We want to only show a signal set of device signals from Stytch OR Neuro or else it's confusing

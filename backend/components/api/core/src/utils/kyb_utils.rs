@@ -10,11 +10,11 @@ use crate::decision::state::DocCollected;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
 use crate::errors::business::BusinessError;
-use crate::errors::ValidationError;
 use crate::utils::email::BoInviteEmailInfo;
 use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
@@ -101,7 +101,7 @@ pub async fn send_missing_secondary_bo_links(
         .ok_or(BusinessError::PrimaryBoNotFound)?;
     let primary_bo = primary_bo.clone();
 
-    let (first_name, last_name) = primary_bo.name().ok_or(ValidationError("No name"))?;
+    let (first_name, last_name) = primary_bo.name().ok_or(BadRequest("No name"))?;
     let inviter = PiiString::new(format!("{} {}", first_name.leak(), last_name.leak()));
     let business_name = bvw
         .get_p_data(&BDK::Name.into())
@@ -117,9 +117,9 @@ pub async fn send_missing_secondary_bo_links(
                 tenant_name: tenant.name.clone(),
                 url: url.clone(),
             };
-            let phone_number = bo_data.phone_number().ok_or(ValidationError("BO has no phone"))?;
+            let phone_number = bo_data.phone_number().ok_or(BadRequest("BO has no phone"))?;
             let phone_number = PhoneNumber::parse(phone_number.clone())?;
-            let email = bo_data.email().ok_or(ValidationError("BO has no email"))?;
+            let email = bo_data.email().ok_or(BadRequest("BO has no email"))?;
             let sms = (sms_message, phone_number);
             let email = BoInviteEmailInfo {
                 to_email: email.clone(),

@@ -2,7 +2,6 @@ use crate::audit_events::AuditEventCursor;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::AssertionError;
 use api_core::types::Base64Cursor;
 use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginatedResponseInner;
@@ -11,6 +10,8 @@ use api_core::utils::db2api::DbToApi;
 use api_core::FpError;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use api_wire_types::ListEvent;
 use api_wire_types::ListEventDetail;
 use crypto::aead::AeadSealedBytes;
@@ -150,19 +151,17 @@ async fn saturate_events(
                         .as_ref()
                         .and_then(|lec| decrypted_list_entry_creations.get(&lec.id))
                         .cloned()
-                        .ok_or(AssertionError("list entries not found for CreateListEntry event"))?;
+                        .ok_or(ServerErr("list entries not found for CreateListEntry event"))?;
                     Ok(ListEventDetail::CreateListEntry {
                         list_id: le
                             .list
                             .clone()
-                            .ok_or(AssertionError("list is not available for this event"))?
+                            .ok_or(ServerErr("list is not available for this event"))?
                             .id,
                         list_entry_creation_id: le
                             .list_entry_creation
                             .clone()
-                            .ok_or(AssertionError(
-                                "list_entry_creation is not available for this event",
-                            ))?
+                            .ok_or(ServerErr("list_entry_creation is not available for this event"))?
                             .id,
                         entries,
                     })
@@ -173,22 +172,22 @@ async fn saturate_events(
                         .as_ref()
                         .and_then(|le| decrypted_list_entries.get(&le.id))
                         .cloned()
-                        .ok_or(AssertionError("list entries not available for this event"))?;
+                        .ok_or(ServerErr("list entries not available for this event"))?;
                     Ok(ListEventDetail::DeleteListEntry {
                         list_id: le
                             .list
                             .clone()
-                            .ok_or(AssertionError("list is not available for this event"))?
+                            .ok_or(ServerErr("list is not available for this event"))?
                             .id,
                         list_entry_id: le
                             .list_entry
                             .clone()
-                            .ok_or(AssertionError("entry not found for DeleteListEntry event"))?
+                            .ok_or(ServerErr("entry not found for DeleteListEntry event"))?
                             .id,
                         entry,
                     })
                 }
-                _ => Err(AssertionError("event is not a List event").into()),
+                _ => ServerErrInto("event is not a List event"),
             };
             detail.map(|d| (le, d))
         })

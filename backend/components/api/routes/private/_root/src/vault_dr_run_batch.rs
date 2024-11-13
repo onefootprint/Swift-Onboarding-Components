@@ -5,7 +5,7 @@ use actix_web::web::Json;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
-use api_errors::ValidationError;
+use api_errors::BadRequestInto;
 use db::models::ob_configuration::IsLive;
 use db::models::vault_dr::VaultDrConfig;
 use newtypes::FpId;
@@ -51,7 +51,7 @@ pub async fn post(
     } = request.into_inner();
 
     if !tenant_id.is_integration_test_tenant() {
-        return ValidationError("Unsupported tenant for this API").into();
+        return BadRequestInto("Unsupported tenant for this API");
     }
 
     let config = state

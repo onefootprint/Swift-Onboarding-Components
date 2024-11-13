@@ -3,8 +3,8 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ValidationError;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
 use db::models::compliance_doc_submission::ComplianceDocSubmission;
@@ -42,13 +42,12 @@ pub async fn delete(
 
             let Some(req) = ComplianceDocRequest::get_active(conn, &doc)?.filter(|req| req.id == request_id)
             else {
-                return ValidationError("Can only retract the latest active request").into();
+                return BadRequestInto("Can only retract the latest active request");
             };
 
             // Ensure there are no submissions for this request.
             if ComplianceDocSubmission::get_active(conn, &doc)?.is_some() {
-                return ValidationError("Cannot retract a compliance document request with submissions")
-                    .into();
+                return BadRequestInto("Cannot retract a compliance document request with submissions");
             }
 
             ComplianceDocRequest::deactivate(conn, &req.id, &doc, Some(&deactivated_by_user_id))?;

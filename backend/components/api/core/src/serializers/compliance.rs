@@ -1,7 +1,7 @@
-use crate::errors::AssertionError;
 use crate::utils::db2api::DbToApi;
 use crate::utils::db2api::TryDbToApi;
 use crate::FpResult;
+use api_errors::ServerErr;
 use db::helpers::ActiveDocResources;
 use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
@@ -36,7 +36,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &TenantUserId)> for api_wire_types::Lite
         let user = summary
             .users
             .get(user_id)
-            .ok_or(AssertionError("user not present in ComplianceDocSummary"))?;
+            .ok_or(ServerErr("user not present in ComplianceDocSummary"))?;
         Ok(api_wire_types::LiteOrgMember::from_db(user.clone()))
     }
 }
@@ -47,7 +47,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::C
         let doc = summary
             .docs
             .get(doc_id)
-            .ok_or(AssertionError("doc not present in ComplianceDocSummary"))?;
+            .ok_or(ServerErr("doc not present in ComplianceDocSummary"))?;
         let ActiveDocResources {
             request: req,
             submission: sub,

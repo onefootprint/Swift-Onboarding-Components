@@ -11,8 +11,6 @@ use api_core::auth::tenant::BasicTenantAuthWrapper;
 use api_core::auth::tenant::ClientTenantAuthContext;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -23,6 +21,8 @@ use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use api_wire_types::BusinessDecryptResponse;
 use api_wire_types::DecryptResponse;
 use api_wire_types::ModernEntityDecryptResponse;
@@ -313,7 +313,7 @@ pub(super) async fn post_inner(
 
             let version_args = [vault_version, seqno_version, timestamp_version];
             if version_args.iter().filter(|v| v.is_some()).count() > 1 {
-                return ValidationError("Conflicting version arguments given").into();
+                return BadRequestInto("Conflicting version arguments given");
             }
 
             let version = version_args.into_iter().find(|v| v.is_some()).flatten();
@@ -371,7 +371,7 @@ pub(super) async fn post_inner(
         .clone()
         .into_iter()
         .map(|(v, targets)| -> FpResult<_> {
-            let vw = vws.get(&v).ok_or(AssertionError("No VW found for version"))?;
+            let vw = vws.get(&v).ok_or(ServerErr("No VW found for version"))?;
             Ok((v, BulkDecryptReq { vw, targets }))
         })
         .collect::<FpResult<_>>()?;

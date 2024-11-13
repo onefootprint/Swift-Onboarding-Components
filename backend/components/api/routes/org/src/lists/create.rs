@@ -1,12 +1,12 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::CreateListRequest;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::insight_event::CreateInsightEvent;
@@ -50,7 +50,7 @@ pub async fn create_list(
         .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
-                return Err(ValidationError("List with that name already exists").into());
+                return BadRequestInto("List with that name already exists");
                 // AssertionError? something else?
             }
 

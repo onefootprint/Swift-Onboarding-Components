@@ -1,6 +1,7 @@
 use super::engine::VaultDataForRules;
-use crate::errors::AssertionError;
 use crate::FpResult;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::rule_instance::RuleInstance;
@@ -220,7 +221,7 @@ fn evaluate_condition(
                 let field_string = field_value
                     .clone()
                     .as_string()
-                    .map_err(|_| AssertionError("Only string-typed DIs can be used in vault rules"))?;
+                    .map_err(|_| ServerErr("Only string-typed DIs can be used in vault rules"))?;
                 match vo {
                     VaultOperation::Equals { field: _, op, value } => {
                         let is_equal = crypto::safe_compare(
@@ -233,10 +234,9 @@ fn evaluate_condition(
                         }
                     }
                     VaultOperation::IsIn { field, op, value } => {
-                        let list = lists.get(value).ok_or(AssertionError(&format!(
-                            "Missing List needed for rule evaluation: {}",
-                            value
-                        )))?;
+                        let list = lists
+                            .get(value)
+                            .ok_or(ServerErr!("Missing List needed for rule evaluation: {}", value))?;
                         let is_in_list = vault_data_is_in_list(field, field_string, list)?;
                         match op {
                             IsIn::IsIn => is_in_list,
@@ -251,10 +251,9 @@ fn evaluate_condition(
         }
         RuleExpressionCondition::DeviceInsight(dio) => match dio {
             DeviceInsightOperation::IsIn { field, op, value } => {
-                let list = lists.get(value).ok_or(AssertionError(&format!(
-                    "Missing List needed for rule evaluation: {}",
-                    value
-                )))?;
+                let list = lists
+                    .get(value)
+                    .ok_or(ServerErr!("Missing List needed for rule evaluation: {}", value))?;
                 match op {
                     IsIn::IsIn => insight_field_value_is_in_list(field, insight_events, list)?,
                     IsIn::IsNotIn => !insight_field_value_is_in_list(field, insight_events, list)?,
@@ -265,7 +264,7 @@ fn evaluate_condition(
             field: _,
             op: _,
             value: _,
-        } => return Err(AssertionError("RiskScore rules not supported").into()),
+        } => return ServerErrInto("RiskScore rules not supported"),
     };
     Ok(res)
 }
@@ -288,11 +287,11 @@ fn vault_data_is_in_list(
         | (DataIdentifier::Custom(_), _) => {}
         (field, _) => {
             // This should have been validated when the rule was written.
-            return AssertionError(&format!(
+            return ServerErrInto!(
                 "Cannot check membership of DI {} in list with kind {}",
-                field, list.kind
-            ))
-            .into();
+                field,
+                list.kind
+            );
         }
     };
 
@@ -304,7 +303,7 @@ fn vault_data_is_in_list(
         ListKind::PhoneCountryCode => PhoneNumber::from_str(value.leak())?.country_code(),
         ListKind::IpAddress => {
             // This should have been validated when the rule was written.
-            return Err(AssertionError("IpAddress list not acceptable in VaultData rule").into());
+            return ServerErrInto("IpAddress list not acceptable in VaultData rule");
         }
     };
 
@@ -327,11 +326,11 @@ fn insight_field_value_is_in_list(
     let (list, entries) = list;
 
     if list.kind != ListKind::IpAddress {
-        return AssertionError(&format!(
+        return ServerErrInto!(
             "Cannot check membership of Device Insight field {} in list with kind {}",
-            field, list.kind
-        ))
-        .into();
+            field,
+            list.kind
+        );
     }
 
     for event in insight_events {

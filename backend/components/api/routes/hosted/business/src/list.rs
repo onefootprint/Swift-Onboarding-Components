@@ -1,6 +1,5 @@
 use crate::State;
 use api_core::auth::user::UserAuthContext;
-use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::bulk_decrypt;
@@ -9,6 +8,7 @@ use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::BadRequest;
 use api_wire_types::business::HostedBusiness;
 use db::models::business_owner::BusinessOwner;
 use newtypes::BusinessDataKind as BDK;
@@ -27,7 +27,7 @@ use std::collections::HashMap;
 pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiListResponse<HostedBusiness> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let uv_id = user_auth.user.id.clone();
-    let tenant = (user_auth.tenant.as_ref()).ok_or(ValidationError("Tenant is required"))?;
+    let tenant = (user_auth.tenant.as_ref()).ok_or(BadRequest("Tenant is required"))?;
     let tenant_id = tenant.id.clone();
 
     let (bos, bvws) = state

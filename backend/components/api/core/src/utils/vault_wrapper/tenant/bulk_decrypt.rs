@@ -1,5 +1,4 @@
 use super::TenantVw;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::batch_execute_decrypt_requests;
 use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::Any;
@@ -8,6 +7,8 @@ use crate::utils::vault_wrapper::Pii;
 use crate::utils::vault_wrapper::VwDecryptRequest;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::data_lifetime::DataLifetime;
@@ -99,9 +100,7 @@ where
                 results,
             } = res.map_to_piijsonvalues()?;
             let decrypted_dis = decrypted_dis.into_iter().map(|t| t.identifier).collect_vec();
-            let sv = key_to_sv
-                .get(&key)
-                .ok_or(AssertionError("No ScopedVault for key"))?;
+            let sv = key_to_sv.get(&key).ok_or(ServerErr("No ScopedVault for key"))?;
             let audit_event_dis = (sv.fp_id.clone(), decrypted_dis);
             let decrypted_result = (key, results);
             Ok((audit_event_dis, decrypted_result))
@@ -131,7 +130,7 @@ where
                     .map(|(fp_id, targets)| -> FpResult<_> {
                         let sv = fp_id_to_sv
                             .remove(&fp_id)
-                            .ok_or(AssertionError("No ScopedVault for key"))?;
+                            .ok_or(ServerErr("No ScopedVault for key"))?;
                         // Combine decrypts for one fp_id into a single audit event
                         let targets: Vec<DataIdentifier> = targets.into_iter().flatten().unique().collect();
                         // NOTE: If we add any more fields to the audit event, we might have to lower
@@ -219,7 +218,7 @@ pub async fn bulk_decrypt_dls_unchecked(
     for (dl_id, dl) in dls.iter() {
         let (_, vault) = sv_vault_by_sv_id
             .get(&dl.scoped_vault_id)
-            .ok_or(AssertionError("No vault fetched for DL"))?;
+            .ok_or(ServerErr("No vault fetched for DL"))?;
 
         let vault_data = vault_data_by_dl.get(&dl.id).into_iter().flatten();
         for vd in vault_data {
@@ -263,11 +262,11 @@ pub async fn bulk_decrypt_dls_unchecked(
             };
             pii_by_dl.insert(dl_id, pii);
         } else {
-            return AssertionError("Expected at least one decryption result per DL").into();
+            return ServerErrInto("Expected at least one decryption result per DL");
         }
 
         if decrypt_ops.next().is_some() {
-            return AssertionError("Expected only one decryption result per DL").into();
+            return ServerErrInto("Expected only one decryption result per DL");
         }
     }
 

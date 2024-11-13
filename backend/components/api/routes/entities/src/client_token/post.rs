@@ -8,12 +8,12 @@ use api_core::auth::tenant::ClientTenantScope;
 use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use api_wire_types::CreateClientTokenRequest;
 use api_wire_types::CreateClientTokenResponse;
 use api_wire_types::DEPRECATEDClientTokenScopeKind;
@@ -92,7 +92,7 @@ pub async fn post(
             ModernClientTokenScopeKind::VaultCard => vec![DEPRECATEDClientTokenScopeKind::Vault],
         },
         (None, v) if v.is_empty() => {
-            return ValidationError("Missing required field scope").into();
+            return BadRequestInto("Missing required field scope");
         }
         (None, v) => v,
     };
@@ -116,7 +116,7 @@ pub async fn post(
     let auth = auth.check_guard(api_core::auth::Any)?;
     let tenant_api_key_id = match auth.actor() {
         AuthActor::TenantApiKey(id) => id,
-        _ => return Err(AssertionError("Non-api key actor in client_token").into()),
+        _ => return Err(ServerErr("Non-api key actor in client_token").into()),
     };
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

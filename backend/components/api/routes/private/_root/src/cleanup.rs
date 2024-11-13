@@ -3,7 +3,6 @@ use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::Either;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::vault_wrapper::Any;
@@ -11,6 +10,7 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErrInto;
 use api_wire_types::IdentifyId;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
@@ -57,7 +57,7 @@ async fn post(
         Request::Email(email) => {
             // only allow footprint emails to be cleanable
             if !["onefootprint.com", "footprint.dev"].contains(&email.domain().as_str()) {
-                return Err(AssertionError("Cannot clean up provided email").into());
+                return ServerErrInto("Cannot clean up provided email");
             }
             let id = IdentifyId::Email(email);
             let existing = state.find_vault(vec![id], sandbox_id.0, None).await?;
@@ -136,7 +136,7 @@ fn ensure_phone_number_allowed(state: &State, phone_number: &PhoneNumber) -> FpR
         .flag(BoolFlag::CanCleanUpPhoneNumber(&phone_number.e164()));
 
     if !can_clean_up_number {
-        return Err(AssertionError("Cannot clean up provided number").into());
+        return ServerErrInto("Cannot clean up provided number");
     }
 
     Ok(can_clean_up_number)

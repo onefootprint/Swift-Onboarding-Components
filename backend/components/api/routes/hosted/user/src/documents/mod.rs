@@ -1,10 +1,10 @@
 use api_core::auth::user::check_workflow_guard;
 use api_core::auth::user::UserWfSession;
 use api_core::auth::SessionContext;
-use api_core::errors::ValidationError;
 use api_core::web;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequest;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::UncheckedDrIdentifier;
 use newtypes::ScopedVaultId;
@@ -53,7 +53,7 @@ async fn get_user_or_business_for_dr<T: Into<UncheckedDrIdentifier>>(
 
                     Ok((sb_id, biz_wf.id))
                 }
-                None => Err(ValidationError(
+                None => Err(BadRequest(
                     "Trying to upload a business document with no active business onboarding",
                 )),
             }?

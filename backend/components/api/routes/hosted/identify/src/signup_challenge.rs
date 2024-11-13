@@ -6,7 +6,6 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::IsComponentsSdk;
@@ -17,6 +16,7 @@ use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
 use api_wire_types::IdentifyChallengeResponse;
 use api_wire_types::IdentifyId;
 use api_wire_types::SignupChallengeData;
@@ -157,7 +157,7 @@ async fn make_vault_context(
     is_components_sdk: bool,
 ) -> FpResult<VaultContext> {
     if ob_pk_auth.ob_config().is_live != sandbox_id.is_none() {
-        return ValidationError("Sandbox ID must be provided if and only if using a sandbox playbook").into();
+        return BadRequestInto("Sandbox ID must be provided if and only if using a sandbox playbook");
     }
 
     let sources = chain(

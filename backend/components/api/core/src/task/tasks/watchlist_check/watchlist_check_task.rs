@@ -1,7 +1,6 @@
 use super::idology;
 use super::incode;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::errors::AssertionError;
 use crate::task::ExecuteTask;
 use crate::task::{
     self,
@@ -10,8 +9,9 @@ use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
-use api_errors::FpError;
 use api_errors::FpResult;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use async_trait::async_trait;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -123,9 +123,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         if !matches!(wc.status, WatchlistCheckStatusKind::Pending) {
             return Ok(());
         }
-        let di_id = wc.decision_intent_id.ok_or(FpError::from(AssertionError(
+        let di_id = wc.decision_intent_id.ok_or(ServerErr(
             "Expected watchlist_check.decision_intent_id to be non-null",
-        )))?;
+        ))?;
 
         let watchlist_result = match (&obc, obc.as_ref().map(|o| o.verification_checks().enhanced_aml())) {
             // Idology
@@ -167,7 +167,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             ) => {
                 // logic that enqeues this Task should prevent this, but extra precaution
                 if !continuous_monitoring {
-                    return AssertionError(format!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id).as_str()).into();
+                    return ServerErrInto!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id);
                 }
                 if IncodeWatchlistCheck.requirements_are_satisfied(uvw.populated().as_slice()) {
                     let reason_codes =

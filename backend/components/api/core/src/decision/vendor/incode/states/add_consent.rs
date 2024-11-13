@@ -6,9 +6,9 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
+use api_errors::ServerErr;
 use async_trait::async_trait;
 use db::models::document::Document;
 use db::models::document::DocumentUpdate;
@@ -54,7 +54,7 @@ impl IncodeStateTransition for AddConsent {
         let consent = db_pool
             .db_query(move |conn| UserConsent::get_for_workflow(conn, &wf_id))
             .await?
-            .ok_or(AssertionError("User consent not found"))?;
+            .ok_or(ServerErr("User consent not found"))?;
         let privacy_request = IncodeAddPrivacyConsentRequest {
             credentials: session.credentials.clone(),
             title: "Service Consent".into(),

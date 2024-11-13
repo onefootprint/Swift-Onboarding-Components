@@ -5,12 +5,12 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::CanDecrypt;
 use api_core::decision::business_insights::BusinessInsights;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use api_core::errors::ValidationError;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
+use api_errors::BadRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use newtypes::vendor_api_struct::MiddeskBusinessUpdateWebhook;
@@ -65,7 +65,7 @@ pub async fn get_business_insights(
 
     let business_response = webhook_biz_response
         .or(biz_response)
-        .ok_or(ValidationError("no vendor response found for middesk"))?;
+        .ok_or(BadRequest("no vendor response found for middesk"))?;
 
 
     Ok(BusinessInsights::from(business_response))

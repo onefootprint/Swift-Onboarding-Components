@@ -9,12 +9,12 @@ doctest = false
 
 [dependencies]
 api_core = { path = "../../core" }
+api_errors = { path = "../../errors" }
 crypto = { path = "../../../enclave/crypto" }
 idv = { path = "../../../idv" }
 newtypes = { path = "../../../newtypes" }
 db = { path = "../../../db/core" }
 api_wire_types = { path = "../../wire_types" }
-api_errors = { path = "../../errors" }
 twilio = { path = "../../../twilio" }
 
 serde = { workspace = true }

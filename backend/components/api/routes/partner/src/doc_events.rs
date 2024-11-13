@@ -2,11 +2,11 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::AssertionError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiCoreError;
 use api_core::FpResult;
+use api_errors::ServerErr;
 use api_wire_types::ComplianceDocEvent;
 use api_wire_types::ComplianceDocEventType;
 use db::helpers::ComplianceDocSummary;
@@ -86,7 +86,7 @@ pub async fn get(
         let doc = summary
             .docs
             .get(&req.compliance_doc_id)
-            .ok_or(AssertionError("Missing document for request document ID"))?;
+            .ok_or(ServerErr("Missing document for request document ID"))?;
 
         events.push(ComplianceDocEvent {
             timestamp: req.created_at,

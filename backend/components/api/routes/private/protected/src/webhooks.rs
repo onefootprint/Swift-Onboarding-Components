@@ -2,12 +2,12 @@ use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::task;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -83,7 +83,7 @@ fn create_webhook_event(
         .into_iter()
         .filter(|(wf, _)| wf.completed_at.is_some())
         .max_by_key(|(wf, _)| wf.completed_at)
-        .ok_or(AssertionError(&format!("No completed workflow for {}", sv.fp_id)))?;
+        .ok_or(ServerErr!("No completed workflow for {}", sv.fp_id))?;
     let (obc, _) = ObConfiguration::get(conn, &latest_wf.ob_configuration_id)?;
     let event = match kind {
         WebhookEventKind::OnboardingCompleted => {
@@ -96,7 +96,7 @@ fn create_webhook_event(
                 is_live: sv.is_live,
             })
         }
-        _ => return ValidationError("Unsupported event kind").into(),
+        _ => return BadRequestInto("Unsupported event kind"),
     };
     let task_data = sv.webhook_event(event).into();
     Ok(task_data)

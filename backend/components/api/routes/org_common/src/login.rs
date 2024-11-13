@@ -2,13 +2,13 @@ use actix_web::web;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::workos::WorkOsError;
-use api_core::errors::AssertionError;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::email_domain;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
 use api_wire_types::OrgLoginResponse;
 use api_wire_types::Organization;
 use api_wire_types::OrganizationMember;
@@ -182,7 +182,7 @@ where
 
     let (rb, t_pt) = requested_rb
         .or(most_recently_logged_into_rb)
-        .ok_or(AssertionError("User has no roles to log into"))?;
+        .ok_or(ServerErr("User has no roles to log into"))?;
 
     //
     // Compose the with a token that has either logged into the single rolebinding OR with a token

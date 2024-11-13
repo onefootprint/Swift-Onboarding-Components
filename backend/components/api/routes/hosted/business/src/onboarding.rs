@@ -6,7 +6,6 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
 use api_core::utils::onboarding::get_or_create_business_wf;
@@ -14,6 +13,7 @@ use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateBusinessWfArgs;
 use api_core::utils::onboarding::ScopedVaultAction;
 use api_core::web::Json;
+use api_errors::BadRequestInto;
 use api_wire_types::hosted::onboarding::BusinessOnboardingResponse;
 use api_wire_types::PostBusinessOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -64,8 +64,7 @@ pub async fn post(
                 (Some(external_id), None) => ScopedVaultAction::GetOrCreateExternalId(external_id),
                 (None, Some(inherit_id)) => ScopedVaultAction::InheritId(inherit_id),
                 (Some(_), Some(_)) => {
-                    return ValidationError("Cannot select a business when business_external_id is set")
-                        .into()
+                    return BadRequestInto("Cannot select a business when business_external_id is set");
                 }
                 (None, None) => ScopedVaultAction::Create,
             };

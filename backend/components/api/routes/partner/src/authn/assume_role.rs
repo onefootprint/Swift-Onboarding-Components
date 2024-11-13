@@ -3,12 +3,12 @@ use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::auth::Any;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
 use api_wire_types::AssumePartnerRoleRequest;
 use api_wire_types::AssumePartnerRoleResponse;
 use api_wire_types::OrganizationMember;
@@ -55,7 +55,7 @@ fn post(
     let tenant = match t_pt {
         TenantOrPartnerTenant::PartnerTenant(pt) => pt,
         TenantOrPartnerTenant::Tenant(_) => {
-            return Err(AssertionError("expected partner tenant, found tenant").into());
+            return Err(ServerErr("expected partner tenant, found tenant").into());
         }
     };
     let session_sealing_key = state.session_sealing_key.clone();

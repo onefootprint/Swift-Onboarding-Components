@@ -8,7 +8,6 @@ use crate::FpResult;
 use crate::State;
 use api_core::auth::CanDecrypt;
 use api_core::auth::IsGuardMet;
-use api_core::errors::AssertionError;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
@@ -20,6 +19,7 @@ use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::DecryptedData;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
+use api_errors::ServerErr;
 use api_wire_types::SearchEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
@@ -142,10 +142,10 @@ pub async fn post(
         .into_iter()
         .map(|(sv, _)| {
             // Zip with VW and OB
-            let vw = vws.get(&sv.id).ok_or(AssertionError("VW not found"))?;
+            let vw = vws.get(&sv.id).ok_or(ServerErr("VW not found"))?;
             let entity = entities
                 .remove(&sv.id)
-                .ok_or(AssertionError("Entity info not found"))?;
+                .ok_or(ServerErr("Entity info not found"))?;
             let decrypted_data = decrypted_results.remove(&sv.id).unwrap_or_default();
             Ok((vw, entity, decrypted_data))
         })

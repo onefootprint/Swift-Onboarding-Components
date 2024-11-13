@@ -3,9 +3,9 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::FpResult;
+use api_errors::BadRequestInto;
+use api_errors::ServerErrInto;
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
@@ -56,7 +56,7 @@ pub async fn post(
             let Some(sub) =
                 ComplianceDocSubmission::get_active(conn, &doc)?.filter(|sub| sub.id == submission_id)
             else {
-                return ValidationError("Can only review the latest submission").into();
+                return BadRequestInto("Can only review the latest submission");
             };
 
             NewComplianceDocReview {
@@ -71,7 +71,7 @@ pub async fn post(
 
             // Create a reupload request upon rejection.
             let Some(req) = ComplianceDocRequest::get_active(conn, &doc)? else {
-                return AssertionError("Found active submission but no active request").into();
+                return ServerErrInto("Found active submission but no active request");
             };
 
             if decision == ComplianceDocReviewDecision::Rejected {

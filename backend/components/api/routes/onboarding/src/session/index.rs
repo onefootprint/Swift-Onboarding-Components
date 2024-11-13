@@ -8,7 +8,7 @@ use api_core::auth::session::onboarding::OnboardingSessionTrustedMetadata;
 use api_core::auth::session::sdk_args::UserDataV1;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ValidationError;
+use api_errors::BadRequestInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
@@ -84,7 +84,7 @@ pub async fn post(
             // Check ownership of Playbook
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;
             if business_external_id.is_some() && !obc.kind.is_kyb() {
-                return ValidationError("business_external_id is only supported for KYB playbooks").into();
+                return BadRequestInto("business_external_id is only supported for KYB playbooks");
             }
             let trusted_metadata = OnboardingSessionTrustedMetadata {
                 allow_reonboard,

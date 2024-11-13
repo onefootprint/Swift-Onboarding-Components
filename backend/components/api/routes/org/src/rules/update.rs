@@ -2,11 +2,11 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine::validation::validate_rules_request;
-use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::MultiUpdateRuleRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::IncludeRules;
@@ -48,7 +48,7 @@ pub async fn multi_update_rules(
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 
             if obc.deactivated_at.is_some() {
-                return ValidationError("Cannot update rules for an outdated playbook version").into();
+                return BadRequestInto("Cannot update rules for an outdated playbook version");
             }
 
             RuleInstance::bulk_edit(conn, &obc, &actor.into(), update)?;
@@ -58,16 +58,15 @@ pub async fn multi_update_rules(
             // Make sure we're not removing all rules, unless this is a document-only playbook
             let is_pb_allowed_to_have_no_rules = obc.kind == ObConfigurationKind::Document;
             if rules.is_empty() && !is_pb_allowed_to_have_no_rules {
-                return Err(ValidationError("Proceeding would remove all rules on your playbook").into());
+                return BadRequestInto("Proceeding would remove all rules on your playbook");
             }
 
             let should_pb_have_no_rules =
                 obc.kind == ObConfigurationKind::Kyb && obc.verification_checks().skip_kyb();
             if should_pb_have_no_rules && rules.iter().any(|r| matches!(r.kind, RuleInstanceKind::Business)) {
-                return Err(ValidationError(
+                return BadRequestInto(
                     "Cannot add Business related rules to a playbook that is skipping running KYB",
-                )
-                .into());
+                );
             }
             Ok(rules)
         })

@@ -3,12 +3,12 @@ use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::Any;
-use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ServerErr;
 use api_wire_types::AssumeRoleRequest;
 use api_wire_types::AssumeRoleResponse;
 use api_wire_types::Organization;
@@ -62,7 +62,7 @@ fn post(
     let tenant = match t_pt {
         TenantOrPartnerTenant::Tenant(tenant) => tenant,
         TenantOrPartnerTenant::PartnerTenant(_) => {
-            return Err(AssertionError("expected tenant, found partner tenant").into());
+            return Err(ServerErr("expected tenant, found partner tenant").into());
         }
     };
     let data = AssumeRoleResponse {

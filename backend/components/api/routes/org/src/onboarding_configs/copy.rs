@@ -4,7 +4,6 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
@@ -12,6 +11,7 @@ use api_core::State;
 use api_core::{
     self,
 };
+use api_errors::BadRequestInto;
 use api_wire_types::CopyPlaybookRequest;
 use api_wire_types::CreateRule;
 use api_wire_types::MultiUpdateRuleRequest;
@@ -53,7 +53,7 @@ async fn post(
         let source_actor = source_auth.actor();
         let target_actor = target_auth.actor();
         if source_actor.tenant_user_id()? != target_actor.tenant_user_id()? {
-            return ValidationError("Target tenant auth is using a different principal").into();
+            return BadRequestInto("Target tenant auth is using a different principal");
         }
         let target_tenant = target_auth.tenant().clone();
         (source_auth, target_actor, target_tenant)

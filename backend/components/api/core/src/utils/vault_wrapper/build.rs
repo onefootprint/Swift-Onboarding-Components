@@ -3,8 +3,9 @@ use super::PieceOfData;
 use super::VaultData;
 use super::VaultWrapper;
 use super::VwArgs;
-use crate::errors::AssertionError;
 use crate::FpResult;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::vault::Vault;
@@ -31,16 +32,16 @@ fn sort_key(l: &DataLifetime, sv_id: Option<&ScopedVaultId>) -> FpResult<(DataLi
             Ok((l.created_seqno, false))
         } else {
             // Data was added by another tenant and is portable. Order by portablized_seqno
-            let seqno = l.portablized_seqno.ok_or(AssertionError(
+            let seqno = l.portablized_seqno.ok_or(ServerErr(
                 "Found data added by other tenant without portablized_seqno",
             ))?;
             Ok((seqno, true))
         }
     } else {
         // Building VW for my1fp view
-        let seqno = l.portablized_seqno.ok_or(AssertionError(
-            "Found data in user view without portablized_seqno",
-        ))?;
+        let seqno = l
+            .portablized_seqno
+            .ok_or(ServerErr("Found data in user view without portablized_seqno"))?;
         Ok((seqno, true))
     }
 }
@@ -70,7 +71,7 @@ impl<Type> VaultWrapper<Type> {
                 } else if let Some(vd) = vd.remove(&l.id) {
                     PieceOfData::Vd(vd)
                 } else {
-                    return Err(AssertionError("Found lifetime without corresponding data").into());
+                    return ServerErrInto("Found lifetime without corresponding data");
                 };
                 let data = VaultData { lifetime: l, data };
                 Ok(data)
@@ -84,7 +85,7 @@ impl<Type> VaultWrapper<Type> {
         {
             // We don't commit custom data yet because we don't want it to be portable. Error if we
             // find any
-            return Err(AssertionError("Found portable custom data").into());
+            return ServerErrInto("Found portable custom data");
         }
 
         // Group data by DI and order pieces of data with the same DI by most recent

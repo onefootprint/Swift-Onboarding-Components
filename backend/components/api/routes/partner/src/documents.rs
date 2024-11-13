@@ -3,13 +3,13 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiCoreError;
 use api_core::FpError;
 use api_core::FpResult;
+use api_errors::BadRequest;
+use api_errors::ServerErr;
 use chrono::Utc;
 use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc::NewComplianceDoc;
@@ -99,8 +99,7 @@ pub async fn post(
             .map_err(|e| -> FpError {
                 match e {
                     DbError::UniqueConstraintViolation(_) => {
-                        ValidationError("A compliance document request already exists for this template")
-                            .into()
+                        BadRequest("A compliance document request already exists for this template")
                     }
                     _ => e.into(),
                 }
@@ -118,9 +117,9 @@ pub async fn post(
 
             let mut summaries =
                 ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), Some(&doc.id))?;
-            let summary = summaries.remove(&partnership_id).ok_or(AssertionError(
-                "no ComplianceDocSummary for requested partnership ID",
-            ))?;
+            let summary = summaries
+                .remove(&partnership_id)
+                .ok_or(ServerErr("no ComplianceDocSummary for requested partnership ID"))?;
 
             Ok((summary, doc.into_inner().id))
         })

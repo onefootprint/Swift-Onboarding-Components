@@ -5,7 +5,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
-use api_errors::ValidationError;
+use api_errors::BadRequest;
 use api_wire_types::PrivateUpdateBillingProfile;
 use api_wire_types::PrivateUpdateSentilinkCredentials;
 use api_wire_types::PrivateUpdateTvc;
@@ -45,7 +45,7 @@ async fn patch(
             };
             let tvc = if let Some(tvc_update) = tvc_update {
                 if tvc_update.lexis_enabled.is_some_and(|enabled| enabled) {
-                    let _ = TenantBusinessInfo::get(conn, &tenant.id)?.ok_or(ValidationError(
+                    let _ = TenantBusinessInfo::get(conn, &tenant.id)?.ok_or(BadRequest(
                         "Cannot enable lexis without adding TenantBusinessInfo first",
                     ))?;
                 }

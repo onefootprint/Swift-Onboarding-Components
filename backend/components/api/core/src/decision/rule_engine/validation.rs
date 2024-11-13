@@ -1,4 +1,3 @@
-use crate::errors::ValidationError;
 use crate::FpResult;
 use api_errors::BadRequestInto;
 use api_wire_types::MultiUpdateRuleRequest;
@@ -294,7 +293,7 @@ pub fn validate_rules_request(
         || edit_rule_ids.len() != edit.as_ref().map(|e| e.len()).unwrap_or(0)
         || delete_rule_ids.len() != delete.as_ref().map(|e| e.len()).unwrap_or(0)
     {
-        return Err(ValidationError("Cannot perform multiple edits on the same rule").into());
+        return BadRequestInto("Cannot perform multiple edits on the same rule");
     }
 
     let edit_updates = edit
@@ -320,7 +319,7 @@ pub fn validate_rules_request(
     let all_updates = edit_updates.into_iter().chain(delete_updates).collect_vec();
 
     if new_rules.is_empty() && all_updates.is_empty() {
-        return Err(ValidationError("At least one update must be provided").into());
+        return BadRequestInto("At least one update must be provided");
     }
 
     Ok(MultiRuleUpdate {

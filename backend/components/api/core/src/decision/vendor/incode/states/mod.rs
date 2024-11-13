@@ -55,10 +55,10 @@ use super::validate_doc_type_is_allowed;
 use super::IncodeContext;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErr;
 use db::models::verification_result::NewVerificationResult;
 use db::models::verification_result::VerificationResult;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
@@ -173,9 +173,7 @@ pub async fn save_incode_fixtures(
                 .collect();
 
             let mut vrs = VerificationResult::bulk_create(conn, new_vres)?;
-            let vres = vrs
-                .pop()
-                .ok_or(AssertionError("missing vres in incode fixture"))?;
+            let vres = vrs.pop().ok_or(ServerErr("missing vres in incode fixture"))?;
 
             let doc_uploads = iddoc.images(conn, DocumentImageArgs::default())?;
 
@@ -255,13 +253,13 @@ fn parse_type_of_id(
     let expected_doc_type = ctx
         .docv_data
         .document_type
-        .ok_or(AssertionError("Docv data has no document_type"))?;
+        .ok_or(ServerErr("Docv data has no document_type"))?;
 
     let expected_country: Iso3166TwoDigitCountryCode = Iso3166TwoDigitCountryCode::from_str(
         ctx.docv_data
             .country_code
             .clone()
-            .ok_or(AssertionError("Docv data has no country_code"))?
+            .ok_or(ServerErr("Docv data has no country_code"))?
             .leak(),
     )?;
 

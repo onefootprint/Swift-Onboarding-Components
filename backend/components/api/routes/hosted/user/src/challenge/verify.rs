@@ -8,8 +8,6 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
 use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
@@ -19,6 +17,9 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
@@ -59,8 +60,8 @@ pub async fn post(
 ) -> ApiResponse<api_wire_types::UserChallengeVerifyResponse> {
     let user_auth = user_auth
         .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
-    let sv_id = (user_auth.su_id.clone())
-        .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
+    let sv_id =
+        (user_auth.su_id.clone()).ok_or(BadRequest("Cannot update contact info without scoped vault"))?;
     let UserChallengeVerifyRequest {
         challenge_token,
         challenge_response: c_response,
@@ -72,10 +73,10 @@ pub async fn post(
         is_register_challenge,
     } = Challenge::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
     if action_kind == ActionKind::Replace && !user_auth.data.is_from_api() {
-        return ValidationError("Can only replace auth methods using auth issued via API").into();
+        return BadRequestInto("Can only replace auth methods using auth issued via API");
     }
     if !is_register_challenge {
-        return ValidationError("Invalid challenge token").into();
+        return BadRequestInto("Invalid challenge token");
     }
 
     // Verify the challenge response and determine which action to perform
@@ -112,7 +113,7 @@ pub async fn post(
             let auth_event = user_auth
                 .auth_events
                 .first()
-                .ok_or(AssertionError("No auth events found for user"))?;
+                .ok_or(ServerErr("No auth events found for user"))?;
             let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
             let vault_id = user_auth.user.id.clone();
             let args = NewAuthEventArgs {
@@ -193,8 +194,7 @@ impl Action {
                         let dis = data.keys().cloned().collect_vec();
                         let existing_ci = ContactInfo::list(conn, vault_id, dis)?;
                         if existing_ci.iter().any(|ci| ci.is_otp_verified()) {
-                            return ValidationError("Cannot add primary contact info when it already exists")
-                                .into();
+                            return BadRequestInto("Cannot add primary contact info when it already exists");
                         }
                     }
                 }
@@ -209,8 +209,7 @@ impl Action {
                     ActionKind::AddPrimary => {
                         let existing = Passkey::list(conn, sv_id)?;
                         if !existing.is_empty() {
-                            return ValidationError("Cannot add primary passkey when one already exists.")
-                                .into();
+                            return BadRequestInto("Cannot add primary passkey when one already exists.");
                         }
                     }
                 }

@@ -4,7 +4,6 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::IsGuardMet;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
-use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
@@ -12,6 +11,7 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequest;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::onboarding_validate::HostedValidateResponse;
 use itertools::Itertools;
@@ -48,9 +48,8 @@ pub async fn post(
     } else {
         // We're generating a token after auth has finished
         let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
-        let obc = (user_auth.obc.clone()).ok_or(ValidationError("No playbook associated with session"))?;
-        let su_id =
-            (user_auth.su_id.clone()).ok_or(ValidationError("No scoped user associated with session"))?;
+        let obc = (user_auth.obc.clone()).ok_or(BadRequest("No playbook associated with session"))?;
+        let su_id = (user_auth.su_id.clone()).ok_or(BadRequest("No scoped user associated with session"))?;
         let auth_events = user_auth.auth_events.clone();
         let reqs = state
             .db_query(move |conn| -> FpResult<_> {

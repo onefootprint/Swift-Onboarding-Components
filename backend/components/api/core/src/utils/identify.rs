@@ -4,8 +4,8 @@ use crate::auth::user::UserIdentifier;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
-use api_errors::AssertionError;
 use api_errors::FpResult;
+use api_errors::ServerErr;
 use db::models::contact_info::ContactInfo;
 use db::models::passkey::Passkey;
 use itertools::Itertools;
@@ -117,14 +117,14 @@ pub async fn get_user_auth_methods(
                 let phone = uvw
                     .decrypt_unchecked_parse(state, IDK::PhoneNumber)
                     .await?
-                    .ok_or(AssertionError("Missing phone number"))?;
+                    .ok_or(ServerErr("Missing phone number"))?;
                 AuthMethodInfo::Phone { lifetime_id, phone }
             }
             ContactInfoKind::Email => {
                 let email = uvw
                     .decrypt_unchecked_parse(state, IDK::Email)
                     .await?
-                    .ok_or(AssertionError("Missing email"))?;
+                    .ok_or(ServerErr("Missing email"))?;
                 AuthMethodInfo::Email { lifetime_id, email }
             }
         };

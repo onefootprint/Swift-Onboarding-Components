@@ -7,7 +7,6 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::AuthError;
 use api_core::config::LinkKind;
-use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::token::create_token;
@@ -17,6 +16,8 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_wire_types::CreateTokenRequest;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::TokenOperationKind;
@@ -76,7 +77,7 @@ pub async fn post(
             TokenOperationKind::User
         }
     } else {
-        return Err(ValidationError("Missing field kind").into());
+        return BadRequestInto("Missing field kind");
     };
 
     let use_implicit_auth = use_implicit_auth.unwrap_or_else(|| {
@@ -101,7 +102,7 @@ pub async fn post(
             .ff_client
             .flag(BoolFlag::CanProvideThirdPartyAuth(&tenant.id));
     if use_third_party_auth && !can_provide_3p_auth {
-        return Err(ValidationError("You are not provisioned to provide third-party authentication.").into());
+        return BadRequestInto("You are not provisioned to provide third-party authentication.");
     }
     if use_implicit_auth && !auth.tenant().can_access_preview(&PreviewApi::ImplicitAuth) {
         return Err(AuthError::CannotAccessPreviewApi.into());
@@ -119,7 +120,7 @@ pub async fn post(
                 };
                 let sb = ScopedVault::get(conn, id)
                     .optional()?
-                    .ok_or(ValidationError("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
+                    .ok_or(BadRequest("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
                 Some(sb)
             } else {
                 None
@@ -194,8 +195,7 @@ pub async fn post(
             let ttl_min = ttl_min.unwrap_or(60);
             const MAX_TTL: u32 = 60 * 24;
             if !(1..=MAX_TTL).contains(&ttl_min) {
-                return ValidationError("Token must have a TTL for at least one minute and at most one day")
-                    .into();
+                return BadRequestInto("Token must have a TTL for at least one minute and at most one day");
             }
             let args = CreateTokenArgs {
                 vw: &vw,

@@ -3,7 +3,6 @@ use super::BasicTenantAuth;
 use super::CanCheckTenantGuard;
 use crate::auth::tenant::TenantAuth;
 use crate::auth::AuthError;
-use crate::errors::AssertionError;
 use crate::FpResult;
 use crate::State;
 use actix_web::http::header::Header;
@@ -11,6 +10,7 @@ use actix_web::web;
 use actix_web::FromRequest;
 use actix_web_httpauth::headers::authorization::Authorization;
 use actix_web_httpauth::headers::authorization::Basic;
+use api_errors::ServerErr;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey as DbTenantApiKey;
 use db::models::tenant_role::TenantRole;
@@ -61,7 +61,7 @@ impl FromRequest for TenantApiKey {
         let extractor = async move {
             let root_span = root_span
                 .await
-                .map_err(|_| AssertionError("Cannot extract root span"))?;
+                .map_err(|_| ServerErr("Cannot extract root span"))?;
 
             let sk = tenant_sk_input?;
             let sh_api_key = sk.fingerprint(state.as_ref()).await?;

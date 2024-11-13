@@ -1,5 +1,5 @@
+use api_errors::BadRequestInto;
 use api_errors::FpError;
-use api_errors::ValidationError;
 use regex::Regex;
 use std::str::FromStr;
 
@@ -36,14 +36,12 @@ impl FromStr for ExternalId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.len() < 10 || s.len() > 256 {
-            return ValidationError("External ID length is invalid. Must be between 10 and 256 characters.")
-                .into();
+            return BadRequestInto("External ID length is invalid. Must be between 10 and 256 characters.");
         }
         if !EXTERNAL_ID_CHARS.is_match(s) {
-            return ValidationError(
+            return BadRequestInto(
                 "External ID is invalid. Must only include alphanumeric characters, -, _, or .",
-            )
-            .into();
+            );
         }
         Ok(Self(s.to_string()))
     }

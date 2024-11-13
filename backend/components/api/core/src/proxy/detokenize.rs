@@ -1,6 +1,5 @@
 use crate::auth::tenant::TenantAuth;
 use crate::errors::tenant::TenantError;
-use crate::errors::ValidationError;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::bulk_decrypt;
 use crate::utils::vault_wrapper::BulkDecryptReq;
@@ -10,6 +9,7 @@ use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::BadRequestInto;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -43,11 +43,10 @@ pub async fn detokenize(
 
     let fp_ids = tokens.keys().cloned().collect_vec();
     if fp_ids.len() > MAX_NUM_FP_IDS_PER_BATCH {
-        return ValidationError(&format!(
+        return BadRequestInto!(
             "Cannot exceed {} fp_ids per proxy invocation.",
             MAX_NUM_FP_IDS_PER_BATCH
-        ))
-        .into();
+        );
     }
 
     // Add some indication of the range of fp_ids handled by this request

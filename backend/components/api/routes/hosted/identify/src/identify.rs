@@ -8,13 +8,13 @@ use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::BadRequestInto;
 use api_wire_types::IdentifiedUser;
 use api_wire_types::IdentifyId;
 use api_wire_types::IdentifyRequest;
@@ -66,8 +66,7 @@ pub async fn post(
             .map(|ua| ua.user.is_live)
             .unwrap_or(sandbox_id.is_none());
         if ob.ob_config().is_live != user_is_live {
-            return ValidationError("Sandbox ID must be provided if and only if using a sandbox playbook")
-                .into();
+            return BadRequestInto("Sandbox ID must be provided if and only if using a sandbox playbook");
         }
     }
 

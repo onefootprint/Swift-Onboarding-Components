@@ -8,8 +8,9 @@ use crate::auth::session::user::NewUserSessionContext;
 use crate::auth::session::user::TokenCreationPurpose;
 use crate::auth::session::user::UserSession;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ValidationError;
 use crate::FpResult;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
@@ -65,18 +66,18 @@ pub fn create_token(
     let su = &vw.scoped_vault;
 
     if su.kind != VaultKind::Person {
-        return ValidationError("Cannot create a token for a non-person vault").into();
+        return BadRequestInto("Cannot create a token for a non-person vault");
     }
     let vw_dis = vw.populated_dis();
     if !vw_dis.contains(&DI::Id(IDK::PhoneNumber)) && !vw_dis.contains(&DI::Id(IDK::Email)) {
-        return ValidationError("Cannot create a token for a vault with no contact info. Must have one of id.phone_number or id.email").into();
+        return BadRequestInto("Cannot create a token for a vault with no contact info. Must have one of id.phone_number or id.email");
     }
 
     if key.is_some() && !kind.allow_obc_key() {
-        return Err(ValidationError("Cannot provide playbook key for this token kind").into());
+        return BadRequestInto("Cannot provide playbook key for this token kind");
     }
     if limit_auth_methods.is_some() && !kind.allow_limit_auth_methods() {
-        return Err(ValidationError("Cannot provide limit_auth_methods for this token kind").into());
+        return BadRequestInto("Cannot provide limit_auth_methods for this token kind");
     }
 
     // Determine arguments for the auth token based on the requested operation
@@ -86,7 +87,7 @@ pub fn create_token(
         TokenOperationKind::Inherit => {
             // Inherit the WorkflowRequest
             let wfr = WorkflowRequest::get_active(conn, &su.id)?
-                .ok_or(ValidationError("No outstanding info is requested from this user"))?;
+                .ok_or(BadRequest("No outstanding info is requested from this user"))?;
 
             let wfr_junctions = WorkflowRequestJunction::list(conn, &wfr.id)?;
             sb_id = wfr_junctions
@@ -99,15 +100,13 @@ pub fn create_token(
             (TokenCreationPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
-            let (_, obc) = Workflow::latest_reonboardable(conn, &su.id, true)?.ok_or(ValidationError(
+            let (_, obc) = Workflow::latest_reonboardable(conn, &su.id, true)?.ok_or(BadRequest(
                 "Cannot reonboard user - user has no complete onboardings.",
             ))?;
             (TokenCreationPurpose::ApiReonboard, Some(obc.id), None)
         }
         TokenOperationKind::Onboard => {
-            let key = key.ok_or(ValidationError(
-                "key must be provided for a token of kind onboard",
-            ))?;
+            let key = key.ok_or(BadRequest("key must be provided for a token of kind onboard"))?;
             let (obc, _) = ObConfiguration::get(conn, (&key, &su.tenant_id, su.is_live))?;
             if !obc.kind.can_onboard() {
                 return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());

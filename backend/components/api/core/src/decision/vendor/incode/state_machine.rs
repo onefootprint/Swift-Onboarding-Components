@@ -8,7 +8,6 @@ use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::errors::user::UserError;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
@@ -16,6 +15,8 @@ use crate::vendor_clients::IncodeClients;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
 use db::models::incode_verification_session::IncodeVerificationSession;
@@ -179,11 +180,11 @@ impl IncodeStateMachine {
         let session = state
             .db_query(move |conn| IncodeVerificationSession::get(conn, &id_doc_id))
             .await?
-            .ok_or(AssertionError("missing session"))?;
+            .ok_or(ServerErr("missing session"))?;
         let v_session = {
             let token = session
                 .incode_authentication_token
-                .ok_or(AssertionError("missing token"))?;
+                .ok_or(ServerErr("missing token"))?;
             VerificationSession {
                 id: session.id,
                 kind: session.kind,
@@ -211,7 +212,7 @@ impl IncodeStateMachine {
             IncodeVerificationSessionState::Complete => Complete::new(),
             IncodeVerificationSessionState::Fail => Fail::new(),
             IncodeVerificationSessionState::StartOnboarding => {
-                return Err(AssertionError("Should have already run StartOnboarding").into())
+                return ServerErrInto("Should have already run StartOnboarding");
             }
         };
 

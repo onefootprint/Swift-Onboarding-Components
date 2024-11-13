@@ -5,13 +5,13 @@ use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use api_core::errors::ValidationError;
 use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::DeleteDataResult;
 use api_core::utils::vault_wrapper::WriteableVw;
+use api_errors::BadRequestInto;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -152,7 +152,7 @@ async fn delete_inner(
             let requested_fields_to_delete = match (delete_all, fields) {
                 (true, None) => uvw.populated_dis(),
                 (false, Some(fields)) => fields,
-                _ => return ValidationError("Must provide only one of `delete_all` and `fields`").into(),
+                _ => return BadRequestInto("Must provide only one of `delete_all` and `fields`"),
             };
 
             // Temporary: Disallow deleting ownership_stake before we migrate entirely off the DB
@@ -162,7 +162,7 @@ async fn delete_inner(
                 .iter()
                 .any(|di| matches!(di, DataIdentifier::Business(BDK::BeneficialOwnerStake(_))))
             {
-                return ValidationError("Cannot delete ownership stake").into();
+                return BadRequestInto("Cannot delete ownership stake");
             }
 
             let DeleteDataResult {
