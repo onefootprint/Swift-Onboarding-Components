@@ -20,8 +20,10 @@ macro_rules! define_err_type {
     // https://www.reddit.com/r/rust/comments/dtrmmg/help_macro_rules_inside_of_macro_rules/
     (($d: tt), $name:ident, $status_code:tt) => {
         paste!(
-            #[doc = concat!("Shorthand to make it convenient to return an HTTP ", stringify!($status_code), " error.")]
             #[allow(non_snake_case)]
+            #[doc = "Shorthand to return an HTTP "]
+            #[doc = stringify!($status_code)]
+            #[doc = " error."]
             pub fn [< $name >]<TErr>(err: TErr) -> FpError
             where
                 TErr: ToString,
@@ -29,8 +31,10 @@ macro_rules! define_err_type {
                 [< $name Into >]::<_, FpError>(err)
             }
 
-            #[doc = concat!("Shorthand to make it convenient to return an HTTP ", stringify!($status_code), " error. Can be coerced into a result.")]
             #[allow(non_snake_case)]
+            #[doc = "Shorthand to return an HTTP "]
+            #[doc = stringify!($status_code)]
+            #[doc = " error. Can be coerced into a result."]
             pub fn [< $name Into >]<TErr, TRes>(err: TErr) -> TRes
             where
                 TErr: ToString,
@@ -39,16 +43,20 @@ macro_rules! define_err_type {
                 TRes::from([< $name Internal >](err.to_string()))
             }
 
-            #[doc = concat!("Shorthand to return a ", stringify!($name), " error with a formatted error message.")]
             #[macro_export]
+            #[doc = "Shorthand to return an HTTP "]
+            #[doc = stringify!($name)]
+            #[doc = " error with a formatted error message."]
             macro_rules! [< $name >] {
                 ($d($arg:tt)*) => {
                     [< $name >](format!($d($arg)*))
                 }
             }
 
-            #[doc = concat!("Shorthand to return a ", stringify!($name), " error with a formatted error message. Can be coerced into a Result.")]
             #[macro_export]
+            #[doc = "Shorthand to return an HTTP "]
+            #[doc = stringify!($name)]
+            #[doc = " error with a formatted error message. Can be coerced into a result."]
             macro_rules! [< $name Into >] {
                 ($d($arg:tt)*) => {
                     [< $name Into >](format!($d($arg)*))
