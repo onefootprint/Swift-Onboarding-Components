@@ -1,7 +1,9 @@
 import type { AuditEvent } from '@onefootprint/request-types/dashboard';
 import { Divider, SearchInput, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
 import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
@@ -21,6 +23,27 @@ const SecurityLogs = () => {
     // AccessEventKind.UpdateOrgRole,
     // AccessEventKind.DeactivateOrgRole,
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Just before reaching the bottom of the page, start loading the next page of data
+      const mainContainer = document.getElementById(MAIN_PAGE_ID);
+      if (!mainContainer) return;
+      const offset = mainContainer.clientHeight * 0.25;
+      const reachedBottom = mainContainer.scrollHeight - mainContainer.scrollTop <= mainContainer.clientHeight + offset;
+      if (reachedBottom) {
+        if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
+          getAccessEvents.fetchNextPage();
+        }
+      }
+    };
+
+    const mainContainer = document.getElementById(MAIN_PAGE_ID);
+    mainContainer?.addEventListener('scroll', handleScroll);
+    return () => {
+      mainContainer?.removeEventListener('scroll', handleScroll);
+    };
+  }, [getAccessEvents.isFetchingNextPage, getAccessEvents.hasNextPage]);
 
   // NOTE: placeholder for now
   // include other events as we add UI support for them
