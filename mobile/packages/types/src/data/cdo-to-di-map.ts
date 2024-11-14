@@ -48,8 +48,7 @@ const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
   [CollectedKybDataOption.phoneNumber]: [BusinessDI.phoneNumber],
   [CollectedKybDataOption.website]: [BusinessDI.website],
   [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
-  [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
-  [CollectedKybDataOption.kycedBeneficialOwners]: [BusinessDI.kycedBeneficialOwners],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [],
 
   // Documents
   [CollectedDocumentDataOption.document]: [

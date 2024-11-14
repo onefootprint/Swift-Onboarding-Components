@@ -12,8 +12,6 @@ type BusinessBootstrapOnlyProps = {
 };
 
 export type BootstrapIgnoredBusinessDI =
-  | BusinessDI.beneficialOwners
-  | BusinessDI.kycedBeneficialOwners
   | BusinessDI.formationState
   | BusinessDI.formationDate
   | BusinessDI.beneficialOwnerExplanationMessage;

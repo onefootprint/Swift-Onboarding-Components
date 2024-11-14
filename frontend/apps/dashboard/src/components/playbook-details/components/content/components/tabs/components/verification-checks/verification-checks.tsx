@@ -36,7 +36,6 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
   const kycText = (() => {
     if (kind === OnboardingConfigKind.kyb) {
       if (!doesKyc) return t('kyb.kyc.none');
-      if (mustCollectData.includes(CollectedKybDataOption.beneficialOwners)) return t('kyb.kyc.primary-only');
       if (mustCollectData.includes(CollectedKybDataOption.kycedBeneficialOwners)) return t('kyb.kyc.full');
     }
     if (kind === OnboardingConfigKind.kyc) {

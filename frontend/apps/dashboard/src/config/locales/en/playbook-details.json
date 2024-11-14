@@ -295,7 +295,6 @@
       "none": "Only collecting the data - no verification checks",
       "kyc": {
         "full": "On all business owners",
-        "primary-only": "Only on business’ primary owner (the person who filled out the KYB form)",
         "none": "KYC is not being conducted on beneficial owners"
       }
     },

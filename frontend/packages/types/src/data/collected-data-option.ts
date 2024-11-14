@@ -18,7 +18,6 @@ export enum CollectedKybDataOption {
   phoneNumber = 'business_phone_number',
   website = 'business_website',
   corporationType = 'business_corporation_type',
-  beneficialOwners = 'business_beneficial_owners',
   kycedBeneficialOwners = 'business_kyced_beneficial_owners',
 }
 
@@ -67,8 +66,7 @@ export const CollectedKybDataOptionToRequiredAttributes: Record<
   [CollectedKybDataOption.phoneNumber]: [BusinessDI.phoneNumber],
   [CollectedKybDataOption.website]: [BusinessDI.website],
   [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
-  [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
-  [CollectedKybDataOption.kycedBeneficialOwners]: [BusinessDI.kycedBeneficialOwners],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [],
 };
 
 export const CollectedKycDataOptionToRequiredAttributes: Record<CollectedKycDataOption, IdDI[]> = {

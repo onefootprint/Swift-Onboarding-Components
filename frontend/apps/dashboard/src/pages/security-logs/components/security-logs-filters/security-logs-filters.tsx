@@ -151,10 +151,6 @@ const SecurityLogsFilters = () => {
                   label: allT(`di.${BusinessDI.website}` as ParseKeys<'common'>),
                   value: BusinessDI.website,
                 },
-                {
-                  label: allT(`di.${BusinessDI.beneficialOwners}` as ParseKeys<'common'>),
-                  value: BusinessDI.beneficialOwners,
-                },
               ],
             },
             {

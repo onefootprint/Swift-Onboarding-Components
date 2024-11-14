@@ -28,7 +28,7 @@ describe('<CdoList />', () => {
     const items = [
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
-      CollectedKybDataOption.beneficialOwners,
+      CollectedKybDataOption.kycedBeneficialOwners,
       CollectedDocumentDataOption.documentAndSelfie,
       CollectedKycDataOption.phoneNumber,
       CollectedKycDataOption.email,

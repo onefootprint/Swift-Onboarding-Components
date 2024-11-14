@@ -1,11 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import {
-  BusinessDI,
-  type DataIdentifier,
-  type EntityVault,
-  SupportedIdDocTypes,
-  type VaultValue,
-} from '@onefootprint/types';
+import { type DataIdentifier, type EntityVault, SupportedIdDocTypes, type VaultValue } from '@onefootprint/types';
 
 import useCurrentEntity from '@/entity/hooks/use-current-entity';
 import useDocuments from '@/entity/hooks/use-documents';
@@ -67,11 +61,8 @@ const useDecryptControls = () => {
   /** Decrypt all decryptable fields on the vault */
   const submitAllFields = () => {
     const documentKinds = getAllDecryptableDocuments();
-    // The boDis are being deprecated, don't request to decrypt them
-    const boDis = [BusinessDI.kycedBeneficialOwners as DataIdentifier, BusinessDI.beneficialOwners];
     const decryptableDIs = getDecryptableDIs(entity);
-    const attrs = decryptableDIs.filter(di => !boDis.includes(di));
-    submitFields(attrs, documentKinds);
+    submitFields(decryptableDIs, documentKinds);
   };
 
   const submitAllFieldsHistorical = (historicalFields: DataIdentifier[]) => {

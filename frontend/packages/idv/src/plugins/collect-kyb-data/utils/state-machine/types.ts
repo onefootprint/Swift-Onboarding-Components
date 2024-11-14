@@ -28,10 +28,6 @@ export type BusinessAddressData = Required<
   >
 >;
 
-export type BeneficialOwnersData =
-  | Required<Pick<BusinessDIData, BusinessDI.beneficialOwners>>
-  | Required<Pick<BusinessDIData, BusinessDI.kycedBeneficialOwners>>;
-
 export type MachineContext = {
   // Plugin context
   kybRequirement: CollectKybDataRequirement;
@@ -53,13 +49,6 @@ export type MachineContext = {
 export type MachineEvents =
   | { type: 'basicDataSubmitted'; payload: BusinessDIData }
   | { type: 'beneficialOwnerKycSubmitted' }
-  | {
-      type: 'beneficialOwnersSubmitted';
-      payload: {
-        data: BeneficialOwnersData;
-        vaultBusinessData: BeneficialOwnersData;
-      };
-    }
   | { type: 'businessAddressSubmitted'; payload: BusinessAddressData }
   | { type: 'businessDataLoadError' }
   | { type: 'confirmed' }

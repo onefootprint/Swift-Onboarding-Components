@@ -4,12 +4,12 @@ describe('parseStringifiedValues', () => {
   it('should parse stringified values', () => {
     expect(
       parseStringifiedValues({
-        'business.beneficial_owners': '[{"first_name":"Jane","last_name":"Doe","ownership_stake":25}]',
+        'id.citizenships': '["US", "NO"]',
         'business.tin': '124412142',
         'business.name': 'Acme Bank',
       }),
     ).toEqual({
-      'business.beneficial_owners': [{ first_name: 'Jane', last_name: 'Doe', ownership_stake: 25 }],
+      'id.citizenships': ['US', 'NO'],
       'business.tin': '124412142',
       'business.name': 'Acme Bank',
     });

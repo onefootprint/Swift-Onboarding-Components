@@ -82,32 +82,6 @@ describe('filterBusinessData', () => {
       [BusinessDI.corporationType]: { value: 'unknown', isBootstrap: true },
       [BusinessDI.formationDate]: { value: '1999-12-25', isBootstrap: true },
       [BusinessDI.formationState]: { value: 'MA', isBootstrap: true },
-      [BusinessDI.beneficialOwners]: {
-        value: [
-          {
-            first_name: 'Jane',
-            middle_name: 'Samantha',
-            last_name: 'Doe',
-            email: 'jane.doe@acme.com',
-            phone_number: '+12025550179',
-            ownership_stake: 50,
-          },
-        ],
-        isBootstrap: true,
-      },
-      [BusinessDI.kycedBeneficialOwners]: {
-        value: [
-          {
-            first_name: 'Jane',
-            middle_name: 'Samantha',
-            last_name: 'Doe',
-            email: 'jane.doe@acme.com',
-            phone_number: '+12025550179',
-            ownership_stake: 50,
-          },
-        ],
-        isBootstrap: true,
-      },
     };
 
     // @ts-expect-error: Property 'formation_date' and other were removed from the static types

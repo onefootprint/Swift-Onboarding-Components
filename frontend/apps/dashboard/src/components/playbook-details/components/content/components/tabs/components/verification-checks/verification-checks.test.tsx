@@ -17,7 +17,7 @@ describe('<VerificationChecks />', () => {
       'business_name',
       'business_address',
       'business_tin',
-      'business_beneficial_owners',
+      'business_kyced_beneficial_owners',
     ],
   };
   const renderVerificationChecks = ({
@@ -53,26 +53,6 @@ describe('<VerificationChecks />', () => {
 
       const kycChecks = screen.getByText('KYC is not being conducted on beneficial owners');
       expect(kycChecks).toBeInTheDocument();
-    });
-
-    it('should show the correct text when EIN-only KYB is enabled and primary-only KYC checks are enabled', () => {
-      renderVerificationChecks({
-        verificationChecks: [
-          { kind: 'kyb', data: { einOnly: true } },
-          { kind: 'kyc', data: {} },
-        ],
-        kind: OnboardingConfigKind.kyb,
-      });
-
-      const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
-      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only');
-      expect(einOnly).toBeInTheDocument();
-
-      const kyc = screen.getByRole('group', { name: 'Know Your Customer (KYC)' });
-      const primaryOnly = within(kyc).getByText(
-        'Only on business’ primary owner (the person who filled out the KYB form)',
-      );
-      expect(primaryOnly).toBeInTheDocument();
     });
 
     it('should show the correct text when EIN-only KYB is enabled and full KYC checks are enabled', () => {

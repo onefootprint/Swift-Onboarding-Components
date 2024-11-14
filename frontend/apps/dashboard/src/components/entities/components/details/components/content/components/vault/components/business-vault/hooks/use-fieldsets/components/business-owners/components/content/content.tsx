@@ -31,7 +31,7 @@ const BusinessOwnersField = ({ businessOwners, explanationMessage }: ContentProp
             <Stack direction="column" gap={2}>
               <Stack align="center" gap={2}>
                 <Text variant="body-3" color="tertiary">
-                  {allT('di.business.kyced_beneficial_owners')}
+                  {allT('di.business.beneficial_owners')}
                 </Text>
                 {businessOwner.status ? (
                   <StatusBadge status={businessOwner.status as EntityStatus} />

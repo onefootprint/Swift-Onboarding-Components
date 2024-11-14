@@ -63,7 +63,6 @@ export const entityFixture: Entity = {
   kind: EntityKind.business,
   data: [
     { ...defaultAttribute, identifier: BusinessDI.addressLine1, isDecryptable: true, value: null },
-    { ...defaultAttribute, identifier: BusinessDI.beneficialOwners, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.city, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.country, isDecryptable: true, value: null },
     { ...defaultAttribute, identifier: BusinessDI.name, isDecryptable: true, value: 'Acme Inc.' },

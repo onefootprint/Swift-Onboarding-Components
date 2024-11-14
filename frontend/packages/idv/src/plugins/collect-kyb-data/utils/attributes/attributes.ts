@@ -1,7 +1,7 @@
 import {
   BootstrapOnlyBusinessPrimaryOwnerStake,
   BootstrapOnlyBusinessSecondaryOwnersKey,
-  BusinessDI,
+  type BusinessDI,
   type BusinessDIData,
   CdoToAllDisMap,
 } from '@onefootprint/types';
@@ -15,10 +15,8 @@ type CustomBusinessDI =
   | typeof BootstrapOnlyBusinessSecondaryOwnersKey
   | typeof BootstrapOnlyBusinessSecondaryOwnersKey;
 
-export const BO_FIELDS: BusinessDI[] = [BusinessDI.beneficialOwners, BusinessDI.kycedBeneficialOwners];
-
 export const extractNonBoBootstrapValues = (filteredObj: MachineContext['bootstrapBusinessData']): BusinessDIData => {
-  const ignoreFields = [...BO_FIELDS, BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake];
+  const ignoreFields = [BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake];
 
   return Object.fromEntries(
     Object.entries(filteredObj)

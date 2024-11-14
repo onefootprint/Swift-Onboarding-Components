@@ -338,37 +338,6 @@ describe.skip('<Details />', () => {
             expect(url).toBeTruthy();
           });
         });
-
-        describe('when clicking on the decrypt button', () => {
-          beforeEach(() => {
-            withEntityDecrypt(entityFixture.id, {
-              [BusinessDI.beneficialOwners]:
-                '[{"first_name":"Jack","last_name":"Johnson","ownership_stake":50},{"first_name":"Billy","last_name":"Jackson","email":"billy@onefootprint.com","ownership_stake":50}]',
-            });
-          });
-
-          it('should allow to decrypt the data', async () => {
-            await renderDetailsAndWaitData();
-            await waitFor(() => {
-              screen.getByTestId('business-owners-content');
-            });
-            await decryptFields(['Beneficial owner']);
-
-            const container = screen.getByRole('group', {
-              name: 'Beneficial owners',
-            });
-
-            await waitFor(() => {
-              const primary = within(container).getByText('Jack Johnson');
-              expect(primary).toBeInTheDocument();
-            });
-
-            await waitFor(() => {
-              const secondary = within(container).getByText('Billy Jackson');
-              expect(secondary).toBeInTheDocument();
-            });
-          });
-        });
       });
     });
 

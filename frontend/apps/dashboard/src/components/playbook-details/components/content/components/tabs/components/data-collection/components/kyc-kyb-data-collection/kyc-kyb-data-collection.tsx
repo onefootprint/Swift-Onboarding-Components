@@ -34,9 +34,7 @@ const KycKybDataCollection = ({ playbook }: KycKybDataCollectionProps) => {
   const hasBusinessDocumentsToCollect = !!businessDocumentsToCollect && businessDocumentsToCollect.length > 0;
   const hasKYCDocsToCollect = !!documentsToCollect && documentsToCollect.length > 0;
 
-  const kycOnlyPrimaryBusinessOwner = mustCollectData.includes('business_beneficial_owners');
-  const kycAllBusinessOwners = mustCollectData.includes('business_kyced_beneficial_owners');
-  const collectBoInfo = kycOnlyPrimaryBusinessOwner || kycAllBusinessOwners;
+  const collectBoInfo = mustCollectData.includes('business_kyced_beneficial_owners');
 
   return (
     <Stack direction="column" gap={5}>

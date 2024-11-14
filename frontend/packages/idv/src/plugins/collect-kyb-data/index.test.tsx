@@ -138,7 +138,7 @@ describe.skip('<CollectKybData />', () => {
       renderPlugin(
         getContext(
           [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn4],
-          [CollectedKybDataOption.name, CollectedKybDataOption.tin, CollectedKybDataOption.beneficialOwners],
+          [CollectedKybDataOption.name, CollectedKybDataOption.tin, CollectedKybDataOption.kycedBeneficialOwners],
           onDone,
         ),
       );

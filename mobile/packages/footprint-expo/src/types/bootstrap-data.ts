@@ -41,20 +41,6 @@ type BusinessProps = {
   'business.tin': string;
   'business.website': string;
   'business.zip': string;
-
-  [key: `business.beneficial_owners[${number}].first_name`]: string;
-  [key: `business.beneficial_owners[${number}].middle_name`]: string;
-  [key: `business.beneficial_owners[${number}].last_name`]: string;
-  [key: `business.beneficial_owners[${number}].email`]: string;
-  [key: `business.beneficial_owners[${number}].phone_number`]: string;
-  [key: `business.beneficial_owners[${number}].ownership_stake`]: number;
-
-  [key: `business.kyced_beneficial_owners[${number}].first_name`]: string;
-  [key: `business.kyced_beneficial_owners[${number}].middle_name`]: string;
-  [key: `business.kyced_beneficial_owners[${number}].last_name`]: string;
-  [key: `business.kyced_beneficial_owners[${number}].email`]: string;
-  [key: `business.kyced_beneficial_owners[${number}].phone_number`]: string;
-  [key: `business.kyced_beneficial_owners[${number}].ownership_stake`]: number;
 };
 
 export type BootstrapData = Partial<IDProps> & Partial<BusinessProps> & Partial<CustomProps>;

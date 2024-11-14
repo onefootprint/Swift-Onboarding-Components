@@ -1,8 +1,4 @@
-import { BeneficialOwnerDataAttribute, type BusinessDI } from '@onefootprint/types';
-
-export type IdField = 'id.first_name' | 'id.last_name' | 'id.email' | 'id.phone_number';
-
-export const BeneficialOwnerIdFields: IdField[] = ['id.first_name', 'id.last_name', 'id.email', 'id.phone_number'];
+import type { BusinessDI } from '@onefootprint/types';
 
 export const BusinessAddressFields = [
   'business.address_line1',
@@ -12,13 +8,6 @@ export const BusinessAddressFields = [
   'business.zip',
   'business.country',
 ];
-
-export const BENEFICIAL_OWNER_ATTRIBUTE: Record<IdField, BeneficialOwnerDataAttribute> = {
-  'id.first_name': BeneficialOwnerDataAttribute.firstName,
-  'id.last_name': BeneficialOwnerDataAttribute.lastName,
-  'id.phone_number': BeneficialOwnerDataAttribute.phoneNumber,
-  'id.email': BeneficialOwnerDataAttribute.email,
-};
 
 export const BusinessFields: Exclude<`${BusinessDI}`, 'business.tin'>[] = [
   'business.address_line1',

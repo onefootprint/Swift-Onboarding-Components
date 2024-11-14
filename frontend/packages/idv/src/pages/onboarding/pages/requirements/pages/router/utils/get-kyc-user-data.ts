@@ -12,11 +12,7 @@ import { getLogger, isObject } from '@/idv/utils';
 const { logInfo } = getLogger();
 
 const BootstrapBusinessDIKeys: BusinessDI[] = Object.values(BusinessDI).filter(
-  di =>
-    di !== BusinessDI.beneficialOwners &&
-    di !== BusinessDI.formationDate &&
-    di !== BusinessDI.formationState &&
-    di !== BusinessDI.kycedBeneficialOwners,
+  di => di !== BusinessDI.formationDate && di !== BusinessDI.formationState,
 );
 
 const isKeyIdDI = (_: unknown, key: IdDI) => Object.values(IdDI).includes(key);

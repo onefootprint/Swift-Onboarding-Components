@@ -1,4 +1,3 @@
-import type { BeneficialOwner } from './beneficial-owner';
 import type { CountryCode } from './countries';
 import type { BusinessDI } from './di';
 
@@ -9,8 +8,6 @@ export type BusinessDIData = Partial<{
   [BusinessDI.website]: string;
   [BusinessDI.phoneNumber]: string;
   [BusinessDI.corporationType]: string;
-  [BusinessDI.beneficialOwners]: BeneficialOwner[];
-  [BusinessDI.kycedBeneficialOwners]: BeneficialOwner[];
   [BusinessDI.addressLine1]: string;
   [BusinessDI.addressLine2]: string;
   [BusinessDI.city]: string;

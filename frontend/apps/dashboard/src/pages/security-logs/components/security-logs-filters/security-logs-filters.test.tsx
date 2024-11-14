@@ -46,7 +46,6 @@ describe('<SecurityLogsFilters />', () => {
       expect(popover).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Beneficial owner')).toBeInTheDocument();
     expect(screen.getByText('Address data')).toBeInTheDocument();
     expect(screen.getByText('Address line 1')).toBeInTheDocument();
   });

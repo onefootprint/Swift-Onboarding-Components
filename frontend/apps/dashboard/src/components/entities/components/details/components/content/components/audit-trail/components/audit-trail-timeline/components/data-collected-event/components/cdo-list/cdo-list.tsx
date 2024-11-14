@@ -39,7 +39,7 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   CollectedKybDataOption.address,
   CollectedKybDataOption.phoneNumber,
   CollectedKybDataOption.website,
-  CollectedKybDataOption.beneficialOwners,
+  CollectedKybDataOption.kycedBeneficialOwners,
   CollectedInvestorProfileDataOption.investorProfile,
   CollectedDocumentDataOption.document,
   CollectedDocumentDataOption.documentAndSelfie,

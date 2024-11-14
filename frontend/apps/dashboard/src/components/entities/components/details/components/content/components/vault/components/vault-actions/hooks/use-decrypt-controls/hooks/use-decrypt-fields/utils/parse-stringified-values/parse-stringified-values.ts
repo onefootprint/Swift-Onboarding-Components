@@ -3,7 +3,7 @@ import type { DataIdentifier, VaultArrayData, VaultObjectData, VaultTextData, Va
 type Output = Partial<Record<DataIdentifier, VaultTextData | VaultArrayData | VaultObjectData>>;
 
 // this function is required because some data is stored as stringified JSON
-// business.beneficial_owners "[{\"first_name\":\"Jane\",\"last_name\":\"Doe\",\"ownership_stake\":25}]"
+// id.citizenships "[\"US\", \"NO\"]"
 // so we'll need to convert it to an object, array of object, or whatever it is
 // additionally, if seqno is provided (for decrypting a historical version), we'll remove the seqno from the DI
 const parseStringifiedValues = (input: Partial<Record<DataIdentifier, VaultValue>>, seqno?: string) => {

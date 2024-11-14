@@ -14,7 +14,6 @@ const IconByCollectedKybDataOption: Record<CollectedKybDataOption, Icon> = {
   [CollectedKybDataOption.phoneNumber]: IcoPhone24,
   [CollectedKybDataOption.website]: IcoFileText24,
   [CollectedKybDataOption.corporationType]: IcoFileText24,
-  [CollectedKybDataOption.beneficialOwners]: IcoUserCircle24,
   [CollectedKybDataOption.kycedBeneficialOwners]: IcoUserCircle24,
 };
 
@@ -35,8 +34,7 @@ const KybFields = ({ data, showTitle }: KybFieldsProps) => {
     [CollectedKybDataOption.phoneNumber]: t('data-labels.business-phone-number'),
     [CollectedKybDataOption.website]: t('data-labels.business-website'),
     [CollectedKybDataOption.corporationType]: t('data-labels.business-corporation-type'),
-    [CollectedKybDataOption.beneficialOwners]: t('data-labels.business-beneficial-owners'),
-    [CollectedKybDataOption.kycedBeneficialOwners]: t('data-labels.kyced-business-beneficial-owners'),
+    [CollectedKybDataOption.kycedBeneficialOwners]: t('data-labels.business-beneficial-owners'),
   };
 
   const fields: FieldProps[] = [];

@@ -23,7 +23,7 @@ export const onboardingConfigFixture: OnboardingConfig = {
     'business_name',
     'business_address',
     'business_tin',
-    'business_beneficial_owners',
+    'business_kyced_beneficial_owners',
   ],
   optionalData: [],
   allowInternationalResidents: false,
@@ -85,7 +85,7 @@ export const playbookFixtureWithKYCForAllBusinessOwnersFixture: OnboardingConfig
     'ssn9',
     'business_name',
     'business_tin',
-    'business_beneficial_owners',
+    'business_kyced_beneficial_owners',
     'business_address',
   ],
 };

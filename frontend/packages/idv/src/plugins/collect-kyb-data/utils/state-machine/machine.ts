@@ -142,7 +142,6 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             ],
             basicDataSubmitted: { actions: 'assignData' },
             businessAddressSubmitted: { actions: 'assignData' },
-            beneficialOwnersSubmitted: { actions: ['assignVaultData'] },
             navigatedToPrevPage: prevScreenTransitions('confirm'),
             stepUpAuthTokenCompleted: { actions: ['assignAuthToken'] },
             stepUpDecryptionCompleted: { actions: ['assignData'] },

@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { BusinessDI, type BusinessDIData, type BusinessDataResponse } from '@onefootprint/types';
+import type { BusinessDIData, BusinessDataResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -40,13 +40,7 @@ const useSyncData = () => {
     }
 
     const filteredData = omitEqualData(vaultBusinessData, data);
-    const formattedPayload = formatPayload(locale, filteredData);
-    // Filter out beneficial owners and kyced beneficial owners from the payload for now.
-    const payload = Object.fromEntries(
-      Object.entries(formattedPayload).filter(
-        ([key]) => key !== BusinessDI.beneficialOwners && key !== BusinessDI.kycedBeneficialOwners,
-      ),
-    );
+    const payload = formatPayload(locale, filteredData);
 
     if (Object.keys(payload).length === 0) {
       onSuccess?.({ data: filteredData });

@@ -5,10 +5,6 @@ export enum BusinessDI {
   phoneNumber = 'business.phone_number',
   tin = 'business.tin',
   corporationType = 'business.corporation_type',
-  /** @deprecated - Remove me after the new API is fully rolled out */
-  beneficialOwners = 'business.beneficial_owners',
-  /** @deprecated - Remove me after the new API is fully rolled out */
-  kycedBeneficialOwners = 'business.kyced_beneficial_owners',
   addressLine1 = 'business.address_line1',
   addressLine2 = 'business.address_line2',
   city = 'business.city',

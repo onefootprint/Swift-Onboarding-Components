@@ -50,75 +50,6 @@ describe('extractNonBoBootstrapValues', () => {
     expect(result).toEqual({});
   });
 
-  it("should filter out 'business.beneficial_owners', 'business.kyced_beneficial_owners', 'business.secondary_owners'", () => {
-    const input = {
-      'business.name': { value: 'Acme Bank Inc.', isBootstrap: true },
-      'business.dba': { value: 'Acme Bank', isBootstrap: true },
-      'business.tin': { value: '12-3456789', isBootstrap: true },
-      'business.website': { value: 'www.google.com', isBootstrap: true },
-      'business.phone_number': { value: '+12025550179', isBootstrap: true },
-      'business.corporation_type': { value: 'unknown', isBootstrap: true },
-      'business.address_line1': { value: '123 Main St', isBootstrap: true },
-      'business.address_line2': { value: 'Apt 123', isBootstrap: true },
-      'business.city': { value: 'Boston', isBootstrap: true },
-      'business.state': { value: 'MA', isBootstrap: true },
-      'business.zip': { value: '02117', isBootstrap: true },
-      'business.country': { value: 'US' as const, isBootstrap: true },
-      'business.secondary_owners': {
-        value: [
-          {
-            first_name: 'Owner',
-            last_name: 'Last',
-            email: 'owners@acme.com',
-            phone_number: '+12025550179',
-            ownership_stake: 50,
-          },
-        ],
-        isBootstrap: true,
-      },
-      'business.kyced_beneficial_owners': {
-        value: [
-          {
-            first_name: 'Owner',
-            last_name: 'Last',
-            email: 'owners@acme.com',
-            phone_number: '+12025550179',
-            ownership_stake: 50,
-          },
-        ],
-        isBootstrap: true,
-      },
-      'business.beneficial_owners': {
-        value: [
-          {
-            first_name: 'Owner',
-            last_name: 'Last',
-            email: 'owners@acme.com',
-            phone_number: '+12025550179',
-            ownership_stake: 50,
-          },
-        ],
-        isBootstrap: true,
-      },
-    };
-
-    const result = extractNonBoBootstrapValues(input);
-    expect(result).toEqual({
-      'business.address_line1': '123 Main St',
-      'business.address_line2': 'Apt 123',
-      'business.city': 'Boston',
-      'business.corporation_type': 'unknown',
-      'business.country': 'US',
-      'business.dba': 'Acme Bank',
-      'business.name': 'Acme Bank Inc.',
-      'business.phone_number': '+12025550179',
-      'business.state': 'MA',
-      'business.tin': '12-3456789',
-      'business.website': 'www.google.com',
-      'business.zip': '02117',
-    });
-  });
-
   it('should filter out null and undefined values', () => {
     const input = {
       'business.name': { value: 'name', isBootstrap: true },
@@ -144,7 +75,7 @@ describe('extractNonBoBootstrapValues', () => {
 describe('getBusinessDataFromContext', () => {
   it('should respect the data already in the context', () => {
     const ctx = {
-      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.beneficialOwners] }),
+      kybRequirement: getKybRequirement({ missing: [CollectedKybDataOption.kycedBeneficialOwners] }),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
