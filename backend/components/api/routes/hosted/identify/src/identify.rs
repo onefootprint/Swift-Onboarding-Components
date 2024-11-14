@@ -188,7 +188,7 @@ pub(super) async fn create_identified_token(
         .and_then(|obc| obc.ob_session())
         .map(|obs| obs.trusted_metadata.clone());
     let token = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let scopes = vec![];
             let biz_info = ob_context
                 .as_ref()

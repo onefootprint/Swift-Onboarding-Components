@@ -8,7 +8,6 @@ use api_errors::FpResult;
 use async_trait::async_trait;
 use db::models::task::Task;
 use db::models::task_execution::TaskExecutionUpdate;
-use db::DbError;
 use newtypes::TaskKind;
 use newtypes::TaskStatus;
 use tasks::generate_invoice::GenerateInvoiceTask;
@@ -42,7 +41,7 @@ pub async fn poll_and_execute_tasks(
     state: &State,
     limit: u32,
     kind: Option<TaskKind>,
-) -> Result<Vec<Task>, DbError> {
+) -> FpResult<Vec<Task>> {
     let tasks = state
         .db_transaction(move |conn| Task::poll(conn, limit, kind))
         .await?;
@@ -87,7 +86,7 @@ pub async fn poll_and_execute_tasks(
     futures::future::join_all(futs)
         .await
         .into_iter()
-        .collect::<Result<Vec<Task>, DbError>>()
+        .collect::<FpResult<Vec<_>>>()
 }
 
 async fn execute_task(task: Task, state: &State) -> FpResult<()> {
@@ -139,7 +138,7 @@ mod task_tests {
     async fn basic_end_to_end(state: &mut State) {
         // Setup
         let tasks = state
-            .db_query(move |conn| -> Result<Vec<Task>, DbError> {
+            .db_query(move |conn| {
                 Ok(vec![
                     Task::create(conn, Utc::now(), task_data("task1 yo"))?,
                     Task::create(conn, Utc::now(), task_data("task2 yo"))?,

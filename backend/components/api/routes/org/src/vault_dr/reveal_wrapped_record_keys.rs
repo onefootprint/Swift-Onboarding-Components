@@ -5,11 +5,10 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::CanDecrypt;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::InsightHeaders;
-use api_core::FpResult;
 use api_core::State;
+use api_errors::FpDbOptionalExtension;
 use api_wire_types::VaultDrRevealWrappedRecordKeysRequest;
 use api_wire_types::VaultDrRevealWrappedRecordKeysResponse;
-use db::errors::FpOptionalExtension;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -54,7 +53,7 @@ pub async fn post(
     let record_paths = distinct_record_paths.clone();
     let num_records = record_paths.len();
     let blobs = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let config = VaultDrConfig::get(conn, (&tenant_id, is_live))
                 .optional()?
                 .ok_or(vault_dr::Error::NotEnrolled)?;

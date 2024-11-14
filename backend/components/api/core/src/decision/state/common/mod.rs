@@ -44,7 +44,6 @@ use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::workflow::Workflow;
 use db::DbPool;
-use db::DbResult;
 use db::PgConn;
 use db::TxnPgConn;
 use feature_flag::BoolFlag;
@@ -83,7 +82,7 @@ use std::collections::HashMap;
 use twilio::response::lookup::LookupV2Response;
 
 #[tracing::instrument(skip(db_pool))]
-pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
+pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> FpResult<ScopedVault> {
     let svid = workflow.scoped_vault_id.clone();
     db_pool.db_query(move |conn| ScopedVault::get(conn, &svid)).await
 }
@@ -110,7 +109,7 @@ pub async fn run_kyc_vendor_calls(
 ) -> FpResult<VendorResult> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -135,7 +134,7 @@ pub async fn run_kyc_vendor_calls(
 pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> FpResult<Option<VendorResult>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -157,7 +156,7 @@ pub async fn run_application_risk(
 ) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, di, v) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -193,7 +192,7 @@ pub async fn run_neuro_check(
 ) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -231,7 +230,7 @@ pub async fn run_twilio_check(
 ) -> FpResult<Option<(LookupV2Response, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -254,7 +253,7 @@ pub async fn run_aml_call(
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let wfid = wf_id.clone();
     let (wf, obc, v, di) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -304,7 +303,7 @@ pub async fn run_samba_if_needed(state: &State, wf_id: &WorkflowId, obc: &ObConf
 
     let wfid = wf_id.clone();
     let (wf, di) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,

@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::apple_device_attestation;
@@ -85,7 +85,7 @@ pub struct NewAppleDeviceAttestation {
 
 impl NewAppleDeviceAttestation {
     #[tracing::instrument("NewAppleDeviceAttestation::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<AppleDeviceAttestation> {
+    pub fn create(self, conn: &mut PgConn) -> FpResult<AppleDeviceAttestation> {
         let res = diesel::insert_into(apple_device_attestation::table)
             .values(self)
             .get_result(conn)?;
@@ -96,7 +96,7 @@ impl NewAppleDeviceAttestation {
 
 impl AppleDeviceAttestation {
     #[tracing::instrument("AppleDeviceAttestation::list", skip_all)]
-    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Vec<Self>> {
         let attestations: Vec<Self> = apple_device_attestation::table
             .inner_join(vault::table)
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(vault::id)))
@@ -107,7 +107,7 @@ impl AppleDeviceAttestation {
         Ok(attestations)
     }
 
-    pub fn count_associated_vaults(&self, conn: &mut PgConn, is_live: bool) -> DbResult<i64> {
+    pub fn count_associated_vaults(&self, conn: &mut PgConn, is_live: bool) -> FpResult<i64> {
         Ok(apple_device_attestation::table
             .filter(apple_device_attestation::attested_public_key.eq(&self.attested_public_key))
             .inner_join(vault::table)

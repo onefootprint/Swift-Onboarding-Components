@@ -4,7 +4,6 @@ use crate::types::ApiResponse;
 use crate::utils::headers::TelemetryHeaders;
 use crate::State;
 use actix_web::web::Json;
-use api_core::FpResult;
 use api_wire_types::hosted::fingerprint_visit::FingerprintVisitRequest;
 use db::models::fingerprint_visit_event::FingerprintVisitEvent;
 use paperclip::actix::api_v2_operation;
@@ -47,7 +46,7 @@ pub async fn post(
         };
 
         let db_res = state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let uv_id = user_auth.user.id.clone();
                 let su_id = user_auth.su_id.clone();
 

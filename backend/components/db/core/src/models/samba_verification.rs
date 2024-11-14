@@ -1,23 +1,17 @@
 use super::data_lifetime::DataLifetime;
 use super::samba_verification_data_lifetime_junction::SambaVerificationDataLifetimeJunction;
-use crate::{
-    DbResult,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use api_errors::FpResult;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::samba_verification;
 use diesel::prelude::*;
-use newtypes::{
-    DataLifetimeId,
-    DataLifetimeSeqno,
-    DecisionIntentId,
-    DocumentId,
-    Locked,
-    SambaVerificationId,
-};
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::Locked;
+use newtypes::SambaVerificationId;
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = samba_verification)]
 pub struct SambaVerification {
@@ -49,7 +43,7 @@ pub struct NewSambaVerificationArgs {
 
 impl SambaVerification {
     #[tracing::instrument("SambaVerification::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewSambaVerificationArgs) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewSambaVerificationArgs) -> FpResult<Self> {
         let NewSambaVerificationArgs {
             decision_intent_id,
             document_id,
@@ -75,7 +69,7 @@ impl SambaVerification {
     }
 
     #[tracing::instrument("SambaVerification::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &SambaVerificationId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &SambaVerificationId) -> FpResult<Locked<Self>> {
         let result = samba_verification::table
             .filter(samba_verification::id.eq(id))
             .for_no_key_update()
@@ -84,7 +78,7 @@ impl SambaVerification {
     }
 
     #[tracing::instrument("SambaVerification::get", skip_all)]
-    pub fn get(conn: &mut TxnPgConn, id: &SambaVerificationId) -> DbResult<Self> {
+    pub fn get(conn: &mut TxnPgConn, id: &SambaVerificationId) -> FpResult<Self> {
         let result = samba_verification::table
             .filter(samba_verification::id.eq(id))
             .get_result(conn.conn())?;

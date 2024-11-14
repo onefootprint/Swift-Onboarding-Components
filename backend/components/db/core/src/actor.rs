@@ -6,8 +6,8 @@ use crate::models::scoped_vault::ScopedVault;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
 use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::tenant_api_key;
 use db_schema::schema::tenant_user;
@@ -63,7 +63,7 @@ impl HasActor for DbActor {
 }
 
 #[instrument(skip_all)]
-pub fn saturate_actors<T>(conn: &mut PgConn, has_actors: Vec<T>) -> DbResult<Vec<(T, SaturatedActor)>>
+pub fn saturate_actors<T>(conn: &mut PgConn, has_actors: Vec<T>) -> FpResult<Vec<(T, SaturatedActor)>>
 where
     T: HasActor,
 {
@@ -78,7 +78,7 @@ where
 pub fn saturate_actors_nullable<T>(
     conn: &mut PgConn,
     has_actors: Vec<T>,
-) -> DbResult<Vec<(T, Option<SaturatedActor>)>>
+) -> FpResult<Vec<(T, Option<SaturatedActor>)>>
 where
     T: HasActor,
 {
@@ -154,13 +154,13 @@ where
             };
             Ok((ha, saturated_actor))
         })
-        .collect::<DbResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     Ok(has_actors_with_saturated_actors)
 }
 
 #[instrument(skip_all)]
-pub fn saturate_actor_nullable<T>(conn: &mut PgConn, has_actor: T) -> DbResult<(T, Option<SaturatedActor>)>
+pub fn saturate_actor_nullable<T>(conn: &mut PgConn, has_actor: T) -> FpResult<(T, Option<SaturatedActor>)>
 where
     T: HasActor,
 {

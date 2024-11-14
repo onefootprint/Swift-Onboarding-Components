@@ -3,9 +3,8 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
-use api_core::FpResult;
 use api_core::State;
-use db::errors::FpOptionalExtension;
+use api_errors::FpDbOptionalExtension;
 use db::models::vault_dr::VaultDrConfig;
 use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
@@ -30,7 +29,7 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let maybe_config = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let maybe_config = VaultDrConfig::get(conn, (&tenant_id, is_live)).optional()?;
             Ok(maybe_config)
         })

@@ -4,7 +4,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
 };
-use crate::FpResult;
 use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
@@ -52,7 +51,7 @@ pub async fn post(
         utils::vault_wrapper::seal_file_and_upload_to_s3(&state, &file, &di, &user_auth.user, su_id).await?;
 
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
             let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
             let doc = uvw.put_document_unsafe(

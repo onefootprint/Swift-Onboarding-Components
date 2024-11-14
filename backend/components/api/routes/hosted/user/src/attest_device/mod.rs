@@ -6,7 +6,6 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::vendor::fp_device_attestation::save_vendor_result_and_risk_signals;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
-use api_core::FpResult;
 use api_wire_types::hosted::device_attestation::CreateDeviceAttestationRequest;
 use api_wire_types::hosted::device_attestation::DeviceAttestationChallengeResponse;
 use api_wire_types::hosted::device_attestation::DeviceAttestationType;
@@ -136,7 +135,7 @@ pub async fn post_attestation(
     let is_live = auth.user.is_live;
     let v_id = auth.user.id.clone();
     state
-        .db_transaction(move |conn| -> FpResult<()> {
+        .db_transaction(move |conn| {
             let attestation = match new_attestation {
                 NewDeviceAttestation::Apple(attestation) => attestation.create(conn.conn())?.into(),
                 NewDeviceAttestation::Android(attestation) => attestation.create(conn.conn())?.into(),

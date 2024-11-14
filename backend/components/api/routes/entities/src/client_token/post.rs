@@ -171,7 +171,7 @@ pub async fn post(
     }
 
     let (token, session) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             // We'll check this later too, but worth at least doing a sanity check that the user
             // in question exists
             ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;

@@ -2,11 +2,11 @@ use crate::task::tasks::watchlist_check::tests::*;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_errors::FpError;
 use chrono::Duration;
 use chrono::Utc;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::MockFFClient;
-use db::DbError;
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use macros::test_state_case;
@@ -276,7 +276,7 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
                         .filter(verification_result::id.eq(vres.id))
                         .set(verification_result::timestamp.eq(Utc::now() - Duration::days(366)))
                         .execute(conn)
-                        .map_err(DbError::from)
+                        .map_err(FpError::from)
                 })
                 .await
                 .unwrap();
@@ -284,7 +284,7 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
         ExistingSearchCase::VaultDataChangedSinceVres(data_changed) => {
             let svid = sv.id.clone();
             state
-                .db_transaction(move |conn| -> DbResult<()> {
+                .db_transaction(move |conn| {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &svid).unwrap();
                     let data = match data_changed {
                         VaultDataChange::Dob => {

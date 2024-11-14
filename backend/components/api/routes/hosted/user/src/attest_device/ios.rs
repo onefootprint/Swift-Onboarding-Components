@@ -9,7 +9,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::tenant_ios_app_meta::TenantIosAppFilters;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
-use db::DbResult;
 use newtypes::VaultId;
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -52,7 +51,7 @@ pub(super) async fn attest(
             app_bundle_id,
         };
         let metas = state
-            .db_query(move |conn| -> DbResult<_> { TenantIosAppMeta::list(conn, filters) })
+            .db_query(move |conn| TenantIosAppMeta::list(conn, filters))
             .await?;
         metas.into_iter().next()
     } else {

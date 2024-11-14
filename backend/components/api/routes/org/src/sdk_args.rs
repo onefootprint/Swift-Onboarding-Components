@@ -7,7 +7,6 @@ use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::large_json::LargeJson;
 use api_core::utils::session::AuthSession;
-use api_core::FpResult;
 use api_core::State;
 use api_wire_types::CreateSdkArgsTokenResponse;
 use chrono::Duration;
@@ -44,7 +43,7 @@ async fn post(
     let (token, session) = state
         // Don't make this a transaction since we return errors from here but still want to save
         // the session in the database
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let duration = Duration::hours(1);
             let result = data.validate();
             let body = PiiString::new(serde_json::ser::to_string(&data)?);

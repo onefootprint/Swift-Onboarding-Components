@@ -51,7 +51,7 @@ pub fn save_verification_results(
         })
         .collect::<FpResult<Vec<NewVerificationResult>>>()?;
 
-    Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
+    VerificationResult::bulk_create(conn, new_verification_results)
 }
 
 /// Save a verification result for an errored VRes, encrypting the response payload in the process
@@ -90,7 +90,7 @@ pub fn save_error_verification_results(
         })
         .collect::<FpResult<Vec<NewVerificationResult>>>()?;
 
-    Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
+    VerificationResult::bulk_create(conn, new_verification_results)
 }
 
 pub fn save_verification_result(
@@ -221,7 +221,7 @@ impl SaveVerificationResultArgs {
         } = self;
         let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
         let result = db_pool
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 // This is interesting - we make the VReq and VRes at the same time.
                 // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
                 // is a VReq without a VRes - for the document workflow, we have the incode state

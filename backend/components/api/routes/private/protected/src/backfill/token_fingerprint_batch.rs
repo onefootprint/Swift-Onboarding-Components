@@ -21,7 +21,6 @@ use db::schema::scoped_vault_version;
 use db::schema::vault;
 use db::schema::vault_data;
 use db::DbError;
-use db::DbResult;
 use db_schema::schema::scoped_vault;
 use diesel::prelude::*;
 use diesel::QueryDsl;
@@ -58,7 +57,7 @@ pub async fn post(
         shard_config,
     } = request.into_inner();
     let svs = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             // Filter out deactivated scoped vaults - causes other utils to crash
             let svs: Vec<(ScopedVault, Vault)> = scoped_vault::table
                 .inner_join(vault::table)
@@ -96,7 +95,7 @@ pub async fn post(
 #[tracing::instrument(skip_all)]
 async fn backfill_token_fingerprints<'a>(state: &'a State, sv: ScopedVault, v: Vault) -> FpResult<()> {
     state
-        .db_transaction(move |conn| -> FpResult<()> {
+        .db_transaction(move |conn| {
             ScopedVault::lock(conn, &sv.id)?;
             let results: Vec<(DbFingerprint, DataLifetime)> = fingerprint::table
                 .inner_join(fingerprint_junction::table)

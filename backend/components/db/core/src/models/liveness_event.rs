@@ -1,7 +1,6 @@
 use super::insight_event::InsightEvent;
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema;
@@ -40,7 +39,7 @@ impl LivenessEvent {
     pub fn get_by_user_vault_id(
         conn: &mut PgConn,
         vault_id: &VaultId,
-    ) -> Result<Vec<(Self, Option<InsightEvent>)>, DbError> {
+    ) -> FpResult<Vec<(Self, Option<InsightEvent>)>> {
         use schema::insight_event;
         let results = liveness_event::table
             .inner_join(scoped_vault::table)
@@ -55,7 +54,7 @@ impl LivenessEvent {
     pub fn get_by_scoped_vault_id(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
-    ) -> Result<Vec<LivenessEvent>, DbError> {
+    ) -> FpResult<Vec<LivenessEvent>> {
         let results = liveness_event::table
             .filter(liveness_event::scoped_vault_id.eq(scoped_vault_id))
             .get_results(conn)?;
@@ -68,7 +67,7 @@ impl LivenessEvent {
         fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> Result<Vec<(Self, Option<InsightEvent>)>, DbError> {
+    ) -> FpResult<Vec<(Self, Option<InsightEvent>)>> {
         use schema::insight_event;
         let results = liveness_event::table
             .inner_join(scoped_vault::table)
@@ -88,7 +87,7 @@ impl LivenessEvent {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&LivenessEventId>,
-    ) -> DbResult<HashMap<LivenessEventId, (Self, InsightEvent)>> {
+    ) -> FpResult<HashMap<LivenessEventId, (Self, InsightEvent)>> {
         let results = liveness_event::table
             .inner_join(schema::insight_event::table)
             .filter(liveness_event::id.eq_any(ids))
@@ -113,7 +112,7 @@ pub struct NewLivenessEvent {
 
 impl NewLivenessEvent {
     #[tracing::instrument("NewLivenessEvent::insert", skip_all)]
-    pub fn insert(self, conn: &mut PgConn) -> Result<LivenessEvent, DbError> {
+    pub fn insert(self, conn: &mut PgConn) -> FpResult<LivenessEvent> {
         let ev = diesel::insert_into(db_schema::schema::liveness_event::table)
             .values(self)
             .get_result(conn)?;

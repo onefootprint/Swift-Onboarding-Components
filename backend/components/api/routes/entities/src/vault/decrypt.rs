@@ -341,7 +341,7 @@ pub(super) async fn post_inner(
     let tenant_id = auth.tenant().id.clone();
 
     let vws: HashMap<Option<VwVersion>, TenantVw> = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Build a VW for every version requested
             let vws = versions

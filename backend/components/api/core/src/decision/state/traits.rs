@@ -79,7 +79,7 @@ where
         let r = self.execute_async_idempotent_actions(action, state).await?;
         let current_state = self.name();
         let (result, wf_source) = state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 // TODO pass the workflow into `on_commit` so we don't have to fetch + lock again
                 let wf = DbWorkflow::lock(conn, &workflow_id)?;
                 if wf.state != current_state {

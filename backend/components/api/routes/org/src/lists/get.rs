@@ -3,7 +3,6 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
-use api_core::FpResult;
 use api_core::State;
 use db::models::list::List;
 use db::models::rule_instance::RuleInstance;
@@ -24,7 +23,7 @@ async fn get_detail(
     let is_live = auth.is_live()?;
 
     let (list, rules_using_list) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let rules_using_list = RuleInstance::list_using_list(conn, &list.id)?;
             Ok((list, rules_using_list))

@@ -1,6 +1,6 @@
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::proxy_config;
@@ -194,7 +194,7 @@ pub type DbProxyConfigAll = (
 impl ProxyConfig {
     /// create a new proxy config along with other config tables
     #[tracing::instrument("ProxyConfig::create_new", skip_all)]
-    pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> DbResult<DbProxyConfigAll> {
+    pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> FpResult<DbProxyConfigAll> {
         let NewProxyConfigArgs {
             tenant_id,
             is_live,
@@ -291,7 +291,7 @@ impl ProxyConfig {
 
     /// updates an existing proxy configuration
     #[tracing::instrument("ProxyConfig::update", skip_all)]
-    pub fn update(conn: &mut TxnPgConn, args: UpdateProxyConfigArgs) -> DbResult<DbProxyConfigAll> {
+    pub fn update(conn: &mut TxnPgConn, args: UpdateProxyConfigArgs) -> FpResult<DbProxyConfigAll> {
         let UpdateProxyConfigArgs {
             tenant_id,
             is_live,
@@ -427,7 +427,7 @@ impl ProxyConfig {
     }
 
     #[tracing::instrument("ProxyConfig::list", skip_all)]
-    pub fn list(conn: &mut PgConn, filters: ProxyConfigFilters) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, filters: ProxyConfigFilters) -> FpResult<Vec<Self>> {
         let mut query = proxy_config::table
             .filter(proxy_config::tenant_id.eq(filters.tenant_id))
             .filter(proxy_config::is_live.eq(filters.is_live))
@@ -449,7 +449,7 @@ impl ProxyConfig {
         tenant_id: &TenantId,
         is_live: bool,
         proxy_config_id: ProxyConfigId,
-    ) -> DbResult<DbProxyConfigAll> {
+    ) -> FpResult<DbProxyConfigAll> {
         let config: ProxyConfig = proxy_config::table
             .filter(proxy_config::tenant_id.eq(tenant_id))
             .filter(proxy_config::is_live.eq(is_live))
@@ -480,7 +480,7 @@ impl ProxyConfig {
         proxy_config_id: ProxyConfigId,
         tenant_id: TenantId,
         is_live: bool,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         diesel::update(proxy_config::table)
             .filter(proxy_config::tenant_id.eq(tenant_id))
             .filter(proxy_config::is_live.eq(is_live))

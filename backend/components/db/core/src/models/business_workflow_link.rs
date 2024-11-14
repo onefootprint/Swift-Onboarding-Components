@@ -1,9 +1,9 @@
 use super::business_owner::BusinessOwner;
 use super::onboarding_decision::OnboardingDecision;
 use super::workflow::Workflow;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::business_owner;
@@ -44,7 +44,7 @@ pub struct NewBusinessWorkflowLinkRow<'a> {
 
 impl BusinessWorkflowLink {
     #[tracing::instrument("BusinessWorkflowLink::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewBusinessWorkflowLinkRow>) -> DbResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewBusinessWorkflowLinkRow>) -> FpResult<Vec<Self>> {
         let results = diesel::insert_into(business_workflow_link::table)
             .values(new)
             .get_results::<Self>(conn.conn())?;
@@ -56,7 +56,7 @@ impl BusinessWorkflowLink {
         conn: &mut PgConn,
         bo_id: &BoId,
         biz_wf_id: &WorkflowId,
-    ) -> DbResult<(Self, Workflow)> {
+    ) -> FpResult<(Self, Workflow)> {
         let result = business_workflow_link::table
             .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::user_workflow_id)))
             .filter(business_workflow_link::business_owner_id.eq(bo_id))
@@ -71,7 +71,7 @@ impl BusinessWorkflowLink {
     pub fn get_latest_user_decisions(
         conn: &mut PgConn,
         biz_wf_id: &WorkflowId,
-    ) -> DbResult<HashMap<BoId, (Workflow, Option<OnboardingDecision>)>> {
+    ) -> FpResult<HashMap<BoId, (Workflow, Option<OnboardingDecision>)>> {
         use db_schema::schema::onboarding_decision;
         use db_schema::schema::workflow;
         let res = business_workflow_link::table
@@ -107,7 +107,7 @@ impl BusinessWorkflowLink {
         conn: &mut PgConn,
         bv_id: &VaultId,
         obc_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(BusinessOwner, Workflow)>> {
+    ) -> FpResult<Vec<(BusinessOwner, Workflow)>> {
         let results = business_workflow_link::table
             .inner_join(business_owner::table)
             .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::user_workflow_id)))
@@ -125,7 +125,7 @@ impl BusinessWorkflowLink {
     pub fn get_business_workflow_for_user_workflow(
         conn: &mut PgConn,
         wf_id: &WorkflowId,
-    ) -> DbResult<Option<(BusinessOwner, Workflow)>> {
+    ) -> FpResult<Option<(BusinessOwner, Workflow)>> {
         let result = business_workflow_link::table
             .inner_join(business_owner::table)
             .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::business_workflow_id)))

@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::contact_info;
@@ -58,7 +58,7 @@ impl ContactInfo {
     pub fn bulk_create(
         conn: &mut PgConn,
         new_rows: Vec<NewContactInfoArgs<DataLifetimeId>>,
-    ) -> DbResult<Vec<Self>> {
+    ) -> FpResult<Vec<Self>> {
         let new_rows = new_rows
             .into_iter()
             .map(|r| NewContactInfoRow {
@@ -77,7 +77,7 @@ impl ContactInfo {
     }
 
     #[tracing::instrument("ContactInfo::mark_otp_verified", skip_all)]
-    pub fn mark_otp_verified(conn: &mut PgConn, id: &ContactInfoId) -> DbResult<()> {
+    pub fn mark_otp_verified(conn: &mut PgConn, id: &ContactInfoId) -> FpResult<()> {
         diesel::update(contact_info::table)
             .filter(contact_info::id.eq(id))
             .set(contact_info::is_otp_verified.eq(true))
@@ -86,7 +86,7 @@ impl ContactInfo {
     }
 
     #[tracing::instrument("ContactInfo::get", skip_all)]
-    pub fn get(conn: &mut PgConn, lifetime_id: &DataLifetimeId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, lifetime_id: &DataLifetimeId) -> FpResult<Self> {
         let result = contact_info::table
             .filter(contact_info::lifetime_id.eq(lifetime_id))
             .get_result(conn)?;
@@ -94,7 +94,7 @@ impl ContactInfo {
     }
 
     #[tracing::instrument("ContactInfo::list", skip_all)]
-    pub fn list(conn: &mut PgConn, vault_id: &VaultId, kinds: Vec<DataIdentifier>) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, vault_id: &VaultId, kinds: Vec<DataIdentifier>) -> FpResult<Vec<Self>> {
         use db_schema::schema::data_lifetime;
         let result = contact_info::table
             .inner_join(data_lifetime::table)

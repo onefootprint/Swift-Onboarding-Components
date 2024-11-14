@@ -57,7 +57,7 @@ pub async fn post(
     };
 
     let (sv, auth_events, wf, biz_wf) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, &sv_id)?;
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {

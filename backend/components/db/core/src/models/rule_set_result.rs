@@ -5,10 +5,10 @@ use super::rule_result::NewRuleResult;
 use super::rule_result::RuleResult;
 use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
-use crate::DbResult;
 use crate::OptionalNonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::risk_signal;
@@ -112,7 +112,7 @@ pub struct RuleSetResultRiskSignalJunction {
 
 impl RuleSetResult {
     #[tracing::instrument("RuleSetResult::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewRuleSetResultArgs) -> DbResult<(Self, Vec<RuleResult>)> {
+    pub fn create(conn: &mut TxnPgConn, args: NewRuleSetResultArgs) -> FpResult<(Self, Vec<RuleResult>)> {
         let now = Utc::now();
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_rule_set_result = NewRuleSetResult {
@@ -165,7 +165,7 @@ impl RuleSetResult {
     pub fn latest_workflow_decision(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-    ) -> DbResult<Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)>> {
+    ) -> FpResult<Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)>> {
         let rule_set_result: Option<RuleSetResult> = rule_set_result::table
             .filter(rule_set_result::scoped_vault_id.eq(sv_id))
             .filter(rule_set_result::kind.eq(RuleSetResultKind::WorkflowDecision))
@@ -187,7 +187,7 @@ impl RuleSetResult {
     pub fn bulk_get_for_workflows(
         conn: &mut PgConn,
         workflow_ids: Vec<WorkflowId>,
-    ) -> DbResult<HashMap<WorkflowId, Vec<Self>>> {
+    ) -> FpResult<HashMap<WorkflowId, Vec<Self>>> {
         let results = rule_set_result::table
             .filter(rule_set_result::workflow_id.eq_any(workflow_ids))
             .filter(rule_set_result::kind.eq(RuleSetResultKind::WorkflowDecision))
@@ -205,7 +205,7 @@ impl RuleSetResult {
     pub fn get(
         conn: &mut PgConn,
         rsr_id: &RuleSetResultId,
-    ) -> DbResult<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
+    ) -> FpResult<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
         let rsr: RuleSetResult = rule_set_result::table
             .filter(rule_set_result::id.eq(rsr_id))
             .get_result(conn)?;
@@ -225,7 +225,7 @@ impl RuleSetResult {
         start: DateTime<Utc>,
         end: DateTime<Utc>,
         limit: i64,
-    ) -> DbResult<Vec<RuleSetResultSample>> {
+    ) -> FpResult<Vec<RuleSetResultSample>> {
         let res: Vec<(ScopedVault, Vault, RuleSetResult)> = workflow::table
             .inner_join(scoped_vault::table.inner_join(vault::table))
             .inner_join(rule_set_result::table)

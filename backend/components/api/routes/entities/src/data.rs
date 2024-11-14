@@ -7,7 +7,6 @@ use crate::State;
 use api_core::serializers::entity_attributes;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::FpResult;
 use api_wire_types::EntityAttribute;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
@@ -34,7 +33,7 @@ pub async fn get(
     let api_wire_types::GetHistoricalDataRequest { seqno } = filters.into_inner();
 
     let vw = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::build_for_tenant_maybe_version(conn, &sv.id, seqno)?;
             Ok(vw)

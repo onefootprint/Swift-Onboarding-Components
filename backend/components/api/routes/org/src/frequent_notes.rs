@@ -7,7 +7,6 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_frequent_note::TenantFrequentNote;
-use db::DbResult;
 use newtypes::TenantFrequentNoteId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -31,7 +30,7 @@ pub async fn get(
     let api_wire_types::GetOrgFrequentNotes { kind } = filters.into_inner();
 
     let list = state
-        .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::list(conn, &tenant_id, kind) })
+        .db_query(move |conn| TenantFrequentNote::list(conn, &tenant_id, kind))
         .await?
         .into_iter()
         .map(api_wire_types::OrgFrequentNote::from_db)
@@ -60,9 +59,7 @@ pub async fn post(
     }
 
     let new_freq_note = state
-        .db_query(move |conn| -> DbResult<_> {
-            TenantFrequentNote::create(conn, tenant_id, actor, kind, content)
-        })
+        .db_query(move |conn| TenantFrequentNote::create(conn, tenant_id, actor, kind, content))
         .await?;
     Ok(api_wire_types::OrgFrequentNote::from_db(new_freq_note))
 }
@@ -83,7 +80,7 @@ pub async fn delete(
     let fn_id = frequent_note_id.into_inner();
 
     state
-        .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::deactivate(conn, &tenant_id, &fn_id) })
+        .db_query(move |conn| TenantFrequentNote::deactivate(conn, &tenant_id, &fn_id))
         .await?;
 
     Ok(api_wire_types::Empty)

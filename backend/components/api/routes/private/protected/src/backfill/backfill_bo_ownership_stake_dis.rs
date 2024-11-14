@@ -85,7 +85,7 @@ pub async fn post(
 
     let (num_bos, num_vault_updates) = state
         .db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             // We don't need to lock the business_owner rows since we're only reading
             // ownership_stake and the vault_id, which are not updated.
             let db_bos: Vec<(BusinessOwner, ScopedVaultId)> = business_owner::table

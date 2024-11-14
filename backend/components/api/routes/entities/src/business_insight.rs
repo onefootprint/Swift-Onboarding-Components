@@ -9,7 +9,6 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
-use api_core::FpResult;
 use api_errors::BadRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
@@ -36,7 +35,7 @@ pub async fn get_business_insights(
     let fp_id = request.into_inner();
 
     let (sv, vw) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             Ok((sv, vw))

@@ -2,7 +2,7 @@ use crate::diesel::Connection;
 use crate::diesel::RunQueryDsl;
 use crate::test_helpers::db_url;
 use crate::DbPool;
-use crate::DbResult;
+use api_errors::FpResult;
 use diesel::PgConnection;
 use macros::test_db_pool;
 use std::ops::Deref;
@@ -112,7 +112,7 @@ impl Drop for TestDbPool {
 #[test_db_pool]
 async fn example_test(db_pool: TestDbPool) {
     let _tenant = db_pool
-        .db_transaction(|conn| -> DbResult<_> { Ok(crate::tests::fixtures::tenant::create(conn)) })
+        .db_transaction(|conn| -> FpResult<_> { Ok(crate::tests::fixtures::tenant::create(conn)) })
         .await
         .unwrap();
 }
@@ -123,7 +123,7 @@ async fn example_test(db_pool: TestDbPool) {
 #[test_db_pool(retain)]
 async fn example_test_retain_test_db(db_pool: TestDbPool) {
     let _tenant = db_pool
-        .db_transaction(|conn| -> DbResult<_> { Ok(crate::tests::fixtures::tenant::create(conn)) })
+        .db_transaction(|conn| -> FpResult<_> { Ok(crate::tests::fixtures::tenant::create(conn)) })
         .await
         .unwrap();
 }

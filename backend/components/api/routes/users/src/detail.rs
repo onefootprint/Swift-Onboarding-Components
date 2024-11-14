@@ -5,7 +5,6 @@ use crate::types::ApiResponse;
 use crate::State;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::FpResult;
 use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
 use db::models::scoped_vault::ScopedVault;
@@ -30,7 +29,7 @@ pub async fn detail(
     let fp_id = fp_id.into_inner();
 
     let (sv, mrs, wfr) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let mr_filters = ManualReviewFilters::get_active();
             let mrs = ManualReview::get(conn, &sv.id, mr_filters)?;

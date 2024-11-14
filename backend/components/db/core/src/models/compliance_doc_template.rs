@@ -1,8 +1,8 @@
 use super::compliance_doc_template_version::ComplianceDocTemplateVersion;
 use super::compliance_doc_template_version::NewComplianceDocTemplateVersion;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc_template;
@@ -30,7 +30,7 @@ pub struct NewComplianceDocTemplate<'a> {
 
 impl<'a> NewComplianceDocTemplate<'a> {
     #[tracing::instrument("NewComplianceDocTemplate::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<Locked<ComplianceDocTemplate>> {
+    pub fn create(self, conn: &mut TxnPgConn) -> FpResult<Locked<ComplianceDocTemplate>> {
         let template = diesel::insert_into(compliance_doc_template::table)
             .values(self)
             .get_result(conn.conn())?;
@@ -45,7 +45,7 @@ impl ComplianceDocTemplate {
         conn: &mut TxnPgConn,
         id: &ComplianceDocTemplateId,
         pt_id: &PartnerTenantId,
-    ) -> DbResult<Locked<ComplianceDocTemplate>> {
+    ) -> FpResult<Locked<ComplianceDocTemplate>> {
         let template = compliance_doc_template::table
             .filter(compliance_doc_template::id.eq(id))
             .filter(compliance_doc_template::partner_tenant_id.eq(pt_id))
@@ -63,7 +63,7 @@ impl ComplianceDocTemplate {
         conn: &mut TxnPgConn,
         template: &Locked<Self>,
         version: NewComplianceDocTemplateVersion,
-    ) -> DbResult<ComplianceDocTemplateVersion> {
+    ) -> FpResult<ComplianceDocTemplateVersion> {
         diesel::update(compliance_doc_template_version::table)
             .filter(compliance_doc_template_version::template_id.eq(&template.id))
             .filter(compliance_doc_template_version::deactivated_at.is_null())
@@ -79,7 +79,7 @@ impl ComplianceDocTemplate {
     pub fn list_active_with_latest_version(
         conn: &mut PgConn,
         pt_id: &PartnerTenantId,
-    ) -> DbResult<Vec<(ComplianceDocTemplate, ComplianceDocTemplateVersion)>> {
+    ) -> FpResult<Vec<(ComplianceDocTemplate, ComplianceDocTemplateVersion)>> {
         Ok(compliance_doc_template::table
             .inner_join(compliance_doc_template_version::table)
             .filter(compliance_doc_template::partner_tenant_id.eq(pt_id))
@@ -101,7 +101,7 @@ impl ComplianceDocTemplate {
         conn: &mut TxnPgConn,
         id: &ComplianceDocTemplateId,
         pt_id: &PartnerTenantId,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         // Deactivate template.
         diesel::update(compliance_doc_template::table)
             .filter(compliance_doc_template::id.eq(id))

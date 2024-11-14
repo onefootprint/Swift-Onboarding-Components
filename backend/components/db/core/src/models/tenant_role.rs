@@ -1,17 +1,17 @@
 use super::ob_configuration::IsLive;
 use crate::DbError;
-use crate::DbResult;
 use crate::NextPage;
 use crate::NonNullVec;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::BadRequestInto;
+use api_errors::FpError;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::tenant_role;
 use db_schema::schema::tenant_role::BoxedQuery;
-use db_schema::schema::tenant_role::{
-    self,
-};
 use diesel::dsl::count_star;
 use diesel::prelude::*;
 use diesel::sql_types::Bool;
@@ -99,12 +99,12 @@ impl TenantRole {
         org_id: OrgIdentifierRef,
         kind: TenantRoleKindDiscriminant,
         is_live: Option<IsLive>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         // Every role must have at least Read permissions for now
         match org_id {
             OrgIdentifierRef::TenantId(_) => {
                 if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
-                    return Err(DbError::InsufficientTenantScopes(TenantScopeDiscriminants::Read));
+                    return Err(DbError::InsufficientTenantScopes(TenantScopeDiscriminants::Read).into());
                 }
             }
             OrgIdentifierRef::PartnerTenantId(_) => {
@@ -113,17 +113,18 @@ impl TenantRole {
                 {
                     return Err(DbError::InsufficientTenantScopes(
                         TenantScopeDiscriminants::CompliancePartnerRead,
-                    ));
+                    )
+                    .into());
                 }
             }
         }
 
         if scopes.iter().unique().count() != scopes.len() {
-            return Err(DbError::NonUniqueTenantScopes);
+            return BadRequestInto("Tenant role scopes must be unique");
         }
 
         if kind.tenant_kind() != org_id.into() {
-            return Err(DbError::IncorrectTenantRoleKind);
+            return BadRequestInto("This kind of role cannot be bound to this entity.");
         }
 
         if let Some(s) = scopes
@@ -131,7 +132,7 @@ impl TenantRole {
             .find(|s| !s.role_kinds().into_iter().contains(&kind))
         {
             let s = TenantScopeDiscriminants::from(s);
-            return Err(DbError::InvalidTenantScope(kind, s));
+            return Err(DbError::InvalidTenantScope(kind, s).into());
         }
         if let OrgIdentifierRef::TenantId(tenant_id) = org_id {
             let proxy_config_ids = scopes
@@ -155,7 +156,7 @@ impl TenantRole {
                 }
                 let proxy_configs_count: i64 = query.count().get_result(conn)?;
                 if (proxy_config_ids.len() as i64) != proxy_configs_count {
-                    return Err(DbError::InvalidProxyConfigId);
+                    return BadRequestInto("Proxy config with provided ID does not exist");
                 }
             }
         }
@@ -168,16 +169,16 @@ impl TenantRole {
         org_id: impl Into<OrgIdentifierRef<'a>>,
         kind: ImmutableRoleKind,
         role_kind: TenantRoleKind,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         let role_kind_discriminant = TenantRoleKindDiscriminant::from(&role_kind);
         if role_kind_discriminant.tenant_kind() != org_id.into() {
-            return Err(DbError::IncorrectTenantRoleKind);
+            return BadRequestInto("This kind of role cannot be bound to this entity.");
         }
 
         if kind.tenant_kind() != org_id.into() {
-            return Err(DbError::IncorrectTenantRoleKind);
+            return BadRequestInto("This kind of role cannot be bound to this entity.");
         }
 
         let (name, scopes) = kind.props();
@@ -196,7 +197,7 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &TenantRoleId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &TenantRoleId) -> FpResult<Self> {
         let role = tenant_role::table
             .filter(tenant_role::id.eq(id))
             .first::<Self>(conn)?;
@@ -211,7 +212,7 @@ impl TenantRole {
         scopes: Vec<TenantScope>,
         is_immutable: IsImmutable,
         kind: TenantRoleKind,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         let is_live = kind.is_live();
@@ -237,9 +238,11 @@ impl TenantRole {
         let result = diesel::insert_into(tenant_role::table)
             .values(new)
             .get_result(conn)
-            .map_err(DbError::from)
-            .map_err(|e| match e {
-                DbError::UniqueConstraintViolation(_) => DbError::TenantRoleAlreadyExists,
+            .map_err(FpError::from)
+            .map_err(|e| match e.code() {
+                Some(e) if e.is_db_unique_constraint_violation() => {
+                    DbError::TenantRolebindingAlreadyExists.into()
+                }
                 _ => e,
             })?;
         Ok(result)
@@ -250,7 +253,7 @@ impl TenantRole {
         conn: &mut TxnPgConn,
         id: &TenantRoleId,
         org_id: impl Into<OrgIdentifierRef<'a>>,
-    ) -> DbResult<Locked<Self>> {
+    ) -> FpResult<Locked<Self>> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         let role: TenantRole = tenant_role::table
@@ -260,7 +263,7 @@ impl TenantRole {
                 .first(conn.conn())?;
 
         if role.deactivated_at.is_some() {
-            return Err(DbError::TargetTenantRoleDeactivated);
+            return Err(DbError::TargetTenantRoleDeactivated.into());
         }
         Ok(Locked::new(role))
     }
@@ -270,14 +273,14 @@ impl TenantRole {
         conn: &mut TxnPgConn,
         id: &TenantRoleId,
         org_id: impl Into<OrgIdentifierRef<'a>>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         use db_schema::schema::tenant_api_key;
         use db_schema::schema::tenant_rolebinding;
         let role = Self::lock_active(conn, id, org_id)?.into_inner();
         if role.is_immutable {
-            return Err(DbError::CannotUpdateImmutableRole(role.name));
+            return Err(DbError::CannotUpdateImmutableRole(role.name).into());
         }
         // Make sure there are no users using this role before deactivating
         let num_active_users: i64 = tenant_rolebinding::table
@@ -291,10 +294,10 @@ impl TenantRole {
             .count()
             .get_result(conn.conn())?;
         if num_active_users > 0 {
-            return Err(DbError::TenantRoleHasUsers(num_active_users));
+            return Err(DbError::TenantRoleHasUsers(num_active_users).into());
         }
         if num_active_keys > 0 {
-            return Err(DbError::TenantRoleHasActiveApiKeys(num_active_keys));
+            return Err(DbError::TenantRoleHasActiveApiKeys(num_active_keys).into());
         }
         let update = TenantRoleUpdate {
             deactivated_at: Some(Some(Utc::now())),
@@ -309,7 +312,7 @@ impl TenantRole {
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated);
+            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
@@ -322,7 +325,7 @@ impl TenantRole {
         id: &TenantRoleId,
         name: Option<String>,
         scopes: Option<Vec<TenantScope>>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         let role = Self::lock_active(conn, id, org_id)?.into_inner();
@@ -330,7 +333,7 @@ impl TenantRole {
             Self::validate_scopes(conn, scopes, org_id, role.kind, role.is_live)?;
         }
         if role.is_immutable {
-            return Err(DbError::CannotUpdateImmutableRole(role.name));
+            return Err(DbError::CannotUpdateImmutableRole(role.name).into());
         }
         let update = TenantRoleUpdate {
             name,
@@ -344,14 +347,16 @@ impl TenantRole {
             .filter(tenant_role::is_immutable.eq(false))
             .set(update)
             .load(conn.conn())
-            .map_err(DbError::from)
-            .map_err(|e| match e {
-                DbError::UniqueConstraintViolation(_) => DbError::TenantRoleAlreadyExists,
+            .map_err(FpError::from)
+            .map_err(|e| match e.code() {
+                Some(e) if e.is_db_unique_constraint_violation() => {
+                    DbError::TenantRolebindingAlreadyExists.into()
+                }
                 _ => e,
             })?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated);
+            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
@@ -392,7 +397,7 @@ impl TenantRole {
         conn: &mut PgConn,
         filters: &TenantRoleListFilters,
         pagination: OffsetPagination,
-    ) -> DbResult<(Vec<TenantRoleInfo>, NextPage)> {
+    ) -> FpResult<(Vec<TenantRoleInfo>, NextPage)> {
         use db_schema::schema::tenant_api_key;
         use db_schema::schema::tenant_rolebinding;
         let mut query = Self::list_active_query(filters)
@@ -436,19 +441,19 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::count_active", skip_all)]
-    pub fn count_active(conn: &mut PgConn, filters: &TenantRoleListFilters) -> DbResult<i64> {
+    pub fn count_active(conn: &mut PgConn, filters: &TenantRoleListFilters) -> FpResult<i64> {
         let query = Self::list_active_query(filters);
         let count = query.count().get_result(conn)?;
         Ok(count)
     }
 
-    pub fn tenant_or_partner_tenant_id(&self) -> DbResult<OrgIdentifierRef> {
+    pub fn tenant_or_partner_tenant_id(&self) -> FpResult<OrgIdentifierRef> {
         match (&self.tenant_id, &self.partner_tenant_id) {
             (Some(tenant_id), None) => Ok(tenant_id.into()),
             (None, Some(partner_tenant_id)) => Ok(partner_tenant_id.into()),
             (Some(_), Some(_)) | (None, None) => {
                 // DB constraints should prevent these cases from occurring.
-                Err(DbError::ValidationError("Invalid tenant role".to_owned()))
+                BadRequestInto("Invalid tenant role")
             }
         }
     }
@@ -472,7 +477,7 @@ impl TenantRole {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&TenantRoleId>,
-    ) -> DbResult<HashMap<TenantRoleId, TenantRole>> {
+    ) -> FpResult<HashMap<TenantRoleId, TenantRole>> {
         let results = tenant_role::table
             .filter(tenant_role::id.eq_any(ids))
             .get_results::<Self>(conn)?

@@ -9,7 +9,6 @@ use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 use db::DbPool;
-use db::DbResult;
 use newtypes::vendor_credentials::ExperianCredentialBuilder;
 use newtypes::vendor_credentials::ExperianCredentials;
 use newtypes::vendor_credentials::IdologyCredentials;
@@ -51,7 +50,7 @@ impl TenantVendorControl {
         enclave_client: &EnclaveClient,
     ) -> FpResult<TenantVendorControl> {
         let (tenant, vendor_control, tbi) = db_pool
-            .db_query(move |conn| -> DbResult<_> {
+            .db_query(move |conn| {
                 let t = Tenant::get(conn, &tenant_id)?;
                 let tvc = DbTenantVendorControl::get(conn, &t.id)?;
                 let tbi = TenantBusinessInfo::get(conn, &t.id)?;

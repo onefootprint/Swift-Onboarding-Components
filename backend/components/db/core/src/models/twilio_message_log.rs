@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::twilio_message_log;
@@ -36,7 +36,7 @@ impl TwilioMessageLog {
         account_sid: String,
         status: String,
         error: Option<String>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         let updated_at = Utc::now();
 
         diesel::insert_into(twilio_message_log::table)
@@ -85,7 +85,7 @@ impl NewTwilioMessageLog {
         vault_id: Option<VaultId>,
         status: String,
         error: Option<String>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         let created_at = Utc::now();
 
         let log = NewTwilioMessageLog {

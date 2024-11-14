@@ -1,9 +1,9 @@
-use crate::errors::FpOptionalExtension;
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::scoped_vault::ScopedVaultIdentifier;
 use crate::models::vault::Vault;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpDbOptionalExtension;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::vault;
@@ -65,7 +65,7 @@ pub struct SearchQuery {
 }
 
 impl ScopedVaultListQueryParams {
-    fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<ScopedVaultId>>> {
+    fn map_search(self, conn: &mut PgConn) -> FpResult<ScopedVaultListQueryParams<Vec<ScopedVaultId>>> {
         let Self {
             tenant_id,
             is_live,
@@ -272,7 +272,7 @@ fn vaults_matching_search(
     search: SearchQuery,
     tenant_id: &TenantId,
     is_live: bool,
-) -> DbResult<Vec<ScopedVaultId>> {
+) -> FpResult<Vec<ScopedVaultId>> {
     use db_schema::schema::fingerprint;
     let SearchQuery {
         search,
@@ -347,7 +347,7 @@ fn list(
     cursor: Option<ScopedVaultCursor>,
     order_by: ScopedVaultCursorKind,
     page_size: i64,
-) -> DbResult<Vec<(ScopedVault, Vault)>> {
+) -> FpResult<Vec<(ScopedVault, Vault)>> {
     let query = list_query!(params);
 
     let mut scoped_vaults = query.inner_join(vault::table).limit(page_size);
@@ -385,14 +385,14 @@ pub fn list_authorized_for_tenant(
     params: ScopedVaultListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> DbResult<Vec<(ScopedVault, Vault)>> {
+) -> FpResult<Vec<(ScopedVault, Vault)>> {
     let params = &params.map_search(conn)?;
     let cursor = cursor.map(ScopedVaultCursor::OrderingId);
     list(conn, params, cursor, ScopedVaultCursorKind::OrderingId, page_size)
 }
 
 #[instrument("ScopedVault::count_for_tenant", skip_all)]
-pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
+pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> FpResult<i64> {
     let params = &params.map_search(conn)?;
     let count = list_query!(params).count().get_result(conn)?;
     Ok(count)
@@ -408,7 +408,7 @@ pub fn list_and_count_authorized_for_tenant(
     cursor: Option<ScopedVaultCursor>,
     order_by: ScopedVaultCursorKind,
     page_size: i64,
-) -> DbResult<(Vec<(ScopedVault, Vault)>, i64)> {
+) -> FpResult<(Vec<(ScopedVault, Vault)>, i64)> {
     let params = &params.map_search(conn)?;
 
     let results = list(conn, params, cursor, order_by, page_size)?;

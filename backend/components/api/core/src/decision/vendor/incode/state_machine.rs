@@ -136,7 +136,7 @@ impl IncodeStateMachine {
         let config_id = configuration_id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
         let session = state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 // TODO: we need to handle auth tokens expiring on stale IVS sessions
                 // (e.g. someone starts and then comes back > 90d we will error here.)
                 let session = IncodeVerificationSession::get(conn, &id_doc_id)?;
@@ -252,7 +252,7 @@ impl IncodeStateMachine {
     pub async fn init_from_existing(state: &State, ivs: IncodeVerificationSession) -> FpResult<Self> {
         let idi = ivs.identity_document_id.clone();
         let (di, id_doc, doc_req, obc, uvw) = state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let (id_doc, doc_req) = Document::get(conn, &idi)?;
 
                 let di = DecisionIntent::get_or_create_for_workflow(

@@ -7,7 +7,6 @@ use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::rule_set_result::RuleSetResult;
 use db::models::scoped_vault::ScopedVault;
-use db::DbResult;
 use newtypes::FpId;
 use newtypes::RuleSetResultId;
 use paperclip::actix::api_v2_operation;
@@ -31,7 +30,7 @@ pub async fn get_latest_workflow_decision(
     let fp_id = request.into_inner();
 
     let result = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RuleSetResult::latest_workflow_decision(conn, &sv.id)
         })
@@ -57,7 +56,7 @@ pub async fn get(
     let (fp_id, rsr_id) = request.into_inner();
 
     let rsr = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?; // permission check
             RuleSetResult::get(conn, &rsr_id)
         })

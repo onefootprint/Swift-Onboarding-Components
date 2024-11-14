@@ -3,8 +3,8 @@ use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::models::scoped_vault::ScopedVault;
 use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::annotation;
@@ -63,7 +63,7 @@ impl Annotation {
         is_pinned: bool,
         scoped_vault_id: ScopedVaultId,
         actor: T,
-    ) -> DbResult<AnnotationInfo>
+    ) -> FpResult<AnnotationInfo>
     where
         T: Into<DbActor>,
     {
@@ -95,7 +95,7 @@ impl Annotation {
         fp_id: FpId,
         is_live: bool,
         is_pinned: Option<bool>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let update = AnnotationUpdate { is_pinned };
 
         let su_ids = scoped_vault::table
@@ -116,7 +116,7 @@ impl Annotation {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&AnnotationId>,
-    ) -> DbResult<HashMap<AnnotationId, AnnotationInfo>> {
+    ) -> FpResult<HashMap<AnnotationId, AnnotationInfo>> {
         let annotations = annotation::table
             .filter(annotation::id.eq_any(ids))
             .get_results::<Annotation>(conn)?;
@@ -138,7 +138,7 @@ impl Annotation {
         tenant_id: TenantId,
         is_live: bool,
         is_pinned: Option<bool>,
-    ) -> DbResult<Vec<AnnotationInfo>> {
+    ) -> FpResult<Vec<AnnotationInfo>> {
         let mut query = annotation::table
             .inner_join(scoped_vault::table)
             .filter(scoped_vault::fp_id.eq(fp_id))
@@ -162,7 +162,7 @@ impl Annotation {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         obd_id: &OnboardingDecisionId,
-    ) -> DbResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         let ut: Option<UserTimeline> = user_timeline::table
             .filter(user_timeline::scoped_vault_id.eq(sv_id))
             .filter(

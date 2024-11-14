@@ -5,7 +5,6 @@ use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
-use api_core::FpResult;
 use api_core::State;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
@@ -21,7 +20,7 @@ async fn get(
     let id = id.into_inner();
 
     let sv = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
             let sv = ScopedVault::get(conn, id)?;
             Ok(sv)

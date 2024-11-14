@@ -1,6 +1,5 @@
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::user::UserWfAuthContext;
@@ -55,7 +54,7 @@ pub async fn post_validate(
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();
     state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
             vw.validate_request(conn, updates, &DataRequestSource::HostedPatchVault(source.into()))?;
             Ok(())
@@ -98,7 +97,7 @@ pub async fn patch(
         .map(|di| (di, DataLifetimeSource::LikelyBootstrap))
         .collect();
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
 
             let sources = DlSourceWithOverrides {

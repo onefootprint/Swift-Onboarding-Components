@@ -1,6 +1,6 @@
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::document_request::{
@@ -46,7 +46,7 @@ pub enum DocumentRequestIdentifier<'a> {
 
 impl DocumentRequest {
     #[tracing::instrument("DocumentRequest::create", skip_all)]
-    pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
+    pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> FpResult<Self> {
         let NewDocumentRequestArgs {
             scoped_vault_id,
             workflow_id,
@@ -69,7 +69,7 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument("DocumentRequest::create", skip_all)]
-    pub fn bulk_create(conn: &mut PgConn, args: Vec<NewDocumentRequestArgs>) -> DbResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut PgConn, args: Vec<NewDocumentRequestArgs>) -> FpResult<Vec<Self>> {
         let new_rows: Vec<NewDocumentRequestRow> = args
             .into_iter()
             .map(|a| {
@@ -101,7 +101,7 @@ impl DocumentRequest {
         conn: &mut PgConn,
         wf_id: &WorkflowId,
         id: T,
-    ) -> DbResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         let mut query = document_request::table
             .filter(document_request::workflow_id.eq(wf_id))
             .into_boxed();
@@ -118,7 +118,7 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument("DocumentRequest::get_all", skip_all)]
-    pub fn get_all(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<Self>> {
+    pub fn get_all(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Vec<Self>> {
         let result = document_request::table
             .filter(document_request::workflow_id.eq(wf_id))
             .get_results(conn)?;
@@ -126,7 +126,7 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument("DocumentRequest::get_or_create", skip_all)]
-    pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
+    pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> FpResult<Self> {
         let kind = DocumentRequestKind::from(&args.config);
         if let Some(existing) = Self::get(conn, &args.workflow_id, kind)? {
             // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie,
@@ -141,7 +141,7 @@ impl DocumentRequest {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<DocumentRequestId>,
-    ) -> DbResult<HashMap<DocumentRequestId, DocumentRequest>> {
+    ) -> FpResult<HashMap<DocumentRequestId, DocumentRequest>> {
         let results = document_request::table
             .filter(document_request::id.eq_any(ids))
             .get_results::<Self>(conn)?
@@ -155,7 +155,7 @@ impl DocumentRequest {
     /// Very targeted method to just return the kind of the vault that owns this document request.
     /// Since we haven't checked ownership of the document request at this point, we don't want to
     /// return any info from the document request itself.
-    pub fn get_owner_kind(conn: &mut PgConn, id: UncheckedDrIdentifier) -> DbResult<VaultKind> {
+    pub fn get_owner_kind(conn: &mut PgConn, id: UncheckedDrIdentifier) -> FpResult<VaultKind> {
         let mut sv_query = document_request::table
             .select(document_request::scoped_vault_id)
             .into_boxed();

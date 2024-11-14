@@ -4,7 +4,6 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
-use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::MultiUpdateRuleRequest;
@@ -41,7 +40,7 @@ pub async fn multi_update_rules(
     let req = request.into_inner();
 
     let rules = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let update = validate_rules_request(conn, &tenant_id, is_live, req)?;
 
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;

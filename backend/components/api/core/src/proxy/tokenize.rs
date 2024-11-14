@@ -151,7 +151,7 @@ pub async fn vault_pii(
 
         let actor = auth.actor();
         state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let vault = Vault::get(conn, &sv.id)?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
@@ -256,7 +256,7 @@ async fn encrypt_document(
     is_live: bool,
 ) -> FpResult<EncryptedDocumentToStore> {
     let (vault, scoped_vault) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vault = Vault::get(conn, &scoped_vault.id)?;
             Ok((vault, scoped_vault))

@@ -210,7 +210,7 @@ async fn test_run_kyc_waterfall(
 
     let sv_id = wf.scoped_vault_id.clone();
     let di = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let args = UpdateTenantVendorControlArgs {
                 idology_enabled: Some(idology_enabled.0),
                 experian_enabled: Some(experian_enabled.0),

@@ -4,7 +4,6 @@ use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::utils::actix::OptionalJson;
-use api_core::FpResult;
 use api_wire_types::SkipPasskeyRegisterRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
@@ -31,7 +30,7 @@ pub async fn post(
     tracing::info!(has_context=%skip_context.is_some(), "Skipping passkey register");
 
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
 
             let _ = NewLivenessEvent {

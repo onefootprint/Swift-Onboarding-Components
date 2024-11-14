@@ -1,10 +1,10 @@
 use super::data_lifetime::DataLifetime;
 use super::data_lifetime::DataLifetimeSeqnoTxn;
-use crate::DbResult;
 use crate::HasLifetime;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::VaultedData;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::document_data;
@@ -58,7 +58,7 @@ impl DocumentData {
         e_data_key: SealedVaultDataKey,
         source: DataLifetimeSource,
         actor: Option<DbActor>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let (dl, _) = DataLifetime::create(conn, sv_txn, kind.clone(), source, actor)?;
 
         let new_doc = NewDocumentData {
@@ -80,7 +80,7 @@ impl DocumentData {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&DocumentDataId>,
-    ) -> DbResult<HashMap<DocumentDataId, DocumentData>> {
+    ) -> FpResult<HashMap<DocumentDataId, DocumentData>> {
         let results = document_data::table
             .filter(document_data::id.eq_any(ids))
             .get_results::<DocumentData>(conn)?
@@ -98,7 +98,7 @@ impl HasLifetime for DocumentData {
     }
 
     #[tracing::instrument("DocumentData::get_for", skip_all)]
-    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> FpResult<Vec<Self>>
     where
         Self: Sized,
     {

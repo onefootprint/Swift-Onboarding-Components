@@ -4,6 +4,8 @@ use actix_web::web::Json;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::ApiResponse;
 use api_core::State;
+use api_errors::BadRequest;
+use api_errors::BadRequestInto;
 use api_errors::ServerErrInto;
 use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
@@ -12,8 +14,6 @@ use db::schema::data_lifetime;
 use db::schema::scoped_vault;
 use db::schema::scoped_vault_version;
 use db::schema::vault_dr_blob;
-use db::DbError;
-use db::DbResult;
 use diesel::prelude::*;
 use newtypes::FpId;
 use newtypes::VaultDrConfigId;
@@ -61,7 +61,7 @@ pub async fn post(
     let fp_ids = request.into_inner();
 
     state
-        .db_transaction(move |conn| -> DbResult<()> {
+        .db_transaction(move |conn| {
             for fp_id in fp_ids {
                 tracing::info!("Running test backfill for fp_id: {:?}", &fp_id);
                 let sv: ScopedVault = scoped_vault::table
@@ -71,9 +71,7 @@ pub async fn post(
                 let tenant = Tenant::get(conn, &sv.tenant_id)?;
 
                 if !tenant.id.is_integration_test_tenant() {
-                    return Err(DbError::ValidationError(
-                        "Unsupported tenant for this API".to_string(),
-                    ));
+                    return BadRequestInto("Unsupported tenant for this API");
                 }
 
                 // Pick a single DL deterministically.
@@ -89,7 +87,7 @@ pub async fn post(
                 } else {
                     dls.into_iter().next()
                 };
-                let dl = dl.ok_or(DbError::ValidationError("No data for this fp_id".to_string()))?;
+                let dl = dl.ok_or(BadRequest("No data for this fp_id"))?;
 
 
                 // Delete the corresponding VDR blob.

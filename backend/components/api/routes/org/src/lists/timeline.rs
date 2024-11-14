@@ -66,7 +66,7 @@ async fn timeline(
     };
 
     let (events, list, list_entry_creations, list_entries) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let (events, _) = AuditEvent::filter(conn, params, (page_size + 1) as i64)?;
 

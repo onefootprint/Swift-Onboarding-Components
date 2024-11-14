@@ -7,7 +7,6 @@ use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::ApiResponse;
-use api_core::FpResult;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::preview_api;
@@ -36,7 +35,7 @@ pub async fn get(
     let pagination = pagination.db_pagination(&state);
 
     let (events, next_page, count) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (events, next_page) = AuthEvent::list(conn, &sv.id, Some(pagination))?;
             let count = AuthEvent::count(conn, &sv.id)?;

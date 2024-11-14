@@ -1,7 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::user::UserError;
@@ -45,7 +44,7 @@ pub async fn handler(
     let t_id = user_auth.tenant.as_ref().map(|t| t.id.clone());
 
     let (uvw, ci) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let id = user_auth.user_identifier();
             let args = VwArgs::from(&id);
             let uvw = VaultWrapper::<Person>::build(conn, args)?;

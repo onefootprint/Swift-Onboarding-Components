@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::fingerprint_visit_event;
@@ -55,7 +55,7 @@ impl FingerprintVisitEvent {
         path: String,
         session_id: Option<SessionId>,
         response: Option<serde_json::Value>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new_row = NewFingerprintVisit {
             visitor_id,
             vault_id,

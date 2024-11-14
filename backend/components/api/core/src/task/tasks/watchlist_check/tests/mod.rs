@@ -16,7 +16,6 @@ use db::models::watchlist_check::WatchlistCheck;
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::DbPool;
-use db::DbResult;
 use idv::idology::pa::IdologyPaAPIResponse;
 use idv::idology::pa::IdologyPaRequest;
 use idv::incode::response::OnboardingStartResponse;
@@ -68,7 +67,7 @@ async fn create_user_and_task(
     idks: Vec<IDK>,
 ) -> (ScopedVault, Task) {
     let (sv, task) = state
-        .db_transaction(move |conn| -> DbResult<_> {
+        .db_transaction(move |conn| {
             let sv = match vault_kind {
                 VaultKind::NonPortable => {
                     let tenant = fixtures::tenant::create(conn);
@@ -117,7 +116,7 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
         raw_response: res.raw_response,
     });
     state
-        .db_query(move |conn| -> FpResult<VerificationResult> {
+        .db_query(move |conn| {
             let v = Vault::get(conn, &sv_id).unwrap();
             let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();
             let (_vreq, vres) = crate::decision::vendor::verification_result::save_vreq_and_vres(
@@ -144,7 +143,7 @@ async fn get_data(
     Vec<RiskSignal>,
 ) {
     db_pool
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let wc = WatchlistCheck::_get_by_svid(conn, &svid)?;
             let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string())?;
 

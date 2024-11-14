@@ -3,7 +3,15 @@ use crate::FpErrorTrait;
 use http::StatusCode;
 
 #[derive(
-    Debug, Copy, Clone, Eq, PartialEq, strum::EnumIter, strum::Display, serde_with::SerializeDisplay,
+    Debug,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    strum::EnumIter,
+    strum::Display,
+    serde_with::SerializeDisplay,
+    derive_more::IsVariant,
 )]
 pub enum FpErrorCode {
     // Internal errors whose serialization generally don't matter
@@ -23,6 +31,10 @@ pub enum FpErrorCode {
     DbBrokenTransactionManager,
     #[strum(serialize = "I107")]
     DbReadOnlyTransaction,
+    #[strum(serialize = "I108")]
+    DbDataNotFound,
+    #[strum(serialize = "I109")]
+    DbUniqueConstraintViolation,
 
     // Errors used by our client
     #[strum(serialize = "E101")]
@@ -97,6 +109,8 @@ impl FpErrorCode {
             Self::DbConnectionClosed => false,
             Self::DbBrokenTransactionManager => false,
             Self::DbReadOnlyTransaction => false,
+            Self::DbDataNotFound => false,
+            Self::DbUniqueConstraintViolation => false,
 
             // Errors used by our client
             Self::InvalidStatusTransition => true,

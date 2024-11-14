@@ -2,9 +2,10 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::models::ob_configuration::IsLive;
 use crate::models::scoped_vault_version::ScopedVaultVersion;
 use crate::models::vault_dr::VaultDrConfig;
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
+use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::data_lifetime;
@@ -38,7 +39,7 @@ pub fn get_scoped_vault_version_batch(
     config_id: &VaultDrConfigId,
     batch_size: usize,
     fp_id_filter: Option<Vec<FpId>>,
-) -> DbResult<Vec<ScopedVaultVersion>> {
+) -> FpResult<Vec<ScopedVaultVersion>> {
     // Implementation is based on GetVaultVersionBatch in
     // backend/formal_methods/vault_disaster_recovery/vdr.tla
 
@@ -151,7 +152,7 @@ pub fn get_dl_batch_for_svv_batch(
     config_id: &VaultDrConfigId,
     svv_batch: &[ScopedVaultVersion],
     batch_size: usize,
-) -> DbResult<Vec<DataLifetime>> {
+) -> FpResult<Vec<DataLifetime>> {
     // Implementation is based on GetDlBatch in
     // backend/formal_methods/vault_disaster_recovery/vdr.tla
 
@@ -210,7 +211,7 @@ pub fn get_complete_svvs_for_svv_batch(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
     svv_batch: &[ScopedVaultVersion],
-) -> DbResult<Vec<ScopedVaultVersion>> {
+) -> FpResult<Vec<ScopedVaultVersion>> {
     // Implementation is based on GetCompleteVaultVersionBatch in
     // backend/formal_methods/vault_disaster_recovery/vdr.tla
 
@@ -276,7 +277,7 @@ pub fn bulk_get_vdr_blob_keys_active_at(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
     svv_ids: Vec<&ScopedVaultVersionId>,
-) -> DbResult<HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>>> {
+) -> FpResult<HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>>> {
     let svvid_blob_keys: Vec<(ScopedVaultVersionId, (DataIdentifier, DataLifetimeSeqno, String))> =
         scoped_vault_version::table
             .inner_join(
@@ -354,7 +355,7 @@ pub fn bulk_get_vdr_blob_keys_active_at(
 /// Returns the greatest timestamp associated with the given SVV, determined by way of connected
 /// DLs.
 #[tracing::instrument(skip_all)]
-fn get_greatest_dl_timestamp_for_svv(conn: &mut PgConn, svv: &ScopedVaultVersion) -> DbResult<DateTime<Utc>> {
+fn get_greatest_dl_timestamp_for_svv(conn: &mut PgConn, svv: &ScopedVaultVersion) -> FpResult<DateTime<Utc>> {
     let dls: Vec<DataLifetime> = data_lifetime::table
         .filter(data_lifetime::scoped_vault_id.eq(&svv.scoped_vault_id))
         .filter(
@@ -371,24 +372,22 @@ fn get_greatest_dl_timestamp_for_svv(conn: &mut PgConn, svv: &ScopedVaultVersion
             let ts = if dl.created_seqno == svv.seqno {
                 dl.created_at
             } else if dl.deactivated_seqno == Some(svv.seqno) {
-                dl.deactivated_at.ok_or(DbError::AssertionError(format!(
+                dl.deactivated_at.ok_or(ServerErr!(
                     "Found deactivated DL without deactivated_at: {:?}",
                     dl.id
-                )))?
+                ))?
             } else {
-                return Err(DbError::AssertionError(
-                    "Got DL that shouldn't match get_latest_backup_record_timestamp query".to_owned(),
-                ));
+                return ServerErrInto("Got DL that shouldn't match get_latest_backup_record_timestamp query");
             };
 
             Ok(ts)
         })
-        .collect::<DbResult<Vec<_>>>()?
+        .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .max();
 
-    let ts = ts.ok_or(DbError::AssertionError(
-        "Got no DLs for SVV in get_latest_backup_record_timestamp query".to_owned(),
+    let ts = ts.ok_or(ServerErr(
+        "Got no DLs for SVV in get_latest_backup_record_timestamp query",
     ))?;
 
     Ok(ts)
@@ -403,7 +402,7 @@ fn get_greatest_dl_timestamp_for_svv(conn: &mut PgConn, svv: &ScopedVaultVersion
 pub fn get_approximate_latest_backup_record_timestamp(
     conn: &mut PgConn,
     config: &VaultDrConfig,
-) -> DbResult<Option<DateTime<Utc>>> {
+) -> FpResult<Option<DateTime<Utc>>> {
     let latest_backed_up_svv: Option<ScopedVaultVersion> = scoped_vault_version::table
         // tenant_id/is_live are included so we can use the index
         // svv_tenant_id_is_live_vdr_cfg_id_seqno
@@ -430,7 +429,7 @@ pub fn get_approximate_latest_backup_record_timestamp(
 pub fn get_approximate_next_backup_record_timestamp(
     conn: &mut PgConn,
     config: &VaultDrConfig,
-) -> DbResult<Option<DateTime<Utc>>> {
+) -> FpResult<Option<DateTime<Utc>>> {
     let next_svv_batch =
         get_scoped_vault_version_batch(conn, &config.tenant_id, config.is_live, &config.id, 1, None)?;
 

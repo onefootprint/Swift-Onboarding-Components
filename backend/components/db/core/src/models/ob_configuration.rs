@@ -5,13 +5,13 @@ use super::workflow::Workflow;
 use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::DbError;
-use crate::DbResult;
 use crate::NextPage;
 use crate::NonNullVec;
 use crate::OffsetPagination;
 use crate::OptionalNonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
@@ -475,7 +475,7 @@ impl ObConfiguration {
         conn: &mut PgConn,
         query: &ObConfigurationQuery,
         pagination: OffsetPagination,
-    ) -> DbResult<(Vec<ObConfigInfo>, NextPage)> {
+    ) -> FpResult<(Vec<ObConfigInfo>, NextPage)> {
         let mut query = Self::list_query(query)
             .order_by(ob_configuration::created_at.desc())
             .limit(pagination.limit());
@@ -499,7 +499,7 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument("ObConfiguration::count", skip_all)]
-    pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> DbResult<i64> {
+    pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> FpResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
@@ -508,7 +508,7 @@ impl ObConfiguration {
         conn: &mut PgConn,
         tenant_ids: Vec<&TenantId>,
         is_live: bool,
-    ) -> DbResult<TenantObConfigCounts> {
+    ) -> FpResult<TenantObConfigCounts> {
         let counts: Vec<_> = ob_configuration::table
             .filter(ob_configuration::is_live.eq(is_live))
             .filter(ob_configuration::tenant_id.eq_any(&tenant_ids))
@@ -523,7 +523,7 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument("ObConfiguration::get", skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
@@ -555,7 +555,7 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument("ObConfiguration::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, obc_id: &ObConfigurationId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, obc_id: &ObConfigurationId) -> FpResult<Locked<Self>> {
         Playbook::lock(conn, obc_id)?;
 
         let result = ob_configuration::table
@@ -569,7 +569,7 @@ impl ObConfiguration {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<ObConfigurationId>,
-    ) -> DbResult<HashMap<ObConfigurationId, Self>> {
+    ) -> FpResult<HashMap<ObConfigurationId, Self>> {
         let results = ob_configuration::table
             .filter(ob_configuration::id.eq_any(ids))
             .get_results::<Self>(conn)?
@@ -583,13 +583,13 @@ impl ObConfiguration {
     /// Gets the OBC, if it's enabled.
     /// The OBC may be deactivated (i.e. not the latest version of the playbook).
     #[tracing::instrument("ObConfiguration::get_enabled", skip_all)]
-    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
+    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
         let result = Self::get(conn, id)?;
         if result.0.status != ApiKeyStatus::Enabled {
-            return Err(DbError::PlaybookDisabled);
+            return Err(DbError::PlaybookDisabled.into());
         }
         Ok(result)
     }
@@ -600,7 +600,7 @@ impl ObConfiguration {
         conn: &mut TxnPgConn,
         playbook: &Locked<Playbook>,
         args: NewObConfigurationArgs,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let Playbook {
             id: playbook_id,
             _created_at: _,
@@ -678,7 +678,7 @@ impl ObConfiguration {
         tenant_id: &TenantId,
         is_live: bool,
         update: ObConfigurationUpdate,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
             .filter(ob_configuration::tenant_id.eq(tenant_id))
@@ -688,14 +688,14 @@ impl ObConfiguration {
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated);
+            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
 
     #[tracing::instrument("ObConfiguration::get_enhanced_aml_obc_for_sv", skip_all)]
-    pub fn get_enhanced_aml_obc_for_sv(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
+    pub fn get_enhanced_aml_obc_for_sv(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Option<Self>> {
         // Get OBC for this scoped vault. This is a little funky now because you can theoretically onboard
         // only multiple Workflow's and each could have a different OBC For now, we take the first
         // completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML,

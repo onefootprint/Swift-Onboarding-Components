@@ -39,7 +39,6 @@ use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
-use db::DbResult;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeUpdatedWatchlistResult;
 use newtypes::vendor_api_struct::IncodeWatchlistCheck;
@@ -101,7 +100,7 @@ pub async fn get(
     };
 
     let signals = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, rs_filters)
         })
@@ -179,7 +178,7 @@ pub async fn get_onboardings(
     let (fp_id, wf_id) = request.into_inner();
 
     let signals = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let wf = Workflow::get(conn, (&sv.id, &wf_id))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::WorkflowId(&wf.id))
@@ -288,7 +287,7 @@ pub async fn decrypt_aml_hits(
     let principal: DbActor = auth.actor().into();
     let insight = CreateInsightEvent::from(insights);
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let reason = DECRYPT_AML_HITS_AUDIT_EVENT_REASON.to_owned();
 
@@ -331,7 +330,7 @@ pub async fn get_sentilink_detail(
     let (fp_id, risk_signal_id) = request.into_inner();
 
     let (vreq_id, vw, rs) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
             let (vreq, _) = VerificationResult::get(
@@ -424,7 +423,7 @@ async fn get_risk_signal_and_maybe_detail(
     HasSentilinkDetail,
 )> {
     let (rs, vreq_vres_key_obc) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
             let vreq_vres_key = if rs.reason_code.is_aml() {

@@ -5,13 +5,11 @@ use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
-use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OnboardingConfigFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::rule_set_version::RuleSetVersion;
-use db::DbError;
 use newtypes::ObConfigurationId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -48,7 +46,7 @@ async fn get_list(
         include_deactivated_versions: false,
     };
     let (results, next_page, count) = state
-        .db_query(move |conn| -> Result<_, DbError> {
+        .db_query(move |conn| {
             let (results, next_page) = ObConfiguration::list(conn, &query, pagination)?;
             let count = ObConfiguration::count(conn, &query)?;
             Ok((results, next_page, count))
@@ -80,7 +78,7 @@ async fn get_detail(
     let ob_config_id = ob_config_id.into_inner();
 
     let (obc, actor, rs) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;

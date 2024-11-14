@@ -34,7 +34,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_result::VerificationResult;
 use db::DbPool;
-use db::DbResult;
 use db::TxnPgConn;
 use feature_flag::BoolFlag;
 use http::StatusCode;
@@ -122,7 +121,7 @@ impl IncodeStateTransition for FetchScores {
         let sv_id = ctx.sv_id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
         let (obc, vw, id_doc, doc_uploads) = db_pool
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = Document::get(conn, &id_doc_id)?;
@@ -313,7 +312,7 @@ async fn run_aws_rekognition(
 
     let sv_id2 = ctx.sv_id.clone();
     let (id_doc, vw) = db_pool
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let (id_doc, _) = Document::get(conn, &id_doc_id)?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id2)?;
             Ok((id_doc, vw))
@@ -369,7 +368,7 @@ async fn run_aws_rekognition(
     };
 
     let vres = db_pool
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let di = DecisionIntent::create(conn, DecisionIntentKind::DocScan, &sv_id, Some(&wf_id))?;
             let (_, vres) =
                 save_vreq_and_vres(conn, &vw.vault.public_key.clone(), &sv_id, &di.id, res_to_save)?;
@@ -408,7 +407,7 @@ async fn add_customer_and_save_session(
 
     // check existing
     let existing = db_pool
-        .db_query(move |conn| -> DbResult<_> { IncodeCustomerSession::list(conn, (&sv_id2, &ivs_id2)) })
+        .db_query(move |conn| IncodeCustomerSession::list(conn, (&sv_id2, &ivs_id2)))
         .await?;
 
     if !existing.is_empty() {
@@ -450,7 +449,7 @@ async fn add_customer_and_save_session(
     if let Some(customer_id) = parsed.customer_id {
         if parsed.success {
             db_pool
-                .db_query(move |conn| -> DbResult<_> {
+                .db_query(move |conn| {
                     IncodeCustomerSession::create(conn, ctx.sv_id, ctx.tenant_id, ivs_id, customer_id.into())
                 })
                 .await?;

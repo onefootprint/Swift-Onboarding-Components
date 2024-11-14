@@ -30,7 +30,7 @@ async fn patch(
     let request = request.into_inner();
 
     let tenant_info = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (tenant, bp, tvc) = Tenant::private_get(conn, &id)?;
             // In absence of a real update log, will just add a log line
             tracing::info!(?request, ?tenant, ?bp, ?tvc, "Updating tenant info");

@@ -4,7 +4,6 @@ use crate::State;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::FpResult;
 use api_wire_types::UpdateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
@@ -32,7 +31,7 @@ pub async fn post(
     let actor: DbActor = auth.actor().into();
 
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             if let Some(label) = label_kind {
                 ScopedVaultLabel::create(conn, sv, label, actor)?;
@@ -60,9 +59,9 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let label = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            Ok(ScopedVaultLabel::get_active(conn, &sv.id)?)
+            ScopedVaultLabel::get_active(conn, &sv.id)
         })
         .await?;
 

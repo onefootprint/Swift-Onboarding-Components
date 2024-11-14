@@ -93,7 +93,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let sb_id = user_auth.sb_id.clone();
     let biz_wf_id = user_auth.biz_wf_id.clone();
     let (uvw, biz_wf_info) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
             let biz_wf_info = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
                 let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sb_id)?;
@@ -125,7 +125,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let person_workflow = user_auth.workflow.clone();
     let has_business_external_id = user_auth.metadata.business_external_id.is_some();
     let requirements = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let ctx = RequirementContext {
                 user_values: &user_values,
                 business_owners: &business_owners,

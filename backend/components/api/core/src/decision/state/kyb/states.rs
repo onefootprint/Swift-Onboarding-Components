@@ -473,7 +473,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let wfid = self.wf_id.clone();
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
@@ -672,7 +672,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let wfid = self.wf_id.clone();
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;

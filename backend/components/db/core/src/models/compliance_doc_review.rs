@@ -1,7 +1,7 @@
 use super::compliance_doc::ComplianceDoc;
-use crate::DbError;
-use crate::DbResult;
 use crate::TxnPgConn;
+use api_errors::FpResult;
+use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc_review;
@@ -47,11 +47,9 @@ pub struct NewComplianceDocReview<'a> {
 
 impl<'a> NewComplianceDocReview<'a> {
     #[tracing::instrument("NewComplianceDocReview::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocReview> {
+    pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> FpResult<ComplianceDocReview> {
         if doc.id != *self.compliance_doc_id {
-            return Err(DbError::AssertionError(
-                "locked document does not match new review".to_string(),
-            ));
+            return ServerErrInto("locked document does not match new review");
         }
 
         // Deactivate any existing review.
@@ -70,7 +68,7 @@ impl ComplianceDocReview {
     pub fn get_active(
         conn: &mut TxnPgConn,
         doc: &Locked<ComplianceDoc>,
-    ) -> DbResult<Option<ComplianceDocReview>> {
+    ) -> FpResult<Option<ComplianceDocReview>> {
         Ok(compliance_doc_review::table
             .filter(compliance_doc_review::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_review::deactivated_at.is_null())
@@ -84,7 +82,7 @@ impl ComplianceDocReview {
         conn: &mut TxnPgConn,
         rev_id: &ComplianceDocReviewId,
         doc: &Locked<ComplianceDoc>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         diesel::update(compliance_doc_review::table)
             .filter(compliance_doc_review::id.eq(rev_id))
             .filter(compliance_doc_review::compliance_doc_id.eq(&doc.id))

@@ -8,7 +8,6 @@ use crate::State;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::DbResult;
 use idv::VendorResponse;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::VerificationResultId;
@@ -72,7 +71,7 @@ where
 {
     let vendor_api = vendor_api_struct.vendor_api();
     let requests_and_result = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             VerificationRequest::get_latest_request_and_successful_result_for_vendor_api(conn, id, vendor_api)
         })
         .await?;
@@ -173,7 +172,7 @@ mod tests {
         let v_pub_key = uv.public_key.clone();
 
         let (vres_id_to_check, di_id, doc_id) = state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let di = DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &sv_id,
@@ -520,7 +519,7 @@ mod tests {
         }
 
         state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let res = VerificationRequest::list(conn, &di_id).unwrap();
                 let res_responses: Vec<_> = res
                     .clone()

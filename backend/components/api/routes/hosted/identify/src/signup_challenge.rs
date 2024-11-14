@@ -121,7 +121,7 @@ pub async fn post(
     )
     .await?;
     let (uv, sv, root_span) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (uv, sv, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
             Ok((uv.into_inner(), sv, root_span))
         })

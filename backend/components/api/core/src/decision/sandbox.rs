@@ -297,7 +297,7 @@ pub async fn save_fixture_incode_watchlist_result(
     let sv_id = sv_id.clone();
     let vault_public_key = vault_public_key.clone();
     let vres = db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let vreq =
                 VerificationRequest::create(conn, (&sv_id, &di_id, VendorAPI::IncodeWatchlistCheck).into())?;
             let e_response = vendor::verification_result::encrypt_verification_result_response(

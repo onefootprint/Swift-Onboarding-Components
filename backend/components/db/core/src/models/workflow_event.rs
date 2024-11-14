@@ -1,6 +1,6 @@
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::workflow_event;
@@ -37,7 +37,7 @@ impl WorkflowEvent {
         workflow_id: WorkflowId,
         from_state: WorkflowState,
         to_state: WorkflowState,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new_workflow_event = NewWorkflowEvent {
             created_at: Utc::now(),
             workflow_id,
@@ -53,7 +53,7 @@ impl WorkflowEvent {
     }
 
     #[tracing::instrument("WorkflowEvent::list_for_workflow", skip_all)]
-    pub fn list_for_workflow(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Vec<Self>> {
+    pub fn list_for_workflow(conn: &mut PgConn, workflow_id: &WorkflowId) -> FpResult<Vec<Self>> {
         let results = workflow_event::table
             .filter(workflow_event::workflow_id.eq(workflow_id))
             .order_by(workflow_event::created_at.asc())

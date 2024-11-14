@@ -175,7 +175,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         let wfid = self.wf_id.clone();
         let svid = self.sv_id.clone();
         let (vw, obc, wf) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let (vw, obc) = common::get_vw_and_obc(conn, &svid, action.seqno, &wfid)?;
                 let wf = DbWorkflow::get(conn, &wfid)?;
 
@@ -527,7 +527,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let wfid = self.wf_id.clone();
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 

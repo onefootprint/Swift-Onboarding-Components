@@ -138,7 +138,7 @@ where
         };
 
         let result = db_pool
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let ivs = IncodeVerificationSession::lock(conn, &session.id)?;
                 if ivs.state != starting_state.name() {
                     Err(StateError::IncodeMachineConcurrentStateChange(

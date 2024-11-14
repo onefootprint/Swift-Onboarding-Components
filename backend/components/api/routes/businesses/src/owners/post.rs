@@ -10,11 +10,11 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
+use api_errors::FpErrorCode;
 use api_wire_types::NewBusinessOwnerRequest;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use db::DbError;
 use newtypes::preview_api;
 use newtypes::DataRequest;
 use newtypes::VaultKind;
@@ -49,7 +49,7 @@ pub async fn post(
     }?;
 
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let sb = ScopedVault::lock(conn, (&fp_bid, &tenant_id, is_live))?;
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id)?;
             if sb.kind != VaultKind::Business {
@@ -71,10 +71,10 @@ pub async fn post(
             let result = BusinessOwner::create_tenant_api(conn, sb, owner_su.vault_id);
             let bo = match result {
                 Ok(bo) => bo,
-                Err(DbError::UniqueConstraintViolation(_)) => {
+                Err(e) if e.code() == Some(FpErrorCode::DbUniqueConstraintViolation) => {
                     return BadRequestInto("The provided user is already an owner of the provided business");
                 }
-                Err(e) => return Err(e.into()),
+                Err(e) => return Err(e),
             };
 
             // Record the beneficial owner's ownership stake on the business vault.

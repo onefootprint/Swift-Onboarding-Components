@@ -116,7 +116,7 @@ pub async fn post(
         tags,
     };
     let (scoped_vaults, mut entities, vws, count) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let page_size = (page_size + 1) as i64;
             let order_by = ScopedVaultCursorKind::LastActivityAt;
             let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(

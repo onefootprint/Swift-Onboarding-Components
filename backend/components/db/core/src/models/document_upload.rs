@@ -1,8 +1,8 @@
 use super::data_lifetime::DataLifetimeSeqnoTxn;
-use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::document_upload;
@@ -105,7 +105,7 @@ impl DocumentUpload {
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         args: NewDocumentUploadArgs,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let NewDocumentUploadArgs {
             document_id,
             side,
@@ -155,7 +155,7 @@ impl DocumentUpload {
         side: DocumentSide,
         failure_reasons: Vec<IncodeFailureReason>,
         deactivate: bool,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         let update = DocumentUploadUpdate {
             deactivated_at: deactivate.then_some(Utc::now()),
             failure_reasons: Some(failure_reasons),
@@ -175,7 +175,7 @@ impl DocumentUpload {
     pub fn count_failed_attempts(
         conn: &mut PgConn,
         document_id: &DocumentId,
-    ) -> DbResult<Vec<(DocumentSide, i64)>> {
+    ) -> FpResult<Vec<(DocumentSide, i64)>> {
         let results = document_upload::table
             .filter(document_upload::document_id.eq(document_id))
             .filter(not(document_upload::deactivated_at.is_null()))
