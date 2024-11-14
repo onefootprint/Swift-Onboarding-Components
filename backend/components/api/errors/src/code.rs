@@ -195,6 +195,6 @@ impl std::error::Error for BadRequestWithCode {
 
 impl<T, E: From<FpError>> From<BadRequestWithCode> for Result<T, E> {
     fn from(value: BadRequestWithCode) -> Self {
-        Err(E::from(FpError(Box::new(value))))
+        Err(E::from(FpError::from(value)))
     }
 }

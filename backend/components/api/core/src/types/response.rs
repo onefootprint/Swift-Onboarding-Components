@@ -42,7 +42,7 @@ impl<T: Into<FpError>> From<T> for ApiError {
 }
 
 #[derive(Clone, serde::Serialize)]
-pub struct SerializedApiResponse {
+pub struct SerializedApiResponse<'a> {
     pub message: String,
     pub code: Option<FpErrorCode>,
     /// Any freeform JSON context to give more information on the error
@@ -52,6 +52,9 @@ pub struct SerializedApiResponse {
     // In non-prod, debug representation of the error message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub debug: Option<String>,
+    // In non-prod, file location that produced the error message
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub location: Option<&'a str>,
 }
 
 
@@ -62,24 +65,21 @@ impl actix_web::ResponseError for ApiError {
 
     fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
         let support_id = newtypes::Uuid::new_v4();
+        self.log_error(support_id.to_string());
+
         let status_code = self.status_code();
+        let mut message = self.message();
+
+        if status_code == StatusCode::INTERNAL_SERVER_ERROR && crate::config::SERVICE_CONFIG.is_production() {
+            // Scrub the error message for 500s in prod
+            message = "Something went wrong".to_string()
+        };
+        let debug = (!crate::config::SERVICE_CONFIG.is_production()).then_some(format!("{:?}", self));
+        let location = (!crate::config::SERVICE_CONFIG.is_production()).then_some(self.location());
 
         // Some errors have specific error codes and context
         let code = self.code();
         let context = self.context();
-        let message = self.message();
-
-        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
-            && crate::config::SERVICE_CONFIG.is_production()
-        {
-            // Hide HTTP 500 error messages from client in prod.
-            tracing::error!(err=?self.0, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api 500: {}", &self.to_string());
-            "Something went wrong".to_string()
-        } else {
-            tracing::info!(error=?self.0, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api {}", status_code);
-            message
-        };
-        let debug = (!crate::config::SERVICE_CONFIG.is_production()).then_some(format!("{:?}", self));
 
         let mut resp = actix_web::HttpResponse::build(status_code);
         self.mutate_response(&mut resp);
@@ -90,6 +90,7 @@ impl actix_web::ResponseError for ApiError {
             context,
             support_id,
             debug,
+            location,
         })
     }
 }

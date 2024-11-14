@@ -24,13 +24,16 @@ pub trait FpErrorTrait:
 
 /// The magical error type that can hold any type T that implements FpErrorTrait.
 /// As crates create their own Error struct, they only need to implement FpErrorTrait.
-pub struct FpError(pub Box<dyn FpErrorTrait>);
+pub struct FpError {
+    inner: Box<dyn FpErrorTrait>,
+    location: String,
+}
 
 impl std::ops::Deref for FpError {
     type Target = dyn FpErrorTrait;
 
     fn deref(&self) -> &Self::Target {
-        &*self.0 as &dyn FpErrorTrait
+        &*self.inner as &dyn FpErrorTrait
     }
 }
 
@@ -39,26 +42,47 @@ impl std::ops::Deref for FpError {
 pub type FpResult<T> = Result<T, FpError>;
 
 impl<T: FpErrorTrait + 'static> From<T> for FpError {
+    #[track_caller]
     fn from(value: T) -> Self {
-        FpError(Box::new(value))
+        FpError {
+            inner: Box::new(value),
+            // Using std::backtrace::Backtrace::capture() here is extremely expensive. Slows down our
+            // integration tests 6x.
+            // Alteratively, we could just `tracing::warn!` right here?
+            location: std::panic::Location::caller().to_string(),
+        }
     }
 }
 
 impl std::fmt::Display for FpError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(&self.0, f)
+        std::fmt::Display::fmt(&self.inner, f)
     }
 }
 
 impl std::fmt::Debug for FpError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Debug::fmt(&self.0, f)
+        std::fmt::Debug::fmt(&self.inner, f)
+    }
+}
+
+impl FpError {
+    pub fn log_error(&self, support_id: String) {
+        if self.status_code().is_server_error() {
+            tracing::error!(err=?self.inner, error.message=%self.inner, error.stack=%self.location, %support_id, status_code=%self.status_code().as_u16(), "{}", self.message());
+        } else {
+            tracing::info!(err=?self.inner, error.message=%self.inner, error.stack=%self.location, %support_id, status_code=%self.status_code().as_u16(), "{}", self.message());
+        };
+    }
+
+    pub fn location(&self) -> &str {
+        &self.location
     }
 }
 
 impl std::error::Error for FpError {
     fn source(&self) -> std::option::Option<&(dyn std::error::Error + 'static)> {
-        self.0.source()
+        self.inner.source()
     }
 }
 
@@ -72,6 +96,7 @@ pub use code::FpErrorCode;
 pub use diesel::*;
 
 impl From<std::convert::Infallible> for FpError {
+    #[track_caller]
     fn from(_: std::convert::Infallible) -> Self {
         panic!("impossible condition convert Infallible to ApiError")
     }

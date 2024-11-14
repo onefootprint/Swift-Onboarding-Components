@@ -14,7 +14,7 @@ pub enum DieselError {
     #[error("The DB connection has been closed.")]
     ConnectionClosed(String),
     #[error("Data not found")]
-    DataNotFound(String),
+    DataNotFound,
     #[error("Operation not allowed: foreign key constraint violation")]
     ForeignKeyViolation(String),
     #[error("Operation not allowed: unique constraint violation")]
@@ -24,19 +24,16 @@ pub enum DieselError {
 }
 
 impl From<diesel::result::Error> for FpError {
+    #[track_caller]
     fn from(value: diesel::result::Error) -> Self {
         DieselError::from(value).into()
     }
 }
 
 impl From<diesel::result::Error> for DieselError {
-    #[track_caller]
     fn from(value: diesel::result::Error) -> Self {
         match value {
-            diesel::result::Error::NotFound => {
-                // Include context from the caller, only visible in the debug output
-                Self::DataNotFound(std::panic::Location::caller().file().to_string())
-            }
+            diesel::result::Error::NotFound => Self::DataNotFound,
             diesel::result::Error::DatabaseError(db_error, info) => {
                 // Postgres provides lots of optional information for these errors - serialize it to a string
                 // and include it in the Debug implementation fo DbError for better analysis
@@ -77,7 +74,7 @@ impl FpErrorTrait for DieselError {
             Self::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::OtherDieselDbError(_, _) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::ConnectionClosed(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::DataNotFound(_) => StatusCode::NOT_FOUND,
+            Self::DataNotFound => StatusCode::NOT_FOUND,
             Self::ForeignKeyViolation(_) => StatusCode::BAD_REQUEST,
             Self::CheckConstraintViolation(_) => StatusCode::BAD_REQUEST,
             Self::UniqueConstraintViolation(_) => StatusCode::BAD_REQUEST,
@@ -87,7 +84,7 @@ impl FpErrorTrait for DieselError {
     fn code(&self) -> Option<FpErrorCode> {
         match self {
             Self::UniqueConstraintViolation(_) => Some(FpErrorCode::DbUniqueConstraintViolation),
-            Self::DataNotFound(_) => Some(FpErrorCode::DbDataNotFound),
+            Self::DataNotFound => Some(FpErrorCode::DbDataNotFound),
             Self::ConnectionClosed(_) => Some(FpErrorCode::DbConnectionClosed),
             Self::Other(diesel::result::Error::BrokenTransactionManager) => {
                 Some(FpErrorCode::DbBrokenTransactionManager)
