@@ -4,6 +4,7 @@ import { Stack } from '@onefootprint/ui';
 import CreateOrgRole from './components/create-org-role';
 import DeactivateOrgRole from './components/deactivate-org-role';
 import DecryptUserData from './components/decrypt-user-data';
+import InviteOrgMember from './components/invite-org-member';
 import PrincipalActor from './components/principal-actor';
 import UpdateOrgRole from './components/update-org-role';
 
@@ -24,6 +25,9 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
       )}
       {kind === 'deactivate_org_role' && (
         <DeactivateOrgRole detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === 'invite_org_member' && (
+        <InviteOrgMember detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
     </Stack>
   );

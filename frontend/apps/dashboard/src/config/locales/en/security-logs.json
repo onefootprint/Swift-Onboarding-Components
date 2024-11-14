@@ -66,6 +66,11 @@
       "other-attribute": "other attribute",
       "other-attributes": "other attributes"
     },
+    "invite": {
+      "invited": "invited",
+      "a-member": "a member",
+      "to-join": "to join"
+    },
     "roles": {
       "created-a-new": "created a new",
       "edited-the": "edited the",

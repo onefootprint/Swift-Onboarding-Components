@@ -20,10 +20,10 @@ const SecurityLogs = () => {
 
   const accessEventsToShow = [
     'decrypt_user_data',
-    // coming soon - keep in for dev
-    // AccessEventKind.CreateOrgRole,
-    // AccessEventKind.UpdateOrgRole,
-    // AccessEventKind.DeactivateOrgRole,
+    // 'create_org_role',
+    // 'update_org_role',
+    // 'deactivate_org_role',
+    // 'invite_org_member',
   ];
 
   useEffect(() => {
