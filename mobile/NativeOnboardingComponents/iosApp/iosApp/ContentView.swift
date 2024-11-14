@@ -1,5 +1,5 @@
 import SwiftUI
-import Shared
+import SwiftOnboardingComponentsShared
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
