@@ -94,10 +94,6 @@ impl std::str::FromStr for CollectedDataOption {
     type Err = strum::ParseError;
 
     fn from_str(s: &str) -> Result<CollectedDataOption, Self::Err> {
-        if s == "business_beneficial_owners" {
-            tracing::warn!("Found deprecated business_beneficial_owners CDO");
-            return Ok(Self::BusinessKycedBeneficialOwners);
-        }
         let res = match CollectedDataOptionKind::from_str(s) {
             Err(_) | Ok(CollectedDataOptionKind::Document) => Self::Document(DocumentCdoInfo::from_str(s)?),
             Ok(cdo_kind) => Self::try_from(cdo_kind).map_err(|_| strum::ParseError::VariantNotFound)?,
