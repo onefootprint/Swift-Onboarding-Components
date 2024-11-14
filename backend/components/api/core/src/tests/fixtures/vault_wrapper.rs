@@ -28,7 +28,7 @@ pub type VwSetup = (
 pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     let uv = db::tests::fixtures::vault::create_person(conn, uv_is_live);
     let tenant = db::tests::fixtures::tenant::create(conn);
-    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, uv_is_live);
+    let (_, ob_config) = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, uv_is_live);
     let sv = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
     let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 

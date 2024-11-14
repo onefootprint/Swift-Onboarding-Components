@@ -426,8 +426,8 @@ mod tests {
         let is_live = true;
         let vault = fixtures::vault::create_person(conn, true).into_inner();
         let tenant = fixtures::tenant::create(conn);
-        let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-        let scoped_vault = fixtures::scoped_vault::create(conn, &vault.id, &ob_config.id);
+        let (_, obc) = fixtures::ob_configuration::create(conn, &tenant.id, true);
+        let scoped_vault = fixtures::scoped_vault::create(conn, &vault.id, &obc.id);
         let role_kind = TenantRoleKind::ApiKey { is_live };
         let role =
             TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, role_kind).unwrap();

@@ -23,7 +23,7 @@ use crate::State;
 use api_wire_types::CreateRule;
 use api_wire_types::MultiUpdateRuleRequest;
 use api_wire_types::RuleActionMigration;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::rule_instance::NewRule;
 use db::models::rule_instance::RuleInstance;
 use db::test_helpers::assert_have_same_elements;
@@ -95,10 +95,11 @@ async fn test_stepup_with_multiple_docs(state: &State, action: RuleActionMigrati
     // DATA SETUP
     let must_collect_data = vec![CDO::PhoneNumber, CDO::Ssn9];
 
+    let is_live = true;
     let (wf, t, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
-            is_live: true,
+            is_live,
             must_collect_data,
             ..Default::default()
         },
@@ -107,7 +108,6 @@ async fn test_stepup_with_multiple_docs(state: &State, action: RuleActionMigrati
     .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
-    let obc_id = obc.id.clone();
     let expr = vec![RuleExpressionCondition::RiskSignal {
         field: FRC::DobCouldNotMatch,
         op: BooleanOperator::Equals,
@@ -144,9 +144,9 @@ async fn test_stepup_with_multiple_docs(state: &State, action: RuleActionMigrati
     let t_id = t.id.clone();
     state
         .db_transaction(move |conn| {
-            let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
+            let playbook = Playbook::lock(conn, (&obc.playbook_id, &t_id, is_live)).unwrap();
             let update = validate_rules_request(conn, &t_id, true, raw_update)?;
-            RuleInstance::bulk_edit(conn, &obc, &DbActor::Footprint, update)?;
+            RuleInstance::bulk_edit(conn, &playbook, &obc.id, &DbActor::Footprint, update)?;
 
             Ok(())
         })
@@ -313,7 +313,8 @@ async fn test_multi_stage_step_up(state: &mut State) {
     // DATA SETUP
     let must_collect_data = vec![CDO::PhoneNumber, CDO::Ssn9];
 
-    let (wf, _, obc, _tu) = setup_data(
+    let is_live = true;
+    let (wf, tenant, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: true,
@@ -325,6 +326,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
     .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
+    let playbook_id = obc.playbook_id.clone();
     let obc_id = obc.id.clone();
 
     //
@@ -373,10 +375,11 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 is_shadow: false,
             };
 
-            let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
+            let playbook = Playbook::lock(conn, (&playbook_id, &tenant.id, is_live)).unwrap();
             RuleInstance::bulk_create(
                 conn,
-                &obc,
+                &playbook,
+                &obc_id,
                 &DbActor::Footprint,
                 vec![kyc_stepup_rule, poa_stepup_rule, poa_review_rule],
             )

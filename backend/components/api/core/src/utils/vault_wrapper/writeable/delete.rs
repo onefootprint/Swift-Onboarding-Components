@@ -78,7 +78,7 @@ mod tests {
     #[db_test]
     fn test_soft_deletion(conn: &mut TestPgConn) {
         let tenant = fixtures::tenant::create(conn);
-        let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+        let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
 
         let scoped_vaults: Vec<_> = (0..=1)
             .map(|_| {

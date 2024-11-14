@@ -48,7 +48,7 @@ mod tests {
         let (sv, obc) = db_pool
             .db_transaction(|conn| -> FpResult<_> {
                 let t = fixtures::tenant::create(conn);
-                let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+                let (_, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
                 let vault = fixtures::vault::create_person(conn, true);
                 let sv = fixtures::scoped_vault::create(conn, &vault.id, &obc.id).into_inner();
                 Ok((sv, obc))

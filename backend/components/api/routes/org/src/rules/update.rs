@@ -8,6 +8,7 @@ use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::MultiUpdateRuleRequest;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use newtypes::ObConfigurationId;
@@ -43,14 +44,14 @@ pub async fn multi_update_rules(
         .db_transaction(move |conn| {
             let update = validate_rules_request(conn, &tenant_id, is_live, req)?;
 
+            let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
-            let obc = ObConfiguration::lock(conn, &obc.id)?;
 
             if obc.deactivated_at.is_some() {
                 return BadRequestInto("Cannot update rules for an outdated playbook version");
             }
 
-            RuleInstance::bulk_edit(conn, &obc, &actor.into(), update)?;
+            RuleInstance::bulk_edit(conn, &playbook, &obc.id, &actor.into(), update)?;
             // retrieve and return full latest list of Rules for FE for convenience
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
 

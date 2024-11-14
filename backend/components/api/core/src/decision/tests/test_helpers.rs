@@ -64,11 +64,10 @@ pub async fn create_user_and_onboarding(
                 ..Default::default()
             };
             let tenant = Tenant::private_update(conn, &tenant.id, update)?;
-            let obc = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
-            let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+            let (playbook, obc) = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
             // TODO: need to rework our test utils so they use the same codepaths as our application logic to
             // create things like OBC's and such
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc).unwrap();
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &playbook, &obc.id).unwrap();
 
             let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);
             let su = su.into_inner();
@@ -118,7 +117,7 @@ pub async fn create_user_and_onboarding(
                 None
             };
 
-            Ok((tenant, wf, uv, su, obc.into_inner(), biz_wf))
+            Ok((tenant, wf, uv, su, obc, biz_wf))
         })
         .await
         .unwrap()

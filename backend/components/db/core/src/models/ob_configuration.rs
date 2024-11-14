@@ -554,17 +554,6 @@ impl ObConfiguration {
         Ok(result)
     }
 
-    #[tracing::instrument("ObConfiguration::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, obc_id: &ObConfigurationId) -> FpResult<Locked<Self>> {
-        Playbook::lock(conn, obc_id)?;
-
-        let result = ob_configuration::table
-            .filter(ob_configuration::id.eq(obc_id))
-            .for_no_key_update()
-            .get_result(conn.conn())?;
-        Ok(Locked::new(result))
-    }
-
     #[tracing::instrument("ObConfiguration::get_bulk", skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
@@ -674,15 +663,14 @@ impl ObConfiguration {
     #[tracing::instrument("ObConfiguration::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
+        playbook: &Locked<Playbook>,
         id: &ObConfigurationId,
-        tenant_id: &TenantId,
-        is_live: bool,
         update: ObConfigurationUpdate,
     ) -> FpResult<Self> {
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
-            .filter(ob_configuration::tenant_id.eq(tenant_id))
-            .filter(ob_configuration::is_live.eq(is_live))
+            .filter(ob_configuration::tenant_id.eq(&playbook.tenant_id))
+            .filter(ob_configuration::is_live.eq(playbook.is_live))
             .filter(ob_configuration::deactivated_at.is_null())
             .set(update)
             .load(conn.conn())?;

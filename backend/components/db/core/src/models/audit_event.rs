@@ -447,7 +447,7 @@ mod tests {
     #[db_test]
     fn test_create_audit_event(conn: &mut TestPgConn) {
         let tenant = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &tenant.id,
             ObConfigurationOpts { ..Default::default() },
@@ -490,7 +490,7 @@ mod tests {
         let tenant = tests::fixtures::tenant::create(conn);
         let other_tenant = tests::fixtures::tenant::create(conn);
 
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &tenant.id,
             ObConfigurationOpts {
@@ -503,7 +503,7 @@ mod tests {
         let vault_2 = tests::fixtures::vault::create_person(conn, true);
         let scoped_vault_2 = tests::fixtures::scoped_vault::create(conn, &vault_2.id, &obc.id);
 
-        let obc_sandbox = tests::fixtures::ob_configuration::create_with_opts(
+        let (_, obc_sandbox) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &tenant.id,
             ObConfigurationOpts { ..Default::default() },

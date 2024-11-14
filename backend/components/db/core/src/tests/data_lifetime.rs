@@ -57,8 +57,8 @@ impl TestData {
         let t2_id = fixtures::tenant::create(conn).id;
 
         // Create ob configs
-        let ob_config_id = fixtures::ob_configuration::create(conn, &t1_id, true).id;
-        let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id, true).id;
+        let ob_config_id = fixtures::ob_configuration::create(conn, &t1_id, true).1.id;
+        let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id, true).1.id;
 
         // Create user vaults (without phone number)
         let v1_id = fixtures::vault::create_person(conn, true).into_inner().id;

@@ -35,7 +35,7 @@ use std::str::FromStr;
 fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     // Just create this for the keypair
     let tenant = db::tests::fixtures::tenant::create(conn);
-    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
     let sv = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
@@ -145,9 +145,9 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     // Tests that we properly apply DLs spread across multiple tenants in the correct order.
     // This test is much less interesting now that tenants have snapshot isolated data
     let tenant = db::tests::fixtures::tenant::create(conn);
-    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
     let tenant2 = db::tests::fixtures::tenant::create(conn);
-    let ob_config2 = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
+    let (_, ob_config2) = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
 
@@ -271,7 +271,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
 fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     let bv = db::tests::fixtures::vault::create_business(conn);
     let tenant = db::tests::fixtures::tenant::create(conn);
-    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
     let sv = db::tests::fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
     let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 
@@ -331,7 +331,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
 fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add an email
@@ -385,7 +385,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
 fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     let bv = fixtures::vault::create_business(conn);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
     // Add a business name
@@ -420,7 +420,7 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
     let bv = fixtures::vault::create_business(conn);
     fixtures::business_owner::create_primary(conn, &uv.id, &bv.id);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
     struct Test {
@@ -520,7 +520,7 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
     let bv = fixtures::vault::create_business(conn);
     fixtures::business_owner::create_primary(conn, &uv.id, &bv.id);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
     let updates = vec![
@@ -552,8 +552,8 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let tenant2 = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant2.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config2) = fixtures::ob_configuration::create(conn, &tenant2.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
     let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
@@ -734,8 +734,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let tenant2 = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant2.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config2) = fixtures::ob_configuration::create(conn, &tenant2.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
     let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
@@ -783,7 +783,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
 fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let updates = vec![
@@ -826,7 +826,7 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
     // for now, let's make sure we never commit them through the UVW
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let k1 = KvDataKey::from_str("blerp").unwrap();
@@ -872,7 +872,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     // for now, let's make sure we never commit them through the UVW
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     // Add some data,
@@ -967,8 +967,8 @@ fn test_portable_view(conn: &mut TestPgConn) {
     // 2. Make sure we choose the correct address line2
     let tenant1 = db::tests::fixtures::tenant::create(conn);
     let tenant2 = db::tests::fixtures::tenant::create(conn);
-    let pb1 = db::tests::fixtures::ob_configuration::create(conn, &tenant1.id, true);
-    let pb2 = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
+    let (_, pb1) = db::tests::fixtures::ob_configuration::create(conn, &tenant1.id, true);
+    let (_, pb2) = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
     let su1 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb1.id);

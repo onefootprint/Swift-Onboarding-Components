@@ -476,7 +476,8 @@ mod tests {
     fn test_vault_dr_batch_query(conn: &mut TestPgConn) {
         let tenant_id = fixtures::tenant::create(conn).id;
         let is_live = true;
-        let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, is_live).id;
+        let (_, obc) = fixtures::ob_configuration::create(conn, &tenant_id, is_live);
+        let ob_config_id = obc.id;
         let v1_id = fixtures::vault::create_person(conn, is_live).into_inner().id;
         let sv1 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id);
 
@@ -790,7 +791,9 @@ mod tests {
         };
         let vdr_config = VaultDrConfig::create(conn, new_vdr_config).unwrap();
 
-        let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, is_live).id;
+        let (_, obc) = fixtures::ob_configuration::create(conn, &tenant_id, is_live);
+        let ob_config_id = obc.id;
+
         let v_id = fixtures::vault::create_person(conn, is_live).into_inner().id;
         let sv = fixtures::scoped_vault::create(conn, &v_id, &ob_config_id);
 

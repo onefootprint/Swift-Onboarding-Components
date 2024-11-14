@@ -23,8 +23,8 @@ use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
 use crate::State;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
+use db::models::playbook::Playbook;
 use db::models::risk_signal::RiskSignal;
 use db::models::rule_instance::NewRule;
 use db::models::rule_instance::RuleInstance;
@@ -69,10 +69,11 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     // Also tests redo_document_and_pass at the end
 
     // DATA SETUP
+    let is_live = user_kind.is_live();
     let (wf, tenant, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
-            is_live: user_kind.is_live(),
+            is_live,
             must_collect_data: vec![
                 CDO::PhoneNumber,
                 CDO::Ssn9,
@@ -87,10 +88,12 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
         user_kind.fixture_result(),
     )
     .await;
+
+    let tenant_id = tenant.id.clone();
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();
-    let obc_id2 = obc.id.clone();
+    let playbook_id = obc.playbook_id.clone();
     let seqno = get_current_seqno(state).await;
 
     let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
@@ -100,7 +103,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
         // This is not a default rule, but we're testing it here
         state
             .db_transaction(move |conn| {
-                let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
+                let playbook = Playbook::lock(conn, (&playbook_id, &tenant_id, is_live)).unwrap();
                 let action = RuleAction::PassWithManualReview;
                 let rule = NewRule {
                     rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
@@ -113,7 +116,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
                     name: None,
                     is_shadow: false,
                 };
-                RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
+                RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![rule])
                     .unwrap()
                     .pop()
                     .unwrap();

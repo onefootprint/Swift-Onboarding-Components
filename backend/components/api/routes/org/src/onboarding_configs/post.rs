@@ -10,7 +10,6 @@ use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::Patch;
 use db::models::ob_configuration::NewObConfigurationArgs;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
 use db::models::playbook::Playbook;
 use db::models::rule_set_version::RuleSetVersion;
@@ -210,10 +209,9 @@ pub async fn post(
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, is_live, &tvc)?;
     let (obc, actor, rs) = state
         .db_transaction(move |conn| {
-            let (_, obc) = Playbook::create(conn, &tenant_id, is_live, args)?;
-            let obc = ObConfiguration::lock(conn, &obc.id)?;
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc)?;
-            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
+            let (playbook, obc) = Playbook::create(conn, &tenant_id, is_live, args)?;
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &playbook, &obc.id)?;
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))
         })

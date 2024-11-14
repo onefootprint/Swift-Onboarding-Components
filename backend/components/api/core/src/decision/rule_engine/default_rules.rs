@@ -1,5 +1,6 @@
 use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::NewRule;
 use db::models::rule_instance::RuleInstance;
@@ -17,6 +18,7 @@ use newtypes::FootprintReasonCode as FRC;
 use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::Locked;
+use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
 use newtypes::RuleActionConfig as RAC;
 use newtypes::RuleExpression;
@@ -344,20 +346,32 @@ pub fn default_rules_for_obc(obc: &ObConfiguration) -> Vec<(RuleExpression, RAC)
 }
 
 #[tracing::instrument(skip_all)]
-pub fn save_default_rules_for_obc(conn: &mut TxnPgConn, obc: &Locked<ObConfiguration>) -> FpResult<()> {
-    let existing_rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, IncludeRules::All)?;
+pub fn save_default_rules_for_obc(
+    conn: &mut TxnPgConn,
+    playbook: &Locked<Playbook>,
+    obc_id: &ObConfigurationId,
+) -> FpResult<()> {
+    let existing_rules = RuleInstance::list(
+        conn,
+        &playbook.tenant_id,
+        playbook.is_live,
+        obc_id,
+        IncludeRules::All,
+    )?;
     if !existing_rules.is_empty() {
         tracing::warn!(
-            ?obc,
+            ?obc_id,
             "save_default_rules_for_obc, skipping because there are existing rules"
         );
         return Ok(());
     }
 
-    let rules = default_rules_for_obc(obc);
+    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+    let rules = default_rules_for_obc(&obc);
     RuleInstance::bulk_create(
         conn,
-        obc,
+        playbook,
+        obc_id,
         &DbActor::Footprint,
         rules
             .into_iter()
@@ -433,7 +447,7 @@ mod tests {
         expected: Vec<(RuleExpression, RAC)>,
     ) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(conn, &t.id, obc_opts);
+        let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(conn, &t.id, obc_opts);
 
         assert_have_same_elements(expected, default_rules_for_obc(&obc))
     }

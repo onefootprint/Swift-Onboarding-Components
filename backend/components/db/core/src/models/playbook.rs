@@ -47,6 +47,16 @@ pub struct NewPlaybook {
 
 #[derive(Debug, derive_more::From)]
 pub enum PlaybookIdentifier<'a> {
+    TenantId {
+        id: &'a PlaybookId,
+        tenant_id: &'a TenantId,
+        is_live: bool,
+    },
+    TenantObcId {
+        obc_id: &'a ObConfigurationId,
+        tenant_id: &'a TenantId,
+        is_live: bool,
+    },
     Key(&'a PublishablePlaybookKey),
     TenantKey {
         key: &'a PublishablePlaybookKey,
@@ -58,11 +68,33 @@ pub enum PlaybookIdentifier<'a> {
 impl<'a> PlaybookIdentifier<'a> {
     pub fn filter<'b, QS>(&self) -> Box<dyn BoxableExpression<QS, diesel::pg::Pg, SqlType = Bool> + 'b>
     where
+        ob_configuration::id: SelectableExpression<QS>,
+        playbook::id: SelectableExpression<QS>,
         playbook::tenant_id: SelectableExpression<QS>,
         playbook::is_live: SelectableExpression<QS>,
         playbook::key: SelectableExpression<QS>,
     {
         match self {
+            PlaybookIdentifier::TenantId {
+                id,
+                tenant_id,
+                is_live,
+            } => Box::new(
+                playbook::id
+                    .eq((*id).clone())
+                    .and(playbook::tenant_id.eq((*tenant_id).clone()))
+                    .and(playbook::is_live.eq(*is_live)),
+            ),
+            PlaybookIdentifier::TenantObcId {
+                obc_id,
+                tenant_id,
+                is_live,
+            } => Box::new(
+                ob_configuration::id
+                    .eq((*obc_id).clone())
+                    .and(playbook::tenant_id.eq((*tenant_id).clone()))
+                    .and(playbook::is_live.eq(*is_live)),
+            ),
             PlaybookIdentifier::Key(key) => Box::new(playbook::key.eq((*key).clone())),
             PlaybookIdentifier::TenantKey {
                 key,
@@ -105,10 +137,15 @@ impl Playbook {
     }
 
     #[tracing::instrument("Playbook::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &ObConfigurationId) -> FpResult<Locked<Self>> {
+    pub fn lock<'a, T>(conn: &mut TxnPgConn, id: T) -> FpResult<Locked<Self>>
+    where
+        T: Into<PlaybookIdentifier<'a>>,
+    {
+        let id: PlaybookIdentifier = id.into();
+
         let result = playbook::table
             .inner_join(ob_configuration::table)
-            .filter(ob_configuration::id.eq(id))
+            .filter(id.filter())
             .for_no_key_update()
             .select(Playbook::as_select())
             .get_result(conn.conn())?;

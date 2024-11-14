@@ -164,7 +164,7 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
             let obc_map: HashMap<T, ObConfiguration> = T::iter()
                 .map(|t| {
                     let tenant = fixtures::tenant::create(conn);
-                    let obc = fixtures::ob_configuration::create(conn, &tenant.id, true);
+                    let (_, obc) = fixtures::ob_configuration::create(conn, &tenant.id, true);
                     (t, obc)
                 })
                 .collect();

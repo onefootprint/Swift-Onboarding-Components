@@ -5,27 +5,37 @@ use api_core::types::ApiResponse;
 use api_core::web::Json;
 use api_core::State;
 use api_errors::BadRequestInto;
+use db::models::ob_configuration::IsLive;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationUpdate;
+use db::models::playbook::Playbook;
 use newtypes::ObConfigurationId;
+use newtypes::TenantId;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 
 // This does not perform a lot of the checks that writing these via the supported org/ob_configs
 // does, so be careful!
-#[patch("/private/protected/ob_configs/{ob_config_id}/update_verification_checks")]
+#[patch("/private/protected/ob_configs/{playbook_id}/update_verification_checks")]
 async fn update_verification_checks(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<UpdateVerificationChecksRequest>,
     path: web::Path<ObConfigurationId>,
 ) -> ApiResponse<UpdateVerificationChecksResponse> {
-    let UpdateVerificationChecksRequest { add, delete } = request.into_inner();
+    let playbook_id = path.into_inner();
+
+    let UpdateVerificationChecksRequest {
+        tenant_id,
+        is_live,
+        add,
+        delete,
+    } = request.into_inner();
 
     let updated_obc = state
         .db_transaction(move |conn| {
-            let (obc, _) = ObConfiguration::get(conn, &path.into_inner())?;
-            let obc = ObConfiguration::lock(conn, &obc.id)?;
+            let playbook = Playbook::lock(conn, (&playbook_id, &tenant_id, is_live))?;
+            let (_, obc, _) = Playbook::get_latest_version(conn, (&playbook.id, &tenant_id, is_live))?;
 
             // remove delete
             let mut new_checks: Vec<_> = obc
@@ -59,7 +69,7 @@ async fn update_verification_checks(
                 verification_checks: Some(new_checks),
                 ..Default::default()
             };
-            let obc = ObConfiguration::update(conn, &obc.id, &obc.tenant_id, obc.is_live, update)?;
+            let obc = ObConfiguration::update(conn, &playbook, &obc.id, update)?;
 
             Ok(obc)
         })
@@ -74,6 +84,8 @@ async fn update_verification_checks(
 }
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct UpdateVerificationChecksRequest {
+    pub tenant_id: TenantId,
+    pub is_live: IsLive,
     pub add: Vec<VerificationCheck>,
     pub delete: Vec<VerificationCheckKind>,
 }

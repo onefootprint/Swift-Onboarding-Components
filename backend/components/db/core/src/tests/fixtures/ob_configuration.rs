@@ -10,11 +10,16 @@ use newtypes::DbActor;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::EnhancedAmlOption;
 use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::Locked;
 use newtypes::ObConfigurationKind;
 use newtypes::TenantId;
 use newtypes::VerificationCheck;
 
-pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: bool) -> ObConfiguration {
+pub fn create(
+    conn: &mut TxnPgConn,
+    tenant_id: &TenantId,
+    is_live: bool,
+) -> (Locked<Playbook>, ObConfiguration) {
     let args = NewObConfigurationArgs {
         name: "Flerp config".to_owned(),
         must_collect_data: vec![CDO::PhoneNumber],
@@ -38,9 +43,8 @@ pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, is_live: bool) -> ObCo
         prompt_for_passkey: true,
         allow_reonboard: false,
     };
-    let (_, obc) =
-        Playbook::create(conn, tenant_id, is_live, args).expect("Could not create ob config history");
-    obc
+
+    Playbook::create(conn, tenant_id, is_live, args).expect("Could not create ob config history")
 }
 
 pub struct ObConfigurationOpts {
@@ -89,7 +93,7 @@ pub fn create_with_opts(
     conn: &mut TxnPgConn,
     tenant_id: &TenantId,
     opts: ObConfigurationOpts,
-) -> ObConfiguration {
+) -> (Locked<Playbook>, ObConfiguration) {
     let ObConfigurationOpts {
         name,
         must_collect_data,
@@ -144,6 +148,5 @@ pub fn create_with_opts(
         allow_reonboard: false,
     };
 
-    let (_, obc) = Playbook::create(conn, tenant_id, is_live, args).unwrap();
-    obc
+    Playbook::create(conn, tenant_id, is_live, args).unwrap()
 }

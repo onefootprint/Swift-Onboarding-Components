@@ -6,6 +6,7 @@ use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationUpdate;
+use db::models::playbook::Playbook;
 use db::models::rule_set_version::RuleSetVersion;
 use newtypes::ApiKeyStatus;
 use newtypes::ObConfigurationId;
@@ -40,9 +41,12 @@ async fn patch(
     request: web::Json<UpdateObConfigRequest>,
 ) -> ApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
-    let tenant = auth.tenant().clone();
+
+    let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let UpdateObConfigPath { id } = path.into_inner();
+
+
+    let UpdateObConfigPath { id: obc_id } = path.into_inner();
     let UpdateObConfigRequest {
         name,
         status,
@@ -50,7 +54,6 @@ async fn patch(
         allow_reonboard,
         skip_confirm,
     } = request.into_inner();
-    let tenant_id = tenant.id.clone();
     let (obc, actor, rs) = state
         .db_transaction(move |conn| {
             let update = ObConfigurationUpdate {
@@ -61,7 +64,8 @@ async fn patch(
                 skip_confirm,
                 ..Default::default()
             };
-            let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, update)?;
+            let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
+            let obc = ObConfiguration::update(conn, &playbook, &obc_id, update)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))

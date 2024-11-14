@@ -32,11 +32,10 @@ use strum::IntoEnumIterator;
 fn test_ob_config(conn: &mut TestPgConn) {
     // Create an ob config
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let (playbook, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
 
     // Enforce it exists
-    let (fetched_ob_config, tenant) =
-        ObConfiguration::get_enabled(conn, &ob_config.id).expect("Could not fetch");
+    let (fetched_ob_config, _) = ObConfiguration::get_enabled(conn, &ob_config.id).expect("Could not fetch");
     assert_eq!(ob_config.name, fetched_ob_config.name);
 
     // Mark as inactive
@@ -44,7 +43,7 @@ fn test_ob_config(conn: &mut TestPgConn) {
         status: Some(ApiKeyStatus::Disabled),
         ..Default::default()
     };
-    ObConfiguration::update(conn, &ob_config.id, &tenant.id, true, update).expect("Couldn't update");
+    ObConfiguration::update(conn, &playbook, &ob_config.id, update).expect("Couldn't update");
 
     // Enforce it does not exist
     ObConfiguration::get_enabled(conn, &ob_config.id).expect_err("Shouldn't find disabled ob config");
@@ -536,7 +535,7 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
 #[db_test]
 pub fn test_enhanced_aml_addition_of_am_lists_is_forwards_compatible(conn: &mut TestPgConn) {
     let t = fixtures::tenant::create(conn);
-    let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+    let (_, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
     assert_eq!(obc.enhanced_aml_for_test(), EnhancedAmlOption::No);
     diesel::sql_query(format!(
             "update ob_configuration set enhanced_aml={} where id = '{}';",
@@ -562,7 +561,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_forwards_compatible(conn: &mut 
 #[db_test]
 pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut TestPgConn) {
     let t = fixtures::tenant::create(conn);
-    let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+    let (_, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
     assert_eq!(obc.enhanced_aml_for_test(), EnhancedAmlOption::No);
     diesel::sql_query(format!(
             "update ob_configuration set enhanced_aml={} where id = '{}';",
@@ -594,7 +593,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
         ]),
         match_kind: AmlMatchKind::ExactName,
     };
-    let obc = fixtures::ob_configuration::create_with_opts(
+    let (_, obc) = fixtures::ob_configuration::create_with_opts(
         conn,
         &t.id,
         ObConfigurationOpts {
@@ -644,7 +643,7 @@ pub fn test_document_and_countries_roundtrip(conn: &mut TestPgConn) {
         document_types_and_countries: document_types_and_countries.clone(),
         ..Default::default()
     };
-    let obc = fixtures::ob_configuration::create_with_opts(conn, &t.id, opts);
+    let (_, obc) = fixtures::ob_configuration::create_with_opts(conn, &t.id, opts);
 
     let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
     assert_eq!(document_types_and_countries, obc.document_types_and_countries)

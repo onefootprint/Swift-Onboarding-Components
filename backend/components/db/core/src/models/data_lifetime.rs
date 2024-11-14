@@ -1,5 +1,5 @@
 use super::fingerprint::Fingerprint;
-use super::ob_configuration::ObConfiguration;
+use super::playbook::Playbook;
 use super::scoped_vault::ScopedVault;
 use super::scoped_vault_version::ScopedVaultVersion;
 use crate::nextval;
@@ -203,10 +203,7 @@ impl DataLifetime {
     }
 
     /// TODO: Create a dedicated sequence for the ObConfiguration usage of seqnos.
-    pub fn get_next_obc_seqno(
-        conn: &mut PgConn,
-        _safety: &Locked<ObConfiguration>,
-    ) -> FpResult<DataLifetimeSeqno> {
+    pub fn get_next_obc_seqno(conn: &mut PgConn, _safety: &Locked<Playbook>) -> FpResult<DataLifetimeSeqno> {
         let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
         Ok(result)
     }

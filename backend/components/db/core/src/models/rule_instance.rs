@@ -1,5 +1,6 @@
 use super::list::List;
 use super::ob_configuration::ObConfiguration;
+use super::playbook::Playbook;
 use super::rule_instance_references_list::NewRuleInstanceReferencesList;
 use super::rule_instance_references_list::RuleInstanceReferencesList;
 use super::rule_set_version::RuleSetVersion;
@@ -139,7 +140,8 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::bulk_edit", skip_all)]
     pub fn bulk_edit(
         conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
+        playbook: &Locked<Playbook>,
+        obc_id: &ObConfigurationId,
         actor: &DbActor,
         update: MultiRuleUpdate,
     ) -> FpResult<Vec<RuleInstance>> {
@@ -149,7 +151,8 @@ impl RuleInstance {
             updates,
         } = update;
 
-        let (_, seqno, now) = RuleSetVersion::create(conn, obc, expected_rule_set_version, actor.clone())?;
+        let (_, seqno, now) =
+            RuleSetVersion::create(conn, playbook, obc_id, expected_rule_set_version, actor.clone())?;
 
         let list_ids = new_rules
             .iter()
@@ -158,7 +161,7 @@ impl RuleInstance {
             .flat_map(|re| re.0)
             .filter_map(|re| re.list_id().cloned())
             .collect_vec();
-        let lists = List::bulk_get(conn, &obc.tenant_id, obc.is_live, &list_ids)?;
+        let lists = List::bulk_get(conn, &playbook.tenant_id, playbook.is_live, &list_ids)?;
         let deactivated_lists = lists
             .iter()
             .filter_map(|(id, list)| list.deactivated_seqno.map(|_| id.clone()))
@@ -180,11 +183,15 @@ impl RuleInstance {
 
         let mut new_rule_instances = vec![];
         if !new_rules.is_empty() {
-            new_rule_instances.append(&mut Self::bulk_add(conn, obc, actor, new_rules, seqno, now)?);
+            new_rule_instances.append(&mut Self::bulk_add(
+                conn, playbook, obc_id, actor, new_rules, seqno, now,
+            )?);
         }
 
         if !updates.is_empty() {
-            new_rule_instances.append(&mut Self::bulk_update(conn, obc, actor, updates, seqno, now)?);
+            new_rule_instances.append(&mut Self::bulk_update(
+                conn, playbook, obc_id, actor, updates, seqno, now,
+            )?);
         }
 
         Ok(new_rule_instances)
@@ -193,7 +200,8 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::bulk_add", skip_all)]
     fn bulk_add(
         conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
+        _safety: &Locked<Playbook>,
+        obc_id: &ObConfigurationId,
         actor: &DbActor,
         new_rules: Vec<NewRule>,
         seqno: DataLifetimeSeqno,
@@ -205,7 +213,7 @@ impl RuleInstance {
                 created_at: now,
                 created_seqno: seqno,
                 rule_id: RuleId::generate(),
-                ob_configuration_id: &obc.id,
+                ob_configuration_id: obc_id,
                 actor,
                 name: r.name,
                 kind: r.rule_expression.kind(),
@@ -224,7 +232,8 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::bulk_update", skip_all)]
     fn bulk_update(
         conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
+        _safety: &Locked<Playbook>,
+        obc_id: &ObConfigurationId,
         actor: &DbActor,
         updates: Vec<RuleInstanceUpdate>,
         seqno: DataLifetimeSeqno,
@@ -234,7 +243,7 @@ impl RuleInstance {
 
         // deactivate existing RuleInstance's for each rule_id
         let existing: Vec<RuleInstance> = diesel::update(rule_instance::table)
-            .filter(rule_instance::ob_configuration_id.eq(&obc.id))
+            .filter(rule_instance::ob_configuration_id.eq(obc_id))
             .filter(rule_instance::rule_id.eq_any(rule_ids))
             .filter(rule_instance::deactivated_at.is_null())
             .set((
@@ -261,7 +270,7 @@ impl RuleInstance {
                     created_at: now,
                     created_seqno: seqno,
                     rule_id: update.rule_id.clone(),
-                    ob_configuration_id: &obc.id,
+                    ob_configuration_id: obc_id,
                     actor,
                     name: update.name.unwrap_or(existing.name),
                     rule_expression: re,
@@ -314,13 +323,15 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
+        playbook: &Locked<Playbook>,
+        obc_id: &ObConfigurationId,
         actor: &DbActor,
         new_rules: Vec<NewRule>,
     ) -> FpResult<Vec<Self>> {
         Self::bulk_edit(
             conn,
-            obc,
+            playbook,
+            obc_id,
             actor,
             MultiRuleUpdate {
                 expected_rule_set_version: None, /* currently the only (non test) use of `bulk_create` is
@@ -449,12 +460,11 @@ mod tests {
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let expression = RuleExpression(vec![RuleExpressionCondition::RiskSignal {
             field: FRC::DocumentOcrDobDoesNotMatch,
@@ -469,7 +479,7 @@ mod tests {
             rule_action: action.to_rule_action(),
             is_shadow: false,
         };
-        let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
+        let rule = RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![rule])
             .unwrap()
             .pop()
             .unwrap();
@@ -488,12 +498,12 @@ mod tests {
     #[db_test]
     fn test_bulk_create(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+
         let r1_a = RuleAction::ManualReview;
         let r1 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
@@ -532,7 +542,9 @@ mod tests {
             is_shadow: false,
         };
 
-        let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
+        let rules =
+            RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![r1, r2, r3])
+                .unwrap();
         assert_eq!(3, rules.len());
         assert_eq!(
             1,
@@ -546,12 +558,11 @@ mod tests {
     #[db_test]
     fn test_rule_instance_references_list(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
         let list1 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
         let list2 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
 
@@ -611,7 +622,7 @@ mod tests {
             is_shadow: false,
         };
 
-        RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
+        RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
 
         assert_eq!(
             1,
@@ -626,12 +637,11 @@ mod tests {
     #[db_test]
     fn test_update(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let rule = NewRule {
             name: Some("name1".to_owned()),
@@ -640,7 +650,7 @@ mod tests {
             rule_action: RuleAction::Fail.to_rule_action(),
             is_shadow: false,
         };
-        let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
+        let rule = RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![rule])
             .unwrap()
             .pop()
             .unwrap();
@@ -661,7 +671,8 @@ mod tests {
         };
         let updated_rule = RuleInstance::bulk_edit(
             conn,
-            &obc,
+            &playbook,
+            &obc.id,
             &DbActor::Footprint,
             MultiRuleUpdate {
                 expected_rule_set_version: None, // clients using this `update` method aren't yet sending this
@@ -702,16 +713,16 @@ mod tests {
     #[db_test]
     fn test_bulk_edit(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let rules = RuleInstance::bulk_edit(
             conn,
-            &obc,
+            &playbook,
+            &obc.id,
             &DbActor::Footprint,
             MultiRuleUpdate {
                 expected_rule_set_version: Some(0),
@@ -748,7 +759,8 @@ mod tests {
         // add 2 rules
         let edits = RuleInstance::bulk_edit(
             conn,
-            &obc,
+            &playbook,
+            &obc.id,
             &DbActor::Footprint,
             MultiRuleUpdate {
                 expected_rule_set_version: Some(1),
@@ -842,8 +854,7 @@ mod tests {
     #[db_test]
     pub fn test_rule_action_is_backwards_compatible(conn: &mut TestPgConn) {
         let t = fixtures::tenant::create(conn);
-        let obc = fixtures::ob_configuration::create(conn, &t.id, true);
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+        let (playbook, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
 
         let r1_a = RuleAction::StepUp(StepUpKind::Identity);
         let rule1 = NewRule {
@@ -853,7 +864,7 @@ mod tests {
             rule_action: r1_a.to_rule_action(),
             is_shadow: false,
         };
-        let rule1 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule1])
+        let rule1 = RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![rule1])
             .unwrap()
             .pop()
             .unwrap();
@@ -869,7 +880,7 @@ mod tests {
             rule_action: r2_a.to_rule_action(),
             is_shadow: false,
         };
-        let rule2 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule2])
+        let rule2 = RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![rule2])
             .unwrap()
             .pop()
             .unwrap();

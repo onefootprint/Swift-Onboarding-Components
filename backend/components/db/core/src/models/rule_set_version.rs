@@ -1,5 +1,5 @@
 use super::data_lifetime::DataLifetime;
-use super::ob_configuration::ObConfiguration;
+use super::playbook::Playbook;
 use crate::PgConn;
 use crate::TxnPgConn;
 use api_errors::BadRequestInto;
@@ -64,15 +64,16 @@ impl RuleSetVersion {
     #[tracing::instrument("RuleSetVersion::create", skip_all)]
     pub(crate) fn create(
         conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
+        playbook: &Locked<Playbook>,
+        obc_id: &ObConfigurationId,
         expected_rule_set_version: Option<i32>,
         actor: DbActor,
     ) -> FpResult<(Self, DataLifetimeSeqno, DateTime<Utc>)> {
-        let seqno = DataLifetime::get_next_obc_seqno(conn, obc)?;
+        let seqno = DataLifetime::get_next_obc_seqno(conn, playbook)?;
         let now = Utc::now();
 
         let current: Option<RuleSetVersion> = diesel::update(rule_set::table)
-            .filter(rule_set::ob_configuration_id.eq(&obc.id))
+            .filter(rule_set::ob_configuration_id.eq(&obc_id))
             .filter(rule_set::deactivated_seqno.is_null())
             .set((
                 rule_set::deactivated_at.eq(now),
@@ -102,7 +103,7 @@ impl RuleSetVersion {
                                                                    * version=1 (ie this is the first one
                                                                    * being created during playbook creation
                                                                    * of default rules) */
-            ob_configuration_id: obc.id.clone(),
+            ob_configuration_id: obc_id.clone(),
             actor,
         };
 
@@ -150,18 +151,19 @@ mod tests {
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
-        let (rsv1, _, _) = RuleSetVersion::create(conn, &obc, None, DbActor::Footprint).unwrap();
+        let (rsv1, _, _) =
+            RuleSetVersion::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
         assert_eq!(1, rsv1.version);
         assert!(rsv1.deactivated_seqno.is_none());
 
-        let (rsv2, _, _) = RuleSetVersion::create(conn, &obc, None, DbActor::Footprint).unwrap();
+        let (rsv2, _, _) =
+            RuleSetVersion::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
         assert_eq!(2, rsv2.version);
         assert!(rsv2.deactivated_seqno.is_none());
 
@@ -178,21 +180,20 @@ mod tests {
     #[db_test]
     fn test_expected_rule_set_version(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
-        RuleSetVersion::create(conn, &obc, None, DbActor::Footprint).unwrap();
+        RuleSetVersion::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
 
         // no error when correct version is given
-        RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint).unwrap();
+        RuleSetVersion::create(conn, &playbook, &obc.id, Some(1), DbActor::Footprint).unwrap();
 
         // error when old version is given
         assert_eq!(
-            RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint)
+            RuleSetVersion::create(conn, &playbook, &obc.id, Some(1), DbActor::Footprint)
                 .unwrap_err()
                 .message(),
             "Expected version 1 but latest version is 2"

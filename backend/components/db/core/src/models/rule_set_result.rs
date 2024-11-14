@@ -318,12 +318,11 @@ mod tests {
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
@@ -352,7 +351,7 @@ mod tests {
                 is_shadow: false,
             },
         ];
-        let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, rules).unwrap();
+        let rules = RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, rules).unwrap();
 
         let di = crate::models::decision_intent::DecisionIntent::create(
             conn,
@@ -519,7 +518,7 @@ mod tests {
     #[db_test]
     fn test_sample_for_eval(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts {

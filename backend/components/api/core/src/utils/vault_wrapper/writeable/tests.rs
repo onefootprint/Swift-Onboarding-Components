@@ -398,20 +398,21 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         is_live: true,
         ..Default::default()
     };
-    let pb1 = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant1.id, pb1_opts);
+    let (_, pb1) = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant1.id, pb1_opts);
     // PB2 only collects ssn4, doesn't collect dob
     let pb2_opts = ObConfigurationOpts {
         must_collect_data: vec![CDO::Email, CDO::PhoneNumber, CDO::Name, CDO::Ssn4],
         is_live: true,
         ..Default::default()
     };
-    let pb2 = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, pb2_opts);
+    let (_, pb2) = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, pb2_opts);
     let auth_pb2_opts = ObConfigurationOpts {
         must_collect_data: vec![CDO::PhoneNumber, CDO::Email],
         is_live: true,
         ..Default::default()
     };
-    let auth_pb2 = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, auth_pb2_opts);
+    let (_, auth_pb2) =
+        db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, auth_pb2_opts);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
     let su1 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb1.id);

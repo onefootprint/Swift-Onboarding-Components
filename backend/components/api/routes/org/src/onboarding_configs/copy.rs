@@ -97,8 +97,7 @@ async fn post(
     let (obc, actor, rs) = state
         .db_transaction(move |conn| {
             // Create the copied playbook
-            let (_, obc) = Playbook::create(conn, &target_tenant_id, target_is_live, args)?;
-            let obc = ObConfiguration::lock(conn, &obc.id)?;
+            let (playbook, obc) = Playbook::create(conn, &target_tenant_id, target_is_live, args)?;
 
             // And add the copied rules into the new playbook
             if !rules.is_empty() {
@@ -112,10 +111,10 @@ async fn post(
                 // exist in the target tenant
                 let rules_update =
                     validate_rules_request(conn, &target_tenant_id, target_is_live, add_rules_request)?;
-                RuleInstance::bulk_edit(conn, &obc, &target_actor.into(), rules_update)?;
+                RuleInstance::bulk_edit(conn, &playbook, &obc.id, &target_actor.into(), rules_update)?;
             }
 
-            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))
         })

@@ -296,6 +296,7 @@ pub fn evaluate_rules(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use db::models::playbook::Playbook;
     use db::models::risk_signal_group::RiskSignalGroupScope;
     use db::models::rule_instance::NewRule;
     use db::models::scoped_vault::ScopedVault;
@@ -378,8 +379,7 @@ mod tests {
         doc_collected: bool,
     ) -> Option<RA> {
         // Setup
-        let (sv, obc) = make_user(conn);
-        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+        let (sv, playbook, obc) = make_user(conn);
 
         let rules = rules
             .into_iter()
@@ -391,7 +391,7 @@ mod tests {
                 is_shadow: false,
             })
             .collect_vec();
-        let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, rules).unwrap();
+        let rules = RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, rules).unwrap();
         let risk_signals = make_risk_signals(conn, &sv.id, risk_signals);
 
         // Eval
@@ -444,9 +444,9 @@ mod tests {
         rule_set_result.action_triggered
     }
 
-    fn make_user(conn: &mut TestPgConn) -> (Locked<ScopedVault>, ObConfiguration) {
+    fn make_user(conn: &mut TestPgConn) -> (Locked<ScopedVault>, Locked<Playbook>, ObConfiguration) {
         let t = tests::fixtures::tenant::create(conn);
-        let obc = tests::fixtures::ob_configuration::create_with_opts(
+        let (playbook, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts { ..Default::default() },
@@ -454,7 +454,7 @@ mod tests {
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
 
-        (sv, obc)
+        (sv, playbook, obc)
     }
 
     fn make_risk_signals(conn: &mut TestPgConn, sv_id: &ScopedVaultId, frcs: Vec<FRC>) -> Vec<RiskSignal> {

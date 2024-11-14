@@ -150,7 +150,7 @@ mod tests {
             .db_transaction(move |conn| {
                 let uv = fixtures::vault::create_person(conn, true);
                 let t = fixtures::tenant::create(conn);
-                let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+                let (_, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
                 let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
                 let wf = fixtures::workflow::create(conn, &sv.id, &obc.id, None);
 

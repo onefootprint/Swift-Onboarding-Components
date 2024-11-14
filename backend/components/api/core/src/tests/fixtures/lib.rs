@@ -1,6 +1,5 @@
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -13,6 +12,7 @@ use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KycState;
 use newtypes::Locked;
+use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::PiiString;
 use newtypes::TenantId;
@@ -41,14 +41,14 @@ pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     is_live: bool,
     tenant_id: TenantId,
-    ob_config: Option<ObConfiguration>,
+    obc_id: Option<&ObConfigurationId>,
     idks: Vec<IDK>,
 ) -> (Vault, Locked<ScopedVault>) {
     let sandbox_id = (!is_live).then_some("pass".to_string());
-    let (uv, su) = if let Some(ob_config) = ob_config {
+    let (uv, su) = if let Some(obc_id) = obc_id {
         let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true).into_inner();
         let uvid = uv.id.clone();
-        (uv, fixtures::scoped_vault::create(conn, &uvid, &ob_config.id))
+        (uv, fixtures::scoped_vault::create(conn, &uvid, obc_id))
     } else {
         let args = fixtures::vault::new_vault_args(VaultKind::Person, sandbox_id, false);
         let (su, uv) = fixtures::scoped_vault::create_non_portable(conn, args, &tenant_id);
@@ -83,13 +83,12 @@ pub fn create_user_and_onboarding(
 ) -> (Tenant, Vault, Locked<ScopedVault>, Workflow) {
     let is_live = obc_opts.is_live;
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
-    let obc_id = ob_config.id.clone();
+    let (_, obc) = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
 
     let tenant_id = tenant.id.clone();
-    let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(ob_config), idks);
+    let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(&obc.id), idks);
 
-    let wf = fixtures::workflow::create(conn, &su.id, &obc_id, None);
+    let wf = fixtures::workflow::create(conn, &su.id, &obc.id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();
     let (wf, _, _) = Workflow::update_status_if_valid(wf, conn, onboarding_status).unwrap();
     let wf_id = Locked::new(wf.id);

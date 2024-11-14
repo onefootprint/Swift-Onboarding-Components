@@ -240,7 +240,7 @@ fn make_vault(
     enhanced_aml: EnhancedAmlOption,
 ) -> ScopedVaultId {
     let sv = if is_portable {
-        let ob_config = fixtures::ob_configuration::create_with_opts(
+        let (_, ob_config) = fixtures::ob_configuration::create_with_opts(
             conn,
             tenant_id,
             ObConfigurationOpts {
