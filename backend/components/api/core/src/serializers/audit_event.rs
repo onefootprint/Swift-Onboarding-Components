@@ -12,6 +12,7 @@ use db::models::audit_event::AuditEventBulkSecondaryData;
 use db::models::audit_event::JoinedAuditEvent;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
+use db::models::tenant_user::TenantUser;
 use newtypes::AuditEventMetadata;
 use newtypes::AuditEventName;
 
@@ -159,7 +160,11 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                 }
             }
             AuditEventMetadata::LoginOrgMember => AuditEventDetail::LoginOrgMember,
-            AuditEventMetadata::RemoveOrgMember => AuditEventDetail::RemoveOrgMember,
+            AuditEventMetadata::RemoveOrgMember => AuditEventDetail::RemoveOrgMember {
+                member: api_wire_types::AuditEventOrgMember::from_db(
+                    tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?,
+                ),
+            },
             AuditEventMetadata::CreateOrg => AuditEventDetail::CreateOrg,
             AuditEventMetadata::UpdateOrgSettings => AuditEventDetail::UpdateOrgSettings,
             AuditEventMetadata::CreateOrgRole { scopes } => {
@@ -237,6 +242,17 @@ impl DbToApi<(TenantApiKey, TenantRole)> for api_wire_types::AuditEventApiKey {
             id: api_key.id,
             name: api_key.name,
             role: OrganizationRole::from_db(role),
+        }
+    }
+}
+
+impl DbToApi<TenantUser> for api_wire_types::AuditEventOrgMember {
+    fn from_db(tu: TenantUser) -> Self {
+        api_wire_types::AuditEventOrgMember {
+            id: tu.id,
+            first_name: tu.first_name,
+            last_name: tu.last_name,
+            email: tu.email,
         }
     }
 }

@@ -87,7 +87,9 @@ pub enum AuditEventDetail {
         tenant_user_id: TenantUserId,
     },
     LoginOrgMember,
-    RemoveOrgMember,
+    RemoveOrgMember {
+        tenant_user_id: TenantUserId,
+    },
     CreateOrg,
     UpdateOrgSettings,
     CreateOrgRole {
@@ -299,7 +301,13 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 },
             },
             AuditEventDetail::LoginOrgMember => todo!(),
-            AuditEventDetail::RemoveOrgMember => todo!(),
+            AuditEventDetail::RemoveOrgMember { tenant_user_id } => Self {
+                metadata: AuditEventMetadata::RemoveOrgMember,
+                args: AuditEventOptionalArgs {
+                    tenant_user_id: Some(tenant_user_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::CreateOrg => todo!(),
             AuditEventDetail::UpdateOrgSettings => todo!(),
             AuditEventDetail::UpdateOrgMember {

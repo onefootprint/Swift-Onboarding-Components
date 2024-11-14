@@ -12,6 +12,7 @@ from tests.utils import (
 from tests.dashboard.utils import (
     assert_has_audit_event_with_details,
     get_audit_event_with_details,
+    list_audit_events_with_details,
 )
 
 
@@ -577,3 +578,25 @@ def test_member_update_audit_event(run_id, sandbox_tenant, admin_role, limited_r
     )
     assert event["detail"]["data"]["new_role"]["id"] == limited_role["id"]
     assert event["detail"]["data"]["old_role"]["id"] == admin_role["id"]
+
+
+def test_member_deactivation_audit_event(run_id, sandbox_tenant, admin_role):
+    # Create a user
+    email = f"test.deactivate.{run_id}@gmail.com"
+    user = create_tenant_user(
+        sandbox_tenant,
+        admin_role,
+        email=email,
+        first_name="Temp",
+        last_name="User",
+    )
+
+    # Deactivate the user
+    post(f"org/members/{user['id']}/deactivate", None, *sandbox_tenant.db_auths)
+
+    # Verify audit event for the deactivation
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="remove_org_member",
+        member={"id": user["id"]},
+    )

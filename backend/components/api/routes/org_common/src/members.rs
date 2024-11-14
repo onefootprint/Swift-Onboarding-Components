@@ -200,15 +200,15 @@ pub async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();
 
     let tu_id = tu_id.into_inner();
-    if let AuthActor::TenantUser(tenant_user_id) = actor {
-        if tenant_user_id == tu_id {
+    if let AuthActor::TenantUser(ref tenant_user_id) = actor {
+        if tenant_user_id == &tu_id {
             return Err(TenantError::CannotEditCurrentUser.into());
         }
     }
@@ -220,6 +220,19 @@ pub async fn deactivate(
     state
         .db_transaction(move |conn| {
             let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
+            if let OrgIdentifier::TenantId(tenant_id) = &authed_org_ident {
+                let audit_event_detail = AuditEventDetail::RemoveOrgMember {
+                    tenant_user_id: tu_id.clone(),
+                };
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                let audit_event = NewAuditEvent {
+                    principal_actor: actor.into(),
+                    insight_event_id,
+                    tenant_id: tenant_id.clone(),
+                    detail: audit_event_detail,
+                };
+                AuditEvent::create(conn, audit_event)?;
+            }
             TenantRolebinding::update(conn, (&tu_id, org_ref), update)?;
             Ok(())
         })

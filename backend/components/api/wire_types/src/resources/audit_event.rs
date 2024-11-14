@@ -99,7 +99,9 @@ pub enum AuditEventDetail {
         old_role: crate::OrganizationRole,
     },
     LoginOrgMember,
-    RemoveOrgMember,
+    RemoveOrgMember {
+        member: AuditEventOrgMember,
+    },
     CreateOrg,
     UpdateOrgSettings,
     CreateOrgRole {
@@ -143,4 +145,13 @@ pub struct AuditEventApiKey {
     pub id: TenantApiKeyId,
     pub name: String,
     pub role: crate::OrganizationRole,
+}
+
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct AuditEventOrgMember {
+    pub id: TenantUserId,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub email: OrgMemberEmail,
 }
