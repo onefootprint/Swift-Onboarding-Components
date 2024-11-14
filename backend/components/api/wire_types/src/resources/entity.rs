@@ -58,16 +58,6 @@ pub struct Entity {
 
     /// Metadata on the data that exists in this vault.
     pub data: Vec<EntityAttribute>,
-
-    /// DEPRECATED.
-    /// The list of attributes populated on this vault.
-    pub attributes: Vec<DataIdentifier>,
-    /// DEPRECATED.
-    /// The list of attributes and their values that are decrypted by default
-    pub decrypted_attributes: HashMap<DataIdentifier, PiiString>,
-    /// DEPRECATED.
-    /// The list of attributes that are allowed to be decrypted by the authed user
-    pub decryptable_attributes: Vec<DataIdentifier>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

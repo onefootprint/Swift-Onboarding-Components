@@ -12230,30 +12230,12 @@
                 "description": "Details for a specific Entity",
                 "type": "object",
                 "properties": {
-                    "attributes": {
-                        "description": "DEPRECATED.\n The list of attributes populated on this vault.",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DataIdentifier"
-                        }
-                    },
                     "data": {
                         "description": "Metadata on the data that exists in this vault.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/EntityAttribute"
                         }
-                    },
-                    "decryptable_attributes": {
-                        "description": "DEPRECATED.\n The list of attributes that are allowed to be decrypted by the authed user",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DataIdentifier"
-                        }
-                    },
-                    "decrypted_attributes": {
-                        "description": "DEPRECATED.\n The list of attributes and their values that are decrypted by default",
-                        "type": "object"
                     },
                     "external_id": {
                         "type": "string"
@@ -12332,10 +12314,7 @@
                     }
                 },
                 "required": [
-                    "attributes",
                     "data",
-                    "decryptable_attributes",
-                    "decrypted_attributes",
                     "has_outstanding_workflow_request",
                     "id",
                     "is_created_via_api",

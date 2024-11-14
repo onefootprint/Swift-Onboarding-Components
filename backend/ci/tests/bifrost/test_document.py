@@ -67,9 +67,11 @@ def test_upload_documents(doc_request_sandbox_ob_config):
 
     tenant = bifrost.ob_config.tenant
     body = get(f"entities/{fp_id}", None, *tenant.db_auths)
-    assert set(body["decryptable_attributes"]) > {
-        "document.drivers_license.back.barcodes"
-    }
+    assert any(
+        i["identifier"] == "document.drivers_license.back.barcodes"
+        for i in body["data"]
+        if i["is_decryptable"]
+    )
 
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
     assert len([i for i in body if i["kind"] == "id_card"]) == 1

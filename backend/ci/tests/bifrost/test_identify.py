@@ -30,7 +30,10 @@ def test_entity_created_after_signup_challenge(sandbox_tenant):
         "entities/search", dict(show_all=True, **pagination), *sandbox_tenant.db_auths
     )
     entity = next(e for e in body["data"] if e["sandbox_id"] == sandbox_id)
-    assert set(entity["decryptable_attributes"]) == {"id.email", "id.phone_number"}
+    assert set(i["identifier"] for i in entity["data"] if i["is_decryptable"]) == {
+        "id.email",
+        "id.phone_number",
+    }
     assert entity["status"] == "in_progress"
 
 

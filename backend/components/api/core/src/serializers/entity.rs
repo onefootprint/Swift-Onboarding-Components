@@ -34,27 +34,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
 
         let data = entity_attributes(vw, &auth.scopes(), decrypted_attrs);
 
-        //
-        // All of these are derivative of the much more descriptive `data`.
-        // TODO: Remove these when the client has stopped reading them
-        //
-        let attributes = data.iter().map(|a| a.identifier.clone()).collect();
-        let decryptable_attributes = data
-            .iter()
-            .filter(|a| a.is_decryptable)
-            .map(|a| a.identifier.clone())
-            .collect();
-        use newtypes::DataIdentifier::Id;
-        use newtypes::IdentityDataKind as IDK;
-        let decrypted_attributes = data
-            .iter()
-            // Don't show the decrypted first name value even though we have it
-            // This will cause the client to start showing the first name decrypted, which will
-            // look strange before the dashboard has been updated to show the last initial too
-            .filter(|a| !matches!(a.identifier, Id(IDK::FirstName)))
-            .filter_map(|a| a.value.as_ref().map(|v| (a.identifier.clone(), v.clone())))
-            .collect();
-
         let Vault {
             id: v_id,
             is_portable,
@@ -106,11 +85,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             has_outstanding_workflow_request: wr.is_some(),
             label: label.map(|l| l.kind),
             tags: tags.into_iter().map(api_wire_types::UserTag::from_db).collect(),
-
-            // TODO deprecate all of these
-            attributes,
-            decrypted_attributes,
-            decryptable_attributes,
             external_id,
         }
     }

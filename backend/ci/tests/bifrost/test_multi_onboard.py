@@ -33,27 +33,31 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant):
     fp_id = user1.fp_id
     sandbox_id = bifrost.sandbox_id
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
-    assert set(body["attributes"]) >= {
+    assert set(i["identifier"] for i in body["data"]) >= {
         "id.phone_number",
         "id.email",
         "id.zip",
         "id.first_name",
     }
-    assert set(body["decryptable_attributes"]) >= {"id.phone_number", "id.email"}
+    assert set(i["identifier"] for i in body["data"] if i["is_decryptable"]) >= {
+        "id.phone_number",
+        "id.email",
+    }
 
     # Decryption perms don't change after onboarding onto ob config 2, but we can see ssn9
     bifrost = BifrostClient.login_user(ob_config2, sandbox_id)
     bifrost.handle_one_requirement("collect_data")
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
-    assert set(body["attributes"]) >= {
+    assert set(i["identifier"] for i in body["data"]) >= {
         "id.phone_number",
         "id.email",
         "id.zip",
         "id.first_name",
         "id.ssn9",
     }
-    assert set(body["decryptable_attributes"]) >= {"id.phone_number", "id.email"}
-    assert not set(body["decryptable_attributes"]) & {
+    decryptable_dis = set(i["identifier"] for i in body["data"] if i["is_decryptable"])
+    assert decryptable_dis >= {"id.phone_number", "id.email"}
+    assert not decryptable_dis & {
         "id.first_name",
         "id.zip",
         "id.ssn9",
@@ -64,7 +68,7 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant):
     user3 = bifrost.run()
     assert user3.fp_id == fp_id
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
-    assert set(body["attributes"]) >= {
+    assert set(i["identifier"] for i in body["data"]) >= {
         "id.phone_number",
         "id.email",
         "id.zip",
@@ -72,11 +76,12 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant):
         "id.ssn4",
         "id.ssn9",
     }
-    assert set(body["decryptable_attributes"]) >= {
+    decryptable_dis = set(i["identifier"] for i in body["data"] if i["is_decryptable"])
+    assert decryptable_dis >= {
         "id.phone_number",
         "id.email",
         "id.zip",
         "id.first_name",
         "id.ssn4",
     }
-    assert not set(body["decryptable_attributes"]) & {"id.ssn9"}
+    assert not decryptable_dis & {"id.ssn9"}

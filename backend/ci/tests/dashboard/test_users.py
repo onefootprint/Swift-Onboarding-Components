@@ -42,7 +42,10 @@ def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user
     assert set(u["id"] for u in scoped_users) > set(all_fp_ids)
     for fp_id in [sandbox_user.fp_id, sandbox_user2.fp_id]:
         scoped_user = next(u for u in scoped_users if u["id"] == fp_id)
-        assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
+        assert {
+            "id.first_name",
+            "id.last_name",
+        } < set(i["identifier"] for i in scoped_user["data"])
         assert scoped_user["status"] == "pass"
 
 
@@ -142,7 +145,9 @@ def test_get_users_list_pagination(sandbox_user, sandbox_user2):
 def test_get_users_detail(sandbox_user):
     tenant = sandbox_user.tenant
     scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
-    assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
+    assert set(["id.first_name", "id.last_name"]) < set(
+        i["identifier"] for i in scoped_user["data"]
+    )
 
 
 # TODO no longer have coverage here of uploading without selfie - somewhere else?
@@ -155,9 +160,15 @@ def test_get_users_detail_doc(
     user = bifrost.run()
 
     res = get(f"entities/{user.fp_id}", None, *tenant.db_auths)
-    assert "document.drivers_license.front.image" in res["attributes"]
-    assert "document.drivers_license.back.image" in res["attributes"]
-    assert "document.drivers_license.selfie.image" in res["attributes"]
+    assert any(
+        i["identifier"] == "document.drivers_license.front.image" for i in res["data"]
+    )
+    assert any(
+        i["identifier"] == "document.drivers_license.back.image" for i in res["data"]
+    )
+    assert any(
+        i["identifier"] == "document.drivers_license.selfie.image" for i in res["data"]
+    )
 
 
 def test_timeline(sandbox_user):

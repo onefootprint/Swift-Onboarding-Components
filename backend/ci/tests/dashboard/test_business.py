@@ -47,11 +47,9 @@ def test_get_entities(sandbox_tenant, primary_bo, populated_business_data):
         None,
         *sandbox_tenant.db_auths,
     )
-    assert set(body["attributes"]) == populated_business_data
-    assert (
-        body["decrypted_attributes"]["business.name"]
-        == primary_bo.client.data["business.name"]
-    )
+    assert set(i["identifier"] for i in body["data"]) == populated_business_data
+    biz_name = next(i for i in body["data"] if i["identifier"] == "business.name")
+    assert biz_name["value"] == primary_bo.client.data["business.name"]
 
 
 def test_get_business_owners(sandbox_tenant, primary_bo):

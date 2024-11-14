@@ -122,9 +122,9 @@ def test_middle_name(sandbox_tenant, middle_name):
 
     # assert that /users/ includes id.middle_name cause why not
     res = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
-    if middle_name:
-        assert di in res["attributes"]
-        assert di in res["decryptable_attributes"]
-    else:
-        assert di not in res["attributes"]
-        assert di not in res["decryptable_attributes"]
+    has_middle_name = any(i["identifier"] == di for i in res["data"])
+    is_middle_name_decryptable = any(
+        i["identifier"] == di for i in res["data"] if i["is_decryptable"]
+    )
+    assert has_middle_name == bool(middle_name)
+    assert is_middle_name_decryptable == bool(middle_name)

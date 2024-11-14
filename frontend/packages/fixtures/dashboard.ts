@@ -2298,11 +2298,6 @@ export const getCursorPaginatedEntity = (
     {
       data: [
         {
-          attributes: [
-            'document.visa.expires_at',
-            'document.passport_card.samba_activity_history_response',
-            'document.visa.clave_de_elector',
-          ],
           data: [
             {
               dataKind: 'vault_data',
@@ -2329,12 +2324,6 @@ export const getCursorPaginatedEntity = (
               value: 'cupidatat ut sunt',
             },
           ],
-          decryptableAttributes: [
-            'document.voter_identification.full_name',
-            'document.permit.back.image',
-            'document.visa.back.image',
-          ],
-          decryptedAttributes: {},
           externalId: '9289f8d0-52e3-41c5-b7e0-25ac5ad8021f',
           hasOutstandingWorkflowRequest: false,
           id: 'ea0f0ae7-3d54-4764-a644-6d46aeec4a14',
@@ -2438,11 +2427,6 @@ export const getCursorPaginatedEntity = (
           ],
         },
         {
-          attributes: [
-            'document.passport.full_address',
-            'document.passport_card.samba_activity_history_response',
-            'document.passport_card.full_address',
-          ],
           data: [
             {
               dataKind: 'vault_data',
@@ -2469,12 +2453,6 @@ export const getCursorPaginatedEntity = (
               value: 'Duis quis',
             },
           ],
-          decryptableAttributes: [
-            'document.passport_card.dob',
-            'document.visa.dob',
-            'document.residence_document.front.mime_type',
-          ],
-          decryptedAttributes: {},
           externalId: '9289f8d0-52e3-41c5-b7e0-25ac5ad8021f',
           hasOutstandingWorkflowRequest: true,
           id: 'ea0f0ae7-3d54-4764-a644-6d46aeec4a14',
@@ -2582,11 +2560,6 @@ export const getCursorPaginatedEntity = (
           ],
         },
         {
-          attributes: [
-            'document.passport.clave_de_elector',
-            'card.*.expiration',
-            'document.voter_identification.selfie.mime_type',
-          ],
           data: [
             {
               dataKind: 'vault_data',
@@ -2613,12 +2586,6 @@ export const getCursorPaginatedEntity = (
               value: 'ut',
             },
           ],
-          decryptableAttributes: [
-            'document.visa.issuing_state',
-            'document.visa.last_name',
-            'document.voter_identification.last_name',
-          ],
-          decryptedAttributes: {},
           externalId: '9289f8d0-52e3-41c5-b7e0-25ac5ad8021f',
           hasOutstandingWorkflowRequest: false,
           id: 'ea0f0ae7-3d54-4764-a644-6d46aeec4a14',
@@ -3329,11 +3296,6 @@ export const getEntity = (
 ): Entity =>
   deepmerge<Entity>(
     {
-      attributes: [
-        'document.permit.issuing_country',
-        'document.passport.full_name',
-        'document.residence_document.full_address',
-      ],
       data: [
         {
           dataKind: 'vault_data',
@@ -3360,12 +3322,6 @@ export const getEntity = (
           value: 'laborum Duis',
         },
       ],
-      decryptableAttributes: [
-        'document.residence_document.front.mime_type',
-        'document.residence_document.gender',
-        'document.id_card.samba_activity_history_response',
-      ],
-      decryptedAttributes: {},
       externalId: '3fad5ed9-77cc-46ce-930d-5b2793f8b48e',
       hasOutstandingWorkflowRequest: true,
       id: '277e0b1c-59ba-402b-835f-cf922c24f69e',

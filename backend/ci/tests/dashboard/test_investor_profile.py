@@ -10,7 +10,7 @@ def sb_user_with_investor_profile(sandbox_tenant, investor_profile_ob_config):
     bifrost = BifrostClient.new_user(investor_profile_ob_config)
     user = bifrost.run()
     entity = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
-    assert set(entity["attributes"]) > set(IP_DATA)
+    assert set(i["identifier"] for i in entity["data"]) > set(IP_DATA)
     # The requirements should be returned and handled in a specific order
     assert [i["kind"] for i in bifrost.handled_requirements] == [
         "collect_data",
@@ -62,4 +62,7 @@ def test_decrypt(sandbox_tenant, sb_user_with_investor_profile, fields_to_decryp
     )
     assert audit_event["name"] == "decrypt_user_data"
     populated_keys = set(sb_user_with_investor_profile.client.data)
-    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(fields_to_decrypt) & populated_keys
+    assert (
+        set(audit_event["detail"]["data"]["decrypted_fields"])
+        == set(fields_to_decrypt) & populated_keys
+    )
