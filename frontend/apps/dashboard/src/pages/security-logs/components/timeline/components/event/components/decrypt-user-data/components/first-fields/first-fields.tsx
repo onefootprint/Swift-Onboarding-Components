@@ -1,7 +1,6 @@
 import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useDITranslation from 'src/hooks/use-di-translation';
 
 type FirstFieldsTextProps = {
   decryptedFields: string[];
@@ -9,12 +8,12 @@ type FirstFieldsTextProps = {
 
 const FirstFieldsText = ({ decryptedFields }: FirstFieldsTextProps) => {
   const { t } = useTranslation('common');
-  const { translateDI } = useDITranslation();
+  const { t: allT } = useTranslation('common', { keyPrefix: 'di' });
 
   const getFieldText = () => {
     if (decryptedFields.length <= 3) {
       return decryptedFields.reduce((acc, field, index) => {
-        const translatedField = translateDI(field as DataIdentifier);
+        const translatedField = allT(field as DataIdentifier);
         if (decryptedFields.length === 1) {
           return translatedField;
         }
@@ -29,7 +28,7 @@ const FirstFieldsText = ({ decryptedFields }: FirstFieldsTextProps) => {
     }
 
     const firstThreeFields = decryptedFields.slice(0, 3);
-    return `${firstThreeFields.map(field => translateDI(field as DataIdentifier)).join(', ')} ${t('and')}`;
+    return `${firstThreeFields.map(field => allT(field as DataIdentifier)).join(', ')} ${t('and')}`;
   };
 
   const text = getFieldText();
