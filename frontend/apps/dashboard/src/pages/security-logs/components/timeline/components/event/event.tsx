@@ -6,6 +6,7 @@ import DeactivateOrgRole from './components/deactivate-org-role';
 import DecryptUserData from './components/decrypt-user-data';
 import InviteOrgMember from './components/invite-org-member';
 import PrincipalActor from './components/principal-actor';
+import RemoveOrgMember from './components/remove-org-member';
 import UpdateOrgMember from './components/update-org-member';
 import UpdateOrgRole from './components/update-org-role';
 
@@ -32,6 +33,9 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
       )}
       {kind === 'update_org_member' && (
         <UpdateOrgMember detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === 'remove_org_member' && (
+        <RemoveOrgMember detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
     </Stack>
   );

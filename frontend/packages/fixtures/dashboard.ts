@@ -17,6 +17,7 @@ import type {
   AuditEventApiKey,
   AuditEventDetail,
   AuditEventName,
+  AuditEventOrgMember,
   AuthEvent,
   AuthEventKind,
   AuthMethodKind,
@@ -753,6 +754,21 @@ export const getAuditEventDetail = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getAuditEventName = (props: AuditEventName): AuditEventName => props ?? 'decrypt_user_data';
+
+export const getAuditEventOrgMember = (
+  props: Partial<AuditEventOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventOrgMember =>
+  deepmerge<AuditEventOrgMember>(
+    {
+      email: 'helga42@gmail.com',
+      firstName: 'Esteban',
+      id: '1279605f-4d2b-4a82-8583-686ee9db76a0',
+      lastName: 'Rau',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 
 export const getAuthEvent = (
   props: Partial<AuthEvent>,

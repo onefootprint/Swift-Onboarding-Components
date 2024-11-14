@@ -230,6 +230,7 @@ export type DataIdentifier =
   | 'document.id_card.classified_document_type'
   | 'document.id_card.curp_validation_response'
   | 'document.id_card.samba_activity_history_response'
+  | 'document.id_card.us_issuing_state'
   | 'document.drivers_license.front.image'
   | 'document.drivers_license.front.mime_type'
   | 'document.drivers_license.back.image'
@@ -258,6 +259,7 @@ export type DataIdentifier =
   | 'document.drivers_license.classified_document_type'
   | 'document.drivers_license.curp_validation_response'
   | 'document.drivers_license.samba_activity_history_response'
+  | 'document.drivers_license.us_issuing_state'
   | 'document.passport.front.image'
   | 'document.passport.front.mime_type'
   | 'document.passport.back.image'
@@ -286,6 +288,7 @@ export type DataIdentifier =
   | 'document.passport.classified_document_type'
   | 'document.passport.curp_validation_response'
   | 'document.passport.samba_activity_history_response'
+  | 'document.passport.us_issuing_state'
   | 'document.passport_card.front.image'
   | 'document.passport_card.front.mime_type'
   | 'document.passport_card.back.image'
@@ -314,6 +317,7 @@ export type DataIdentifier =
   | 'document.passport_card.classified_document_type'
   | 'document.passport_card.curp_validation_response'
   | 'document.passport_card.samba_activity_history_response'
+  | 'document.passport_card.us_issuing_state'
   | 'document.permit.front.image'
   | 'document.permit.front.mime_type'
   | 'document.permit.back.image'
@@ -342,6 +346,7 @@ export type DataIdentifier =
   | 'document.permit.classified_document_type'
   | 'document.permit.curp_validation_response'
   | 'document.permit.samba_activity_history_response'
+  | 'document.permit.us_issuing_state'
   | 'document.visa.front.image'
   | 'document.visa.front.mime_type'
   | 'document.visa.back.image'
@@ -370,6 +375,7 @@ export type DataIdentifier =
   | 'document.visa.classified_document_type'
   | 'document.visa.curp_validation_response'
   | 'document.visa.samba_activity_history_response'
+  | 'document.visa.us_issuing_state'
   | 'document.residence_document.front.image'
   | 'document.residence_document.front.mime_type'
   | 'document.residence_document.back.image'
@@ -398,6 +404,7 @@ export type DataIdentifier =
   | 'document.residence_document.classified_document_type'
   | 'document.residence_document.curp_validation_response'
   | 'document.residence_document.samba_activity_history_response'
+  | 'document.residence_document.us_issuing_state'
   | 'document.voter_identification.front.image'
   | 'document.voter_identification.front.mime_type'
   | 'document.voter_identification.back.image'
@@ -426,6 +433,7 @@ export type DataIdentifier =
   | 'document.voter_identification.classified_document_type'
   | 'document.voter_identification.curp_validation_response'
   | 'document.voter_identification.samba_activity_history_response'
+  | 'document.voter_identification.us_issuing_state'
   | 'document.finra_compliance_letter'
   | 'document.proof_of_address.image'
   | 'document.ssn_card.image'
@@ -1138,6 +1146,7 @@ export type ModernRawUserDataRequest = {
   'document.drivers_license.selfie.image'?: string;
   'document.drivers_license.selfie.mime_type'?: string;
   'document.drivers_license.state'?: string;
+  'document.drivers_license.us_issuing_state'?: string;
   'document.finra_compliance_letter'?: string;
   'document.id_card.address_line1'?: string;
   'document.id_card.back.image'?: string;
@@ -1167,6 +1176,7 @@ export type ModernRawUserDataRequest = {
   'document.id_card.selfie.image'?: string;
   'document.id_card.selfie.mime_type'?: string;
   'document.id_card.state'?: string;
+  'document.id_card.us_issuing_state'?: string;
   'document.passport_card.address_line1'?: string;
   'document.passport_card.back.image'?: string;
   'document.passport_card.back.mime_type'?: string;
@@ -1195,6 +1205,7 @@ export type ModernRawUserDataRequest = {
   'document.passport_card.selfie.image'?: string;
   'document.passport_card.selfie.mime_type'?: string;
   'document.passport_card.state'?: string;
+  'document.passport_card.us_issuing_state'?: string;
   'document.passport.address_line1'?: string;
   'document.passport.back.image'?: string;
   'document.passport.back.mime_type'?: string;
@@ -1223,6 +1234,7 @@ export type ModernRawUserDataRequest = {
   'document.passport.selfie.image'?: string;
   'document.passport.selfie.mime_type'?: string;
   'document.passport.state'?: string;
+  'document.passport.us_issuing_state'?: string;
   'document.permit.address_line1'?: string;
   'document.permit.back.image'?: string;
   'document.permit.back.mime_type'?: string;
@@ -1251,6 +1263,7 @@ export type ModernRawUserDataRequest = {
   'document.permit.selfie.image'?: string;
   'document.permit.selfie.mime_type'?: string;
   'document.permit.state'?: string;
+  'document.permit.us_issuing_state'?: string;
   'document.proof_of_address.image'?: string;
   'document.residence_document.address_line1'?: string;
   'document.residence_document.back.image'?: string;
@@ -1280,6 +1293,7 @@ export type ModernRawUserDataRequest = {
   'document.residence_document.selfie.image'?: string;
   'document.residence_document.selfie.mime_type'?: string;
   'document.residence_document.state'?: string;
+  'document.residence_document.us_issuing_state'?: string;
   'document.ssn_card.image'?: string;
   'document.visa.address_line1'?: string;
   'document.visa.back.image'?: string;
@@ -1309,6 +1323,7 @@ export type ModernRawUserDataRequest = {
   'document.visa.selfie.image'?: string;
   'document.visa.selfie.mime_type'?: string;
   'document.visa.state'?: string;
+  'document.visa.us_issuing_state'?: string;
   'document.voter_identification.address_line1'?: string;
   'document.voter_identification.back.image'?: string;
   'document.voter_identification.back.mime_type'?: string;
@@ -1337,6 +1352,7 @@ export type ModernRawUserDataRequest = {
   'document.voter_identification.selfie.image'?: string;
   'document.voter_identification.selfie.mime_type'?: string;
   'document.voter_identification.state'?: string;
+  'document.voter_identification.us_issuing_state'?: string;
   'id.address_line1'?: string;
   'id.address_line2'?: string;
   'id.citizenships'?: string;
@@ -1422,6 +1438,7 @@ export type ModernUserDecryptResponse = {
   'document.drivers_license.selfie.image'?: string;
   'document.drivers_license.selfie.mime_type'?: string;
   'document.drivers_license.state'?: string;
+  'document.drivers_license.us_issuing_state'?: string;
   'document.finra_compliance_letter'?: string;
   'document.id_card.address_line1'?: string;
   'document.id_card.back.image'?: string;
@@ -1451,6 +1468,7 @@ export type ModernUserDecryptResponse = {
   'document.id_card.selfie.image'?: string;
   'document.id_card.selfie.mime_type'?: string;
   'document.id_card.state'?: string;
+  'document.id_card.us_issuing_state'?: string;
   'document.passport_card.address_line1'?: string;
   'document.passport_card.back.image'?: string;
   'document.passport_card.back.mime_type'?: string;
@@ -1479,6 +1497,7 @@ export type ModernUserDecryptResponse = {
   'document.passport_card.selfie.image'?: string;
   'document.passport_card.selfie.mime_type'?: string;
   'document.passport_card.state'?: string;
+  'document.passport_card.us_issuing_state'?: string;
   'document.passport.address_line1'?: string;
   'document.passport.back.image'?: string;
   'document.passport.back.mime_type'?: string;
@@ -1507,6 +1526,7 @@ export type ModernUserDecryptResponse = {
   'document.passport.selfie.image'?: string;
   'document.passport.selfie.mime_type'?: string;
   'document.passport.state'?: string;
+  'document.passport.us_issuing_state'?: string;
   'document.permit.address_line1'?: string;
   'document.permit.back.image'?: string;
   'document.permit.back.mime_type'?: string;
@@ -1535,6 +1555,7 @@ export type ModernUserDecryptResponse = {
   'document.permit.selfie.image'?: string;
   'document.permit.selfie.mime_type'?: string;
   'document.permit.state'?: string;
+  'document.permit.us_issuing_state'?: string;
   'document.proof_of_address.image'?: string;
   'document.residence_document.address_line1'?: string;
   'document.residence_document.back.image'?: string;
@@ -1564,6 +1585,7 @@ export type ModernUserDecryptResponse = {
   'document.residence_document.selfie.image'?: string;
   'document.residence_document.selfie.mime_type'?: string;
   'document.residence_document.state'?: string;
+  'document.residence_document.us_issuing_state'?: string;
   'document.ssn_card.image'?: string;
   'document.visa.address_line1'?: string;
   'document.visa.back.image'?: string;
@@ -1593,6 +1615,7 @@ export type ModernUserDecryptResponse = {
   'document.visa.selfie.image'?: string;
   'document.visa.selfie.mime_type'?: string;
   'document.visa.state'?: string;
+  'document.visa.us_issuing_state'?: string;
   'document.voter_identification.address_line1'?: string;
   'document.voter_identification.back.image'?: string;
   'document.voter_identification.back.mime_type'?: string;
@@ -1621,6 +1644,7 @@ export type ModernUserDecryptResponse = {
   'document.voter_identification.selfie.image'?: string;
   'document.voter_identification.selfie.mime_type'?: string;
   'document.voter_identification.state'?: string;
+  'document.voter_identification.us_issuing_state'?: string;
   'id.address_line1'?: string;
   'id.address_line2'?: string;
   'id.citizenships'?: string;
@@ -1943,6 +1967,7 @@ export type UserDataIdentifier =
   | 'document.id_card.classified_document_type'
   | 'document.id_card.curp_validation_response'
   | 'document.id_card.samba_activity_history_response'
+  | 'document.id_card.us_issuing_state'
   | 'document.drivers_license.front.image'
   | 'document.drivers_license.front.mime_type'
   | 'document.drivers_license.back.image'
@@ -1971,6 +1996,7 @@ export type UserDataIdentifier =
   | 'document.drivers_license.classified_document_type'
   | 'document.drivers_license.curp_validation_response'
   | 'document.drivers_license.samba_activity_history_response'
+  | 'document.drivers_license.us_issuing_state'
   | 'document.passport.front.image'
   | 'document.passport.front.mime_type'
   | 'document.passport.back.image'
@@ -1999,6 +2025,7 @@ export type UserDataIdentifier =
   | 'document.passport.classified_document_type'
   | 'document.passport.curp_validation_response'
   | 'document.passport.samba_activity_history_response'
+  | 'document.passport.us_issuing_state'
   | 'document.passport_card.front.image'
   | 'document.passport_card.front.mime_type'
   | 'document.passport_card.back.image'
@@ -2027,6 +2054,7 @@ export type UserDataIdentifier =
   | 'document.passport_card.classified_document_type'
   | 'document.passport_card.curp_validation_response'
   | 'document.passport_card.samba_activity_history_response'
+  | 'document.passport_card.us_issuing_state'
   | 'document.permit.front.image'
   | 'document.permit.front.mime_type'
   | 'document.permit.back.image'
@@ -2055,6 +2083,7 @@ export type UserDataIdentifier =
   | 'document.permit.classified_document_type'
   | 'document.permit.curp_validation_response'
   | 'document.permit.samba_activity_history_response'
+  | 'document.permit.us_issuing_state'
   | 'document.visa.front.image'
   | 'document.visa.front.mime_type'
   | 'document.visa.back.image'
@@ -2083,6 +2112,7 @@ export type UserDataIdentifier =
   | 'document.visa.classified_document_type'
   | 'document.visa.curp_validation_response'
   | 'document.visa.samba_activity_history_response'
+  | 'document.visa.us_issuing_state'
   | 'document.residence_document.front.image'
   | 'document.residence_document.front.mime_type'
   | 'document.residence_document.back.image'
@@ -2111,6 +2141,7 @@ export type UserDataIdentifier =
   | 'document.residence_document.classified_document_type'
   | 'document.residence_document.curp_validation_response'
   | 'document.residence_document.samba_activity_history_response'
+  | 'document.residence_document.us_issuing_state'
   | 'document.voter_identification.front.image'
   | 'document.voter_identification.front.mime_type'
   | 'document.voter_identification.back.image'
@@ -2139,6 +2170,7 @@ export type UserDataIdentifier =
   | 'document.voter_identification.classified_document_type'
   | 'document.voter_identification.curp_validation_response'
   | 'document.voter_identification.samba_activity_history_response'
+  | 'document.voter_identification.us_issuing_state'
   | 'document.finra_compliance_letter'
   | 'document.proof_of_address.image'
   | 'document.ssn_card.image'
@@ -2953,6 +2985,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.id_card.classified_document_type'
       | 'document.id_card.curp_validation_response'
       | 'document.id_card.samba_activity_history_response'
+      | 'document.id_card.us_issuing_state'
       | 'document.drivers_license.front.image'
       | 'document.drivers_license.front.mime_type'
       | 'document.drivers_license.back.image'
@@ -2981,6 +3014,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.drivers_license.classified_document_type'
       | 'document.drivers_license.curp_validation_response'
       | 'document.drivers_license.samba_activity_history_response'
+      | 'document.drivers_license.us_issuing_state'
       | 'document.passport.front.image'
       | 'document.passport.front.mime_type'
       | 'document.passport.back.image'
@@ -3009,6 +3043,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.passport.classified_document_type'
       | 'document.passport.curp_validation_response'
       | 'document.passport.samba_activity_history_response'
+      | 'document.passport.us_issuing_state'
       | 'document.passport_card.front.image'
       | 'document.passport_card.front.mime_type'
       | 'document.passport_card.back.image'
@@ -3037,6 +3072,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.passport_card.classified_document_type'
       | 'document.passport_card.curp_validation_response'
       | 'document.passport_card.samba_activity_history_response'
+      | 'document.passport_card.us_issuing_state'
       | 'document.permit.front.image'
       | 'document.permit.front.mime_type'
       | 'document.permit.back.image'
@@ -3065,6 +3101,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.permit.classified_document_type'
       | 'document.permit.curp_validation_response'
       | 'document.permit.samba_activity_history_response'
+      | 'document.permit.us_issuing_state'
       | 'document.visa.front.image'
       | 'document.visa.front.mime_type'
       | 'document.visa.back.image'
@@ -3093,6 +3130,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.visa.classified_document_type'
       | 'document.visa.curp_validation_response'
       | 'document.visa.samba_activity_history_response'
+      | 'document.visa.us_issuing_state'
       | 'document.residence_document.front.image'
       | 'document.residence_document.front.mime_type'
       | 'document.residence_document.back.image'
@@ -3121,6 +3159,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.residence_document.classified_document_type'
       | 'document.residence_document.curp_validation_response'
       | 'document.residence_document.samba_activity_history_response'
+      | 'document.residence_document.us_issuing_state'
       | 'document.voter_identification.front.image'
       | 'document.voter_identification.front.mime_type'
       | 'document.voter_identification.back.image'
@@ -3149,6 +3188,7 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'document.voter_identification.classified_document_type'
       | 'document.voter_identification.curp_validation_response'
       | 'document.voter_identification.samba_activity_history_response'
+      | 'document.voter_identification.us_issuing_state'
       | 'document.finra_compliance_letter'
       | 'document.proof_of_address.image'
       | 'document.ssn_card.image'

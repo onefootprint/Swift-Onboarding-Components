@@ -77,6 +77,13 @@
       "role-from": "role from",
       "to": "to"
     },
+    "remove": {
+      "removed": "removed",
+      "a-member": "a member",
+      "from": "from",
+      "the": "the",
+      "team": "team"
+    },
     "roles": {
       "created-a-new": "created a new",
       "edited-the": "edited the",

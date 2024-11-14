@@ -206,6 +206,9 @@ export type AuditEventDetail =
       kind: 'login_org_member';
     }
   | {
+      data: {
+        member: AuditEventOrgMember;
+      };
       kind: 'remove_org_member';
     }
   | {
@@ -311,6 +314,12 @@ export type AuditEventName =
   | 'manually_review_entity'
   | 'edit_playbook'
   | 'deactivate_org_role';
+export type AuditEventOrgMember = {
+  email: string;
+  firstName?: string;
+  id: string;
+  lastName?: string;
+};
 export type AuthEvent = {
   createdAt: string;
   insight?: InsightEvent;

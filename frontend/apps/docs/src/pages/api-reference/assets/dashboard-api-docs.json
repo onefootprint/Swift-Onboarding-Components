@@ -9406,6 +9406,17 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "member": {
+                                        "$ref": "#/components/schemas/AuditEventOrgMember"
+                                    }
+                                },
+                                "required": [
+                                    "member"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -9414,6 +9425,7 @@
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },
@@ -9752,6 +9764,27 @@
                     "manually_review_entity",
                     "edit_playbook",
                     "deactivate_org_role"
+                ]
+            },
+            "AuditEventOrgMember": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "id"
                 ]
             },
             "AuthEvent": {
