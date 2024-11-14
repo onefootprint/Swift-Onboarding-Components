@@ -1,6 +1,6 @@
 use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_frequent_note;
@@ -46,7 +46,7 @@ impl TenantFrequentNote {
         created_by: DbActor,
         kind: TenantFrequentNoteKind,
         content: String,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new = NewTenantFrequentNote {
             created_at: Utc::now(),
             tenant_id,
@@ -57,8 +57,7 @@ impl TenantFrequentNote {
 
         let result = diesel::insert_into(tenant_frequent_note::table)
             .values(new)
-            .get_result(conn)
-            .map_err(DbError::from)?;
+            .get_result(conn)?;
 
         Ok(result)
     }
@@ -68,7 +67,7 @@ impl TenantFrequentNote {
         conn: &mut PgConn,
         tenant_id: &TenantId,
         kind: TenantFrequentNoteKind,
-    ) -> DbResult<Vec<Self>> {
+    ) -> FpResult<Vec<Self>> {
         let result = tenant_frequent_note::table
             .filter(tenant_frequent_note::tenant_id.eq(tenant_id))
             .filter(tenant_frequent_note::kind.eq(kind))
@@ -79,7 +78,7 @@ impl TenantFrequentNote {
     }
 
     #[tracing::instrument("TenantFrequentNote::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut PgConn, tenant_id: &TenantId, fn_id: &TenantFrequentNoteId) -> DbResult<()> {
+    pub fn deactivate(conn: &mut PgConn, tenant_id: &TenantId, fn_id: &TenantFrequentNoteId) -> FpResult<()> {
         let count_updated = diesel::update(tenant_frequent_note::table)
             .filter(tenant_frequent_note::tenant_id.eq(tenant_id))
             .filter(tenant_frequent_note::id.eq(fn_id))
@@ -88,7 +87,7 @@ impl TenantFrequentNote {
             .execute(conn)?;
 
         if count_updated == 0 {
-            Err(DbError::ObjectNotFound)
+            Err(DbError::ObjectNotFound.into())
         } else {
             Ok(())
         }

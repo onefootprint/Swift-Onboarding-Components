@@ -14,7 +14,6 @@ use db::models::proxy_config::NewProxyConfigArgs;
 use db::models::proxy_config::ProxyConfig;
 use db::models::proxy_config::ProxyConfigFilters;
 use db::models::proxy_config::UpdateProxyConfigArgs;
-use db::DbError;
 use newtypes::ProxyConfigId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -40,7 +39,7 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let configs = state
-        .db_query(move |conn| -> Result<_, DbError> {
+        .db_query(move |conn| {
             let filters = ProxyConfigFilters {
                 status,
                 tenant_id: &tenant_id,
@@ -75,9 +74,7 @@ pub async fn get_detail(
     let proxy_config_id = proxy_config_id.into_inner();
 
     let config = state
-        .db_query(move |conn| -> Result<_, DbError> {
-            ProxyConfig::find(conn, &tenant_id, is_live, proxy_config_id)
-        })
+        .db_query(move |conn| ProxyConfig::find(conn, &tenant_id, is_live, proxy_config_id))
         .await?;
 
     Ok(api_wire_types::ProxyConfigDetailed::from_db(config))
@@ -182,7 +179,7 @@ pub async fn post(
     };
 
     let config = state
-        .db_transaction(move |conn| -> Result<_, DbError> { ProxyConfig::create_new(conn, args) })
+        .db_transaction(move |conn| ProxyConfig::create_new(conn, args))
         .await?;
 
     let config = api_wire_types::ProxyConfigDetailed::from_db(config);
@@ -326,7 +323,7 @@ pub async fn patch(
     };
 
     let config = state
-        .db_transaction(move |conn| -> Result<_, DbError> { ProxyConfig::update(conn, args) })
+        .db_transaction(move |conn| ProxyConfig::update(conn, args))
         .await?;
 
     let config = api_wire_types::ProxyConfigDetailed::from_db(config);

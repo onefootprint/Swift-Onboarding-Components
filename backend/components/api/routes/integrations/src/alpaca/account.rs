@@ -13,7 +13,6 @@ use api_core::errors::cip_error::CipError;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Person;
-use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
@@ -132,10 +131,10 @@ async fn create_create_account_request(
     req: DeprecatedAlpacaCreateAccountRequest,
 ) -> FpResult<CreateAccountRequest> {
     let (uvw, doc) = state
-        .db_query(move |conn| -> FpResult<(TenantVw<Person>, _)> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
             let doc = Document::get_latest_complete_identity(conn, &sv.id)?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let uvw = VaultWrapper::<Person>::build_for_tenant(conn, &sv.id)?;
             Ok((uvw, doc))
         })
         .await?;

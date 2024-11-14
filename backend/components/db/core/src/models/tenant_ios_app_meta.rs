@@ -1,8 +1,8 @@
 use crate::DbError;
-use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_ios_app_meta;
@@ -64,7 +64,7 @@ impl TenantIosAppMeta {
         app_bundle_ids: Vec<String>,
         device_check_key_id: String,
         e_device_check_private_key: SealedVaultBytes,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new = NewTenantIosAppMeta {
             created_at: Utc::now(),
             tenant_id,
@@ -91,7 +91,7 @@ impl TenantIosAppMeta {
         app_bundle_ids: Option<Vec<String>>,
         device_check_key_id: Option<String>,
         e_device_check_private_key: Option<SealedVaultBytes>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let update = TenantIosAppMetaUpdate {
             team_id,
             app_bundle_ids,
@@ -107,14 +107,14 @@ impl TenantIosAppMeta {
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated);
+            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
 
     #[tracing::instrument("TenantIosAppMeta::list", skip_all)]
-    pub fn list(conn: &mut PgConn, filters: TenantIosAppFilters) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, filters: TenantIosAppFilters) -> FpResult<Vec<Self>> {
         let mut query = tenant_ios_app_meta::table
             .filter(tenant_ios_app_meta::tenant_id.eq(filters.tenant_id))
             .into_boxed();
@@ -135,7 +135,7 @@ impl TenantIosAppMeta {
         conn: &mut PgConn,
         id: TenantIosAppMetaId,
         tenant_id: &TenantId,
-    ) -> DbResult<TenantIosAppMeta> {
+    ) -> FpResult<TenantIosAppMeta> {
         let query = tenant_ios_app_meta::table
             .filter(tenant_ios_app_meta::deactivated_at.is_null())
             .filter(tenant_ios_app_meta::id.eq(id))
@@ -145,7 +145,7 @@ impl TenantIosAppMeta {
     }
 
     #[tracing::instrument("TenantIosAppMeta::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut PgConn, id: &TenantIosAppMetaId, tenant_id: &TenantId) -> DbResult<()> {
+    pub fn deactivate(conn: &mut PgConn, id: &TenantIosAppMetaId, tenant_id: &TenantId) -> FpResult<()> {
         let count_updated = diesel::update(tenant_ios_app_meta::table)
             .filter(tenant_ios_app_meta::id.eq(id))
             .filter(tenant_ios_app_meta::tenant_id.eq(tenant_id))
@@ -154,7 +154,7 @@ impl TenantIosAppMeta {
             .execute(conn)?;
 
         if count_updated == 0 {
-            Err(DbError::ObjectNotFound)
+            Err(DbError::ObjectNotFound.into())
         } else {
             Ok(())
         }

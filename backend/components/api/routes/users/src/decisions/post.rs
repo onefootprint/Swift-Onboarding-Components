@@ -7,10 +7,9 @@ use api_core::decision;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::task;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::FpResult;
 use api_errors::BadRequestInto;
+use api_errors::FpDbOptionalExtension;
 use api_wire_types::CreateUserDecisionRequest;
-use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
@@ -44,7 +43,7 @@ pub async fn post(
     let fpid = fp_id.clone();
     let tid = tenant_id.clone();
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
             if !sv.status.is_terminal() {
                 return BadRequestInto(

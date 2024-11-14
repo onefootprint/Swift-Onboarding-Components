@@ -35,7 +35,7 @@ pub async fn run_sentilink_application_risk(
     let wf_id2 = wf_id.clone();
 
     let (vw, tenant_id, curr_seqno, ie) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let ie = InsightEvent::get_for_workflow(conn, &wf_id2)?;
@@ -126,7 +126,7 @@ pub async fn run_sentilink_application_risk(
     let wf_id3 = wf_id.clone();
     state
         .db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
             BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::SentilinkScore)?;
 

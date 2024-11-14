@@ -1,7 +1,7 @@
 use super::audit_event::AuditEvent;
 use super::audit_event::NewAuditEvent;
-use crate::DbResult;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::list_entry_creation;
@@ -55,7 +55,7 @@ impl ListEntryCreation {
         tenant_id: &TenantId,
         is_live: bool,
         insight_event_id: &InsightEventId,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new = NewListEntryCreation {
             created_at,
             created_seqno,

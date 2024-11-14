@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::appearance;
@@ -26,7 +26,7 @@ pub struct Appearance {
 
 impl Appearance {
     #[tracing::instrument("Appearance::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &AppearanceId, t_id: &TenantId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &AppearanceId, t_id: &TenantId) -> FpResult<Self> {
         let result = appearance::table
             .filter(appearance::id.eq(id))
             .filter(appearance::tenant_id.eq(t_id))

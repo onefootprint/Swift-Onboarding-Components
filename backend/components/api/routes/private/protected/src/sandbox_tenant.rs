@@ -9,7 +9,6 @@ use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::types::ApiResponse;
 use api_core::utils::session::AuthSession;
-use api_core::FpResult;
 use api_errors::BadRequestInto;
 use db::models::tenant::NewTenant;
 use db::models::tenant::Tenant;
@@ -51,7 +50,7 @@ pub async fn post(
     let sealing_key = state.session_sealing_key.clone();
     let expires_at = auth.clone().session().expires_at;
     let token = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             if Tenant::is_domain_already_claimed(conn, &domains)? {
                 return BadRequestInto("Tenant for this domain already exists");
             }

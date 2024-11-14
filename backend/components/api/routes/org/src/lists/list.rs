@@ -5,7 +5,6 @@ use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::ApiResponse;
-use api_core::FpResult;
 use api_core::State;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
@@ -33,7 +32,7 @@ pub async fn list_for_tenant(
     let pagination = pagination.db_pagination(&state);
 
     let (lists, next_page, count, entries, list_ids_used_in_playbook) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let (lists, next_page) = List::list(conn, &tenant_id, is_live, pagination)?;
             let count = List::count(conn, &tenant_id, is_live)?;
             let list_ids = lists.iter().map(|list| list.id.clone()).collect::<Vec<_>>();

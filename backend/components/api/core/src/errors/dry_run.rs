@@ -1,6 +1,5 @@
 use crate::FpError;
 use crate::FpResult;
-use db::DbError;
 
 /// Drop-in replacement for ApiError when we also want to be able to roll back a transaction
 #[derive(Debug)]
@@ -9,23 +8,17 @@ pub enum DryRunError<T> {
     DryRunRollback(T),
 }
 
-// Any error type from conn.transaction() needs to implement From<DbError>
-impl<T> From<DbError> for DryRunError<T> {
-    fn from(value: DbError) -> Self {
-        Self::Err(FpError::from(value))
+// Any error type from conn.transaction() needs to implement From<FpError>
+impl<T> From<FpError> for DryRunError<T> {
+    fn from(value: FpError) -> Self {
+        Self::Err(value)
     }
 }
 
 // Convenience to allow using ? for db operations
 impl<T> From<diesel::result::Error> for DryRunError<T> {
     fn from(value: diesel::result::Error) -> Self {
-        Self::from(DbError::from(value))
-    }
-}
-
-impl<T> From<FpError> for DryRunError<T> {
-    fn from(value: FpError) -> Self {
-        Self::Err(value)
+        Self::from(FpError::from(value))
     }
 }
 

@@ -9,6 +9,7 @@ use api_core::ApiCoreError;
 use api_core::FpError;
 use api_core::FpResult;
 use api_errors::BadRequest;
+use api_errors::FpErrorCode;
 use api_errors::ServerErr;
 use chrono::Utc;
 use db::helpers::ComplianceDocSummary;
@@ -16,7 +17,6 @@ use db::models::compliance_doc::NewComplianceDoc;
 use db::models::compliance_doc_request::NewComplianceDocRequest;
 use db::models::compliance_doc_template_version::ComplianceDocTemplateVersion;
 use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
-use db::DbError;
 use newtypes::TenantCompliancePartnershipId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -41,7 +41,7 @@ pub async fn get(
     let partnership_id = partnership_id.into_inner();
 
     let summary = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), None)?
                 .into_values()
                 .next()
@@ -78,7 +78,7 @@ pub async fn post(
     let requested_by_partner_tenant_user_id = auth.actor().tenant_user_id()?.clone();
 
     let (summary, doc_id) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             // Check that the authorized partner tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
 
@@ -97,11 +97,11 @@ pub async fn post(
             }
             .create(conn)
             .map_err(|e| -> FpError {
-                match e {
-                    DbError::UniqueConstraintViolation(_) => {
+                match e.code() {
+                    Some(FpErrorCode::DbUniqueConstraintViolation) => {
                         BadRequest("A compliance document request already exists for this template")
                     }
-                    _ => e.into(),
+                    _ => e,
                 }
             })?;
 

@@ -1,7 +1,7 @@
 use super::scoped_vault::ScopedVault;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::billing_event;
@@ -54,7 +54,7 @@ impl BillingEvent {
         tenant_id: &TenantId,
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
-    ) -> DbResult<HashMap<BillingEventKind, i64>> {
+    ) -> FpResult<HashMap<BillingEventKind, i64>> {
         use db_schema::schema::scoped_vault;
         let counts = billing_event::table
             .inner_join(scoped_vault::table)
@@ -80,7 +80,7 @@ impl BillingEvent {
         sv_id: &ScopedVaultId,
         obc_id: Option<&ObConfigurationId>,
         kind: BillingEventKind,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         ScopedVault::lock(conn, sv_id)?;
         let existing_query = billing_event::table
             .filter(billing_event::scoped_vault_id.eq(&sv_id))

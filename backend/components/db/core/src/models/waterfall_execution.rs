@@ -1,9 +1,9 @@
 use super::waterfall_step::NewWaterfallStepArgs;
 use super::waterfall_step::WaterfallStep;
-use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::waterfall_execution;
@@ -68,7 +68,7 @@ impl WaterfallExecution {
         conn: &mut PgConn,
         available_vendor_apis: Vec<VendorAPI>,
         decision_intent_id: &DecisionIntentId,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let existing: Option<Self> = waterfall_execution::table
             .filter(waterfall_execution::decision_intent_id.eq(decision_intent_id))
             .filter(waterfall_execution::completed_at.is_null())
@@ -92,7 +92,7 @@ impl WaterfallExecution {
     }
 
     #[tracing::instrument("WaterfallExecution::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &WaterfallExecutionId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &WaterfallExecutionId) -> FpResult<Locked<Self>> {
         let result = waterfall_execution::table
             .filter(waterfall_execution::id.eq(id))
             .for_no_key_update()
@@ -105,7 +105,7 @@ impl WaterfallExecution {
         locked: Locked<Self>,
         conn: &mut TxnPgConn,
         update: UpdateWaterfallExecution,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let res = diesel::update(waterfall_execution::table)
             .filter(waterfall_execution::id.eq(&locked.id))
             .set(update)
@@ -119,7 +119,7 @@ impl WaterfallExecution {
         execution: Locked<Self>,
         conn: &mut TxnPgConn,
         vendor_api: VendorAPI,
-    ) -> DbResult<WaterfallStep> {
+    ) -> FpResult<WaterfallStep> {
         let next = execution.latest_step + 1;
         let args = NewWaterfallStepArgs {
             vendor_api,
@@ -135,7 +135,7 @@ impl WaterfallExecution {
     }
 
     #[tracing::instrument("WaterfallExecution::list", skip_all)]
-    pub fn list(conn: &mut PgConn, di_id: &DecisionIntentId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, di_id: &DecisionIntentId) -> FpResult<Vec<Self>> {
         let res = waterfall_execution::table
             .filter(waterfall_execution::decision_intent_id.eq(di_id))
             .order_by(waterfall_execution::_created_at.asc())

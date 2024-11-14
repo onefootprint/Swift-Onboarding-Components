@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::session;
@@ -33,7 +33,7 @@ impl Session {
     #[tracing::instrument("Session::get", skip_all)]
     /// Return the session with the provided hash.
     /// NOTE: the returned session may be expired
-    pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> DbResult<Option<Session>> {
+    pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> FpResult<Option<Session>> {
         let session = session::table
             .filter(session::key.eq(key))
             .first::<Session>(conn)
@@ -48,7 +48,7 @@ impl Session {
         data: Vec<u8>,
         kind: SessionKind,
         expires_at: DateTime<Utc>,
-    ) -> Result<Session, crate::DbError> {
+    ) -> FpResult<Session> {
         let session = UpdateSession {
             key,
             data,
@@ -69,7 +69,7 @@ impl Session {
     }
 
     #[tracing::instrument("Session::invalidate", skip_all)]
-    pub fn invalidate(key: AuthTokenHash, conn: &mut PgConn) -> DbResult<()> {
+    pub fn invalidate(key: AuthTokenHash, conn: &mut PgConn) -> FpResult<()> {
         let now = Utc::now();
         diesel::update(session::table)
             .filter(session::key.eq(key))

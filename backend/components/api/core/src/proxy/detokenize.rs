@@ -57,7 +57,7 @@ pub async fn detokenize(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let vws: HashMap<FpId, TenantVw> = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
             let vws = VaultWrapper::multi_get_for_tenant(conn, svs, None)?;
             Ok(vws)

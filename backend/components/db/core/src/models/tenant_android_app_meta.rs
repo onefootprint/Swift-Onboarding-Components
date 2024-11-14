@@ -1,8 +1,8 @@
 use crate::DbError;
-use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_android_app_meta;
@@ -65,7 +65,7 @@ impl TenantAndroidAppMeta {
         apk_cert_sha256s: Vec<String>,
         e_integrity_verification_key: SealedVaultBytes,
         e_integrity_decryption_key: SealedVaultBytes,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new = NewTenantAndroidAppMeta {
             created_at: Utc::now(),
             tenant_id,
@@ -92,7 +92,7 @@ impl TenantAndroidAppMeta {
         apk_cert_sha256s: Option<Vec<String>>,
         e_integrity_verification_key: Option<SealedVaultBytes>,
         e_integrity_decryption_key: Option<SealedVaultBytes>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let update = TenantAndroidAppMetaUpdate {
             package_names,
             apk_cert_sha256s,
@@ -108,14 +108,14 @@ impl TenantAndroidAppMeta {
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated);
+            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
 
     #[tracing::instrument("TenantAndroidAppMeta::list", skip_all)]
-    pub fn list(conn: &mut PgConn, filters: TenantAndroidAppFilters) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, filters: TenantAndroidAppFilters) -> FpResult<Vec<Self>> {
         let mut query = tenant_android_app_meta::table
             .filter(tenant_android_app_meta::tenant_id.eq(filters.tenant_id))
             .into_boxed();
@@ -136,7 +136,7 @@ impl TenantAndroidAppMeta {
         conn: &mut PgConn,
         id: TenantAndroidAppMetaId,
         tenant_id: &TenantId,
-    ) -> DbResult<TenantAndroidAppMeta> {
+    ) -> FpResult<TenantAndroidAppMeta> {
         let query = tenant_android_app_meta::table
             .filter(tenant_android_app_meta::deactivated_at.is_null())
             .filter(tenant_android_app_meta::id.eq(id))
@@ -146,7 +146,7 @@ impl TenantAndroidAppMeta {
     }
 
     #[tracing::instrument("TenantAndroidAppMeta::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut PgConn, id: &TenantAndroidAppMetaId, tenant_id: &TenantId) -> DbResult<()> {
+    pub fn deactivate(conn: &mut PgConn, id: &TenantAndroidAppMetaId, tenant_id: &TenantId) -> FpResult<()> {
         let count_updated = diesel::update(tenant_android_app_meta::table)
             .filter(tenant_android_app_meta::id.eq(id))
             .filter(tenant_android_app_meta::tenant_id.eq(tenant_id))
@@ -155,7 +155,7 @@ impl TenantAndroidAppMeta {
             .execute(conn)?;
 
         if count_updated == 0 {
-            Err(DbError::ObjectNotFound)
+            Err(DbError::ObjectNotFound.into())
         } else {
             Ok(())
         }

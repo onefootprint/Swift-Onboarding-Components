@@ -1,5 +1,5 @@
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use db_schema::schema::zip_code;
 use diesel::prelude::*;
 use newtypes::ZipCode as NTZipCode;
@@ -17,7 +17,7 @@ pub struct ZipCode {
 }
 
 impl ZipCode {
-    pub fn get(conn: &mut PgConn, zip_code: NTZipCode) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, zip_code: NTZipCode) -> FpResult<Self> {
         let res = zip_code::table
             .filter(zip_code::code.eq(zip_code))
             .get_result(conn)?;

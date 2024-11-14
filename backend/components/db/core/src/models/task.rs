@@ -2,9 +2,9 @@ use super::task_execution::TaskExecution;
 use super::task_execution::TaskExecutionCreateArgs;
 use super::task_execution::TaskExecutionUpdate;
 use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::task;
@@ -65,7 +65,7 @@ impl Task {
         conn: &mut PgConn,
         scheduled_for: DateTime<Utc>,
         task_data: T,
-    ) -> Result<Task, DbError> {
+    ) -> FpResult<Task> {
         let task_data = task_data.into();
         let task_kind = TaskKind::from(&task_data);
         let new_task = NewTask {
@@ -84,7 +84,7 @@ impl Task {
     }
 
     #[tracing::instrument("Task::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut PgConn, args: Vec<TaskCreateArgs>) -> DbResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut PgConn, args: Vec<TaskCreateArgs>) -> FpResult<Vec<Self>> {
         let new_tasks: Vec<NewTask> = args
             .into_iter()
             .map(|a| NewTask {
@@ -110,7 +110,7 @@ impl Task {
         conn: &mut TxnPgConn,
         limit: u32,
         kind: Option<TaskKind>,
-    ) -> DbResult<Vec<(Task, TaskExecution)>> {
+    ) -> FpResult<Vec<(Task, TaskExecution)>> {
         let now = Utc::now();
         // TODO: cannot for the life of me get this to compile in diesel
         let tasks = sql_query(format!(
@@ -170,7 +170,7 @@ impl Task {
         status: TaskStatus,
         task_execution_id: &TaskExecutionId,
         task_execution_update: TaskExecutionUpdate,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         TaskExecution::update(conn.conn(), task_execution_id, task_execution_update)?;
         let task_update = TaskUpdate { status };
         let result = diesel::update(task::table)
@@ -181,7 +181,7 @@ impl Task {
     }
 
     #[tracing::instrument("Task::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, task_id: &TaskId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, task_id: &TaskId) -> FpResult<Locked<Self>> {
         let result = task::table
             .filter(task::id.eq(task_id))
             .for_no_key_update()
@@ -191,13 +191,13 @@ impl Task {
 
     // Currently only used for Tests! pretend there is #[cfg(test)] here!!
     #[tracing::instrument("Task::_bulk_delete_for_tests", skip_all)]
-    pub fn _bulk_delete_for_tests(conn: &mut PgConn, ids: Vec<&TaskId>) -> DbResult<usize> {
+    pub fn _bulk_delete_for_tests(conn: &mut PgConn, ids: Vec<&TaskId>) -> FpResult<usize> {
         let cnt = diesel::delete(task::table.filter(task::id.eq_any(ids))).execute(conn)?;
         Ok(cnt)
     }
 
     #[cfg(test)]
-    pub fn create_for_test(conn: &mut PgConn, new_task: NewTask) -> DbResult<Self> {
+    pub fn create_for_test(conn: &mut PgConn, new_task: NewTask) -> FpResult<Self> {
         let res = diesel::insert_into(task::table)
             .values(new_task)
             .get_result(conn)?;
@@ -206,7 +206,7 @@ impl Task {
 
     #[cfg(test)]
     #[tracing::instrument("Task::update", skip_all)]
-    pub fn _update_for_test(conn: &mut TxnPgConn, id: &TaskId, status: TaskStatus) -> DbResult<Self> {
+    pub fn _update_for_test(conn: &mut TxnPgConn, id: &TaskId, status: TaskStatus) -> FpResult<Self> {
         // only updates `task`, not `task_execution`
         let task_update = TaskUpdate { status };
         let result = diesel::update(task::table)
@@ -238,7 +238,7 @@ mod tests {
     #[test_db_pool]
     async fn create_and_poll(db_pool: TestDbPool) {
         db_pool
-            .db_transaction(|conn| -> DbResult<()> {
+            .db_transaction(|conn| -> FpResult<()> {
                 let task1 = Task::create(conn, Utc::now(), task_data())?;
                 let task2 = Task::create(conn, Utc::now(), task_data())?;
                 let _task3 = Task::create(conn, Utc::now(), task_data())?;
@@ -266,7 +266,7 @@ mod tests {
     #[test_db_pool]
     async fn only_pending_tasks_are_retrieved(db_pool: TestDbPool) {
         db_pool
-            .db_transaction(|conn| -> DbResult<()> {
+            .db_transaction(|conn| -> FpResult<()> {
                 let task1 = Task::create(conn, Utc::now(), task_data())?;
                 Task::_update_for_test(conn, &task1.id, TaskStatus::Running);
                 let task2 = Task::create(conn, Utc::now(), task_data())?;
@@ -288,7 +288,7 @@ mod tests {
     #[test_db_pool]
     async fn filter_to_kind(db_pool: TestDbPool) {
         db_pool
-            .db_transaction(|conn| -> DbResult<()> {
+            .db_transaction(|conn| -> FpResult<()> {
                 let task1 = Task::create(conn, Utc::now(), task_data())?;
                 let _task2 = Task::create(
                     conn,
@@ -328,7 +328,7 @@ mod tests {
     #[test_db_pool]
     async fn poll_over_leased(db_pool: TestDbPool) {
         let tasks = db_pool
-            .db_transaction(move |conn| -> DbResult<_> {
+            .db_transaction(move |conn| {
                 let task1 = Task::create(conn, Utc::now(), task_data())?;
                 let task2 = Task::create(conn, Utc::now(), task_data())?;
 
@@ -352,7 +352,7 @@ mod tests {
 
         std::thread::sleep(std::time::Duration::from_secs(3));
         db_pool
-            .db_transaction(move |conn| -> DbResult<()> {
+            .db_transaction(move |conn| {
                 // tasks now past their max lease duration and should be polled again, num_attempts
                 // incremented, and new task_execution's written
                 let repolled_tasks = Task::poll(conn, 2, None)?;

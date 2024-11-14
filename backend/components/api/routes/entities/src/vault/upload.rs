@@ -3,7 +3,6 @@ use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::FpResult;
 use crate::State;
 use api_core::api_headers_schema;
 use api_core::auth::tenant::BasicTenantAuth;
@@ -150,7 +149,7 @@ async fn post_upload_inner(
     };
 
     let (vault, scoped_vault) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vault = Vault::get(conn, &scoped_vault.id)?;
             Ok((vault, scoped_vault))
@@ -167,7 +166,7 @@ async fn post_upload_inner(
     // TODO make a timeline event here
     let actor = auth.actor();
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
             let doc = NewDocument {
                 kind: di.clone(),

@@ -1,11 +1,11 @@
 use super::tenant_role::ImmutableRoleKind;
 use super::tenant_role::TenantRole;
 use crate::helpers::WorkosAuthIdentity;
-use crate::DbResult;
 use crate::NonNullVec;
 use crate::OptionalNonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::partner_tenant;
@@ -80,7 +80,7 @@ pub struct NewIntegrationTestPartnerTenant {
 
 impl PartnerTenant {
     #[tracing::instrument("PartnerTenant::create", skip_all)]
-    pub fn create<T>(conn: &mut TxnPgConn, value: T) -> DbResult<PartnerTenant>
+    pub fn create<T>(conn: &mut TxnPgConn, value: T) -> FpResult<PartnerTenant>
     where
         T: Insertable<partner_tenant::table>,
         <T as Insertable<partner_tenant::table>>::Values:
@@ -110,7 +110,7 @@ impl PartnerTenant {
     }
 
     #[tracing::instrument("PartnerTenant::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &PartnerTenantId) -> DbResult<Self> {
+    pub fn lock(conn: &mut TxnPgConn, id: &PartnerTenantId) -> FpResult<Self> {
         let pt = partner_tenant::table
             .for_no_key_update()
             .filter(partner_tenant::id.eq(id))
@@ -124,7 +124,7 @@ impl PartnerTenant {
         conn: &mut TxnPgConn,
         id: &PartnerTenantId,
         update_pt: UpdatePartnerTenant,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         if update_pt == UpdatePartnerTenant::default() {
             return PartnerTenant::lock(conn, id);
         }
@@ -138,7 +138,7 @@ impl PartnerTenant {
     }
 
     #[tracing::instrument("PartnerTenant::get_by_domain", skip_all)]
-    pub fn get_by_domain(conn: &mut PgConn, domain: &str) -> DbResult<Option<Self>> {
+    pub fn get_by_domain(conn: &mut PgConn, domain: &str) -> FpResult<Option<Self>> {
         let res = partner_tenant::table
             .filter(partner_tenant::domains.contains(vec![domain]))
             .filter(partner_tenant::allow_domain_access.eq(true))
@@ -149,7 +149,7 @@ impl PartnerTenant {
 
     #[tracing::instrument("PartnerTenant::is_domain_already_claimed", skip_all)]
     /// Returns true if the domain is already claimed
-    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> DbResult<bool> {
+    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> FpResult<bool> {
         let result = if !domains.is_empty() {
             let existing: Option<PartnerTenantId> = partner_tenant::table
                 .filter(partner_tenant::domains.overlaps_with(domains))

@@ -1,5 +1,4 @@
 use crate::interval::get_billing_interval;
-use crate::BResult;
 use crate::BillingClient;
 use crate::BillingCounts;
 use crate::BillingInfo;
@@ -10,7 +9,6 @@ use db::models::billing_profile::BillingProfile;
 use db::models::tenant::Tenant;
 use db::models::tenant::UpdateTenant;
 use db::DbPool;
-use db::DbResult;
 use itertools::chain;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
@@ -26,7 +24,7 @@ pub async fn generate_invoice_for_tenant(
 
     // Count the number of billable uses of each product for this tenant
     let (tenant, billing_profile, counts) = db_pool
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let tenant = Tenant::get(conn, &tenant_id)?;
             if tenant.super_tenant_id.is_some() {
                 return BadRequestInto("Cannot generate invoice for subtenant");
@@ -40,7 +38,7 @@ pub async fn generate_invoice_for_tenant(
                 .map(|t| {
                     BillingCounts::build_for_tenant(conn, &t.id, bp, &i).map(|counts| (t.id.clone(), counts))
                 })
-                .collect::<DbResult<Vec<_>>>()?;
+                .collect::<FpResult<Vec<_>>>()?;
             if counts.len() > 1 {
                 for (t_id, counts) in counts.iter() {
                     tracing::info!(%t_id, ?counts, "Merging billing counts of children");
@@ -84,7 +82,7 @@ async fn get_or_create_customer_id(
     client: &BillingClient,
     db_pool: &DbPool,
     tenant: &Tenant,
-) -> BResult<StripeCustomerId> {
+) -> FpResult<StripeCustomerId> {
     let customer_id = if let Some(customer_id) = tenant.stripe_customer_id.clone() {
         customer_id
     } else {

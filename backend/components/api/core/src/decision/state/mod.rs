@@ -5,7 +5,6 @@ use api_errors::FpErrorCode;
 use db::models::data_lifetime::DataLifetime;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::workflow::Workflow as DbWorkflow;
-use db::DbResult;
 use enum_dispatch::enum_dispatch;
 use newtypes::DataLifetimeSeqno;
 use newtypes::WorkflowId;
@@ -169,7 +168,7 @@ pub async fn run_incode_machine_and_workflow(
 ) -> FpResult<RunIncodeMachineAndWorkflowResult> {
     let wfid = ww.workflow_id.clone();
     let (ivs, seqno) = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             // TODO this doesn't have to be a latest - there's only one active per workflow
             let ivs = IncodeVerificationSession::latest_for_workflow(conn, &wfid)?;
 

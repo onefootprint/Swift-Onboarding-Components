@@ -11,7 +11,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::NewUserTimeline;
 use db::models::vault_data::{NewVaultData, NewVaultDataRow, VaultData};
 use db::models::workflow::Workflow;
-use db::{DbError, DbResult, TxnPgConn};
+use db::{DbError, FpResult, TxnPgConn};
 use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, user_timeline, vault, vault_data};
 use diesel::dsl::{count, not};
 use diesel::prelude::*;
@@ -35,7 +35,7 @@ pub async fn run(
 ) -> ApiResult<Vec<(VaultId, Vec<ScopedVaultId>)>> {
     // Gather the vaults that have multiple scoped_vaults
     let vault_ids = state
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| ApiResult<_> {
             let svs_with_prefill_data = data_lifetime::table
                 .filter(data_lifetime::source.eq(DataLifetimeSource::Prefill))
                 .select(data_lifetime::scoped_vault_id);
@@ -83,7 +83,7 @@ async fn backfill_portable_data_for_vault(
 ) -> ApiResult<Vec<ScopedVaultId>> {
     let s = state.clone();
     let result = state
-        .db_transaction(move |conn| -> DryRunResult<_> {
+        .db_transaction(move |conn| DryRunResult<_> {
             // Lock the vault and scoped vaults we will be updating
             vault::table
                 .filter(vault::id.eq(&vault_id))
@@ -346,14 +346,14 @@ fn compare_vws(
         }
     }
     // Compare that each CI's verification status is still the same
-    let mut get_ci = |vw: TenantVw<Any>| -> DbResult<HashSet<(DataIdentifier, bool, bool)>> {
+    let mut get_ci = |vw: TenantVw<Any>| -> FpResult<HashSet<(DataIdentifier, bool, bool)>> {
         Ok(vw
             .populated_dis()
             .into_iter()
             .filter(|di| di.is_contact_info())
             .filter_map(|di| vw.get_lifetime(di))
             .map(|l| ContactInfo::get(conn, &l.id).map(|ci| (l.kind.clone(), ci)))
-            .collect::<DbResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .map(|(di, ci)| (di, ci.is_otp_verified, ci.is_verified))
             .collect())

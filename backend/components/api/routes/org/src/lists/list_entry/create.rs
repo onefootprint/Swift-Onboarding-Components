@@ -44,7 +44,7 @@ pub async fn create_list_entry(
 
     let tid = tenant_id.clone();
     let (tenant, list, existing_entries) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let t = Tenant::get(conn, &tid)?;
             let list = List::get(conn, &tid, is_live, &list_id)?;
             let entries = ListEntry::list(conn, &list_id)?;
@@ -74,7 +74,7 @@ pub async fn create_list_entry(
     let key = decrypted_list_key.clone();
     let insight = CreateInsightEvent::from(insights);
     let list_entries = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let canonicalized = entries
                 .into_iter()
                 .map(|d| -> FpResult<_> {
@@ -95,15 +95,7 @@ pub async fn create_list_entry(
                 .collect::<Result<Vec<_>, _>>()?;
 
             let ie = insight.insert_with_conn(conn)?;
-            Ok(ListEntry::bulk_create(
-                conn,
-                &list_id,
-                actor.into(),
-                e_data,
-                &tenant_id,
-                is_live,
-                &ie.id,
-            )?)
+            ListEntry::bulk_create(conn, &list_id, actor.into(), e_data, &tenant_id, is_live, &ie.id)
         })
         .await?;
 

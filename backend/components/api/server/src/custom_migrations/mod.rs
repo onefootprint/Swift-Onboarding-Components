@@ -4,13 +4,12 @@
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
 use api_core::ApiCoreError;
+use api_core::FpError;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::FpErrorCode;
 use byteorder::BigEndian;
 use byteorder::ReadBytesExt;
-use db::DbError;
-use db::DbResult;
 use db::TxnPgConn;
 use diesel::sql_query;
 use diesel::sql_types::BigInt;
@@ -51,7 +50,7 @@ where
 
     // 0. first check if the migration is run to avoid grabbing an advisory lock
     let pre_flight_should_run = state
-        .db_query(move |conn| -> DbResult<bool> {
+        .db_query(move |conn| {
             Ok(
                 db::models::custom_migration::CustomMigration::get_run_by_version(conn, &M::version())?
                     .is_none(),
@@ -70,13 +69,13 @@ where
 
     // Run the migration inside a DB TXN
     let result = state
-        .db_transaction(move |conn| -> FpResult<()> {
+        .db_transaction(move |conn| {
             // 1. take out the lock so no other servers can continue along the txn (we don't need to unlock it
             //    as it will be dropped after the txn)
             let _ = sql_query("SELECT pg_advisory_xact_lock($1);")
                 .bind::<BigInt, _>(advisory_lock_value)
                 .execute(conn.conn())
-                .map_err(DbError::from)?;
+                .map_err(FpError::from)?;
 
             let is_run =
                 db::models::custom_migration::CustomMigration::get_run_by_version(conn, &M::version())?;

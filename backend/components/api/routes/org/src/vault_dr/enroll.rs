@@ -4,15 +4,13 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
-use api_core::FpError;
-use api_core::FpResult;
 use api_core::State;
+use api_errors::FpDbOptionalExtension;
+use api_errors::FpErrorCode;
 use chrono::Utc;
-use db::errors::FpOptionalExtension;
 use db::models::vault_dr::NewVaultDrConfig;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrConfig;
-use db::DbError;
 use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
@@ -57,7 +55,7 @@ pub async fn post(
 
     let tenant_id = tenant.id.clone();
     let pre_enrollment = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             Ok(VaultDrAwsPreEnrollment::get(conn, (&tenant_id, is_live))
                 .optional()?
                 .ok_or(vault_dr::Error::MissingAwsPreEnrollment)?)
@@ -83,7 +81,7 @@ pub async fn post(
 
     let tenant_id = tenant.id.clone();
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let existing_config = VaultDrConfig::lock(conn, &tenant_id, is_live)?;
             if let Some(existing_config) = existing_config {
                 if re_enroll != Some(true) {
@@ -120,11 +118,9 @@ pub async fn post(
                 bucket_path_namespace,
             };
 
-            VaultDrConfig::create(conn, new_config).map_err(|err| -> FpError {
-                match err {
-                    DbError::UniqueConstraintViolation(_) => vault_dr::Error::AlreadyEnrolled.into(),
-                    err => err.into(),
-                }
+            VaultDrConfig::create(conn, new_config).map_err(|err| match err.code() {
+                Some(FpErrorCode::DbUniqueConstraintViolation) => vault_dr::Error::AlreadyEnrolled.into(),
+                _ => err,
             })?;
 
             Ok(())

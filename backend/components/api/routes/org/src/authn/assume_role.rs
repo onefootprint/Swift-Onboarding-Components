@@ -6,7 +6,6 @@ use api_core::auth::Any;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
-use api_core::FpResult;
 use api_core::State;
 use api_errors::ServerErr;
 use api_wire_types::AssumeRoleRequest;
@@ -42,7 +41,7 @@ fn post(
 
     let sealing_key = state.session_sealing_key.clone();
     let (login_result, token) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let login_result = TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method)?;
             let session_data = TenantRbSession::create(&login_result, purpose);
             // The new token will expire at the same time as the existing token to prevent allowing

@@ -173,7 +173,7 @@ pub async fn build_docv_data_from_identity_doc(
     identity_document_id: DocumentId,
 ) -> FpResult<DocVData> {
     let (doc, images, uvw) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let (doc, dr) = Document::get(conn, &identity_document_id)?;
             let images = doc.images(conn, DocumentImageArgs::default())?;
             // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest

@@ -1,7 +1,7 @@
 //! logic for integrating into risk signal/decision engine
 use crate::decision;
 use crate::decision::vendor;
-use crate::FpResult;
+use api_errors::FpResult;
 use db::models::apple_device_attest::AppleDeviceAttestation;
 use db::models::apple_device_attest::DeviceMetadata;
 use db::models::decision_intent::DecisionIntent;
@@ -136,7 +136,6 @@ pub fn save_vendor_result_and_risk_signals(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::FpResult;
     use crate::State;
     use db::models::verification_request::VReqIdentifier;
     use db::tests::fixtures;
@@ -148,7 +147,7 @@ mod tests {
     #[test_state]
     async fn test_deser(state: &mut State) {
         let (vreq, private_key) = state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let uv = fixtures::vault::create_person(conn, true);
                 let t = fixtures::tenant::create(conn);
                 let obc = fixtures::ob_configuration::create(conn, &t.id, true);

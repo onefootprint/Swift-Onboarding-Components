@@ -21,7 +21,7 @@ pub async fn create_validation_token(
     let su_id = (user_auth.su_id.clone()).ok_or(ServerErr("No scoped user associated with auth session"))?;
     let biz_wf_id = user_auth.biz_wf_id.clone();
     let validation_token = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             if user_auth.auth_events.is_empty() {
                 return ServerErrInto("No auth events found for user");
             }

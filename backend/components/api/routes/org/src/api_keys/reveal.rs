@@ -4,7 +4,6 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
-use api_core::FpResult;
 use api_core::State;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
@@ -42,7 +41,7 @@ async fn post(
     let tenant_id = auth.tenant().id.clone();
     let actor = auth.actor().clone();
     let (key, role) = state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let detail = AuditEventDetail::DecryptOrgAPIKey {

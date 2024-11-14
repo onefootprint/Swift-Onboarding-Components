@@ -1,6 +1,5 @@
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::socure_device_session;
@@ -34,7 +33,7 @@ impl SocureDeviceSession {
         conn: &mut PgConn,
         device_session_id: String, //TODO: make this a wrapped type?
         workflow_id: WorkflowId,
-    ) -> Result<SocureDeviceSession, DbError> {
+    ) -> FpResult<SocureDeviceSession> {
         let new_result = NewSocureDeviceSession {
             device_session_id,
             created_at: Utc::now(),
@@ -47,7 +46,7 @@ impl SocureDeviceSession {
     }
 
     #[tracing::instrument("SocureDeviceSession::latest_for_onboarding", skip_all)]
-    pub fn latest(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<SocureDeviceSession>> {
+    pub fn latest(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Option<SocureDeviceSession>> {
         let res = socure_device_session::table
             .filter(socure_device_session::workflow_id.eq(wf_id))
             .order_by(socure_device_session::created_at.desc())

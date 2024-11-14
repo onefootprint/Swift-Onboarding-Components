@@ -2,12 +2,12 @@ use super::fingerprint::Fingerprint;
 use super::ob_configuration::ObConfiguration;
 use super::scoped_vault::ScopedVault;
 use super::scoped_vault_version::ScopedVaultVersion;
-use crate::errors::AssertionError;
 use crate::nextval;
 use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
+use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::data_lifetime::{
@@ -187,7 +187,7 @@ impl DataLifetime {
     /// single scoped vault. Therefore, for safety, we requires a Locked<ScopedVault> as an
     /// argument.
     #[tracing::instrument("DataLifetime::new_sv_txn", skip_all)]
-    pub fn new_sv_txn<'a, T>(conn: &mut TxnPgConn, sv: T) -> DbResult<DataLifetimeSeqnoTxn<'a>>
+    pub fn new_sv_txn<'a, T>(conn: &mut TxnPgConn, sv: T) -> FpResult<DataLifetimeSeqnoTxn<'a>>
     where
         T: Into<BorrowedOrOwned<'a, Locked<ScopedVault>>>,
     {
@@ -197,7 +197,7 @@ impl DataLifetime {
     }
 
     /// Temporary function while we clean up unsafe usage of seqnos.
-    pub fn get_next_seqno_no_ordering_guarantee(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
+    pub fn get_next_seqno_no_ordering_guarantee(conn: &mut PgConn) -> FpResult<DataLifetimeSeqno> {
         let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
         Ok(result)
     }
@@ -206,7 +206,7 @@ impl DataLifetime {
     pub fn get_next_obc_seqno(
         conn: &mut PgConn,
         _safety: &Locked<ObConfiguration>,
-    ) -> DbResult<DataLifetimeSeqno> {
+    ) -> FpResult<DataLifetimeSeqno> {
         let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
         Ok(result)
     }
@@ -215,7 +215,7 @@ impl DataLifetime {
     /// when taking a snapshot
     /// This DOES NOT give you the latest sequence number used in the current transaction.
     #[tracing::instrument("DataLifetime::get_current_seqno", skip_all)]
-    pub fn get_current_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
+    pub fn get_current_seqno(conn: &mut PgConn) -> FpResult<DataLifetimeSeqno> {
         let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno".to_owned())
             .get_result::<PgSequence>(conn)?;
         Ok(result.last_value)
@@ -229,7 +229,7 @@ impl DataLifetime {
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         rows: Vec<NewDataLifetimeArgs>,
         actor: Option<DbActor>,
-    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
+    ) -> FpResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let scoped_vault = sv_txn.sv.as_ref();
         let seqno = sv_txn.seqno();
 
@@ -270,7 +270,7 @@ impl DataLifetime {
         kind: DataIdentifier,
         source: DataLifetimeSource,
         actor: Option<DbActor>,
-    ) -> DbResult<(Self, ScopedVaultVersionNumber)> {
+    ) -> FpResult<(Self, ScopedVaultVersionNumber)> {
         let args = NewDataLifetimeArgs {
             kind,
             origin_id: None,
@@ -286,19 +286,17 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         id: &DataLifetimeId,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let dl = data_lifetime::table
             .filter(data_lifetime::id.eq(id))
             .get_result::<Self>(conn.conn())?;
 
         if sv_txn.sv.as_ref().id != dl.scoped_vault_id {
-            return AssertionError(&format!(
-                "DataLifetime's scoped vault ID doesn't match the DataLifetimeSeqnoTxn's
-            scoped vault ID: {} != {}",
+            return ServerErrInto!(
+                "DataLifetime's scoped vault ID doesn't match the DataLifetimeSeqnoTxn's scoped vault ID: {} != {}",
                 sv_txn.sv.as_ref().id,
                 dl.scoped_vault_id
-            ))
-            .into();
+            );
         }
 
         if dl.portablized_seqno.is_some() {
@@ -325,7 +323,7 @@ impl DataLifetime {
         conn: &mut PgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         ids: Vec<DataLifetimeId>,
-    ) -> DbResult<Vec<Self>> {
+    ) -> FpResult<Vec<Self>> {
         let update = DataLifetimeUpdate {
             portablized_at: Some(Some(Utc::now())),
             portablized_seqno: Some(Some(sv_txn.seqno())),
@@ -346,7 +344,7 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         ids: Vec<DataLifetimeId>,
-    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
+    ) -> FpResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let filter = Box::new(
             data_lifetime::id
                 .eq_any(ids)
@@ -362,7 +360,7 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         kinds: Vec<DataIdentifier>,
-    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
+    ) -> FpResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let filter = Box::new(
             data_lifetime::kind
                 .eq_any(kinds)
@@ -376,7 +374,7 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         filter: Box<dyn BoxableExpression<data_lifetime::table, Pg, SqlType = sql_types::Bool>>,
-    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
+    ) -> FpResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let seqno = sv_txn.seqno();
 
         let deactivated_at = Utc::now();
@@ -414,7 +412,7 @@ impl DataLifetime {
         conn: &mut PgConn,
         sv_id: Vec<&ScopedVaultId>,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<Vec<Self>> {
+    ) -> FpResult<Vec<Self>> {
         let results = data_lifetime::table
             .filter(data_lifetime::scoped_vault_id.eq_any(sv_id))
             // Data must be added at or before the seqno
@@ -438,7 +436,7 @@ impl DataLifetime {
         conn: &mut PgConn,
         v_id: &VaultId,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<Vec<Self>> {
+    ) -> FpResult<Vec<Self>> {
         let results = data_lifetime::table
             .filter(data_lifetime::vault_id.eq(v_id))
             // Data must be portablized at or before the seqno
@@ -449,7 +447,7 @@ impl DataLifetime {
     }
 
     /// Computes the active seqno at the provided timestamp.
-    pub fn get_seqno_at(conn: &mut PgConn, timestamp: DateTime<Utc>) -> DbResult<DataLifetimeSeqno> {
+    pub fn get_seqno_at(conn: &mut PgConn, timestamp: DateTime<Utc>) -> FpResult<DataLifetimeSeqno> {
         // Grab the DataLifetime that was created most recently before the provided timestamp and return its
         // seqno. This was the currently active seqno at the time of the provided timestamp.
 

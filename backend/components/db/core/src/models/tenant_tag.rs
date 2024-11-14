@@ -1,6 +1,6 @@
 use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_tag;
@@ -64,7 +64,7 @@ impl TenantTag {
         kind: VaultKind,
         tag: String,
         is_live: bool,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let new = NewTenantTag {
             created_at: Utc::now(),
             tenant_id,
@@ -76,8 +76,7 @@ impl TenantTag {
 
         let result = diesel::insert_into(tenant_tag::table)
             .values(new)
-            .get_result(conn)
-            .map_err(DbError::from)?;
+            .get_result(conn)?;
 
         Ok(result)
     }
@@ -88,7 +87,7 @@ impl TenantTag {
         tenant_id: &TenantId,
         kind: Option<VaultKind>,
         is_live: bool,
-    ) -> DbResult<Vec<TenantTag>> {
+    ) -> FpResult<Vec<TenantTag>> {
         let mut query = tenant_tag::table
             .filter(tenant_tag::tenant_id.eq(tenant_id))
             .filter(tenant_tag::deactivated_at.is_null())
@@ -108,7 +107,7 @@ impl TenantTag {
         tenant_id: &TenantId,
         tt_id: &TenantTagId,
         deactivated_by_actor: DbActor,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         let update = UpdateTenantTag::set_deactivated_at(deactivated_by_actor);
         let count_updated = diesel::update(tenant_tag::table)
             .filter(tenant_tag::tenant_id.eq(tenant_id))
@@ -118,7 +117,7 @@ impl TenantTag {
             .execute(conn)?;
 
         if count_updated == 0 {
-            Err(DbError::ObjectNotFound)
+            Err(DbError::ObjectNotFound.into())
         } else {
             Ok(())
         }

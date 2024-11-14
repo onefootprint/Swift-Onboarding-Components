@@ -6,16 +6,15 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::types::ApiResponse;
-use api_core::FpResult;
 use api_errors::BadRequestWithCode;
 use api_errors::FpErrorCode;
+use api_errors::FpResult;
 use db::models::appearance::Appearance;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::models::workflow_request::WorkflowRequest;
 use db::models::workflow_request_junction::WorkflowRequestJunction;
-use db::DbResult;
 use db::PgConn;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
@@ -59,7 +58,7 @@ pub fn get(
 
     // get other properties of our configuration relevant to rendering it
     let (appearance, client_config, wfr, sandbox_stepup_outcome_enabled) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let appearance = appearance_id
                 .map(|id| Appearance::get(conn, &id, &tenant_id))
                 .transpose()?;
@@ -111,7 +110,7 @@ fn is_sandbox_stepup_outcome_enabled(
     conn: &mut PgConn,
     tenant_id: &TenantId,
     obc_id: &ObConfigurationId,
-) -> DbResult<bool> {
+) -> FpResult<bool> {
     let res = RuleInstance::list(conn, tenant_id, false, obc_id, IncludeRules::All)?
         .iter()
         .any(|ri| matches!(ri.action, RuleAction::StepUp(_)));

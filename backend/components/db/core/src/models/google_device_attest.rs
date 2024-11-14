@@ -1,6 +1,6 @@
 use super::apple_device_attest::DeviceMetadata;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::google_device_attestation;
@@ -82,7 +82,7 @@ pub struct NewGoogleDeviceAttestation {
 
 impl NewGoogleDeviceAttestation {
     #[tracing::instrument("NewGoogleDeviceAttestation::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<GoogleDeviceAttestation> {
+    pub fn create(self, conn: &mut PgConn) -> FpResult<GoogleDeviceAttestation> {
         let res = diesel::insert_into(google_device_attestation::table)
             .values(self)
             .get_result(conn)?;
@@ -93,7 +93,7 @@ impl NewGoogleDeviceAttestation {
 
 impl GoogleDeviceAttestation {
     #[tracing::instrument("GoogleDeviceAttestation::list", skip_all)]
-    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Vec<Self>> {
         let attestations: Vec<Self> = google_device_attestation::table
             .inner_join(vault::table)
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(vault::id)))
@@ -104,7 +104,7 @@ impl GoogleDeviceAttestation {
         Ok(attestations)
     }
 
-    pub fn count_associated_vaults(&self, conn: &mut PgConn, is_live: bool) -> DbResult<i64> {
+    pub fn count_associated_vaults(&self, conn: &mut PgConn, is_live: bool) -> FpResult<i64> {
         Ok(google_device_attestation::table
             .filter(google_device_attestation::widevine_id.eq(&self.widevine_id))
             .filter(google_device_attestation::widevine_security_level.eq("L1")) // only get the high sec level IDs

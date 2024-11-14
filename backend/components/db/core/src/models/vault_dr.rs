@@ -1,10 +1,10 @@
 use super::data_lifetime::DataLifetime;
 use super::ob_configuration::IsLive;
-use crate::errors::FpOptionalExtension;
-use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpDbOptionalExtension;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::data_lifetime;
@@ -56,7 +56,7 @@ impl VaultDrAwsPreEnrollment {
     pub fn get<'a>(
         conn: &mut PgConn,
         id_ref: impl Into<VaultDrAwsPreEnrollmentIdentifier<'a>>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let id_ref: VaultDrAwsPreEnrollmentIdentifier = id_ref.into();
 
         let row = match id_ref {
@@ -75,7 +75,7 @@ impl VaultDrAwsPreEnrollment {
     }
 
     #[tracing::instrument("VaultDrAwsPreEnrollment::get_or_create", skip_all)]
-    pub fn get_or_create(conn: &mut TxnPgConn, new: NewVaultDrAwsPreEnrollment) -> DbResult<Self> {
+    pub fn get_or_create(conn: &mut TxnPgConn, new: NewVaultDrAwsPreEnrollment) -> FpResult<Self> {
         if let Some(existing) = Self::get(conn.conn(), (new.tenant_id, new.is_live)).optional()? {
             return Ok(existing);
         };
@@ -147,7 +147,7 @@ enum VaultDrConfigIdentifier<'a> {
 
 impl VaultDrConfig {
     #[tracing::instrument("VaultDrConfig::get", skip_all)]
-    pub fn get<'a>(conn: &mut PgConn, id_ref: impl Into<VaultDrConfigIdentifier<'a>>) -> DbResult<Self> {
+    pub fn get<'a>(conn: &mut PgConn, id_ref: impl Into<VaultDrConfigIdentifier<'a>>) -> FpResult<Self> {
         let id_ref: VaultDrConfigIdentifier = id_ref.into();
 
         let row = match id_ref {
@@ -163,7 +163,7 @@ impl VaultDrConfig {
     }
 
     #[tracing::instrument("VaultDrConfig::lock", skip_all)]
-    pub fn lock(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Option<Locked<Self>>> {
+    pub fn lock(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> FpResult<Option<Locked<Self>>> {
         let result = vault_dr_config::table
             .filter(vault_dr_config::tenant_id.eq(tenant_id))
             .filter(vault_dr_config::is_live.eq(is_live))
@@ -177,7 +177,7 @@ impl VaultDrConfig {
     }
 
     #[tracing::instrument("VaultDrConfig::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, new: NewVaultDrConfig) -> DbResult<Locked<Self>> {
+    pub fn create(conn: &mut TxnPgConn, new: NewVaultDrConfig) -> FpResult<Locked<Self>> {
         let result = diesel::insert_into(vault_dr_config::table)
             .values(&new)
             .get_result(conn.conn())?;
@@ -186,7 +186,7 @@ impl VaultDrConfig {
     }
 
     #[tracing::instrument("VaultDrConfig::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, config: Locked<Self>) -> DbResult<()> {
+    pub fn deactivate(conn: &mut TxnPgConn, config: Locked<Self>) -> FpResult<()> {
         diesel::update(vault_dr_config::table)
             .filter(vault_dr_config::id.eq(&config.id))
             .filter(vault_dr_config::deactivated_at.is_null())
@@ -197,7 +197,7 @@ impl VaultDrConfig {
     }
 
     #[tracing::instrument("VaultDrConfig::list", skip_all)]
-    pub fn list(conn: &mut PgConn) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn) -> FpResult<Vec<Self>> {
         Ok(vault_dr_config::table
             .filter(vault_dr_config::deactivated_at.is_null())
             .select(Self::as_select())
@@ -237,7 +237,7 @@ pub struct NewVaultDrBlob {
 
 impl VaultDrBlob {
     #[tracing::instrument("VaultDrBlob::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrBlob>) -> DbResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrBlob>) -> FpResult<Vec<Self>> {
         let results = diesel::insert_into(vault_dr_blob::table)
             .values(new)
             .get_results(conn.conn())?;
@@ -250,7 +250,7 @@ impl VaultDrBlob {
         conn: &mut PgConn,
         config_id: &VaultDrConfigId,
         bucket_paths: Vec<String>,
-    ) -> DbResult<Vec<(Self, DataLifetime)>> {
+    ) -> FpResult<Vec<(Self, DataLifetime)>> {
         let results = vault_dr_blob::table
             .inner_join(data_lifetime::table)
             .filter(vault_dr_blob::config_id.eq(config_id))
@@ -294,7 +294,7 @@ pub struct NewVaultDrManifest {
 
 impl VaultDrManifest {
     #[tracing::instrument("VaultDrManifest::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrManifest>) -> DbResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrManifest>) -> FpResult<Vec<Self>> {
         let results = diesel::insert_into(vault_dr_manifest::table)
             .values(new)
             .get_results(conn.conn())?;

@@ -1,6 +1,5 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::onboarding::OnboardingError;
-use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::errors::onboarding::UnmetRequirements;
@@ -48,7 +47,7 @@ pub async fn post(
     // mark person and business wf as authorized
     let wf_id = user_auth.workflow.id.clone();
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             Workflow::set_is_authorized(conn, &wf_id)?;
 
             // TODO we eventually won't hit this anymore because business workflows are now

@@ -22,7 +22,6 @@ use crate::decision::state::DocCollected;
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
-use crate::FpResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -34,7 +33,6 @@ use db::models::workflow::Workflow;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::MockFFClient;
-use db::DbResult;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
@@ -101,7 +99,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     let expected_status = if doc_passed_with_review {
         // This is not a default rule, but we're testing it here
         state
-            .db_transaction(move |conn| -> FpResult<_> {
+            .db_transaction(move |conn| {
                 let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
                 let action = RuleAction::PassWithManualReview;
                 let rule = NewRule {
@@ -291,7 +289,7 @@ async fn collect_ad_hoc_document(
     let fixture_result = prior_wf.fixture_result;
     let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
-        .db_transaction(move |conn| -> DbResult<_> {
+        .db_transaction(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id.clone(),
                 config: DocumentConfig {

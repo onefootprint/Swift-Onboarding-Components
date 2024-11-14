@@ -6,7 +6,6 @@ use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
 use db::tests::test_db_pool::TestDbPool;
 use db::DbPool;
-use db::DbResult;
 use macros::test_state;
 use newtypes::vendor_credentials::ExperianCredentialBuilder;
 use newtypes::vendor_credentials::ExperianCredentials;
@@ -25,7 +24,7 @@ async fn create_db_vendor_control(
     experian_subscriber_code: Option<String>,
 ) -> TenantId {
     db_pool
-        .db_transaction(move |conn| -> DbResult<_> {
+        .db_transaction(move |conn| {
             let tenant = db::tests::fixtures::tenant::create_with_keys(conn, public_key, e_private_key);
             let args = UpdateTenantVendorControlArgs {
                 idology_enabled: Some(idology_enabled),
@@ -76,7 +75,7 @@ async fn test_update_credentials(state: &mut State) {
 
     // No TVC, credentials should be the same
     let tenant_with_no_tvc = state
-        .db_transaction(move |conn| -> DbResult<_> {
+        .db_transaction(move |conn| {
             Ok(db::tests::fixtures::tenant::create_with_keys(
                 conn,
                 pk2,

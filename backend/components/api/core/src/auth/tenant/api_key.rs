@@ -10,11 +10,11 @@ use actix_web::web;
 use actix_web::FromRequest;
 use actix_web_httpauth::headers::authorization::Authorization;
 use actix_web_httpauth::headers::authorization::Basic;
+use api_errors::FpDbOptionalExtension;
 use api_errors::ServerErr;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey as DbTenantApiKey;
 use db::models::tenant_role::TenantRole;
-use db::DbError;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantScope;
@@ -66,21 +66,20 @@ impl FromRequest for TenantApiKey {
             let sk = tenant_sk_input?;
             let sh_api_key = sk.fingerprint(state.as_ref()).await?;
 
-            let (api_key, tenant, role) = state
-                .db_transaction(|conn| DbTenantApiKey::get_enabled(conn, sh_api_key))
-                .await
-                .map_err(|e| -> Self::Error {
-                    match e {
-                        DbError::DataNotFound(_) => {
-                            if sk.is_maybe_ob_config_key() {
-                                AuthError::ObConfigKeyUsedForApiKey.into()
-                            } else {
-                                AuthError::ApiKeyNotFound.into()
-                            }
-                        }
-                        _ => e.into(),
+            let result = state
+                .db_transaction(move |conn| DbTenantApiKey::get_enabled(conn, sh_api_key))
+                .await;
+            let (api_key, tenant, role) = match result.optional() {
+                Ok(Some((api_key, tenant, role))) => (api_key, tenant, role),
+                Ok(None) => {
+                    if sk.is_maybe_ob_config_key() {
+                        return Err(AuthError::ObConfigKeyUsedForApiKey.into());
+                    } else {
+                        return Err(AuthError::ApiKeyNotFound.into());
                     }
-                })?;
+                }
+                Err(e) => return Err(e.into()),
+            };
 
             tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, role_id=%role.id, "authenticated");
 

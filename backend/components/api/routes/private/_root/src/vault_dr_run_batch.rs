@@ -4,7 +4,6 @@ use actix_web::web;
 use actix_web::web::Json;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::types::ApiResponse;
-use api_core::FpResult;
 use api_errors::BadRequestInto;
 use db::models::ob_configuration::IsLive;
 use db::models::vault_dr::VaultDrConfig;
@@ -55,7 +54,7 @@ pub async fn post(
     }
 
     let config = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let config = VaultDrConfig::get(conn, (&tenant_id, is_live))?;
             Ok(config)
         })

@@ -9,7 +9,6 @@ use api_core::auth::AuthError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
-use api_core::FpResult;
 use api_core::State;
 use db::models::tenant::Tenant;
 use newtypes::SessionAuthToken;
@@ -48,7 +47,7 @@ async fn post(
 
     let expires_at = auth.session().expires_at;
     let (tenant, token) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             // Verify the tenant_id is real
             let tenant = Tenant::get(conn, &tenant_id)?;
 

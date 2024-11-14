@@ -53,7 +53,7 @@ impl KybBoFeatures {
     pub async fn build(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Self> {
         let wfid = biz_wf_id.clone();
         let (mut user_decisions, bvw, obc) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let biz_wf = Workflow::get(conn, &wfid)?;
                 let user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id)?;
                 let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;

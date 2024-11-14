@@ -1,6 +1,6 @@
 use super::scoped_vault::ScopedVault;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::neuro_id_analytics_event;
@@ -119,7 +119,7 @@ pub struct NewNeuroIdAnalyticsEventRow {
 
 impl NeuroIdAnalyticsEvent {
     #[tracing::instrument("NeuroIdAnalyticsEvent::create", skip_all)]
-    pub fn create(conn: &mut PgConn, args: NewNeuroIdAnalyticsEvent) -> DbResult<Self> {
+    pub fn create(conn: &mut PgConn, args: NewNeuroIdAnalyticsEvent) -> FpResult<Self> {
         let NewNeuroIdAnalyticsEvent {
             verification_result_id,
             workflow_id,
@@ -183,7 +183,7 @@ impl NeuroIdAnalyticsEvent {
     }
 
     #[tracing::instrument("NeuroIdAnalyticsEvent::list", skip_all)]
-    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> FpResult<Vec<Self>> {
         let res = neuro_id_analytics_event::table
             .filter(neuro_id_analytics_event::scoped_vault_id.eq(scoped_vault_id))
             .get_results(conn)?;
@@ -198,7 +198,7 @@ pub struct NeuroDeviceDupesResult {
 }
 
 impl NeuroIdAnalyticsEvent {
-    pub fn get_dupes_for_tenant(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<NeuroDeviceDupesResult> {
+    pub fn get_dupes_for_tenant(conn: &mut PgConn, sv: &ScopedVault) -> FpResult<NeuroDeviceDupesResult> {
         let (device_ids, cookie_ids): (Vec<Option<String>>, Vec<Option<String>>) =
             neuro_id_analytics_event::table
                 .filter(neuro_id_analytics_event::scoped_vault_id.eq(&sv.id))

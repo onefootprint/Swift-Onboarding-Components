@@ -7,9 +7,9 @@ use crate::models::partner_tenant::PartnerTenant;
 use crate::models::tenant::Tenant;
 use crate::models::tenant_compliance_partnership::TenantCompliancePartnership;
 use crate::models::tenant_user::TenantUser;
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
+use api_errors::FpResult;
+use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc;
@@ -63,7 +63,7 @@ impl ComplianceDocSummary {
         org_id: impl Into<OrgIdentifierRef<'a>>,
         p_id: Option<&TenantCompliancePartnershipId>,
         doc_id: Option<&ComplianceDocId>,
-    ) -> DbResult<HashMap<TenantCompliancePartnershipId, ComplianceDocSummary>> {
+    ) -> FpResult<HashMap<TenantCompliancePartnershipId, ComplianceDocSummary>> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         let mut query = tenant_compliance_partnership::table
@@ -164,7 +164,7 @@ impl ComplianceDocSummary {
     }
 
     // The newest request may be deactivated.
-    pub fn newest_request_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<&ComplianceDocRequest> {
+    pub fn newest_request_for_doc(&self, doc_id: &ComplianceDocId) -> FpResult<&ComplianceDocRequest> {
         let req = self
             .doc_requests
             .values()
@@ -172,9 +172,7 @@ impl ComplianceDocSummary {
             .max_by_key(|r| r.created_at);
 
         let Some(req) = req else {
-            return Err(DbError::AssertionError(
-                "invalid state: no request for document".to_owned(),
-            ));
+            return ServerErrInto("invalid state: no request for document");
         };
         Ok(req)
     }
@@ -221,7 +219,7 @@ impl ComplianceDocSummary {
             .find(|a| a.deactivated_at.is_none())
     }
 
-    pub fn num_controls_complete(&self) -> DbResult<i64> {
+    pub fn num_controls_complete(&self) -> FpResult<i64> {
         let mut count = 0;
         for doc_id in self.docs.keys() {
             let status = self.status_for_doc(doc_id)?;
@@ -232,7 +230,7 @@ impl ComplianceDocSummary {
         Ok(count)
     }
 
-    pub fn num_controls_total(&self) -> DbResult<i64> {
+    pub fn num_controls_total(&self) -> FpResult<i64> {
         let mut count = 0;
         for doc_id in self.docs.keys() {
             let status = self.status_for_doc(doc_id)?;
@@ -246,7 +244,7 @@ impl ComplianceDocSummary {
     pub fn active_resources_for_doc<'a>(
         &'a self,
         doc_id: &ComplianceDocId,
-    ) -> DbResult<ActiveDocResources<'a>> {
+    ) -> FpResult<ActiveDocResources<'a>> {
         let request = self.active_request_for_doc(doc_id);
         let submission = request.and_then(|r| self.active_submission_for_request(&r.id));
         let review = submission.and_then(|s| self.active_review_for_submission(&s.id));
@@ -262,7 +260,7 @@ impl ComplianceDocSummary {
         })
     }
 
-    pub fn status_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<ComplianceDocStatus> {
+    pub fn status_for_doc(&self, doc_id: &ComplianceDocId) -> FpResult<ComplianceDocStatus> {
         let ActiveDocResources {
             request,
             submission,
@@ -288,7 +286,7 @@ impl ComplianceDocSummary {
         })
     }
 
-    pub fn last_updated(&self, doc_id: &ComplianceDocId) -> DbResult<Option<DateTime<Utc>>> {
+    pub fn last_updated(&self, doc_id: &ComplianceDocId) -> FpResult<Option<DateTime<Utc>>> {
         let newest_req = self.newest_request_for_doc(doc_id)?;
         let ActiveDocResources {
             request,

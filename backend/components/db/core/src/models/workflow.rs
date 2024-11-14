@@ -12,13 +12,13 @@ use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
 use super::workflow_request::WorkflowRequest;
-use crate::errors::ValidationError;
 use crate::models::vault::Vault;
-use crate::DbResult;
 use crate::OffsetPaginatedResult;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::BadRequestInto;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::identity_document;
@@ -165,7 +165,7 @@ pub type IsNew = bool;
 
 impl Workflow {
     #[tracing::instrument("Workflow::insert", skip_all)]
-    pub fn insert(conn: &mut TxnPgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
+    pub fn insert(conn: &mut TxnPgConn, new_workflow: NewWorkflow) -> FpResult<Self> {
         // Deactivate existing workflow, if any. We also set the deactivated_at of the previous
         // workflow to the created_at of the new workflow, just for convenience
         let deactivated_wf = diesel::update(workflow::table)
@@ -209,7 +209,7 @@ impl Workflow {
         conn: &mut TxnPgConn,
         args: OnboardingWorkflowArgs,
         force_create: bool,
-    ) -> DbResult<(Self, IsNew)> {
+    ) -> FpResult<(Self, IsNew)> {
         let OnboardingWorkflowArgs {
             scoped_vault_id,
             ob_configuration_id,
@@ -226,7 +226,7 @@ impl Workflow {
         let v = Vault::get(conn.conn(), &scoped_vault_id)?;
 
         if sv.is_live && fixture_result.is_some() {
-            return ValidationError("Cannot add a fixture_result for live vault").into();
+            return BadRequestInto("Cannot add a fixture_result for live vault");
         }
 
         if !force_create {
@@ -315,7 +315,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewWorkflowArgs) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewWorkflowArgs) -> FpResult<Self> {
         let NewWorkflowArgs {
             scoped_vault_id,
             config,
@@ -354,7 +354,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::get", skip_all)]
-    pub fn get<'a, T: Into<WorkflowIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Self> {
+    pub fn get<'a, T: Into<WorkflowIdentifier<'a>>>(conn: &mut PgConn, id: T) -> FpResult<Self> {
         let result = match id.into() {
             WorkflowIdentifier::Id { id } => workflow::table.filter(workflow::id.eq(id)).get_result(conn)?,
             WorkflowIdentifier::ScopedVaultId {
@@ -386,7 +386,7 @@ impl Workflow {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         pagination: OffsetPagination,
-    ) -> DbResult<OffsetPaginatedResult<(Self, ObConfiguration)>> {
+    ) -> FpResult<OffsetPaginatedResult<(Self, ObConfiguration)>> {
         let mut query = workflow::table
             .filter(workflow::scoped_vault_id.eq(sv_id))
             .order_by(workflow::created_at.desc())
@@ -406,7 +406,7 @@ impl Workflow {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         only_completed: bool,
-    ) -> DbResult<Option<(Self, ObConfiguration)>> {
+    ) -> FpResult<Option<(Self, ObConfiguration)>> {
         let mut query = workflow::table
             .inner_join(ob_configuration::table)
             .filter(workflow::scoped_vault_id.eq(sv_id))
@@ -431,7 +431,7 @@ impl Workflow {
     pub fn get_all<'a, T: Into<WorkflowIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,
-    ) -> DbResult<(Self, ScopedVault)> {
+    ) -> FpResult<(Self, ScopedVault)> {
         use db_schema::schema::scoped_vault;
         let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
         match id.into() {
@@ -461,7 +461,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::get_with_vault", skip_all)]
-    pub fn get_with_vault(conn: &mut PgConn, id: &WorkflowId) -> DbResult<(Self, Vault)> {
+    pub fn get_with_vault(conn: &mut PgConn, id: &WorkflowId) -> FpResult<(Self, Vault)> {
         use db_schema::schema::scoped_vault;
         use db_schema::schema::vault;
         let res = workflow::table
@@ -473,7 +473,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::get_bulk", skip_all)]
-    pub fn get_bulk(conn: &mut PgConn, ids: Vec<WorkflowId>) -> DbResult<HashMap<WorkflowId, Self>> {
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<WorkflowId>) -> FpResult<HashMap<WorkflowId, Self>> {
         let res = workflow::table
             .filter(workflow::id.eq_any(ids))
             .get_results::<Self>(conn)?
@@ -485,7 +485,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &WorkflowId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &WorkflowId) -> FpResult<Locked<Self>> {
         let result = workflow::table
             .filter(workflow::id.eq(id))
             .for_no_key_update()
@@ -499,7 +499,7 @@ impl Workflow {
         id: Locked<WorkflowId>, // The caller passes of the locked wf, so let's just take the ID
         old_state: WorkflowState,
         new_state: WorkflowState,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let id = id.into_inner();
         let e = WorkflowEvent::create(conn, id, old_state, new_state)?;
 
@@ -545,7 +545,7 @@ impl Workflow {
         wf: Locked<Self>,
         conn: &mut TxnPgConn,
         new_status: OnboardingStatus,
-    ) -> DbResult<(Self, WorkflowStatusDelta, SvStatusDelta)> {
+    ) -> FpResult<(Self, WorkflowStatusDelta, SvStatusDelta)> {
         let old_status = wf.status;
 
         let can_transition = new_status.can_transition_from(&old_status);
@@ -571,7 +571,7 @@ impl Workflow {
         conn: &mut TxnPgConn,
         wf_delta: WorkflowStatusDelta,
         mr_deltas: ManualReviewDelta,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         if wf_delta.old_status.is_terminal() || !wf_delta.new_status.is_terminal() {
             return Ok(());
         }
@@ -597,7 +597,7 @@ impl Workflow {
         conn: &mut TxnPgConn,
         sv_delta: SvStatusDelta,
         mr_deltas: ManualReviewDelta,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         let (_, tenant) = ObConfiguration::get(conn, &self.ob_configuration_id)?;
         // If this is a legacy tenant that can still see the old onboarding status webhooks, send out the
         // legacy webhook event
@@ -625,7 +625,7 @@ impl Workflow {
         Ok(())
     }
 
-    pub fn set_is_authorized(conn: &mut TxnPgConn, id: &WorkflowId) -> DbResult<()> {
+    pub fn set_is_authorized(conn: &mut TxnPgConn, id: &WorkflowId) -> FpResult<()> {
         diesel::update(workflow::table)
             .filter(workflow::id.eq(id))
             .filter(workflow::authorized_at.is_null())
@@ -634,7 +634,7 @@ impl Workflow {
         Ok(())
     }
 
-    pub fn set_decision_made_at(conn: &mut TxnPgConn, id: &WorkflowId) -> DbResult<Self> {
+    pub fn set_decision_made_at(conn: &mut TxnPgConn, id: &WorkflowId) -> FpResult<Self> {
         let result = diesel::update(workflow::table)
             .filter(workflow::id.eq(id))
             .filter(workflow::decision_made_at.is_null())
@@ -648,7 +648,7 @@ impl Workflow {
         conn: &mut TxnPgConn,
         id: &WorkflowId,
         fixture_result: WorkflowFixtureResult,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let result = diesel::update(workflow::table)
             .filter(workflow::id.eq(id))
             .set(workflow::fixture_result.eq(fixture_result))
@@ -657,7 +657,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::set_session_validated_at", skip_all)]
-    pub fn set_session_validated_at(conn: &mut PgConn, id: &WorkflowId) -> DbResult<()> {
+    pub fn set_session_validated_at(conn: &mut PgConn, id: &WorkflowId) -> FpResult<()> {
         diesel::update(workflow::table)
             .filter(workflow::id.eq(id))
             .filter(workflow::session_validated_at.is_null())
@@ -667,7 +667,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> FpResult<Self> {
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
             .filter(workflow::deactivated_at.is_null())
@@ -682,7 +682,7 @@ impl Workflow {
         conn: &mut PgConn,
         sh_data: &[FingerprintData],
         is_live: bool,
-    ) -> DbResult<Vec<(Self, ScopedVault, Tenant)>> {
+    ) -> FpResult<Vec<(Self, ScopedVault, Tenant)>> {
         use db_schema::schema::fingerprint;
         use db_schema::schema::scoped_vault;
         use db_schema::schema::tenant;
@@ -800,7 +800,7 @@ impl Workflow {
     pub fn bulk_get_for_users(
         conn: &mut PgConn,
         scoped_vault_ids: Vec<&ScopedVaultId>,
-    ) -> DbResult<HashMap<ScopedVaultId, Vec<WorkflowAndConfig>>> {
+    ) -> FpResult<HashMap<ScopedVaultId, Vec<WorkflowAndConfig>>> {
         use db_schema::schema::ob_configuration;
         let results = workflow::table
             .inner_join(ob_configuration::table)

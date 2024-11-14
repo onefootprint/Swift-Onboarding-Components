@@ -1,7 +1,8 @@
 use crate::helpers::WorkosAuthIdentity;
 use crate::models::partner_tenant::PartnerTenant;
 use crate::models::tenant::Tenant;
-use crate::DbError;
+use api_errors::FpError;
+use api_errors::ServerErrInto;
 use derive_more::From;
 use newtypes::OrgIdentifierRef;
 use newtypes::TenantKind;
@@ -47,16 +48,14 @@ impl From<&TenantOrPartnerTenant> for TenantKind {
 }
 
 impl TryFrom<(Option<Tenant>, Option<PartnerTenant>)> for TenantOrPartnerTenant {
-    type Error = DbError;
+    type Error = FpError;
 
     fn try_from(value: (Option<Tenant>, Option<PartnerTenant>)) -> Result<Self, Self::Error> {
         let ret = match value {
             (Some(tenant), None) => TenantOrPartnerTenant::Tenant(tenant),
             (None, Some(partner_tenant)) => TenantOrPartnerTenant::PartnerTenant(partner_tenant),
             _ => {
-                return Err(DbError::AssertionError(
-                    "tenant and partner tenant options are mutually exclusive".to_owned(),
-                ))
+                return ServerErrInto("tenant and partner tenant options are mutually exclusive");
             }
         };
         Ok(ret)

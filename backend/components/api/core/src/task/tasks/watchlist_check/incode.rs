@@ -17,7 +17,6 @@ use db::models::verification_request::RequestAndResult;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::DbResult;
 use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::DataIdentifier as DI;
 use newtypes::DecisionIntentId;
@@ -38,7 +37,7 @@ pub async fn complete_vendor_call(
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
     let (di, latest_watchlist_check_vres) = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let di = DecisionIntent::get(conn, &di_id)?;
             let latest_watchlist_check_vres = VerificationResult::get_latest_successful_by_vendor_api(
                 conn,

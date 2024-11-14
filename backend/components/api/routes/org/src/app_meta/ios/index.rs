@@ -8,7 +8,6 @@ use api_core::State;
 use api_wire_types::UpdateTenantIosAppMetaRequest;
 use db::models::tenant_ios_app_meta::TenantIosAppFilters;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
-use db::DbResult;
 use newtypes::SealedVaultBytes;
 use newtypes::TenantIosAppMetaId;
 use paperclip::actix::api_v2_operation;
@@ -30,7 +29,7 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
 
     let list = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let filters = TenantIosAppFilters {
                 tenant_id,
                 app_bundle_id: None,
@@ -72,7 +71,7 @@ pub async fn post(
         .seal_bytes(device_check_private_key.as_bytes())?;
 
     let new_tenant_ios_app_meta = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             TenantIosAppMeta::create(
                 conn,
                 tenant_id,

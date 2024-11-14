@@ -16,7 +16,6 @@ use db::models::annotation::Annotation;
 use db::models::annotation::AnnotationInfo;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
-use db::DbError;
 use newtypes::AnnotationId;
 use newtypes::CreateAnnotationRequest;
 use newtypes::FpId;
@@ -125,7 +124,7 @@ pub fn post(
     // function, ie MakeAnnotation::call(note,is_pinned,fp_id,auth_actor)   we can call this from
     // tests, from future spots where we want to create annotations (eg: decision engine)
     let annotation: AnnotationInfo = state
-        .db_transaction(move |conn| -> Result<_, DbError> {
+        .db_transaction(move |conn| {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let annotation: AnnotationInfo =

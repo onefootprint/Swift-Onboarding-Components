@@ -1,7 +1,7 @@
-use crate::DbResult;
 use crate::OptionalNonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
@@ -78,7 +78,7 @@ impl WatchlistCheck {
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         timestamp: DateTime<Utc>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         diesel::update(watchlist_check::table)
             .filter(watchlist_check::scoped_vault_id.eq(scoped_vault_id))
             .filter(watchlist_check::deactivated_at.is_null())
@@ -95,7 +95,7 @@ impl WatchlistCheck {
         task_id: TaskId,
         decision_intent_id: Option<DecisionIntentId>,
         status: WatchlistCheckStatus,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let timestamp = Utc::now();
         // Mark the watchlist check as completed if it has a terminal status
         let completed_at = match status {
@@ -123,7 +123,7 @@ impl WatchlistCheck {
     }
 
     #[tracing::instrument("WatchlistCheck::get_by_task_id", skip_all)]
-    pub fn get_by_task_id(conn: &mut PgConn, task_id: &TaskId) -> DbResult<Option<Self>> {
+    pub fn get_by_task_id(conn: &mut PgConn, task_id: &TaskId) -> FpResult<Option<Self>> {
         let res = watchlist_check::table
             .filter(watchlist_check::task_id.eq(task_id))
             .get_result(conn)
@@ -133,7 +133,7 @@ impl WatchlistCheck {
     }
 
     #[tracing::instrument("WatchlistCheck::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &WatchlistCheckId) -> DbResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &WatchlistCheckId) -> FpResult<Locked<Self>> {
         let result = watchlist_check::table
             .filter(watchlist_check::id.eq(id))
             .for_no_key_update()
@@ -149,7 +149,7 @@ impl WatchlistCheck {
         reason_codes: Option<Vec<FootprintReasonCode>>,
         completed_at: Option<DateTime<Utc>>,
         logic_git_hash: Option<String>,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         if let Some(completed_at) = completed_at {
             Self::deactivate_old(conn, &wc.scoped_vault_id, completed_at)?;
         }
@@ -174,7 +174,7 @@ impl WatchlistCheck {
         tenant_id: &TenantId,
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
-    ) -> DbResult<i64> {
+    ) -> FpResult<i64> {
         use db_schema::schema::scoped_vault;
         let count = watchlist_check::table
             .inner_join(scoped_vault::table)
@@ -193,7 +193,7 @@ impl WatchlistCheck {
 
     // #[cfg(test)]
     #[tracing::instrument("WatchlistCheck::_get_by_svid", skip_all)]
-    pub fn _get_by_svid(conn: &mut PgConn, svid: &ScopedVaultId) -> DbResult<Self> {
+    pub fn _get_by_svid(conn: &mut PgConn, svid: &ScopedVaultId) -> FpResult<Self> {
         let res = watchlist_check::table
             .filter(watchlist_check::scoped_vault_id.eq(svid))
             .get_result(conn)?;
@@ -204,7 +204,7 @@ impl WatchlistCheck {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&WatchlistCheckId>,
-    ) -> DbResult<HashMap<WatchlistCheckId, Self>> {
+    ) -> FpResult<HashMap<WatchlistCheckId, Self>> {
         let results = watchlist_check::table
             .filter(watchlist_check::id.eq_any(ids))
             .get_results::<WatchlistCheck>(conn)?
@@ -220,7 +220,7 @@ impl WatchlistCheck {
         conn: &mut PgConn,
         legacy_non_enhanced_aml_tenant_id: TenantId,
         limit: i64,
-    ) -> DbResult<Vec<ScopedVaultId>> {
+    ) -> FpResult<Vec<ScopedVaultId>> {
         let thirty_days_ago = Utc::now() - Duration::days(30);
 
         let (npv_wf, enhanced_wf) = diesel::alias!(workflow as npv_wf, workflow as enhanced_wf);
@@ -300,7 +300,7 @@ impl WatchlistCheck {
 
     #[cfg(test)]
     #[tracing::instrument("WatchlistCheck::create_for_test", skip_all)]
-    pub fn create_for_test(conn: &mut PgConn, new_watchlist_check: NewWatchlistCheck) -> DbResult<Self> {
+    pub fn create_for_test(conn: &mut PgConn, new_watchlist_check: NewWatchlistCheck) -> FpResult<Self> {
         if let Some(completed_at) = new_watchlist_check.completed_at {
             Self::deactivate_old(conn, &new_watchlist_check.scoped_vault_id, completed_at)?;
         }

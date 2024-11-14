@@ -12,10 +12,10 @@ use crate::models::tenant::Tenant;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
 use crate::models::tenant_user::TenantUser;
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
+use api_errors::ServerErr;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::audit_event;
@@ -188,16 +188,13 @@ impl HasActor for DieselJoinedAuditEvent {
 
 impl AuditEvent {
     #[tracing::instrument("AuditEvent::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, new: NewAuditEvent) -> DbResult<AuditEventId> {
+    pub fn create(conn: &mut TxnPgConn, new: NewAuditEvent) -> FpResult<AuditEventId> {
         let ids = AuditEvent::bulk_create(conn, vec![new])?;
-
-        ids.into_iter()
-            .next()
-            .ok_or(DbError::AssertionError("expected one AuditEventId".to_owned()))
+        (ids.into_iter().next()).ok_or(ServerErr("expected one AuditEventId"))
     }
 
     #[tracing::instrument("AuditEvent::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, events: Vec<NewAuditEvent>) -> DbResult<Vec<AuditEventId>> {
+    pub fn bulk_create(conn: &mut TxnPgConn, events: Vec<NewAuditEvent>) -> FpResult<Vec<AuditEventId>> {
         let ids = events.iter().map(|_| AuditEventId::generate()).collect_vec();
         let rows = events
             .into_iter()
@@ -244,7 +241,7 @@ impl AuditEvent {
         conn: &mut PgConn,
         params: FilterQueryParams,
         page_size: i64,
-    ) -> DbResult<(Vec<JoinedAuditEvent>, AuditEventBulkSecondaryData)> {
+    ) -> FpResult<(Vec<JoinedAuditEvent>, AuditEventBulkSecondaryData)> {
         let mut results = audit_event::table
             .inner_join(tenant::table)
             .inner_join(insight_event::table)
@@ -368,7 +365,7 @@ impl AuditEvent {
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
         purposes: Vec<DecryptionContext>,
-    ) -> DbResult<i64> {
+    ) -> FpResult<i64> {
         let count = audit_event::table
             .filter(audit_event::name.eq_any(vec![
                 AuditEventName::DecryptUserData,
@@ -402,7 +399,7 @@ pub struct AuditEventBulkSecondaryData {
 }
 
 impl AuditEventBulkSecondaryData {
-    pub fn load(conn: &mut PgConn, joined_events: &[JoinedAuditEvent]) -> DbResult<Self> {
+    pub fn load(conn: &mut PgConn, joined_events: &[JoinedAuditEvent]) -> FpResult<Self> {
         // Return a vector because sometimes we will need to fetch multiple roles for one event
         let tr_ids = joined_events
             .iter()

@@ -14,7 +14,6 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::utils::vault_wrapper::TenantVw;
-use api_core::FpResult;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
@@ -62,7 +61,7 @@ pub async fn get(
         .ok_or(TenantError::NoDecryptionReasonProvided)?;
 
     let vw = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &scoped_vault.id)?;
             Ok(vw)

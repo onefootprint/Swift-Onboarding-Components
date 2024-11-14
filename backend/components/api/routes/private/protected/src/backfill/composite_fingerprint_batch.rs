@@ -15,7 +15,6 @@ use api_errors::FpResult;
 use db::models::fingerprint::Fingerprint as DbFingerprint;
 use db::models::fingerprint::NewFingerprintArgs;
 use db::DbError;
-use db::DbResult;
 use db_schema::schema::fingerprint;
 use db_schema::schema::scoped_vault;
 use diesel::prelude::*;
@@ -42,7 +41,7 @@ pub async fn post(
     } = request.into_inner();
 
     let sv_ids = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             // Filter out deactivated scoped vaults - causes other utils to crash
             let sv_ids = scoped_vault::table
                 .filter(scoped_vault::id.eq_any(entity_ids))
@@ -108,7 +107,7 @@ async fn backfill_composite_fingerprints(state: &State, sv_id: ScopedVaultId) ->
         .unzip();
 
     state
-        .db_transaction(move |conn| -> FpResult<()> {
+        .db_transaction(move |conn| {
             let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
             let dis = vw.populated_dis();
             let dis = dis.iter().collect_vec();

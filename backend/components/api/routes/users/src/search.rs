@@ -1,5 +1,4 @@
 use crate::auth::tenant::TenantApiKeyAuth;
-use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
@@ -69,7 +68,7 @@ pub async fn get(
     root_span.record("meta", meta);
 
     let (svs, count) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let page_size = (page_size + 1) as i64;
             let cursor = cursor.map(ScopedVaultCursor::OrderingId);
             let order_by = ScopedVaultCursorKind::OrderingId;
@@ -121,7 +120,7 @@ pub async fn post_search(
     let page_size = pagination.page_size(&state);
 
     let (svs, count) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let page_size = (page_size + 1) as i64;
             let order_by = ScopedVaultCursorKind::LastActivityAt;
             let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(

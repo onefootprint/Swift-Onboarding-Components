@@ -1,9 +1,9 @@
 use super::scoped_vault::ScopedVault;
 use super::workflow_request_junction::NewWorkflowRequestJunctionRow;
 use super::workflow_request_junction::WorkflowRequestJunction;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::scoped_vault;
@@ -58,7 +58,7 @@ pub struct NewWorkflowRequestArgs<'a> {
 
 impl WorkflowRequest {
     #[tracing::instrument("WorkflowRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> FpResult<Self> {
         let result = workflow_request::table
             .inner_join(workflow_request_junction::table)
             .filter(workflow_request::id.eq(id))
@@ -69,7 +69,7 @@ impl WorkflowRequest {
     }
 
     #[tracing::instrument("WorkflowRequest::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
+    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Option<Self>> {
         let result = workflow_request::table
             .inner_join(workflow_request_junction::table)
             .filter(workflow_request_junction::scoped_vault_id.eq(sv_id))
@@ -84,7 +84,7 @@ impl WorkflowRequest {
     pub fn get_bulk_with_user(
         conn: &mut PgConn,
         ids: Vec<WorkflowRequestId>,
-    ) -> DbResult<HashMap<WorkflowRequestId, (Self, ScopedVault)>> {
+    ) -> FpResult<HashMap<WorkflowRequestId, (Self, ScopedVault)>> {
         let res = workflow_request::table
             .filter(workflow_request::id.eq_any(ids))
             .inner_join(workflow_request_junction::table.inner_join(scoped_vault::table))
@@ -100,7 +100,7 @@ impl WorkflowRequest {
     }
 
     #[tracing::instrument("WorkflowRequest::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewWorkflowRequestArgs) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewWorkflowRequestArgs) -> FpResult<Self> {
         let NewWorkflowRequestArgs {
             su_id,
             sb_id,
@@ -148,7 +148,7 @@ impl WorkflowRequest {
         conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
         obc_id: Option<&ObConfigurationId>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         let mut query = diesel::update(workflow_request::table)
             .filter(exists(
                 workflow_request_junction::table

@@ -7,7 +7,6 @@ use crate::ApiResponse;
 use crate::State;
 use actix_web::HttpResponseBuilder;
 use api_core::auth::user::UserAuthScope;
-use api_core::FpResult;
 use api_errors::ServerErr;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
@@ -87,7 +86,7 @@ async fn authorize_privacy_pass(
     tracing::info!("verify pat success");
 
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let liveness_event = NewLivenessEvent {

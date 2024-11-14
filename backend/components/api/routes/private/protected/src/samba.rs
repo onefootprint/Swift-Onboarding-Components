@@ -4,7 +4,6 @@ use actix_web::web;
 use actix_web::web::Json;
 use api_core::decision::vendor::samba::create_order;
 use api_core::types::ApiResponse;
-use api_core::FpResult;
 use api_core::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::scoped_vault::ScopedVault;
@@ -29,7 +28,7 @@ pub async fn create_samba_order(
     let CreateSambaOrderRequest { fp_id, data, kind } = request.into_inner();
 
     let di = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, ScopedVaultIdentifier::SuperAdminView { identifier: &fp_id })?;
             // TODO: prevent people from re-running this over and over
             let di = DecisionIntent::create(conn, DecisionIntentKind::ManualRunKyc, &sv.id, None)?;

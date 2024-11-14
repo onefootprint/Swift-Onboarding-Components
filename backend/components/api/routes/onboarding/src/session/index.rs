@@ -1,7 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::session::AuthSession;
-use crate::FpResult;
 use crate::State;
 use api_core::auth::session::onboarding::OnboardingSession;
 use api_core::auth::session::onboarding::OnboardingSessionTrustedMetadata;
@@ -80,7 +79,7 @@ pub async fn post(
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             // Check ownership of Playbook
             let (_, obc, _) = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant.id, is_live))?;
             if business_external_id.is_some() && !obc.kind.is_kyb() {

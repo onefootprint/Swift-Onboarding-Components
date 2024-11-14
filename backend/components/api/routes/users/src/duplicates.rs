@@ -12,7 +12,6 @@ use db::models::fingerprint::Fingerprint;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use db::models::scoped_vault_tag::ScopedVaultTag;
-use db::DbResult;
 use itertools::Itertools;
 use newtypes::preview_api;
 use newtypes::DupeKind;
@@ -43,7 +42,7 @@ pub async fn get(
     let pagination = pagination.db_pagination(&state);
 
     let (fingerprints, scoped_vaults, labels, tags, next_page) = state
-        .db_query(move |conn| -> DbResult<_> {
+        .db_query(move |conn| {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (fingerprints, next_page) = Fingerprint::get_internal_dupes(conn, &scoped_vault, pagination)?;
             let sv_ids = fingerprints.iter().map(|fp| &fp.scoped_vault_id).collect_vec();

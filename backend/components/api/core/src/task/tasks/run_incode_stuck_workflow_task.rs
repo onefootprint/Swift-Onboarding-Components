@@ -10,7 +10,6 @@ use api_errors::ServerErrInto;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
 use db::models::workflow::Workflow;
-use db::DbResult;
 use newtypes::RunIncodeStuckWorkflowArgs;
 use std::time::Duration;
 use tokio::time::Instant;
@@ -26,7 +25,7 @@ impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
         let Self { state } = self;
         let RunIncodeStuckWorkflowArgs { workflow_id: wfid } = args;
         let (wf, seqno) = state
-            .db_query(move |conn| -> DbResult<_> {
+            .db_query(move |conn| {
                 let wf = Workflow::get(conn, &wfid)?;
                 let seqno = DataLifetime::get_current_seqno(conn)?;
                 Ok((wf, seqno))

@@ -6,7 +6,6 @@ use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
-use db::DbError;
 use newtypes::ObConfigurationId;
 use newtypes::RuleAction;
 use newtypes::StepUpKind;
@@ -31,9 +30,7 @@ pub async fn list_rules_for_playbook(
     let is_live = auth.is_live()?;
 
     let rules = state
-        .db_query(move |conn| -> Result<_, DbError> {
-            RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id, IncludeRules::All)
-        })
+        .db_query(move |conn| RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id, IncludeRules::All))
         .await?;
     let rules = rules
     .into_iter()

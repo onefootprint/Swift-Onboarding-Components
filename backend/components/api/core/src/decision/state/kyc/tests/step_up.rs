@@ -19,7 +19,6 @@ use crate::decision::state::test_utils::WithQualifier;
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
-use crate::FpResult;
 use crate::State;
 use api_wire_types::CreateRule;
 use api_wire_types::MultiUpdateRuleRequest;
@@ -144,7 +143,7 @@ async fn test_stepup_with_multiple_docs(state: &State, action: RuleActionMigrati
     //
     let t_id = t.id.clone();
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
             let update = validate_rules_request(conn, &t_id, true, raw_update)?;
             RuleInstance::bulk_edit(conn, &obc, &DbActor::Footprint, update)?;
@@ -332,7 +331,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
     // Add in a rule for dob not matching which will step up to id doc from KYC
     //
     state
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let action = RuleAction::StepUp(identity_stepup);
             let kyc_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {

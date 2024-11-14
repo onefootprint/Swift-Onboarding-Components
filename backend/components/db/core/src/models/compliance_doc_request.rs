@@ -1,9 +1,9 @@
 use super::compliance_doc::ComplianceDoc;
 use super::compliance_doc_review::ComplianceDocReview;
 use super::compliance_doc_submission::ComplianceDocSubmission;
-use crate::DbError;
-use crate::DbResult;
 use crate::TxnPgConn;
+use api_errors::FpResult;
+use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc_request;
@@ -48,11 +48,9 @@ pub struct NewComplianceDocRequest<'a> {
 
 impl<'a> NewComplianceDocRequest<'a> {
     #[tracing::instrument("NewComplianceDocRequest::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocRequest> {
+    pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> FpResult<ComplianceDocRequest> {
         if doc.id != *self.compliance_doc_id {
-            return Err(DbError::AssertionError(
-                "locked document does not match new request".to_string(),
-            ));
+            return ServerErrInto("locked document does not match new request");
         }
 
         // Deactivate any existing request, submission, and review.
@@ -77,7 +75,7 @@ impl ComplianceDocRequest {
     pub fn get_active(
         conn: &mut TxnPgConn,
         doc: &Locked<ComplianceDoc>,
-    ) -> DbResult<Option<ComplianceDocRequest>> {
+    ) -> FpResult<Option<ComplianceDocRequest>> {
         let req = compliance_doc_request::table
             .filter(compliance_doc_request::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_request::deactivated_at.is_null())
@@ -96,7 +94,7 @@ impl ComplianceDocRequest {
         req_id: &ComplianceDocRequestId,
         doc: &Locked<ComplianceDoc>,
         deactivated_by: Option<&TenantUserId>,
-    ) -> DbResult<()> {
+    ) -> FpResult<()> {
         diesel::update(compliance_doc_request::table)
             .filter(compliance_doc_request::id.eq(req_id))
             .filter(compliance_doc_request::compliance_doc_id.eq(&doc.id))

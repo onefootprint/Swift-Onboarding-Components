@@ -1,7 +1,7 @@
 use super::data_lifetime::DataLifetime;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_business_info;
@@ -64,7 +64,7 @@ impl TenantBusinessInfo {
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
         new_business_info: NewBusinessInfo,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         let NewBusinessInfo {
             company_name,
             address_line1,
@@ -104,7 +104,7 @@ impl TenantBusinessInfo {
     }
 
     #[tracing::instrument("TenantBusinessInfo::get", skip_all)]
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Option<Self>> {
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> FpResult<Option<Self>> {
         let res = tenant_business_info::table
             .filter(tenant_business_info::tenant_id.eq(tenant_id))
             .filter(tenant_business_info::deactivated_at.is_null())

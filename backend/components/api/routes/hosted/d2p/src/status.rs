@@ -6,7 +6,6 @@ use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::types::ApiResponse;
-use api_core::FpResult;
 use api_wire_types::D2pStatusResponse;
 use api_wire_types::D2pUpdateStatusRequest;
 use paperclip::actix::api_v2_operation;
@@ -49,7 +48,7 @@ pub async fn post(
 
     let D2pUpdateStatusRequest { status } = request.into_inner();
     state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             // TODO lock session
             let session = JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token)?
                 .ok_or(HandoffError::HandoffSessionNotFound)?;

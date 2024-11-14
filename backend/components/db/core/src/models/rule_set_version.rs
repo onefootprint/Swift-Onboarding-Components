@@ -1,9 +1,9 @@
 use super::data_lifetime::DataLifetime;
 use super::ob_configuration::ObConfiguration;
-use crate::DbError;
-use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use api_errors::BadRequestInto;
+use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::rule_set;
@@ -67,7 +67,7 @@ impl RuleSetVersion {
         obc: &Locked<ObConfiguration>,
         expected_rule_set_version: Option<i32>,
         actor: DbActor,
-    ) -> DbResult<(Self, DataLifetimeSeqno, DateTime<Utc>)> {
+    ) -> FpResult<(Self, DataLifetimeSeqno, DateTime<Utc>)> {
         let seqno = DataLifetime::get_next_obc_seqno(conn, obc)?;
         let now = Utc::now();
 
@@ -86,10 +86,11 @@ impl RuleSetVersion {
             // current RSV version
             let current_version = current.as_ref().map(|c| c.version).unwrap_or(0);
             if expected_rule_set_version != current_version {
-                return Err(DbError::UnexpectedRuleSetVersion(
+                return BadRequestInto!(
+                    "Expected version {} but latest version is {}",
                     expected_rule_set_version,
-                    current_version,
-                ));
+                    current_version
+                );
             }
         }
 
@@ -112,7 +113,7 @@ impl RuleSetVersion {
     }
 
     #[tracing::instrument("RuleSetVersion::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, obc_id: &ObConfigurationId) -> DbResult<Option<Self>> {
+    pub fn get_active(conn: &mut PgConn, obc_id: &ObConfigurationId) -> FpResult<Option<Self>> {
         let res = rule_set::table
             .filter(rule_set::ob_configuration_id.eq(obc_id))
             .filter(rule_set::deactivated_seqno.is_null())
@@ -126,7 +127,7 @@ impl RuleSetVersion {
     pub fn bulk_get_active(
         conn: &mut PgConn,
         obc_ids: Vec<&ObConfigurationId>,
-    ) -> DbResult<HashMap<ObConfigurationId, Self>> {
+    ) -> FpResult<HashMap<ObConfigurationId, Self>> {
         let res = rule_set::table
             .filter(rule_set::ob_configuration_id.eq_any(obc_ids))
             .filter(rule_set::deactivated_seqno.is_null())
@@ -190,9 +191,11 @@ mod tests {
         RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint).unwrap();
 
         // error when old version is given
-        assert!(matches!(
-            RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint).unwrap_err(),
-            DbError::UnexpectedRuleSetVersion(1, 2)
-        ));
+        assert_eq!(
+            RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint)
+                .unwrap_err()
+                .message(),
+            "Expected version 1 but latest version is 2"
+        );
     }
 }

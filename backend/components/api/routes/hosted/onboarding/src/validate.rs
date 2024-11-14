@@ -9,7 +9,6 @@ use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequest;
 use api_route_hosted_core::validation_token::create_validation_token;
@@ -52,7 +51,7 @@ pub async fn post(
         let su_id = (user_auth.su_id.clone()).ok_or(BadRequest("No scoped user associated with session"))?;
         let auth_events = user_auth.auth_events.clone();
         let reqs = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
                 let reqs = get_register_auth_method_requirements(conn, &obc, &auth_events, &vw)?;
                 Ok(reqs)

@@ -10,7 +10,6 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::ApiCoreError;
-use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -33,7 +32,7 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let (entity, vw) = state
-        .db_query(move |conn| -> FpResult<_> {
+        .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let entity = ScopedVault::bulk_get_serializable_info(conn, vec![sv.id.clone()])?

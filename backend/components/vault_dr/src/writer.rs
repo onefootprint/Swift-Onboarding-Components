@@ -13,11 +13,11 @@ use api_core::utils::vault_wrapper::MimeTypedPii;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::FpDbOptionalExtension;
 use api_errors::ServerErr;
 use api_errors::ServerErrInto;
 use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::primitives::SdkBody;
-use db::errors::FpOptionalExtension;
 use db::helpers::vault_dr::bulk_get_vdr_blob_keys_active_at;
 use db::helpers::vault_dr::get_complete_svvs_for_svv_batch;
 use db::helpers::vault_dr::get_dl_batch_for_svv_batch;
@@ -32,7 +32,6 @@ use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use db::models::vault_dr::VaultDrManifest;
-use db::DbResult;
 use futures::FutureExt;
 use futures::Stream;
 use futures::StreamExt;
@@ -96,7 +95,7 @@ impl VaultDrWriter {
 
         let config_id_0 = config_id.clone();
         let (config, aws_pre_enrollment) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let config = VaultDrConfig::get(conn, &config_id_0)
                     .optional()?
                     .ok_or(Error::NotEnrolled)?;
@@ -167,7 +166,7 @@ impl VaultDrWriter {
         let blob_batch_size = self.knobs.blob_batch_size as usize;
 
         let (svv_batch, dls) = state
-            .db_query(move |conn| -> DbResult<_> {
+            .db_query(move |conn| {
                 // TLA+ Spec: GetVaultVersionBatch
                 let svv_batch = get_scoped_vault_version_batch(
                     conn,
@@ -204,9 +203,7 @@ impl VaultDrWriter {
         // TLA+ Spec: GetCompleteVaultVersionBatch
         let config_id = self.config_id.clone();
         let complete_svvs = state
-            .db_query(move |conn| -> DbResult<_> {
-                get_complete_svvs_for_svv_batch(conn, &config_id, &svv_batch)
-            })
+            .db_query(move |conn| get_complete_svvs_for_svv_batch(conn, &config_id, &svv_batch))
             .await?;
 
         let complete_svv_ids = complete_svvs.iter().map(|svv| svv.id.clone()).collect_vec();
@@ -220,7 +217,7 @@ impl VaultDrWriter {
 
         let config_id = self.config_id.clone();
         state
-            .db_transaction(move |conn| -> DbResult<_> {
+            .db_transaction(move |conn| {
                 VaultDrManifest::bulk_create(conn, new_manifests)?;
 
                 // TLA+ Spec: CommitManifests
@@ -252,7 +249,7 @@ impl VaultDrWriter {
         let sv_ids = dls.iter().map(|dl| dl.scoped_vault_id.clone()).collect_vec();
 
         let (dls, sv_id_to_fp_id) = state
-            .db_query(move |conn| -> FpResult<_> {
+            .db_query(move |conn| {
                 let sv_id_to_fp_id: HashMap<_, _> =
                     ScopedVault::bulk_get(conn, sv_ids.iter().collect_vec(), &tenant_id, is_live)?
                         .into_iter()

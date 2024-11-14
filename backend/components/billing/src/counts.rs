@@ -2,13 +2,13 @@ use crate::interval::BillingInterval;
 use crate::profile::BillingProfile;
 use crate::BResult;
 use crate::Error;
+use api_errors::FpResult;
 use db::models::audit_event::AuditEvent;
 use db::models::billing_event::BillingEvent;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultPiiFilters;
 use db::models::watchlist_check::WatchlistCheck;
-use db::DbResult;
 use db::PgConn;
 use itertools::chain;
 use newtypes::DecryptionContext;
@@ -116,7 +116,7 @@ impl BillingCounts {
         t_id: &TenantId,
         bp: Option<&DbBillingProfile>,
         i: &BillingInterval,
-    ) -> DbResult<Self> {
+    ) -> FpResult<Self> {
         // Fetch counts for most products regardless of whether the tenant is set up with
         // billing for them. We will error if any of these products have use when they haven't
         // been contracted
