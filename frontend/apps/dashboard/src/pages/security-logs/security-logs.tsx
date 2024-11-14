@@ -5,12 +5,14 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
+import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
 import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
 
 const SecurityLogs = () => {
   const { t } = useTranslation('security-logs');
 
+  const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
   const auditEvents: AuditEvent[] =
     getAccessEvents.data?.pages.reduce<AuditEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
@@ -60,8 +62,8 @@ const SecurityLogs = () => {
       <Stack gap={5} direction="column">
         <SearchInput
           width="232px"
-          onChangeText={() => console.log('test change text')}
-          value=""
+          onChangeText={value => filters.push({ search: value })}
+          value={filters.query.search || ''}
           size="compact"
           placeholder={t('filters.search')}
         />
