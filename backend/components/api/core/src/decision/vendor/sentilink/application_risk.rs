@@ -34,7 +34,7 @@ pub async fn run_sentilink_application_risk(
     let svid = di.scoped_vault_id.clone();
     let wf_id2 = wf_id.clone();
 
-    let (vw, tenant_id, curr_seqno, ie) = state
+    let (vw, tenant_id, curr_seqno, ie, fp_id) = state
         .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
@@ -46,7 +46,7 @@ pub async fn run_sentilink_application_risk(
             // that to reconstruct the vault. For now in testing it doesn't matter
             let curr_seqno = DataLifetime::get_current_seqno(conn)?;
 
-            Ok((vw, tenant_id, curr_seqno, ie))
+            Ok((vw, tenant_id, curr_seqno, ie, sv.fp_id))
         })
         .await?;
 
@@ -91,6 +91,7 @@ pub async fn run_sentilink_application_risk(
         workflow_id: wf_id.clone(),
         // Currently from the wf creation IE event
         ip_address: ie.and_then(|i| i.ip_address.map(|ip| ip.into())),
+        fp_id,
     };
 
     // make request
@@ -120,7 +121,6 @@ pub async fn run_sentilink_application_risk(
 
     let validated = resp.validate().map_err(into_fp_error)?;
 
-
     // Save billing event
     let sv_id = di.scoped_vault_id.clone();
     let wf_id3 = wf_id.clone();
@@ -129,7 +129,6 @@ pub async fn run_sentilink_application_risk(
         .db_transaction(move |conn| {
             let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
             BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::SentilinkScore)?;
-
 
             Ok(())
         })

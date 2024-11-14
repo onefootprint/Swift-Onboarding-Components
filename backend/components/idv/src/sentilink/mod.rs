@@ -1,6 +1,7 @@
 use application_risk::response::ApplicationRiskResponse;
 use newtypes::sentilink::SentilinkProduct;
 use newtypes::vendor_credentials::SentilinkCredentials;
+use newtypes::FpId;
 use newtypes::IdvData;
 use newtypes::PiiString;
 use newtypes::WorkflowId;
@@ -146,6 +147,7 @@ pub struct SentilinkApplicationRiskRequest {
     pub products: Vec<SentilinkProduct>,
     pub workflow_id: WorkflowId,
     pub ip_address: Option<PiiString>,
+    pub fp_id: FpId,
 }
 
 

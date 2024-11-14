@@ -4,10 +4,12 @@ use chrono::DateTime;
 use chrono::Utc;
 use newtypes::output::Csv;
 use newtypes::sentilink::SentilinkProduct;
+use newtypes::FpId;
 use newtypes::IdentityDataKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
+use newtypes::WorkflowId;
 use serde::Deserialize;
 use serde::Serialize;
 use std::str::FromStr;
@@ -21,15 +23,14 @@ pub struct ApplicationRiskRequest {
 #[derive(Serialize, Deserialize, Default)]
 pub struct Application {
     // ID of application. We use workflow_id for now
-    application_id: String,
+    application_id: WorkflowId,
     // Timestamp string of application, default: timestamp string for when SentiLink receives the request.
     application_created: DateTime<Utc>,
-    // ID of customer.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    user_id: Option<String>,
     // Timestamp string of customer account. creation. Other accepted formats: "2017-01-02", "2017-01-02
     // `00:00:00", "01022017", "02Jan2017", "01/22/2017".
     user_created: DateTime<Utc>,
+    // ID of customer.
+    user_id: FpId,
     first_name: PiiString,
     last_name: PiiString,
     // Customer date of birth. Must be in YYYY-MM-DD format, more recent than 1901-12-31 and reflect an
@@ -83,6 +84,7 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             products,
             credentials: _,
             workflow_id,
+            fp_id,
             ip_address,
         } = value;
         // Check products
@@ -128,9 +130,9 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
                 .ok_or(SentilinkError::MissingRequiredField(idk))
         };
 
-        // TODO: ip_address, user_id, user_created, device_id
+        // TODO: user_created, device_id
         let application = Application {
-            application_id: workflow_id.to_string(),
+            application_id: workflow_id,
             application_created: Utc::now(),
             first_name: get_di(IdentityDataKind::FirstName)?,
             last_name: get_di(IdentityDataKind::LastName)?,
@@ -146,6 +148,7 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             phone: idv_data.get(IdentityDataKind::PhoneNumber).cloned(),
             email: idv_data.get(IdentityDataKind::Email).cloned(),
             ip_address,
+            user_id: fp_id,
             ..Default::default()
         };
 
