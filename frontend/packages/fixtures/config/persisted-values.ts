@@ -110,6 +110,7 @@ import type {
   AssumeRoleResponse,
   AttestedDeviceData,
   AuditEvent,
+  AuditEventApiKey,
   AuditEventDetail,
   AuditEventName,
   AuthEvent,
@@ -3093,6 +3094,29 @@ export const dashboard_AuditEvent: AuditEvent = {
   },
   tenantId: '8f10e964-e03d-40c6-82cd-3274f0486bcd',
   timestamp: '1933-12-29T01:34:52.0Z',
+};
+export const dashboard_AuditEventApiKey: AuditEventApiKey = {
+  name: 'Orlando Stroman',
+  role: {
+    createdAt: '1910-02-09T02:50:22.0Z',
+    id: '84590132-941e-42bb-be2c-c9941aa311f9',
+    isImmutable: true,
+    kind: 'api_key',
+    name: 'Tabitha Conn',
+    numActiveApiKeys: 15380009,
+    numActiveUsers: 30457833,
+    scopes: [
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+    ],
+  },
 };
 export const dashboard_AuditEventDetail: AuditEventDetail = {
   data: {
@@ -8160,9 +8184,9 @@ export const dashboard_OnboardingConfiguration: OnboardingConfiguration = {
   isRulesEnabled: true,
   key: '792f73c0-dc71-4207-a457-091e366ef20c',
   kind: 'auth',
-  mustCollectData: ['name', 'email', 'business_beneficial_owners'],
+  mustCollectData: ['name', 'email', 'business_kyced_beneficial_owners'],
   name: 'Lorenzo Abshire',
-  optionalData: ['business_beneficial_owners', 'business_name', 'us_tax_id'],
+  optionalData: ['business_kyced_beneficial_owners', 'business_name', 'us_tax_id'],
   promptForPasskey: true,
   requiredAuthMethods: ['passkey', 'email', 'phone'],
   ruleSet: {
@@ -9032,7 +9056,7 @@ export const dashboard_TriggerRequest: TriggerRequest = {
   trigger: {
     data: {
       playbookId: 'ef1a3dd4-7bc3-4a73-8ba2-f6606c165557',
-      recollectAttributes: ['nationality', 'business_beneficial_owners', 'bank'],
+      recollectAttributes: ['nationality', 'business_kyced_beneficial_owners', 'bank'],
       reuseExistingBoKyc: true,
     },
     kind: 'onboard',
@@ -9342,7 +9366,7 @@ export const dashboard_WorkflowKind: WorkflowKind = 'kyb';
 export const dashboard_WorkflowRequestConfig: WorkflowRequestConfig = {
   data: {
     playbookId: 'd8e6617d-30c7-4c60-877f-e9917c128abc',
-    recollectAttributes: ['dob', 'business_beneficial_owners', 'us_tax_id'],
+    recollectAttributes: ['dob', 'business_kyced_beneficial_owners', 'us_tax_id'],
     reuseExistingBoKyc: true,
   },
   kind: 'onboard',

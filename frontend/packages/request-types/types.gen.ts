@@ -63,7 +63,6 @@ export type CollectedDataOption =
   | 'business_address'
   | 'business_phone_number'
   | 'business_website'
-  | 'business_beneficial_owners'
   | 'business_kyced_beneficial_owners'
   | 'business_corporation_type'
   | 'investor_profile'

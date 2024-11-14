@@ -97,6 +97,10 @@ export type AuditEvent = {
   tenantId: string;
   timestamp: string;
 };
+export type AuditEventApiKey = {
+  name: string;
+  role: OrganizationRole;
+};
 export type AuditEventDetail =
   | {
       data: {
@@ -159,6 +163,9 @@ export type AuditEventDetail =
       kind: 'create_org_api_key';
     }
   | {
+      data: {
+        apiKey: AuditEventApiKey;
+      };
       kind: 'decrypt_org_api_key';
     }
   | {
@@ -276,8 +283,8 @@ export type AuditEventName =
   | 'complete_user_verification'
   | 'collect_user_document'
   | 'create_org_api_key'
-  | 'org_member_joined'
   | 'decrypt_org_api_key'
+  | 'org_member_joined'
   | 'update_org_api_key'
   | 'invite_org_member'
   | 'update_org_member'
@@ -427,7 +434,6 @@ export type CollectedDataOption =
   | 'business_address'
   | 'business_phone_number'
   | 'business_website'
-  | 'business_beneficial_owners'
   | 'business_kyced_beneficial_owners'
   | 'business_corporation_type'
   | 'investor_profile'

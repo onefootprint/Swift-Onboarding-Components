@@ -31,7 +31,7 @@ let newPersistedValues = '';
 // We could either remove randomization, or make randomization purely a function of the object's key.
 export async function generateFixtures(type: 'hosted' | 'dashboard') {
   let examples = '';
-  let imports = 'import merge from "lodash/merge";\nimport type { \n';
+  let imports = 'import deepmerge from "deepmerge";\nimport type { \n';
 
   const config =
     type === 'hosted'
@@ -76,7 +76,9 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
       const mocks = _.isObject(dictionary[index]) ? sortObjectKeys(toCamelCase(dictionary[index])) : dictionary[index];
 
       if (_.isObject(dictionary[index])) {
-        examples += `export const get${name[0].toUpperCase() + name.slice(1)} = (props: Partial<${name}>): ${name} => merge<${name}, Partial<${name}>>(${JSON.stringify(mocks, null, 2)}, props);\n`;
+        examples += `
+        export const get${name[0].toUpperCase() + name.slice(1)} = (props: Partial<${name}>, options: { overwriteArray: boolean} = { overwriteArray: true }): ${name} => 
+        deepmerge<${name}>(${JSON.stringify(mocks, null, 2)}, props, {...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {})  });\n`;
       } else {
         examples += `export const get${name[0].toUpperCase() + name.slice(1)} = (props: ${name}): ${name} => (props ?? ${JSON.stringify(mocks, null, 2)});\n`;
       }

@@ -14,6 +14,7 @@ import type {
   AssumeRoleResponse,
   AttestedDeviceData,
   AuditEvent,
+  AuditEventApiKey,
   AuditEventDetail,
   AuditEventName,
   AuthEvent,
@@ -303,20 +304,29 @@ import type {
   WorkflowStartedEventKind,
   WorkflowTriggered,
 } from '@onefootprint/request-types/dashboard';
-import merge from 'lodash/merge';
+import deepmerge from 'deepmerge';
 
 export const getActionKind = (props: ActionKind): ActionKind => props ?? 'add_primary';
-export const getActor = (props: Partial<Actor>): Actor =>
-  merge<Actor, Partial<Actor>>(
+
+export const getActor = (
+  props: Partial<Actor>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Actor =>
+  deepmerge<Actor>(
     {
       id: '790e0e91-7999-45b8-92d6-2c9b6115af8e',
       kind: 'user',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getAdverseMediaListKind = (props: AdverseMediaListKind): AdverseMediaListKind => props ?? 'cyber_crime';
-export const getAmlDetail = (props: Partial<AmlDetail>): AmlDetail =>
-  merge<AmlDetail, Partial<AmlDetail>>(
+
+export const getAmlDetail = (
+  props: Partial<AmlDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AmlDetail =>
+  deepmerge<AmlDetail>(
     {
       hits: [
         {
@@ -407,9 +417,14 @@ export const getAmlDetail = (props: Partial<AmlDetail>): AmlDetail =>
       shareUrl: 'https://assured-jogging.us',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAmlHit = (props: Partial<AmlHit>): AmlHit =>
-  merge<AmlHit, Partial<AmlHit>>(
+
+export const getAmlHit = (
+  props: Partial<AmlHit>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AmlHit =>
+  deepmerge<AmlHit>(
     {
       fields: {},
       matchTypes: ['non', 'consequat dolore nisi dolore', 'incididunt'],
@@ -439,9 +454,14 @@ export const getAmlHit = (props: Partial<AmlHit>): AmlHit =>
       name: 'Gwendolyn Von Sr.',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAmlHitMedia = (props: Partial<AmlHitMedia>): AmlHitMedia =>
-  merge<AmlHitMedia, Partial<AmlHitMedia>>(
+
+export const getAmlHitMedia = (
+  props: Partial<AmlHitMedia>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AmlHitMedia =>
+  deepmerge<AmlHitMedia>(
     {
       date: '1962-09-15T20:24:01.0Z',
       pdfUrl: 'https://inexperienced-league.us',
@@ -450,10 +470,15 @@ export const getAmlHitMedia = (props: Partial<AmlHitMedia>): AmlHitMedia =>
       url: 'https://agreeable-stool.us/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getAmlMatchKind = (props: AmlMatchKind): AmlMatchKind => props ?? 'exact_name';
-export const getAnnotation = (props: Partial<Annotation>): Annotation =>
-  merge<Annotation, Partial<Annotation>>(
+
+export const getAnnotation = (
+  props: Partial<Annotation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Annotation =>
+  deepmerge<Annotation>(
     {
       id: 'a715ef5a-5c3f-4ffa-8b33-e723e22a5ef2',
       isPinned: false,
@@ -465,17 +490,27 @@ export const getAnnotation = (props: Partial<Annotation>): Annotation =>
       timestamp: '1905-01-20T23:57:01.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getApiKeyStatus = (props: ApiKeyStatus): ApiKeyStatus => props ?? 'enabled';
-export const getAssumePartnerRoleRequest = (props: Partial<AssumePartnerRoleRequest>): AssumePartnerRoleRequest =>
-  merge<AssumePartnerRoleRequest, Partial<AssumePartnerRoleRequest>>(
+
+export const getAssumePartnerRoleRequest = (
+  props: Partial<AssumePartnerRoleRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AssumePartnerRoleRequest =>
+  deepmerge<AssumePartnerRoleRequest>(
     {
       partnerTenantId: 'b2d2c462-066a-43cc-9379-06374ec042c3',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAssumePartnerRoleResponse = (props: Partial<AssumePartnerRoleResponse>): AssumePartnerRoleResponse =>
-  merge<AssumePartnerRoleResponse, Partial<AssumePartnerRoleResponse>>(
+
+export const getAssumePartnerRoleResponse = (
+  props: Partial<AssumePartnerRoleResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AssumePartnerRoleResponse =>
+  deepmerge<AssumePartnerRoleResponse>(
     {
       partnerTenant: {
         allowDomainAccess: true,
@@ -521,16 +556,26 @@ export const getAssumePartnerRoleResponse = (props: Partial<AssumePartnerRoleRes
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAssumeRoleRequest = (props: Partial<AssumeRoleRequest>): AssumeRoleRequest =>
-  merge<AssumeRoleRequest, Partial<AssumeRoleRequest>>(
+
+export const getAssumeRoleRequest = (
+  props: Partial<AssumeRoleRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AssumeRoleRequest =>
+  deepmerge<AssumeRoleRequest>(
     {
       tenantId: 'f2787f8f-ede9-4215-b8bc-72a3ea02d468',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAssumeRoleResponse = (props: Partial<AssumeRoleResponse>): AssumeRoleResponse =>
-  merge<AssumeRoleResponse, Partial<AssumeRoleResponse>>(
+
+export const getAssumeRoleResponse = (
+  props: Partial<AssumeRoleResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AssumeRoleResponse =>
+  deepmerge<AssumeRoleResponse>(
     {
       tenant: {
         allowDomainAccess: false,
@@ -591,9 +636,14 @@ export const getAssumeRoleResponse = (props: Partial<AssumeRoleResponse>): Assum
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAttestedDeviceData = (props: Partial<AttestedDeviceData>): AttestedDeviceData =>
-  merge<AttestedDeviceData, Partial<AttestedDeviceData>>(
+
+export const getAttestedDeviceData = (
+  props: Partial<AttestedDeviceData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AttestedDeviceData =>
+  deepmerge<AttestedDeviceData>(
     {
       appBundleId: '88358cb7-d458-4ea2-a7f2-c3969b28ddd3',
       deviceType: 'ios',
@@ -602,9 +652,14 @@ export const getAttestedDeviceData = (props: Partial<AttestedDeviceData>): Attes
       os: 'ea aliqua ullamco',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAuditEvent = (props: Partial<AuditEvent>): AuditEvent =>
-  merge<AuditEvent, Partial<AuditEvent>>(
+
+export const getAuditEvent = (
+  props: Partial<AuditEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEvent =>
+  deepmerge<AuditEvent>(
     {
       detail: {
         data: {
@@ -642,9 +697,46 @@ export const getAuditEvent = (props: Partial<AuditEvent>): AuditEvent =>
       timestamp: '1933-12-29T01:34:52.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAuditEventDetail = (props: Partial<AuditEventDetail>): AuditEventDetail =>
-  merge<AuditEventDetail, Partial<AuditEventDetail>>(
+
+export const getAuditEventApiKey = (
+  props: Partial<AuditEventApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventApiKey =>
+  deepmerge<AuditEventApiKey>(
+    {
+      name: 'Orlando Stroman',
+      role: {
+        createdAt: '1910-02-09T02:50:22.0Z',
+        id: '84590132-941e-42bb-be2c-c9941aa311f9',
+        isImmutable: true,
+        kind: 'api_key',
+        name: 'Tabitha Conn',
+        numActiveApiKeys: 15380009,
+        numActiveUsers: 30457833,
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+      },
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetail = (
+  props: Partial<AuditEventDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetail =>
+  deepmerge<AuditEventDetail>(
     {
       data: {
         createdFields: [
@@ -657,10 +749,15 @@ export const getAuditEventDetail = (props: Partial<AuditEventDetail>): AuditEven
       kind: 'create_user',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getAuditEventName = (props: AuditEventName): AuditEventName => props ?? 'decrypt_user_data';
-export const getAuthEvent = (props: Partial<AuthEvent>): AuthEvent =>
-  merge<AuthEvent, Partial<AuthEvent>>(
+
+export const getAuthEvent = (
+  props: Partial<AuthEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuthEvent =>
+  deepmerge<AuthEvent>(
     {
       createdAt: '1946-07-01T06:18:21.0Z',
       insight: {
@@ -705,11 +802,16 @@ export const getAuthEvent = (props: Partial<AuthEvent>): AuthEvent =>
       scope: 'onboarding',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getAuthEventKind = (props: AuthEventKind): AuthEventKind => props ?? 'third_party';
 export const getAuthMethodKind = (props: AuthMethodKind): AuthMethodKind => props ?? 'email';
-export const getAuthMethodUpdated = (props: Partial<AuthMethodUpdated>): AuthMethodUpdated =>
-  merge<AuthMethodUpdated, Partial<AuthMethodUpdated>>(
+
+export const getAuthMethodUpdated = (
+  props: Partial<AuthMethodUpdated>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuthMethodUpdated =>
+  deepmerge<AuthMethodUpdated>(
     {
       action: 'add_primary',
       insightEvent: {
@@ -730,9 +832,14 @@ export const getAuthMethodUpdated = (props: Partial<AuthMethodUpdated>): AuthMet
       kind: 'email',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getAuthOrgMember = (props: Partial<AuthOrgMember>): AuthOrgMember =>
-  merge<AuthOrgMember, Partial<AuthOrgMember>>(
+
+export const getAuthOrgMember = (
+  props: Partial<AuthOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuthOrgMember =>
+  deepmerge<AuthOrgMember>(
     {
       email: 'macey98@gmail.com',
       firstName: 'Laurie',
@@ -778,10 +885,15 @@ export const getAuthOrgMember = (props: Partial<AuthOrgMember>): AuthOrgMember =
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getBooleanOperator = (props: BooleanOperator): BooleanOperator => props ?? 'not_eq';
-export const getBusinessDetail = (props: Partial<BusinessDetail>): BusinessDetail =>
-  merge<BusinessDetail, Partial<BusinessDetail>>(
+
+export const getBusinessDetail = (
+  props: Partial<BusinessDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): BusinessDetail =>
+  deepmerge<BusinessDetail>(
     {
       entityType: 'dolore',
       formationDate: 'Excepteur cupidatat consequat ipsum in',
@@ -813,9 +925,14 @@ export const getBusinessDetail = (props: Partial<BusinessDetail>): BusinessDetai
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getBusinessInsights = (props: Partial<BusinessInsights>): BusinessInsights =>
-  merge<BusinessInsights, Partial<BusinessInsights>>(
+
+export const getBusinessInsights = (
+  props: Partial<BusinessInsights>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): BusinessInsights =>
+  deepmerge<BusinessInsights>(
     {
       addresses: [
         {
@@ -1275,31 +1392,46 @@ export const getBusinessInsights = (props: Partial<BusinessInsights>): BusinessI
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getBusinessOwnerKind = (props: BusinessOwnerKind): BusinessOwnerKind => props ?? 'primary';
 export const getBusinessOwnerSource = (props: BusinessOwnerSource): BusinessOwnerSource => props ?? 'hosted';
 export const getCipKind = (props: CipKind): CipKind => props ?? 'alpaca';
-export const getClientDecryptRequest = (props: Partial<ClientDecryptRequest>): ClientDecryptRequest =>
-  merge<ClientDecryptRequest, Partial<ClientDecryptRequest>>(
+
+export const getClientDecryptRequest = (
+  props: Partial<ClientDecryptRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ClientDecryptRequest =>
+  deepmerge<ClientDecryptRequest>(
     {
       fields: ['id.first_name', 'document.drivers_license.selfie.mime_type', 'document.id_card.front.image'],
       reason: 'eiusmod',
       transforms: ['to_uppercase', 'suffix(<n>)', 'to_uppercase'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getClientIdentity = (props: Partial<ClientIdentity>): ClientIdentity =>
-  merge<ClientIdentity, Partial<ClientIdentity>>(
+
+export const getClientIdentity = (
+  props: Partial<ClientIdentity>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ClientIdentity =>
+  deepmerge<ClientIdentity>(
     {
       certificate: 'culpa occaecat Excepteur',
       key: 'f7752ed0-942f-445a-9c3a-b5f33f488892',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getCollectedDataOption = (props: CollectedDataOption): CollectedDataOption => props ?? 'ssn4';
 export const getCompanySize = (props: CompanySize): CompanySize => props ?? 's101_to1000';
-export const getComplianceCompanySummary = (props: Partial<ComplianceCompanySummary>): ComplianceCompanySummary =>
-  merge<ComplianceCompanySummary, Partial<ComplianceCompanySummary>>(
+
+export const getComplianceCompanySummary = (
+  props: Partial<ComplianceCompanySummary>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceCompanySummary =>
+  deepmerge<ComplianceCompanySummary>(
     {
       companyName: 'Essie Blanda',
       id: 'f08e780f-8e88-4e96-9dc0-782e12f26287',
@@ -1308,9 +1440,14 @@ export const getComplianceCompanySummary = (props: Partial<ComplianceCompanySumm
       numControlsTotal: -13167131,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getComplianceDocData = (props: Partial<ComplianceDocData>): ComplianceDocData =>
-  merge<ComplianceDocData, Partial<ComplianceDocData>>(
+
+export const getComplianceDocData = (
+  props: Partial<ComplianceDocData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocData =>
+  deepmerge<ComplianceDocData>(
     {
       data: {
         url: 'https://hateful-shipper.name',
@@ -1318,10 +1455,15 @@ export const getComplianceDocData = (props: Partial<ComplianceDocData>): Complia
       kind: 'external_url',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getComplianceDocDataKind = (props: ComplianceDocDataKind): ComplianceDocDataKind => props ?? 'file_upload';
-export const getComplianceDocEvent = (props: Partial<ComplianceDocEvent>): ComplianceDocEvent =>
-  merge<ComplianceDocEvent, Partial<ComplianceDocEvent>>(
+
+export const getComplianceDocEvent = (
+  props: Partial<ComplianceDocEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEvent =>
+  deepmerge<ComplianceDocEvent>(
     {
       actor: {
         org: 'sed aliquip et eiusmod',
@@ -1342,9 +1484,14 @@ export const getComplianceDocEvent = (props: Partial<ComplianceDocEvent>): Compl
       timestamp: '1896-09-05T16:01:04.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getComplianceDocEventAssigned = (props: Partial<ComplianceDocEventAssigned>): ComplianceDocEventAssigned =>
-  merge<ComplianceDocEventAssigned, Partial<ComplianceDocEventAssigned>>(
+
+export const getComplianceDocEventAssigned = (
+  props: Partial<ComplianceDocEventAssigned>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventAssigned =>
+  deepmerge<ComplianceDocEventAssigned>(
     {
       assignedTo: {
         org: 'quis',
@@ -1357,38 +1504,54 @@ export const getComplianceDocEventAssigned = (props: Partial<ComplianceDocEventA
       kind: 'tenant',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getComplianceDocEventRequested = (
   props: Partial<ComplianceDocEventRequested>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): ComplianceDocEventRequested =>
-  merge<ComplianceDocEventRequested, Partial<ComplianceDocEventRequested>>(
+  deepmerge<ComplianceDocEventRequested>(
     {
       description: 'veniam esse',
       name: 'Darrell Bergstrom',
       templateId: '86b944f9-84a9-4744-b433-6c6e1f9dce83',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getComplianceDocEventReviewed = (props: Partial<ComplianceDocEventReviewed>): ComplianceDocEventReviewed =>
-  merge<ComplianceDocEventReviewed, Partial<ComplianceDocEventReviewed>>(
+
+export const getComplianceDocEventReviewed = (
+  props: Partial<ComplianceDocEventReviewed>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventReviewed =>
+  deepmerge<ComplianceDocEventReviewed>(
     {
       decision: 'accepted',
       note: 'et eu tempor',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getComplianceDocEventSubmitted = (
   props: Partial<ComplianceDocEventSubmitted>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): ComplianceDocEventSubmitted =>
-  merge<ComplianceDocEventSubmitted, Partial<ComplianceDocEventSubmitted>>(
+  deepmerge<ComplianceDocEventSubmitted>(
     {
       kind: 'file_upload',
       submissionId: '1b58bf09-c7cb-49ac-afce-f7cb07638dc0',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getComplianceDocEventType = (props: Partial<ComplianceDocEventType>): ComplianceDocEventType =>
-  merge<ComplianceDocEventType, Partial<ComplianceDocEventType>>(
+
+export const getComplianceDocEventType = (
+  props: Partial<ComplianceDocEventType>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventType =>
+  deepmerge<ComplianceDocEventType>(
     {
       data: {
         description: 'elit occaecat magna',
@@ -1398,13 +1561,18 @@ export const getComplianceDocEventType = (props: Partial<ComplianceDocEventType>
       kind: 'requested',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getComplianceDocReviewDecision = (props: ComplianceDocReviewDecision): ComplianceDocReviewDecision =>
   props ?? 'rejected';
 export const getComplianceDocStatus = (props: ComplianceDocStatus): ComplianceDocStatus =>
   props ?? 'waiting_for_upload';
-export const getComplianceDocSubmission = (props: Partial<ComplianceDocSubmission>): ComplianceDocSubmission =>
-  merge<ComplianceDocSubmission, Partial<ComplianceDocSubmission>>(
+
+export const getComplianceDocSubmission = (
+  props: Partial<ComplianceDocSubmission>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocSubmission =>
+  deepmerge<ComplianceDocSubmission>(
     {
       createdAt: '1895-09-11T09:40:07.0Z',
       data: {
@@ -1416,9 +1584,14 @@ export const getComplianceDocSubmission = (props: Partial<ComplianceDocSubmissio
       id: 'dcca6c41-182f-4c7d-b303-fc7253ca63e5',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getComplianceDocSummary = (props: Partial<ComplianceDocSummary>): ComplianceDocSummary =>
-  merge<ComplianceDocSummary, Partial<ComplianceDocSummary>>(
+
+export const getComplianceDocSummary = (
+  props: Partial<ComplianceDocSummary>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocSummary =>
+  deepmerge<ComplianceDocSummary>(
     {
       activeRequestId: 'cd1d76a7-5fc2-4a63-a587-4e8583aeaa6e',
       activeReviewId: '276cab32-ed9a-441f-9513-7231811e93ee',
@@ -1441,9 +1614,14 @@ export const getComplianceDocSummary = (props: Partial<ComplianceDocSummary>): C
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getComplianceDocTemplate = (props: Partial<ComplianceDocTemplate>): ComplianceDocTemplate =>
-  merge<ComplianceDocTemplate, Partial<ComplianceDocTemplate>>(
+
+export const getComplianceDocTemplate = (
+  props: Partial<ComplianceDocTemplate>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocTemplate =>
+  deepmerge<ComplianceDocTemplate>(
     {
       id: '19f24e5b-347b-49fc-a1f8-197d01952aa7',
       latestVersion: {
@@ -1460,11 +1638,14 @@ export const getComplianceDocTemplate = (props: Partial<ComplianceDocTemplate>):
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getComplianceDocTemplateVersion = (
   props: Partial<ComplianceDocTemplateVersion>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): ComplianceDocTemplateVersion =>
-  merge<ComplianceDocTemplateVersion, Partial<ComplianceDocTemplateVersion>>(
+  deepmerge<ComplianceDocTemplateVersion>(
     {
       createdAt: '1938-05-23T12:51:13.0Z',
       createdByPartnerTenantUser: {
@@ -1478,66 +1659,103 @@ export const getComplianceDocTemplateVersion = (
       templateId: '7ff998e6-d4b3-4830-a332-21f7261b7048',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getContactInfoKind = (props: ContactInfoKind): ContactInfoKind => props ?? 'email';
-export const getCopyPlaybookRequest = (props: Partial<CopyPlaybookRequest>): CopyPlaybookRequest =>
-  merge<CopyPlaybookRequest, Partial<CopyPlaybookRequest>>(
+
+export const getCopyPlaybookRequest = (
+  props: Partial<CopyPlaybookRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CopyPlaybookRequest =>
+  deepmerge<CopyPlaybookRequest>(
     {
       isLive: true,
       name: 'Elsa Pfeffer',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getCountrySpecificDocumentMapping = (
   props: Partial<CountrySpecificDocumentMapping>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): CountrySpecificDocumentMapping =>
-  merge<CountrySpecificDocumentMapping, Partial<CountrySpecificDocumentMapping>>({}, props);
-export const getCreateAnnotationRequest = (props: Partial<CreateAnnotationRequest>): CreateAnnotationRequest =>
-  merge<CreateAnnotationRequest, Partial<CreateAnnotationRequest>>(
+  deepmerge<CountrySpecificDocumentMapping>({}, props, {
+    ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}),
+  });
+
+export const getCreateAnnotationRequest = (
+  props: Partial<CreateAnnotationRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateAnnotationRequest =>
+  deepmerge<CreateAnnotationRequest>(
     {
       isPinned: false,
       note: 'culpa occaecat',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateApiKeyRequest = (props: Partial<CreateApiKeyRequest>): CreateApiKeyRequest =>
-  merge<CreateApiKeyRequest, Partial<CreateApiKeyRequest>>(
+
+export const getCreateApiKeyRequest = (
+  props: Partial<CreateApiKeyRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateApiKeyRequest =>
+  deepmerge<CreateApiKeyRequest>(
     {
       name: 'Mark Effertz',
       roleId: 'eb28970f-0d62-4233-851d-6ebe78dac89a',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateComplianceDocRequest = (props: Partial<CreateComplianceDocRequest>): CreateComplianceDocRequest =>
-  merge<CreateComplianceDocRequest, Partial<CreateComplianceDocRequest>>(
+
+export const getCreateComplianceDocRequest = (
+  props: Partial<CreateComplianceDocRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateComplianceDocRequest =>
+  deepmerge<CreateComplianceDocRequest>(
     {
       description: 'in tempor consequat',
       name: 'Mrs. Kristie Konopelski II',
       templateVersionId: '120ae062-b678-420c-b9dd-b75d74a4f5ae',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getCreateComplianceDocTemplateRequest = (
   props: Partial<CreateComplianceDocTemplateRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): CreateComplianceDocTemplateRequest =>
-  merge<CreateComplianceDocTemplateRequest, Partial<CreateComplianceDocTemplateRequest>>(
+  deepmerge<CreateComplianceDocTemplateRequest>(
     {
       description: 'Duis enim',
       name: 'Stephen Douglas',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateEntityTokenRequest = (props: Partial<CreateEntityTokenRequest>): CreateEntityTokenRequest =>
-  merge<CreateEntityTokenRequest, Partial<CreateEntityTokenRequest>>(
+
+export const getCreateEntityTokenRequest = (
+  props: Partial<CreateEntityTokenRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateEntityTokenRequest =>
+  deepmerge<CreateEntityTokenRequest>(
     {
       key: 'a2952dd1-4d4c-4016-be89-ddf23dc6f803',
       kind: 'user',
       sendLink: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateEntityTokenResponse = (props: Partial<CreateEntityTokenResponse>): CreateEntityTokenResponse =>
-  merge<CreateEntityTokenResponse, Partial<CreateEntityTokenResponse>>(
+
+export const getCreateEntityTokenResponse = (
+  props: Partial<CreateEntityTokenResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateEntityTokenResponse =>
+  deepmerge<CreateEntityTokenResponse>(
     {
       deliveryMethod: 'phone',
       expiresAt: '1948-05-11T18:27:40.0Z',
@@ -1545,23 +1763,38 @@ export const getCreateEntityTokenResponse = (props: Partial<CreateEntityTokenRes
       token: 'f1c6c7c1-c8bc-45db-9adc-56b9ec4bf71f',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateKycLinksRequest = (props: Partial<CreateKycLinksRequest>): CreateKycLinksRequest =>
-  merge<CreateKycLinksRequest, Partial<CreateKycLinksRequest>>(
+
+export const getCreateKycLinksRequest = (
+  props: Partial<CreateKycLinksRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateKycLinksRequest =>
+  deepmerge<CreateKycLinksRequest>(
     {
       sendToBoIds: ['Lorem', 'occaecat sit in nostrud', 'amet'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateListEntryRequest = (props: Partial<CreateListEntryRequest>): CreateListEntryRequest =>
-  merge<CreateListEntryRequest, Partial<CreateListEntryRequest>>(
+
+export const getCreateListEntryRequest = (
+  props: Partial<CreateListEntryRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateListEntryRequest =>
+  deepmerge<CreateListEntryRequest>(
     {
       entries: ['ut magna in ut Duis', 'nostrud aliqua sit aliquip magna', 'sit occaecat exercitation'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateListRequest = (props: Partial<CreateListRequest>): CreateListRequest =>
-  merge<CreateListRequest, Partial<CreateListRequest>>(
+
+export const getCreateListRequest = (
+  props: Partial<CreateListRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateListRequest =>
+  deepmerge<CreateListRequest>(
     {
       alias: 'nisi et ut exercitation',
       entries: ['elit nulla', 'in', 'irure enim exercitation'],
@@ -1569,11 +1802,14 @@ export const getCreateListRequest = (props: Partial<CreateListRequest>): CreateL
       name: "Terri D'Amore",
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getCreateOnboardingConfigurationRequest = (
   props: Partial<CreateOnboardingConfigurationRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): CreateOnboardingConfigurationRequest =>
-  merge<CreateOnboardingConfigurationRequest, Partial<CreateOnboardingConfigurationRequest>>(
+  deepmerge<CreateOnboardingConfigurationRequest>(
     {
       allowInternationalResidents: false,
       allowReonboard: false,
@@ -1691,27 +1927,40 @@ export const getCreateOnboardingConfigurationRequest = (
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getCreateOrgFrequentNoteRequest = (
   props: Partial<CreateOrgFrequentNoteRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): CreateOrgFrequentNoteRequest =>
-  merge<CreateOrgFrequentNoteRequest, Partial<CreateOrgFrequentNoteRequest>>(
+  deepmerge<CreateOrgFrequentNoteRequest>(
     {
       content: 'Excepteur culpa',
       kind: 'annotation',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateOrgTenantTagRequest = (props: Partial<CreateOrgTenantTagRequest>): CreateOrgTenantTagRequest =>
-  merge<CreateOrgTenantTagRequest, Partial<CreateOrgTenantTagRequest>>(
+
+export const getCreateOrgTenantTagRequest = (
+  props: Partial<CreateOrgTenantTagRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateOrgTenantTagRequest =>
+  deepmerge<CreateOrgTenantTagRequest>(
     {
       kind: 'person',
       tag: 'nulla est anim',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateProxyConfigRequest = (props: Partial<CreateProxyConfigRequest>): CreateProxyConfigRequest =>
-  merge<CreateProxyConfigRequest, Partial<CreateProxyConfigRequest>>(
+
+export const getCreateProxyConfigRequest = (
+  props: Partial<CreateProxyConfigRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateProxyConfigRequest =>
+  deepmerge<CreateProxyConfigRequest>(
     {
       accessReason: 'adipisicing labore dolore irure velit',
       clientIdentity: {
@@ -1769,18 +2018,28 @@ export const getCreateProxyConfigRequest = (props: Partial<CreateProxyConfigRequ
       url: 'https://taut-scrap.biz/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateReviewRequest = (props: Partial<CreateReviewRequest>): CreateReviewRequest =>
-  merge<CreateReviewRequest, Partial<CreateReviewRequest>>(
+
+export const getCreateReviewRequest = (
+  props: Partial<CreateReviewRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateReviewRequest =>
+  deepmerge<CreateReviewRequest>(
     {
       decision: 'accepted',
       note: 'occaecat Duis',
       submissionId: 'fa0c75cb-76ca-4d65-ac83-3c126f28cd34',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateRule = (props: Partial<CreateRule>): CreateRule =>
-  merge<CreateRule, Partial<CreateRule>>(
+
+export const getCreateRule = (
+  props: Partial<CreateRule>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateRule =>
+  deepmerge<CreateRule>(
     {
       isShadow: true,
       name: 'Fannie Greenholt',
@@ -1804,18 +2063,26 @@ export const getCreateRule = (props: Partial<CreateRule>): CreateRule =>
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateTagRequest = (props: Partial<CreateTagRequest>): CreateTagRequest =>
-  merge<CreateTagRequest, Partial<CreateTagRequest>>(
+
+export const getCreateTagRequest = (
+  props: Partial<CreateTagRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateTagRequest =>
+  deepmerge<CreateTagRequest>(
     {
       tag: 'veniam et do',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getCreateTenantAndroidAppMetaRequest = (
   props: Partial<CreateTenantAndroidAppMetaRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): CreateTenantAndroidAppMetaRequest =>
-  merge<CreateTenantAndroidAppMetaRequest, Partial<CreateTenantAndroidAppMetaRequest>>(
+  deepmerge<CreateTenantAndroidAppMetaRequest>(
     {
       apkCertSha256S: ['est voluptate occaecat eu amet', 'nostrud proident', 'Lorem'],
       integrityDecryptionKey: '534aaa55-b14f-47d2-bf10-2a4a3ee045aa',
@@ -1823,11 +2090,14 @@ export const getCreateTenantAndroidAppMetaRequest = (
       packageNames: ['tempor', 'consectetur', 'Excepteur quis pariatur mollit'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getCreateTenantIosAppMetaRequest = (
   props: Partial<CreateTenantIosAppMetaRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): CreateTenantIosAppMetaRequest =>
-  merge<CreateTenantIosAppMetaRequest, Partial<CreateTenantIosAppMetaRequest>>(
+  deepmerge<CreateTenantIosAppMetaRequest>(
     {
       appBundleIds: ['exercitation ea ullamco adipisicing', 'aliquip', 'laboris minim tempor'],
       deviceCheckKeyId: 'f63d8231-1bcc-41ff-931e-75974574a3b7',
@@ -1835,9 +2105,14 @@ export const getCreateTenantIosAppMetaRequest = (
       teamId: '028fb068-cfe1-4ada-a0e3-e06d5f8869e5',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateTenantRoleRequest = (props: Partial<CreateTenantRoleRequest>): CreateTenantRoleRequest =>
-  merge<CreateTenantRoleRequest, Partial<CreateTenantRoleRequest>>(
+
+export const getCreateTenantRoleRequest = (
+  props: Partial<CreateTenantRoleRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateTenantRoleRequest =>
+  deepmerge<CreateTenantRoleRequest>(
     {
       kind: 'api_key',
       name: 'Geoffrey Abshire',
@@ -1854,9 +2129,14 @@ export const getCreateTenantRoleRequest = (props: Partial<CreateTenantRoleReques
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateTenantUserRequest = (props: Partial<CreateTenantUserRequest>): CreateTenantUserRequest =>
-  merge<CreateTenantUserRequest, Partial<CreateTenantUserRequest>>(
+
+export const getCreateTenantUserRequest = (
+  props: Partial<CreateTenantUserRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateTenantUserRequest =>
+  deepmerge<CreateTenantUserRequest>(
     {
       email: 'maeve94@gmail.com',
       firstName: 'Ewell',
@@ -1866,9 +2146,14 @@ export const getCreateTenantUserRequest = (props: Partial<CreateTenantUserReques
       roleId: '1947aac2-7c90-4c10-8cc0-ae78cfb206ad',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCreateTokenResponse = (props: Partial<CreateTokenResponse>): CreateTokenResponse =>
-  merge<CreateTokenResponse, Partial<CreateTokenResponse>>(
+
+export const getCreateTokenResponse = (
+  props: Partial<CreateTokenResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateTokenResponse =>
+  deepmerge<CreateTokenResponse>(
     {
       expiresAt: '1916-08-06T07:48:41.0Z',
       kind: 'trigger',
@@ -1876,9 +2161,14 @@ export const getCreateTokenResponse = (props: Partial<CreateTokenResponse>): Cre
       token: '0e29d8e2-2ac6-496d-bab1-c8b6373287a3',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCursorPaginatedAuditEvent = (props: Partial<CursorPaginatedAuditEvent>): CursorPaginatedAuditEvent =>
-  merge<CursorPaginatedAuditEvent, Partial<CursorPaginatedAuditEvent>>(
+
+export const getCursorPaginatedAuditEvent = (
+  props: Partial<CursorPaginatedAuditEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CursorPaginatedAuditEvent =>
+  deepmerge<CursorPaginatedAuditEvent>(
     {
       data: [
         {
@@ -1996,9 +2286,14 @@ export const getCursorPaginatedAuditEvent = (props: Partial<CursorPaginatedAudit
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>): CursorPaginatedEntity =>
-  merge<CursorPaginatedEntity, Partial<CursorPaginatedEntity>>(
+
+export const getCursorPaginatedEntity = (
+  props: Partial<CursorPaginatedEntity>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CursorPaginatedEntity =>
+  deepmerge<CursorPaginatedEntity>(
     {
       data: [
         {
@@ -2436,9 +2731,14 @@ export const getCursorPaginatedEntity = (props: Partial<CursorPaginatedEntity>):
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCursorPaginatedListEvent = (props: Partial<CursorPaginatedListEvent>): CursorPaginatedListEvent =>
-  merge<CursorPaginatedListEvent, Partial<CursorPaginatedListEvent>>(
+
+export const getCursorPaginatedListEvent = (
+  props: Partial<CursorPaginatedListEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CursorPaginatedListEvent =>
+  deepmerge<CursorPaginatedListEvent>(
     {
       data: [
         {
@@ -2551,9 +2851,14 @@ export const getCursorPaginatedListEvent = (props: Partial<CursorPaginatedListEv
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>): CustomDocumentConfig =>
-  merge<CustomDocumentConfig, Partial<CustomDocumentConfig>>(
+
+export const getCustomDocumentConfig = (
+  props: Partial<CustomDocumentConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CustomDocumentConfig =>
+  deepmerge<CustomDocumentConfig>(
     {
       description: 'voluptate veniam',
       identifier: 'document.id_card.clave_de_elector',
@@ -2562,9 +2867,14 @@ export const getCustomDocumentConfig = (props: Partial<CustomDocumentConfig>): C
       uploadSettings: 'capture_only_on_mobile',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getDashboardSecretApiKey = (props: Partial<DashboardSecretApiKey>): DashboardSecretApiKey =>
-  merge<DashboardSecretApiKey, Partial<DashboardSecretApiKey>>(
+
+export const getDashboardSecretApiKey = (
+  props: Partial<DashboardSecretApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DashboardSecretApiKey =>
+  deepmerge<DashboardSecretApiKey>(
     {
       createdAt: '1895-05-24T13:57:26.0Z',
       id: '62ba2982-9416-4192-9d8d-ce1a73d05a05',
@@ -2596,10 +2906,15 @@ export const getDashboardSecretApiKey = (props: Partial<DashboardSecretApiKey>):
       status: 'disabled',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDataAttributeKind = (props: DataAttributeKind): DataAttributeKind => props ?? 'document_data';
-export const getDataCollectedInfo = (props: Partial<DataCollectedInfo>): DataCollectedInfo =>
-  merge<DataCollectedInfo, Partial<DataCollectedInfo>>(
+
+export const getDataCollectedInfo = (
+  props: Partial<DataCollectedInfo>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DataCollectedInfo =>
+  deepmerge<DataCollectedInfo>(
     {
       actor: {
         id: 'c008bcac-4e4a-41d7-902e-f3f3cfd08264',
@@ -2614,11 +2929,16 @@ export const getDataCollectedInfo = (props: Partial<DataCollectedInfo>): DataCol
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDataIdentifier = (props: DataIdentifier): DataIdentifier => props ?? 'business.formation_date';
 export const getDataLifetimeSource = (props: DataLifetimeSource): DataLifetimeSource => props ?? 'client_tenant';
-export const getDbActor = (props: Partial<DbActor>): DbActor =>
-  merge<DbActor, Partial<DbActor>>(
+
+export const getDbActor = (
+  props: Partial<DbActor>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DbActor =>
+  deepmerge<DbActor>(
     {
       data: {
         id: '719f959a-47e9-457f-9fae-cf2cd8b5226b',
@@ -2626,11 +2946,16 @@ export const getDbActor = (props: Partial<DbActor>): DbActor =>
       kind: 'user',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDecisionStatus = (props: DecisionStatus): DecisionStatus => props ?? 'fail';
 export const getDecryptionContext = (props: DecryptionContext): DecryptionContext => props ?? 'vault_proxy';
-export const getDeleteRequest = (props: Partial<DeleteRequest>): DeleteRequest =>
-  merge<DeleteRequest, Partial<DeleteRequest>>(
+
+export const getDeleteRequest = (
+  props: Partial<DeleteRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DeleteRequest =>
+  deepmerge<DeleteRequest>(
     {
       deleteAll: false,
       fields: [
@@ -2640,28 +2965,43 @@ export const getDeleteRequest = (props: Partial<DeleteRequest>): DeleteRequest =
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDeviceFraudRiskLevel = (props: DeviceFraudRiskLevel): DeviceFraudRiskLevel => props ?? 'medium';
 export const getDeviceInsightField = (props: DeviceInsightField): DeviceInsightField => props ?? 'ip_address';
-export const getDeviceInsightOperation = (props: Partial<DeviceInsightOperation>): DeviceInsightOperation =>
-  merge<DeviceInsightOperation, Partial<DeviceInsightOperation>>(
+
+export const getDeviceInsightOperation = (
+  props: Partial<DeviceInsightOperation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DeviceInsightOperation =>
+  deepmerge<DeviceInsightOperation>(
     {
       field: 'ip_address',
       op: 'is_in',
       value: 'anim commodo nulla dolor consectetur',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDeviceType = (props: DeviceType): DeviceType => props ?? 'android';
-export const getDocsTokenResponse = (props: Partial<DocsTokenResponse>): DocsTokenResponse =>
-  merge<DocsTokenResponse, Partial<DocsTokenResponse>>(
+
+export const getDocsTokenResponse = (
+  props: Partial<DocsTokenResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocsTokenResponse =>
+  deepmerge<DocsTokenResponse>(
     {
       token: 'ad6eb44f-437d-4e0d-8189-d159bb330d6f',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getDocument = (props: Partial<Document>): Document =>
-  merge<Document, Partial<Document>>(
+
+export const getDocument = (
+  props: Partial<Document>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Document =>
+  deepmerge<Document>(
     {
       completedVersion: 84443820,
       curpCompletedVersion: -2350034,
@@ -2703,29 +3043,42 @@ export const getDocument = (props: Partial<Document>): Document =>
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getDocumentAndCountryConfiguration = (
   props: Partial<DocumentAndCountryConfiguration>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): DocumentAndCountryConfiguration =>
-  merge<DocumentAndCountryConfiguration, Partial<DocumentAndCountryConfiguration>>(
+  deepmerge<DocumentAndCountryConfiguration>(
     {
       countrySpecific: {},
       global: ['visa', 'voter_identification', 'passport_card'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDocumentImageError = (props: DocumentImageError): DocumentImageError => props ?? 'barcode_not_detected';
 export const getDocumentKind = (props: DocumentKind): DocumentKind => props ?? 'drivers_license';
-export const getDocumentRequest = (props: Partial<DocumentRequest>): DocumentRequest =>
-  merge<DocumentRequest, Partial<DocumentRequest>>(
+
+export const getDocumentRequest = (
+  props: Partial<DocumentRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentRequest =>
+  deepmerge<DocumentRequest>(
     {
       kind: 'proof_of_ssn',
       ruleSetResultId: 'b72de1a0-be5c-46e8-9d0e-e87526c715de',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>): DocumentRequestConfig =>
-  merge<DocumentRequestConfig, Partial<DocumentRequestConfig>>(
+
+export const getDocumentRequestConfig = (
+  props: Partial<DocumentRequestConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentRequestConfig =>
+  deepmerge<DocumentRequestConfig>(
     {
       data: {
         collectSelfie: true,
@@ -2737,14 +3090,19 @@ export const getDocumentRequestConfig = (props: Partial<DocumentRequestConfig>):
       kind: 'identity',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDocumentRequestKind = (props: DocumentRequestKind): DocumentRequestKind => props ?? 'identity';
 export const getDocumentReviewStatus = (props: DocumentReviewStatus): DocumentReviewStatus =>
   props ?? 'pending_human_review';
 export const getDocumentSide = (props: DocumentSide): DocumentSide => props ?? 'selfie';
 export const getDocumentStatus = (props: DocumentStatus): DocumentStatus => props ?? 'pending';
-export const getDocumentUpload = (props: Partial<DocumentUpload>): DocumentUpload =>
-  merge<DocumentUpload, Partial<DocumentUpload>>(
+
+export const getDocumentUpload = (
+  props: Partial<DocumentUpload>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentUpload =>
+  deepmerge<DocumentUpload>(
     {
       failureReasons: ['selfie_face_not_found', 'image_error', 'invalid_jpeg'],
       identifier: 'document.residence_document.gender',
@@ -2754,13 +3112,16 @@ export const getDocumentUpload = (props: Partial<DocumentUpload>): DocumentUploa
       version: 93080216,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDocumentUploadSettings = (props: DocumentUploadSettings): DocumentUploadSettings =>
   props ?? 'prefer_capture';
+
 export const getDocumentUploadedTimelineEvent = (
   props: Partial<DocumentUploadedTimelineEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): DocumentUploadedTimelineEvent =>
-  merge<DocumentUploadedTimelineEvent, Partial<DocumentUploadedTimelineEvent>>(
+  deepmerge<DocumentUploadedTimelineEvent>(
     {
       config: {
         data: {
@@ -2777,10 +3138,15 @@ export const getDocumentUploadedTimelineEvent = (
       status: 'pending',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getDupeKind = (props: DupeKind): DupeKind => props ?? 'cookie_id';
-export const getDupes = (props: Partial<Dupes>): Dupes =>
-  merge<Dupes, Partial<Dupes>>(
+
+export const getDupes = (
+  props: Partial<Dupes>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Dupes =>
+  deepmerge<Dupes>(
     {
       otherTenant: {
         numMatches: -27344066,
@@ -2886,9 +3252,14 @@ export const getDupes = (props: Partial<Dupes>): Dupes =>
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEditRule = (props: Partial<EditRule>): EditRule =>
-  merge<EditRule, Partial<EditRule>>(
+
+export const getEditRule = (
+  props: Partial<EditRule>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EditRule =>
+  deepmerge<EditRule>(
     {
       ruleExpression: [
         {
@@ -2910,19 +3281,36 @@ export const getEditRule = (props: Partial<EditRule>): EditRule =>
       ruleId: 'f3f80328-4e1a-4e29-b702-ed62b60265a7',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEmpty = (props: Partial<Empty>): Empty => merge<Empty, Partial<Empty>>({}, props);
-export const getEnclaveHealthResponse = (props: Partial<EnclaveHealthResponse>): EnclaveHealthResponse =>
-  merge<EnclaveHealthResponse, Partial<EnclaveHealthResponse>>(
+
+export const getEmpty = (
+  props: Partial<Empty>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Empty =>
+  deepmerge<Empty>({}, props, {
+    ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}),
+  });
+
+export const getEnclaveHealthResponse = (
+  props: Partial<EnclaveHealthResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EnclaveHealthResponse =>
+  deepmerge<EnclaveHealthResponse>(
     {
       decryptMs: -18567333,
       keypairGenMs: -41244421,
       success: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEnhancedAml = (props: Partial<EnhancedAml>): EnhancedAml =>
-  merge<EnhancedAml, Partial<EnhancedAml>>(
+
+export const getEnhancedAml = (
+  props: Partial<EnhancedAml>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EnhancedAml =>
+  deepmerge<EnhancedAml>(
     {
       adverseMedia: false,
       enhancedAml: true,
@@ -2931,9 +3319,14 @@ export const getEnhancedAml = (props: Partial<EnhancedAml>): EnhancedAml =>
       pep: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEntity = (props: Partial<Entity>): Entity =>
-  merge<Entity, Partial<Entity>>(
+
+export const getEntity = (
+  props: Partial<Entity>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Entity =>
+  deepmerge<Entity>(
     {
       attributes: [
         'document.permit.issuing_country',
@@ -3075,9 +3468,14 @@ export const getEntity = (props: Partial<Entity>): Entity =>
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEntityAction = (props: Partial<EntityAction>): EntityAction =>
-  merge<EntityAction, Partial<EntityAction>>(
+
+export const getEntityAction = (
+  props: Partial<EntityAction>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityAction =>
+  deepmerge<EntityAction>(
     {
       fpBid: '2785553b-dc76-460c-8164-d64e1787be6e',
       kind: 'trigger',
@@ -3092,9 +3490,14 @@ export const getEntityAction = (props: Partial<EntityAction>): EntityAction =>
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEntityActionResponse = (props: Partial<EntityActionResponse>): EntityActionResponse =>
-  merge<EntityActionResponse, Partial<EntityActionResponse>>(
+
+export const getEntityActionResponse = (
+  props: Partial<EntityActionResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionResponse =>
+  deepmerge<EntityActionResponse>(
     {
       expiresAt: '1917-10-30T15:03:11.0Z',
       kind: 'trigger',
@@ -3102,9 +3505,14 @@ export const getEntityActionResponse = (props: Partial<EntityActionResponse>): E
       token: 'de8a5133-091c-4879-b82e-d3e27a7def31',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEntityActionsRequest = (props: Partial<EntityActionsRequest>): EntityActionsRequest =>
-  merge<EntityActionsRequest, Partial<EntityActionsRequest>>(
+
+export const getEntityActionsRequest = (
+  props: Partial<EntityActionsRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionsRequest =>
+  deepmerge<EntityActionsRequest>(
     {
       actions: [
         {
@@ -3149,9 +3557,14 @@ export const getEntityActionsRequest = (props: Partial<EntityActionsRequest>): E
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEntityAttribute = (props: Partial<EntityAttribute>): EntityAttribute =>
-  merge<EntityAttribute, Partial<EntityAttribute>>(
+
+export const getEntityAttribute = (
+  props: Partial<EntityAttribute>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityAttribute =>
+  deepmerge<EntityAttribute>(
     {
       dataKind: 'document_data',
       identifier: 'document.visa.full_name',
@@ -3161,9 +3574,14 @@ export const getEntityAttribute = (props: Partial<EntityAttribute>): EntityAttri
       value: 'tempor consequat',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getEntityOnboarding = (props: Partial<EntityOnboarding>): EntityOnboarding =>
-  merge<EntityOnboarding, Partial<EntityOnboarding>>(
+
+export const getEntityOnboarding = (
+  props: Partial<EntityOnboarding>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityOnboarding =>
+  deepmerge<EntityOnboarding>(
     {
       id: 'cfa455b0-a178-4dab-a96e-b505c29965d0',
       playbookKey: '2c6b1579-a878-4723-a5b6-968b0d666bac',
@@ -3186,20 +3604,28 @@ export const getEntityOnboarding = (props: Partial<EntityOnboarding>): EntityOnb
       timestamp: '1932-12-13T13:55:15.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getEntityOnboardingRuleSetResult = (
   props: Partial<EntityOnboardingRuleSetResult>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): EntityOnboardingRuleSetResult =>
-  merge<EntityOnboardingRuleSetResult, Partial<EntityOnboardingRuleSetResult>>(
+  deepmerge<EntityOnboardingRuleSetResult>(
     {
       id: 'd63c3f7e-bc44-49fc-80ed-ff85ba335f82',
       timestamp: '1911-04-21T17:21:45.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getEntityStatus = (props: EntityStatus): EntityStatus => props ?? 'pass';
-export const getEntityWorkflow = (props: Partial<EntityWorkflow>): EntityWorkflow =>
-  merge<EntityWorkflow, Partial<EntityWorkflow>>(
+
+export const getEntityWorkflow = (
+  props: Partial<EntityWorkflow>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityWorkflow =>
+  deepmerge<EntityWorkflow>(
     {
       createdAt: '1957-05-15T02:18:42.0Z',
       insightEvent: {
@@ -3221,10 +3647,15 @@ export const getEntityWorkflow = (props: Partial<EntityWorkflow>): EntityWorkflo
       status: 'pending',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getEquals = (props: Equals): Equals => props ?? 'not_eq';
-export const getEvaluateRuleRequest = (props: Partial<EvaluateRuleRequest>): EvaluateRuleRequest =>
-  merge<EvaluateRuleRequest, Partial<EvaluateRuleRequest>>(
+
+export const getEvaluateRuleRequest = (
+  props: Partial<EvaluateRuleRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EvaluateRuleRequest =>
+  deepmerge<EvaluateRuleRequest>(
     {
       add: [
         {
@@ -3361,20 +3792,30 @@ export const getEvaluateRuleRequest = (props: Partial<EvaluateRuleRequest>): Eva
       startTimestamp: '1927-09-24T16:58:10.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getExternalIntegrationCalled = (props: Partial<ExternalIntegrationCalled>): ExternalIntegrationCalled =>
-  merge<ExternalIntegrationCalled, Partial<ExternalIntegrationCalled>>(
+
+export const getExternalIntegrationCalled = (
+  props: Partial<ExternalIntegrationCalled>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ExternalIntegrationCalled =>
+  deepmerge<ExternalIntegrationCalled>(
     {
       externalId: 'b4baf450-9bee-457b-8c56-352779ab941c',
       integration: 'alpaca_cip',
       successful: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getExternalIntegrationKind = (props: ExternalIntegrationKind): ExternalIntegrationKind =>
   props ?? 'alpaca_cip';
-export const getFieldValidation = (props: Partial<FieldValidation>): FieldValidation =>
-  merge<FieldValidation, Partial<FieldValidation>>(
+
+export const getFieldValidation = (
+  props: Partial<FieldValidation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): FieldValidation =>
+  deepmerge<FieldValidation>(
     {
       matchLevel: 'partial',
       signals: [
@@ -3402,9 +3843,14 @@ export const getFieldValidation = (props: Partial<FieldValidation>): FieldValida
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getFieldValidationDetail = (props: Partial<FieldValidationDetail>): FieldValidationDetail =>
-  merge<FieldValidationDetail, Partial<FieldValidationDetail>>(
+
+export const getFieldValidationDetail = (
+  props: Partial<FieldValidationDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): FieldValidationDetail =>
+  deepmerge<FieldValidationDetail>(
     {
       description: 'elit do',
       matchLevel: 'no_match',
@@ -3413,13 +3859,18 @@ export const getFieldValidationDetail = (props: Partial<FieldValidationDetail>):
       severity: 'low',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getFilterFunction = (props: FilterFunction): FilterFunction =>
   props ?? "encrypt('<algorithm>','<public_key>')";
 export const getFootprintReasonCode = (props: FootprintReasonCode): FootprintReasonCode =>
   props ?? 'watchlist_hit_ofac';
-export const getGetClientTokenResponse = (props: Partial<GetClientTokenResponse>): GetClientTokenResponse =>
-  merge<GetClientTokenResponse, Partial<GetClientTokenResponse>>(
+
+export const getGetClientTokenResponse = (
+  props: Partial<GetClientTokenResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): GetClientTokenResponse =>
+  deepmerge<GetClientTokenResponse>(
     {
       expiresAt: '1903-12-25T09:17:55.0Z',
       tenant: {
@@ -3432,18 +3883,26 @@ export const getGetClientTokenResponse = (props: Partial<GetClientTokenResponse>
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getGetClientTokenResponseTenant = (
   props: Partial<GetClientTokenResponseTenant>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): GetClientTokenResponseTenant =>
-  merge<GetClientTokenResponseTenant, Partial<GetClientTokenResponseTenant>>(
+  deepmerge<GetClientTokenResponseTenant>(
     {
       name: 'Doyle Thompson',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationResponse>): GetFieldValidationResponse =>
-  merge<GetFieldValidationResponse, Partial<GetFieldValidationResponse>>(
+
+export const getGetFieldValidationResponse = (
+  props: Partial<GetFieldValidationResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): GetFieldValidationResponse =>
+  deepmerge<GetFieldValidationResponse>(
     {
       address: {
         matchLevel: 'partial',
@@ -3785,19 +4244,29 @@ export const getGetFieldValidationResponse = (props: Partial<GetFieldValidationR
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getGetUserVaultResponse = (props: Partial<GetUserVaultResponse>): GetUserVaultResponse =>
-  merge<GetUserVaultResponse, Partial<GetUserVaultResponse>>(
+
+export const getGetUserVaultResponse = (
+  props: Partial<GetUserVaultResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): GetUserVaultResponse =>
+  deepmerge<GetUserVaultResponse>(
     {
       key: 'document.visa.issuing_state',
       value: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getIdDocKind = (props: IdDocKind): IdDocKind => props ?? 'voter_identification';
 export const getIdentifyScope = (props: IdentifyScope): IdentifyScope => props ?? 'auth';
-export const getInProgressOnboarding = (props: Partial<InProgressOnboarding>): InProgressOnboarding =>
-  merge<InProgressOnboarding, Partial<InProgressOnboarding>>(
+
+export const getInProgressOnboarding = (
+  props: Partial<InProgressOnboarding>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InProgressOnboarding =>
+  deepmerge<InProgressOnboarding>(
     {
       fpId: '8b0242b1-7860-4fd8-aa48-efe5b89adad2',
       status: 'pending',
@@ -3808,17 +4277,27 @@ export const getInProgressOnboarding = (props: Partial<InProgressOnboarding>): I
       timestamp: '1909-10-13T04:50:14.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInProgressOnboardingTenant = (props: Partial<InProgressOnboardingTenant>): InProgressOnboardingTenant =>
-  merge<InProgressOnboardingTenant, Partial<InProgressOnboardingTenant>>(
+
+export const getInProgressOnboardingTenant = (
+  props: Partial<InProgressOnboardingTenant>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InProgressOnboardingTenant =>
+  deepmerge<InProgressOnboardingTenant>(
     {
       name: 'George Kutch',
       websiteUrl: 'https://comfortable-plastic.biz',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getIngressSettings = (props: Partial<IngressSettings>): IngressSettings =>
-  merge<IngressSettings, Partial<IngressSettings>>(
+
+export const getIngressSettings = (
+  props: Partial<IngressSettings>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): IngressSettings =>
+  deepmerge<IngressSettings>(
     {
       contentType: 'json',
       rules: [
@@ -3837,9 +4316,14 @@ export const getIngressSettings = (props: Partial<IngressSettings>): IngressSett
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightAddress = (props: Partial<InsightAddress>): InsightAddress =>
-  merge<InsightAddress, Partial<InsightAddress>>(
+
+export const getInsightAddress = (
+  props: Partial<InsightAddress>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightAddress =>
+  deepmerge<InsightAddress>(
     {
       addressLine1: '5610 W Center Street Apt. 209',
       addressLine2: '2051 Cleveland Street Suite 283',
@@ -3856,9 +4340,14 @@ export const getInsightAddress = (props: Partial<InsightAddress>): InsightAddres
       verified: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightBusinessName = (props: Partial<InsightBusinessName>): InsightBusinessName =>
-  merge<InsightBusinessName, Partial<InsightBusinessName>>(
+
+export const getInsightBusinessName = (
+  props: Partial<InsightBusinessName>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightBusinessName =>
+  deepmerge<InsightBusinessName>(
     {
       kind: 'ea',
       name: 'Archie Walter Jr.',
@@ -3868,9 +4357,14 @@ export const getInsightBusinessName = (props: Partial<InsightBusinessName>): Ins
       verified: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightEvent = (props: Partial<InsightEvent>): InsightEvent =>
-  merge<InsightEvent, Partial<InsightEvent>>(
+
+export const getInsightEvent = (
+  props: Partial<InsightEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightEvent =>
+  deepmerge<InsightEvent>(
     {
       city: 'East Odieville',
       country: 'Reunion',
@@ -3887,9 +4381,14 @@ export const getInsightEvent = (props: Partial<InsightEvent>): InsightEvent =>
       userAgent: 'aliquip sit officia proident',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightPerson = (props: Partial<InsightPerson>): InsightPerson =>
-  merge<InsightPerson, Partial<InsightPerson>>(
+
+export const getInsightPerson = (
+  props: Partial<InsightPerson>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightPerson =>
+  deepmerge<InsightPerson>(
     {
       associationVerified: false,
       name: 'Deborah DuBuque',
@@ -3898,18 +4397,28 @@ export const getInsightPerson = (props: Partial<InsightPerson>): InsightPerson =
       submitted: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightPhone = (props: Partial<InsightPhone>): InsightPhone =>
-  merge<InsightPhone, Partial<InsightPhone>>(
+
+export const getInsightPhone = (
+  props: Partial<InsightPhone>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightPhone =>
+  deepmerge<InsightPhone>(
     {
       phone: '+16544282343',
       submitted: true,
       verified: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightRegistration = (props: Partial<InsightRegistration>): InsightRegistration =>
-  merge<InsightRegistration, Partial<InsightRegistration>>(
+
+export const getInsightRegistration = (
+  props: Partial<InsightRegistration>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightRegistration =>
+  deepmerge<InsightRegistration>(
     {
       addresses: ['aliqua nulla', 'mollit', 'culpa'],
       entityType: 'ut ullamco',
@@ -3938,17 +4447,27 @@ export const getInsightRegistration = (props: Partial<InsightRegistration>): Ins
       subStatus: 'consectetur ullamco cillum',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightTin = (props: Partial<InsightTin>): InsightTin =>
-  merge<InsightTin, Partial<InsightTin>>(
+
+export const getInsightTin = (
+  props: Partial<InsightTin>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightTin =>
+  deepmerge<InsightTin>(
     {
       tin: 'laborum',
       verified: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightWatchlist = (props: Partial<InsightWatchlist>): InsightWatchlist =>
-  merge<InsightWatchlist, Partial<InsightWatchlist>>(
+
+export const getInsightWatchlist = (
+  props: Partial<InsightWatchlist>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightWatchlist =>
+  deepmerge<InsightWatchlist>(
     {
       business: [
         {
@@ -4185,33 +4704,53 @@ export const getInsightWatchlist = (props: Partial<InsightWatchlist>): InsightWa
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInsightWebsite = (props: Partial<InsightWebsite>): InsightWebsite =>
-  merge<InsightWebsite, Partial<InsightWebsite>>(
+
+export const getInsightWebsite = (
+  props: Partial<InsightWebsite>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightWebsite =>
+  deepmerge<InsightWebsite>(
     {
       url: 'https://helpful-finding.org/',
       verified: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getIntegrityRequest = (props: Partial<IntegrityRequest>): IntegrityRequest =>
-  merge<IntegrityRequest, Partial<IntegrityRequest>>(
+
+export const getIntegrityRequest = (
+  props: Partial<IntegrityRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): IntegrityRequest =>
+  deepmerge<IntegrityRequest>(
     {
       fields: ['document.voter_identification.issuing_country', 'document.passport.selfie.mime_type', 'id.ssn9'],
       signingKey: 'bdbd5cd5-598e-41d1-96a5-1caea3889034',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getIntegrityResponse = (props: Partial<IntegrityResponse>): IntegrityResponse =>
-  merge<IntegrityResponse, Partial<IntegrityResponse>>(
+
+export const getIntegrityResponse = (
+  props: Partial<IntegrityResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): IntegrityResponse =>
+  deepmerge<IntegrityResponse>(
     {
       key: 'card.*.number_last4',
       value: {},
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInvoicePreview = (props: Partial<InvoicePreview>): InvoicePreview =>
-  merge<InvoicePreview, Partial<InvoicePreview>>(
+
+export const getInvoicePreview = (
+  props: Partial<InvoicePreview>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InvoicePreview =>
+  deepmerge<InvoicePreview>(
     {
       lastUpdatedAt: '1966-05-02T13:06:51.0Z',
       lineItems: [
@@ -4239,27 +4778,42 @@ export const getInvoicePreview = (props: Partial<InvoicePreview>): InvoicePrevie
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getInvokeVaultProxyPermission = (props: Partial<InvokeVaultProxyPermission>): InvokeVaultProxyPermission =>
-  merge<InvokeVaultProxyPermission, Partial<InvokeVaultProxyPermission>>(
+
+export const getInvokeVaultProxyPermission = (
+  props: Partial<InvokeVaultProxyPermission>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InvokeVaultProxyPermission =>
+  deepmerge<InvokeVaultProxyPermission>(
     {
       kind: 'any',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getIsIn = (props: IsIn): IsIn => props ?? 'is_not_in';
 export const getIso3166TwoDigitCountryCode = (props: Iso3166TwoDigitCountryCode): Iso3166TwoDigitCountryCode =>
   props ?? 'GN';
-export const getLabelAdded = (props: Partial<LabelAdded>): LabelAdded =>
-  merge<LabelAdded, Partial<LabelAdded>>(
+
+export const getLabelAdded = (
+  props: Partial<LabelAdded>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LabelAdded =>
+  deepmerge<LabelAdded>(
     {
       kind: 'active',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getLabelKind = (props: LabelKind): LabelKind => props ?? 'active';
-export const getLineItem = (props: Partial<LineItem>): LineItem =>
-  merge<LineItem, Partial<LineItem>>(
+
+export const getLineItem = (
+  props: Partial<LineItem>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LineItem =>
+  deepmerge<LineItem>(
     {
       description: 'nostrud in nisi dolor',
       id: '8a2b1e49-8194-4d0b-9e06-8022959cd848',
@@ -4268,17 +4822,24 @@ export const getLineItem = (props: Partial<LineItem>): LineItem =>
       unitPriceCents: 'eu Excepteur laboris velit',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getLinkAuthRequest = (props: Partial<LinkAuthRequest>): LinkAuthRequest =>
-  merge<LinkAuthRequest, Partial<LinkAuthRequest>>(
+
+export const getLinkAuthRequest = (
+  props: Partial<LinkAuthRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LinkAuthRequest =>
+  deepmerge<LinkAuthRequest>(
     {
       emailAddress: 'jaylen.fahey@gmail.com',
       redirectUrl: 'https://hasty-humor.name',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getList = (props: Partial<List>): List =>
-  merge<List, Partial<List>>(
+
+export const getList = (props: Partial<List>, options: { overwriteArray: boolean } = { overwriteArray: true }): List =>
+  deepmerge<List>(
     {
       actor: {
         data: {
@@ -4295,9 +4856,14 @@ export const getList = (props: Partial<List>): List =>
       usedInPlaybook: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getListDetails = (props: Partial<ListDetails>): ListDetails =>
-  merge<ListDetails, Partial<ListDetails>>(
+
+export const getListDetails = (
+  props: Partial<ListDetails>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListDetails =>
+  deepmerge<ListDetails>(
     {
       actor: {
         data: {
@@ -4596,9 +5162,14 @@ export const getListDetails = (props: Partial<ListDetails>): ListDetails =>
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getListEntitiesSearchRequest = (props: Partial<ListEntitiesSearchRequest>): ListEntitiesSearchRequest =>
-  merge<ListEntitiesSearchRequest, Partial<ListEntitiesSearchRequest>>(
+
+export const getListEntitiesSearchRequest = (
+  props: Partial<ListEntitiesSearchRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListEntitiesSearchRequest =>
+  deepmerge<ListEntitiesSearchRequest>(
     {
       externalId: '28495320-873c-4a3a-b564-c6aab37fab65',
       hasOutstandingWorkflowRequest: true,
@@ -4619,9 +5190,14 @@ export const getListEntitiesSearchRequest = (props: Partial<ListEntitiesSearchRe
       watchlistHit: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getListEntry = (props: Partial<ListEntry>): ListEntry =>
-  merge<ListEntry, Partial<ListEntry>>(
+
+export const getListEntry = (
+  props: Partial<ListEntry>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListEntry =>
+  deepmerge<ListEntry>(
     {
       actor: {
         data: {
@@ -4634,9 +5210,14 @@ export const getListEntry = (props: Partial<ListEntry>): ListEntry =>
       id: '10cde94f-4060-4a7a-8d83-14ece0d97093',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getListEvent = (props: Partial<ListEvent>): ListEvent =>
-  merge<ListEvent, Partial<ListEvent>>(
+
+export const getListEvent = (
+  props: Partial<ListEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListEvent =>
+  deepmerge<ListEvent>(
     {
       detail: {
         data: {
@@ -4671,9 +5252,14 @@ export const getListEvent = (props: Partial<ListEvent>): ListEvent =>
       timestamp: '1947-07-12T05:28:51.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getListEventDetail = (props: Partial<ListEventDetail>): ListEventDetail =>
-  merge<ListEventDetail, Partial<ListEventDetail>>(
+
+export const getListEventDetail = (
+  props: Partial<ListEventDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListEventDetail =>
+  deepmerge<ListEventDetail>(
     {
       data: {
         entries: ['consectetur dolor deserunt', 'nostrud dolore id Ut', 'in pariatur sunt ea'],
@@ -4683,10 +5269,15 @@ export const getListEventDetail = (props: Partial<ListEventDetail>): ListEventDe
       kind: 'create_list_entry',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getListKind = (props: ListKind): ListKind => props ?? 'ip_address';
-export const getListPlaybookUsage = (props: Partial<ListPlaybookUsage>): ListPlaybookUsage =>
-  merge<ListPlaybookUsage, Partial<ListPlaybookUsage>>(
+
+export const getListPlaybookUsage = (
+  props: Partial<ListPlaybookUsage>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListPlaybookUsage =>
+  deepmerge<ListPlaybookUsage>(
     {
       id: 'bae5b7ec-995e-463d-8e98-9795d18843d3',
       key: '10f5ca34-343e-47ca-af95-c6e03c95e5ab',
@@ -4782,18 +5373,28 @@ export const getListPlaybookUsage = (props: Partial<ListPlaybookUsage>): ListPla
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getLiteOrgMember = (props: Partial<LiteOrgMember>): LiteOrgMember =>
-  merge<LiteOrgMember, Partial<LiteOrgMember>>(
+
+export const getLiteOrgMember = (
+  props: Partial<LiteOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LiteOrgMember =>
+  deepmerge<LiteOrgMember>(
     {
       firstName: 'Jarret',
       id: '16a13601-e37a-4d2c-9cd6-6c244d9be86e',
       lastName: 'Hirthe',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getLiteUserAndOrg = (props: Partial<LiteUserAndOrg>): LiteUserAndOrg =>
-  merge<LiteUserAndOrg, Partial<LiteUserAndOrg>>(
+
+export const getLiteUserAndOrg = (
+  props: Partial<LiteUserAndOrg>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LiteUserAndOrg =>
+  deepmerge<LiteUserAndOrg>(
     {
       org: 'in id sed nisi',
       user: {
@@ -4803,9 +5404,14 @@ export const getLiteUserAndOrg = (props: Partial<LiteUserAndOrg>): LiteUserAndOr
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getLivenessAttributes = (props: Partial<LivenessAttributes>): LivenessAttributes =>
-  merge<LivenessAttributes, Partial<LivenessAttributes>>(
+
+export const getLivenessAttributes = (
+  props: Partial<LivenessAttributes>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LivenessAttributes =>
+  deepmerge<LivenessAttributes>(
     {
       device: 'mollit do',
       issuers: ['google', 'footprint', 'apple'],
@@ -4813,9 +5419,14 @@ export const getLivenessAttributes = (props: Partial<LivenessAttributes>): Liven
       os: 'ex magna culpa',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getLivenessEvent = (props: Partial<LivenessEvent>): LivenessEvent =>
-  merge<LivenessEvent, Partial<LivenessEvent>>(
+
+export const getLivenessEvent = (
+  props: Partial<LivenessEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): LivenessEvent =>
+  deepmerge<LivenessEvent>(
     {
       attributes: {
         device: 'dolor enim commodo anim in',
@@ -4841,11 +5452,16 @@ export const getLivenessEvent = (props: Partial<LivenessEvent>): LivenessEvent =
       source: 'privacy_pass',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getLivenessIssuer = (props: LivenessIssuer): LivenessIssuer => props ?? 'google';
 export const getLivenessSource = (props: LivenessSource): LivenessSource => props ?? 'google_device_attestation';
-export const getManualDecisionRequest = (props: Partial<ManualDecisionRequest>): ManualDecisionRequest =>
-  merge<ManualDecisionRequest, Partial<ManualDecisionRequest>>(
+
+export const getManualDecisionRequest = (
+  props: Partial<ManualDecisionRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ManualDecisionRequest =>
+  deepmerge<ManualDecisionRequest>(
     {
       annotation: {
         isPinned: false,
@@ -4855,20 +5471,28 @@ export const getManualDecisionRequest = (props: Partial<ManualDecisionRequest>):
       status: 'pass',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getManualReview = (props: Partial<ManualReview>): ManualReview =>
-  merge<ManualReview, Partial<ManualReview>>(
+
+export const getManualReview = (
+  props: Partial<ManualReview>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ManualReview =>
+  deepmerge<ManualReview>(
     {
       kind: 'document_needs_review',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getManualReviewKind = (props: ManualReviewKind): ManualReviewKind => props ?? 'rule_triggered';
 export const getMatchLevel = (props: MatchLevel): MatchLevel => props ?? 'exact';
+
 export const getModernEntityDecryptResponse = (
   props: Partial<ModernEntityDecryptResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): ModernEntityDecryptResponse =>
-  merge<ModernEntityDecryptResponse, Partial<ModernEntityDecryptResponse>>(
+  deepmerge<ModernEntityDecryptResponse>(
     {
       'bank.*.account_type': 'ex sunt',
       'bank.*.ach_account_id': '01d07fd4-7415-4690-a242-8f75201ca711',
@@ -5168,9 +5792,14 @@ export const getModernEntityDecryptResponse = (
       'investor_profile.senior_executive_symbols': 'proident id culpa ut sed',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>): MultiUpdateRuleRequest =>
-  merge<MultiUpdateRuleRequest, Partial<MultiUpdateRuleRequest>>(
+
+export const getMultiUpdateRuleRequest = (
+  props: Partial<MultiUpdateRuleRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): MultiUpdateRuleRequest =>
+  deepmerge<MultiUpdateRuleRequest>(
     {
       add: [
         {
@@ -5306,21 +5935,29 @@ export const getMultiUpdateRuleRequest = (props: Partial<MultiUpdateRuleRequest>
       expectedRuleSetVersion: 73467657,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getNumberOperator = (props: NumberOperator): NumberOperator => props ?? 'lt';
 export const getObConfigurationKind = (props: ObConfigurationKind): ObConfigurationKind => props ?? 'kyc';
-export const getOfficer = (props: Partial<Officer>): Officer =>
-  merge<Officer, Partial<Officer>>(
+
+export const getOfficer = (
+  props: Partial<Officer>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Officer =>
+  deepmerge<Officer>(
     {
       name: 'Evelyn Green',
       roles: 'ut officia',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getOffsetPaginatedDashboardSecretApiKey = (
   props: Partial<OffsetPaginatedDashboardSecretApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): OffsetPaginatedDashboardSecretApiKey =>
-  merge<OffsetPaginatedDashboardSecretApiKey, Partial<OffsetPaginatedDashboardSecretApiKey>>(
+  deepmerge<OffsetPaginatedDashboardSecretApiKey>(
     {
       data: [
         {
@@ -5420,11 +6057,14 @@ export const getOffsetPaginatedDashboardSecretApiKey = (
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getOffsetPaginatedEntityOnboarding = (
   props: Partial<OffsetPaginatedEntityOnboarding>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): OffsetPaginatedEntityOnboarding =>
-  merge<OffsetPaginatedEntityOnboarding, Partial<OffsetPaginatedEntityOnboarding>>(
+  deepmerge<OffsetPaginatedEntityOnboarding>(
     {
       data: [
         {
@@ -5496,9 +6136,14 @@ export const getOffsetPaginatedEntityOnboarding = (
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOffsetPaginatedList = (props: Partial<OffsetPaginatedList>): OffsetPaginatedList =>
-  merge<OffsetPaginatedList, Partial<OffsetPaginatedList>>(
+
+export const getOffsetPaginatedList = (
+  props: Partial<OffsetPaginatedList>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OffsetPaginatedList =>
+  deepmerge<OffsetPaginatedList>(
     {
       data: [
         {
@@ -5553,11 +6198,14 @@ export const getOffsetPaginatedList = (props: Partial<OffsetPaginatedList>): Off
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getOffsetPaginatedOnboardingConfiguration = (
   props: Partial<OffsetPaginatedOnboardingConfiguration>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): OffsetPaginatedOnboardingConfiguration =>
-  merge<OffsetPaginatedOnboardingConfiguration, Partial<OffsetPaginatedOnboardingConfiguration>>(
+  deepmerge<OffsetPaginatedOnboardingConfiguration>(
     {
       data: [
         {
@@ -5954,11 +6602,14 @@ export const getOffsetPaginatedOnboardingConfiguration = (
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getOffsetPaginatedOrganizationMember = (
   props: Partial<OffsetPaginatedOrganizationMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): OffsetPaginatedOrganizationMember =>
-  merge<OffsetPaginatedOrganizationMember, Partial<OffsetPaginatedOrganizationMember>>(
+  deepmerge<OffsetPaginatedOrganizationMember>(
     {
       data: [
         {
@@ -6061,11 +6712,14 @@ export const getOffsetPaginatedOrganizationMember = (
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getOffsetPaginatedOrganizationRole = (
   props: Partial<OffsetPaginatedOrganizationRole>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): OffsetPaginatedOrganizationRole =>
-  merge<OffsetPaginatedOrganizationRole, Partial<OffsetPaginatedOrganizationRole>>(
+  deepmerge<OffsetPaginatedOrganizationRole>(
     {
       data: [
         {
@@ -6135,17 +6789,27 @@ export const getOffsetPaginatedOrganizationRole = (
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOmittedSecretCustomHeader = (props: Partial<OmittedSecretCustomHeader>): OmittedSecretCustomHeader =>
-  merge<OmittedSecretCustomHeader, Partial<OmittedSecretCustomHeader>>(
+
+export const getOmittedSecretCustomHeader = (
+  props: Partial<OmittedSecretCustomHeader>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OmittedSecretCustomHeader =>
+  deepmerge<OmittedSecretCustomHeader>(
     {
       id: '7821881f-74f5-4b6a-b24f-db7bde49e90f',
       name: 'Eleanor Hane',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguration>): OnboardingConfiguration =>
-  merge<OnboardingConfiguration, Partial<OnboardingConfiguration>>(
+
+export const getOnboardingConfiguration = (
+  props: Partial<OnboardingConfiguration>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OnboardingConfiguration =>
+  deepmerge<OnboardingConfiguration>(
     {
       allowInternationalResidents: true,
       allowReonboard: true,
@@ -6242,9 +6906,9 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
       isRulesEnabled: true,
       key: '792f73c0-dc71-4207-a457-091e366ef20c',
       kind: 'auth',
-      mustCollectData: ['name', 'email', 'business_beneficial_owners'],
+      mustCollectData: ['name', 'email', 'business_kyced_beneficial_owners'],
       name: 'Lorenzo Abshire',
-      optionalData: ['business_beneficial_owners', 'business_name', 'us_tax_id'],
+      optionalData: ['business_kyced_beneficial_owners', 'business_name', 'us_tax_id'],
       promptForPasskey: true,
       requiredAuthMethods: ['passkey', 'email', 'phone'],
       ruleSet: {
@@ -6276,18 +6940,28 @@ export const getOnboardingConfiguration = (props: Partial<OnboardingConfiguratio
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getOnboardingStatus = (props: OnboardingStatus): OnboardingStatus => props ?? 'pass';
-export const getOnboardingTimelineInfo = (props: Partial<OnboardingTimelineInfo>): OnboardingTimelineInfo =>
-  merge<OnboardingTimelineInfo, Partial<OnboardingTimelineInfo>>(
+
+export const getOnboardingTimelineInfo = (
+  props: Partial<OnboardingTimelineInfo>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OnboardingTimelineInfo =>
+  deepmerge<OnboardingTimelineInfo>(
     {
       event: 'sint',
       sessionId: '67060f97-ad17-4a25-818c-c0f5aac0373e',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrgClientSecurityConfig = (props: Partial<OrgClientSecurityConfig>): OrgClientSecurityConfig =>
-  merge<OrgClientSecurityConfig, Partial<OrgClientSecurityConfig>>(
+
+export const getOrgClientSecurityConfig = (
+  props: Partial<OrgClientSecurityConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrgClientSecurityConfig =>
+  deepmerge<OrgClientSecurityConfig>(
     {
       allowedOrigins: [
         'quis officia non irure commodo',
@@ -6297,18 +6971,28 @@ export const getOrgClientSecurityConfig = (props: Partial<OrgClientSecurityConfi
       isLive: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrgFrequentNote = (props: Partial<OrgFrequentNote>): OrgFrequentNote =>
-  merge<OrgFrequentNote, Partial<OrgFrequentNote>>(
+
+export const getOrgFrequentNote = (
+  props: Partial<OrgFrequentNote>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrgFrequentNote =>
+  deepmerge<OrgFrequentNote>(
     {
       content: 'ullamco',
       id: '161c635d-7729-4416-972e-050b884a6c4a',
       kind: 'trigger',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>): OrgLoginResponse =>
-  merge<OrgLoginResponse, Partial<OrgLoginResponse>>(
+
+export const getOrgLoginResponse = (
+  props: Partial<OrgLoginResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrgLoginResponse =>
+  deepmerge<OrgLoginResponse>(
     {
       authToken: '3d8739b4-e4d0-42d1-81bc-465066353609',
       createdNewTenant: true,
@@ -6383,9 +7067,14 @@ export const getOrgLoginResponse = (props: Partial<OrgLoginResponse>): OrgLoginR
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrgMetrics = (props: Partial<OrgMetrics>): OrgMetrics =>
-  merge<OrgMetrics, Partial<OrgMetrics>>(
+
+export const getOrgMetrics = (
+  props: Partial<OrgMetrics>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrgMetrics =>
+  deepmerge<OrgMetrics>(
     {
       failOnboardings: 24386977,
       incompleteOnboardings: 46734391,
@@ -6394,9 +7083,14 @@ export const getOrgMetrics = (props: Partial<OrgMetrics>): OrgMetrics =>
       totalOnboardings: 98260186,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrgMetricsResponse = (props: Partial<OrgMetricsResponse>): OrgMetricsResponse =>
-  merge<OrgMetricsResponse, Partial<OrgMetricsResponse>>(
+
+export const getOrgMetricsResponse = (
+  props: Partial<OrgMetricsResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrgMetricsResponse =>
+  deepmerge<OrgMetricsResponse>(
     {
       business: {
         failOnboardings: 57028148,
@@ -6414,18 +7108,28 @@ export const getOrgMetricsResponse = (props: Partial<OrgMetricsResponse>): OrgMe
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrgTenantTag = (props: Partial<OrgTenantTag>): OrgTenantTag =>
-  merge<OrgTenantTag, Partial<OrgTenantTag>>(
+
+export const getOrgTenantTag = (
+  props: Partial<OrgTenantTag>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrgTenantTag =>
+  deepmerge<OrgTenantTag>(
     {
       id: '17d19602-9a8e-40ac-bee2-5e44ef2c3a3f',
       kind: 'business',
       tag: 'ut ea laborum ullamco',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrganization = (props: Partial<Organization>): Organization =>
-  merge<Organization, Partial<Organization>>(
+
+export const getOrganization = (
+  props: Partial<Organization>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): Organization =>
+  deepmerge<Organization>(
     {
       allowDomainAccess: false,
       allowedPreviewApis: ['implicit_auth', 'risk_signals_list', 'labels'],
@@ -6452,9 +7156,14 @@ export const getOrganization = (props: Partial<Organization>): Organization =>
       websiteUrl: 'https://tough-term.com/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrganizationMember = (props: Partial<OrganizationMember>): OrganizationMember =>
-  merge<OrganizationMember, Partial<OrganizationMember>>(
+
+export const getOrganizationMember = (
+  props: Partial<OrganizationMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrganizationMember =>
+  deepmerge<OrganizationMember>(
     {
       createdAt: '1949-04-22T13:10:10.0Z',
       email: 'brenda.christiansen@gmail.com',
@@ -6487,9 +7196,14 @@ export const getOrganizationMember = (props: Partial<OrganizationMember>): Organ
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrganizationRole = (props: Partial<OrganizationRole>): OrganizationRole =>
-  merge<OrganizationRole, Partial<OrganizationRole>>(
+
+export const getOrganizationRole = (
+  props: Partial<OrganizationRole>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrganizationRole =>
+  deepmerge<OrganizationRole>(
     {
       createdAt: '1895-01-08T09:07:28.0Z',
       id: '538d0041-c1da-4aa4-9636-7a8c3bb92754',
@@ -6511,40 +7225,65 @@ export const getOrganizationRole = (props: Partial<OrganizationRole>): Organizat
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOrganizationRolebinding = (props: Partial<OrganizationRolebinding>): OrganizationRolebinding =>
-  merge<OrganizationRolebinding, Partial<OrganizationRolebinding>>(
+
+export const getOrganizationRolebinding = (
+  props: Partial<OrganizationRolebinding>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OrganizationRolebinding =>
+  deepmerge<OrganizationRolebinding>(
     {
       lastLoginAt: '1892-02-13T20:44:46.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getOtherTenantDupes = (props: Partial<OtherTenantDupes>): OtherTenantDupes =>
-  merge<OtherTenantDupes, Partial<OtherTenantDupes>>(
+
+export const getOtherTenantDupes = (
+  props: Partial<OtherTenantDupes>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OtherTenantDupes =>
+  deepmerge<OtherTenantDupes>(
     {
       numMatches: -48416503,
       numTenants: -75290789,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getParentOrganization = (props: Partial<ParentOrganization>): ParentOrganization =>
-  merge<ParentOrganization, Partial<ParentOrganization>>(
+
+export const getParentOrganization = (
+  props: Partial<ParentOrganization>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ParentOrganization =>
+  deepmerge<ParentOrganization>(
     {
       id: '7d4b127d-e29b-4b44-ae3b-0c228c9eb00e',
       name: 'Bruce Metz',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getPartnerLoginRequest = (props: Partial<PartnerLoginRequest>): PartnerLoginRequest =>
-  merge<PartnerLoginRequest, Partial<PartnerLoginRequest>>(
+
+export const getPartnerLoginRequest = (
+  props: Partial<PartnerLoginRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PartnerLoginRequest =>
+  deepmerge<PartnerLoginRequest>(
     {
       code: 'non velit do',
       requestOrgId: 'f20831d1-5c6b-4ae7-9888-156c7b6b7c8a',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getPartnerOrganization = (props: Partial<PartnerOrganization>): PartnerOrganization =>
-  merge<PartnerOrganization, Partial<PartnerOrganization>>(
+
+export const getPartnerOrganization = (
+  props: Partial<PartnerOrganization>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PartnerOrganization =>
+  deepmerge<PartnerOrganization>(
     {
       allowDomainAccess: false,
       domains: ['fugiat nostrud', 'et id sint ut', 'ut dolor'],
@@ -6556,9 +7295,14 @@ export const getPartnerOrganization = (props: Partial<PartnerOrganization>): Par
       websiteUrl: 'https://terrible-deduction.org',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getPatchProxyConfigRequest = (props: Partial<PatchProxyConfigRequest>): PatchProxyConfigRequest =>
-  merge<PatchProxyConfigRequest, Partial<PatchProxyConfigRequest>>(
+
+export const getPatchProxyConfigRequest = (
+  props: Partial<PatchProxyConfigRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PatchProxyConfigRequest =>
+  deepmerge<PatchProxyConfigRequest>(
     {
       accessReason: 'culpa',
       addSecretHeaders: [
@@ -6618,20 +7362,30 @@ export const getPatchProxyConfigRequest = (props: Partial<PatchProxyConfigReques
       url: 'https://shabby-tail.net/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getPhoneLookupAttributes = (props: PhoneLookupAttributes): PhoneLookupAttributes =>
   props ?? 'line_type_intelligence';
-export const getPlainCustomHeader = (props: Partial<PlainCustomHeader>): PlainCustomHeader =>
-  merge<PlainCustomHeader, Partial<PlainCustomHeader>>(
+
+export const getPlainCustomHeader = (
+  props: Partial<PlainCustomHeader>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PlainCustomHeader =>
+  deepmerge<PlainCustomHeader>(
     {
       name: 'Pat Hane',
       value: 'dolor consectetur',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getPreviewApi = (props: PreviewApi): PreviewApi => props ?? 'decisions_list';
-export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>): PrivateBusinessOwner =>
-  merge<PrivateBusinessOwner, Partial<PrivateBusinessOwner>>(
+
+export const getPrivateBusinessOwner = (
+  props: Partial<PrivateBusinessOwner>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PrivateBusinessOwner =>
+  deepmerge<PrivateBusinessOwner>(
     {
       fpId: 'af38c335-844c-4bcc-b380-fa0a21e03e81',
       id: '60bd9d13-4b29-4879-a6af-6b29c73107e2',
@@ -6643,11 +7397,14 @@ export const getPrivateBusinessOwner = (props: Partial<PrivateBusinessOwner>): P
       status: 'fail',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getPrivateBusinessOwnerKycLink = (
   props: Partial<PrivateBusinessOwnerKycLink>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): PrivateBusinessOwnerKycLink =>
-  merge<PrivateBusinessOwnerKycLink, Partial<PrivateBusinessOwnerKycLink>>(
+  deepmerge<PrivateBusinessOwnerKycLink>(
     {
       id: '2cce5dda-1edc-41b8-9c93-39fd506d3e30',
       link: 'voluptate aute',
@@ -6655,17 +7412,27 @@ export const getPrivateBusinessOwnerKycLink = (
       token: '94f45ffb-484a-4ae6-b5c3-0b1bbca8d54e',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getPrivateOwnedBusiness = (props: Partial<PrivateOwnedBusiness>): PrivateOwnedBusiness =>
-  merge<PrivateOwnedBusiness, Partial<PrivateOwnedBusiness>>(
+
+export const getPrivateOwnedBusiness = (
+  props: Partial<PrivateOwnedBusiness>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PrivateOwnedBusiness =>
+  deepmerge<PrivateOwnedBusiness>(
     {
       id: '5b617a49-a919-4bec-8f67-f7184379c1b0',
       status: 'fail',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getProxyConfigBasic = (props: Partial<ProxyConfigBasic>): ProxyConfigBasic =>
-  merge<ProxyConfigBasic, Partial<ProxyConfigBasic>>(
+
+export const getProxyConfigBasic = (
+  props: Partial<ProxyConfigBasic>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ProxyConfigBasic =>
+  deepmerge<ProxyConfigBasic>(
     {
       createdAt: '1969-07-10T01:25:35.0Z',
       deactivatedAt: '1921-07-17T16:07:48.0Z',
@@ -6677,9 +7444,14 @@ export const getProxyConfigBasic = (props: Partial<ProxyConfigBasic>): ProxyConf
       url: 'https://sudden-yogurt.us/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getProxyConfigDetailed = (props: Partial<ProxyConfigDetailed>): ProxyConfigDetailed =>
-  merge<ProxyConfigDetailed, Partial<ProxyConfigDetailed>>(
+
+export const getProxyConfigDetailed = (
+  props: Partial<ProxyConfigDetailed>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ProxyConfigDetailed =>
+  deepmerge<ProxyConfigDetailed>(
     {
       accessReason: 'enim consectetur',
       clientCertificate: 'irure',
@@ -6737,37 +7509,55 @@ export const getProxyConfigDetailed = (props: Partial<ProxyConfigDetailed>): Pro
       url: 'https://crazy-procurement.biz',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getProxyIngressContentType = (props: ProxyIngressContentType): ProxyIngressContentType => props ?? 'json';
-export const getProxyIngressRule = (props: Partial<ProxyIngressRule>): ProxyIngressRule =>
-  merge<ProxyIngressRule, Partial<ProxyIngressRule>>(
+
+export const getProxyIngressRule = (
+  props: Partial<ProxyIngressRule>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ProxyIngressRule =>
+  deepmerge<ProxyIngressRule>(
     {
       target: 'ea',
       token: 'document.drivers_license.front.image',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRawUserDataRequest = (props: Partial<RawUserDataRequest>): RawUserDataRequest =>
-  merge<RawUserDataRequest, Partial<RawUserDataRequest>>(
+
+export const getRawUserDataRequest = (
+  props: Partial<RawUserDataRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RawUserDataRequest =>
+  deepmerge<RawUserDataRequest>(
     {
       key: 'bank.*.ach_account_id',
       value: {},
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getReuploadComplianceDocRequest = (
   props: Partial<ReuploadComplianceDocRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): ReuploadComplianceDocRequest =>
-  merge<ReuploadComplianceDocRequest, Partial<ReuploadComplianceDocRequest>>(
+  deepmerge<ReuploadComplianceDocRequest>(
     {
       description: 'quis aute',
       name: 'Donnie Bechtelar',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getRiskScore = (props: RiskScore): RiskScore => props ?? 'experian_score';
-export const getRiskSignal = (props: Partial<RiskSignal>): RiskSignal =>
-  merge<RiskSignal, Partial<RiskSignal>>(
+
+export const getRiskSignal = (
+  props: Partial<RiskSignal>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RiskSignal =>
+  deepmerge<RiskSignal>(
     {
       description: 'tempor qui dolor fugiat',
       group: 'phone',
@@ -6780,9 +7570,14 @@ export const getRiskSignal = (props: Partial<RiskSignal>): RiskSignal =>
       timestamp: '1960-04-07T16:37:50.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRiskSignalDetail = (props: Partial<RiskSignalDetail>): RiskSignalDetail =>
-  merge<RiskSignalDetail, Partial<RiskSignalDetail>>(
+
+export const getRiskSignalDetail = (
+  props: Partial<RiskSignalDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RiskSignalDetail =>
+  deepmerge<RiskSignalDetail>(
     {
       description: 'dolor ut adipisicing',
       hasAmlHits: true,
@@ -6796,10 +7591,12 @@ export const getRiskSignalDetail = (props: Partial<RiskSignalDetail>): RiskSigna
       timestamp: '1905-08-09T05:47:11.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getRiskSignalGroupKind = (props: RiskSignalGroupKind): RiskSignalGroupKind => props ?? 'native_device';
-export const getRule = (props: Partial<Rule>): Rule =>
-  merge<Rule, Partial<Rule>>(
+
+export const getRule = (props: Partial<Rule>, options: { overwriteArray: boolean } = { overwriteArray: true }): Rule =>
+  deepmerge<Rule>(
     {
       action: 'step_up.identity_proof_of_ssn_proof_of_address',
       createdAt: '1948-11-29T17:34:56.0Z',
@@ -6830,19 +7627,29 @@ export const getRule = (props: Partial<Rule>): Rule =>
       ruleId: '408e3083-38db-49a0-98cf-e87fef631997',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getRuleAction = (props: RuleAction): RuleAction => props ?? 'step_up.custom';
-export const getRuleActionConfig = (props: Partial<RuleActionConfig>): RuleActionConfig =>
-  merge<RuleActionConfig, Partial<RuleActionConfig>>(
+
+export const getRuleActionConfig = (
+  props: Partial<RuleActionConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleActionConfig =>
+  deepmerge<RuleActionConfig>(
     {
       config: {},
       kind: 'pass_with_manual_review',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getRuleActionMigration = (props: RuleActionMigration): RuleActionMigration => props ?? 'manual_review';
-export const getRuleEvalResult = (props: Partial<RuleEvalResult>): RuleEvalResult =>
-  merge<RuleEvalResult, Partial<RuleEvalResult>>(
+
+export const getRuleEvalResult = (
+  props: Partial<RuleEvalResult>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleEvalResult =>
+  deepmerge<RuleEvalResult>(
     {
       backtestActionTriggered: 'step_up.identity_proof_of_ssn',
       currentStatus: 'pass',
@@ -6850,9 +7657,14 @@ export const getRuleEvalResult = (props: Partial<RuleEvalResult>): RuleEvalResul
       historicalActionTriggered: 'step_up.identity',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRuleEvalResults = (props: Partial<RuleEvalResults>): RuleEvalResults =>
-  merge<RuleEvalResults, Partial<RuleEvalResults>>(
+
+export const getRuleEvalResults = (
+  props: Partial<RuleEvalResults>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleEvalResults =>
+  deepmerge<RuleEvalResults>(
     {
       results: [
         {
@@ -6882,9 +7694,14 @@ export const getRuleEvalResults = (props: Partial<RuleEvalResults>): RuleEvalRes
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRuleEvalStats = (props: Partial<RuleEvalStats>): RuleEvalStats =>
-  merge<RuleEvalStats, Partial<RuleEvalStats>>(
+
+export const getRuleEvalStats = (
+  props: Partial<RuleEvalStats>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleEvalStats =>
+  deepmerge<RuleEvalStats>(
     {
       countByBacktestActionTriggered: {},
       countByHistoricalActionTriggered: {},
@@ -6892,9 +7709,14 @@ export const getRuleEvalStats = (props: Partial<RuleEvalStats>): RuleEvalStats =
       total: -61560433,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRuleExpression = (props: Partial<RuleExpression>): RuleExpression =>
-  merge<RuleExpression, Partial<RuleExpression>>(
+
+export const getRuleExpression = (
+  props: Partial<RuleExpression>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleExpression =>
+  deepmerge<RuleExpression>(
     [
       {
         field: 'address_state_matches',
@@ -6913,19 +7735,29 @@ export const getRuleExpression = (props: Partial<RuleExpression>): RuleExpressio
       },
     ],
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRuleExpressionCondition = (props: Partial<RuleExpressionCondition>): RuleExpressionCondition =>
-  merge<RuleExpressionCondition, Partial<RuleExpressionCondition>>(
+
+export const getRuleExpressionCondition = (
+  props: Partial<RuleExpressionCondition>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleExpressionCondition =>
+  deepmerge<RuleExpressionCondition>(
     {
       field: 'drivers_license_number_not_valid',
       op: 'not_eq',
       value: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getRuleInstanceKind = (props: RuleInstanceKind): RuleInstanceKind => props ?? 'business';
-export const getRuleResult = (props: Partial<RuleResult>): RuleResult =>
-  merge<RuleResult, Partial<RuleResult>>(
+
+export const getRuleResult = (
+  props: Partial<RuleResult>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleResult =>
+  deepmerge<RuleResult>(
     {
       result: false,
       rule: {
@@ -6959,16 +7791,26 @@ export const getRuleResult = (props: Partial<RuleResult>): RuleResult =>
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRuleSet = (props: Partial<RuleSet>): RuleSet =>
-  merge<RuleSet, Partial<RuleSet>>(
+
+export const getRuleSet = (
+  props: Partial<RuleSet>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleSet =>
+  deepmerge<RuleSet>(
     {
       version: -67232831,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getRuleSetResult = (props: Partial<RuleSetResult>): RuleSetResult =>
-  merge<RuleSetResult, Partial<RuleSetResult>>(
+
+export const getRuleSetResult = (
+  props: Partial<RuleSetResult>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleSetResult =>
+  deepmerge<RuleSetResult>(
     {
       actionTriggered: 'pass_with_manual_review',
       createdAt: '1910-07-09T10:01:49.0Z',
@@ -7077,9 +7919,14 @@ export const getRuleSetResult = (props: Partial<RuleSetResult>): RuleSetResult =
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getSameTenantDupe = (props: Partial<SameTenantDupe>): SameTenantDupe =>
-  merge<SameTenantDupe, Partial<SameTenantDupe>>(
+
+export const getSameTenantDupe = (
+  props: Partial<SameTenantDupe>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SameTenantDupe =>
+  deepmerge<SameTenantDupe>(
     {
       data: [
         {
@@ -7113,19 +7960,29 @@ export const getSameTenantDupe = (props: Partial<SameTenantDupe>): SameTenantDup
       status: 'fail',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getScoreBand = (props: ScoreBand): ScoreBand => props ?? 'low';
 export const getSecretApiKey = (props: SecretApiKey): SecretApiKey => props ?? 'commodo laboris sunt';
-export const getSecretCustomHeader = (props: Partial<SecretCustomHeader>): SecretCustomHeader =>
-  merge<SecretCustomHeader, Partial<SecretCustomHeader>>(
+
+export const getSecretCustomHeader = (
+  props: Partial<SecretCustomHeader>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SecretCustomHeader =>
+  deepmerge<SecretCustomHeader>(
     {
       name: 'Lynda Wisozk',
       value: 'velit voluptate',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getSentilinkDetail = (props: Partial<SentilinkDetail>): SentilinkDetail =>
-  merge<SentilinkDetail, Partial<SentilinkDetail>>(
+
+export const getSentilinkDetail = (
+  props: Partial<SentilinkDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SentilinkDetail =>
+  deepmerge<SentilinkDetail>(
     {
       idTheft: {
         reasonCodes: [
@@ -7177,9 +8034,14 @@ export const getSentilinkDetail = (props: Partial<SentilinkDetail>): SentilinkDe
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getSentilinkReasonCode = (props: Partial<SentilinkReasonCode>): SentilinkReasonCode =>
-  merge<SentilinkReasonCode, Partial<SentilinkReasonCode>>(
+
+export const getSentilinkReasonCode = (
+  props: Partial<SentilinkReasonCode>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SentilinkReasonCode =>
+  deepmerge<SentilinkReasonCode>(
     {
       code: 'id',
       direction: 'in dolore dolor adipisicing',
@@ -7187,9 +8049,14 @@ export const getSentilinkReasonCode = (props: Partial<SentilinkReasonCode>): Sen
       rank: 41960061,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getSentilinkScoreDetail = (props: Partial<SentilinkScoreDetail>): SentilinkScoreDetail =>
-  merge<SentilinkScoreDetail, Partial<SentilinkScoreDetail>>(
+
+export const getSentilinkScoreDetail = (
+  props: Partial<SentilinkScoreDetail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SentilinkScoreDetail =>
+  deepmerge<SentilinkScoreDetail>(
     {
       reasonCodes: [
         {
@@ -7215,18 +8082,28 @@ export const getSentilinkScoreDetail = (props: Partial<SentilinkScoreDetail>): S
       scoreBand: 'high',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getSignalScope = (props: SignalScope): SignalScope => props ?? 'state';
 export const getSignalSeverity = (props: SignalSeverity): SignalSeverity => props ?? 'info';
-export const getSubmitExternalUrlRequest = (props: Partial<SubmitExternalUrlRequest>): SubmitExternalUrlRequest =>
-  merge<SubmitExternalUrlRequest, Partial<SubmitExternalUrlRequest>>(
+
+export const getSubmitExternalUrlRequest = (
+  props: Partial<SubmitExternalUrlRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SubmitExternalUrlRequest =>
+  deepmerge<SubmitExternalUrlRequest>(
     {
       url: 'https://ornate-contrail.org/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>): TenantAndroidAppMeta =>
-  merge<TenantAndroidAppMeta, Partial<TenantAndroidAppMeta>>(
+
+export const getTenantAndroidAppMeta = (
+  props: Partial<TenantAndroidAppMeta>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantAndroidAppMeta =>
+  deepmerge<TenantAndroidAppMeta>(
     {
       apkCertSha256S: ['sint', 'in dolore', 'id cupidatat'],
       id: 'e66847fb-5123-41c6-9348-ae80fe3c0e98',
@@ -7236,11 +8113,16 @@ export const getTenantAndroidAppMeta = (props: Partial<TenantAndroidAppMeta>): T
       tenantId: 'f0e8ce5e-e21d-4f4f-bd5a-81b205efa8c0',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getTenantFrequentNoteKind = (props: TenantFrequentNoteKind): TenantFrequentNoteKind =>
   props ?? 'annotation';
-export const getTenantIosAppMeta = (props: Partial<TenantIosAppMeta>): TenantIosAppMeta =>
-  merge<TenantIosAppMeta, Partial<TenantIosAppMeta>>(
+
+export const getTenantIosAppMeta = (
+  props: Partial<TenantIosAppMeta>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantIosAppMeta =>
+  deepmerge<TenantIosAppMeta>(
     {
       appBundleIds: ['veniam commodo do', 'id consectetur ut', 'in veniam'],
       deviceCheckKeyId: '4b854c10-41f4-4d28-bda5-c52c9fd91a66',
@@ -7250,28 +8132,43 @@ export const getTenantIosAppMeta = (props: Partial<TenantIosAppMeta>): TenantIos
       tenantId: 'f112063f-0f8d-491e-a030-78622dbb4e16',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getTenantKind = (props: TenantKind): TenantKind => props ?? 'tenant';
-export const getTenantLoginRequest = (props: Partial<TenantLoginRequest>): TenantLoginRequest =>
-  merge<TenantLoginRequest, Partial<TenantLoginRequest>>(
+
+export const getTenantLoginRequest = (
+  props: Partial<TenantLoginRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantLoginRequest =>
+  deepmerge<TenantLoginRequest>(
     {
       code: 'et Lorem est',
       requestOrgId: 'eefc02b5-0ac0-4247-96c4-69d703fd3be7',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getTenantRoleKindDiscriminant = (props: TenantRoleKindDiscriminant): TenantRoleKindDiscriminant =>
   props ?? 'api_key';
-export const getTenantScope = (props: Partial<TenantScope>): TenantScope =>
-  merge<TenantScope, Partial<TenantScope>>(
+
+export const getTenantScope = (
+  props: Partial<TenantScope>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScope =>
+  deepmerge<TenantScope>(
     {
       kind: 'read',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getTerminalDecisionStatus = (props: TerminalDecisionStatus): TerminalDecisionStatus => props ?? 'pass';
-export const getTimelineOnboardingDecision = (props: Partial<TimelineOnboardingDecision>): TimelineOnboardingDecision =>
-  merge<TimelineOnboardingDecision, Partial<TimelineOnboardingDecision>>(
+
+export const getTimelineOnboardingDecision = (
+  props: Partial<TimelineOnboardingDecision>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TimelineOnboardingDecision =>
+  deepmerge<TimelineOnboardingDecision>(
     {
       clearedManualReviews: [
         {
@@ -7301,19 +8198,29 @@ export const getTimelineOnboardingDecision = (props: Partial<TimelineOnboardingD
       workflowKind: 'alpaca_kyc',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getTimelinePlaybook = (props: Partial<TimelinePlaybook>): TimelinePlaybook =>
-  merge<TimelinePlaybook, Partial<TimelinePlaybook>>(
+
+export const getTimelinePlaybook = (
+  props: Partial<TimelinePlaybook>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TimelinePlaybook =>
+  deepmerge<TimelinePlaybook>(
     {
       id: '367621e6-a7ff-43f5-9764-6199e904bb6a',
       mustCollectData: ['business_phone_number', 'business_address', 'business_website'],
       name: 'Clara Herzog',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getTokenOperationKind = (props: TokenOperationKind): TokenOperationKind => props ?? 'update_auth_methods';
-export const getTriggerRequest = (props: Partial<TriggerRequest>): TriggerRequest =>
-  merge<TriggerRequest, Partial<TriggerRequest>>(
+
+export const getTriggerRequest = (
+  props: Partial<TriggerRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TriggerRequest =>
+  deepmerge<TriggerRequest>(
     {
       fpBid: '54bda7fa-e958-4aaa-b672-6dbbca8b515a',
       kind: 'trigger',
@@ -7321,16 +8228,21 @@ export const getTriggerRequest = (props: Partial<TriggerRequest>): TriggerReques
       trigger: {
         data: {
           playbookId: 'ef1a3dd4-7bc3-4a73-8ba2-f6606c165557',
-          recollectAttributes: ['nationality', 'business_beneficial_owners', 'bank'],
+          recollectAttributes: ['nationality', 'business_kyced_beneficial_owners', 'bank'],
           reuseExistingBoKyc: true,
         },
         kind: 'onboard',
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUnvalidatedRuleExpression = (props: Partial<UnvalidatedRuleExpression>): UnvalidatedRuleExpression =>
-  merge<UnvalidatedRuleExpression, Partial<UnvalidatedRuleExpression>>(
+
+export const getUnvalidatedRuleExpression = (
+  props: Partial<UnvalidatedRuleExpression>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UnvalidatedRuleExpression =>
+  deepmerge<UnvalidatedRuleExpression>(
     [
       {
         field: 'business_address_match',
@@ -7349,66 +8261,102 @@ export const getUnvalidatedRuleExpression = (props: Partial<UnvalidatedRuleExpre
       },
     ],
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateAnnotationRequest = (props: Partial<UpdateAnnotationRequest>): UpdateAnnotationRequest =>
-  merge<UpdateAnnotationRequest, Partial<UpdateAnnotationRequest>>(
+
+export const getUpdateAnnotationRequest = (
+  props: Partial<UpdateAnnotationRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateAnnotationRequest =>
+  deepmerge<UpdateAnnotationRequest>(
     {
       isPinned: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateApiKeyRequest = (props: Partial<UpdateApiKeyRequest>): UpdateApiKeyRequest =>
-  merge<UpdateApiKeyRequest, Partial<UpdateApiKeyRequest>>(
+
+export const getUpdateApiKeyRequest = (
+  props: Partial<UpdateApiKeyRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateApiKeyRequest =>
+  deepmerge<UpdateApiKeyRequest>(
     {
       name: 'Krystal Balistreri',
       roleId: 'd1c4ee93-c3c4-46ba-afcf-6ada2a81b8fb',
       status: 'enabled',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateClientSecurityConfig = (props: Partial<UpdateClientSecurityConfig>): UpdateClientSecurityConfig =>
-  merge<UpdateClientSecurityConfig, Partial<UpdateClientSecurityConfig>>(
+
+export const getUpdateClientSecurityConfig = (
+  props: Partial<UpdateClientSecurityConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateClientSecurityConfig =>
+  deepmerge<UpdateClientSecurityConfig>(
     {
       allowedOrigins: ['aliquip', 'commodo cupidatat culpa', 'cupidatat pariatur minim nisi cillum'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getUpdateComplianceDocAssignmentRequest = (
   props: Partial<UpdateComplianceDocAssignmentRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): UpdateComplianceDocAssignmentRequest =>
-  merge<UpdateComplianceDocAssignmentRequest, Partial<UpdateComplianceDocAssignmentRequest>>(
+  deepmerge<UpdateComplianceDocAssignmentRequest>(
     {
       userId: 'a2daf3bc-b7fd-42bf-a604-4c23b889275b',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getUpdateComplianceDocTemplateRequest = (
   props: Partial<UpdateComplianceDocTemplateRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): UpdateComplianceDocTemplateRequest =>
-  merge<UpdateComplianceDocTemplateRequest, Partial<UpdateComplianceDocTemplateRequest>>(
+  deepmerge<UpdateComplianceDocTemplateRequest>(
     {
       description: 'nulla anim',
       name: 'Kayla Hartmann IV',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateLabelRequest = (props: Partial<UpdateLabelRequest>): UpdateLabelRequest =>
-  merge<UpdateLabelRequest, Partial<UpdateLabelRequest>>(
+
+export const getUpdateLabelRequest = (
+  props: Partial<UpdateLabelRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateLabelRequest =>
+  deepmerge<UpdateLabelRequest>(
     {
       kind: 'offboard_fraud',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateListRequest = (props: Partial<UpdateListRequest>): UpdateListRequest =>
-  merge<UpdateListRequest, Partial<UpdateListRequest>>(
+
+export const getUpdateListRequest = (
+  props: Partial<UpdateListRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateListRequest =>
+  deepmerge<UpdateListRequest>(
     {
       alias: 'aliqua et',
       name: 'Grady Lind',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateObConfigRequest = (props: Partial<UpdateObConfigRequest>): UpdateObConfigRequest =>
-  merge<UpdateObConfigRequest, Partial<UpdateObConfigRequest>>(
+
+export const getUpdateObConfigRequest = (
+  props: Partial<UpdateObConfigRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateObConfigRequest =>
+  deepmerge<UpdateObConfigRequest>(
     {
       allowReonboard: true,
       name: 'Patsy Funk',
@@ -7417,20 +8365,28 @@ export const getUpdateObConfigRequest = (props: Partial<UpdateObConfigRequest>):
       status: 'disabled',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdatePartnerTenantRequest = (props: Partial<UpdatePartnerTenantRequest>): UpdatePartnerTenantRequest =>
-  merge<UpdatePartnerTenantRequest, Partial<UpdatePartnerTenantRequest>>(
+
+export const getUpdatePartnerTenantRequest = (
+  props: Partial<UpdatePartnerTenantRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdatePartnerTenantRequest =>
+  deepmerge<UpdatePartnerTenantRequest>(
     {
       allowDomainAccess: false,
       name: 'Dr. Deanna Morissette',
       websiteUrl: 'https://polite-bookend.com/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getUpdateTenantAndroidAppMetaRequest = (
   props: Partial<UpdateTenantAndroidAppMetaRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): UpdateTenantAndroidAppMetaRequest =>
-  merge<UpdateTenantAndroidAppMetaRequest, Partial<UpdateTenantAndroidAppMetaRequest>>(
+  deepmerge<UpdateTenantAndroidAppMetaRequest>(
     {
       apkCertSha256S: ['anim aliquip', 'nulla sint', 'voluptate dolore Excepteur est'],
       integrityDecryptionKey: 'aaec2951-dbb1-4547-ac67-c3f3605e1d28',
@@ -7438,11 +8394,14 @@ export const getUpdateTenantAndroidAppMetaRequest = (
       packageNames: ['incididunt', 'labore id', 'dolore ullamco'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getUpdateTenantIosAppMetaRequest = (
   props: Partial<UpdateTenantIosAppMetaRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): UpdateTenantIosAppMetaRequest =>
-  merge<UpdateTenantIosAppMetaRequest, Partial<UpdateTenantIosAppMetaRequest>>(
+  deepmerge<UpdateTenantIosAppMetaRequest>(
     {
       appBundleIds: ['ullamco ipsum', 'anim laborum aliqua', 'culpa'],
       deviceCheckKeyId: '3d268de5-62d0-4d80-8d33-ebab0f939753',
@@ -7450,9 +8409,14 @@ export const getUpdateTenantIosAppMetaRequest = (
       teamId: '6d929467-2946-4a9f-afda-40dc44e4ade3',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateTenantRequest = (props: Partial<UpdateTenantRequest>): UpdateTenantRequest =>
-  merge<UpdateTenantRequest, Partial<UpdateTenantRequest>>(
+
+export const getUpdateTenantRequest = (
+  props: Partial<UpdateTenantRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateTenantRequest =>
+  deepmerge<UpdateTenantRequest>(
     {
       allowDomainAccess: false,
       clearSupportEmail: false,
@@ -7467,9 +8431,14 @@ export const getUpdateTenantRequest = (props: Partial<UpdateTenantRequest>): Upd
       websiteUrl: 'https://unimportant-term.net',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateTenantRoleRequest = (props: Partial<UpdateTenantRoleRequest>): UpdateTenantRoleRequest =>
-  merge<UpdateTenantRoleRequest, Partial<UpdateTenantRoleRequest>>(
+
+export const getUpdateTenantRoleRequest = (
+  props: Partial<UpdateTenantRoleRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateTenantRoleRequest =>
+  deepmerge<UpdateTenantRoleRequest>(
     {
       name: 'Ramon Bashirian',
       scopes: [
@@ -7485,27 +8454,40 @@ export const getUpdateTenantRoleRequest = (props: Partial<UpdateTenantRoleReques
       ],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getUpdateTenantRolebindingRequest = (
   props: Partial<UpdateTenantRolebindingRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): UpdateTenantRolebindingRequest =>
-  merge<UpdateTenantRolebindingRequest, Partial<UpdateTenantRolebindingRequest>>(
+  deepmerge<UpdateTenantRolebindingRequest>(
     {
       roleId: '91e4a4f5-7f3b-415f-9ae0-6dcb818777d4',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUpdateTenantUserRequest = (props: Partial<UpdateTenantUserRequest>): UpdateTenantUserRequest =>
-  merge<UpdateTenantUserRequest, Partial<UpdateTenantUserRequest>>(
+
+export const getUpdateTenantUserRequest = (
+  props: Partial<UpdateTenantUserRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UpdateTenantUserRequest =>
+  deepmerge<UpdateTenantUserRequest>(
     {
       firstName: 'Amaya',
       lastName: 'Beer',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getUploadSource = (props: UploadSource): UploadSource => props ?? 'mobile';
-export const getUserAiSummary = (props: Partial<UserAiSummary>): UserAiSummary =>
-  merge<UserAiSummary, Partial<UserAiSummary>>(
+
+export const getUserAiSummary = (
+  props: Partial<UserAiSummary>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserAiSummary =>
+  deepmerge<UserAiSummary>(
     {
       conclusion: 'aliqua eu',
       detailedSummary: 'nisi velit labore cillum ipsum',
@@ -7513,10 +8495,15 @@ export const getUserAiSummary = (props: Partial<UserAiSummary>): UserAiSummary =
       riskSignalSummary: 'magna',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getUserDataIdentifier = (props: UserDataIdentifier): UserDataIdentifier => props ?? 'id.country';
-export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>): UserDecryptRequest =>
-  merge<UserDecryptRequest, Partial<UserDecryptRequest>>(
+
+export const getUserDecryptRequest = (
+  props: Partial<UserDecryptRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserDecryptRequest =>
+  deepmerge<UserDecryptRequest>(
     {
       fields: [
         'document.passport_card.curp_validation_response',
@@ -7528,25 +8515,40 @@ export const getUserDecryptRequest = (props: Partial<UserDecryptRequest>): UserD
       versionAt: '1891-03-31T04:49:11.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUserDecryptResponse = (props: Partial<UserDecryptResponse>): UserDecryptResponse =>
-  merge<UserDecryptResponse, Partial<UserDecryptResponse>>(
+
+export const getUserDecryptResponse = (
+  props: Partial<UserDecryptResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserDecryptResponse =>
+  deepmerge<UserDecryptResponse>(
     {
       key: 'document.permit.postal_code',
       value: {},
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUserDeleteResponse = (props: Partial<UserDeleteResponse>): UserDeleteResponse =>
-  merge<UserDeleteResponse, Partial<UserDeleteResponse>>(
+
+export const getUserDeleteResponse = (
+  props: Partial<UserDeleteResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserDeleteResponse =>
+  deepmerge<UserDeleteResponse>(
     {
       key: 'id.ssn4',
       value: false,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUserInsight = (props: Partial<UserInsight>): UserInsight =>
-  merge<UserInsight, Partial<UserInsight>>(
+
+export const getUserInsight = (
+  props: Partial<UserInsight>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserInsight =>
+  deepmerge<UserInsight>(
     {
       description: 'in aliqua magna',
       name: 'Karen McClure',
@@ -7555,28 +8557,43 @@ export const getUserInsight = (props: Partial<UserInsight>): UserInsight =>
       value: 'proident tempor ipsum qui',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getUserInsightScope = (props: UserInsightScope): UserInsightScope => props ?? 'behavior';
 export const getUserInsightUnit = (props: UserInsightUnit): UserInsightUnit => props ?? 'boolean';
-export const getUserLabel = (props: Partial<UserLabel>): UserLabel =>
-  merge<UserLabel, Partial<UserLabel>>(
+
+export const getUserLabel = (
+  props: Partial<UserLabel>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserLabel =>
+  deepmerge<UserLabel>(
     {
       createdAt: '1927-07-17T14:20:28.0Z',
       kind: 'active',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUserTag = (props: Partial<UserTag>): UserTag =>
-  merge<UserTag, Partial<UserTag>>(
+
+export const getUserTag = (
+  props: Partial<UserTag>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTag =>
+  deepmerge<UserTag>(
     {
       createdAt: '1918-02-19T23:26:14.0Z',
       id: 'b4cba478-b6ec-4e41-995e-e875a841f2a4',
       tag: 'voluptate',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUserTimeline = (props: Partial<UserTimeline>): UserTimeline =>
-  merge<UserTimeline, Partial<UserTimeline>>(
+
+export const getUserTimeline = (
+  props: Partial<UserTimeline>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimeline =>
+  deepmerge<UserTimeline>(
     {
       event: {
         data: {
@@ -7594,9 +8611,14 @@ export const getUserTimeline = (props: Partial<UserTimeline>): UserTimeline =>
       timestamp: '1940-05-01T04:09:38.0Z',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>): UserTimelineEvent =>
-  merge<UserTimelineEvent, Partial<UserTimelineEvent>>(
+
+export const getUserTimelineEvent = (
+  props: Partial<UserTimelineEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEvent =>
+  deepmerge<UserTimelineEvent>(
     {
       data: {
         actor: {
@@ -7614,9 +8636,14 @@ export const getUserTimelineEvent = (props: Partial<UserTimelineEvent>): UserTim
       kind: 'data_collected',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getVaultCreated = (props: Partial<VaultCreated>): VaultCreated =>
-  merge<VaultCreated, Partial<VaultCreated>>(
+
+export const getVaultCreated = (
+  props: Partial<VaultCreated>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VaultCreated =>
+  deepmerge<VaultCreated>(
     {
       actor: {
         id: '305157cd-57d4-45f1-ac4c-a1fb5890f411',
@@ -7624,18 +8651,26 @@ export const getVaultCreated = (props: Partial<VaultCreated>): VaultCreated =>
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getVaultDrAwsPreEnrollResponse = (
   props: Partial<VaultDrAwsPreEnrollResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): VaultDrAwsPreEnrollResponse =>
-  merge<VaultDrAwsPreEnrollResponse, Partial<VaultDrAwsPreEnrollResponse>>(
+  deepmerge<VaultDrAwsPreEnrollResponse>(
     {
       externalId: 'f63833cc-3972-434a-b459-e2ef366e6d82',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getVaultDrEnrollRequest = (props: Partial<VaultDrEnrollRequest>): VaultDrEnrollRequest =>
-  merge<VaultDrEnrollRequest, Partial<VaultDrEnrollRequest>>(
+
+export const getVaultDrEnrollRequest = (
+  props: Partial<VaultDrEnrollRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VaultDrEnrollRequest =>
+  deepmerge<VaultDrEnrollRequest>(
     {
       awsAccountId: '0dd2eb44-b005-4ae5-be24-dbcbfb26d442',
       awsRoleName: 'Sandy Hermann',
@@ -7644,11 +8679,22 @@ export const getVaultDrEnrollRequest = (props: Partial<VaultDrEnrollRequest>): V
       s3BucketName: 'Lewis Denesik',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getVaultDrEnrollResponse = (props: Partial<VaultDrEnrollResponse>): VaultDrEnrollResponse =>
-  merge<VaultDrEnrollResponse, Partial<VaultDrEnrollResponse>>({}, props);
-export const getVaultDrEnrolledStatus = (props: Partial<VaultDrEnrolledStatus>): VaultDrEnrolledStatus =>
-  merge<VaultDrEnrolledStatus, Partial<VaultDrEnrolledStatus>>(
+
+export const getVaultDrEnrollResponse = (
+  props: Partial<VaultDrEnrollResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VaultDrEnrollResponse =>
+  deepmerge<VaultDrEnrollResponse>({}, props, {
+    ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}),
+  });
+
+export const getVaultDrEnrolledStatus = (
+  props: Partial<VaultDrEnrolledStatus>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VaultDrEnrolledStatus =>
+  deepmerge<VaultDrEnrolledStatus>(
     {
       awsAccountId: 'b8f5478e-a0c9-4928-835a-5f56de060185',
       awsRoleName: 'Percy Haag',
@@ -7664,27 +8710,38 @@ export const getVaultDrEnrolledStatus = (props: Partial<VaultDrEnrolledStatus>):
       s3BucketName: 'Harold Aufderhar',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getVaultDrRevealWrappedRecordKeysRequest = (
   props: Partial<VaultDrRevealWrappedRecordKeysRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): VaultDrRevealWrappedRecordKeysRequest =>
-  merge<VaultDrRevealWrappedRecordKeysRequest, Partial<VaultDrRevealWrappedRecordKeysRequest>>(
+  deepmerge<VaultDrRevealWrappedRecordKeysRequest>(
     {
       recordPaths: ['Lorem esse dolor ea', 'non voluptate', 'in aliquip cupidatat dolor dolor'],
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
 export const getVaultDrRevealWrappedRecordKeysResponse = (
   props: Partial<VaultDrRevealWrappedRecordKeysResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
 ): VaultDrRevealWrappedRecordKeysResponse =>
-  merge<VaultDrRevealWrappedRecordKeysResponse, Partial<VaultDrRevealWrappedRecordKeysResponse>>(
+  deepmerge<VaultDrRevealWrappedRecordKeysResponse>(
     {
       wrappedRecordKeys: {},
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getVaultDrStatus = (props: Partial<VaultDrStatus>): VaultDrStatus =>
-  merge<VaultDrStatus, Partial<VaultDrStatus>>(
+
+export const getVaultDrStatus = (
+  props: Partial<VaultDrStatus>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VaultDrStatus =>
+  deepmerge<VaultDrStatus>(
     {
       enrolledStatus: {
         awsAccountId: '78e661ad-21a5-4008-bcf1-86b5e8f697c0',
@@ -7701,19 +8758,29 @@ export const getVaultDrStatus = (props: Partial<VaultDrStatus>): VaultDrStatus =
       orgName: 'Marian Towne',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getVaultKind = (props: VaultKind): VaultKind => props ?? 'business';
-export const getVaultOperation = (props: Partial<VaultOperation>): VaultOperation =>
-  merge<VaultOperation, Partial<VaultOperation>>(
+
+export const getVaultOperation = (
+  props: Partial<VaultOperation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VaultOperation =>
+  deepmerge<VaultOperation>(
     {
       field: 'investor_profile.occupation',
       op: 'eq',
       value: 'pariatur laboris',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getVerificationCheck = (props: Partial<VerificationCheck>): VerificationCheck =>
-  merge<VerificationCheck, Partial<VerificationCheck>>(
+
+export const getVerificationCheck = (
+  props: Partial<VerificationCheck>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheck =>
+  deepmerge<VerificationCheck>(
     {
       data: {
         einOnly: true,
@@ -7721,9 +8788,14 @@ export const getVerificationCheck = (props: Partial<VerificationCheck>): Verific
       kind: 'kyb',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getWatchlistCheck = (props: Partial<WatchlistCheck>): WatchlistCheck =>
-  merge<WatchlistCheck, Partial<WatchlistCheck>>(
+
+export const getWatchlistCheck = (
+  props: Partial<WatchlistCheck>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WatchlistCheck =>
+  deepmerge<WatchlistCheck>(
     {
       id: '5d06a348-6b39-4dbe-bce3-0aeda9dcecc5',
       reasonCodes: [
@@ -7734,11 +8806,16 @@ export const getWatchlistCheck = (props: Partial<WatchlistCheck>): WatchlistChec
       status: 'pending',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getWatchlistCheckStatusKind = (props: WatchlistCheckStatusKind): WatchlistCheckStatusKind =>
   props ?? 'error';
-export const getWatchlistEntry = (props: Partial<WatchlistEntry>): WatchlistEntry =>
-  merge<WatchlistEntry, Partial<WatchlistEntry>>(
+
+export const getWatchlistEntry = (
+  props: Partial<WatchlistEntry>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WatchlistEntry =>
+  deepmerge<WatchlistEntry>(
     {
       hits: [
         {
@@ -7778,9 +8855,14 @@ export const getWatchlistEntry = (props: Partial<WatchlistEntry>): WatchlistEntr
       screenedEntityName: 'Kristi Mitchell',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getWatchlistHit = (props: Partial<WatchlistHit>): WatchlistHit =>
-  merge<WatchlistHit, Partial<WatchlistHit>>(
+
+export const getWatchlistHit = (
+  props: Partial<WatchlistHit>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WatchlistHit =>
+  deepmerge<WatchlistHit>(
     {
       agency: 'occaecat minim Excepteur elit dolore',
       agencyAbbr: 'dolor',
@@ -7793,32 +8875,47 @@ export const getWatchlistHit = (props: Partial<WatchlistHit>): WatchlistHit =>
       url: 'https://indelible-custody.net',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
-export const getWebhookPortalResponse = (props: Partial<WebhookPortalResponse>): WebhookPortalResponse =>
-  merge<WebhookPortalResponse, Partial<WebhookPortalResponse>>(
+
+export const getWebhookPortalResponse = (
+  props: Partial<WebhookPortalResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WebhookPortalResponse =>
+  deepmerge<WebhookPortalResponse>(
     {
       appId: '9f4b76dd-4350-4675-82a6-0fb914b928e8',
       token: '4be15425-befa-4709-ada0-d8733cfe03fd',
       url: 'https://silver-dredger.name/',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getWorkflowKind = (props: WorkflowKind): WorkflowKind => props ?? 'kyb';
-export const getWorkflowRequestConfig = (props: Partial<WorkflowRequestConfig>): WorkflowRequestConfig =>
-  merge<WorkflowRequestConfig, Partial<WorkflowRequestConfig>>(
+
+export const getWorkflowRequestConfig = (
+  props: Partial<WorkflowRequestConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowRequestConfig =>
+  deepmerge<WorkflowRequestConfig>(
     {
       data: {
         playbookId: 'd8e6617d-30c7-4c60-877f-e9917c128abc',
-        recollectAttributes: ['dob', 'business_beneficial_owners', 'us_tax_id'],
+        recollectAttributes: ['dob', 'business_kyced_beneficial_owners', 'us_tax_id'],
         reuseExistingBoKyc: true,
       },
       kind: 'onboard',
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getWorkflowSource = (props: WorkflowSource): WorkflowSource => props ?? 'unknown';
-export const getWorkflowStarted = (props: Partial<WorkflowStarted>): WorkflowStarted =>
-  merge<WorkflowStarted, Partial<WorkflowStarted>>(
+
+export const getWorkflowStarted = (
+  props: Partial<WorkflowStarted>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowStarted =>
+  deepmerge<WorkflowStarted>(
     {
       kind: 'document',
       playbook: {
@@ -7828,11 +8925,16 @@ export const getWorkflowStarted = (props: Partial<WorkflowStarted>): WorkflowSta
       },
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getWorkflowStartedEventKind = (props: WorkflowStartedEventKind): WorkflowStartedEventKind =>
   props ?? 'playbook';
-export const getWorkflowTriggered = (props: Partial<WorkflowTriggered>): WorkflowTriggered =>
-  merge<WorkflowTriggered, Partial<WorkflowTriggered>>(
+
+export const getWorkflowTriggered = (
+  props: Partial<WorkflowTriggered>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowTriggered =>
+  deepmerge<WorkflowTriggered>(
     {
       actor: {
         id: '21200ed0-b4d0-44d6-a342-9f9d2827e58d',
@@ -7851,4 +8953,5 @@ export const getWorkflowTriggered = (props: Partial<WorkflowTriggered>): Workflo
       requestIsActive: true,
     },
     props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );

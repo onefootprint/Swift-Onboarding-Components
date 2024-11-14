@@ -1853,6 +1853,10 @@ importers:
         version: 5.6.3
 
   packages/fixtures:
+    dependencies:
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
     devDependencies:
       '@apidevtools/json-schema-ref-parser':
         specifier: ^11.7.2
@@ -1869,9 +1873,6 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.12.14
-      deepmerge:
-        specifier: ^4.3.1
-        version: 4.3.1
       json-schema-faker:
         specifier: ^0.5.6
         version: 0.5.6
