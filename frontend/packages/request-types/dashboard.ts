@@ -295,7 +295,6 @@ export type AuditEventName =
   | 'complete_user_verification'
   | 'collect_user_document'
   | 'create_org_api_key'
-  | 'org_member_joined'
   | 'decrypt_org_api_key'
   | 'update_org_api_key_role'
   | 'invite_org_member'

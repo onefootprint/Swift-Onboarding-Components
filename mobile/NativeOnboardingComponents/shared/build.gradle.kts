@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -38,6 +39,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
+            implementation(libs.ktor.client.jvm)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -48,6 +50,20 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.kotlinx.coroutines)
+            implementation(libs.kotlinx.serialization)
+
+            api(libs.ktor.client.core)
+            api(libs.ktor.client.serialization)
+            api(libs.ktor.client.negotiation)
+            api(libs.ktor.serialization.json)
+
+            api(libs.kotlinx.datetime)
+        }
+        iosMain {
+            dependencies {
+                api(libs.ktor.client.ios)
+            }
         }
     }
 }
