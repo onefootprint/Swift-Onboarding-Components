@@ -29,7 +29,6 @@ describe('<ResidentialAddress />', () => {
     withUserVault();
   });
   const otherValues = {
-    disabled: false,
     decrypted: false,
     scrubbed: false,
     bootstrap: false,

@@ -16,7 +16,6 @@ const renderBasicInformation = (initialContext: InitMachineArgs, onComplete?: ()
 
 describe('BasicInformation', () => {
   const otherValues = {
-    disabled: false,
     decrypted: false,
     scrubbed: false,
     bootstrap: false,

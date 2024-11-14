@@ -6,11 +6,7 @@ import type { UserData } from '../../../../types';
 import allAttributes from '../all-attributes';
 import type { KycData } from '../data-types';
 
-const getInitData = (
-  requirement: CollectKycDataRequirement,
-  bootstrapUserData: UserData,
-  disabledFields?: IdDI[],
-): KycData => {
+const getInitData = (requirement: CollectKycDataRequirement, bootstrapUserData: UserData): KycData => {
   const cdos = allAttributes(requirement);
   const data: KycData = {};
   Object.entries(bootstrapUserData).forEach(([key, value]) => {
@@ -22,16 +18,6 @@ const getInitData = (
       };
     }
   });
-
-  // Used for fields that are autofilled in the KYB machine
-  if (disabledFields?.length) {
-    disabledFields.forEach(field => {
-      const entry = data[field];
-      if (entry) {
-        entry.disabled = true;
-      }
-    });
-  }
 
   // If a piece of data is passed into the collect KYC machine but doesn't exist on the backend,
   // we should immediately mark it as dirty

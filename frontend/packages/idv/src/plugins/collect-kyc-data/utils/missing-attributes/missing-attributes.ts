@@ -25,7 +25,7 @@ export const isDiMissing = (cdos: CollectedKycDataOption[], collectedData?: KycD
 
   return requiredDis.some(di => {
     const entry = collectedData?.[di];
-    const isEntryPopulated = entry?.value || entry?.bootstrap || entry?.disabled || entry?.decrypted || entry?.scrubbed;
+    const isEntryPopulated = entry?.value || entry?.bootstrap || entry?.decrypted || entry?.scrubbed;
     return !isEntryPopulated;
   });
 };

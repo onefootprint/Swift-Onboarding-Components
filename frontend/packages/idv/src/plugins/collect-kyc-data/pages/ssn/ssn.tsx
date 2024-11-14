@@ -86,9 +86,6 @@ const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrT
     },
   });
   const { getValues, setError } = methods;
-  const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
-  const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
-  const isUsTaxIdDisabled = data?.[IdDI.usTaxId]?.disabled;
 
   const sendData = (d: KycData) => {
     syncData({
@@ -154,7 +151,7 @@ const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrT
             <Stack gap={7} direction="column">
               {requirementTaxIdKind === 'usTaxId' ? (
                 <TaxId
-                  disabled={isUsTaxIdDisabled || isTaxPayerIdSkipped}
+                  disabled={isTaxPayerIdSkipped}
                   isOptional={isOptional}
                   isSkipped={isTaxPayerIdSkipped}
                   onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
@@ -164,7 +161,7 @@ const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrT
               ) : null}
               {requirementTaxIdKind === 'ssn9' ? (
                 <TaxId
-                  disabled={isSsn9Disabled || isTaxPayerIdSkipped}
+                  disabled={isTaxPayerIdSkipped}
                   hideDisclaimer={hideDisclaimer}
                   isOptional={isOptional}
                   isSkipped={isTaxPayerIdSkipped}
@@ -175,7 +172,7 @@ const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrT
               ) : null}
               {requirementTaxIdKind === 'ssn4' ? (
                 <SSN4
-                  disabled={isSsn4Disabled || isTaxPayerIdSkipped}
+                  disabled={isTaxPayerIdSkipped}
                   isOptional={isOptional}
                   isSkipped={isTaxPayerIdSkipped}
                   onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}

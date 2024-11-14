@@ -1,4 +1,4 @@
-import type { CollectKycDataRequirement, IdDI, PublicOnboardingConfig } from '@onefootprint/types';
+import type { CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { UserData } from '../../types';
 import type { CommonIdvContext } from '../../utils/state-machine';
@@ -13,7 +13,6 @@ export type CollectKycDataContext = {
   config: PublicOnboardingConfig;
   requirement: CollectKycDataRequirement;
   bootstrapUserData: UserData; // For tenant-provided initial data or email/phone from identify flows
-  disabledFields?: IdDI[]; // To disable inputs, like when KYC'ing the first BO
 };
 
 export type CollectKycDataProps = {

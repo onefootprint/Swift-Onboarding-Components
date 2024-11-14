@@ -7,51 +7,51 @@ describe('isDiMissing for basic info', () => {
     expect(isDiMissing([], {})).toEqual(false);
   });
 
-  it('should return false if the user has all the basic attributes but they are disabled', () => {
+  it('should return false if the user has all the basic attributes', () => {
     expect(
       isDiMissing([CollectedKycDataOption.name], {
-        [IdDI.firstName]: { value: 'Belce', disabled: true },
-        [IdDI.middleName]: { value: 'C.', disabled: true },
-        [IdDI.lastName]: { value: 'Dogru', disabled: true },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
+        [IdDI.firstName]: { value: 'Belce' },
+        [IdDI.middleName]: { value: 'C.' },
+        [IdDI.lastName]: { value: 'Dogru' },
+        [IdDI.city]: { value: 'Enclave' },
       }),
     ).toEqual(false);
 
     expect(
       isDiMissing([CollectedKycDataOption.name], {
-        [IdDI.firstName]: { value: 'Belce', disabled: true },
-        [IdDI.middleName]: { value: 'C.', disabled: true },
-        [IdDI.lastName]: { value: 'Dogru', disabled: true },
+        [IdDI.firstName]: { value: 'Belce' },
+        [IdDI.middleName]: { value: 'C.' },
+        [IdDI.lastName]: { value: 'Dogru' },
       }),
     ).toEqual(false);
   });
 
-  it('should return true if only some of the data values are disabled', () => {
+  it('should return true if only some of the fields are populated', () => {
     expect(
       isDiMissing([CollectedKycDataOption.name], {
-        [IdDI.firstName]: { value: 'Belce', disabled: true },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
-      }),
-    ).toEqual(true);
-
-    expect(
-      isDiMissing([CollectedKycDataOption.name], {
-        [IdDI.firstName]: { value: 'Belce', disabled: true },
-        [IdDI.lastName]: { value: 'Dogru' },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
-      }),
-    ).toEqual(false);
-
-    expect(
-      isDiMissing([CollectedKycDataOption.name], {
-        [IdDI.lastName]: { value: 'Dogru', disabled: true },
+        [IdDI.firstName]: { value: 'Belce' },
+        [IdDI.city]: { value: 'Enclave' },
       }),
     ).toEqual(true);
 
     expect(
       isDiMissing([CollectedKycDataOption.name], {
         [IdDI.firstName]: { value: 'Belce' },
-        [IdDI.lastName]: { value: 'Dogru', disabled: true },
+        [IdDI.lastName]: { value: 'Dogru' },
+        [IdDI.city]: { value: 'Enclave' },
+      }),
+    ).toEqual(false);
+
+    expect(
+      isDiMissing([CollectedKycDataOption.name], {
+        [IdDI.lastName]: { value: 'Dogru' },
+      }),
+    ).toEqual(true);
+
+    expect(
+      isDiMissing([CollectedKycDataOption.name], {
+        [IdDI.firstName]: { value: 'Belce' },
+        [IdDI.lastName]: { value: 'Dogru' },
       }),
     ).toEqual(false);
   });
@@ -143,44 +143,44 @@ describe('isDiMissing for address', () => {
     expect(isDiMissing([CollectedKycDataOption.address], {})).toEqual(true);
   });
 
-  it('should return false if the user has all the residential attributes but they are disabled', () => {
+  it('should return false if the user has all the residential attributes', () => {
     expect(
       isDiMissing([CollectedKycDataOption.address], {
-        [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
-        [IdDI.state]: { value: 'NY', disabled: true },
-        [IdDI.zip]: { value: '94117', disabled: true },
-        [IdDI.country]: { value: 'US', disabled: true },
+        [IdDI.addressLine1]: { value: '123 Main St' },
+        [IdDI.city]: { value: 'Enclave' },
+        [IdDI.state]: { value: 'NY' },
+        [IdDI.zip]: { value: '94117' },
+        [IdDI.country]: { value: 'US' },
       }),
     ).toEqual(false);
   });
 
-  it('should return true if only some of the data values are disabled', () => {
+  it('should return true if some data is missing', () => {
     expect(
       isDiMissing([CollectedKycDataOption.address], {
-        [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
+        [IdDI.addressLine1]: { value: '123 Main St' },
+        [IdDI.city]: { value: 'Enclave' },
         [IdDI.country]: { value: 'US' },
       }),
     ).toEqual(true);
 
     expect(
       isDiMissing([CollectedKycDataOption.address], {
-        [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
-        [IdDI.state]: { value: 'NY', disabled: true },
-        [IdDI.zip]: { value: '94117', disabled: true },
+        [IdDI.addressLine1]: { value: '123 Main St' },
+        [IdDI.city]: { value: 'Enclave' },
+        [IdDI.state]: { value: 'NY' },
+        [IdDI.zip]: { value: '94117' },
         [IdDI.country]: { value: 'US' },
       }),
     ).toEqual(false);
 
     expect(
       isDiMissing([CollectedKycDataOption.address], {
-        [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
-        [IdDI.city]: { value: 'Enclave', disabled: true },
+        [IdDI.addressLine1]: { value: '123 Main St' },
+        [IdDI.city]: { value: 'Enclave' },
         [IdDI.state]: { value: 'NY' },
-        [IdDI.zip]: { value: '94117', disabled: true },
-        [IdDI.country]: { value: 'US', disabled: true },
+        [IdDI.zip]: { value: '94117' },
+        [IdDI.country]: { value: 'US' },
       }),
     ).toEqual(false);
   });
@@ -421,7 +421,7 @@ describe('isDiMissing for SSN', () => {
 
     expect(
       isDiMissing([CollectedKycDataOption.ssn9], {
-        [IdDI.ssn9]: { value: '000000', disabled: true },
+        [IdDI.ssn9]: { value: '000000' },
       }),
     ).toEqual(false);
 
@@ -447,7 +447,7 @@ describe('isDiMissing for SSN', () => {
 
     expect(
       isDiMissing([CollectedKycDataOption.ssn4], {
-        [IdDI.ssn4]: { value: '000000', disabled: true },
+        [IdDI.ssn4]: { value: '000000' },
       }),
     ).toEqual(false);
 
@@ -474,7 +474,7 @@ describe('isDiMissing for SSN', () => {
     ).toEqual(true);
     expect(
       isDiMissing([CollectedKycDataOption.ssn4], {
-        [IdDI.ssn9]: { value: '0000000', disabled: true },
+        [IdDI.ssn9]: { value: '0000000' },
       }),
     ).toEqual(true);
     expect(
@@ -494,7 +494,7 @@ describe('isDiMissing for SSN', () => {
     ).toEqual(true);
     expect(
       isDiMissing([CollectedKycDataOption.ssn9], {
-        [IdDI.ssn4]: { value: '0000', disabled: true },
+        [IdDI.ssn4]: { value: '0000' },
       }),
     ).toEqual(true);
   });

@@ -16,7 +16,6 @@ const renderSsn = (initialContext: InitMachineArgs, onComplete?: () => void) => 
 
 describe('<SSN />', () => {
   const otherValues = {
-    disabled: false,
     decrypted: false,
     scrubbed: false,
     bootstrap: false,
@@ -139,9 +138,8 @@ describe('<SSN />', () => {
               'id.ssn4': {
                 bootstrap: false,
                 decrypted: false,
-                dirty: false,
-                disabled: false,
                 scrubbed: false,
+                dirty: false,
                 value: '1234',
               },
             });
@@ -268,7 +266,6 @@ describe('<SSN />', () => {
                 bootstrap: false,
                 decrypted: false,
                 dirty: false,
-                disabled: false,
                 scrubbed: false,
                 value: '121-21-2121',
               },
@@ -424,7 +421,6 @@ describe('<SSN />', () => {
                 bootstrap: false,
                 decrypted: false,
                 dirty: false,
-                disabled: false,
                 scrubbed: false,
                 value: '121-21-2121',
               },

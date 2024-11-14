@@ -18,7 +18,6 @@ const updateDataValue = <T>(
     bootstrap: Boolean(isChanged ? false : oldValue?.bootstrap),
     decrypted: Boolean(isChanged ? false : oldValue?.decrypted),
     dirty: isChanged || oldValue?.dirty,
-    disabled: Boolean(oldValue?.disabled),
   };
 };
 

@@ -39,8 +39,8 @@ describe('When ssn and usTaxId are required', () => {
     const formData = { ssn4: 'newSsn4', ssn9: 'newSsn9', usTaxId: 'newUsTaxId' };
     const convertedData = result.current(formData, true);
     expect(convertedData).toEqual({
-      'id.ssn4': { bootstrap: false, decrypted: false, dirty: true, disabled: false, value: '' },
-      'id.ssn9': { bootstrap: false, decrypted: false, dirty: true, disabled: false, value: '' },
+      'id.ssn4': { bootstrap: false, decrypted: false, dirty: true, value: '' },
+      'id.ssn9': { bootstrap: false, decrypted: false, dirty: true, value: '' },
     });
   });
 
@@ -56,7 +56,7 @@ describe('When ssn and usTaxId are required', () => {
     const formData = { ssn4: '', ssn9: '', usTaxId: 'newUsTaxId' };
     const convertedData = result.current(formData);
     expect(convertedData).toEqual({
-      'id.us_tax_id': { bootstrap: false, decrypted: false, dirty: true, disabled: false, value: 'newUsTaxId' },
+      'id.us_tax_id': { bootstrap: false, decrypted: false, dirty: true, value: 'newUsTaxId' },
     });
   });
 
@@ -65,7 +65,7 @@ describe('When ssn and usTaxId are required', () => {
     const formData = { ssn4: '', ssn9: 'newSsn9', usTaxId: '' };
     const convertedData = result.current(formData);
     expect(convertedData).toEqual({
-      'id.ssn9': { bootstrap: false, decrypted: false, dirty: true, disabled: false, value: 'newSsn9' },
+      'id.ssn9': { bootstrap: false, decrypted: false, dirty: true, value: 'newSsn9' },
     });
   });
 
@@ -74,7 +74,7 @@ describe('When ssn and usTaxId are required', () => {
     const formData = { ssn4: 'newSsn4', ssn9: '', usTaxId: '' };
     const convertedData = result.current(formData);
     expect(convertedData).toEqual({
-      'id.ssn4': { bootstrap: false, decrypted: false, dirty: true, disabled: false, value: 'newSsn4' },
+      'id.ssn4': { bootstrap: false, decrypted: false, dirty: true, value: 'newSsn4' },
     });
   });
 });

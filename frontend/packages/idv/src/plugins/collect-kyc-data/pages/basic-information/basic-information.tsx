@@ -62,12 +62,6 @@ const BasicInformation = ({
   const requiresPhone = !isTest && attributes.includes(CollectedKycDataOption.phoneNumber);
   const requiresEmail = !isTest && attributes.includes(CollectedKycDataOption.email);
 
-  const isNameDisabled = data?.[IdDI.firstName]?.disabled && data?.[IdDI.lastName]?.disabled;
-  const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
-  const isDobDisabled = data?.[IdDI.dob]?.disabled;
-  const isPhoneDisabled = data?.[IdDI.phoneNumber]?.disabled;
-  const isEmailDisabled = data?.[IdDI.email]?.disabled;
-
   const nationalityValue = data?.[IdDI.nationality]?.value;
   const defaultNationality = nationalityValue && isCountryCode(nationalityValue) ? nationalityValue : undefined;
   const formMethods = useForm<FormData>({
@@ -115,15 +109,11 @@ const BasicInformation = ({
       <FormProvider {...formMethods}>
         <Grid.Container gap={7} tag="form" onSubmit={formMethods.handleSubmit(onSubmitFormData)}>
           <Stack direction="column" gap={5}>
-            {requiresName ? <NameFields disabled={isNameDisabled} /> : null}
-            {requiresDob ? <DobField disabled={isDobDisabled} /> : null}
-            {requiresNationality ? <NationalityField disabled={isNationalityDisabled} /> : null}
-            {phoneConfig?.visible && requiresPhone ? (
-              <PhoneField disabled={phoneConfig?.disabled || isPhoneDisabled} />
-            ) : null}
-            {emailConfig?.visible && requiresEmail ? (
-              <EmailField disabled={emailConfig?.disabled || isEmailDisabled} />
-            ) : null}
+            {requiresName ? <NameFields /> : null}
+            {requiresDob ? <DobField /> : null}
+            {requiresNationality ? <NationalityField /> : null}
+            {phoneConfig?.visible && requiresPhone ? <PhoneField disabled={phoneConfig?.disabled} /> : null}
+            {emailConfig?.visible && requiresEmail ? <EmailField disabled={emailConfig?.disabled} /> : null}
           </Stack>
           <EditableFormButtonContainer
             isLoading={mutation.isPending}

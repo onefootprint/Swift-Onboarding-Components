@@ -5,7 +5,6 @@ export type DataValue<T> = {
   bootstrap?: boolean;
   decrypted?: boolean; // True when populated from decrypted value in vault
   scrubbed?: boolean; // True when it exists in vault but we haven't yet decrypted it
-  disabled?: boolean;
   dirty?: boolean;
 };
 

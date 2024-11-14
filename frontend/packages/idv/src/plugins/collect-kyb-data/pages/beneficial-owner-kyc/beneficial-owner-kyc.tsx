@@ -35,9 +35,6 @@ const BeneficialOwnerKyc = () => {
     <CollectKycData
       idvContext={idvContext}
       context={{
-        // TODO: eventually we can disable editing first and last name as they were already provided on the BO
-        // screen. Handling of middle name is a little annoying.
-        // So maybe i don't actually mind leaving these name fields editable
         bootstrapUserData: kycUserData,
         requirement: kycRequirement,
         config,

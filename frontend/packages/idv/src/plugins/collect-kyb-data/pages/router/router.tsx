@@ -56,6 +56,7 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('confirm')) {
     return <Confirm />;
   }
+  // TODO: remove this state, no reason to have it inside the KYB machine anymore
   if (state.matches('beneficialOwnerKyc')) {
     return <BeneficialOwnerKyc />;
   }

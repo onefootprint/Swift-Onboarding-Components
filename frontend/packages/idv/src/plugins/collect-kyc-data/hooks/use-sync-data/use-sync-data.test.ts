@@ -80,7 +80,6 @@ describe('useSyncData', () => {
     [IdDI.firstName]: {
       value: 'John',
       decrypted: false,
-      disabled: false,
       scrubbed: false,
       bootstrap: false,
       dirty: false,
@@ -88,14 +87,12 @@ describe('useSyncData', () => {
     [IdDI.lastName]: {
       value: 'Doe',
       decrypted: false,
-      disabled: false,
       scrubbed: false,
       bootstrap: false,
       dirty: false,
     },
     [IdDI.dob]: {
       value: '05/24/1996',
-      disabled: false,
       decrypted: false,
       scrubbed: false,
       bootstrap: false,
@@ -103,7 +100,6 @@ describe('useSyncData', () => {
     },
     [IdDI.addressLine1]: {
       value: '123 Main St',
-      disabled: false,
       decrypted: false,
       scrubbed: false,
       bootstrap: false,
@@ -111,7 +107,6 @@ describe('useSyncData', () => {
     },
     [IdDI.city]: {
       value: 'Anytown',
-      disabled: false,
       decrypted: false,
       scrubbed: false,
       bootstrap: false,
@@ -119,7 +114,6 @@ describe('useSyncData', () => {
     },
     [IdDI.state]: {
       value: 'NY',
-      disabled: false,
       decrypted: false,
       scrubbed: false,
       bootstrap: false,
@@ -127,7 +121,6 @@ describe('useSyncData', () => {
     },
     [IdDI.zip]: {
       value: '12345',
-      disabled: false,
       decrypted: false,
       scrubbed: false,
       bootstrap: false,
@@ -135,7 +128,6 @@ describe('useSyncData', () => {
     },
     [IdDI.country]: {
       value: 'US',
-      disabled: false,
       decrypted: false,
       scrubbed: false,
       bootstrap: false,

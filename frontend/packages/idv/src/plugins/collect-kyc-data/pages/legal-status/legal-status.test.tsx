@@ -33,7 +33,6 @@ describe('LegalStatus', () => {
   });
 
   const otherValues = {
-    disabled: false,
     decrypted: false,
     scrubbed: false,
     bootstrap: false,

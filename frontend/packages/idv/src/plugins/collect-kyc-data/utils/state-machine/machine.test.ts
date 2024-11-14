@@ -354,9 +354,9 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.lastName]: { value: 'Lee', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'San Francisco', bootstrap: true },
-          [IdDI.state]: { value: 'CA', disabled: true },
-          [IdDI.zip]: { value: '94105', disabled: true },
-          [IdDI.country]: { value: 'US', disabled: true },
+          [IdDI.state]: { value: 'CA' },
+          [IdDI.zip]: { value: '94105' },
+          [IdDI.country]: { value: 'US' },
           [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
         },
       );
@@ -634,7 +634,7 @@ describe('Collect KYC Data Machine Tests', () => {
     });
   });
 
-  describe('When user has bootstrapped/decrypted/disabled data', () => {
+  describe('When user has bootstrapped/decrypted data', () => {
     it('if no attributes are missing at the start', () => {
       const machine = createMachine(
         [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.address],
@@ -644,9 +644,9 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.lastName]: { value: 'Doe', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'San Francisco', bootstrap: true },
-          [IdDI.state]: { value: 'CA', disabled: true },
-          [IdDI.zip]: { value: '94105', disabled: true },
-          [IdDI.country]: { value: 'US', disabled: true },
+          [IdDI.state]: { value: 'CA' },
+          [IdDI.zip]: { value: '94105' },
+          [IdDI.country]: { value: 'US' },
         },
       );
       expect(machine.state.context.dataCollectionScreensToShow).toEqual(['confirm']);
@@ -670,9 +670,6 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.initialData[IdDI.lastName]?.bootstrap).toEqual(true);
       expect(context.initialData[IdDI.addressLine1]?.bootstrap).toEqual(true);
       expect(context.initialData[IdDI.city]?.bootstrap).toEqual(true);
-      expect(context.initialData[IdDI.state]?.disabled).toEqual(true);
-      expect(context.initialData[IdDI.zip]?.disabled).toBe(true);
-      expect(context.initialData[IdDI.country]?.disabled).toBe(true);
       expect(context.initialData[IdDI.ssn9]?.decrypted).toEqual(true);
       expect(context.initialData[IdDI.dob]?.scrubbed).toEqual(true);
 
@@ -692,9 +689,9 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'San Francisco', bootstrap: true },
-          [IdDI.state]: { value: 'CA', disabled: true },
-          [IdDI.zip]: { value: '94105', disabled: true },
-          [IdDI.country]: { value: 'US', disabled: true },
+          [IdDI.state]: { value: 'CA' },
+          [IdDI.zip]: { value: '94105' },
+          [IdDI.country]: { value: 'US' },
         },
       );
       expect(machine.state.context.dataCollectionScreensToShow).toEqual(['basicInformation', 'confirm']);
@@ -1067,9 +1064,9 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'San Francisco', bootstrap: true },
-          [IdDI.state]: { value: 'CA', disabled: true },
-          [IdDI.zip]: { value: '94105', disabled: true },
-          [IdDI.country]: { value: 'US', disabled: true },
+          [IdDI.state]: { value: 'CA' },
+          [IdDI.zip]: { value: '94105' },
+          [IdDI.country]: { value: 'US' },
         },
       );
       expect(machine.state.context.dataCollectionScreensToShow).toEqual(['basicInformation', 'confirm']);

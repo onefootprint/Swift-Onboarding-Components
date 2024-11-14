@@ -97,7 +97,6 @@ const useSyncData = () => {
           valueCopy.bootstrap = false;
           valueCopy.decrypted = false;
           valueCopy.scrubbed = false;
-          valueCopy.disabled = value.disabled ?? false;
 
           return [key, valueCopy];
         }),
