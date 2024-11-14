@@ -10,6 +10,7 @@ use newtypes::EnhancedAml;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
+use newtypes::PlaybookId;
 use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
 use newtypes::VerificationCheck;
@@ -20,10 +21,12 @@ use newtypes::WorkflowRequestConfig;
 
 pub struct OnboardingConfiguration {
     pub id: ObConfigurationId,
+    pub playbook_id: PlaybookId,
     pub name: String,
     pub key: PublishablePlaybookKey,
     pub is_live: bool,
     pub created_at: DateTime<Utc>,
+    pub deactivated_at: Option<DateTime<Utc>>,
     pub status: ApiKeyStatus,
     pub must_collect_data: Vec<CollectedDataOption>,
     pub optional_data: Vec<CollectedDataOption>,

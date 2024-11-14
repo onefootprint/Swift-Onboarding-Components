@@ -57,6 +57,18 @@ def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration
     assert config["status"] == "disabled"
 
 
+def test_list_playbook_versions(sandbox_tenant, ob_configuration):
+    playbook_id = ob_configuration.playbook_id
+    body = get(f"org/playbooks/{playbook_id}/versions", None, *sandbox_tenant.db_auths)
+
+    assert len(body["data"]) == 1, "Only one version for a playbook without edits"
+    assert len([
+        obc_version
+        for obc_version in body["data"]
+        if obc_version["id"] == ob_configuration.id
+    ]) == 1
+
+
 @pytest.mark.parametrize(
     "params,expect_ob_config1,expect_ob_config2",
     [

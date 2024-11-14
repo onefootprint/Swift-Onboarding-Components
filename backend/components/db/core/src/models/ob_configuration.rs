@@ -440,6 +440,7 @@ pub struct ObConfigurationQuery {
     pub status: Option<ApiKeyStatus>,
     pub search: Option<String>,
     pub kinds: Option<Vec<ObConfigurationKind>>,
+    pub playbook_id: Option<PlaybookId>,
     pub include_deactivated_versions: bool,
 }
 
@@ -453,6 +454,10 @@ impl ObConfiguration {
             .filter(ob_configuration::tenant_id.eq(&filters.tenant_id))
             .filter(ob_configuration::is_live.eq(filters.is_live))
             .into_boxed();
+
+        if let Some(playbook_id) = filters.playbook_id.as_ref() {
+            query = query.filter(ob_configuration::playbook_id.eq(playbook_id));
+        }
 
         if !filters.include_deactivated_versions {
             query = query.filter(ob_configuration::deactivated_at.is_null());

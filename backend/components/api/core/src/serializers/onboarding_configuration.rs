@@ -159,6 +159,8 @@ impl
             required_auth_methods,
             prompt_for_passkey,
             allow_reonboard,
+            playbook_id,
+            deactivated_at,
 
             // explicitly enumerating unused fields here so we don't forget to expose
             tenant_id: _,
@@ -203,6 +205,8 @@ impl
             required_auth_methods,
             prompt_for_passkey,
             allow_reonboard,
+            playbook_id,
+            deactivated_at,
         }
     }
 }

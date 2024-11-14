@@ -15,6 +15,7 @@ mod invoice_preview;
 mod metrics_api;
 mod onboarding_configs;
 mod partners;
+mod playbooks;
 mod proxy_configs;
 mod risk_signals;
 mod roles;
@@ -60,6 +61,7 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(tenant_tag::post)
         .service(tenant_tag::delete);
 
+    playbooks::routes(config);
     onboarding_configs::routes(config);
     authn::routes(config);
     api_keys::routes(config);

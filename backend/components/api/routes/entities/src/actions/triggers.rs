@@ -151,6 +151,7 @@ pub(super) fn apply_trigger_request(
                     status: Some(ApiKeyStatus::Enabled),
                     kinds: Some(kinds),
                     search: None,
+                    playbook_id: None,
                     include_deactivated_versions: false,
                 };
 

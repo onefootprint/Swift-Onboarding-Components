@@ -23,6 +23,7 @@ class ObConfiguration(NamedTuple):
     key: PlaybookKey
     tenant: Any  # Tenant
     id: str
+    playbook_id: str
     name: str
     status: str
     must_collect_data: List[str]
@@ -36,6 +37,7 @@ class ObConfiguration(NamedTuple):
             PlaybookKey(resp["key"]),
             tenant,
             resp["id"],
+            resp["playbook_id"],
             resp["name"],
             resp["status"],
             resp["must_collect_data"],

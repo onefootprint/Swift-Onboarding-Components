@@ -43,6 +43,7 @@ async fn get_list(
         status,
         search,
         kinds,
+        playbook_id: None,
         include_deactivated_versions: false,
     };
     let (results, next_page, count) = state
