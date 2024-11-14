@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::risk_signal_group;
@@ -64,7 +64,7 @@ impl RiskSignalGroup {
         conn: &mut PgConn,
         scope: RiskSignalGroupScope,
         kind: RiskSignalGroupKind,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let sv_id = scope.scoped_vault_id();
         let wf_id = scope.workflow_id();
         let new = NewRiskSignalGroup {
@@ -85,7 +85,7 @@ impl RiskSignalGroup {
         conn: &mut PgConn,
         scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let existing = Self::latest_by_kind(conn, &scope.scoped_vault_id(), kind)?;
         match existing {
             Some(e) => Ok(e),
@@ -99,7 +99,7 @@ impl RiskSignalGroup {
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         kind: RiskSignalGroupKind,
-    ) -> FpResult<Option<Self>> {
+    ) -> DbResult<Option<Self>> {
         let res = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
             .filter(risk_signal_group::kind.eq(kind))
@@ -111,7 +111,7 @@ impl RiskSignalGroup {
     }
 
     #[tracing::instrument("RiskSignalGroup::latest_by_kinds", skip(conn))]
-    pub fn latest_by_kinds(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> FpResult<Vec<Self>> {
+    pub fn latest_by_kinds(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let res = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
             .order((risk_signal_group::kind, risk_signal_group::created_at.desc()))

@@ -92,7 +92,7 @@ where
     //
 
     let (user, matching_rolebindings) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let email = OrgMemberEmail::from_str(&profile2.email)?;
             // Get or create tenant user
             let user =

@@ -3,9 +3,9 @@ use super::ob_configuration::NewObConfigurationArgs;
 use super::ob_configuration::ObConfiguration;
 use super::tenant::Tenant;
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
@@ -86,7 +86,7 @@ impl Playbook {
         tenant_id: &TenantId,
         is_live: IsLive,
         obc_args: NewObConfigurationArgs,
-    ) -> FpResult<(Locked<Self>, ObConfiguration)> {
+    ) -> DbResult<(Locked<Self>, ObConfiguration)> {
         let new_playbook = NewPlaybook {
             key: PublishablePlaybookKey::generate(is_live),
             tenant_id: tenant_id.clone(),
@@ -105,7 +105,7 @@ impl Playbook {
     }
 
     #[tracing::instrument("Playbook::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &ObConfigurationId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &ObConfigurationId) -> DbResult<Locked<Self>> {
         let result = playbook::table
             .inner_join(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
@@ -118,7 +118,7 @@ impl Playbook {
 
     /// Gets the latest version (active) OBC for a given playbook.
     #[tracing::instrument("Playbook::get_latest_version", skip_all)]
-    pub fn get_latest_version<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Self, ObConfiguration, Tenant)>
+    pub fn get_latest_version<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, ObConfiguration, Tenant)>
     where
         T: Into<PlaybookIdentifier<'a>>,
     {
@@ -143,14 +143,14 @@ impl Playbook {
     pub fn get_latest_version_if_enabled<'a, T>(
         conn: &mut PgConn,
         id: T,
-    ) -> FpResult<(Self, ObConfiguration, Tenant)>
+    ) -> DbResult<(Self, ObConfiguration, Tenant)>
     where
         T: Into<PlaybookIdentifier<'a>>,
     {
         let (playbook, obc, tenant) = Self::get_latest_version(conn, id)?;
         // n.b. playbook-wide (all version) disabled status is not implemented yet.
         if obc.status == ApiKeyStatus::Disabled {
-            return Err(DbError::PlaybookDisabled.into());
+            return Err(DbError::PlaybookDisabled);
         }
         Ok((playbook, obc, tenant))
     }

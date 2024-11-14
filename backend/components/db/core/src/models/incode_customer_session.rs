@@ -1,6 +1,6 @@
 use super::scoped_vault::ScopedVault;
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::incode_customer_session;
@@ -44,7 +44,7 @@ impl IncodeCustomerSession {
         tenant_id: TenantId,
         incode_verification_session_id: IncodeVerificationSessionId,
         incode_customer_id: IncodeCustomerId,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let new = NewIncodeCustomerSession {
             created_at: Utc::now(),
             scoped_vault_id,
@@ -64,7 +64,7 @@ impl IncodeCustomerSession {
     pub fn list<'a, T: Into<IncodeCustomerSessionIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let res = match id.into() {
             IncodeCustomerSessionIdentifier::ScopedVaultId { id } => incode_customer_session::table
                 .filter(incode_customer_session::scoped_vault_id.eq(id))
@@ -87,7 +87,7 @@ pub struct IncodeSelfieDupesResult {
 
 impl IncodeCustomerSession {
     #[tracing::instrument("IncodeCustomerSession::get_dupes_for_tenant", skip_all)]
-    pub fn get_dupes_for_tenant(conn: &mut PgConn, sv: &ScopedVault) -> FpResult<IncodeSelfieDupesResult> {
+    pub fn get_dupes_for_tenant(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<IncodeSelfieDupesResult> {
         let customer_ids: Vec<IncodeCustomerId> = Self::list(conn, &sv.id)?
             .into_iter()
             .map(|s| s.incode_customer_id)

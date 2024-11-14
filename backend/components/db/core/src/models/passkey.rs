@@ -1,6 +1,6 @@
 use crate::diesel::ExpressionMethods;
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::webauthn_credential;
@@ -59,7 +59,7 @@ impl Passkey {
     /// credentials registered to that tenant.
     /// Given a VaultId (when onboarding onto a new tenant, or in my1fp), we return only the most
     /// recent credential.
-    pub fn list<'a, T: Into<PasskeyIdentifier<'a>>>(conn: &mut PgConn, id: T) -> FpResult<Vec<Self>> {
+    pub fn list<'a, T: Into<PasskeyIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Vec<Self>> {
         let results = Self::list_query(id).get_results(conn)?;
         Ok(results)
     }
@@ -91,7 +91,7 @@ impl Passkey {
         conn: &mut PgConn,
         source_vault_id: &VaultId,
         destination_sv_id: &ScopedVaultId,
-    ) -> FpResult<()> {
+    ) -> DbResult<()> {
         let creds = Self::list(conn, source_vault_id)?;
         let new_creds = creds
             .into_iter()
@@ -119,7 +119,7 @@ impl Passkey {
     /// Set the backup_state to true for all Passkeys owned by the provided VaultId with
     /// the provided credential ID.
     /// There may be multiple if this credential is active at multiple tenants.
-    pub fn set_backup_state(conn: &mut PgConn, vault_id: &VaultId, cred_id: &[u8]) -> FpResult<()> {
+    pub fn set_backup_state(conn: &mut PgConn, vault_id: &VaultId, cred_id: &[u8]) -> DbResult<()> {
         diesel::update(webauthn_credential::table)
             .filter(webauthn_credential::vault_id.eq(vault_id))
             .filter(webauthn_credential::credential_id.eq(cred_id))
@@ -136,7 +136,7 @@ impl Passkey {
         conn: &mut PgConn,
         id: PasskeyIdentifier<'a>,
         cred_id: &[u8],
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         // This could return multiple credentials if they're registered at different tenants
         let result = Self::list_query(id)
             .filter(webauthn_credential::credential_id.eq(cred_id))
@@ -146,7 +146,7 @@ impl Passkey {
 
     #[tracing::instrument("Passkey::deactivate", skip_all)]
     /// Deactivate any webauthn credentials for the provided vault
-    pub fn deactivate(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<()> {
+    pub fn deactivate(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<()> {
         diesel::update(webauthn_credential::table)
             .filter(webauthn_credential::scoped_vault_id.eq(sv_id))
             .set(webauthn_credential::deactivated_at.eq(Utc::now()))
@@ -172,7 +172,7 @@ pub struct NewPasskey {
 
 impl NewPasskey {
     #[tracing::instrument("NewPasskey::save", skip_all)]
-    pub fn save(self, conn: &mut PgConn) -> FpResult<Passkey> {
+    pub fn save(self, conn: &mut PgConn) -> DbResult<Passkey> {
         let result = diesel::insert_into(webauthn_credential::table)
             .values(self)
             .get_result(conn)?;

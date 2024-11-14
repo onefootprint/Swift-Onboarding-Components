@@ -37,7 +37,7 @@ pub async fn get(
     let (partnership_id, doc_id) = args.into_inner();
 
     let summary = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), Some(&doc_id))?
                 .into_values()
                 .next()

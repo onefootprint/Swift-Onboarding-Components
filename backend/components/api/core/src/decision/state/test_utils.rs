@@ -10,7 +10,6 @@ use crate::decision::vendor::{
 };
 use crate::FpResult;
 use crate::State;
-use api_errors::FpError;
 use api_wire_types::CreateDocumentRequest;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -41,8 +40,12 @@ use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use db::models::workflow_event::WorkflowEvent;
-use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::fixtures::{
+    self,
+};
+use db::DbError;
+use db::DbResult;
 use db::TxnPgConn;
 use db_schema::schema::document_request;
 use diesel::prelude::*;
@@ -185,7 +188,7 @@ pub async fn setup_data(
 
     let tid = tenant.id.clone();
     let tu = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             // only enable Idology for this dummy test merchant
             let args = UpdateTenantVendorControlArgs {
                 idology_enabled: Some(true),
@@ -216,7 +219,7 @@ pub async fn query_data(
     let svid = sv_id.clone();
     let wfid = wf_id.clone();
     state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let rs =
                 RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, RiskSignalFilter::LegacyLatest)
                     .unwrap()
@@ -260,7 +263,9 @@ pub async fn query_risk_signals(
 ) -> Vec<RiskSignal> {
     let s = sv_id.clone();
     state
-        .db_query(move |conn| RiskSignal::latest_by_risk_signal_group_kind(conn, &s, kind))
+        .db_query(move |conn| -> FpResult<_> {
+            Ok(RiskSignal::latest_by_risk_signal_group_kind(conn, &s, kind)?)
+        })
         .await
         .unwrap()
 }
@@ -268,11 +273,11 @@ pub async fn query_risk_signals(
 pub async fn query_doc_requests(state: &State, wf_id: &WorkflowId) -> Vec<DocumentRequest> {
     let w = wf_id.clone();
     state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             document_request::table
                 .filter(document_request::workflow_id.eq(w))
                 .get_results(conn)
-                .map_err(FpError::from)
+                .map_err(DbError::from)
         })
         .await
         .unwrap()
@@ -284,7 +289,7 @@ pub async fn query_rule_set_result(
 ) -> Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
     let s = sv_id.clone();
     state
-        .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &s).map_err(FpError::from))
+        .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &s).map_err(DbError::from))
         .await
         .unwrap()
 }
@@ -296,7 +301,7 @@ pub async fn query_timeline_events(
 ) -> Vec<UserTimelineInfo> {
     let svid = sv_id.clone();
     state
-        .db_query(move |conn| UserTimeline::list(conn, &svid, kinds))
+        .db_query(move |conn| -> DbResult<_> { UserTimeline::list(conn, &svid, kinds) })
         .await
         .unwrap()
 }
@@ -605,7 +610,7 @@ pub async fn mock_incode_doc_collection(
     create_doc_request: bool,
 ) {
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vault = Vault::get(conn.conn(), &scoped_vault_id).unwrap();
 
             if create_doc_request

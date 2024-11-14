@@ -1,11 +1,12 @@
 use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
+use crate::errors::ValidationError;
+use crate::DbError;
+use crate::DbResult;
 use crate::OffsetPaginatedResult;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::business_owner;
@@ -70,7 +71,7 @@ impl BusinessOwner {
         conn: &mut TxnPgConn,
         user_vault_id: VaultId,
         business_vault_id: VaultId,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let new = NewBusinessOwnerRow {
             user_vault_id: Some(user_vault_id),
             business_vault_id,
@@ -91,7 +92,7 @@ impl BusinessOwner {
         conn: &mut TxnPgConn,
         bos: Vec<NewSecondaryBo>,
         business_vault_id: &VaultId,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let rows = bos
             .into_iter()
             .map(|bo| {
@@ -118,7 +119,7 @@ impl BusinessOwner {
         conn: &mut TxnPgConn,
         sb: Locked<ScopedVault>,
         owner_vault_id: VaultId,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let existing = business_owner::table
             .filter(business_owner::business_vault_id.eq(&sb.vault_id))
             .get_results::<Self>(conn.conn())?;
@@ -148,7 +149,7 @@ impl BusinessOwner {
         conn: &mut PgConn,
         bv_id: &VaultId,
         tenant_id: &TenantId,
-    ) -> FpResult<Vec<(Self, Option<UserData>)>> {
+    ) -> DbResult<Vec<(Self, Option<UserData>)>> {
         let result = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))
             .filter(business_owner::deactivated_at.is_null())
@@ -170,7 +171,7 @@ impl BusinessOwner {
         conn: &'a mut PgConn,
         uv_id: &'a VaultId,
         id: impl Into<ListOwnedBusinessesIdentifier<'a>>,
-    ) -> FpResult<Vec<(BusinessOwner, ScopedVault, Vault)>> {
+    ) -> DbResult<Vec<(BusinessOwner, ScopedVault, Vault)>> {
         let mut query = business_owner::table
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
             .inner_join(vault::table.on(scoped_vault::vault_id.eq(vault::id)))
@@ -197,7 +198,7 @@ impl BusinessOwner {
     }
 
     #[tracing::instrument("BusinessOwner::get", skip_all)]
-    pub fn get<'a, T: Into<BoIdentifier<'a>>>(conn: &mut PgConn, id: T) -> FpResult<Self> {
+    pub fn get<'a, T: Into<BoIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Self> {
         let mut query = business_owner::table
             .filter(business_owner::deactivated_at.is_null())
             .into_boxed();
@@ -222,14 +223,14 @@ impl BusinessOwner {
 
         if let BoIdentifier::Uuid { bv_id, .. } = id {
             if &result.business_vault_id != bv_id {
-                return BadRequestInto("Business owner with UUID belongs to different business");
+                return ValidationError("Business owner with UUID belongs to different business").into();
             }
         }
         Ok(result)
     }
 
     #[tracing::instrument("BusinessOwner::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &BoId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &BoId) -> DbResult<Locked<Self>> {
         let result = business_owner::table
             .filter(business_owner::id.eq(id))
             .filter(business_owner::deactivated_at.is_null())
@@ -239,10 +240,10 @@ impl BusinessOwner {
     }
 
     #[tracing::instrument("BusinessOwner::add_user_vault_id", skip_all)]
-    pub fn add_user_vault_id(self, conn: &mut PgConn, user_vault_id: &VaultId) -> FpResult<Self> {
+    pub fn add_user_vault_id(self, conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>
         if self.has_linked_user() {
-            return BadRequestInto("BO already has a user_vault_id");
+            return Err(DbError::ValidationError("BO already has a user_vault_id".into()));
         }
         let result = diesel::update(business_owner::table)
             .filter(business_owner::id.eq(self.id))
@@ -252,16 +253,16 @@ impl BusinessOwner {
     }
 
     #[tracing::instrument("BusinessOwner::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut PgConn, bo: Locked<Self>) -> FpResult<Self> {
+    pub fn deactivate(conn: &mut PgConn, bo: Locked<Self>) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>
         if bo.has_linked_user() {
-            return BadRequestInto("This owner is already linked to a user and cannot be deleted");
+            return ValidationError("This owner is already linked to a user and cannot be deleted").into();
         }
         if bo.source == BusinessOwnerSource::Tenant {
-            return BadRequestInto("Cannot deactivate a business owner made by tenant");
+            return ValidationError("Cannot deactivate a business owner made by tenant").into();
         }
         if bo.kind == BusinessOwnerKind::Primary {
-            return BadRequestInto("Cannot deactivate a primary BO");
+            return ValidationError("Cannot deactivate a primary BO").into();
         }
         let result = diesel::update(business_owner::table)
             .filter(business_owner::id.eq(&bo.id))
@@ -311,7 +312,7 @@ impl BusinessOwner {
         conn: &mut PgConn,
         args: BusinessOwnerQuery<'a>,
         pagination: OffsetPagination,
-    ) -> FpResult<OffsetPaginatedResult<(Self, UserData)>> {
+    ) -> DbResult<OffsetPaginatedResult<(Self, UserData)>> {
         let BusinessOwnerQuery { bv_id, tenant_id } = args;
         let mut query = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))

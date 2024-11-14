@@ -9,6 +9,7 @@ use clap::Parser;
 use db::models::task::Task;
 use db::models::task::TaskCreateArgs;
 use db::models::watchlist_check::WatchlistCheck;
+use db::DbError;
 use newtypes::output::Csv;
 use newtypes::TaskData;
 use newtypes::TaskId;
@@ -36,7 +37,7 @@ impl CreateOverdueWatchlistCheckTasks {
         let tenant_id = TenantId::from_str(LEGACY_NON_ENHANCED_AML_TENANT_ID).unwrap(); // Infallible
 
         let new_tasks = state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> Result<_, DbError> {
                 let overdue_svs = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant_id, limit)?;
                 let cnt = overdue_svs.len();
                 let task_args: Vec<TaskCreateArgs> = overdue_svs

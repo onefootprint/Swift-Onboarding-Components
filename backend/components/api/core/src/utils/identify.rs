@@ -93,7 +93,7 @@ pub async fn get_user_auth_methods(
     user_auth: Option<CheckedUserAuthContext>,
 ) -> FpResult<UserAuthMethodsContext> {
     let (uvw, cis, passkeys) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::from(&identifier))?;
             let passkeys = match identifier {
                 UserIdentifier::Vault(v_id) => Passkey::list(conn, &v_id)?,

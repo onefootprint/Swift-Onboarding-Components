@@ -9,10 +9,10 @@ use api_core::utils::identify::get_user_auth_methods;
 use api_core::utils::identify::UserAuthMethodsContext;
 use api_core::FpResult;
 use api_core::State;
-use api_errors::FpDbOptionalExtension;
 use api_wire_types::IdentifyId;
 use api_wire_types::IdentifyIdKind;
 use crypto::sha256;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
@@ -154,7 +154,7 @@ async fn get_identify_challenge_context(
     root_span.record("vault_id", existing_user_id.to_string());
     let v_id = existing_user_id.clone();
     let (tenant, sv) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             // Add some log fields to the root span. Prefer info from the sv_id, otherwise look
             // through the obc
             let (tenant, sv) = if let Some(sv_id) = sv_id.as_ref() {

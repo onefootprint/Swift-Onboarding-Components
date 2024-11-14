@@ -83,7 +83,7 @@ pub async fn evaluate_rule(
         end_timestamp,
     } = request.into_inner();
     let (current_rules, historical_results, adds, edits, lists_with_entries, vws, insight_events) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id, IncludeRules::All)?;

@@ -5,6 +5,7 @@ use crate::utils::onboarding::CommonWfArgs;
 use crate::utils::onboarding::CreateUserWfArgs;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
@@ -53,7 +54,7 @@ pub async fn create_user_and_onboarding(
 ) {
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let tenant = if let Some(t) = reuse_tenant {
                 t
             } else {

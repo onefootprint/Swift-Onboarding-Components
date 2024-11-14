@@ -1,9 +1,9 @@
 use super::data_lifetime::DataLifetime;
 use super::scoped_vault::ScopedVault;
 use super::user_timeline::UserTimeline;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::scoped_vault_label;
@@ -39,7 +39,7 @@ pub struct ScopedVaultLabel {
 
 impl ScopedVaultLabel {
     #[tracing::instrument("ScopedVaultLabel::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Option<ScopedVaultLabel>> {
+    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<ScopedVaultLabel>> {
         let label = scoped_vault_label::table
             .filter(scoped_vault_label::scoped_vault_id.eq(sv_id))
             .filter(scoped_vault_label::deactivated_seqno.is_null())
@@ -52,7 +52,7 @@ impl ScopedVaultLabel {
     pub fn bulk_get_active(
         conn: &mut PgConn,
         sv_ids: Vec<&ScopedVaultId>,
-    ) -> FpResult<Vec<ScopedVaultLabel>> {
+    ) -> DbResult<Vec<ScopedVaultLabel>> {
         let labels = scoped_vault_label::table
             .filter(scoped_vault_label::scoped_vault_id.eq_any(sv_ids))
             .filter(scoped_vault_label::deactivated_seqno.is_null())
@@ -61,7 +61,7 @@ impl ScopedVaultLabel {
     }
 
     #[tracing::instrument("ScopedVaultLabel::get_bulk", skip_all)]
-    pub fn get_bulk(conn: &mut PgConn, ids: Vec<LabelId>) -> FpResult<HashMap<LabelId, ScopedVaultLabel>> {
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<LabelId>) -> DbResult<HashMap<LabelId, ScopedVaultLabel>> {
         let results = scoped_vault_label::table
             .filter(scoped_vault_label::id.eq_any(ids))
             .get_results::<Self>(conn)?
@@ -76,7 +76,7 @@ impl ScopedVaultLabel {
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         actor: DbActor,
-    ) -> FpResult<DataLifetimeSeqno> {
+    ) -> DbResult<DataLifetimeSeqno> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let update: DeactivateLabelUpdate = DeactivateLabelUpdate {
             deactivated_at: Utc::now(),
@@ -118,7 +118,7 @@ impl ScopedVaultLabel {
         sv: ScopedVault,
         kind: LabelKind,
         actor: DbActor,
-    ) -> FpResult<ScopedVaultLabel> {
+    ) -> DbResult<ScopedVaultLabel> {
         // First deactivate
         let seqno = Self::deactivate(conn.conn(), &sv.id, actor.clone())?;
 

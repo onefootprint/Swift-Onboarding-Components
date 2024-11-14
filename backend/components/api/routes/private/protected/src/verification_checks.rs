@@ -3,6 +3,7 @@ use actix_web::web;
 use api_core::auth::protected_auth::ProtectedAuth;
 use api_core::types::ApiResponse;
 use api_core::web::Json;
+use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use db::models::ob_configuration::ObConfiguration;
@@ -23,7 +24,7 @@ async fn update_verification_checks(
     let UpdateVerificationChecksRequest { add, delete } = request.into_inner();
 
     let updated_obc = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, &path.into_inner())?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 

@@ -1,9 +1,8 @@
 use super::data_lifetime::DataLifetime;
 use super::vault::Vault;
 use super::verification_result::VerificationResult;
-use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::decision_intent;
@@ -126,7 +125,7 @@ impl VerificationRequest {
         vendor_apis: Vec<VendorAPI>,
         decision_intent_id: &DecisionIntentId,
         identity_document_id: Option<&DocumentId>,
-    ) -> FpResult<Vec<Self>> {
+    ) -> Result<Vec<Self>, crate::DbError> {
         let seqno = DataLifetime::get_next_seqno_no_ordering_guarantee(conn)?;
         let requests: Vec<_> = vendor_apis
             .into_iter()
@@ -147,7 +146,7 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument("VerificationRequest::create", skip_all)]
-    pub fn create(conn: &mut PgConn, args: NewVerificationRequestArgs) -> FpResult<Self> {
+    pub fn create(conn: &mut PgConn, args: NewVerificationRequestArgs) -> DbResult<Self> {
         let NewVerificationRequestArgs {
             scoped_vault_id,
             decision_intent_id,
@@ -162,11 +161,11 @@ impl VerificationRequest {
             identity_document_id,
         )?
         .pop()
-        .ok_or(DbError::ObjectNotFound.into())
+        .ok_or(crate::DbError::ObjectNotFound)
     }
 
     #[tracing::instrument("VerificationRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &VerificationRequestId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &VerificationRequestId) -> DbResult<Self> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
             .first(conn)?;
@@ -183,7 +182,7 @@ impl VerificationRequest {
     pub fn get_latest_requests_and_maybe_successful_results_for_scoped_user(
         conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
-    ) -> FpResult<Vec<RequestAndMaybeResult>> {
+    ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
             .filter(verification_request::scoped_vault_id.eq(scoped_vault_id))
             .left_join(verification_result::table)
@@ -212,7 +211,7 @@ impl VerificationRequest {
     pub fn get_latest_requests_and_successful_results_for_scoped_user(
         conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
-    ) -> FpResult<Vec<RequestAndResult>> {
+    ) -> DbResult<Vec<RequestAndResult>> {
         let req_and_res: Vec<RequestAndResult> = verification_request::table
             .filter(verification_request::scoped_vault_id.eq(scoped_vault_id))
             .inner_join(verification_result::table)
@@ -236,7 +235,7 @@ impl VerificationRequest {
         conn: &mut PgConn,
         id: VReqIdentifier,
         vendor_api: VendorAPI,
-    ) -> FpResult<Option<RequestAndResult>> {
+    ) -> DbResult<Option<RequestAndResult>> {
         let mut query = verification_request::table
             .filter(verification_request::vendor_api.eq(vendor_api))
             .inner_join(verification_result::table)
@@ -283,7 +282,7 @@ impl VerificationRequest {
     pub fn get_latest_by_vendor_api_for_decision_intent(
         conn: &mut PgConn,
         di_id: &DecisionIntentId,
-    ) -> FpResult<Vec<RequestAndMaybeResult>> {
+    ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
             .filter(verification_request::decision_intent_id.eq(di_id))
             .left_join(verification_result::table)
@@ -305,7 +304,7 @@ impl VerificationRequest {
         scoped_vault_id: ScopedVaultId,
         identity_document_id: DocumentId,
         decision_intent_id: &DecisionIntentId,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno_no_ordering_guarantee(conn)?;
         let new_row = NewVerificationRequestRow {
             vendor_api,
@@ -323,7 +322,7 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument("VerificationRequest::get_user_vault", skip_all)]
-    pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> FpResult<Vault> {
+    pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Vault> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
             .inner_join(scoped_vault::table.inner_join(vault::table))
@@ -338,7 +337,7 @@ impl VerificationRequest {
     pub fn list(
         conn: &mut PgConn,
         decision_intent_id: &DecisionIntentId,
-    ) -> FpResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
+    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
         let res = verification_request::table
             .left_join(verification_result::table)
             .filter(verification_request::decision_intent_id.eq(decision_intent_id))
@@ -351,7 +350,7 @@ impl VerificationRequest {
     pub fn list_for_user_temp(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-    ) -> FpResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
+    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
         let res = verification_request::table
             .left_join(verification_result::table)
             .filter(verification_request::scoped_vault_id.eq(sv_id))

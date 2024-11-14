@@ -23,11 +23,11 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::WriteableVw;
 use api_core::FpResult;
 use api_errors::BadRequest;
-use api_errors::FpDbOptionalExtension;
 use api_errors::ServerErr;
 use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
+use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;
@@ -125,7 +125,7 @@ pub async fn post(
 
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uv_id = &user_auth.user_vault_id;
 
             // Get or create the ScopedVault for non-my1fp flows
@@ -285,7 +285,7 @@ async fn get_prefill_data(
     let t_id = obc.tenant_id.clone();
     let uv_id = user_auth.user_vault_id.clone();
     let portable_vw = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let existing_sv = ScopedVault::get(conn, (&uv_id, &t_id)).optional()?;
             let portable_vw = existing_sv
                 .is_none()

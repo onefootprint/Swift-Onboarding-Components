@@ -1,6 +1,6 @@
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_compliance_partnership;
@@ -36,7 +36,7 @@ pub type IsNew = bool;
 
 impl<'a> NewTenantCompliancePartnership<'a> {
     #[tracing::instrument("NewTenantCompliancePartnership::get_or_create", skip_all)]
-    pub fn get_or_create(self, conn: &mut TxnPgConn) -> FpResult<(TenantCompliancePartnership, IsNew)> {
+    pub fn get_or_create(self, conn: &mut TxnPgConn) -> DbResult<(TenantCompliancePartnership, IsNew)> {
         let existing: Option<TenantCompliancePartnership> = tenant_compliance_partnership::table
             .filter(tenant_compliance_partnership::tenant_id.eq(self.tenant_id))
             .filter(tenant_compliance_partnership::partner_tenant_id.eq(self.partner_tenant_id))
@@ -59,7 +59,7 @@ impl TenantCompliancePartnership {
         conn: &mut PgConn,
         id: &TenantCompliancePartnershipId,
         org_id: impl Into<OrgIdentifierRef<'a>>,
-    ) -> FpResult<TenantCompliancePartnership> {
+    ) -> DbResult<TenantCompliancePartnership> {
         let query = tenant_compliance_partnership::table
             .filter(tenant_compliance_partnership::id.eq(id))
             .into_boxed();

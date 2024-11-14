@@ -39,6 +39,7 @@ use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::test_db_pool::TestDbPool;
 use db::tests::MockFFClient;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state;
@@ -104,7 +105,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
 
 async fn get_wf(state: &State, wfid: WorkflowId) -> (DbWorkflow, Vec<WorkflowEvent>) {
     state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let wf = DbWorkflow::get(conn, &wfid)?;
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
             Ok((wf, wfe))

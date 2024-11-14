@@ -1,7 +1,7 @@
 use super::rule_instance::RuleInstance;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::rule_instance;
@@ -42,7 +42,7 @@ impl RuleResult {
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
         new_rule_results: Vec<NewRuleResult>,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let res = diesel::insert_into(rule_result::table)
             .values(new_rule_results)
             .get_results::<Self>(conn.conn())?;
@@ -53,7 +53,7 @@ impl RuleResult {
     pub(crate) fn list(
         conn: &mut PgConn,
         rule_set_result_id: &RuleSetResultId,
-    ) -> FpResult<Vec<(RuleResult, RuleInstance)>> {
+    ) -> DbResult<Vec<(RuleResult, RuleInstance)>> {
         let res = rule_result::table
             .filter(rule_result::rule_set_result_id.eq(rule_set_result_id))
             .inner_join(rule_instance::table)

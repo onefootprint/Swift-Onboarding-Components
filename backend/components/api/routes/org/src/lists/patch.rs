@@ -2,6 +2,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
+use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::UpdateListRequest;
@@ -27,7 +28,7 @@ pub async fn patch(
     let UpdateListRequest { name, alias } = request.into_inner();
 
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
                 return BadRequestInto("List with that name already exists");
             }

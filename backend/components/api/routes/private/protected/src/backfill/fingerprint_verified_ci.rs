@@ -77,7 +77,7 @@ async fn backfill_fingerprints(state: &State, sv_id: ScopedVaultId) -> FpResult<
         .await?;
 
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<()> {
             let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
             // Don't need composite fingerprints here
             let fps_to_insert = fingerprints.iter().flat_map(|((salt, dl_id), sh_data)| {

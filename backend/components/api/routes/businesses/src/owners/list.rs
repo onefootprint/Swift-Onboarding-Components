@@ -8,6 +8,7 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::web::Json;
 use api_core::ApiResponse;
+use api_core::FpResult;
 use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::BusinessOwnerQuery;
@@ -38,7 +39,7 @@ pub async fn get(
 
     let pagination = pagination.db_pagination(&state);
     let (bos, next_page) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sb = ScopedVault::get(conn, (&fp_bid, &tenant_id, is_live))?;
             let query = BusinessOwnerQuery {
                 bv_id: &sb.vault_id,

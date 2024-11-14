@@ -1,7 +1,7 @@
 use super::workflow::Workflow;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::workflow;
@@ -37,7 +37,7 @@ pub struct NewWorkflowRequestJunctionRow<'a> {
 }
 
 impl WorkflowRequestJunction {
-    pub fn bulk_create(conn: &mut PgConn, rows: Vec<NewWorkflowRequestJunctionRow>) -> FpResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut PgConn, rows: Vec<NewWorkflowRequestJunctionRow>) -> DbResult<Vec<Self>> {
         let result = diesel::insert_into(workflow_request_junction::table)
             .values(rows)
             .get_results::<Self>(conn)?;
@@ -45,7 +45,7 @@ impl WorkflowRequestJunction {
     }
 
     #[tracing::instrument("WorkflowRequestJunction::set_wf_id", skip_all)]
-    pub fn set_wf_id(conn: &mut TxnPgConn, id: &WorkflowRequestId, wf: &Workflow) -> FpResult<Vec<Self>> {
+    pub fn set_wf_id(conn: &mut TxnPgConn, id: &WorkflowRequestId, wf: &Workflow) -> DbResult<Vec<Self>> {
         let results = diesel::update(workflow_request_junction::table)
             .filter(workflow_request_junction::workflow_request_id.eq(id))
             .filter(workflow_request_junction::scoped_vault_id.eq(&wf.scoped_vault_id))
@@ -60,7 +60,7 @@ impl WorkflowRequestJunction {
         conn: &mut PgConn,
         wfr_id: &WorkflowRequestId,
         sv_id: &ScopedVaultId,
-    ) -> FpResult<(Self, Option<Workflow>)> {
+    ) -> DbResult<(Self, Option<Workflow>)> {
         let result = workflow_request_junction::table
             .left_join(workflow::table)
             .filter(workflow_request_junction::workflow_request_id.eq(wfr_id))
@@ -70,7 +70,7 @@ impl WorkflowRequestJunction {
     }
 
     #[tracing::instrument("WorkflowRequestJunction::list", skip_all)]
-    pub fn list(conn: &mut PgConn, wfr_id: &WorkflowRequestId) -> FpResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, wfr_id: &WorkflowRequestId) -> DbResult<Vec<Self>> {
         let results = workflow_request_junction::table
             .filter(workflow_request_junction::workflow_request_id.eq(wfr_id))
             .get_results::<Self>(conn)?;

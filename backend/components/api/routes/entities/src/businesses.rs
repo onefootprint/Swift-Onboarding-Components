@@ -4,6 +4,7 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
@@ -27,7 +28,7 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let businesses = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let businesses = BusinessOwner::list_owned_businesses(conn, &su.vault_id, &tenant_id)?;
             Ok(businesses)

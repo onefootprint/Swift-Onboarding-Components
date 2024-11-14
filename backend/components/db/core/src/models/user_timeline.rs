@@ -18,9 +18,9 @@ use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_vault::ScopedVault;
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::user_timeline;
@@ -116,7 +116,7 @@ impl UserTimeline {
         event: T,
         vault_id: VaultId,
         scoped_vault_id: ScopedVaultId,
-    ) -> FpResult<()>
+    ) -> DbResult<()>
     where
         T: Into<DbUserTimelineEvent>,
     {
@@ -142,7 +142,7 @@ impl UserTimeline {
         conn: &mut PgConn,
         scoped_vault_id: T,
         kinds: Vec<DbUserTimelineEventKind>,
-    ) -> FpResult<Vec<UserTimelineInfo>>
+    ) -> DbResult<Vec<UserTimelineInfo>>
     where
         T: Into<ScopedVaultIdentifier<'a>>,
     {
@@ -371,7 +371,7 @@ impl UserTimeline {
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))
             })
-            .collect::<FpResult<Vec<_>>>()?;
+            .collect::<DbResult<Vec<_>>>()?;
 
         Ok(results)
     }
@@ -381,7 +381,7 @@ impl UserTimeline {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         id: String,
-    ) -> FpResult<Option<Self>> {
+    ) -> DbResult<Option<Self>> {
         let res = user_timeline::table
             .filter(user_timeline::scoped_vault_id.eq(sv_id))
             .filter(

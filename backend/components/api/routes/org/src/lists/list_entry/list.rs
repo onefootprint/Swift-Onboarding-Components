@@ -4,6 +4,7 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpError;
+use api_core::FpResult;
 use api_core::State;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
@@ -34,7 +35,7 @@ pub async fn entries_for_list(
     let is_live = auth.is_live()?;
 
     let (tenant, list, entries) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let entries = ListEntry::list(conn, &list_id)?;

@@ -17,9 +17,9 @@ use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::requirements::UserDecryptResultForReqs;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
-use api_errors::FpDbOptionalExtension;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKybRequest;
 use db::models::data_lifetime::DataLifetime;
@@ -83,7 +83,7 @@ pub async fn post(
     }
 
     let (bvw, sb, seqno) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -110,13 +110,12 @@ pub async fn post(
     let dbos = bvw.decrypt_business_owners(&state).await?;
     let tenant_id = auth.tenant().id.clone();
     let (biz_wf, obc) = state
-        .db_transaction(move |conn| {
-            let result = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live));
-            let obc = match result.optional() {
-                Ok(Some((_, obc, _))) => obc,
-                Ok(None) => return Err(DbError::PlaybookNotFound.into()),
-                Err(e) => return Err(e),
-            };
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (_, obc, _) = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live))
+                .map_err(|e| match e {
+                    DbError::DataNotFound(_) => DbError::PlaybookNotFound,
+                    e => e,
+                })?;
             tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
             if obc.kind != ObConfigurationKind::Kyb {
                 return BadRequestInto("Must use playbook of kind KYB");
@@ -194,7 +193,7 @@ pub async fn post(
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     let (wf, sv, mrs) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf.id)?;
             let mr_filters = ManualReviewFilters::get_active();
             let mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;

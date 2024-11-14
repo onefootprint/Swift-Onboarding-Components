@@ -8,7 +8,7 @@ use db::{
         tenant_role::{ImmutableRoleKind, TenantRole},
         tenant_rolebinding::TenantRolebinding,
     },
-    DbError, FpResult, PgConn, TxnPgConn,
+    DbError, DbResult, PgConn, TxnPgConn,
 };
 use db_schema::schema::{tenant_api_key, tenant_role, tenant_rolebinding};
 use diesel::prelude::*;
@@ -59,7 +59,7 @@ impl CustomMigration for Migration {
     }
 }
 
-fn migrate_role(conn: &mut TxnPgConn, role: TenantRole) -> FpResult<()> {
+fn migrate_role(conn: &mut TxnPgConn, role: TenantRole) -> DbResult<()> {
     println!("{:?}", role);
     // Some legacy legacy roles don't have read, which fails validation - this adds read perms everywhere
     let scopes = role
@@ -137,7 +137,7 @@ fn create_role(
     role: &TenantRole,
     scopes: Vec<TenantScope>,
     kind: TenantRoleKind,
-) -> FpResult<TenantRole> {
+) -> DbResult<TenantRole> {
     // Immutable roles are get_or_created, while other roles are just created
     if role.is_immutable {
         let irk = if role.name == "Admin" {
@@ -160,7 +160,7 @@ fn create_role(
     }
 }
 
-fn validate(conn: &mut PgConn) -> FpResult<()> {
+fn validate(conn: &mut PgConn) -> DbResult<()> {
     // Make sure all API keys and Rolebindings now point to modern tenant roles
     let api_key_live_roles = tenant_api_key::table
         .filter(tenant_api_key::is_live.eq(true))

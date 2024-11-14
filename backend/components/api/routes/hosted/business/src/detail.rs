@@ -1,4 +1,5 @@
 use crate::types::ApiResponse;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
@@ -6,10 +7,10 @@ use api_core::utils::vault_wrapper::BusinessOwnerInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_errors::BadRequest;
 use api_errors::BadRequestWithCode;
-use api_errors::FpDbOptionalExtension;
 use api_errors::FpErrorCode;
 use api_wire_types::hosted::business::HostedBusinessDetail;
 use api_wire_types::hosted::business::Inviter;
+use db::errors::FpOptionalExtension;
 use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::workflow::Workflow;
 use newtypes::BusinessDataKind as BDK;
@@ -29,7 +30,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     let biz_wf_id = bo_auth.data.data.biz_wf_id.clone();
     let bo_id = bo_auth.bo.id.clone();
     let (bvw, user_wfl) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (_, sb) = Workflow::get_all(conn, &biz_wf_id)?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             let user_wfl = BusinessWorkflowLink::get_bo_workflow(conn, &bo_id, &biz_wf_id).optional()?;

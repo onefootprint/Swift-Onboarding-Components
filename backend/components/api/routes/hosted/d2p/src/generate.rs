@@ -6,6 +6,7 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::IsGuardMet;
 use api_core::types::ApiResponse;
+use api_core::FpResult;
 use api_wire_types::D2pGenerateRequest;
 use api_wire_types::D2pGenerateResponse;
 use chrono::Duration;
@@ -32,7 +33,7 @@ pub async fn handler(
     let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let limit_ttl = Duration::minutes(30);
             let args = NewUserSessionContext::default();
             let session = user_auth.update(

@@ -2,7 +2,7 @@ use crate::actions::EntityActionPostCommit;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::FpResult;
-use api_errors::FpDbOptionalExtension;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;

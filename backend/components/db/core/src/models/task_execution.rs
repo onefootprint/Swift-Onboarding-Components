@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::task_execution;
@@ -62,7 +62,7 @@ impl TaskExecution {
         conn: &mut PgConn,
         args: Vec<TaskExecutionCreateArgs>,
         now: DateTime<Utc>,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewTaskExecution> = args
             .into_iter()
             .map(|a| NewTaskExecution {
@@ -81,7 +81,7 @@ impl TaskExecution {
     }
 
     #[tracing::instrument("TaskExecution::update", skip_all)]
-    pub fn update(conn: &mut PgConn, id: &TaskExecutionId, update: TaskExecutionUpdate) -> FpResult<Self> {
+    pub fn update(conn: &mut PgConn, id: &TaskExecutionId, update: TaskExecutionUpdate) -> DbResult<Self> {
         let result = diesel::update(task_execution::table)
             .filter(task_execution::id.eq(id))
             .set(update)

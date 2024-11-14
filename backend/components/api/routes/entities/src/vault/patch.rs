@@ -4,6 +4,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::BasicTenantAuth;
 use api_core::auth::tenant::BasicTenantAuthWrapper;
@@ -163,7 +164,7 @@ async fn patch_inner(
         let fp_id = fp_id.clone();
         let tenant_id = tenant_id.clone();
         let uvw = state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
                 let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
                 Ok(vw)
@@ -201,7 +202,7 @@ async fn patch_inner(
 
     let actor = auth.actor();
     let svv = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
 
             // TODO one day, delete in `patch_data` below and make a more informative timeline

@@ -2,12 +2,11 @@ use super::ob_configuration::IsLive;
 use super::tenant::Tenant;
 use super::tenant_role::TenantRole;
 use crate::DbError;
+use crate::DbResult;
 use crate::NextPage;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_api_key;
@@ -107,7 +106,7 @@ impl TenantApiKey {
         conn: &mut PgConn,
         filters: &ApiKeyListFilters,
         pagination: OffsetPagination,
-    ) -> FpResult<(Vec<(TenantApiKey, TenantRole)>, NextPage)> {
+    ) -> DbResult<(Vec<(TenantApiKey, TenantRole)>, NextPage)> {
         let mut query = Self::list_query(filters)
             .inner_join(tenant_role::table)
             .select((tenant_api_key::all_columns, tenant_role::all_columns))
@@ -123,7 +122,7 @@ impl TenantApiKey {
     }
 
     #[tracing::instrument("TenantApiKey::count", skip_all)]
-    pub fn count(conn: &mut PgConn, filters: &ApiKeyListFilters) -> FpResult<i64> {
+    pub fn count(conn: &mut PgConn, filters: &ApiKeyListFilters) -> DbResult<i64> {
         let count = Self::list_query(filters).count().get_result(conn)?;
         Ok(count)
     }
@@ -132,7 +131,7 @@ impl TenantApiKey {
     pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,
-    ) -> FpResult<(TenantApiKey, TenantRole)> {
+    ) -> DbResult<(TenantApiKey, TenantRole)> {
         let mut query = tenant_api_key::table
             .inner_join(tenant_role::table)
             .filter(tenant_api_key::deactivated_at.is_null())
@@ -159,7 +158,7 @@ impl TenantApiKey {
     pub fn get_enabled(
         conn: &mut TxnPgConn,
         sh_api_key: Fingerprint,
-    ) -> FpResult<(TenantApiKey, Tenant, TenantRole)> {
+    ) -> DbResult<(TenantApiKey, Tenant, TenantRole)> {
         use db_schema::schema::tenant;
         let (api_key, tenant, role): (TenantApiKey, Tenant, TenantRole) = tenant_api_key::table
             .inner_join(tenant::table)
@@ -168,22 +167,22 @@ impl TenantApiKey {
             .filter(tenant_api_key::deactivated_at.is_null())
             .first(conn.conn())?;
         if api_key.status != ApiKeyStatus::Enabled {
-            return Err(DbError::ApiKeyDisabled.into());
+            return Err(DbError::ApiKeyDisabled);
         }
         if role.deactivated_at.is_some() {
-            return Err(DbError::TenantRoleDeactivated.into());
+            return Err(DbError::TenantRoleDeactivated);
         }
 
         let role_tenant_id = match role.tenant_or_partner_tenant_id()? {
             OrgIdentifierRef::TenantId(tenant_id) => tenant_id,
             OrgIdentifierRef::PartnerTenantId(_) => {
                 // Partner tenants don't have API key access.
-                return BadRequestInto("This kind of role cannot be bound to this entity.");
+                return Err(DbError::IncorrectTenantRoleKind);
             }
         };
 
         if *role_tenant_id != api_key.tenant_id {
-            return Err(DbError::TenantRoleMismatch.into());
+            return Err(DbError::TenantRoleMismatch);
         }
 
         let api_key = api_key.maybe_update_last_used_at(conn)?;
@@ -202,7 +201,7 @@ impl TenantApiKey {
 
     /// Updates the last_used_at timestamp on this API key, including some controls to prevent
     /// flooding the DB with writes for lots of API requests made in rapid succession
-    fn maybe_update_last_used_at(self, conn: &mut TxnPgConn) -> FpResult<Self> {
+    fn maybe_update_last_used_at(self, conn: &mut TxnPgConn) -> DbResult<Self> {
         // First, check if the key has been updated recently. No need to add write throughput to the
         // db if this timestamp was updated recently
         if !self.should_update_last_used_at() {
@@ -239,13 +238,13 @@ impl TenantApiKey {
         tenant_id: TenantId,
         is_live: IsLive,
         role_id: TenantRoleId,
-    ) -> FpResult<TenantApiKey> {
+    ) -> DbResult<TenantApiKey> {
         // Make sure the role we are using belongs to the tenant, otherwise could make api key
         // for another tenant's role
         // And, lock the role so it isn't deactivated while we are making the key
         let role = TenantRole::lock_active(conn, &role_id, &tenant_id)?;
         if role.kind != TenantRoleKindDiscriminant::ApiKey || role.is_live != Some(is_live) {
-            return BadRequestInto("This kind of role cannot be bound to this entity.");
+            return Err(DbError::IncorrectTenantRoleKind);
         }
         let role_id = role.into_inner().id;
         let new_key = NewTenantApiKey {
@@ -276,7 +275,7 @@ impl TenantApiKey {
         status: Option<ApiKeyStatus>,
         role_id: Option<TenantRoleId>,
         deactivated_at: Option<DateTime<Utc>>,
-    ) -> FpResult<(Self, TenantRole)> {
+    ) -> DbResult<(Self, TenantRole)> {
         let update = TenantApiKeyUpdate {
             name,
             status,
@@ -290,10 +289,10 @@ impl TenantApiKey {
         // on another tenant's role
         let new_role = TenantRole::lock_active(conn, role_id_to_lock, &tenant_id)?;
         if new_role.kind != TenantRoleKindDiscriminant::ApiKey || new_role.is_live != Some(is_live) {
-            return BadRequestInto("This kind of role cannot be bound to this entity.");
+            return Err(DbError::IncorrectTenantRoleKind);
         }
         if new_role.deactivated_at.is_some() {
-            return Err(DbError::TenantRoleAlreadyDeactivated.into());
+            return Err(DbError::TenantRoleAlreadyDeactivated);
         }
         let results: Vec<Self> = diesel::update(tenant_api_key::table)
             .filter(tenant_api_key::id.eq(key.id))
@@ -301,7 +300,7 @@ impl TenantApiKey {
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok((result, new_role.into_inner()))

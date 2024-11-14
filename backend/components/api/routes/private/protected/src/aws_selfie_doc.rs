@@ -8,6 +8,7 @@ use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiCoreError;
+use api_core::FpResult;
 use api_core::State;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::DataIdentifier;
@@ -41,7 +42,7 @@ pub async fn post(
     } = request.into_inner();
 
     let uvw = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(
                 conn,
                 db::models::scoped_vault::ScopedVaultIdentifier::SuperAdminView { identifier: &fp_id },

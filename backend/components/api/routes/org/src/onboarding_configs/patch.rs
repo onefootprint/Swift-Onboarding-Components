@@ -3,6 +3,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationUpdate;
@@ -52,7 +53,7 @@ async fn patch(
     } = request.into_inner();
     let tenant_id = tenant.id.clone();
     let (obc, actor, rs) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let update = ObConfigurationUpdate {
                 name,
                 status,

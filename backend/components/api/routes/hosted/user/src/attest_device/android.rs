@@ -16,6 +16,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::tenant_android_app_meta::TenantAndroidAppFilters;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
+use db::DbResult;
 use newtypes::AndroidAppLicense;
 use newtypes::AndroidAppRecognition;
 use newtypes::AndroidDeviceIntegrityLevel;
@@ -65,7 +66,7 @@ pub(super) async fn attest(
             package_name,
         };
         let metas = state
-            .db_query(move |conn| TenantAndroidAppMeta::list(conn, filters))
+            .db_query(move |conn| -> DbResult<_> { TenantAndroidAppMeta::list(conn, filters) })
             .await?;
         metas.into_iter().next()
     } else {

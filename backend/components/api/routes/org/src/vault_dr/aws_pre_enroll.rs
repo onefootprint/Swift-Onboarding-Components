@@ -3,6 +3,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
+use api_core::FpResult;
 use api_core::State;
 use crypto::hex::ToHex;
 use db::models::vault_dr::NewVaultDrAwsPreEnrollment;
@@ -27,14 +28,14 @@ pub async fn post(
     let is_live = auth.is_live()?;
 
     let pre_enrollment = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let new_pre_enrollment = NewVaultDrAwsPreEnrollment {
                 tenant_id: &tenant.id,
                 is_live,
                 aws_external_id: crypto::random::gen_rand_bytes(16).encode_hex::<String>().into(),
             };
 
-            VaultDrAwsPreEnrollment::get_or_create(conn, new_pre_enrollment)
+            Ok(VaultDrAwsPreEnrollment::get_or_create(conn, new_pre_enrollment)?)
         })
         .await?;
 
@@ -57,7 +58,9 @@ pub async fn get(
     let is_live = auth.is_live()?;
 
     let pre_enrollment = state
-        .db_query(move |conn| VaultDrAwsPreEnrollment::get(conn, (&tenant_id, is_live)))
+        .db_query(move |conn| -> FpResult<_> {
+            Ok(VaultDrAwsPreEnrollment::get(conn, (&tenant_id, is_live))?)
+        })
         .await?;
 
     Ok(api_wire_types::VaultDrAwsPreEnrollResponse {

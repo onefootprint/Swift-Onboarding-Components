@@ -15,14 +15,15 @@ use api_core::utils::token::CreateTokenResult;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
-use api_errors::FpDbOptionalExtension;
 use api_wire_types::CreateTokenRequest;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use chrono::Utc;
+use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -108,7 +109,7 @@ pub async fn post(
     }
 
     let (token, session) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant.id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
 

@@ -4,6 +4,7 @@ use crypto::aead::SealingKey;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
 use db::tests::MockFFClient;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use idv::incode::doc::response::*;
 use idv::incode::doc::IncodeAddBackRequest;
@@ -301,7 +302,7 @@ pub async fn mock_enclave_s3_client(
     let mut mock_s3_client_enclave = crate::s3::MockS3Client::new();
 
     let (data_keys, s3_urls): (Vec<SealedVaultBytes>, Vec<S3Url>) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let (identity_document, _) = Document::get(conn, &document_id)?;
             identity_document.images(conn, DocumentImageArgs::default())
         })

@@ -2,10 +2,10 @@ use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
 use super::workflow::Workflow;
 use crate::DbError;
+use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::manual_review;
@@ -93,7 +93,7 @@ impl ManualReview {
         workflow: &Workflow,
         decision: &OnboardingDecision,
         mrs: Vec<ManualReviewArgs>,
-    ) -> FpResult<ManualReviewDelta> {
+    ) -> DbResult<ManualReviewDelta> {
         let filters = ManualReviewFilters::get_active();
         let existing_mrs = Self::get(conn, &workflow.scoped_vault_id, filters)?;
         let old_has_mrs = !existing_mrs.is_empty();
@@ -130,7 +130,7 @@ impl ManualReview {
                         .set(update)
                         .get_results::<Self>(conn.conn())?;
                     if results.len() != 1 {
-                        return Err(DbError::IncorrectNumberOfRowsUpdated.into());
+                        return Err(DbError::IncorrectNumberOfRowsUpdated);
                     }
                 }
                 // No-op
@@ -154,7 +154,7 @@ impl ManualReview {
         conn: &mut PgConn,
         id: T,
         filters: ManualReviewFilters,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let mut query = manual_review::table.into_boxed();
 
         match id.into() {

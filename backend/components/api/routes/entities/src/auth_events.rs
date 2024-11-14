@@ -7,6 +7,7 @@ use crate::State;
 use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
@@ -29,7 +30,7 @@ pub async fn get(
     let fp_id = request.into_inner();
 
     let events = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (events, _) = AuthEvent::list(conn, &sv.id, None)?;
             Ok(events)

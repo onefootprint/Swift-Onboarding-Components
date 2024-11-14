@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use db_schema::schema::apple_device_attestation;
 use db_schema::schema::auth_event;
 use db_schema::schema::rule_result;
@@ -10,7 +10,7 @@ use itertools::Itertools;
 use newtypes::VaultId;
 
 #[tracing::instrument(skip_all)]
-pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) -> FpResult<usize> {
+pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) -> DbResult<usize> {
     // we register users within our integration tests. to avoid filling up our database with fake
     // information, we clean up afterwards.
 

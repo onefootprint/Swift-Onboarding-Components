@@ -11,6 +11,7 @@ use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::VaultVersion;
 use api_core::utils::vault_wrapper::TenantVw;
+use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_version::ScopedVaultVersion;
 use macros::route_alias;
@@ -135,7 +136,7 @@ async fn get_inner(
     };
 
     let (uvw, svvn) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let svvn = if let Some(svvn) = vault_version {

@@ -5,6 +5,7 @@ use actix_web::web::Json;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::types::ApiResponse;
+use api_core::FpResult;
 use api_wire_types::CompliancePartnershipRequest;
 use chrono::DateTime;
 use chrono::Utc;
@@ -40,7 +41,7 @@ pub async fn post(
     auth.check_guard(FirmEmployeeGuard::Any)?;
 
     let partnership = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (np, is_new) = NewTenantCompliancePartnership {
                 tenant_id: &request.tenant_id.clone(),
                 partner_tenant_id: &request.partner_tenant_id.clone(),

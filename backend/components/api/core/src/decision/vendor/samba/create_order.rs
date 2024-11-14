@@ -399,7 +399,7 @@ pub async fn run_samba_create_order(
     let context2 = context.clone();
 
     let (vw, tenant_id, doc) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw: VaultWrapper = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -496,7 +496,7 @@ pub async fn run_samba_create_order(
     let create_order_response = resp.result.into_success().map_err(into_fp_error)?;
 
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let args = NewSambaOrderArgs {
                 decision_intent_id: di_id,
                 document_id: doc_id.clone(),

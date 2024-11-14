@@ -6,6 +6,7 @@ use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_core::{
     self,
@@ -73,7 +74,7 @@ async fn post(
     } = request.into_inner();
 
     let (obc, rules) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
             Ok((obc, rules))
@@ -95,7 +96,7 @@ async fn post(
     let rules = rules.into_iter().map(copy_rule).collect_vec();
 
     let (obc, actor, rs) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Create the copied playbook
             let (_, obc) = Playbook::create(conn, &target_tenant_id, target_is_live, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;

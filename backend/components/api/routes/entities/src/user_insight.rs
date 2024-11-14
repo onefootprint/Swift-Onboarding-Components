@@ -9,6 +9,7 @@ use db::models::insight_event::InsightEvent;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
+use db::DbResult;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -28,7 +29,7 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
     let (behavior_events, latest_completed_wf, insight_event_for_latest_wf) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let behavior = NeuroIdAnalyticsEvent::list(conn, &sv.id)?;
             let latest_completed_wf = Workflow::latest_reonboardable(conn, &sv.id, true)?.map(|(wf, _)| wf);

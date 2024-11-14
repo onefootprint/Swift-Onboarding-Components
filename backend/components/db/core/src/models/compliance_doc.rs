@@ -1,6 +1,6 @@
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc;
@@ -39,7 +39,7 @@ pub struct NewComplianceDoc<'a> {
 
 impl<'a> NewComplianceDoc<'a> {
     #[tracing::instrument("NewComplianceDoc::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn) -> FpResult<Locked<ComplianceDoc>> {
+    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<Locked<ComplianceDoc>> {
         let doc = diesel::insert_into(compliance_doc::table)
             .values(self)
             .get_result(conn.conn())?;
@@ -56,7 +56,7 @@ pub enum ComplianceDocIdentifier<'a> {
 }
 
 impl<'a> ComplianceDocIdentifier<'a> {
-    pub fn get_doc_id(&self, conn: &mut PgConn) -> FpResult<ComplianceDocId> {
+    pub fn get_doc_id(&self, conn: &mut PgConn) -> DbResult<ComplianceDocId> {
         let doc_id = match *self {
             ComplianceDocIdentifier::ComplianceDocId(id) => id.clone(),
             ComplianceDocIdentifier::ComplianceDocRequestId(request_id) => compliance_doc_request::table
@@ -84,7 +84,7 @@ impl ComplianceDoc {
         conn: &mut PgConn,
         id: impl Into<ComplianceDocIdentifier<'a>>,
         partnership_id: &TenantCompliancePartnershipId,
-    ) -> FpResult<ComplianceDoc> {
+    ) -> DbResult<ComplianceDoc> {
         let id: ComplianceDocIdentifier<'a> = id.into();
         let doc_id = id.get_doc_id(conn)?;
 
@@ -102,7 +102,7 @@ impl ComplianceDoc {
         conn: &mut TxnPgConn,
         id: impl Into<ComplianceDocIdentifier<'a>>,
         partnership_id: &TenantCompliancePartnershipId,
-    ) -> FpResult<Locked<ComplianceDoc>> {
+    ) -> DbResult<Locked<ComplianceDoc>> {
         let id: ComplianceDocIdentifier<'a> = id.into();
         let doc_id = id.get_doc_id(conn.conn())?;
 

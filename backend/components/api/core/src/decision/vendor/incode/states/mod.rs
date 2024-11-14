@@ -143,7 +143,7 @@ pub async fn save_incode_fixtures(
     let iddoc = id_doc.clone();
     let wfid = wf_id.clone();
     let (vres, doc_uploads) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let di =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wfid, DecisionIntentKind::DocScan)?;
             let apis = vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores];
@@ -199,7 +199,7 @@ pub async fn save_incode_fixtures(
     let suid = su_id.clone();
     let wfid = wf_id.clone();
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Enter the complete state to save risk signals
             let args = CompleteArgs {
                 vault: &vw.vault,

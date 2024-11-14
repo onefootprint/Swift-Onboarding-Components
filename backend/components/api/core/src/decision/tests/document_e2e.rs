@@ -30,6 +30,7 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::DbResult;
 use macros::test_state_case;
 use newtypes::CollectedDataOption;
 use newtypes::CountryRestriction;
@@ -170,7 +171,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         device_type: None,
     };
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> DbResult<_> {
             let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
@@ -337,7 +338,7 @@ async fn assertions(
         .await;
 
         state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> DbResult<_> {
                 let (id_doc, _) = Document::get(conn, &document_id)?;
                 assert_eq!(id_doc.status, DocumentStatus::Complete);
 
@@ -385,7 +386,7 @@ pub async fn assert_ivs_in_state(
     incode_session_state: IncodeVerificationSessionState,
 ) -> IncodeVerificationSession {
     state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &document_id)
                 .unwrap()
                 .unwrap();

@@ -8,6 +8,7 @@ use crate::utils::db2api::DbToApi;
 use crate::utils::fp_id_path::FpIdPath;
 use crate::web::Json;
 use crate::ApiResponse;
+use crate::FpResult;
 use crate::State;
 use db::models::data_lifetime::DataLifetime;
 use db::models::rule_set_result::RuleSetResult;
@@ -41,7 +42,7 @@ pub async fn get(
 
     let pagination = pagination.db_pagination(&state);
     let (wfs, next_page) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (wfs, next_page) = Workflow::list(conn, &sv.id, pagination)?;
             let wf_ids = wfs.iter().map(|(wf, _)| wf.id.clone()).collect_vec();

@@ -7,6 +7,7 @@ use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::tenant::TenantError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::Patch;
 use db::models::ob_configuration::NewObConfigurationArgs;
@@ -204,7 +205,7 @@ pub async fn post(
     .await?;
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant, is_live, &tvc)?;
     let (obc, actor, rs) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (_, obc) = Playbook::create(conn, &tenant_id, is_live, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc)?;

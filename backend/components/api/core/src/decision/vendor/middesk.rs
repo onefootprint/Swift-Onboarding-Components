@@ -317,7 +317,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let di_id = self.state.create_business_vreq.decision_intent_id;
         let middesk_request_id = self.middesk_request.id.clone();
         let (udpated_middesk_request, business_update_webhook_vreq) = state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, vreq_id)?;
                 let _vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
@@ -363,7 +363,7 @@ impl MiddeskState<AwaitingBusinessUpdateWebhook> {
 
         let middesk_request_id = self.middesk_request.id.clone();
         let (updated_middesk_request, vres, tin_retry_vreq) = db_pool
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, webhook_vreq.id.clone())?;
 
                 let vendor_response = VendorResponse {
@@ -429,7 +429,7 @@ impl MiddeskState<AwaitingTinRetry> {
         let middesk_request_id = self.middesk_request.id.clone();
 
         let (updated_middesk_request, get_business_vreq) = db_pool
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, webhook_vreq.id.clone())?;
 
                 let vendor_response = VendorResponse {
@@ -506,7 +506,7 @@ impl MiddeskState<PendingGetBusinessCall> {
         // TODO: refactor code sites where we save a single vres to share a common func
         let vr = (self.state.get_business_vreq.clone(), vendor_response.clone());
         let (updated_middesk_request, business_response_vres) = db_pool
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let (_, uv) = Workflow::get_with_vault(conn, &wf.id)?;
                 let vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
@@ -534,7 +534,7 @@ impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(self, state: &State) -> FpResult<()> {
         let wfid = self.middesk_request.workflow_id.clone();
         let (v, sv, wf, seqno) = state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let (_, v) = Workflow::get_with_vault(conn, &wfid)?;
                 let (wf, sv) = Workflow::get_all(conn, &wfid)?;
                 let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -583,7 +583,7 @@ impl MiddeskState<Complete> {
         let obc_id = wf.ob_configuration_id.clone();
         let wf_id = wf.id.clone();
         state
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let billing_event_kind = if let Some(VerificationCheck::Kyb { ein_only }) =
                     obc.verification_checks().get(VerificationCheckKind::Kyb)
@@ -640,7 +640,7 @@ pub async fn init_middesk_request(
     wf_id: WorkflowId,
 ) -> FpResult<MiddeskState<PendingCreateBusinessCall>> {
     let (middesk_request, create_business_vreq) = db_pool
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let wf = Workflow::lock(conn, &wf_id)?;
             // TODO should these state transitions be handled by the ww machines?
             let (wf, _, _) = Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Pending)?;

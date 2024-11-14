@@ -1,7 +1,7 @@
 use super::workflow::Workflow;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::decision_intent;
@@ -39,7 +39,7 @@ impl DecisionIntent {
         kind: DecisionIntentKind,
         scoped_vault_id: &ScopedVaultId,
         workflow_id: Option<&WorkflowId>,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let new_di = NewDecisionIntent {
             created_at: Utc::now(),
             kind,
@@ -53,7 +53,7 @@ impl DecisionIntent {
     }
 
     #[tracing::instrument("DecisionIntent::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &DecisionIntentId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &DecisionIntentId) -> DbResult<Self> {
         let result = decision_intent::table
             .filter(decision_intent::id.eq(id))
             .get_result(conn)?;
@@ -66,7 +66,7 @@ impl DecisionIntent {
         sv_id: &ScopedVaultId,
         wf_id: &WorkflowId,
         kind: DecisionIntentKind,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         Workflow::lock(conn, wf_id)?;
         let new_di = NewDecisionIntent {
             created_at: Utc::now(),

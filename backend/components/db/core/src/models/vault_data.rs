@@ -1,13 +1,13 @@
 use super::data_lifetime::DataLifetime;
 use super::data_lifetime::DataLifetimeSeqnoTxn;
 use super::data_lifetime::NewDataLifetimeArgs;
+use crate::errors::AssertionError;
+use crate::DbError;
+use crate::DbResult;
 use crate::HasLifetime;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::VaultedData;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
-use api_errors::ServerErr;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::vault_data;
@@ -68,20 +68,26 @@ impl VaultData {
         sv_txn: &DataLifetimeSeqnoTxn<'_>,
         data: Vec<NewVaultData>,
         actor: Option<DbActor>,
-    ) -> FpResult<(Vec<Self>, ScopedVaultVersionNumber)> {
+    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         // One more sanity check that we don't store plaintext data where not desired
         if let Some(d) = data
             .iter()
             .find(|d| d.kind.store_plaintext() != d.p_data.is_some())
         {
-            return BadRequestInto!("Invalid {} in plaintext", d.kind);
+            return Err(DbError::ValidationError(format!(
+                "Invalid {} in plaintext",
+                d.kind
+            )));
         }
         // And a sanity check that all the data we are storing should be in the vault data table
         if let Some(d) = data
             .iter()
             .find(|d| d.kind.storage_type() != StorageType::VaultData)
         {
-            return BadRequestInto!("Cannot store {} as VaultData", d.kind);
+            return Err(DbError::ValidationError(format!(
+                "Cannot store {} as VaultData",
+                d.kind
+            )));
         }
         // Make a DataLifetime row for each of the new pieces of data being inserted
         let dl_data = data
@@ -96,8 +102,8 @@ impl VaultData {
         let mut dls: HashMap<_, _> = dls.into_iter().map(|dl| (dl.kind.clone(), dl)).collect();
         let new_rows: Vec<_> = data
             .into_iter()
-            .map(|vd| -> FpResult<_> {
-                let dl = dls.remove(&vd.kind).ok_or(ServerErr("No lifetime found"))?;
+            .map(|vd| -> DbResult<_> {
+                let dl = dls.remove(&vd.kind).ok_or(AssertionError("No lifetime found"))?;
                 Ok((vd, dl))
             })
             .map_ok(|(new_vd, lifetime)| NewVaultDataRow {
@@ -107,7 +113,7 @@ impl VaultData {
                 p_data: new_vd.p_data,
                 format: new_vd.format,
             })
-            .collect::<FpResult<_>>()?;
+            .collect::<DbResult<_>>()?;
         let results = diesel::insert_into(vault_data::table)
             .values(new_rows)
             .get_results(conn.conn())?;
@@ -115,7 +121,7 @@ impl VaultData {
     }
 
     #[tracing::instrument("VaultData::bulk_get_by_id", skip_all)]
-    pub fn bulk_get_by_id(conn: &mut PgConn, ids: &[VdId]) -> FpResult<Vec<Self>> {
+    pub fn bulk_get_by_id(conn: &mut PgConn, ids: &[VdId]) -> DbResult<Vec<Self>> {
         Ok(vault_data::table
             .filter(vault_data::id.eq_any(ids))
             .get_results(conn)?)
@@ -128,7 +134,7 @@ impl HasLifetime for VaultData {
     }
 
     #[tracing::instrument("VaultData::get_for", skip_all)]
-    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> FpResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,
     {

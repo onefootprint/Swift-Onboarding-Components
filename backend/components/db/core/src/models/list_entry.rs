@@ -4,10 +4,9 @@ use super::data_lifetime::DataLifetime;
 use super::list::List;
 use super::list_entry_creation::ListEntryCreation;
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::list;
@@ -73,8 +72,8 @@ impl ListEntry {
         tenant_id: &TenantId,
         is_live: bool,
         insight_event_id: &InsightEventId,
-    ) -> FpResult<Self> {
-        let result = Self::bulk_create(
+    ) -> DbResult<Self> {
+        Self::bulk_create(
             conn,
             list_id,
             actor,
@@ -84,8 +83,7 @@ impl ListEntry {
             insight_event_id,
         )?
         .pop()
-        .ok_or(DbError::IncorrectNumberOfRowsUpdated)?;
-        Ok(result)
+        .ok_or(DbError::IncorrectNumberOfRowsUpdated)
     }
 
     #[tracing::instrument("ListEntry::bulk_create", skip_all)]
@@ -97,7 +95,7 @@ impl ListEntry {
         tenant_id: &TenantId,
         is_live: bool,
         insight_event_id: &InsightEventId,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         if e_data.is_empty() {
             return Ok(vec![]);
         }
@@ -135,7 +133,7 @@ impl ListEntry {
     }
 
     #[tracing::instrument("ListEntry::get", skip_all)]
-    pub fn get(conn: &mut PgConn, list_entry_id: &ListEntryId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, list_entry_id: &ListEntryId) -> DbResult<Self> {
         let res = list_entry::table
             .filter(list_entry::id.eq(list_entry_id))
             .get_result(conn)?;
@@ -146,7 +144,7 @@ impl ListEntry {
     pub fn bulk_get(
         conn: &mut PgConn,
         list_entry_ids: &[ListEntryId],
-    ) -> FpResult<HashMap<ListEntryId, ListEntry>> {
+    ) -> DbResult<HashMap<ListEntryId, ListEntry>> {
         let res = list_entry::table
             .filter(list_entry::id.eq_any(list_entry_ids))
             .get_results::<Self>(conn)?
@@ -158,7 +156,7 @@ impl ListEntry {
 
     #[allow(clippy::self_named_constructors)]
     #[tracing::instrument("ListEntry::list", skip_all)]
-    pub fn list(conn: &mut PgConn, list_id: &ListId) -> FpResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, list_id: &ListId) -> DbResult<Vec<Self>> {
         let res = list_entry::table
             .filter(list_entry::list_id.eq(list_id))
             .filter(list_entry::deactivated_seqno.is_null())
@@ -170,7 +168,7 @@ impl ListEntry {
 
     #[allow(clippy::self_named_constructors)]
     #[tracing::instrument("ListEntry::list_bulk", skip_all)]
-    pub fn list_bulk(conn: &mut PgConn, ids: &[ListId]) -> FpResult<HashMap<ListId, ListWithEntries>> {
+    pub fn list_bulk(conn: &mut PgConn, ids: &[ListId]) -> DbResult<HashMap<ListId, ListWithEntries>> {
         let mut entries = list_entry::table
             .filter(list_entry::list_id.eq_any(ids))
             .filter(list_entry::deactivated_seqno.is_null())
@@ -203,7 +201,7 @@ impl ListEntry {
     pub fn bulk_list_by_creation_id(
         conn: &mut PgConn,
         lec_ids: &[ListEntryCreationId],
-    ) -> FpResult<HashMap<ListEntryCreationId, Vec<Self>>> {
+    ) -> DbResult<HashMap<ListEntryCreationId, Vec<Self>>> {
         let res = list_entry::table
             .filter(list_entry::list_entry_creation_id.eq_any(lec_ids))
             .order_by((list_entry::list_entry_creation_id, list_entry::id))
@@ -220,7 +218,7 @@ impl ListEntry {
     }
 
     #[tracing::instrument("ListEntry::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, list_entry_id: &ListEntryId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, list_entry_id: &ListEntryId) -> DbResult<Locked<Self>> {
         let result = list_entry::table
             .filter(list_entry::id.eq(list_entry_id))
             .for_no_key_update()
@@ -236,9 +234,9 @@ impl ListEntry {
         tenant_id: &TenantId,
         is_live: bool,
         insight_event_id: &InsightEventId,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         if list_entry.deactivated_seqno.is_some() {
-            return BadRequestInto("List entry already deactivated");
+            return Err(DbError::ListEntryAlreadyDeactivated);
         }
 
         let now = Utc::now();
@@ -325,8 +323,9 @@ mod tests {
 
         assert_eq!(0, ListEntry::list(conn, &list.id).unwrap().len());
         let le = ListEntry::lock(conn, &le.id).unwrap();
-        let err =
-            ListEntry::deactivate(conn, le, &DbActor::Footprint, &t.id, list.is_live, &ie.id).unwrap_err();
-        assert_eq!("List entry already deactivated", err.message());
+        assert!(matches!(
+            ListEntry::deactivate(conn, le, &DbActor::Footprint, &t.id, list.is_live, &ie.id).unwrap_err(),
+            DbError::ListEntryAlreadyDeactivated
+        ));
     }
 }

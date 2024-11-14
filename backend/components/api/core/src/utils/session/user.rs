@@ -1,12 +1,13 @@
 use crate::auth::session::AuthSessionData;
 use crate::errors::error_with_code::ErrorWithCode;
+use crate::FpResult;
 use crate::State;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use crypto::aead::ScopedSealingKey;
 use db::models::session::Session;
+use db::DbResult;
 use db::PgConn;
 use newtypes::AuthTokenHash;
 use newtypes::HasSessionKind;
@@ -68,7 +69,7 @@ impl AuthSession {
         state: &State,
         data: T,
         expires_in: Duration,
-    ) -> FpResult<SessionAuthToken> {
+    ) -> DbResult<SessionAuthToken> {
         let data = data.into();
         let key = state.session_sealing_key.clone();
         let (auth_token, _) = state
@@ -84,7 +85,7 @@ impl AuthSession {
         session_sealing_key: &ScopedSealingKey,
         data: T,
         expiry: impl Into<Expiry>,
-    ) -> FpResult<(SessionAuthToken, Session)> {
+    ) -> DbResult<(SessionAuthToken, Session)> {
         let data = data.into();
         let tok_prefix = data.token_prefix();
         let token = SessionAuthToken::generate(tok_prefix);
@@ -105,7 +106,7 @@ impl AuthSession {
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
-    ) -> FpResult<()> {
+    ) -> DbResult<()> {
         let kind = data.session_kind();
         let sealed_data = data.seal(session_sealing_key)?;
         // Keep the same expiration date and primary key in the DB - just update the data

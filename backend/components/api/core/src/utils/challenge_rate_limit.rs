@@ -27,7 +27,7 @@ impl<'a> RateLimit<'a> {
         let now = Utc::now();
 
         state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
                     let time_since_last_sent = now - session.data.sent_at;
                     if time_since_last_sent < period {

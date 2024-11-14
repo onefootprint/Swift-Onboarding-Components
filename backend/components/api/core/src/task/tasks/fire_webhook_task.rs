@@ -32,9 +32,9 @@ impl ExecuteTask<FireWebhookArgs> for FireWebhookTask {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use api_errors::FpResult;
     use db::tests::fixtures;
     use db::tests::test_db_pool::TestDbPool;
+    use db::DbResult;
     use macros::test_db_pool;
     use newtypes::OnboardingCompletedPayload as NTOnboardingCompletedPayload;
     use newtypes::OnboardingStatus;
@@ -46,7 +46,7 @@ mod tests {
     async fn test(db_pool: TestDbPool) {
         // Setup
         let (sv, obc) = db_pool
-            .db_transaction(|conn| -> FpResult<_> {
+            .db_transaction(|conn| -> DbResult<_> {
                 let t = fixtures::tenant::create(conn);
                 let obc = fixtures::ob_configuration::create(conn, &t.id, true);
                 let vault = fixtures::vault::create_person(conn, true);

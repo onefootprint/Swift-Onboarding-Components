@@ -1,7 +1,7 @@
+use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::incode_verification_session_event;
@@ -53,7 +53,7 @@ impl IncodeVerificationSessionEvent {
         latest_failure_reasons: Vec<IncodeFailureReason>,
         kind: IncodeVerificationSessionKind,
         ignored_failure_reasons: Vec<IncodeFailureReason>,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSessionEvent {
             created_at: Utc::now(),
             incode_verification_session_id,
@@ -75,7 +75,7 @@ impl IncodeVerificationSessionEvent {
     pub fn get_for_session_id(
         conn: &mut PgConn,
         session_id: &IncodeVerificationSessionId,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let res = incode_verification_session_event::table
             .filter(incode_verification_session_event::incode_verification_session_id.eq(session_id))
             .get_results(conn)?;

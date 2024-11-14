@@ -3,6 +3,7 @@ use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::BasicTenantAuth;
 use api_core::auth::tenant::BasicTenantAuthWrapper;
@@ -116,7 +117,7 @@ async fn post_inner(
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
     state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             uvw.validate_request(conn, updates, &source)?;

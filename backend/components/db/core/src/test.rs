@@ -82,7 +82,7 @@ mod test {
     use crate::models::tenant::Tenant;
     use crate::models::vault::Vault;
     use crate::test_helpers;
-    use api_errors::FpResult;
+    use crate::DbResult;
     use diesel::sql_query;
     use diesel::sql_types::Text;
     use diesel::RunQueryDsl;
@@ -133,7 +133,7 @@ mod test {
             is_created_via_api: false,
             duplicate_of_id: None,
         };
-        pool.db_transaction(|conn| -> FpResult<_> {
+        pool.db_transaction(|conn| -> DbResult<_> {
             let result = Vault::create(conn, new_user)?.into_inner();
             Ok(result)
         })

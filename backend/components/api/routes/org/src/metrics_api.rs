@@ -53,7 +53,7 @@ async fn get(
     };
 
     let (user, business) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let mut metrics_for = |kind: VaultKind| -> FpResult<_> {
                 let new_vaults = count_for_tenant(conn, search_params(kind, vec![], false))?;
                 let total_onboardings = count_for_tenant(conn, search_params(kind, vec![], true))?;

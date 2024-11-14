@@ -9,6 +9,7 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::web::Json;
 use api_core::ApiResponse;
+use api_core::FpResult;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
@@ -41,7 +42,7 @@ pub async fn get(
     let pagination = pagination.db_pagination(&state);
 
     let (decisions, next_page) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (decisions, next_page) =
                 OnboardingDecision::list(conn, &sv.id, Default::default(), pagination)?;

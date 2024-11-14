@@ -3,6 +3,7 @@ use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -145,7 +146,7 @@ async fn delete_inner(
     let tenant_id = tenant.id.clone();
 
     let (requested_fields_to_delete, deleted_dis, new_version) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
             let requested_fields_to_delete = match (delete_all, fields) {

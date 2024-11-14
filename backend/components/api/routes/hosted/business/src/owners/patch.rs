@@ -80,7 +80,7 @@ pub async fn patch(
 
     // Handle each request atomically
     let (bvw, link_ids, user_auth) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let link_ids = ops
                 .into_iter()
                 .map(|req| req.process(conn, &user_auth, *is_bootstrap))

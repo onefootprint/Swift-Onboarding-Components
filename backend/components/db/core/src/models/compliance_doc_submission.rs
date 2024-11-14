@@ -1,9 +1,9 @@
 use super::compliance_doc::ComplianceDoc;
 use super::compliance_doc_review::ComplianceDocReview;
+use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
-use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc_submission;
@@ -49,9 +49,11 @@ impl<'a> NewComplianceDocSubmission<'a> {
         self,
         conn: &mut TxnPgConn,
         doc: &Locked<ComplianceDoc>,
-    ) -> FpResult<ComplianceDocSubmission> {
+    ) -> DbResult<ComplianceDocSubmission> {
         if doc.id != *self.compliance_doc_id {
-            return ServerErrInto("locked document does not match new submission");
+            return Err(DbError::AssertionError(
+                "locked document does not match new submission".to_string(),
+            ));
         }
 
         // Deactivate any existing submission and review.
@@ -74,7 +76,7 @@ impl ComplianceDocSubmission {
         conn: &mut PgConn,
         id: &ComplianceDocSubmissionId,
         doc_id: &ComplianceDocId,
-    ) -> FpResult<ComplianceDocSubmission> {
+    ) -> DbResult<ComplianceDocSubmission> {
         Ok(compliance_doc_submission::table
             .filter(compliance_doc_submission::id.eq(id))
             .filter(compliance_doc_submission::compliance_doc_id.eq(doc_id))
@@ -86,7 +88,7 @@ impl ComplianceDocSubmission {
     pub fn get_active(
         conn: &mut TxnPgConn,
         doc: &Locked<ComplianceDoc>,
-    ) -> FpResult<Option<ComplianceDocSubmission>> {
+    ) -> DbResult<Option<ComplianceDocSubmission>> {
         Ok(compliance_doc_submission::table
             .filter(compliance_doc_submission::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_submission::deactivated_at.is_null())
@@ -100,7 +102,7 @@ impl ComplianceDocSubmission {
         conn: &mut TxnPgConn,
         sub_id: &ComplianceDocSubmissionId,
         doc: &Locked<ComplianceDoc>,
-    ) -> FpResult<()> {
+    ) -> DbResult<()> {
         diesel::update(compliance_doc_submission::table)
             .filter(compliance_doc_submission::id.eq(sub_id))
             .filter(compliance_doc_submission::compliance_doc_id.eq(&doc.id))

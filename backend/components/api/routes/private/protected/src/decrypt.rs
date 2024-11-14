@@ -8,6 +8,7 @@ use api_core::ApiCoreError;
 use api_core::State;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
+use db::DbResult;
 use newtypes::PiiJsonValue;
 use newtypes::VerificationResultId;
 
@@ -31,7 +32,7 @@ pub async fn post(
     let DecryptVresRequest { vres_id } = request.into_inner();
 
     let (vres, uv) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let (vreq, vres) = VerificationResult::get(conn, &vres_id)?;
             let uv = Vault::get(conn, &vreq.scoped_vault_id)?;
 

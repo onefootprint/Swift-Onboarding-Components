@@ -1,7 +1,7 @@
 use super::waterfall_execution::WaterfallExecution;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::waterfall_step;
@@ -87,7 +87,7 @@ impl UpdateWaterfallStep {
 
 impl WaterfallStep {
     #[tracing::instrument("WaterfallStep::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &WaterfallStepId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &WaterfallStepId) -> DbResult<Locked<Self>> {
         let result = waterfall_step::table
             .filter(waterfall_step::id.eq(id))
             .for_no_key_update()
@@ -101,7 +101,7 @@ impl WaterfallStep {
         conn: &mut TxnPgConn,
         id: WaterfallStepId,
         update: UpdateWaterfallStep,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let res = diesel::update(waterfall_step::table)
             .filter(waterfall_step::id.eq(id))
             .set(update)
@@ -111,7 +111,7 @@ impl WaterfallStep {
     }
 
     #[tracing::instrument("WaterfallStep::create", , skip(conn))]
-    pub(crate) fn create(conn: &mut TxnPgConn, args: NewWaterfallStepArgs) -> FpResult<Self> {
+    pub(crate) fn create(conn: &mut TxnPgConn, args: NewWaterfallStepArgs) -> DbResult<Self> {
         let NewWaterfallStepArgs {
             vendor_api,
             execution_id,
@@ -139,7 +139,7 @@ impl WaterfallStep {
         execution_id: &WaterfallExecutionId,
         step: i32,
         vendor_api: &VendorAPI,
-    ) -> FpResult<Option<Self>> {
+    ) -> DbResult<Option<Self>> {
         let res: Option<Self> = waterfall_step::table
             .filter(waterfall_step::execution_id.eq(execution_id))
             .filter(waterfall_step::vendor_api.eq(vendor_api))
@@ -151,7 +151,7 @@ impl WaterfallStep {
     }
 
     #[tracing::instrument("WaterfallStep::list", skip(conn))]
-    pub fn list(conn: &mut PgConn, execution_id: &WaterfallExecutionId) -> FpResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, execution_id: &WaterfallExecutionId) -> DbResult<Vec<Self>> {
         let res: Vec<Self> = waterfall_step::table
             .filter(waterfall_step::execution_id.eq(execution_id))
             .get_results(conn)?;

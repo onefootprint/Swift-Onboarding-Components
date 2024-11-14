@@ -75,7 +75,7 @@ async fn post(
         }
         Request::Id(id) => {
             state
-                .db_query(move |conn| {
+                .db_query(move |conn| -> FpResult<_> {
                     let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
                     let sv = ScopedVault::get(conn, id)?;
                     Ok(sv.vault_id)
@@ -100,7 +100,7 @@ async fn post(
 
     let ff_client = state.ff_client.clone();
     let num_deleted_rows = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<usize> {
             Vault::lock(conn, &uv_id)?;
 
             if is_production {

@@ -87,7 +87,7 @@ pub async fn run_neuro_call(
 ) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
     let (vw, scoped_vault) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
             let scoped_vault = ScopedVault::get(conn, &svid)?;
             Ok((vw, scoped_vault))
@@ -148,7 +148,7 @@ pub async fn run_neuro_call(
     let wf_id3 = wf_id.clone();
     state
         .db_pool
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
             BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::NeuroIdBehavioral)?;
 
@@ -213,6 +213,7 @@ mod tests {
     use crate::decision::tests::test_helpers::create_kyc_user_and_wf;
     use crate::decision::tests::test_helpers::FixtureData;
     use crate::decision::vendor::verification_result::save_vreq_and_vres;
+    use crate::FpResult;
     use crate::State;
     use db::models::decision_intent::DecisionIntent;
     use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
@@ -297,7 +298,9 @@ mod tests {
     async fn test_neuro_dupes(state: &mut State) {
         let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
         let tenant = state
-            .db_transaction(move |conn| Ok(fixtures::tenant::create_with_keys(conn, pk, tenant_e_key)))
+            .db_transaction(move |conn| -> FpResult<_> {
+                Ok(fixtures::tenant::create_with_keys(conn, pk, tenant_e_key))
+            })
             .await
             .unwrap();
 
@@ -345,7 +348,7 @@ mod tests {
         // Tests
         //
         let (dupes1, dupes2, dupes3, dupes4) = state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let d1 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv1)?;
                 let d2 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv2)?;
                 let d3 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv3)?;

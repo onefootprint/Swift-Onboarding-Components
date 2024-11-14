@@ -73,7 +73,7 @@ pub async fn post(
     } = request.into_inner();
 
     let (sv_ids, cursor) = state
-        .db_query(move |conn| ApiResult<_> {
+        .db_query(move |conn| -> ApiResult<_> {
             let sv_ids = svs_to_backfill::table
                 .filter(svs_to_backfill::scoped_vault_id.gt(cursor))
                 .limit(limit)
@@ -137,7 +137,7 @@ async fn backfill_composite_fingerprints(
     let fps: HashMap<_, _> = fps.into_iter().collect();
 
     let result = state
-        .db_transaction(move |conn| DryRunResult<_> {
+        .db_transaction(move |conn| -> DryRunResult<_> {
             let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
 
             let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id)

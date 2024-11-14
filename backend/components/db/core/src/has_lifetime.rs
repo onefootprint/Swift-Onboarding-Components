@@ -1,7 +1,7 @@
 use crate::models::data_lifetime::DataLifetime;
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use itertools::Itertools;
 use newtypes::DataLifetimeId;
 use newtypes::PiiString;
@@ -21,13 +21,13 @@ pub trait HasLifetime {
 
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to a single user vault.
-    fn get_for(conn: &mut PgConn, lifetimes: &[DataLifetimeId]) -> FpResult<Vec<Self>>
+    fn get_for(conn: &mut PgConn, lifetimes: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized;
 
     /// Get rows of this table associated with the provided lifetime IDs.
     /// Used where the lifetime IDs all belong to potentially multiple user vaults.
-    fn bulk_get(conn: &mut PgConn, lifetimes: &[&DataLifetime]) -> FpResult<HashMap<VaultId, Vec<Self>>>
+    fn bulk_get(conn: &mut PgConn, lifetimes: &[&DataLifetime]) -> DbResult<HashMap<VaultId, Vec<Self>>>
     where
         Self: Sized,
     {
@@ -42,7 +42,7 @@ pub trait HasLifetime {
             .chunks(LIFETIME_ID_CHUNK_SIZE)
             .into_iter()
             .map(|l_ids| Self::get_for(conn, &l_ids.into_iter().collect_vec()))
-            .collect::<FpResult<Vec<_>>>()?;
+            .collect::<DbResult<Vec<_>>>()?;
         let results = results.into_iter().flatten().collect_vec();
 
         // Organize the results by the uv_id to which each row belongs
@@ -52,9 +52,9 @@ pub trait HasLifetime {
                 lifetime_id_to_uv_id
                     .get(d.lifetime_id())
                     .cloned()
-                    .ok_or(DbError::RelatedObjectNotFound.into())
+                    .ok_or(DbError::RelatedObjectNotFound)
             })
-            .collect::<FpResult<Vec<_>>>()?;
+            .collect::<DbResult<Vec<_>>>()?;
         let results = uv_ids.into_iter().zip(results).into_group_map();
         Ok(results)
     }

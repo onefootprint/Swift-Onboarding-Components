@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc_template;
@@ -44,7 +44,7 @@ impl ComplianceDocTemplateVersion {
         conn: &mut PgConn,
         id: &ComplianceDocTemplateVersionId,
         pt_id: &PartnerTenantId,
-    ) -> FpResult<ComplianceDocTemplateVersion> {
+    ) -> DbResult<ComplianceDocTemplateVersion> {
         Ok(compliance_doc_template::table
             .inner_join(compliance_doc_template_version::table)
             .filter(compliance_doc_template_version::id.eq(id))

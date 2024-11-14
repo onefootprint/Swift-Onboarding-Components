@@ -52,7 +52,7 @@ async fn post(
     let num_fp_ids = fp_ids.len();
 
     state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
             let sv_ids = svs.into_iter().map(|(sv, _)| sv.id).collect_vec();
             let entities = ScopedVault::bulk_get_serializable_info(conn, sv_ids)?;

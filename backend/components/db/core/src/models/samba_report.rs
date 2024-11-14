@@ -1,6 +1,6 @@
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::samba_order;
@@ -47,7 +47,7 @@ impl SambaReport {
         report_id: SambaReportId,
         verification_result_id: VerificationResultId,
         completed_seqno: DataLifetimeSeqno,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let new_row = NewSambaReportRow {
             created_at: Utc::now(),
             order_id,
@@ -66,7 +66,7 @@ impl SambaReport {
     pub fn bulk_get_latest_by_order_kind(
         conn: &mut PgConn,
         document_ids: &[DocumentId],
-    ) -> FpResult<HashMap<(DocumentId, SambaOrderKind), Self>> {
+    ) -> DbResult<HashMap<(DocumentId, SambaOrderKind), Self>> {
         let res = samba_report::table
             .inner_join(samba_order::table)
             .filter(samba_order::document_id.eq_any(document_ids))

@@ -7,6 +7,7 @@ use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::ApiResponse;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::PrivateTenantFilters;
 use db::models::tenant::PrivateTenantFilters as DbPrivateTenantFilters;
@@ -34,7 +35,7 @@ async fn get(
     };
 
     let (orgs, mut counts) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let orgs = Tenant::private_list(conn, filters)?;
             let counts = Tenant::private_user_counts(conn)?;
             Ok((orgs, counts))

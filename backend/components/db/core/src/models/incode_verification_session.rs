@@ -1,8 +1,8 @@
 use super::incode_verification_session_event::IncodeVerificationSessionEvent;
+use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
@@ -140,7 +140,7 @@ impl IncodeVerificationSession {
         kind: IncodeVerificationSessionKind,
         incode_environment: Option<IncodeEnvironment>,
         incode_session_id: Option<IncodeSessionId>,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let purpose: IncodeVerificationSessionPurpose = kind.into();
         let new_req = NewIncodeVerificationSession {
             created_at: Utc::now(),
@@ -173,7 +173,7 @@ impl IncodeVerificationSession {
     }
 
     #[tracing::instrument("IncodeVerificationSession::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, id: &IncodeVerificationSessionId) -> FpResult<()> {
+    pub fn deactivate(conn: &mut TxnPgConn, id: &IncodeVerificationSessionId) -> DbResult<()> {
         diesel::update(incode_verification_session::table)
             .filter(incode_verification_session::id.eq(id))
             .set(incode_verification_session::deactivated_at.eq(Utc::now()))
@@ -187,7 +187,7 @@ impl IncodeVerificationSession {
         session: Locked<Self>,
         conn: &mut TxnPgConn,
         update: UpdateIncodeVerificationSession,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let res: IncodeVerificationSession = diesel::update(incode_verification_session::table)
             .filter(incode_verification_session::id.eq(&session.id))
             .set(update)
@@ -219,7 +219,7 @@ impl IncodeVerificationSession {
     }
 
     #[tracing::instrument("IncodeVerificationSession::get", skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<Option<Self>>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Option<Self>>
     where
         T: Into<IncodeSessionIdentifier<'a>>,
     {
@@ -228,7 +228,7 @@ impl IncodeVerificationSession {
     }
 
     #[tracing::instrument("IncodeVerificationSession::latest_for_workflow", skip_all)]
-    pub fn latest_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Option<Self>> {
+    pub fn latest_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
         let res = document_request::table
             .filter(document_request::workflow_id.eq(wf_id))
             .inner_join(identity_document::table)
@@ -246,7 +246,7 @@ impl IncodeVerificationSession {
     }
 
     #[tracing::instrument("IncodeVerificationSession::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &IncodeVerificationSessionId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &IncodeVerificationSessionId) -> DbResult<Locked<Self>> {
         let result = incode_verification_session::table
             .filter(incode_verification_session::id.eq(id))
             .for_no_key_update()

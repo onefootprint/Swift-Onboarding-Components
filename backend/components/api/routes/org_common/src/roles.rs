@@ -7,6 +7,7 @@ use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgRoleFilters;
 use db::models::audit_event::AuditEvent;
@@ -38,7 +39,7 @@ pub async fn get(
     let OrgRoleFilters { search, kind } = filters.into_inner();
 
     let (results, next_page, count) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let filters = TenantRoleListFilters {
                 org_ident: (&authed_org_ident).into(),
                 scopes: None,
@@ -85,7 +86,7 @@ pub async fn post(
     };
 
     let result = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let new_tenant_role =
                 TenantRole::create(conn, &authed_org_ident, &name, scopes.clone(), false, kind)?;
 

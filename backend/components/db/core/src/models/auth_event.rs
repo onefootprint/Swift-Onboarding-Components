@@ -2,13 +2,13 @@ use super::apple_device_attest::AppleDeviceAttestation;
 use super::google_device_attest::GoogleDeviceAttestation;
 use super::insight_event::InsightEvent;
 use super::user_timeline::UserTimeline;
+use crate::errors::ValidationError;
+use crate::DbError;
+use crate::DbResult;
 use crate::NextPage;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequest;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
@@ -73,7 +73,7 @@ pub struct NewAuthEventArgs {
 
 impl AuthEvent {
     #[tracing::instrument("AuthEvent::save", skip_all)]
-    pub fn save(args: NewAuthEventArgs, conn: &mut TxnPgConn) -> FpResult<AuthEvent> {
+    pub fn save(args: NewAuthEventArgs, conn: &mut TxnPgConn) -> DbResult<AuthEvent> {
         let NewAuthEventArgs {
             vault_id,
             scoped_vault_id,
@@ -90,7 +90,10 @@ impl AuthEvent {
             IdentifyScope::Onboarding | IdentifyScope::Auth => {
                 // We depend upon this in the validate API
                 if scoped_vault_id.is_none() {
-                    return BadRequestInto!("Auth event of type {} must have a scoped_vault_id", scope);
+                    return Err(DbError::ValidationError(format!(
+                        "Auth event of type {} must have a scoped_vault_id",
+                        scope
+                    )));
                 }
             }
         }
@@ -110,8 +113,9 @@ impl AuthEvent {
         // For auth events when a new auth method is registered, create a timeline event
         if let Some(new_auth_method_action) = new_auth_method_action {
             if let Some(sv_id) = ev.scoped_vault_id.clone() {
-                let kind = AuthMethodKind::try_from(ev.kind)
-                    .map_err(|_| BadRequest("Can't create a timeline event for third-party auth event"))?;
+                let kind = AuthMethodKind::try_from(ev.kind).map_err(|_| {
+                    ValidationError("Can't create a timeline event for third-party auth event")
+                })?;
                 // Create a timeline event that shows the passkey was added
                 let info = AuthMethodUpdatedInfo {
                     kind,
@@ -143,7 +147,7 @@ impl AuthEvent {
     /// Return auth events at this tenant in the last Self::AUTH_EVENT_EXPIRY_H hours.
     /// These auth events are proof that the end user has authenticated with footprint recently.
     /// If these auth events exist, the tenant is allowed to create an authed token for the user
-    pub fn list_recent(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Vec<Self>> {
+    pub fn list_recent(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let min_timestamp = Utc::now() - Duration::hours(Self::AUTH_EVENT_EXPIRY_H);
         let results = auth_event::table
             .filter(auth_event::scoped_vault_id.eq(sv_id))
@@ -153,13 +157,13 @@ impl AuthEvent {
     }
 
     #[tracing::instrument("AuthEvent::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &AuthEventId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &AuthEventId) -> DbResult<Self> {
         let result = auth_event::table.filter(auth_event::id.eq(id)).get_result(conn)?;
         Ok(result)
     }
 
     #[tracing::instrument("AuthEvent::get_bulk", skip_all)]
-    pub fn get_bulk(conn: &mut PgConn, ids: &[AuthEventId]) -> FpResult<Vec<Self>> {
+    pub fn get_bulk(conn: &mut PgConn, ids: &[AuthEventId]) -> DbResult<Vec<Self>> {
         let results = auth_event::table
             .filter(auth_event::id.eq_any(ids))
             .get_results(conn)?;
@@ -170,7 +174,7 @@ impl AuthEvent {
     pub fn get_bulk_for_timeline(
         conn: &mut PgConn,
         ids: Vec<AuthEventId>,
-    ) -> FpResult<HashMap<AuthEventId, (Self, InsightEvent)>> {
+    ) -> DbResult<HashMap<AuthEventId, (Self, InsightEvent)>> {
         use db_schema::schema::insight_event;
         let results = auth_event::table
             // Not all have an insight event, but all the ones we care about do
@@ -184,7 +188,7 @@ impl AuthEvent {
     }
 
     #[tracing::instrument("AuthEvent::count", skip_all)]
-    pub fn count(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<i64> {
+    pub fn count(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<i64> {
         let count = auth_event::table
             .filter(auth_event::scoped_vault_id.eq(sv_id))
             .count()
@@ -197,7 +201,7 @@ impl AuthEvent {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         pagination: Option<OffsetPagination>,
-    ) -> FpResult<(Vec<LoadedAuthEvent>, NextPage)> {
+    ) -> DbResult<(Vec<LoadedAuthEvent>, NextPage)> {
         let mut query = auth_event::table
             .left_join(schema::insight_event::table)
             .filter(auth_event::scoped_vault_id.eq(sv_id))

@@ -4,6 +4,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
+use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use chrono::Utc;
@@ -52,7 +53,7 @@ pub async fn post(
     // Check permissions before uploading anything.
     let params = (tenant_id.clone(), partnership_id.clone(), request_id.clone());
     let document_id = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (tenant_id, partnership_id, request_id) = params;
             // Check that the authorized tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &tenant_id)?;
@@ -90,7 +91,7 @@ pub async fn post(
     tracing::info!(s3_url = s3_url, partnership_id=%partnership_id, document_id=%request_id, filename=%filename, mime_type=%file.mime_type, "Uploaded compliance document to S3");
 
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             // We've already validated that the authorized user matches the partnership.
 
             let doc = ComplianceDoc::lock(conn, &request_id, &partnership_id)?;

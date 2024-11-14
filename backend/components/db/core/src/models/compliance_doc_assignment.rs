@@ -1,7 +1,7 @@
 use super::compliance_doc::ComplianceDoc;
+use crate::DbError;
+use crate::DbResult;
 use crate::TxnPgConn;
-use api_errors::FpResult;
-use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::compliance_doc_assignment;
@@ -49,9 +49,11 @@ impl<'a> NewComplianceDocAssignment<'a> {
         self,
         conn: &mut TxnPgConn,
         doc: &Locked<ComplianceDoc>,
-    ) -> FpResult<ComplianceDocAssignment> {
+    ) -> DbResult<ComplianceDocAssignment> {
         if doc.id != *self.compliance_doc_id {
-            return ServerErrInto("locked document does not match new assignment");
+            return Err(DbError::AssertionError(
+                "locked document does not match new assignment".to_string(),
+            ));
         }
 
         // Deactivate existing assignment if one exists.
@@ -71,7 +73,7 @@ impl ComplianceDocAssignment {
         conn: &mut TxnPgConn,
         kind: TenantKind,
         doc: &Locked<ComplianceDoc>,
-    ) -> FpResult<Option<ComplianceDocAssignment>> {
+    ) -> DbResult<Option<ComplianceDocAssignment>> {
         let req = compliance_doc_assignment::table
             .filter(compliance_doc_assignment::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_assignment::kind.eq(kind))
@@ -88,7 +90,7 @@ impl ComplianceDocAssignment {
         conn: &mut TxnPgConn,
         id: &ComplianceDocAssignmentId,
         doc: &Locked<ComplianceDoc>,
-    ) -> FpResult<()> {
+    ) -> DbResult<()> {
         diesel::update(compliance_doc_assignment::table)
             .filter(compliance_doc_assignment::id.eq(id))
             .filter(compliance_doc_assignment::compliance_doc_id.eq(&doc.id))

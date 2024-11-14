@@ -1,3 +1,4 @@
+use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantApiKeyGated;
@@ -45,7 +46,7 @@ pub async fn get(
     let page_size = pagination.page_size(&state);
 
     let (svs, count) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let page_size = (page_size + 1) as i64;
             let cursor = cursor.map(ScopedVaultCursor::OrderingId);
             let order_by = ScopedVaultCursorKind::OrderingId;

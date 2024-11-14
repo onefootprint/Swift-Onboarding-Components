@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::user_consent;
@@ -44,7 +44,7 @@ impl UserConsent {
         consent_language_text: String,
         ml_consent: bool,
         workflow_id: WorkflowId,
-    ) -> FpResult<UserConsent> {
+    ) -> Result<UserConsent, crate::DbError> {
         let new_user_consent = NewUserConsent {
             timestamp,
             insight_event_id,
@@ -61,7 +61,7 @@ impl UserConsent {
     }
 
     #[tracing::instrument("UserConsent::get_for_workflow", skip_all)]
-    pub fn get_for_workflow(conn: &mut PgConn, workflow_id: &WorkflowId) -> FpResult<Option<UserConsent>> {
+    pub fn get_for_workflow(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Option<UserConsent>> {
         let res = user_consent::table
             .filter(user_consent::workflow_id.eq(workflow_id))
             .get_result(conn)

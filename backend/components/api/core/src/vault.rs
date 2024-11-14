@@ -20,6 +20,7 @@ use crate::FpResult;
 use crate::State;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
+use api_errors::FpError;
 use api_wire_types::UpdateEntityRequest;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
@@ -31,6 +32,7 @@ use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
+use db::DbError;
 use itertools::Itertools;
 use newtypes::put_data_request::PatchDataRequest;
 use newtypes::AuditEventDetail;
@@ -107,7 +109,7 @@ pub async fn create_non_portable_vault(
 
     let actor = auth.actor();
     let (scoped_user, vault, new_version) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let idempotency_id = idempotency_id.0;
             let sv_args = NewScopedVaultArgs {
                 // All new non-portable vaults start as active
@@ -180,18 +182,19 @@ pub async fn patch_vault(
 
     let UpdateEntityRequest { external_id } = request;
     let (sv, v) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let v = Vault::get(conn, &sv.vault_id)?;
             let update = ScopedVaultUpdate {
                 external_id,
                 ..Default::default()
             };
-            let sv = ScopedVault::update(conn, &sv.id, update).map_err(|e| match e.code() {
-                Some(c) if c.is_db_unique_constraint_violation() => {
+            let sv = ScopedVault::update(conn, &sv.id, update).map_err(|e| -> FpError {
+                if matches!(e, DbError::UniqueConstraintViolation(_)) {
                     BadRequest("User or business with this external ID already exists")
+                } else {
+                    e.into()
                 }
-                _ => e,
             })?;
             Ok((sv, v))
         })

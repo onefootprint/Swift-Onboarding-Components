@@ -1,11 +1,11 @@
 use super::scoped_vault::ScopedVault;
+use crate::DbError;
+use crate::DbError::AssertionError;
+use crate::DbResult;
 use crate::NextPage;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
-use api_errors::ServerErr;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::fingerprint;
@@ -108,19 +108,25 @@ struct NewFingerprintJunction<'a> {
 
 impl Fingerprint {
     #[tracing::instrument("Fingerprint::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprintArgs>) -> FpResult<()> {
+    pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprintArgs>) -> DbResult<()> {
         for fp in fingerprints.iter() {
             if !fp.kind.is_fingerprintable() {
-                return BadRequestInto!("Fingerprinting DI that is not fingerprintable {}", fp.kind);
+                return Err(DbError::ValidationError(format!(
+                    "Fingerprinting DI that is not fingerprintable {}",
+                    fp.kind
+                )));
             }
             if matches!(fp.data, FingerprintDataValue::Plaintext(_)) && !fp.kind.store_plaintext() {
-                return BadRequestInto!("Cannot save plaintext fingerprint with kind {}", fp.kind);
+                return Err(DbError::ValidationError(format!(
+                    "Cannot save plaintext fingerprint with kind {}",
+                    fp.kind
+                )));
             }
             if fp.scope == FingerprintScope::Global && !fp.kind.is_globally_fingerprintable() {
-                return BadRequestInto!(
+                return Err(DbError::ValidationError(format!(
                     "Fingerprinting DI that is not globally fingerprintable {}",
                     fp.kind
-                );
+                )));
             }
         }
         let (fingerprints, fp_junctions): (Vec<_>, Vec<_>) = fingerprints
@@ -184,7 +190,7 @@ impl Fingerprint {
         conn: &mut TxnPgConn,
         lifetime_ids: Vec<&DataLifetimeId>,
         time: DateTime<Utc>,
-    ) -> FpResult<()> {
+    ) -> DbResult<()> {
         let fp_ids = fingerprint_junction::table
             .filter(fingerprint_junction::lifetime_id.eq_any(lifetime_ids))
             .select(fingerprint_junction::fingerprint_id);
@@ -240,7 +246,7 @@ impl Fingerprint {
     ];
 
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
-    pub fn get_dupes(conn: &mut PgConn, sv: &ScopedVault) -> FpResult<FingerprintDupesResult> {
+    pub fn get_dupes(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<FingerprintDupesResult> {
         // TODO hide dupes at other tenants in sandbox in next PR
         let (internal_matches, _) = Self::get_internal_dupes(conn, sv, OffsetPagination::new(Some(0), 100))?;
         let external = if sv.is_live {
@@ -281,7 +287,7 @@ impl Fingerprint {
         conn: &mut PgConn,
         sv: &ScopedVault,
         pagination: OffsetPagination,
-    ) -> FpResult<(Vec<Fingerprint>, NextPage)> {
+    ) -> DbResult<(Vec<Fingerprint>, NextPage)> {
         let q_dupes = Self::q_dupes_query(conn, sv, true)?;
         let internal_matches = q_dupes
             // TODO when we stop making unverified vaults after each signup challenge, remove this
@@ -302,7 +308,7 @@ impl Fingerprint {
         conn: &mut PgConn,
         sv: &'a ScopedVault,
         distinct_on_kind: bool,
-    ) -> FpResult<BoxedQuery<'a, Pg>> {
+    ) -> DbResult<BoxedQuery<'a, Pg>> {
         let mut fingerprints = fingerprint::table
             .filter(fingerprint::scoped_vault_id.eq(&sv.id))
             .filter(fingerprint::deactivated_at.is_null())
@@ -325,7 +331,11 @@ impl Fingerprint {
 
         let sh_datas = fingerprints
             .into_iter()
-            .map(|fingerprint| (fingerprint.sh_data).ok_or(ServerErr("Missing sh_data on fingerprint")))
+            .map(|fingerprint| {
+                fingerprint
+                    .sh_data
+                    .ok_or(AssertionError("Missing sh_data on fingerprint".into()))
+            })
             .collect::<Result<Vec<_>, _>>()?;
 
         let q_dupes = fingerprint::table

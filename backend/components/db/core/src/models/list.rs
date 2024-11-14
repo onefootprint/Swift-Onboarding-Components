@@ -1,15 +1,17 @@
 use super::data_lifetime::DataLifetime;
 use super::ob_configuration::IsLive;
+use crate::DbError;
+use crate::DbResult;
 use crate::NextPage;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
-use db_schema::schema::list;
 use db_schema::schema::list::BoxedQuery;
+use db_schema::schema::list::{
+    self,
+};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::Insertable;
@@ -81,7 +83,7 @@ impl List {
                            * from us */
         kind: ListKind,
         e_data_key: SealedVaultDataKey,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let created_seqno = DataLifetime::get_current_seqno(conn)?;
         let new_list = NewList {
             created_at: Utc::now(),
@@ -102,7 +104,7 @@ impl List {
     }
 
     #[tracing::instrument("List::get", skip_all)]
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool, list_id: &ListId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool, list_id: &ListId) -> DbResult<Self> {
         let res = list::table
             .filter(list::tenant_id.eq(tenant_id))
             .filter(list::is_live.eq(is_live))
@@ -117,7 +119,7 @@ impl List {
         tenant_id: &TenantId,
         is_live: bool,
         list_ids: &[ListId],
-    ) -> FpResult<HashMap<ListId, Self>> {
+    ) -> DbResult<HashMap<ListId, Self>> {
         let res = list::table
             .filter(list::tenant_id.eq(tenant_id))
             .filter(list::is_live.eq(is_live))
@@ -137,7 +139,7 @@ impl List {
         is_live: IsLive,
         name: &String,
         alias: &ListAlias,
-    ) -> FpResult<Option<Self>> {
+    ) -> DbResult<Option<Self>> {
         let res = list::table
             .filter(list::tenant_id.eq(tenant_id))
             .filter(list::is_live.eq(is_live))
@@ -164,7 +166,7 @@ impl List {
         tenant_id: &TenantId,
         is_live: bool,
         pagination: OffsetPagination,
-    ) -> FpResult<(Vec<Self>, NextPage)> {
+    ) -> DbResult<(Vec<Self>, NextPage)> {
         let mut query = Self::list_query(tenant_id, is_live)
             .order_by(list::created_at.desc())
             .limit(pagination.limit());
@@ -176,7 +178,7 @@ impl List {
     }
 
     #[tracing::instrument("List::count", skip_all)]
-    pub fn count(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> FpResult<i64> {
+    pub fn count(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<i64> {
         let count = Self::list_query(tenant_id, is_live).count().get_result(conn)?;
         Ok(count)
     }
@@ -187,7 +189,7 @@ impl List {
         tenant_id: &TenantId,
         is_live: bool,
         list_id: &ListId,
-    ) -> FpResult<Locked<Self>> {
+    ) -> DbResult<Locked<Self>> {
         let result = list::table
             .filter(list::tenant_id.eq(tenant_id))
             .filter(list::is_live.eq(is_live))
@@ -205,7 +207,7 @@ impl List {
         id: &ListId,
         name: String,
         alias: ListAlias,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let update = ListUpdate { name, alias };
         let result = diesel::update(list::table)
             .filter(list::tenant_id.eq(tenant_id))
@@ -218,9 +220,9 @@ impl List {
     }
 
     #[tracing::instrument("List::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, list: Locked<Self>) -> FpResult<Self> {
+    pub fn deactivate(conn: &mut TxnPgConn, list: Locked<Self>) -> DbResult<Self> {
         if list.deactivated_seqno.is_some() {
-            return BadRequestInto("List already deactivated");
+            return Err(DbError::ListAlreadyDeactivated);
         }
 
         let now = Utc::now();
@@ -279,9 +281,9 @@ mod tests {
         let pagination = OffsetPagination::new(None, 10);
         assert_eq!(0, List::list(conn, &t.id, true, pagination).unwrap().0.len());
         let list = List::lock(conn, &t.id, true, &list.id).unwrap();
-        assert_eq!(
-            "List already deactivated",
-            List::deactivate(conn, list).unwrap_err().message()
-        );
+        assert!(matches!(
+            List::deactivate(conn, list).unwrap_err(),
+            DbError::ListAlreadyDeactivated
+        ));
     }
 }

@@ -278,7 +278,7 @@ impl WriteableVw<Person> {
                     actor.clone().map(|a| a.into()),
                 )
             })
-            .collect::<FpResult<Vec<_>>>()?;
+            .collect::<db::DbResult<Vec<_>>>()?;
 
         if make_timeline_event {
             Self::add_timeline_event(conn, sv_txn, kinds, actor, false)?;

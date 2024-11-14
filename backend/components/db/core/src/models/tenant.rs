@@ -3,11 +3,11 @@ use super::tenant_role::ImmutableRoleKind;
 use super::tenant_role::TenantRole;
 use super::tenant_vendor::TenantVendorControl;
 use crate::helpers::WorkosAuthIdentity;
+use crate::DbResult;
 use crate::NonNullVec;
 use crate::OptionalNonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::billing_profile;
@@ -175,7 +175,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> FpResult<Self> {
+    pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table
             .for_no_key_update()
             .filter(tenant::id.eq(id))
@@ -184,7 +184,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::get", skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<Self>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
         T: Into<TenantIdentifier<'a>>,
     {
@@ -193,7 +193,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::list_billable", skip_all)]
-    pub fn list_billable(conn: &mut PgConn) -> FpResult<Vec<Self>> {
+    pub fn list_billable(conn: &mut PgConn) -> DbResult<Vec<Self>> {
         let results = tenant::table
             .filter(tenant::sandbox_restricted.eq(false))
             .filter(tenant::super_tenant_id.is_null())
@@ -205,7 +205,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::private_list", skip_all)]
-    pub fn private_list(conn: &mut PgConn, filters: PrivateTenantFilters) -> FpResult<Vec<Self>> {
+    pub fn private_list(conn: &mut PgConn, filters: PrivateTenantFilters) -> DbResult<Vec<Self>> {
         let mut query = tenant::table.into_boxed();
         let PrivateTenantFilters {
             search,
@@ -245,7 +245,7 @@ impl Tenant {
     pub fn private_get(
         conn: &mut PgConn,
         id: &TenantId,
-    ) -> FpResult<(Self, Option<BillingProfile>, Option<TenantVendorControl>)> {
+    ) -> DbResult<(Self, Option<BillingProfile>, Option<TenantVendorControl>)> {
         let result = tenant::table
             .filter(tenant::id.eq(id))
             .left_join(billing_profile::table)
@@ -257,7 +257,7 @@ impl Tenant {
 
     #[tracing::instrument("Tenant::private_user_counts", skip_all)]
     /// Count the number of vaults that exist for each tenant
-    pub fn private_user_counts(conn: &mut PgConn) -> FpResult<HashMap<TenantId, UserCounts>> {
+    pub fn private_user_counts(conn: &mut PgConn) -> DbResult<HashMap<TenantId, UserCounts>> {
         let results: Vec<((TenantId, bool), i64)> = scoped_vault::table
             .filter(scoped_vault::is_active.eq(true))
             .group_by((scoped_vault::tenant_id, scoped_vault::is_live))
@@ -282,7 +282,7 @@ impl Tenant {
         conn: &mut TxnPgConn,
         id: &TenantId,
         update: PrivateUpdateTenant,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         if update == Default::default() {
             // Support no-op updates
             let (tenant, _, _) = Self::private_get(conn, id)?;
@@ -299,7 +299,7 @@ impl Tenant {
     /// are kind of clunky, but removes the need to have two separate functions with the same exact
     /// body
     #[tracing::instrument("Tenant::create", skip_all)]
-    pub fn create<T>(conn: &mut TxnPgConn, value: T) -> FpResult<Self>
+    pub fn create<T>(conn: &mut TxnPgConn, value: T) -> DbResult<Self>
     where
         T: Insertable<tenant::table>,
         <T as Insertable<tenant::table>>::Values: QueryFragment<Pg> + CanInsertInSingleQuery<Pg> + QueryId,
@@ -323,7 +323,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::update", skip_all)]
-    pub fn update<'a>(conn: &mut PgConn, id: &TenantId, update_tenant: UpdateTenant<'a>) -> FpResult<Self> {
+    pub fn update<'a>(conn: &mut PgConn, id: &TenantId, update_tenant: UpdateTenant<'a>) -> DbResult<Self> {
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
             .set(update_tenant)
@@ -333,7 +333,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::list_by_user_vault_id", skip_all)]
-    pub fn list_by_user_vault_id(conn: &mut PgConn, vault_id: &VaultId) -> FpResult<Vec<Tenant>> {
+    pub fn list_by_user_vault_id(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Tenant>> {
         let res = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(vault_id))
             .inner_join(tenant::table)
@@ -343,7 +343,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::get_opt_by_workos_org_id", skip_all)]
-    pub fn get_opt_by_workos_org_id(conn: &mut PgConn, workos_org_id: &String) -> FpResult<Option<Tenant>> {
+    pub fn get_opt_by_workos_org_id(conn: &mut PgConn, workos_org_id: &String) -> DbResult<Option<Tenant>> {
         let res = tenant::table
             .filter(tenant::workos_id.eq(workos_org_id))
             .first(conn)
@@ -352,7 +352,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::get_tenant_by_domain", skip_all)]
-    pub fn get_tenant_by_domain(conn: &mut PgConn, domain: &str) -> FpResult<Option<Tenant>> {
+    pub fn get_tenant_by_domain(conn: &mut PgConn, domain: &str) -> DbResult<Option<Tenant>> {
         let res = tenant::table
             .filter(tenant::domains.contains(vec![domain]))
             .filter(tenant::allow_domain_access.eq(true))
@@ -363,7 +363,7 @@ impl Tenant {
 
     #[tracing::instrument("Tenant::is_domain_already_claimed", skip_all)]
     /// Returns true if the domain is already claimed
-    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> FpResult<bool> {
+    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> DbResult<bool> {
         let result = if !domains.is_empty() {
             let existing: Option<TenantId> = tenant::table
                 .filter(tenant::domains.overlaps_with(domains))
@@ -379,7 +379,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::get_with_parent", skip_all)]
-    pub fn with_parent(self, conn: &mut PgConn) -> FpResult<TenantWithParent> {
+    pub fn with_parent(self, conn: &mut PgConn) -> DbResult<TenantWithParent> {
         let parent = if let Some(super_tenant_id) = &self.super_tenant_id {
             let parent = Tenant::get(conn, TenantIdentifier::Id(super_tenant_id))?;
             Some(parent)
@@ -390,7 +390,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::list_childre", skip_all)]
-    pub fn list_children(conn: &mut PgConn, id: &TenantId) -> FpResult<Vec<Self>> {
+    pub fn list_children(conn: &mut PgConn, id: &TenantId) -> DbResult<Vec<Self>> {
         let results = tenant::table
             .filter(tenant::super_tenant_id.eq(id))
             .get_results::<Self>(conn)?;
@@ -402,7 +402,7 @@ impl Tenant {
         id: &TenantId,
         is_live: bool,
         app_id: &SvixAppId,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let update = UpdateTenant {
             svix_app_id_sandbox: (!is_live).then_some(app_id),
             svix_app_id_live: (is_live).then_some(app_id),

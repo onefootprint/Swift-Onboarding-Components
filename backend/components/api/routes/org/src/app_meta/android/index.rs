@@ -8,6 +8,7 @@ use api_core::State;
 use api_wire_types::UpdateTenantAndroidAppMetaRequest;
 use db::models::tenant_android_app_meta::TenantAndroidAppFilters;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
+use db::DbResult;
 use newtypes::SealedVaultBytes;
 use newtypes::TenantAndroidAppMetaId;
 use paperclip::actix::api_v2_operation;
@@ -28,7 +29,7 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let list = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let filters = TenantAndroidAppFilters {
                 tenant_id,
                 package_name: None,
@@ -73,7 +74,7 @@ pub async fn post(
         .seal_bytes(integrity_decryption_key.as_bytes())?;
 
     let new_tenant_android_app_meta = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             TenantAndroidAppMeta::create(
                 conn,
                 tenant_id,

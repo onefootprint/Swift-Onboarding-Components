@@ -40,7 +40,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     let svid = di.scoped_vault_id.clone();
     let wf_id = wf.id.clone();
     let (tenant_id, vw, obc) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             let obc = ObConfiguration::get(conn, &wf_id)?.0;
@@ -66,7 +66,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
 
     let diid2 = di.id.clone();
     let waterfall_execution = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let wfe = WaterfallExecution::get_or_create(
                 conn,
                 ordered_apis2.into_iter().map(|v| v.into()).collect(),
@@ -103,7 +103,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         let eid2 = eid.clone();
         let v_api = waterfall_vendor_api.into();
         let step = state
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let locked = WaterfallExecution::lock(conn, &eid)?;
                 let step = WaterfallExecution::create_step(locked, conn, v_api)?;
                 Ok(step)
@@ -152,7 +152,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         // Update our WaterfallStep with the results
         let sr2 = step_result.clone();
         state
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let locked = WaterfallExecution::lock(conn, &eid2)?;
                 let update = UpdateWaterfallStep::save_step_result(
                     sr2.verification_result_id,
@@ -218,7 +218,7 @@ async fn complete_waterfall_execution(
     let is_one_click = wf.is_one_click;
     let obc_id = obc_id.clone();
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let locked = WaterfallExecution::lock(conn, &eid)?;
             if locked.completed_at.is_some() {
                 return Ok(());

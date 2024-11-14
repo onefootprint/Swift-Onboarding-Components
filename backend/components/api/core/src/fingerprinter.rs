@@ -1,12 +1,12 @@
 use crate::errors::kms::KmsSignError;
 use crate::FpResult;
 use crate::State;
-use api_errors::FpDbOptionalExtension;
 use api_errors::FpError;
 use api_wire_types::IdentifyId;
 use async_trait::async_trait;
 use aws_sdk_kms::primitives::Blob;
 use crypto::sha256;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::LocatedVault;
 use db::models::vault::Vault;
@@ -109,7 +109,7 @@ impl State {
         let t_id = t_id.cloned();
         let result = self
             .db_pool
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let existing = Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref())?;
                 let Some(existing) = existing.into_iter().next() else {
                     return Ok(None);

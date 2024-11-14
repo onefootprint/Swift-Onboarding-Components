@@ -1,5 +1,6 @@
+use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::insight_event;
@@ -100,7 +101,7 @@ pub struct CreateInsightEvent {
 
 impl CreateInsightEvent {
     #[tracing::instrument("CreateInsightEvent::insert_with_conn", skip_all)]
-    pub fn insert_with_conn(self, conn: &mut PgConn) -> FpResult<InsightEvent> {
+    pub fn insert_with_conn(self, conn: &mut PgConn) -> Result<InsightEvent, DbError> {
         let ev = diesel::insert_into(db_schema::schema::insight_event::table)
             .values(self)
             .get_result(conn)?;
@@ -110,7 +111,7 @@ impl CreateInsightEvent {
 
 impl InsightEvent {
     #[tracing::instrument("InsightEvent::get_for_workflow", skip_all)]
-    pub fn get_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Option<InsightEvent>> {
+    pub fn get_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<InsightEvent>> {
         let insight_event: Option<InsightEvent> = workflow::table
             .inner_join(insight_event::table)
             .filter(workflow::id.eq(wf_id))
@@ -125,7 +126,7 @@ impl InsightEvent {
         conn: &mut PgConn,
         obc_id: &ObConfigurationId,
         sv_ids: &[ScopedVaultId],
-    ) -> FpResult<HashMap<ScopedVaultId, Vec<InsightEvent>>> {
+    ) -> DbResult<HashMap<ScopedVaultId, Vec<InsightEvent>>> {
         let results: Vec<(ScopedVaultId, InsightEvent)> = workflow::table
             .inner_join(insight_event::table)
             .filter(workflow::ob_configuration_id.eq(obc_id))

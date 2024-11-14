@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::State;
 use chrono::Utc;
 use db::models::task::Task;
+use db::DbError;
 use newtypes::TaskData;
 use newtypes::TaskId;
 
@@ -45,7 +46,7 @@ async fn create_task(
     let CreateTaskRequest { task_data } = request.into_inner();
 
     let task = state
-        .db_query(move |conn| Task::create(conn, Utc::now(), task_data))
+        .db_query(move |conn| -> Result<Task, DbError> { Task::create(conn, Utc::now(), task_data) })
         .await?;
 
     Ok(CreateTasksResponse { task_id: task.id })

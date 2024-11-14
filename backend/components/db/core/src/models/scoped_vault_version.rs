@@ -1,9 +1,9 @@
 use super::data_lifetime::DataLifetime;
 use super::data_lifetime::DataLifetimeSeqnoTxn;
+use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
-use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::scoped_vault_version;
@@ -47,7 +47,7 @@ struct NewScopedVaultVersion {
 
 impl ScopedVaultVersion {
     #[tracing::instrument("ScopedVaultVersion::get_or_create", skip_all)]
-    pub fn get_or_create(conn: &mut TxnPgConn, sv_txn: &DataLifetimeSeqnoTxn<'_>) -> FpResult<Self> {
+    pub fn get_or_create(conn: &mut TxnPgConn, sv_txn: &DataLifetimeSeqnoTxn<'_>) -> DbResult<Self> {
         let scoped_vault = sv_txn.scoped_vault();
         let seqno = sv_txn.seqno();
 
@@ -74,7 +74,9 @@ impl ScopedVaultVersion {
 
         let version = if let Some(latest_row) = latest_row {
             if seqno <= latest_row.seqno {
-                return ServerErrInto("seqnos must increment with each scoped vault version");
+                return Err(DbError::AssertionError(
+                    "seqnos must increment with each scoped vault version".to_owned(),
+                ));
             }
 
             latest_row.version + ScopedVaultVersionNumber::from(1)
@@ -102,7 +104,7 @@ impl ScopedVaultVersion {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         version: ScopedVaultVersionNumber,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let result = scoped_vault_version::table
             .filter(scoped_vault_version::scoped_vault_id.eq(sv_id))
             .filter(scoped_vault_version::version.eq(version))
@@ -115,7 +117,7 @@ impl ScopedVaultVersion {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         version: ScopedVaultVersionNumber,
-    ) -> FpResult<DataLifetimeSeqno> {
+    ) -> DbResult<DataLifetimeSeqno> {
         if version == 0.into() {
             // A version number of 0 represents the state of the vault with no
             // DLs. Translate this into a seqno of 0, which is before all DLs.
@@ -133,7 +135,7 @@ impl ScopedVaultVersion {
     pub fn latest_version_number(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-    ) -> FpResult<ScopedVaultVersionNumber> {
+    ) -> DbResult<ScopedVaultVersionNumber> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         Self::version_number_at_seqno(conn, sv_id, seqno)
     }
@@ -143,7 +145,7 @@ impl ScopedVaultVersion {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         seqno: DataLifetimeSeqno,
-    ) -> FpResult<ScopedVaultVersionNumber> {
+    ) -> DbResult<ScopedVaultVersionNumber> {
         let existing_version: Option<ScopedVaultVersion> = scoped_vault_version::table
             .filter(scoped_vault_version::scoped_vault_id.eq(sv_id))
             .filter(scoped_vault_version::seqno.le(seqno))
@@ -165,7 +167,7 @@ impl ScopedVaultVersion {
         conn: &mut TxnPgConn,
         svv_ids: &[ScopedVaultVersionId],
         config_id: &VaultDrConfigId,
-    ) -> FpResult<()> {
+    ) -> DbResult<()> {
         let num_updated = diesel::update(scoped_vault_version::table)
             .filter(scoped_vault_version::id.eq_any(svv_ids))
             .set(scoped_vault_version::backed_up_by_vdr_config_id.eq(Some(config_id)))
@@ -173,11 +175,11 @@ impl ScopedVaultVersion {
 
         // Assert that svv_ids were all valid.
         if num_updated != svv_ids.len() {
-            return ServerErrInto!(
+            return Err(DbError::AssertionError(format!(
                 "ScopedVaultVersion::bulk_update_backed_up_by_vdr_config_id expected to update {} rows, but updated {}",
                 svv_ids.len(),
                 num_updated
-            );
+            )));
         }
 
         Ok(())

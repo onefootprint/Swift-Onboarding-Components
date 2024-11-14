@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::rule_instance_references_list;
@@ -31,7 +31,7 @@ pub struct NewRuleInstanceReferencesList {
 
 impl RuleInstanceReferencesList {
     #[tracing::instrument("RuleInstanceReferencesList::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewRuleInstanceReferencesList>) -> FpResult<Vec<Self>> {
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewRuleInstanceReferencesList>) -> DbResult<Vec<Self>> {
         let res = diesel::insert_into(rule_instance_references_list::table)
             .values(new)
             .get_results::<Self>(conn.conn())?;
@@ -40,7 +40,7 @@ impl RuleInstanceReferencesList {
 
     #[cfg(test)]
     #[tracing::instrument("RuleInstanceReferencesList::list", skip_all)]
-    pub fn list(conn: &mut TxnPgConn, list_id: &ListId) -> FpResult<Vec<Self>> {
+    pub fn list(conn: &mut TxnPgConn, list_id: &ListId) -> DbResult<Vec<Self>> {
         let res = rule_instance_references_list::table
             .filter(rule_instance_references_list::list_id.eq(list_id))
             .get_results(conn.conn())?;

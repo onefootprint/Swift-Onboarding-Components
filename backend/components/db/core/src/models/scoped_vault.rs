@@ -13,11 +13,10 @@ use super::workflow_request::WorkflowRequest;
 use crate::models::data_lifetime::DataLifetime;
 use crate::models::scoped_vault_tag::ScopedVaultTag;
 use crate::models::workflow_request_junction::WorkflowRequestJunction;
+use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequest;
-use api_errors::FpErrorCode;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
@@ -211,7 +210,7 @@ impl ScopedVault {
         conn: &mut TxnPgConn,
         vault: &Locked<Vault>,
         ob_configuration_id: &ObConfigurationId,
-    ) -> FpResult<(Self, IsNew)> {
+    ) -> DbResult<(Self, IsNew)> {
         let (ob_config, _) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
@@ -242,7 +241,7 @@ impl ScopedVault {
         new_user: NewVaultArgs,
         args: NewScopedVaultArgs,
         idempotency_id: Option<String>,
-    ) -> FpResult<(Self, Vault, IsNew)> {
+    ) -> DbResult<(Self, Vault, IsNew)> {
         // Since the idempotency id and external ID are stored on the vault, concatenate them with
         // the tenant ID to make sure they are scoped per tenant.
         let idempotency_id =
@@ -262,9 +261,7 @@ impl ScopedVault {
                 // TODO instead of silently inheriting, we might want to actualy HTTP 409
                 match svr {
                     Ok(sv) => Ok((Vault::lock(conn, &sv.vault_id)?, false)),
-                    Err(err) if err.code() == Some(FpErrorCode::DbDataNotFound) => {
-                        Ok(Vault::insert(conn, new_user, idempotency_id)?)
-                    }
+                    Err(DbError::DataNotFound(_)) => Ok(Vault::insert(conn, new_user, idempotency_id)?),
                     Err(err) => Err(err),
                 }?
             }
@@ -280,9 +277,9 @@ impl ScopedVault {
                 .filter(scoped_vault::is_active.eq(true))
                 .get_result(conn.conn())
                 .map_err(|e| match e {
-                    diesel::result::Error::NotFound if idempotency_id_given => {
-                        BadRequest("Vault previously created with given external ID has been deleted")
-                    }
+                    diesel::result::Error::NotFound if idempotency_id_given => DbError::ValidationError(
+                        "Vault previously created with given idempotency key has been deleted".to_owned(),
+                    ),
                     e => e.into(),
                 })?
         };
@@ -290,7 +287,7 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, uv: &Locked<Vault>, args: NewScopedVaultArgs) -> FpResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, uv: &Locked<Vault>, args: NewScopedVaultArgs) -> DbResult<Self> {
         let NewScopedVaultArgs {
             tenant_id,
             is_active,
@@ -322,7 +319,7 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::get", skip_all)]
-    pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> FpResult<ScopedVault> {
+    pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
         let mut query = scoped_vault::table.into_boxed();
 
         match id.into() {
@@ -394,7 +391,7 @@ impl ScopedVault {
         ids: T,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> FpResult<Vec<(Self, Vault)>> {
+    ) -> DbResult<Vec<(Self, Vault)>> {
         use db_schema::schema::vault;
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(tenant_id))
@@ -414,7 +411,7 @@ impl ScopedVault {
     pub fn bulk_get_serializable_info(
         conn: &mut PgConn,
         ids: Vec<ScopedVaultId>,
-    ) -> FpResult<HashMap<ScopedVaultId, SerializableEntity>> {
+    ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
         use db_schema::schema::insight_event;
         use db_schema::schema::manual_review;
         use db_schema::schema::scoped_vault_label;
@@ -494,7 +491,7 @@ impl ScopedVault {
         Ok(result_map)
     }
 
-    pub fn lock<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> FpResult<Locked<Self>> {
+    pub fn lock<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Locked<Self>> {
         // First lock the vault so we have a defined ordering of locks between the vault and scoped vault
         // tables. This will no-op if we have already locked the vault
         let sv = Self::get(conn, id)?;
@@ -510,7 +507,7 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::update", skip_all)]
-    pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> FpResult<Self> {
+    pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<Self> {
         if update == Default::default() {
             // No-op if the update is empty
             let existing_sv = scoped_vault::table
@@ -531,7 +528,7 @@ impl ScopedVault {
         conn: &mut TxnPgConn,
         id: &ScopedVaultId,
         new_status: OnboardingStatus,
-    ) -> FpResult<SvStatusDelta> {
+    ) -> DbResult<SvStatusDelta> {
         // Must lock to make sure scoped vault status isn't stale
         let sv = ScopedVault::lock(conn, id)?.into_inner();
         let can_transition = new_status.can_transition_from(&sv.status);
@@ -559,7 +556,7 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, id: &ScopedVaultId) -> FpResult<Self> {
+    pub fn deactivate(conn: &mut TxnPgConn, id: &ScopedVaultId) -> DbResult<Self> {
         let now = Utc::now();
         let updated_sv = diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
@@ -572,7 +569,7 @@ impl ScopedVault {
         Ok(updated_sv)
     }
 
-    pub fn set_heartbeat(&self, conn: &mut PgConn) -> FpResult<()> {
+    pub fn set_heartbeat(&self, conn: &mut PgConn) -> DbResult<()> {
         // To reduce frequency of writes, only set the heartbeat if it's >3 mins old
         if Utc::now() - self.last_heartbeat_at > Duration::minutes(3) {
             diesel::update(scoped_vault::table)
@@ -589,7 +586,7 @@ pub type AuthorizedTenant = (Workflow, ScopedVault, ObConfiguration, Tenant);
 impl ScopedVault {
     /// List all authorized onboardings for a given vault
     #[tracing::instrument("ScopedVault::list_authorized", skip_all)]
-    pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> FpResult<Vec<AuthorizedTenant>> {
+    pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<AuthorizedTenant>> {
         use db_schema::schema::ob_configuration;
         use db_schema::schema::tenant;
         use db_schema::schema::workflow;
@@ -605,7 +602,7 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::list", skip_all)]
-    pub fn list(conn: &mut PgConn, v_id: &VaultId) -> FpResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<Self>> {
         let results = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(v_id))
             .get_results(conn)?;
@@ -619,7 +616,7 @@ impl ScopedVault {
         t_id: &TenantId,
         end_date: DateTime<Utc>,
         filters: ScopedVaultPiiFilters,
-    ) -> FpResult<i64> {
+    ) -> DbResult<i64> {
         use db_schema::schema::data_lifetime;
 
         let mut sv_with_data = data_lifetime::table
@@ -672,7 +669,7 @@ impl ScopedVault {
 
     /// For the more modern webhook kinds, create a task that will send the provided webhook `kind`
     /// for the provided `ScopedVault`.
-    pub fn create_webhook_task(&self, conn: &mut TxnPgConn, kind: UserSpecificWebhookKind) -> FpResult<()> {
+    pub fn create_webhook_task(&self, conn: &mut TxnPgConn, kind: UserSpecificWebhookKind) -> DbResult<()> {
         let payload = UserSpecificWebhookPayload {
             is_live: self.is_live,
             fp_id: self.fp_id.clone(),
@@ -957,10 +954,7 @@ mod tests {
             Some("idempotency-id-1".into()),
         )
         .unwrap_err();
-        assert_eq!(
-            err.message(),
-            "Vault previously created with given external ID has been deleted",
-        );
+        assert!(matches!(err, DbError::ValidationError(_)));
 
         let sv_args = NewScopedVaultArgs {
             is_active: true,

@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::stytch_fingerprint_event;
@@ -55,7 +55,7 @@ pub struct NewStytchFingerprintEvent {
 
 impl StytchFingerprintEvent {
     #[tracing::instrument("StytchFingerprintEvent::create", skip_all)]
-    pub fn create(conn: &mut PgConn, new_event: NewStytchFingerprintEvent) -> FpResult<Self> {
+    pub fn create(conn: &mut PgConn, new_event: NewStytchFingerprintEvent) -> DbResult<Self> {
         let res = diesel::insert_into(stytch_fingerprint_event::table)
             .values(new_event)
             .get_result(conn)?;

@@ -1,7 +1,7 @@
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_user;
@@ -29,7 +29,7 @@ pub struct TenantUser {
 
 impl TenantUser {
     #[tracing::instrument("TenantUser::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &TenantUserId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
             .select(TenantUser::as_select())
@@ -37,7 +37,7 @@ impl TenantUser {
         Ok(user)
     }
 
-    pub fn get_bulk(conn: &mut PgConn, ids: Vec<&TenantUserId>) -> FpResult<HashMap<TenantUserId, Self>> {
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<&TenantUserId>) -> DbResult<HashMap<TenantUserId, Self>> {
         let res = tenant_user::table
             .filter(tenant_user::id.eq_any(ids))
             .select(TenantUser::as_select())
@@ -50,7 +50,7 @@ impl TenantUser {
     }
 
     #[tracing::instrument("TenantUser::get_firm_employee", skip_all)]
-    pub fn get_firm_employee(conn: &mut PgConn, id: &TenantUserId) -> FpResult<Self> {
+    pub fn get_firm_employee(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
             .filter(tenant_user::is_firm_employee.eq(true))
@@ -64,7 +64,7 @@ impl TenantUser {
         email: OrgMemberEmail,
         first_name: Option<String>,
         last_name: Option<String>,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let user: Option<Self> = tenant_user::table
             .filter(tenant_user::email.eq(&email))
             .first(conn.conn())
@@ -102,21 +102,21 @@ impl TenantUser {
     }
 
     #[tracing::instrument("TenantUser::update", skip_all)]
-    pub fn update(conn: &mut TxnPgConn, id: &TenantUserId, update: TenantUserUpdate) -> FpResult<Self> {
+    pub fn update(conn: &mut TxnPgConn, id: &TenantUserId, update: TenantUserUpdate) -> DbResult<Self> {
         let results: Vec<Self> = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
             .set(update)
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
 
     #[tracing::instrument("TenantUser::set_is_firm_employee_testing_only", skip_all)]
-    pub fn set_is_firm_employee_testing_only(conn: &mut PgConn, id: &TenantUserId) -> FpResult<Self> {
+    pub fn set_is_firm_employee_testing_only(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
             .filter(tenant_user::email.eq(OrgMemberEmail::INTEGRATION_TEST_USER_EMAIL))
@@ -126,7 +126,7 @@ impl TenantUser {
     }
 
     #[tracing::instrument("TenantUser::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &TenantUserId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &TenantUserId) -> DbResult<Locked<Self>> {
         let user = tenant_user::table
             .filter(tenant_user::id.eq(id))
             .for_no_key_update()

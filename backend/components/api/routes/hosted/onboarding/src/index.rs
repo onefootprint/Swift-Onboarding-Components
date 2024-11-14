@@ -4,6 +4,7 @@ use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::utils::headers::InsightHeaders;
+use crate::FpError;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -17,6 +18,7 @@ use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -53,7 +55,7 @@ pub async fn post(
     let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
     let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoObConfig)?;
     let (scoped_user, ob_config, portable_vw) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (ob_config, _) = ObConfiguration::get_enabled(conn, &obc_id)?;
@@ -74,7 +76,7 @@ pub async fn post(
         .get(VerificationCheckKind::NeuroId)
         .is_some();
     let auth_token = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> Result<_, FpError> {
             // TODO: allow_reonboard here technically allows creating multiple Workflows per auth token. This
             // is harmless, but ideally we have idempotency protection here and only allow creating one
             // onboarding for the purpose of associating with the auth session.

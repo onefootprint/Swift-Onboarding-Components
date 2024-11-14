@@ -64,12 +64,10 @@ impl std::error::Error for FpError {
 
 mod base;
 mod code;
-mod diesel;
 
 pub use base::*;
 pub use code::BadRequestWithCode;
 pub use code::FpErrorCode;
-pub use diesel::*;
 
 impl From<std::convert::Infallible> for FpError {
     fn from(_: std::convert::Infallible) -> Self {

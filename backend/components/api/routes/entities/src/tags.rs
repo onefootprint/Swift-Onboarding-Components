@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::fp_id_path::FpIdPathPlus;
+use api_core::FpResult;
 use api_wire_types::CreateTagRequest;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
@@ -38,7 +39,7 @@ pub async fn post(
     let actor: DbActor = auth.actor().into();
 
     let tag = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let args = NewScopedVaultTag {
@@ -70,9 +71,9 @@ pub async fn get(
     let fp_id = fp_id.into_inner();
 
     let tags = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            ScopedVaultTag::get_active(conn, &sv.id)
+            Ok(ScopedVaultTag::get_active(conn, &sv.id)?)
         })
         .await?;
 
@@ -94,9 +95,9 @@ pub async fn delete(
     let (fp_id, tag_id) = path.into_inner();
 
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            ScopedVaultTag::deactivate(conn, &sv.id, &tag_id, actor)
+            Ok(ScopedVaultTag::deactivate(conn, &sv.id, &tag_id, actor)?)
         })
         .await?;
 

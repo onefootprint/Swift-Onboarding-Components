@@ -25,6 +25,7 @@ use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::watchlist_check::WatchlistCheck;
+use db::DbResult;
 use db::TxnPgConn;
 use idv::requirements::HasIdentityDataRequirements;
 use newtypes::vendor_api_struct::IdologyPa;
@@ -93,7 +94,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to
         //    be made
         let (tenant, sv, obc, uvw, wc) = state
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> FpResult<_> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be
                 // extra safe
                 let _task = Task::lock(conn, &task_id)?;
@@ -182,7 +183,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         let vault_id = uvw.vault().id.clone();
         let wc_id = wc.id.clone();
         state
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> DbResult<()> {
                 // not strictly necessarily since we aren't currently running multiple instances of a single
                 // Task concurrently, but doesnt hurt
                 let wc = WatchlistCheck::lock(conn, &wc_id)?;
@@ -243,7 +244,7 @@ impl WatchlistCheckTask {
         task_id: &TaskId,
         sv: &ScopedVault,
         uvw: &VaultWrapper<Person>,
-    ) -> FpResult<WatchlistCheck> {
+    ) -> DbResult<WatchlistCheck> {
         let has_onboarding_in_non_pass_status =
             !uvw.vault.is_created_via_api && sv.status != OnboardingStatus::Pass;
         let status = if !sv.is_live {

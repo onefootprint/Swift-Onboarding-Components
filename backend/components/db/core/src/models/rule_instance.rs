@@ -4,10 +4,9 @@ use super::rule_instance_references_list::NewRuleInstanceReferencesList;
 use super::rule_instance_references_list::RuleInstanceReferencesList;
 use super::rule_set_version::RuleSetVersion;
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
@@ -142,7 +141,7 @@ impl RuleInstance {
         obc: &Locked<ObConfiguration>,
         actor: &DbActor,
         update: MultiRuleUpdate,
-    ) -> FpResult<Vec<RuleInstance>> {
+    ) -> DbResult<Vec<RuleInstance>> {
         let MultiRuleUpdate {
             expected_rule_set_version,
             new_rules,
@@ -164,10 +163,10 @@ impl RuleInstance {
             .filter_map(|(id, list)| list.deactivated_seqno.map(|_| id.clone()))
             .collect_vec();
         if !deactivated_lists.is_empty() {
-            return BadRequestInto!(
+            return Err(DbError::ValidationError(format!(
                 "Cannot use deactivated lists in rules: {}",
                 Csv::from(deactivated_lists)
-            );
+            )));
         }
 
         let unknown_list_ids = list_ids
@@ -175,7 +174,10 @@ impl RuleInstance {
             .filter(|l| !lists.contains_key(l))
             .collect_vec();
         if !unknown_list_ids.is_empty() {
-            return BadRequestInto!("Unknown list_ids: {}", Csv::from(unknown_list_ids));
+            return Err(DbError::ValidationError(format!(
+                "Unknown list_ids: {}",
+                Csv::from(unknown_list_ids)
+            )));
         }
 
         let mut new_rule_instances = vec![];
@@ -198,7 +200,7 @@ impl RuleInstance {
         new_rules: Vec<NewRule>,
         seqno: DataLifetimeSeqno,
         now: DateTime<Utc>,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let new_rule_instances: Vec<_> = new_rules
             .into_iter()
             .map(|r| NewRuleInstance {
@@ -229,7 +231,7 @@ impl RuleInstance {
         updates: Vec<RuleInstanceUpdate>,
         seqno: DataLifetimeSeqno,
         now: DateTime<Utc>,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let rule_ids = updates.iter().map(|u| &u.rule_id).collect_vec();
 
         // deactivate existing RuleInstance's for each rule_id
@@ -248,7 +250,12 @@ impl RuleInstance {
 
         let existing_with_update: Vec<(RuleInstance, RuleInstanceUpdate)> = updates
             .into_iter()
-            .map(|u| (existing.remove(&u.rule_id).ok_or(DbError::RelatedObjectNotFound)).map(|e| (e, u)))
+            .map(|u| {
+                existing
+                    .remove(&u.rule_id)
+                    .ok_or(DbError::RelatedObjectNotFound)
+                    .map(|e| (e, u))
+            })
             .collect::<Result<Vec<_>, _>>()?;
 
         // create new RuleInstance's for each update (both edits + deletes)
@@ -285,7 +292,7 @@ impl RuleInstance {
     fn insert_rule_instances(
         conn: &mut TxnPgConn,
         new_rule_instances: Vec<NewRuleInstance<'_>>,
-    ) -> FpResult<Vec<RuleInstance>> {
+    ) -> DbResult<Vec<RuleInstance>> {
         let rule_instances = diesel::insert_into(rule_instance::table)
             .values(new_rule_instances)
             .get_results::<Self>(conn.conn())?;
@@ -317,7 +324,7 @@ impl RuleInstance {
         obc: &Locked<ObConfiguration>,
         actor: &DbActor,
         new_rules: Vec<NewRule>,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         Self::bulk_edit(
             conn,
             obc,
@@ -334,7 +341,7 @@ impl RuleInstance {
     }
 
     #[tracing::instrument("RuleInstance::get", skip_all)]
-    pub fn get(conn: &mut PgConn, rule_id: &RuleId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, rule_id: &RuleId) -> DbResult<Self> {
         let res = rule_instance::table
             .filter(rule_instance::rule_id.eq(rule_id))
             .filter(rule_instance::deactivated_at.is_null())
@@ -350,7 +357,7 @@ impl RuleInstance {
         is_live: bool,
         ob_config_id: &ObConfigurationId,
         include_rules: IncludeRules,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let kinds = match include_rules {
             IncludeRules::All => RuleInstanceKind::iter().collect(),
             IncludeRules::Kind(k) => vec![k, RuleInstanceKind::Any],
@@ -375,7 +382,7 @@ impl RuleInstance {
     pub fn list_using_list(
         conn: &mut PgConn,
         list_id: &ListId,
-    ) -> FpResult<Vec<(ObConfiguration, Vec<Self>)>> {
+    ) -> DbResult<Vec<(ObConfiguration, Vec<Self>)>> {
         let rules: Vec<(ObConfigurationId, RuleInstance)> = rule_instance_references_list::table
             .inner_join(rule_instance::table)
             .filter(rule_instance_references_list::list_id.eq(list_id))
@@ -395,7 +402,9 @@ impl RuleInstance {
             .into_group_map()
             .into_iter()
             .map(|(obc_id, rules)| {
-                (obcs.remove(&obc_id).ok_or(DbError::RelatedObjectNotFound)).map(|o| (o, rules))
+                obcs.remove(&obc_id)
+                    .ok_or(DbError::RelatedObjectNotFound)
+                    .map(|o| (o, rules))
             })
             .collect::<Result<Vec<_>, _>>()?
             .into_iter()
@@ -408,7 +417,7 @@ impl RuleInstance {
     // takes in a list of list_id's and returns those which are used in at least 1 (active) rule in 1
     // playbook
     #[tracing::instrument("Rule::get_is_used_in_some_playbook", skip_all)]
-    pub fn get_is_used_in_some_playbook(conn: &mut PgConn, list_ids: &[ListId]) -> FpResult<HashSet<ListId>> {
+    pub fn get_is_used_in_some_playbook(conn: &mut PgConn, list_ids: &[ListId]) -> DbResult<HashSet<ListId>> {
         let res = rule_instance_references_list::table
             .inner_join(rule_instance::table)
             .filter(rule_instance_references_list::list_id.eq_any(list_ids))

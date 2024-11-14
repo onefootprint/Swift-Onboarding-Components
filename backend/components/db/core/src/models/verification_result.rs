@@ -1,8 +1,9 @@
 use super::decision_intent::DecisionIntent;
 use super::verification_request::RequestAndResult;
 use super::verification_request::VerificationRequest;
+use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::decision_intent;
@@ -60,7 +61,7 @@ impl VerificationResult {
         response: ScrubbedPiiVendorResponse,
         e_response: SealedVaultBytes,
         is_error: bool,
-    ) -> FpResult<VerificationResult> {
+    ) -> Result<VerificationResult, DbError> {
         let new_result = NewVerificationResult {
             request_id,
             response,
@@ -78,7 +79,7 @@ impl VerificationResult {
     pub fn bulk_create(
         conn: &mut PgConn,
         new_verification_results: Vec<NewVerificationResult>,
-    ) -> FpResult<Vec<VerificationResult>> {
+    ) -> Result<Vec<VerificationResult>, DbError> {
         let result = diesel::insert_into(verification_result::table)
             .values(new_verification_results)
             .get_results(conn)?;
@@ -90,7 +91,7 @@ impl VerificationResult {
         conn: &mut PgConn,
         vendor_api: VendorAPI,
         id: &str,
-    ) -> FpResult<Option<(VerificationRequest, VerificationResult, DecisionIntent)>> {
+    ) -> DbResult<Option<(VerificationRequest, VerificationResult, DecisionIntent)>> {
         let res = verification_request::table
             .filter(verification_request::vendor_api.eq(vendor_api))
             .inner_join(verification_result::table)
@@ -108,7 +109,7 @@ impl VerificationResult {
     }
 
     #[tracing::instrument("VerificationResult::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &VerificationResultId) -> FpResult<RequestAndResult> {
+    pub fn get(conn: &mut PgConn, id: &VerificationResultId) -> DbResult<RequestAndResult> {
         let res = verification_request::table
             .inner_join(verification_result::table)
             .filter(verification_result::id.eq(id))
@@ -121,7 +122,7 @@ impl VerificationResult {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         vendor_api: &VendorAPI,
-    ) -> FpResult<Option<RequestAndResult>> {
+    ) -> DbResult<Option<RequestAndResult>> {
         let res = verification_request::table
             .inner_join(verification_result::table)
             .filter(verification_request::scoped_vault_id.eq(sv_id))

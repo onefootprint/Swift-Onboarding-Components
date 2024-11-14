@@ -92,7 +92,7 @@ impl TenantVw<Business> {
         let tid = self.scoped_vault.tenant_id.clone();
         let seqno = self.seqno;
         let (linked_bos, bo_vws) = state
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let linked_bos = BusinessOwner::list_owners(conn, &vid, &tid)?;
                 let vaults = linked_bos.iter().flat_map(|(_, x)| x.clone()).collect_vec();
                 // Build VWs for each linked BO (at the same seqno that this VW was built at)

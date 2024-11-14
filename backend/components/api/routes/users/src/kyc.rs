@@ -25,9 +25,9 @@ use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::requirements::UserDecryptResultForReqs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
-use api_errors::FpDbOptionalExtension;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::SimpleFixtureResult;
 use api_wire_types::TriggerKycRequest;
@@ -98,7 +98,7 @@ pub async fn post(
     };
 
     let (uvw, sv, seqno, vault_version) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -141,13 +141,12 @@ pub async fn post(
         && uvw.vault.is_created_via_api;
 
     let (wf, obc) = state
-        .db_transaction(move |conn| {
-            let result = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live));
-            let obc = match result.optional() {
-                Ok(Some((_, obc, _))) => obc,
-                Ok(None) => return Err(DbError::PlaybookNotFound.into()),
-                Err(e) => return Err(e),
-            };
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (_, obc, _) = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live))
+                .map_err(|e| match e {
+                    DbError::DataNotFound(_) => DbError::PlaybookNotFound,
+                    e => e,
+                })?;
             tracing::info!(playbook_key=%obc.key, "Post /kyc with playbook");
             // We support using a KYB playbook since this will just run the KYC checks from the playbook
             if !matches!(obc.kind, ObConfigurationKind::Kyc | ObConfigurationKind::Kyb) {
@@ -252,7 +251,7 @@ pub async fn post(
         tracing::error!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
     let (wf, sv, mrs) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
             let mr_filters = ManualReviewFilters::get_active();
             let mrs = ManualReview::get(conn, &sv.id, mr_filters)?;

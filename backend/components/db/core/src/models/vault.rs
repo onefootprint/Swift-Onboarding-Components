@@ -1,9 +1,9 @@
 use super::ob_configuration::IsLive;
 use crate::models::fingerprint::Fingerprint as DbFingerprint;
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::fingerprint_junction;
@@ -114,7 +114,7 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::get", skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<Self>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
         T: Into<VaultIdentifier<'a>>,
     {
@@ -123,7 +123,7 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &VaultId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<Locked<Self>> {
         let user = vault::table
             .filter(vault::id.eq(id))
             .for_no_key_update()
@@ -132,7 +132,7 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::lock_by_scoped_user", skip_all)]
-    pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedVaultId) -> FpResult<Locked<Self>> {
+    pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let uv_ids = scoped_vault::table
             .filter(scoped_vault::id.eq(su_id))
             .select(scoped_vault::vault_id);
@@ -144,7 +144,7 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, new_user: NewVaultArgs) -> FpResult<Locked<Vault>> {
+    pub fn create(conn: &mut TxnPgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
         let (uv, _) = Self::insert(conn, new_user, None)?;
         Ok(uv)
     }
@@ -153,7 +153,7 @@ impl Vault {
     /// As soon as a vault's contact info is marked as OTP verified, the vault itself is marked as
     /// verified _and_ identifiable.
     // This has the effect of allowing vaults initially created via API to now be identifiable
-    pub fn mark_verified(conn: &mut TxnPgConn, id: &VaultId) -> FpResult<()> {
+    pub fn mark_verified(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
         diesel::update(vault::table)
             .filter(vault::id.eq(id))
             .set((vault::is_verified.eq(true), vault::is_identifiable.eq(true)))
@@ -162,7 +162,7 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::lock_by_idempotency_id", skip_all)]
-    fn lock_by_idempotency_id(conn: &mut TxnPgConn, i_id: &IdempotencyId) -> FpResult<Option<Locked<Vault>>> {
+    fn lock_by_idempotency_id(conn: &mut TxnPgConn, i_id: &IdempotencyId) -> DbResult<Option<Locked<Vault>>> {
         let vault = vault::table
             .filter(vault::idempotency_id.eq(i_id))
             .for_no_key_update()
@@ -176,7 +176,7 @@ impl Vault {
         conn: &mut TxnPgConn,
         new_user: NewVaultArgs,
         idempotency_id: Option<IdempotencyId>,
-    ) -> FpResult<(Locked<Vault>, IsNew)> {
+    ) -> DbResult<(Locked<Vault>, IsNew)> {
         let existing_vault = idempotency_id
             .as_ref()
             .map(|i_id| Self::lock_by_idempotency_id(conn, i_id))
@@ -242,7 +242,7 @@ impl Vault {
 
     #[tracing::instrument("Vault::mark_portable", skip_all)]
     /// Mark the provided vault as portable
-    pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> FpResult<()> {
+    pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
         let existing: Self = vault::table.filter(vault::id.eq(id)).get_result(conn.conn())?;
         if !existing.is_identifiable {
             // TODO if we don't see this happening at all, we can remove the logic that sets
@@ -323,7 +323,7 @@ impl Vault {
         sh_data: &[Fingerprint],
         sandbox_id: Option<SandboxId>,
         tenant_id: Option<&TenantId>,
-    ) -> FpResult<Vec<LocatedVault>> {
+    ) -> DbResult<Vec<LocatedVault>> {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::data_lifetime;
         use db_schema::schema::fingerprint;

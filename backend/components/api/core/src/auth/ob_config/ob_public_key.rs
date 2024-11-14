@@ -3,11 +3,12 @@ use crate::telemetry::RootSpan;
 use crate::State;
 use actix_web::web;
 use actix_web::FromRequest;
-use api_errors::FpDbOptionalExtension;
 use api_errors::ServerErr;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
 use db::models::tenant::Tenant;
+use db::DbError;
+use db::DbResult;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use std::marker::PhantomData;
@@ -57,22 +58,23 @@ impl FromRequest for PublicOnboardingContext {
 
             let key = newtypes::PublishablePlaybookKey::from(config_key?);
             let key2 = key.clone();
-            let result = state
-                .db_query(move |conn| Playbook::get_latest_version_if_enabled(conn, &key))
-                .await;
-            let (ob_config, tenant) = match result.optional() {
-                Ok(Some((_, ob_config, tenant))) => (ob_config, tenant),
-                Ok(None) => {
-                    // Slightly more informative error message when we can't find an ObConfig with
-                    // this key
-                    if key2.starts_with("sk_") {
-                        return Err(AuthError::ApiKeyUsedForObConfig.into());
-                    } else {
-                        return Err(AuthError::ObConfigNotFound.into());
+            let (_, ob_config, tenant) = state
+                .db_query(move |conn| -> DbResult<_> { Playbook::get_latest_version_if_enabled(conn, &key) })
+                .await
+                .map_err(|e| -> Self::Error {
+                    match e {
+                        DbError::DataNotFound(_) => {
+                            // Slightly more informative error message when we can't find an ObConfig with
+                            // this key
+                            if key2.starts_with("sk_") {
+                                AuthError::ApiKeyUsedForObConfig.into()
+                            } else {
+                                AuthError::ObConfigNotFound.into()
+                            }
+                        }
+                        _ => e.into(),
                     }
-                }
-                Err(e) => return Err(e.into()),
-            };
+                })?;
 
             tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "pk_ob_session authenticated");
             root_span.record("tenant_id", &tenant.id.to_string());

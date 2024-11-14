@@ -1,6 +1,6 @@
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::billing_profile;
@@ -33,7 +33,7 @@ pub struct NewBillingProfile<'a> {
 }
 
 impl BillingProfile {
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> FpResult<Option<Self>> {
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Option<Self>> {
         let result = billing_profile::table
             .filter(billing_profile::tenant_id.eq(tenant_id))
             .get_result::<Self>(conn)
@@ -45,7 +45,7 @@ impl BillingProfile {
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
         args: UpdateBillingProfileArgs,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         // Create a new BillingProfile row if one doesn't exist
         let existing = billing_profile::table
             .filter(billing_profile::tenant_id.eq(tenant_id))

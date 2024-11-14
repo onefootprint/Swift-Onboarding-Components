@@ -6,6 +6,7 @@ use api_core::errors::tenant::TenantError;
 use api_core::serializers::IsDomainAlreadyClaimed;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::partner_tenant::PartnerTenant;
 use db::models::partner_tenant::UpdatePartnerTenant;
@@ -71,7 +72,7 @@ pub async fn patch(
     };
 
     let updated_pt = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let pt = PartnerTenant::lock(conn, &pt_id)?;
 
             // If we're enabling domain access, ensure the partner tenant's domains aren't already claimed.
@@ -86,7 +87,7 @@ pub async fn patch(
                 .into());
             }
 
-            PartnerTenant::update(conn, &pt_id, update_pt)
+            Ok(PartnerTenant::update(conn, &pt_id, update_pt)?)
         })
         .await?;
 

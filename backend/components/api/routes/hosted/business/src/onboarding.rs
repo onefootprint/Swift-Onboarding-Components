@@ -1,5 +1,6 @@
 use crate::auth::user::UserAuthScope;
 use crate::utils::headers::InsightHeaders;
+use crate::FpError;
 use crate::State;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
@@ -44,7 +45,7 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let (auth_token, is_new_sb) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> Result<_, FpError> {
             let wfr = (user_auth.wfr_id.as_ref())
                 .map(|wfr_id| WorkflowRequest::get(conn, wfr_id, &user_auth.scoped_user.id))
                 .transpose()?;

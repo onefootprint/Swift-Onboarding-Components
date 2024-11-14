@@ -6,11 +6,11 @@ use super::user_timeline::UserTimeline;
 use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::models::workflow::Workflow;
+use crate::DbResult;
 use crate::OffsetPaginatedResult;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::manual_review;
@@ -100,7 +100,7 @@ impl OnboardingDecision {
         conn: &mut TxnPgConn,
         wf: &Workflow,
         args: NewDecisionArgs,
-    ) -> FpResult<(Self, ManualReviewDelta)> {
+    ) -> DbResult<(Self, ManualReviewDelta)> {
         let NewDecisionArgs {
             vault_id,
             logic_git_hash,
@@ -150,7 +150,7 @@ impl OnboardingDecision {
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
-    ) -> FpResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
+    ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
         use db_schema::schema::ob_configuration;
         use db_schema::schema::workflow;
         let results: Vec<(Self, (Workflow, ObConfiguration))> = onboarding_decision::table
@@ -184,7 +184,7 @@ impl OnboardingDecision {
     }
 
     #[tracing::instrument("OnboardingDecision::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Option<Self>> {
+    pub fn get_active(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
         let res = onboarding_decision::table
             .filter(onboarding_decision::workflow_id.eq(wf_id))
             .filter(onboarding_decision::deactivated_at.is_null())
@@ -199,7 +199,7 @@ impl OnboardingDecision {
         sv_id: &ScopedVaultId,
         filters: OnboardingDecisionFilters,
         pagination: OffsetPagination,
-    ) -> FpResult<OffsetPaginatedResult<(Self, Workflow, ObConfiguration)>> {
+    ) -> DbResult<OffsetPaginatedResult<(Self, Workflow, ObConfiguration)>> {
         let OnboardingDecisionFilters { made_by_footprint } = filters;
         let mut query = onboarding_decision::table
             .inner_join(workflow::table.inner_join(ob_configuration::table))

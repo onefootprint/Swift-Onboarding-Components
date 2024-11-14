@@ -18,6 +18,7 @@ use api_core::types::ApiResponse;
 use api_core::ApiCoreError;
 use db::models::data_lifetime::DataLifetime;
 use db::models::workflow::Workflow;
+use db::DbResult;
 use newtypes::WorkflowId;
 use newtypes::WorkflowState;
 
@@ -44,7 +45,7 @@ async fn proceed(
     } = request.into_inner();
 
     let (wf, seqno) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             let wf = Workflow::get(conn, &wf_id)?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
             Ok((wf, seqno))

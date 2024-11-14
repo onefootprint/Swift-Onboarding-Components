@@ -15,9 +15,8 @@ pub mod models;
 mod connection;
 
 mod pagination;
-use api_errors::FpError;
 use api_errors::FpErrorCode;
-use api_errors::FpResult;
+use api_errors::FpErrorTrait;
 pub use pagination::*;
 use tokio::time::Instant;
 mod instrumented_connection;
@@ -57,6 +56,7 @@ pub mod tests;
 // Wrapper around diesel's PgConnection that allows us to swap out the underlying conn
 // implementation in one place
 pub type PgConn = instrumented_connection::InstrumentedPgConnection;
+pub type DbResult<T> = Result<T, DbError>;
 pub use connection::TxnPgConn;
 
 pub type ManagedPgConn = deadpool_diesel::Manager<PgConn>;
@@ -65,21 +65,24 @@ pub type Pool = deadpool::managed::Pool<ManagedPgConn, deadpool::managed::Object
 pub struct DbPool(Pool);
 
 impl DbPool {
-    pub async fn db_query<F, R>(&self, f: F) -> FpResult<R>
+    pub async fn db_query<F, R, E>(&self, f: F) -> Result<R, E>
     where
-        F: FnOnce(&mut PgConn) -> FpResult<R> + Send + 'static,
+        F: FnOnce(&mut PgConn) -> Result<R, E> + Send + 'static,
+        E: From<DbError> + Send + 'static + std::fmt::Debug,
+        // The E here just needs to be dereferencable into a trait object for FpErrorTrait for us to call
+        // .code()
+        E: std::ops::Deref<Target = dyn FpErrorTrait>,
         R: Send + 'static,
     {
         let start = Instant::now();
-        let conn: deadpool::managed::Object<ManagedPgConn> =
-            self.0.get().await.map_err(DbError::from).map_err(FpError::from)?;
+        let conn: deadpool::managed::Object<ManagedPgConn> = self.0.get().await.map_err(DbError::from)?;
         let duration = start.elapsed().as_secs_f64();
         if duration >= 1f64 {
             tracing::warn!(wait_time_s=%duration, "Long wait to fetch db conn from pool");
         }
 
         let result = conn.interact(move |conn| f(conn)).await;
-        let result: FpResult<R> = (move || result.map_err(DbError::from).map_err(FpError::from)?)();
+        let result: Result<R, E> = (move || result.map_err(DbError::from)?)();
 
         // Check if the connection experienced an irrecoverable error
         if let Err(e) = result.as_ref() {
@@ -103,22 +106,24 @@ impl DbPool {
         Ok(result)
     }
 
-    pub async fn db_transaction<F, R>(&self, f: F) -> FpResult<R>
+    pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
-        F: FnOnce(&mut TxnPgConn) -> FpResult<R> + Send + 'static,
+        F: FnOnce(&mut TxnPgConn) -> Result<R, E> + Send + 'static,
+        E: From<DbError> + Send + 'static + std::fmt::Debug,
+        E: std::ops::Deref<Target = dyn FpErrorTrait>,
         R: Send + 'static,
     {
         let result = self
             .db_query(|c: &mut PgConn| {
-                let result = c.transaction(|conn| -> Result<R, TransactionError> {
+                let result = c.transaction(|conn| -> Result<R, TransactionError<E>> {
                     let mut conn = TxnPgConn::new(conn);
                     // Any error returned by f() is an ApplicationError.
                     // Errors issuing the `BEGIN` or `COMMIT` instructions are a DbError
-                    f(&mut conn).map_err(TransactionError::ApplicationError)
+                    f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
                 });
                 result.map_err(|txn_error| match txn_error {
                     TransactionError::ApplicationError(e) => e,
-                    TransactionError::DbError(e) => FpError::from(e),
+                    TransactionError::DbError(e) => E::from(DbError::from(e)),
                 })
             })
             .await;
@@ -133,7 +138,7 @@ impl DbPool {
 const CONNECTION_RECYCLE_MAX_AGE_SECS: u64 = 600;
 
 /// Initialize our DB
-pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> FpResult<DbPool> {
+pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> Result<DbPool, DbError> {
     let manager = ManagedPgConn::new(url, Runtime::Tokio1);
     let pool = Pool::builder(manager)
         .runtime(Runtime::Tokio1)
@@ -199,15 +204,15 @@ pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> FpResul
             Ok(())
         }))
         .max_size(max_conns)
-        .build().map_err(DbError::from)?;
+        .build()?;
 
     Ok(DbPool(pool))
 }
 
 #[tracing::instrument(skip_all)]
-pub fn run_migrations(url: &str) -> FpResult<()> {
+pub fn run_migrations(url: &str) -> DbResult<()> {
     use crate::diesel_migrations::MigrationHarness;
-    let mut conn = DieselPgConnection::establish(url).map_err(DbError::from)?;
+    let mut conn = DieselPgConnection::establish(url)?;
     log::info!("Running migrations");
 
     // Cap how long migrations can take. Avoids mistakes like accidentally taking a table lock in a
@@ -220,13 +225,13 @@ pub fn run_migrations(url: &str) -> FpResult<()> {
     Ok(())
 }
 
-pub fn health_check(conn: &mut PgConn) -> FpResult<()> {
+pub fn health_check(conn: &mut PgConn) -> DbResult<()> {
     diesel::sql_query("SELECT 1").execute(conn)?;
     Ok(())
 }
 
-pub fn ro_health_check(ro_url: &str) -> FpResult<()> {
-    let mut conn = PgConn::establish(ro_url).map_err(DbError::from)?;
+pub fn ro_health_check(ro_url: &str) -> DbResult<()> {
+    let mut conn = PgConn::establish(ro_url)?;
     health_check(&mut conn)?;
     Ok(())
 }

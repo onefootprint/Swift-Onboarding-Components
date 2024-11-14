@@ -49,7 +49,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
 
     let order_id = webhook.data.order_id.clone();
     let (order, di, tenant_id, vw) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             // TODO: handle error from not finding Order?
             let order = SambaOrder::get(conn, &order_id)?;
             let di = DecisionIntent::get(conn, &order.decision_intent_id)?;
@@ -124,7 +124,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
     };
 
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let locked = SambaOrder::lock(conn, &order.id)?;
             // check again we should be creating the report
             if locked.completed_at.is_none() {

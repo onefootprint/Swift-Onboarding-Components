@@ -5,6 +5,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
 use api_core::utils::vault_wrapper::VwArgs;
+use api_core::FpResult;
 use api_wire_types::ModernUserDecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -37,7 +38,7 @@ pub async fn post(
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
     let uvw = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let id = user_auth.user_identifier();
             let args = VwArgs::from(&id);
             let uvw = VaultWrapper::<Any>::build(conn, args)?;

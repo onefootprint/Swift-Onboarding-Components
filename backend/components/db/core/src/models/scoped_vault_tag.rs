@@ -1,7 +1,7 @@
 use super::data_lifetime::DataLifetime;
 use super::scoped_vault::ScopedVault;
+use crate::DbError;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::scoped_vault_tag;
@@ -43,7 +43,7 @@ pub struct DeactivateTagUpdate {
 
 impl ScopedVaultTag {
     #[tracing::instrument("ScopedVaultTag::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Vec<Self>> {
+    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> Result<Vec<Self>, DbError> {
         let tags = scoped_vault_tag::table
             .filter(scoped_vault_tag::scoped_vault_id.eq(sv_id))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())
@@ -53,7 +53,7 @@ impl ScopedVaultTag {
     }
 
     #[tracing::instrument("ScopedVaultTag::bulk_get_active", skip_all)]
-    pub fn bulk_get_active(conn: &mut PgConn, sv_ids: Vec<&ScopedVaultId>) -> FpResult<Vec<Self>> {
+    pub fn bulk_get_active(conn: &mut PgConn, sv_ids: Vec<&ScopedVaultId>) -> Result<Vec<Self>, DbError> {
         let tags = scoped_vault_tag::table
             .filter(scoped_vault_tag::scoped_vault_id.eq_any(sv_ids))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())
@@ -68,7 +68,7 @@ impl ScopedVaultTag {
         sv_id: &ScopedVaultId,
         tag_id: &TagId,
         deactivated_by_actor: DbActor,
-    ) -> FpResult<()> {
+    ) -> Result<(), DbError> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
 
         let update = DeactivateTagUpdate {
@@ -88,7 +88,7 @@ impl ScopedVaultTag {
     }
 
     #[tracing::instrument("ScopedVaultTag::get_or_create", skip_all)]
-    pub fn get_or_create(conn: &mut PgConn, args: NewScopedVaultTag) -> FpResult<ScopedVaultTag> {
+    pub fn get_or_create(conn: &mut PgConn, args: NewScopedVaultTag) -> Result<ScopedVaultTag, DbError> {
         let existing = scoped_vault_tag::table
             .filter(scoped_vault_tag::scoped_vault_id.eq(&args.scoped_vault.id))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())

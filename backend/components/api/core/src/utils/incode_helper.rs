@@ -6,9 +6,9 @@ use crate::decision::vendor::incode::IncodeStateMachine;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpError;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpErrorCode;
-use api_errors::FpResult;
 use api_errors::ServerErr;
 use api_errors::ServerErrInto;
 use api_wire_types::DocumentImageError;
@@ -20,6 +20,7 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::incode_verification_session::UpdateIncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
 use db::DbPool;
+use db::DbResult;
 use feature_flag::FeatureFlagClient;
 use newtypes::DecisionIntentId;
 use newtypes::DocumentId;
@@ -137,7 +138,7 @@ pub async fn handle_incode_request(
         if next_side_to_collect.is_none() {
             let id_doc_id = identity_document_id.clone();
             state
-                .db_transaction(move |conn| {
+                .db_transaction(move |conn| -> FpResult<_> {
                     // mb lock??
                     let (iddoc, _) = Document::get(conn, &id_doc_id)?;
                     if iddoc.status == DocumentStatus::Pending {
@@ -172,7 +173,7 @@ async fn init_and_run_incode_state_machine(
     is_sandbox: bool,
     configuration_id_override: IncodeConfigurationIdOverride,
     is_re_run: bool,
-) -> FpResult<Option<(IncodeVerificationSessionState, Vec<IncodeFailureReason>)>> {
+) -> DbResult<Option<(IncodeVerificationSessionState, Vec<IncodeFailureReason>)>> {
     let machine = IncodeStateMachine::init(
         state,
         tenant_id.clone(),
@@ -213,7 +214,7 @@ async fn init_and_run_incode_state_machine(
 }
 
 #[tracing::instrument(skip(db_pool))]
-async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &DocumentId) -> FpResult<()> {
+async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &DocumentId) -> DbResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
     if err.code() == Some(FpErrorCode::IncodeMachineConcurrentChange) {
@@ -222,7 +223,7 @@ async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &Docume
     }
 
     db_pool
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &id_doc_id)?;
 
             if let Some(ivs) = ivs {

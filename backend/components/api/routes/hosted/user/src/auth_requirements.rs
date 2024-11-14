@@ -4,6 +4,7 @@ use api_core::auth::Any;
 use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiResponse;
+use api_core::FpResult;
 use api_errors::BadRequest;
 use api_wire_types::hosted::onboarding_status::ApiOnboardingRequirement;
 use api_wire_types::hosted::onboarding_status::AuthRequirementsResponse;
@@ -28,7 +29,7 @@ pub async fn get(
     let sv_id = (user_auth.su_id.clone()).ok_or(BadRequest("No scoped user associated with session"))?;
 
     let requirements = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id)?;
             let reqs = get_register_auth_method_requirements(conn, &obc, &user_auth.auth_events, &vw)?;
             Ok(reqs)

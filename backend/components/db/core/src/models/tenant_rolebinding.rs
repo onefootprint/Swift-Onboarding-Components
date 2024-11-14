@@ -6,14 +6,11 @@ use super::tenant_user::TenantUser;
 use crate::helpers::TenantOrPartnerTenant;
 use crate::helpers::WorkosAuthIdentity;
 use crate::DbError;
+use crate::DbResult;
 use crate::NextPage;
 use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpError;
-use api_errors::FpResult;
-use api_errors::UnauthorizedInto;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_role;
@@ -114,7 +111,7 @@ impl TenantRolebinding {
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
         org_id: impl Into<OrgIdentifierRef<'a>>,
-    ) -> FpResult<(Self, TenantRole)> {
+    ) -> DbResult<(Self, TenantRole)> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
@@ -126,12 +123,12 @@ impl TenantRolebinding {
             TenantRoleKindDiscriminant::DashboardUser
             | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
                 if tenant_role.kind.tenant_kind() != org_id.into() {
-                    return BadRequestInto("Incorrect tenant kind in this context.");
+                    return Err(DbError::IncorrectTenantKind);
                 }
             }
             TenantRoleKindDiscriminant::ApiKey => {
                 // API keys roles can't be bound to a tenant user.
-                return BadRequestInto("This kind of role cannot be bound to this entity.");
+                return Err(DbError::IncorrectTenantRoleKind);
             }
         }
 
@@ -150,11 +147,9 @@ impl TenantRolebinding {
         let rb = diesel::insert_into(tenant_rolebinding::table)
             .values(new)
             .get_result(conn.conn())
-            .map_err(FpError::from)
-            .map_err(|e| match e.code() {
-                Some(e) if e.is_db_unique_constraint_violation() => {
-                    DbError::TenantRolebindingAlreadyExists.into()
-                }
+            .map_err(DbError::from)
+            .map_err(|e| match e {
+                DbError::UniqueConstraintViolation(_) => DbError::TenantRolebindingAlreadyExists,
                 _ => e,
             })?;
         Ok((rb, tenant_role.into_inner()))
@@ -165,7 +160,7 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         user_id: TenantUserId,
         org_id: impl Into<OrgIdentifierRef<'a>>,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         // Get the default admin and read-only role for this tenant/partner tenant.
@@ -208,7 +203,7 @@ impl TenantRolebinding {
     pub fn list_by_user(
         conn: &mut TxnPgConn,
         user_id: &TenantUserId,
-    ) -> FpResult<Vec<(Self, TenantOrPartnerTenant)>> {
+    ) -> DbResult<Vec<(Self, TenantOrPartnerTenant)>> {
         use db_schema::schema::partner_tenant;
         use db_schema::schema::tenant;
         #[allow(clippy::type_complexity)]
@@ -234,7 +229,7 @@ impl TenantRolebinding {
     /// Fetches TenantUserInfo when logging them in via a workos auth token, and
     /// validates invariants for the TenantUser
     #[tracing::instrument("TenantRolebinding::get", skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<TenantUserInfo>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<TenantUserInfo>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -295,13 +290,13 @@ impl TenantRolebinding {
         Ok((user, rb, role, t_pt))
     }
 
-    fn validate_login(&self, role: &TenantRole) -> FpResult<()> {
+    fn validate_login(&self, role: &TenantRole) -> DbResult<()> {
         if self.deactivated_at.is_some() {
             // We'll generally filter out deactivated rolebindings, but this can't hurt
-            return Err(DbError::TenantUserDeactivated.into());
+            return Err(DbError::TenantUserDeactivated);
         }
         if role.deactivated_at.is_some() {
-            return Err(DbError::TenantRoleDeactivated.into());
+            return Err(DbError::TenantRoleDeactivated);
         }
 
         Ok(())
@@ -313,7 +308,7 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         id: T,
         auth_method: WorkosAuthMethod,
-    ) -> FpResult<TenantRbLoginResult>
+    ) -> DbResult<TenantRbLoginResult>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -330,7 +325,7 @@ impl TenantRolebinding {
             TenantOrPartnerTenant::PartnerTenant(pt) => (&user.id, &pt.id).into(),
         };
         if !t_pt.supports_auth_method(auth_method) {
-            return UnauthorizedInto("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.");
+            return Err(DbError::UnsupportedAuthMethod);
         }
         let rb = Self::update(conn, rb_id, rb_update)?;
         let result = TenantRbLoginResult {
@@ -345,7 +340,7 @@ impl TenantRolebinding {
     }
 
     #[tracing::instrument("TenantRolebinding::update", skip_all)]
-    pub fn update<'a, T>(conn: &mut TxnPgConn, id: T, update: TenantRolebindingUpdate) -> FpResult<Self>
+    pub fn update<'a, T>(conn: &mut TxnPgConn, id: T, update: TenantRolebindingUpdate) -> DbResult<Self>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -362,16 +357,16 @@ impl TenantRolebinding {
                 TenantRoleKindDiscriminant::DashboardUser
                 | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
                     if role.kind.tenant_kind() != (&t_pt).into() {
-                        return BadRequestInto("Incorrect tenant kind in this context.");
+                        return Err(DbError::IncorrectTenantRoleKind);
                     }
                 }
                 TenantRoleKindDiscriminant::ApiKey => {
                     // API keys roles can't be bound to a tenant user.
-                    return BadRequestInto("This kind of role cannot be bound to this entity.");
+                    return Err(DbError::IncorrectTenantRoleKind);
                 }
             }
             if role.deactivated_at.is_some() {
-                return BadRequestInto("Role is deactivated - please choose an active role.");
+                return Err(DbError::TenantRoleAlreadyDeactivated);
             }
         }
         let results: Vec<Self> = diesel::update(tenant_rolebinding::table)
@@ -381,14 +376,14 @@ impl TenantRolebinding {
             .load(conn.conn())?;
 
         if results.len() > 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated.into());
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
 
     #[tracing::instrument("TenantRolebinding::count", skip_all)]
-    pub fn count(conn: &mut PgConn, filters: &TenantRolebindingFilters) -> FpResult<i64> {
+    pub fn count(conn: &mut PgConn, filters: &TenantRolebindingFilters) -> DbResult<i64> {
         let query = list_query!(filters);
 
         let count = query.count().get_result(conn)?;
@@ -400,7 +395,7 @@ impl TenantRolebinding {
         conn: &mut PgConn,
         filters: &TenantRolebindingFilters,
         pagination: OffsetPagination,
-    ) -> FpResult<(Vec<BasicTenantUserInfo>, NextPage)> {
+    ) -> DbResult<(Vec<BasicTenantUserInfo>, NextPage)> {
         let mut query = list_query!(filters);
 
         // Apply pagination filters

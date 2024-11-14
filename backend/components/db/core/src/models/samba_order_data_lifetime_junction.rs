@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::samba_order_data_lifetime_junction;
@@ -30,7 +30,7 @@ impl SambaOrderDataLifetimeJunction {
         conn: &mut TxnPgConn,
         lifetime_ids: Vec<DataLifetimeId>,
         order_id: SambaOrderTableId,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let rows: Vec<_> = lifetime_ids
             .into_iter()
             .map(|lifetime_id| NewSambaOrderDataLifetimeJunctionRow {

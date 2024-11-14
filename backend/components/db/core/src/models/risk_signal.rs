@@ -1,9 +1,9 @@
 use super::data_lifetime::DataLifetime;
 use super::risk_signal_group::RiskSignalGroup;
 use super::risk_signal_group::RiskSignalGroupScope;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::risk_signal;
@@ -105,7 +105,7 @@ impl RiskSignal {
         signals: Vec<NewRiskSignalInfo>,
         risk_group_kind: RiskSignalGroupKind,
         hidden: bool,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         let sv_id = risk_group_scope.scoped_vault_id();
         let rsg = RiskSignalGroup::create(conn.conn(), risk_group_scope, risk_group_kind)?;
         let duplicates = Self::generate_duplicate_frc_by_reason_code_and_vendor_api(signals.clone());
@@ -122,7 +122,7 @@ impl RiskSignal {
         signals: Vec<T>,
         hidden: bool,
         rsg_id: RiskSignalGroupId,
-    ) -> FpResult<Vec<Self>>
+    ) -> DbResult<Vec<Self>>
     where
         T: Into<NewRiskSignalArgs> + Clone + Eq + PartialEq + std::hash::Hash,
     {
@@ -172,7 +172,7 @@ impl RiskSignal {
     }
 
     #[tracing::instrument("RiskSignal::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &RiskSignalId, sv_id: &ScopedVaultId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &RiskSignalId, sv_id: &ScopedVaultId) -> DbResult<Self> {
         let signal = risk_signal::table
             .inner_join(risk_signal_group::table)
             .filter(risk_signal_group::scoped_vault_id.eq(sv_id))
@@ -188,7 +188,7 @@ impl RiskSignal {
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         kind: RiskSignalGroupKind,
-    ) -> FpResult<Vec<Self>> {
+    ) -> DbResult<Vec<Self>> {
         // TODO: For now we only pull risk signals by sv_id. Keep this interface as is for now
         let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, kind)?;
         if let Some(rsg) = rsg {
@@ -208,7 +208,7 @@ impl RiskSignal {
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         filters: RiskSignalFilter,
-    ) -> FpResult<Vec<(RiskSignalGroupKind, Self)>> {
+    ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
         // First, fetch the most recent RSGs per kind that has any visible RSes
         let mut query = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
@@ -259,7 +259,7 @@ impl RiskSignal {
         conn: &mut TxnPgConn,
         rsg_id: &RiskSignalGroupId,
         vendor_api: VendorAPI,
-    ) -> FpResult<usize> {
+    ) -> DbResult<usize> {
         let rows_updated = diesel::update(
             risk_signal::table
                 .filter(risk_signal::risk_signal_group_id.eq(rsg_id))

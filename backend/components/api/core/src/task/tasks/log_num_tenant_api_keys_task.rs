@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
+use db::DbError;
 use db::DbPool;
 use newtypes::LogNumTenantApiKeysArgs;
 
@@ -19,7 +20,7 @@ impl ExecuteTask<LogNumTenantApiKeysArgs> for LogNumTenantApiKeysTask {
         let LogNumTenantApiKeysArgs { tenant_id, is_live } = args;
         let t_id = tenant_id.clone();
         let cnt = db_pool
-            .db_query(move |conn| {
+            .db_query(move |conn| -> Result<i64, DbError> {
                 Tenant::get(conn, &t_id)?; // assert tenant exists
 
                 let filters = ApiKeyListFilters {

@@ -2,10 +2,10 @@ use super::document_request::DocumentRequest;
 use super::document_upload::DocumentUpload;
 use super::incode_verification_session::IncodeVerificationSession;
 use super::insight_event::CreateInsightEvent;
+use crate::errors::ValidationError;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::BadRequestInto;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::document_request;
@@ -145,7 +145,7 @@ impl Document {
     #[tracing::instrument("Document::get_or_create", skip_all)]
     /// Returns the existing Document with this args if uploads haven't began. Otherwise
     /// creates a new Document and deactivates the old ones
-    pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentArgs) -> FpResult<Self> {
+    pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentArgs) -> DbResult<Self> {
         let dr = document_request::table
             .filter(document_request::id.eq(&args.request_id))
             .for_no_key_update()
@@ -161,7 +161,7 @@ impl Document {
         } = args;
 
         if country_code.is_none() && dr.kind.is_identity() {
-            return BadRequestInto("Country code must be provided for ID doc");
+            return ValidationError("Country code must be provided for ID doc").into();
         }
 
         // See if we can use an existing Pending IdDoc instead of making a new one
@@ -219,7 +219,7 @@ impl Document {
 
     /// Get the identity document, and the associated document request
     #[tracing::instrument("Document::update", skip(conn, update))]
-    pub fn update(conn: &mut PgConn, id: &DocumentId, update: DocumentUpdate) -> FpResult<Self> {
+    pub fn update(conn: &mut PgConn, id: &DocumentId, update: DocumentUpdate) -> DbResult<Self> {
         let res = diesel::update(identity_document::table)
             .filter(identity_document::id.eq(id))
             .set(update)
@@ -230,7 +230,7 @@ impl Document {
 
     /// Get the identity document, and the associated document request
     #[tracing::instrument("Document::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &DocumentId) -> FpResult<(Self, DocumentRequest)> {
+    pub fn get(conn: &mut PgConn, id: &DocumentId) -> DbResult<(Self, DocumentRequest)> {
         let res = identity_document::table
             .filter(identity_document::id.eq(id))
             .inner_join(document_request::table)
@@ -242,7 +242,7 @@ impl Document {
 
     /// Get the identity document, and the associated document request
     #[tracing::instrument("Document::get_by_request_id", skip_all)]
-    pub fn list_by_request_id(conn: &mut PgConn, request_id: &DocumentRequestId) -> FpResult<Vec<Self>> {
+    pub fn list_by_request_id(conn: &mut PgConn, request_id: &DocumentRequestId) -> DbResult<Vec<Self>> {
         let res = identity_document::table
             .filter(identity_document::request_id.eq(request_id))
             .get_results(conn)?;
@@ -254,7 +254,7 @@ impl Document {
     pub fn get_bulk_with_requests(
         conn: &mut PgConn,
         ids: Vec<&DocumentId>,
-    ) -> FpResult<HashMap<DocumentId, (Self, DocumentRequest)>> {
+    ) -> DbResult<HashMap<DocumentId, (Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(identity_document::id.eq_any(ids))
@@ -271,7 +271,7 @@ impl Document {
     pub fn list(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
-    ) -> FpResult<Vec<(Self, DocumentRequest)>> {
+    ) -> DbResult<Vec<(Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
@@ -281,7 +281,7 @@ impl Document {
     }
 
     #[tracing::instrument("Document::list_by_wf_id", skip_all)]
-    pub fn list_by_wf_id(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Vec<(Self, DocumentRequest)>> {
+    pub fn list_by_wf_id(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<(Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::workflow_id.eq(wf_id))
@@ -294,7 +294,7 @@ impl Document {
     pub fn list_completed_sent_to_incode<'a, T: Into<DocumentIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,
-    ) -> FpResult<Vec<(Self, DocumentRequest, Option<IncodeVerificationSession>)>> {
+    ) -> DbResult<Vec<(Self, DocumentRequest, Option<IncodeVerificationSession>)>> {
         let mut query = identity_document::table
             .inner_join(document_request::table)
             // only completed
@@ -324,7 +324,7 @@ impl Document {
     pub fn get_latest_complete_identity<'a, T: Into<DocumentIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,
-    ) -> FpResult<Option<(Document, DocumentRequest)>> {
+    ) -> DbResult<Option<(Document, DocumentRequest)>> {
         let mut query = identity_document::table
             .inner_join(document_request::table)
             .filter(identity_document::status.eq(DocumentStatus::Complete))
@@ -347,7 +347,7 @@ impl Document {
 
     /// Logic to extract the DI for a given Document row. It can be derived from GovtIssuedDocKinds,
     /// but must be fetched from the DocumentRequestConfig for custom docs
-    pub fn identifier(&self, config: &DocumentRequestConfig, side: DocumentSide) -> FpResult<DataIdentifier> {
+    pub fn identifier(&self, config: &DocumentRequestConfig, side: DocumentSide) -> DbResult<DataIdentifier> {
         let di = match self.document_type {
             DocumentKind::IdCard
             | DocumentKind::DriversLicense
@@ -364,7 +364,7 @@ impl Document {
             DocumentKind::ProofOfAddress => DataIdentifier::from(DocumentDiKind::ProofOfAddress),
             DocumentKind::Custom => {
                 let DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) = config else {
-                    return BadRequestInto("Custom document doesn't have identifier");
+                    return ValidationError("Custom document doesn't have identifier").into();
                 };
                 identifier.clone()
             }
@@ -389,7 +389,7 @@ impl Default for DocumentImageArgs {
 
 impl Document {
     #[tracing::instrument("Document::images", skip_all)]
-    pub fn images(&self, conn: &mut PgConn, args: DocumentImageArgs) -> FpResult<Vec<DocumentUpload>> {
+    pub fn images(&self, conn: &mut PgConn, args: DocumentImageArgs) -> DbResult<Vec<DocumentUpload>> {
         let mut query = document_upload::table
             .filter(document_upload::document_id.eq(&self.id))
             .into_boxed();

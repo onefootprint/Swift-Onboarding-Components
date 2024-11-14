@@ -9,6 +9,7 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::kyb_utils::generate_secondary_bo_links;
 use api_core::utils::kyb_utils::send_missing_secondary_bo_links;
 use api_core::web::Json;
+use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::CreateKycLinksRequest;
@@ -38,7 +39,7 @@ pub async fn post(
     let CreateKycLinksRequest { send_to_bo_ids } = request.into_inner();
 
     let (sb, biz_wf) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Eventually we could make this API workflow-specific, but for now we just get the active wf
             let biz_wf = Workflow::get_active(conn, &sb.id)?;

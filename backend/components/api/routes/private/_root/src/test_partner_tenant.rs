@@ -7,7 +7,6 @@ use api_core::errors::tenant::TenantError;
 use api_core::types::ApiResponse;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
-use api_errors::FpDbOptionalExtension;
 use chrono::Duration;
 use db::models::partner_tenant::NewIntegrationTestPartnerTenant;
 use db::models::partner_tenant::PartnerTenant;
@@ -15,6 +14,7 @@ use db::models::tenant_role::ImmutableRoleKind;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
+use db::DbError;
 use newtypes::OrgMemberEmail;
 use newtypes::PartnerTenantId;
 use newtypes::SessionAuthToken;
@@ -71,13 +71,13 @@ async fn post(
         auth_token,
         ro_auth_token,
     } = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             //
             // Get or create the partner tenant
             //
-            let partner_tenant = match PartnerTenant::lock(conn, &id).optional() {
-                Ok(Some(t)) => t,
-                Ok(None) => {
+            let partner_tenant = match PartnerTenant::lock(conn, &id) {
+                Ok(t) => t,
+                Err(DbError::DataNotFound(_)) => {
                     let new_partner_tenant = NewIntegrationTestPartnerTenant {
                         // Notably, we create the partner tenant with the ID as passed in. Next
                         // time the partner tenant is requested, it will already exist
@@ -93,7 +93,7 @@ async fn post(
                     };
                     PartnerTenant::create(conn, new_partner_tenant)?
                 }
-                Err(e) => return Err(e),
+                Err(e) => return Err(e.into()),
             };
 
             //
@@ -110,14 +110,14 @@ async fn post(
                     irk,
                     TenantRoleKind::CompliancePartnerDashboardUser,
                 )?;
-                let rb = match TenantRolebinding::get(conn, (&user.id, &partner_tenant.id)).optional() {
-                    Ok(Some((_, rb, _, _))) => rb,
-                    Ok(None) => {
+                let rb = match TenantRolebinding::get(conn, (&user.id, &partner_tenant.id)) {
+                    Ok((_, rb, _, _)) => rb,
+                    Err(DbError::DataNotFound(_)) => {
                         let role_id = role.id.clone();
                         let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, &partner_tenant.id)?;
                         rb
                     }
-                    Err(e) => return Err(e),
+                    Err(e) => return Err(e.into()),
                 };
                 // Create a new partner tenant RB session for the integration test tenant user
                 let login_result = TenantRolebinding::login(conn, &rb.id, WorkosAuthMethod::GoogleOauth)?;

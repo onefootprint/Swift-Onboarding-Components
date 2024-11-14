@@ -1,8 +1,8 @@
 use super::data_lifetime::DataLifetime;
 use super::samba_order_data_lifetime_junction::SambaOrderDataLifetimeJunction;
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::samba_order;
@@ -71,7 +71,7 @@ struct NewSambaOrderRow {
 
 impl SambaOrder {
     #[tracing::instrument("SambaOrder::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewSambaOrderArgs) -> FpResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewSambaOrderArgs) -> DbResult<Self> {
         let NewSambaOrderArgs {
             decision_intent_id,
             document_id,
@@ -102,7 +102,7 @@ impl SambaOrder {
     }
 
     #[tracing::instrument("SambaOrder::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &SambaOrderTableId) -> FpResult<Locked<Self>> {
+    pub fn lock(conn: &mut TxnPgConn, id: &SambaOrderTableId) -> DbResult<Locked<Self>> {
         let result = samba_order::table
             .filter(samba_order::id.eq(id))
             .for_no_key_update()
@@ -111,7 +111,7 @@ impl SambaOrder {
     }
 
     #[tracing::instrument("SambaOrder::update", skip(conn, update))]
-    pub fn update(conn: &mut TxnPgConn, locked: Locked<Self>, update: UpdateSambaOrder) -> FpResult<Self> {
+    pub fn update(conn: &mut TxnPgConn, locked: Locked<Self>, update: UpdateSambaOrder) -> DbResult<Self> {
         let res = diesel::update(samba_order::table)
             .filter(samba_order::id.eq(&locked.id))
             .set(update)
@@ -121,7 +121,7 @@ impl SambaOrder {
     }
 
     #[tracing::instrument("SambaOrder::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &SambaOrderId) -> FpResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &SambaOrderId) -> DbResult<Self> {
         let result = samba_order::table
             .filter(samba_order::order_id.eq(id))
             .get_result(conn)?;

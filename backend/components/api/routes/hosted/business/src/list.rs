@@ -7,6 +7,7 @@ use api_core::utils::vault_wrapper::BulkDecryptReq;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_errors::BadRequest;
 use api_wire_types::business::HostedBusiness;
 use db::models::business_owner::BusinessOwner;
@@ -30,7 +31,7 @@ pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiList
     let tenant_id = tenant.id.clone();
 
     let (bos, bvws) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let bos = BusinessOwner::list_owned_businesses(conn, &uv_id, &tenant_id)?;
             let svs = bos.iter().map(|(_, sv, v)| (sv.clone(), v.clone())).collect();
             let bvws = VaultWrapper::<Business>::multi_get_for_tenant(conn, svs, None)?;

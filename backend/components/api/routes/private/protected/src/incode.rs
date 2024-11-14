@@ -50,6 +50,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
+use db::DbError;
 use newtypes::DecisionIntentKind;
 use newtypes::DocumentId;
 use newtypes::DocumentKind;
@@ -116,7 +117,7 @@ pub async fn rerun_machine(
     let force_no_selfie = force_no_selfie.unwrap_or_default();
 
     let (id_doc, dr, su, di, uvw, obc) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(ServerErr("No session found"))?;
             let (id_doc, dr) = Document::get(conn, &old_session.identity_document_id)?;
@@ -180,7 +181,7 @@ async fn handle_forcing_failure(
     id: IncodeVerificationSessionId,
 ) -> FpResult<DocumentResponse> {
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(ServerErr("No session found"))?;
             let (_, dr) = Document::get(conn, &old_session.identity_document_id)?;
@@ -249,13 +250,19 @@ pub async fn adhoc_create_document_and_workflow(
     let doc_kind: DocumentRequestKind = document_type.into();
 
     let (vw, document_request, wf_id) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sv.id, seqno))?;
 
             let (_, obc, _) =
-                Playbook::get_latest_version_if_enabled(conn, (&playbook_key, &tenant_id, is_live))?;
+                Playbook::get_latest_version_if_enabled(conn, (&playbook_key, &tenant_id, is_live)).map_err(
+                    |e| match e {
+                        DbError::DataNotFound(_) => DbError::PlaybookNotFound,
+                        e => e,
+                    },
+                )?;
+
 
             if obc.kind != ObConfigurationKind::Document && !obc.is_doc_first {
                 return ServerErrInto("Must use playbook of kind Document or Document-First");
@@ -303,7 +310,7 @@ pub async fn adhoc_create_document_and_workflow(
 
     // Create our identity document now
     let doc_id = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let args = NewDocumentArgs {
                 request_id: document_request.id,
                 document_type,
@@ -346,7 +353,7 @@ pub async fn adhoc_upload_and_process(
 
     let (document_id, side) = args.into_inner();
     let (iddoc, wf, tenant_id) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let (iddoc, doc_req) = Document::get(conn, &document_id)?;
             let wf = Workflow::get(conn, &doc_req.workflow_id)?;
             let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
@@ -404,7 +411,7 @@ pub async fn adhoc_document_process(
     let document_id = args.into_inner();
 
     let (wf, uvw, obc, seqno) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (_, doc_req) = Document::get(conn, &document_id)?;
             // authorize since this is a non-customer facing route
             Workflow::set_is_authorized(conn, &doc_req.workflow_id)?;
@@ -419,7 +426,11 @@ pub async fn adhoc_document_process(
             }
             .insert(conn)?;
 
-            let (obc, _) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)?;
+            let (obc, _) =
+                ObConfiguration::get_enabled(conn, &wf.ob_configuration_id).map_err(|e| match e {
+                    DbError::DataNotFound(_) => DbError::PlaybookNotFound,
+                    e => e,
+                })?;
 
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let uvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, seqno)?;
@@ -443,7 +454,7 @@ pub async fn adhoc_document_process(
     let decrypted_values = UserDecryptResultForReqs::get_decrypted_values(&state, &uvw).await?;
 
     let unmet_requirements: Vec<_> = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> FpResult<_> {
             let ctx = RequirementContext {
                 user_values: &decrypted_values,
                 business_owners: &[],

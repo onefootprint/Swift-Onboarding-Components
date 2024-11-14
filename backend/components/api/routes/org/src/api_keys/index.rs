@@ -20,6 +20,7 @@ use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_api_key::TenantApiKeyIdentifier;
 use db::models::tenant_role::TenantRole;
+use db::DbError;
 use itertools::Itertools;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::ApiKeyStatus;
@@ -65,7 +66,7 @@ pub async fn get(
     };
     let pagination = pagination.db_pagination(&state);
     let (keys_and_roles, next_page, count) = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> Result<_, DbError> {
             let (keys_and_roles, next_page) = TenantApiKey::list(conn, &query, pagination)?;
             let count = TenantApiKey::count(conn, &query)?;
             Ok((keys_and_roles, next_page, count))
@@ -115,7 +116,7 @@ pub async fn post(
     let actor = auth.actor();
     let CreateApiKeyRequest { name, role_id } = request.into_inner();
     let (api_key, role) = state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             let api_key =
                 TenantApiKey::create(conn, name, sh_key, e_key, tenant.id.clone(), is_live, role_id)?;
             let role = TenantRole::get(conn, &api_key.role_id)?;

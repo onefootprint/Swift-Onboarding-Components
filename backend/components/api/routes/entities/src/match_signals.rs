@@ -11,6 +11,7 @@ use api_wire_types::GetFieldValidationResponse;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal::RiskSignalFilter;
 use db::models::scoped_vault::ScopedVault;
+use db::DbResult;
 use newtypes::SignalScope;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -32,7 +33,7 @@ pub async fn get(
     let fp_id = request.into_inner();
 
     let reason_codes = state
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<Vec<_>> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::LegacyLatest)
         })

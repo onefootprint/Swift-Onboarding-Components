@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_tag::TenantTag;
+use db::DbResult;
 use newtypes::TenantTagId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -31,7 +32,7 @@ pub async fn get(
     let api_wire_types::GetOrgTenantTag { kind } = filters.into_inner();
 
     let list = state
-        .db_query(move |conn| TenantTag::list(conn, &tenant_id, Some(kind), is_live))
+        .db_query(move |conn| -> DbResult<_> { TenantTag::list(conn, &tenant_id, Some(kind), is_live) })
         .await?
         .into_iter()
         .map(api_wire_types::OrgTenantTag::from_db)
@@ -62,7 +63,9 @@ pub async fn post(
     }
 
     let new_tag = state
-        .db_query(move |conn| TenantTag::create(conn, tenant_id, actor, kind, tag, is_live))
+        .db_query(move |conn| -> DbResult<_> {
+            TenantTag::create(conn, tenant_id, actor, kind, tag, is_live)
+        })
         .await?;
     Ok(api_wire_types::OrgTenantTag::from_db(new_tag))
 }
@@ -84,7 +87,7 @@ pub async fn delete(
     let t_id = tag_id.into_inner();
 
     state
-        .db_query(move |conn| TenantTag::deactivate(conn, &tenant_id, &t_id, actor))
+        .db_query(move |conn| -> DbResult<_> { TenantTag::deactivate(conn, &tenant_id, &t_id, actor) })
         .await?;
 
     Ok(api_wire_types::Empty)

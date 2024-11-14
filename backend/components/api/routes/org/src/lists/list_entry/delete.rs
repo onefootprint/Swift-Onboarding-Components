@@ -3,6 +3,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::InsightHeaders;
+use api_core::FpResult;
 use api_core::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::list::List;
@@ -31,7 +32,7 @@ pub async fn deactivate_list_entry(
 
     let insight = CreateInsightEvent::from(insights);
     state
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> FpResult<_> {
             List::get(conn, &tenant_id, is_live, &list_id)?;
             let list_entry = ListEntry::lock(conn, &list_entry_id)?;
             let ie = insight.insert_with_conn(conn)?;

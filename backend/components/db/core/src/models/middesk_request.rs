@@ -1,6 +1,6 @@
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::middesk_request;
@@ -66,7 +66,7 @@ impl MiddeskRequest {
         workflow_id: WorkflowId,
         decision_intent_id: DecisionIntentId,
         state: MiddeskRequestState,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         let new_req = NewMiddeskRequest {
             created_at: Utc::now(),
             decision_intent_id,
@@ -82,7 +82,7 @@ impl MiddeskRequest {
     }
 
     #[tracing::instrument("MiddeskRequest::update", skip_all)]
-    pub fn update(conn: &mut PgConn, id: MiddeskRequestId, update: UpdateMiddeskRequest) -> FpResult<Self> {
+    pub fn update(conn: &mut PgConn, id: MiddeskRequestId, update: UpdateMiddeskRequest) -> DbResult<Self> {
         let res = diesel::update(middesk_request::table)
             .filter(middesk_request::id.eq(&id))
             .set(update)
@@ -92,7 +92,7 @@ impl MiddeskRequest {
     }
 
     #[tracing::instrument("MiddeskRequest::get_by_business_id", skip_all)]
-    pub fn get_by_business_id(conn: &mut PgConn, business_id: String) -> FpResult<Self> {
+    pub fn get_by_business_id(conn: &mut PgConn, business_id: String) -> DbResult<Self> {
         let res: MiddeskRequest = middesk_request::table
             .filter(middesk_request::business_id.eq(business_id))
             .get_result(conn)?;

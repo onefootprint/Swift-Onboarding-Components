@@ -1,5 +1,5 @@
+use crate::DbResult;
 use crate::PgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::proxy_request_log;
@@ -51,7 +51,7 @@ pub struct FinishedRequestLog {
 impl ProxyRequestLog {
     /// create a new request log
     #[tracing::instrument("ProxyRequestLog::create_new", skip_all)]
-    pub fn create_new(conn: &mut PgConn, new: NewProxyRequestLog) -> FpResult<Self> {
+    pub fn create_new(conn: &mut PgConn, new: NewProxyRequestLog) -> DbResult<Self> {
         let log = diesel::insert_into(proxy_request_log::table)
             .values(new)
             .get_result(conn)?;
@@ -61,7 +61,7 @@ impl ProxyRequestLog {
 
     /// create a new request log
     #[tracing::instrument("ProxyRequestLog::finish_request", skip_all)]
-    pub fn finish_request(&self, conn: &mut PgConn, update: FinishedRequestLog) -> FpResult<Self> {
+    pub fn finish_request(&self, conn: &mut PgConn, update: FinishedRequestLog) -> DbResult<Self> {
         let result = diesel::update(proxy_request_log::table)
             .filter(proxy_request_log::id.eq(&self.id))
             .set(update)

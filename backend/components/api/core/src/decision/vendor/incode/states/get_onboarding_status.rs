@@ -29,7 +29,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
     ) -> FpResult<Option<Self>> {
         let id_doc_id = ctx.id_doc_id.clone();
         let doc_uploads = db_pool
-            .db_query(move |conn| {
+            .db_query(move |conn| -> FpResult<_> {
                 let (id_doc, _) = Document::get(conn, &id_doc_id)?;
                 let doc_uploads = id_doc.images(conn, DocumentImageArgs::default())?;
                 Ok(doc_uploads)

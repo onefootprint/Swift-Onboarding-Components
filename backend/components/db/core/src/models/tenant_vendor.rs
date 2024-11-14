@@ -1,6 +1,6 @@
+use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_vendor_control;
@@ -62,7 +62,7 @@ impl TenantVendorControl {
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
         args: UpdateTenantVendorControlArgs,
-    ) -> FpResult<Self> {
+    ) -> DbResult<Self> {
         // TVC is a create-new-and-deactivate-old model, so let's overlay the update args over the
         // existing TVC, if any
         let existing = Self::get(conn, tenant_id)?;
@@ -120,7 +120,7 @@ impl TenantVendorControl {
     }
 
     #[tracing::instrument("TenantVendorControl::get", skip_all)]
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> FpResult<Option<Self>> {
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> Result<Option<Self>, crate::DbError> {
         let control: Option<Self> = tenant_vendor_control::table
             .filter(tenant_vendor_control::tenant_id.eq(tenant_id))
             .filter(tenant_vendor_control::deactivated_at.is_null())

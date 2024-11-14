@@ -1,7 +1,7 @@
+use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
-use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::tenant_client_config;
@@ -35,7 +35,7 @@ pub struct UpdateTenantClientConfig {
 
 impl UpdateTenantClientConfig {
     #[tracing::instrument("UpdateTenantClientConfig::create", skip_all)]
-    pub fn create_or_update(self, conn: &mut TxnPgConn) -> FpResult<TenantClientConfig> {
+    pub fn create_or_update(self, conn: &mut TxnPgConn) -> DbResult<TenantClientConfig> {
         // deactivate the old ones
         // this lets us keep a record of old values for security context
         diesel::update(tenant_client_config::table)
@@ -56,7 +56,11 @@ impl UpdateTenantClientConfig {
 
 impl TenantClientConfig {
     #[tracing::instrument("TenantClientConfig::get", skip_all)]
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> FpResult<Option<Self>> {
+    pub fn get(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> Result<Option<Self>, crate::DbError> {
         let control: Option<Self> = tenant_client_config::table
             .filter(tenant_client_config::tenant_id.eq(tenant_id))
             .filter(tenant_client_config::deactivated_at.is_null())
