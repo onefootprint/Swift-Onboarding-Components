@@ -13,6 +13,8 @@ use crate::vendor_clients::VendorClient;
 use crate::vendor_clients::VendorClients;
 use crate::GIT_HASH;
 use api_errors::FpError;
+use api_errors::FpResult;
+use api_errors::ServerErr;
 use crypto::aead::ScopedSealingKey;
 use db::tests::MockFFClient;
 use db::DbPool;
@@ -144,7 +146,7 @@ impl State {
         use webhooks::MockWebhookClient;
         let config = Config::load_from_env().expect("failed to load config");
 
-        let mut s = Self::init_or_die(config, false).await;
+        let mut s = Self::init(config, false).await.expect("failed to init state");
         s.enclave_client.replace_proxy_client(Arc::new(MockEnclave));
         s.enclave_client.replace_s3_client(Arc::new(MockS3Client::new()));
 
@@ -165,9 +167,8 @@ impl State {
         s
     }
 
-    #[allow(clippy::expect_used)]
     #[tracing::instrument(skip_all)]
-    pub async fn init_or_die(mut config: Config, is_api_server: bool) -> Self {
+    pub async fn init(mut config: Config, is_api_server: bool) -> FpResult<Self> {
         let ff_client: Arc<dyn FeatureFlagClient> = if config.disable_launch_darkly.is_none() {
             let ff_client = LaunchDarklyFeatureFlagClient::new();
             let ff_client = match ff_client.init(&config.launch_darkly_sdk_key).await {
@@ -229,20 +230,17 @@ impl State {
             twilio_backup,
             config.time_s_between_challenges,
             ff_client.clone(),
-        )
-        .expect("failed to build SMS client");
+        )?;
 
         let sendgrid_client = SendgridClient::new(config.sendgrid_api_key.clone());
 
         let idology_client = IdologyClient::new(
             config.idology_config.username.clone().into(),
             config.idology_config.password.clone().into(),
-        )
-        .expect("failed to build idology client");
+        )?;
 
         let socure_production_client =
-            SocureClient::new(config.socure_config.production_api_key.clone(), false)
-                .expect("failed to build socure certification client");
+            SocureClient::new(config.socure_config.production_api_key.clone(), false)?;
 
         let webhook_service_client = webhooks::WebhookServiceClient::new(
             &config.svix_auth_token,
@@ -254,17 +252,14 @@ impl State {
             config.service_config.environment.clone(),
         );
 
-        let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())
-            .expect("failed to build fingerprint client");
+        let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())?;
 
-        let middesk_client = MiddeskClient::new(config.middesk_config.middesk_base_url.clone())
-            .expect("failed to build middesk client");
+        let middesk_client = MiddeskClient::new(config.middesk_config.middesk_base_url.clone())?;
 
         let stytch_client = StytchClient::new(
             config.stytch_config.stytch_project.clone(),
             config.stytch_config.stytch_secret.clone(),
-        )
-        .expect("failed to build stytch client");
+        )?;
 
         // Check experian in dev so we fail early if something is misconfigured
         if !config.service_config.is_production()
@@ -281,15 +276,13 @@ impl State {
             panic!("config.incode.base_url cannot end with /")
         }
 
-        let footprint_vendor_http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())
-            .expect("failed to build vendor client");
+        let footprint_vendor_http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
 
         // run migrations
-        let result = db::run_migrations(&config.database_url);
-        if let Err(ref err) = result {
-            tracing::error!(err=%err, "Failed to run migrations");
-        }
-        result.expect("failed to run migrations");
+        db::run_migrations(&config.database_url).map_err(|err| {
+            tracing::error!(%err, "Failed to run migrations");
+            err
+        })?;
 
         // then create the db connection pool
         let db_max_conns = match is_api_server {
@@ -298,9 +291,8 @@ impl State {
             false => 5,
         };
         let db_statement_timeout = Duration::from_secs(config.database_statement_timeout_sec);
-        let db_pool = db::init(&config.database_url, db_statement_timeout, db_max_conns)
-            .map_err(FpError::from)
-            .expect("failed to init db pool");
+        let db_pool =
+            db::init(&config.database_url, db_statement_timeout, db_max_conns).map_err(FpError::from)?;
 
         // our session key
         let (challenge_sealing_key, session_sealing_key) = {
@@ -308,11 +300,11 @@ impl State {
             let hex_key = config
                 .cookie_session_key_hex
                 .take()
-                .expect("No cookie_session_key_hex provided");
-            let key = crypto::hex::decode(hex_key).expect("invalid session cookie key");
+                .ok_or(ServerErr("Missing cookie session key"))?;
+            let key = crypto::hex::decode(hex_key).map_err(|_| ServerErr("Invalid cookie session key"))?;
             (
-                ScopedSealingKey::new(key.clone(), "CHALLENGE_SEALING").expect("invalid master session key"),
-                ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid master session key"),
+                ScopedSealingKey::new(key.clone(), "CHALLENGE_SEALING")?,
+                ScopedSealingKey::new(key, "SESSION_SEALING")?,
             )
         };
 
@@ -332,7 +324,7 @@ impl State {
         // metrics for each API request. But we already have enough coverage from otel traces.
         let metrics = crate::metrics::init();
 
-        State {
+        let state = State {
             config,
             enclave_client,
             aws_hmac_client: hmac_client,
@@ -351,7 +343,8 @@ impl State {
             vendor_clients,
             metrics,
             aws_selfie_doc_client,
-        }
+        };
+        Ok(state)
     }
 
     #[cfg(test)]

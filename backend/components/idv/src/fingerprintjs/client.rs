@@ -9,10 +9,11 @@ pub struct FingerprintJSClient {
 }
 
 impl FingerprintJSClient {
-    pub fn new(api_key: PiiString) -> Result<Self, error::Error> {
+    pub fn new(api_key: PiiString) -> Result<Self, crate::Error> {
         let client = reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(45))
-            .build()?;
+            .build()
+            .map_err(error::Error::from)?;
         Ok(Self { client, api_key })
     }
 }

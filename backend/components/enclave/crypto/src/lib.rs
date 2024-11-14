@@ -60,7 +60,7 @@ pub enum Error {
     #[error("Invalid Sha256 Digest Key Length")]
     Sha2DigestLength(#[from] sha2::digest::InvalidLength),
 
-    #[error("rsa error: {0}")]
+    #[error("RSA error: {0}")]
     RsaError(#[from] rsa_pksc1v15::Error),
 }
 

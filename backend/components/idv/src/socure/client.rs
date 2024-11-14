@@ -1,5 +1,6 @@
 use super::decode_response;
 use super::requirements;
+use super::Error;
 use crate::socure::conversion::SocureRequest;
 use crate::socure::SocureReqwestError;
 use newtypes::IdvData;
@@ -24,7 +25,7 @@ impl std::fmt::Debug for SocureClient {
 }
 
 impl SocureClient {
-    pub fn new(sdk_key: String, sandbox: bool) -> Result<Self, crate::socure::SocureReqwestError> {
+    pub fn new(sdk_key: String, sandbox: bool) -> Result<Self, crate::Error> {
         let idplus_url = if sandbox {
             "https://sandbox.socure.com/api/3.0/EmailAuthScore"
         } else {
@@ -33,10 +34,11 @@ impl SocureClient {
         let reason_code_url = "https://service.socure.com/api/3.0/reasoncodes";
         let mut headers = header::HeaderMap::new();
         let header_val = format!("SocureApiKey {}", sdk_key);
-        headers.insert(
-            "Authorization",
-            header::HeaderValue::from_str(header_val.as_str())?,
-        );
+
+        let auth_header = header::HeaderValue::from_str(header_val.as_str())
+            .map_err(SocureReqwestError::from)
+            .map_err(Error::from)?;
+        headers.insert("Authorization", auth_header);
         headers.insert(
             "Content-Type",
             header::HeaderValue::from_static("application/json"),
@@ -45,7 +47,8 @@ impl SocureClient {
         let client = reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(45))
             .default_headers(headers)
-            .build()?;
+            .build()
+            .map_err(Error::from)?;
         Ok(Self {
             client,
             idplus_url: idplus_url.to_string(),

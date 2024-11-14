@@ -288,6 +288,8 @@ pub enum Error {
     SambaSafetyError(#[from] samba::error::Error),
     #[error("SentilinkError: {0}")]
     SentilinkError(#[from] sentilink::error::Error),
+    #[error("FingerprintError: {0}")]
+    FingerprintError(#[from] fingerprintjs::error::Error),
 }
 
 impl api_errors::FpErrorTrait for Error {

@@ -18,7 +18,7 @@ pub struct MiddeskClient {
 }
 
 impl MiddeskClient {
-    pub fn new(base_url: String) -> Result<Self, Error> {
+    pub fn new(base_url: String) -> Result<Self, crate::Error> {
         let mut headers = header::HeaderMap::new();
 
         headers.insert(
@@ -30,7 +30,8 @@ impl MiddeskClient {
             .timeout(std::time::Duration::from_secs(45))
             .default_headers(headers)
             .build()
-            .map_err(MiddeskReqwestError::from)?;
+            .map_err(MiddeskReqwestError::from)
+            .map_err(Error::from)?;
         Ok(Self { client, base_url })
     }
 

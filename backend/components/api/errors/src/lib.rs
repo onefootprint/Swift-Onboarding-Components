@@ -60,8 +60,8 @@ impl std::fmt::Debug for FpError {
 }
 
 impl FpError {
-    pub fn log_error(&self, support_id: String) {
-        if self.status_code().is_server_error() {
+    pub fn emit_error(&self, is_error: bool, support_id: String) {
+        if is_error {
             tracing::error!(err=?self.0, error.message=%self.0, error.stack=%self.location(), %support_id, status_code=%self.status_code().as_u16(), "{}", self.message());
         } else {
             tracing::info!(err=?self.0, error.message=%self.0, error.stack=%self.location(), %support_id, status_code=%self.status_code().as_u16(), "{}", self.message());

@@ -9,6 +9,7 @@ use api_core::utils::timeouts::ResponseDeadline;
 use api_core::*;
 use clap::Parser;
 use clap::Subcommand;
+use newtypes::Uuid;
 use std::time::Duration;
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
@@ -51,26 +52,33 @@ async fn run(config: Config) -> Result<()> {
 
     let args = Args::parse();
     let is_api_server = matches!(args.command, None | Some(Command::ApiServer));
-    let state: State = State::init_or_die(config.clone(), is_api_server).await;
+    let run = || async {
+        let state = State::init(config.clone(), is_api_server).await?;
 
-    match args.command {
-        None | Some(Command::ApiServer) => run_api_server(config, state).await?,
-        Some(Command::CreateOverdueWatchlistCheckTasks(subcommand)) => subcommand.run(config, state).await?,
-        Some(Command::GenerateInvoices(subcommand)) => subcommand.run(config, state).await?,
-        Some(Command::ExecuteTasks(subcommand)) => subcommand.run(config, state).await?,
-        Some(Command::VaultDrWorker(subcommand)) => subcommand.run(config, state).await?,
+        match args.command {
+            None | Some(Command::ApiServer) => run_api_server(config, state).await?,
+            Some(Command::CreateOverdueWatchlistCheckTasks(subcommand)) => {
+                subcommand.run(config, state).await?
+            }
+            Some(Command::GenerateInvoices(subcommand)) => subcommand.run(config, state).await?,
+            Some(Command::ExecuteTasks(subcommand)) => subcommand.run(config, state).await?,
+            Some(Command::VaultDrWorker(subcommand)) => subcommand.run(config, state).await?,
+        };
+        FpResult::Ok(())
     };
+    if let Err(err) = run().await {
+        let support_id = Uuid::new_v4();
+        err.emit_error(true, support_id.to_string());
+        return Err(anyhow::anyhow!("Command failed: {:?}", err));
+    }
 
     telemetry::shutdown();
     Ok(())
 }
 
-#[allow(clippy::expect_used)]
-async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Error> {
+async fn run_api_server(config: Config, state: State) -> FpResult<()> {
     // run custom migrations if needed
-    custom_migrations::run(&state)
-        .await
-        .expect("failed to run custom migrations");
+    custom_migrations::run(&state).await?;
 
     log::info!("starting server on port {}", config.port);
 
@@ -179,7 +187,8 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
     .shutdown_timeout(30)
     .bind(("0.0.0.0", config.port))?
     .run()
-    .await
+    .await?;
+    Ok(())
 }
 
 async fn default_not_found() -> impl actix_web::Responder {

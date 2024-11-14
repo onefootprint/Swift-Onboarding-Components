@@ -65,7 +65,8 @@ impl actix_web::ResponseError for ApiError {
 
     fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
         let support_id = newtypes::Uuid::new_v4();
-        self.log_error(support_id.to_string());
+        let is_server_error = self.status_code().is_server_error();
+        self.emit_error(is_server_error, support_id.to_string());
 
         let status_code = self.status_code();
         let mut message = self.message();
