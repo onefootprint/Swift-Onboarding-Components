@@ -159,3 +159,24 @@ impl FpErrorTrait for webauthn_rs_core::error::WebauthnError {
         }
     }
 }
+
+impl FpErrorTrait for crypto::Error {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+
+impl FpErrorTrait for rpc::TransformError {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

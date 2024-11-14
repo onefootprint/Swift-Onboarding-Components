@@ -29,3 +29,5 @@ url = { workspace = true }
 paste = { workspace = true }
 webauthn-rs-core = { workspace = true }
 aws-sdk-pinpointsmsvoicev2 = { workspace = true }
+crypto = { path = "../../enclave/crypto" }
+rpc = { path = "../../enclave/rpc" }

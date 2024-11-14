@@ -737,6 +737,7 @@ dependencies = [
  "actix-web",
  "aws-sdk-pinpointsmsvoicev2",
  "base64 0.13.0",
+ "crypto",
  "derive_more",
  "diesel",
  "http 0.2.9",
@@ -745,6 +746,7 @@ dependencies = [
  "regex",
  "reqwest",
  "reqwest-middleware",
+ "rpc",
  "serde",
  "serde_cbor",
  "serde_json",
@@ -3396,7 +3398,6 @@ version = "0.1.0"
 dependencies = [
  "aead 0.5.1",
  "aes-gcm 0.10.3",
- "api_errors",
  "base64 0.13.0",
  "chacha20poly1305",
  "elliptic-curve 0.12.3",
@@ -7814,7 +7815,6 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
- "api_errors",
  "byteorder",
  "chrono",
  "crypto",

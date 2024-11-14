@@ -3,7 +3,6 @@ pub mod conversion;
 pub mod random;
 pub mod seal;
 
-use api_errors::FpErrorTrait;
 pub use base64;
 pub use hex;
 use hmac::Hmac;
@@ -63,16 +62,6 @@ pub enum Error {
 
     #[error("rsa error: {0}")]
     RsaError(#[from] rsa_pksc1v15::Error),
-}
-
-impl FpErrorTrait for Error {
-    fn status_code(&self) -> api_errors::StatusCode {
-        api_errors::StatusCode::INTERNAL_SERVER_ERROR
-    }
-
-    fn message(&self) -> String {
-        self.to_string()
-    }
 }
 
 /// safely compare to byte strings
