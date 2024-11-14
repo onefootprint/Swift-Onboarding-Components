@@ -16,6 +16,7 @@ pub enum IncodeOcrField {
     IssuedAt,
     IssuingCountry,
     IssuingState,
+    UsIssuingState,
     Gender,
     DocumentNumber,
     RefNumber,
@@ -62,6 +63,7 @@ impl TryFrom<IncodeOcrField> for ODK {
             IncodeOcrField::City => Ok(ODK::City),
             IncodeOcrField::State => Ok(ODK::State),
             IncodeOcrField::Zip => Ok(ODK::PostalCode),
+            IncodeOcrField::UsIssuingState => Ok(ODK::UsIssuingState),
             // IDKs only
             IncodeOcrField::MiddleName
             | IncodeOcrField::AddressLine2
@@ -92,6 +94,7 @@ impl TryFrom<IncodeOcrField> for IDK {
             | IncodeOcrField::Nationality
             | IncodeOcrField::Curp
             | IncodeOcrField::ClaveDeElector
+            | IncodeOcrField::UsIssuingState
             | IncodeOcrField::ClassifiedDocumentType => {
                 Err(crate::decision::Error::IncodeOCRDataIdentifierConversionError)
             }
@@ -157,6 +160,7 @@ impl IncodeOcrField {
                 r.nationality.clone().map(PiiString::from),
             )
         };
+        let issuing_country = r.issuing_country_two_digit_code();
         let (confidence, value) = match self {
             IncodeOcrField::FullName => (
                 conf.as_ref().and_then(|c| c.name_confidence),
@@ -179,7 +183,7 @@ impl IncodeOcrField {
                 r.issue_date().ok().map(|s| s.into()),
             ),
             // TODO: seems like theres no confidence for these two..?
-            IncodeOcrField::IssuingCountry => (None, r.issuing_country_two_digit().map(|s| s.into())),
+            IncodeOcrField::IssuingCountry => (None, issuing_country.map(|c| c.to_string().into())),
             IncodeOcrField::IssuingState => (None, r.normalized_issuing_state().map(|s| s.into())),
             IncodeOcrField::Gender => (
                 conf.as_ref().and_then(|c| c.gender_confidence),
@@ -243,6 +247,14 @@ impl IncodeOcrField {
             IncodeOcrField::Country => (None, r.issuing_country_two_digit().map(|s| s.leak().into())),
             IncodeOcrField::DriversLicenseNumber => (None, drivers_license_number.map(|s| s.leak().into())),
             IncodeOcrField::DriversLicenseState => (None, drivers_license_state.map(|s| s.leak().into())),
+            IncodeOcrField::UsIssuingState => (
+                None,
+                issuing_country
+                    .is_some_and(|c| c.is_us_including_territories())
+                    .then(|| r.issuing_state_us_2_char())
+                    .flatten()
+                    .map(|s| s.to_string().into()),
+            ),
         };
 
         value.map(|v| ParsedIncodeField {

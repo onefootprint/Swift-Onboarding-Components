@@ -313,7 +313,7 @@ fn build_request(ocr_res: &FetchOCRResponse) -> FpResult<SambaData> {
 }
 
 
-const ODK_FIELDS: [ODK; 8] = [
+const ODK_FIELDS: [ODK; 9] = [
     ODK::FirstName,
     ODK::LastName,
     ODK::AddressLine1,
@@ -322,6 +322,7 @@ const ODK_FIELDS: [ODK; 8] = [
     ODK::PostalCode,
     ODK::Dob,
     ODK::DocumentNumber,
+    ODK::UsIssuingState,
 ];
 
 fn dl_di(odk: &ODK) -> DataIdentifier {
@@ -360,7 +361,7 @@ async fn build_request_from_data_identifiers(
             .remove(&dl_di(&ODK::DocumentNumber).into())
             .ok_or(ServerErr("missing license number"))?,
         license_state: decrypted_values
-            .remove(&dl_di(&ODK::IssuingState).into())
+            .remove(&dl_di(&ODK::UsIssuingState).into())
             .ok_or(ServerErr("missing license state"))?,
 
         dob: decrypted_values.remove(&dl_di(&ODK::Dob).into()),

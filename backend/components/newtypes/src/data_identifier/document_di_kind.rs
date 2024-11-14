@@ -103,6 +103,7 @@ pub enum OcrDataKind {
     CurpValidationResponse,
     /// This is the full response from Samba Activity History API
     SambaActivityHistoryResponse,
+    UsIssuingState,
 }
 
 impl OcrDataKind {
