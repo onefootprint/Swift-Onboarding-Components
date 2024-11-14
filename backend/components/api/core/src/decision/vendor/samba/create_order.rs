@@ -422,6 +422,11 @@ pub async fn run_samba_create_order(
         ctx: context.clone(),
     };
 
+    let logger = SambaLogger {
+        sv_id: di.scoped_vault_id.clone(),
+        wf_id: None,
+    };
+
     // check if we've already created an order
     let existing_result = load_response_for_vendor_api(
         state,
@@ -458,19 +463,26 @@ pub async fn run_samba_create_order(
             )
         }
         SambaOrderKind::ActivityHistory => {
-            let (request, lifetime_ids) = samba_helper
+            let (request, lifetime_ids) = match samba_helper
                 .create_ah_request(state, &vw, doc_id.clone(), &tvc)
-                .await?;
+                .await
+            {
+                Ok(r) => r,
+                Err(e) => {
+                    logger.log_info(&format!("could not create AH request: {:?}", e));
+                    return Ok(());
+                }
+            };
 
             // TODO: will need to refactor this in the future. Not all too elegant
             if let Some(config) = config.as_ref() {
                 let state = UsStateAndTerritories::from_raw_string(request.data.license_state.leak()).ok();
                 if state.map(|s| !config.states.contains(&s)).unwrap_or(true) {
-                    tracing::info!(?state, "Samba config does not support this state");
+                    logger.log_info(&format!("config does not support this state: {:?}", state));
                     return Ok(());
                 }
             }
-
+            logger.log_info("running request");
             (
                 samba_helper.make_activity_history_request(state, request).await,
                 lifetime_ids,
@@ -529,6 +541,15 @@ pub async fn run_samba_create_order(
     Ok(())
 }
 
+struct SambaLogger {
+    sv_id: ScopedVaultId,
+    wf_id: Option<WorkflowId>,
+}
+impl SambaLogger {
+    fn log_info(&self, msg: &str) {
+        tracing::info!(msg, ?self.sv_id, ?self.wf_id, "samba verification");
+    }
+}
 
 #[cfg(test)]
 mod tests {
