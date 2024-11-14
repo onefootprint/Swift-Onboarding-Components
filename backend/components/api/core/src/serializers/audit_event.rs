@@ -40,8 +40,6 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             return ServerErrInto("audit event name does not match metadata kind");
         }
 
-        let tenant_role2 = tenant_role.clone();
-
         let detail: AuditEventDetail = match audit_event.metadata {
             AuditEventMetadata::CreateUser { fields } => AuditEventDetail::CreateUser {
                 fp_id: scoped_vault
@@ -168,7 +166,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::CreateOrg => AuditEventDetail::CreateOrg,
             AuditEventMetadata::UpdateOrgSettings => AuditEventDetail::UpdateOrgSettings,
             AuditEventMetadata::CreateOrgRole { scopes } => {
-                let tr = tenant_role2.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 AuditEventDetail::CreateOrgRole {
                     role_name: tr.name,
                     scopes,
@@ -187,7 +185,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                 prev_scopes,
                 new_scopes,
             } => {
-                let tr = tenant_role2.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 AuditEventDetail::UpdateOrgRole {
                     prev_scopes,
                     new_scopes,
@@ -212,7 +210,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
             AuditEventMetadata::OrgMemberJoined => {
-                let tr = tenant_role2.ok_or(ServerErr("tenant role is not available for this event"))?;
+                let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
                 AuditEventDetail::OrgMemberJoined {
                     tenant_role: api_wire_types::OrganizationRole::from_db(tr),
