@@ -41,7 +41,7 @@ pub enum DbError {
     #[error("The DB connection has been closed.")]
     ConnectionClosed(String),
     #[error("Data not found")]
-    DataNotFound,
+    DataNotFound(String),
     #[error("Operation not allowed: foreign key constraint violation")]
     ForeignKeyViolation(String),
     #[error("Operation not allowed: unique constraint violation")]
@@ -133,9 +133,13 @@ pub enum DbError {
 }
 
 impl From<diesel::result::Error> for DbError {
+    #[track_caller]
     fn from(value: diesel::result::Error) -> Self {
         match value {
-            diesel::result::Error::NotFound => Self::DataNotFound,
+            diesel::result::Error::NotFound => {
+                // Include context from the caller, only visible in the debug output
+                Self::DataNotFound(std::panic::Location::caller().file().to_string())
+            }
             DieselDbError(db_error, info) => {
                 // Postgres provides lots of optional information for these errors - serialize it to a string
                 // and include it in the Debug implementation fo DbError for better analysis
@@ -177,7 +181,7 @@ impl FpErrorTrait for DbError {
             Self::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::OtherDieselDbError(_, _) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::ConnectionClosed(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::DataNotFound => StatusCode::NOT_FOUND,
+            Self::DataNotFound(_) => StatusCode::NOT_FOUND,
             Self::ForeignKeyViolation(_) => StatusCode::BAD_REQUEST,
             Self::CheckConstraintViolation(_) => StatusCode::BAD_REQUEST,
             Self::UniqueConstraintViolation(_) => StatusCode::BAD_REQUEST,
@@ -253,7 +257,7 @@ impl<T> FpOptionalExtension<T, DbError> for Result<T, DbError> {
     fn optional(self) -> Result<Option<T>, DbError> {
         match self {
             Ok(v) => Ok(Some(v)),
-            Err(DbError::DataNotFound) => Ok(None),
+            Err(DbError::DataNotFound(_)) => Ok(None),
             Err(e) => Err(e),
         }
     }

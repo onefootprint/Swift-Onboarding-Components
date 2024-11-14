@@ -71,7 +71,7 @@ impl FromRequest for TenantApiKey {
                 .await
                 .map_err(|e| -> Self::Error {
                     match e {
-                        DbError::DataNotFound => {
+                        DbError::DataNotFound(_) => {
                             if sk.is_maybe_ob_config_key() {
                                 AuthError::ObConfigKeyUsedForApiKey.into()
                             } else {

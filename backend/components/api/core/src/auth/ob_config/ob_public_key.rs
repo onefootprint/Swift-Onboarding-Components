@@ -63,7 +63,7 @@ impl FromRequest for PublicOnboardingContext {
                 .await
                 .map_err(|e| -> Self::Error {
                     match e {
-                        DbError::DataNotFound => {
+                        DbError::DataNotFound(_) => {
                             // Slightly more informative error message when we can't find an ObConfig with
                             // this key
                             if key2.starts_with("sk_") {

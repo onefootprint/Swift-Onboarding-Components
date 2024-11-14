@@ -77,7 +77,7 @@ async fn post(
             //
             let partner_tenant = match PartnerTenant::lock(conn, &id) {
                 Ok(t) => t,
-                Err(DbError::DataNotFound) => {
+                Err(DbError::DataNotFound(_)) => {
                     let new_partner_tenant = NewIntegrationTestPartnerTenant {
                         // Notably, we create the partner tenant with the ID as passed in. Next
                         // time the partner tenant is requested, it will already exist
@@ -112,7 +112,7 @@ async fn post(
                 )?;
                 let rb = match TenantRolebinding::get(conn, (&user.id, &partner_tenant.id)) {
                     Ok((_, rb, _, _)) => rb,
-                    Err(DbError::DataNotFound) => {
+                    Err(DbError::DataNotFound(_)) => {
                         let role_id = role.id.clone();
                         let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, &partner_tenant.id)?;
                         rb
