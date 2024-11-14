@@ -113,7 +113,7 @@ pub async fn post(
         .db_transaction(move |conn| -> FpResult<_> {
             let (_, obc, _) = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|e| match e {
-                    DbError::DataNotFound => DbError::PlaybookNotFound,
+                    DbError::DataNotFound(_) => DbError::PlaybookNotFound,
                     e => e,
                 })?;
             tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");

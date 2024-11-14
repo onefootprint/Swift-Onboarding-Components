@@ -258,7 +258,7 @@ pub async fn adhoc_create_document_and_workflow(
             let (_, obc, _) =
                 Playbook::get_latest_version_if_enabled(conn, (&playbook_key, &tenant_id, is_live)).map_err(
                     |e| match e {
-                        DbError::DataNotFound => DbError::PlaybookNotFound,
+                        DbError::DataNotFound(_) => DbError::PlaybookNotFound,
                         e => e,
                     },
                 )?;
@@ -428,7 +428,7 @@ pub async fn adhoc_document_process(
 
             let (obc, _) =
                 ObConfiguration::get_enabled(conn, &wf.ob_configuration_id).map_err(|e| match e {
-                    DbError::DataNotFound => DbError::PlaybookNotFound,
+                    DbError::DataNotFound(_) => DbError::PlaybookNotFound,
                     e => e,
                 })?;
 
