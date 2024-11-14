@@ -43,8 +43,10 @@ pub struct CreateOnboardingConfigurationRequest {
     pub cip_kind: Option<CipKind>,
     pub is_no_phone_flow: Option<bool>,
     #[serde(default)]
+    #[openapi(optional)]
     pub is_doc_first_flow: bool,
     #[serde(default)]
+    #[openapi(optional)]
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub skip_kyc: Option<bool>,
@@ -60,8 +62,10 @@ pub struct CreateOnboardingConfigurationRequest {
     pub skip_confirm: Option<bool>,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     #[serde(default)]
+    #[openapi(optional)]
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     #[serde(default)]
+    #[openapi(optional)]
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     #[serde(default)]
     pub curp_validation_enabled: Option<bool>,
@@ -71,6 +75,7 @@ pub struct CreateOnboardingConfigurationRequest {
     pub required_auth_methods: Patch<Vec<AuthMethodKind>>,
     pub prompt_for_passkey: Option<bool>,
     #[serde(default)]
+    #[openapi(optional)]
     /// Allow the same user to onboard onto this playbook multiple times. It is generally not
     /// recommended to enable this setting. When this is enabled, you lose:
     /// - Protection against one user incurring many charges at your tenant

@@ -134,6 +134,7 @@
                                 "document.id_card.classified_document_type",
                                 "document.id_card.curp_validation_response",
                                 "document.id_card.samba_activity_history_response",
+                                "document.id_card.us_issuing_state",
                                 "document.drivers_license.front.image",
                                 "document.drivers_license.front.mime_type",
                                 "document.drivers_license.back.image",
@@ -162,6 +163,7 @@
                                 "document.drivers_license.classified_document_type",
                                 "document.drivers_license.curp_validation_response",
                                 "document.drivers_license.samba_activity_history_response",
+                                "document.drivers_license.us_issuing_state",
                                 "document.passport.front.image",
                                 "document.passport.front.mime_type",
                                 "document.passport.back.image",
@@ -190,6 +192,7 @@
                                 "document.passport.classified_document_type",
                                 "document.passport.curp_validation_response",
                                 "document.passport.samba_activity_history_response",
+                                "document.passport.us_issuing_state",
                                 "document.passport_card.front.image",
                                 "document.passport_card.front.mime_type",
                                 "document.passport_card.back.image",
@@ -218,6 +221,7 @@
                                 "document.passport_card.classified_document_type",
                                 "document.passport_card.curp_validation_response",
                                 "document.passport_card.samba_activity_history_response",
+                                "document.passport_card.us_issuing_state",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -246,6 +250,7 @@
                                 "document.permit.classified_document_type",
                                 "document.permit.curp_validation_response",
                                 "document.permit.samba_activity_history_response",
+                                "document.permit.us_issuing_state",
                                 "document.visa.front.image",
                                 "document.visa.front.mime_type",
                                 "document.visa.back.image",
@@ -274,6 +279,7 @@
                                 "document.visa.classified_document_type",
                                 "document.visa.curp_validation_response",
                                 "document.visa.samba_activity_history_response",
+                                "document.visa.us_issuing_state",
                                 "document.residence_document.front.image",
                                 "document.residence_document.front.mime_type",
                                 "document.residence_document.back.image",
@@ -302,6 +308,7 @@
                                 "document.residence_document.classified_document_type",
                                 "document.residence_document.curp_validation_response",
                                 "document.residence_document.samba_activity_history_response",
+                                "document.residence_document.us_issuing_state",
                                 "document.voter_identification.front.image",
                                 "document.voter_identification.front.mime_type",
                                 "document.voter_identification.back.image",
@@ -330,6 +337,7 @@
                                 "document.voter_identification.classified_document_type",
                                 "document.voter_identification.curp_validation_response",
                                 "document.voter_identification.samba_activity_history_response",
+                                "document.voter_identification.us_issuing_state",
                                 "document.finra_compliance_letter",
                                 "document.proof_of_address.image",
                                 "document.ssn_card.image",
@@ -753,6 +761,7 @@
                                 "document.id_card.classified_document_type",
                                 "document.id_card.curp_validation_response",
                                 "document.id_card.samba_activity_history_response",
+                                "document.id_card.us_issuing_state",
                                 "document.drivers_license.front.image",
                                 "document.drivers_license.front.mime_type",
                                 "document.drivers_license.back.image",
@@ -781,6 +790,7 @@
                                 "document.drivers_license.classified_document_type",
                                 "document.drivers_license.curp_validation_response",
                                 "document.drivers_license.samba_activity_history_response",
+                                "document.drivers_license.us_issuing_state",
                                 "document.passport.front.image",
                                 "document.passport.front.mime_type",
                                 "document.passport.back.image",
@@ -809,6 +819,7 @@
                                 "document.passport.classified_document_type",
                                 "document.passport.curp_validation_response",
                                 "document.passport.samba_activity_history_response",
+                                "document.passport.us_issuing_state",
                                 "document.passport_card.front.image",
                                 "document.passport_card.front.mime_type",
                                 "document.passport_card.back.image",
@@ -837,6 +848,7 @@
                                 "document.passport_card.classified_document_type",
                                 "document.passport_card.curp_validation_response",
                                 "document.passport_card.samba_activity_history_response",
+                                "document.passport_card.us_issuing_state",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -865,6 +877,7 @@
                                 "document.permit.classified_document_type",
                                 "document.permit.curp_validation_response",
                                 "document.permit.samba_activity_history_response",
+                                "document.permit.us_issuing_state",
                                 "document.visa.front.image",
                                 "document.visa.front.mime_type",
                                 "document.visa.back.image",
@@ -893,6 +906,7 @@
                                 "document.visa.classified_document_type",
                                 "document.visa.curp_validation_response",
                                 "document.visa.samba_activity_history_response",
+                                "document.visa.us_issuing_state",
                                 "document.residence_document.front.image",
                                 "document.residence_document.front.mime_type",
                                 "document.residence_document.back.image",
@@ -921,6 +935,7 @@
                                 "document.residence_document.classified_document_type",
                                 "document.residence_document.curp_validation_response",
                                 "document.residence_document.samba_activity_history_response",
+                                "document.residence_document.us_issuing_state",
                                 "document.voter_identification.front.image",
                                 "document.voter_identification.front.mime_type",
                                 "document.voter_identification.back.image",
@@ -949,6 +964,7 @@
                                 "document.voter_identification.classified_document_type",
                                 "document.voter_identification.curp_validation_response",
                                 "document.voter_identification.samba_activity_history_response",
+                                "document.voter_identification.us_issuing_state",
                                 "document.finra_compliance_letter",
                                 "document.proof_of_address.image",
                                 "document.ssn_card.image",
@@ -2774,6 +2790,7 @@
                                     "document.id_card.classified_document_type",
                                     "document.id_card.curp_validation_response",
                                     "document.id_card.samba_activity_history_response",
+                                    "document.id_card.us_issuing_state",
                                     "document.drivers_license.front.image",
                                     "document.drivers_license.front.mime_type",
                                     "document.drivers_license.back.image",
@@ -2802,6 +2819,7 @@
                                     "document.drivers_license.classified_document_type",
                                     "document.drivers_license.curp_validation_response",
                                     "document.drivers_license.samba_activity_history_response",
+                                    "document.drivers_license.us_issuing_state",
                                     "document.passport.front.image",
                                     "document.passport.front.mime_type",
                                     "document.passport.back.image",
@@ -2830,6 +2848,7 @@
                                     "document.passport.classified_document_type",
                                     "document.passport.curp_validation_response",
                                     "document.passport.samba_activity_history_response",
+                                    "document.passport.us_issuing_state",
                                     "document.passport_card.front.image",
                                     "document.passport_card.front.mime_type",
                                     "document.passport_card.back.image",
@@ -2858,6 +2877,7 @@
                                     "document.passport_card.classified_document_type",
                                     "document.passport_card.curp_validation_response",
                                     "document.passport_card.samba_activity_history_response",
+                                    "document.passport_card.us_issuing_state",
                                     "document.permit.front.image",
                                     "document.permit.front.mime_type",
                                     "document.permit.back.image",
@@ -2886,6 +2906,7 @@
                                     "document.permit.classified_document_type",
                                     "document.permit.curp_validation_response",
                                     "document.permit.samba_activity_history_response",
+                                    "document.permit.us_issuing_state",
                                     "document.visa.front.image",
                                     "document.visa.front.mime_type",
                                     "document.visa.back.image",
@@ -2914,6 +2935,7 @@
                                     "document.visa.classified_document_type",
                                     "document.visa.curp_validation_response",
                                     "document.visa.samba_activity_history_response",
+                                    "document.visa.us_issuing_state",
                                     "document.residence_document.front.image",
                                     "document.residence_document.front.mime_type",
                                     "document.residence_document.back.image",
@@ -2942,6 +2964,7 @@
                                     "document.residence_document.classified_document_type",
                                     "document.residence_document.curp_validation_response",
                                     "document.residence_document.samba_activity_history_response",
+                                    "document.residence_document.us_issuing_state",
                                     "document.voter_identification.front.image",
                                     "document.voter_identification.front.mime_type",
                                     "document.voter_identification.back.image",
@@ -2970,6 +2993,7 @@
                                     "document.voter_identification.classified_document_type",
                                     "document.voter_identification.curp_validation_response",
                                     "document.voter_identification.samba_activity_history_response",
+                                    "document.voter_identification.us_issuing_state",
                                     "document.finra_compliance_letter",
                                     "document.proof_of_address.image",
                                     "document.ssn_card.image",
@@ -3446,6 +3470,7 @@
                                 "document.id_card.classified_document_type",
                                 "document.id_card.curp_validation_response",
                                 "document.id_card.samba_activity_history_response",
+                                "document.id_card.us_issuing_state",
                                 "document.drivers_license.front.image",
                                 "document.drivers_license.front.mime_type",
                                 "document.drivers_license.back.image",
@@ -3474,6 +3499,7 @@
                                 "document.drivers_license.classified_document_type",
                                 "document.drivers_license.curp_validation_response",
                                 "document.drivers_license.samba_activity_history_response",
+                                "document.drivers_license.us_issuing_state",
                                 "document.passport.front.image",
                                 "document.passport.front.mime_type",
                                 "document.passport.back.image",
@@ -3502,6 +3528,7 @@
                                 "document.passport.classified_document_type",
                                 "document.passport.curp_validation_response",
                                 "document.passport.samba_activity_history_response",
+                                "document.passport.us_issuing_state",
                                 "document.passport_card.front.image",
                                 "document.passport_card.front.mime_type",
                                 "document.passport_card.back.image",
@@ -3530,6 +3557,7 @@
                                 "document.passport_card.classified_document_type",
                                 "document.passport_card.curp_validation_response",
                                 "document.passport_card.samba_activity_history_response",
+                                "document.passport_card.us_issuing_state",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -3558,6 +3586,7 @@
                                 "document.permit.classified_document_type",
                                 "document.permit.curp_validation_response",
                                 "document.permit.samba_activity_history_response",
+                                "document.permit.us_issuing_state",
                                 "document.visa.front.image",
                                 "document.visa.front.mime_type",
                                 "document.visa.back.image",
@@ -3586,6 +3615,7 @@
                                 "document.visa.classified_document_type",
                                 "document.visa.curp_validation_response",
                                 "document.visa.samba_activity_history_response",
+                                "document.visa.us_issuing_state",
                                 "document.residence_document.front.image",
                                 "document.residence_document.front.mime_type",
                                 "document.residence_document.back.image",
@@ -3614,6 +3644,7 @@
                                 "document.residence_document.classified_document_type",
                                 "document.residence_document.curp_validation_response",
                                 "document.residence_document.samba_activity_history_response",
+                                "document.residence_document.us_issuing_state",
                                 "document.voter_identification.front.image",
                                 "document.voter_identification.front.mime_type",
                                 "document.voter_identification.back.image",
@@ -3642,6 +3673,7 @@
                                 "document.voter_identification.classified_document_type",
                                 "document.voter_identification.curp_validation_response",
                                 "document.voter_identification.samba_activity_history_response",
+                                "document.voter_identification.us_issuing_state",
                                 "document.finra_compliance_letter",
                                 "document.proof_of_address.image",
                                 "document.ssn_card.image",
@@ -8898,6 +8930,9 @@
             "AuditEventApiKey": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "string"
+                    },
                     "name": {
                         "type": "string"
                     },
@@ -8906,6 +8941,7 @@
                     }
                 },
                 "required": [
+                    "id",
                     "name",
                     "role"
                 ]
@@ -9179,6 +9215,17 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "api_key": {
+                                        "$ref": "#/components/schemas/AuditEventApiKey"
+                                    }
+                                },
+                                "required": [
+                                    "api_key"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -9187,6 +9234,7 @@
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },
@@ -9219,14 +9267,34 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "api_key": {
+                                        "$ref": "#/components/schemas/AuditEventApiKey"
+                                    },
+                                    "new_role": {
+                                        "$ref": "#/components/schemas/OrganizationRole"
+                                    },
+                                    "old_role": {
+                                        "$ref": "#/components/schemas/OrganizationRole"
+                                    }
+                                },
+                                "required": [
+                                    "api_key",
+                                    "new_role",
+                                    "old_role"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
-                                    "update_org_api_key"
+                                    "update_org_api_key_role"
                                 ]
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },
@@ -9667,9 +9735,9 @@
                     "collect_user_document",
                     "create_org_api_key",
                     "decrypt_org_api_key",
-                    "org_member_joined",
-                    "update_org_api_key",
+                    "update_org_api_key_role",
                     "invite_org_member",
+                    "org_member_joined",
                     "update_org_member",
                     "login_org_member",
                     "remove_org_member",
@@ -10674,11 +10742,6 @@
                     }
                 },
                 "required": [
-                    "allow_international_residents",
-                    "allow_reonboard",
-                    "business_documents_to_collect",
-                    "documents_to_collect",
-                    "is_doc_first_flow",
                     "kind",
                     "must_collect_data",
                     "name"
@@ -11250,6 +11313,7 @@
                     "document.id_card.classified_document_type",
                     "document.id_card.curp_validation_response",
                     "document.id_card.samba_activity_history_response",
+                    "document.id_card.us_issuing_state",
                     "document.drivers_license.front.image",
                     "document.drivers_license.front.mime_type",
                     "document.drivers_license.back.image",
@@ -11278,6 +11342,7 @@
                     "document.drivers_license.classified_document_type",
                     "document.drivers_license.curp_validation_response",
                     "document.drivers_license.samba_activity_history_response",
+                    "document.drivers_license.us_issuing_state",
                     "document.passport.front.image",
                     "document.passport.front.mime_type",
                     "document.passport.back.image",
@@ -11306,6 +11371,7 @@
                     "document.passport.classified_document_type",
                     "document.passport.curp_validation_response",
                     "document.passport.samba_activity_history_response",
+                    "document.passport.us_issuing_state",
                     "document.passport_card.front.image",
                     "document.passport_card.front.mime_type",
                     "document.passport_card.back.image",
@@ -11334,6 +11400,7 @@
                     "document.passport_card.classified_document_type",
                     "document.passport_card.curp_validation_response",
                     "document.passport_card.samba_activity_history_response",
+                    "document.passport_card.us_issuing_state",
                     "document.permit.front.image",
                     "document.permit.front.mime_type",
                     "document.permit.back.image",
@@ -11362,6 +11429,7 @@
                     "document.permit.classified_document_type",
                     "document.permit.curp_validation_response",
                     "document.permit.samba_activity_history_response",
+                    "document.permit.us_issuing_state",
                     "document.visa.front.image",
                     "document.visa.front.mime_type",
                     "document.visa.back.image",
@@ -11390,6 +11458,7 @@
                     "document.visa.classified_document_type",
                     "document.visa.curp_validation_response",
                     "document.visa.samba_activity_history_response",
+                    "document.visa.us_issuing_state",
                     "document.residence_document.front.image",
                     "document.residence_document.front.mime_type",
                     "document.residence_document.back.image",
@@ -11418,6 +11487,7 @@
                     "document.residence_document.classified_document_type",
                     "document.residence_document.curp_validation_response",
                     "document.residence_document.samba_activity_history_response",
+                    "document.residence_document.us_issuing_state",
                     "document.voter_identification.front.image",
                     "document.voter_identification.front.mime_type",
                     "document.voter_identification.back.image",
@@ -11446,6 +11516,7 @@
                     "document.voter_identification.classified_document_type",
                     "document.voter_identification.curp_validation_response",
                     "document.voter_identification.samba_activity_history_response",
+                    "document.voter_identification.us_issuing_state",
                     "document.finra_compliance_letter",
                     "document.proof_of_address.image",
                     "document.ssn_card.image",
@@ -13087,6 +13158,7 @@
                             "document.id_card.classified_document_type",
                             "document.id_card.curp_validation_response",
                             "document.id_card.samba_activity_history_response",
+                            "document.id_card.us_issuing_state",
                             "document.drivers_license.front.image",
                             "document.drivers_license.front.mime_type",
                             "document.drivers_license.back.image",
@@ -13115,6 +13187,7 @@
                             "document.drivers_license.classified_document_type",
                             "document.drivers_license.curp_validation_response",
                             "document.drivers_license.samba_activity_history_response",
+                            "document.drivers_license.us_issuing_state",
                             "document.passport.front.image",
                             "document.passport.front.mime_type",
                             "document.passport.back.image",
@@ -13143,6 +13216,7 @@
                             "document.passport.classified_document_type",
                             "document.passport.curp_validation_response",
                             "document.passport.samba_activity_history_response",
+                            "document.passport.us_issuing_state",
                             "document.passport_card.front.image",
                             "document.passport_card.front.mime_type",
                             "document.passport_card.back.image",
@@ -13171,6 +13245,7 @@
                             "document.passport_card.classified_document_type",
                             "document.passport_card.curp_validation_response",
                             "document.passport_card.samba_activity_history_response",
+                            "document.passport_card.us_issuing_state",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -13199,6 +13274,7 @@
                             "document.permit.classified_document_type",
                             "document.permit.curp_validation_response",
                             "document.permit.samba_activity_history_response",
+                            "document.permit.us_issuing_state",
                             "document.visa.front.image",
                             "document.visa.front.mime_type",
                             "document.visa.back.image",
@@ -13227,6 +13303,7 @@
                             "document.visa.classified_document_type",
                             "document.visa.curp_validation_response",
                             "document.visa.samba_activity_history_response",
+                            "document.visa.us_issuing_state",
                             "document.residence_document.front.image",
                             "document.residence_document.front.mime_type",
                             "document.residence_document.back.image",
@@ -13255,6 +13332,7 @@
                             "document.residence_document.classified_document_type",
                             "document.residence_document.curp_validation_response",
                             "document.residence_document.samba_activity_history_response",
+                            "document.residence_document.us_issuing_state",
                             "document.voter_identification.front.image",
                             "document.voter_identification.front.mime_type",
                             "document.voter_identification.back.image",
@@ -13283,6 +13361,7 @@
                             "document.voter_identification.classified_document_type",
                             "document.voter_identification.curp_validation_response",
                             "document.voter_identification.samba_activity_history_response",
+                            "document.voter_identification.us_issuing_state",
                             "document.finra_compliance_letter",
                             "document.proof_of_address.image",
                             "document.ssn_card.image",
@@ -13776,6 +13855,7 @@
                             "document.id_card.classified_document_type",
                             "document.id_card.curp_validation_response",
                             "document.id_card.samba_activity_history_response",
+                            "document.id_card.us_issuing_state",
                             "document.drivers_license.front.image",
                             "document.drivers_license.front.mime_type",
                             "document.drivers_license.back.image",
@@ -13804,6 +13884,7 @@
                             "document.drivers_license.classified_document_type",
                             "document.drivers_license.curp_validation_response",
                             "document.drivers_license.samba_activity_history_response",
+                            "document.drivers_license.us_issuing_state",
                             "document.passport.front.image",
                             "document.passport.front.mime_type",
                             "document.passport.back.image",
@@ -13832,6 +13913,7 @@
                             "document.passport.classified_document_type",
                             "document.passport.curp_validation_response",
                             "document.passport.samba_activity_history_response",
+                            "document.passport.us_issuing_state",
                             "document.passport_card.front.image",
                             "document.passport_card.front.mime_type",
                             "document.passport_card.back.image",
@@ -13860,6 +13942,7 @@
                             "document.passport_card.classified_document_type",
                             "document.passport_card.curp_validation_response",
                             "document.passport_card.samba_activity_history_response",
+                            "document.passport_card.us_issuing_state",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -13888,6 +13971,7 @@
                             "document.permit.classified_document_type",
                             "document.permit.curp_validation_response",
                             "document.permit.samba_activity_history_response",
+                            "document.permit.us_issuing_state",
                             "document.visa.front.image",
                             "document.visa.front.mime_type",
                             "document.visa.back.image",
@@ -13916,6 +14000,7 @@
                             "document.visa.classified_document_type",
                             "document.visa.curp_validation_response",
                             "document.visa.samba_activity_history_response",
+                            "document.visa.us_issuing_state",
                             "document.residence_document.front.image",
                             "document.residence_document.front.mime_type",
                             "document.residence_document.back.image",
@@ -13944,6 +14029,7 @@
                             "document.residence_document.classified_document_type",
                             "document.residence_document.curp_validation_response",
                             "document.residence_document.samba_activity_history_response",
+                            "document.residence_document.us_issuing_state",
                             "document.voter_identification.front.image",
                             "document.voter_identification.front.mime_type",
                             "document.voter_identification.back.image",
@@ -13972,6 +14058,7 @@
                             "document.voter_identification.classified_document_type",
                             "document.voter_identification.curp_validation_response",
                             "document.voter_identification.samba_activity_history_response",
+                            "document.voter_identification.us_issuing_state",
                             "document.finra_compliance_letter",
                             "document.proof_of_address.image",
                             "document.ssn_card.image",
@@ -15056,6 +15143,9 @@
                     "document.drivers_license.state": {
                         "type": "string"
                     },
+                    "document.drivers_license.us_issuing_state": {
+                        "type": "string"
+                    },
                     "document.finra_compliance_letter": {
                         "type": "string"
                     },
@@ -15143,6 +15233,9 @@
                     "document.id_card.state": {
                         "type": "string"
                     },
+                    "document.id_card.us_issuing_state": {
+                        "type": "string"
+                    },
                     "document.passport.address_line1": {
                         "type": "string"
                     },
@@ -15225,6 +15318,9 @@
                         "type": "string"
                     },
                     "document.passport.state": {
+                        "type": "string"
+                    },
+                    "document.passport.us_issuing_state": {
                         "type": "string"
                     },
                     "document.passport_card.address_line1": {
@@ -15311,6 +15407,9 @@
                     "document.passport_card.state": {
                         "type": "string"
                     },
+                    "document.passport_card.us_issuing_state": {
+                        "type": "string"
+                    },
                     "document.permit.address_line1": {
                         "type": "string"
                     },
@@ -15393,6 +15492,9 @@
                         "type": "string"
                     },
                     "document.permit.state": {
+                        "type": "string"
+                    },
+                    "document.permit.us_issuing_state": {
                         "type": "string"
                     },
                     "document.proof_of_address.image": {
@@ -15482,6 +15584,9 @@
                     "document.residence_document.state": {
                         "type": "string"
                     },
+                    "document.residence_document.us_issuing_state": {
+                        "type": "string"
+                    },
                     "document.ssn_card.image": {
                         "type": "string"
                     },
@@ -15569,6 +15674,9 @@
                     "document.visa.state": {
                         "type": "string"
                     },
+                    "document.visa.us_issuing_state": {
+                        "type": "string"
+                    },
                     "document.voter_identification.address_line1": {
                         "type": "string"
                     },
@@ -15651,6 +15759,9 @@
                         "type": "string"
                     },
                     "document.voter_identification.state": {
+                        "type": "string"
+                    },
+                    "document.voter_identification.us_issuing_state": {
                         "type": "string"
                     },
                     "id.address_line1": {
@@ -17050,6 +17161,7 @@
                             "document.id_card.classified_document_type",
                             "document.id_card.curp_validation_response",
                             "document.id_card.samba_activity_history_response",
+                            "document.id_card.us_issuing_state",
                             "document.drivers_license.front.image",
                             "document.drivers_license.front.mime_type",
                             "document.drivers_license.back.image",
@@ -17078,6 +17190,7 @@
                             "document.drivers_license.classified_document_type",
                             "document.drivers_license.curp_validation_response",
                             "document.drivers_license.samba_activity_history_response",
+                            "document.drivers_license.us_issuing_state",
                             "document.passport.front.image",
                             "document.passport.front.mime_type",
                             "document.passport.back.image",
@@ -17106,6 +17219,7 @@
                             "document.passport.classified_document_type",
                             "document.passport.curp_validation_response",
                             "document.passport.samba_activity_history_response",
+                            "document.passport.us_issuing_state",
                             "document.passport_card.front.image",
                             "document.passport_card.front.mime_type",
                             "document.passport_card.back.image",
@@ -17134,6 +17248,7 @@
                             "document.passport_card.classified_document_type",
                             "document.passport_card.curp_validation_response",
                             "document.passport_card.samba_activity_history_response",
+                            "document.passport_card.us_issuing_state",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -17162,6 +17277,7 @@
                             "document.permit.classified_document_type",
                             "document.permit.curp_validation_response",
                             "document.permit.samba_activity_history_response",
+                            "document.permit.us_issuing_state",
                             "document.visa.front.image",
                             "document.visa.front.mime_type",
                             "document.visa.back.image",
@@ -17190,6 +17306,7 @@
                             "document.visa.classified_document_type",
                             "document.visa.curp_validation_response",
                             "document.visa.samba_activity_history_response",
+                            "document.visa.us_issuing_state",
                             "document.residence_document.front.image",
                             "document.residence_document.front.mime_type",
                             "document.residence_document.back.image",
@@ -17218,6 +17335,7 @@
                             "document.residence_document.classified_document_type",
                             "document.residence_document.curp_validation_response",
                             "document.residence_document.samba_activity_history_response",
+                            "document.residence_document.us_issuing_state",
                             "document.voter_identification.front.image",
                             "document.voter_identification.front.mime_type",
                             "document.voter_identification.back.image",
@@ -17246,6 +17364,7 @@
                             "document.voter_identification.classified_document_type",
                             "document.voter_identification.curp_validation_response",
                             "document.voter_identification.samba_activity_history_response",
+                            "document.voter_identification.us_issuing_state",
                             "document.finra_compliance_letter",
                             "document.proof_of_address.image",
                             "document.ssn_card.image",
@@ -18898,6 +19017,7 @@
                     "document.id_card.classified_document_type",
                     "document.id_card.curp_validation_response",
                     "document.id_card.samba_activity_history_response",
+                    "document.id_card.us_issuing_state",
                     "document.drivers_license.front.image",
                     "document.drivers_license.front.mime_type",
                     "document.drivers_license.back.image",
@@ -18926,6 +19046,7 @@
                     "document.drivers_license.classified_document_type",
                     "document.drivers_license.curp_validation_response",
                     "document.drivers_license.samba_activity_history_response",
+                    "document.drivers_license.us_issuing_state",
                     "document.passport.front.image",
                     "document.passport.front.mime_type",
                     "document.passport.back.image",
@@ -18954,6 +19075,7 @@
                     "document.passport.classified_document_type",
                     "document.passport.curp_validation_response",
                     "document.passport.samba_activity_history_response",
+                    "document.passport.us_issuing_state",
                     "document.passport_card.front.image",
                     "document.passport_card.front.mime_type",
                     "document.passport_card.back.image",
@@ -18982,6 +19104,7 @@
                     "document.passport_card.classified_document_type",
                     "document.passport_card.curp_validation_response",
                     "document.passport_card.samba_activity_history_response",
+                    "document.passport_card.us_issuing_state",
                     "document.permit.front.image",
                     "document.permit.front.mime_type",
                     "document.permit.back.image",
@@ -19010,6 +19133,7 @@
                     "document.permit.classified_document_type",
                     "document.permit.curp_validation_response",
                     "document.permit.samba_activity_history_response",
+                    "document.permit.us_issuing_state",
                     "document.visa.front.image",
                     "document.visa.front.mime_type",
                     "document.visa.back.image",
@@ -19038,6 +19162,7 @@
                     "document.visa.classified_document_type",
                     "document.visa.curp_validation_response",
                     "document.visa.samba_activity_history_response",
+                    "document.visa.us_issuing_state",
                     "document.residence_document.front.image",
                     "document.residence_document.front.mime_type",
                     "document.residence_document.back.image",
@@ -19066,6 +19191,7 @@
                     "document.residence_document.classified_document_type",
                     "document.residence_document.curp_validation_response",
                     "document.residence_document.samba_activity_history_response",
+                    "document.residence_document.us_issuing_state",
                     "document.voter_identification.front.image",
                     "document.voter_identification.front.mime_type",
                     "document.voter_identification.back.image",
@@ -19094,6 +19220,7 @@
                     "document.voter_identification.classified_document_type",
                     "document.voter_identification.curp_validation_response",
                     "document.voter_identification.samba_activity_history_response",
+                    "document.voter_identification.us_issuing_state",
                     "document.finra_compliance_letter",
                     "document.proof_of_address.image",
                     "document.ssn_card.image",
@@ -19231,6 +19358,7 @@
                             "document.id_card.classified_document_type",
                             "document.id_card.curp_validation_response",
                             "document.id_card.samba_activity_history_response",
+                            "document.id_card.us_issuing_state",
                             "document.drivers_license.front.image",
                             "document.drivers_license.front.mime_type",
                             "document.drivers_license.back.image",
@@ -19259,6 +19387,7 @@
                             "document.drivers_license.classified_document_type",
                             "document.drivers_license.curp_validation_response",
                             "document.drivers_license.samba_activity_history_response",
+                            "document.drivers_license.us_issuing_state",
                             "document.passport.front.image",
                             "document.passport.front.mime_type",
                             "document.passport.back.image",
@@ -19287,6 +19416,7 @@
                             "document.passport.classified_document_type",
                             "document.passport.curp_validation_response",
                             "document.passport.samba_activity_history_response",
+                            "document.passport.us_issuing_state",
                             "document.passport_card.front.image",
                             "document.passport_card.front.mime_type",
                             "document.passport_card.back.image",
@@ -19315,6 +19445,7 @@
                             "document.passport_card.classified_document_type",
                             "document.passport_card.curp_validation_response",
                             "document.passport_card.samba_activity_history_response",
+                            "document.passport_card.us_issuing_state",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -19343,6 +19474,7 @@
                             "document.permit.classified_document_type",
                             "document.permit.curp_validation_response",
                             "document.permit.samba_activity_history_response",
+                            "document.permit.us_issuing_state",
                             "document.visa.front.image",
                             "document.visa.front.mime_type",
                             "document.visa.back.image",
@@ -19371,6 +19503,7 @@
                             "document.visa.classified_document_type",
                             "document.visa.curp_validation_response",
                             "document.visa.samba_activity_history_response",
+                            "document.visa.us_issuing_state",
                             "document.residence_document.front.image",
                             "document.residence_document.front.mime_type",
                             "document.residence_document.back.image",
@@ -19399,6 +19532,7 @@
                             "document.residence_document.classified_document_type",
                             "document.residence_document.curp_validation_response",
                             "document.residence_document.samba_activity_history_response",
+                            "document.residence_document.us_issuing_state",
                             "document.voter_identification.front.image",
                             "document.voter_identification.front.mime_type",
                             "document.voter_identification.back.image",
@@ -19427,6 +19561,7 @@
                             "document.voter_identification.classified_document_type",
                             "document.voter_identification.curp_validation_response",
                             "document.voter_identification.samba_activity_history_response",
+                            "document.voter_identification.us_issuing_state",
                             "document.finra_compliance_letter",
                             "document.proof_of_address.image",
                             "document.ssn_card.image",
@@ -19535,6 +19670,7 @@
                             "document.id_card.classified_document_type",
                             "document.id_card.curp_validation_response",
                             "document.id_card.samba_activity_history_response",
+                            "document.id_card.us_issuing_state",
                             "document.drivers_license.front.image",
                             "document.drivers_license.front.mime_type",
                             "document.drivers_license.back.image",
@@ -19563,6 +19699,7 @@
                             "document.drivers_license.classified_document_type",
                             "document.drivers_license.curp_validation_response",
                             "document.drivers_license.samba_activity_history_response",
+                            "document.drivers_license.us_issuing_state",
                             "document.passport.front.image",
                             "document.passport.front.mime_type",
                             "document.passport.back.image",
@@ -19591,6 +19728,7 @@
                             "document.passport.classified_document_type",
                             "document.passport.curp_validation_response",
                             "document.passport.samba_activity_history_response",
+                            "document.passport.us_issuing_state",
                             "document.passport_card.front.image",
                             "document.passport_card.front.mime_type",
                             "document.passport_card.back.image",
@@ -19619,6 +19757,7 @@
                             "document.passport_card.classified_document_type",
                             "document.passport_card.curp_validation_response",
                             "document.passport_card.samba_activity_history_response",
+                            "document.passport_card.us_issuing_state",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -19647,6 +19786,7 @@
                             "document.permit.classified_document_type",
                             "document.permit.curp_validation_response",
                             "document.permit.samba_activity_history_response",
+                            "document.permit.us_issuing_state",
                             "document.visa.front.image",
                             "document.visa.front.mime_type",
                             "document.visa.back.image",
@@ -19675,6 +19815,7 @@
                             "document.visa.classified_document_type",
                             "document.visa.curp_validation_response",
                             "document.visa.samba_activity_history_response",
+                            "document.visa.us_issuing_state",
                             "document.residence_document.front.image",
                             "document.residence_document.front.mime_type",
                             "document.residence_document.back.image",
@@ -19703,6 +19844,7 @@
                             "document.residence_document.classified_document_type",
                             "document.residence_document.curp_validation_response",
                             "document.residence_document.samba_activity_history_response",
+                            "document.residence_document.us_issuing_state",
                             "document.voter_identification.front.image",
                             "document.voter_identification.front.mime_type",
                             "document.voter_identification.back.image",
@@ -19731,6 +19873,7 @@
                             "document.voter_identification.classified_document_type",
                             "document.voter_identification.curp_validation_response",
                             "document.voter_identification.samba_activity_history_response",
+                            "document.voter_identification.us_issuing_state",
                             "document.finra_compliance_letter",
                             "document.proof_of_address.image",
                             "document.ssn_card.image",
