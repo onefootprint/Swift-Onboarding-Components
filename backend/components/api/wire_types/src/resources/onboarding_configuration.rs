@@ -18,7 +18,6 @@ use newtypes::WorkflowRequestConfig;
 
 /// OnboardingConfiguration that was created
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
-
 pub struct OnboardingConfiguration {
     pub id: ObConfigurationId,
     pub playbook_id: PlaybookId,
@@ -64,7 +63,6 @@ pub struct OnboardingConfiguration {
 
 /// The public onboarding configuration
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
-
 pub struct PublicOnboardingConfiguration {
     pub name: String,
     pub key: PublishablePlaybookKey,

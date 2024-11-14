@@ -4,7 +4,7 @@ mod copy;
 mod get;
 mod patch;
 mod post;
-mod validation;
+pub(crate) mod validation;
 
 #[cfg(test)]
 mod tests;

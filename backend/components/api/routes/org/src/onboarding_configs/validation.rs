@@ -1,4 +1,3 @@
-use super::post::CreateOnboardingConfigurationRequest;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::tenant::TenantError;
 use api_core::FpError;
@@ -6,10 +5,14 @@ use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_errors::ServerErr;
+use api_wire_types::CreateOnboardingConfigurationRequest;
+use api_wire_types::Patch;
 use db::models::ob_configuration::IsLive;
 use db::models::ob_configuration::NewObConfigurationArgs;
+use db::models::ob_configuration::VerificationChecks;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::sentilink::SentilinkProduct;
@@ -20,6 +23,7 @@ use newtypes::CollectedDataOption as CDO;
 use newtypes::CollectedDataOptionKind as CDOK;
 use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant as DID;
+use newtypes::DbActor;
 use newtypes::DocumentRequestConfig;
 use newtypes::EnhancedAmlOption;
 use newtypes::ObConfigurationKind;
@@ -688,25 +692,148 @@ impl ObConfigurationArgsToValidate {
     }
 }
 
+fn collects_identity_document(create_obc_req: &CreateOnboardingConfigurationRequest) -> bool {
+    let has_document_cdo = create_obc_req
+        .must_collect_data
+        .iter()
+        .any(|d| CDOK::from(d) == CDOK::Document);
+    let has_other_document = create_obc_req
+        .documents_to_collect
+        .iter()
+        .any(|c| c.is_identity());
+    has_document_cdo || has_other_document
+}
 
-impl CreateOnboardingConfigurationRequest {
-    pub fn validate(self) -> FpResult<Self> {
-        // First, map some of the API format to the format we write to the DB
-        if let Some(r) = &self.enhanced_aml {
-            if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
-                return Err(TenantError::ValidationError(
-                    "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
-                )
-                .into());
-            }
-            if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
-                return Err(TenantError::ValidationError(
-                    "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true"
-                        .to_owned(),
-                )
-                .into());
-            }
+pub async fn prepare_onboarding_configuration_request(
+    state: &State,
+    obc_request: CreateOnboardingConfigurationRequest,
+    tenant: &Tenant,
+    is_live: IsLive,
+    author: DbActor,
+) -> FpResult<NewObConfigurationArgs> {
+    // First, map some of the API format to the format we write to the DB
+    if let Some(r) = &obc_request.enhanced_aml {
+        if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
+            return Err(TenantError::ValidationError(
+                "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
+            )
+            .into());
         }
-        Ok(self)
+        if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
+            return Err(TenantError::ValidationError(
+                "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true".to_owned(),
+            )
+            .into());
+        }
     }
+
+    if obc_request.doc_scan_for_optional_ssn.is_some() {
+        return Err(TenantError::ValidationError(
+            "doc_scan_for_optional_ssn not supported. Please use the `ssn_not_provided` risk signal in a StepUp Rule to encode this logic.".to_string(),
+        )
+        .into());
+    }
+
+    let collects_identity_document = collects_identity_document(&obc_request);
+
+    let CreateOnboardingConfigurationRequest {
+        name,
+        must_collect_data,
+        optional_data,
+        deprecated_can_access_data,
+        cip_kind,
+        is_no_phone_flow,
+        is_doc_first_flow,
+        allow_international_residents,
+        international_country_restrictions,
+        skip_kyc,
+        allow_us_residents,
+        allow_us_territories,
+        skip_confirm,
+        document_types_and_countries,
+        documents_to_collect,
+        business_documents_to_collect,
+        curp_validation_enabled,
+        enhanced_aml: api_enhanced_aml,
+        kind,
+        verification_checks,
+        required_auth_methods,
+        prompt_for_passkey,
+        allow_reonboard,
+        doc_scan_for_optional_ssn: _,
+    } = obc_request;
+
+    // TODO: clean this up by surfacing AM lists in FE
+    let db_enhanced_aml = api_enhanced_aml.map(|r| r.into());
+
+    // VERIFICATION CHECK MIGRATION: construct verification checks
+    let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
+    let verification_checks = VerificationChecks::new(
+        &tenant.id,
+        verification_checks,
+        skip_kyc,
+        db_enhanced_aml.clone(),
+        collects_identity_document,
+        curp_validation_enabled,
+    );
+
+    let is_no_phone_flow = is_no_phone_flow.unwrap_or(false);
+
+    // TODO remove once client start providing this
+    let required_auth_methods = match required_auth_methods {
+        Patch::Null => None,
+        Patch::Value(v) => Some(v),
+        Patch::Missing => match kind {
+            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
+            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
+            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
+                vec![AuthMethodKind::Email]
+            } else {
+                vec![AuthMethodKind::Phone]
+            }),
+        },
+    };
+
+    let prompt_for_passkey =
+        prompt_for_passkey.unwrap_or(!is_no_phone_flow && kind != ObConfigurationKind::Auth);
+    let optional_data = optional_data.unwrap_or(vec![]);
+    let can_access_data = deprecated_can_access_data
+        .unwrap_or(chain!(must_collect_data.clone(), optional_data.clone()).collect());
+
+    let args = NewObConfigurationArgs {
+        name,
+        must_collect_data,
+        optional_data,
+        can_access_data,
+        cip_kind,
+        is_no_phone_flow,
+        is_doc_first: is_doc_first_flow,
+        allow_international_residents,
+        international_country_restrictions,
+        author,
+        // TODO: remove these once frontend is merged
+        allow_us_residents: allow_us_residents.unwrap_or(true),
+        allow_us_territory_residents: allow_us_territories.unwrap_or(false),
+        kind,
+        skip_confirm: skip_confirm.unwrap_or(false),
+        document_types_and_countries,
+        documents_to_collect,
+        business_documents_to_collect,
+        verification_checks,
+        required_auth_methods,
+        prompt_for_passkey,
+        allow_reonboard,
+    };
+
+
+    // Need to check Tenants are able to use certain vendors
+    let tvc = TenantVendorControl::new(
+        tenant.id.clone(),
+        &state.db_pool,
+        &state.config,
+        &state.enclave_client,
+    )
+    .await?;
+    let args = ObConfigurationArgsToValidate::validate(state, args, tenant, is_live, &tvc)?;
+    Ok(args)
 }

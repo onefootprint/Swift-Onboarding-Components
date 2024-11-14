@@ -595,6 +595,12 @@ impl ObConfiguration {
         playbook: &Locked<Playbook>,
         args: NewObConfigurationArgs,
     ) -> FpResult<Self> {
+        diesel::update(ob_configuration::table)
+            .filter(ob_configuration::playbook_id.eq(&playbook.id))
+            .filter(ob_configuration::deactivated_at.is_null())
+            .set(ob_configuration::deactivated_at.eq(Some(Utc::now())))
+            .execute(conn.conn())?;
+
         let Playbook {
             id: playbook_id,
             _created_at: _,

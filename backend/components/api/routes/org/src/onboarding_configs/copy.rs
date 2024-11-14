@@ -2,6 +2,7 @@ use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
+use api_core::decision::rule_engine::rules::copy_rule;
 use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::ApiResponse;
@@ -12,7 +13,6 @@ use api_core::{
 };
 use api_errors::BadRequestInto;
 use api_wire_types::CopyPlaybookRequest;
-use api_wire_types::CreateRule;
 use api_wire_types::MultiUpdateRuleRequest;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
@@ -24,7 +24,6 @@ use db::models::rule_set_version::RuleSetVersion;
 use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
-use newtypes::UnvalidatedRuleExpression;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -123,36 +122,6 @@ async fn post(
     Ok(result)
 }
 
-fn copy_rule(r: RuleInstance) -> CreateRule {
-    let RuleInstance {
-        name,
-        rule_expression,
-        action: _,
-        rule_action,
-        is_shadow,
-
-        // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
-        // field is added
-        id: _,
-        created_at: _,
-        created_seqno: _,
-        _created_at: _,
-        _updated_at: _,
-        deactivated_at: _,
-        deactivated_seqno: _,
-        rule_id: _,
-        ob_configuration_id: _,
-        actor: _,
-        kind: _,
-    } = r;
-
-    CreateRule {
-        name,
-        rule_action: api_wire_types::RuleActionMigration::New(rule_action),
-        rule_expression: UnvalidatedRuleExpression(rule_expression.0),
-        is_shadow,
-    }
-}
 
 fn copy_playbook(pb: ObConfiguration, author: DbActor, name: String) -> NewObConfigurationArgs {
     let verification_checks = VerificationChecks::from_existing(&pb);

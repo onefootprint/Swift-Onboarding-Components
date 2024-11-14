@@ -64,6 +64,9 @@ pub use alpaca_create_account::*;
 mod process;
 pub use process::*;
 
+mod playbooks;
+pub use playbooks::*;
+
 mod onboarding_configs;
 pub use onboarding_configs::*;
 
