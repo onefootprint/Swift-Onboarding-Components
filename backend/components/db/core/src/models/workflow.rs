@@ -44,6 +44,7 @@ use newtypes::ObConfigurationKind;
 use newtypes::OnboardingCompletedPayload;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusChangedPayload;
+use newtypes::PlaybookId;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::TenantScope;
@@ -60,7 +61,7 @@ use newtypes::WorkflowStartedInfo;
 use newtypes::WorkflowState;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Selectable)]
 #[diesel(table_name = workflow)]
 pub struct Workflow {
     pub id: WorkflowId,
@@ -237,16 +238,27 @@ impl Workflow {
             // one was incomplete and deactivated.
             // But we don't want them to make a new workflow for the same OBC if they already
             // completed the last one.
+
+            let playbook_id: PlaybookId = ob_configuration::table
+                .filter(ob_configuration::id.eq(&ob_configuration_id))
+                .select(ob_configuration::playbook_id)
+                .first(conn.conn())?;
+
             let active_wf = workflow::table
+                .inner_join(ob_configuration::table)
                 .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
-                .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
+                .filter(ob_configuration::playbook_id.eq(&playbook_id))
                 .filter(workflow::deactivated_at.is_null())
+                .select(Workflow::as_select())
                 .first(conn.conn())
                 .optional()?;
+
             let complete_wf = workflow::table
+                .inner_join(ob_configuration::table)
                 .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
-                .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
+                .filter(ob_configuration::playbook_id.eq(&playbook_id))
                 .filter(not(workflow::completed_at.is_null()))
+                .select(Workflow::as_select())
                 .first(conn.conn())
                 .optional()?;
             let wf = active_wf.or(complete_wf);

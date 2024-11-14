@@ -1,8 +1,15 @@
 from tests.identify_client import IdentifyClient
 from tests.headers import FpAuth, PlaybookKey
-from tests.utils import get, patch, post
+from tests.types import ObConfiguration
+from tests.utils import get, patch, post, put
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
+
+
+def num_onboarding_decisions(fp_id, tenant):
+    timeline = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
+    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    return len(obds)
 
 
 def test_reonboard(sandbox_tenant, sandbox_user):
@@ -15,11 +22,7 @@ def test_reonboard(sandbox_tenant, sandbox_user):
     assert len(bifrost.handled_requirements) == 0
 
     # no new KYC checks should be run, we should still only 1 OBD
-    timeline = get(
-        f"entities/{sandbox_user.fp_id}/timeline", None, *sandbox_user.tenant.db_auths
-    )
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
-    assert len(obds) == 1
+    assert num_onboarding_decisions(sandbox_user.fp_id, sandbox_tenant) == 1
 
 
 def test_abort_then_reonboard(sandbox_tenant, must_collect_data):
@@ -55,9 +58,7 @@ def test_allow_reonboard(sandbox_tenant, must_collect_data):
     assert [r["kind"] for r in bifrost2.handled_requirements] == ["process"]
 
     # Should have two onboarding decisions
-    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
-    assert len(obds) == 2
+    assert num_onboarding_decisions(user.fp_id, sandbox_tenant) == 2
 
 
 def test_allow_reonboard_kyb(sandbox_tenant, must_collect_data):
@@ -87,9 +88,7 @@ def test_allow_reonboard_kyb(sandbox_tenant, must_collect_data):
     assert user1.fp_id == user2.fp_id
     assert user1.fp_bid != user2.fp_bid, "Should make a new fp_bid when reonboarding"
 
-    timeline = get(f"entities/{user1.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
-    assert len(obds) == 2
+    assert num_onboarding_decisions(user1.fp_id, sandbox_tenant) == 2
 
 
 def test_allow_reonboard_user_token(sandbox_tenant, must_collect_data):
@@ -110,17 +109,13 @@ def test_allow_reonboard_user_token(sandbox_tenant, must_collect_data):
     # Create a token with allow_reonboard = False. Should not allow reonboarding
     bifrost2 = reonboard(False)
     assert [r["kind"] for r in bifrost2.handled_requirements] == []
-    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
-    assert len(obds) == 1
+    assert num_onboarding_decisions(user.fp_id, sandbox_tenant) == 1
 
     # Create a token with allow_reonboard = False. Should allow reonboarding, even though the playbook doesn't
     # have the option set
     bifrost3 = reonboard(True)
     assert [r["kind"] for r in bifrost3.handled_requirements] == ["process"]
-    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
-    assert len(obds) == 2
+    assert num_onboarding_decisions(user.fp_id, sandbox_tenant) == 2
 
 
 def test_allow_reonboard_ob_session_token(sandbox_tenant, must_collect_data):
@@ -155,3 +150,69 @@ def test_allow_reonboard_ob_session_token(sandbox_tenant, must_collect_data):
     )
     bifrost3.run()
     assert [r["kind"] for r in bifrost3.handled_requirements] == ["process"]
+
+
+def test_allow_reonboard_checks_all_playbook_versions(sandbox_tenant):
+    obc_req = {
+        "name": "Test Playbook v1",
+        "must_collect_data": [
+            "name",
+            "ssn9",
+            "full_address",
+            "email",
+            "phone_number",
+            "nationality",
+            "dob",
+        ],
+        "kind": "kyc",
+        "skip_kyc": False,
+        "allow_reonboard": False,
+    }
+    obc_v1 = post(
+        "org/onboarding_configs",
+        obc_req,
+        *sandbox_tenant.db_auths,
+    )
+    obc_v1 = ObConfiguration.from_response(obc_v1, sandbox_tenant)
+
+    # First onboard.
+    bifrost_v1 = BifrostClient.new_user(obc_v1)
+    bifrost_v1.run()
+
+    # Edit the playbook.
+    obc_req["name"] = "Test Playbook v2"
+    obc_v2 = put(
+        f"org/playbooks/{obc_v1.playbook_id}",
+        {
+            "expected_latest_obc_id": obc_v1.id,
+            "new_onboarding_config": obc_req,
+        },
+        *sandbox_tenant.db_auths,
+    )
+    obc_v2 = ObConfiguration.from_response(obc_v2, sandbox_tenant)
+
+    # Second onboard should be a no-op and should not generate a new onboarding
+    # decision.
+    bifrost_v2 = BifrostClient.login_user(obc_v2, bifrost_v1.sandbox_id)
+    user = bifrost_v2.run()
+    assert bifrost_v2.handled_requirements == []
+    assert num_onboarding_decisions(user.fp_id, sandbox_tenant) == 1
+
+    # Edit the playbook again to allow reonboards.
+    obc_req["name"] = "Test Playbook v3"
+    obc_req["allow_reonboard"] = True
+    obc_v3 = put(
+        f"org/playbooks/{obc_v2.playbook_id}",
+        {
+            "expected_latest_obc_id": obc_v2.id,
+            "new_onboarding_config": obc_req,
+        },
+        *sandbox_tenant.db_auths,
+    )
+    obc_v3 = ObConfiguration.from_response(obc_v3, sandbox_tenant)
+
+    # Reonboarding should now generate a new onboarding decision.
+    bifrost_v3 = BifrostClient.login_user(obc_v3, bifrost_v1.sandbox_id)
+    user = bifrost_v3.run()
+    assert [r["kind"] for r in bifrost_v3.handled_requirements] == ["process"]
+    assert num_onboarding_decisions(user.fp_id, sandbox_tenant) == 2
