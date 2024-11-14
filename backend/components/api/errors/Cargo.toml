@@ -8,6 +8,7 @@ authors = { workspace = true }
 doctest = false
 
 [dependencies]
+anyhow = { workspace = true }
 thiserror = { workspace = true }
 serde_json = { workspace = true }
 diesel = { workspace = true }

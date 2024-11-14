@@ -42,7 +42,7 @@ impl<T: Into<FpError>> From<T> for ApiError {
 }
 
 #[derive(Clone, serde::Serialize)]
-pub struct SerializedApiResponse<'a> {
+pub struct SerializedApiResponse {
     pub message: String,
     pub code: Option<FpErrorCode>,
     /// Any freeform JSON context to give more information on the error
@@ -54,7 +54,7 @@ pub struct SerializedApiResponse<'a> {
     pub debug: Option<String>,
     // In non-prod, file location that produced the error message
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub location: Option<&'a str>,
+    pub location: Option<String>,
 }
 
 

@@ -735,6 +735,7 @@ name = "api_errors"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "anyhow",
  "aws-sdk-pinpointsmsvoicev2",
  "base64 0.13.0",
  "crypto",
