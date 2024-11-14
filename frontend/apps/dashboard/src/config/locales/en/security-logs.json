@@ -71,6 +71,12 @@
       "a-member": "a member",
       "to-join": "to join"
     },
+    "update": {
+      "updated": "updated",
+      "a-member-s": "a member's",
+      "role-from": "role from",
+      "to": "to"
+    },
     "roles": {
       "created-a-new": "created a new",
       "edited-the": "edited the",

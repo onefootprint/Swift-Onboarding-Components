@@ -24,6 +24,7 @@ const SecurityLogs = () => {
     // 'update_org_role',
     // 'deactivate_org_role',
     // 'invite_org_member',
+    // 'update_org_member',
   ];
 
   useEffect(() => {
