@@ -101,7 +101,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
           on: {
             businessDataLoadSuccess: {
               target: 'router',
-              actions: 'assignVaultData',
+              actions: 'assignData',
             },
             businessDataLoadError: {
               target: 'router',
@@ -158,24 +158,10 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
     {
       actions: {
         assignData: assign((ctx, { payload }) => {
-          ctx.vaultBusinessData = {
-            ...ctx.vaultBusinessData,
-            ...payload,
-          };
+          // Only after data is synced to the backend, we update the local view of the data
           ctx.data = {
             ...ctx.data,
             ...payload,
-          };
-          return ctx;
-        }),
-        assignVaultData: assign((ctx, { payload }) => {
-          ctx.vaultBusinessData = {
-            ...ctx.vaultBusinessData,
-            ...payload.vaultBusinessData,
-          };
-          ctx.data = {
-            ...ctx.data,
-            ...payload.data,
           };
           return ctx;
         }),

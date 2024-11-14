@@ -9,7 +9,7 @@ import { omitNullAndUndefined } from '../../utils/utils';
 type BusinessFieldsLoaderProps = {
   children: React.ReactNode;
   onError: (error?: unknown) => void;
-  onSuccess: (payload: { data: BusinessDIData; vaultBusinessData: BusinessDIData }) => void;
+  onSuccess: (payload: BusinessDIData) => void;
 };
 
 const BusinessFieldsLoader = ({ children, onError, onSuccess }: BusinessFieldsLoaderProps) => {
@@ -21,26 +21,20 @@ const BusinessFieldsLoader = ({ children, onError, onSuccess }: BusinessFieldsLo
   } = state.context;
 
   useEffectOnceStrict(() => {
-    if (authToken) {
-      mutDecryptBusiness
-        .mutateAsync({ authToken, fields: BusinessFields })
-        .then(businessData => {
-          const vaultBusinessData: Readonly<BusinessDIData> = omitNullAndUndefined(businessData);
-          const payload = {
-            ...vaultBusinessData,
-          };
-
-          if (kybRequirement.populatedAttributes?.includes(CollectedKybDataOption.tin)) {
-            payload['business.tin'] = 'scrubbed';
-          }
-
-          return onSuccess({
-            data: payload,
-            vaultBusinessData,
-          });
-        })
-        .catch(onError);
+    if (!authToken) {
+      return;
     }
+    mutDecryptBusiness
+      .mutateAsync({ authToken, fields: BusinessFields })
+      .then(businessData => {
+        const payload = omitNullAndUndefined(businessData);
+        if (kybRequirement.populatedAttributes?.includes(CollectedKybDataOption.tin)) {
+          payload['business.tin'] = 'scrubbed';
+        }
+
+        return onSuccess(payload);
+      })
+      .catch(onError);
   });
 
   return children;

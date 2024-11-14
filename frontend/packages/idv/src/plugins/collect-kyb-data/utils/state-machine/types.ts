@@ -40,8 +40,6 @@ export type MachineContext = {
   config?: PublicOnboardingConfig;
   /** Object with ``business.*`` form data */
   data: BusinessDIData;
-  /** Readonly object with decrypted ``business.*`` data */
-  vaultBusinessData?: Readonly<BusinessDIData>;
   dataCollectionScreensToShow: StateValue[];
   isConfirmScreenVisible?: boolean;
 };
@@ -58,10 +56,4 @@ export type MachineEvents =
   | { type: 'setStakeExplanationDialogConfirmed'; payload: boolean }
   | { type: 'stepUpAuthTokenCompleted'; payload: string }
   | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData }
-  | {
-      type: 'businessDataLoadSuccess';
-      payload: {
-        data: BusinessDIData;
-        vaultBusinessData: BusinessDIData;
-      };
-    };
+  | { type: 'businessDataLoadSuccess'; payload: BusinessDIData };

@@ -22,7 +22,7 @@ const useSyncData = () => {
   const [state] = useCollectKybDataMachine();
   const toast = useToast();
   const locale = useL10nContext()?.locale || 'en-US';
-  const { vaultBusinessData } = state.context;
+  const { data: vaultedBusinessData } = state.context;
 
   const syncData = ({ authToken, data, onSuccess, onError, speculative }: SyncDataArgs) => {
     if (!authToken) {
@@ -39,7 +39,7 @@ const useSyncData = () => {
       return;
     }
 
-    const filteredData = omitEqualData(vaultBusinessData, data);
+    const filteredData = omitEqualData(vaultedBusinessData, data);
     const payload = formatPayload(locale, filteredData);
 
     if (Object.keys(payload).length === 0) {

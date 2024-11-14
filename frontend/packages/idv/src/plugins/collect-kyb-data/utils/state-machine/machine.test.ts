@@ -82,7 +82,7 @@ describe('Collect KYB Data Machine Tests', () => {
 
     let { state } = machine;
     expect(state.value).toEqual('loadFromVault');
-    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
     expect(state.value).toEqual('manageBos');
   });
 
@@ -173,7 +173,7 @@ describe('Collect KYB Data Machine Tests', () => {
     let { state } = machine;
     expect(state.value).toEqual('loadFromVault');
 
-    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
     expect(state.value).toEqual('confirm');
   });
 
@@ -192,7 +192,7 @@ describe('Collect KYB Data Machine Tests', () => {
     let { state } = machine;
     expect(state.value).toEqual('loadFromVault');
 
-    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
 
     expect(state.value).toEqual('businessAddress');
 
@@ -243,7 +243,7 @@ describe('Collect KYB Data Machine Tests', () => {
       let { state } = machine;
 
       expect(state.value).toEqual('loadFromVault');
-      state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+      state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
 
       // Collect all fields first
       state = machine.send('basicDataSubmitted', {
@@ -323,7 +323,7 @@ describe('Collect KYB Data Machine Tests', () => {
       let { state } = machine;
 
       expect(state.value).toEqual('loadFromVault');
-      state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+      state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
 
       // Collect all fields first
       state = machine.send('basicDataSubmitted', {
