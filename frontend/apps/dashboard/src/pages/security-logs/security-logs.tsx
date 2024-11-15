@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
+import useSession from 'src/hooks/use-session';
 import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
 import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
@@ -12,6 +13,7 @@ import Timeline from './components/timeline';
 const SecurityLogs = () => {
   const { t } = useTranslation('security-logs');
   const [showDecryptionReason, setShowDecryptionReason] = useState(false);
+  const { data: session } = useSession();
 
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
@@ -19,15 +21,19 @@ const SecurityLogs = () => {
     getAccessEvents.data?.pages.reduce<AuditEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
 
-  const accessEventsToShow = [
-    'decrypt_user_data',
-    // 'create_org_role',
-    // 'update_org_role',
-    // 'deactivate_org_role',
-    // 'invite_org_member',
-    // 'update_org_member',
-    // 'remote_org_member'
+  const accessEventsToShow = ['decrypt_user_data'];
+
+  const extendedAccessEventsToShow = [
+    ...accessEventsToShow,
+    'create_org_role',
+    'update_org_role',
+    'deactivate_org_role',
+    'invite_org_member',
+    'update_org_member',
+    'remote_org_member',
   ];
+
+  const isFirmEmployee = session?.user?.isFirmEmployee;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +58,11 @@ const SecurityLogs = () => {
 
   // NOTE: placeholder for now
   // include other events as we add UI support for them
-  const filteredAuditEvents = auditEvents.filter(auditEvent => accessEventsToShow.includes(auditEvent.name));
+  const filteredAuditEvents = auditEvents.filter(auditEvent =>
+    isFirmEmployee
+      ? extendedAccessEventsToShow.includes(auditEvent.name)
+      : accessEventsToShow.includes(auditEvent.name),
+  );
 
   return (
     <>
