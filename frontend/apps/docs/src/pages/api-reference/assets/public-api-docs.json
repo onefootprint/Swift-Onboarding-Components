@@ -7291,7 +7291,6 @@
                 "enum": [
                     "onboard",
                     "inherit",
-                    "user",
                     "update_auth_methods"
                 ]
             },

@@ -19,8 +19,6 @@ pub struct CreateTokenRequest {
     ///   the `key`.
     /// - `inherit` creates a token that inherits any operation previously requested via the
     ///   dashboard.
-    /// - `user` simply create a token for the user. A playbook key may be provided directly to the
-    ///   Footprint Verify SDK to trigger onboarding.
     /// - `update_auth_methods` creates a token that allows the user to update their contact info
     ///   using the Footprint Auth SDK.
     /// You can find more information on the options [here](https://docs.onefootprint.com/articles/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).
@@ -103,6 +101,7 @@ pub enum TokenOperationKind {
     Inherit,
     /// Simply create a token for the user. A playbook key may be provided directly to the Footprint
     /// Verify SDK to trigger onboarding.
+    #[openapi(skip)]
     User,
     /// Generate a token and link that allows the user to update their contact info
     UpdateAuthMethods,
