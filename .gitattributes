@@ -1,1 +1,10 @@
 frontend/apps/docs/src/pages/api-reference/assets/*.json linguist-generated
+frontend/packages/request-types/types.gen.ts
+frontend/packages/request-types/dashboard.ts
+frontend/packages/fixtures/dashboard.ts
+frontend/packages/fixtures/index.ts
+frontend/packages/fixtures/config/persisted-values.ts
+frontend/packages/axios/index.ts
+frontend/packages/axios/services.gen.ts
+frontend/packages/fetch/index.ts
+frontend/packages/fetch/services.gen.ts
