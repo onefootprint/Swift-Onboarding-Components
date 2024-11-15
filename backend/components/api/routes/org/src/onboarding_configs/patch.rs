@@ -7,7 +7,7 @@ use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationUpdate;
 use db::models::playbook::Playbook;
-use db::models::rule_set_version::RuleSetVersion;
+use db::models::rule_set::RuleSet;
 use newtypes::ApiKeyStatus;
 use newtypes::ObConfigurationId;
 use paperclip::actix::api_v2_operation;
@@ -67,7 +67,7 @@ async fn patch(
             let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::update(conn, &playbook, &obc_id, update)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
-            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            let rs = RuleSet::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))
         })
         .await?;

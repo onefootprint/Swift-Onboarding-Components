@@ -4,7 +4,7 @@ use api_wire_types::HostedWorkflowRequest;
 use db::actor::SaturatedActor;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_set_version::RuleSetVersion;
+use db::models::rule_set::RuleSet;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::models::workflow_request::WorkflowRequest;
@@ -116,7 +116,7 @@ impl
     DbToApi<(
         ObConfiguration,
         Option<SaturatedActor>,
-        Option<RuleSetVersion>,
+        Option<RuleSet>,
         Arc<dyn FeatureFlagClient>,
     )> for api_wire_types::OnboardingConfiguration
 {
@@ -124,7 +124,7 @@ impl
         (ob_config, author, rule_set, _ff_client): (
             ObConfiguration,
             Option<SaturatedActor>,
-            Option<RuleSetVersion>,
+            Option<RuleSet>,
             Arc<dyn FeatureFlagClient>,
         ),
     ) -> Self {

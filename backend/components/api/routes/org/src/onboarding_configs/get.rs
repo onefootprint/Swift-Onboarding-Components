@@ -5,7 +5,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_set_version::RuleSetVersion;
+use db::models::rule_set::RuleSet;
 use newtypes::ObConfigurationId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -30,7 +30,7 @@ async fn get_detail(
         .db_query(move |conn| {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
-            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            let rs = RuleSet::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))
         })
         .await?;

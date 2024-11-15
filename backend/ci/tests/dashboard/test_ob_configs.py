@@ -1510,7 +1510,7 @@ def test_playbook_versions(sandbox_tenant, tenant):
     og_user = og_bifrost.run()
     og_user_vault = get(f"/users/{og_user.fp_id}/vault", None, sandbox_tenant.s_sk)
     assert all(not di.startswith("document.") for di in og_user_vault)
-    
+
     # New onboardings should require the new configuration.
     new_obc = ObConfiguration.from_response(new_obc_resp, sandbox_tenant)
     new_bifrost = BifrostClient.new_user(new_obc)

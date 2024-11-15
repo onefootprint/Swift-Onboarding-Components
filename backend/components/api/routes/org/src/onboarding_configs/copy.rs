@@ -20,7 +20,7 @@ use db::models::ob_configuration::VerificationChecks;
 use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
-use db::models::rule_set_version::RuleSetVersion;
+use db::models::rule_set::RuleSet;
 use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::ObConfigurationId;
@@ -114,7 +114,7 @@ async fn post(
             }
 
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
-            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            let rs = RuleSet::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))
         })
         .await?;

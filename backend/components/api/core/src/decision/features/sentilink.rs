@@ -2,7 +2,7 @@ use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse
 use newtypes::FootprintReasonCode as FRC;
 
 
-// TODO: put thresholds on TVC or RuleSetVersion. We don't want to require a deploy here
+// TODO: put thresholds on TVC or RuleSet. We don't want to require a deploy here
 // Recommendations from Sentilink. Test and adjust for individual Tenants
 // 750-800 high risk
 // 400-700 medium

@@ -14,15 +14,15 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::Locked;
 use newtypes::ObConfigurationId;
-use newtypes::RuleSetVersionId;
+use newtypes::RuleSetId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_set)]
 /// A marker for a particular edit/group of edit's done to a Playbook's rules.
-/// A new Playbook starts with a default set of rules and an initial RuleSetVersion with version=1
+/// A new Playbook starts with a default set of rules and an initial RuleSet with version=1
 /// When any edit(s) are made to rules (edit existing rule, delete a rule, add a new rule or a bulk
-/// combination of those done at once), the latest RuleSetVersion is marked as deactivated and a new
+/// combination of those done at once), the latest RuleSet is marked as deactivated and a new
 /// row is written with version+1 This enables a few things:
 ///  - We can use this table to easily query for different version of rules, and join in what the
 ///    rules looked like at those rule_set.created_seqno (by cross referencing with
@@ -34,9 +34,8 @@ use std::collections::HashMap;
 ///    would indicate that concurrenet edit(s) have occured since the client last retrieved the
 ///    rules and we can error or perhaps in the future provide a way for the user to merge
 ///    conflicting edits.
-// TODO: rename RuleSet
-pub struct RuleSetVersion {
-    pub id: RuleSetVersionId,
+pub struct RuleSet {
+    pub id: RuleSetId,
     pub created_at: DateTime<Utc>,
     pub created_seqno: DataLifetimeSeqno,
     pub _created_at: DateTime<Utc>,
@@ -52,7 +51,7 @@ pub struct RuleSetVersion {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = rule_set)]
-pub struct NewRuleSetVersion {
+pub struct NewRuleSet {
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
     version: i32,
@@ -60,8 +59,8 @@ pub struct NewRuleSetVersion {
     actor: DbActor,
 }
 
-impl RuleSetVersion {
-    #[tracing::instrument("RuleSetVersion::create", skip_all)]
+impl RuleSet {
+    #[tracing::instrument("RuleSet::create", skip_all)]
     pub(crate) fn create(
         conn: &mut TxnPgConn,
         playbook: &Locked<Playbook>,
@@ -72,7 +71,7 @@ impl RuleSetVersion {
         let seqno = DataLifetime::get_next_obc_seqno(conn, playbook)?;
         let now = Utc::now();
 
-        let current: Option<RuleSetVersion> = diesel::update(rule_set::table)
+        let current: Option<RuleSet> = diesel::update(rule_set::table)
             .filter(rule_set::ob_configuration_id.eq(&obc_id))
             .filter(rule_set::deactivated_seqno.is_null())
             .set((
@@ -95,7 +94,7 @@ impl RuleSetVersion {
             }
         }
 
-        let new_rsv = NewRuleSetVersion {
+        let new_rsv = NewRuleSet {
             created_at: now,
             created_seqno: seqno,
             version: current.map(|c| c.version + 1).unwrap_or(1), /* if no RSV exists already, we are
@@ -113,7 +112,7 @@ impl RuleSetVersion {
         Ok((res, seqno, now))
     }
 
-    #[tracing::instrument("RuleSetVersion::get_active", skip_all)]
+    #[tracing::instrument("RuleSet::get_active", skip_all)]
     pub fn get_active(conn: &mut PgConn, obc_id: &ObConfigurationId) -> FpResult<Option<Self>> {
         let res = rule_set::table
             .filter(rule_set::ob_configuration_id.eq(obc_id))
@@ -124,7 +123,7 @@ impl RuleSetVersion {
         Ok(res)
     }
 
-    #[tracing::instrument("RuleSetVersion::bulk_get_active", skip_all)]
+    #[tracing::instrument("RuleSet::bulk_get_active", skip_all)]
     pub fn bulk_get_active(
         conn: &mut PgConn,
         obc_ids: Vec<&ObConfigurationId>,
@@ -134,7 +133,7 @@ impl RuleSetVersion {
             .filter(rule_set::deactivated_seqno.is_null())
             .get_results(conn)?
             .into_iter()
-            .map(|rs: RuleSetVersion| (rs.ob_configuration_id.clone(), rs))
+            .map(|rs: RuleSet| (rs.ob_configuration_id.clone(), rs))
             .collect();
 
         Ok(res)
@@ -157,18 +156,16 @@ mod tests {
             ObConfigurationOpts { ..Default::default() },
         );
 
-        let (rsv1, _, _) =
-            RuleSetVersion::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
+        let (rsv1, _, _) = RuleSet::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
         assert_eq!(1, rsv1.version);
         assert!(rsv1.deactivated_seqno.is_none());
 
-        let (rsv2, _, _) =
-            RuleSetVersion::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
+        let (rsv2, _, _) = RuleSet::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
         assert_eq!(2, rsv2.version);
         assert!(rsv2.deactivated_seqno.is_none());
 
         // reload rsv1 and confirm it is deactivated
-        let rsv1: RuleSetVersion = rule_set::table
+        let rsv1: RuleSet = rule_set::table
             .filter(rule_set::id.eq(rsv1.id))
             .get_result(conn.conn())
             .unwrap();
@@ -186,14 +183,14 @@ mod tests {
             ObConfigurationOpts { ..Default::default() },
         );
 
-        RuleSetVersion::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
+        RuleSet::create(conn, &playbook, &obc.id, None, DbActor::Footprint).unwrap();
 
         // no error when correct version is given
-        RuleSetVersion::create(conn, &playbook, &obc.id, Some(1), DbActor::Footprint).unwrap();
+        RuleSet::create(conn, &playbook, &obc.id, Some(1), DbActor::Footprint).unwrap();
 
         // error when old version is given
         assert_eq!(
-            RuleSetVersion::create(conn, &playbook, &obc.id, Some(1), DbActor::Footprint)
+            RuleSet::create(conn, &playbook, &obc.id, Some(1), DbActor::Footprint)
                 .unwrap_err()
                 .message(),
             "Expected version 1 but latest version is 2"

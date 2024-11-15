@@ -18,10 +18,10 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
-use db::models::rule_set_version::RuleSetVersion;
+use db::models::rule_set::RuleSet;
 use itertools::Itertools;
 use newtypes::PlaybookId;
-use newtypes::RuleSetVersionId;
+use newtypes::RuleSetId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::put;
 use paperclip::actix::web;
@@ -75,8 +75,8 @@ pub async fn put_create_version(
                 let auth_actor = actor;
                 let (new_obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;
 
-                let rs = RuleSetVersion {
-                    id: RuleSetVersionId::default(),
+                let rs = RuleSet {
+                    id: RuleSetId::default(),
                     created_at: Utc::now(),
                     created_seqno: DataLifetime::get_current_seqno(conn.conn())?,
                     _created_at: Utc::now(),
@@ -106,7 +106,7 @@ pub async fn put_create_version(
             }
 
             let (new_obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;
-            let new_rs = RuleSetVersion::get_active(conn, &new_obc.id)?;
+            let new_rs = RuleSet::get_active(conn, &new_obc.id)?;
             Ok((new_obc, actor, new_rs))
         })
         .await?;

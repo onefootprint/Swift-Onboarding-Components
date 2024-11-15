@@ -1,5 +1,5 @@
 use super::playbook::Playbook;
-use super::rule_set_version::RuleSetVersion;
+use super::rule_set::RuleSet;
 use super::tenant::Tenant;
 use super::workflow::Workflow;
 use crate::actor;
@@ -516,7 +516,7 @@ pub struct ObConfigurationQuery {
     pub include_deactivated_versions: bool,
 }
 
-pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>, Option<RuleSetVersion>);
+pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>, Option<RuleSet>);
 
 pub type TenantObConfigCounts = HashMap<TenantId, i64>;
 
@@ -562,7 +562,7 @@ impl ObConfiguration {
         }
         let results = query.load::<Self>(conn)?;
         let obc_ids = results.iter().map(|obc| &obc.id).collect();
-        let mut rule_sets = RuleSetVersion::bulk_get_active(conn, obc_ids)?;
+        let mut rule_sets = RuleSet::bulk_get_active(conn, obc_ids)?;
         let results = actor::saturate_actors_nullable(conn, results)?;
         let results = results
             .into_iter()

@@ -3,7 +3,7 @@ use super::ob_configuration::ObConfiguration;
 use super::playbook::Playbook;
 use super::rule_instance_references_list::NewRuleInstanceReferencesList;
 use super::rule_instance_references_list::RuleInstanceReferencesList;
-use super::rule_set_version::RuleSetVersion;
+use super::rule_set::RuleSet;
 use crate::DbError;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -152,7 +152,7 @@ impl RuleInstance {
         } = update;
 
         let (_, seqno, now) =
-            RuleSetVersion::create(conn, playbook, obc_id, expected_rule_set_version, actor.clone())?;
+            RuleSet::create(conn, playbook, obc_id, expected_rule_set_version, actor.clone())?;
 
         let list_ids = new_rules
             .iter()
@@ -442,7 +442,7 @@ pub enum IncludeRules {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::rule_set_version::RuleSetVersion;
+    use crate::models::rule_set::RuleSet;
     use crate::tests::prelude::*;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
@@ -486,13 +486,7 @@ mod tests {
         assert_eq!(expression, rule.rule_expression);
         assert_eq!(action, rule.action);
         assert!(rule.deactivated_seqno.is_none());
-        assert_eq!(
-            1,
-            RuleSetVersion::get_active(conn, &obc.id)
-                .unwrap()
-                .unwrap()
-                .version
-        );
+        assert_eq!(1, RuleSet::get_active(conn, &obc.id).unwrap().unwrap().version);
     }
 
     #[db_test]
@@ -546,13 +540,7 @@ mod tests {
             RuleInstance::bulk_create(conn, &playbook, &obc.id, &DbActor::Footprint, vec![r1, r2, r3])
                 .unwrap();
         assert_eq!(3, rules.len());
-        assert_eq!(
-            1,
-            RuleSetVersion::get_active(conn, &obc.id)
-                .unwrap()
-                .unwrap()
-                .version
-        );
+        assert_eq!(1, RuleSet::get_active(conn, &obc.id).unwrap().unwrap().version);
     }
 
     #[db_test]
@@ -654,13 +642,7 @@ mod tests {
             .unwrap()
             .pop()
             .unwrap();
-        assert_eq!(
-            1,
-            RuleSetVersion::get_active(conn, &obc.id)
-                .unwrap()
-                .unwrap()
-                .version
-        );
+        assert_eq!(1, RuleSet::get_active(conn, &obc.id).unwrap().unwrap().version);
 
         let update = RuleInstanceUpdate {
             rule_id: rule.rule_id.clone(),
@@ -701,13 +683,7 @@ mod tests {
         );
 
         // new RSV has been written for this update
-        assert_eq!(
-            2,
-            RuleSetVersion::get_active(conn, &obc.id)
-                .unwrap()
-                .unwrap()
-                .version
-        );
+        assert_eq!(2, RuleSet::get_active(conn, &obc.id).unwrap().unwrap().version);
     }
 
     #[db_test]
@@ -739,13 +715,7 @@ mod tests {
             },
         )
         .unwrap();
-        assert_eq!(
-            1,
-            RuleSetVersion::get_active(conn, &obc.id)
-                .unwrap()
-                .unwrap()
-                .version
-        );
+        assert_eq!(1, RuleSet::get_active(conn, &obc.id).unwrap().unwrap().version);
         assert_eq!(5, rules.len());
         assert_eq!(
             5,
@@ -796,13 +766,7 @@ mod tests {
             },
         )
         .unwrap();
-        assert_eq!(
-            2,
-            RuleSetVersion::get_active(conn, &obc.id)
-                .unwrap()
-                .unwrap()
-                .version
-        );
+        assert_eq!(2, RuleSet::get_active(conn, &obc.id).unwrap().unwrap().version);
         assert_eq!(6, edits.len()); // 6 new RuleInstance's are returned (2 additions, 2 edits, 2 deletes)
         assert!(edits
             .iter()
