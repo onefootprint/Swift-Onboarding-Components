@@ -1,7 +1,6 @@
 mod aws_selfie_doc;
 mod backfill;
 mod decrypt;
-mod default_rules;
 mod incode;
 mod org;
 mod samba;
@@ -28,7 +27,6 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(token_reveal::post)
         .service(decrypt::post)
         .service(aws_selfie_doc::post)
-        .service(default_rules::add_default_rules)
         .service(sandbox_tenant::post)
         .service(webhooks::post)
         .service(org::update_business_info)
