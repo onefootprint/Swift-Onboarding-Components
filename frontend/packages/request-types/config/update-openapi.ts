@@ -1,5 +1,6 @@
+import deepmerge from 'deepmerge';
 import fs from 'fs/promises';
-import { startCase, toLower } from 'lodash';
+import { partition, startCase, toLower } from 'lodash';
 import type {
   OpenAPIObject,
   OperationObject,
@@ -85,6 +86,41 @@ const createHeadersFromSecuritySchemes = (openAPI: OpenAPIObject) => {
   return openAPICopy;
 };
 
+/** Our open API spec utilizes `allOf` to overlay additional properties / attributes on top of a referenced schema. This merges the allOf entries into a single schema where possible. */
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const mergeAllOf = (schema: any): any => {
+  if (Array.isArray(schema)) {
+    return schema.map(s => mergeAllOf(s));
+  }
+  if (typeof schema !== 'object' || !schema) {
+    return schema;
+  }
+
+  let finalSchema = schema;
+  if (schema.allOf?.length) {
+    const [allOfWithProperties, allOfToMerge] = partition(schema.allOf, s => !!Object.keys(s.properties || {}).length);
+    // Merge the simple allOf entries that _don't_ have properties into a single schema.
+    // This allows overlaying descriptions / extensions on top of a referenced schema.
+    // But, if an entry has properties, leave it unchanged.
+    const mergedAllOf = allOfToMerge.reduce((acc, s) => deepmerge(acc, s), {});
+
+    if (!allOfToMerge.length) {
+      // Leave unchanged
+    } else if (allOfWithProperties.length) {
+      finalSchema.allOf = [mergedAllOf, ...allOfWithProperties];
+    } else {
+      // Replace the schema entirely with the merged contents
+      finalSchema = mergedAllOf;
+    }
+  }
+
+  return Object.fromEntries(
+    Object.entries(finalSchema).map(([k, v]) => {
+      return [k, mergeAllOf(v)];
+    }),
+  );
+};
+
 // Function to provide a hotfix to the openAPI schema to unblock the frontend
 export const updateOpenApi = async (filePath: string, tempPath: string) => {
   const openAPIContent = await fs.readFile(filePath, 'utf-8');
@@ -113,5 +149,7 @@ export const updateOpenApi = async (filePath: string, tempPath: string) => {
 
   const openAPIWithHeaders = createHeadersFromSecuritySchemes(openAPI);
 
-  await fs.writeFile(tempPath, JSON.stringify(openAPIWithHeaders, null, 2));
+  const openAPIMerged = mergeAllOf(openAPIWithHeaders);
+
+  await fs.writeFile(tempPath, JSON.stringify(openAPIMerged, null, 2));
 };

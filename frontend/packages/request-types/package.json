@@ -15,12 +15,14 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.53.11",
+    "@openapitools/openapi-generator-cli": "^2.15.3",
     "@types/lodash": "^4.17.13",
     "@types/node": "^20",
+    "deepmerge": "^4.3.1",
     "lodash": "^4.17.21",
     "openapi3-ts": "^4.4.0",
     "tsconfig": "workspace:*",
-    "typescript": "^5.6.3",
-    "@openapitools/openapi-generator-cli": "^2.15.3"
-  }
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {}
 }

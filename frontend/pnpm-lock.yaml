@@ -2391,6 +2391,9 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.12.14
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21

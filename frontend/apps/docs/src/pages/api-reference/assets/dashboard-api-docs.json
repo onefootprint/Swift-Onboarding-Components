@@ -10063,7 +10063,15 @@
                         "format": "date-time"
                     },
                     "insight": {
-                        "$ref": "#/components/schemas/InsightEvent"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InsightEvent"
+                            },
+                            {
+                                "description": "Information on from where the auth occurred",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "kind": {
                         "$ref": "#/components/schemas/AuthEventKind"
@@ -10194,10 +10202,26 @@
                         }
                     },
                     "tin": {
-                        "$ref": "#/components/schemas/InsightTin"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InsightTin"
+                            },
+                            {
+                                "description": "Information about the provided TIN",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "website": {
-                        "$ref": "#/components/schemas/InsightWebsite"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InsightWebsite"
+                            },
+                            {
+                                "description": "Info on the website provided",
+                                "type": "object"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -10215,7 +10239,15 @@
                         }
                     },
                     "details": {
-                        "$ref": "#/components/schemas/BusinessDetail"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BusinessDetail"
+                            },
+                            {
+                                "description": "Details about the business",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "names": {
                         "description": "Information about names (DBA/Legal) that were submitted and found associated with the\n business",
@@ -10239,7 +10271,15 @@
                         }
                     },
                     "watchlist": {
-                        "$ref": "#/components/schemas/InsightWatchlist"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InsightWatchlist"
+                            },
+                            {
+                                "description": "Watchlist results from screening the submitted + found people + biz names",
+                                "type": "object"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -10300,7 +10340,6 @@
                 }
             },
             "ClientIdentity": {
-                "description": "A certificate and key to authenticate via mTLS\n omit to not make changes, set to null to remove",
                 "type": "object",
                 "properties": {
                     "certificate": {
@@ -10475,7 +10514,15 @@
                 "type": "object",
                 "properties": {
                     "assigned_to": {
-                        "$ref": "#/components/schemas/LiteUserAndOrg"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LiteUserAndOrg"
+                            },
+                            {
+                                "description": "None if the doc is unassigned.",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "kind": {
                         "$ref": "#/components/schemas/TenantKind"
@@ -10756,7 +10803,6 @@
                 ]
             },
             "ContactInfoKind": {
-                "description": "When a link was requested to be sent, the method by which the link was sent",
                 "type": "string",
                 "enum": [
                     "phone",
@@ -10867,7 +10913,15 @@
                 "type": "object",
                 "properties": {
                     "delivery_method": {
-                        "$ref": "#/components/schemas/ContactInfoKind"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ContactInfoKind"
+                            },
+                            {
+                                "description": "When a link was requested to be sent, the method by which the link was sent",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "expires_at": {
                         "type": "string",
@@ -11101,7 +11155,15 @@
                         "type": "string"
                     },
                     "client_identity": {
-                        "$ref": "#/components/schemas/ClientIdentity"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ClientIdentity"
+                            },
+                            {
+                                "description": "A certificate and key to authenticate via mTLS. Omit to skip client-certificate\n authentication",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "headers": {
                         "description": "Custom headers",
@@ -11439,7 +11501,15 @@
                         "type": "string"
                     },
                     "identifier": {
-                        "$ref": "#/components/schemas/DataIdentifier"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DataIdentifier"
+                            },
+                            {
+                                "description": "Custom document identifier under which the document will be vaulted",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "name": {
                         "description": "The human-readable name of the document to display to the user",
@@ -12101,7 +12171,15 @@
                         "format": "double"
                     },
                     "review_status": {
-                        "$ref": "#/components/schemas/DocumentReviewStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DocumentReviewStatus"
+                            },
+                            {
+                                "description": "Non-null for images uploaded via bifrost",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "samba_activity_history_completed_version": {
                         "type": "integer",
@@ -12116,7 +12194,15 @@
                         "format": "date-time"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/DocumentStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DocumentStatus"
+                            },
+                            {
+                                "description": "Non-null for images uploaded via bifrost",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "status_description": {
                         "type": "string"
@@ -12340,7 +12426,6 @@
                 ]
             },
             "DocumentReviewStatus": {
-                "description": "Non-null for images uploaded via bifrost",
                 "type": "string",
                 "enum": [
                     "unreviewed",
@@ -12565,7 +12650,15 @@
                         "type": "boolean"
                     },
                     "kind": {
-                        "$ref": "#/components/schemas/VaultKind"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/VaultKind"
+                            },
+                            {
+                                "description": "The kind of entity: Person or Business",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "label": {
                         "$ref": "#/components/schemas/LabelKind"
@@ -13797,11 +13890,18 @@
                 ]
             },
             "IngressSettings": {
-                "description": "Ingress configuration\n omit to not change, set to null to remove",
                 "type": "object",
                 "properties": {
                     "content_type": {
-                        "$ref": "#/components/schemas/ProxyIngressContentType"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ProxyIngressContentType"
+                            },
+                            {
+                                "description": "Ingress content type",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "rules": {
                         "description": "Ingress rules",
@@ -13894,7 +13994,6 @@
                 ]
             },
             "InsightEvent": {
-                "description": "Information on from where the auth occurred",
                 "type": "object",
                 "properties": {
                     "city": {
@@ -14043,7 +14142,6 @@
                 ]
             },
             "InsightTin": {
-                "description": "Information about the provided TIN",
                 "type": "object",
                 "properties": {
                     "tin": {
@@ -14059,7 +14157,6 @@
                 ]
             },
             "InsightWatchlist": {
-                "description": "Watchlist results from screening the submitted + found people + biz names",
                 "type": "object",
                 "properties": {
                     "business": {
@@ -14087,7 +14184,6 @@
                 ]
             },
             "InsightWebsite": {
-                "description": "Info on the website provided",
                 "type": "object",
                 "properties": {
                     "url": {
@@ -15182,7 +15278,6 @@
                 ]
             },
             "LiteUserAndOrg": {
-                "description": "None if the doc is unassigned.",
                 "type": "object",
                 "properties": {
                     "org": {
@@ -17117,7 +17212,15 @@
                         }
                     },
                     "client_identity": {
-                        "$ref": "#/components/schemas/ClientIdentity"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ClientIdentity"
+                            },
+                            {
+                                "description": "A certificate and key to authenticate via mTLS\n omit to not make changes, set to null to remove",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "delete_secret_headers": {
                         "description": "A list of secret headers to delete (by it's ID)",
@@ -17134,7 +17237,15 @@
                         }
                     },
                     "ingress_settings": {
-                        "$ref": "#/components/schemas/IngressSettings"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/IngressSettings"
+                            },
+                            {
+                                "description": "Ingress configuration\n omit to not change, set to null to remove",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "method": {
                         "description": "HTTP method: POST, GET, PUT, PATCH, DELETE",
@@ -17152,7 +17263,15 @@
                         }
                     },
                     "status": {
-                        "$ref": "#/components/schemas/ApiKeyStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ApiKeyStatus"
+                            },
+                            {
+                                "description": "Enable or disable the config",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "url": {
                         "description": "The proxy destination URL. Can include path and query params",
@@ -17233,7 +17352,15 @@
                         "format": "int32"
                     },
                     "ownership_stake_di": {
-                        "$ref": "#/components/schemas/DataIdentifier"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DataIdentifier"
+                            },
+                            {
+                                "description": "The vault field that can be used to update the ownership stake.",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "source": {
                         "$ref": "#/components/schemas/BusinessOwnerSource"
@@ -17362,7 +17489,15 @@
                         "type": "string"
                     },
                     "ingress_content_type": {
-                        "$ref": "#/components/schemas/ProxyIngressContentType"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ProxyIngressContentType"
+                            },
+                            {
+                                "description": "The content type expected to be received from responses from the upstream.",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "ingress_rules": {
                         "type": "array",
@@ -17417,7 +17552,6 @@
                 ]
             },
             "ProxyIngressContentType": {
-                "description": "The content type expected to be received from responses from the upstream.",
                 "type": "string",
                 "enum": [
                     "json"
@@ -17431,7 +17565,15 @@
                         "type": "string"
                     },
                     "token": {
-                        "$ref": "#/components/schemas/DataIdentifier"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DataIdentifier"
+                            },
+                            {
+                                "description": "The token data identifier to vault as",
+                                "type": "string"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -20824,7 +20966,6 @@
                 ]
             },
             "VaultKind": {
-                "description": "The kind of entity: Person or Business",
                 "type": "string",
                 "enum": [
                     "person",

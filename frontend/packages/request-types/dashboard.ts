@@ -324,6 +324,9 @@ export type AuditEventOrgMember = {
 };
 export type AuthEvent = {
   createdAt: string;
+  /**
+   * Information on from where the auth occurred
+   */
   insight?: InsightEvent;
   kind: AuthEventKind;
   /**
@@ -374,7 +377,13 @@ export type BusinessDetail = {
    * Info on the phone numbers provided
    */
   phoneNumbers: Array<InsightPhone>;
+  /**
+   * Information about the provided TIN
+   */
   tin?: InsightTin;
+  /**
+   * Info on the website provided
+   */
   website?: InsightWebsite;
 };
 export type BusinessInsights = {
@@ -382,6 +391,9 @@ export type BusinessInsights = {
    * Addresses (found + submitted)
    */
   addresses: Array<InsightAddress>;
+  /**
+   * Details about the business
+   */
   details?: BusinessDetail;
   /**
    * Information about names (DBA/Legal) that were submitted and found associated with the
@@ -396,6 +408,9 @@ export type BusinessInsights = {
    * Information about governmental registrations
    */
   registrations: Array<InsightRegistration>;
+  /**
+   * Watchlist results from screening the submitted + found people + biz names
+   */
   watchlist?: InsightWatchlist;
 };
 export type BusinessOwnerKind = 'primary' | 'secondary';
@@ -419,10 +434,6 @@ export type ClientDecryptRequest = {
    */
   transforms?: Array<FilterFunction>;
 };
-/**
- * A certificate and key to authenticate via mTLS
- * omit to not make changes, set to null to remove
- */
 export type ClientIdentity = {
   /**
    * PEM encoded x509 cert
@@ -497,6 +508,9 @@ export type ComplianceDocEvent = {
   timestamp: string;
 };
 export type ComplianceDocEventAssigned = {
+  /**
+   * None if the doc is unassigned.
+   */
   assignedTo?: LiteUserAndOrg;
   kind: TenantKind;
 };
@@ -574,9 +588,6 @@ export type ComplianceDocTemplateVersion = {
   name: string;
   templateId: string;
 };
-/**
- * When a link was requested to be sent, the method by which the link was sent
- */
 export type ContactInfoKind = 'phone' | 'email';
 export type CopyPlaybookRequest = {
   /**
@@ -611,6 +622,9 @@ export type CreateEntityTokenRequest = {
   sendLink: boolean;
 };
 export type CreateEntityTokenResponse = {
+  /**
+   * When a link was requested to be sent, the method by which the link was sent
+   */
   deliveryMethod?: ContactInfoKind;
   expiresAt: string;
   link: string;
@@ -686,6 +700,10 @@ export type CreateProxyConfigRequest = {
    * Access reason to use during proxy decryptions
    */
   accessReason?: string;
+  /**
+   * A certificate and key to authenticate via mTLS. Omit to skip client-certificate
+   * authentication
+   */
   clientIdentity?: ClientIdentity;
   /**
    * Custom headers
@@ -828,6 +846,9 @@ export type CustomDocumentConfig = {
    * Optional human-readable description of the document that will be displayed to the user
    */
   description?: string;
+  /**
+   * Custom document identifier under which the document will be vaulted
+   */
   identifier: DataIdentifier;
   /**
    * The human-readable name of the document to display to the user
@@ -1235,10 +1256,16 @@ export type Document = {
   documentScore?: number;
   kind: DocumentKind;
   ocrConfidenceScore?: number;
+  /**
+   * Non-null for images uploaded via bifrost
+   */
   reviewStatus?: DocumentReviewStatus;
   sambaActivityHistoryCompletedVersion?: number;
   selfieScore?: number;
   startedAt?: string;
+  /**
+   * Non-null for images uploaded via bifrost
+   */
   status?: DocumentStatus;
   statusDescription?: string;
   uploads: Array<DocumentUpload>;
@@ -1330,9 +1357,6 @@ export type kind5 = 'identity';
  * Auto-generated discriminant enum variants
  */
 export type DocumentRequestKind = 'identity' | 'proof_of_ssn' | 'proof_of_address' | 'custom';
-/**
- * Non-null for images uploaded via bifrost
- */
 export type DocumentReviewStatus =
   | 'unreviewed'
   | 'not_needed'
@@ -1413,6 +1437,9 @@ export type Entity = {
   isCreatedViaApi: boolean;
   isIdentifiable: boolean;
   isPortable: boolean;
+  /**
+   * The kind of entity: Person or Business
+   */
   kind: VaultKind;
   label?: LabelKind;
   lastActivityAt: string;
@@ -2527,11 +2554,10 @@ export type InProgressOnboardingTenant = {
   name: string;
   websiteUrl?: string;
 };
-/**
- * Ingress configuration
- * omit to not change, set to null to remove
- */
 export type IngressSettings = {
+  /**
+   * Ingress content type
+   */
   contentType: ProxyIngressContentType;
   /**
    * Ingress rules
@@ -2578,9 +2604,6 @@ export type InsightBusinessName = {
    */
   verified?: boolean;
 };
-/**
- * Information on from where the auth occurred
- */
 export type InsightEvent = {
   city?: string;
   country?: string;
@@ -2643,9 +2666,6 @@ export type InsightRegistration = {
   status?: string;
   subStatus?: string;
 };
-/**
- * Information about the provided TIN
- */
 export type InsightTin = {
   tin?: string;
   /**
@@ -2653,9 +2673,6 @@ export type InsightTin = {
    */
   verified: boolean;
 };
-/**
- * Watchlist results from screening the submitted + found people + biz names
- */
 export type InsightWatchlist = {
   /**
    * Watchlist entries for the submitted + found biz names
@@ -2667,9 +2684,6 @@ export type InsightWatchlist = {
    */
   people: Array<WatchlistEntry>;
 };
-/**
- * Info on the website provided
- */
 export type InsightWebsite = {
   url: string;
   verified?: boolean;
@@ -3364,9 +3378,6 @@ export type LiteOrgMember = {
   id: string;
   lastName?: string;
 };
-/**
- * None if the doc is unassigned.
- */
 export type LiteUserAndOrg = {
   org: string;
   user: LiteOrgMember;
@@ -4033,6 +4044,10 @@ export type PatchProxyConfigRequest = {
    * Custom headers containing auth secrets to add
    */
   addSecretHeaders?: Array<SecretCustomHeader>;
+  /**
+   * A certificate and key to authenticate via mTLS
+   * omit to not make changes, set to null to remove
+   */
   clientIdentity?: ClientIdentity;
   /**
    * A list of secret headers to delete (by it's ID)
@@ -4042,6 +4057,10 @@ export type PatchProxyConfigRequest = {
    * Custom headers
    */
   headers?: Array<PlainCustomHeader>;
+  /**
+   * Ingress configuration
+   * omit to not change, set to null to remove
+   */
   ingressSettings?: IngressSettings;
   /**
    * HTTP method: POST, GET, PUT, PATCH, DELETE
@@ -4058,6 +4077,9 @@ export type PatchProxyConfigRequest = {
    * presented by the proxy
    */
   pinnedServerCertificates?: Array<string>;
+  /**
+   * Enable or disable the config
+   */
   status?: ApiKeyStatus;
   /**
    * The proxy destination URL. Can include path and query params
@@ -4107,6 +4129,9 @@ export type PrivateBusinessOwner = {
   kind: BusinessOwnerKind;
   name?: string;
   ownershipStake?: number;
+  /**
+   * The vault field that can be used to update the ownership stake.
+   */
   ownershipStakeDi: DataIdentifier;
   source: BusinessOwnerSource;
   status?: OnboardingStatus;
@@ -4153,6 +4178,9 @@ export type ProxyConfigDetailed = {
    */
   headers: Array<PlainCustomHeader>;
   id: string;
+  /**
+   * The content type expected to be received from responses from the upstream.
+   */
   ingressContentType?: ProxyIngressContentType;
   ingressRules: Array<ProxyIngressRule>;
   isLive: boolean;
@@ -4177,15 +4205,15 @@ export type ProxyConfigDetailed = {
    */
   url: string;
 };
-/**
- * The content type expected to be received from responses from the upstream.
- */
 export type ProxyIngressContentType = 'json';
 export type ProxyIngressRule = {
   /**
    * The target path to extract
    */
   target: string;
+  /**
+   * The token data identifier to vault as
+   */
   token: DataIdentifier;
 };
 export type RawUserDataRequest = {
@@ -6004,9 +6032,6 @@ export type VaultDrStatus = {
   orgId: string;
   orgName: string;
 };
-/**
- * The kind of entity: Person or Business
- */
 export type VaultKind = 'person' | 'business';
 export type VaultOperation =
   | {

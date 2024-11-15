@@ -130,6 +130,9 @@ export type CustomDocumentConfig = {
    * Optional human-readable description of the document that will be displayed to the user
    */
   description?: string;
+  /**
+   * Custom document identifier under which the document will be vaulted
+   */
   identifier: DataIdentifier;
   /**
    * The human-readable name of the document to display to the user
@@ -648,6 +651,9 @@ export type HostedBusiness = {
   name: string;
 };
 export type HostedBusinessDetail = {
+  /**
+   * The basic data provided for the user accepting this invitation.
+   */
   invitedData: ModernUserDecryptResponse;
   inviter: Inviter;
   name: string;
@@ -679,10 +685,6 @@ export type HostedUserDecryptRequest = {
 export type HostedValidateResponse = {
   validationToken: string;
 };
-/**
- * Context on what information is specifically requested from the user, if any.
- * NOTE: This is not actually a property of the ob configuration.
- */
 export type HostedWorkflowRequest = {
   config: WorkflowRequestConfig;
   note?: string;
@@ -700,9 +702,6 @@ export type IdDocKind =
   | 'visa'
   | 'residence_document'
   | 'voter_identification';
-/**
- * All of the context on the identified user, if found
- */
 export type IdentifiedUser = {
   authMethods: Array<IdentifyAuthMethod>;
   availableChallengeKinds: Array<ChallengeKind>;
@@ -755,9 +754,16 @@ export type IdentifyRequest = {
   email?: string;
   identifier?: IdentifyId;
   phoneNumber?: string;
+  /**
+   * Determines which scopes the issued auth token will have. Request the correct scopes for your
+   * use case in order to get the least permissions required
+   */
   scope: IdentifyScope;
 };
 export type IdentifyResponse = {
+  /**
+   * All of the context on the identified user, if found
+   */
   user?: IdentifiedUser;
 };
 export type IdentifyScope = 'my1fp' | 'onboarding' | 'auth';
@@ -767,6 +773,10 @@ export type IdentifyVerifyRequest = {
    * Opaque challenge state token
    */
   challengeToken: string;
+  /**
+   * Determines which scopes the issued auth token will have. Request the correct scopes for your
+   * use case in order to get the least permissions required
+   */
   scope: IdentifyScope;
 };
 export type IdentifyVerifyResponse = {
@@ -1760,6 +1770,10 @@ export type PublicOnboardingConfiguration = {
   supportEmail?: string;
   supportPhone?: string;
   supportWebsite?: string;
+  /**
+   * Context on what information is specifically requested from the user, if any.
+   * NOTE: This is not actually a property of the ob configuration.
+   */
   workflowRequest?: HostedWorkflowRequest;
 };
 export type RegisterPasskeyAttemptContext = {
@@ -1864,11 +1878,18 @@ export type UserChallengeData = {
   token: string;
 };
 export type UserChallengeRequest = {
+  /**
+   * Specifies whether to add the new auth method alongside existing auth methods or replace the
+   * existing method.
+   */
   actionKind: ActionKind;
   /**
    * If the challenge kind is email, the email address to send the challenge to
    */
   email?: string;
+  /**
+   * The kind of auth method for which to initiate a challenge
+   */
   kind: AuthMethodKind;
   /**
    * If the challenge kind is SMS, the phone number to send the challenge to

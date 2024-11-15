@@ -4658,7 +4658,15 @@
                         }
                     },
                     "scope": {
-                        "$ref": "#/components/schemas/ModernClientTokenScopeKind"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ModernClientTokenScopeKind"
+                            },
+                            {
+                                "description": "Specify the permissions of this token.\n - `vault` allows writing to the specified fields.\n - `decrypt` allows decrypting the specified fields.\n - `vault_and_decrypt` allows both.\n - `decrypt_download` allows decrypting a single piece of data as a file.\n - `vault_card` is a shorthand to generate a token to vault a card with a random alias.",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "ttl": {
                         "example": 300,
@@ -4774,7 +4782,15 @@
                         "type": "string"
                     },
                     "kind": {
-                        "$ref": "#/components/schemas/TokenOperationKind"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TokenOperationKind"
+                            },
+                            {
+                                "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the\n   Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/articles/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "limit_auth_methods": {
                         "example": null,
@@ -5053,7 +5069,15 @@
                         "type": "boolean"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/OnboardingStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OnboardingStatus"
+                            },
+                            {
+                                "description": "The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).",
+                                "type": "string"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -5878,7 +5902,6 @@
                 ]
             },
             "InsightEvent": {
-                "description": "Information on from where the auth occurred",
                 "type": "object",
                 "properties": {
                     "city": {
@@ -6365,7 +6388,6 @@
                 ]
             },
             "ModernClientTokenScopeKind": {
-                "description": "Specify the permissions of this token.\n - `vault` allows writing to the specified fields.\n - `decrypt` allows decrypting the specified fields.\n - `vault_and_decrypt` allows both.\n - `decrypt_download` allows decrypting a single piece of data as a file.\n - `vault_card` is a shorthand to generate a token to vault a card with a random alias.",
                 "type": "string",
                 "enum": [
                     "vault",
@@ -6562,7 +6584,15 @@
                         "format": "date-time"
                     },
                     "insight": {
-                        "$ref": "#/components/schemas/PublicInsightEvent"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicInsightEvent"
+                            },
+                            {
+                                "description": "Information on from where the auth occurred",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "kind": {
                         "$ref": "#/components/schemas/ModernAuthEventKind"
@@ -6581,7 +6611,15 @@
                         "format": "date-time"
                     },
                     "document_type": {
-                        "$ref": "#/components/schemas/DocumentKind"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DocumentKind"
+                            },
+                            {
+                                "description": "Document type of the successfully uploaded document. Can be used to fetch from vault",
+                                "type": "string"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -6615,7 +6653,6 @@
                 ]
             },
             "PublicInsightEvent": {
-                "description": "Information on from where the auth occurred",
                 "type": "object",
                 "properties": {
                     "city": {
@@ -6716,7 +6753,15 @@
                         "type": "string"
                     },
                     "reason_code": {
-                        "$ref": "#/components/schemas/FootprintReasonCode"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/FootprintReasonCode"
+                            },
+                            {
+                                "example": "address_does_not_match",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "scopes": {
                         "example": [
@@ -6728,7 +6773,15 @@
                         }
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/SignalSeverity"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SignalSeverity"
+                            },
+                            {
+                                "example": "high",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "timestamp": {
                         "type": "string",
@@ -6766,7 +6819,15 @@
                         }
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/SignalSeverity"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SignalSeverity"
+                            },
+                            {
+                                "description": "An indication of importance",
+                                "type": "string"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -6778,7 +6839,6 @@
                 ]
             },
             "PublicWorkflowRequest": {
-                "description": "When non-null, there is additional info pending collection from this user. In this case, you\n may create a token for this user with the `inherit` operation. This token can be used to\n collect any outstanding information.",
                 "type": "object",
                 "properties": {
                     "note": {
@@ -7212,8 +7272,6 @@
                 ]
             },
             "SimpleFixtureResult": {
-                "example": null,
-                "description": "(only valid for sandbox users) choose the desired KYC outcome.",
                 "type": "string",
                 "enum": [
                     "fail",
@@ -7245,7 +7303,16 @@
                         "type": "boolean"
                     },
                     "fixture_result": {
-                        "$ref": "#/components/schemas/SimpleFixtureResult"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SimpleFixtureResult"
+                            },
+                            {
+                                "example": null,
+                                "description": "(only valid for sandbox businesses) choose the desired KYB outcome",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "key": {
                         "description": "The publishable key of the playbook onto which you would like this business to onboard.\n The playbook will specify required information and the rules by which to make a KYB\n decision.",
@@ -7264,7 +7331,16 @@
                         "type": "boolean"
                     },
                     "fixture_result": {
-                        "$ref": "#/components/schemas/SimpleFixtureResult"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SimpleFixtureResult"
+                            },
+                            {
+                                "example": null,
+                                "description": "(only valid for sandbox users) choose the desired KYC outcome.",
+                                "type": "string"
+                            }
+                        ]
                     },
                     "key": {
                         "description": "The publishable key of the playbook onto which you would like this user to onboard. The\n playbook will specify required information and the rules by which to make a KYC decision.",
@@ -7342,7 +7418,15 @@
                         "type": "string"
                     },
                     "requires_additional_info": {
-                        "$ref": "#/components/schemas/PublicWorkflowRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicWorkflowRequest"
+                            },
+                            {
+                                "description": "When non-null, there is additional info pending collection from this user. In this case, you\n may create a token for this user with the `inherit` operation. This token can be used to\n collect any outstanding information.",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "requires_manual_review": {
                         "type": "boolean"
@@ -7358,7 +7442,6 @@
                 ]
             },
             "UserAuthResponse": {
-                "description": "Information on the authenticated user and the auth method they used.",
                 "type": "object",
                 "properties": {
                     "auth_events": {
@@ -8400,13 +8483,38 @@
                 "type": "object",
                 "properties": {
                     "business": {
-                        "$ref": "#/components/schemas/EntityValidateResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EntityValidateResponse"
+                            },
+                            {
+                                "example": null,
+                                "description": "Information on the business and its onboarding session. Provided after onboarding onto a KYB\n playbook.",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "user": {
-                        "$ref": "#/components/schemas/EntityValidateResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EntityValidateResponse"
+                            },
+                            {
+                                "description": "Information on the user and their onboarding session. Provided after onboarding onto a KYC\n or KYB playbook.",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "user_auth": {
-                        "$ref": "#/components/schemas/UserAuthResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/UserAuthResponse"
+                            },
+                            {
+                                "description": "Information on the authenticated user and the auth method they used.",
+                                "type": "object"
+                            }
+                        ]
                     }
                 },
                 "required": [

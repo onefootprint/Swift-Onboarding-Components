@@ -3583,11 +3583,52 @@ export const getEntityAction = (
       note: 'Duis qui',
       trigger: {
         data: {
-          playbookId: 'cd831b57-f413-4486-91af-5090f3fd0127',
-          recollectAttributes: ['nationality', 'ssn4', 'business_address'],
-          reuseExistingBoKyc: true,
+          businessConfigs: [
+            {
+              data: {
+                collectSelfie: true,
+                documentTypesAndCountries: {
+                  countrySpecific: {},
+                  global: ['permit', 'voter_identification', 'drivers_license'],
+                },
+              },
+              kind: 'identity',
+            },
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_ssn',
+            },
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_address',
+            },
+          ],
+          configs: [
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_address',
+            },
+            {
+              data: {
+                requiresHumanReview: false,
+              },
+              kind: 'proof_of_ssn',
+            },
+            {
+              data: {
+                requiresHumanReview: true,
+              },
+              kind: 'proof_of_ssn',
+            },
+          ],
         },
-        kind: 'onboard',
+        kind: 'document',
       },
     },
     props,
