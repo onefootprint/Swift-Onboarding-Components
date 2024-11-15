@@ -8,6 +8,7 @@ import DecryptUserData from './components/decrypt-user-data';
 import InviteOrgMember from './components/invite-org-member';
 import PrincipalActor from './components/principal-actor';
 import RemoveOrgMember from './components/remove-org-member';
+import UpdateOrgApiKey from './components/update-org-api-key';
 import UpdateOrgMember from './components/update-org-member';
 import UpdateOrgRole from './components/update-org-role';
 
@@ -40,6 +41,9 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
       )}
       {kind === 'create_org_api_key' && (
         <CreateOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === 'update_org_api_key_role' && (
+        <UpdateOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
     </Stack>
   );

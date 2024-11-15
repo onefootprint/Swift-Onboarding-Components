@@ -76,7 +76,9 @@
       "updated": "updated",
       "a-member-s": "a member's",
       "role-from": "role from",
-      "to": "to"
+      "to": "to",
+      "from": "from",
+      "an-api-key": "an API key"
     },
     "remove": {
       "removed": "removed",

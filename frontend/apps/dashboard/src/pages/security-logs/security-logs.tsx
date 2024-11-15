@@ -32,6 +32,7 @@ const SecurityLogs = () => {
     'update_org_member',
     'remote_org_member',
     // 'create_org_api_key',
+    // 'update_org_api_key_role',
   ];
 
   const isFirmEmployee = session?.user?.isFirmEmployee;
