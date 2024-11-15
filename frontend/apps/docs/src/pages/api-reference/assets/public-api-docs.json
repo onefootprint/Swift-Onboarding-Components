@@ -2454,7 +2454,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EntityValidateResponse"
+                                    "$ref": "#/components/schemas/PostUsersKycResponse"
                                 }
                             }
                         }
@@ -6576,6 +6576,49 @@
                     "none"
                 ]
             },
+            "PostUsersKycResponse": {
+                "type": "object",
+                "properties": {
+                    "fp_id": {
+                        "type": "string"
+                    },
+                    "in_progress_link": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CreateTokenResponse"
+                            },
+                            {
+                                "description": "If the user triggers a step up rule, a link that can be used to prompt the user to finish\n uploading any remaining information.",
+                                "x_fp_preview_gate": "post_kyc_stepup_links",
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "playbook_key": {
+                        "type": "string"
+                    },
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OnboardingStatus"
+                            },
+                            {
+                                "description": "The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "fp_id",
+                    "playbook_key",
+                    "requires_manual_review",
+                    "status"
+                ]
+            },
             "PublicAuthEvent": {
                 "type": "object",
                 "properties": {
@@ -7340,6 +7383,11 @@
                                 "type": "string"
                             }
                         ]
+                    },
+                    "generate_link_on_stepup": {
+                        "description": "When true, if the user ends up triggering a stepup rule, sends them a link to finish the\n flow",
+                        "x_fp_preview_gate": "post_kyc_stepup_links",
+                        "type": "boolean"
                     },
                     "key": {
                         "description": "The publishable key of the playbook onto which you would like this user to onboard. The\n playbook will specify required information and the rules by which to make a KYC decision.",

@@ -71,6 +71,9 @@ pub enum PreviewApi {
     /// Access to the DELETE /users/<> API
     SoftDeleteUsers,
 
+    /// Generates a link if the user triggers a stepup rule in `POST /users/<>/kyc`
+    PostKycStepupLinks,
+
     //
     // The below variants are used to hide documentation on the API reference docs site
     /// Not used to gate any access on the backend - the docs site uses this to hide client vaulting

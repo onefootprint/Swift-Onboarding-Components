@@ -200,6 +200,7 @@ pub async fn post(
                 vw: &vw,
                 kind,
                 key,
+                wf: None,
                 sb_id: sb.map(|sb| sb.id),
                 scopes,
                 auth_events,

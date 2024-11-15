@@ -62,6 +62,7 @@ pub async fn post(
                 sb_id: None,
                 kind,
                 key,
+                wf: None,
                 scopes: vec![],
                 auth_events: vec![],
                 limit_auth_methods: None,

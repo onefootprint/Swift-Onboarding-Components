@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::PreviewApi;
 use newtypes::PublishablePlaybookKey;
 use newtypes::WorkflowFixtureResult;
 
@@ -18,6 +19,23 @@ pub struct TriggerKycRequest {
     /// this playbook. Defaults to true.
     #[serde(alias = "force_reonboard")]
     pub allow_reonboard: Option<bool>,
+    /// When true, if the user ends up triggering a stepup rule, sends them a link to finish the
+    /// flow
+    #[serde(default)]
+    #[openapi(optional)]
+    #[openapi(gated = "PreviewApi::PostKycStepupLinks")]
+    pub generate_link_on_stepup: bool,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
+pub struct PostUsersKycResponse {
+    #[serde(flatten)]
+    pub validate: EntityValidateResponse,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(gated = "PreviewApi::PostKycStepupLinks")]
+    /// If the user triggers a step up rule, a link that can be used to prompt the user to finish
+    /// uploading any remaining information.
+    pub in_progress_link: Option<CreateTokenResponse>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
@@ -26,6 +44,8 @@ pub enum SimpleFixtureResult {
     Fail,
     Pass,
     ManualReview,
+    #[openapi(skip)]
+    StepUp,
 }
 
 impl From<SimpleFixtureResult> for WorkflowFixtureResult {
@@ -34,6 +54,7 @@ impl From<SimpleFixtureResult> for WorkflowFixtureResult {
             SimpleFixtureResult::Fail => WorkflowFixtureResult::Fail,
             SimpleFixtureResult::Pass => WorkflowFixtureResult::Pass,
             SimpleFixtureResult::ManualReview => WorkflowFixtureResult::ManualReview,
+            SimpleFixtureResult::StepUp => WorkflowFixtureResult::StepUp,
         }
     }
 }

@@ -3,6 +3,7 @@ use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
+use api_core::config::LinkKind;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::kyc::KycState;
 use api_core::decision::state::Authorize;
@@ -23,14 +24,20 @@ use api_core::utils::requirements::get_requirements_for_wf;
 use api_core::utils::requirements::RequirementContext;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::requirements::UserDecryptResultForReqs;
+use api_core::utils::token::create_token;
+use api_core::utils::token::CreateTokenArgs;
+use api_core::utils::token::CreateTokenResult;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
 use api_errors::FpDbOptionalExtension;
-use api_wire_types::EntityValidateResponse;
+use api_wire_types::CreateTokenResponse;
+use api_wire_types::PostUsersKycResponse;
 use api_wire_types::SimpleFixtureResult;
+use api_wire_types::TokenOperationKind;
 use api_wire_types::TriggerKycRequest;
+use chrono::Duration;
 use db::models::data_lifetime::DataLifetime;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::manual_review::ManualReview;
@@ -65,7 +72,7 @@ pub async fn post(
     request: web::Json<TriggerKycRequest>,
     auth: TenantApiKeyAuth,
     root_span: RootSpan,
-) -> ApiResponse<WithVaultVersionHeader<EntityValidateResponse>> {
+) -> ApiResponse<WithVaultVersionHeader<PostUsersKycResponse>> {
     let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -76,6 +83,7 @@ pub async fn post(
         key,
         fixture_result,
         allow_reonboard,
+        generate_link_on_stepup,
     } = request.into_inner();
     let allow_reonboard = allow_reonboard.unwrap_or(true);
     // For backwards compatibility
@@ -192,7 +200,6 @@ pub async fn post(
                 return Err(TfError::AlreadyOnboardedToPlaybook.into());
             }
 
-            // TODO: consolidate with /authorize code
             Workflow::set_is_authorized(conn, &wf.id)?;
             let wf = Workflow::get(conn, &wf.id)?;
 
@@ -239,7 +246,6 @@ pub async fn post(
                 return Err(err.into());
             }
 
-
             Ok((wf, obc))
         })
         .await?;
@@ -251,12 +257,37 @@ pub async fn post(
     } else {
         tracing::error!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
-    let (wf, sv, mrs) = state
-        .db_query(move |conn| {
+
+    let session_key = state.session_sealing_key.clone();
+    let (wf, sv, mrs, in_progress_session) = state
+        .db_transaction(move |conn| {
+            let vw = VaultWrapper::build_for_tenant(conn, &wf.scoped_vault_id)?;
             let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
             let mr_filters = ManualReviewFilters::get_active();
             let mrs = ManualReview::get(conn, &sv.id, mr_filters)?;
-            Ok((wf, sv, mrs))
+
+            let in_progress_session = if !wf.status.is_terminal() && generate_link_on_stepup {
+                let args = CreateTokenArgs {
+                    vw: &vw,
+                    kind: TokenOperationKind::Onboard,
+                    key: None,
+                    wf: Some(&wf),
+                    sb_id: None,
+                    scopes: vec![],
+                    auth_events: vec![],
+                    limit_auth_methods: None,
+                    allow_reonboard: false,
+                };
+                let CreateTokenResult {
+                    token,
+                    session,
+                    wfr: _,
+                } = create_token(conn, &session_key, args, Duration::minutes(60 * 24))?;
+                Some((token, session))
+            } else {
+                None
+            };
+            Ok((wf, sv, mrs, in_progress_session))
         })
         .await?;
 
@@ -266,8 +297,15 @@ pub async fn post(
         None
     };
 
-    Ok(WithVaultVersionHeader::new(
-        api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, obc)),
-        vault_version,
-    ))
+    let validate = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, obc));
+    let in_progress_link = in_progress_session.map(|(token, session)| CreateTokenResponse {
+        link: (state.config.service_config).generate_link(LinkKind::VerifyUser, &token),
+        token,
+        expires_at: session.expires_at,
+    });
+    let response = PostUsersKycResponse {
+        validate,
+        in_progress_link,
+    };
+    Ok(WithVaultVersionHeader::new(response, vault_version))
 }

@@ -1,6 +1,8 @@
 import pytest
+from tests.identify_client import IdentifyClient
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA
-from tests.headers import ExternalId, IdempotencyId
+from tests.headers import ExternalId, IdempotencyId, FpAuth
+from tests.bifrost_client import BifrostClient
 from tests.utils import (
     _gen_random_sandbox_id,
     post,
@@ -201,6 +203,40 @@ def test_kyc(sandbox_tenant, obc):
         "reason": "i wanna",
     }
     post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+
+
+def test_kyc_stepup_link(sandbox_tenant, obc):
+    """
+    Run KYC on a user that triggers a stepup rule. We should generate a link that we can use to finish onboarding.
+    """
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    sandbox_id = body["sandbox_id"]
+    fp_id = body["id"]
+
+    data = dict(
+        key=obc.key.value, fixture_result="step_up", generate_link_on_stepup=True
+    )
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
+    assert body["status"] == "incomplete"
+
+    auth_token = FpAuth(body["in_progress_link"]["token"])
+    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    user = bifrost.run()
+    assert user.fp_id == fp_id
+    # The `step_up` fixture result always ends in failure after the step up condition is met
+    # https://github.com/onefootprint/monorepo/blob/bc04e7003b33393677b09462876008b05ab8e07e/backend/components/api/core/src/decision/state/kyc/states.rs#L593-L595
+    assert bifrost.validate_response["user"]["status"] == "fail"
+    assert [i["kind"] for i in bifrost.handled_requirements] == [
+        "collect_document",
+        "process",
+    ]
 
 
 def test_kyc_missing_requirement(sandbox_tenant, obc):

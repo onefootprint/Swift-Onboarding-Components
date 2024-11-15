@@ -14,6 +14,7 @@ use api_errors::BadRequestInto;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
 use db::models::session::Session;
 use db::models::workflow::Workflow;
@@ -34,6 +35,7 @@ pub struct CreateTokenArgs<'a> {
     pub sb_id: Option<ScopedVaultId>,
     pub kind: TokenOperationKind,
     pub key: Option<PublishablePlaybookKey>,
+    pub wf: Option<&'a Workflow>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
@@ -58,6 +60,7 @@ pub fn create_token(
         mut sb_id,
         kind,
         key,
+        wf,
         scopes,
         auth_events,
         limit_auth_methods,
@@ -106,8 +109,14 @@ pub fn create_token(
             (TokenCreationPurpose::ApiReonboard, Some(obc.id), None)
         }
         TokenOperationKind::Onboard => {
-            let key = key.ok_or(BadRequest("key must be provided for a token of kind onboard"))?;
-            let (_, obc, _) = Playbook::get_latest_version(conn, (&key, &su.tenant_id, su.is_live))?;
+            let obc = if let Some(wf) = wf {
+                let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
+                obc
+            } else {
+                let key = key.ok_or(BadRequest("key must be provided for a token of kind onboard"))?;
+                let (_, obc, _) = Playbook::get_latest_version(conn, (&key, &su.tenant_id, su.is_live))?;
+                obc
+            };
             if !obc.kind.can_onboard() {
                 return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
             }
@@ -128,6 +137,7 @@ pub fn create_token(
         su_id: Some(su.id.clone()),
         sb_id,
         obc_id,
+        wf_id: wf.map(|wf| wf.id.clone()),
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         metadata: Some(metadata),
         ..Default::default()

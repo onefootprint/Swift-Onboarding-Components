@@ -202,6 +202,7 @@ pub(super) fn apply_trigger_request(
         sb_id: sb.map(|sb| sb.id),
         kind: TokenOperationKind::Inherit,
         key: None,
+        wf: None,
         // No scopes or auth factors - require the user to re-auth when using this token
         scopes: vec![],
         auth_events: vec![],

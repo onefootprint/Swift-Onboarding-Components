@@ -17328,6 +17328,7 @@
                     "onboarding_session_token",
                     "vault_integrity",
                     "soft_delete_users",
+                    "post_kyc_stepup_links",
                     "client_vaulting_docs",
                     "list_duplicate_users"
                 ]
