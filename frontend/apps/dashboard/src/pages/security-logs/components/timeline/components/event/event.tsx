@@ -1,6 +1,7 @@
 import type { Actor, AuditEvent, AuditEventDetail } from '@onefootprint/request-types/dashboard';
 
 import { Stack } from '@onefootprint/ui';
+import CreateOrgApiKey from './components/create-org-api-key';
 import CreateOrgRole from './components/create-org-role';
 import DeactivateOrgRole from './components/deactivate-org-role';
 import DecryptUserData from './components/decrypt-user-data';
@@ -36,6 +37,9 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
       )}
       {kind === 'remove_org_member' && (
         <RemoveOrgMember detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === 'create_org_api_key' && (
+        <CreateOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
     </Stack>
   );

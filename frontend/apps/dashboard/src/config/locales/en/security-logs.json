@@ -94,6 +94,10 @@
       "new-permissions": "New permissions",
       "old-permissions": "Old permissions"
     },
+    "api-keys": {
+      "created-a-new": "created a new",
+      "api-key": "API key"
+    },
     "body": {
       "decryption-reason": {
         "aria-label": "Decryption reason body",
