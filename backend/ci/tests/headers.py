@@ -93,3 +93,7 @@ class VaultVersion(BaseAuth):
 
     def __init__(self, value):
         super().__init__(str(value))
+
+
+class DryRun(BaseAuth):
+    HEADER_NAME = "x-fp-dry-run"

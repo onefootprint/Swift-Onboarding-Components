@@ -6,11 +6,14 @@ use api_core::decision::rule_engine::rules::copy_rule;
 use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::DryRun;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::CreatePlaybookVersionRequest;
 use api_wire_types::MultiUpdateRuleRequest;
+use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
@@ -18,6 +21,7 @@ use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_version::RuleSetVersion;
 use itertools::Itertools;
 use newtypes::PlaybookId;
+use newtypes::RuleSetVersionId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::put;
 use paperclip::actix::web;
@@ -32,6 +36,7 @@ pub async fn put_create_version(
     state: web::Data<State>,
     playbook_id: web::Path<PlaybookId>,
     request: Json<CreatePlaybookVersionRequest>,
+    dry_run: DryRun,
     auth: TenantSessionAuth,
 ) -> ApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
@@ -44,6 +49,8 @@ pub async fn put_create_version(
         expected_latest_obc_id,
         new_onboarding_config: obc_request,
     } = request.into_inner();
+
+    let dry_run = dry_run.into_inner();
 
     let obc_args =
         prepare_onboarding_configuration_request(&state, obc_request, &tenant, is_live, actor.clone().into())
@@ -62,6 +69,26 @@ pub async fn put_create_version(
                 );
             }
 
+            if dry_run {
+                let new_obc = ObConfiguration::new_dry_run(&playbook, obc_args);
+                let auth_actor = actor;
+                let (new_obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;
+
+                let rs = RuleSetVersion {
+                    id: RuleSetVersionId::default(),
+                    created_at: Utc::now(),
+                    created_seqno: DataLifetime::get_current_seqno(conn.conn())?,
+                    _created_at: Utc::now(),
+                    _updated_at: Utc::now(),
+                    deactivated_at: None,
+                    deactivated_seqno: None,
+                    version: 1,
+                    ob_configuration_id: new_obc.id.clone(),
+                    actor: auth_actor.into(),
+                };
+                return Ok((new_obc, actor, Some(rs)));
+            }
+
             let new_obc = ObConfiguration::create(conn, &playbook, obc_args)?;
 
             let rules = RuleInstance::list(conn, &tenant.id, is_live, &latest_obc.id, IncludeRules::All)?;
@@ -76,7 +103,6 @@ pub async fn put_create_version(
                 let rules_update = validate_rules_request(conn, &tenant.id, is_live, add_rules_request)?;
                 RuleInstance::bulk_edit(conn, &playbook, &new_obc.id, &actor.clone().into(), rules_update)?;
             }
-
 
             let (new_obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;
             let new_rs = RuleSetVersion::get_active(conn, &new_obc.id)?;

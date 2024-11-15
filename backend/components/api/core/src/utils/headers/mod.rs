@@ -24,6 +24,9 @@ pub use is_components_sdk::*;
 mod vault_version;
 pub use vault_version::*;
 
+mod dry_run;
+pub use dry_run::*;
+
 mod bootstrap_fields;
 use crate::ApiCoreError;
 use crate::FpResult;

@@ -12,6 +12,7 @@ from tests.utils import (
 )
 from tests.dashboard.utils import update_rules
 from tests.headers import (
+    DryRun,
     IsLive,
     PlaybookKey,
     SecondaryDashboardAuth,
@@ -1475,12 +1476,25 @@ def test_playbook_versions(sandbox_tenant, tenant):
     put(f"org/playbooks/{playbook_id}", update_playbook_req, *tenant.db_auths, status_code=404)
     put(f"org/playbooks/{playbook_id}", update_playbook_req, *sandbox_tenant.ro_db_auths, status_code=403)
 
+    dry_run_new_obc_resp = put(
+        f"org/playbooks/{playbook_id}",
+        update_playbook_req,
+        DryRun("true"),
+        *sandbox_tenant.db_auths,
+    )
+
     new_obc_resp = put(
         f"org/playbooks/{playbook_id}",
         update_playbook_req,
         *sandbox_tenant.db_auths,
     )
     new_obc_id = new_obc_resp["id"]
+    assert new_obc_resp == dry_run_new_obc_resp | {
+        "id": new_obc_id,
+        "created_at": new_obc_resp["created_at"],
+        # Rule set version restarts at 1
+        "rule_set": {"version": 1},
+    }
 
     want_new_obc_resp = initial_obc_resp | {
         "id": new_obc_id,

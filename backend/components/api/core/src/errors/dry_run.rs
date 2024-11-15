@@ -1,6 +1,8 @@
 use crate::FpError;
 use crate::FpResult;
 
+/// FIXME: this is incompatible with db_transaction.
+///
 /// Drop-in replacement for ApiError when we also want to be able to roll back a transaction
 #[derive(Debug)]
 pub enum DryRunError<T> {

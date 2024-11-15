@@ -286,6 +286,78 @@ impl ObConfiguration {
 
         has_document_cdo || has_other_document
     }
+
+    pub fn new_dry_run(playbook: &Locked<Playbook>, args: NewObConfigurationArgs) -> Self {
+        let new_obc = NewObConfiguration::new(playbook, args, Utc::now());
+
+        let NewObConfiguration {
+            key,
+            created_at,
+            status,
+            name,
+            tenant_id,
+            is_live,
+            must_collect_data,
+            can_access_data,
+            cip_kind,
+            optional_data,
+            is_no_phone_flow,
+            is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
+            author,
+            enhanced_aml,
+            allow_us_residents,
+            allow_us_territory_residents,
+            kind,
+            skip_confirm,
+            document_types_and_countries,
+            documents_to_collect,
+            business_documents_to_collect,
+            verification_checks,
+            required_auth_methods,
+            prompt_for_passkey,
+            allow_reonboard,
+            playbook_id,
+        } = new_obc;
+
+        Self {
+            id: ObConfigurationId::test_data("preview".to_owned()),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            deactivated_at: None,
+            appearance_id: None,
+
+            key,
+            created_at,
+            status,
+            name,
+            tenant_id,
+            is_live,
+            must_collect_data,
+            can_access_data,
+            cip_kind,
+            optional_data,
+            is_no_phone_flow,
+            is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
+            author: Some(author),
+            enhanced_aml,
+            allow_us_residents,
+            allow_us_territory_residents,
+            kind,
+            skip_confirm,
+            document_types_and_countries,
+            documents_to_collect: Some(documents_to_collect),
+            business_documents_to_collect,
+            verification_checks: Some(verification_checks),
+            required_auth_methods,
+            prompt_for_passkey,
+            allow_reonboard,
+            playbook_id,
+        }
+    }
 }
 
 
@@ -601,70 +673,7 @@ impl ObConfiguration {
             .set(ob_configuration::deactivated_at.eq(Some(Utc::now())))
             .execute(conn.conn())?;
 
-        let Playbook {
-            id: playbook_id,
-            _created_at: _,
-            _updated_at: _,
-            key,
-            tenant_id,
-            is_live,
-            status: _,
-        } = (*playbook).clone();
-
-        let enhanced_aml = args.verification_checks.enhanced_aml();
-        let NewObConfigurationArgs {
-            name,
-            must_collect_data,
-            optional_data,
-            can_access_data,
-            cip_kind,
-            is_no_phone_flow,
-            is_doc_first,
-            allow_international_residents,
-            international_country_restrictions,
-            author,
-            allow_us_residents,
-            allow_us_territory_residents,
-            kind,
-            skip_confirm,
-            document_types_and_countries,
-            documents_to_collect,
-            business_documents_to_collect,
-            verification_checks,
-            required_auth_methods,
-            prompt_for_passkey,
-            allow_reonboard,
-        } = args;
-        let config = NewObConfiguration {
-            key,
-            status: ApiKeyStatus::Enabled,
-            created_at: Utc::now(),
-            name,
-            tenant_id,
-            must_collect_data,
-            can_access_data,
-            is_live,
-            cip_kind,
-            optional_data,
-            is_no_phone_flow,
-            is_doc_first,
-            allow_international_residents,
-            international_country_restrictions,
-            author,
-            enhanced_aml,
-            allow_us_residents,
-            allow_us_territory_residents,
-            kind,
-            skip_confirm,
-            document_types_and_countries,
-            documents_to_collect,
-            business_documents_to_collect,
-            verification_checks: verification_checks.into_inner(),
-            required_auth_methods,
-            prompt_for_passkey,
-            allow_reonboard,
-            playbook_id,
-        };
+        let config = NewObConfiguration::new(playbook, args, Utc::now());
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
             .get_result::<ObConfiguration>(conn.conn())?;
@@ -736,6 +745,79 @@ impl ObConfiguration {
     }
 }
 
+impl NewObConfiguration {
+    fn new(
+        playbook: &Playbook,
+        args: NewObConfigurationArgs,
+        created_at: DateTime<Utc>,
+    ) -> NewObConfiguration {
+        let Playbook {
+            id: playbook_id,
+            _created_at: _,
+            _updated_at: _,
+            key,
+            tenant_id,
+            is_live,
+            status: _,
+        } = playbook.clone();
+
+        let enhanced_aml = args.verification_checks.enhanced_aml();
+        let NewObConfigurationArgs {
+            name,
+            must_collect_data,
+            optional_data,
+            can_access_data,
+            cip_kind,
+            is_no_phone_flow,
+            is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
+            author,
+            allow_us_residents,
+            allow_us_territory_residents,
+            kind,
+            skip_confirm,
+            document_types_and_countries,
+            documents_to_collect,
+            business_documents_to_collect,
+            verification_checks,
+            required_auth_methods,
+            prompt_for_passkey,
+            allow_reonboard,
+        } = args;
+
+        NewObConfiguration {
+            key,
+            status: ApiKeyStatus::Enabled,
+            created_at,
+            name,
+            tenant_id,
+            must_collect_data,
+            can_access_data,
+            is_live,
+            cip_kind,
+            optional_data,
+            is_no_phone_flow,
+            is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
+            author,
+            enhanced_aml,
+            allow_us_residents,
+            allow_us_territory_residents,
+            kind,
+            skip_confirm,
+            document_types_and_countries,
+            documents_to_collect,
+            business_documents_to_collect,
+            verification_checks: verification_checks.into_inner(),
+            required_auth_methods,
+            prompt_for_passkey,
+            allow_reonboard,
+            playbook_id,
+        }
+    }
+}
 
 /// Helper to more easily interact with verification checks
 #[derive(Default, Clone)]
