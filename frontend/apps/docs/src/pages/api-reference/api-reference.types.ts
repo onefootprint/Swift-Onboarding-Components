@@ -67,6 +67,7 @@ export type ContentSchema = FpExtensions & {
   required?: string[];
   type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'integer';
   anyOf?: ContentSchema[];
+  allOf?: ContentSchema[];
   format?: string;
   $ref?: string;
 };
@@ -81,6 +82,7 @@ export type ContentSchemaNoRef = FpExtensions & {
   required?: string[];
   type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'integer';
   anyOf?: ContentSchemaNoRef[];
+  // allOf is merged into a single schema when we hydrate the schema and resolve refs
   format?: string;
 };
 

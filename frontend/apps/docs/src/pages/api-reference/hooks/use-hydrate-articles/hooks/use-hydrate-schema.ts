@@ -1,3 +1,4 @@
+import deepmerge from 'deepmerge';
 import type { ContentSchema, ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
 import useCanAccessPreviewApi from './use-can-access-preview-api';
 
@@ -29,6 +30,17 @@ const useHydrateSchema = (openApiSpec: any) => {
       if (!dereferencedSchema) {
         throw Error(`Couldn't dereference schema ${schema.$ref}`);
       }
+    }
+
+    if (schema.allOf?.length) {
+      let allOf;
+      ({ allOf, ...dereferencedSchema } = dereferencedSchema);
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      allOf.forEach((s: any) => {
+        // Merge the allOf schemas into a single schema.
+        // allOf is mostly used to add additional properties, descriptions, or extensions to a referenced schema.
+        dereferencedSchema = deepmerge(dereferencedSchema, resolveAllSchemaRefs(s));
+      });
     }
 
     // Recursively crawl for any values that are schema references and resolve them

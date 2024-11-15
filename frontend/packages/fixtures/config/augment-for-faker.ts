@@ -35,6 +35,8 @@ export function augmentForFaker(schema: OpenAPIV3.SchemaObject): OpenAPIV3.Schem
     enhancedSchema.anyOf = [augmentForFaker(enhancedSchema.anyOf[0] as OpenAPIV3.SchemaObject)];
   }
 
+  enhancedSchema.allOf = enhancedSchema.allOf?.map(s => augmentForFaker(s as OpenAPIV3.SchemaObject));
+
   if (schema.properties) {
     enhancedSchema.properties = Object.entries(schema.properties).reduce(
       (acc, [key, prop]) => {
