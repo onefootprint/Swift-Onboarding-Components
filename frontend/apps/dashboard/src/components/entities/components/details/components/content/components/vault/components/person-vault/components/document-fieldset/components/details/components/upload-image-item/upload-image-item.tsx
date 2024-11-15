@@ -1,11 +1,10 @@
-import type { DocumentUpload, EntityVault } from '@onefootprint/types';
+import type { DocumentUpload, EntityVault, IdDocImageProcessingError } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 import UploadTitleCard from '../upload-title-card';
 import PdfThumbnail from './components/pdf-thumbnail';
-import RotatedImage from './components/rotated-image';
-import StyledImage from './components/styled-image';
+import UploadImage from './components/upload-image';
 import useUploadData from './hooks/use-upload-data/use-upload-data';
 
 type UploadImageItemProps = {
@@ -22,29 +21,31 @@ const UploadImageItem = forwardRef<HTMLDivElement, UploadImageItemProps>(
     if (!objectUrl) return null;
     if (isPdf) return <PdfThumbnail src={objectUrl} />;
 
-    const hasRotateIndex = (index: number | undefined): index is number => index === 0 || Boolean(index);
-    const shouldRotate = hasRotateIndex(rotateIndex);
-    if (shouldRotate) {
-      return <RotatedImage alt={di} src={objectUrl} ref={ref} rotateIndex={rotateIndex} />;
-    }
+    const uploadImage = (
+      <UploadImage
+        objectUrl={objectUrl}
+        alt={di}
+        failureReasons={upload.failureReasons as IdDocImageProcessingError[]}
+        rotateIndex={rotateIndex}
+      />
+    );
 
     return (
-      <Upload
-        key={`${upload.identifier}:${upload.version}`}
-        ref={ref}
-        direction="column"
-        align="center"
-        gap={3}
-        width="100%"
-      >
-        {!imageOnly && <UploadTitleCard upload={upload} />}
-        <StyledImage alt={di} src={objectUrl} />
-      </Upload>
+      <Container ref={ref} direction="column" align="center" gap={3} width="100%">
+        {imageOnly ? (
+          uploadImage
+        ) : (
+          <>
+            <UploadTitleCard upload={upload} />
+            {uploadImage}
+          </>
+        )}
+      </Container>
     );
   },
 );
 
-const Upload = styled(Stack)`
+const Container = styled(Stack)`
   ${({ theme }) => css`
     scroll-margin-top: ${theme.spacing[3]};
   `};

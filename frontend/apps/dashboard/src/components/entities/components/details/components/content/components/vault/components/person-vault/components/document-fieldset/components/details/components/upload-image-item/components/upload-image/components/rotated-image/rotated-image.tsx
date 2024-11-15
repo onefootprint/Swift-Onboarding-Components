@@ -1,7 +1,7 @@
 import { Box } from '@onefootprint/ui';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import StyledImage from '../styled-image';
+import BaseImage from '../base-image';
 
 type RotatedImageProps = {
   alt: string;
@@ -11,7 +11,7 @@ type RotatedImageProps = {
 
 const RotatedImage = forwardRef<HTMLDivElement, RotatedImageProps>(({ alt, src, rotateIndex }, ref) => (
   <Container $index={rotateIndex} ref={ref} position="absolute" top={0} left={0} width="100%">
-    <StyledImage alt={alt} src={src} />
+    <BaseImage alt={alt} src={src} />
   </Container>
 ));
 

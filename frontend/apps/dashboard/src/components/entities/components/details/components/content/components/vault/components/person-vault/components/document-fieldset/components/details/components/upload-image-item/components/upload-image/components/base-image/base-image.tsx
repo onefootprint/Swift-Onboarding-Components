@@ -1,14 +1,14 @@
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
 
-type StyledImageProps = {
+type BaseImageProps = {
   alt: string;
   src: string;
 };
 
-const StyledImage = ({ alt, src }: StyledImageProps) => <Img src={src} width={0} height={0} alt={alt} />;
+const BaseImage = ({ alt, src }: BaseImageProps) => <StyledImage src={src} width={0} height={0} alt={alt} />;
 
-const Img = styled(Image)`
+const StyledImage = styled(Image)`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[2]};
@@ -19,4 +19,4 @@ const Img = styled(Image)`
   `};
 `;
 
-export default StyledImage;
+export default BaseImage;
