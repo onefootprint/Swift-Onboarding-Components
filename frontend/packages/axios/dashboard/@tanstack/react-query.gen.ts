@@ -79,6 +79,8 @@ import type {
   GetOrgOnboardingConfigsByIdData,
   GetOrgOnboardingConfigsByObcIdRulesData,
   GetOrgOnboardingConfigsData,
+  GetOrgPlaybooksByPlaybookIdVersionsData,
+  GetOrgPlaybooksData,
   GetOrgProxyConfigsByProxyConfigIdData,
   GetOrgProxyConfigsData,
   GetOrgRolesData,
@@ -273,6 +275,9 @@ import type {
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadData,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadError,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadResponse,
+  PostOrgPlaybooksData,
+  PostOrgPlaybooksError,
+  PostOrgPlaybooksResponse,
   PostOrgProxyConfigsByProxyConfigIdDeactivateData,
   PostOrgProxyConfigsByProxyConfigIdDeactivateError,
   PostOrgProxyConfigsByProxyConfigIdDeactivateResponse,
@@ -346,6 +351,9 @@ import type {
   PutOrgLogoData,
   PutOrgLogoError,
   PutOrgLogoResponse,
+  PutOrgPlaybooksByPlaybookIdData,
+  PutOrgPlaybooksByPlaybookIdError,
+  PutOrgPlaybooksByPlaybookIdResponse,
   PutPartnerDocTemplatesByTemplateIdData,
   PutPartnerDocTemplatesByTemplateIdError,
   PutPartnerDocTemplatesByTemplateIdResponse,
@@ -418,6 +426,8 @@ import {
   getOrgOnboardingConfigs,
   getOrgOnboardingConfigsById,
   getOrgOnboardingConfigsByObcIdRules,
+  getOrgPlaybooks,
+  getOrgPlaybooksByPlaybookIdVersions,
   getOrgProxyConfigs,
   getOrgProxyConfigsByProxyConfigId,
   getOrgRoles,
@@ -497,6 +507,7 @@ import {
   postOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignments,
   postOrgPartnersByPartnershipIdRequestsByRequestIdSubmissions,
   postOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUpload,
+  postOrgPlaybooks,
   postOrgProxyConfigs,
   postOrgProxyConfigsByProxyConfigIdDeactivate,
   postOrgRoles,
@@ -522,6 +533,7 @@ import {
   postWebhooksSambaHandleWebhook,
   postWebhooksTwilioStatusCallback,
   putOrgLogo,
+  putOrgPlaybooksByPlaybookId,
   putPartnerDocTemplatesByTemplateId,
   putPartnerLogo,
 } from '../services.gen';
@@ -3490,6 +3502,101 @@ export const postOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadM
     },
   };
   return mutationOptions;
+};
+
+export const getOrgPlaybooksQueryKey = (options?: Options<GetOrgPlaybooksData>) => [
+  createQueryKey('getOrgPlaybooks', options),
+];
+
+export const getOrgPlaybooksOptions = (options?: Options<GetOrgPlaybooksData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOrgPlaybooks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOrgPlaybooksQueryKey(options),
+  });
+};
+
+export const postOrgPlaybooksQueryKey = (options: Options<PostOrgPlaybooksData>) => [
+  createQueryKey('postOrgPlaybooks', options),
+];
+
+export const postOrgPlaybooksOptions = (options: Options<PostOrgPlaybooksData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postOrgPlaybooks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postOrgPlaybooksQueryKey(options),
+  });
+};
+
+export const postOrgPlaybooksMutation = (options?: Partial<Options<PostOrgPlaybooksData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PostOrgPlaybooksResponse,
+    AxiosError<PostOrgPlaybooksError>,
+    Options<PostOrgPlaybooksData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postOrgPlaybooks({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const putOrgPlaybooksByPlaybookIdMutation = (options?: Partial<Options<PutOrgPlaybooksByPlaybookIdData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PutOrgPlaybooksByPlaybookIdResponse,
+    AxiosError<PutOrgPlaybooksByPlaybookIdError>,
+    Options<PutOrgPlaybooksByPlaybookIdData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await putOrgPlaybooksByPlaybookId({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getOrgPlaybooksByPlaybookIdVersionsQueryKey = (
+  options: Options<GetOrgPlaybooksByPlaybookIdVersionsData>,
+) => [createQueryKey('getOrgPlaybooksByPlaybookIdVersions', options)];
+
+export const getOrgPlaybooksByPlaybookIdVersionsOptions = (
+  options: Options<GetOrgPlaybooksByPlaybookIdVersionsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOrgPlaybooksByPlaybookIdVersions({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOrgPlaybooksByPlaybookIdVersionsQueryKey(options),
+  });
 };
 
 export const getOrgProxyConfigsQueryKey = (options?: Options<GetOrgProxyConfigsData>) => [

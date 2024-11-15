@@ -5920,7 +5920,7 @@
                     "Organization",
                     "Private"
                 ],
-                "description": "Returns a list of onboarding configurations owned by the tenant.",
+                "description": "Returns a list of playbooks owned by the tenant.",
                 "parameters": [
                     {
                         "in": "query",
@@ -5996,7 +5996,7 @@
                     "Organization",
                     "Private"
                 ],
-                "description": "Creates a new onboarding configuration.",
+                "description": "Creates a new playbook.",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -6478,6 +6478,241 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
+        "/org/playbooks": {
+            "get": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a list of playbooks owned by the tenant.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "kinds",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "disabled",
+                                "enabled"
+                            ]
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedOnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a new playbook.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOnboardingConfigurationRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
+        "/org/playbooks/{playbook_id}": {
+            "put": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a new version (onboarding configuration) for the given playbook.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "playbook_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-dry-run",
+                        "description": "When provided as a header, specifies the request should be a dry-run",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreatePlaybookVersionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
+        "/org/playbooks/{playbook_id}/versions": {
+            "get": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns the version history of onboarding configurations for the given playbook.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "playbook_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedOnboardingConfiguration"
                                 }
                             }
                         }
@@ -10808,6 +11043,21 @@
                 "required": [
                     "kind",
                     "tag"
+                ]
+            },
+            "CreatePlaybookVersionRequest": {
+                "type": "object",
+                "properties": {
+                    "expected_latest_obc_id": {
+                        "type": "string"
+                    },
+                    "new_onboarding_config": {
+                        "$ref": "#/components/schemas/CreateOnboardingConfigurationRequest"
+                    }
+                },
+                "required": [
+                    "expected_latest_obc_id",
+                    "new_onboarding_config"
                 ]
             },
             "CreateProxyConfigRequest": {
@@ -16209,6 +16459,10 @@
                     "curp_validation_enabled": {
                         "type": "boolean"
                     },
+                    "deactivated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
                     "document_types_and_countries": {
                         "$ref": "#/components/schemas/DocumentAndCountryConfiguration"
                     },
@@ -16263,6 +16517,9 @@
                             "$ref": "#/components/schemas/CollectedDataOption"
                         }
                     },
+                    "playbook_id": {
+                        "type": "string"
+                    },
                     "prompt_for_passkey": {
                         "type": "boolean"
                     },
@@ -16315,6 +16572,7 @@
                     "must_collect_data",
                     "name",
                     "optional_data",
+                    "playbook_id",
                     "prompt_for_passkey",
                     "skip_confirm",
                     "skip_kyb",

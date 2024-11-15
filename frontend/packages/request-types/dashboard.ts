@@ -674,6 +674,10 @@ export type CreateOrgTenantTagRequest = {
   kind: VaultKind;
   tag: string;
 };
+export type CreatePlaybookVersionRequest = {
+  expectedLatestObcId: string;
+  newOnboardingConfig: CreateOnboardingConfigurationRequest;
+};
 export type CreateProxyConfigRequest = {
   /**
    * Access reason to use during proxy decryptions
@@ -3824,6 +3828,7 @@ export type OnboardingConfiguration = {
   cipKind?: CipKind;
   createdAt: string;
   curpValidationEnabled: boolean;
+  deactivatedAt?: string;
   documentsToCollect: Array<DocumentRequestConfig>;
   documentTypesAndCountries?: DocumentAndCountryConfiguration;
   enhancedAml: EnhancedAml;
@@ -3838,6 +3843,7 @@ export type OnboardingConfiguration = {
   mustCollectData: Array<CollectedDataOption>;
   name: string;
   optionalData: Array<CollectedDataOption>;
+  playbookId: string;
   promptForPasskey: boolean;
   requiredAuthMethods?: Array<AuthMethodKind>;
   ruleSet?: RuleSet;
@@ -8928,6 +8934,69 @@ export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadDa
 };
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadResponse = Empty;
 export type PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadError = unknown;
+export type GetOrgPlaybooksData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+  query?: {
+    kinds?: string;
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    status?: 'disabled' | 'enabled';
+  };
+};
+export type GetOrgPlaybooksResponse = OffsetPaginatedOnboardingConfiguration;
+export type GetOrgPlaybooksError = unknown;
+export type PostOrgPlaybooksData = {
+  body: CreateOnboardingConfigurationRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
+export type PostOrgPlaybooksResponse = OnboardingConfiguration;
+export type PostOrgPlaybooksError = unknown;
+export type PutOrgPlaybooksByPlaybookIdData = {
+  body: CreatePlaybookVersionRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+    /**
+     * When provided as a header, specifies the request should be a dry-run
+     */
+    'X-Fp-Dry-Run'?: boolean;
+  };
+  path: {
+    playbookId: string;
+  };
+};
+export type PutOrgPlaybooksByPlaybookIdResponse = OnboardingConfiguration;
+export type PutOrgPlaybooksByPlaybookIdError = unknown;
+export type GetOrgPlaybooksByPlaybookIdVersionsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+  path: {
+    playbookId: string;
+  };
+  query?: {
+    page?: number;
+    pageSize?: number;
+  };
+};
+export type GetOrgPlaybooksByPlaybookIdVersionsResponse = OffsetPaginatedOnboardingConfiguration;
+export type GetOrgPlaybooksByPlaybookIdVersionsError = unknown;
 export type GetOrgProxyConfigsData = {
   headers?: {
     /**
@@ -10671,6 +10740,48 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Empty;
+      };
+    };
+  };
+  '/org/playbooks': {
+    get: {
+      req: GetOrgPlaybooksData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OffsetPaginatedOnboardingConfiguration;
+      };
+    };
+    post: {
+      req: PostOrgPlaybooksData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingConfiguration;
+      };
+    };
+  };
+  '/org/playbooks/{playbook_id}': {
+    put: {
+      req: PutOrgPlaybooksByPlaybookIdData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingConfiguration;
+      };
+    };
+  };
+  '/org/playbooks/{playbook_id}/versions': {
+    get: {
+      req: GetOrgPlaybooksByPlaybookIdVersionsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OffsetPaginatedOnboardingConfiguration;
       };
     };
   };

@@ -173,6 +173,12 @@ import type {
   GetOrgOnboardingConfigsData,
   GetOrgOnboardingConfigsError,
   GetOrgOnboardingConfigsResponse,
+  GetOrgPlaybooksByPlaybookIdVersionsData,
+  GetOrgPlaybooksByPlaybookIdVersionsError,
+  GetOrgPlaybooksByPlaybookIdVersionsResponse,
+  GetOrgPlaybooksData,
+  GetOrgPlaybooksError,
+  GetOrgPlaybooksResponse,
   GetOrgProxyConfigsByProxyConfigIdData,
   GetOrgProxyConfigsByProxyConfigIdError,
   GetOrgProxyConfigsByProxyConfigIdResponse,
@@ -401,6 +407,9 @@ import type {
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadData,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadError,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadResponse,
+  PostOrgPlaybooksData,
+  PostOrgPlaybooksError,
+  PostOrgPlaybooksResponse,
   PostOrgProxyConfigsByProxyConfigIdDeactivateData,
   PostOrgProxyConfigsByProxyConfigIdDeactivateError,
   PostOrgProxyConfigsByProxyConfigIdDeactivateResponse,
@@ -474,6 +483,9 @@ import type {
   PutOrgLogoData,
   PutOrgLogoError,
   PutOrgLogoResponse,
+  PutOrgPlaybooksByPlaybookIdData,
+  PutOrgPlaybooksByPlaybookIdError,
+  PutOrgPlaybooksByPlaybookIdResponse,
   PutPartnerDocTemplatesByTemplateIdData,
   PutPartnerDocTemplatesByTemplateIdError,
   PutPartnerDocTemplatesByTemplateIdResponse,
@@ -1901,7 +1913,7 @@ export const getOrgMetrics = <ThrowOnError extends boolean = false>(
 };
 
 /**
- * Returns a list of onboarding configurations owned by the tenant.
+ * Returns a list of playbooks owned by the tenant.
  */
 export const getOrgOnboardingConfigs = <ThrowOnError extends boolean = false>(
   options?: Options<GetOrgOnboardingConfigsData, ThrowOnError>,
@@ -1913,7 +1925,7 @@ export const getOrgOnboardingConfigs = <ThrowOnError extends boolean = false>(
 };
 
 /**
- * Creates a new onboarding configuration.
+ * Creates a new playbook.
  */
 export const postOrgOnboardingConfigs = <ThrowOnError extends boolean = false>(
   options: Options<PostOrgOnboardingConfigsData, ThrowOnError>,
@@ -2071,6 +2083,62 @@ export const postOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUpload 
   >({
     ...options,
     url: '/org/partners/{partnershipId}/requests/{requestId}/submissions/upload',
+  });
+};
+
+/**
+ * Returns a list of playbooks owned by the tenant.
+ */
+export const getOrgPlaybooks = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgPlaybooksData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<GetOrgPlaybooksResponse, GetOrgPlaybooksError, ThrowOnError>({
+    ...options,
+    url: '/org/playbooks',
+  });
+};
+
+/**
+ * Creates a new playbook.
+ */
+export const postOrgPlaybooks = <ThrowOnError extends boolean = false>(
+  options: Options<PostOrgPlaybooksData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<PostOrgPlaybooksResponse, PostOrgPlaybooksError, ThrowOnError>({
+    ...options,
+    url: '/org/playbooks',
+  });
+};
+
+/**
+ * Creates a new version (onboarding configuration) for the given playbook.
+ */
+export const putOrgPlaybooksByPlaybookId = <ThrowOnError extends boolean = false>(
+  options: Options<PutOrgPlaybooksByPlaybookIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutOrgPlaybooksByPlaybookIdResponse,
+    PutOrgPlaybooksByPlaybookIdError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/org/playbooks/{playbookId}',
+  });
+};
+
+/**
+ * Returns the version history of onboarding configurations for the given playbook.
+ */
+export const getOrgPlaybooksByPlaybookIdVersions = <ThrowOnError extends boolean = false>(
+  options: Options<GetOrgPlaybooksByPlaybookIdVersionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOrgPlaybooksByPlaybookIdVersionsResponse,
+    GetOrgPlaybooksByPlaybookIdVersionsError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/org/playbooks/{playbookId}/versions',
   });
 };
 

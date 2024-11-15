@@ -63,6 +63,7 @@ import type {
   CreateOnboardingConfigurationRequest,
   CreateOrgFrequentNoteRequest,
   CreateOrgTenantTagRequest,
+  CreatePlaybookVersionRequest,
   CreateProxyConfigRequest,
   CreateReviewRequest,
   CreateRule,
@@ -1968,6 +1969,134 @@ export const getCreateOrgTenantTagRequest = (
     {
       kind: 'person',
       tag: 'nulla est anim',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getCreatePlaybookVersionRequest = (
+  props: Partial<CreatePlaybookVersionRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreatePlaybookVersionRequest =>
+  deepmerge<CreatePlaybookVersionRequest>(
+    {
+      expectedLatestObcId: '0b8a9c6d-7fba-43fc-8b10-5e5b30fd947f',
+      newOnboardingConfig: {
+        allowInternationalResidents: false,
+        allowReonboard: false,
+        allowUsResidents: false,
+        allowUsTerritories: true,
+        businessDocumentsToCollect: [
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['id_card', 'voter_identification', 'passport'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['visa', 'drivers_license', 'permit'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['residence_document', 'id_card', 'visa'],
+              },
+            },
+            kind: 'identity',
+          },
+        ],
+        cipKind: 'apex',
+        curpValidationEnabled: false,
+        deprecatedCanAccessData: ['name', 'us_legal_status', 'card'],
+        docScanForOptionalSsn: 'phone_number',
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['passport', 'passport', 'residence_document'],
+        },
+        documentsToCollect: [
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['drivers_license', 'permit', 'passport'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['residence_document', 'residence_document', 'drivers_license'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['passport_card', 'drivers_license', 'drivers_license'],
+              },
+            },
+            kind: 'identity',
+          },
+        ],
+        enhancedAml: {
+          adverseMedia: false,
+          enhancedAml: true,
+          matchKind: 'fuzzy_medium',
+          ofac: true,
+          pep: false,
+        },
+        internationalCountryRestrictions: ['BO', 'ML', 'CH'],
+        isDocFirstFlow: true,
+        isNoPhoneFlow: true,
+        kind: 'auth',
+        mustCollectData: ['investor_profile', 'us_legal_status', 'business_name'],
+        name: 'Elaine Tillman PhD',
+        optionalData: ['bank', 'us_tax_id', 'us_tax_id'],
+        promptForPasskey: false,
+        requiredAuthMethods: ['passkey', 'phone', 'email'],
+        skipConfirm: true,
+        skipKyc: true,
+        verificationChecks: [
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+        ],
+      },
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -6288,6 +6417,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (
           mustCollectData: ['nationality', 'us_legal_status', 'name'],
           name: 'Devin Connelly',
           optionalData: ['ssn9', 'us_legal_status', 'card'],
+          playbookId: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
           promptForPasskey: false,
           requiredAuthMethods: ['passkey', 'email', 'email'],
           ruleSet: {
@@ -6417,6 +6547,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (
           mustCollectData: ['full_address', 'dob', 'card'],
           name: 'Devin Connelly',
           optionalData: ['dob', 'email', 'business_website'],
+          playbookId: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
           promptForPasskey: true,
           requiredAuthMethods: ['phone', 'passkey', 'phone'],
           ruleSet: {
@@ -6546,6 +6677,7 @@ export const getOffsetPaginatedOnboardingConfiguration = (
           mustCollectData: ['business_website', 'bank', 'bank'],
           name: 'Devin Connelly',
           optionalData: ['ssn9', 'phone_number', 'bank'],
+          playbookId: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
           promptForPasskey: false,
           requiredAuthMethods: ['passkey', 'passkey', 'phone'],
           ruleSet: {
@@ -6836,6 +6968,7 @@ export const getOnboardingConfiguration = (
       cipKind: 'alpaca',
       createdAt: '1919-03-24T05:04:03.0Z',
       curpValidationEnabled: false,
+      deactivatedAt: '1940-04-29T01:41:01.0Z',
       documentTypesAndCountries: {
         countrySpecific: {},
         global: ['visa', 'residence_document', 'passport'],
@@ -6890,6 +7023,7 @@ export const getOnboardingConfiguration = (
       mustCollectData: ['name', 'email', 'business_kyced_beneficial_owners'],
       name: 'Lorenzo Abshire',
       optionalData: ['business_kyced_beneficial_owners', 'business_name', 'us_tax_id'],
+      playbookId: 'f4904a80-ea55-4ab3-9c2f-2c46063d2d4d',
       promptForPasskey: true,
       requiredAuthMethods: ['passkey', 'email', 'phone'],
       ruleSet: {
