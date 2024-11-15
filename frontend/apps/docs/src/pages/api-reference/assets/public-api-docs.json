@@ -4787,7 +4787,7 @@
                                 "$ref": "#/components/schemas/TokenOperationKind"
                             },
                             {
-                                "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the\n   Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/articles/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
+                                "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/articles/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
                                 "type": "string"
                             }
                         ]
