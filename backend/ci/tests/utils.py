@@ -399,7 +399,7 @@ def create_ob_config(
         "required_auth_methods": required_auth_methods,
     }
     auths = override_auths if override_auths else tenant.db_auths
-    body = post("org/onboarding_configs", ob_conf_data, *auths)
+    body = post("org/playbooks", ob_conf_data, *auths)
     ob_config = ObConfiguration.from_response(body, tenant)
     return ob_config
 

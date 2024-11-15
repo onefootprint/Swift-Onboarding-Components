@@ -157,7 +157,7 @@ tenants = body["tenants"]
 for tenant in tenants:
     for i in range(random.randint(3, 5)):
         requests.post(
-            f"{API_BASE}/org/onboarding_configs",
+            f"{API_BASE}/org/playbooks",
             json={
                 "name": f"Playbook {i}",
                 "must_collect_data": [

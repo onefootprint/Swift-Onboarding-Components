@@ -9,17 +9,25 @@ use api_core::State;
 use api_wire_types::CreateOnboardingConfigurationRequest;
 use db::models::playbook::Playbook;
 use db::models::rule_set_version::RuleSetVersion;
+use macros::route_alias;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 
+
+// TODO: migrate clients to /org/playbooks
+#[route_alias(post(
+    "/org/onboarding_configs",
+    tags(Playbooks, Organization, Private),
+    description = "Creates a new playbook."
+))]
 #[api_v2_operation(
-    description = "Creates a new onboarding configuration.",
+    description = "Creates a new playbook.",
     tags(Playbooks, Organization, Private)
 )]
-#[post("/org/onboarding_configs")]
-pub async fn post(
+#[post("/org/playbooks")]
+pub async fn post_create_playbook(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,

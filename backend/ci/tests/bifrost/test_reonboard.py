@@ -169,7 +169,7 @@ def test_allow_reonboard_checks_all_playbook_versions(sandbox_tenant):
         "allow_reonboard": False,
     }
     obc_v1 = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         obc_req,
         *sandbox_tenant.db_auths,
     )

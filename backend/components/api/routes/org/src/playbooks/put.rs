@@ -27,6 +27,7 @@ use paperclip::actix::put;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 
+
 #[api_v2_operation(
     description = "Creates a new version (onboarding configuration) for the given playbook.",
     tags(Playbooks, Organization, Private)

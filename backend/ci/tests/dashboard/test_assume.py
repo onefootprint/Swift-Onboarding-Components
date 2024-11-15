@@ -61,7 +61,7 @@ def assumed_token(tenant, sandbox_tenant_data):
         "org",
         "org/members",
         "org/roles",
-        "org/onboarding_configs",
+        "org/playbooks",
         "org/audit_events",
     ],
 )
@@ -109,7 +109,7 @@ def test_cannot_patch(assumed_token, path):
         # ),
         # ("entities/some_fp_id/annotations", dict(note="", is_pinned=False)),
         # (
-        #     "org/onboarding_configs",
+        #     "org/playbooks",
         #     dict(name="", must_collect_data=[]),
         # ),
         ("org/members", dict(email="e@onefootprint.com", role_id="", redirect_url="")),
