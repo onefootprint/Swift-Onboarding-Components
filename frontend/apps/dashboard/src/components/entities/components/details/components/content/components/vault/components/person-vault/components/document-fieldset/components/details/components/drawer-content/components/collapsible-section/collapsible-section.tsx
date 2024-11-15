@@ -11,17 +11,18 @@ type CollapsibleSectionProps = {
   icon: Icon;
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 };
 
-const CollapsibleSection = ({ icon: Icon, title, children }: CollapsibleSectionProps) => {
-  const [open, setOpen] = useState(false);
+const CollapsibleSection = ({ icon: Icon, title, children, defaultOpen = false }: CollapsibleSectionProps) => {
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
     <Stack direction="column" gap={3} align="flex-start" width="100%">
       <CollapsibleRoot className="CollapsibleRoot" open={open} onOpenChange={setOpen} asChild>
         <Container layoutRoot>
           <StyledTrigger>
-            <Stack gap={2} align="center" justify="flex-start">
+            <Stack position="relative" left="-2px" gap={2} align="center" justify="flex-start">
               <Icon />
               <Text variant="label-2">{title}</Text>
             </Stack>
@@ -52,6 +53,10 @@ const Container = styled(motion.div)`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     width: 100%;
     gap: ${theme.spacing[2]};
+
+    &:has(${StyledTrigger}:hover) {
+      background-color: ${theme.backgroundColor.secondary};
+    }
   `};
 `;
 
@@ -65,6 +70,7 @@ const StyledTrigger = styled(CollapsibleTrigger)`
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
+    border-radius: ${theme.borderRadius.default};
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};

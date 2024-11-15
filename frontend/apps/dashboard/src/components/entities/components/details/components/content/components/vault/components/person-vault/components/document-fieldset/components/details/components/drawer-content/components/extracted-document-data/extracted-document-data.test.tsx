@@ -20,22 +20,22 @@ describe('<ExtractedDocumentData />', () => {
 
     const nameLabel = screen.getByText('Full name');
     expect(nameLabel).toBeInTheDocument();
-    const name = screen.getByText('test drivers license full name');
+    const name = screen.getByText('Test Drivers License Full Name');
     expect(name).toBeInTheDocument();
 
     const dobLabel = screen.getByText('Date of birth');
     expect(dobLabel).toBeInTheDocument();
-    const dob = screen.getByText('test drivers license DOB');
+    const dob = screen.getByText('06/15/1992');
     expect(dob).toBeInTheDocument();
 
     const genderLabel = screen.getByText('Gender');
     expect(genderLabel).toBeInTheDocument();
-    const gender = screen.getByText('test drivers license gender');
+    const gender = screen.getByText('Test Drivers License Gender');
     expect(gender).toBeInTheDocument();
 
     const addressLabel = screen.getByText('Address');
     expect(addressLabel).toBeInTheDocument();
-    const address = screen.getByText('test drivers license full address');
+    const address = screen.getByText('Test Drivers License Full Address');
     expect(address).toBeInTheDocument();
 
     const documentNumberLabel = screen.getByText('Document number');
@@ -43,23 +43,21 @@ describe('<ExtractedDocumentData />', () => {
     const documentNumber = screen.getByText('test drivers license document number');
     expect(documentNumber).toBeInTheDocument();
 
-    const issuedAtLabel = screen.getByText('Issued at');
-    expect(issuedAtLabel).toBeInTheDocument();
-    const issuedAt = screen.getByText('test drivers license issued at');
+    const issuedAt = screen.getByText('01/15/2021');
     expect(issuedAt).toBeInTheDocument();
 
     const expiresAtLabel = screen.getByText('Expires at');
     expect(expiresAtLabel).toBeInTheDocument();
-    expect(screen.getByText('test drivers license expires at')).toBeInTheDocument();
+    expect(screen.getByText('01/15/2026')).toBeInTheDocument();
 
     const issuingStateLabel = screen.getByText('Issuing state');
     expect(issuingStateLabel).toBeInTheDocument();
-    const issuingState = screen.getByText('test drivers license issuing state');
+    const issuingState = screen.getByText('Test Drivers License Issuing State');
     expect(issuingState).toBeInTheDocument();
 
     const issuingCountryLabel = screen.getByText('Issuing country');
     expect(issuingCountryLabel).toBeInTheDocument();
-    const issuingCountry = screen.getByText('test drivers license issuing country');
+    const issuingCountry = screen.getByText('Test Drivers License Issuing Country');
     expect(issuingCountry).toBeInTheDocument();
 
     const refNumberLabel = screen.getByText('Ref number');
@@ -89,22 +87,22 @@ describe('<ExtractedDocumentData />', () => {
 
     const nameLabel = screen.getByText('Full name');
     expect(nameLabel).toBeInTheDocument();
-    const name = screen.getByText('test ID full name');
+    const name = screen.getByText('Test ID Full Name');
     expect(name).toBeInTheDocument();
 
     const dobLabel = screen.getByText('Date of birth');
     expect(dobLabel).toBeInTheDocument();
-    const dob = screen.getByText('test ID DOB');
+    const dob = screen.getByText('04/15/1990');
     expect(dob).toBeInTheDocument();
 
     const genderLabel = screen.getByText('Gender');
     expect(genderLabel).toBeInTheDocument();
-    const gender = screen.getByText('test id card gender');
+    const gender = screen.getByText('Test ID Card Gender');
     expect(gender).toBeInTheDocument();
 
     const addressLabel = screen.getByText('Address');
     expect(addressLabel).toBeInTheDocument();
-    const address = screen.getByText('test id card full address');
+    const address = screen.getByText('Test ID Card Full Address');
     expect(address).toBeInTheDocument();
 
     const documentNumberLabel = screen.getByText('Document number');
@@ -112,24 +110,22 @@ describe('<ExtractedDocumentData />', () => {
     const documentNumber = screen.getByText('test id card document number');
     expect(documentNumber).toBeInTheDocument();
 
-    const issuedAtLabel = screen.getByText('Issued at');
-    expect(issuedAtLabel).toBeInTheDocument();
-    const issuedAt = screen.getByText('test id card issued at');
+    const issuedAt = screen.getByText('04/23/2020');
     expect(issuedAt).toBeInTheDocument();
 
     const expiresAtLabel = screen.getByText('Expires at');
     expect(expiresAtLabel).toBeInTheDocument();
-    const expiresAt = screen.getByText('test id card expires at');
+    const expiresAt = screen.getByText('12/31/2025');
     expect(expiresAt).toBeInTheDocument();
 
     const issuingStateLabel = screen.getByText('Issuing state');
     expect(issuingStateLabel).toBeInTheDocument();
-    const issuingState = screen.getByText('test id card issuing state');
+    const issuingState = screen.getByText('Test ID Card Issuing State');
     expect(issuingState).toBeInTheDocument();
 
     const issuingCountryLabel = screen.getByText('Issuing country');
     expect(issuingCountryLabel).toBeInTheDocument();
-    const issuingCountry = screen.getByText('test id card issuing country');
+    const issuingCountry = screen.getByText('Test ID Card Issuing Country');
     expect(issuingCountry).toBeInTheDocument();
 
     const refNumberLabel = screen.getByText('Ref number');
@@ -154,22 +150,22 @@ describe('<ExtractedDocumentData />', () => {
 
     const nameLabel = screen.getByText('Full name');
     expect(nameLabel).toBeInTheDocument();
-    const name = screen.getByText('test passport full name');
+    const name = screen.getByText('Test Passport Full Name');
     expect(name).toBeInTheDocument();
 
     const dobLabel = screen.getByText('Date of birth');
     expect(dobLabel).toBeInTheDocument();
-    const dob = screen.getByText('test passport DOB');
+    const dob = screen.getByText('03/03/1988');
     expect(dob).toBeInTheDocument();
 
     const genderLabel = screen.getByText('Gender');
     expect(genderLabel).toBeInTheDocument();
-    const gender = screen.getByText('test passport gender');
+    const gender = screen.getByText('Test Passport Gender');
     expect(gender).toBeInTheDocument();
 
     const addressLabel = screen.getByText('Address');
     expect(addressLabel).toBeInTheDocument();
-    const address = screen.getByText('test passport full address');
+    const address = screen.getByText('Test Passport Full Address');
     expect(address).toBeInTheDocument();
 
     const documentNumberLabel = screen.getByText('Document number');
@@ -179,22 +175,22 @@ describe('<ExtractedDocumentData />', () => {
 
     const issuedAtLabel = screen.getByText('Issued at');
     expect(issuedAtLabel).toBeInTheDocument();
-    const issuedAt = screen.getByText('test passport issued at');
+    const issuedAt = screen.getByText('08/20/2019');
     expect(issuedAt).toBeInTheDocument();
 
     const expiresAtLabel = screen.getByText('Expires at');
     expect(expiresAtLabel).toBeInTheDocument();
-    const expiresAt = screen.getByText('test passport expires at');
+    const expiresAt = screen.getByText('08/20/2029');
     expect(expiresAt).toBeInTheDocument();
 
     const issuingStateLabel = screen.getByText('Issuing state');
     expect(issuingStateLabel).toBeInTheDocument();
-    const issuingState = screen.getByText('test passport issuing state');
+    const issuingState = screen.getByText('Test Passport Issuing State');
     expect(issuingState).toBeInTheDocument();
 
     const issuingCountryLabel = screen.getByText('Issuing country');
     expect(issuingCountryLabel).toBeInTheDocument();
-    const issuingCountry = screen.getByText('test passport issuing country');
+    const issuingCountry = screen.getByText('Test Passport Issuing Country');
     expect(issuingCountry).toBeInTheDocument();
 
     const refNumberLabel = screen.getByText('Ref number');
@@ -219,24 +215,24 @@ describe('<ExtractedDocumentData />', () => {
 
     const nameLabel = screen.getByText('Full name');
     expect(nameLabel).toBeInTheDocument();
-    const name = screen.getByText('test drivers license full name');
+    const name = screen.getByText('Test Drivers License Full Name');
     expect(name).toBeInTheDocument();
 
     const dobLabel = screen.getByText('Date of birth');
     expect(dobLabel).toBeInTheDocument();
-    const dob = screen.getByText('test drivers license DOB');
+    const dob = screen.getByText('04/15/1990');
     expect(dob).toBeInTheDocument();
 
     const genderLabel = screen.getByText('Gender');
     expect(genderLabel).toBeInTheDocument();
-    const gender = screen.getByText('test drivers license gender');
+    const gender = screen.getByText('Test Drivers License Gender');
     expect(gender).toBeInTheDocument();
 
     // all of these are not in this particular DI
     // we should not see them even though they are drivers license DIs
     const addressLabel = screen.queryByText('Address');
     expect(addressLabel).not.toBeInTheDocument();
-    const address = screen.queryByText('test drivers license full address');
+    const address = screen.queryByText('Test Drivers License Full Address');
     expect(address).not.toBeInTheDocument();
 
     const documentNumberLabel = screen.queryByText('Document number');
@@ -246,22 +242,22 @@ describe('<ExtractedDocumentData />', () => {
 
     const issuedAtLabel = screen.queryByText('Issued at');
     expect(issuedAtLabel).not.toBeInTheDocument();
-    const issuedAt = screen.queryByText('test drivers license issued at');
+    const issuedAt = screen.queryByText('01/15/2021');
     expect(issuedAt).not.toBeInTheDocument();
 
     const expiresAtLabel = screen.queryByText('Expires at');
     expect(expiresAtLabel).not.toBeInTheDocument();
-    const expiresAt = screen.queryByText('test drivers license expires at');
+    const expiresAt = screen.queryByText('01/15/2026');
     expect(expiresAt).not.toBeInTheDocument();
 
     const issuingStateLabel = screen.queryByText('Issuing state');
     expect(issuingStateLabel).not.toBeInTheDocument();
-    const issuingState = screen.queryByText('test drivers license issuing state');
+    const issuingState = screen.queryByText('Test Drivers License Issuing State');
     expect(issuingState).not.toBeInTheDocument();
 
     const issuingCountryLabel = screen.queryByText('Issuing country');
     expect(issuingCountryLabel).not.toBeInTheDocument();
-    const issuingCountry = screen.queryByText('test drivers license issuing country');
+    const issuingCountry = screen.queryByText('Test Drivers License Issuing Country');
     expect(issuingCountry).not.toBeInTheDocument();
 
     const refNumberLabel = screen.queryByText('Ref number');

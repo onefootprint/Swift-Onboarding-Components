@@ -1,10 +1,12 @@
 import { IcoFileText24 } from '@onefootprint/icons';
-import { type DocumentDI, type EntityVault, type SupportedIdDocTypes, isVaultDataText } from '@onefootprint/types';
+import type { EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 import getRelevantKeys from '../../../../../../utils/get-relevant-keys';
+import CollapsibleSection from '../collapsible-section';
 import useDataLabelText from './hooks/use-data-label-text';
+import getDataValue from './utils/get-data-value';
 
 export type ExtractedDocumentDataProps = {
   vault: EntityVault;
@@ -23,32 +25,28 @@ const ExtractedDocumentData = ({ vault, documentType, activeDocumentVersion }: E
     currentDocumentNumber: activeDocumentVersion,
   });
 
-  const getVaultValueString = (key: DocumentDI) => {
-    const vaultValue = vault[key];
-    const valueString = isVaultDataText(vaultValue) ? vaultValue : JSON.stringify(vaultValue);
-    return valueString ? valueString : '-';
-  };
+  if (relevantKeys.length === 0) return null;
 
-  return relevantKeys.length ? (
-    <Stack direction="column" gap={5} align="flex-start">
-      <Stack gap={2} align="center" justify="flex-start" position="relative" left="-2px">
-        <IcoFileText24 />
-        <Text variant="label-2">{t('title')}</Text>
-      </Stack>
+  return (
+    <CollapsibleSection icon={IcoFileText24} title={t('title')} defaultOpen={true}>
       <Stack direction="column" gap={3} width="100%">
-        {relevantKeys.sort().map(key => (
-          <Stack key={key} justify="space-between" flexWrap="wrap">
-            <Text variant="body-3" color="tertiary" tag="label">
-              {dataLabelT(key, activeDocumentVersion)}
-            </Text>
-            <Text variant="body-3" color="primary" textAlign="right" truncate>
-              {getVaultValueString(key)}
-            </Text>
-          </Stack>
-        ))}
+        {relevantKeys.sort().map(key => {
+          const vaultValue = vault[key];
+          const value = getDataValue(vaultValue, key, activeDocumentVersion);
+          return (
+            <Stack key={key} justify="space-between" gap={7}>
+              <Text variant="body-3" color="tertiary" tag="label">
+                {dataLabelT(key, activeDocumentVersion)}
+              </Text>
+              <Text variant="body-3" color="primary" textAlign="right" truncate title={value}>
+                {value}
+              </Text>
+            </Stack>
+          );
+        })}
       </Stack>
-    </Stack>
-  ) : null;
+    </CollapsibleSection>
+  );
 };
 
 export default ExtractedDocumentData;

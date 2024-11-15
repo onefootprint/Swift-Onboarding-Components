@@ -1,9 +1,10 @@
 import { IcoSpeedometer24 } from '@onefootprint/icons';
 import type { Document } from '@onefootprint/types';
-import { Stack, Text } from '@onefootprint/ui';
+import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import CollapsibleSection from '../collapsible-section';
 import ConfidenceScore from './components/confidence-score';
 
 type ConfidenceScoresProps = {
@@ -14,29 +15,15 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'fieldset.document.drawer.confidence-scores',
   });
+  const confidenceScoreLabels = [t('labels.document'), t('labels.extracted-data'), t('labels.face-match')];
   const confidenceScores = [document?.documentScore, document?.ocrConfidenceScore, document?.selfieScore];
   const numScores = confidenceScores.filter(score => score || score === 0).length;
-  if (numScores === 0) {
-    return null;
-  }
-  const confidenceScoreLabels = [t('labels.document'), t('labels.extracted-data'), t('labels.face-match')];
+
+  if (numScores === 0) return null;
 
   return (
-    <Stack direction="column" gap={5} align="flex-start">
-      <Stack gap={2} align="flex-start" justify="flex-start" position="relative" left="-2px">
-        <IcoSpeedometer24 />
-        <Text variant="label-2">{t('title')}</Text>
-      </Stack>
-      <Stack
-        justify="space-between"
-        gap={6}
-        borderWidth={1}
-        borderStyle="solid"
-        borderColor="tertiary"
-        borderRadius="default"
-        padding={5}
-        width="100%"
-      >
+    <CollapsibleSection icon={IcoSpeedometer24} title={t('title')} defaultOpen={true}>
+      <Stack justify="space-between" gap={6} width="100%">
         {confidenceScores.map((score, index) =>
           score || score === 0 ? (
             <ScoreContainer
@@ -54,7 +41,7 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
           ) : null,
         )}
       </Stack>
-    </Stack>
+    </CollapsibleSection>
   );
 };
 
