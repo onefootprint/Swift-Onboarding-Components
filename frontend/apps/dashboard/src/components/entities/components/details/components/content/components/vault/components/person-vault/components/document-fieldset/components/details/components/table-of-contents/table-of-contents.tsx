@@ -33,9 +33,10 @@ const TableOfContents = ({ successfulUploads, failedUploads, onClick, visibleInd
         })}
         {failedUploads.map((sameSideUploads, index) => {
           const { identifier, version, side } = sameSideUploads[0];
-          const isActive = index + successfulUploads.length === visibleIndex;
+          const actualIndex = index + successfulUploads.length;
+          const isActive = actualIndex === visibleIndex;
           return (
-            <UploadButton key={`${identifier}:${version}`} onClick={() => onClick(index)} $isActive={isActive}>
+            <UploadButton key={`${identifier}:${version}`} onClick={() => onClick(actualIndex)} $isActive={isActive}>
               {t('table-of-contents.label', {
                 side: sideT(side),
                 status: t('status.failed-count', { count: sameSideUploads.length }),

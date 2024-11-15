@@ -10,12 +10,23 @@ const findVisibleElement = (containerRect: DOMRect, elements: (ScrollElement | n
   const fullyVisibleIndex = elements.findIndex((element, index) => {
     if (!element) return false;
 
-    const { top, bottom, height } = element.getBoundingClientRect();
+    const { top: elementTop, bottom: elementBottom } = element.getBoundingClientRect();
+    const { top: containerTop, bottom: containerBottom } = containerRect;
+    if (elementTop >= containerTop && elementBottom <= containerBottom) return true;
 
-    if (top >= containerRect.top && bottom <= containerRect.bottom) return true;
-    const center = top + height / 2;
-    const containerCenter = containerRect.top + containerRect.height / 2;
-    if (Math.abs(center - containerCenter) < height) partiallyVisibleIndex = index;
+    // Element is partially visible if:
+    // - its top is between container top and bottom OR
+    // - its bottom is between container top and bottom OR
+    // - it completely encompasses the container
+    const isPartiallyVisible =
+      (elementTop >= containerTop && elementTop <= containerBottom) ||
+      (elementBottom >= containerTop && elementBottom <= containerBottom) ||
+      (elementTop <= containerTop && elementBottom >= containerBottom);
+    if (isPartiallyVisible) {
+      partiallyVisibleIndex = index;
+    }
+
+    return false;
   });
 
   return fullyVisibleIndex === -1 ? partiallyVisibleIndex : fullyVisibleIndex;
