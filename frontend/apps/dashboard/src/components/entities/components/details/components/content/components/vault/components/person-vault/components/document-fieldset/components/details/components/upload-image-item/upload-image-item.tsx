@@ -1,5 +1,6 @@
 import type { DocumentUpload, EntityVault, IdDocImageProcessingError } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
+import { format } from 'date-fns';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 import UploadTitleCard from '../upload-title-card';
@@ -27,6 +28,7 @@ const UploadImageItem = forwardRef<HTMLDivElement, UploadImageItemProps>(
         alt={di}
         failureReasons={upload.failureReasons as IdDocImageProcessingError[]}
         rotateIndex={rotateIndex}
+        timestamp={imageOnly ? format(new Date(upload.timestamp), 'h:mma') : undefined}
       />
     );
 

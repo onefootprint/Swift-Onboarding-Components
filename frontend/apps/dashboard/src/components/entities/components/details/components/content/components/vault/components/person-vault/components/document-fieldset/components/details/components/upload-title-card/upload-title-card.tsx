@@ -6,11 +6,13 @@ import useUploadSideText from '../../../../hooks/use-upload-side-text';
 
 export type UploadTitleCardProps = {
   upload: DocumentUpload & { isLatest: boolean };
+  customTimestamp?: string;
   rightChildren?: React.ReactNode;
 };
 
 const UploadTitleCard = ({
   upload: { timestamp, failureReasons, isLatest, side },
+  customTimestamp,
   rightChildren,
 }: UploadTitleCardProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset.documents.details' });
@@ -36,7 +38,7 @@ const UploadTitleCard = ({
     >
       <Stack gap={2} align="center">
         <Text variant="snippet-1" truncate>
-          {format(new Date(timestamp), 'MM/dd/yy h:mma')}
+          {customTimestamp ?? format(new Date(timestamp), 'MM/dd/yy h:mma')}
         </Text>
         <Text tag="span" variant="label-3">
           ⋅

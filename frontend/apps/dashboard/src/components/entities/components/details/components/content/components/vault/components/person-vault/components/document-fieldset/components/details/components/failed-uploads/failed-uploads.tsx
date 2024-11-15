@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import UploadImageItem from '../upload-image-item';
 import UploadTitleCard from '../upload-title-card';
 
+import getTimestampRange from './utils/get-timestamp-range';
 export type FailedUploadsProps = {
   uploads: (DocumentUpload & { isLatest: boolean })[];
   vault: EntityVault;
@@ -23,6 +24,7 @@ const FailedUploads = forwardRef<HTMLDivElement, FailedUploadsProps>(({ uploads,
     <Stack direction="column" align="center" width="100%" ref={ref}>
       <UploadTitleCard
         upload={uploads[0]}
+        customTimestamp={getTimestampRange(uploads)}
         rightChildren={
           <Stack align="center" gap={2}>
             <Text variant="label-3">{t('title-card.attempts', { count: uploads.length })}</Text>
