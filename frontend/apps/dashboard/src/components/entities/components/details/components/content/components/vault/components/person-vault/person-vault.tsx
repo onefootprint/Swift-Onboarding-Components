@@ -10,12 +10,10 @@ import styled, { css } from 'styled-components';
 
 import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses';
 
-import useSession from 'src/hooks/use-session';
 import AddressFieldset from '../address-fieldset';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
-import DocumentFields from './components/document-fields';
 import DocumentFieldset from './components/document-fieldset';
 import FinancialFieldset from './components/financial-fieldset';
 import InvestorProfileFields from './components/investor-profile-fields';
@@ -34,19 +32,11 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
   );
   const hasCards = hasEntityCards(entity);
   const hasBankAccounts = hasEntityBankAccounts(entity);
-  const hasDocuments = hasEntityDocuments(entity);
-  const hasInvestorProfile = hasEntityInvestorProfile(entity);
-  const hasCustomData = entity.data.some(
-    attr => attr.identifier.startsWith('custom') || attr.identifier.startsWith('document.custom'),
-  );
-  const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(entity.id);
-
-  const {
-    data: { user },
-  } = useSession();
-  const hasAnyDocuments =
+  const hasDocuments =
     hasEntityDocuments(entity) || entity.data.some(attr => attr.identifier.startsWith('document.custom'));
-  const showNewDocumentFieldset = user?.isFirmEmployee && hasAnyDocuments;
+  const hasInvestorProfile = hasEntityInvestorProfile(entity);
+  const hasCustomData = entity.data.some(attr => attr.identifier.startsWith('custom'));
+  const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(entity.id);
 
   // if there are three elements, we want to display as grid
   const displayFirstSectionAsGrid = getGridTemplateAreas({ entity, hasBusinesses }) <= 3;
@@ -124,18 +114,6 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           </GridItem>
         ) : null}
         {hasDocuments ? (
-          <GridItem>
-            <Fieldset
-              fields={documents.fields}
-              iconComponent={documents.iconComponent}
-              title={documents.title}
-              footer={<RiskSignalsOverview type="document" />}
-            >
-              <DocumentFields />
-            </Fieldset>
-          </GridItem>
-        ) : null}
-        {showNewDocumentFieldset ? (
           <WideGridItem>
             <DocumentFieldset fields={documents.fields} />
           </WideGridItem>
