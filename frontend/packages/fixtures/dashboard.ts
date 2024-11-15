@@ -2302,7 +2302,6 @@ export const getCreateTokenResponse = (
   deepmerge<CreateTokenResponse>(
     {
       expiresAt: '1916-08-06T07:48:41.0Z',
-      kind: 'trigger',
       link: 'minim id',
       token: '0e29d8e2-2ac6-496d-bab1-c8b6373287a3',
     },
@@ -5569,7 +5568,6 @@ export const getManualDecisionRequest = (
         isPinned: false,
         note: 'occaecat ut laboris qui sit',
       },
-      kind: 'manual_decision',
       status: 'pass',
     },
     props,
@@ -8338,7 +8336,6 @@ export const getTriggerRequest = (
   deepmerge<TriggerRequest>(
     {
       fpBid: '54bda7fa-e958-4aaa-b672-6dbbca8b515a',
-      kind: 'trigger',
       note: 'minim dolore consequat commodo',
       trigger: {
         data: {

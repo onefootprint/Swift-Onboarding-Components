@@ -8821,22 +8821,33 @@
             "Actor": {
                 "anyOf": [
                     {
-                        "description": "A user onboarding with Footprint.",
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
+                        "allOf": [
+                            {
+                                "description": "A user onboarding with Footprint.",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id"
+                                ]
                             },
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "user"
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "user"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
                                 ]
                             }
-                        },
-                        "required": [
-                            "id",
-                            "kind"
                         ]
                     },
                     {
@@ -8870,55 +8881,77 @@
                         ]
                     },
                     {
-                        "description": "A dashboard user for a tenant",
-                        "type": "object",
-                        "properties": {
-                            "email": {
-                                "type": "string"
-                            },
-                            "first_name": {
-                                "type": "string"
-                            },
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "organization"
+                        "allOf": [
+                            {
+                                "description": "A dashboard user for a tenant",
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "member": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "member"
                                 ]
                             },
-                            "last_name": {
-                                "type": "string"
-                            },
-                            "member": {
-                                "type": "string"
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "organization"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
                             }
-                        },
-                        "required": [
-                            "email",
-                            "kind",
-                            "member"
                         ]
                     },
                     {
-                        "description": "A tenant API key",
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            },
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "api_key"
+                        "allOf": [
+                            {
+                                "description": "A tenant API key",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
                                 ]
                             },
-                            "name": {
-                                "type": "string"
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "api_key"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
                             }
-                        },
-                        "required": [
-                            "id",
-                            "kind",
-                            "name"
                         ]
                     }
                 ]
@@ -11285,12 +11318,6 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "trigger"
-                        ]
-                    },
                     "link": {
                         "example": "https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
                         "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
@@ -11304,7 +11331,6 @@
                 },
                 "required": [
                     "expires_at",
-                    "kind",
                     "link",
                     "token"
                 ]
@@ -12617,7 +12643,25 @@
             "EntityAction": {
                 "anyOf": [
                     {
-                        "$ref": "#/components/schemas/TriggerRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TriggerRequest"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "trigger"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
                     },
                     {
                         "type": "object",
@@ -12634,14 +12678,50 @@
                         ]
                     },
                     {
-                        "$ref": "#/components/schemas/ManualDecisionRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ManualDecisionRequest"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "manual_decision"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
             "EntityActionResponse": {
                 "anyOf": [
                     {
-                        "$ref": "#/components/schemas/CreateTokenResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CreateTokenResponse"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "trigger"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
@@ -14402,21 +14482,32 @@
                         ]
                     },
                     {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            },
-                            "kind": {
-                                "type": "string",
-                                "enum": [
+                        "allOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
                                     "id"
                                 ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "id"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
                             }
-                        },
-                        "required": [
-                            "id",
-                            "kind"
                         ]
                     }
                 ]
@@ -15172,19 +15263,12 @@
                     "annotation": {
                         "$ref": "#/components/schemas/CreateAnnotationRequest"
                     },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "manual_decision"
-                        ]
-                    },
                     "status": {
                         "$ref": "#/components/schemas/TerminalDecisionStatus"
                     }
                 },
                 "required": [
                     "annotation",
-                    "kind",
                     "status"
                 ]
             },
@@ -18561,22 +18645,33 @@
                         ]
                     },
                     {
-                        "description": "Invoke the specified vault proxies",
-                        "type": "object",
-                        "properties": {
-                            "data": {
-                                "$ref": "#/components/schemas/InvokeVaultProxyPermission"
+                        "allOf": [
+                            {
+                                "description": "Invoke the specified vault proxies",
+                                "type": "object",
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/InvokeVaultProxyPermission"
+                                    }
+                                },
+                                "required": [
+                                    "data"
+                                ]
                             },
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "invoke_vault_proxy"
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "invoke_vault_proxy"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
                                 ]
                             }
-                        },
-                        "required": [
-                            "data",
-                            "kind"
                         ]
                     },
                     {
@@ -18640,22 +18735,33 @@
                         ]
                     },
                     {
-                        "description": "Allows decrypting data attributes belonging to the listed CollectedDataOption",
-                        "type": "object",
-                        "properties": {
-                            "data": {
-                                "$ref": "#/components/schemas/CollectedDataOption"
+                        "allOf": [
+                            {
+                                "description": "Allows decrypting data attributes belonging to the listed CollectedDataOption",
+                                "type": "object",
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/CollectedDataOption"
+                                    }
+                                },
+                                "required": [
+                                    "data"
+                                ]
                             },
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "decrypt"
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "decrypt"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
                                 ]
                             }
-                        },
-                        "required": [
-                            "data",
-                            "kind"
                         ]
                     },
                     {
@@ -18929,12 +19035,6 @@
                     "fp_bid": {
                         "type": "string"
                     },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "trigger"
-                        ]
-                    },
                     "note": {
                         "description": "Optional note with more context on what we're asking the user to do",
                         "type": "string"
@@ -18944,7 +19044,6 @@
                     }
                 },
                 "required": [
-                    "kind",
                     "trigger"
                 ]
             },

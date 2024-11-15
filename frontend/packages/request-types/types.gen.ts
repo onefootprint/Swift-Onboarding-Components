@@ -33,8 +33,16 @@ export type AuthorizedOrg = {
   orgName: string;
 };
 export type BatchHostedBusinessOwnerRequest =
-  | UpdateOrCreateHostedBusinessOwnerRequest
-  | DeleteHostedBusinessOwnerRequest;
+  | (UpdateOrCreateHostedBusinessOwnerRequest & {
+      op: 'update';
+    })
+  | (UpdateOrCreateHostedBusinessOwnerRequest & {
+      op: 'create';
+    })
+  | (DeleteHostedBusinessOwnerRequest & {
+      op: 'delete';
+    });
+export type op = 'update';
 export type BusinessOnboardingResponse = {
   authToken: string;
   isNewBusiness: boolean;
@@ -456,10 +464,8 @@ export type DataIdentifier =
   | 'bank.*.account_type'
   | 'bank.*.fingerprint';
 export type DeleteHostedBusinessOwnerRequest = {
-  op: 'delete';
   uuid: string;
 };
-export type op = 'delete';
 export type DeviceAttestationChallengeResponse = {
   /**
    * attestation challenge to use
@@ -1836,11 +1842,9 @@ export type UpdateAuthMethodsV1SdkArgs = {
 };
 export type UpdateOrCreateHostedBusinessOwnerRequest = {
   data: ModernRawUserDataRequest;
-  op: 'create';
   ownershipStake?: number;
   uuid: string;
 };
-export type op2 = 'create';
 export type UserAuthScope =
   | 'sign_up'
   | 'auth'

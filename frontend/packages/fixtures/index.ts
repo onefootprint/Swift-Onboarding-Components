@@ -771,7 +771,6 @@ export const getDeleteHostedBusinessOwnerRequest = (
 ): DeleteHostedBusinessOwnerRequest =>
   deepmerge<DeleteHostedBusinessOwnerRequest>(
     {
-      op: 'delete',
       uuid: 'c7b1c5de-3b85-44a5-ad9d-2d92641f30d3',
     },
     props,
@@ -3215,7 +3214,6 @@ export const getUpdateOrCreateHostedBusinessOwnerRequest = (
         'investor_profile.risk_tolerance': 'cillum',
         'investor_profile.senior_executive_symbols': 'ea',
       },
-      op: 'create',
       ownershipStake: 77074481,
       uuid: '5801ab10-beb7-4447-91bc-031c4e582ad2',
     },

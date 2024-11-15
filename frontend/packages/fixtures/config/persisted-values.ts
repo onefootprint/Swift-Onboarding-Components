@@ -833,7 +833,6 @@ export const hosted_D2pUpdateStatusRequest: D2pUpdateStatusRequest = {
 };
 export const hosted_DataIdentifier: DataIdentifier = 'document.passport.curp_validation_response';
 export const hosted_DeleteHostedBusinessOwnerRequest: DeleteHostedBusinessOwnerRequest = {
-  op: 'delete',
   uuid: 'c7b1c5de-3b85-44a5-ad9d-2d92641f30d3',
 };
 export const hosted_DeviceAttestationChallengeResponse: DeviceAttestationChallengeResponse = {
@@ -2763,7 +2762,6 @@ export const hosted_UpdateOrCreateHostedBusinessOwnerRequest: UpdateOrCreateHost
     'investor_profile.risk_tolerance': 'cillum',
     'investor_profile.senior_executive_symbols': 'ea',
   },
-  op: 'create',
   ownershipStake: 77074481,
   uuid: '5801ab10-beb7-4447-91bc-031c4e582ad2',
 };
@@ -4315,7 +4313,6 @@ export const dashboard_CreateTenantUserRequest: CreateTenantUserRequest = {
 };
 export const dashboard_CreateTokenResponse: CreateTokenResponse = {
   expiresAt: '1916-08-06T07:48:41.0Z',
-  kind: 'trigger',
   link: 'minim id',
   token: '0e29d8e2-2ac6-496d-bab1-c8b6373287a3',
 };
@@ -5390,11 +5387,52 @@ export const dashboard_EntityAction: EntityAction = {
   note: 'Duis qui',
   trigger: {
     data: {
-      playbookId: 'cd831b57-f413-4486-91af-5090f3fd0127',
-      recollectAttributes: ['nationality', 'ssn4', 'business_address'],
-      reuseExistingBoKyc: true,
+      businessConfigs: [
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['permit', 'voter_identification', 'drivers_license'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            requiresHumanReview: false,
+          },
+          kind: 'proof_of_ssn',
+        },
+        {
+          data: {
+            requiresHumanReview: true,
+          },
+          kind: 'proof_of_address',
+        },
+      ],
+      configs: [
+        {
+          data: {
+            requiresHumanReview: false,
+          },
+          kind: 'proof_of_address',
+        },
+        {
+          data: {
+            requiresHumanReview: false,
+          },
+          kind: 'proof_of_ssn',
+        },
+        {
+          data: {
+            requiresHumanReview: true,
+          },
+          kind: 'proof_of_ssn',
+        },
+      ],
     },
-    kind: 'onboard',
+    kind: 'document',
   },
 };
 export const dashboard_EntityActionResponse: EntityActionResponse = {
@@ -6969,7 +7007,6 @@ export const dashboard_ManualDecisionRequest: ManualDecisionRequest = {
     isPinned: false,
     note: 'occaecat ut laboris qui sit',
   },
-  kind: 'manual_decision',
   status: 'pass',
 };
 export const dashboard_ManualReview: ManualReview = {
@@ -9180,7 +9217,6 @@ export const dashboard_TimelinePlaybook: TimelinePlaybook = {
 export const dashboard_TokenOperationKind: TokenOperationKind = 'update_auth_methods';
 export const dashboard_TriggerRequest: TriggerRequest = {
   fpBid: '54bda7fa-e958-4aaa-b672-6dbbca8b515a',
-  kind: 'trigger',
   note: 'minim dolore consequat commodo',
   trigger: {
     data: {

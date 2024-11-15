@@ -4809,12 +4809,6 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "trigger"
-                        ]
-                    },
                     "link": {
                         "example": "https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
                         "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
@@ -4828,7 +4822,6 @@
                 },
                 "required": [
                     "expires_at",
-                    "kind",
                     "link",
                     "token"
                 ]

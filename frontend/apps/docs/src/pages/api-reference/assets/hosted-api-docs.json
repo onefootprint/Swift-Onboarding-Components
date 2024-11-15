@@ -2560,13 +2560,67 @@
                 },
                 "anyOf": [
                     {
-                        "$ref": "#/components/schemas/UpdateOrCreateHostedBusinessOwnerRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/UpdateOrCreateHostedBusinessOwnerRequest"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "op": {
+                                        "type": "string",
+                                        "enum": [
+                                            "update"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "op"
+                                ]
+                            }
+                        ]
                     },
                     {
-                        "$ref": "#/components/schemas/UpdateOrCreateHostedBusinessOwnerRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/UpdateOrCreateHostedBusinessOwnerRequest"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "op": {
+                                        "type": "string",
+                                        "enum": [
+                                            "create"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "op"
+                                ]
+                            }
+                        ]
                     },
                     {
-                        "$ref": "#/components/schemas/DeleteHostedBusinessOwnerRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DeleteHostedBusinessOwnerRequest"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "op": {
+                                        "type": "string",
+                                        "enum": [
+                                            "delete"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "op"
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
@@ -3171,19 +3225,12 @@
             "DeleteHostedBusinessOwnerRequest": {
                 "type": "object",
                 "properties": {
-                    "op": {
-                        "type": "string",
-                        "enum": [
-                            "delete"
-                        ]
-                    },
                     "uuid": {
                         "type": "string",
                         "format": "uuid"
                     }
                 },
                 "required": [
-                    "op",
                     "uuid"
                 ]
             },
@@ -6669,12 +6716,6 @@
                     "data": {
                         "$ref": "#/components/schemas/ModernRawUserDataRequest"
                     },
-                    "op": {
-                        "type": "string",
-                        "enum": [
-                            "create"
-                        ]
-                    },
                     "ownership_stake": {
                         "type": "integer",
                         "format": "int32"
@@ -6686,7 +6727,6 @@
                 },
                 "required": [
                     "data",
-                    "op",
                     "uuid"
                 ]
             },
