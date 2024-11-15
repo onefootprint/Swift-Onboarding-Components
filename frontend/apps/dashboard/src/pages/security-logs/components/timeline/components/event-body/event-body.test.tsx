@@ -6,6 +6,7 @@ describe('<EventBody />', () => {
   it('renders decryption reason when kind is DecryptUserData', () => {
     customRender(
       <EventBody
+        showDecryptionReason
         auditEvent={getAuditEvent({
           detail: getAuditEventDetail({
             kind: 'decrypt_user_data',
@@ -20,6 +21,7 @@ describe('<EventBody />', () => {
   it('renders nothing for other kinds', () => {
     customRender(
       <EventBody
+        showDecryptionReason
         auditEvent={getAuditEvent({
           detail: getAuditEventDetail({
             kind: 'disable_playbook',

@@ -4,6 +4,7 @@
     "title": "Security logs"
   },
   "loading-aria": "Loading...",
+  "show-decryption-reason": "Show decryption reason",
   "filters": {
     "search": "Search by FP ID...",
     "attributes": {

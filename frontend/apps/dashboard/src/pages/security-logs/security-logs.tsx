@@ -1,7 +1,7 @@
 import type { AuditEvent } from '@onefootprint/request-types/dashboard';
-import { Divider, SearchInput, Stack, Text } from '@onefootprint/ui';
+import { Divider, SearchInput, Stack, Text, Toggle } from '@onefootprint/ui';
 import Head from 'next/head';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
@@ -11,6 +11,7 @@ import Timeline from './components/timeline';
 
 const SecurityLogs = () => {
   const { t } = useTranslation('security-logs');
+  const [showDecryptionReason, setShowDecryptionReason] = useState(false);
 
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
@@ -62,16 +63,32 @@ const SecurityLogs = () => {
         {t('header.title')}
       </Text>
       <Stack gap={5} direction="column">
-        <SearchInput
-          width="232px"
-          onChangeText={value => filters.push({ search: value })}
-          value={filters.query.search || ''}
-          size="compact"
-          placeholder={t('filters.search')}
-        />
-        <SecurityLogsFilters />
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" gap={4}>
+            <SearchInput
+              width="232px"
+              onChangeText={value => filters.push({ search: value })}
+              value={filters.query.search || ''}
+              size="compact"
+              placeholder={t('filters.search')}
+            />
+            <SecurityLogsFilters />
+          </Stack>
+          <Stack gap={0} alignItems="center">
+            <Toggle
+              checked={showDecryptionReason}
+              onChange={() => setShowDecryptionReason(!showDecryptionReason)}
+              size="compact"
+            />
+            <Text variant="label-3">{t('show-decryption-reason')}</Text>
+          </Stack>
+        </Stack>
         <Divider />
-        <Timeline auditEvents={filteredAuditEvents} isLoading={getAccessEvents.isLoading} />
+        <Timeline
+          auditEvents={filteredAuditEvents}
+          isLoading={getAccessEvents.isLoading}
+          showDecryptionReason={showDecryptionReason}
+        />
       </Stack>
     </>
   );

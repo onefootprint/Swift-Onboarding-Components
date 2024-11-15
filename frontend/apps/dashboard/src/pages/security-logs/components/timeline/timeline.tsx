@@ -23,9 +23,10 @@ export const getKeyForItemTime = (time: string) => {
 type TimelineProps = {
   auditEvents: AuditEvent[];
   isLoading: boolean;
+  showDecryptionReason: boolean;
 };
 
-const Timeline = ({ auditEvents, isLoading }: TimelineProps) => {
+const Timeline = ({ auditEvents, isLoading, showDecryptionReason }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   const filters = useSecurityLogsFilters();
 
@@ -85,7 +86,7 @@ const Timeline = ({ auditEvents, isLoading }: TimelineProps) => {
                   <Event auditEvent={accessEvent} />
                 </Grid.Item>
                 <Box height="auto" tag="span" marginTop={3}>
-                  <EventBody auditEvent={accessEvent} />
+                  <EventBody auditEvent={accessEvent} showDecryptionReason={showDecryptionReason} />
                 </Box>
               </Grid.Container>
             </Grid.Container>
