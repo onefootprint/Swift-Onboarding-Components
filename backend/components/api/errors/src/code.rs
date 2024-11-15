@@ -89,6 +89,8 @@ pub enum FpErrorCode {
     LinkAlreadyUsed,
     #[strum(serialize = "E126")]
     MissingPlaybookKey,
+    #[strum(serialize = "E127")]
+    ConflictingPlaybookKey,
 
     // Tenant-facing errors
     #[strum(serialize = "T120")]
@@ -141,6 +143,7 @@ impl FpErrorCode {
             Self::BusinessNotOwnedByUser => true,
             Self::LinkAlreadyUsed => true,
             Self::MissingPlaybookKey => true,
+            Self::ConflictingPlaybookKey => true,
 
             // Tenant-facing errors
             Self::VaultDataValidationError => true,

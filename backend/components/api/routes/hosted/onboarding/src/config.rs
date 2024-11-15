@@ -1,9 +1,11 @@
 use crate::auth::ob_config::ObConfigAuth;
-use crate::auth::Either;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::ob_config::PublicOnboardingContext;
 use api_core::auth::user::UserAuthContext;
+use api_core::auth::user::UserSessionContext;
 use api_core::auth::Any;
+use api_core::auth::AuthError;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::types::ApiResponse;
 use api_errors::BadRequestWithCode;
@@ -31,22 +33,32 @@ use paperclip::actix::web;
 #[get("/hosted/onboarding/config")]
 pub fn get(
     state: web::Data<State>,
-    auth: Either<ObConfigAuth, UserAuthContext>,
+    ob_pk_auth: Option<ObConfigAuth>,
+    user_auth: Option<UserAuthContext>,
 ) -> ApiResponse<api_wire_types::PublicOnboardingConfiguration> {
-    let (tenant, ob_config, user_auth) = match auth {
-        Either::Left(ob_pk_auth) => {
-            // Support auth that identifies an ob config
+    let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
+    let (tenant, ob_config, user_auth) = match (user_auth, ob_pk_auth) {
+        (Some(user_auth), Some(ob_pk_auth))
+            if (user_auth.obc.as_ref()).is_some_and(|obc| obc.id != ob_pk_auth.ob_config().id) =>
+        {
+            return Err(OnboardingError::ConflictingPlaybookKey.into());
+        }
+        (Some(user_auth), _) => {
+            let ob_config = user_auth.obc.clone().ok_or(OnboardingError::NoPlaybook)?;
+            let tenant = user_auth.tenant.clone().ok_or(OnboardingError::NoPlaybook)?;
+            (tenant, ob_config, Some(user_auth))
+        }
+        (None, Some(ob_pk_auth)) => {
             let tenant = ob_pk_auth.tenant().clone();
             let ob_config = ob_pk_auth.ob_config().clone();
             (tenant, ob_config, None)
         }
-        Either::Right(user_auth) => {
-            // Also take in a user auth token that has the onboarding scope that identifies an ob
-            // config
-            let user_auth = user_auth.check_guard(Any)?;
-            let ob_config = user_auth.obc.clone().ok_or(OnboardingError::NoPlaybook)?;
-            let tenant = user_auth.tenant.clone().ok_or(OnboardingError::NoPlaybook)?;
-            (tenant, ob_config, Some(user_auth))
+        (None, None) => {
+            let missing_headers = vec![
+                PublicOnboardingContext::HEADER_NAME.to_owned(),
+                UserSessionContext::HEADER_NAME.to_owned(),
+            ];
+            return Err(AuthError::MissingHeader(missing_headers).into());
         }
     };
 

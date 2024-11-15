@@ -30,7 +30,9 @@ pub struct PublicOnboardingContext {
     phantom: PhantomData<()>,
 }
 
-const HEADER_NAME: &str = "X-Onboarding-Config-Key";
+impl PublicOnboardingContext {
+    pub const HEADER_NAME: &'static str = "X-Onboarding-Config-Key";
+}
 
 impl FromRequest for PublicOnboardingContext {
     type Error = crate::ApiError;
@@ -41,9 +43,9 @@ impl FromRequest for PublicOnboardingContext {
         // get the tenant header
         let config_key = req
             .headers()
-            .get(HEADER_NAME)
+            .get(Self::HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or_else(|| AuthError::MissingHeader(vec![HEADER_NAME.to_owned()]));
+            .ok_or_else(|| AuthError::MissingHeader(vec![Self::HEADER_NAME.to_owned()]));
 
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();

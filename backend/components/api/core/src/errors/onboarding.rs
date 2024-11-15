@@ -31,6 +31,8 @@ pub enum OnboardingError {
     NoDocumentRequestFound,
     #[error("No playbook key provided")]
     NoPlaybook,
+    #[error("Playbook key provided conflicts with the playbook associated with the user token")]
+    ConflictingPlaybookKey,
     #[error("Cannot edit completed onboarding")]
     AlreadyCompleted,
     #[error("User consent not found for onboarding")]
@@ -75,6 +77,7 @@ impl api_errors::FpErrorTrait for OnboardingError {
     fn code(&self) -> Option<FpErrorCode> {
         match self {
             Self::NoPlaybook => Some(FpErrorCode::MissingPlaybookKey),
+            Self::ConflictingPlaybookKey => Some(FpErrorCode::ConflictingPlaybookKey),
             _ => None,
         }
     }

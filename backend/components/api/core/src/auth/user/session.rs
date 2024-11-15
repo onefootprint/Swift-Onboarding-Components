@@ -39,6 +39,8 @@ pub struct UserSessionContext {
 }
 
 impl UserSessionContext {
+    pub const HEADER_NAME: &'static str = "X-Fp-Authorization";
+
     pub fn did_use_passkey(&self, conn: &mut PgConn) -> FpResult<bool> {
         let aes = load_auth_events(conn, &self.auth_events)?;
         Ok(aes.iter().any(|(ae, _)| ae.kind == AuthEventKind::Passkey))
@@ -95,7 +97,7 @@ pub struct ParsedUserSessionContext(pub(super) UserSessionContext);
 
 impl ExtractableAuthSession for ParsedUserSessionContext {
     fn header_names() -> Vec<&'static str> {
-        vec!["X-Fp-Authorization"]
+        vec![UserSessionContext::HEADER_NAME]
     }
 
     fn try_load_session(
