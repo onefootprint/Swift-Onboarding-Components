@@ -9,7 +9,8 @@ import {
   documentWithZeroScores,
 } from './confidence-scores.test.config';
 
-const renderConfidenceScores = (document: Document) => customRender(<ConfidenceScores document={document} />);
+const renderConfidenceScores = (document: Omit<Document, 'uploads'>) =>
+  customRender(<ConfidenceScores document={document} />);
 
 describe('<ConfidenceScores />', () => {
   it('should render properly when just two scores defined', () => {

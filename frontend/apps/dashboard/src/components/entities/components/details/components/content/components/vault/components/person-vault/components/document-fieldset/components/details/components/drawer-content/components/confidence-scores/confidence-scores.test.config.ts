@@ -1,60 +1,54 @@
-import type { Document } from '@onefootprint/types';
-import { IdDocStatus, SupportedIdDocTypes, UploadSource } from '@onefootprint/types';
+import { type Document, IdDocStatus, SupportedIdDocTypes, UploadSource } from '@onefootprint/types';
 
-const documentFixture: Document = {
+const documentFixture: Omit<Document, 'uploads'> = {
   completedVersion: 1,
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
-  uploads: [],
   documentScore: 55,
   selfieScore: 50,
   ocrConfidenceScore: 45,
   uploadSource: UploadSource.Mobile,
 };
 
-export const documentWithTwoScores: Document = {
+export const documentWithTwoScores: Omit<Document, 'uploads'> = {
   completedVersion: 1,
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
-  uploads: [],
   documentScore: 55,
-  selfieScore: null,
   ocrConfidenceScore: 45,
+  selfieScore: null,
   uploadSource: UploadSource.Mobile,
 };
 
-export const documentWithOneScore: Document = {
+export const documentWithOneScore: Omit<Document, 'uploads'> = {
   completedVersion: 1,
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
-  uploads: [],
+  ocrConfidenceScore: 45,
   documentScore: null,
   selfieScore: null,
-  ocrConfidenceScore: 45,
   uploadSource: UploadSource.Mobile,
 };
 
-export const documentWithNoScores: Document = {
+export const documentWithNoScores: Omit<Document, 'uploads'> = {
   completedVersion: 1,
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
-  uploads: [],
+  uploadSource: UploadSource.Mobile,
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
-  uploadSource: UploadSource.Mobile,
 };
 
-export const documentWithZeroScores: Document = {
+export const documentWithZeroScores: Omit<Document, 'uploads'> = {
   completedVersion: 1,
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
-  uploads: [],
   documentScore: 0,
   selfieScore: 0,
   ocrConfidenceScore: 0,

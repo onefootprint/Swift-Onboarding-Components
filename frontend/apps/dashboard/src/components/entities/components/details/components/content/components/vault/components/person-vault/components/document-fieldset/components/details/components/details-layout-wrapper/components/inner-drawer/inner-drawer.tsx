@@ -12,6 +12,9 @@ type InnerDrawerProps = {
 const InnerDrawer = ({ children, open, onClose }: InnerDrawerProps) => {
   return (
     <Container>
+      <Box height="90vh" overflowY="auto" display="flex" flexDirection="column">
+        <Box display={open ? 'block' : 'none'}>{children}</Box>
+      </Box>
       <ChevronButtonContainer onClick={onClose}>
         <Stack
           alignItems="center"
@@ -21,24 +24,21 @@ const InnerDrawer = ({ children, open, onClose }: InnerDrawerProps) => {
           <IcoChevronRight16 />
         </Stack>
       </ChevronButtonContainer>
-      <Box display={open ? 'block' : 'none'}>{children}</Box>
     </Container>
   );
 };
 
 const Container = styled(Box)`
-${({ theme }) => css`
+  ${({ theme }) => css`
     grid-area: drawer;
-    display: flex;
-    flex-direction: column;
+    position: relative;
     background-color: ${theme.backgroundColor.primary};
     border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    position: relative;
-`}
+  `}
 `;
 
 const ChevronButtonContainer = styled(Box)`
-${({ theme }) => css`
+  ${({ theme }) => css`
     position: absolute;
     top: ${theme.spacing[3]};
     right: 0;
@@ -52,12 +52,12 @@ ${({ theme }) => css`
     align-items: center;
     justify-content: center;
     background-color: ${theme.backgroundColor.primary};
-    z-index: ${theme.zIndex.drawer};
+    z-index: ${theme.zIndex.toast};
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};
     }
-`}
+  `}
 `;
 
 export default InnerDrawer;

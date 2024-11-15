@@ -27,7 +27,7 @@ const DetailsLayoutWrapper = forwardRef<HTMLDivElement, DetailsLayoutWrapperProp
       >
         {drawerChildren && (
           <InnerDrawer open={drawerOpen} onClose={handleDrawerToggle} onOpenChange={setDrawerOpen}>
-            <Stack direction="column" gap={8} padding={7}>
+            <Stack direction="column" gap={8} padding={5}>
               {drawerChildren}
             </Stack>
           </InnerDrawer>

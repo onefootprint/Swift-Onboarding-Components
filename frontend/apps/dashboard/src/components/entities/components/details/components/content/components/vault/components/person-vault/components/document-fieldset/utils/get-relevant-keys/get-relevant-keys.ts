@@ -1,14 +1,13 @@
 import type { DocumentDI, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 
-// Get all of the keys in the vault that are (a) associated with the current DocumentType and
-// (b) not an image or latest upload (we show these separately).
-
 type GetRelevantKeysProps = {
   vault: EntityVault;
   documentType: SupportedIdDocTypes;
   currentDocumentNumber?: string;
 };
 
+// Get all of the keys in the vault that are (a) associated with the current DocumentType and
+// (b) not an image or latest upload (we show these separately).
 const getRelevantKeys = ({ vault, documentType, currentDocumentNumber }: GetRelevantKeysProps) =>
   Object.keys(vault).filter(
     key =>

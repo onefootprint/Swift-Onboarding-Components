@@ -1,6 +1,5 @@
 import { IcoFileText24 } from '@onefootprint/icons';
-import type { DocumentDI, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
-import { isVaultDataText } from '@onefootprint/types';
+import { type DocumentDI, type EntityVault, type SupportedIdDocTypes, isVaultDataText } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
