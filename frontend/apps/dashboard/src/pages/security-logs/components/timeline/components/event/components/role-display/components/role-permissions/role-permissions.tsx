@@ -2,7 +2,7 @@ import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import type { CollectedDataOption } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useGetRoleText from './hooks/use-get-role-text/use-get-role-text';
+import useGetRoleText from './hooks/use-get-role-text';
 
 type RolePermissionsProps = {
   scopes: TenantScope[];

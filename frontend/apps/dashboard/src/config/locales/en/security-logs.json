@@ -90,7 +90,9 @@
       "edited-the": "edited the",
       "role": "role",
       "role-permissions": "role permissions",
-      "deleted-the": "deleted the"
+      "deleted-the": "deleted the",
+      "new-permissions": "New permissions",
+      "old-permissions": "Old permissions"
     },
     "body": {
       "decryption-reason": {
