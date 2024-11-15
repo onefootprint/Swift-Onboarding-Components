@@ -30,12 +30,16 @@ const PostPreview = ({
 }: PostPreviewProps) => (
   <Container>
     <StyledLink href={href}>
-      <FeatureImageDesktopContainer data-type={type}>
-        <Image alt={featureImageAlt} height={228} src={featureImageUrl} width={468} priority />
-      </FeatureImageDesktopContainer>
-      <FeatureImageMobileContainer data-type={type}>
-        <Image height={228} width={358} alt={featureImageAlt} src={featureImageUrl} />
-      </FeatureImageMobileContainer>
+      {featureImageUrl ? (
+        <>
+          <FeatureImageDesktopContainer data-type={type}>
+            <Image alt={featureImageAlt} height={228} src={featureImageUrl} width={468} priority />
+          </FeatureImageDesktopContainer>
+          <FeatureImageMobileContainer data-type={type}>
+            <Image height={228} width={358} alt={featureImageAlt} src={featureImageUrl} />
+          </FeatureImageMobileContainer>
+        </>
+      ) : null}
       <Content>
         <Header>
           <Text color="accent" variant="label-3" marginBottom={2}>
