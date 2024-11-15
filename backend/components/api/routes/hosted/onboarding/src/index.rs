@@ -51,7 +51,7 @@ pub async fn post(
     let scoped_user_id = (user_auth.su_id.clone()).ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user.id.clone();
     let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
-    let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoObConfig)?;
+    let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoPlaybook)?;
     let (scoped_user, ob_config, portable_vw) = state
         .db_query(move |conn| {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;

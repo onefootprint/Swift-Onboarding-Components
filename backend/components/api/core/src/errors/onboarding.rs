@@ -1,3 +1,4 @@
+use api_errors::FpErrorCode;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::CollectedDataOption;
@@ -29,7 +30,7 @@ pub enum OnboardingError {
     #[error("Cannot create a document when no document request exists")]
     NoDocumentRequestFound,
     #[error("No playbook key provided")]
-    NoObConfig,
+    NoPlaybook,
     #[error("Cannot edit completed onboarding")]
     AlreadyCompleted,
     #[error("User consent not found for onboarding")]
@@ -69,6 +70,13 @@ impl api_errors::FpErrorTrait for OnboardingError {
 
     fn message(&self) -> String {
         self.to_string()
+    }
+
+    fn code(&self) -> Option<FpErrorCode> {
+        match self {
+            Self::NoPlaybook => Some(FpErrorCode::MissingPlaybookKey),
+            _ => None,
+        }
     }
 }
 

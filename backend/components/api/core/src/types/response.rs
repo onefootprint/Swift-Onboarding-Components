@@ -36,6 +36,7 @@ impl std::error::Error for ApiError {
 }
 
 impl<T: Into<FpError>> From<T> for ApiError {
+    #[track_caller]
     fn from(value: T) -> Self {
         Self(value.into())
     }
