@@ -47,6 +47,8 @@ const useEditField = (entity: Entity) => {
       IdDI.firstName,
       IdDI.middleName,
       IdDI.lastName,
+      IdDI.phoneNumber,
+      IdDI.email,
       IdDI.dob,
       IdDI.ssn9,
       IdDI.addressLine1,

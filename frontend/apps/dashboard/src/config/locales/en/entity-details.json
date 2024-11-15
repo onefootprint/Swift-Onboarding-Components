@@ -39,6 +39,7 @@
             "first-name": "Jane",
             "middle-name": "Sue",
             "last-name": "Doe",
+            "email": "jane.doe@acme.com",
             "address-line-1": "Street and house number",
             "address-line-2": "Apartment, suite, etc.",
             "dob": "YYYY-MM-DD",
@@ -138,7 +139,10 @@
               "special-chars": "Cannot contain special characters",
               "required": "Cannot be empty"
             },
-            "email": "Cannot be empty",
+            "email": {
+              "required": "Cannot be empty",
+              "invalid": "Cannot be invalid"
+            },
             "phone-number": {
               "required": "Cannot be empty",
               "pattern": "Must include a '+' and country code (e.g. +1555550100)"

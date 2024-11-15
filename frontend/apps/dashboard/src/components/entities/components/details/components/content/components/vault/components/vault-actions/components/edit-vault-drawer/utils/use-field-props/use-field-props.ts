@@ -3,6 +3,7 @@ import {
   isDobInTheFuture,
   isDobTooOld,
   isDobTooYoung,
+  isEmail,
   isPhoneNumber,
   isSSN9Flexible,
   isSsn4,
@@ -157,6 +158,38 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
             return entityT('errors.name.special-chars');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === IdDI.phoneNumber) {
+    return {
+      inputOptions: {
+        placeholder: entityT('placeholders.phone-number'),
+        validate: (value: string) => {
+          if (!value) {
+            return previousValue ? entityT('errors.phone-number.required') : true;
+          }
+          if (!isPhoneNumber(value)) {
+            return entityT('errors.phone-number.pattern');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === IdDI.email) {
+    return {
+      inputOptions: {
+        placeholder: entityT('placeholders.email'),
+        validate: (value: string) => {
+          if (!value) {
+            return previousValue ? entityT('errors.email.required') : true;
+          }
+          if (!isEmail(value)) {
+            return entityT('errors.email.invalid');
           }
           return true;
         },
@@ -573,7 +606,6 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
       },
     };
   }
-
   if (di === IdDI.country || di === BusinessDI.country) {
     return {
       selectOptions: {
