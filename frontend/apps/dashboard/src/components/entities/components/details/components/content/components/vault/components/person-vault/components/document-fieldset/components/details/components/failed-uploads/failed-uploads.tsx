@@ -1,6 +1,6 @@
 import type { DocumentUpload, EntityVault } from '@onefootprint/types';
 import { Box, LinkButton, Stack, Text } from '@onefootprint/ui';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import UploadImageItem from '../upload-image-item';
@@ -9,21 +9,18 @@ import UploadTitleCard from '../upload-title-card';
 export type FailedUploadsProps = {
   uploads: (DocumentUpload & { isLatest: boolean })[];
   vault: EntityVault;
-  refCallback: (el: HTMLDivElement | null, index: number) => void;
 };
 
-const FailedUploads = ({ uploads, vault, refCallback }: FailedUploadsProps) => {
+const FailedUploads = forwardRef<HTMLDivElement, FailedUploadsProps>(({ uploads, vault }, ref) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset.documents.details' });
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   if (uploads.length === 1) {
-    return (
-      <UploadImageItem upload={uploads[0]} vault={vault} ref={(el: HTMLDivElement | null) => refCallback(el, 0)} />
-    );
+    return <UploadImageItem upload={uploads[0]} vault={vault} ref={ref} />;
   }
 
   return (
-    <Stack direction="column" align="center" width="100%">
+    <Stack direction="column" align="center" width="100%" ref={ref}>
       <UploadTitleCard
         upload={uploads[0]}
         rightChildren={
@@ -45,33 +42,27 @@ const FailedUploads = ({ uploads, vault, refCallback }: FailedUploadsProps) => {
               key={`${upload.identifier}:${upload.version}`}
               upload={upload as DocumentUpload & { isLatest: boolean }}
               vault={vault}
-              ref={(el: HTMLDivElement | null) => refCallback(el, index)}
               rotateIndex={index}
             />
           ))}
         </Box>
       ) : (
         <Box display="grid" width="100%" paddingLeft={5}>
-          {uploads.map((upload, index) => (
+          {uploads.map(upload => (
             <LinedUpload
               key={`${upload.identifier}:${upload.version}`}
               position="relative"
               paddingLeft={5}
               paddingTop={7}
             >
-              <UploadImageItem
-                upload={upload}
-                vault={vault}
-                imageOnly={true}
-                ref={(el: HTMLDivElement | null) => refCallback(el, index)}
-              />
+              <UploadImageItem upload={upload} vault={vault} imageOnly={true} />
             </LinedUpload>
           ))}
         </Box>
       )}
     </Stack>
   );
-};
+});
 
 const LinedUpload = styled(Box)`
   ${({ theme }) => css`

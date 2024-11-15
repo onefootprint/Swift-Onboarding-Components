@@ -5,37 +5,40 @@ import styled, { css } from 'styled-components';
 import useUploadSideText from '../../../../hooks/use-upload-side-text';
 
 export type TableOfContentsProps = {
-  uploads: DocumentUpload[];
+  successfulUploads: DocumentUpload[];
+  failedUploads: DocumentUpload[][];
   onClick: (index: number) => void;
   visibleIndex: number;
 };
 
-const TableOfContents = ({ uploads, onClick, visibleIndex }: TableOfContentsProps) => {
+const TableOfContents = ({ successfulUploads, failedUploads, onClick, visibleIndex }: TableOfContentsProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset.documents.details' });
   const sideT = useUploadSideText();
 
-  if (uploads.length === 1) return null;
-
-  const firstFailedIndex = uploads.findIndex(upload => upload.failureReasons.length > 0);
-  const hasFailedUploads = firstFailedIndex !== -1;
-  const uploadsWithButtons = hasFailedUploads ? uploads.slice(0, firstFailedIndex + 1) : uploads; // Only one button for all failed uploads
-  const visibleIndexIsFailed = hasFailedUploads && visibleIndex >= firstFailedIndex;
+  if (successfulUploads.length + failedUploads.flat().length === 1) return null;
 
   return (
     <Container position="fixed" alignSelf="flex-start">
       <Stack direction="column" gap={3}>
-        {uploadsWithButtons.map(({ failureReasons, identifier, version, side }, index) => {
-          const isFailedButton = index === firstFailedIndex;
-          const isActive = index === visibleIndex || (isFailedButton && visibleIndexIsFailed);
-
+        {successfulUploads.map(({ identifier, version, side }, index) => {
+          const isActive = index === visibleIndex;
           return (
             <UploadButton key={`${identifier}:${version}`} onClick={() => onClick(index)} $isActive={isActive}>
               {t('table-of-contents.label', {
                 side: sideT(side),
-                status:
-                  failureReasons.length === 0
-                    ? t('status.success')
-                    : t('status.failed-count', { count: uploads.length - firstFailedIndex }),
+                status: t('status.success'),
+              })}
+            </UploadButton>
+          );
+        })}
+        {failedUploads.map((sameSideUploads, index) => {
+          const { identifier, version, side } = sameSideUploads[0];
+          const isActive = index + successfulUploads.length === visibleIndex;
+          return (
+            <UploadButton key={`${identifier}:${version}`} onClick={() => onClick(index)} $isActive={isActive}>
+              {t('table-of-contents.label', {
+                side: sideT(side),
+                status: t('status.failed-count', { count: sameSideUploads.length }),
               })}
             </UploadButton>
           );

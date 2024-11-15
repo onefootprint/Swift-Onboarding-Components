@@ -1,6 +1,7 @@
 import type { Document, DocumentUpload, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Dialog, Stack } from '@onefootprint/ui';
-import { partition } from 'lodash';
+import groupBy from 'lodash/groupBy';
+import partition from 'lodash/partition';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import useDocumentsFilters from '../../hooks/use-documents-filters';
@@ -30,6 +31,7 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
   const { kind, uploads } = document;
   const showDrawer = hasDrawerContent(document, vault);
   const [successfulUploads, failedUploads] = partition(uploads, upload => upload.failureReasons.length === 0);
+  const groupedFailedUploads = Object.values(groupBy(failedUploads, 'side'));
 
   // For the table of contents buttons and the selfie preview
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -73,7 +75,12 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
           drawerChildren={showDrawer && <DrawerContent document={document} vault={vault} />}
           ref={scrollContainerRef}
         >
-          <TableOfContents uploads={uploads} onClick={scrollToUpload} visibleIndex={visibleUploadIndex} />
+          <TableOfContents
+            successfulUploads={successfulUploads}
+            failedUploads={groupedFailedUploads}
+            onClick={scrollToUpload}
+            visibleIndex={visibleUploadIndex}
+          />
           <UploadsContainer direction="column" align="center" gap={8} width="70%" height="100%">
             {successfulUploads.map((upload, index) => (
               <UploadImageItem
@@ -83,13 +90,14 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
                 ref={el => (uploadRefs.current[index] = el)}
               />
             ))}
-            {failedUploads.length > 0 && (
-              <FailedUploads
-                uploads={failedUploads as (DocumentUpload & { isLatest: boolean })[]}
-                vault={vault}
-                refCallback={(el, index) => (uploadRefs.current[successfulUploads.length + index] = el)}
-              />
-            )}
+            {failedUploads.length > 0 &&
+              groupedFailedUploads.map((sameSideUploads, index) => (
+                <FailedUploads
+                  uploads={sameSideUploads as (DocumentUpload & { isLatest: boolean })[]}
+                  vault={vault}
+                  ref={el => (uploadRefs.current[successfulUploads.length + index] = el)}
+                />
+              ))}
           </UploadsContainer>
           {showSelfiePreview(uploads, visibleUploadIndex) && <SelfiePreview uploads={uploads} vault={vault} />}
         </DetailsLayoutWrapper>

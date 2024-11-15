@@ -26,7 +26,8 @@ const SelfiePreview = ({ uploads, vault }: SelfiePreviewProps) => {
 
 const Container = styled(Box)`
   ${({ theme }) => css`
-    bottom: ${theme.spacing[4]};
+    --dialog-header-height: 44px;
+    top: calc(var(--dialog-header-height) + ${theme.spacing[4]});
     right: ${theme.spacing[4]};
   `};
 `;
