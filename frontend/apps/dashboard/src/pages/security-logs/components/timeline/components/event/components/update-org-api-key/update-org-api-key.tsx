@@ -2,6 +2,7 @@ import type { AuditEventDetail } from '@onefootprint/request-types/dashboard';
 import { Text } from '@onefootprint/ui';
 import capitalize from 'lodash/capitalize';
 import { useTranslation } from 'react-i18next';
+import ApiKeyDisplay from '../api-key-display';
 import RoleDisplay from '../role-display';
 
 type UpdateOrgApiKeyProps = { detail: AuditEventDetail; hasPrincipalActor: boolean };
@@ -17,9 +18,7 @@ const UpdateOrgApiKey = ({ detail, hasPrincipalActor }: UpdateOrgApiKeyProps) =>
       <Text variant="body-3" color="tertiary" tag="span">
         {hasPrincipalActor ? t('updated') : capitalize(t('updated'))}
       </Text>
-      <Text variant="label-3" tag="span">
-        {t('an-api-key')} ({apiKey.name})
-      </Text>
+      <ApiKeyDisplay name={apiKey.name} scopes={apiKey.role.scopes} roleName={apiKey.role.name} />
       <Text variant="body-3" color="tertiary" tag="span">
         {t('from')}
       </Text>
