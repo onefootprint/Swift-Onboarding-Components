@@ -6,7 +6,7 @@ import {
   type Entity,
   EntityKind,
   EntityStatus,
-  type GetOnboardingConfigsResponse,
+  type GetPlaybooksResponse,
   IdDI,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
@@ -97,7 +97,7 @@ export const entitiesFixture: Entity[] = [
   },
 ];
 
-export const obConfigsFixture: GetOnboardingConfigsResponse = [
+export const playbooksFixture: GetPlaybooksResponse = [
   {
     author: {
       kind: 'organization',
@@ -169,10 +169,10 @@ export const withEntitiesError = () =>
     },
   });
 
-export const withOnboardingConfigs = (response = obConfigsFixture) =>
+export const withPlaybooks = (response = playbooksFixture) =>
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_configs',
+    path: '/org/playbooks',
     response: {
       data: response,
       meta: {

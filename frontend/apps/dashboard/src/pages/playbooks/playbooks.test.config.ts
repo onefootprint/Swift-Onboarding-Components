@@ -114,7 +114,7 @@ export const playbooksFixture: OnboardingConfig[] = [
 export const withPlaybooks = () =>
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_configs',
+    path: '/org/playbooks',
     response: {
       data: playbooksFixture,
       meta: {
@@ -127,7 +127,7 @@ export const withPlaybooks = () =>
 export const withPlaybooksError = () =>
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_configs',
+    path: '/org/playbooks',
     statusCode: 400,
     response: {
       message: 'Something went wrong',

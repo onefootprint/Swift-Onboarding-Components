@@ -116,7 +116,7 @@ describe('<RequestMoreInfoDialog />', () => {
     beforeEach(() => {
       mockRequest({
         method: 'get',
-        path: '/org/onboarding_configs',
+        path: '/org/playbooks',
         statusCode: 200,
         response: {
           data: [

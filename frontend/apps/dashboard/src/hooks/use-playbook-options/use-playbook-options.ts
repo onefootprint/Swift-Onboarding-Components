@@ -1,6 +1,6 @@
 import type { PaginatedRequestResponse } from '@onefootprint/request';
 import request from '@onefootprint/request';
-import type { GetOnboardingConfigsResponse, OnboardingConfigKind } from '@onefootprint/types';
+import type { GetPlaybooksResponse, OnboardingConfigKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
@@ -12,9 +12,9 @@ type GetPlaybooksRequest = {
 
 const getPlaybooks = async ({ authHeaders, kinds }: GetPlaybooksRequest) => {
   const params = { kinds: kinds?.join(','), page_size: 100 };
-  const { data: response } = await request<PaginatedRequestResponse<GetOnboardingConfigsResponse>>({
+  const { data: response } = await request<PaginatedRequestResponse<GetPlaybooksResponse>>({
     method: 'GET',
-    url: '/org/onboarding_configs',
+    url: '/org/playbooks',
     headers: authHeaders,
     params,
   });

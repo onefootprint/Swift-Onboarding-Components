@@ -1,8 +1,8 @@
 import type { OnboardingConfig, OnboardingConfigStatus } from '../data';
 
-export type GetOnboardingConfigsRequest = {
+export type GetPlaybooksRequest = {
   status?: OnboardingConfigStatus;
   page?: number;
 };
 
-export type GetOnboardingConfigsResponse = OnboardingConfig[];
+export type GetPlaybooksResponse = OnboardingConfig[];

@@ -7,7 +7,7 @@ import {
   type Entity,
   EntityKind,
   EntityStatus,
-  type GetOnboardingConfigsResponse,
+  type GetPlaybooksResponse,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
@@ -65,7 +65,7 @@ export const entitiesFixture: Entity[] = [
   },
 ];
 
-export const obConfigsFixture: GetOnboardingConfigsResponse = [
+export const playbooksFixture: GetPlaybooksResponse = [
   {
     id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
     key: 'pb_live_wkkZyAbY92huSqp83SEOzw',
@@ -123,18 +123,5 @@ export const withEntitiesError = () =>
     statusCode: 400,
     response: {
       message: 'Something went wrong',
-    },
-  });
-
-export const withOnboardingConfigs = (response = obConfigsFixture) =>
-  mockRequest({
-    method: 'post',
-    path: '/entities/search',
-    response: {
-      data: response,
-      meta: {
-        next: null,
-        count: response.length,
-      },
     },
   });

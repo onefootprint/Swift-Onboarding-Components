@@ -132,9 +132,9 @@ export type {
   HostedWorkflowRequest,
 } from './get-onboarding-config';
 export type {
-  GetOnboardingConfigsRequest,
-  GetOnboardingConfigsResponse,
-} from './get-onboarding-configs';
+  GetPlaybooksRequest,
+  GetPlaybooksResponse,
+} from './get-playbooks';
 export type { GetOrgRequest, GetOrgResponse } from './get-org';
 export type { GetOrgRiskSignalsResponse } from './get-org-risk-signals';
 export type {

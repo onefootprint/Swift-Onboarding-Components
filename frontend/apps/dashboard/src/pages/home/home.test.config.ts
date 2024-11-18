@@ -73,7 +73,7 @@ export const withOrgMetricsError = () => {
 export const withPlaybooks = (response: OnboardingConfiguration[] = playbooksFixture) => {
   return mockRequest({
     method: 'get',
-    path: '/org/onboarding_configs',
+    path: '/org/playbooks',
     response,
   });
 };

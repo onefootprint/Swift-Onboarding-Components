@@ -29,7 +29,7 @@ export const withFrequentNotes = (kind: OrgFrequentNoteKind, resp: GetOrgFrequen
 export const withPlaybooks = () => {
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_configs',
+    path: '/org/playbooks',
     queryParams: new URLSearchParams({
       kinds: 'document,kyb,kyc',
       page_size: '100',

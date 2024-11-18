@@ -7,7 +7,7 @@ const createPlaybook = async (authHeaders: AuthHeaders, data: OrgOnboardingConfi
     data,
     headers: authHeaders,
     method: 'POST',
-    url: '/org/onboarding_configs',
+    url: '/org/playbooks',
   });
 
   return response.data;

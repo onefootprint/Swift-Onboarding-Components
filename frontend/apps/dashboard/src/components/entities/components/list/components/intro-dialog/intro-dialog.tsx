@@ -7,14 +7,14 @@ import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import useEntities from '../../hooks/use-entities/use-entities';
-import useOnboardingConfigs from './hooks/use-onboarding-configs';
+import usePlaybooks from './hooks/use-playbooks';
 
 const TIME_TO_SHOW_DIALOG = 1000;
 
 const IntroDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { t } = useTranslation('common', { keyPrefix: 'pages.entities.intro' });
-  const { data: onboardings } = useOnboardingConfigs();
+  const { data: onboardings } = usePlaybooks();
   const { data: entities } = useEntities(EntityKind.person);
   const router = useRouter();
   const shouldShowDialog = onboardings?.length === 0 && entities?.data?.length === 0;

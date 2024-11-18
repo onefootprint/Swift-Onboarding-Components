@@ -3,7 +3,7 @@ import mockRouter from 'next-router-mock';
 import { asAdminUser } from 'src/config/tests';
 
 import List from './list';
-import { withEntities, withEntitiesError, withOnboardingConfigs, withOrgTags } from './list.test.config';
+import { withEntities, withEntitiesError, withOrgTags, withPlaybooks } from './list.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -14,7 +14,7 @@ describe('<List />', () => {
 
   beforeEach(() => {
     asAdminUser();
-    withOnboardingConfigs();
+    withPlaybooks();
     withOrgTags();
   });
 
@@ -71,7 +71,7 @@ describe('<List />', () => {
 
     describe('when the tenant has some onboarding configurations', () => {
       beforeEach(() => {
-        withOnboardingConfigs();
+        withPlaybooks();
       });
 
       it("shouldn't show any onboarding dialog", async () => {
@@ -87,7 +87,7 @@ describe('<List />', () => {
     describe("when the tenant doesn't have any onboarding configurations", () => {
       beforeEach(() => {
         withEntities([]);
-        withOnboardingConfigs([]);
+        withPlaybooks([]);
       });
 
       it('should shown an onboarding dialog', async () => {
