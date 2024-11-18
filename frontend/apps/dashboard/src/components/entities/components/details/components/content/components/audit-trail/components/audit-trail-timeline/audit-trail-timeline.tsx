@@ -14,7 +14,7 @@ import type {
   WatchlistCheckEventData,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
-import { TimelineEventKind } from '@onefootprint/types';
+import { EntityKind, TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
   LabelAddedEventData,
@@ -136,7 +136,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: (
           <>
             <Text variant="body-3" color="tertiary">
-              {t('timeline.vault-created-event.user-created-by')}
+              {entity.kind === EntityKind.person
+                ? t('timeline.vault-created-event.user-created-by')
+                : t('timeline.vault-created-event.business-created-by')}
             </Text>
             <LinkButton href="/api-keys">{(eventData.actor as ActorApiKey).name}</LinkButton>
           </>

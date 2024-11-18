@@ -1008,7 +1008,8 @@
         }
       },
       "vault-created-event": {
-        "user-created-by": "User created by "
+        "user-created-by": "User created by ",
+        "business-created-by": "Business created by "
       },
       "auth-method-updated": {
         "user": "User",
