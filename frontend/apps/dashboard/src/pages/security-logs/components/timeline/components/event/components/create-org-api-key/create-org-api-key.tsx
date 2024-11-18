@@ -14,7 +14,7 @@ const CreateOrgApiKey = ({ detail, hasPrincipalActor }: CreateOrgApiKeyProps) =>
   const {
     apiKey: {
       name,
-      role: { scopes },
+      role: { scopes, name: roleName },
     },
   } = detail.data;
 
@@ -23,7 +23,7 @@ const CreateOrgApiKey = ({ detail, hasPrincipalActor }: CreateOrgApiKeyProps) =>
       <Text variant="body-3" color="tertiary" tag="span">
         {hasPrincipalActor ? t('created-a-new') : capitalize(t('created-a-new'))}
       </Text>
-      <ApiKeyDisplay name={name} scopes={scopes} />
+      <ApiKeyDisplay name={name} scopes={scopes} roleName={roleName} />
     </>
   );
 };

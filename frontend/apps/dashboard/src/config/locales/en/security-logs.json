@@ -100,7 +100,11 @@
     },
     "api-keys": {
       "created-a-new": "created a new",
-      "api-key": "API key"
+      "api-key": "API key",
+      "api-key-details": "API key details",
+      "name": "Name",
+      "role": "Role",
+      "permissions": "Permissions"
     },
     "body": {
       "decryption-reason": {
