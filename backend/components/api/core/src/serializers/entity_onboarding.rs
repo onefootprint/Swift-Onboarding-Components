@@ -25,9 +25,10 @@ impl
             created_at,
             status,
             id,
+            kind,
             ..
         } = wf;
-        let ObConfiguration { key, .. } = obc;
+        let ObConfiguration { name, key, .. } = obc;
         let rule_set_results = rsrs
             .iter()
             .map(|rsr| api_wire_types::EntityOnboardingRuleSetResult {
@@ -38,7 +39,9 @@ impl
 
         Self {
             id,
+            playbook_name: name,
             playbook_key: key,
+            kind,
             status,
             rule_set_results,
             seqno,

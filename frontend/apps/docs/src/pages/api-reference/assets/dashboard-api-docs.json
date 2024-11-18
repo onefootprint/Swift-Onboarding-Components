@@ -12870,8 +12870,14 @@
                     "id": {
                         "type": "string"
                     },
+                    "kind": {
+                        "$ref": "#/components/schemas/WorkflowKind"
+                    },
                     "playbook_key": {
                         "example": "pb_live_fZvYlX3JpanlQ3MAwE45g0",
+                        "type": "string"
+                    },
+                    "playbook_name": {
                         "type": "string"
                     },
                     "rule_set_results": {
@@ -12894,7 +12900,9 @@
                 },
                 "required": [
                     "id",
+                    "kind",
                     "playbook_key",
+                    "playbook_name",
                     "rule_set_results",
                     "status",
                     "timestamp"
