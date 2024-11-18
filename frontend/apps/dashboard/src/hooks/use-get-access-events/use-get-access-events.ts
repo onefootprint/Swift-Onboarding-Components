@@ -11,6 +11,7 @@ export type GetAccessEventsRequest = {
   targets?: string[];
   timestamp_gte?: string; // from
   timestamp_lte?: string; // to
+  page_size?: number;
 };
 
 export type GetAccessEventsResponse = AuditEvent[];
@@ -21,7 +22,10 @@ const getAccessEventsRequest = async (params: GetAccessEventsRequest, authHeader
   const response = await request<PaginatedRequestResponse<GetAccessEventsResponse>>({
     headers: authHeaders,
     method: 'GET',
-    params,
+    params: {
+      ...params,
+      page_size: 100,
+    },
     url: '/org/audit_events',
   });
   return response.data;

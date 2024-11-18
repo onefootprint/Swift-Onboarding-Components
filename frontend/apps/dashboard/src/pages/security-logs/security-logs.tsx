@@ -41,31 +41,27 @@ const SecurityLogs = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Just before reaching the bottom of the page, start loading the next page of data
       const mainContainer = document.getElementById(MAIN_PAGE_ID);
       if (!mainContainer) return;
-      const offset = mainContainer.clientHeight * 0.25;
-      const reachedBottom = mainContainer.scrollHeight - mainContainer.scrollTop <= mainContainer.clientHeight + offset;
-      if (reachedBottom) {
-        if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
-          getAccessEvents.fetchNextPage();
-        }
+
+      const { scrollHeight, scrollTop, clientHeight } = mainContainer;
+      const offset = clientHeight * 0.5; // Add some offset to load earlier
+      const reachedBottom = scrollHeight - scrollTop <= clientHeight + offset;
+
+      if (reachedBottom && !getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
+        getAccessEvents.fetchNextPage();
       }
     };
 
     const mainContainer = document.getElementById(MAIN_PAGE_ID);
     mainContainer?.addEventListener('scroll', handleScroll);
-    return () => {
-      mainContainer?.removeEventListener('scroll', handleScroll);
-    };
-  }, [getAccessEvents.isFetchingNextPage, getAccessEvents.hasNextPage]);
+    return () => mainContainer?.removeEventListener('scroll', handleScroll);
+  }, [getAccessEvents]);
 
-  // NOTE: placeholder for now
-  // include other events as we add UI support for them
   const filteredAuditEvents = auditEvents.filter(auditEvent =>
     isFirmEmployee
-      ? extendedAccessEventsToShow.includes(auditEvent.name)
-      : accessEventsToShow.includes(auditEvent.name),
+      ? extendedAccessEventsToShow.includes(auditEvent.detail.kind)
+      : accessEventsToShow.includes(auditEvent.detail.kind),
   );
 
   return (
