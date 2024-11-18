@@ -3,6 +3,7 @@ package com.onefootprint.native_onboarding_components.models
 class FootprintException(
     val kind: ErrorKind,
     override val message: String,
+    val supportId : String? = null,
     val context: Map<String, String>? = null // Optional context for specific errors, usually will be used for vaulting error
 ) : Exception(message) {
 
@@ -22,10 +23,16 @@ class FootprintException(
 
     // Override the toString() method to include kind, message, and context (if available)
     override fun toString(): String {
-        val contextString = context?.let {
-            it.entries.joinToString(", ") { (key, value) -> "$key=$value" }
-        } ?: "No context available"
+        val parts = mutableListOf<String>()
+        parts.add("kind=$kind")
+        parts.add("message=$message")
 
-        return "FootprintException(kind=$kind, message=$message, context=$contextString)"
+        supportId?.let { parts.add("supportId=$it") }
+        context?.let {
+            val contextString = it.entries.joinToString(", ") { (key, value) -> "$key=$value" }
+            parts.add("context=$contextString") 
+        }
+
+        return "FootprintException(${parts.joinToString(", ")})"
     }
 }

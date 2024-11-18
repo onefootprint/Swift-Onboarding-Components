@@ -15,9 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.BatchHostedBusinessOwnerRequestAnyOf
-import org.openapitools.client.models.BatchHostedBusinessOwnerRequestAnyOf1
-import org.openapitools.client.models.BatchHostedBusinessOwnerRequestAnyOf2
 import org.openapitools.client.models.ModernRawUserDataRequest
 
 import kotlinx.serialization.*
@@ -34,13 +31,13 @@ import kotlinx.serialization.encoding.*
  */
 @Serializable
 
-data class BatchHostedBusinessOwnerRequest (
+data class BatchHostedBusinessOwnerRequestAnyOf1 (
 
     @SerialName(value = "data") @Required val `data`: ModernRawUserDataRequest,
 
     @SerialName(value = "uuid") @Required val uuid: kotlin.String,
 
-    @SerialName(value = "op") @Required val op: BatchHostedBusinessOwnerRequest.Op,
+    @SerialName(value = "op") @Required val op: BatchHostedBusinessOwnerRequestAnyOf1.Op,
 
     @SerialName(value = "ownership_stake") val ownershipStake: kotlin.Int? = null
 
@@ -49,11 +46,11 @@ data class BatchHostedBusinessOwnerRequest (
     /**
      * 
      *
-     * Values: delete
+     * Values: create
      */
     @Serializable
     enum class Op(val value: kotlin.String) {
-        @SerialName(value = "delete") delete("delete");
+        @SerialName(value = "create") create("create");
     }
 
 }

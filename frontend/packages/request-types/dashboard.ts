@@ -1499,7 +1499,9 @@ export type EntityAttribute = {
 };
 export type EntityOnboarding = {
   id: string;
+  kind: WorkflowKind;
   playbookKey: string;
+  playbookName: string;
   ruleSetResults: Array<EntityOnboardingRuleSetResult>;
   seqno?: number;
   status: OnboardingStatus;
@@ -4121,6 +4123,7 @@ export type PreviewApi =
   | 'onboarding_session_token'
   | 'vault_integrity'
   | 'soft_delete_users'
+  | 'post_kyc_stepup_links'
   | 'client_vaulting_docs'
   | 'list_duplicate_users';
 export type PrivateBusinessOwner = {
@@ -4886,7 +4889,7 @@ export type TimelinePlaybook = {
   mustCollectData: Array<CollectedDataOption>;
   name: string;
 };
-export type TokenOperationKind = 'onboard' | 'inherit' | 'user' | 'update_auth_methods';
+export type TokenOperationKind = 'onboard' | 'inherit' | 'update_auth_methods';
 export type TriggerRequest = {
   fpBid?: string;
   /**

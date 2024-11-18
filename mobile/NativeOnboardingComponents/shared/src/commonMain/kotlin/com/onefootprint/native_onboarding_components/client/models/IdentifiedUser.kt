@@ -25,7 +25,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * All of the context on the identified user, if found
+ * 
  *
  * @param authMethods 
  * @param availableChallengeKinds 

@@ -15,7 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.ModernRawUserDataRequest
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,19 +23,25 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param `data` 
- * @param uuid 
- * @param ownershipStake 
+ * @param code 
+ * @param message 
+ * @param supportId 
+ * @param debug 
+ * @param location 
  */
 @Serializable
 
-data class UpdateOrCreateHostedBusinessOwnerRequest (
+data class Error (
 
-    @SerialName(value = "data") @Required val `data`: ModernRawUserDataRequest,
+    @SerialName(value = "code") @Required val code: kotlin.String,
 
-    @SerialName(value = "uuid") @Required val uuid: kotlin.String,
+    @SerialName(value = "message") @Required val message: kotlin.String,
 
-    @SerialName(value = "ownership_stake") val ownershipStake: kotlin.Int? = null
+    @SerialName(value = "support_id") @Required val supportId: kotlin.String,
+
+    @SerialName(value = "debug") val debug: kotlin.String? = null,
+
+    @SerialName(value = "location") val location: kotlin.String? = null
 
 ) {
 

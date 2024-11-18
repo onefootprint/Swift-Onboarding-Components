@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.onefootprint.native_onboarding_components.models.FootprintException
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.openapitools.client.models.PublicOnboardingConfiguration
 
@@ -26,8 +27,15 @@ fun TestUi() {
             AnimatedVisibility(showContent) {
                 var onboardingConfig by remember { mutableStateOf<PublicOnboardingConfiguration?>(null)}
                 LaunchedEffect(Unit) {
+                    try {
                     val onboardingConfiguration = Greeting().getOnboardingConfig()
                         onboardingConfig = onboardingConfiguration
+                    }catch (e: FootprintException){
+                        println("error toString: ${e.toString()}")
+                        println("error kind: ${e.kind}")
+                        println("error message: ${e.message}")
+                        println("error supportID: ${e.supporId}")
+                    }
                 }
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Onboarding config data",fontSize = 24.sp )

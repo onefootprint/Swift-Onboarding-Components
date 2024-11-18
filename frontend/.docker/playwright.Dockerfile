@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.48.1-jammy
+FROM mcr.microsoft.com/playwright:v1.49.0-jammy
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable

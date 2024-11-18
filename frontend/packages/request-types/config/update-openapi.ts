@@ -151,5 +151,16 @@ export const updateOpenApi = async (filePath: string, tempPath: string) => {
 
   const openAPIMerged = mergeAllOf(openAPIWithHeaders);
 
+  openAPIMerged.servers = [
+    {
+      url: 'https://api.onefootprint.com',
+      description: 'prod',
+    },
+    {
+      url: 'https://api.dev.onefootprint.com',
+      description: 'dev',
+    },
+  ];
+
   await fs.writeFile(tempPath, JSON.stringify(openAPIMerged, null, 2));
 };

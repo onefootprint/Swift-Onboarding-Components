@@ -15,10 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.BatchHostedBusinessOwnerRequestAnyOf
-import org.openapitools.client.models.BatchHostedBusinessOwnerRequestAnyOf1
-import org.openapitools.client.models.BatchHostedBusinessOwnerRequestAnyOf2
-import org.openapitools.client.models.ModernRawUserDataRequest
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -27,22 +23,16 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param `data` 
  * @param uuid 
  * @param op 
- * @param ownershipStake 
  */
 @Serializable
 
-data class BatchHostedBusinessOwnerRequest (
-
-    @SerialName(value = "data") @Required val `data`: ModernRawUserDataRequest,
+data class BatchHostedBusinessOwnerRequestAnyOf2 (
 
     @SerialName(value = "uuid") @Required val uuid: kotlin.String,
 
-    @SerialName(value = "op") @Required val op: BatchHostedBusinessOwnerRequest.Op,
-
-    @SerialName(value = "ownership_stake") val ownershipStake: kotlin.Int? = null
+    @SerialName(value = "op") @Required val op: BatchHostedBusinessOwnerRequestAnyOf2.Op
 
 ) {
 

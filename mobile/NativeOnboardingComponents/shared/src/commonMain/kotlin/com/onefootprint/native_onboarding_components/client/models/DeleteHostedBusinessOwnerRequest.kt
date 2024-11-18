@@ -23,28 +23,16 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param op 
  * @param uuid 
  */
 @Serializable
 
 data class DeleteHostedBusinessOwnerRequest (
 
-    @SerialName(value = "op") @Required val op: DeleteHostedBusinessOwnerRequest.Op,
-
     @SerialName(value = "uuid") @Required val uuid: kotlin.String
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: delete
-     */
-    @Serializable
-    enum class Op(val value: kotlin.String) {
-        @SerialName(value = "delete") delete("delete");
-    }
 
 }
 

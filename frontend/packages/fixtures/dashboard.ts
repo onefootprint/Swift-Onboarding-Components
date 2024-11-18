@@ -1762,7 +1762,7 @@ export const getCreateEntityTokenRequest = (
   deepmerge<CreateEntityTokenRequest>(
     {
       key: 'a2952dd1-4d4c-4016-be89-ddf23dc6f803',
-      kind: 'user',
+      kind: 'onboard',
       sendLink: true,
     },
     props,
@@ -3726,7 +3726,9 @@ export const getEntityOnboarding = (
   deepmerge<EntityOnboarding>(
     {
       id: 'cfa455b0-a178-4dab-a96e-b505c29965d0',
+      kind: 'document',
       playbookKey: '2c6b1579-a878-4723-a5b6-968b0d666bac',
+      playbookName: 'Kyle Jacobi',
       ruleSetResults: [
         {
           id: 'c0f89046-673b-408f-ba38-54d43b1a29cd',
@@ -6219,6 +6221,8 @@ export const getOffsetPaginatedEntityOnboarding = (
         {
           id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
           playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
+          playbookName: 'Test Playbook',
+          kind: 'kyb',
           ruleSetResults: [
             {
               id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
@@ -6240,6 +6244,8 @@ export const getOffsetPaginatedEntityOnboarding = (
         {
           id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
           playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
+          playbookName: 'Test Playbook',
+          kind: 'kyc',
           ruleSetResults: [
             {
               id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
@@ -6261,6 +6267,8 @@ export const getOffsetPaginatedEntityOnboarding = (
         {
           id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
           playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
+          playbookName: 'Test Playbook',
+          kind: 'document',
           ruleSetResults: [
             {
               id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',

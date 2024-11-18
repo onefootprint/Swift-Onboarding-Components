@@ -22,7 +22,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * Context on what information is specifically requested from the user, if any.  NOTE: This is not actually a property of the ob configuration.
+ * 
  *
  * @param config 
  * @param note 

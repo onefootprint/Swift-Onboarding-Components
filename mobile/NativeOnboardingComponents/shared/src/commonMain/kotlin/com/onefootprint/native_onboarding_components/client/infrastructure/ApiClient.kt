@@ -62,7 +62,7 @@ open class ApiClient(
     }
 
     companion object {
-        const val BASE_URL = "http://api.onefootprint.com"
+        const val BASE_URL = "https://api.onefootprint.com"
         val JSON_DEFAULT = Json {
           ignoreUnknownKeys = true
           prettyPrint = true
