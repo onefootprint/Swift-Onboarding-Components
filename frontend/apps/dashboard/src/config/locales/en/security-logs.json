@@ -58,14 +58,16 @@
     "employees": "An employee"
   },
   "events": {
-    "decryption-event": {
+    "user-data": {
       "aria-label": "Decryption event",
       "decrypted": "decrypted",
       "and": "and",
       "of-a": "of a",
       "user": "user",
       "other-attribute": "other attribute",
-      "other-attributes": "other attributes"
+      "other-attributes": "other attributes",
+      "updated": "updated",
+      "deleted": "deleted"
     },
     "invite": {
       "invited": "invited",

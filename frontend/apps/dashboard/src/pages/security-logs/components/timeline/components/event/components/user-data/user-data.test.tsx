@@ -1,5 +1,5 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import DecryptUserData from './decrypt-user-data';
+import UserData from './user-data';
 import {
   fiveFieldsFixture,
   fourFieldsFixture,
@@ -7,29 +7,29 @@ import {
   sixteenFieldsFixture,
   threeFieldsFixture,
   twoFieldsFixture,
-} from './decrypt-user-data.test.config';
+} from './user-data.test.config';
 
-describe('<DecryptUserData />', () => {
+describe('<UserData />', () => {
   it('should render correctly with one field', () => {
-    customRender(<DecryptUserData detail={oneFieldFixture} />);
+    customRender(<UserData detail={oneFieldFixture} />);
     const text = screen.getByText('First name');
     expect(text).toBeInTheDocument();
   });
 
   it('should render correctly with two fields', () => {
-    customRender(<DecryptUserData detail={twoFieldsFixture} />);
+    customRender(<UserData detail={twoFieldsFixture} />);
     const text = screen.getByText('First name and Last name');
     expect(text).toBeInTheDocument();
   });
 
   it('should render correctly with three fields', () => {
-    customRender(<DecryptUserData detail={threeFieldsFixture} />);
+    customRender(<UserData detail={threeFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
     expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,and Date of birth');
   });
 
   it('should render correctly with four fields', async () => {
-    customRender(<DecryptUserData detail={fourFieldsFixture} />);
+    customRender(<UserData detail={fourFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
     expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth and');
     const otherText = screen.getByText('1 other attribute');
@@ -43,7 +43,7 @@ describe('<DecryptUserData />', () => {
   });
 
   it('should render correctly with five fields', async () => {
-    customRender(<DecryptUserData detail={fiveFieldsFixture} />);
+    customRender(<UserData detail={fiveFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
     expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth and');
     const otherText = screen.getByText('2 other attributes');
@@ -57,7 +57,7 @@ describe('<DecryptUserData />', () => {
   });
 
   it('should render correctly with twenty fields', async () => {
-    customRender(<DecryptUserData detail={sixteenFieldsFixture} />);
+    customRender(<UserData detail={sixteenFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
     expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth and');
     const otherText = screen.getByText('13 other attributes');
@@ -70,5 +70,45 @@ describe('<DecryptUserData />', () => {
       });
       expect(tooltip).toBeInTheDocument();
     });
+  });
+});
+
+describe('UserData for different event types', () => {
+  it('should render correctly for delete_user_data event', () => {
+    customRender(
+      <UserData
+        detail={{
+          kind: 'delete_user_data',
+          data: {
+            fpId: '123',
+            deletedFields: ['id.first_name', 'id.last_name'],
+          },
+        }}
+      />,
+    );
+
+    const deletedText = screen.getByText('deleted');
+    const fieldsText = screen.getByText('First name and Last name');
+    expect(deletedText).toBeInTheDocument();
+    expect(fieldsText).toBeInTheDocument();
+  });
+
+  it('should render correctly for update_user_data event', () => {
+    customRender(
+      <UserData
+        detail={{
+          kind: 'update_user_data',
+          data: {
+            fpId: '123',
+            updatedFields: ['id.email', 'id.phone_number'],
+          },
+        }}
+      />,
+    );
+
+    const updatedText = screen.getByText('updated');
+    const fieldsText = screen.getByText('Email and Phone number');
+    expect(updatedText).toBeInTheDocument();
+    expect(fieldsText).toBeInTheDocument();
   });
 });

@@ -22,7 +22,20 @@ describe('<Event />', () => {
   });
 
   it('does not show decryption event description when event is not DecryptUserData', () => {
-    customRender(<Event auditEvent={getAuditEvent({ detail: getAuditEventDetail({ kind: 'update_user_data' }) })} />);
+    customRender(
+      <Event
+        auditEvent={getAuditEvent({
+          detail: getAuditEventDetail({
+            kind: 'create_org_role',
+            data: {
+              roleName: 'test',
+              scopes: [],
+              tenantRoleId: '123',
+            },
+          }),
+        })}
+      />,
+    );
     const element = screen.queryByText('decrypted');
     expect(element).not.toBeInTheDocument();
   });
