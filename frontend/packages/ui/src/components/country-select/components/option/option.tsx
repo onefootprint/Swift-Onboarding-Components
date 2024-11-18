@@ -35,7 +35,7 @@ const Option = <Option, IsMulti extends boolean, Group extends GroupBase<Option>
   return (
     <OptionContainer
       ref={innerRef}
-      highlighted={isFocused}
+      $highlighted={isFocused}
       id={innerProps.id}
       onClick={innerProps.onClick}
       onMouseMove={innerProps.onMouseMove}
@@ -71,9 +71,9 @@ const IcoCheck = styled(IcoCheck16)`
 `;
 
 const OptionContainer = styled.div<{
-  highlighted: boolean;
+  $highlighted: boolean;
 }>`
-  ${({ theme, highlighted }) => css`
+  ${({ theme, $highlighted }) => css`
     ${createFontStyles('body-3')};
     align-items: center;
     background: ${theme.backgroundColor.primary};
@@ -89,7 +89,7 @@ const OptionContainer = styled.div<{
     height: 100%;
 
     ${
-      highlighted &&
+      $highlighted &&
       css`
       ${createOverlayBackground('darken-1', 'primary')};
     `
