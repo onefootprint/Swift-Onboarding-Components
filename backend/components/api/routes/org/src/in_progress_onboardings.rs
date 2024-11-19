@@ -58,6 +58,7 @@ async fn get(
     root_span.record("meta", workflows.len());
     let response = workflows
         .into_iter()
+        .filter(|(_, _, tenant)| !tenant.is_demo_tenant)
         .map(|(wf, sv, tenant)| api_wire_types::InProgressOnboarding {
             fp_id: sv.fp_id,
             tenant: InProgressOnboardingTenant {
