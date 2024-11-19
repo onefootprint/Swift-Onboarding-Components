@@ -1,10 +1,10 @@
-import type { SupportedIdDocTypes } from '@onefootprint/types';
-import useIdDocText from '../use-id-doc-text';
+import type { IdDocKind } from '@onefootprint/request-types/dashboard';
+import { useTranslation } from 'react-i18next';
 
 const useIdDocList = () => {
-  const getText = useIdDocText();
-  return (docs: SupportedIdDocTypes[]) => {
-    return [...docs].map(getText).sort((a, b) => a.localeCompare(b));
+  const { t } = useTranslation('common', { keyPrefix: 'id_document' });
+  return (docs: IdDocKind[]) => {
+    return [...docs].map(doc => t(doc)).sort((a, b) => a.localeCompare(b));
   };
 };
 

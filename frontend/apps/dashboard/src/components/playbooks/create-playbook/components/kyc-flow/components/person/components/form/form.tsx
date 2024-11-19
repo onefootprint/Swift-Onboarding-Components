@@ -1,4 +1,3 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
 import { Button, Checkbox, Radio, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
@@ -33,7 +32,7 @@ const Form = ({ onClose }: FormProps) => {
   };
 
   const handleSsnKindChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === CollectedKycDataOption.ssn4) {
+    if (e.target.value === 'ssn4') {
       setValue('person.usTaxIdAcceptable', false);
     }
   };
@@ -46,7 +45,7 @@ const Form = ({ onClose }: FormProps) => {
 
   const setSsnType = (nextValue: React.ChangeEvent<HTMLInputElement>) => {
     if (nextValue.target.checked) {
-      setValue('person.ssn.kind', CollectedKycDataOption.ssn9);
+      setValue('person.ssn.kind', 'ssn9');
     }
   };
 
@@ -73,21 +72,21 @@ const Form = ({ onClose }: FormProps) => {
               <OptionsContainer>
                 <Radio
                   label={t('ssn.full')}
-                  value={CollectedKycDataOption.ssn9}
+                  value={'ssn9'}
                   {...register('person.ssn.kind', {
                     onChange: handleSsnKindChange,
                   })}
                 />
                 <Radio
                   label={t('ssn.last4')}
-                  value={CollectedKycDataOption.ssn4}
+                  value={'ssn4'}
                   {...register('person.ssn.kind', {
                     onChange: handleSsnKindChange,
                   })}
                 />
               </OptionsContainer>
             </Subsection>
-            {data.ssn.kind === CollectedKycDataOption.ssn9 ? (
+            {data.ssn.kind === 'ssn9' ? (
               <Subsection>
                 <Checkbox
                   hint={t('accept-itin-hint')}

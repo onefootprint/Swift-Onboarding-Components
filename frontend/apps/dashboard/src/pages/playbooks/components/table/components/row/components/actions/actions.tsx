@@ -10,8 +10,6 @@ import type { CopyHandler } from './components/copy';
 import Copy from './components/copy';
 import type { CopyLinkHandler } from './components/copy-link';
 import CopyLink from './components/copy-link';
-import type { EditNameHandler } from './components/edit-name';
-import EditName from './components/edit-name';
 import type { StatusHandler } from './components/status';
 import Status from './components/status';
 
@@ -26,7 +24,6 @@ const Actions = ({ playbook }: ActionsProps) => {
     keyPrefix: 'table.actions',
   });
   const statusRef = useRef<StatusHandler>(null);
-  const editNameRef = useRef<EditNameHandler>(null);
   const copyRef = useRef<CopyHandler>(null);
   const copyLinkRef = useRef<CopyLinkHandler>(null);
   const canShowLink = kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
@@ -34,11 +31,6 @@ const Actions = ({ playbook }: ActionsProps) => {
   const handleToggleStatus = () => {
     setDropdownOpen(false);
     statusRef.current?.toggle();
-  };
-
-  const launchEditName = () => {
-    setDropdownOpen(false);
-    editNameRef.current?.launch();
   };
 
   const launchCopy = () => {
@@ -71,9 +63,6 @@ const Actions = ({ playbook }: ActionsProps) => {
                   {t('get-link')}
                 </Dropdown.Item>
               )}
-              <Dropdown.Item onSelect={launchEditName} onClick={event => event.stopPropagation()}>
-                {t('edit-name.cta')}
-              </Dropdown.Item>
               <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('not-allowed')}>
                 <Dropdown.Item onSelect={launchCopy} onClick={event => event.stopPropagation()}>
                   {t('copy')}
@@ -94,7 +83,6 @@ const Actions = ({ playbook }: ActionsProps) => {
         </Dropdown.Portal>
       </Dropdown.Root>
       <Status playbook={playbook} key={status} ref={statusRef} />
-      <EditName playbook={playbook} ref={editNameRef} key={name} />
       <CopyLink playbook={playbook} ref={copyLinkRef} />
       <Copy playbook={playbook} ref={copyRef} />
     </Stack>

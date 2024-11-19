@@ -1,4 +1,3 @@
-import { OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper } from '@onefootprint/ui';
 import { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +43,7 @@ const DocumentFlow = ({ onBack, onDone }: DocumentFlowProps) => {
       {state.step === 'name' && (
         <NameStep
           defaultValues={state.data.nameForm}
-          meta={{ kind: OnboardingConfigKind.document }}
+          meta={{ kind: 'document' }}
           onBack={onBack}
           onSubmit={data => {
             dispatch({ type: 'updateNameData', payload: data });

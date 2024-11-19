@@ -1,5 +1,4 @@
 import { IcoTrash16 } from '@onefootprint/icons';
-import type { CustomDocumentUploadSettings } from '@onefootprint/types';
 import { Button, Divider, Form, LinkButton, Radio, Stack, Text, TextArea } from '@onefootprint/ui';
 import get from 'lodash/get';
 import { useId, useState } from 'react';
@@ -140,13 +139,13 @@ const CustomDocsForm = ({ index = 0, formName, onDelete, onCancel, onSubmit }: C
         <Stack flexDirection="column" gap={5} paddingTop={5}>
           <Text variant="label-3"> {t('collection-method.title')}</Text>
           <Stack flexDirection="column" gap={3}>
-            <Radio<CustomDocumentUploadSettings>
+            <Radio
               hint={t('collection-method.prefer-upload.hint')}
               label={t('collection-method.prefer-upload.label')}
               value="prefer_upload"
               {...register(nameAttrs.uploadSettings)}
             />
-            <Radio<CustomDocumentUploadSettings>
+            <Radio
               hint={t('collection-method.prefer-capture.hint')}
               label={t('collection-method.prefer-capture.label')}
               value="prefer_capture"

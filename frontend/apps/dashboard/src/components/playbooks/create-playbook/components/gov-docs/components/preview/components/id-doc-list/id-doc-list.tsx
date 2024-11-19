@@ -1,10 +1,10 @@
-import type { SupportedIdDocTypes } from '@onefootprint/types';
+import type { IdDocKind } from '@onefootprint/request-types/dashboard';
 import { Stack, Text, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
 
 export type IdDocListProps = {
-  docs: SupportedIdDocTypes[];
+  docs: IdDocKind[];
   limit?: number;
 };
 

@@ -1,5 +1,7 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountrySpecificDocumentMapping, IdDocKind } from '@onefootprint/request-types/dashboard';
+
+import type { CountryCode } from '@onefootprint/types';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -20,9 +22,7 @@ const CountrySpecificIdDocPicker = () => {
   const existingCountries = Object.keys(countryDocMap);
   const isEmptyMap = existingCountries.length === 0;
   const [showPicker, setShowPicker] = useState(false);
-  const [editingCountryDocMap, setEditingCountryDocMap] = useState<
-    Partial<Record<CountryCode, SupportedIdDocTypes[]>> | undefined
-  >();
+  const [editingCountryDocMap, setEditingCountryDocMap] = useState<CountrySpecificDocumentMapping>();
 
   const handleEdit = (country: CountryCode) => {
     const selectedDocs = countryDocMap[country];
@@ -38,7 +38,7 @@ const CountrySpecificIdDocPicker = () => {
     setShowPicker(true);
   };
 
-  const handleSave = (newCountry: CountryCode, newDocs: SupportedIdDocTypes[]) => {
+  const handleSave = (newCountry: CountryCode, newDocs: IdDocKind[]) => {
     setShowPicker(false);
     const newMap = { ...countryDocMap, [newCountry]: newDocs };
     setEditingCountryDocMap(undefined);

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import Panel from '../../../panel';
 import type { ResidencyFormData } from '../../../residency-step';
 import Cta from './components/cta';

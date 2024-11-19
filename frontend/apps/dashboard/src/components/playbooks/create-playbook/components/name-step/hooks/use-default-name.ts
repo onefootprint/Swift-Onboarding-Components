@@ -1,8 +1,8 @@
-import { OnboardingConfigKind } from '@onefootprint/types';
+import type { ObConfigurationKind } from '@onefootprint/request-types/dashboard';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
-const useDefaultName = ({ kind }: { kind: OnboardingConfigKind }) => {
+const useDefaultName = ({ kind }: { kind: ObConfigurationKind }) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'kinds' });
   const {
     data: { org },
@@ -13,24 +13,7 @@ const useDefaultName = ({ kind }: { kind: OnboardingConfigKind }) => {
     day: '2-digit',
     year: '2-digit',
   });
-
-  const getKindName = (kind: OnboardingConfigKind) => {
-    if (kind === OnboardingConfigKind.auth) {
-      return t('auth');
-    }
-    if (kind === OnboardingConfigKind.kyb) {
-      return t('kyb');
-    }
-    if (kind === OnboardingConfigKind.kyc) {
-      return t('kyc');
-    }
-    if (kind === OnboardingConfigKind.document) {
-      return t('document');
-    }
-    return 'Unknown';
-  };
-
-  return `${tenantName} ${getKindName(kind)} (${dateString})`;
+  return `${tenantName} ${t(kind)} (${dateString})`;
 };
 
 export default useDefaultName;

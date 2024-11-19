@@ -1,9 +1,9 @@
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountrySpecificDocumentMapping, IdDocKind } from '@onefootprint/request-types/dashboard';
 
 export type GovDocsFormData = {
   gov: {
-    global: SupportedIdDocTypes[];
-    country: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
+    global: IdDocKind[];
+    country: CountrySpecificDocumentMapping;
     selfie: boolean;
     idDocFirst: boolean;
   };

@@ -1,44 +1,47 @@
-import { SupportedIdDocTypes } from '@onefootprint/types';
-import useIdDocText from 'src/hooks/use-id-doc-text';
+import type { IdDocKind } from '@onefootprint/request-types/dashboard';
+import { useTranslation } from 'react-i18next';
 
-const useIdDocOptions = () => {
-  const t = useIdDocText();
-  const options = [
+type IdDocOption = {
+  value: IdDocKind;
+  label: string;
+};
+
+const useIdDocOptions = (): IdDocOption[] => {
+  const { t } = useTranslation('common', { keyPrefix: 'id_document' });
+  return [
     {
-      value: SupportedIdDocTypes.driversLicense,
-      label: t(SupportedIdDocTypes.driversLicense),
+      value: 'drivers_license',
+      label: t('drivers_license'),
     },
     {
-      value: SupportedIdDocTypes.passport,
-      label: t(SupportedIdDocTypes.passport),
+      value: 'passport',
+      label: t('passport'),
     },
     {
-      value: SupportedIdDocTypes.passportCard,
-      label: t(SupportedIdDocTypes.passportCard),
+      value: 'passport_card',
+      label: t('passport_card'),
     },
     {
-      value: SupportedIdDocTypes.idCard,
-      label: t(SupportedIdDocTypes.idCard),
+      value: 'id_card',
+      label: t('id_card'),
     },
     {
-      value: SupportedIdDocTypes.residenceDocument,
-      label: t(SupportedIdDocTypes.residenceDocument),
+      value: 'residence_document',
+      label: t('residence_document'),
     },
     {
-      value: SupportedIdDocTypes.workPermit,
-      label: t(SupportedIdDocTypes.workPermit),
+      value: 'permit',
+      label: t('permit'),
     },
     {
-      value: SupportedIdDocTypes.visa,
-      label: t(SupportedIdDocTypes.visa),
+      value: 'visa',
+      label: t('visa'),
     },
     {
-      value: SupportedIdDocTypes.voterIdentification,
-      label: t(SupportedIdDocTypes.voterIdentification),
+      value: 'voter_identification',
+      label: t('voter_identification'),
     },
   ];
-
-  return options;
 };
 
 export default useIdDocOptions;

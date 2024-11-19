@@ -1,8 +1,8 @@
-import type { CustomDocumentUploadSettings } from '@onefootprint/types';
+import type { DocumentUploadSettings } from '@onefootprint/request-types/dashboard';
 
 export type CustomDoc = {
   name: string;
   identifier: string;
   description?: string;
-  uploadSettings: CustomDocumentUploadSettings;
+  uploadSettings: DocumentUploadSettings;
 };

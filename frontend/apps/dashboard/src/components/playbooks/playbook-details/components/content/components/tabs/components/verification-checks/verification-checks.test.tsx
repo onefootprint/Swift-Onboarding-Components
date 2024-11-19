@@ -4,7 +4,6 @@ import type {
   VerificationCheck,
 } from '@onefootprint/request-types/dashboard';
 import { customRender, screen, within } from '@onefootprint/test-utils';
-
 import VerificationChecks from './verification-checks';
 import { onboardingConfigFixture } from './verification-checks.test.config';
 
@@ -55,29 +54,6 @@ describe('<VerificationChecks />', () => {
       expect(kycChecks).toBeInTheDocument();
     });
 
-<<<<<<< HEAD
-=======
-    it('should show the correct text when EIN-only KYB is enabled and primary-only KYC checks are enabled', () => {
-      renderVerificationChecks({
-        verificationChecks: [
-          { kind: 'kyb', data: { einOnly: true } },
-          { kind: 'kyc', data: {} },
-        ],
-        kind: 'kyb',
-      });
-
-      const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
-      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only');
-      expect(einOnly).toBeInTheDocument();
-
-      const kyc = screen.getByRole('group', { name: 'Know Your Customer (KYC)' });
-      const primaryOnly = within(kyc).getByText(
-        'Only on business’ primary owner (the person who filled out the KYB form)',
-      );
-      expect(primaryOnly).toBeInTheDocument();
-    });
-
->>>>>>> 25e674d0e4 (Edit playbooks (3): dialog title)
     it('should show the correct text when EIN-only KYB is enabled and full KYC checks are enabled', () => {
       renderVerificationChecks({
         verificationChecks: [
@@ -117,7 +93,7 @@ describe('<VerificationChecks />', () => {
                 pep: false,
                 adverseMedia: false,
                 continuousMonitoring: false,
-                matchKind: 'exact_name_and_dob_year',
+                matchKind: 'fuzzy_low',
               },
             },
           ],
@@ -138,7 +114,7 @@ describe('<VerificationChecks />', () => {
                 pep: true,
                 adverseMedia: true,
                 continuousMonitoring: false,
-                matchKind: 'exact_name_and_dob_year',
+                matchKind: 'fuzzy_low',
               },
             },
           ],
@@ -157,11 +133,11 @@ describe('<VerificationChecks />', () => {
             {
               kind: 'aml',
               data: {
-                pep: true,
                 ofac: false,
+                pep: true,
                 adverseMedia: false,
                 continuousMonitoring: false,
-                matchKind: 'exact_name_and_dob_year',
+                matchKind: 'fuzzy_low',
               },
             },
           ],
@@ -178,11 +154,11 @@ describe('<VerificationChecks />', () => {
             {
               kind: 'aml',
               data: {
-                pep: false,
                 ofac: true,
+                pep: false,
                 adverseMedia: true,
                 continuousMonitoring: false,
-                matchKind: 'exact_name_and_dob_year',
+                matchKind: 'fuzzy_low',
               },
             },
           ],
@@ -199,14 +175,14 @@ describe('<VerificationChecks />', () => {
         renderVerificationChecks({
           verificationChecks: [
             {
+              kind: 'aml',
               data: {
-                adverseMedia: true,
-                continuousMonitoring: false,
-                matchKind: 'exact_name_and_dob_year',
                 ofac: false,
                 pep: false,
+                adverseMedia: true,
+                continuousMonitoring: false,
+                matchKind: 'fuzzy_low',
               },
-              kind: 'aml',
             },
           ],
         });
@@ -222,11 +198,11 @@ describe('<VerificationChecks />', () => {
             {
               kind: 'aml',
               data: {
-                adverseMedia: false,
-                pep: true,
                 ofac: true,
+                pep: true,
+                adverseMedia: false,
                 continuousMonitoring: false,
-                matchKind: 'exact_name_and_dob_year',
+                matchKind: 'fuzzy_low',
               },
             },
           ],

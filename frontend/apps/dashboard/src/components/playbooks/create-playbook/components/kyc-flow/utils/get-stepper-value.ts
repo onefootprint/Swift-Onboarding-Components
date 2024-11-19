@@ -1,5 +1,5 @@
 import type { StepperOption } from '@onefootprint/ui';
-import type { Step } from './reducer';
+import type { Step } from './reducer/reducer';
 
 const detailsSteps: Step[] = ['residency', 'kycData', 'requiredAuthMethods'];
 

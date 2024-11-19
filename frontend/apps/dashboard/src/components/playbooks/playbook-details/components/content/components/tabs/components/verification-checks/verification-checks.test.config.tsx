@@ -31,17 +31,3 @@ export const onboardingConfigFixture = getOnboardingConfiguration({
     },
   ],
 });
-
-export const amlCheck = ({
-  adverseMedia = false,
-  continuousMonitoring = false,
-  ofac = false,
-  pep = false,
-}: {
-  adverseMedia?: boolean;
-  continuousMonitoring?: boolean;
-  ofac?: boolean;
-  pep?: boolean;
-}) => {
-  return { kind: 'aml', data: { adverseMedia, ofac, pep, continuousMonitoring } };
-};

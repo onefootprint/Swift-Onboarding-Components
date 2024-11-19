@@ -1,4 +1,4 @@
-import type { OnboardingConfigKind } from '@onefootprint/types';
+import type { ObConfigurationKind } from '@onefootprint/request-types/dashboard';
 import { Form, Stack } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ export type NameFormData = {
 export type NameStepProps = {
   defaultValues: NameFormData;
   meta: {
-    kind: OnboardingConfigKind;
+    kind: ObConfigurationKind;
   };
   onBack: () => void;
   onSubmit: (data: NameFormData) => void;

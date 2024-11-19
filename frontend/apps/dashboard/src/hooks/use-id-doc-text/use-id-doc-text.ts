@@ -1,6 +1,7 @@
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
+/** @deprecated */
 const useIdDocText = () => {
   const { t } = useTranslation('common', { keyPrefix: 'id_document' });
   const map: Record<SupportedIdDocTypes, string> = {

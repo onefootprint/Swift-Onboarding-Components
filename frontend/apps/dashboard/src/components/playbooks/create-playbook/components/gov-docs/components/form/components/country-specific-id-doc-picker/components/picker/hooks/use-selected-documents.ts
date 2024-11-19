@@ -1,9 +1,9 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { SupportedIdDocTypes } from '@onefootprint/types';
+import type { IdDocKind } from '@onefootprint/request-types/dashboard';
 import isEqual from 'lodash/isEqual';
 import { useEffect, useState } from 'react';
 
-type DocSelectorOptionType = { value: SupportedIdDocTypes; label: string };
+type DocSelectorOptionType = { value: IdDocKind; label: string };
 
 const useSelectedDocuments = (preselectedDocs: DocSelectorOptionType[], selectedCountry: CountryRecord) => {
   const [selectedDocuments, setSelectedDocuments] = useState<DocSelectorOptionType[]>(preselectedDocs);

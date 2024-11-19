@@ -1,5 +1,4 @@
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { CollectedKybDataOption } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Info from '../info';
@@ -37,7 +36,7 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
   const kycText = (() => {
     if (kind === 'kyb') {
       if (!doesKyc) return t('kyb.kyc.none');
-      if (mustCollectData.includes(CollectedKybDataOption.kycedBeneficialOwners)) return t('kyb.kyc.full');
+      if (mustCollectData.includes('business_kyced_beneficial_owners')) return t('kyb.kyc.full');
     }
     if (kind === 'kyc') {
       return doesKyc ? t('kyc.full') : t('kyc.none');

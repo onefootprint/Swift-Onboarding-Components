@@ -1,5 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { Box, Checkbox, Divider, InlineAlert, MultiSelect, Radio, Stack, Text } from '@onefootprint/ui';
+import { useMemo } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -21,10 +22,15 @@ const StepResidency = ({ defaultValues, onBack, onSubmit, meta }: StepResidencyP
   const { handleSubmit, register, control } = useForm<ResidencyFormData>({
     defaultValues,
   });
-  const [residencyType, isCountryRestricted] = useWatch({
+  const [residencyType, isCountryRestricted, countryList] = useWatch({
     control,
-    name: ['residencyType', 'isCountryRestricted'],
+    name: ['residencyType', 'isCountryRestricted', 'countryList'],
   });
+  const countryValues = useMemo(() => {
+    if (countryList.length === 0) return [];
+    // @ts-expect-error we should not use country record anymore
+    return countriesExceptUs.filter(country => countryList.includes(country.value));
+  }, [countryList]);
 
   return (
     <Stack direction="column" gap={7} width="520px" whiteSpace="pre-wrap">
@@ -91,16 +97,20 @@ const StepResidency = ({ defaultValues, onBack, onSubmit, meta }: StepResidencyP
                     <Controller
                       control={control}
                       name="countryList"
-                      render={({ field }) => (
-                        <MultiSelect
-                          label={t('countries')}
-                          onBlur={field.onBlur}
-                          onChange={field.onChange}
-                          options={countriesExceptUs}
-                          value={field.value}
-                          disabled={!meta.canEdit}
-                        />
-                      )}
+                      render={({ field }) => {
+                        return (
+                          <MultiSelect
+                            label={t('countries')}
+                            onBlur={field.onBlur}
+                            onChange={countries => {
+                              field.onChange(countries.map(c => c.value));
+                            }}
+                            value={countryValues}
+                            options={countriesExceptUs}
+                            disabled={!meta.canEdit}
+                          />
+                        );
+                      }}
                     />
                   </>
                 )}

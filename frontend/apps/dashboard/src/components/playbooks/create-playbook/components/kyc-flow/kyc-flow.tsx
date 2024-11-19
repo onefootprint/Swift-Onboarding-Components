@@ -1,8 +1,8 @@
 import { getOrgOptions } from '@onefootprint/axios/dashboard';
-import { CollectedKycDataOption, OnboardingConfigKind } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Stepper } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import useCreatePlaybook from '../../hooks/use-create-playbook';
 import NameStep from '../name-step';
@@ -12,43 +12,27 @@ import StepperContainer from '../stepper-container';
 import PersonStep from './components/details-step';
 import TemplatesStep, { OnboardingTemplate } from './components/templates-step';
 import VerificationChecksStep from './components/verification-checks-step';
+import useOptions from './hooks/use-options';
 import createPayload from './utils/create-payload';
 import getStepperValue from './utils/get-stepper-value';
-import { initialState, reducer } from './utils/reducer';
+import { getInitialValues, reducer } from './utils/reducer';
 
 type KycFlowProps = {
   onDone: () => void;
   onBack: () => void;
+  playbook?: OnboardingConfiguration;
 };
 
-const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
+const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.stepper' });
+  const initialState = useMemo(() => {
+    return getInitialValues(playbook);
+  }, [playbook]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
   const orgQuery = useQuery(getOrgOptions());
-  const options = [
-    { label: t('name'), value: 'name' },
-    { label: t('templates'), value: 'templates' },
-    {
-      label: t('details'),
-      value: 'details',
-      options: [
-        {
-          label: t('residency'),
-          value: 'residency',
-        },
-        {
-          label: t('personal'),
-          value: 'kycData',
-        },
-        {
-          label: t('otp'),
-          value: 'requiredAuthMethods',
-        },
-      ],
-    },
-    { label: t('verification-checks'), value: 'verificationChecks' },
-  ];
+  const options = useOptions(playbook);
+  const isEditing = !!playbook;
   const isTemplateEditable =
     state.data.templateForm.template !== OnboardingTemplate.Alpaca &&
     state.data.templateForm.template !== OnboardingTemplate.Apex;
@@ -75,11 +59,11 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
       {state.step === 'name' && (
         <NameStep
           defaultValues={state.data.nameForm}
-          meta={{ kind: OnboardingConfigKind.kyc }}
+          meta={{ kind: 'kyc' }}
           onBack={onBack}
           onSubmit={data => {
             dispatch({ type: 'updateNameData', payload: data });
-            dispatch({ type: 'updateStep', payload: 'templates' });
+            dispatch({ type: 'updateStep', payload: isEditing ? 'residency' : 'templates' });
           }}
         />
       )}
@@ -102,7 +86,7 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
           }}
           defaultValues={state.data.residencyForm}
           onBack={() => {
-            dispatch({ type: 'updateStep', payload: 'templates' });
+            dispatch({ type: 'updateStep', payload: isEditing ? 'name' : 'templates' });
           }}
           onSubmit={data => {
             dispatch({ type: 'updateResidencyData', payload: data });
@@ -148,8 +132,7 @@ const KycFlow = ({ onBack, onDone }: KycFlowProps) => {
             collectsDocs: state.data.detailsForm.gov.global.length > 0,
             collectsPhone: state.data.detailsForm.person.phoneNumber,
             collectsSsn9:
-              state.data.detailsForm.person.ssn.collect &&
-              state.data.detailsForm.person.ssn.kind === CollectedKycDataOption.ssn9,
+              state.data.detailsForm.person.ssn.collect && state.data.detailsForm.person.ssn.kind === 'ssn9',
             isProdNeuroEnabled: orgQuery.data?.isProdNeuroEnabled || false,
             isProdSentilinkEnabled: orgQuery.data?.isProdSentilinkEnabled || false,
           }}

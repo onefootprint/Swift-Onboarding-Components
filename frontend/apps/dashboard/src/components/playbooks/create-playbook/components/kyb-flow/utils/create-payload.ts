@@ -1,13 +1,9 @@
-import {
-  type CollectedDataOption,
-  CollectedKybDataOption,
-  CollectedKycDataOption,
-  type CustomDI,
-  type DocumentRequestConfig,
-  DocumentRequestKind,
-  OnboardingConfigKind,
-  type OrgOnboardingConfigCreateRequest,
-} from '@onefootprint/types';
+import type {
+  CollectedDataOption,
+  CreateOnboardingConfigurationRequest,
+  DocumentRequestConfig,
+  VerificationCheck,
+} from '@onefootprint/request-types/dashboard';
 import type { NameFormData } from '../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
 import type { BoFormData } from '../components/bo-step';
@@ -28,14 +24,9 @@ type KycFlowFormData = {
   verificationChecksForm: VerificationChecksFormData;
 };
 
-const requiredKybFields = [CollectedKybDataOption.name, CollectedKybDataOption.tin];
+const requiredKybFields: CollectedDataOption[] = ['business_name', 'business_tin'];
 
-const requiredKycFields = [
-  CollectedKycDataOption.email,
-  CollectedKycDataOption.name,
-  CollectedKycDataOption.dob,
-  CollectedKycDataOption.address,
-];
+const requiredKycFields: CollectedDataOption[] = ['email', 'name', 'dob', 'full_address'];
 
 const createPayload = ({
   nameForm,
@@ -43,7 +34,7 @@ const createPayload = ({
   boForm,
   requiredAuthMethodsForm,
   verificationChecksForm,
-}: KycFlowFormData): OrgOnboardingConfigCreateRequest => {
+}: KycFlowFormData): CreateOnboardingConfigurationRequest => {
   const collectsBO = boForm.data.collect;
   const { mustCollectData: personMustCollectData, optionalData: personOptionalData } = createPersonPayload(boForm, {
     collectsBO,
@@ -57,7 +48,7 @@ const createPayload = ({
 
   return {
     name: nameForm.name,
-    kind: OnboardingConfigKind.kyb,
+    kind: 'kyb',
     allowUsResidents: true,
     allowUsTerritories: false,
     allowInternationalResidents: false,
@@ -67,7 +58,7 @@ const createPayload = ({
     documentsToCollect: createAdditionalDocsPayload(boForm.docs),
     requiredAuthMethods: createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
     businessDocumentsToCollect: createBusinessDocumentsPayload(businessForm),
-    ...createVerificationChecksPayload(verificationChecksForm),
+    verificationChecks: createVerificationChecksPayload(verificationChecksForm),
   };
 };
 
@@ -90,20 +81,22 @@ const createPersonPayload = (
   const hasIdDocuments = global.length > 0 || Object.keys(country).length > 0;
   if (hasIdDocuments) {
     if (selfie) {
+      // @ts-expect-error: backend has deprecated
       mustCollectData.push('document_and_selfie');
     } else {
+      // @ts-expect-error: backend has deprecated
       mustCollectData.push('document');
     }
   }
   if (phoneNumber) {
-    mustCollectData.push(CollectedKycDataOption.phoneNumber);
+    mustCollectData.push('phone_number');
   }
   if (usLegalStatus) {
-    mustCollectData.push(CollectedKycDataOption.usLegalStatus);
+    mustCollectData.push('us_legal_status');
   }
   if (ssn.collect && ssn.kind && !ssn.optional) {
-    if (ssn.kind === CollectedKycDataOption.ssn9 && usTaxIdAcceptable) {
-      mustCollectData.push(CollectedKycDataOption.usTaxId);
+    if (ssn.kind === 'ssn9' && usTaxIdAcceptable) {
+      mustCollectData.push('us_tax_id');
     }
     mustCollectData.push(ssn.kind);
   } else {
@@ -119,10 +112,11 @@ const createBusinessDocumentsPayload = (businessForm: BusinessFormData) => {
   const documentsToCollect: DocumentRequestConfig[] = [];
   businessForm.docs.custom.forEach(doc => {
     documentsToCollect.push({
-      kind: DocumentRequestKind.Custom,
+      kind: 'custom',
       data: {
         description: doc.description,
-        identifier: `document.custom.${doc.identifier}` as CustomDI,
+        // @ts-expect-error: fix once we support template literals
+        identifier: `document.custom.${doc.identifier}`,
         name: doc.name,
         requiresHumanReview: true,
         uploadSettings: doc.uploadSettings,
@@ -141,40 +135,38 @@ const createBusinessPayload = (
 ) => {
   const mustCollectData: CollectedDataOption[] = [...requiredKybFields];
   if (meta.collectsBO && meta.runKyc) {
-    mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
+    mustCollectData.push('business_kyced_beneficial_owners');
   }
   if (businessForm.data.address) {
-    mustCollectData.push(CollectedKybDataOption.address);
+    mustCollectData.push('business_address');
   }
   if (businessForm.data.website) {
-    mustCollectData.push(CollectedKybDataOption.website);
+    mustCollectData.push('business_website');
   }
   if (businessForm.data.phoneNumber) {
-    mustCollectData.push(CollectedKybDataOption.phoneNumber);
+    mustCollectData.push('business_website');
   }
   if (businessForm.data.type) {
-    mustCollectData.push(CollectedKybDataOption.corporationType);
+    mustCollectData.push('business_corporation_type');
   }
   return mustCollectData;
 };
 
-const createVerificationChecksPayload = (verificationChecksForm: VerificationChecksFormData) => {
-  return {
-    verificationChecks: [
-      ...(verificationChecksForm.runKyb
-        ? [
-            {
-              kind: 'kyb',
-              data: {
-                einOnly: verificationChecksForm.kybKind === 'ein',
-              },
+const createVerificationChecksPayload = (verificationChecksForm: VerificationChecksFormData): VerificationCheck[] => {
+  return [
+    ...(verificationChecksForm.runKyb
+      ? [
+          {
+            kind: 'kyb' as const,
+            data: {
+              einOnly: verificationChecksForm.kybKind === 'ein',
             },
-          ]
-        : []),
-      ...(verificationChecksForm.runKyc ? [{ kind: 'kyc', data: {} }] : []),
-      ...(verificationChecksForm.aml.enhancedAml ? [{ kind: 'business_aml', data: {} }] : []),
-    ],
-  };
+          },
+        ]
+      : []),
+    ...(verificationChecksForm.runKyc ? [{ kind: 'kyc' as const, data: {} }] : []),
+    ...(verificationChecksForm.aml.enhancedAml ? [{ kind: 'business_aml' as const, data: {} }] : []),
+  ];
 };
 
 export default createPayload;

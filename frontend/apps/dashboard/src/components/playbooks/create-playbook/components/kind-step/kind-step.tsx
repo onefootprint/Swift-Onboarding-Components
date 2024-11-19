@@ -1,5 +1,5 @@
 import { IcoIdCard24, IcoShield24, IcoStore24, IcoUsers24 } from '@onefootprint/icons';
-import { OnboardingConfigKind } from '@onefootprint/types';
+import type { ObConfigurationKind } from '@onefootprint/request-types/dashboard';
 import { RadioSelect, Stack } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import useSession from 'src/hooks/use-session';
 import Header from '../header';
 
 type FormData = {
-  kind: OnboardingConfigKind;
+  kind: ObConfigurationKind;
 };
 
 export type KindStepProps = {
@@ -34,7 +34,7 @@ const KindStep = ({ onSubmit, defaultValues }: KindStepProps) => {
           <Controller
             control={control}
             name="kind"
-            defaultValue={OnboardingConfigKind.kyc}
+            defaultValue="kyc"
             render={({ field }) => (
               <RadioSelect
                 options={[
@@ -44,7 +44,7 @@ const KindStep = ({ onSubmit, defaultValues }: KindStepProps) => {
                       {
                         title: t('kyc.title'),
                         description: t('kyc.description'),
-                        value: OnboardingConfigKind.kyc,
+                        value: 'kyc',
                         IconComponent: IcoUsers24,
                         disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
                         disabledHint: t('kyc.disabled-tooltip'),
@@ -52,7 +52,7 @@ const KindStep = ({ onSubmit, defaultValues }: KindStepProps) => {
                       {
                         title: t('kyb.title'),
                         description: t('kyb.description'),
-                        value: OnboardingConfigKind.kyb,
+                        value: 'kyb',
                         IconComponent: IcoStore24,
                         disabled: org?.isLive && org?.isProdKybPlaybookRestricted,
                         disabledHint: t('kyb.disabled-tooltip'),
@@ -65,7 +65,7 @@ const KindStep = ({ onSubmit, defaultValues }: KindStepProps) => {
                       {
                         title: t('auth.title'),
                         description: t('auth.description'),
-                        value: OnboardingConfigKind.auth,
+                        value: 'auth',
                         IconComponent: IcoShield24,
                         disabled: org?.isLive && org?.isProdAuthPlaybookRestricted,
                         disabledHint: t('auth.disabled-tooltip'),
@@ -78,7 +78,7 @@ const KindStep = ({ onSubmit, defaultValues }: KindStepProps) => {
                       {
                         title: t('doc-only.title'),
                         description: t('doc-only.description'),
-                        value: OnboardingConfigKind.document,
+                        value: 'document',
                         IconComponent: IcoIdCard24,
                         disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
                         disabledHint: t('doc-only.disabled-tooltip'),

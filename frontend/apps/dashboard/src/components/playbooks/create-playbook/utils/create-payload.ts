@@ -1,10 +1,8 @@
-import {
+import type {
   AuthMethodKind,
-  type CustomDI,
-  type DocumentRequestConfig,
-  DocumentRequestKind,
-  type DocumentTypesAndCountries,
-} from '@onefootprint/types';
+  DocumentAndCountryConfiguration,
+  DocumentRequestConfig,
+} from '@onefootprint/request-types/dashboard';
 import type { AdditionalDocsFormData } from '../components/additional-docs';
 import type { GovDocsFormData } from '../components/gov-docs';
 import type { RequiredAuthMethodsFormData } from '../components/required-auth-methods-step';
@@ -18,7 +16,7 @@ export const createAdditionalDocsPayload = ({
   const documentsToCollect: DocumentRequestConfig[] = [];
   if (poa) {
     documentsToCollect.push({
-      kind: DocumentRequestKind.ProofOfAddress,
+      kind: 'proof_of_address',
       data: {
         requiresHumanReview: !!requireManualReview,
       },
@@ -26,7 +24,7 @@ export const createAdditionalDocsPayload = ({
   }
   if (possn) {
     documentsToCollect.push({
-      kind: DocumentRequestKind.ProofOfSsn,
+      kind: 'proof_of_ssn',
       data: {
         requiresHumanReview: !!requireManualReview,
       },
@@ -35,10 +33,11 @@ export const createAdditionalDocsPayload = ({
   if (custom) {
     custom.forEach(doc => {
       documentsToCollect.push({
-        kind: DocumentRequestKind.Custom,
+        kind: 'custom',
         data: {
           description: doc.description,
-          identifier: `document.custom.${doc.identifier}` as CustomDI,
+          // @ts-expect-error: backend doesn't have the correct type
+          identifier: `document.custom.${doc.identifier}`,
           name: doc.name,
           requiresHumanReview: !!requireManualReview,
           uploadSettings: doc.uploadSettings,
@@ -52,17 +51,17 @@ export const createAdditionalDocsPayload = ({
 export const createRequiredAuthMethodsPayload = (formData: RequiredAuthMethodsFormData) => {
   const requiredAuthMethods: AuthMethodKind[] = [];
   if (formData.email) {
-    requiredAuthMethods.push(AuthMethodKind.email);
+    requiredAuthMethods.push('email');
   }
   if (formData.phone) {
-    requiredAuthMethods.push(AuthMethodKind.phone);
+    requiredAuthMethods.push('phone');
   }
   return requiredAuthMethods;
 };
 
-export const createGovDocsPayload = (formData: GovDocsFormData['gov']): DocumentTypesAndCountries | null => {
+export const createGovDocsPayload = (formData: GovDocsFormData['gov']): DocumentAndCountryConfiguration | undefined => {
   if (formData.global.length === 0 && Object.keys(formData.country).length === 0) {
-    return null;
+    return undefined;
   }
   return {
     countrySpecific: formData.country,

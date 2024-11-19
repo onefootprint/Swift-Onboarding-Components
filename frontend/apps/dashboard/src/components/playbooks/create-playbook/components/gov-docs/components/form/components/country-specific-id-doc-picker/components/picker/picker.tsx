@@ -1,10 +1,11 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoTrash16 } from '@onefootprint/icons';
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountrySpecificDocumentMapping, IdDocKind } from '@onefootprint/request-types/dashboard';
+import type { CountryCode } from '@onefootprint/types';
 import { Button, CountrySelect, Divider, LinkButton, Stack } from '@onefootprint/ui';
 import { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -15,20 +16,22 @@ import useSelectedDocuments from './hooks/use-selected-documents';
 import type { GovDocsFormData } from '../../../../../../gov-docs.types';
 
 type PickerProps = {
-  editingCountryDocMap?: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
-  onSave: (country: CountryCode, docs: SupportedIdDocTypes[]) => void;
+  editingCountryDocMap?: CountrySpecificDocumentMapping;
+  onSave: (country: CountryCode, docs: IdDocKind[]) => void;
   onRemove: (country: CountryCode) => void;
   onCancel: () => void;
 };
 
 const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProps) => {
   const { t } = useTranslation('common');
-  const { watch } = useFormContext<GovDocsFormData>();
-  const countryDocMap = watch('gov.country');
-  const globalDocs = watch('gov.global');
+  const { control } = useFormContext<GovDocsFormData>();
+  const [countryDocMap, globalDocs] = useWatch({
+    control,
+    name: ['gov.country', 'gov.global'],
+  });
   const editingCountry = editingCountryDocMap ? Object.keys(editingCountryDocMap)[0] : null;
   const editingCountryRecord = COUNTRIES.find(country => country.value === editingCountry);
-  const editingDocs = editingCountryDocMap ? editingCountryDocMap[editingCountry as CountryCode] : null;
+  const editingDocs = editingCountryDocMap ? (editingCountryDocMap[editingCountry as CountryCode] as IdDocKind) : null;
   const existingCountries = Object.keys(countryDocMap);
   const countryOptions = COUNTRIES.filter(
     country => country.value === editingCountry || !existingCountries.includes(country.value),
@@ -56,7 +59,7 @@ const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProp
   };
 
   const handleCheckboxChange = (doc: {
-    value: SupportedIdDocTypes;
+    value: IdDocKind;
     label: string;
   }) => {
     const isSelected = selectedDocuments.some(selectedDoc => selectedDoc.value === doc.value);

@@ -1,4 +1,3 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
 import type { State } from './reducer';
 
 export const defaultFormValues: State['data'] = {
@@ -29,7 +28,7 @@ export const defaultFormValues: State['data'] = {
       usLegalStatus: false,
       ssn: {
         collect: true,
-        kind: CollectedKycDataOption.ssn9,
+        kind: 'ssn9',
         optional: false,
       },
       usTaxIdAcceptable: false,

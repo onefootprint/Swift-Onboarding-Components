@@ -145,7 +145,8 @@
       "bo": "Business owners details",
       "personal": "Personal information",
       "otp": "OTP configurations",
-      "verification-checks": "Verification checks"
+      "verification-checks": "Verification checks",
+      "review-changes": "Review changes"
     },
     "feedback": {
       "success": {
@@ -612,7 +613,6 @@
       "email": "Email OTP",
       "error": "At least one verification is needed"
     },
-
     "business": {
       "title": "Business information",
       "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",

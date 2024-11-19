@@ -1,4 +1,3 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
 import { useFormContext, useWatch } from 'react-hook-form';
 import type { PersonFormData } from '../person.types';
 
@@ -15,8 +14,8 @@ const useMeta = () => {
     hasSsnOptional: !!person.ssn.optional,
     hasUsLegalStatus: !!person.usLegalStatus,
     hasUsTaxIdAcceptable: !!person.usTaxIdAcceptable,
-    isSsn4: person.ssn.kind === CollectedKycDataOption.ssn4,
-    isSsn9: person.ssn.kind === CollectedKycDataOption.ssn9,
+    isSsn4: person.ssn.kind === 'ssn4',
+    isSsn9: person.ssn.kind === 'ssn9',
     showNoPhoneFlow: false,
   };
 };

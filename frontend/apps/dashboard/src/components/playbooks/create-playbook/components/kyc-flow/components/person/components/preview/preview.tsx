@@ -1,3 +1,4 @@
+import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -88,7 +89,7 @@ const InternationalResidents = ({ meta: { residencyForm } }: PreviewProps) => {
       <DataCollection.Group title={t('non-us-residents.title')}>
         {residencyForm.isCountryRestricted ? (
           <DataCollection.Item label={t('non-us-residents.restrictions')}>
-            <CountryList countries={residencyForm.countryList.map(c => c.label) || []} />
+            <CountryList countries={residencyForm.countryList.map(c => getCountryNameFromCode(c))} />
           </DataCollection.Item>
         ) : (
           <DataCollection.EmptyItem>{t('non-us-residents.all')}</DataCollection.EmptyItem>

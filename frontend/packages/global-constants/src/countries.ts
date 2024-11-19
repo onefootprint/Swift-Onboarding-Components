@@ -895,5 +895,8 @@ export const COUNTRIES_WITH_PROVINCES: CountryCode[] = [
 
 export const US_TERRITORY_COUNTRY_CODES = ['AS', 'GU', 'MP', 'PR', 'VI'];
 
-export const getCountryNameFromCode = (countryCode: CountryCode) =>
-  COUNTRIES.find(country => country.value === countryCode)?.label;
+export const getCountryNameFromCode = (countryCode: string) => {
+  const country = COUNTRIES.find(country => country.value === countryCode);
+  if (!country) throw new Error('Invalid country code');
+  return country.label;
+};

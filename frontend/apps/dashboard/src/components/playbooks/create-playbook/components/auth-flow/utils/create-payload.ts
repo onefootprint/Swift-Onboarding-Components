@@ -1,4 +1,4 @@
-import { OnboardingConfigKind, type OrgOnboardingConfigCreateRequest } from '@onefootprint/types';
+import type { CreateOnboardingConfigurationRequest } from '@onefootprint/request-types/dashboard';
 import { createRequiredAuthMethodsPayload } from '../../../utils/create-payload';
 import type { NameFormData } from '../../name-step';
 import type { AuthDetailsFormData } from '../components/auth-details-step';
@@ -9,10 +9,10 @@ const createAuthFlowPayload = ({
 }: {
   nameForm: NameFormData;
   requiredAuthMethodsForm: AuthDetailsFormData;
-}): OrgOnboardingConfigCreateRequest => {
+}): CreateOnboardingConfigurationRequest => {
   return {
     name: nameForm.name,
-    kind: OnboardingConfigKind.auth,
+    kind: 'auth',
     mustCollectData: ['phone_number', 'email'],
     verificationChecks: [{ kind: 'kyc', data: {} }],
     requiredAuthMethods: createRequiredAuthMethodsPayload(requiredAuthMethodsForm),

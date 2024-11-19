@@ -1,28 +1,27 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountrySpecificDocumentMapping, IdDocKind } from '@onefootprint/request-types/dashboard';
+import type { CountryCode } from '@onefootprint/types';
 import { Flag, Stack, Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 import IdDocList from '../id-doc-list';
 
 type CountryDocListProps = {
-  countryDocs: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
+  countryDocs: CountrySpecificDocumentMapping;
 };
 
 const CountryDocList = ({ countryDocs }: CountryDocListProps) => {
   return (
     <Stack flexDirection="column" gap={2} alignItems="center">
-      {Object.entries(countryDocs).map(([code, docs]) => {
-        const countryCode = code as CountryCode;
-        const countryName = getCountryNameFromCode(countryCode);
-
+      {(Object.entries(countryDocs) as Array<[CountryCode, IdDocKind[]]>).map(([code, docs]) => {
+        const countryName = getCountryNameFromCode(code);
         return (
           // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
           <Row key={countryName} role="row">
             <Label variant="body-3" color="tertiary">
-              <Flag code={countryCode} />
+              <Flag code={code} />
               {countryName}
             </Label>
-            <IdDocList docs={docs as SupportedIdDocTypes[]} limit={1} />
+            <IdDocList docs={docs} limit={1} />
           </Row>
         );
       })}

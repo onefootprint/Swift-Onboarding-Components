@@ -11,7 +11,6 @@ type GlobalProps = {
 const Global = ({ global = [], hasSelfie = false }: GlobalProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
   const getIdDocList = useIdDocList();
-  // @ts-expect-error: this needs to be fixed but will affect several files
   const documentTypes = getIdDocList(global);
 
   return (

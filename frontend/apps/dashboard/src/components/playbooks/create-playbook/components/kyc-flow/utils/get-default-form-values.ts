@@ -1,6 +1,5 @@
-import { CollectedKycDataOption, SupportedIdDocTypes } from '@onefootprint/types';
 import { OnboardingTemplate } from '../components/templates-step';
-import type { State } from './reducer';
+import type { State } from './reducer/reducer';
 
 export const defaultFormValues: State['data'] = {
   nameForm: {
@@ -24,7 +23,7 @@ export const defaultFormValues: State['data'] = {
       usLegalStatus: false,
       ssn: {
         collect: true,
-        kind: CollectedKycDataOption.ssn9,
+        kind: 'ssn9',
         optional: false,
       },
       usTaxIdAcceptable: false,
@@ -176,15 +175,7 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
       ...defaultFormValues.detailsForm,
       gov: {
         country: {},
-        global: [
-          SupportedIdDocTypes.driversLicense,
-          SupportedIdDocTypes.passport,
-          SupportedIdDocTypes.idCard,
-          SupportedIdDocTypes.residenceDocument,
-          SupportedIdDocTypes.passportCard,
-          SupportedIdDocTypes.visa,
-          SupportedIdDocTypes.workPermit,
-        ],
+        global: ['drivers_license', 'passport', 'id_card', 'residence_document', 'passport_card', 'visa', 'permit'],
         selfie: true,
         idDocFirst: false,
       },
@@ -198,7 +189,7 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
       ...defaultFormValues.detailsForm,
       gov: {
         country: {},
-        global: [SupportedIdDocTypes.driversLicense],
+        global: ['drivers_license'],
         selfie: true,
         idDocFirst: false,
       },
@@ -213,14 +204,14 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
       gov: {
         country: {},
         global: [
-          SupportedIdDocTypes.driversLicense,
-          SupportedIdDocTypes.passport,
-          SupportedIdDocTypes.idCard,
-          SupportedIdDocTypes.passportCard,
-          SupportedIdDocTypes.visa,
-          SupportedIdDocTypes.residenceDocument,
-          SupportedIdDocTypes.workPermit,
-          SupportedIdDocTypes.voterIdentification,
+          'drivers_license',
+          'passport',
+          'id_card',
+          'passport_card',
+          'visa',
+          'residence_document',
+          'permit',
+          'voter_identification',
         ],
         selfie: true,
         idDocFirst: false,

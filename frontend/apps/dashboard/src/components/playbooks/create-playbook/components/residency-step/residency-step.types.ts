@@ -1,8 +1,8 @@
-import type { CountryRecord } from '@onefootprint/global-constants';
+import type { Iso3166TwoDigitCountryCode } from '@onefootprint/request-types/dashboard';
 
 export type ResidencyFormData = {
   allowUsTerritories: boolean;
-  countryList: CountryRecord[];
-  isCountryRestricted: false;
+  countryList: Iso3166TwoDigitCountryCode[];
+  isCountryRestricted: boolean;
   residencyType: 'us' | 'international';
 };

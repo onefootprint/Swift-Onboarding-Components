@@ -42,10 +42,7 @@ const CountrySpecific = ({ countrySpecific, hasSelfie }: CountrySpecificProps) =
                   {docTypes.length > 0 ? (
                     <Stack direction="row" gap={3}>
                       <Text variant="body-2" color="tertiary" tag="span">
-                        {
-                          // @ts-expect-error: getText is using deprecated
-                          getText(docTypes).join(', ')
-                        }
+                        {getText(docTypes).join(', ')}
                       </Text>
                       {hasSelfie && (
                         <>

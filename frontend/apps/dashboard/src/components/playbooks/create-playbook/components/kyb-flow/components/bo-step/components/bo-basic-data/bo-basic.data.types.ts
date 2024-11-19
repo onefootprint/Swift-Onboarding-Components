@@ -1,5 +1,3 @@
-import type { CollectedKycDataOption } from '@onefootprint/types';
-
 export type BoBasicFormData = {
   data: {
     collect: boolean;
@@ -10,7 +8,7 @@ export type BoBasicFormData = {
     usLegalStatus: boolean;
     ssn: {
       collect: boolean;
-      kind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+      kind: 'ssn4' | 'ssn9';
       optional: boolean;
     };
     usTaxIdAcceptable: boolean;
