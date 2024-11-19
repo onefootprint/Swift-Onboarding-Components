@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::ApiKeyStatus;
 use newtypes::AuditEventId;
 use newtypes::AuditEventName;
 use newtypes::DataIdentifier;
@@ -122,6 +123,10 @@ pub enum AuditEventDetail {
     DeleteListEntry {
         list_id: ListId,
         list_entry_id: ListEntryId,
+    },
+    UpdateOrgApiKeyStatus {
+        api_key: AuditEventApiKey,
+        status: ApiKeyStatus,
     },
     CreatePlaybook,
     DisablePlaybook,

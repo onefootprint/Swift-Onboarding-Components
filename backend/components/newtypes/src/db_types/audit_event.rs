@@ -1,5 +1,6 @@
 use super::DecryptionContext;
 use crate::util::impl_enum_str_diesel;
+use crate::ApiKeyStatus;
 use crate::DataIdentifier;
 use crate::DocumentDataId;
 use crate::ListEntryCreationId;
@@ -72,6 +73,10 @@ pub enum AuditEventDetail {
         old_tenant_role_id: TenantRoleId,
         tenant_api_key_id: TenantApiKeyId,
         new_tenant_role_id: TenantRoleId,
+    },
+    UpdateOrgApiKeyStatus {
+        tenant_api_key_id: TenantApiKeyId,
+        status: ApiKeyStatus,
     },
     InviteOrgMember {
         tenant_user_id: TenantUserId,
@@ -259,6 +264,16 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
+            AuditEventDetail::UpdateOrgApiKeyStatus {
+                tenant_api_key_id,
+                status,
+            } => Self {
+                metadata: AuditEventMetadata::UpdateOrgApiKeyStatus { status },
+                args: AuditEventOptionalArgs {
+                    tenant_api_key_id: Some(tenant_api_key_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::DecryptOrgAPIKey { tenant_api_key_id } => Self {
                 metadata: AuditEventMetadata::DecryptOrgApiKey,
                 args: AuditEventOptionalArgs {
@@ -432,6 +447,9 @@ pub enum AuditEventMetadata {
     DecryptOrgApiKey,
     UpdateOrgApiKeyRole {
         old_tenant_role_id: TenantRoleId,
+    },
+    UpdateOrgApiKeyStatus {
+        status: ApiKeyStatus,
     },
     InviteOrgMember,
     OrgMemberJoined,

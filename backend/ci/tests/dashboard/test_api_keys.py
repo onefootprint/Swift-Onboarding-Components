@@ -314,3 +314,53 @@ def test_api_key_role_update(sandbox_tenant):
     assert events[1]["detail"]["data"]["old_role"]["id"] == role_1["id"]
     assert events[1]["detail"]["data"]["new_role"]["id"] == role_2["id"]
     assert events[1]["detail"]["data"]["api_key"]["role"]["id"] == role_3["id"]
+
+
+def test_api_key_status_changes_audit_events(sandbox_tenant, admin_role):
+    # Create an API key
+    data = dict(name="Test API key for status changes", role_id=admin_role["id"])
+    api_key = post("org/api_keys", data, *sandbox_tenant.db_auths)
+
+    # Disable the API key
+    patch(
+        f"org/api_keys/{api_key['id']}",
+        dict(status="disabled"),
+        *sandbox_tenant.db_auths,
+    )
+
+    # Verify the disable audit event was created with correct details
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="update_org_api_key_status",
+        api_key={
+            "id": api_key["id"],
+        },
+        status="disabled",
+    )
+
+    # Verify the API key is actually disabled
+    body = get("org/api_keys", dict(status="disabled"), *sandbox_tenant.db_auths)
+    disabled_key = next(key for key in body["data"] if key["id"] == api_key["id"])
+    assert disabled_key["status"] == "disabled"
+
+    # Re-enable the API key
+    patch(
+        f"org/api_keys/{api_key['id']}",
+        dict(status="enabled"),
+        *sandbox_tenant.db_auths,
+    )
+
+    # Verify the enable audit event was created with correct details
+    assert_has_audit_event_with_details(
+        tenant=sandbox_tenant,
+        name="update_org_api_key_status",
+        api_key={
+            "id": api_key["id"],
+        },
+        status="enabled",
+    )
+
+    # Verify the API key is now enabled
+    body = get("org/api_keys", dict(status="enabled"), *sandbox_tenant.db_auths)
+    enabled_key = next(key for key in body["data"] if key["id"] == api_key["id"])
+    assert enabled_key["status"] == "enabled"

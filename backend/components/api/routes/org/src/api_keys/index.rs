@@ -170,6 +170,7 @@ pub async fn patch(
     let auth_actor = auth.actor();
     let (api_key, role) = state
         .db_transaction(move |conn| {
+            // if there is a status update and a role change, log two audit events
             if let Some(new_role_id) = role_id.clone() {
                 let (_, old_role) =
                     TenantApiKey::get(conn, TenantApiKeyIdentifier::Id(&id, &tenant_id, is_live))?;
@@ -177,6 +178,19 @@ pub async fn patch(
                     old_tenant_role_id: old_role.id,
                     tenant_api_key_id: id.clone(),
                     new_tenant_role_id: new_role_id,
+                };
+                AuditEvent::create_with_insight(
+                    conn,
+                    &tenant_id,
+                    auth_actor.clone(),
+                    insight.clone(),
+                    detail,
+                )?;
+            }
+            if let Some(new_status) = status.clone() {
+                let detail = AuditEventDetail::UpdateOrgApiKeyStatus {
+                    tenant_api_key_id: id.clone(),
+                    status: new_status,
                 };
                 AuditEvent::create_with_insight(conn, &tenant_id, auth_actor, insight, detail)?;
             }

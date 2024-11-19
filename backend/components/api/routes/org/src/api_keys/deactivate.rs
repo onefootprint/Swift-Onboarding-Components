@@ -10,7 +10,10 @@ use api_core::utils::headers::InsightHeaders;
 use api_core::State;
 use api_errors::ServerErr;
 use chrono::Utc;
+use db::models::audit_event::AuditEvent;
 use db::models::tenant_api_key::TenantApiKey;
+use newtypes::ApiKeyStatus;
+use newtypes::AuditEventDetail;
 use newtypes::TenantApiKeyId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -26,7 +29,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
-    _insight: InsightHeaders,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::DashboardSecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
@@ -37,8 +40,14 @@ pub async fn post(
     }
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
+    let actor = auth.actor().clone();
     let (api_key, role) = state
         .db_transaction(move |conn| {
+            let detail = AuditEventDetail::UpdateOrgApiKeyStatus {
+                tenant_api_key_id: id.clone(),
+                status: ApiKeyStatus::Disabled,
+            };
+            AuditEvent::create_with_insight(conn, &tenant_id, actor, insight.clone(), detail)?;
             TenantApiKey::update(conn, id, tenant_id, is_live, None, None, None, Some(Utc::now()))
         })
         .await?;

@@ -129,6 +129,20 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     )),
                 }
             }
+            AuditEventMetadata::UpdateOrgApiKeyStatus { status } => {
+                let tenant_api_key =
+                    tenant_api_key.ok_or(ServerErr("tenant api key is not available for this event"))?;
+                let tenant_api_key_role = (secondary_data.tenant_roles)
+                    .get(&tenant_api_key.role_id)
+                    .ok_or(ServerErr("current api key role is not available for this event"))?;
+                AuditEventDetail::UpdateOrgApiKeyStatus {
+                    api_key: api_wire_types::AuditEventApiKey::from_db((
+                        tenant_api_key,
+                        tenant_api_key_role.to_owned(),
+                    )),
+                    status,
+                }
+            }
             AuditEventMetadata::InviteOrgMember => {
                 let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
