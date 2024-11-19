@@ -40,12 +40,24 @@ const SecurityLogs = () => {
   const isFirmEmployee = session?.user?.isFirmEmployee;
 
   useEffect(() => {
+    const checkIfShouldLoadMore = () => {
+      const mainContainer = document.getElementById(MAIN_PAGE_ID);
+      if (!mainContainer) return;
+
+      const { scrollHeight, clientHeight } = mainContainer;
+      const shouldLoadMore = scrollHeight <= clientHeight;
+
+      if (shouldLoadMore && !getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
+        getAccessEvents.fetchNextPage();
+      }
+    };
+
     const handleScroll = () => {
       const mainContainer = document.getElementById(MAIN_PAGE_ID);
       if (!mainContainer) return;
 
       const { scrollHeight, scrollTop, clientHeight } = mainContainer;
-      const offset = clientHeight * 0.5; // Add some offset to load earlier
+      const offset = clientHeight * 0.5;
       const reachedBottom = scrollHeight - scrollTop <= clientHeight + offset;
 
       if (reachedBottom && !getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
@@ -53,10 +65,12 @@ const SecurityLogs = () => {
       }
     };
 
+    checkIfShouldLoadMore();
+
     const mainContainer = document.getElementById(MAIN_PAGE_ID);
     mainContainer?.addEventListener('scroll', handleScroll);
     return () => mainContainer?.removeEventListener('scroll', handleScroll);
-  }, [getAccessEvents]);
+  }, [getAccessEvents, getAccessEvents.data]);
 
   const filteredAuditEvents = auditEvents.filter(auditEvent =>
     isFirmEmployee
