@@ -197,7 +197,11 @@ const createOnboardingRequirementsMachine = ({
         setRequirementRouterVisited: assign(ctx => ({ ...ctx, isRequirementRouterVisited: true })),
         setContinueOnMobile: assign(ctx => ({ ...ctx, continueOnMobile: true })),
         setContinueOnDesktop: assign(ctx => ({ ...ctx, continueOnMobile: false })),
-        setError: assign((ctx, event) => ({ ...ctx, error: event?.payload?.error })),
+        setError: assign((ctx, event) => {
+          const errString = JSON.stringify(event?.payload?.error);
+          logError(`Encountered error state in onboarding requirements machine: ${errString}`);
+          return { ...ctx, error: event?.payload?.error };
+        }),
       },
     },
   );

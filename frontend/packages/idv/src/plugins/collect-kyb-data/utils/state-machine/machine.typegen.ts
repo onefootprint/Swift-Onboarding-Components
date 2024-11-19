@@ -14,8 +14,11 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'stepUpAuthTokenCompleted';
-    assignData: 'basicDataSubmitted' | 'businessAddressSubmitted' | 'stepUpDecryptionCompleted';
-    assignStakeExplanationDialogConfirmed: 'setStakeExplanationDialogConfirmed';
+    assignData:
+      | 'basicDataSubmitted'
+      | 'businessAddressSubmitted'
+      | 'businessDataLoadSuccess'
+      | 'stepUpDecryptionCompleted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -23,11 +26,9 @@ export interface Typegen0 {
   matchesStates:
     | 'basicData'
     | 'beneficialOwnerKyc'
-    | 'beneficialOwners'
     | 'businessAddress'
     | 'completed'
     | 'confirm'
-    | 'introduction'
     | 'loadFromVault'
     | 'manageBos'
     | 'router';

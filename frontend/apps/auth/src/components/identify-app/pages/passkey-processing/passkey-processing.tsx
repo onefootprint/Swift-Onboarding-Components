@@ -1,4 +1,4 @@
-import { trackAction, useCancelD2P } from '@onefootprint/idv';
+import { getLogger, trackAction, useCancelD2P } from '@onefootprint/idv';
 import { Box, LinkButton, LoadingSpinner } from '@onefootprint/ui';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,8 @@ import { D2PStatus } from '@onefootprint/types';
 type PasskeyProcessingProps = {
   onCancelError?: (error: unknown) => void;
 };
+
+const { logError } = getLogger({ location: 'passkey-processing' });
 
 const PasskeyProcessing = ({ onCancelError }: PasskeyProcessingProps) => {
   const { t } = useTranslation('common');
@@ -47,6 +49,7 @@ const PasskeyProcessing = ({ onCancelError }: PasskeyProcessingProps) => {
 
         if (status === D2PStatus.failed) {
           trackAction('auth:passkey-failed');
+          logError('Passkey processing error - D2P status failed');
           return send({ type: 'passkeyProcessingError' });
         }
       },

@@ -13,13 +13,13 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignInitContext: 'initContextUpdated';
     assignError: 'errorReceived';
+    assignInitContext: 'initContextUpdated';
     resetContext: 'reset';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'complete' | 'idv' | 'init' | 'intro' | 'error';
+  matchesStates: 'complete' | 'error' | 'idv' | 'init' | 'intro';
   tags: never;
 }

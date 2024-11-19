@@ -149,7 +149,7 @@ const Init = () => {
         send({ type: 'sessionExpired' });
         return;
       }
-
+      logError(`Bifrost init failed, couldn't fetch props ${JSON.stringify(error)}`);
       send({ type: 'initError' });
     },
   });
