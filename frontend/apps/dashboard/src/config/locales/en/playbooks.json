@@ -67,27 +67,6 @@
         "copy-link": "Copy link",
         "copied": "Copied!"
       },
-      "edit-name": {
-        "cta": "Edit name",
-        "title": "Edit Playbook name",
-        "form": {
-          "name": {
-            "label": "Playbook name",
-            "placeholder": "User ID verification",
-            "errors": {
-              "required": "Please enter a name for the Playbook."
-            }
-          },
-          "save": "Save",
-          "cancel": "Cancel"
-        },
-        "feedback": {
-          "success": {
-            "title": "Success",
-            "description": "Playbook name changed!"
-          }
-        }
-      },
       "get-link": "Get shareable link",
       "copy": "Copy playbook"
     },

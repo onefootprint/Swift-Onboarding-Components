@@ -9,12 +9,9 @@
     "playbook-details": "Playbook details"
   },
   "header": {
-    "edit-name": {
-      "cta": "Edit playbook name",
-      "cta-not-allowed": "You're not allowed to edit Playbooks",
-      "form": {
-        "label": "Playbook name"
-      }
+    "edit": {
+      "cta": "Edit playbook",
+      "cta-not-allowed": "You're not allowed to edit this playbook"
     },
     "type": {
       "label": "Type",

@@ -2,12 +2,9 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, CodeInline, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css, useTheme } from 'styled-components';
-
-import EditNameDialog from './components/edit-name-dialog';
 
 export type HeaderProps = {
   playbook: OnboardingConfig;
@@ -16,16 +13,7 @@ export type HeaderProps = {
 
 const Header = ({ playbook, isDisabled }: HeaderProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'header' });
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const theme = useTheme();
-
-  const handleOpenForm = () => {
-    setIsFormOpen(true);
-  };
-
-  const handleCloseForm = () => {
-    setIsFormOpen(false);
-  };
 
   return (
     <HeaderContainer data-is-disabled={isDisabled}>
@@ -38,19 +26,14 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
             {playbook.key}
           </CodeInline>
         </Stack>
-        {!isFormOpen && (
-          <PermissionGate
-            scopeKind={RoleScopeKind.onboardingConfiguration}
-            fallbackText={t('edit-name.cta-not-allowed')}
-            tooltipPosition="left"
-          >
-            <Button variant="secondary" onClick={handleOpenForm}>
-              {t('edit-name.cta')}
-            </Button>
-          </PermissionGate>
-        )}
+        <PermissionGate
+          scopeKind={RoleScopeKind.onboardingConfiguration}
+          fallbackText={t('edit.cta-not-allowed')}
+          tooltipPosition="left"
+        >
+          <Button variant="secondary">{t('edit.cta')}</Button>
+        </PermissionGate>
       </Stack>
-      <EditNameDialog open={isFormOpen} onClose={handleCloseForm} playbook={playbook} />
     </HeaderContainer>
   );
 };
