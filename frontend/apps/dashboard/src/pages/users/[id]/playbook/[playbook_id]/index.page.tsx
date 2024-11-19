@@ -1,1 +1,1 @@
-export { default } from 'src/components/playbook-details';
+export { default } from 'src/components/playbooks/playbook-details';

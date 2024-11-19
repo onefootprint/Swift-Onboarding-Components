@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
-import Details from '../../components/playbook-details';
+import Details from '../../components/playbooks/playbook-details';
 
 const PlaybookDetails = () => {
   const { t } = useTranslation('playbook-details');

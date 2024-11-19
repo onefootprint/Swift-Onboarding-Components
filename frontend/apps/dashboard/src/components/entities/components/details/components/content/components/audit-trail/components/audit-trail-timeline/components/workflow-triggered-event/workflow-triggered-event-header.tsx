@@ -1,7 +1,7 @@
 import { TriggerKind, type WorkflowTriggeredEventData } from '@onefootprint/types';
 import { Shimmer, Text } from '@onefootprint/ui';
 import { Trans, useTranslation } from 'react-i18next';
-import usePlaybook from 'src/components/playbook-details/hooks/use-playbook';
+import usePlaybook from 'src/components/playbooks/playbook-details/hooks/use-playbook';
 
 import Actor from '../actor/actor';
 import PlaybookLink from '../playbook-link';

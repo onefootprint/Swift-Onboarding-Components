@@ -2,15 +2,16 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Pagination, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
-import Create from './components/create';
 import Table from './components/table';
 import useFilters from './hooks/use-filters';
 import usePlaybooks from './hooks/use-playbooks';
+
+const Create = lazy(() => import('../../components/playbooks/create-playbook'));
 
 const Playbooks = () => {
   const { t } = useTranslation('playbooks');
@@ -83,7 +84,9 @@ const Playbooks = () => {
           />
         )}
       </Stack>
-      <Create open={dialogOpen} onClose={handleClose} onDone={handleCreate} />
+      <Suspense fallback={null}>
+        <Create open={dialogOpen} onClose={handleClose} onDone={handleCreate} />
+      </Suspense>
     </Stack>
   );
 };

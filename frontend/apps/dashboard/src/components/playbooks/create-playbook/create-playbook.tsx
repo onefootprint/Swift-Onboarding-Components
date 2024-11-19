@@ -14,13 +14,13 @@ const KybFlow = lazy(() => import('./components/kyb-flow'));
 
 type Step = 'select-kind' | OnboardingConfigKind;
 
-type CreateDialogProps = {
+type CreatePlaybookProps = {
   open: boolean;
   onClose: () => void;
   onDone: () => void;
 };
 
-const CreateDialog = ({ open, onDone, onClose }: CreateDialogProps) => {
+const CreatePlaybook = ({ open, onDone, onClose }: CreatePlaybookProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create' });
   const { primaryButton, secondaryButton, reset } = useDialogButtons();
 
@@ -88,10 +88,10 @@ const Content = styled.div`
   `}
 `;
 
-export default ({ open, onDone, onClose }: CreateDialogProps) => {
+export default ({ open, onDone, onClose }: CreatePlaybookProps) => {
   return (
     <DialogButtonsProvider>
-      <CreateDialog open={open} onClose={onClose} onDone={onDone} />
+      <CreatePlaybook open={open} onClose={onClose} onDone={onDone} />
     </DialogButtonsProvider>
   );
 };
