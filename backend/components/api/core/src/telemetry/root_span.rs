@@ -1,7 +1,9 @@
 use crate::utils::headers::InsightHeaders;
 use crate::utils::headers::TelemetryHeaders;
 use actix_web::FromRequest;
+use actix_web::HttpMessage;
 use anyhow::Result;
+use api_errors::ResponseErrorContext;
 use db::models::scoped_vault::ScopedVault;
 use futures_util::Future;
 use std::pin::Pin;
@@ -80,19 +82,23 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         // the root span in DefaultRootSpanBuilder::on_request_end(span, outcome);
         // It largely makes use of DatadogJsonEventFormatter to automatically add useful attributes from the
         // root span to the log line.
-        let name = match outcome {
+        let (name, err_ctx) = match outcome {
             Ok(r) => {
                 let req = r.request();
-                format!(
+                let err_ctx = req.extensions().get::<ResponseErrorContext>().cloned();
+                let name = format!(
                     "{} {}",
                     req.method().as_str(),
                     req.match_pattern().unwrap_or("default".into())
-                )
+                );
+                (name, err_ctx)
             }
             // API errors don't end up in this branch. I'm not sure in what situations we have an Err here.
-            Err(_) => "Canonical log line".to_string(),
+            Err(_) => ("Canonical log line".to_string(), None),
         };
-        tracing::info!(is_root = true, "{}", name);
+        let (error_message, error_location) =
+            err_ctx.map(|ctx| (ctx.message, ctx.location)).unwrap_or_default();
+        tracing::info!(is_root = true, error.message=%error_message, error.stack=%error_location, "{}", name);
     }
 }
 

@@ -71,6 +71,22 @@ impl FpError {
     pub fn location(&self) -> String {
         self.0.location()
     }
+
+    pub fn on_request_end(&self, resp: &mut actix_web::HttpResponseBuilder) {
+        self.mutate_response(resp);
+        let ctx = ResponseErrorContext {
+            message: self.message(),
+            location: self.location(),
+        };
+        resp.extensions_mut().insert(ctx);
+    }
+}
+
+/// Extension to add context on an error to the actix response
+#[derive(Debug, Clone)]
+pub struct ResponseErrorContext {
+    pub message: String,
+    pub location: String,
 }
 
 impl std::error::Error for FpError {

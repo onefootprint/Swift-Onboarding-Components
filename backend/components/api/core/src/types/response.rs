@@ -84,7 +84,7 @@ impl actix_web::ResponseError for ApiError {
         let context = self.context();
 
         let mut resp = actix_web::HttpResponse::build(status_code);
-        self.mutate_response(&mut resp);
+        self.on_request_end(&mut resp);
 
         resp.json(SerializedApiResponse {
             message,

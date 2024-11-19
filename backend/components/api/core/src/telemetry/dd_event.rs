@@ -76,6 +76,8 @@ where
                     s.serialize_entry("trace_id", &trace_id.to_string())?;
                 }
             }
+            s.serialize_entry("git.commit.sha", &crate::GIT_HASH.to_string())?;
+            s.serialize_entry("git.repository_url", "https://github.com/onefootprint/monorepo")?;
 
             // Keeping this for backwards compatibility.
             // TODO: will remove soon
