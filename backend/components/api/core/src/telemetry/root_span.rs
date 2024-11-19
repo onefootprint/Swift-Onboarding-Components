@@ -48,7 +48,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         let span = root_span!(
             request,
             tenant_id = tracing::field::Empty,
-            fp_id = tracing::field::Empty, // maybe replace with scoped_vault_id, available in more places
+            fp_id = tracing::field::Empty,
             is_live = tracing::field::Empty,
             auth_method = tracing::field::Empty,
             // Allow associating requests made with the same auth token, even if the auth extractor failed
@@ -58,6 +58,9 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             client_version,
             fp_session_id,
             session_id,
+            git.commit.sha=%server_git_hash,
+            git.repository_url="github.com/onefootprint/monorepo",
+            // TODO: can we remove this now?
             server_git_hash,
             is_integration_test_req,
             route,
