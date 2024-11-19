@@ -1,27 +1,14 @@
-import { Stack, Text } from '@onefootprint/ui';
-
 type HeaderProps = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 };
 
 const Header = ({ title, subtitle }: HeaderProps) => {
   return (
-    <Stack
-      gap={2}
-      flexDirection="column"
-      tag="header"
-      aria-label={title}
-      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <header />
-      role="heading"
-    >
-      <Text variant="label-1" color="primary">
-        {title}
-      </Text>
-      <Text variant="body-2" color="secondary">
-        {subtitle}
-      </Text>
-    </Stack>
+    <header className="flex flex-col gap-1">
+      <h2 className="text-label-1 text-primary">{title}</h2>
+      {subtitle && <h3 className="text-body-2 text-secondary">{subtitle}</h3>}
+    </header>
   );
 };
 

@@ -8,12 +8,19 @@ type DialogButtonsContextType = {
   showBackButton: () => void;
   hideBackButton: () => void;
   reset: () => void;
+  resetWithBackButton: () => void;
   setBusy: (isBusy: boolean) => void;
 };
 
 const initialPrimaryButton: DialogButton = {
   label: 'Continue',
   type: 'submit',
+  form: 'playbook-form',
+};
+
+const initialSecondaryButton: DialogButton = {
+  label: 'Back',
+  type: 'reset',
   form: 'playbook-form',
 };
 
@@ -28,10 +35,15 @@ export const DialogButtonsProvider = ({ children }: { children: React.ReactNode 
     setSecondaryButton(undefined);
   };
 
+  const resetWithBackButton = () => {
+    setPrimaryButton(initialPrimaryButton);
+    setSecondaryButton(initialSecondaryButton);
+  };
+
   const hideBackButton = () => setSecondaryButton(undefined);
 
   const showBackButton = () => {
-    setSecondaryButton({ label: 'Back', type: 'reset', form: 'playbook-form' });
+    setSecondaryButton(initialSecondaryButton);
   };
 
   const setBusy = (isBusy: boolean) => {
@@ -48,6 +60,7 @@ export const DialogButtonsProvider = ({ children }: { children: React.ReactNode 
         showBackButton,
         hideBackButton,
         reset,
+        resetWithBackButton,
         setBusy,
       }}
     >

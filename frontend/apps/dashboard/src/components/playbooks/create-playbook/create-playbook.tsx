@@ -1,7 +1,6 @@
 import type { ObConfigurationKind, OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { Box, Dialog, media } from '@onefootprint/ui';
+import { Dialog } from '@onefootprint/ui';
 import { Suspense, lazy, useState } from 'react';
-import styled from 'styled-components';
 
 import StepKind from './components/kind-step';
 import { DialogButtonsProvider, useDialogButtons } from './hooks/use-dialog-buttons';
@@ -66,8 +65,8 @@ const Form = ({ onDone, playbook }: { onDone: () => void; playbook?: OnboardingC
   };
 
   return (
-    <Box position="relative">
-      <Content>
+    <div className="relative">
+      <div className="mx-auto max-w-[520px] md:max-w-[580px]">
         {step === 'select-kind' && <StepKind defaultValues={{ kind }} onSubmit={handleSubmitStep} />}
         <Suspense fallback={null}>
           {step === 'auth' && <AuthFlow onDone={onDone} onBack={handleBack} />}
@@ -75,19 +74,10 @@ const Form = ({ onDone, playbook }: { onDone: () => void; playbook?: OnboardingC
           {step === 'kyc' && <KycFlow onDone={onDone} onBack={handleBack} playbook={playbook} />}
           {step === 'kyb' && <KybFlow onDone={onDone} onBack={handleBack} />}
         </Suspense>
-      </Content>
-    </Box>
+      </div>
+    </div>
   );
 };
-
-const Content = styled.div`
-  max-width: 520px;
-  margin: auto;
- 
-  ${media.greaterThan('md')`
-    max-width: 580px;
-  `}
-`;
 
 export default ({ open, onDone, onClose, playbook }: CreatePlaybookProps) => {
   return (
