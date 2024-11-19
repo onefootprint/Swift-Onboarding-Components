@@ -660,7 +660,6 @@ impl ObConfiguration {
         Ok(result)
     }
 
-    #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
@@ -678,6 +677,75 @@ impl ObConfiguration {
             .values(config)
             .get_result::<ObConfiguration>(conn.conn())?;
         Ok(obc)
+    }
+
+    pub fn into_copy_args(self, author: DbActor) -> NewObConfigurationArgs {
+        let verification_checks = VerificationChecks::from_existing(&self);
+
+        let ObConfiguration {
+            must_collect_data,
+            can_access_data,
+            cip_kind,
+            optional_data,
+            is_no_phone_flow,
+            is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
+            allow_us_residents,
+            allow_us_territory_residents,
+            kind,
+            skip_confirm,
+            document_types_and_countries,
+            documents_to_collect,
+            business_documents_to_collect,
+            required_auth_methods,
+            prompt_for_passkey,
+            allow_reonboard,
+            name,
+
+            // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
+            // field is added
+            id: _,
+            key: _,
+            tenant_id: _,
+            _created_at: _,
+            _updated_at: _,
+            is_live: _,
+            status: _,
+            created_at: _,
+            author: _,
+
+            // Maybe we should copy appearance one day. But it's not really used today.
+            appearance_id: _,
+            verification_checks: _,
+            // TODO: only thing here is enhanced_aml and skip_kyb which will be removed shortly
+            ..
+        } = self;
+
+        NewObConfigurationArgs {
+            author,
+            name,
+            // Copied fields
+            must_collect_data,
+            can_access_data,
+            cip_kind,
+            optional_data,
+            is_no_phone_flow,
+            is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
+            allow_us_residents,
+            allow_us_territory_residents,
+            kind,
+            skip_confirm,
+            document_types_and_countries,
+            documents_to_collect: documents_to_collect.unwrap_or_default(),
+            business_documents_to_collect,
+            verification_checks,
+            required_auth_methods,
+            prompt_for_passkey,
+            allow_reonboard,
+        }
     }
 
     #[tracing::instrument("ObConfiguration::update", skip_all)]
@@ -725,9 +793,7 @@ impl ObConfiguration {
         };
         Ok(obc)
     }
-}
 
-impl ObConfiguration {
     pub fn document_cdo(&self) -> Option<&DocumentCdoInfo> {
         self.must_collect_data
             .iter()

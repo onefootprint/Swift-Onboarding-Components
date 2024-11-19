@@ -37,10 +37,11 @@ use strum::IntoEnumIterator;
 /// Wrapper around NewObConfigurationArgs to perform some validation
 pub struct ObConfigurationArgsToValidate(pub(super) NewObConfigurationArgs);
 
+// TODO: refactor this so it's closer to models.
 impl ObConfigurationArgsToValidate {
     const ALLOWED_OPTIONAL_FIELDS: [CDO; 2] = [CDO::Ssn4, CDO::Ssn9];
 
-    pub(super) fn validate(
+    pub fn validate(
         state: &State,
         args: NewObConfigurationArgs,
         tenant: &Tenant,

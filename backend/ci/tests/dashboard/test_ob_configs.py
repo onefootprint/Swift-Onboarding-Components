@@ -1418,7 +1418,7 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
 
 
 def test_playbook_versions(sandbox_tenant, tenant):
-    initial_obc_req = {
+    obc_v1_req = {
         "name": "Test Playbook Initial Version",
         "must_collect_data": [
             "name",
@@ -1432,23 +1432,23 @@ def test_playbook_versions(sandbox_tenant, tenant):
         "kind": "kyc",
         "skip_kyc": False,
     }
-    initial_obc_resp = post(
+    obc_v1_resp = post(
         "org/onboarding_configs",
-        initial_obc_req,
+        obc_v1_req,
         *sandbox_tenant.db_auths,
     )
-    obc_id = initial_obc_resp["id"]
-    playbook_id = initial_obc_resp["playbook_id"]
+    obc_v1_id = obc_v1_resp["id"]
+    playbook_id = obc_v1_resp["playbook_id"]
 
-    assert initial_obc_resp["rule_set"] == {"version": 1}
-    assert initial_obc_resp["documents_to_collect"] == []
+    assert obc_v1_resp["rule_set"] == {"version": 1}
+    assert obc_v1_resp["documents_to_collect"] == []
 
-    initial_obc = ObConfiguration.from_response(initial_obc_resp, sandbox_tenant)
-    og_bifrost = BifrostClient.new_user(initial_obc)
-    assert og_bifrost.get_requirement("collect_document") == None
+    obc_v1 = ObConfiguration.from_response(obc_v1_resp, sandbox_tenant)
+    bifrost_v1 = BifrostClient.new_user(obc_v1)
+    assert bifrost_v1.get_requirement("collect_document") == None
 
     # Modify rules for the initial playbook
-    patch(f"/org/onboarding_configs/{obc_id}/rules", {
+    patch(f"/org/onboarding_configs/{obc_v1_id}/rules", {
         "expected_rule_set_version": 1,
         "add": [
             {
@@ -1459,15 +1459,15 @@ def test_playbook_versions(sandbox_tenant, tenant):
         ],
     }, *sandbox_tenant.db_auths)
 
-    obc_with_rules_edit = get(f"/org/onboarding_configs/{obc_id}", None, *sandbox_tenant.db_auths)
-    assert obc_with_rules_edit["rule_set"] == {"version": 2}
+    obc_v1_with_rules_edit = get(f"/org/onboarding_configs/{obc_v1_id}", None, *sandbox_tenant.db_auths)
+    assert obc_v1_with_rules_edit["rule_set"] == {"version": 2}
 
     # Modify the playbook
     update_playbook_req ={
-        "expected_latest_obc_id": obc_id,
-        "new_onboarding_config": initial_obc_req | {
-            "name": "Test Playbook Version 2", 
-            "must_collect": initial_obc_req["must_collect_data"],
+        "expected_latest_obc_id": obc_v1_id,
+        "new_onboarding_config": obc_v1_req | {
+            "name": "Test Playbook Version 2",
+            "must_collect": obc_v1_req["must_collect_data"],
             "documents_to_collect": [{"kind": "proof_of_address", "data": {}}],
         }
     }
@@ -1476,68 +1476,110 @@ def test_playbook_versions(sandbox_tenant, tenant):
     put(f"org/playbooks/{playbook_id}", update_playbook_req, *tenant.db_auths, status_code=404)
     put(f"org/playbooks/{playbook_id}", update_playbook_req, *sandbox_tenant.ro_db_auths, status_code=403)
 
-    dry_run_new_obc_resp = put(
+    dry_run_obc_v2_resp = put(
         f"org/playbooks/{playbook_id}",
         update_playbook_req,
         DryRun("true"),
         *sandbox_tenant.db_auths,
     )
 
-    new_obc_resp = put(
+    obc_v2_resp = put(
         f"org/playbooks/{playbook_id}",
         update_playbook_req,
         *sandbox_tenant.db_auths,
     )
-    new_obc_id = new_obc_resp["id"]
-    assert new_obc_resp == dry_run_new_obc_resp | {
-        "id": new_obc_id,
-        "created_at": new_obc_resp["created_at"],
+    obc_v2_id = obc_v2_resp["id"]
+    assert obc_v2_resp == dry_run_obc_v2_resp | {
+        "id": obc_v2_id,
+        "created_at": obc_v2_resp["created_at"],
         # Rule set version restarts at 1
         "rule_set": {"version": 1},
     }
 
-    want_new_obc_resp = initial_obc_resp | {
-        "id": new_obc_id,
-        "created_at": new_obc_resp["created_at"],
+    want_obc_v2_resp = obc_v1_resp | {
+        "id": obc_v2_id,
+        "created_at": obc_v2_resp["created_at"],
         "name": "Test Playbook Version 2",
         # Rule set version restarts at 1
         "rule_set": {"version": 1},
         "documents_to_collect": [{"kind": "proof_of_address", "data": {"requires_human_review": True}}],
     }
-    assert new_obc_resp == want_new_obc_resp
+    assert obc_v2_resp == want_obc_v2_resp
 
     # In-progress onboardings should be allowed to finish without fulfilling new requiremnents.
-    og_user = og_bifrost.run()
-    og_user_vault = get(f"/users/{og_user.fp_id}/vault", None, sandbox_tenant.s_sk)
-    assert all(not di.startswith("document.") for di in og_user_vault)
+    v1_user = bifrost_v1.run()
+    v1_user_vault = get(f"/users/{v1_user.fp_id}/vault", None, sandbox_tenant.s_sk)
+    assert all(not di.startswith("document.") for di in v1_user_vault)
 
     # New onboardings should require the new configuration.
-    new_obc = ObConfiguration.from_response(new_obc_resp, sandbox_tenant)
-    new_bifrost = BifrostClient.new_user(new_obc)
-    assert new_bifrost.get_requirement("collect_document")["config"]["kind"] == "proof_of_address"
+    obc_v2 = ObConfiguration.from_response(obc_v2_resp, sandbox_tenant)
+    bifrost_v2 = BifrostClient.new_user(obc_v2)
+    assert bifrost_v2.get_requirement("collect_document")["config"]["kind"] == "proof_of_address"
 
-    new_user = new_bifrost.run()
-    new_user_vault = get(f"/users/{new_user.fp_id}/vault", None, sandbox_tenant.s_sk)
-    assert set(di for di in new_user_vault if di.startswith("document.")) == {"document.proof_of_address.image", "document.drivers_license.back.barcodes"}
+    user_v2 = bifrost_v2.run()
+    user_v2_vault = get(f"/users/{user_v2.fp_id}/vault", None, sandbox_tenant.s_sk)
+    assert set(di for di in user_v2_vault if di.startswith("document.")) == {"document.proof_of_address.image", "document.drivers_license.back.barcodes"}
 
     # GET endpoints return the proper versions
-    get_og_obc = get(f"/org/onboarding_configs/{obc_id}", None, *sandbox_tenant.db_auths)
-    assert get_og_obc["deactivated_at"]
-    assert get_og_obc == obc_with_rules_edit | {
-        "deactivated_at": get_og_obc["deactivated_at"],
+    get_obc_v1 = get(f"/org/onboarding_configs/{obc_v1_id}", None, *sandbox_tenant.db_auths)
+    assert get_obc_v1["deactivated_at"]
+    assert get_obc_v1 == obc_v1_with_rules_edit | {
+        "deactivated_at": get_obc_v1["deactivated_at"],
     }
 
-    get_new_obc = get(f"/org/onboarding_configs/{new_obc_id}", None, *sandbox_tenant.db_auths)
-    assert get_new_obc == new_obc_resp
+    get_obc_v2 = get(f"/org/onboarding_configs/{obc_v2_id}", None, *sandbox_tenant.db_auths)
+    assert get_obc_v2 == obc_v2_resp
 
-    versions = get(f"/org/playbooks/{playbook_id}/versions", None, *sandbox_tenant.db_auths) 
+    versions = get(f"/org/playbooks/{playbook_id}/versions", None, *sandbox_tenant.db_auths)
     assert versions == {
         "data": [
-            get_new_obc,
-            get_og_obc,
+            get_obc_v2,
+            get_obc_v1,
         ],
         "meta": {
             "count": 2,
             "next_page": None,
         }
     }
+
+    # Revert to the original playbook
+    revert_req = {
+        "expected_latest_obc_id": obc_v2_id,
+        "restore_obc_id": obc_v1_id,
+    }
+    restore_resp = post(f"/org/playbooks/{playbook_id}/restore", revert_req, *sandbox_tenant.db_auths)
+    obc_v3_id = restore_resp["id"]
+
+    versions = get(f"/org/playbooks/{playbook_id}/versions", None, *sandbox_tenant.db_auths)
+    obcs_active = {
+        obc["id"]: obc["deactivated_at"] is None
+        for obc in versions["data"]
+    }
+    assert obcs_active == {
+        obc_v1_id: False,
+        obc_v2_id: False,
+        obc_v3_id: True,
+    }
+
+    # Incorrect latest OBC ID fails
+    incorrect_update_playbook_req = {
+        "expected_latest_obc_id": obc_v1_id,
+        "new_onboarding_config": obc_v1_req,
+    }
+    put(f"org/playbooks/{playbook_id}", incorrect_update_playbook_req, *sandbox_tenant.db_auths, status_code=400)
+
+    # Rules are correctly reverted.
+    rules_v2 = get(f"/org/onboarding_configs/{obc_v2_id}/rules", None, *sandbox_tenant.db_auths)
+    rules_v3 = get(f"/org/onboarding_configs/{obc_v3_id}/rules", None, *sandbox_tenant.db_auths)
+    # Rule IDs and timestamps are not maintained.
+    rules_v2_repr = set(json.dumps({
+        "name": r["name"],
+        "rule_expression": r["rule_expression"],
+        "action": r["action"],
+    }) for r in rules_v2)
+    rules_v3_repr = set(json.dumps({
+        "name": r["name"],
+        "rule_expression": r["rule_expression"],
+        "action": r["action"],
+    }) for r in rules_v3)
+    assert rules_v2_repr == rules_v3_repr

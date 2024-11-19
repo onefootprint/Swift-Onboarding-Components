@@ -16,13 +16,11 @@ use api_wire_types::CopyPlaybookRequest;
 use api_wire_types::MultiUpdateRuleRequest;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::ob_configuration::VerificationChecks;
 use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set::RuleSet;
 use itertools::Itertools;
-use newtypes::DbActor;
 use newtypes::ObConfigurationId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -88,7 +86,11 @@ async fn post(
     )
     .await?;
 
-    let args = copy_playbook(obc, target_actor.clone().into(), name);
+    let actor = target_actor.clone().into();
+    let args = NewObConfigurationArgs {
+        name,
+        ..obc.into_copy_args(actor)
+    };
     let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant, target_is_live, &tvc)?;
 
     let rules = rules.into_iter().map(copy_rule).collect_vec();
@@ -120,73 +122,4 @@ async fn post(
         .await?;
     let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
     Ok(result)
-}
-
-
-fn copy_playbook(pb: ObConfiguration, author: DbActor, name: String) -> NewObConfigurationArgs {
-    let verification_checks = VerificationChecks::from_existing(&pb);
-    let ObConfiguration {
-        must_collect_data,
-        can_access_data,
-        cip_kind,
-        optional_data,
-        is_no_phone_flow,
-        is_doc_first,
-        allow_international_residents,
-        international_country_restrictions,
-        allow_us_residents,
-        allow_us_territory_residents,
-        kind,
-        skip_confirm,
-        document_types_and_countries,
-        documents_to_collect,
-        business_documents_to_collect,
-        required_auth_methods,
-        prompt_for_passkey,
-        allow_reonboard,
-
-        // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
-        // field is added
-        id: _,
-        key: _,
-        tenant_id: _,
-        _created_at: _,
-        _updated_at: _,
-        is_live: _,
-        status: _,
-        created_at: _,
-        author: _,
-        name: _,
-
-        // Maybe we should copy appearance one day. But it's not really used today.
-        appearance_id: _,
-        verification_checks: _,
-        // TODO: only thing here is enhanced_aml and skip_kyb which will be removed shortly
-        ..
-    } = pb;
-
-    NewObConfigurationArgs {
-        author,
-        name,
-        // Copied fields
-        must_collect_data,
-        can_access_data,
-        cip_kind,
-        optional_data,
-        is_no_phone_flow,
-        is_doc_first,
-        allow_international_residents,
-        international_country_restrictions,
-        allow_us_residents,
-        allow_us_territory_residents,
-        kind,
-        skip_confirm,
-        document_types_and_countries,
-        documents_to_collect: documents_to_collect.unwrap_or_default(),
-        business_documents_to_collect,
-        verification_checks,
-        required_auth_methods,
-        prompt_for_passkey,
-        allow_reonboard,
-    }
 }
