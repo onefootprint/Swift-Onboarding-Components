@@ -760,7 +760,6 @@ pub async fn prepare_onboarding_configuration_request(
         verification_checks,
         required_auth_methods,
         prompt_for_passkey,
-        allow_reonboard,
         doc_scan_for_optional_ssn: _,
     } = obc_request;
 
@@ -823,7 +822,6 @@ pub async fn prepare_onboarding_configuration_request(
         verification_checks,
         required_auth_methods,
         prompt_for_passkey,
-        allow_reonboard,
     };
 
 

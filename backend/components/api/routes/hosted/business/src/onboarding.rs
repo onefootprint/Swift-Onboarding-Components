@@ -49,7 +49,7 @@ pub async fn post(
                 .map(|wfr_id| WorkflowRequest::get(conn, wfr_id, &user_auth.scoped_user.id))
                 .transpose()?;
 
-            let force_create = user_auth.data.metadata.allow_reonboard || user_auth.ob_config.allow_reonboard;
+            let force_create = user_auth.data.metadata.allow_reonboard;
             let common_args = CommonWfArgs {
                 obc: &user_auth.ob_config,
                 insight_event: Some(insight_event),

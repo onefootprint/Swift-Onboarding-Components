@@ -107,9 +107,6 @@ pub struct ObConfiguration {
     /// When true, will prompt for passkey registration during onboarding requirements.
     /// Passkey registration will always be skippable.
     pub prompt_for_passkey: bool,
-    /// When true, allows users who have already onboarded onto this playbook to reonboard onto the
-    /// playbook in hosted bifrost.
-    pub allow_reonboard: bool,
     pub playbook_id: PlaybookId,
     pub deactivated_at: Option<DateTime<Utc>>,
 }
@@ -317,7 +314,6 @@ impl ObConfiguration {
             verification_checks,
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
             playbook_id,
         } = new_obc;
 
@@ -354,7 +350,6 @@ impl ObConfiguration {
             verification_checks: Some(verification_checks),
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
             playbook_id,
         }
     }
@@ -454,7 +449,6 @@ struct NewObConfiguration {
     verification_checks: Vec<VerificationCheck>,
     required_auth_methods: Option<Vec<AuthMethodKind>>,
     prompt_for_passkey: bool,
-    allow_reonboard: bool,
     playbook_id: PlaybookId,
 }
 
@@ -479,7 +473,6 @@ pub struct NewObConfigurationArgs {
     pub verification_checks: VerificationChecks,
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
     pub prompt_for_passkey: bool,
-    pub allow_reonboard: bool,
 }
 
 
@@ -501,7 +494,6 @@ pub struct ObConfigurationUpdate {
     pub status: Option<ApiKeyStatus>,
     pub verification_checks: Option<Vec<VerificationCheck>>,
     pub prompt_for_passkey: Option<bool>,
-    pub allow_reonboard: Option<bool>,
     pub skip_confirm: Option<bool>,
 }
 
@@ -700,7 +692,6 @@ impl ObConfiguration {
             business_documents_to_collect,
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
             name,
 
             // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
@@ -744,7 +735,6 @@ impl ObConfiguration {
             verification_checks,
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
         }
     }
 
@@ -849,7 +839,6 @@ impl NewObConfiguration {
             verification_checks,
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
         } = args;
 
         NewObConfiguration {
@@ -879,7 +868,6 @@ impl NewObConfiguration {
             verification_checks: verification_checks.into_inner(),
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
             playbook_id,
         }
     }

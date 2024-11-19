@@ -22,9 +22,13 @@ BO_DIS = ["id.first_name", "id.last_name", "id.email", "id.phone_number"]
 @pytest.fixture(scope="session")
 def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, kyb_cdos):
     cdos = must_collect_data + kyb_cdos
-    return create_ob_config(
-        sandbox_tenant, "Multi-KYC KYB config", cdos, kind="kyb", allow_reonboard=True
-    )
+    return create_ob_config(sandbox_tenant, "Multi-KYC KYB config", cdos, kind="kyb")
+
+
+@pytest.fixture(scope="session")
+def kyb_sandbox_ob_config2(sandbox_tenant, must_collect_data, kyb_cdos):
+    cdos = must_collect_data + kyb_cdos
+    return create_ob_config(sandbox_tenant, "Multi-KYC KYB config 2", cdos, kind="kyb")
 
 
 @pytest.mark.flaky
@@ -380,7 +384,9 @@ def test_kyb_possible_bo_missing_reason_code(kyb_sandbox_ob_config, sandbox_tena
     assert bo_failed_rses["severity"] == "info"
 
 
-def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
+def test_concurrent_onboard(
+    kyb_sandbox_ob_config, kyb_sandbox_ob_config2, sandbox_tenant
+):
     """
     Test that the KYC results used to decide whether BOs passed KYC all come from the same business workflow.
     """
@@ -416,9 +422,9 @@ def test_concurrent_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     # Extract the secondary BO token, but don't use it yet
     secondary_bo_token = extract_bo_token(primary_bo)
 
-    # Then, onboard the same user onto the same playbook and pass them this time. This creates a new business.
+    # Then, onboard the same user onto a new playbook and pass them this time. This creates a new business.
     bifrost = BifrostClient.login_user(
-        kyb_sandbox_ob_config, sandbox_id=bifrost.sandbox_id, fixture_result="pass"
+        kyb_sandbox_ob_config2, sandbox_id=bifrost.sandbox_id, fixture_result="pass"
     )
     bifrost.data.update(BUSINESS_SECONDARY_BOS)
     primary_bo2 = bifrost.run()

@@ -11000,10 +11000,6 @@
                     "allow_international_residents": {
                         "type": "boolean"
                     },
-                    "allow_reonboard": {
-                        "description": "Allow the same user to onboard onto this playbook multiple times. It is generally not\n recommended to enable this setting. When this is enabled, you lose:\n - Protection against one user incurring many charges at your tenant\n - Ability for in-progress onboardings to continue where they left off\n When false, onboarding will no-op for repeat onboardings.",
-                        "type": "boolean"
-                    },
                     "allow_us_residents": {
                         "type": "boolean"
                     },
@@ -16612,9 +16608,6 @@
                     "allow_international_residents": {
                         "type": "boolean"
                     },
-                    "allow_reonboard": {
-                        "type": "boolean"
-                    },
                     "allow_us_residents": {
                         "type": "boolean"
                     },
@@ -16740,7 +16733,6 @@
                 },
                 "required": [
                     "allow_international_residents",
-                    "allow_reonboard",
                     "allow_us_residents",
                     "allow_us_territory_residents",
                     "business_documents_to_collect",
@@ -19289,9 +19281,6 @@
             "UpdateObConfigRequest": {
                 "type": "object",
                 "properties": {
-                    "allow_reonboard": {
-                        "type": "boolean"
-                    },
                     "name": {
                         "type": "string"
                     },

@@ -158,7 +158,6 @@ impl
             verification_checks,
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
             playbook_id,
             deactivated_at,
 
@@ -204,7 +203,6 @@ impl
             verification_checks: verification_checks.unwrap_or_default(),
             required_auth_methods,
             prompt_for_passkey,
-            allow_reonboard,
             playbook_id,
             deactivated_at,
         }

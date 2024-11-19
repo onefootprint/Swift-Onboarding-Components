@@ -25,7 +25,6 @@ struct UpdateObConfigRequest {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
     prompt_for_passkey: Option<bool>,
-    allow_reonboard: Option<bool>,
     skip_confirm: Option<bool>,
 }
 
@@ -51,7 +50,6 @@ async fn patch(
         name,
         status,
         prompt_for_passkey,
-        allow_reonboard,
         skip_confirm,
     } = request.into_inner();
     let (obc, actor, rs) = state
@@ -60,7 +58,6 @@ async fn patch(
                 name,
                 status,
                 prompt_for_passkey,
-                allow_reonboard,
                 skip_confirm,
                 ..Default::default()
             };

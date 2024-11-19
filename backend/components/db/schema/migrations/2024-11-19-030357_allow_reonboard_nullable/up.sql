@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ALTER COLUMN allow_reonboard SET DEFAULT 'f';

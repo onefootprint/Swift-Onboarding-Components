@@ -82,9 +82,8 @@ pub async fn post(
                 .map(|wfr_id| WorkflowRequest::get(conn, wfr_id, &scoped_user.id))
                 .transpose()?;
 
-            // If this auth token allows reonboarding OR the playbook is opted into always allow reonboarding,
-            // force create a new workflwo
-            let force_create = user_auth.data.metadata.allow_reonboard || ob_config.allow_reonboard;
+            // If this auth token allows reonboarding, force create a new workflow
+            let force_create = user_auth.data.metadata.allow_reonboard;
             let common_args = CommonWfArgs {
                 obc: &obc,
                 insight_event: Some(insight_event),

@@ -364,7 +364,6 @@ def create_ob_config(
     skip_kyc=False,
     verification_checks=None,
     prompt_for_passkey=None,
-    allow_reonboard=None,
     required_auth_methods=None,
 ):
     kind = kind or "kyc"
@@ -395,7 +394,6 @@ def create_ob_config(
         "skip_kyc": skip_kyc,
         "verification_checks": checks,
         "prompt_for_passkey": prompt_for_passkey,
-        "allow_reonboard": allow_reonboard or False,
         "required_auth_methods": required_auth_methods,
     }
     auths = override_auths if override_auths else tenant.db_auths

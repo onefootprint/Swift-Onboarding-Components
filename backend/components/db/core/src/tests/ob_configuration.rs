@@ -84,7 +84,6 @@ fn test_ob_config_international_countries(
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
@@ -126,7 +125,6 @@ fn obc_with_doc_cdo(
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     let tenant_id = TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap();
@@ -391,7 +389,6 @@ fn test_cip_kind_documents(
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
@@ -466,7 +463,6 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
@@ -514,7 +510,6 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();

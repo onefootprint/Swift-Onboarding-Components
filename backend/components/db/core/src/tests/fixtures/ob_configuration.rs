@@ -41,7 +41,6 @@ pub fn create(
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     Playbook::create(conn, tenant_id, is_live, args).expect("Could not create ob config history")
@@ -145,7 +144,6 @@ pub fn create_with_opts(
         verification_checks,
         required_auth_methods: None,
         prompt_for_passkey: true,
-        allow_reonboard: false,
     };
 
     Playbook::create(conn, tenant_id, is_live, args).unwrap()
