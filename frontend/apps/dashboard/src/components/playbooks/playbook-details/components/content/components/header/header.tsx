@@ -1,10 +1,10 @@
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { RoleScopeKind } from '@onefootprint/types';
-import { Button, CodeInline, Stack, Text } from '@onefootprint/ui';
+// import { RoleScopeKind } from '@onefootprint/types';
+import { CodeInline, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PermissionGate from 'src/components/permission-gate';
+// import PermissionGate from 'src/components/permission-gate';
 import styled, { css, useTheme } from 'styled-components';
 
 const Create = lazy(() => import('src/components/playbooks/create-playbook'));
@@ -31,7 +31,7 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
               {playbook.key}
             </CodeInline>
           </Stack>
-          <PermissionGate
+          {/* <PermissionGate
             scopeKind={RoleScopeKind.onboardingConfiguration}
             fallbackText={t('edit.cta-not-allowed')}
             tooltipPosition="left"
@@ -39,7 +39,7 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
             <Button variant="secondary" onClick={() => setIsOpen(true)}>
               {t('edit.cta')}
             </Button>
-          </PermissionGate>
+          </PermissionGate> */}
         </Stack>
       </HeaderContainer>
       <Suspense>

@@ -177,9 +177,10 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
           }}
         />
       )}
-      {state.step === 'reviewChanges' && (
+      {state.step === 'reviewChanges' && !!playbook && (
         <ReviewChangesStep
           meta={{
+            playbook: playbook,
             hasChanges: !isEqual(initialState.data, state.data),
           }}
           onBack={() => {
