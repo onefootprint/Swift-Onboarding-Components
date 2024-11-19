@@ -34,14 +34,21 @@ const vaultBootstrapData = async (
 
   if (hasBusinessBootstrapData) {
     await patchHostedBusinessVault({
-      headers: { 'X-Fp-Authorization': options.authToken },
+      headers: {
+        'X-Fp-Authorization': options.authToken,
+        // @ts-expect-error backend types are wrong
+        'X-Fp-Is-Bootstrap': true,
+      },
       body: businessPayload,
     });
   }
 
   if (hasUserBoostrapData) {
     await patchHostedUserVault({
-      headers: { 'X-Fp-Authorization': options.authToken },
+      headers: {
+        'X-Fp-Authorization': options.authToken,
+        'X-Fp-Is-Bootstrap': true,
+      },
       body: userPayload,
     });
   }
@@ -66,8 +73,11 @@ const vaultBootstrapData = async (
     }
 
     await patchHostedBusinessOwners({
-      headers: { 'X-Fp-Authorization': options.authToken },
-      // @ts-ignore backend types are wrong
+      headers: {
+        'X-Fp-Authorization': options.authToken,
+        'X-Fp-Is-Bootstrap': true,
+      },
+      // @ts-expect-error backend types are wrong
       body: payload,
     });
   }
