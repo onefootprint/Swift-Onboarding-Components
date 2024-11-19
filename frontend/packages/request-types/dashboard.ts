@@ -655,7 +655,6 @@ export type CreateOnboardingConfigurationRequest = {
    * - Ability for in-progress onboardings to continue where they left off
    * When false, onboarding will no-op for repeat onboardings.
    */
-  allowReonboard?: boolean;
   allowUsResidents?: boolean;
   allowUsTerritories?: boolean;
   businessDocumentsToCollect?: Array<DocumentRequestConfig>;
@@ -3838,7 +3837,6 @@ export type OmittedSecretCustomHeader = {
  */
 export type OnboardingConfiguration = {
   allowInternationalResidents: boolean;
-  allowReonboard: boolean;
   allowUsResidents: boolean;
   allowUsTerritoryResidents: boolean;
   author?: Actor;
@@ -4928,7 +4926,6 @@ export type UpdateListRequest = {
   name: string;
 };
 export type UpdateObConfigRequest = {
-  allowReonboard?: boolean;
   name?: string;
   promptForPasskey?: boolean;
   skipConfirm?: boolean;

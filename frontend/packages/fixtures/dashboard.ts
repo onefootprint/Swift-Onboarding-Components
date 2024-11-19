@@ -1830,7 +1830,6 @@ export const getCreateOnboardingConfigurationRequest = (
   deepmerge<CreateOnboardingConfigurationRequest>(
     {
       allowInternationalResidents: false,
-      allowReonboard: false,
       allowUsResidents: true,
       allowUsTerritories: false,
       businessDocumentsToCollect: [
@@ -1983,7 +1982,6 @@ export const getCreatePlaybookVersionRequest = (
       expectedLatestObcId: '0b8a9c6d-7fba-43fc-8b10-5e5b30fd947f',
       newOnboardingConfig: {
         allowInternationalResidents: false,
-        allowReonboard: false,
         allowUsResidents: false,
         allowUsTerritories: true,
         businessDocumentsToCollect: [
@@ -6367,7 +6365,6 @@ export const getOffsetPaginatedOnboardingConfiguration = (
       data: [
         {
           allowInternationalResidents: true,
-          allowReonboard: false,
           allowUsResidents: false,
           allowUsTerritoryResidents: true,
           author: {
@@ -6497,7 +6494,6 @@ export const getOffsetPaginatedOnboardingConfiguration = (
         },
         {
           allowInternationalResidents: true,
-          allowReonboard: true,
           allowUsResidents: true,
           allowUsTerritoryResidents: false,
           author: {
@@ -6627,7 +6623,6 @@ export const getOffsetPaginatedOnboardingConfiguration = (
         },
         {
           allowInternationalResidents: true,
-          allowReonboard: true,
           allowUsResidents: false,
           allowUsTerritoryResidents: true,
           author: {
@@ -6972,7 +6967,6 @@ export const getOnboardingConfiguration = (
   deepmerge<OnboardingConfiguration>(
     {
       allowInternationalResidents: true,
-      allowReonboard: true,
       allowUsResidents: false,
       allowUsTerritoryResidents: true,
       author: {
@@ -8519,7 +8513,6 @@ export const getUpdateObConfigRequest = (
 ): UpdateObConfigRequest =>
   deepmerge<UpdateObConfigRequest>(
     {
-      allowReonboard: true,
       name: 'Patsy Funk',
       promptForPasskey: false,
       skipConfirm: true,

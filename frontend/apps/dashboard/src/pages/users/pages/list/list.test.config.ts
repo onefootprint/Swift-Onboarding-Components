@@ -131,7 +131,6 @@ export const playbooksFixture: GetPlaybooksResponse = [
     },
     documentsToCollect: null,
     promptForPasskey: true,
-    allowReonboard: false,
     businessDocumentsToCollect: [],
     requiredAuthMethods: [AuthMethodKind.phone],
     verificationChecks: [],

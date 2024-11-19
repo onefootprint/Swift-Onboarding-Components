@@ -58,26 +58,6 @@ describe('Settings', () => {
     });
   });
 
-  describe('reonboard settings', () => {
-    beforeEach(() => {
-      withUpdatePlaybook({ ...getOnboardingConfiguration({ kind: 'kyc', promptForPasskey: false }) });
-    });
-
-    it('should not render the switch for KYC playbook', async () => {
-      renderSettings({ ...getOnboardingConfiguration({ kind: 'kyc', allowReonboard: false }) });
-
-      expect(screen.queryByRole('switch', { name: 'Allow reonboarding' })).toBeFalsy();
-    });
-
-    it('should render the switch correctly for KYB', async () => {
-      renderSettings({ ...getOnboardingConfiguration({ kind: 'kyb', allowReonboard: false }) });
-
-      const toggle = screen.getByRole<HTMLInputElement>('switch', { name: 'Allow reonboarding' });
-      await userEvent.click(toggle);
-      expect(toggle.checked).toBe(true);
-    });
-  });
-
   describe('when the skip confirm is enabled', () => {
     it('should render the switch correctly', () => {
       renderSettings({ ...getOnboardingConfiguration({ kind: 'kyc', skipConfirm: true }) });

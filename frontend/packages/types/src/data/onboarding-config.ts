@@ -135,7 +135,6 @@ export type OnboardingConfig = {
   documentsToCollect: DocumentRequestConfig[] | null;
   businessDocumentsToCollect: DocumentRequestConfig[] | null;
   promptForPasskey: boolean;
-  allowReonboard: boolean;
   ruleSet: {
     version: number;
   };

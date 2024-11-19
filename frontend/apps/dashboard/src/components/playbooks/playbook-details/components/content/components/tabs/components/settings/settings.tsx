@@ -11,7 +11,6 @@ export type PasskeysProps = {
 };
 
 type LocalState = {
-  allowReonboard: boolean;
   promptForPasskey: boolean;
   skipConfirm: boolean;
 };
@@ -20,7 +19,6 @@ const Settings = ({ playbook }: PasskeysProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'settings' });
   const [localState, setLocalState] = useState<LocalState>({
     promptForPasskey: playbook.promptForPasskey,
-    allowReonboard: playbook.allowReonboard,
     skipConfirm: Boolean(playbook.skipConfirm),
   });
   const mutation = useUpdatePlaybook();
@@ -83,20 +81,6 @@ const Settings = ({ playbook }: PasskeysProps) => {
           </Stack>
         </DescriptionContainer>
       </Stack>
-      {playbook.kind === 'kyb' && (
-        <Stack direction="column">
-          <Toggle
-            label={t('allow-reonboard.title')}
-            checked={localState.allowReonboard}
-            onChange={handleToggle('allowReonboard')}
-          />
-          <DescriptionContainer>
-            <Text variant="body-2" color="tertiary">
-              {t('allow-reonboard.description')}
-            </Text>
-          </DescriptionContainer>
-        </Stack>
-      )}
       {(playbook.kind === 'kyb' || playbook.kind === 'kyc') && (
         <Stack direction="column">
           <Toggle

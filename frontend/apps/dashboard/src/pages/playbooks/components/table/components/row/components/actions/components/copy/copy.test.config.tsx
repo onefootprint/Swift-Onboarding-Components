@@ -41,7 +41,6 @@ export const playbookFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
-  allowReonboard: false,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
   verificationChecks: [],

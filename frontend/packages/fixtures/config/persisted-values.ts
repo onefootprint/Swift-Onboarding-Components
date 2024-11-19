@@ -3949,7 +3949,6 @@ export const dashboard_CreateListRequest: CreateListRequest = {
 };
 export const dashboard_CreateOnboardingConfigurationRequest: CreateOnboardingConfigurationRequest = {
   allowInternationalResidents: false,
-  allowReonboard: false,
   allowUsResidents: true,
   allowUsTerritories: false,
   businessDocumentsToCollect: [
@@ -4075,7 +4074,6 @@ export const dashboard_CreatePlaybookVersionRequest: CreatePlaybookVersionReques
   expectedLatestObcId: '0b8a9c6d-7fba-43fc-8b10-5e5b30fd947f',
   newOnboardingConfig: {
     allowInternationalResidents: false,
-    allowReonboard: false,
     allowUsResidents: false,
     allowUsTerritories: true,
     businessDocumentsToCollect: [
@@ -7693,7 +7691,6 @@ export const dashboard_OffsetPaginatedOnboardingConfiguration: OffsetPaginatedOn
   data: [
     {
       allowInternationalResidents: true,
-      allowReonboard: false,
       allowUsResidents: false,
       allowUsTerritoryResidents: true,
       author: {
@@ -7823,7 +7820,6 @@ export const dashboard_OffsetPaginatedOnboardingConfiguration: OffsetPaginatedOn
     },
     {
       allowInternationalResidents: true,
-      allowReonboard: true,
       allowUsResidents: true,
       allowUsTerritoryResidents: false,
       author: {
@@ -7953,7 +7949,6 @@ export const dashboard_OffsetPaginatedOnboardingConfiguration: OffsetPaginatedOn
     },
     {
       allowInternationalResidents: true,
-      allowReonboard: true,
       allowUsResidents: false,
       allowUsTerritoryResidents: true,
       author: {
@@ -8262,7 +8257,6 @@ export const dashboard_OmittedSecretCustomHeader: OmittedSecretCustomHeader = {
 };
 export const dashboard_OnboardingConfiguration: OnboardingConfiguration = {
   allowInternationalResidents: true,
-  allowReonboard: true,
   allowUsResidents: false,
   allowUsTerritoryResidents: true,
   author: {
@@ -9278,7 +9272,6 @@ export const dashboard_UpdateListRequest: UpdateListRequest = {
   name: 'Grady Lind',
 };
 export const dashboard_UpdateObConfigRequest: UpdateObConfigRequest = {
-  allowReonboard: true,
   name: 'Patsy Funk',
   promptForPasskey: false,
   skipConfirm: true,

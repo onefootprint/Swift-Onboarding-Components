@@ -1,11 +1,8 @@
-import { mockRequest } from '@onefootprint/test-utils';
 import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, OnboardingConfigStatus } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
-export const entityIdFixture: string = 'fp_id_wL6XIWe26cRinucZrRK1yn';
-
-export const playbookDetailsFixture: OnboardingConfig = {
+const playbookFixture: OnboardingConfig = {
   author: {
     kind: 'organization',
     member: 'Jane doe',
@@ -20,7 +17,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   isDocFirstFlow: false,
   isLive: false,
   isNoPhoneFlow: false,
-  key: 'pb_live_cp5NX9wDbxkldd52hnJuRB',
+  key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
   kind: OnboardingConfigKind.kyc,
   mustCollectData: [CollectedKycDataOption.name],
   name: 'Test playbook',
@@ -37,19 +34,4 @@ export const playbookDetailsFixture: OnboardingConfig = {
   verificationChecks: [],
 };
 
-export const withPlaybookDetails = (id: string, response = playbookDetailsFixture) =>
-  mockRequest({
-    method: 'get',
-    path: `/org/onboarding_configs/${id}`,
-    response,
-  });
-
-export const withPlaybookDetailsError = (id: string) =>
-  mockRequest({
-    method: 'get',
-    path: `/org/onboarding_configs/${id}`,
-    statusCode: 400,
-    response: {
-      message: 'Something went wrong',
-    },
-  });
+export default playbookFixture;
