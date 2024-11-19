@@ -5,6 +5,7 @@ use crate::actor::saturate_actors_nullable;
 use crate::actor::HasActor;
 use crate::actor::SaturatedActor;
 use crate::models::document_data::DocumentData;
+use crate::models::insight_event::CreateInsightEvent;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::models::scoped_vault::*;
@@ -389,6 +390,28 @@ impl AuditEvent {
             .select(count_distinct(audit_event::scoped_vault_id))
             .get_result(conn)?;
         Ok(count)
+    }
+
+    pub fn create_with_insight<T, A>(
+        conn: &mut TxnPgConn,
+        tenant_id: &TenantId,
+        principal_actor: A,
+        insight: T,
+        detail: AuditEventDetail,
+    ) -> FpResult<AuditEventId>
+    where
+        T: Into<CreateInsightEvent>,
+        A: Into<DbActor>,
+    {
+        let insight_event_id = insight.into().insert_with_conn(conn)?.id;
+        let audit_event = NewAuditEvent {
+            tenant_id: tenant_id.clone(),
+            principal_actor: principal_actor.into(),
+            insight_event_id,
+            detail,
+        };
+        let id = Self::create(conn, audit_event)?;
+        Ok(id)
     }
 }
 

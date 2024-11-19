@@ -165,22 +165,12 @@ pub async fn patch(
             let (user, _, old_role, _) = TenantRolebinding::get(conn, (&tu_id, org_ref))?;
             if let (OrgIdentifier::TenantId(tenant_id), Some(role_id)) = (&authed_org_ident, role_id.as_ref())
             {
-                let new_role = TenantRole::get(conn, role_id)?;
-
                 let detail = AuditEventDetail::UpdateOrgMember {
                     old_tenant_role_id: old_role.id,
-                    new_tenant_role_id: new_role.id,
-                    tenant_user_id: tu_id.clone(),
+                    tenant_user_id: user.id.clone(),
+                    new_tenant_role_id: role_id.clone(),
                 };
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
-
-                let audit_event = NewAuditEvent {
-                    principal_actor: actor.into(),
-                    insight_event_id,
-                    tenant_id: tenant_id.clone(),
-                    detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, tenant_id, actor, insight, detail)?;
             }
             let rolebinding_update = TenantRolebindingUpdate {
                 tenant_role_id: role_id,
