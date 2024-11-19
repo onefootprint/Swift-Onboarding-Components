@@ -10,8 +10,6 @@ use api_core::utils::headers::InsightHeaders;
 use api_core::State;
 use api_wire_types::OrgRoleFilters;
 use db::models::audit_event::AuditEvent;
-use db::models::audit_event::NewAuditEvent;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_role::TenantRoleListFilters;
 use newtypes::AuditEventDetail;
@@ -97,14 +95,7 @@ pub async fn post(
 
             // we will only create audit events for tenant roles - we'll skip partner roles
             if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident {
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
-                let audit_event = NewAuditEvent {
-                    principal_actor: db_actor.into(),
-                    insight_event_id,
-                    tenant_id,
-                    detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, &tenant_id, db_actor, insight, detail)?;
             }
             Ok(new_tenant_role)
         })
@@ -128,7 +119,6 @@ pub async fn patch(
     let result = state
         .db_transaction(move |conn| {
             if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident.clone() {
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
                 let prev_tenant_role = TenantRole::get(conn, &role_id.clone())?;
                 let detail = AuditEventDetail::UpdateOrgRole {
                     prev_scopes: prev_tenant_role.scopes,
@@ -136,14 +126,7 @@ pub async fn patch(
                     is_live,
                     tenant_role_id: role_id.clone(),
                 };
-
-                let audit_event = NewAuditEvent {
-                    principal_actor: db_actor.into(),
-                    insight_event_id,
-                    tenant_id,
-                    detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, &tenant_id, db_actor, insight, detail)?;
             }
             TenantRole::update(conn, &authed_org_ident, &role_id, name, scopes)
         })
@@ -166,17 +149,10 @@ pub async fn deactivate(
     let result = state
         .db_transaction(move |conn| {
             if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident.clone() {
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
                 let detail = AuditEventDetail::DeactivateOrgRole {
                     tenant_role_id: role_id.clone(),
                 };
-                let audit_event = NewAuditEvent {
-                    principal_actor: db_actor.into(),
-                    insight_event_id,
-                    tenant_id,
-                    detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, &tenant_id, db_actor, insight, detail)?;
             }
             TenantRole::deactivate(conn, &role_id, &authed_org_ident)
         })

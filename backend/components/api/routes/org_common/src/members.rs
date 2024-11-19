@@ -14,8 +14,6 @@ use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
 use db::helpers::TenantOrPartnerTenantRef;
 use db::models::audit_event::AuditEvent;
-use db::models::audit_event::NewAuditEvent;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_rolebinding::TenantRolebindingFilters;
@@ -108,18 +106,11 @@ pub async fn post(
             let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, &authed_org_ident)?;
 
             if let OrgIdentifier::TenantId(tenant_id) = authed_org_ident {
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
                 let detail = AuditEventDetail::InviteOrgMember {
                     tenant_user_id: user.id.clone(),
                     tenant_role_id: role.id.clone(),
                 };
-                let audit_event = NewAuditEvent {
-                    principal_actor: actor.into(),
-                    insight_event_id,
-                    tenant_id,
-                    detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, &tenant_id, actor, insight, detail)?;
             }
 
             Ok((inviter, user, rb, role))
@@ -214,14 +205,7 @@ pub async fn deactivate(
                 let audit_event_detail = AuditEventDetail::RemoveOrgMember {
                     tenant_user_id: tu_id.clone(),
                 };
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
-                let audit_event = NewAuditEvent {
-                    principal_actor: actor.into(),
-                    insight_event_id,
-                    tenant_id: tenant_id.clone(),
-                    detail: audit_event_detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, tenant_id, actor, insight, audit_event_detail)?;
             }
             TenantRolebinding::update(conn, (&tu_id, org_ref), update)?;
             Ok(())

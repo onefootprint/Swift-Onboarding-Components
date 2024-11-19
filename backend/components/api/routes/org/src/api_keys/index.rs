@@ -14,8 +14,6 @@ use api_core::State;
 use api_errors::ServerErr;
 use api_wire_types::ApiKeyFilters;
 use db::models::audit_event::AuditEvent;
-use db::models::audit_event::NewAuditEvent;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_api_key::TenantApiKeyIdentifier;
@@ -119,17 +117,10 @@ pub async fn post(
             let api_key =
                 TenantApiKey::create(conn, name, sh_key, e_key, tenant.id.clone(), is_live, role_id)?;
             let role = TenantRole::get(conn, &api_key.role_id)?;
-            let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let detail = AuditEventDetail::CreateOrgApiKey {
                 tenant_api_key_id: api_key.id.clone(),
             };
-            let audit_event = NewAuditEvent {
-                tenant_id: tenant.id,
-                principal_actor: actor.into(),
-                insight_event_id,
-                detail,
-            };
-            AuditEvent::create(conn, audit_event)?;
+            AuditEvent::create_with_insight(conn, &tenant.id, actor, insight, detail)?;
             Ok((api_key, role))
         })
         .await?;
@@ -187,14 +178,7 @@ pub async fn patch(
                     tenant_api_key_id: id.clone(),
                     new_tenant_role_id: new_role_id,
                 };
-                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
-                let audit_event = NewAuditEvent {
-                    tenant_id: tenant_id.clone(),
-                    principal_actor: auth_actor.into(),
-                    insight_event_id,
-                    detail,
-                };
-                AuditEvent::create(conn, audit_event)?;
+                AuditEvent::create_with_insight(conn, &tenant_id, auth_actor, insight, detail)?;
             }
             TenantApiKey::update(conn, id, tenant_id.clone(), is_live, name, status, role_id, None)
         })
