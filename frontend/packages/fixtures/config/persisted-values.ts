@@ -5431,6 +5431,9 @@ export const dashboard_EntityAction: EntityAction = {
           kind: 'proof_of_ssn',
         },
       ],
+      playbookId: '5cd288b0-adac-4c2b-a15a-82b27f80f248',
+      recollectAttributes: ['business_kyced_beneficial_owners', 'business_address', 'phone_number'],
+      reuseExistingBoKyc: true,
     },
     kind: 'document',
   },
@@ -7564,8 +7567,8 @@ export const dashboard_OffsetPaginatedEntityOnboarding: OffsetPaginatedEntityOnb
   data: [
     {
       id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
       kind: 'kyb',
+      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
       playbookName: 'Example Playbook',
       ruleSetResults: [
         {
@@ -7587,8 +7590,8 @@ export const dashboard_OffsetPaginatedEntityOnboarding: OffsetPaginatedEntityOnb
     },
     {
       id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
       kind: 'kyc',
+      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
       playbookName: 'Example Playbook',
       ruleSetResults: [
         {
@@ -7610,8 +7613,8 @@ export const dashboard_OffsetPaginatedEntityOnboarding: OffsetPaginatedEntityOnb
     },
     {
       id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
       kind: 'document',
+      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
       playbookName: 'Example Playbook',
       ruleSetResults: [
         {

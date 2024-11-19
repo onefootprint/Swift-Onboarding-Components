@@ -3627,6 +3627,9 @@ export const getEntityAction = (
               kind: 'proof_of_ssn',
             },
           ],
+          playbookId: '5cd288b0-adac-4c2b-a15a-82b27f80f248',
+          recollectAttributes: ['business_kyced_beneficial_owners', 'business_address', 'phone_number'],
+          reuseExistingBoKyc: true,
         },
         kind: 'document',
       },
@@ -6220,9 +6223,9 @@ export const getOffsetPaginatedEntityOnboarding = (
       data: [
         {
           id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
-          playbookName: 'Test Playbook',
           kind: 'kyb',
+          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
+          playbookName: 'Example Playbook',
           ruleSetResults: [
             {
               id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
@@ -6243,9 +6246,9 @@ export const getOffsetPaginatedEntityOnboarding = (
         },
         {
           id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
-          playbookName: 'Test Playbook',
           kind: 'kyc',
+          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
+          playbookName: 'Example Playbook',
           ruleSetResults: [
             {
               id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
@@ -6266,9 +6269,9 @@ export const getOffsetPaginatedEntityOnboarding = (
         },
         {
           id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
-          playbookName: 'Test Playbook',
           kind: 'document',
+          playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
+          playbookName: 'Example Playbook',
           ruleSetResults: [
             {
               id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
