@@ -44,7 +44,6 @@ use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::ExternalId;
 use newtypes::KybConfig;
-use newtypes::ObConfigurationKind;
 use newtypes::OnboardingStatus;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
@@ -328,8 +327,8 @@ pub fn get_or_create_business_wf<'a>(
         return Ok((biz_wf, false, false));
     };
 
-    if obc.kind != ObConfigurationKind::Kyb {
-        return BadRequestInto("Cannot onboard a business to a non-KYB playbook");
+    if !obc.kind.can_onboard() {
+        return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
     }
 
     Vault::lock(conn, &su.vault_id)?;
