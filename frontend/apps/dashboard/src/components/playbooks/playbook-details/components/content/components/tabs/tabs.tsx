@@ -1,6 +1,7 @@
 import { tabsRouterSchema } from '@/playbooks/utils/schema';
 import type { PlaybookTabs } from '@/playbooks/utils/schema/schema';
-import { type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Stack, Tabs as UITabs } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +13,7 @@ import Settings from './components/settings';
 import VerificationChecks from './components/verification-checks';
 
 export type TabsProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
   isTabsDisabled: boolean;
   toggleDisableHeading: (disable: boolean) => void;
 };
@@ -25,7 +26,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
   const router = useRouter();
 
   const options: OptionsProps =
-    playbook.kind === OnboardingConfigKind.document
+    playbook.kind === 'document'
       ? [
           { value: 'data', label: t('tabs.data-collection') },
           { value: 'rules', label: t('tabs.rules') },
@@ -49,7 +50,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
       <UITabs options={options} onChange={handleChange} disabled={isTabsDisabled} defaultValue={tab} />
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'verification-checks' && <VerificationChecks playbook={playbook} />}
-      {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
+      {tab === 'rules' && <Rules playbook={playbook as OnboardingConfig} toggleDisableHeading={toggleDisableHeading} />}
       {tab === 'settings' && <Settings playbook={playbook} />}
       {tab === 'information' && <Information playbook={playbook} />}
     </Stack>

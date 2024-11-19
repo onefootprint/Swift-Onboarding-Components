@@ -1,13 +1,17 @@
+import type {
+  CollectedDataOption,
+  ObConfigurationKind,
+  VerificationCheck,
+} from '@onefootprint/request-types/dashboard';
 import { customRender, screen, within } from '@onefootprint/test-utils';
-import { type CollectedDataOption, OnboardingConfigKind, type VerificationCheck } from '@onefootprint/types';
+
 import VerificationChecks from './verification-checks';
-import { amlCheck, onboardingConfigFixture } from './verification-checks.test.config';
+import { onboardingConfigFixture } from './verification-checks.test.config';
 
 describe('<VerificationChecks />', () => {
-  const defaultValues = {
-    verificationChecks: [],
-    skipKyc: false,
-    mustCollectData: [
+  const renderVerificationChecks = ({
+    verificationChecks = [],
+    mustCollectData = [
       'email',
       'name',
       'dob',
@@ -19,15 +23,11 @@ describe('<VerificationChecks />', () => {
       'business_tin',
       'business_kyced_beneficial_owners',
     ],
-  };
-  const renderVerificationChecks = ({
-    verificationChecks = defaultValues.verificationChecks,
-    mustCollectData = defaultValues.mustCollectData,
-    kind = OnboardingConfigKind.kyc,
+    kind = 'kyc',
   }: {
     verificationChecks?: VerificationCheck[];
     mustCollectData?: CollectedDataOption[];
-    kind?: OnboardingConfigKind;
+    kind?: ObConfigurationKind;
   }) => {
     return customRender(
       <VerificationChecks
@@ -45,7 +45,7 @@ describe('<VerificationChecks />', () => {
     it('should show the correct text when full KYB is enabled and KYC checks are disabled', () => {
       renderVerificationChecks({
         verificationChecks: [{ kind: 'kyb', data: { einOnly: false } }],
-        kind: OnboardingConfigKind.kyb,
+        kind: 'kyb',
       });
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
       const full = within(kyb).getByText('Full KYB (data collection + verification checks)');
@@ -55,6 +55,29 @@ describe('<VerificationChecks />', () => {
       expect(kycChecks).toBeInTheDocument();
     });
 
+<<<<<<< HEAD
+=======
+    it('should show the correct text when EIN-only KYB is enabled and primary-only KYC checks are enabled', () => {
+      renderVerificationChecks({
+        verificationChecks: [
+          { kind: 'kyb', data: { einOnly: true } },
+          { kind: 'kyc', data: {} },
+        ],
+        kind: 'kyb',
+      });
+
+      const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
+      const einOnly = within(kyb).getByText('TIN (EIN) and business name verification only');
+      expect(einOnly).toBeInTheDocument();
+
+      const kyc = screen.getByRole('group', { name: 'Know Your Customer (KYC)' });
+      const primaryOnly = within(kyc).getByText(
+        'Only on business’ primary owner (the person who filled out the KYB form)',
+      );
+      expect(primaryOnly).toBeInTheDocument();
+    });
+
+>>>>>>> 25e674d0e4 (Edit playbooks (3): dialog title)
     it('should show the correct text when EIN-only KYB is enabled and full KYC checks are enabled', () => {
       renderVerificationChecks({
         verificationChecks: [
@@ -62,7 +85,7 @@ describe('<VerificationChecks />', () => {
           { kind: 'kyc', data: {} },
         ],
         mustCollectData: ['business_kyced_beneficial_owners'],
-        kind: OnboardingConfigKind.kyb,
+        kind: 'kyb',
       });
 
       const kyb = screen.getByRole('group', { name: 'Know Your Business (KYB)' });
@@ -85,7 +108,20 @@ describe('<VerificationChecks />', () => {
 
     describe('ofac', () => {
       it('should show a check icon when ofac is enabled', () => {
-        renderVerificationChecks({ verificationChecks: [amlCheck({ ofac: true })] });
+        renderVerificationChecks({
+          verificationChecks: [
+            {
+              kind: 'aml',
+              data: {
+                ofac: true,
+                pep: false,
+                adverseMedia: false,
+                continuousMonitoring: false,
+                matchKind: 'exact_name_and_dob_year',
+              },
+            },
+          ],
+        });
 
         const ofac = screen.getByRole('row', { name: 'Office of Foreign Assets Control (OFAC)' });
         const check = within(ofac).getByLabelText('Enabled');
@@ -93,7 +129,20 @@ describe('<VerificationChecks />', () => {
       });
 
       it('should show a close icon when ofac is disabled', () => {
-        renderVerificationChecks({ verificationChecks: [amlCheck({ ofac: false, pep: true, adverseMedia: true })] });
+        renderVerificationChecks({
+          verificationChecks: [
+            {
+              kind: 'aml',
+              data: {
+                ofac: false,
+                pep: true,
+                adverseMedia: true,
+                continuousMonitoring: false,
+                matchKind: 'exact_name_and_dob_year',
+              },
+            },
+          ],
+        });
 
         const ofac = screen.getByRole('row', { name: 'Office of Foreign Assets Control (OFAC)' });
         const close = within(ofac).getByLabelText('Disabled');
@@ -103,7 +152,20 @@ describe('<VerificationChecks />', () => {
 
     describe('pep', () => {
       it('should show a check icon when pep is enabled', () => {
-        renderVerificationChecks({ verificationChecks: [amlCheck({ pep: true })] });
+        renderVerificationChecks({
+          verificationChecks: [
+            {
+              kind: 'aml',
+              data: {
+                pep: true,
+                ofac: false,
+                adverseMedia: false,
+                continuousMonitoring: false,
+                matchKind: 'exact_name_and_dob_year',
+              },
+            },
+          ],
+        });
 
         const pep = screen.getByRole('row', { name: 'Politically Exposed Person (PEP)' });
         const check = within(pep).getByLabelText('Enabled');
@@ -111,7 +173,20 @@ describe('<VerificationChecks />', () => {
       });
 
       it('should show a close icon when is pep disabled', () => {
-        renderVerificationChecks({ verificationChecks: [amlCheck({ pep: false, ofac: true, adverseMedia: true })] });
+        renderVerificationChecks({
+          verificationChecks: [
+            {
+              kind: 'aml',
+              data: {
+                pep: false,
+                ofac: true,
+                adverseMedia: true,
+                continuousMonitoring: false,
+                matchKind: 'exact_name_and_dob_year',
+              },
+            },
+          ],
+        });
 
         const pep = screen.getByRole('row', { name: 'Politically Exposed Person (PEP)' });
         const close = within(pep).getByLabelText('Disabled');
@@ -121,7 +196,20 @@ describe('<VerificationChecks />', () => {
 
     describe('adverse media', () => {
       it('should show a check icon when adverse media is enabled', () => {
-        renderVerificationChecks({ verificationChecks: [amlCheck({ adverseMedia: true })] });
+        renderVerificationChecks({
+          verificationChecks: [
+            {
+              data: {
+                adverseMedia: true,
+                continuousMonitoring: false,
+                matchKind: 'exact_name_and_dob_year',
+                ofac: false,
+                pep: false,
+              },
+              kind: 'aml',
+            },
+          ],
+        });
 
         const adverseMedia = screen.getByRole('row', { name: 'Adverse media' });
         const check = within(adverseMedia).getByLabelText('Enabled');
@@ -129,7 +217,20 @@ describe('<VerificationChecks />', () => {
       });
 
       it('should show a close icon when is adverse media is disabled', () => {
-        renderVerificationChecks({ verificationChecks: [amlCheck({ adverseMedia: false, pep: true, ofac: true })] });
+        renderVerificationChecks({
+          verificationChecks: [
+            {
+              kind: 'aml',
+              data: {
+                adverseMedia: false,
+                pep: true,
+                ofac: true,
+                continuousMonitoring: false,
+                matchKind: 'exact_name_and_dob_year',
+              },
+            },
+          ],
+        });
 
         const adverseMedia = screen.getByRole('row', { name: 'Adverse media' });
         const close = within(adverseMedia).getByLabelText('Disabled');

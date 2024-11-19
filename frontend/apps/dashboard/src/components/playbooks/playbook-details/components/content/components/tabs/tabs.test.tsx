@@ -1,18 +1,20 @@
+import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { customRender, screen } from '@onefootprint/test-utils';
-import type { OnboardingConfig } from '@onefootprint/types';
-
 import Tabs from './tabs';
-import playbookFixture from './tabs.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
-const renderTabs = (playbook: OnboardingConfig) => {
+const renderTabs = (playbook: OnboardingConfiguration) => {
   customRender(<Tabs playbook={playbook} isTabsDisabled={false} toggleDisableHeading={jest.fn()} />);
 };
 
 describe('<Tabs />', () => {
   it('should render the default tabs', () => {
-    renderTabs(playbookFixture);
+    renderTabs({
+      ...getOnboardingConfiguration({}),
+      documentsToCollect: [],
+    });
 
     const dataCollection = screen.getByRole('tab', { name: 'Data collection' });
     expect(dataCollection).toBeInTheDocument();

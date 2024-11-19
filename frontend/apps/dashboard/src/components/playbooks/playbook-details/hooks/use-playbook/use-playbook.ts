@@ -16,6 +16,9 @@ const getPlaybook = async (authHeaders: AuthHeaders, id: string) => {
   return response.data;
 };
 
+/**
+ * @deprecated Use from open api instead
+ */
 const usePlaybook = (overrideId?: string) => {
   const selectedId = usePlaybookId();
   const id = overrideId ?? selectedId;

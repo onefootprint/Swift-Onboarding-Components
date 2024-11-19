@@ -130,7 +130,10 @@
     }
   },
   "create": {
-    "title": "Create Playbook",
+    "title": {
+      "new": "Create playbook",
+      "edit": "Editing ”{{name}}” | {{kind}} playbook"
+    },
     "stepper": {
       "aria-label": "Progress indicator for Playbooks",
       "kind": "Playbook type",

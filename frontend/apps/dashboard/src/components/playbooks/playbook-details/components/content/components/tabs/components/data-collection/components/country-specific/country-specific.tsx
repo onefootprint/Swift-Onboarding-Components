@@ -1,21 +1,23 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountrySpecificDocumentMapping, IdDocKind } from '@onefootprint/request-types/dashboard';
+import type { CountryCode } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
 
 type CountrySpecificProps = {
-  countrySpecific: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
+  countrySpecific: CountrySpecificDocumentMapping;
   hasSelfie: boolean;
 };
 
 const CountrySpecific = ({ countrySpecific, hasSelfie }: CountrySpecificProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
-
-  const sortedCountrySpecific = Object.entries(countrySpecific).sort(([a], [b]) => a.localeCompare(b));
+  const getText = useIdDocList();
+  const sortedCountrySpecific = Object.entries(countrySpecific).sort(([countryA], [countryB]) =>
+    countryA.localeCompare(countryB),
+  ) as Array<[CountryCode, Array<IdDocKind>]>;
   const countries = sortedCountrySpecific.map(([country]) => country as CountryCode);
   const acceptedDocScans = sortedCountrySpecific.map(([, docTypes]) => docTypes);
-  const getText = useIdDocList();
 
   return (
     <Stack gap={3} direction="column">
@@ -40,7 +42,10 @@ const CountrySpecific = ({ countrySpecific, hasSelfie }: CountrySpecificProps) =
                   {docTypes.length > 0 ? (
                     <Stack direction="row" gap={3}>
                       <Text variant="body-2" color="tertiary" tag="span">
-                        {getText(docTypes).join(', ')}
+                        {
+                          // @ts-expect-error: getText is using deprecated
+                          getText(docTypes).join(', ')
+                        }
                       </Text>
                       {hasSelfie && (
                         <>

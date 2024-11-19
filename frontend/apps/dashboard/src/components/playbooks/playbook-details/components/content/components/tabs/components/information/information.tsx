@@ -1,4 +1,4 @@
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import { CodeInline } from '@onefootprint/ui';
 import { format } from 'date-fns';
@@ -6,11 +6,7 @@ import { uniqueId } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
 type InformationProps = {
-  playbook: OnboardingConfig;
-};
-
-const formatDate = (date: string) => {
-  return format(new Date(date), 'MMMM d, yyyy');
+  playbook: OnboardingConfiguration;
 };
 
 const Information = ({ playbook }: InformationProps) => {
@@ -42,11 +38,6 @@ const Information = ({ playbook }: InformationProps) => {
       value: formatDate(playbook.createdAt),
       type: 'text',
     },
-    {
-      label: t('playbook-information.author'),
-      value: playbook.author.member,
-      type: 'text',
-    },
   ];
   return (
     <Stack direction="column" gap={5}>
@@ -70,6 +61,10 @@ const Information = ({ playbook }: InformationProps) => {
       ))}
     </Stack>
   );
+};
+
+const formatDate = (date: string) => {
+  return format(new Date(date), 'MMMM d, yyyy');
 };
 
 export default Information;

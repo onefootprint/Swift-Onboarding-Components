@@ -1,10 +1,6 @@
 import type { FontVariant } from '@onefootprint/design-tokens';
 import { IcoCode216, IcoFileText16, IcoFlag16, IcoWriting16 } from '@onefootprint/icons';
-import {
-  type CustomDocumentUploadSettings,
-  type DocumentRequestConfig,
-  DocumentRequestKind,
-} from '@onefootprint/types';
+import type { DocumentRequestConfig, DocumentUploadSettings } from '@onefootprint/request-types/dashboard';
 import { Box, Divider, Popover, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +12,7 @@ type AdditionalDocsProps = {
 const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection.additional-docs' });
   const list = docs.map(doc => {
-    if (doc.kind === DocumentRequestKind.ProofOfSsn) {
+    if (doc.kind === 'proof_of_ssn') {
       return {
         label: t('possn.title'),
         identifier: undefined,
@@ -25,7 +21,7 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
         uploadSettings: undefined,
       };
     }
-    if (doc.kind === DocumentRequestKind.ProofOfAddress) {
+    if (doc.kind === 'proof_of_address') {
       return {
         label: t('poa.title'),
         identifier: undefined,
@@ -34,7 +30,7 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
         uploadSettings: undefined,
       };
     }
-    if (doc.kind === DocumentRequestKind.Custom) {
+    if (doc.kind === 'custom') {
       return {
         label: doc.data.name,
         identifier: doc.data.identifier,
@@ -72,9 +68,9 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
 };
 
 type DocItemProps = {
-  uploadSettings: CustomDocumentUploadSettings | undefined;
-  description: string | undefined;
-  identifier: string | undefined;
+  uploadSettings?: DocumentUploadSettings;
+  description?: string;
+  identifier?: string;
   label: string;
   requiresHumanReview: boolean;
 };

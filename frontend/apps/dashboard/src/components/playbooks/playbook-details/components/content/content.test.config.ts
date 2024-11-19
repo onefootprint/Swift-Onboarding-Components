@@ -1,61 +1,46 @@
-import type { OnboardingConfig } from '@onefootprint/types';
-import { AuthMethodKind, OnboardingConfigKind, OnboardingConfigStatus, SupportedIdDocTypes } from '@onefootprint/types';
+import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 
-const basePlaybook: OnboardingConfig = {
-  id: '1',
-  name: 'Base Playbook',
-  key: 'base-playbook',
-  isLive: true,
-  createdAt: '2023-01-01T00:00:00Z',
-  status: OnboardingConfigStatus.enabled,
-  mustCollectData: ['name'],
-  optionalData: [],
-  isNoPhoneFlow: false,
-  allowUsResidents: true,
-  allowInternationalResidents: false,
-  internationalCountryRestrictions: null,
-  allowUsTerritoryResidents: true,
-  isDocFirstFlow: false,
-  skipKyc: false,
-  kind: OnboardingConfigKind.kyc,
-  author: {
-    kind: 'user',
-    member: 'john.doe@example.com',
-  },
-  requiredAuthMethods: [AuthMethodKind.email],
+export const kycPlaybookFixture: OnboardingConfiguration = {
+  ...getOnboardingConfiguration({
+    id: '1',
+    name: 'Base Playbook',
+  }),
+  kind: 'kyc',
   documentsToCollect: [],
-  businessDocumentsToCollect: null,
-  promptForPasskey: false,
-  allowReonboard: false,
-  ruleSet: {
-    version: 1,
-  },
-  verificationChecks: [],
 };
 
-export const kycPlaybookFixture: OnboardingConfig = {
-  ...basePlaybook,
-  kind: OnboardingConfigKind.kyc,
+export const kybPlaybookFixture: OnboardingConfiguration = {
+  ...getOnboardingConfiguration({
+    id: '1',
+    name: 'Base Playbook',
+  }),
+  kind: 'kyb',
+  documentsToCollect: [],
+  businessDocumentsToCollect: [],
 };
 
-export const kybPlaybookFixture: OnboardingConfig = {
-  ...basePlaybook,
-  kind: OnboardingConfigKind.kyb,
+export const authPlaybookFixture: OnboardingConfiguration = {
+  ...getOnboardingConfiguration({
+    id: '1',
+    name: 'Base Playbook',
+  }),
+  kind: 'auth',
+  documentsToCollect: [],
 };
 
-export const authPlaybookFixture: OnboardingConfig = {
-  ...basePlaybook,
-  kind: OnboardingConfigKind.auth,
-};
-
-export const docPlaybookFixture: OnboardingConfig = {
-  ...basePlaybook,
-  kind: OnboardingConfigKind.document,
+export const docPlaybookFixture: OnboardingConfiguration = {
+  ...getOnboardingConfiguration({
+    id: '1',
+    name: 'Base Playbook',
+  }),
+  kind: 'document',
   documentTypesAndCountries: {
-    global: [SupportedIdDocTypes.passport, SupportedIdDocTypes.idCard, SupportedIdDocTypes.driversLicense],
     countrySpecific: {
-      US: [SupportedIdDocTypes.passport, SupportedIdDocTypes.idCard, SupportedIdDocTypes.driversLicense],
-      IR: [SupportedIdDocTypes.passport, SupportedIdDocTypes.idCard, SupportedIdDocTypes.driversLicense],
+      US: ['passport', 'id_card', 'drivers_license'],
+      IR: ['passport', 'id_card', 'drivers_license'],
     },
+    global: ['passport', 'id_card', 'drivers_license'],
   },
+  documentsToCollect: [],
 };

@@ -1,11 +1,12 @@
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { OnboardingConfigKind } from '@onefootprint/types';
 import { Box, Dialog, media } from '@onefootprint/ui';
 import { Suspense, lazy, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import StepKind from './components/kind-step';
 import { DialogButtonsProvider, useDialogButtons } from './hooks/use-dialog-buttons';
+import useTitle from './hooks/use-title';
 
 const AuthFlow = lazy(() => import('./components/auth-flow'));
 const DocumentFlow = lazy(() => import('./components/document-flow'));
@@ -18,11 +19,12 @@ type CreatePlaybookProps = {
   open: boolean;
   onClose: () => void;
   onDone: () => void;
+  playbook?: OnboardingConfiguration;
 };
 
-const CreatePlaybook = ({ open, onDone, onClose }: CreatePlaybookProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create' });
+const CreatePlaybook = ({ open, onDone, onClose, playbook }: CreatePlaybookProps) => {
   const { primaryButton, secondaryButton, reset } = useDialogButtons();
+  const title = useTitle(playbook);
 
   const handleClose = () => {
     onClose();
@@ -36,7 +38,7 @@ const CreatePlaybook = ({ open, onDone, onClose }: CreatePlaybookProps) => {
 
   return (
     <Dialog
-      title={t('title')}
+      title={title}
       size="full-screen"
       open={open}
       onClose={handleClose}
@@ -88,10 +90,10 @@ const Content = styled.div`
   `}
 `;
 
-export default ({ open, onDone, onClose }: CreatePlaybookProps) => {
+export default ({ open, onDone, onClose, playbook }: CreatePlaybookProps) => {
   return (
     <DialogButtonsProvider>
-      <CreatePlaybook open={open} onClose={onClose} onDone={onDone} />
+      <CreatePlaybook open={open} onClose={onClose} onDone={onDone} playbook={playbook} />
     </DialogButtonsProvider>
   );
 };

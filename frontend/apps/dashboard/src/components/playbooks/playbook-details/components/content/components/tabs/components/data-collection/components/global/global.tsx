@@ -1,16 +1,17 @@
-import type { SupportedIdDocTypes } from '@onefootprint/types';
+import type { IdDocKind } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
 
 type GlobalProps = {
-  global?: SupportedIdDocTypes[];
+  global?: Array<IdDocKind>;
   hasSelfie?: boolean;
 };
 
 const Global = ({ global = [], hasSelfie = false }: GlobalProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
   const getIdDocList = useIdDocList();
+  // @ts-expect-error: this needs to be fixed but will affect several files
   const documentTypes = getIdDocList(global);
 
   return (

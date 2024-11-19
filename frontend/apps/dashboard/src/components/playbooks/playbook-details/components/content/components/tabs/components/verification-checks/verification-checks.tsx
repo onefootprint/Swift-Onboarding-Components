@@ -1,4 +1,5 @@
-import { CollectedKybDataOption, type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
+import { CollectedKybDataOption } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Info from '../info';
@@ -12,7 +13,7 @@ import {
 } from './verification-checks.utils';
 
 export type VerificationChecksProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectData } }: VerificationChecksProps) => {
@@ -26,7 +27,7 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
   const hasFraudChecks = isNeuroEnabled || isSentilinkEnabled;
 
   const kybText = (() => {
-    if (kind === OnboardingConfigKind.kyc) return null;
+    if (kind === 'kyc') return null;
     if (kyb?.data) {
       return kyb.data.einOnly ? t('kyb.ein-only') : t('kyb.full');
     }
@@ -34,11 +35,11 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
   })();
 
   const kycText = (() => {
-    if (kind === OnboardingConfigKind.kyb) {
+    if (kind === 'kyb') {
       if (!doesKyc) return t('kyb.kyc.none');
       if (mustCollectData.includes(CollectedKybDataOption.kycedBeneficialOwners)) return t('kyb.kyc.full');
     }
-    if (kind === OnboardingConfigKind.kyc) {
+    if (kind === 'kyc') {
       return doesKyc ? t('kyc.full') : t('kyc.none');
     }
     return null;
@@ -122,7 +123,7 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
           <Info.Item label={kycText} checked={doesKyc} />
         </Info.Group>
       )}
-      {kind === OnboardingConfigKind.kyc && (
+      {kind === 'kyc' && (
         <>
           <Stack direction="column" gap={4}>
             <Text variant="label-2">{t('aml.title')}</Text>
@@ -161,7 +162,7 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
           </Info.Group>
         </>
       )}
-      {kind === OnboardingConfigKind.kyb && (
+      {kind === 'kyb' && (
         <Stack direction="column" gap={4}>
           <Text variant="label-2">{t('aml.title')}</Text>
           <Info.Group title={t('screening.title')}>

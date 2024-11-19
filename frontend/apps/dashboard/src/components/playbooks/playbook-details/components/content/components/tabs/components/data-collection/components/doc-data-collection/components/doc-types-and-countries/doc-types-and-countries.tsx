@@ -1,11 +1,11 @@
-import type { DocumentTypesAndCountries, SupportedIdDocTypes } from '@onefootprint/types';
+import type { DocumentAndCountryConfiguration } from '@onefootprint/request-types/dashboard';
 import { Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import CountrySpecific from '../../../country-specific';
 import Global from '../../../global';
 
 type DocTypesAndCountriesProps = {
-  documentTypesAndCountries: DocumentTypesAndCountries;
+  documentTypesAndCountries: DocumentAndCountryConfiguration;
   hasSelfie: boolean;
 };
 
@@ -20,10 +20,7 @@ const DocTypesAndCountries = ({ documentTypesAndCountries, hasSelfie }: DocTypes
         <Divider variant="secondary" />
       </Stack>
       <Global global={global} hasSelfie={hasSelfie} />
-      <CountrySpecific
-        countrySpecific={countrySpecific as Record<string, SupportedIdDocTypes[]>}
-        hasSelfie={hasSelfie}
-      />
+      <CountrySpecific countrySpecific={countrySpecific} hasSelfie={hasSelfie} />
     </Stack>
   );
 };

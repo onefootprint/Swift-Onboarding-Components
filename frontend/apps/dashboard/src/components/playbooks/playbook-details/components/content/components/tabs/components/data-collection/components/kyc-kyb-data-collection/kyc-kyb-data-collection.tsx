@@ -1,5 +1,5 @@
 import CollectedInformation from '@/playbooks/components/collected-information';
-import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import AdditionalDocs from '../additional-docs';
@@ -9,7 +9,7 @@ import Section from './components/section';
 import SingleItem from './components/single-item';
 
 export type KycKybDataCollectionProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const KycKybDataCollection = ({ playbook }: KycKybDataCollectionProps) => {
@@ -81,8 +81,8 @@ const KycKybDataCollection = ({ playbook }: KycKybDataCollectionProps) => {
             <CollectedInformation
               title={t('otp')}
               options={{
-                phoneNumber: requiredAuthMethods?.includes(AuthMethodKind.phone),
-                email: requiredAuthMethods?.includes(AuthMethodKind.email),
+                phoneNumber: requiredAuthMethods?.includes('phone'),
+                email: requiredAuthMethods?.includes('email'),
               }}
             />
           )}
@@ -109,12 +109,14 @@ const KycKybDataCollection = ({ playbook }: KycKybDataCollectionProps) => {
           {documentTypesAndCountries?.global && (
             <Global
               global={documentTypesAndCountries.global}
+              /** @ts-expect-error: this is deprecated */
               hasSelfie={mustCollectData.includes('document_and_selfie')}
             />
           )}
           {documentTypesAndCountries?.countrySpecific && (
             <CountrySpecific
               countrySpecific={documentTypesAndCountries.countrySpecific}
+              /** @ts-expect-error: this is deprecated */
               hasSelfie={mustCollectData.includes('document_and_selfie')}
             />
           )}

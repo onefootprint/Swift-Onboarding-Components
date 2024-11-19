@@ -1,16 +1,17 @@
 import CollectedInformation from '@/playbooks/components/collected-information';
-import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
-type AuthOnlyProps = { playbook: OnboardingConfig };
+type AuthOnlyProps = {
+  playbook: OnboardingConfiguration;
+};
 
 const AuthOnly = ({ playbook: { requiredAuthMethods, mustCollectData, allowUsTerritoryResidents } }: AuthOnlyProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection' });
 
   return (
-    <Container>
+    <Stack gap={8} direction="column">
       <Stack gap={8} direction="column">
         <Stack gap={4} direction="column">
           <Text variant="label-2">{t('section-title')}</Text>
@@ -28,8 +29,8 @@ const AuthOnly = ({ playbook: { requiredAuthMethods, mustCollectData, allowUsTer
             <CollectedInformation
               title={t('otp')}
               options={{
-                phoneOTP: requiredAuthMethods?.includes(AuthMethodKind.phone),
-                emailOTP: requiredAuthMethods?.includes(AuthMethodKind.email),
+                phoneOTP: requiredAuthMethods?.includes('phone'),
+                emailOTP: requiredAuthMethods?.includes('email'),
               }}
             />
           ) : null}
@@ -48,16 +49,8 @@ const AuthOnly = ({ playbook: { requiredAuthMethods, mustCollectData, allowUsTer
           ) : null}
         </Stack>
       </Stack>
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[8]};
-  `}
-`;
 
 export default AuthOnly;

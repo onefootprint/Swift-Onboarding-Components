@@ -442,6 +442,13 @@
     "us_legal_status": "Legal status in the U.S.",
     "us_tax_id": "US Tax ID"
   },
+  "playbook-kind": {
+    "kyc": "KYC",
+    "kyb": "KYB",
+    "auth": "Auth",
+    "document": "Document",
+    "unknown": "unknown"
+  },
   "vendor": {
     "idology": "Idology",
     "socure": "Socure",

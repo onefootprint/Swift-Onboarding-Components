@@ -1,12 +1,12 @@
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { customRender, screen } from '@onefootprint/test-utils';
-import type { OnboardingConfig } from '@onefootprint/types';
 import Content from './content';
 import { authPlaybookFixture, docPlaybookFixture, kybPlaybookFixture, kycPlaybookFixture } from './content.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Content />', () => {
-  const renderContent = (playbook: OnboardingConfig) => {
+  const renderContent = (playbook: OnboardingConfiguration) => {
     customRender(<Content playbook={playbook} />);
   };
 

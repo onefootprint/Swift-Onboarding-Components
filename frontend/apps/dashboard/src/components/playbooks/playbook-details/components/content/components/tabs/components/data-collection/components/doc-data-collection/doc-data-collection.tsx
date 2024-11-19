@@ -1,13 +1,16 @@
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Stack } from '@onefootprint/ui';
 import AdditionalDocs from '../additional-docs';
 import DocTypesAndCountries from './components/doc-types-and-countries';
 
-type DocDataCollectionProps = { playbook: OnboardingConfig };
+type DocDataCollectionProps = {
+  playbook: OnboardingConfiguration;
+};
 
 const DocDataCollection = ({
   playbook: { documentTypesAndCountries, documentsToCollect = [], mustCollectData = [] },
 }: DocDataCollectionProps) => {
+  // @ts-expect-error: this will be deprecated
   const hasSelfie = mustCollectData.includes('document_and_selfie');
 
   return (

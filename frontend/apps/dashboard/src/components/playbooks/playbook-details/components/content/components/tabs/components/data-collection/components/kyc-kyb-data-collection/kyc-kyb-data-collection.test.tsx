@@ -1,24 +1,20 @@
 import { customRender, screen, within } from '@onefootprint/test-utils';
-import { DocumentRequestKind, OnboardingConfigKind } from '@onefootprint/types';
 
+import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
 import type { KycKybDataCollectionProps } from './kyc-kyb-data-collection';
 import KycKybDataCollection from './kyc-kyb-data-collection';
-import {
-  onboardingConfigFixture,
-  playbookFixtureWithBusinessAndKYCDocsFixture,
-  playbookFixtureWithKYCForAllBusinessOwnersFixture,
-} from './kyc-kyb-data-collection.test.config';
 
 describe('<KycKybDataCollection />', () => {
-  const renderDataCollection = ({ playbook = onboardingConfigFixture }: Partial<KycKybDataCollectionProps>) =>
+  const renderDataCollection = ({ playbook }: KycKybDataCollectionProps) =>
     customRender(<KycKybDataCollection playbook={playbook} />);
 
   describe('when it has US territories enabled', () => {
     it('should show a note', () => {
       renderDataCollection({
         playbook: {
-          ...onboardingConfigFixture,
+          ...getOnboardingConfiguration({ kind: 'kyc' }),
           allowUsTerritoryResidents: true,
+          documentsToCollect: [],
         },
       });
 
@@ -32,8 +28,7 @@ describe('<KycKybDataCollection />', () => {
       it('should not show the additional docs section', () => {
         renderDataCollection({
           playbook: {
-            ...onboardingConfigFixture,
-            kind: OnboardingConfigKind.kyb,
+            ...getOnboardingConfiguration({ kind: 'kyb' }),
             businessDocumentsToCollect: [],
             documentsToCollect: [],
           },
@@ -47,11 +42,11 @@ describe('<KycKybDataCollection />', () => {
         it('should show Business Owners additional documents section', () => {
           renderDataCollection({
             playbook: {
-              ...onboardingConfigFixture,
-              kind: OnboardingConfigKind.kyb,
+              ...getOnboardingConfiguration({ kind: 'kyb' }),
+              businessDocumentsToCollect: [],
               documentsToCollect: [
                 {
-                  kind: DocumentRequestKind.ProofOfSsn,
+                  kind: 'proof_of_ssn',
                   data: {
                     requiresHumanReview: false,
                   },
@@ -70,15 +65,15 @@ describe('<KycKybDataCollection />', () => {
       it('should show Additional docs once if there are only business docs', () => {
         renderDataCollection({
           playbook: {
-            ...onboardingConfigFixture,
-            kind: OnboardingConfigKind.kyb,
+            ...getOnboardingConfiguration({ kind: 'kyb' }),
             businessDocumentsToCollect: [
               {
-                kind: DocumentRequestKind.Custom,
+                kind: 'custom',
                 data: {
                   name: 'Business License',
-                  identifier: 'document.custom.business_license',
+                  identifier: 'document.custom.*',
                   requiresHumanReview: false,
+                  uploadSettings: 'prefer_capture',
                 },
               },
             ],
@@ -92,7 +87,28 @@ describe('<KycKybDataCollection />', () => {
 
       it('should show Additional docs twice if there are both business and KYC docs', () => {
         renderDataCollection({
-          playbook: playbookFixtureWithBusinessAndKYCDocsFixture,
+          playbook: {
+            ...getOnboardingConfiguration({ kind: 'kyb' }),
+            businessDocumentsToCollect: [
+              {
+                kind: 'custom',
+                data: {
+                  name: 'Business license',
+                  identifier: 'document.custom.*',
+                  requiresHumanReview: false,
+                  uploadSettings: 'prefer_upload',
+                },
+              },
+            ],
+            documentsToCollect: [
+              {
+                kind: 'proof_of_address',
+                data: {
+                  requiresHumanReview: false,
+                },
+              },
+            ],
+          },
         });
 
         const additionalDocs = screen.getAllByText('Additional docs');
@@ -105,8 +121,9 @@ describe('<KycKybDataCollection />', () => {
     it('should show a check icon', () => {
       renderDataCollection({
         playbook: {
-          ...onboardingConfigFixture,
-          kind: OnboardingConfigKind.kyb,
+          ...getOnboardingConfiguration({ kind: 'kyb' }),
+          businessDocumentsToCollect: [],
+          documentsToCollect: [],
           mustCollectData: [
             'email',
             'name',
@@ -132,11 +149,10 @@ describe('<KycKybDataCollection />', () => {
     it('should show additional documents section', () => {
       renderDataCollection({
         playbook: {
-          ...onboardingConfigFixture,
-          kind: OnboardingConfigKind.kyc,
+          ...getOnboardingConfiguration({ kind: 'kyc' }),
           documentsToCollect: [
             {
-              kind: DocumentRequestKind.ProofOfSsn,
+              kind: 'proof_of_ssn',
               data: {
                 requiresHumanReview: false,
               },
@@ -153,7 +169,23 @@ describe('<KycKybDataCollection />', () => {
   describe('when it does KYC on all the business owners', () => {
     it('should show a check icon', () => {
       renderDataCollection({
-        playbook: playbookFixtureWithKYCForAllBusinessOwnersFixture,
+        playbook: {
+          ...getOnboardingConfiguration({ kind: 'kyb' }),
+          documentsToCollect: [],
+          businessDocumentsToCollect: [],
+          mustCollectData: [
+            'email',
+            'name',
+            'dob',
+            'full_address',
+            'phone_number',
+            'ssn9',
+            'business_name',
+            'business_tin',
+            'business_beneficial_owners',
+            'business_address',
+          ],
+        },
       });
 
       const collectBo = screen.getByRole('row', { name: 'Collect beneficial owners’ information' });

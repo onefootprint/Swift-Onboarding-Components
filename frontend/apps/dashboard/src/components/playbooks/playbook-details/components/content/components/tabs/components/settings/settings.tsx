@@ -1,13 +1,13 @@
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import { type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { LinkButton, Stack, Text, Toggle } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 export type PasskeysProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 type LocalState = {
@@ -83,7 +83,7 @@ const Settings = ({ playbook }: PasskeysProps) => {
           </Stack>
         </DescriptionContainer>
       </Stack>
-      {playbook.kind === OnboardingConfigKind.kyb && (
+      {playbook.kind === 'kyb' && (
         <Stack direction="column">
           <Toggle
             label={t('allow-reonboard.title')}
@@ -97,7 +97,7 @@ const Settings = ({ playbook }: PasskeysProps) => {
           </DescriptionContainer>
         </Stack>
       )}
-      {(playbook.kind === OnboardingConfigKind.kyb || playbook.kind === OnboardingConfigKind.kyc) && (
+      {(playbook.kind === 'kyb' || playbook.kind === 'kyc') && (
         <Stack direction="column">
           <Toggle
             label={t('skip-confirm.title')}

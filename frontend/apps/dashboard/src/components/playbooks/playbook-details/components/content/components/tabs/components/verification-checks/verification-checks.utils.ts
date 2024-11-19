@@ -1,12 +1,16 @@
-import type {
-  AmlCheck,
-  BusinessAmlCheck,
-  KybCheck,
-  KycCheck,
-  NeuroCheck,
-  SentilinkCheck,
-  VerificationCheck,
-} from '@onefootprint/types';
+import type { VerificationCheck } from '@onefootprint/request-types/dashboard';
+
+type KybCheck = Extract<VerificationCheck, { kind: 'kyb' }>;
+
+type KycCheck = Extract<VerificationCheck, { kind: 'kyc' }>;
+
+type BusinessAmlCheck = Extract<VerificationCheck, { kind: 'business_aml' }>;
+
+type AmlCheck = Extract<VerificationCheck, { kind: 'aml' }>;
+
+type NeuroCheck = Extract<VerificationCheck, { kind: 'neuro_id' }>;
+
+type SentilinkCheck = Extract<VerificationCheck, { kind: 'sentilink' }>;
 
 export const isKybCheck = (check: VerificationCheck): check is KybCheck => {
   return check.kind === 'kyb';

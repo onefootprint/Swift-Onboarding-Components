@@ -1,15 +1,14 @@
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Box } from '@onefootprint/ui';
 import { useState } from 'react';
 
-import { OnboardingConfigKind } from '@onefootprint/types';
 import AuthOnly from './components/auth-only';
 import Breadcrumb from './components/breadcrumb';
 import Header from './components/header';
 import Tabs from './components/tabs';
 
 type ContentProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const Content = ({ playbook }: ContentProps) => {
@@ -24,7 +23,7 @@ const Content = ({ playbook }: ContentProps) => {
       <Box marginBottom={7}>
         <Header playbook={playbook} isDisabled={isHeadingDisabled} />
       </Box>
-      {kind === OnboardingConfigKind.auth ? (
+      {kind === 'auth' ? (
         <AuthOnly playbook={playbook} />
       ) : (
         <Tabs playbook={playbook} isTabsDisabled={isHeadingDisabled} toggleDisableHeading={setIsHeadingDisabled} />

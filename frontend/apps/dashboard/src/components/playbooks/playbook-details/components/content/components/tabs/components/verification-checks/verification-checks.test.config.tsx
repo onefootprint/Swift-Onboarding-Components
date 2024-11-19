@@ -1,38 +1,8 @@
-import {
-  type AmlCheck,
-  AuthMethodKind,
-  type OnboardingConfig,
-  OnboardingConfigKind,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
 
-export const onboardingConfigFixture: OnboardingConfig = {
-  id: 'ob_config_id_sIrGC9qX1sdg6IH66kxwEd',
-  name: 'Acme Inc. KYC (10/28/24)',
-  key: 'pb_test_yfpnuqlV6oISBTVcaesYtO',
-  isLive: false,
-  createdAt: '2024-10-28T21:23:05.360166Z',
+export const onboardingConfigFixture = getOnboardingConfiguration({
+  kind: 'kyc',
   mustCollectData: ['email', 'name', 'dob', 'full_address', 'phone_number', 'ssn9'],
-  optionalData: [],
-  allowInternationalResidents: false,
-  internationalCountryRestrictions: null,
-  allowUsResidents: true,
-  allowUsTerritoryResidents: false,
-  isNoPhoneFlow: false,
-  isDocFirstFlow: false,
-  skipConfirm: false,
-  author: {
-    kind: 'organization',
-    member: 'Rafael Motta (rafael@onefootprint.com)',
-  },
-  kind: OnboardingConfigKind.kyc,
-  isRulesEnabled: true,
-  ruleSet: {
-    version: 1,
-  },
-  status: OnboardingConfigStatus.enabled,
-  documentsToCollect: [],
-  businessDocumentsToCollect: [],
   verificationChecks: [
     {
       kind: 'kyc',
@@ -60,10 +30,7 @@ export const onboardingConfigFixture: OnboardingConfig = {
       },
     },
   ],
-  requiredAuthMethods: [AuthMethodKind.phone],
-  promptForPasskey: true,
-  allowReonboard: false,
-};
+});
 
 export const amlCheck = ({
   adverseMedia = false,
@@ -76,5 +43,5 @@ export const amlCheck = ({
   ofac?: boolean;
   pep?: boolean;
 }) => {
-  return { kind: 'aml', data: { adverseMedia, ofac, pep, continuousMonitoring } } as AmlCheck;
+  return { kind: 'aml', data: { adverseMedia, ofac, pep, continuousMonitoring } };
 };
