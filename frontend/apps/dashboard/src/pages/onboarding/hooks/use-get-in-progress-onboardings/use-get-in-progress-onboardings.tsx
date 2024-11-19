@@ -17,6 +17,7 @@ export const getInProgressOnboardings = async ({ authToken }: GetInProgressOnboa
     url: '/org/member/in_progress_onboardings',
     params: {
       isLive: true,
+      omitDemoTenants: true,
     },
   });
 

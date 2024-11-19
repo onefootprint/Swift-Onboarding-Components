@@ -21,6 +21,9 @@ use std::str::FromStr;
 #[derive(Deserialize, Apiv2Schema)]
 pub struct InProgressOnboardingsRequest {
     is_live: bool,
+    #[serde(default)]
+    #[openapi(optional)]
+    omit_demo_tenants: bool,
 }
 
 #[api_v2_operation(
@@ -36,7 +39,10 @@ async fn get(
 ) -> ApiListResponse<api_wire_types::InProgressOnboarding> {
     let auth = auth.check_guard(Any)?;
     let tu_id = auth.actor().tenant_user_id()?.clone();
-    let InProgressOnboardingsRequest { is_live } = request.into_inner();
+    let InProgressOnboardingsRequest {
+        is_live,
+        omit_demo_tenants,
+    } = request.into_inner();
     let tenant_user = state.db_query(move |conn| TenantUser::get(conn, &tu_id)).await?;
 
     // Fingerprint the authenticated dashboard user's email in the same way we fingerprint data for
@@ -58,6 +64,7 @@ async fn get(
     root_span.record("meta", workflows.len());
     let response = workflows
         .into_iter()
+        .filter(|(_, _, tenant)| !tenant.is_demo_tenant || !omit_demo_tenants)
         .map(|(wf, sv, tenant)| api_wire_types::InProgressOnboarding {
             fp_id: sv.fp_id,
             tenant: InProgressOnboardingTenant {
