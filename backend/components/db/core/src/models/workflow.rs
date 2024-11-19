@@ -44,7 +44,6 @@ use newtypes::ObConfigurationKind;
 use newtypes::OnboardingCompletedPayload;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusChangedPayload;
-use newtypes::PlaybookId;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::TenantScope;
@@ -230,6 +229,8 @@ impl Workflow {
             return BadRequestInto("Cannot add a fixture_result for live vault");
         }
 
+        let (obc, _) = ObConfiguration::get(conn, &ob_configuration_id)?;
+
         if !force_create {
             // Check if an active or completed workflow exists for this ob config.
             // An existing workflow (that we'd inherit) has to be _either_ active OR already
@@ -238,16 +239,10 @@ impl Workflow {
             // one was incomplete and deactivated.
             // But we don't want them to make a new workflow for the same OBC if they already
             // completed the last one.
-
-            let playbook_id: PlaybookId = ob_configuration::table
-                .filter(ob_configuration::id.eq(&ob_configuration_id))
-                .select(ob_configuration::playbook_id)
-                .first(conn.conn())?;
-
             let active_wf = workflow::table
                 .inner_join(ob_configuration::table)
                 .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
-                .filter(ob_configuration::playbook_id.eq(&playbook_id))
+                .filter(ob_configuration::playbook_id.eq(&obc.playbook_id))
                 .filter(workflow::deactivated_at.is_null())
                 .select(Workflow::as_select())
                 .first(conn.conn())
@@ -256,7 +251,7 @@ impl Workflow {
             let complete_wf = workflow::table
                 .inner_join(ob_configuration::table)
                 .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
-                .filter(ob_configuration::playbook_id.eq(&playbook_id))
+                .filter(ob_configuration::playbook_id.eq(&obc.playbook_id))
                 .filter(not(workflow::completed_at.is_null()))
                 .select(Workflow::as_select())
                 .first(conn.conn())
@@ -267,7 +262,7 @@ impl Workflow {
             }
         }
 
-        let config = match wfr.map(|wfr| wfr.config.clone()) {
+        let config: WorkflowConfig = match wfr.map(|wfr| wfr.config.clone()) {
             Some(WorkflowRequestConfig::Document {
                 configs,
                 business_configs,
@@ -293,6 +288,14 @@ impl Workflow {
                 VaultKind::Business => KybConfig::default().into(),
             },
         };
+
+        if !config.kind().is_compatible_with(obc.kind) {
+            return BadRequestInto!(
+                "Cannot create workflow of kind {} with playbook of kind {}",
+                config.kind(),
+                obc.kind
+            );
+        }
 
         // Create a new workflow
         let insight_event_id = if let Some(insight_event) = insight_event {

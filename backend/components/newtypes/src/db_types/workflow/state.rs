@@ -1,5 +1,6 @@
 use crate::util::impl_enum_string_diesel;
 use crate::EnumDotNotationError;
+use crate::ObConfigurationKind;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -76,6 +77,16 @@ impl WorkflowKind {
             // Don't show status of document-only workflows triggered via the dashboard. Onboardings onto
             // document playbooks actually use the Kyc workflow (which is shown above)
             Self::Document => false,
+        }
+    }
+
+    /// Returns true if this WorkflowKind can be created with a playbook of the given kind
+    pub fn is_compatible_with(&self, obc_kind: ObConfigurationKind) -> bool {
+        match self {
+            Self::Kyb => !matches!(obc_kind, ObConfigurationKind::Kyc | ObConfigurationKind::Auth),
+            Self::Kyc | Self::AlpacaKyc => !matches!(obc_kind, ObConfigurationKind::Auth),
+            // Document workflows don't particularly care what kind of playbook they're associated with
+            Self::Document => !matches!(obc_kind, ObConfigurationKind::Auth),
         }
     }
 }

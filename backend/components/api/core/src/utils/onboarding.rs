@@ -6,7 +6,6 @@ use super::vault_wrapper::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::auth::user::UserSessionContext;
 use crate::enclave_client::VaultKeyPair;
-use crate::errors::onboarding::OnboardingError;
 use crate::FpResult;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
@@ -128,9 +127,6 @@ pub fn get_or_create_user_workflow(
     //
 
     Vault::lock(conn, &su.vault_id)?;
-    if !obc.kind.can_onboard() {
-        return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
-    }
 
     // Make a new workflow. The workflow is created either for the playbook specified in the
     // auth token OR for the config specified in the WorkflowRequest
@@ -326,10 +322,6 @@ pub fn get_or_create_business_wf<'a>(
         let biz_wf = Workflow::get(conn, biz_wf_id)?;
         return Ok((biz_wf, false, false));
     };
-
-    if !obc.kind.can_onboard() {
-        return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
-    }
 
     Vault::lock(conn, &su.vault_id)?;
     let (sb_id, is_new_sb) = get_or_create_business(conn, user_auth, obc, scoped_vault_action, kp)?;
