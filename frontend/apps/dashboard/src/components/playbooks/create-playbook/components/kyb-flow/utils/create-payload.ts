@@ -94,14 +94,17 @@ const createPersonPayload = (
   if (usLegalStatus) {
     mustCollectData.push('us_legal_status');
   }
-  if (ssn.collect && ssn.kind && !ssn.optional) {
-    if (ssn.kind === 'ssn9' && usTaxIdAcceptable) {
-      mustCollectData.push('us_tax_id');
+  if (ssn.collect && ssn.kind) {
+    if (!ssn.optional) {
+      if (ssn.kind === 'ssn9' && usTaxIdAcceptable) {
+        mustCollectData.push('us_tax_id');
+      }
+      mustCollectData.push(ssn.kind);
+    } else {
+      optionalData.push(ssn.kind);
     }
-    mustCollectData.push(ssn.kind);
-  } else {
-    optionalData.push(ssn.kind);
   }
+
   return {
     mustCollectData,
     optionalData,
