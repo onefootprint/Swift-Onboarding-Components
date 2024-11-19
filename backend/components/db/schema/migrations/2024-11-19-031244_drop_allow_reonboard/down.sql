@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN allow_reonboard BOOLEAN NOT NULL DEFAULT 'f';
