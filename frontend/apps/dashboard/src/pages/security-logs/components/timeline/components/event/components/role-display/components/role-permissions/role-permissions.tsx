@@ -1,3 +1,4 @@
+import { IcoUser16 } from '@onefootprint/icons';
 import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import type { CollectedDataOption } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
@@ -40,7 +41,10 @@ const RolePermissions = ({ scopes, name }: RolePermissionsProps) => {
       backgroundColor="primary"
       width={scopesTextWithDecrypt.length > 1 ? '413px' : '212px'}
     >
-      <Text variant="label-3">{`"${name}" ${t('role-permissions')}`}</Text>
+      <Stack gap={2} align="center">
+        <IcoUser16 />
+        <Text variant="label-3">{`"${name}" ${t('role-permissions')}`}</Text>
+      </Stack>
       <Stack justifyContent="space-between">
         <Stack direction="column" gap={3}>
           {firstHalf.map(scopeText => (

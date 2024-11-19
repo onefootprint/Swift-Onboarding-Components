@@ -1,5 +1,5 @@
 import type { AuditEvent } from '@onefootprint/request-types/dashboard';
-import { Divider, SearchInput, Stack, Text, Toggle } from '@onefootprint/ui';
+import { Divider, LoadingSpinner, SearchInput, Stack, Text, Toggle } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,9 @@ const SecurityLogs = () => {
   const { t } = useTranslation('security-logs');
   const [showDecryptionReason, setShowDecryptionReason] = useState(false);
   const { data: session } = useSession();
+  const getAccessEvents = useGetAccessEvents();
 
   const filters = useSecurityLogsFilters();
-  const getAccessEvents = useGetAccessEvents();
   const auditEvents: AuditEvent[] =
     getAccessEvents.data?.pages.reduce<AuditEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
@@ -113,6 +113,11 @@ const SecurityLogs = () => {
           isLoading={getAccessEvents.isLoading}
           showDecryptionReason={showDecryptionReason}
         />
+        {(getAccessEvents.isFetchingNextPage || getAccessEvents.isLoading) && (
+          <Stack justifyContent="center" padding={4}>
+            <LoadingSpinner />
+          </Stack>
+        )}
       </Stack>
     </>
   );

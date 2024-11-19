@@ -29,7 +29,7 @@ const RoleDiff = ({ detail }: { detail: AuditEventDetail }) => {
       backgroundColor="primary"
       width="475px"
     >
-      <Stack gap={1}>
+      <Stack gap={2} alignItems="center">
         <IcoUser16 />
         <Text variant="label-3">
           "{roleName}" {t('role-permissions')}
