@@ -1,8 +1,9 @@
 import { IcoUser16 } from '@onefootprint/icons';
 import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import type { CollectedDataOption } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import useGetRoleText from './hooks/use-get-role-text';
 
 type RolePermissionsProps = {
@@ -24,13 +25,8 @@ const RolePermissions = ({ scopes, name }: RolePermissionsProps) => {
     ? scopesTextWithoutDecrypt.concat(getRoleText({ kind: 'decrypt', data: 'data' as CollectedDataOption }))
     : scopesTextWithoutDecrypt;
 
-  // Divide into two columns
-  const midpoint = Math.ceil(scopesTextWithDecrypt.length / 2);
-  const firstHalf = scopesTextWithDecrypt.slice(0, midpoint);
-  const secondHalf = scopesTextWithDecrypt.slice(midpoint);
-
   return (
-    <Stack
+    <ShadowStack
       direction="column"
       gap={6}
       borderColor="tertiary"
@@ -45,20 +41,23 @@ const RolePermissions = ({ scopes, name }: RolePermissionsProps) => {
         <IcoUser16 />
         <Text variant="label-3">{`"${name}" ${t('role-permissions')}`}</Text>
       </Stack>
-      <Stack justifyContent="space-between">
-        <Stack direction="column" gap={3}>
-          {firstHalf.map(scopeText => (
-            <Text variant="body-3">{scopeText}</Text>
-          ))}
-        </Stack>
-        <Stack direction="column" gap={3}>
-          {secondHalf.map(scopeText => (
-            <Text variant="body-3">{scopeText}</Text>
-          ))}
-        </Stack>
-      </Stack>
-    </Stack>
+      <Box
+        display="grid"
+        gridTemplateColumns={scopesTextWithDecrypt.length > 2 ? 'repeat(2, minmax(0, 190px))' : '190px'}
+        justifyContent="space-between"
+        gap={9}
+        rowGap={4}
+      >
+        {scopesTextWithDecrypt.map(scopeText => (
+          <Text variant="body-3">{scopeText}</Text>
+        ))}
+      </Box>
+    </ShadowStack>
   );
 };
+
+const ShadowStack = styled(Stack)`
+    box-shadow: 0px 1px 8px 0px #00000024;
+`;
 
 export default RolePermissions;
