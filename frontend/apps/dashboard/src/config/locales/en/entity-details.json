@@ -1119,7 +1119,7 @@
   "onboardings": {
     "title": "Onboardings",
     "header": {
-      "onboarded-onto": "Onboarded onto {{playbookName}} ⋅ {{timestampText}}",
+      "onboarded-onto": "Onboarded onto {{playbookName}}",
       "document-upload": "Document upload",
       "outcome": "Outcome:"
     }
