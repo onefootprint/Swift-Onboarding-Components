@@ -44,6 +44,7 @@ pub async fn post(
     let (api_key, role) = state
         .db_transaction(move |conn| {
             let detail = AuditEventDetail::UpdateOrgApiKeyStatus {
+                is_live,
                 tenant_api_key_id: id.clone(),
                 status: ApiKeyStatus::Disabled,
             };

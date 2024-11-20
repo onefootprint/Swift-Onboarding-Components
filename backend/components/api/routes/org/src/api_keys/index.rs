@@ -118,6 +118,7 @@ pub async fn post(
                 TenantApiKey::create(conn, name, sh_key, e_key, tenant.id.clone(), is_live, role_id)?;
             let role = TenantRole::get(conn, &api_key.role_id)?;
             let detail = AuditEventDetail::CreateOrgApiKey {
+                is_live,
                 tenant_api_key_id: api_key.id.clone(),
             };
             AuditEvent::create_with_insight(conn, &tenant.id, actor, insight, detail)?;
@@ -178,6 +179,7 @@ pub async fn patch(
                     old_tenant_role_id: old_role.id,
                     tenant_api_key_id: id.clone(),
                     new_tenant_role_id: new_role_id,
+                    is_live,
                 };
                 AuditEvent::create_with_insight(
                     conn,
@@ -189,6 +191,7 @@ pub async fn patch(
             }
             if let Some(new_status) = status.clone() {
                 let detail = AuditEventDetail::UpdateOrgApiKeyStatus {
+                    is_live,
                     tenant_api_key_id: id.clone(),
                     status: new_status,
                 };

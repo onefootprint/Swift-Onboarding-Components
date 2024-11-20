@@ -45,6 +45,7 @@ async fn post(
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let detail = AuditEventDetail::DecryptOrgAPIKey {
+                is_live,
                 tenant_api_key_id: key.id.clone(),
             };
             let audit_event = NewAuditEvent {

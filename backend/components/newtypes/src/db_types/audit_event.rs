@@ -64,17 +64,21 @@ pub enum AuditEventDetail {
     CompleteUserVerification,
     CollectUserDocument, // TODO: is there a better name for this?
     CreateOrgApiKey {
+        is_live: bool,
         tenant_api_key_id: TenantApiKeyId,
     },
     DecryptOrgAPIKey {
+        is_live: bool,
         tenant_api_key_id: TenantApiKeyId,
     },
     UpdateOrgApiKeyRole {
+        is_live: bool,
         old_tenant_role_id: TenantRoleId,
         tenant_api_key_id: TenantApiKeyId,
         new_tenant_role_id: TenantRoleId,
     },
     UpdateOrgApiKeyStatus {
+        is_live: bool,
         tenant_api_key_id: TenantApiKeyId,
         status: ApiKeyStatus,
     },
@@ -262,26 +266,36 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
             AuditEventDetail::StartUserVerification => todo!(),
             AuditEventDetail::CompleteUserVerification => todo!(),
             AuditEventDetail::CollectUserDocument => todo!(),
-            AuditEventDetail::CreateOrgApiKey { tenant_api_key_id } => Self {
+            AuditEventDetail::CreateOrgApiKey {
+                is_live,
+                tenant_api_key_id,
+            } => Self {
                 metadata: AuditEventMetadata::CreateOrgApiKey,
                 args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
                     tenant_api_key_id: Some(tenant_api_key_id),
                     ..Default::default()
                 },
             },
             AuditEventDetail::UpdateOrgApiKeyStatus {
+                is_live,
                 tenant_api_key_id,
                 status,
             } => Self {
                 metadata: AuditEventMetadata::UpdateOrgApiKeyStatus { status },
                 args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
                     tenant_api_key_id: Some(tenant_api_key_id),
                     ..Default::default()
                 },
             },
-            AuditEventDetail::DecryptOrgAPIKey { tenant_api_key_id } => Self {
+            AuditEventDetail::DecryptOrgAPIKey {
+                is_live,
+                tenant_api_key_id,
+            } => Self {
                 metadata: AuditEventMetadata::DecryptOrgApiKey,
                 args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
                     tenant_api_key_id: Some(tenant_api_key_id),
                     ..Default::default()
                 },
@@ -298,12 +312,14 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 },
             },
             AuditEventDetail::UpdateOrgApiKeyRole {
+                is_live,
                 new_tenant_role_id,
                 old_tenant_role_id,
                 tenant_api_key_id,
             } => Self {
                 metadata: AuditEventMetadata::UpdateOrgApiKeyRole { old_tenant_role_id },
                 args: AuditEventOptionalArgs {
+                    is_live: Some(is_live),
                     tenant_role_id: Some(new_tenant_role_id),
                     tenant_api_key_id: Some(tenant_api_key_id),
                     ..Default::default()
