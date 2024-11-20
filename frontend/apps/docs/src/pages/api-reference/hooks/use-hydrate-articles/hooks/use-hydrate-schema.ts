@@ -32,7 +32,7 @@ const useHydrateSchema = (openApiSpec: any) => {
       }
     }
 
-    if (schema.allOf?.length) {
+    if (dereferencedSchema.allOf?.length) {
       let allOf;
       ({ allOf, ...dereferencedSchema } = dereferencedSchema);
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>

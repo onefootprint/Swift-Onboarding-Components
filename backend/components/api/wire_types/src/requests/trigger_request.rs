@@ -29,13 +29,13 @@ pub struct TriggerKycRequest {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PostUsersKycResponse {
-    #[serde(flatten)]
-    pub validate: EntityValidateResponse,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[openapi(gated = "PreviewApi::PostKycStepupLinks")]
     /// If the user triggers a step up rule, a link that can be used to prompt the user to finish
     /// uploading any remaining information.
     pub in_progress_link: Option<CreateTokenResponse>,
+    #[serde(flatten)]
+    pub validate: EntityValidateResponse,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
