@@ -154,6 +154,17 @@
   --border-secondary: var(--purple-400);
   --border-tertiary: var(--gray-100);
   --border-error: var(--red-500);
+  --border-info: var(--blue-600);
+  --border-success: var(--green-600);
+  --border-warning: var(--yellow-800);
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-default: 6px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
 }
 
 .dark {

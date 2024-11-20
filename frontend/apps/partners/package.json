@@ -11,7 +11,6 @@
     "lint": "biome check src --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3012",
-    "test:ci:bun": "bun test --bail",
     "test:watch": "DEBUG_PRINT_LIMIT=100000 bun test --watch",
     "test": "bun test",
     "typecheck": "pnpm tsc --noEmit"

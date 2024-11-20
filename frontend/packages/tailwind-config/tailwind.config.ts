@@ -51,13 +51,17 @@ const config: Omit<Config, 'content'> = {
       secondary: 'var(--border-secondary)',
       tertiary: 'var(--border-tertiary)',
       error: 'var(--border-error)',
+      info: 'var(--border-info)',
+      success: 'var(--border-success)',
+      warning: 'var(--border-warning)',
     },
     borderRadius: {
-      none: '0px',
-      sm: '4px',
-      DEFAULT: '6px',
-      lg: '20px',
-      full: '9999px',
+      none: 'var(--radius-none)',
+      xs: 'var(--radius-xs)',
+      sm: 'var(--radius-sm)',
+      DEFAULT: 'var(--radius-default)',
+      lg: 'var(--radius-lg)',
+      full: 'var(--radius-full)',
     },
     extend: {
       fontFamily: {

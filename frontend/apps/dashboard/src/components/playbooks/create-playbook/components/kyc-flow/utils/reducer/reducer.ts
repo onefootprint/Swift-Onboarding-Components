@@ -34,6 +34,8 @@ export type State = {
   };
 };
 
+export type StateFormData = State['data'];
+
 export type Action =
   | { type: 'updateStep'; payload: Step }
   | { type: 'updateNameData'; payload: Partial<NameFormData> }
@@ -244,7 +246,9 @@ export const getInitialValues = (playbook?: OnboardingConfiguration): State => {
               if (doc.kind === 'custom') {
                 return {
                   name: doc.data.name,
-                  identifier: doc.data.identifier,
+                  // We append the prefix in the form
+                  // if we don't remove here we would need to handle differently from the create flow
+                  identifier: doc.data.identifier.replace('document.custom.', ''),
                   description: doc.data.description,
                   requiresHumanReview: doc.data.requiresHumanReview,
                   uploadSettings: doc.data.uploadSettings,

@@ -31,13 +31,17 @@ export const createAdditionalDocsPayload = ({
     });
   }
   if (custom) {
+    const addCustomDocPrefixIfRequired = (identifier: string) => {
+      return identifier.startsWith('document.custom') ? identifier : `document.custom.${identifier}`;
+    };
+
     custom.forEach(doc => {
       documentsToCollect.push({
         kind: 'custom',
         data: {
           description: doc.description,
-          // @ts-expect-error: backend doesn't have the correct type
-          identifier: `document.custom.${doc.identifier}`,
+          // @ts-expect-error: fix
+          identifier: addCustomDocPrefixIfRequired(doc.identifier),
           name: doc.name,
           requiresHumanReview: !!requireManualReview,
           uploadSettings: doc.uploadSettings,

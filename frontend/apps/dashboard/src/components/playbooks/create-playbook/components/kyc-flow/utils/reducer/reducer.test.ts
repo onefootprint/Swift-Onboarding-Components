@@ -296,7 +296,7 @@ describe('kyc flow reducer', () => {
                   custom: [
                     {
                       name: 'Proof of Lorem',
-                      identifier: 'document.custom.*',
+                      identifier: '*',
                       description: 'Lorem ipsum',
                       requiresHumanReview: true,
                       uploadSettings: 'prefer_upload',

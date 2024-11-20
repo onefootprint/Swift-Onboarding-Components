@@ -28,7 +28,7 @@ const RequiredAuthMethodsStep = ({ defaultValues, onBack, onSubmit }: RequiredAu
         }}
       >
         <Stack flexDirection="column" gap={6}>
-          <Stack flexDirection="column" gap={3} paddingLeft={3}>
+          <Stack flexDirection="column" gap={3}>
             <Checkbox label={t('phone')} {...register('phone')} />
             <Checkbox label={t('email')} {...register('email')} />
           </Stack>

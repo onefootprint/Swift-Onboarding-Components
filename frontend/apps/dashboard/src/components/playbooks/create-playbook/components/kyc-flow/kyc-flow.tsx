@@ -41,6 +41,8 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
     state.data.templateForm.template !== OnboardingTemplate.Alpaca &&
     state.data.templateForm.template !== OnboardingTemplate.Apex;
 
+  console.log(state.data.detailsForm.docs.custom);
+
   return (
     <>
       <StepperContainer>
@@ -180,6 +182,7 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
       {state.step === 'reviewChanges' && !!playbook && (
         <ReviewChangesStep
           meta={{
+            formData: state.data,
             playbook: playbook,
             hasChanges: !isEqual(initialState.data, state.data),
           }}
