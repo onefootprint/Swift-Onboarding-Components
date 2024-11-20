@@ -31,7 +31,6 @@ use newtypes::CollectedDataOption as CDO;
 use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant as DID;
-use newtypes::Declaration;
 use newtypes::DocumentCdoInfo;
 use newtypes::DocumentConfig;
 use newtypes::DocumentDiKind;
@@ -39,6 +38,7 @@ use newtypes::DocumentRequestConfig;
 use newtypes::DocumentStatus;
 use newtypes::DocumentUploadSettings;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileDeclaration;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::LivenessSource;
@@ -397,7 +397,7 @@ fn get_collect_investor_profile_requirement<T>(
     };
     let declarations = ctx.user_values.get_di(IPK::Declarations).ok();
     let missing_document = if let Some(declarations) = declarations {
-        let declarations: Vec<Declaration> = declarations.deserialize()?;
+        let declarations: Vec<InvestorProfileDeclaration> = declarations.deserialize()?;
         // The finra compliance doc is missing if any of the declarations require a doc and we
         // don't yet have one on file
         declarations.iter().any(|d| d.requires_finra_compliance_doc())

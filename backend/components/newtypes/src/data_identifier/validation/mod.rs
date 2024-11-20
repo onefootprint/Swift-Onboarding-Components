@@ -22,7 +22,9 @@ pub use card::LuhnValidatedCardNumber;
 pub use identity::IdentityData;
 pub use identity::UsLegalStatus;
 pub use identity::VisaKind;
-pub use investor_profile::Declaration;
+pub use investor_profile::InvestorProfileDeclaration;
+pub use investor_profile::InvestorProfileFundingSource;
+pub use investor_profile::InvestorProfileInvestmentGoal;
 pub use utils::AgeHelper;
 pub type AllData = HashMap<DataIdentifier, PiiJsonValue>;
 

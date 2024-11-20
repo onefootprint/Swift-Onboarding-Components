@@ -1,7 +1,7 @@
 use chrono::DateTime;
 use chrono::Utc;
 use newtypes::AlpacaPiiString;
-use newtypes::Declaration;
+use newtypes::InvestorProfileDeclaration;
 use newtypes::PiiJsonValue;
 use paperclip::actix::Apiv2Schema;
 
@@ -97,12 +97,14 @@ pub struct Disclosures {
 }
 
 impl Disclosures {
-    pub fn from_declarations(declarations: &[Declaration]) -> Disclosures {
+    pub fn from_declarations(declarations: &[InvestorProfileDeclaration]) -> Disclosures {
         Disclosures {
-            is_control_person: declarations.contains(&Declaration::SeniorExecutive),
-            is_affiliated_exchange_or_finra: declarations.contains(&Declaration::AffiliatedWithUsBroker),
-            is_politically_exposed: declarations.contains(&Declaration::SeniorPoliticalFigure),
-            immediate_family_exposed: declarations.contains(&Declaration::FamilyOfPoliticalFigure),
+            is_control_person: declarations.contains(&InvestorProfileDeclaration::SeniorExecutive),
+            is_affiliated_exchange_or_finra: declarations
+                .contains(&InvestorProfileDeclaration::AffiliatedWithUsBroker),
+            is_politically_exposed: declarations.contains(&InvestorProfileDeclaration::SeniorPoliticalFigure),
+            immediate_family_exposed: declarations
+                .contains(&InvestorProfileDeclaration::FamilyOfPoliticalFigure),
             context: None,
             employment_status: None,
             employer_name: None,

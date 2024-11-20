@@ -23,10 +23,10 @@ use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::email::Email;
 use newtypes::DataIdentifier as DI;
-use newtypes::Declaration;
 use newtypes::DocumentDiKind as DK;
 use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileDeclaration;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::PhoneNumber;
 use newtypes::PiiJsonValue;
@@ -193,7 +193,8 @@ async fn create_create_account_request(
     let disclosures = if let Some(disclosures) = req.disclosures {
         disclosures
     } else {
-        let declarations: Vec<Declaration> = decrypted.rm_di(IPK::Declarations)?.deserialize()?;
+        let declarations: Vec<InvestorProfileDeclaration> =
+            decrypted.rm_di(IPK::Declarations)?.deserialize()?;
         Disclosures::from_declarations(&declarations)
     };
 

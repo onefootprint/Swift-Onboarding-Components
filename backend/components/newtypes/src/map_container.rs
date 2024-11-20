@@ -36,7 +36,7 @@ pub mod declare_map_container {
 
     #[macro_export]
     macro_rules! impl_modern_map_apiv2_schema {
-        ($name: ident <$k: ty, $v: ty>, $description: tt, $json: tt) => {
+        ($name: ident, $k: ty, $description: tt, $json: tt) => {
             impl paperclip::v2::schema::Apiv2Schema for $name {
                 fn name() -> Option<String> {
                     Some(stringify!($name).to_string())
@@ -55,9 +55,8 @@ pub mod declare_map_container {
                         data_type: Some(DataType::Object),
                         ..Default::default()
                     };
-                    for key in <$k>::raw_schema().enum_.iter() {
-                        let key = key.as_str().unwrap().to_string();
-                        (schema.properties).insert(key, Box::new(<$v>::raw_schema()));
+                    for key in <$k>::api_examples() {
+                        (schema.properties).insert(key.to_string(), Box::new(key.value_schema()));
                     }
                     schema
                 }

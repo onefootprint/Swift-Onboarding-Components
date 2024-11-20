@@ -9,6 +9,7 @@ use crate::PiiJsonValue;
 use crate::PiiString;
 use crate::ValidateArgs;
 use itertools::Itertools;
+use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
 
@@ -28,15 +29,17 @@ impl CleanAndValidate for IPK {
             Self::Employer => value.as_string()?,
             Self::AnnualIncome => utils::parse_enum::<AnnualIncome>(value.as_string()?)?,
             Self::NetWorth => utils::parse_enum::<NetWorth>(value.as_string()?)?,
-            Self::InvestmentGoals => utils::parse_json_and_validate::<Vec<InvestmentGoal>, _>(value, |l| {
-                if l.is_empty() {
-                    Err(Error::InvalidLength)
-                } else {
-                    Ok(())
-                }
-            })?,
+            Self::InvestmentGoals => {
+                utils::parse_json_and_validate::<Vec<InvestorProfileInvestmentGoal>, _>(value, |l| {
+                    if l.is_empty() {
+                        Err(Error::InvalidLength)
+                    } else {
+                        Ok(())
+                    }
+                })?
+            }
             Self::RiskTolerance => utils::parse_enum::<RiskTolerance>(value.as_string()?)?,
-            Self::Declarations => utils::parse_json::<Vec<Declaration>>(value)?,
+            Self::Declarations => utils::parse_json::<Vec<InvestorProfileDeclaration>>(value)?,
             Self::BrokerageFirmEmployer => value.as_string()?,
             Self::SeniorExecutiveSymbols => utils::parse_json_and_map::<Vec<String>, _>(value, |l| {
                 if l.is_empty() || l.iter().any(|symbol| symbol.len() < 3 || symbol.len() > 5) {
@@ -60,13 +63,15 @@ impl CleanAndValidate for IPK {
                 }
             })?,
             Self::PoliticalOrganization => value.as_string()?,
-            Self::FundingSources => utils::parse_json_and_validate::<Vec<FundingSource>, _>(value, |l| {
-                if l.is_empty() {
-                    Err(Error::InvalidLength)
-                } else {
-                    Ok(())
-                }
-            })?,
+            Self::FundingSources => {
+                utils::parse_json_and_validate::<Vec<InvestorProfileFundingSource>, _>(value, |l| {
+                    if l.is_empty() {
+                        Err(Error::InvalidLength)
+                    } else {
+                        Ok(())
+                    }
+                })?
+            }
         };
         let value = utils::validate_not_empty(value)?;
 
@@ -136,9 +141,10 @@ enum NetWorth {
     Gt1m,
 }
 
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, Apiv2Schema, macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
-enum InvestmentGoal {
+#[serde(rename_all = "snake_case")]
+pub enum InvestorProfileInvestmentGoal {
     Growth,
     Income,
     PreserveCapital,
@@ -148,16 +154,22 @@ enum InvestmentGoal {
 
     // Can't remove these yet since some old vaults have these
     /// DEPRECATED
+    #[openapi(skip)]
     GrowLongTermWealth,
     /// DEPRECATED
+    #[openapi(skip)]
     SaveForRetirement,
     /// DEPRECATED
+    #[openapi(skip)]
     SupportLovedOnes,
     /// DEPRECATED
+    #[openapi(skip)]
     BuyAHome,
     /// DEPRECATED
+    #[openapi(skip)]
     PayOffDebt,
     /// DEPRECATED
+    #[openapi(skip)]
     StartMyOwnBusiness,
 }
 
@@ -169,24 +181,30 @@ enum RiskTolerance {
     Aggressive,
 }
 
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
+#[derive(
+    Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq, Apiv2Schema, macros::SerdeAttr,
+)]
 #[strum(serialize_all = "snake_case")]
-pub enum Declaration {
+#[serde(rename_all = "snake_case")]
+pub enum InvestorProfileDeclaration {
     AffiliatedWithUsBroker,
     SeniorExecutive,
     SeniorPoliticalFigure,
     FamilyOfPoliticalFigure,
 }
 
-impl Declaration {
+impl InvestorProfileDeclaration {
     pub fn requires_finra_compliance_doc(&self) -> bool {
         matches!(self, Self::AffiliatedWithUsBroker | Self::SeniorExecutive)
     }
 }
 
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
+#[derive(
+    Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq, Apiv2Schema, macros::SerdeAttr,
+)]
 #[strum(serialize_all = "snake_case")]
-pub enum FundingSource {
+#[serde(rename_all = "snake_case")]
+pub enum InvestorProfileFundingSource {
     EmploymentIncome,
     Investments,
     Inheritance,

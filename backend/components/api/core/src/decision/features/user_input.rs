@@ -12,9 +12,9 @@ use newtypes::AgeHelper;
 use newtypes::CollectedData;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
-use newtypes::Declaration;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileDeclaration;
 use newtypes::InvestorProfileKind;
 use newtypes::PiiString;
 use newtypes::VendorAPI;
@@ -45,8 +45,8 @@ pub async fn generate_user_input_risk_signals(
     let mut reason_codes = user_input_based_risk_signals(vw, obc, &decrypted);
 
     if let Ok(declarations) = decrypted.get_di(InvestorProfileKind::Declarations) {
-        let declarations: Vec<Declaration> = declarations.deserialize()?;
-        if declarations.contains(&Declaration::AffiliatedWithUsBroker) {
+        let declarations: Vec<InvestorProfileDeclaration> = declarations.deserialize()?;
+        if declarations.contains(&InvestorProfileDeclaration::AffiliatedWithUsBroker) {
             reason_codes.push(FootprintReasonCode::AffiliatedWithBrokerOrFinra)
         }
     }

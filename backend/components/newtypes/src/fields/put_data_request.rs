@@ -13,7 +13,6 @@ use crate::DocumentDiKind;
 use crate::NtResult;
 use crate::NtValidationError;
 use crate::PiiJsonValue;
-use crate::PiiString;
 use crate::PiiValueKind;
 use crate::UserDataIdentifier;
 use crate::ValidateArgs;
@@ -59,7 +58,8 @@ impl_request_type!(RawBusinessDataRequest);
 )]
 pub struct ModernRawUserDataRequest(RawDataRequest);
 impl_modern_map_apiv2_schema!(
-    ModernRawUserDataRequest<UserDataIdentifier, PiiString>,
+    ModernRawUserDataRequest,
+    UserDataIdentifier,
     "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
     { "id.first_name": "Jane", "id.last_name": "Doe", "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58" }
 );
@@ -70,7 +70,8 @@ impl_request_type!(ModernRawUserDataRequest);
 )]
 pub struct ModernRawBusinessDataRequest(RawDataRequest);
 impl_modern_map_apiv2_schema!(
-    ModernRawBusinessDataRequest<BusinessDataIdentifier, PiiString>,
+    ModernRawBusinessDataRequest,
+    BusinessDataIdentifier,
     "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
     { "business.name": "Acme Bank", "business.website": "acmebank.org", "custom.account_id": "d0af81fc-41c2-46ca-8a8d-797b8e4d3146" }
 );

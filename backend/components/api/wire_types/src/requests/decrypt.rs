@@ -4,7 +4,6 @@ use newtypes::impl_response_type;
 use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
 use newtypes::PiiJsonValue;
-use newtypes::PiiString;
 use newtypes::UserDataIdentifier;
 use newtypes::VersionedDataIdentifier;
 use std::collections::HashMap;
@@ -65,8 +64,9 @@ impl_collect!(BusinessDecryptResponse);
 pub struct ModernEntityDecryptResponse(pub DecryptResponse);
 // NOTE: we are not serializing that this response can include versioned DIs
 impl_modern_map_apiv2_schema!(
-    ModernEntityDecryptResponse<DataIdentifier, Option<PiiString>>,
-    "",
+    ModernEntityDecryptResponse,
+    DataIdentifier,
+    "A key-value map with the corresponding decrypted values",
     { "id.first_name": "Jane", "id.last_name": "Doe" }
 );
 impl_response_type!(ModernEntityDecryptResponse);
@@ -76,8 +76,9 @@ impl_collect!(ModernEntityDecryptResponse);
 pub struct ModernUserDecryptResponse(pub DecryptResponse);
 // NOTE: we are not serializing that this response can include versioned DIs
 impl_modern_map_apiv2_schema!(
-    ModernUserDecryptResponse<UserDataIdentifier, Option<PiiString>>,
-    "",
+    ModernUserDecryptResponse,
+    UserDataIdentifier,
+    "A key-value map with the corresponding decrypted values",
     { "id.first_name": "Jane", "id.last_name": "Doe" }
 );
 impl_response_type!(ModernUserDecryptResponse);
@@ -87,8 +88,9 @@ impl_collect!(ModernUserDecryptResponse);
 pub struct ModernBusinessDecryptResponse(pub DecryptResponse);
 // NOTE: we are not serializing that this response can include versioned DIs
 impl_modern_map_apiv2_schema!(
-    ModernBusinessDecryptResponse<BusinessDataIdentifier, Option<PiiString>>,
-    "",
+    ModernBusinessDecryptResponse,
+    BusinessDataIdentifier,
+    "A key-value map with the corresponding decrypted values",
     { "business.name": "Acme Bank", "business.website": "acmebank.org" }
 );
 impl_response_type!(ModernBusinessDecryptResponse);

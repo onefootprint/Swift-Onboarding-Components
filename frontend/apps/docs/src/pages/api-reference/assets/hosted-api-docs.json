@@ -4020,6 +4020,37 @@
                     "auth_token"
                 ]
             },
+            "InvestorProfileDeclaration": {
+                "type": "string",
+                "enum": [
+                    "affiliated_with_us_broker",
+                    "senior_executive",
+                    "senior_political_figure",
+                    "family_of_political_figure"
+                ]
+            },
+            "InvestorProfileFundingSource": {
+                "type": "string",
+                "enum": [
+                    "employment_income",
+                    "investments",
+                    "inheritance",
+                    "business_income",
+                    "savings",
+                    "family"
+                ]
+            },
+            "InvestorProfileInvestmentGoal": {
+                "type": "string",
+                "enum": [
+                    "growth",
+                    "income",
+                    "preserve_capital",
+                    "speculation",
+                    "diversification",
+                    "other"
+                ]
+            },
             "Inviter": {
                 "description": "The primary business owner that invited you to fill out a KYC form",
                 "type": "object",
@@ -4389,6 +4420,7 @@
                     "business.name": "Acme Bank",
                     "business.website": "acmebank.org"
                 },
+                "description": "A key-value map with the corresponding decrypted values",
                 "type": "object",
                 "properties": {
                     "business.address_line1": {
@@ -5271,7 +5303,10 @@
                         "type": "string"
                     },
                     "id.citizenships": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Iso3166TwoDigitCountryCode"
+                        }
                     },
                     "id.city": {
                         "type": "string"
@@ -5340,7 +5375,10 @@
                         "type": "string"
                     },
                     "investor_profile.declarations": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InvestorProfileDeclaration"
+                        }
                     },
                     "investor_profile.employer": {
                         "type": "string"
@@ -5349,13 +5387,22 @@
                         "type": "string"
                     },
                     "investor_profile.family_member_names": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "investor_profile.funding_sources": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InvestorProfileFundingSource"
+                        }
                     },
                     "investor_profile.investment_goals": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InvestorProfileInvestmentGoal"
+                        }
                     },
                     "investor_profile.net_worth": {
                         "type": "string"
@@ -5370,7 +5417,10 @@
                         "type": "string"
                     },
                     "investor_profile.senior_executive_symbols": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -5379,6 +5429,7 @@
                     "id.first_name": "Jane",
                     "id.last_name": "Doe"
                 },
+                "description": "A key-value map with the corresponding decrypted values",
                 "type": "object",
                 "properties": {
                     "bank.*.account_type": {
@@ -6150,7 +6201,10 @@
                         "type": "string"
                     },
                     "id.citizenships": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Iso3166TwoDigitCountryCode"
+                        }
                     },
                     "id.city": {
                         "type": "string"
@@ -6219,7 +6273,10 @@
                         "type": "string"
                     },
                     "investor_profile.declarations": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InvestorProfileDeclaration"
+                        }
                     },
                     "investor_profile.employer": {
                         "type": "string"
@@ -6228,13 +6285,22 @@
                         "type": "string"
                     },
                     "investor_profile.family_member_names": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "investor_profile.funding_sources": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InvestorProfileFundingSource"
+                        }
                     },
                     "investor_profile.investment_goals": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InvestorProfileInvestmentGoal"
+                        }
                     },
                     "investor_profile.net_worth": {
                         "type": "string"
@@ -6249,7 +6315,10 @@
                         "type": "string"
                     },
                     "investor_profile.senior_executive_symbols": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },
