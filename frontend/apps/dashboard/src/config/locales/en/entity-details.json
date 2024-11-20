@@ -1124,7 +1124,18 @@
       "outcome": "Outcome:"
     },
     "risk-signals": {
-      "title": "Risk signals"
+      "title": "Risk signals",
+      "group": {
+        "kyc": "KYC",
+        "kyb": "KYB",
+        "doc": "Document",
+        "web-device": "Web device",
+        "native-device": "Native device",
+        "aml": "AML",
+        "behavior": "Behavior",
+        "phone": "Phone",
+        "synthetic": "Synthetic"
+      }
     },
     "rules": {
       "title": "Rules"

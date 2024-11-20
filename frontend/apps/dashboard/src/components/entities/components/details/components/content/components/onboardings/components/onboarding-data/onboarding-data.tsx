@@ -7,6 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import Subsection from '../subsection';
+import OnboardingRiskSignals from './components/onboarding-risk-signals';
+import groupRiskSignals from './utils/group-risk-signals';
 
 type OnboardingDataProps = {
   onboarding: EntityOnboarding;
@@ -43,7 +45,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
       <TopSection>
         {riskSignals && (
           <Subsection icon={subsections.riskSignals.iconComponent} title={subsections.riskSignals.title}>
-            <Text variant="label-3">Document (6)</Text>
+            <OnboardingRiskSignals riskSignals={groupRiskSignals(riskSignals)} />
           </Subsection>
         )}
         {onboarding.ruleSetResults.length > 0 && (
