@@ -452,6 +452,7 @@
         "title": "Know Your Customer (KYC)",
         "disabled": {
           "missing-bos": "You must collect beneficial owners' information to enable KYC checks.",
+          "must-kyc-if-collecting-bos": "You must run KYC checks if your playbook collects beneficial owners' information.",
           "must-collect-id-doc": "You must collect ID document information to disable KYC checks."
         },
         "toggle": {

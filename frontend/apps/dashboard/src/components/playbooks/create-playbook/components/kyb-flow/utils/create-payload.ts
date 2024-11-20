@@ -39,10 +39,7 @@ const createPayload = ({
   const { mustCollectData: personMustCollectData, optionalData: personOptionalData } = createPersonPayload(boForm, {
     collectsBO,
   });
-  const businessMustCollectData = createBusinessPayload(businessForm, {
-    collectsBO,
-    runKyc: verificationChecksForm.runKyc,
-  });
+  const businessMustCollectData = createBusinessPayload(businessForm, { collectsBO });
 
   const mustCollectData = [...personMustCollectData, ...businessMustCollectData];
 
@@ -133,11 +130,10 @@ const createBusinessPayload = (
   businessForm: BusinessFormData,
   meta: {
     collectsBO: boolean;
-    runKyc: boolean;
   },
 ) => {
   const mustCollectData: CollectedDataOption[] = [...requiredKybFields];
-  if (meta.collectsBO && meta.runKyc) {
+  if (meta.collectsBO) {
     mustCollectData.push('business_kyced_beneficial_owners');
   }
   if (businessForm.data.address) {

@@ -14,8 +14,11 @@ const useMeta = ({ collectsBO, collectsBusinessAddress }: MetaProps) => {
       disabledText: t('aml.disabled.missing-bos'),
     },
     kyc: {
-      disabled: !collectsBO,
-      disabledText: t('kyc-checks.disabled.missing-bos'),
+      // KYC is always determined by whether we collect BOs
+      disabled: true,
+      disabledText: collectsBO
+        ? t('kyc-checks.disabled.must-kyc-if-collecting-bos')
+        : t('kyc-checks.disabled.missing-bos'),
     },
     kybKind: {
       disabled: !collectsBusinessAddress,
