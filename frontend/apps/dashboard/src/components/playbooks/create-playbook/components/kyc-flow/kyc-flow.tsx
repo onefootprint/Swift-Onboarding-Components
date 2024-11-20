@@ -7,6 +7,7 @@ import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import useCreatePlaybook from '../../hooks/use-create-playbook';
 import { useDialogButtons } from '../../hooks/use-dialog-buttons';
+import useUpdatePlaybook from '../../hooks/use-update-playbook';
 import NameStep from '../name-step';
 import RequiredAuthMethodsStep from '../required-auth-methods-step';
 import ResidencyStep from '../residency-step';
@@ -33,15 +34,14 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
   }, [playbook]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
+  const updateMutation = useUpdatePlaybook();
   const orgQuery = useQuery(getOrgOptions());
   const options = useOptions(playbook);
-  const { showBackButton, hideBackButton, setPrimaryButton, resetWithBackButton } = useDialogButtons();
+  const { showBackButton, hideBackButton, setPrimaryButton, reset, resetWithBackButton } = useDialogButtons();
   const isEditing = !!playbook;
   const isTemplateEditable =
     state.data.templateForm.template !== OnboardingTemplate.Alpaca &&
     state.data.templateForm.template !== OnboardingTemplate.Apex;
-
-  console.log(state.data.detailsForm.docs.custom);
 
   return (
     <>
@@ -52,15 +52,17 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
             if (option.value === 'kind') {
               onBack();
             }
-
             // Playbook details has sub-options, meaning that we need to pick which sub-option we should start
             // in this case, we want to start always with "Residency"
             dispatch({ type: 'navigateStep', payload: option.value === 'details' ? 'residency' : option.value });
 
-            // When we're editing and we go back to the first step, there's no reason
-            // why we should display the back button, so we hide it
-            if (isEditing && option.value === 'name') {
-              hideBackButton();
+            if (isEditing) {
+              // When we're editing and we go back to the first step, we should hide the back button
+              if (option.value === 'name') {
+                reset();
+              } else {
+                resetWithBackButton();
+              }
             }
           }}
           options={options}
@@ -168,7 +170,9 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
 
             if (isEditing) {
               dispatch({ type: 'updateStep', payload: 'reviewChanges' });
-              setPrimaryButton({ label: 'Save changes', disabled: true });
+              if (isEqual(initialState.data, state.data)) {
+                setPrimaryButton({ label: 'Save changes', disabled: true });
+              }
             } else {
               const payload = createPayload({
                 ...state.data,
@@ -189,6 +193,20 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
           onBack={() => {
             dispatch({ type: 'updateStep', payload: 'verificationChecks' });
             resetWithBackButton();
+          }}
+          onSubmit={() => {
+            updateMutation.mutate(
+              {
+                body: {
+                  expectedLatestObcId: playbook.id,
+                  newOnboardingConfig: createPayload(state.data),
+                },
+                path: {
+                  playbookId: playbook.playbookId,
+                },
+              },
+              // { onSuccess: onDone },
+            );
           }}
         />
       )}

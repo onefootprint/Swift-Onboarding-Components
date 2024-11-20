@@ -16,7 +16,7 @@ describe('createDiff', () => {
             label: 'Name',
             changes: [
               {
-                alias: 'name-updated',
+                alias: 'playbook-name-updated',
                 old: 'Old name',
                 updated: 'New name',
               },
@@ -47,7 +47,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'us-to-international',
+                alias: 'residency-us-to-international',
                 old: 'US residents',
                 updated: 'International residents (all countries)',
               },
@@ -76,7 +76,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'us-to-international',
+                alias: 'residency-us-to-international',
                 old: 'US and US territory residents',
                 updated: 'International residents (GB, FR)',
               },
@@ -105,7 +105,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'international-to-us',
+                alias: 'residency-international-to-us',
                 old: 'International residents (all countries)',
                 updated: 'US residents',
               },
@@ -134,7 +134,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'add-us-territory',
+                alias: 'residency-add-us-territory',
                 old: 'US residents',
                 updated: 'US and US territory residents',
               },
@@ -163,7 +163,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'remove-us-territory',
+                alias: 'residency-remove-us-territory',
                 old: 'US and US territory residents',
                 updated: 'US residents',
               },
@@ -192,7 +192,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'add-country-restrictions',
+                alias: 'residency-add-country-restrictions',
                 old: 'International residents (all countries)',
                 updated: 'International residents (GB, FR)',
               },
@@ -221,7 +221,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'remove-country-restrictions',
+                alias: 'residency-remove-country-restrictions',
                 old: 'International residents (GB, FR)',
                 updated: 'International residents (all countries)',
               },
@@ -250,7 +250,7 @@ describe('createDiff', () => {
             label: 'Residency',
             changes: [
               {
-                alias: 'update-country-restrictions',
+                alias: 'residency-update-country-restrictions',
                 old: 'International residents (GB, FR)',
                 updated: 'International residents (GB, DE)',
               },
@@ -278,7 +278,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn9-is-ssn4',
+                  alias: 'ssn-change-9-to-4',
                   old: 'SSN (Full)',
                   updated: 'SSN (Last 4) ',
                 },
@@ -303,7 +303,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn4-is-ssn9',
+                  alias: 'ssn-change-4-to-9',
                   old: 'SSN (Last 4)',
                   updated: 'SSN (Full)',
                 },
@@ -328,7 +328,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn-required-to-optional',
+                  alias: 'ssn-9-required-to-optional',
                   old: 'SSN (Full) required',
                   updated: 'SSN (Full) optional',
                 },
@@ -353,7 +353,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn-required-to-optional',
+                  alias: 'ssn-9-required-to-4-optional',
                   old: 'SSN (Full) required',
                   updated: 'SSN (Last 4) optional',
                 },
@@ -378,7 +378,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn-required-to-optional',
+                  alias: 'ssn-4-required-to-optional',
                   old: 'SSN (Last 4) required',
                   updated: 'SSN (Last 4) optional',
                 },
@@ -403,7 +403,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn-9-skipped',
+                  alias: 'ssn-9-required-to-not-collected',
                   old: 'SSN (Full) required',
                   updated: 'SSN (Full) is not collected',
                 },
@@ -428,7 +428,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'ssn-4-skipped',
+                  alias: 'ssn-4-required-to-not-collected',
                   old: 'SSN (Last 4) required',
                   updated: 'SSN (Last 4) is not collected',
                 },
@@ -453,7 +453,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'us-tax-id-skipped',
+                  alias: 'us-tax-id-required-to-not-collected',
                   old: 'US Tax ID required',
                   updated: 'US Tax ID is not collected',
                 },
@@ -478,7 +478,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'us-tax-id-required',
+                  alias: 'us-tax-id-not-collected-to-required',
                   old: 'US Tax ID is not collected',
                   updated: 'US Tax ID required',
                 },
@@ -505,7 +505,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'legal-status-skipped',
+                  alias: 'legal-status-required-to-not-collected',
                   old: 'US Legal Status required',
                   updated: 'US Legal Status is not collected',
                 },
@@ -530,7 +530,7 @@ describe('createDiff', () => {
               label: 'Basic information',
               changes: [
                 {
-                  alias: 'legal-status-required',
+                  alias: 'legal-status-not-collected-to-required',
                   old: 'US Legal Status is not collected',
                   updated: 'US Legal Status required',
                 },
@@ -558,7 +558,7 @@ describe('createDiff', () => {
             label: 'Investor profile questions',
             changes: [
               {
-                alias: 'investor-questions-skipped',
+                alias: 'investor-questions-required-to-not-collected',
                 old: 'Investor questions required',
                 updated: 'Investor questions are not collected',
               },
@@ -583,7 +583,7 @@ describe('createDiff', () => {
             label: 'Investor profile questions',
             changes: [
               {
-                alias: 'investor-questions-required',
+                alias: 'investor-questions-not-collected-to-required',
                 old: 'Investor questions are not collected',
                 updated: 'Investor questions required',
               },
@@ -608,7 +608,7 @@ describe('createDiff', () => {
             label: 'Authentication methods',
             changes: [
               {
-                alias: 'auth-methods-updated',
+                alias: 'auth-methods-list-updated',
                 old: 'SMS',
                 updated: 'Email',
               },
@@ -631,7 +631,7 @@ describe('createDiff', () => {
             label: 'Authentication methods',
             changes: [
               {
-                alias: 'auth-methods-updated',
+                alias: 'auth-methods-list-updated',
                 old: 'SMS',
                 updated: 'SMS, Email',
               },
@@ -654,7 +654,7 @@ describe('createDiff', () => {
             label: 'Authentication methods',
             changes: [
               {
-                alias: 'auth-methods-updated',
+                alias: 'auth-methods-list-updated',
                 old: 'SMS, Email',
                 updated: 'SMS',
               },
@@ -679,7 +679,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'poa-added',
+                alias: 'proof-of-address-added',
                 old: 'Proof of address not collected',
                 updated: 'Proof of address collected',
               },
@@ -702,7 +702,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'poa-removed',
+                alias: 'proof-of-address-removed',
                 old: 'Proof of address collected',
                 updated: 'Proof of address not collected',
               },
@@ -725,7 +725,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'poa-review-changed',
+                alias: 'proof-of-address-review-requirement-changed',
                 old: 'Proof of address does not require human review',
                 updated: 'Proof of address requires human review',
               },
@@ -748,7 +748,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'possn-added',
+                alias: 'proof-of-ssn-added',
                 old: 'Proof of SSN not collected',
                 updated: 'Proof of SSN collected',
               },
@@ -771,7 +771,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'possn-removed',
+                alias: 'proof-of-ssn-removed',
                 old: 'Proof of SSN collected',
                 updated: 'Proof of SSN not collected',
               },
@@ -794,7 +794,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'possn-review-changed',
+                alias: 'proof-of-ssn-review-requirement-changed',
                 old: 'Proof of SSN does not require human review',
                 updated: 'Proof of SSN requires human review',
               },
@@ -827,7 +827,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'custom-doc-added',
+                alias: 'custom-doc-added-document.custom.*',
                 old: 'Custom document "document.custom.*" not collected',
                 updated: 'Custom document "document.custom.*" collected',
               },
@@ -860,7 +860,7 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'custom-doc-removed',
+                alias: 'custom-doc-removed-document.custom.*',
                 old: 'Custom document "document.custom.*" collected',
                 updated: 'Custom document "document.custom.*" not collected',
               },
@@ -915,19 +915,370 @@ describe('createDiff', () => {
             label: 'Document requirements',
             changes: [
               {
-                alias: 'poa-removed',
+                alias: 'proof-of-address-removed',
                 old: 'Proof of address collected',
                 updated: 'Proof of address not collected',
               },
               {
-                alias: 'possn-added',
+                alias: 'proof-of-ssn-added',
                 old: 'Proof of SSN not collected',
                 updated: 'Proof of SSN collected',
               },
               {
-                alias: 'custom-doc-name-updated',
+                alias: 'custom-doc-name-updated-document.custom.*',
                 old: 'Custom document "document.custom.*" name: "test1"',
                 updated: 'Custom document "document.custom.*" name: "test2"',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+  });
+
+  describe('Identity documents', () => {
+    it('should show when global document types are added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {},
+        },
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport', 'drivers_license'],
+          countrySpecific: {},
+        },
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document Types and Countries',
+            changes: [
+              {
+                alias: 'global-document-requirement-added',
+                old: 'No global document requirement',
+                updated: 'Added drivers_license as global document requirement',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when global document types are removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport', 'drivers_license', 'id_card'],
+          countrySpecific: {},
+        },
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {},
+        },
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document Types and Countries',
+            changes: [
+              {
+                alias: 'global-doc-removed',
+                old: 'drivers_license was required globally',
+                updated: 'Removed global document requirement',
+              },
+              {
+                alias: 'global-doc-removed',
+                old: 'id_card was required globally',
+                updated: 'Removed global document requirement',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when country specific document types are added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {},
+        },
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {
+            US: ['drivers_license'],
+          },
+        },
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document Types and Countries',
+            changes: [
+              {
+                alias: 'country-added',
+                old: 'No requirements for US',
+                updated: 'Added US (drivers_license) to supported countries',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when country specific document types are removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {
+            US: ['drivers_license'],
+            GB: ['id_card'],
+          },
+        },
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {},
+        },
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document Types and Countries',
+            changes: [
+              {
+                alias: 'country-removed',
+                old: 'US was supported',
+                updated: 'Removed US from supported countries',
+              },
+              {
+                alias: 'country-removed',
+                old: 'GB was supported',
+                updated: 'Removed GB from supported countries',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when country specific document types are modified', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {
+            US: ['drivers_license'],
+          },
+        },
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentTypesAndCountries: {
+          global: ['passport'],
+          countrySpecific: {
+            US: ['id_card'],
+          },
+        },
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document Types and Countries',
+            changes: [
+              {
+                alias: 'country-docs-modified',
+                old: 'US required: drivers_license',
+                updated: 'US requires: id_card',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+  });
+
+  describe('verification checks', () => {
+    it('should show when KYC verification is added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'kyc', data: {} }],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'kyc-verification-added',
+                old: 'KYC verification not required',
+                updated: 'KYC verification required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when AML settings are modified', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [
+          {
+            kind: 'aml',
+            data: {
+              adverseMedia: true,
+              adverseMediaLists: ['financial_crime', 'fraud'],
+              ofac: true,
+              pep: false,
+              matchKind: 'exact_name',
+              continuousMonitoring: false,
+            },
+          },
+        ],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [
+          {
+            kind: 'aml',
+            data: {
+              adverseMedia: true,
+              adverseMediaLists: ['financial_crime', 'fraud', 'cyber_crime'],
+              ofac: false,
+              pep: true,
+              matchKind: 'fuzzy_high',
+              continuousMonitoring: false,
+            },
+          },
+        ],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'aml-adverse-media-updated',
+                old: 'Adverse media enabled (financial_crime, fraud)',
+                updated: 'Adverse media enabled (financial_crime, fraud, cyber_crime)',
+              },
+              {
+                alias: 'aml-ofac-updated',
+                old: 'OFAC enabled',
+                updated: 'OFAC disabled',
+              },
+              {
+                alias: 'aml-pep-updated',
+                old: 'PEP disabled',
+                updated: 'PEP enabled',
+              },
+              {
+                alias: 'aml-match-kind-updated',
+                old: 'Match kind: exact_name',
+                updated: 'Match kind: fuzzy_high',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when Neuro ID verification is added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'neuro_id', data: {} }],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'neuro-id-added',
+                old: 'Neuro ID verification disabled',
+                updated: 'Neuro ID verification enabled',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when Neuro ID verification is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'neuro_id', data: {} }],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'neuro-id-removed',
+                old: 'Neuro ID verification enabled',
+                updated: 'Neuro ID verification disabled',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when Sentilink verification is added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'sentilink', data: {} }],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'sentilink-added',
+                old: 'Sentilink verification disabled',
+                updated: 'Sentilink verification enabled',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when Sentilink verification is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'sentilink', data: {} }],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'sentilink-removed',
+                old: 'Sentilink verification enabled',
+                updated: 'Sentilink verification disabled',
               },
             ],
           },

@@ -666,5 +666,13 @@
       "subtitle": "No changes detected in this playbook. If you need to update any settings, please return to the previous steps and make your adjustments before reviewing.",
       "warning": "New onboardings will use the most recent saved version of this playbook. In-progress onboardings will continue with the existing configuration until completion. Please review your changes carefully, as they will take effect immediately."
     }
+  },
+  "update": {
+    "feedback": {
+      "success": {
+        "title": "Playbook Updated",
+        "description": "Your playbook has been successfully updated."
+      }
+    }
   }
 }

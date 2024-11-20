@@ -1,13 +1,17 @@
 import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import CreatePlaybook from './create-playbook';
 import { withCreatePlaybook, withOrg } from './create-playbook.test.config';
+
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<CreatePlaybook />', () => {
   beforeEach(() => {
     withOrg();
     withCreatePlaybook();
     window.scrollTo = jest.fn();
+    mockRouter.setCurrentUrl('playbooks');
   });
 
   describe('kyc', () => {
