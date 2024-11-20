@@ -932,7 +932,6 @@
       "onboarding-decision-event": {
         "uploaded-docs": "Finished uploading requested documents",
         "onboarded-onto": "Onboarded onto <playbook />{{outcome}}",
-        "ran-playbook": "Ran <playbook /> via API{{outcome}}",
         "with-outcome": " with {{ status }} outcome",
         "decision-status": {
           "pass": "Pass",
@@ -1071,7 +1070,6 @@
       },
       "workflow-started-event": {
         "started-onboarding-onto": "Started onboarding onto",
-        "started-running-playbook": "Started running playbook via API",
         "started-uploading-document": "Started uploading document"
       },
       "step-up-event": {

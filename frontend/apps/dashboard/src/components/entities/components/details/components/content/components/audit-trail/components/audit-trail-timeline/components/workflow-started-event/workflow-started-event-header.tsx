@@ -1,6 +1,6 @@
 import { type WorkflowStartedEventData, WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 import { Text } from '@onefootprint/ui';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import PlaybookLink from '../playbook-link';
 
@@ -14,21 +14,12 @@ const WorkflowStartedEventHeader = ({ data }: WorkflowStartedEventHeaderProps) =
   });
 
   if (data.kind === WorkflowStartedEventKind.playbook) {
-    let transKey = 'audit-trail.timeline.workflow-started-event.started-onboarding-onto';
-    if (data.workflowSource === 'tenant') {
-      transKey = 'audit-trail.timeline.workflow-started-event.started-running-playbook';
-    }
     return (
       <>
         <Text variant="body-3" color="tertiary">
-          <Trans
-            ns="entity-details"
-            i18nKey={transKey}
-            components={{
-              playbook: <PlaybookLink playbook={data.playbook} />,
-            }}
-          />
+          {t('started-onboarding-onto')}
         </Text>
+        <PlaybookLink playbook={data.playbook} />
       </>
     );
   }

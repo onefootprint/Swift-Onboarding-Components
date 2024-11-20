@@ -248,7 +248,6 @@ export const workflowStartedEventFixture = {
         mustCollectData: [],
       },
       kind: WorkflowStartedEventKind.playbook,
-      workflowSource: 'hosted',
     },
   } as WorkflowStartedEvent,
   time: {

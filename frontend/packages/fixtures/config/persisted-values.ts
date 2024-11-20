@@ -9545,7 +9545,6 @@ export const dashboard_WorkflowStarted: WorkflowStarted = {
     mustCollectData: ['business_address', 'ssn9', 'bank'],
     name: 'Glenn Balistreri',
   },
-  workflowSource: 'tenant',
 };
 export const dashboard_WorkflowStartedEventKind: WorkflowStartedEventKind = 'playbook';
 export const dashboard_WorkflowTriggered: WorkflowTriggered = {

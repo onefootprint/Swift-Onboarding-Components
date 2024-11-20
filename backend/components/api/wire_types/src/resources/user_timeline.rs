@@ -86,7 +86,6 @@ pub struct WorkflowTriggered {
 pub struct WorkflowStarted {
     pub kind: WorkflowStartedEventKind,
     pub playbook: TimelinePlaybook,
-    pub workflow_source: WorkflowSource,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

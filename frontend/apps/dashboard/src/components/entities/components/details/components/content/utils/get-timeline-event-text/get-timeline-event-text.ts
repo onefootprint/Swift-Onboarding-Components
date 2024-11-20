@@ -152,7 +152,6 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
 
     const {
       decision: { workflowKind, source, status, obConfiguration, clearedManualReviews },
-      workflowSource,
     } = eventData;
     const statusToText: Record<DecisionStatus, string> = {
       [DecisionStatus.fail]: 'Fail',
@@ -167,15 +166,10 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
       return 'Finished uploading requested documents';
     }
     if (source.kind === ActorKind.footprint) {
-      let text = `Onboarded onto ${obConfiguration.name}`;
-      if (workflowSource === 'tenant') {
-        text = `Ran ${obConfiguration.name} via API`;
-      }
-      let outcome = '';
       if (status === DecisionStatus.pass || status === DecisionStatus.fail) {
-        outcome = ` with ${statusText} outcome`;
+        return `Onboarded onto ${obConfiguration.name} with ${statusText} outcome`;
       }
-      return `${text}${outcome}`;
+      return `Onboarded onto ${obConfiguration.name}`;
     }
     if (status === DecisionStatus.none && clearedManualReviews?.length) {
       return `Manual review cleared by ${getActorText(source)}`;
@@ -223,9 +217,6 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
     const eventData = data as WorkflowStartedEventData;
 
     if (eventData.kind === WorkflowStartedEventKind.playbook) {
-      if (eventData.workflowSource === 'tenant') {
-        return `Started running ${eventData.playbook.name} via API`;
-      }
       return `Started onboarding onto ${eventData.playbook.name}`;
     }
     if (eventData.kind === WorkflowStartedEventKind.document) {
