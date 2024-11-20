@@ -85,7 +85,6 @@
     "subtitle": "Enter your phone number to proceed.",
     "replace-title": "Update your phone number",
     "add-primary-title": "Add a phone number",
-    "verify-with-sms": "Verify with SMS",
     "form": {
       "input-invalid": "Phone number is invalid",
       "input-required": "Phone number cannot be empty"

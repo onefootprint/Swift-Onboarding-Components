@@ -350,7 +350,7 @@ describe('<Identify />', () => {
             expect(screen.getByText('Phone number')).toBeInTheDocument();
           });
           expect(screen.getByDisplayValue('(234) 567-8999')).toBeInTheDocument();
-          await userEvent.click(screen.getByText('Verify with SMS'));
+          await userEvent.click(screen.getByText('Continue'));
 
           await fillChallengePin();
 

@@ -46,7 +46,7 @@ test('Auth with email, fill phone number, verify phone #ci', async ({ browserNam
 
   await frame
     .getByRole('button')
-    .filter({ hasText: /verify with sms/i })
+    .filter({ hasText: /continue/i })
     .first()
     .click();
   await page.waitForLoadState();

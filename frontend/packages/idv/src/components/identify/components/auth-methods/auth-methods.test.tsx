@@ -133,7 +133,7 @@ describe('<AuthMethods />', () => {
       expect(await screen.findByText(/Update your phone number/i)).toBeInTheDocument();
       const emailField = screen.getByLabelText('Phone number');
       await userEvent.type(emailField, '5555550100');
-      await userEvent.click(screen.getByText('Verify with SMS'));
+      await userEvent.click(screen.getByText('Continue'));
 
       expect(await screen.findByText(/Verify your phone number/i)).toBeInTheDocument();
       await fillChallengePin();

@@ -1,5 +1,4 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import { IcoSmartphone224 } from '@onefootprint/icons';
 import type { L10n } from '@onefootprint/types';
 import { Button, Grid, PhoneInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
@@ -74,14 +73,7 @@ const PhoneForm = ({ defaultPhone, isLoading, l10n, onSubmit, options, texts, va
           />
         )}
       />
-      <Button
-        fullWidth
-        loading={isLoading}
-        type="submit"
-        prefixIcon={IcoSmartphone224}
-        size="large"
-        data-dd-action-name="phone:continue"
-      >
+      <Button fullWidth loading={isLoading} type="submit" size="large" data-dd-action-name="phone:continue">
         {texts.cta}
       </Button>
     </Grid.Container>

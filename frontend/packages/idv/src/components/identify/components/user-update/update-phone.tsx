@@ -51,7 +51,7 @@ const UpdatePhone = ({ Header, authToken, actionKind, onSuccess, identifyVariant
               ? t('phone-step.replace-title')
               : t('phone-step.add-primary-title'),
           headerSubtitle: t('phone-step.subtitle'),
-          cta: t('phone-step.verify-with-sms'),
+          cta: t('continue'),
           phoneInvalid: t('phone-step.form.input-invalid'),
           phoneLabel: t('phone-number'),
           phoneRequired: t('phone-step.form.input-required'),

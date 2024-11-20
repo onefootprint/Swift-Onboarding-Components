@@ -219,7 +219,7 @@ const fillIdentifyPhone = async () => {
   });
   const inputPhone = screen.getByText('Phone number');
   await userEvent.type(inputPhone, '9999999999');
-  await userEvent.click(screen.getByText('Verify with SMS'));
+  await userEvent.click(screen.getByText('Continue'));
 };
 
 const fillSmsPin = async () => {

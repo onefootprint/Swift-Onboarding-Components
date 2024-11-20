@@ -22,7 +22,7 @@ export const clickOn = async (hasText: RegExp, parent: FrameLocator | Page) => {
 };
 
 export const clickOnContinue = clickOn.bind(null, /continue/i);
-export const clickOnVerifyWithSms = clickOn.bind(null, /verify with sms/i);
+export const clickOnVerifyWithSms = clickOn.bind(null, /continue/i);
 export const clickOnSave = clickOn.bind(null, /save/i);
 export const clickOnAgree = clickOn.bind(null, /agree/i);
 export const clickOnTakePhoto = clickOn.bind(null, /take photo/i);

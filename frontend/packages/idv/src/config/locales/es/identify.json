@@ -85,7 +85,6 @@
     "subtitle": "Introduce tu número de teléfono para continuar.",
     "replace-title": "Actualizar tu número de teléfono",
     "add-primary-title": "Agregar un número de teléfono",
-    "verify-with-sms": "Verificar enviando un SMS",
     "form": {
       "input-invalid": "Número de teléfono inválido",
       "input-required": "No se puede dejar el número de teléfono en blanco"
