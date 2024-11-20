@@ -5625,6 +5625,14 @@
                             "type": "boolean"
                         },
                         "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "omit_demo_tenants",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "form"
                     }
                 ],
                 "responses": {
@@ -6642,6 +6650,57 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/CreatePlaybookVersionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
+        "/org/playbooks/{playbook_id}/restore": {
+            "post": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a new version (onboarding configuration) for the given playbook that is a copy ",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "playbook_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RestoreOnboardingConfigurationRequest"
                             }
                         }
                     },
@@ -9869,6 +9928,36 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "api_key": {
+                                        "$ref": "#/components/schemas/AuditEventApiKey"
+                                    },
+                                    "status": {
+                                        "$ref": "#/components/schemas/ApiKeyStatus"
+                                    }
+                                },
+                                "required": [
+                                    "api_key",
+                                    "status"
+                                ]
+                            },
+                            "kind": {
+                                "type": "string",
+                                "enum": [
+                                    "update_org_api_key_status"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "data",
+                            "kind"
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -10016,6 +10105,7 @@
                     "create_org_api_key",
                     "decrypt_org_api_key",
                     "update_org_api_key_role",
+                    "update_org_api_key_status",
                     "invite_org_member",
                     "org_member_joined",
                     "update_org_member",
@@ -11132,10 +11222,19 @@
                 "type": "object",
                 "properties": {
                     "expected_latest_obc_id": {
+                        "description": "The latest OBC ID in the timeline for this playbook. Provided to ensure the client has an\n up-to-date view of the playbook timeline.",
                         "type": "string"
                     },
                     "new_onboarding_config": {
-                        "$ref": "#/components/schemas/CreateOnboardingConfigurationRequest"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CreateOnboardingConfigurationRequest"
+                            },
+                            {
+                                "description": "The new playbook version to be created.",
+                                "type": "object"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -17892,6 +17991,23 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "RestoreOnboardingConfigurationRequest": {
+                "type": "object",
+                "properties": {
+                    "expected_latest_obc_id": {
+                        "description": "The latest OBC ID in the timeline for this playbook. Provided to ensure the client has an\n up-to-date view of the playbook timeline.",
+                        "type": "string"
+                    },
+                    "restore_obc_id": {
+                        "description": "The OBC ID that should be restored.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expected_latest_obc_id",
+                    "restore_obc_id"
                 ]
             },
             "ReuploadComplianceDocRequest": {
