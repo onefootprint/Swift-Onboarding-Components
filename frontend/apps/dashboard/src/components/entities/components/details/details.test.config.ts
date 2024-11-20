@@ -115,6 +115,7 @@ export const timelineFixture: Timeline = [
           ranRulesInSandbox: false,
         },
         annotation: null,
+        workflowSource: 'hosted',
       },
     },
     timestamp: '2023-04-05T11:17:06.776409Z',

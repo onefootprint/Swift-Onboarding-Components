@@ -6191,6 +6191,7 @@ export type WorkflowSource = 'hosted' | 'tenant' | 'unknown';
 export type WorkflowStarted = {
   kind: WorkflowStartedEventKind;
   playbook: TimelinePlaybook;
+  workflowSource: WorkflowSource;
 };
 export type WorkflowStartedEventKind = 'playbook' | 'document';
 export type WorkflowTriggered = {
