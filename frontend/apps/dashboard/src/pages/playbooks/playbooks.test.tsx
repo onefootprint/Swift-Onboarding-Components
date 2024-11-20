@@ -41,7 +41,7 @@ describe('<Playbooks />', () => {
           key: 'ob_test_Y8Uzs96q0DgTehYdKI14f9',
         },
         {
-          name: 'Playbook KYC',
+          name: 'Playbook Auth',
           kind: 'Playbook Auth',
           key: 'ob_test_QhzzskOCGDZjvIKNzx91tY',
         },

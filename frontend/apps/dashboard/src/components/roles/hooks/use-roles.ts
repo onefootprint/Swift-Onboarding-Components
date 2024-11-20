@@ -40,8 +40,9 @@ const useRoles = (kind: RoleKind) => {
   });
   const pagination = usePagination({
     count: rolesQuery.data?.meta.count,
+    // @ts-expect-error: this will be fixed once we use the auto-generate requests
     next: rolesQuery.data?.meta.nextPage,
-    onChange: newPage => filters.push({ roles_page: newPage }),
+    onChange: newPage => filters.push({ roles_page: newPage.toString() }),
     page: filters.values.page,
     pageSize: 10,
   });

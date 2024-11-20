@@ -42,9 +42,10 @@ const useTenants = () => {
 
   const pagination = usePagination({
     count: query.data?.meta.count,
+    // @ts-expect-error: this will be fixed once we use the auto-generate requests
     next: query.data?.meta.nextPage,
     page: filters.values.page,
-    onChange: newPage => filters.push({ tenants_page: newPage }),
+    onChange: newPage => filters.push({ tenants_page: newPage.toString() }),
     pageSize: 15,
   });
 

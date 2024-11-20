@@ -1,21 +1,20 @@
 import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import { OnboardingConfigKind } from '@onefootprint/types';
 
 export const playbooksFixture = [
   getOnboardingConfiguration({
     name: 'Playbook KYC',
-    kind: OnboardingConfigKind.kyc,
+    kind: 'kyc',
     key: 'ob_test_gc1cmZRQoF4MAWGVegTh6T',
   }),
   getOnboardingConfiguration({
     name: 'Playbook KYB',
-    kind: OnboardingConfigKind.kyb,
+    kind: 'kyb',
     key: 'ob_test_Y8Uzs96q0DgTehYdKI14f9',
   }),
   getOnboardingConfiguration({
     name: 'Playbook Auth',
-    kind: OnboardingConfigKind.auth,
+    kind: 'auth',
     key: 'ob_test_QhzzskOCGDZjvIKNzx91tY',
   }),
 ];

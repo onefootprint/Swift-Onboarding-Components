@@ -1,4 +1,4 @@
-import { OnboardingConfigStatus } from '@onefootprint/types';
+import type { GetOrgPlaybooksData } from '@onefootprint/request-types/dashboard';
 import useBaseFilters, { queryToBoolean, queryToArray, arrayToQuery } from 'src/hooks/use-filters';
 import type { PlaybooksConfigQuery } from '../../utils/schema/schema';
 
@@ -22,13 +22,12 @@ const useFilters = () => {
     search: query.search,
     kinds: queryToArray(query.kinds) || [],
   };
-  const requestParams = {
+  const requestParams: GetOrgPlaybooksData['query'] = {
     page: values.page,
     search: values.search,
-    status: values.hideDisabled ? OnboardingConfigStatus.enabled : undefined,
+    status: values.hideDisabled ? 'enabled' : undefined,
     kinds: arrayToQuery(values.kinds),
   };
-
   const hasFilters = values.kinds.length > 0;
 
   return {

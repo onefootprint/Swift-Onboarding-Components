@@ -6,8 +6,8 @@ const useCursorPagination = ({
   pageSize = 10,
 }: {
   count?: number;
-  next?: string | null;
-  onChange: (newPage: string) => void;
+  next?: number | null;
+  onChange: (newPage: number) => void;
   page?: number;
   pageSize?: number;
 }) => ({
@@ -21,7 +21,7 @@ const useCursorPagination = ({
   },
   loadPrevPage: () => {
     const newPage = Math.max(0, page - 1);
-    onChange(newPage.toString());
+    onChange(newPage);
   },
   pageIndex: page,
   pageSize,

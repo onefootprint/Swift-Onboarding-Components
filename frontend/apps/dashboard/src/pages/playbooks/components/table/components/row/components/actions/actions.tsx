@@ -1,6 +1,6 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { OnboardingConfigKind, RoleScopeKind } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   const statusRef = useRef<StatusHandler>(null);
   const copyRef = useRef<CopyHandler>(null);
   const copyLinkRef = useRef<CopyLinkHandler>(null);
-  const canShowLink = kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
+  const canShowLink = kind === 'kyc' || kind === 'kyb';
 
   const handleToggleStatus = () => {
     setDropdownOpen(false);

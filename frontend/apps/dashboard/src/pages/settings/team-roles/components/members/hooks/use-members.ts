@@ -38,8 +38,9 @@ const useMembers = () => {
 
   const pagination = usePagination({
     count: membersQuery.data?.meta.count,
+    // @ts-expect-error: this will be fixed once we use the auto-generate requests
     next: membersQuery.data?.meta.nextPage,
-    onChange: newPage => filters.push({ members_page: newPage }),
+    onChange: newPage => filters.push({ members_page: newPage.toString() }),
     page: filters.values.page,
     pageSize: 10,
   });

@@ -71,7 +71,6 @@ const Playbooks = () => {
         </Wrapper>
       </Stack>
       <Stack direction="column">
-        {/* @ts-ignore: this will be fixed soon */}
         <Table data={response?.data} errorMessage={errorMessage} isPending={isPending} />
         {response && response.meta.count > 0 && (
           <Pagination
