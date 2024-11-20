@@ -26,7 +26,7 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             saturated_actor,
             insight_event,
             scoped_vault,
-            ob_configuration: _,
+            ob_configuration,
             document_data: _,
             tenant_api_key,
             tenant_user,
@@ -219,7 +219,11 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     .ok_or(ServerErr("list_entry is not available for this event"))?
                     .id,
             },
-            AuditEventMetadata::CreatePlaybook => AuditEventDetail::CreatePlaybook,
+            AuditEventMetadata::CreatePlaybook => AuditEventDetail::CreatePlaybook {
+                ob_configuration_id: ob_configuration
+                    .ok_or(ServerErr("ob_configuration is not available for this event"))?
+                    .id,
+            },
             AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook,
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,

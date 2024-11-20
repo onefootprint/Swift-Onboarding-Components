@@ -8,6 +8,7 @@ use newtypes::FpId;
 use newtypes::ListEntryCreationId;
 use newtypes::ListEntryId;
 use newtypes::ListId;
+use newtypes::ObConfigurationId;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantId;
@@ -128,7 +129,9 @@ pub enum AuditEventDetail {
         api_key: AuditEventApiKey,
         status: ApiKeyStatus,
     },
-    CreatePlaybook,
+    CreatePlaybook {
+        ob_configuration_id: ObConfigurationId,
+    },
     DisablePlaybook,
     ManuallyReviewEntity,
     EditPlaybook,

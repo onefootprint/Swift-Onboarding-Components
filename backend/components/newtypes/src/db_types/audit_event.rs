@@ -121,7 +121,10 @@ pub enum AuditEventDetail {
         list_id: ListId,
         list_entry_id: ListEntryId,
     },
-    CreatePlaybook,
+    CreatePlaybook {
+        is_live: bool,
+        ob_configuration_id: ObConfigurationId,
+    },
     DisablePlaybook,
     ManuallyReviewEntity,
     EditPlaybook,
@@ -372,7 +375,17 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
-            AuditEventDetail::CreatePlaybook => todo!(),
+            AuditEventDetail::CreatePlaybook {
+                ob_configuration_id,
+                is_live,
+            } => Self {
+                metadata: AuditEventMetadata::CreatePlaybook,
+                args: AuditEventOptionalArgs {
+                    ob_configuration_id: Some(ob_configuration_id),
+                    is_live: Some(is_live),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::DisablePlaybook => todo!(),
             AuditEventDetail::EditPlaybook => todo!(),
             AuditEventDetail::ManuallyReviewEntity => todo!(),

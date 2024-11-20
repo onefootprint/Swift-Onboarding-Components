@@ -9,11 +9,13 @@ use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::headers::InsightHeaders;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::CreateOnboardingConfigurationRequest;
 use api_wire_types::MultiUpdateRuleRequest;
 use api_wire_types::RestoreOnboardingConfigurationRequest;
+use db::models::audit_event::AuditEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
@@ -21,6 +23,7 @@ use db::models::rule_instance::RuleInstance;
 use db::models::rule_set::RuleSet;
 use itertools::Itertools;
 use macros::route_alias;
+use newtypes::AuditEventDetail;
 use newtypes::PlaybookId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -43,6 +46,7 @@ pub async fn post_create_playbook(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let is_live = auth.is_live()?;
@@ -54,12 +58,18 @@ pub async fn post_create_playbook(
     let obc_args =
         prepare_onboarding_configuration_request(&state, obc_request, tenant, is_live, actor).await?;
 
+    let principal_actor = auth.actor();
     let (obc, actor, rs) = state
         .db_transaction(move |conn| {
             let (playbook, obc) = Playbook::create(conn, &tenant_id, is_live, obc_args)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &playbook, &obc.id)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
+            let detail = AuditEventDetail::CreatePlaybook {
+                ob_configuration_id: obc.id.clone(),
+                is_live,
+            };
+            AuditEvent::create_with_insight(conn, &tenant_id, principal_actor, insight.clone(), detail)?;
             Ok((obc, actor, rs))
         })
         .await?;

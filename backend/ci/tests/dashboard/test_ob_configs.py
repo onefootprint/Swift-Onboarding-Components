@@ -10,7 +10,7 @@ from tests.utils import (
     create_ob_config,
     _gen_random_sandbox_id,
 )
-from tests.dashboard.utils import update_rules
+from tests.dashboard.utils import update_rules, assert_has_audit_event_with_details
 from tests.headers import (
     DryRun,
     IsLive,
@@ -128,6 +128,12 @@ def test_config_create(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     auth_token = IdentifyClient(obc, sandbox_id).create_user()
     post("hosted/onboarding", None, obc.key, auth_token)
+
+    assert_has_audit_event_with_details(
+        sandbox_tenant,
+        "create_playbook",
+        ob_configuration_id=obc.id,
+    )
 
 
 @pytest.mark.parametrize(
