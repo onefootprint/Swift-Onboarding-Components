@@ -5,6 +5,7 @@ import type { ParseKeys } from 'i18next';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+import useSession from 'src/hooks/use-session';
 import styled, { css, useTheme } from 'styled-components';
 
 const Create = lazy(() => import('src/components/playbooks/create-playbook'));
@@ -18,6 +19,10 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'header' });
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
+  const {
+    data: { user },
+  } = useSession();
+  const showEdit = user?.isFirmEmployee && playbook.kind === 'kyc';
 
   return (
     <>
@@ -31,15 +36,17 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
               {playbook.key}
             </CodeInline>
           </Stack>
-          <PermissionGate
-            scopeKind={RoleScopeKind.onboardingConfiguration}
-            fallbackText={t('edit.cta-not-allowed')}
-            tooltipPosition="left"
-          >
-            <Button variant="secondary" onClick={() => setIsOpen(true)}>
-              {t('edit.cta')}
-            </Button>
-          </PermissionGate>
+          {showEdit && (
+            <PermissionGate
+              scopeKind={RoleScopeKind.onboardingConfiguration}
+              fallbackText={t('edit.cta-not-allowed')}
+              tooltipPosition="left"
+            >
+              <Button variant="secondary" onClick={() => setIsOpen(true)}>
+                {t('edit.cta')}
+              </Button>
+            </PermissionGate>
+          )}
         </Stack>
       </HeaderContainer>
       <Suspense>
