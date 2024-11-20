@@ -1518,6 +1518,7 @@ def test_playbook_versions(sandbox_tenant, tenant):
         update_playbook_req,
         *sandbox_tenant.db_auths,
     )
+
     obc_v2_id = obc_v2_resp["id"]
     assert obc_v2_resp == dry_run_obc_v2_resp | {
         "id": obc_v2_id,
@@ -1525,6 +1526,12 @@ def test_playbook_versions(sandbox_tenant, tenant):
         # Rule set version restarts at 1
         "rule_set": {"version": 1},
     }
+
+    assert_has_audit_event_with_details(
+        sandbox_tenant,
+        "edit_playbook",
+        ob_configuration_id=obc_v2_id,
+    )
 
     want_obc_v2_resp = obc_v1_resp | {
         "id": obc_v2_id,

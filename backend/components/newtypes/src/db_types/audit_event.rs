@@ -127,7 +127,9 @@ pub enum AuditEventDetail {
     },
     DisablePlaybook,
     ManuallyReviewEntity,
-    EditPlaybook,
+    EditPlaybook {
+        ob_configuration_id: ObConfigurationId,
+    },
 }
 
 
@@ -387,7 +389,13 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 },
             },
             AuditEventDetail::DisablePlaybook => todo!(),
-            AuditEventDetail::EditPlaybook => todo!(),
+            AuditEventDetail::EditPlaybook { ob_configuration_id } => Self {
+                metadata: AuditEventMetadata::EditPlaybook,
+                args: AuditEventOptionalArgs {
+                    ob_configuration_id: Some(ob_configuration_id),
+                    ..Default::default()
+                },
+            },
             AuditEventDetail::ManuallyReviewEntity => todo!(),
         }
     }

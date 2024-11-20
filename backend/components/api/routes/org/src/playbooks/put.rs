@@ -7,12 +7,14 @@ use api_core::decision::rule_engine::validation::validate_rules_request;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::DryRun;
+use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::CreatePlaybookVersionRequest;
 use api_wire_types::MultiUpdateRuleRequest;
 use chrono::Utc;
+use db::models::audit_event::AuditEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
@@ -20,6 +22,7 @@ use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set::RuleSet;
 use itertools::Itertools;
+use newtypes::AuditEventDetail;
 use newtypes::PlaybookId;
 use newtypes::RuleSetId;
 use paperclip::actix::api_v2_operation;
@@ -39,11 +42,13 @@ pub async fn put_create_version(
     request: Json<CreatePlaybookVersionRequest>,
     dry_run: DryRun,
     auth: TenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor().clone();
+    let principal_actor = auth.actor();
 
     let playbook_id = playbook_id.into_inner();
     let CreatePlaybookVersionRequest {
@@ -91,6 +96,10 @@ pub async fn put_create_version(
             }
 
             let new_obc = ObConfiguration::create(conn, &playbook, obc_args)?;
+            let detail = AuditEventDetail::EditPlaybook {
+                ob_configuration_id: new_obc.id.clone(),
+            };
+            AuditEvent::create_with_insight(conn, &tenant.id, principal_actor, insight.clone(), detail)?;
 
             let rules = RuleInstance::list(conn, &tenant.id, is_live, &latest_obc.id, IncludeRules::All)?;
             if !rules.is_empty() {
@@ -102,7 +111,7 @@ pub async fn put_create_version(
                     delete: None,
                 };
                 let rules_update = validate_rules_request(conn, &tenant.id, is_live, add_rules_request)?;
-                RuleInstance::bulk_edit(conn, &playbook, &new_obc.id, &actor.clone().into(), rules_update)?;
+                RuleInstance::bulk_edit(conn, &playbook, &new_obc.id, &actor.into(), rules_update)?;
             }
 
             let (new_obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;

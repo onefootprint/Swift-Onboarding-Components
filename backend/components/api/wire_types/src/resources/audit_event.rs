@@ -134,7 +134,9 @@ pub enum AuditEventDetail {
     },
     DisablePlaybook,
     ManuallyReviewEntity,
-    EditPlaybook,
+    EditPlaybook {
+        ob_configuration_id: ObConfigurationId,
+    },
     DeactivateOrgRole {
         tenant_role_id: TenantRoleId,
         role_name: String,

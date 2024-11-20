@@ -224,7 +224,11 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     .ok_or(ServerErr("ob_configuration is not available for this event"))?
                     .id,
             },
-            AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook,
+            AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook {
+                ob_configuration_id: ob_configuration
+                    .ok_or(ServerErr("ob_configuration is not available for this event"))?
+                    .id,
+            },
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
             AuditEventMetadata::OrgMemberJoined => {
