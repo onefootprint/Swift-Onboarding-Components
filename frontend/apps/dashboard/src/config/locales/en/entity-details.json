@@ -1122,6 +1122,15 @@
       "onboarded-onto": "Onboarded onto {{playbookName}}",
       "document-upload": "Document upload",
       "outcome": "Outcome:"
+    },
+    "risk-signals": {
+      "title": "Risk signals"
+    },
+    "rules": {
+      "title": "Rules"
+    },
+    "user-data": {
+      "title": "User data"
     }
   },
   "business-insights": {

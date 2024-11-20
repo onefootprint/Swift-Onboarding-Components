@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { FIELDSET_HEADER_HEIGHT } from '../../../../constants';
 import useStatusText from '../../hooks/use-status-text';
+import OnboardingData from '../onboarding-data';
 import Trigger from '../trigger ';
 
 type ContentProps = {
@@ -71,6 +72,7 @@ const Content = ({ onboardings }: ContentProps) => {
           </Text>
         </Stack>
       </Header>
+      <OnboardingData onboarding={selectedOnboarding} />
     </Container>
   );
 };
