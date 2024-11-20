@@ -21575,11 +21575,15 @@
                     },
                     "playbook": {
                         "$ref": "#/components/schemas/TimelinePlaybook"
+                    },
+                    "workflow_source": {
+                        "$ref": "#/components/schemas/WorkflowSource"
                     }
                 },
                 "required": [
                     "kind",
-                    "playbook"
+                    "playbook",
+                    "workflow_source"
                 ]
             },
             "WorkflowStartedEventKind": {

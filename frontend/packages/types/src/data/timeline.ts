@@ -131,6 +131,7 @@ export type OnboardingDecisionEvent = {
 export type OnboardingDecisionEventData = {
   decision: OnboardingDecision;
   annotation: Annotation | null;
+  workflowSource: 'hosted' | 'tenant' | 'unknown';
 };
 
 export type WatchlistCheckEvent = {
@@ -169,6 +170,7 @@ export enum WorkflowStartedEventKind {
 export type WorkflowStartedEventData = {
   kind: WorkflowStartedEventKind;
   playbook: TimelinePlaybook;
+  workflowSource: 'hosted' | 'tenant' | 'unknown';
 };
 
 export type WorkflowStartedEvent = {

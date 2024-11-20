@@ -176,6 +176,7 @@ export const timelineFixture: Timeline = [
           ranRulesInSandbox: false,
         },
         annotation: null,
+        workflowSource: 'hosted',
       },
     },
     timestamp: '2023-03-29T23:08:36.768054Z',

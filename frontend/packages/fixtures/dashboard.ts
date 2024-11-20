@@ -9077,6 +9077,7 @@ export const getWorkflowStarted = (
         mustCollectData: ['business_address', 'ssn9', 'bank'],
         name: 'Glenn Balistreri',
       },
+      workflowSource: 'tenant',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

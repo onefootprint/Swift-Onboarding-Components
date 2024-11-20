@@ -139,6 +139,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     // Even though document workflows don't really use them, they are associated with
                     // playbooks
                     playbook: api_wire_types::TimelinePlaybook::from_db(pb),
+                    workflow_source: wf.source,
                 })
             }
             SaturatedTimelineEvent::AuthMethodUpdated((e, _, insight_event)) => {

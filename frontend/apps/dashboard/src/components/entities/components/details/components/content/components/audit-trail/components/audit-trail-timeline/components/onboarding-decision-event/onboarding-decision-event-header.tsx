@@ -19,6 +19,7 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
   });
   const {
     decision: { workflowKind, source, status, obConfiguration: playbook, ruleSetResultId, clearedManualReviews },
+    workflowSource,
   } = data;
   const statusToText: Record<DecisionStatus, string> = {
     [DecisionStatus.fail]: t('decision-status.fail'),
@@ -56,13 +57,17 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
     if (status === DecisionStatus.pass || status === DecisionStatus.fail) {
       outcome = t('with-outcome', { status: statusToText[status] });
     }
+    let transKey = 'audit-trail.timeline.onboarding-decision-event.onboarded-onto';
+    if (workflowSource === 'tenant') {
+      transKey = 'audit-trail.timeline.onboarding-decision-event.ran-playbook';
+    }
     return (
       <Stack direction="row" align="center" gap={2} flexWrap="wrap">
         <Stack align="center" testID="onboarding-decision-event-header">
           <Text variant="label-3" color={color} display="flex" gap={2} whiteSpace="nowrap">
             <Trans
               ns="entity-details"
-              i18nKey="audit-trail.timeline.onboarding-decision-event.onboarded-onto"
+              i18nKey={transKey}
               values={{ outcome }}
               components={{
                 playbook: <PlaybookLink playbook={playbook} />,
