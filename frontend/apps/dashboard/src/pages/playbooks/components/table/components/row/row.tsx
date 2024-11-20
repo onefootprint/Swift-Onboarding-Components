@@ -1,7 +1,6 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useIntl } from '@onefootprint/hooks';
-import type { OnboardingConfig } from '@onefootprint/types';
-import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Badge, CodeInline, Text, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +10,7 @@ import styled, { css } from 'styled-components';
 import Actions from './components/actions';
 
 export type RowProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const Row = ({ playbook }: RowProps) => {
@@ -46,10 +45,10 @@ const Row = ({ playbook }: RowProps) => {
         )}
       </td>
       <td>
-        {playbook.kind === OnboardingConfigKind.kyc && t('type.kyc')}
-        {playbook.kind === OnboardingConfigKind.kyb && t('type.kyb')}
-        {playbook.kind === OnboardingConfigKind.auth && t('type.auth')}
-        {playbook.kind === OnboardingConfigKind.document && t('type.document')}
+        {playbook.kind === 'kyc' && t('type.kyc')}
+        {playbook.kind === 'kyb' && t('type.kyb')}
+        {playbook.kind === 'auth' && t('type.auth')}
+        {playbook.kind === 'document' && t('type.document')}
       </td>
       <td>
         <CodeInline truncate>{key}</CodeInline>

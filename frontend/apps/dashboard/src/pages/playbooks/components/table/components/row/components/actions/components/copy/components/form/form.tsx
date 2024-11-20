@@ -1,5 +1,5 @@
 import { IcoCode16, IcoUser16 } from '@onefootprint/icons';
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Form, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ type FormData = {
 
 export type FormProps = {
   onSubmit: (data: FormData & { tenantName: string }) => void;
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
   tenants: {
     label: string;
     value: string;

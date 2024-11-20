@@ -1,5 +1,4 @@
-import type { OnboardingConfig } from '@onefootprint/types';
-import { OnboardingConfigKind } from '@onefootprint/types';
+import type { ObConfigurationKind, OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Box, Button, Dialog, Text, TextInput } from '@onefootprint/ui';
 import type React from 'react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
@@ -13,7 +12,7 @@ export type CopyLinkHandler = {
 };
 
 export type CopyLinkProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) => {
@@ -32,11 +31,11 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) 
     [],
   );
 
-  const getDescription = (kind: OnboardingConfigKind) => {
-    if (kind === OnboardingConfigKind.auth) {
+  const getDescription = (kind: ObConfigurationKind) => {
+    if (kind === 'auth') {
       return t('description.auth');
     }
-    if (kind === OnboardingConfigKind.kyb) {
+    if (kind === 'kyb') {
       return t('description.kyb');
     }
     return t('description.kyc');

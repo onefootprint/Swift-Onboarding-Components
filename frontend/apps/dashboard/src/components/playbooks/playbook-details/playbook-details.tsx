@@ -1,4 +1,4 @@
-import { getOrgOnboardingConfigsByIdOptions } from '@onefootprint/axios/dashboard';
+import { getOrgPlaybooksByPlaybookIdVersionsOptions } from '@onefootprint/axios/dashboard';
 import { getErrorMessage } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 import Content from './components/content';
@@ -9,13 +9,15 @@ import usePlaybookId from './hooks/use-playbook-id';
 const PlaybookDetails = () => {
   const id = usePlaybookId();
   const { data, isPending, error } = useQuery({
-    ...getOrgOnboardingConfigsByIdOptions({ path: { id } }),
+    ...getOrgPlaybooksByPlaybookIdVersionsOptions({ path: { playbookId: id } }),
     enabled: !!id,
   });
+  const playbooks = data?.data ?? [];
+  const [playbook] = playbooks;
 
   return (
     <>
-      {data && <Content playbook={data} />}
+      {playbooks.length > 0 && <Content playbook={playbook} />}
       {isPending && <Loading />}
       {error && <ErrorComponent message={getErrorMessage(error)} />}
     </>

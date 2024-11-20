@@ -1,5 +1,5 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { OnboardingConfigKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
@@ -14,7 +14,7 @@ import type { StatusHandler } from './components/status';
 import Status from './components/status';
 
 type ActionsProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const Actions = ({ playbook }: ActionsProps) => {

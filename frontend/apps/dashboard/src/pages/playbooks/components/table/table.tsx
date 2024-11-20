@@ -1,5 +1,5 @@
 import type { tabsRouterSchema } from '@/playbooks/utils/schema';
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Table as UITable } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import Filters from './components/filters';
 import Row from './components/row';
 
 type TableProps = {
-  data?: OnboardingConfig[];
+  data?: OnboardingConfiguration[];
   errorMessage?: string;
   isPending?: boolean;
 };
@@ -31,16 +31,16 @@ const Table = ({ data, isPending, errorMessage }: TableProps) => {
     filters.push({ search, page: undefined });
   };
 
-  const handleRowClick = (config: OnboardingConfig) => {
+  const handleRowClick = (onboardingConfig: OnboardingConfiguration) => {
     const query: z.infer<typeof tabsRouterSchema> = { ...filters.query, tab: 'data' };
     router.push({
-      pathname: `/playbooks/${config.id}`,
+      pathname: `/playbooks/${onboardingConfig.playbookId}`,
       query,
     });
   };
 
   return (
-    <UITable<OnboardingConfig>
+    <UITable<OnboardingConfiguration>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('empty-description')}

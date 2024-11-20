@@ -1,50 +1,13 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  AuthMethodKind,
-  CollectedKycDataOption,
-  type GetAuthRoleResponse,
-  type OnboardingConfig,
-  OnboardingConfigKind,
-  OnboardingConfigStatus,
-  type OrgAssumeRoleResponse,
-  RoleKind,
-  RoleScopeKind,
-} from '@onefootprint/types';
+import { type GetAuthRoleResponse, type OrgAssumeRoleResponse, RoleKind, RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 
+import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
 import Copy, { type CopyHandler, type CopyProps } from './copy';
 
-export const playbookFixture: OnboardingConfig = {
-  author: {
-    kind: 'organization',
-    member: 'Jane doe',
-  },
-  allowInternationalResidents: false,
-  allowUsResidents: true,
-  allowUsTerritoryResidents: false,
-  appearance: undefined,
-  createdAt: '',
-  id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
-  internationalCountryRestrictions: null,
-  isDocFirstFlow: false,
-  isLive: false,
-  isNoPhoneFlow: false,
-  key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
-  kind: OnboardingConfigKind.kyc,
-  mustCollectData: [CollectedKycDataOption.name],
+export const playbookFixture = getOnboardingConfiguration({
   name: 'People verification',
-  optionalData: [],
-  skipKyc: false,
-  status: OnboardingConfigStatus.enabled,
-  ruleSet: {
-    version: 1,
-  },
-  documentsToCollect: null,
-  promptForPasskey: true,
-  businessDocumentsToCollect: [],
-  requiredAuthMethods: [AuthMethodKind.phone],
-  verificationChecks: [],
-};
+});
 
 export const authRolesFixture: GetAuthRoleResponse = [
   {
@@ -164,15 +127,15 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
 };
 
 export const withAssumeRole = () => {
-  mockRequest({
+  return mockRequest({
     method: 'post',
     path: '/org/auth/assume_role',
     response: orgAssumeRoleFixture,
   });
 };
 
-export const withPlaybookCopyError = (playbook = playbookFixture) =>
-  mockRequest({
+export const withPlaybookCopyError = (playbook = playbookFixture) => {
+  return mockRequest({
     method: 'post',
     path: `/org/onboarding_configs/${playbook.id}/copy`,
     statusCode: 400,
@@ -180,9 +143,10 @@ export const withPlaybookCopyError = (playbook = playbookFixture) =>
       message: 'Something went wrong',
     },
   });
+};
 
-export const withPlaybookCopy = (playbook = playbookFixture) =>
-  mockRequest({
+export const withPlaybookCopy = (playbook = playbookFixture) => {
+  return mockRequest({
     method: 'post',
     path: `/org/onboarding_configs/${playbook.id}/copy`,
     response: {
@@ -192,6 +156,7 @@ export const withPlaybookCopy = (playbook = playbookFixture) =>
       isLive: true,
     },
   });
+};
 
 export const withModes = () => {
   mockRequest({
@@ -213,7 +178,7 @@ export const withModes = () => {
 };
 
 export const withAuthRoles = (response: GetAuthRoleResponse = authRolesFixture) => {
-  mockRequest({
+  return mockRequest({
     method: 'get',
     path: '/org/auth/roles',
     response,

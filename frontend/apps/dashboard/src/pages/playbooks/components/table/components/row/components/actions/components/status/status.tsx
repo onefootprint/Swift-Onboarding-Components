@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { OnboardingConfigStatus } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import { forwardRef, useImperativeHandle, useState } from 'react';
@@ -14,7 +14,7 @@ export type StatusHandler = {
 };
 
 export type StatusProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
@@ -30,12 +30,10 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
   };
 
   const disable = () => {
-    const status = playbook.status === 'enabled' ? OnboardingConfigStatus.disabled : OnboardingConfigStatus.enabled;
-
     mutation.mutate(
       {
         id: playbook.id,
-        status,
+        status: playbook.status === 'enabled' ? OnboardingConfigStatus.disabled : OnboardingConfigStatus.enabled,
       },
       {
         onSuccess: hideConfirmation,

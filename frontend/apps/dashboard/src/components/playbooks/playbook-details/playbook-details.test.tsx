@@ -3,11 +3,12 @@ import mockRouter from 'next-router-mock';
 
 import PlaybookDetails from './playbook-details';
 import {
-  entityIdFixture,
   playbookDetailsFixture,
+  playbookId,
   withPlaybookDetails,
   withPlaybookDetailsError,
 } from './playbook-details.test.config';
+
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<PlaybookDetails />', () => {
@@ -64,9 +65,9 @@ describe('<PlaybookDetails />', () => {
 
   describe('when the request to fetch from User details succeeds', () => {
     beforeEach(() => {
-      mockRouter.setCurrentUrl(`/users/${entityIdFixture}/playbook/${playbookDetailsFixture.id}`);
+      mockRouter.setCurrentUrl(`/users/${playbookId}/playbook/${playbookDetailsFixture.id}`);
       mockRouter.query = {
-        id: entityIdFixture,
+        id: playbookId,
         playbook_id: playbookDetailsFixture.id,
       };
       withPlaybookDetails(playbookDetailsFixture.id);

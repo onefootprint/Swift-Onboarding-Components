@@ -1,4 +1,4 @@
-import type { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Dialog } from '@onefootprint/ui';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ export type CopyHandler = {
 };
 
 export type CopyProps = {
-  playbook: OnboardingConfig;
+  playbook: OnboardingConfiguration;
 };
 
 type FormData = {
