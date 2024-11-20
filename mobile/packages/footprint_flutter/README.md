@@ -16,7 +16,7 @@ This will add the `footprint_flutter` dependency to your project’s `pubspec.ya
 
 ```yaml
 dependencies:
-  footprint_flutter: ^2.0.0-beta.3.1
+  footprint_flutter: ^2.0.0-beta.3.2
 ```
 
 Alternatively, you can manually edit the `pubspec.yaml` file to add the dependency and run `flutter pub get` from the terminal to install the dependency.

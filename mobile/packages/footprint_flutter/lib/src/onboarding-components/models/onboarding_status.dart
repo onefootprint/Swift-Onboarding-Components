@@ -1,4 +1,3 @@
-import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/collected_data_option.dart';
 
 enum OnboardingRequirementKind {
@@ -126,11 +125,9 @@ class OnboardingRequirement {
 
 class OnboardingStatusResponse {
   final List<OnboardingRequirement> allRequirements;
-  final OnboardingConfig obConfiguration;
 
   OnboardingStatusResponse({
     required this.allRequirements,
-    required this.obConfiguration,
   });
 
   factory OnboardingStatusResponse.fromJson(Map<String, dynamic> json) {
@@ -143,7 +140,6 @@ class OnboardingStatusResponse {
 
     return OnboardingStatusResponse(
       allRequirements: allRequirements,
-      obConfiguration: OnboardingConfig.fromJson(json['ob_configuration']),
     );
   }
 }

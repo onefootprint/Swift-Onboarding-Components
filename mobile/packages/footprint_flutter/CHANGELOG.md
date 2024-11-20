@@ -32,3 +32,7 @@
 ## 2.0.0-beta.3.1
 
 Late initialization bug fix
+
+## 2.0.0-beta.3.2
+
+Align with requirements and onboarding status API response changes

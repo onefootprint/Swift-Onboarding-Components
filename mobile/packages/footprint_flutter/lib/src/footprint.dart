@@ -73,13 +73,13 @@ class _Footprint {
 
   void _openWebView(String url) {
     _browser.open(
-        url: Uri.parse(url),
-        options: ChromeSafariBrowserClassOptions(
-            android: AndroidChromeCustomTabsOptions(
-                shareState: CustomTabsShareState.SHARE_STATE_OFF),
-            ios: IOSSafariOptions(
-                barCollapsingEnabled: true,
-                presentationStyle: IOSUIModalPresentationStyle.FORM_SHEET)));
+      url: WebUri(url),
+      settings: ChromeSafariBrowserSettings(
+        shareState: CustomTabsShareState.SHARE_STATE_OFF,
+        barCollapsingEnabled: true,
+        presentationStyle: ModalPresentationStyle.FORM_SHEET,
+      ),
+    );
   }
 
   void _handleIncomingLinks() {
