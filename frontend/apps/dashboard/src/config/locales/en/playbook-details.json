@@ -403,6 +403,7 @@
     "current-version": "Current version",
     "original-version": "Original version",
     "version-history": "Version history",
-    "edited-by": "Edited by {{name}}"
+    "edited-by": "Edited by {{name}}",
+    "created-by": "Created by {{name}}"
   }
 }
