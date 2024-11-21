@@ -2,7 +2,7 @@ import { putOrgPlaybooksByPlaybookId } from '@onefootprint/axios/dashboard';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { PutOrgPlaybooksByPlaybookIdData } from '@onefootprint/request-types/dashboard';
 import { useToast } from '@onefootprint/ui';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,7 @@ const useCreatePlaybook = () => {
   const router = useRouter();
   const errorToast = useRequestErrorToast();
   const buttons = useDialogButtons();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: PutOrgPlaybooksByPlaybookIdData) => {
@@ -27,12 +28,13 @@ const useCreatePlaybook = () => {
         description: t('feedback.success.description'),
       });
       if (response.data) {
-        router.replace(`/playbooks/${response.data.id}`);
+        router.replace(`/playbooks/${response.data.playbookId}`);
       }
     },
     onError: errorToast,
     onSettled: () => {
       buttons.setBusy(false);
+      queryClient.invalidateQueries();
     },
   });
 };

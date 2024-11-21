@@ -205,7 +205,9 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
                   playbookId: playbook.playbookId,
                 },
               },
-              // { onSuccess: onDone },
+              {
+                onSuccess: onDone,
+              },
             );
           }}
         />
