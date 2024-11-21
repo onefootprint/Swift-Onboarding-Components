@@ -404,6 +404,11 @@
     "original-version": "Original version",
     "version-history": "Version history",
     "edited-by": "Edited by {{name}}",
-    "created-by": "Created by {{name}}"
+    "created-by": "Created by {{name}}",
+    "current": "Current version",
+    "restore": "Restore to this version",
+    "nav": "Navigation",
+    "changes": "Changes",
+    "configurations": "Configurations"
   }
 }

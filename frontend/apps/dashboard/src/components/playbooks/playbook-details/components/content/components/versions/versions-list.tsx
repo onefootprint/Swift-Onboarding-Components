@@ -5,8 +5,8 @@ import getAuthor from './utils/get-author';
 import getCreatedTime from './utils/get-created-time';
 
 type VersionsListProps = {
-  playbooks: OnboardingConfiguration[];
   onChange: (playbook: OnboardingConfiguration) => void;
+  playbooks: OnboardingConfiguration[];
   selected: OnboardingConfiguration;
 };
 

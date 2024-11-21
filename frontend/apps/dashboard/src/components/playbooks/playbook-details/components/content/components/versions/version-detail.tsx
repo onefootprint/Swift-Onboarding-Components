@@ -7,17 +7,19 @@ import PlaybookDiff from 'src/components/playbooks/playbook-diff';
 import getAuthor from './utils/get-author';
 import getCreatedTime from './utils/get-created-time';
 
+type VersionView = 'diff' | 'config';
+
 type VersionDetailsProps = {
-  playbook: OnboardingConfiguration;
-  previousPlaybook: OnboardingConfiguration | null;
   isCurrent: boolean;
   isOriginal: boolean;
   onRestore: () => void;
+  playbook: OnboardingConfiguration;
+  previousPlaybook: OnboardingConfiguration | null;
 };
 
-const VersionDetails = ({ playbook, previousPlaybook, isCurrent, isOriginal, onRestore }: VersionDetailsProps) => {
+const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPlaybook }: VersionDetailsProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'versions' });
-  const [nav, setNav] = useState('diff');
+  const [nav, setNav] = useState<VersionView>('diff');
 
   useEffect(() => {
     setNav(isOriginal ? 'config' : 'diff');
@@ -35,26 +37,26 @@ const VersionDetails = ({ playbook, previousPlaybook, isCurrent, isOriginal, onR
             </h2>
             {' · '}
             {isCurrent ? (
-              <div className="text-label-2 text-info">Current version</div>
+              <div className="text-label-2 text-info">{t('current')}</div>
             ) : (
               <LinkButton variant="label-2" onClick={onRestore}>
-                Restore to this version
+                {t('restore')}
               </LinkButton>
             )}
           </div>
           {isOriginal ? null : (
-            <SegmentedControl
-              aria-label="lorem"
+            <SegmentedControl<VersionView>
+              aria-label={t('nav')}
               value={nav}
               onChange={setNav}
               options={[
                 {
                   value: 'diff',
-                  label: 'Changes',
+                  label: t('changes'),
                 },
                 {
                   value: 'config',
-                  label: 'Configurations',
+                  label: t('configurations'),
                 },
               ]}
             />

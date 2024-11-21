@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components';
 import Text from '../../../text';
 import type { SegmentedControlSize, SegmentedControlVariant } from '../../segmented-control';
 
-export type SegmentedControlOptionFields = {
-  value: string;
+export type SegmentedControlOptionFields<T extends string = string> = {
+  value: T;
   label: string;
   size?: SegmentedControlSize;
   variant?: SegmentedControlVariant;
