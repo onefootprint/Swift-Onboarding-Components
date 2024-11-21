@@ -21,7 +21,7 @@ class Greeting {
                 val error = response.response.body<HttpError>()
                 println("Hosted onboarding error: $error")
 
-                throw FootprintException(FootprintException.ErrorKind.ONBOARDING_ERROR, error.message, supporId = error.supportId)
+                throw FootprintException(FootprintException.ErrorKind.ONBOARDING_ERROR, error.message, supportId = error.supportId)
             }
             return response.body()
     }

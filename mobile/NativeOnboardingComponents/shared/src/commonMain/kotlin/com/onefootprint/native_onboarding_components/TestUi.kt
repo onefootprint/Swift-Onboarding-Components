@@ -1,49 +1,92 @@
 package com.onefootprint.native_onboarding_components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
-import com.onefootprint.native_onboarding_components.models.FootprintException
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.openapitools.client.models.PublicOnboardingConfiguration
 
 @Composable
 @Preview
 fun TestUi() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+        var showVerificationInput by remember { mutableStateOf(false) }
+        var verificationCode by remember { mutableStateOf("") }
+        var initializationMessage by remember { mutableStateOf<String?>(null) }
+        var verificationResponseMessage by remember { mutableStateOf<String?>(null) }
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Display initialization message
+            initializationMessage?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
             }
-            AnimatedVisibility(showContent) {
-                var onboardingConfig by remember { mutableStateOf<PublicOnboardingConfiguration?>(null)}
-                LaunchedEffect(Unit) {
-                    try {
-                    val onboardingConfiguration = Greeting().getOnboardingConfig()
-                        onboardingConfig = onboardingConfiguration
-                    }catch (e: FootprintException){
-                        println("error toString: ${e.toString()}")
-                        println("error kind: ${e.kind}")
-                        println("error message: ${e.message}")
-                        println("error supportID: ${e.supporId}")
+
+            // Button to toggle verification input visibility
+            Button(onClick = { showVerificationInput = !showVerificationInput }) {
+                Text("Toggle Verification Input")
+            }
+
+            // Verification input and button
+            AnimatedVisibility(visible = showVerificationInput) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    OutlinedTextField(
+                        value = verificationCode,
+                        onValueChange = { verificationCode = it },
+                        label = { Text("Enter Verification Code") },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+                    Button(onClick = {
+                        try {
+                            runBlocking {
+                                val response = Footprint.verify(verificationCode = verificationCode)
+                                verificationResponseMessage = "Verification successful: ${response.validationToken}"
+                            }
+                        } catch (e: Exception) {
+                            verificationResponseMessage = "Verification failed: ${e.message}"
+                        }
+                    }) {
+                        Text("Verify Code")
                     }
                 }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Onboarding config data",fontSize = 24.sp )
-                    Text("Name: ${onboardingConfig?.name}")
-                    Text("orgName: ${onboardingConfig?.orgName}")
-                    Text("Key: ${onboardingConfig?.key}")
+            }
 
-                }
+            // Display verification response
+            verificationResponseMessage?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+
+        // Run initialization logic on mount
+        LaunchedEffect(Unit) {
+            try {
+                val response = Footprint.initialize(publicKey = "pb_test_Uc3tXMWyn9XR53Mng1KnZl")
+                println("" + response.requiresAuth + ", " + response.authMethod)
+                val createChallengeResponse = Footprint.createChallenge(
+                    email = "raisul.ahsan.ahsan@gmail.com",
+                    phoneNumber = "+15055079015"
+                )
+                println("Create challenge response: $createChallengeResponse")
+                initializationMessage = "Initialization completed successfully!"
+            } catch (e: Exception) {
+                println("Initialization failed: ${e.message}")
+                initializationMessage = "Initialization failed: ${e.message}"
             }
         }
     }

@@ -2,10 +2,16 @@ package com.onefootprint.native_onboarding_components
 
 import com.onefootprint.native_onboarding_components.models.AuthTokenStatus
 import com.onefootprint.native_onboarding_components.models.DocumentOutcome
+import com.onefootprint.native_onboarding_components.models.FootprintAuthMethods
+import com.onefootprint.native_onboarding_components.models.FootprintAuthRequirement
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
+import com.onefootprint.native_onboarding_components.models.VerificationResponse
+import com.onefootprint.native_onboarding_components.utils.AuthUtils
 import com.onefootprint.native_onboarding_components.utils.generateRandomString
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
@@ -19,7 +25,7 @@ object Footprint {
     private var authValidationToken: String? = null
     private var vaultData: String? = null // TODO: update the type here
     private var onboardingConfig: PublicOnboardingConfiguration? = null
-    private var challengeResponse: IdentifyChallengeResponse? = null
+    private var challenge: IdentifyChallengeResponse? = null
 
     // TODO: add requirements field (check we actually need requirements field)
     private var sandboxId: String? = null
@@ -27,6 +33,10 @@ object Footprint {
     private var isReady: Boolean = false
     // TODO: add l10n
     // TODO: add appearance
+
+    // To ensure that only one coroutine can modify the state of the Footprint object at any given time
+    // private functions won't have to use the mutex
+    private val mutex = Mutex()
 
     private fun reset() {
         publicKey = null
@@ -37,7 +47,7 @@ object Footprint {
         authValidationToken = null
         vaultData = null
         onboardingConfig = null
-        challengeResponse = null
+        challenge = null
         sandboxId = null
         sandboxOutcome = null
         isReady = false
@@ -48,58 +58,125 @@ object Footprint {
         authToken: String? = null,
         sandboxId: String? = null,
         sandboxOutcome: SandboxOutcome? = null
-    ) {
-        reset()
-        if (publicKey == null && authToken == null) {
-            throw FootprintException(
-                kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
-                message = "Must provide public key or auth token"
-            )
-        }
-
-        try {
-            onboardingConfig = FootprintQueries.getOnboardingConfig(
-                publicKey = publicKey,
-                authToken = authToken
-            )
-            this.publicKey = publicKey
-            this.authToken = authToken
-        }catch (e: Exception){
-            println(e)
-        }
-
-        if(onboardingConfig == null){
+    ): FootprintAuthRequirement {
+        mutex.withLock {
             reset()
-            throw FootprintException(
-                kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
-                message = "Something went wrong. Fetched onboarding config is null"
-            )
-        }
+            if (publicKey == null && authToken == null) {
+                throw FootprintException(
+                    kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
+                    message = "Must provide public key or auth token"
+                )
+            }
 
-        if(onboardingConfig!!.kind != ObConfigurationKind.kyc){
-            reset()
-            throw FootprintException(
-                kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
-                message = "Only KYC playbooks are supported"
-            )
-        }
+            try {
+                onboardingConfig = FootprintQueries.getOnboardingConfig(
+                    publicKey = publicKey,
+                    authToken = authToken
+                )
+                this.publicKey = publicKey
+                this.authToken = authToken
+            } catch (e: Exception) {
+                reset()
+                throw e
+            }
 
-        if(onboardingConfig!!.isLive){
-            this.sandboxId = null
-            this.sandboxOutcome = null
-        }else{
-            if (sandboxId?.any { !it.isLetterOrDigit() } == true) {
+            if (onboardingConfig == null) {
                 reset()
                 throw FootprintException(
                     kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
-                    message = "Invalid sandboxId. Can only contain alphanumeric characters."
+                    message = "Something went wrong. Fetched onboarding config is null"
                 )
             }
-            this.sandboxId = sandboxId ?: generateRandomString()
-            val requiresDocument = onboardingConfig!!.requiresIdDoc
-            val overallOutcome = sandboxOutcome?.overallOutcome ?: OverallOutcome.PASS
-            val documentOutcome = if(requiresDocument) sandboxOutcome?.documentOutcome ?: DocumentOutcome.PASS else null
-            this.sandboxOutcome = SandboxOutcome(overallOutcome = overallOutcome, documentOutcome = documentOutcome)
+
+            if (onboardingConfig!!.kind != ObConfigurationKind.kyc) {
+                reset()
+                throw FootprintException(
+                    kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
+                    message = "Only KYC playbooks are supported"
+                )
+            }
+
+            if (onboardingConfig!!.isLive) {
+                this.sandboxId = null
+                this.sandboxOutcome = null
+            } else {
+                if (sandboxId?.any { !it.isLetterOrDigit() } == true) {
+                    reset()
+                    throw FootprintException(
+                        kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
+                        message = "Invalid sandboxId. Can only contain alphanumeric characters."
+                    )
+                }
+                this.sandboxId = sandboxId ?: generateRandomString()
+                val requiresDocument = onboardingConfig!!.requiresIdDoc
+                val overallOutcome = sandboxOutcome?.overallOutcome ?: OverallOutcome.PASS
+                val documentOutcome = if (requiresDocument) sandboxOutcome?.documentOutcome
+                    ?: DocumentOutcome.PASS else null
+                this.sandboxOutcome = SandboxOutcome(
+                    overallOutcome = overallOutcome,
+                    documentOutcome = documentOutcome
+                )
+            }
+            try {
+                authTokenStatus = AuthUtils.validateAuthToken(
+                    onboardingConfig = onboardingConfig,
+                    authToken = authToken
+                )
+
+                when (authTokenStatus) {
+                    AuthTokenStatus.VALID_WITH_SUFFICIENT_SCOPE ->
+                        return FootprintAuthRequirement(requiresAuth = false, authMethod = null)
+
+                    AuthTokenStatus.VALID_WITH_INSUFFICIENT_SCOPE ->
+                        return FootprintAuthRequirement(
+                            requiresAuth = true,
+                            authMethod = FootprintAuthMethods.AUTH_TOKEN
+                        )
+
+                    else ->
+                        return FootprintAuthRequirement(
+                            requiresAuth = true,
+                            authMethod = FootprintAuthMethods.EMAIL_PHONE
+                        )
+                }
+            } catch (e: Exception) {
+                reset()
+                throw e
+            }
+        }
+    }
+
+    suspend fun createChallenge(email: String? = null, phoneNumber: String? = null): String {
+        mutex.withLock {
+            challenge = AuthUtils.createChallenge(
+                publicKey = publicKey,
+                email = email,
+                phoneNumber = phoneNumber,
+                onboardingConfig = onboardingConfig,
+                authToken = authToken,
+                sandboxId = sandboxId
+            )
+            return challenge!!.challengeData.challengeKind.toString()
+        }
+    }
+
+    suspend fun verify(
+        verificationCode: String
+    ): VerificationResponse{
+        mutex.withLock {
+            val verificationResponseInternal = AuthUtils.verify(
+                challenge = challenge,
+                challengeResponse = verificationCode,
+                onboardingConfig = onboardingConfig,
+                overallOutcome = sandboxOutcome?.overallOutcome
+            )
+            verifiedAuthToken = verificationResponseInternal.authToken
+            authValidationToken = verificationResponseInternal.validationToken
+            vaultingToken = verificationResponseInternal.vaultingToken
+
+            return VerificationResponse(
+                validationToken = verificationResponseInternal.validationToken
+            )
         }
     }
 }
