@@ -7,13 +7,13 @@ import { LoadingSpinner } from '@onefootprint/ui';
 import useDiffPlaybooks from './hooks/use-diff-playbooks';
 
 type PlaybookDiffProps = {
-  currentPlaybook: OnboardingConfiguration;
+  oldPlaybook: OnboardingConfiguration;
   newPlaybookPayload: CreateOnboardingConfigurationRequest;
 };
 
-const PlaybookDiff = ({ currentPlaybook, newPlaybookPayload }: PlaybookDiffProps) => {
+const PlaybookDiff = ({ oldPlaybook, newPlaybookPayload }: PlaybookDiffProps) => {
   const diffMutation = useDiffPlaybooks({
-    currentPlaybook,
+    oldPlaybook,
     newPlaybookPayload: newPlaybookPayload,
   });
 

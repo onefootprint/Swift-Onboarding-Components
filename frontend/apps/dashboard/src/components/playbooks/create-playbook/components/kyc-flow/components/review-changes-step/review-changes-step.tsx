@@ -48,7 +48,7 @@ const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewC
         <InlineAlert variant="warning" marginBottom={7}>
           {t('warning')}
         </InlineAlert>
-        <PlaybookDiff currentPlaybook={playbook} newPlaybookPayload={createPayload(formData)} />
+        <PlaybookDiff oldPlaybook={playbook} newPlaybookPayload={createPayload(formData)} />
       </div>
     </form>
   );

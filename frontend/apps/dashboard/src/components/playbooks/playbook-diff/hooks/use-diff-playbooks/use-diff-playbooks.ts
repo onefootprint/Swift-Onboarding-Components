@@ -8,10 +8,10 @@ import { useEffect } from 'react';
 import createDiff from './utils/create-diff';
 
 const useDiffPlaybooks = ({
-  currentPlaybook,
+  oldPlaybook,
   newPlaybookPayload,
 }: {
-  currentPlaybook: OnboardingConfiguration;
+  oldPlaybook: OnboardingConfiguration;
   newPlaybookPayload: CreateOnboardingConfigurationRequest;
 }) => {
   const mutation = useMutation(
@@ -24,10 +24,10 @@ const useDiffPlaybooks = ({
     try {
       await mutation.mutateAsync({
         path: {
-          playbookId: currentPlaybook.playbookId,
+          playbookId: oldPlaybook.playbookId,
         },
         body: {
-          expectedLatestObcId: currentPlaybook.id,
+          expectedLatestObcId: oldPlaybook.id,
           newOnboardingConfig: newPlaybookPayload,
         },
       });
@@ -43,7 +43,7 @@ const useDiffPlaybooks = ({
 
   return {
     ...mutation,
-    data: mutation.data && createDiff(currentPlaybook, mutation.data),
+    data: mutation.data && createDiff(oldPlaybook, mutation.data),
   };
 };
 
