@@ -27,13 +27,17 @@ pub enum Expiry {
 }
 
 impl AuthSession {
-    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> FpResult<Self> {
+    pub fn get(
+        conn: &mut PgConn,
+        sealing_key: &ScopedSealingKey,
+        auth_token: &SessionAuthToken,
+    ) -> FpResult<Self> {
         let key = auth_token.id();
-        let session: Option<Session> = state.db_query(move |conn| Session::get(conn, key)).await?;
+        let session = Session::get(conn, key)?;
         let Some(session) = session else {
             return Err(ErrorWithCode::NoSessionFound.into());
         };
-        let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data));
+        let data = AuthSessionData::unseal(sealing_key, SealedSessionBytes(session.data));
         let data = if let Err(crypto::Error::Cbor(e)) = data {
             tracing::info!(e=?e, "Couldn't parse auth session");
             if session.expires_at <= Utc::now() {

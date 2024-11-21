@@ -152,31 +152,29 @@ where
                 .collect_vec();
             let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
             let auth_token = SessionAuthToken::from(auth_token);
-
             root_span.record("auth_token_hash", auth_token.id().to_string());
-            let session = AuthSession::get(&state, &auth_token).await?;
 
-            // Explicit type annotation here (T:: try_from) automatically ensures that a malicious user
-            // cannot re-use session tokens for different purposes -- the API endpoints declare the
-            // session type "T" that they allow (example:
-            // UserSession<OnboardingSessionData>) and if the session associated with the
-            // token cannot be converted to type T (in this case, OnboardingSession) we
-            // fail
-            let raw_session_data = session.data.clone();
             let ff_client = state.ff_client.clone();
-
-            let parsed_session_data = state
-                .db_query(move |conn| T::try_load_session(raw_session_data, conn, ff_client, req))
+            let sealing_key = state.session_sealing_key.clone();
+            let (session, parsed_session_data, auth_token) = state
+                .db_query(move |conn| {
+                    let session = AuthSession::get(conn, &sealing_key, &auth_token)?;
+                    let parsed_session_data =
+                        T::try_load_session(session.data.clone(), conn, ff_client, req)?;
+                    Ok((session, parsed_session_data, auth_token))
+                })
                 .await
                 .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers.join(" or "), e))?;
+
             parsed_session_data.log_authed_principal(root_span);
 
-            Ok(Self {
+            let result = Self {
                 data: parsed_session_data,
                 auth_token,
                 session,
                 phantom: PhantomData,
-            })
+            };
+            Ok(result)
         };
         Box::pin(extractor.in_current_span())
     }

@@ -42,22 +42,22 @@ pub async fn post(
     root_span: RootSpan,
 ) -> ApiResponse<ValidateResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
-
     root_span.record("auth_token_hash", request.validation_token.id().to_string());
-    let session = AuthSession::get(&state, &request.validation_token).await?.data;
 
-    let AuthSessionData::ValidateUserToken(ValidateUserToken {
-        sv_id,
-        wf_id,
-        biz_wf_id,
-        auth_event_ids,
-    }) = session
-    else {
-        return Err(OnboardingError::ValidateTokenInvalid.into());
-    };
-
+    let sealing_key = state.session_sealing_key.clone();
     let (sv, auth_events, wf, biz_wf) = state
         .db_query(move |conn| {
+            let session = AuthSession::get(conn, &sealing_key, &request.validation_token)?.data;
+            let AuthSessionData::ValidateUserToken(ValidateUserToken {
+                sv_id,
+                wf_id,
+                biz_wf_id,
+                auth_event_ids,
+            }) = session
+            else {
+                return Err(OnboardingError::ValidateTokenInvalid.into());
+            };
+
             let sv = ScopedVault::get(conn, &sv_id)?;
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {

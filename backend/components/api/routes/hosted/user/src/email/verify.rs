@@ -30,7 +30,10 @@ pub async fn post(
 ) -> ApiResponse<api_wire_types::Empty> {
     // NOTE this is no longer used.
     // Check the context in https://github.com/onefootprint/monorepo/pull/10698
-    let session = AuthSession::get(&state, &request.data).await?;
+    let sealing_key = state.session_sealing_key.clone();
+    let session = state
+        .db_query(move |conn| AuthSession::get(conn, &sealing_key, &request.data))
+        .await?;
 
     let AuthSessionData::EmailVerify(_) = session.data else {
         return Err(ChallengeError::EmailVerificationTokenInvalid.into());
