@@ -1,7 +1,7 @@
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { Dialog, LinkButton } from '@onefootprint/ui';
 import { cx } from 'class-variance-authority';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import getAuthor from './utils/get-author';
 import getCreatedTime from './utils/get-created-time';
@@ -16,6 +16,10 @@ const Versions = ({ open, onClose, playbooks }: VersionsProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'versions' });
   const [current] = playbooks;
   const [selectedPlaybook, setSelectedPlaybook] = useState<OnboardingConfiguration>(current);
+
+  useEffect(() => {
+    if (!open) setSelectedPlaybook(current);
+  }, [open]);
 
   return (
     <Dialog title={t('title')} size="full-screen" open={open} onClose={onClose} noPadding noScroll>
