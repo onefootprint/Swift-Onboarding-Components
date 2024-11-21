@@ -1,32 +1,20 @@
 import { IcoMinusSmall16, IcoPlusSmall16 } from '@onefootprint/icons';
-import type {
-  CreateOnboardingConfigurationRequest,
-  OnboardingConfiguration,
-} from '@onefootprint/request-types/dashboard';
-import { LoadingSpinner } from '@onefootprint/ui';
-import useDiffPlaybooks from './hooks/use-diff-playbooks';
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
+import createPlaybookDiff from './utils/create-playbook-diff';
 
 type PlaybookDiffProps = {
-  oldPlaybook: OnboardingConfiguration;
-  newPlaybookPayload: CreateOnboardingConfigurationRequest;
+  playbookA: OnboardingConfiguration;
+  playbookB: OnboardingConfiguration;
 };
 
-const PlaybookDiff = ({ oldPlaybook, newPlaybookPayload }: PlaybookDiffProps) => {
-  const diffMutation = useDiffPlaybooks({
-    oldPlaybook,
-    newPlaybookPayload: newPlaybookPayload,
-  });
+const PlaybookDiff = ({ playbookA, playbookB }: PlaybookDiffProps) => {
+  const changes = createPlaybookDiff(playbookA, playbookB);
 
   return (
     <>
-      {diffMutation.isPending && (
-        <div className="mt-3 flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      )}
-      {diffMutation.data?.length && (
+      {changes.length && (
         <ul className="flex flex-col gap-6">
-          {diffMutation.data.map(diff => (
+          {changes.map(diff => (
             <li key={diff.label} className="flex flex-col gap-3">
               <h3 className="text-secondary text-label-3">{diff.label}</h3>
               {diff.changes.map(change => (

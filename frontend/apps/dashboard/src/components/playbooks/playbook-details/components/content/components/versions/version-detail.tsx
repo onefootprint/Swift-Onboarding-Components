@@ -66,21 +66,7 @@ const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPl
       </header>
       <div>
         {nav === 'diff' && playbook && previousPlaybook && (
-          <PlaybookDiff
-            oldPlaybook={previousPlaybook}
-            newPlaybookPayload={{
-              allowInternationalResidents: playbook.allowInternationalResidents,
-              allowUsResidents: playbook.allowUsResidents,
-              allowUsTerritories: playbook.allowUsTerritoryResidents,
-              documentsToCollect: playbook.documentsToCollect,
-              kind: playbook.kind,
-              mustCollectData: playbook.mustCollectData,
-              name: playbook.name,
-              optionalData: playbook.optionalData,
-              requiredAuthMethods: playbook.requiredAuthMethods,
-              verificationChecks: playbook.verificationChecks,
-            }}
-          />
+          <PlaybookDiff playbookA={previousPlaybook} playbookB={playbook} />
         )}
         {nav === 'config' && playbook && <PlaybookConfig playbook={playbook} />}
       </div>

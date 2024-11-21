@@ -1,5 +1,5 @@
 import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
-import createDiff from './create-diff';
+import createDiff from './create-playbook-diff';
 
 describe('createDiff', () => {
   describe('Name', () => {

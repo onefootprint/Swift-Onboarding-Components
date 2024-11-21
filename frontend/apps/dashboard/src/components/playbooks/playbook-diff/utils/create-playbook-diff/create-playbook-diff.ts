@@ -1,7 +1,9 @@
 import type { AuthMethodKind, OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import isEqual from 'lodash/isEqual';
 
-type Diff = { alias: string; old: string; updated: string };
+export type Changes = { label: string; changes: Array<Diff> };
+
+export type Diff = { alias: string; old: string; updated: string };
 
 const getResidencyChanges = (old: OnboardingConfiguration, updated: OnboardingConfiguration) => {
   const residencyChanges: Array<Diff> = [];
@@ -588,7 +590,7 @@ const getVerificationCheckChanges = (old: OnboardingConfiguration, updated: Onbo
 };
 
 const createDiff = (old: OnboardingConfiguration, updated: OnboardingConfiguration) => {
-  const diff: Array<{ label: string; changes: Array<Diff> }> = [];
+  const diff: Array<Changes> = [];
   const getBasicInfo = getBasicInfoChanges(old, updated);
 
   // Name

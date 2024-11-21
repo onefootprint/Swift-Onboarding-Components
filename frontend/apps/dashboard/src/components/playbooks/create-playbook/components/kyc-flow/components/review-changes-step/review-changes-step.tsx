@@ -1,5 +1,8 @@
+import { putOrgPlaybooksByPlaybookIdMutation } from '@onefootprint/axios/dashboard';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { InlineAlert, Stack } from '@onefootprint/ui';
+import { InlineAlert, LoadingSpinner, Stack } from '@onefootprint/ui';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PlaybookDiff from 'src/components/playbooks/playbook-diff';
 import Header from '../../../header';
@@ -30,6 +33,32 @@ const ReviewChangesStep = ({ onBack, onSubmit, meta }: ReviewChangesStepProps) =
 
 const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewChangesStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.review-changes' });
+  const mutation = useMutation(
+    putOrgPlaybooksByPlaybookIdMutation({
+      headers: { 'X-Fp-Dry-Run': true },
+    }),
+  );
+
+  const validateChanges = async () => {
+    try {
+      await mutation.mutateAsync({
+        path: {
+          playbookId: playbook.playbookId,
+        },
+        body: {
+          expectedLatestObcId: playbook.id,
+          newOnboardingConfig: createPayload(formData),
+        },
+      });
+    } catch (error) {
+      // TODO: handle error
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    validateChanges();
+  }, []);
 
   return (
     <form
@@ -48,7 +77,14 @@ const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewC
         <InlineAlert variant="warning" marginBottom={7}>
           {t('warning')}
         </InlineAlert>
-        <PlaybookDiff oldPlaybook={playbook} newPlaybookPayload={createPayload(formData)} />
+        <div>
+          {mutation.isPending && (
+            <div className="mt-3 flex items-center justify-center">
+              <LoadingSpinner />
+            </div>
+          )}
+          {mutation.data && <PlaybookDiff playbookA={playbook} playbookB={mutation.data} />}
+        </div>
       </div>
     </form>
   );
