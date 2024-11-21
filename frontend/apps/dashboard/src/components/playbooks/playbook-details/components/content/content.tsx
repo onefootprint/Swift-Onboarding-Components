@@ -6,9 +6,10 @@ import Header from './components/header';
 
 type ContentProps = {
   playbook: OnboardingConfiguration;
+  playbooks: OnboardingConfiguration[];
 };
 
-const Content = ({ playbook }: ContentProps) => {
+const Content = ({ playbook, playbooks }: ContentProps) => {
   const [isHeadingDisabled, setIsHeadingDisabled] = useState(false);
 
   return (
@@ -17,7 +18,7 @@ const Content = ({ playbook }: ContentProps) => {
         <Breadcrumb playbookName={playbook.name} isDisabled={isHeadingDisabled} />
       </div>
       <div className="mb-6">
-        <Header playbook={playbook} isDisabled={isHeadingDisabled} />
+        <Header playbook={playbook} playbooks={playbooks} isDisabled={isHeadingDisabled} />
       </div>
       <PlaybookConfig
         playbook={playbook}

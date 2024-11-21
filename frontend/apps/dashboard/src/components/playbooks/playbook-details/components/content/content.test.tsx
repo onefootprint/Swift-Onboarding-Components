@@ -7,7 +7,7 @@ jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Content />', () => {
   const renderContent = (playbook: OnboardingConfiguration) => {
-    customRender(<Content playbook={playbook} />);
+    customRender(<Content playbook={playbook} playbooks={[playbook]} />);
   };
 
   describe('doc only playbook', () => {

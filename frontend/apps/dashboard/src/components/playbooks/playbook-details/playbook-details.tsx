@@ -17,7 +17,7 @@ const PlaybookDetails = () => {
 
   return (
     <>
-      {playbooks.length > 0 && <Content playbook={playbook} />}
+      {playbooks.length > 0 && <Content playbook={playbook} playbooks={playbooks} />}
       {isPending && <Loading />}
       {error && <ErrorComponent message={getErrorMessage(error)} />}
     </>

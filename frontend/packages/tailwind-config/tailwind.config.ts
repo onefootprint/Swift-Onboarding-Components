@@ -54,14 +54,15 @@ const config: Omit<Config, 'content'> = {
       info: 'var(--border-info)',
       success: 'var(--border-success)',
       warning: 'var(--border-warning)',
+      accent: 'var(--border-accent)',
     },
     borderRadius: {
-      none: 'var(--radius-none)',
-      xs: 'var(--radius-xs)',
-      sm: 'var(--radius-sm)',
-      DEFAULT: 'var(--radius-default)',
-      lg: 'var(--radius-lg)',
-      full: 'var(--radius-full)',
+      none: '0px',
+      xs: '2px',
+      sm: '4px',
+      DEFAULT: '6px',
+      lg: '20px',
+      full: '9999px',
     },
     extend: {
       fontFamily: {

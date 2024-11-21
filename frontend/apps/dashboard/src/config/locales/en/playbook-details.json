@@ -21,7 +21,8 @@
       "document": "Document"
     },
     "name": "Playbook name",
-    "publishable-key": "Publishable key"
+    "publishable-key": "Publishable key",
+    "edited": "Edited"
   },
   "tabs": {
     "data-collection": "Data collection",
@@ -396,5 +397,11 @@
     "email-address": "Email address",
     "email-otp": "Email address",
     "phone-otp": "Phone number"
+  },
+  "versions": {
+    "title": "Playbook edits",
+    "current-version": "Current version",
+    "version-history": "Version history",
+    "edited-by": "Edited by {{name}}"
   }
 }
