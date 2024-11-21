@@ -74,14 +74,14 @@ const List = ({
                 <button
                   type="button"
                   onClick={() => onChange(playbook)}
-                  className={cx('flex-1 flex flex-col gap-1 p-3 rounded border border-solid w-full mb-4', {
+                  className={cx('flex-1 flex flex-col gap-1 p-3 rounded border border-solid w-full mb-4 group', {
+                    'bg-primary border-tertiary hover:border-primary': selected.id !== playbook.id,
                     'bg-active border-accent': selected.id === playbook.id,
-                    'bg-primary border-tertiary': selected.id !== playbook.id,
                   })}
                 >
                   <div className="flex justify-between gap-4 w-full">
                     <div
-                      className={cx('text-label-3', {
+                      className={cx('text-label-3 group-hover:text-accent', {
                         'text-accent': selected.id === playbook.id,
                         'text-primary': selected.id !== playbook.id,
                       })}
