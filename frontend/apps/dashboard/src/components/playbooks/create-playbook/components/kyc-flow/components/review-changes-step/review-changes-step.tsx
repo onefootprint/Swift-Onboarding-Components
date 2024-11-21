@@ -2,10 +2,10 @@ import { IcoMinusSmall16, IcoPlusSmall16 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { InlineAlert, LoadingSpinner, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import useDiffPlaybooks from 'src/hooks/use-diff-playbooks';
 import Header from '../../../header';
 import createPayload from '../../utils/create-payload';
 import type { StateFormData } from '../../utils/reducer';
-import useDiffPlaybooks from './hooks/use-diff-playbooks/use-diff-playbooks';
 
 export type ReviewChangesStepProps = {
   onBack: () => void;
