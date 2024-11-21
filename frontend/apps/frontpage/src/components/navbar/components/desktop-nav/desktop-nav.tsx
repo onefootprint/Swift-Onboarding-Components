@@ -22,21 +22,26 @@ type DesktopNavProps = {
   entries: NavEntry[];
 };
 
-const handleLoginClick = () => {
-  window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-};
-
-const handleSignUpClick = () => {
-  window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-};
-
 const DesktopNav = ({ entries }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const router = useRouter();
   const isArticlePage = router.pathname.includes(ARTICLE_URL);
   const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
+  const signInUrl = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-in`);
+  const signUpUrl = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
 
-  const handleCloseBanner = () => setIsBannerVisible(false);
+  const handleCloseBanner = () => {
+    setIsBannerVisible(false);
+  };
+
+  const handleLoginClick = () => {
+    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
+  };
+
+  const handleSignUpClick = () => {
+    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
+  };
+
   return (
     <NavigationMenu.Root asChild>
       <NavContainer>
@@ -61,18 +66,10 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
             })}
           </MainNav>
           <SecondaryNav>
-            <Login
-              href={addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-in`)}
-              target="_blank"
-              onClick={handleLoginClick}
-            >
+            <Login href={signInUrl} onClick={handleLoginClick} target="_blank">
               {t('login')}
             </Login>
-            <Signup
-              onClick={handleSignUpClick}
-              href={addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`)}
-              target="_blank"
-            >
+            <Signup href={signUpUrl} onClick={handleSignUpClick} target="_blank">
               {t('sign-up')}
             </Signup>
           </SecondaryNav>

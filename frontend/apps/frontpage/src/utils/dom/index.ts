@@ -12,7 +12,6 @@ export const getCurrentParams = (): URLSearchParams => {
 export const addCurrentParamsToUrl = (baseUrl: string): string => {
   if (typeof window === 'undefined') return baseUrl;
   if (!baseUrl) return '';
-
   const params = getCurrentParams();
   if (params.toString().length === 0) {
     return baseUrl;
