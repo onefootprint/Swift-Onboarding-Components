@@ -16,7 +16,6 @@ use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
-use db::models::session::Session;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use db::models::workflow_request_junction::WorkflowRequestJunction;
@@ -44,7 +43,7 @@ pub struct CreateTokenArgs<'a> {
 
 pub struct CreateTokenResult {
     pub token: SessionAuthToken,
-    pub session: Session,
+    pub session: AuthSession,
     /// For Inherit tokens, the WorkflowRequest being inherited
     pub wfr: Option<WorkflowRequest>,
 }

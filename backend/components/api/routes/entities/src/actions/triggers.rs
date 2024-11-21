@@ -3,6 +3,7 @@ use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
 use api_core::task::execute_webhook_tasks;
+use api_core::utils::session::AuthSession;
 use api_core::utils::token::create_token;
 use api_core::utils::token::CreateTokenArgs;
 use api_core::utils::token::CreateTokenResult;
@@ -19,7 +20,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
-use db::models::session::Session;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
@@ -88,7 +88,7 @@ fn validate(
 
 pub(super) struct TriggerRequestOutcome {
     token: SessionAuthToken,
-    session: Session,
+    session: AuthSession,
 }
 
 pub(super) fn apply_trigger_request(

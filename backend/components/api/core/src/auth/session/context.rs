@@ -94,14 +94,8 @@ impl<T> SessionContext<T> {
         session: AuthSessionData,
         max_duration: Option<Duration>,
     ) -> FpResult<(SessionAuthToken, DateTime<Utc>)> {
-        let current_expires_at = self.expires_at();
-        let expires_at = if let Some(duration) = max_duration {
-            current_expires_at.min(Utc::now() + duration)
-        } else {
-            current_expires_at
-        };
-        let (token, session) = AuthSession::create_sync(conn, session_key, session, expires_at)?;
-        Ok((token, session.expires_at))
+        self.session
+            .create_derived(conn, session_key, session, max_duration)
     }
 }
 

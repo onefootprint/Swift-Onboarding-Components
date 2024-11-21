@@ -88,7 +88,7 @@ impl AuthSession {
         session_sealing_key: &ScopedSealingKey,
         data: T,
         expiry: impl Into<Expiry>,
-    ) -> FpResult<(SessionAuthToken, Session)> {
+    ) -> FpResult<(SessionAuthToken, Self)> {
         let data = data.into();
         let tok_prefix = data.token_prefix();
         let token = SessionAuthToken::generate(tok_prefix);
@@ -100,7 +100,12 @@ impl AuthSession {
         };
         let kind = data.session_kind();
         let sealed_data = data.seal(session_sealing_key)?;
-        let session = Session::update_or_create(conn, token.id(), sealed_data.0, kind, expires_at)?;
+        Session::update_or_create(conn, token.id(), sealed_data.0, kind, expires_at)?;
+        let session = Self {
+            key: token.id(),
+            expires_at,
+            data,
+        };
         Ok((token, session))
     }
 
@@ -116,5 +121,25 @@ impl AuthSession {
         // can use AuthSessionData kind
         Session::update_or_create(conn, self.key.clone(), sealed_data.0, kind, self.expires_at)?;
         Ok(())
+    }
+
+    /// Creates a new auth token with an expiry derived off of the current auth token.
+    /// This function guarantees that we won't create a derived token that expires after the source
+    /// token.
+    pub fn create_derived(
+        &self,
+        conn: &mut db::PgConn,
+        session_key: &ScopedSealingKey,
+        session: AuthSessionData,
+        max_duration: Option<Duration>,
+    ) -> FpResult<(SessionAuthToken, DateTime<Utc>)> {
+        let current_expires_at = self.expires_at;
+        let expires_at = if let Some(duration) = max_duration {
+            current_expires_at.min(Utc::now() + duration)
+        } else {
+            current_expires_at
+        };
+        let (token, session) = Self::create_sync(conn, session_key, session, expires_at)?;
+        Ok((token, session.expires_at))
     }
 }
