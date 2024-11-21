@@ -3,6 +3,7 @@ import { Dialog } from '@onefootprint/ui';
 import { cx } from 'class-variance-authority';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import getAuthor from './utils/get-author';
 
 type VersionsProps = {
   open: boolean;
@@ -49,17 +50,6 @@ const List = ({
         {isLast ? null : <div className="w-[2px] h-full bg-senary absolute top-3 mt-[-6px]" />}
       </div>
     );
-  };
-
-  const getAuthor = ({ author }: OnboardingConfiguration) => {
-    if (author?.kind === 'organization') {
-      const name = [author.firstName, author.lastName].filter(Boolean).join(' ');
-      return name || author.email;
-    }
-    if (author?.kind === 'footprint') {
-      return 'Footprint';
-    }
-    return 'Unknown';
   };
 
   return (
