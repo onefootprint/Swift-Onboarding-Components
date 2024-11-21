@@ -4,6 +4,7 @@ import { cx } from 'class-variance-authority';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import getAuthor from './utils/get-author';
+import getCreatedTime from './utils/get-created-time';
 
 type VersionsProps = {
   open: boolean;
@@ -80,16 +81,7 @@ const List = ({
                     </div>
                     {index === 0 ? <div className="text-label-3 text-info">{t('current-version')}</div> : null}
                   </div>
-                  <div className="text-snippet-2 text-tertiary">
-                    {new Date(playbook.createdAt).toLocaleString('en-US', {
-                      month: '2-digit',
-                      day: '2-digit',
-                      year: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true,
-                    })}
-                  </div>
+                  <div className="text-snippet-2 text-tertiary">{getCreatedTime(playbook)}</div>
                 </button>
               </div>
             </li>
