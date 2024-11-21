@@ -153,7 +153,16 @@ async fn run_kyb_if_needed(
 
         let su = Some(&user_auth.scoped_user);
         let tenant = user_auth.tenant.clone();
-        api_core::utils::kyb_utils::progress_business_workflow(state, su, &tenant, biz_wf_id, seqno).await?;
+        let is_secondary_bo = user_auth.is_secondary_bo();
+        api_core::utils::kyb_utils::progress_business_workflow(
+            state,
+            su,
+            &tenant,
+            biz_wf_id,
+            seqno,
+            is_secondary_bo,
+        )
+        .await?;
     }
     Ok(())
 }

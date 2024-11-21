@@ -161,6 +161,7 @@ pub async fn progress_business_workflow(
     tenant: &Tenant,
     biz_wf_id: WorkflowId,
     seqno: DataLifetimeSeqno,
+    is_secondary_bo: bool,
 ) -> FpResult<()> {
     let biz_wf = state
         .db_query(move |conn| Workflow::get(conn, &biz_wf_id))
@@ -210,10 +211,12 @@ pub async fn progress_business_workflow(
     // before sending out links
     let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
-    if is_waiting_for_bo_kyc {
+    if is_waiting_for_bo_kyc && !is_secondary_bo {
         let KybBoFeatures { bos, bvw } = kyb_features;
         let tokens = generate_secondary_bo_links(state, su, &biz_wf, &bos).await?;
         send_missing_secondary_bo_links(state, &bvw, &bos, tokens, tenant).await?;
+    }
+    if is_waiting_for_bo_kyc {
         return Ok(());
     }
 
