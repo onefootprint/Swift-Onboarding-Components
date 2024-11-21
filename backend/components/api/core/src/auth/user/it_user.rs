@@ -2,14 +2,12 @@ use super::CheckedUserAuthContext;
 use super::ParsedUserSessionContext;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::SessionContext;
 use crate::FpResult;
 use api_errors::BadRequestInto;
 use db::PgConn;
-use feature_flag::FeatureFlagClient;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 #[derive(Debug, Clone, Apiv2Security, derive_more::Deref)]
 #[openapi(
@@ -27,15 +25,13 @@ impl ExtractableAuthSession for ParsedItUserSession {
     }
 
     fn try_load_session(
-        value: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: Arc<dyn FeatureFlagClient>,
-        req: RequestInfo,
+        value: AuthSessionData,
+        ctx: LoadSessionContext,
     ) -> FpResult<Self> {
         // Since this is derived from a user session, we just grab all the user info
-        let user_session = <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(
-            value, conn, ff_client, req,
-        )?;
+        let user_session =
+            <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(conn, value, ctx)?;
 
         // This auth extractor is only used for integration tests to be able to get an fp_id from an
         // incomplete session. NOTE: Do not remove these validations below.

@@ -1,6 +1,8 @@
 use super::AuthSessionData;
 use super::ExtractableAuthSession;
 use super::GetSessionForUpdate;
+use super::LoadSessionContext;
+use super::RequestInfo;
 use crate::auth::tenant::InvalidateAuth;
 use crate::auth::AuthError;
 use crate::utils::session::AuthSession;
@@ -8,7 +10,6 @@ use crate::ApiError;
 use crate::ApiResponse;
 use crate::FpResult;
 use crate::State;
-use actix_web::http::header::HeaderMap;
 use actix_web::web;
 use actix_web::FromRequest;
 use api_errors::ServerErr;
@@ -20,7 +21,6 @@ use crypto::aead::ScopedSealingKey;
 use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
-use http::Method;
 use itertools::Itertools;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
@@ -111,26 +111,6 @@ impl<T> GetSessionForUpdate for SessionContext<T> {
     }
 }
 
-pub struct RequestInfo {
-    pub headers: HeaderMap,
-    pub method: Method,
-}
-
-impl<'a> From<&'a actix_web::HttpRequest> for RequestInfo {
-    fn from(value: &'a actix_web::HttpRequest) -> Self {
-        Self {
-            headers: value.headers().clone(),
-            method: value.method().clone(),
-        }
-    }
-}
-
-impl std::fmt::Debug for RequestInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("RequestInfo <redacted>")
-    }
-}
-
 impl<T> SessionContext<T>
 where
     T: ExtractableAuthSession,
@@ -154,13 +134,15 @@ where
             let auth_token = SessionAuthToken::from(auth_token);
             root_span.record("auth_token_hash", auth_token.id().to_string());
 
-            let ff_client = state.ff_client.clone();
-            let sealing_key = state.session_sealing_key.clone();
+            let ctx = LoadSessionContext {
+                ff_client: state.ff_client.clone(),
+                sealing_key: state.session_sealing_key.clone(),
+                req,
+            };
             let (session, parsed_session_data, auth_token) = state
                 .db_query(move |conn| {
-                    let session = AuthSession::get(conn, &sealing_key, &auth_token)?;
-                    let parsed_session_data =
-                        T::try_load_session(session.data.clone(), conn, ff_client, req)?;
+                    let session = AuthSession::get(conn, &ctx.sealing_key, &auth_token)?;
+                    let parsed_session_data = T::try_load_session(conn, session.data.clone(), ctx)?;
                     Ok((session, parsed_session_data, auth_token))
                 })
                 .await

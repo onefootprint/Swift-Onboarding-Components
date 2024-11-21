@@ -3,6 +3,7 @@ use super::BasicTenantAuth;
 use crate::auth::session::tenant::ClientTenantAuth;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::CanDecrypt;
@@ -25,7 +26,6 @@ use paperclip::v2::models::DefaultSchemaRaw;
 use paperclip::v2::models::Parameter;
 use paperclip::v2::models::ParameterIn;
 use std::pin::Pin;
-use std::sync::Arc;
 use tracing_actix_web::RootSpan;
 
 #[derive(Debug, Clone)]
@@ -117,10 +117,9 @@ impl ExtractableAuthSession for ParsedClientTenantData {
     }
 
     fn try_load_session(
-        auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: Arc<dyn feature_flag::FeatureFlagClient>,
-        _: RequestInfo,
+        auth_session: AuthSessionData,
+        _: LoadSessionContext,
     ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::ClientTenant(data) => {

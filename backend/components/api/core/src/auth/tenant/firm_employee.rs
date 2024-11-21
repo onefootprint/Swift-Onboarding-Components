@@ -1,6 +1,6 @@
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::FpResult;
@@ -8,11 +8,9 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 use newtypes::TenantSessionPurpose;
 use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents an auth session for a firm employee, regardless of whether they are currently
@@ -46,10 +44,9 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
     }
 
     fn try_load_session(
-        auth_session: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: Arc<dyn FeatureFlagClient>,
-        _: RequestInfo,
+        auth_session: AuthSessionData,
+        ctx: LoadSessionContext,
     ) -> FpResult<Self> {
         // Uniquely, this kind of auth allows extracting the user from two different types of tokens
         let (tenant_user, auth_method, purpose) = match auth_session {
@@ -70,7 +67,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
             // Double-checking for safety
             return Err(AuthError::NotFirmEmployee.into());
         }
-        let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
+        let is_risk_ops = ctx.ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
         tracing::info!(tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
         Ok(Self(FirmEmployeeAuth {

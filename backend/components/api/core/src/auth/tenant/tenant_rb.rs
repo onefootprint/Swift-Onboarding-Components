@@ -7,7 +7,7 @@ use crate::auth::session::get_is_live;
 use crate::auth::session::tenant::TenantRbSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::FpResult;
@@ -17,11 +17,9 @@ use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
-use feature_flag::FeatureFlagClient;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a tenant RB session token. This struct is hydrated from
@@ -60,10 +58,9 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedTenantRbAuth<IS_
     }
 
     fn try_load_session(
-        auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: Arc<dyn FeatureFlagClient>,
-        req: RequestInfo,
+        auth_session: AuthSessionData,
+        ctx: LoadSessionContext,
     ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
@@ -79,7 +76,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedTenantRbAuth<IS_
             }
         };
 
-        let is_live = get_is_live(&req).unwrap_or(!tenant.sandbox_restricted);
+        let is_live = get_is_live(&ctx.req).unwrap_or(!tenant.sandbox_restricted);
 
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tr.id, tenant_rb_id=%rb.id, tenant_user_id=%tu.id, "authenticated");
 

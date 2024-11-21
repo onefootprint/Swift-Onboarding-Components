@@ -4,7 +4,7 @@ use crate::auth::session::user::UserSession;
 use crate::auth::session::AllowSessionUpdate;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
@@ -16,7 +16,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::PgConn;
-use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::ScopedVaultId;
@@ -25,7 +24,6 @@ use newtypes::VaultId;
 use newtypes::VaultKind;
 use paperclip::actix::Apiv2Security;
 use std::collections::HashMap;
-use std::sync::Arc;
 
 #[derive(Debug, Clone, derive_more::Deref)]
 pub struct UserSessionContext {
@@ -101,10 +99,9 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
     }
 
     fn try_load_session(
-        value: AuthSessionData,
         conn: &mut PgConn,
-        _: Arc<dyn FeatureFlagClient>,
-        req: RequestInfo,
+        value: AuthSessionData,
+        ctx: LoadSessionContext,
     ) -> FpResult<Self> {
         match value {
             AuthSessionData::User(data) => {
@@ -133,7 +130,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     // Every few minutes, set the heartbeat when a user auth session authenticates
                     // as this scoped user. This allows us to track when users are still
                     // in progress and the last time we've seen the user
-                    if !req.method.is_safe() {
+                    if !ctx.req.method.is_safe() {
                         // Only do this in non-read-only API requests so we don't have unintended
                         // side effects in HTTP GET/OPTIONS/TRACE/HEAD requests
                         su.set_heartbeat(conn)?;

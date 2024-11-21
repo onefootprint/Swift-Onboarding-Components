@@ -3,19 +3,17 @@ use super::ParsedUserWfSession;
 use super::UserWfSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
 use crate::FpResult;
 use db::models::workflow::Workflow;
 use db::PgConn;
-use feature_flag::FeatureFlagClient;
 use newtypes::ScopedVaultId;
 use newtypes::UserAuthScope;
 use newtypes::WorkflowGuard;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 /// A wrapper around UserWfSession that can only be extracted when the auth token is for an active
 /// onboarding session linked to a scoped business and with an in-progress business workflow.
@@ -45,14 +43,13 @@ impl ExtractableAuthSession for ParsedUserBizWfSession {
     }
 
     fn try_load_session(
-        value: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: Arc<dyn FeatureFlagClient>,
-        req: RequestInfo,
+        value: AuthSessionData,
+        ctx: LoadSessionContext,
     ) -> FpResult<Self> {
         // Since this is derived from a user session, we just grab all the user info
         let user_wf_session =
-            <ParsedUserWfSession as ExtractableAuthSession>::try_load_session(value, conn, ff_client, req)?.0;
+            <ParsedUserWfSession as ExtractableAuthSession>::try_load_session(conn, value, ctx)?.0;
 
         let sb_id = user_wf_session.sb_id.clone().ok_or(AuthError::MissingBusiness)?;
 

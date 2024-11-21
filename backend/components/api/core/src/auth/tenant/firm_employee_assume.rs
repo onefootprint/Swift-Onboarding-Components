@@ -7,7 +7,7 @@ use crate::auth::session::get_is_live;
 use crate::auth::session::tenant::FirmEmployeeSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::utils::headers::get_bool_header;
@@ -18,14 +18,12 @@ use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::InvokeVaultProxyPermission;
 use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a workos session token. This struct is hydrated from
@@ -78,10 +76,9 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
     }
 
     fn try_load_session(
-        auth_session: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: Arc<dyn FeatureFlagClient>,
-        req: RequestInfo,
+        auth_session: AuthSessionData,
+        ctx: LoadSessionContext,
     ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::FirmEmployee(data) => data,
@@ -104,9 +101,9 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
         let kind = TenantRoleKind::DashboardUser;
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
 
-        let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
-        let is_live = get_is_live(&req).unwrap_or(!tenant.sandbox_restricted);
-        let allow_writes = get_bool_header("x-allow-assumed-writes", &req.headers).unwrap_or(false);
+        let is_risk_ops = ctx.ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
+        let is_live = get_is_live(&ctx.req).unwrap_or(!tenant.sandbox_restricted);
+        let allow_writes = get_bool_header("x-allow-assumed-writes", &ctx.req.headers).unwrap_or(false);
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee in assume session");
         Ok(Self(FirmEmployeeAssumeAuth {

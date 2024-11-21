@@ -1,7 +1,7 @@
 use crate::auth::session::onboarding::BoSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::FpResult;
@@ -9,10 +9,8 @@ use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::PgConn;
-use feature_flag::FeatureFlagClient;
 use newtypes::ObConfigurationKind;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
@@ -38,10 +36,9 @@ impl ExtractableAuthSession for ParsedBoSession {
     }
 
     fn try_load_session(
-        auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: Arc<dyn FeatureFlagClient>,
-        _: RequestInfo,
+        auth_session: AuthSessionData,
+        _: LoadSessionContext,
     ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::BusinessOwner(data) => data,

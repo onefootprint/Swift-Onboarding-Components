@@ -4,7 +4,7 @@ use super::PartnerTenantAuth;
 use crate::auth::session::tenant::TenantRbSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
-use crate::auth::session::RequestInfo;
+use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::FpResult;
@@ -14,11 +14,9 @@ use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
-use feature_flag::FeatureFlagClient;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
-use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents all partner tenant info identified by a TenantRbSession token. This struct is
@@ -53,10 +51,9 @@ impl ExtractableAuthSession for ParsedPartnerTenantRbAuth {
     }
 
     fn try_load_session(
-        auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: Arc<dyn FeatureFlagClient>,
-        _: RequestInfo,
+        auth_session: AuthSessionData,
+        _: LoadSessionContext,
     ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
