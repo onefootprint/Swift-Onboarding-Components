@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import post, get, create_ob_config
+from tests.utils import get, create_ob_config
 from tests.bifrost_client import BifrostClient
 
 
@@ -8,8 +8,7 @@ def skip_kyc_playbook(sandbox_tenant, must_collect_data):
     return create_ob_config(
         sandbox_tenant,
         "skip kyc (happens to be kyb)",
-        must_collect_data
-        + ["business_name", "business_address", "business_kyced_beneficial_owners"],
+        ["business_name", "business_address"],
         skip_kyc=True,
         allow_international_residents=True,
         # For now, we don't support collection-only KYC playbooks, but we should.
@@ -19,12 +18,11 @@ def skip_kyc_playbook(sandbox_tenant, must_collect_data):
 
 
 @pytest.fixture(scope="session")
-def skip_kyc_playbook_with_verification_checks(sandbox_tenant, must_collect_data):
+def skip_kyc_playbook_with_verification_checks(sandbox_tenant):
     return create_ob_config(
         sandbox_tenant,
         "skip kyc (happens to be kyb)",
-        must_collect_data
-        + ["business_name", "business_address", "business_kyced_beneficial_owners"],
+        ["business_name", "business_address"],
         allow_international_residents=True,
         # For now, we don't support collection-only KYC playbooks, but we should.
         # Instead, we'll model this as a KYB playbook that has skip_kyc

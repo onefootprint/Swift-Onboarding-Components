@@ -103,14 +103,7 @@ def test_put_business_vault_not_authorized(sandbox_tenant):
     )
 
 
-@pytest.mark.parametrize(
-    "beneficial_owners",
-    [
-        "dont_collect",
-        "collect_without_kyc",
-        "collect_and_kyc",
-    ],
-)
+@pytest.mark.parametrize("beneficial_owners", ["dont_collect", "collect_and_kyc"])
 def test_business_owners(sandbox_tenant, beneficial_owners):
     must_collect_data = []
     user_cdos = ["name", "ssn9", "full_address", "email", "phone_number", "nationality"]
@@ -124,8 +117,6 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     if beneficial_owners == "dont_collect":
         must_collect_data = business_cdos
         skip_kyc = True
-    elif beneficial_owners == "collect_without_kyc":
-        must_collect_data = business_cdos + user_cdos
         skip_kyc = True
     elif beneficial_owners == "collect_and_kyc":
         must_collect_data = (

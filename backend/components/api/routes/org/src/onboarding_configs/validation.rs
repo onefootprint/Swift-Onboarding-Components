@@ -284,11 +284,14 @@ impl ObConfigurationArgsToValidate {
             let has_bo_cdo = (self.must_collect_data).contains(&CDO::BusinessKycedBeneficialOwners);
             let collecting_kyc_data = self.must_collect_data.iter().any(|cdo| cdo.matches(DID::Id));
 
+            if has_bo_cdo != collecting_kyc_data {
+                return BadRequestInto("If collecting KYC data, must collect from all beneficial owners");
+            }
             if !self.verification_checks.skip_kyc() && !has_bo_cdo {
                 return BadRequestInto("Must skip KYC if not collecting BOs");
             }
-            if !self.verification_checks.skip_kyc() && !collecting_kyc_data {
-                return BadRequestInto("Must skip KYC if not collecting KYC data");
+            if self.verification_checks.skip_kyc() && has_bo_cdo {
+                return BadRequestInto("Must run KYC if collecting BOs");
             }
         }
 
@@ -578,7 +581,7 @@ impl ObConfigurationArgsToValidate {
                             Ok(())
                         }
                     }
-                    VerificationCheck::Kyc {  } => Ok(()),
+                    VerificationCheck::Kyc { } => Ok(()),
                     VerificationCheck::IdentityDocument {  } => Ok(()),
                     VerificationCheck::StytchDevice {  } => Ok(()),
                     VerificationCheck::NeuroId {  } => {

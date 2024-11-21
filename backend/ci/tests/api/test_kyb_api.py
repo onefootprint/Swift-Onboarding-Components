@@ -98,14 +98,8 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     of BOs linked via API
     """
     business_cdos = ["business_name", "business_tin", "business_address"]
-    bo_cdos = ["business_kyced_beneficial_owners", "name"]
-    must_collect_data = business_cdos + bo_cdos
     obc = create_ob_config(
-        sandbox_tenant,
-        "Business-only config",
-        must_collect_data,
-        kind="kyb",
-        skip_kyc=True,
+        sandbox_tenant, "Business-only config", business_cdos, kind="kyb", skip_kyc=True
     )
     vault_data = {
         di: BUSINESS_DATA[di] for cdo in business_cdos for di in CDO_TO_DIS[cdo]
@@ -113,17 +107,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     body = post("businesses", vault_data, sandbox_tenant.sk.key)
     fp_bid = body["id"]
 
-    # Can't KYB without BOs
-    data = dict(key=obc.key.value, fixture_result="pass")
-    body = post(
-        f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key, status_code=400
-    )
-    assert (
-        body["message"]
-        == "Cannot run kyb playbook due to unmet requirements. Missing business_kyced_beneficial_owners."
-    )
-
-    # Link the BO, then should be able to KYB
+    # Link the BO
     data = {
         "id.first_name": "Piip",
         "id.last_name": "Businessowner",
