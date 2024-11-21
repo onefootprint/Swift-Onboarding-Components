@@ -1,5 +1,5 @@
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { LinkButton, SegmentedControl } from '@onefootprint/ui';
+import { LinkButton, SegmentedControl, useConfirmationDialog } from '@onefootprint/ui';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PlaybookConfig from 'src/components/playbooks/playbook-config';
@@ -12,7 +12,7 @@ type VersionView = 'diff' | 'config';
 type VersionDetailsProps = {
   isCurrent: boolean;
   isOriginal: boolean;
-  onRestore: () => void;
+  onRestore: (playbook: OnboardingConfiguration) => void;
   playbook: OnboardingConfiguration;
   previousPlaybook: OnboardingConfiguration | null;
 };
@@ -20,11 +20,26 @@ type VersionDetailsProps = {
 const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPlaybook }: VersionDetailsProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'versions' });
   const [nav, setNav] = useState<VersionView>('diff');
+  const confirmationDialog = useConfirmationDialog();
   const author = getAuthor(playbook);
 
   useEffect(() => {
     setNav(isOriginal ? 'config' : 'diff');
   }, [playbook.id]);
+
+  const handleRestore = () => {
+    confirmationDialog.open({
+      title: t('restore-confirmation.title'),
+      description: t('restore-confirmation.description'),
+      primaryButton: {
+        label: t('restore-confirmation.cta'),
+        onClick: () => onRestore(playbook),
+      },
+      secondaryButton: {
+        label: t('restore-confirmation.cancel'),
+      },
+    });
+  };
 
   return (
     <div className="bg-primary h-full py-5 px-6 overflow-auto flex flex-col gap-6">
@@ -38,7 +53,7 @@ const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPl
             {isCurrent ? (
               <div className="text-label-2 text-info">{t('current')}</div>
             ) : (
-              <LinkButton variant="label-2" onClick={onRestore}>
+              <LinkButton variant="label-2" onClick={handleRestore}>
                 {t('restore')}
               </LinkButton>
             )}

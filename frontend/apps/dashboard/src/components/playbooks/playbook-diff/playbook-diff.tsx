@@ -1,5 +1,7 @@
 import { IcoMinusSmall16, IcoPlusSmall16 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
+import { InlineAlert } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 import createPlaybookDiff from './utils/create-playbook-diff';
 
 type PlaybookDiffProps = {
@@ -8,11 +10,12 @@ type PlaybookDiffProps = {
 };
 
 const PlaybookDiff = ({ playbookA, playbookB }: PlaybookDiffProps) => {
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'diff' });
   const changes = createPlaybookDiff(playbookA, playbookB);
 
   return (
     <>
-      {changes.length && (
+      {changes.length ? (
         <ul className="flex flex-col gap-6">
           {changes.map(diff => (
             <li key={diff.label} className="flex flex-col gap-3">
@@ -35,6 +38,8 @@ const PlaybookDiff = ({ playbookA, playbookB }: PlaybookDiffProps) => {
             </li>
           ))}
         </ul>
+      ) : (
+        <InlineAlert variant="info">{t('identical')}</InlineAlert>
       )}
     </>
   );
