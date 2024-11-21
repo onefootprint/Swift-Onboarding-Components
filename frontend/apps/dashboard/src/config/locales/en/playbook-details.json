@@ -413,21 +413,18 @@
     "nav": "Navigation",
     "changes": "Changes",
     "configurations": "Configurations",
-
     "restore-confirmation": {
       "title": "Restore version",
       "description": "Are you sure you want to restore this version? This will overwrite the current version.",
       "cta": "Restore",
       "cancel": "Cancel"
     },
-    "feedback": {
-      "restore-success": {
-        "title": "Version restored",
-        "description": "The playbook has been restored to the selected version"
-      },
-      "restore-error": {
-        "title": "Failed to restore version"
-      }
+    "restore-success": {
+      "title": "Version restored",
+      "description": "The playbook has been restored to the selected version"
+    },
+    "restore-error": {
+      "title": "Failed to restore version"
     }
   }
 }
