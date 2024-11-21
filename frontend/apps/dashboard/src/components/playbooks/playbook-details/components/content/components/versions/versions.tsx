@@ -60,6 +60,9 @@ const List = ({ playbooks, onChange, selected }: ListProps) => {
       <h3 className="text-label-2 text-primary mb-4">{t('version-history')}</h3>
       <ul className="flex flex-col">
         {playbooks.map((playbook, index) => {
+          const isCurrent = index === 0;
+          const isOriginal = index === playbooks.length - 1;
+
           return (
             <li key={playbook.id} className="relative">
               <div className="flex gap-4">
@@ -81,7 +84,8 @@ const List = ({ playbooks, onChange, selected }: ListProps) => {
                     >
                       {t('edited-by', { name: getAuthor(playbook) })}
                     </div>
-                    {index === 0 ? <div className="text-label-3 text-info">{t('current-version')}</div> : null}
+                    {isCurrent ? <div className="text-label-3 text-info">{t('current-version')}</div> : null}
+                    {isOriginal ? <div className="text-label-3 text-primary">{t('original-version')}</div> : null}
                   </div>
                   <div className="text-snippet-2 text-tertiary">{getCreatedTime(playbook)}</div>
                 </button>

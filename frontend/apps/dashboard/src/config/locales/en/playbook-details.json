@@ -401,6 +401,7 @@
   "versions": {
     "title": "Playbook edits",
     "current-version": "Current version",
+    "original-version": "Original version",
     "version-history": "Version history",
     "edited-by": "Edited by {{name}}"
   }
