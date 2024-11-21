@@ -16,7 +16,7 @@ const VersionsList = ({ playbooks, onChange, selected }: VersionsListProps) => {
   const renderTimeline = (index: number) => {
     const isLast = index === playbooks.length - 1;
     return (
-      <div className="relative flex flex-col items-center top-[30px] select-none">
+      <div className="relative hidden xl:flex flex-col items-center top-[30px] select-none">
         <div className="w-[7px] h-[7px] bg-senary rounded-full z-10" />
         {isLast ? null : <div className="w-[2px] h-full bg-senary absolute top-3 mt-[-6px]" />}
       </div>
@@ -26,6 +26,7 @@ const VersionsList = ({ playbooks, onChange, selected }: VersionsListProps) => {
   const renderItem = (playbook: OnboardingConfiguration, index: number) => {
     const isCurrent = index === 0;
     const isOriginal = index === playbooks.length - 1;
+    const author = getAuthor(playbook);
 
     return (
       <li key={playbook.id} className="relative">
@@ -41,17 +42,15 @@ const VersionsList = ({ playbooks, onChange, selected }: VersionsListProps) => {
           >
             <div className="flex justify-between gap-4 w-full">
               <div
-                className={cx('text-label-3 group-hover:text-accent', {
+                className={cx('text-label-3 truncate group-hover:text-accent', {
                   'text-accent': selected.id === playbook.id,
                   'text-primary': selected.id !== playbook.id,
                 })}
               >
-                {isOriginal
-                  ? t('created-by', { name: getAuthor(playbook) })
-                  : t('edited-by', { name: getAuthor(playbook) })}
+                {isOriginal ? t('created-by', { name: author }) : t('edited-by', { name: author })}
               </div>
-              {isCurrent ? <div className="text-label-3 text-info">{t('current-version')}</div> : null}
-              {isOriginal ? <div className="text-label-3 text-primary">{t('original-version')}</div> : null}
+              {isCurrent ? <div className="text-label-3 text-info truncate">{t('current-version')}</div> : null}
+              {isOriginal ? <div className="text-label-3 text-primary truncate">{t('original-version')}</div> : null}
             </div>
             <div className="text-snippet-2 text-tertiary">{getCreatedTime(playbook)}</div>
           </button>

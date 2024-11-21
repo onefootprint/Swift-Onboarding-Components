@@ -20,6 +20,7 @@ type VersionDetailsProps = {
 const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPlaybook }: VersionDetailsProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'versions' });
   const [nav, setNav] = useState<VersionView>('diff');
+  const author = getAuthor(playbook);
 
   useEffect(() => {
     setNav(isOriginal ? 'config' : 'diff');
@@ -31,9 +32,7 @@ const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPl
         <div className="flex justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-label-2 text-primary">
-              {isOriginal
-                ? t('created-by', { name: getAuthor(playbook) })
-                : t('edited-by', { name: getAuthor(playbook) })}
+              {isOriginal ? t('created-by', { name: author }) : t('edited-by', { name: author })}
             </h2>
             {' · '}
             {isCurrent ? (
