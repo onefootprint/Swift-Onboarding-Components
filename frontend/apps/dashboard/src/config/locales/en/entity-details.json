@@ -1144,7 +1144,19 @@
       }
     },
     "rules": {
-      "title": "Rules"
+      "title": "Rules",
+      "no-rule-results": "No rule results found.",
+      "no-triggered-rules": "There were no rules triggered.",
+      "no-not-triggered-rules": "There were no rules that were not triggered.",
+      "action": {
+        "pass-with-manual-review": "Pass + Manual review",
+        "manual-review": "Fail + Manual review",
+        "fail": "Fail",
+        "step-up": "Step-up ⋅ {{document}}",
+        "identity-proof-of-ssn": "Identity document and Proof of SSN",
+        "proof-of-address": "Proof of Address",
+        "identity": "Identity document"
+      }
     },
     "user-data": {
       "title": "User data"

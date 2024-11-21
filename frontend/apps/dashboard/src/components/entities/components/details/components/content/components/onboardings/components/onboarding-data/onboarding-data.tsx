@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import Subsection from '../subsection';
 import OnboardingRiskSignals from './components/onboarding-risk-signals';
+import OnboardingRules from './components/onboarding-rules';
 import groupRiskSignals from './utils/group-risk-signals';
 
 type OnboardingDataProps = {
@@ -50,7 +51,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
         )}
         {onboarding.ruleSetResults.length > 0 && (
           <Subsection icon={subsections.rules.iconComponent} title={subsections.rules.title}>
-            <Text variant="label-3">Fail</Text>
+            <OnboardingRules ruleSetResultId={onboarding.ruleSetResults[0].id} />
           </Subsection>
         )}
       </TopSection>
