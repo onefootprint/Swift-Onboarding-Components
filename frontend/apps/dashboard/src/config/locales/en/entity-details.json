@@ -1135,6 +1135,12 @@
         "behavior": "Behavior",
         "phone": "Phone",
         "synthetic": "Synthetic"
+      },
+      "severity": {
+        "info": "Info",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
       }
     },
     "rules": {
