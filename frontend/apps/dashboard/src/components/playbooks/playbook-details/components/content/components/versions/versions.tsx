@@ -1,5 +1,5 @@
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { Dialog } from '@onefootprint/ui';
+import { Dialog, LinkButton } from '@onefootprint/ui';
 import { cx } from 'class-variance-authority';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,22 +24,20 @@ const Versions = ({ open, onClose, playbooks }: VersionsProps) => {
           <List playbooks={playbooks} selected={selectedPlaybook} onChange={setSelectedPlaybook} />
         </div>
         <div className="w-[70%] h-full">
-          <Details playbook={selectedPlaybook} isCurrent={selectedPlaybook.id === current.id} />
+          <Details playbook={selectedPlaybook} isCurrent={selectedPlaybook.id === current.id} onRestore={console.log} />
         </div>
       </div>
     </Dialog>
   );
 };
 
-const List = ({
-  playbooks,
-  onChange,
-  selected,
-}: {
+type ListProps = {
   playbooks: OnboardingConfiguration[];
   onChange: (playbook: OnboardingConfiguration) => void;
   selected: OnboardingConfiguration;
-}) => {
+};
+
+const List = ({ playbooks, onChange, selected }: ListProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'versions' });
 
   const renderTimeline = (index: number) => {
@@ -92,9 +90,33 @@ const List = ({
   );
 };
 
-const Details = ({ playbook, isCurrent }: { playbook: OnboardingConfiguration; isCurrent: boolean }) => {
-  console.log({ playbook, isCurrent });
-  return <div>TO DO</div>;
+type DetailsProps = {
+  playbook: OnboardingConfiguration;
+  isCurrent: boolean;
+  onRestore: () => void;
+};
+
+const Details = ({ playbook, isCurrent, onRestore }: DetailsProps) => {
+  const { t } = useTranslation('playbook-details', { keyPrefix: 'versions' });
+
+  return (
+    <div className="bg-primary h-full py-5 px-6 overflow-auto flex flex-col gap-6">
+      <header className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <h2 className="text-label-2 text-primary">{t('edited-by', { name: getAuthor(playbook) })}</h2>
+          {' · '}
+          {isCurrent ? (
+            <div className="text-label-2 text-info">Current version</div>
+          ) : (
+            <LinkButton variant="label-2" onClick={onRestore}>
+              Restore to this version
+            </LinkButton>
+          )}
+        </div>
+        <div className="text-snippet-2 text-tertiary">{getCreatedTime(playbook)}</div>
+      </header>
+    </div>
+  );
 };
 
 export default Versions;
