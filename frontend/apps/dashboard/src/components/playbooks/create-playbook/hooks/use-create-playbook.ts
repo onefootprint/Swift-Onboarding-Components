@@ -1,4 +1,4 @@
-import { postOrgOnboardingConfigs } from '@onefootprint/axios/dashboard';
+import { postOrgPlaybooks } from '@onefootprint/axios/dashboard';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { CreateOnboardingConfigurationRequest } from '@onefootprint/request-types/dashboard';
 import { useToast } from '@onefootprint/ui';
@@ -17,7 +17,7 @@ const useCreatePlaybook = () => {
   return useMutation({
     mutationFn: (body: CreateOnboardingConfigurationRequest) => {
       buttons.setBusy(true);
-      return postOrgOnboardingConfigs({ body });
+      return postOrgPlaybooks({ body });
     },
     onSuccess: () => {
       toast.show({

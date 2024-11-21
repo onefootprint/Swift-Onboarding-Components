@@ -14,7 +14,7 @@ export const withOrg = (response = organizationFixture) => {
 export const withCreatePlaybook = () => {
   return mockRequest({
     method: 'post',
-    path: '/org/onboarding_configs',
+    path: '/org/playbooks',
     response: {},
   });
 };
