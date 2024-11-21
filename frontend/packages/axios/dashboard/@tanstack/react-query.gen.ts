@@ -275,6 +275,9 @@ import type {
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadData,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadError,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadResponse,
+  PostOrgPlaybooksByPlaybookIdRestoreData,
+  PostOrgPlaybooksByPlaybookIdRestoreError,
+  PostOrgPlaybooksByPlaybookIdRestoreResponse,
   PostOrgPlaybooksData,
   PostOrgPlaybooksError,
   PostOrgPlaybooksResponse,
@@ -508,6 +511,7 @@ import {
   postOrgPartnersByPartnershipIdRequestsByRequestIdSubmissions,
   postOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUpload,
   postOrgPlaybooks,
+  postOrgPlaybooksByPlaybookIdRestore,
   postOrgProxyConfigs,
   postOrgProxyConfigsByProxyConfigIdDeactivate,
   postOrgRoles,
@@ -3568,6 +3572,47 @@ export const putOrgPlaybooksByPlaybookIdMutation = (options?: Partial<Options<Pu
   > = {
     mutationFn: async localOptions => {
       const { data } = await putOrgPlaybooksByPlaybookId({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postOrgPlaybooksByPlaybookIdRestoreQueryKey = (
+  options: Options<PostOrgPlaybooksByPlaybookIdRestoreData>,
+) => [createQueryKey('postOrgPlaybooksByPlaybookIdRestore', options)];
+
+export const postOrgPlaybooksByPlaybookIdRestoreOptions = (
+  options: Options<PostOrgPlaybooksByPlaybookIdRestoreData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postOrgPlaybooksByPlaybookIdRestore({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postOrgPlaybooksByPlaybookIdRestoreQueryKey(options),
+  });
+};
+
+export const postOrgPlaybooksByPlaybookIdRestoreMutation = (
+  options?: Partial<Options<PostOrgPlaybooksByPlaybookIdRestoreData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostOrgPlaybooksByPlaybookIdRestoreResponse,
+    AxiosError<PostOrgPlaybooksByPlaybookIdRestoreError>,
+    Options<PostOrgPlaybooksByPlaybookIdRestoreData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postOrgPlaybooksByPlaybookIdRestore({
         ...options,
         ...localOptions,
         throwOnError: true,

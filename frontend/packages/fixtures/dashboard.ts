@@ -147,6 +147,9 @@ import type {
   InsightWebsite,
   IntegrityRequest,
   IntegrityResponse,
+  InvestorProfileDeclaration,
+  InvestorProfileFundingSource,
+  InvestorProfileInvestmentGoal,
   InvoicePreview,
   InvokeVaultProxyPermission,
   IsIn,
@@ -214,6 +217,7 @@ import type {
   ProxyIngressContentType,
   ProxyIngressRule,
   RawUserDataRequest,
+  RestoreOnboardingConfigurationRequest,
   ReuploadComplianceDocRequest,
   RiskScore,
   RiskSignal,
@@ -234,6 +238,7 @@ import type {
   RuleSetResult,
   SameTenantDupe,
   ScoreBand,
+  SearchEntitiesRequest,
   SecretApiKey,
   SecretCustomHeader,
   SentilinkDetail,
@@ -4887,6 +4892,12 @@ export const getIntegrityResponse = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getInvestorProfileDeclaration = (props: InvestorProfileDeclaration): InvestorProfileDeclaration =>
+  props ?? 'senior_political_figure';
+export const getInvestorProfileFundingSource = (props: InvestorProfileFundingSource): InvestorProfileFundingSource =>
+  props ?? 'investments';
+export const getInvestorProfileInvestmentGoal = (props: InvestorProfileInvestmentGoal): InvestorProfileInvestmentGoal =>
+  props ?? 'income';
 
 export const getInvoicePreview = (
   props: Partial<InvoicePreview>,
@@ -5905,7 +5916,7 @@ export const getModernEntityDecryptResponse = (
       'document.voter_identification.us_issuing_state': 'Florida',
       'id.address_line1': '706 S Broadway Street Suite 105',
       'id.address_line2': '8405 McKenzie Bypass Suite 689',
-      'id.citizenships': 'fa76ec2d-faca-4b94-b1d3-347126b66e0e',
+      'id.citizenships': ['CA'],
       'id.city': 'Ferryfield',
       'id.country': 'Uruguay',
       'id.dob': '0430a70e-96c8-45fc-9c56-06e1e6dfd618',
@@ -5928,17 +5939,17 @@ export const getModernEntityDecryptResponse = (
       'id.zip': '70917-8363',
       'investor_profile.annual_income': 'quis ex officia nisi',
       'investor_profile.brokerage_firm_employer': 'commodo dolor ipsum',
-      'investor_profile.declarations': 'irure dolor ut',
+      'investor_profile.declarations': ['senior_executive'],
       'investor_profile.employer': 'nostrud pariatur Excepteur',
       'investor_profile.employment_status': 'ipsum commodo',
-      'investor_profile.family_member_names': 'Alma Schultz',
-      'investor_profile.funding_sources': 'reprehenderit nostrud ipsum sit cupidatat',
-      'investor_profile.investment_goals': 'officia culpa fugiat nisi',
+      'investor_profile.family_member_names': ['Alma Schultz'],
+      'investor_profile.funding_sources': ['savings'],
+      'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
       'investor_profile.net_worth': 'sint ad Ut exercitation',
       'investor_profile.occupation': 'exercitation aliqua',
       'investor_profile.political_organization': 'nisi do minim',
       'investor_profile.risk_tolerance': 'adipisicing consectetur Excepteur do',
-      'investor_profile.senior_executive_symbols': 'proident id culpa ut sed',
+      'investor_profile.senior_executive_symbols': ['proident id culpa ut sed'],
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -7695,6 +7706,19 @@ export const getRawUserDataRequest = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getRestoreOnboardingConfigurationRequest = (
+  props: Partial<RestoreOnboardingConfigurationRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RestoreOnboardingConfigurationRequest =>
+  deepmerge<RestoreOnboardingConfigurationRequest>(
+    {
+      expectedLatestObcId: '79aef31e-8a37-40b1-82ab-7e18001871e4',
+      restoreObcId: '2ae7b681-a5b6-4b61-af5e-57706329af55',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getReuploadComplianceDocRequest = (
   props: Partial<ReuploadComplianceDocRequest>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -8119,6 +8143,30 @@ export const getSameTenantDupe = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getScoreBand = (props: ScoreBand): ScoreBand => props ?? 'low';
+
+export const getSearchEntitiesRequest = (
+  props: Partial<SearchEntitiesRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SearchEntitiesRequest =>
+  deepmerge<SearchEntitiesRequest>(
+    {
+      externalId: '684ac69a-2f56-48e6-85eb-f3ea2739a137',
+      hasOutstandingWorkflowRequest: true,
+      kind: 'business',
+      labels: ['offboard_other', 'offboard_fraud', 'active'],
+      playbookIds: ['ea eiusmod', 'adipisicing sunt esse ea', 'sunt et elit id reprehenderit'],
+      requiresManualReview: false,
+      search: 'enim',
+      showAll: false,
+      statuses: ['incomplete', 'pass', 'pass'],
+      tags: ['cupidatat aute est ipsum', 'mollit incididunt Lorem do', 'deserunt laborum adipisicing'],
+      timestampGte: '1938-02-20T23:08:44.0Z',
+      timestampLte: '1915-04-11T09:21:38.0Z',
+      watchlistHit: false,
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getSecretApiKey = (props: SecretApiKey): SecretApiKey => props ?? 'commodo laboris sunt';
 
 export const getSecretCustomHeader = (

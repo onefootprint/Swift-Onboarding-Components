@@ -6577,46 +6577,27 @@
                 ]
             },
             "PostUsersKycResponse": {
-                "type": "object",
-                "properties": {
-                    "fp_id": {
-                        "type": "string"
-                    },
-                    "in_progress_link": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/CreateTokenResponse"
-                            },
-                            {
-                                "description": "If the user triggers a step up rule, a link that can be used to prompt the user to finish\n uploading any remaining information.",
-                                "x_fp_preview_gate": "post_kyc_stepup_links",
-                                "type": "object"
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "in_progress_link": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/CreateTokenResponse"
+                                    },
+                                    {
+                                        "description": "If the user triggers a step up rule, a link that can be used to prompt the user to finish\n uploading any remaining information.",
+                                        "x_fp_preview_gate": "post_kyc_stepup_links",
+                                        "type": "object"
+                                    }
+                                ]
                             }
-                        ]
+                        }
                     },
-                    "playbook_key": {
-                        "type": "string"
-                    },
-                    "requires_manual_review": {
-                        "type": "boolean"
-                    },
-                    "status": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/OnboardingStatus"
-                            },
-                            {
-                                "description": "The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).",
-                                "type": "string"
-                            }
-                        ]
+                    {
+                        "$ref": "#/components/schemas/EntityValidateResponse"
                     }
-                },
-                "required": [
-                    "fp_id",
-                    "playbook_key",
-                    "requires_manual_review",
-                    "status"
                 ]
             },
             "PublicAuthEvent": {

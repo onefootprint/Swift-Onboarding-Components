@@ -252,6 +252,16 @@ export type AuditEventDetail =
       kind: 'delete_list_entry';
     }
   | {
+      data: {
+        apiKey: AuditEventApiKey;
+        status: ApiKeyStatus;
+      };
+      kind: 'update_org_api_key_status';
+    }
+  | {
+      data: {
+        obConfigurationId: string;
+      };
       kind: 'create_playbook';
     }
   | {
@@ -261,6 +271,9 @@ export type AuditEventDetail =
       kind: 'manually_review_entity';
     }
   | {
+      data: {
+        obConfigurationId: string;
+      };
       kind: 'edit_playbook';
     }
   | {
@@ -300,6 +313,7 @@ export type AuditEventName =
   | 'create_org_api_key'
   | 'decrypt_org_api_key'
   | 'update_org_api_key_role'
+  | 'update_org_api_key_status'
   | 'invite_org_member'
   | 'org_member_joined'
   | 'update_org_member'
@@ -648,13 +662,6 @@ export type CreateListRequest = {
 };
 export type CreateOnboardingConfigurationRequest = {
   allowInternationalResidents?: boolean;
-  /**
-   * Allow the same user to onboard onto this playbook multiple times. It is generally not
-   * recommended to enable this setting. When this is enabled, you lose:
-   * - Protection against one user incurring many charges at your tenant
-   * - Ability for in-progress onboardings to continue where they left off
-   * When false, onboarding will no-op for repeat onboardings.
-   */
   allowUsResidents?: boolean;
   allowUsTerritories?: boolean;
   businessDocumentsToCollect?: Array<DocumentRequestConfig>;
@@ -691,7 +698,14 @@ export type CreateOrgTenantTagRequest = {
   tag: string;
 };
 export type CreatePlaybookVersionRequest = {
+  /**
+   * The latest OBC ID in the timeline for this playbook. Provided to ensure the client has an
+   * up-to-date view of the playbook timeline.
+   */
   expectedLatestObcId: string;
+  /**
+   * The new playbook version to be created.
+   */
   newOnboardingConfig: CreateOnboardingConfigurationRequest;
 };
 export type CreateProxyConfigRequest = {
@@ -2999,6 +3013,25 @@ export type IntegrityResponse = {
     [key: string]: unknown;
   };
 };
+export type InvestorProfileDeclaration =
+  | 'affiliated_with_us_broker'
+  | 'senior_executive'
+  | 'senior_political_figure'
+  | 'family_of_political_figure';
+export type InvestorProfileFundingSource =
+  | 'employment_income'
+  | 'investments'
+  | 'inheritance'
+  | 'business_income'
+  | 'savings'
+  | 'family';
+export type InvestorProfileInvestmentGoal =
+  | 'growth'
+  | 'income'
+  | 'preserve_capital'
+  | 'speculation'
+  | 'diversification'
+  | 'other';
 export type InvoicePreview = {
   lastUpdatedAt?: string;
   lineItems: Array<LineItem>;
@@ -3306,27 +3339,11 @@ export type ListDetails = {
   name: string;
   playbooks: Array<ListPlaybookUsage>;
 };
-export type ListEntitiesSearchRequest = {
-  externalId?: string;
-  hasOutstandingWorkflowRequest?: boolean;
-  kind?: VaultKind;
-  labels: Array<LabelKind>;
+export type ListEntitiesSearchRequest = SearchEntitiesRequest & {
   pagination?: {
     cursor?: number;
     pageSize?: number;
   };
-  playbookIds?: Array<string>;
-  requiresManualReview?: boolean;
-  search?: string;
-  /**
-   * When true, shows hidden incomplete vaults that didn't complete a signup challenge
-   */
-  showAll?: boolean;
-  statuses: Array<OnboardingStatus>;
-  tags: Array<string>;
-  timestampGte?: string;
-  timestampLte?: string;
-  watchlistHit?: boolean;
 };
 export type ListEntry = {
   actor: DbActor;
@@ -3415,6 +3432,9 @@ export type ManualReview = {
 };
 export type ManualReviewKind = 'rule_triggered' | 'document_needs_review';
 export type MatchLevel = 'no_match' | 'could_not_match' | 'partial' | 'exact';
+/**
+ * A key-value map with the corresponding decrypted values
+ */
 export type ModernEntityDecryptResponse = {
   'bank.*.account_type'?: string;
   'bank.*.ach_account_id'?: string;
@@ -3686,7 +3706,7 @@ export type ModernEntityDecryptResponse = {
   'document.voter_identification.us_issuing_state'?: string;
   'id.address_line1'?: string;
   'id.address_line2'?: string;
-  'id.citizenships'?: string;
+  'id.citizenships'?: Array<Iso3166TwoDigitCountryCode>;
   'id.city'?: string;
   'id.country'?: string;
   'id.dob'?: string;
@@ -3709,17 +3729,17 @@ export type ModernEntityDecryptResponse = {
   'id.zip'?: string;
   'investor_profile.annual_income'?: string;
   'investor_profile.brokerage_firm_employer'?: string;
-  'investor_profile.declarations'?: string;
+  'investor_profile.declarations'?: Array<InvestorProfileDeclaration>;
   'investor_profile.employer'?: string;
   'investor_profile.employment_status'?: string;
-  'investor_profile.family_member_names'?: string;
-  'investor_profile.funding_sources'?: string;
-  'investor_profile.investment_goals'?: string;
+  'investor_profile.family_member_names'?: Array<string>;
+  'investor_profile.funding_sources'?: Array<InvestorProfileFundingSource>;
+  'investor_profile.investment_goals'?: Array<InvestorProfileInvestmentGoal>;
   'investor_profile.net_worth'?: string;
   'investor_profile.occupation'?: string;
   'investor_profile.political_organization'?: string;
   'investor_profile.risk_tolerance'?: string;
-  'investor_profile.senior_executive_symbols'?: string;
+  'investor_profile.senior_executive_symbols'?: Array<string>;
 };
 export type MultiUpdateRuleRequest = {
   add?: Array<CreateRule>;
@@ -4513,6 +4533,17 @@ export type RawUserDataRequest = {
     [key: string]: unknown;
   };
 };
+export type RestoreOnboardingConfigurationRequest = {
+  /**
+   * The latest OBC ID in the timeline for this playbook. Provided to ensure the client has an
+   * up-to-date view of the playbook timeline.
+   */
+  expectedLatestObcId: string;
+  /**
+   * The OBC ID that should be restored.
+   */
+  restoreObcId: string;
+};
 export type ReuploadComplianceDocRequest = {
   description: string;
   name: string;
@@ -4672,6 +4703,24 @@ export type SameTenantDupe = {
   status: EntityStatus;
 };
 export type ScoreBand = 'low' | 'medium' | 'high';
+export type SearchEntitiesRequest = {
+  externalId?: string;
+  hasOutstandingWorkflowRequest?: boolean;
+  kind?: VaultKind;
+  labels: Array<LabelKind>;
+  playbookIds?: Array<string>;
+  requiresManualReview?: boolean;
+  search?: string;
+  /**
+   * When true, shows hidden incomplete vaults that didn't complete a signup challenge
+   */
+  showAll?: boolean;
+  statuses: Array<OnboardingStatus>;
+  tags: Array<string>;
+  timestampGte?: string;
+  timestampLte?: string;
+  watchlistHit?: boolean;
+};
 /**
  * A secret api key wrapper around a string
  */
@@ -8739,6 +8788,7 @@ export type GetOrgMemberInProgressOnboardingsData = {
   };
   query: {
     isLive: boolean;
+    omitDemoTenants?: boolean;
   };
 };
 export type GetOrgMemberInProgressOnboardingsResponse = Array<InProgressOnboarding>;
@@ -9013,6 +9063,20 @@ export type PutOrgPlaybooksByPlaybookIdData = {
 };
 export type PutOrgPlaybooksByPlaybookIdResponse = OnboardingConfiguration;
 export type PutOrgPlaybooksByPlaybookIdError = unknown;
+export type PostOrgPlaybooksByPlaybookIdRestoreData = {
+  body: RestoreOnboardingConfigurationRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+  path: {
+    playbookId: string;
+  };
+};
+export type PostOrgPlaybooksByPlaybookIdRestoreResponse = OnboardingConfiguration;
+export type PostOrgPlaybooksByPlaybookIdRestoreError = unknown;
 export type GetOrgPlaybooksByPlaybookIdVersionsData = {
   headers?: {
     /**
@@ -10799,6 +10863,17 @@ export type $OpenApiTs = {
   '/org/playbooks/{playbook_id}': {
     put: {
       req: PutOrgPlaybooksByPlaybookIdData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingConfiguration;
+      };
+    };
+  };
+  '/org/playbooks/{playbook_id}/restore': {
+    post: {
+      req: PostOrgPlaybooksByPlaybookIdRestoreData;
       res: {
         /**
          * OK

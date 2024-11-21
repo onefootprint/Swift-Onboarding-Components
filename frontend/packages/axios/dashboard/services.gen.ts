@@ -407,6 +407,9 @@ import type {
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadData,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadError,
   PostOrgPartnersByPartnershipIdRequestsByRequestIdSubmissionsUploadResponse,
+  PostOrgPlaybooksByPlaybookIdRestoreData,
+  PostOrgPlaybooksByPlaybookIdRestoreError,
+  PostOrgPlaybooksByPlaybookIdRestoreResponse,
   PostOrgPlaybooksData,
   PostOrgPlaybooksError,
   PostOrgPlaybooksResponse,
@@ -2123,6 +2126,22 @@ export const putOrgPlaybooksByPlaybookId = <ThrowOnError extends boolean = false
   >({
     ...options,
     url: '/org/playbooks/{playbookId}',
+  });
+};
+
+/**
+ * Creates a new version (onboarding configuration) for the given playbook that is a copy
+ */
+export const postOrgPlaybooksByPlaybookIdRestore = <ThrowOnError extends boolean = false>(
+  options: Options<PostOrgPlaybooksByPlaybookIdRestoreData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostOrgPlaybooksByPlaybookIdRestoreResponse,
+    PostOrgPlaybooksByPlaybookIdRestoreError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/org/playbooks/{playbookId}/restore',
   });
 };
 

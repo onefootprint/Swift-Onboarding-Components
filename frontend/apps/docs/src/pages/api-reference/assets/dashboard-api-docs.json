@@ -9958,6 +9958,17 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "ob_configuration_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "ob_configuration_id"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -9966,6 +9977,7 @@
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },
@@ -10000,6 +10012,17 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "ob_configuration_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "ob_configuration_id"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -10008,6 +10031,7 @@
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },
@@ -15146,81 +15170,29 @@
                 ]
             },
             "ListEntitiesSearchRequest": {
-                "type": "object",
-                "properties": {
-                    "external_id": {
-                        "type": "string"
-                    },
-                    "has_outstanding_workflow_request": {
-                        "type": "boolean"
-                    },
-                    "kind": {
-                        "$ref": "#/components/schemas/VaultKind"
-                    },
-                    "labels": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LabelKind"
-                        }
-                    },
-                    "pagination": {
+                "allOf": [
+                    {
                         "type": "object",
                         "properties": {
-                            "cursor": {
-                                "example": null,
-                                "type": "integer"
-                            },
-                            "page_size": {
-                                "example": 10,
-                                "type": "integer",
-                                "format": "int64"
+                            "pagination": {
+                                "type": "object",
+                                "properties": {
+                                    "cursor": {
+                                        "example": null,
+                                        "type": "integer"
+                                    },
+                                    "page_size": {
+                                        "example": 10,
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                }
                             }
                         }
                     },
-                    "playbook_ids": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "requires_manual_review": {
-                        "type": "boolean"
-                    },
-                    "search": {
-                        "type": "string"
-                    },
-                    "show_all": {
-                        "description": "When true, shows hidden incomplete vaults that didn't complete a signup challenge",
-                        "type": "boolean"
-                    },
-                    "statuses": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OnboardingStatus"
-                        }
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "timestamp_gte": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "timestamp_lte": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "watchlist_hit": {
-                        "type": "boolean"
+                    {
+                        "$ref": "#/components/schemas/SearchEntitiesRequest"
                     }
-                },
-                "required": [
-                    "labels",
-                    "statuses",
-                    "tags"
                 ]
             },
             "ListEntry": {
@@ -18560,6 +18532,70 @@
                     "low",
                     "medium",
                     "high"
+                ]
+            },
+            "SearchEntitiesRequest": {
+                "type": "object",
+                "properties": {
+                    "external_id": {
+                        "type": "string"
+                    },
+                    "has_outstanding_workflow_request": {
+                        "type": "boolean"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/VaultKind"
+                    },
+                    "labels": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LabelKind"
+                        }
+                    },
+                    "playbook_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "search": {
+                        "type": "string"
+                    },
+                    "show_all": {
+                        "description": "When true, shows hidden incomplete vaults that didn't complete a signup challenge",
+                        "type": "boolean"
+                    },
+                    "statuses": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OnboardingStatus"
+                        }
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "timestamp_gte": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "timestamp_lte": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "watchlist_hit": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "labels",
+                    "statuses",
+                    "tags"
                 ]
             },
             "SecretApiKey": {

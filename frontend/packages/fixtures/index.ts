@@ -7,11 +7,13 @@ import type {
   AuthRequirementsResponse,
   AuthV1Options,
   AuthV1SdkArgs,
+  AuthorizeFields,
   AuthorizedOrg,
   BatchHostedBusinessOwnerRequest,
   BusinessOnboardingResponse,
   ChallengeKind,
   CheckSessionResponse,
+  CollectDocumentConfig,
   CollectedDataOption,
   ConsentRequest,
   CountrySpecificDocumentMapping,
@@ -69,6 +71,9 @@ import type {
   IdentifyScope,
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
+  InvestorProfileDeclaration,
+  InvestorProfileFundingSource,
+  InvestorProfileInvestmentGoal,
   Inviter,
   Iso3166TwoDigitCountryCode,
   KbaResponse,
@@ -84,6 +89,7 @@ import type {
   ModernUserDecryptResponse,
   NeuroIdentityIdResponse,
   ObConfigurationKind,
+  OnboardingRequirement,
   OnboardingResponse,
   OnboardingSessionResponse,
   OnboardingStatusResponse,
@@ -128,7 +134,9 @@ export const getApiOnboardingRequirement = (
 ): ApiOnboardingRequirement =>
   deepmerge<ApiOnboardingRequirement>(
     {
+      authMethodKind: 'phone',
       isMet: false,
+      kind: 'register_auth_method',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -158,12 +166,15 @@ export const getAuthRequirementsResponse = (
       allRequirements: [
         {
           isMet: true,
+          kind: 'process',
         },
         {
           isMet: true,
+          kind: 'process',
         },
         {
           isMet: true,
+          kind: 'process',
         },
       ],
     },
@@ -198,6 +209,19 @@ export const getAuthV1SdkArgs = (
       },
       publicKey: '7c1e3afb-b864-49ee-b5fa-18d31c9bf77b',
       userData: {},
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuthorizeFields = (
+  props: Partial<AuthorizeFields>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuthorizeFields =>
+  deepmerge<AuthorizeFields>(
+    {
+      collectedData: ['phone_number', 'bank', 'name'],
+      documentTypes: ['ssn_card', 'permit', 'custom'],
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -480,7 +504,7 @@ export const getBatchHostedBusinessOwnerRequest = (
         'document.voter_identification.us_issuing_state': 'North Carolina',
         'id.address_line1': '62748 Hammes Trafficway Suite 286',
         'id.address_line2': '51023 Lubowitz Glens Apt. 364',
-        'id.citizenships': 'd40e5aed-08f4-4d90-8caf-a4435320cf05',
+        'id.citizenships': ['CA'],
         'id.city': 'Fort Jordyn',
         'id.country': 'Dominica',
         'id.dob': 'bbfc5c85-9d68-4e8d-aab4-97a1e31f924e',
@@ -503,17 +527,17 @@ export const getBatchHostedBusinessOwnerRequest = (
         'id.zip': '52756',
         'investor_profile.annual_income': 'aliqua',
         'investor_profile.brokerage_firm_employer': 'mollit',
-        'investor_profile.declarations': 'eu',
+        'investor_profile.declarations': ['senior_political_figure'],
         'investor_profile.employer': 'ullamco elit cupidatat sed',
         'investor_profile.employment_status': 'eiusmod mollit nisi',
-        'investor_profile.family_member_names': 'Doyle Abshire',
-        'investor_profile.funding_sources': 'labore dolore ea elit Excepteur',
-        'investor_profile.investment_goals': 'sit',
+        'investor_profile.family_member_names': ['Doyle Abshire'],
+        'investor_profile.funding_sources': ['business_income', 'investments'],
+        'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
         'investor_profile.net_worth': 'mollit non',
         'investor_profile.occupation': 'proident reprehenderit est',
         'investor_profile.political_organization': 'ullamco dolor reprehenderit tempor dolor',
         'investor_profile.risk_tolerance': 'pariatur ut aliquip',
-        'investor_profile.senior_executive_symbols': 'minim Lorem fugiat',
+        'investor_profile.senior_executive_symbols': ['minim Lorem fugiat'],
       },
       op: 'create',
       ownershipStake: -98833602,
@@ -537,6 +561,21 @@ export const getBusinessOnboardingResponse = (
   );
 export const getChallengeKind = (props: ChallengeKind): ChallengeKind => props ?? 'email';
 export const getCheckSessionResponse = (props: CheckSessionResponse): CheckSessionResponse => props ?? 'active';
+
+export const getCollectDocumentConfig = (
+  props: Partial<CollectDocumentConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CollectDocumentConfig =>
+  deepmerge<CollectDocumentConfig>(
+    {
+      kind: 'identity',
+      shouldCollectConsent: false,
+      shouldCollectSelfie: false,
+      supportedCountryAndDocTypes: {},
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getCollectedDataOption = (props: CollectedDataOption): CollectedDataOption =>
   props ?? 'business_kyced_beneficial_owners';
 
@@ -1265,7 +1304,7 @@ export const getHostedBusinessDetail = (
         'document.voter_identification.state': 'South Dakota',
         'id.address_line1': '271 E Walnut Street Apt. 105',
         'id.address_line2': '86185 N Poplar Street Suite 547',
-        'id.citizenships': '492441b9-d8fa-4600-be8f-b9c6fd1e64bd',
+        'id.citizenships': ['CA'],
         'id.city': 'North Jaquelineworth',
         'id.country': 'Gambia',
         'id.dob': 'ff38da03-fae6-4598-a952-4bb04347a101',
@@ -1288,17 +1327,17 @@ export const getHostedBusinessDetail = (
         'id.zip': '97600',
         'investor_profile.annual_income': 'ullamco laborum esse Ut reprehenderit',
         'investor_profile.brokerage_firm_employer': 'ut ad',
-        'investor_profile.declarations': 'ut',
+        'investor_profile.declarations': ['affiliated_with_us_broker'],
         'investor_profile.employer': 'consectetur',
         'investor_profile.employment_status': 'deserunt Excepteur dolore consequat',
-        'investor_profile.family_member_names': 'Gerard Padberg',
-        'investor_profile.funding_sources': 'dolor ipsum',
-        'investor_profile.investment_goals': 'quis officia ipsum enim exercitation',
+        'investor_profile.family_member_names': ['Gerard Padberg'],
+        'investor_profile.funding_sources': ['inheritance'],
+        'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
         'investor_profile.net_worth': 'eu cupidatat',
         'investor_profile.occupation': 'consequat ut ad commodo enim',
         'investor_profile.political_organization': 'consequat laborum',
         'investor_profile.risk_tolerance': 'cupidatat sint et id',
-        'investor_profile.senior_executive_symbols': 'commodo nulla cupidatat fugiat',
+        'investor_profile.senior_executive_symbols': ['minim Lorem fugiat'],
       },
       inviter: {
         firstName: 'Eddie',
@@ -1566,7 +1605,7 @@ export const getHostedBusinessOwner = (
         'document.voter_identification.state': 'Georgia',
         'id.address_line1': '6615 Beer Villages Suite 133',
         'id.address_line2': '5506 Kovacek Point Apt. 910',
-        'id.citizenships': 'fb813b81-f86d-4aae-b206-773ac10f25ba',
+        'id.citizenships': ['CA'],
         'id.city': 'Sporerfort',
         'id.country': 'Mexico',
         'id.dob': 'b24a4293-f39e-496f-a19d-e3e153bdcca3',
@@ -1589,17 +1628,17 @@ export const getHostedBusinessOwner = (
         'id.zip': '79389',
         'investor_profile.annual_income': 'qui in ad',
         'investor_profile.brokerage_firm_employer': 'Duis enim exercitation',
-        'investor_profile.declarations': 'eu',
+        'investor_profile.declarations': ['affiliated_with_us_broker'],
         'investor_profile.employer': 'tempor occaecat nulla culpa',
         'investor_profile.employment_status': 'deserunt Duis ipsum Excepteur',
-        'investor_profile.family_member_names': 'Gretchen Hoppe',
-        'investor_profile.funding_sources': 'cillum consectetur',
-        'investor_profile.investment_goals': 'sint sit',
+        'investor_profile.family_member_names': ['Gretchen Hoppe'],
+        'investor_profile.funding_sources': ['employment_income', 'savings'],
+        'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
         'investor_profile.net_worth': 'esse dolore ad qui',
         'investor_profile.occupation': 'in nisi minim',
         'investor_profile.political_organization': 'dolor dolor eu ullamco proident',
         'investor_profile.risk_tolerance': 'ullamco in ea amet',
-        'investor_profile.senior_executive_symbols': 'in ut anim dolor',
+        'investor_profile.senior_executive_symbols': ['in ut anim dolor'],
       },
       hasLinkedUser: false,
       isAuthedUser: true,
@@ -1827,6 +1866,12 @@ export const getIdentifyVerifyResponse = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getInvestorProfileDeclaration = (props: InvestorProfileDeclaration): InvestorProfileDeclaration =>
+  props ?? 'senior_executive';
+export const getInvestorProfileFundingSource = (props: InvestorProfileFundingSource): InvestorProfileFundingSource =>
+  props ?? 'business_income';
+export const getInvestorProfileInvestmentGoal = (props: InvestorProfileInvestmentGoal): InvestorProfileInvestmentGoal =>
+  props ?? 'diversification';
 
 export const getInviter = (
   props: Partial<Inviter>,
@@ -2247,7 +2292,7 @@ export const getModernRawUserDataRequest = (
       'document.voter_identification.us_issuing_state': 'Illinois',
       'id.address_line1': '201 Graham Brook Suite 129',
       'id.address_line2': '49330 Braun Loop Suite 678',
-      'id.citizenships': '199c5a53-4171-4932-b294-df88bc644b5b',
+      'id.citizenships': ['CA'],
       'id.city': 'Fort Carolynemouth',
       'id.country': 'Slovenia',
       'id.dob': '14e64c90-f96e-4487-ac77-64144a4432d1',
@@ -2270,17 +2315,17 @@ export const getModernRawUserDataRequest = (
       'id.zip': '72605-3708',
       'investor_profile.annual_income': 'eu sed incididunt',
       'investor_profile.brokerage_firm_employer': 'Lorem',
-      'investor_profile.declarations': 'minim',
+      'investor_profile.declarations': ['senior_executive'],
       'investor_profile.employer': 'ut incididunt minim mollit',
       'investor_profile.employment_status': 'enim',
-      'investor_profile.family_member_names': 'Genevieve Weissnat',
-      'investor_profile.funding_sources': 'velit in elit sint',
-      'investor_profile.investment_goals': 'dolore deserunt anim exercitation ad',
+      'investor_profile.family_member_names': ['Genevieve Weissnat'],
+      'investor_profile.funding_sources': ['savings'],
+      'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
       'investor_profile.net_worth': 'eiusmod nulla esse',
       'investor_profile.occupation': 'velit',
       'investor_profile.political_organization': 'adipisicing',
       'investor_profile.risk_tolerance': 'magna anim cupidatat non',
-      'investor_profile.senior_executive_symbols': 'occaecat do laborum',
+      'investor_profile.senior_executive_symbols': ['occaecat do laborum'],
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -2548,7 +2593,7 @@ export const getModernUserDecryptResponse = (
       'document.voter_identification.us_issuing_state': 'Wyoming',
       'id.address_line1': '5047 S Center Street Apt. 110',
       'id.address_line2': '2000 1st Street Suite 604',
-      'id.citizenships': '30513756-888f-4b50-bc53-4cb56bf23092',
+      'id.citizenships': ['CA'],
       'id.city': 'Dietrichworth',
       'id.country': 'Lebanon',
       'id.dob': '665ad4f3-f1c0-4a8f-8810-436f4be58f1c',
@@ -2571,17 +2616,17 @@ export const getModernUserDecryptResponse = (
       'id.zip': '94782-8986',
       'investor_profile.annual_income': 'enim consectetur magna consequat exercitation',
       'investor_profile.brokerage_firm_employer': 'occaecat',
-      'investor_profile.declarations': 'dolore ea sed amet',
+      'investor_profile.declarations': ['family_of_political_figure'],
       'investor_profile.employer': 'irure Duis dolor fugiat do',
       'investor_profile.employment_status': 'aliquip qui',
-      'investor_profile.family_member_names': 'Mr. Geoffrey Bauch',
-      'investor_profile.funding_sources': 'ut',
-      'investor_profile.investment_goals': 'exercitation dolore in ad',
+      'investor_profile.family_member_names': ['Mr. Geoffrey Bauch'],
+      'investor_profile.funding_sources': ['savings'],
+      'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
       'investor_profile.net_worth': 'veniam incididunt ex sed fugiat',
       'investor_profile.occupation': 'in anim',
       'investor_profile.political_organization': 'occaecat laboris ut do',
       'investor_profile.risk_tolerance': 'laborum in',
-      'investor_profile.senior_executive_symbols': 'sed eiusmod veniam dolor',
+      'investor_profile.senior_executive_symbols': ['sed eiusmod veniam dolor'],
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -2599,6 +2644,19 @@ export const getNeuroIdentityIdResponse = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getObConfigurationKind = (props: ObConfigurationKind): ObConfigurationKind => props ?? 'document';
+
+export const getOnboardingRequirement = (
+  props: Partial<OnboardingRequirement>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OnboardingRequirement =>
+  deepmerge<OnboardingRequirement>(
+    {
+      authMethodKind: 'email',
+      kind: 'register_auth_method',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 
 export const getOnboardingResponse = (
   props: Partial<OnboardingResponse>,
@@ -2633,12 +2691,15 @@ export const getOnboardingStatusResponse = (
       allRequirements: [
         {
           isMet: false,
+          kind: 'process',
         },
         {
           isMet: true,
+          kind: 'process',
         },
         {
           isMet: false,
+          kind: 'process',
         },
       ],
     },
@@ -3179,7 +3240,7 @@ export const getUpdateOrCreateHostedBusinessOwnerRequest = (
         'document.voter_identification.us_issuing_state': 'Missouri',
         'id.address_line1': '57573 Kelley Causeway Apt. 915',
         'id.address_line2': '652 Chestnut Street Suite 587',
-        'id.citizenships': '357e27cb-2cde-4d19-8760-f63122813a93',
+        'id.citizenships': ['CA'],
         'id.city': 'East Ubaldofort',
         'id.country': 'Guinea-Bissau',
         'id.dob': 'd9c1533c-d14b-4abc-b6a6-8ecbe98a5f0c',
@@ -3202,17 +3263,17 @@ export const getUpdateOrCreateHostedBusinessOwnerRequest = (
         'id.zip': '79428',
         'investor_profile.annual_income': 'laborum dolore',
         'investor_profile.brokerage_firm_employer': 'labore',
-        'investor_profile.declarations': 'elit aute',
+        'investor_profile.declarations': ['affiliated_with_us_broker'],
         'investor_profile.employer': 'sit',
         'investor_profile.employment_status': 'sit dolor',
-        'investor_profile.family_member_names': 'Billie Mills',
-        'investor_profile.funding_sources': 'Duis amet velit ut dolore',
-        'investor_profile.investment_goals': 'Ut mollit dolore incididunt minim',
+        'investor_profile.family_member_names': ['Billie Mills'],
+        'investor_profile.funding_sources': ['savings'],
+        'investor_profile.investment_goals': ['growth', 'income', 'preserve_capital'],
         'investor_profile.net_worth': 'laborum',
         'investor_profile.occupation': 'do aute',
         'investor_profile.political_organization': 'laborum qui nisi aute cillum',
         'investor_profile.risk_tolerance': 'cillum',
-        'investor_profile.senior_executive_symbols': 'ea',
+        'investor_profile.senior_executive_symbols': ['ea'],
       },
       ownershipStake: 77074481,
       uuid: '5801ab10-beb7-4447-91bc-031c4e582ad2',

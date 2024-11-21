@@ -2450,14 +2450,21 @@
                 ]
             },
             "ApiOnboardingRequirement": {
-                "type": "object",
-                "properties": {
-                    "is_met": {
-                        "type": "boolean"
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "is_met": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "is_met"
+                        ]
+                    },
+                    {
+                        "$ref": "#/components/schemas/OnboardingRequirement"
                     }
-                },
-                "required": [
-                    "is_met"
                 ]
             },
             "AuthMethod": {
@@ -2526,6 +2533,27 @@
                         "type": "object"
                     }
                 }
+            },
+            "AuthorizeFields": {
+                "type": "object",
+                "properties": {
+                    "collected_data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollectedDataOption"
+                        }
+                    },
+                    "document_types": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentKind"
+                        }
+                    }
+                },
+                "required": [
+                    "collected_data",
+                    "document_types"
+                ]
             },
             "AuthorizedOrg": {
                 "type": "object",
@@ -2653,6 +2681,110 @@
                     "active",
                     "expired",
                     "unknown"
+                ]
+            },
+            "CollectDocumentConfig": {
+                "anyOf": [
+                    {
+                        "allOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "should_collect_consent": {
+                                        "type": "boolean"
+                                    },
+                                    "should_collect_selfie": {
+                                        "type": "boolean"
+                                    },
+                                    "supported_country_and_doc_types": {
+                                        "type": "object"
+                                    }
+                                },
+                                "required": [
+                                    "should_collect_consent",
+                                    "should_collect_selfie",
+                                    "supported_country_and_doc_types"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "identity"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "proof_of_ssn"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "proof_of_address"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CustomDocumentConfig"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "custom"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    }
                 ]
             },
             "CollectedDataOption": {
@@ -6340,6 +6472,317 @@
                     "kyb",
                     "auth",
                     "document"
+                ]
+            },
+            "OnboardingRequirement": {
+                "anyOf": [
+                    {
+                        "allOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "auth_method_kind": {
+                                        "$ref": "#/components/schemas/AuthMethodKind"
+                                    }
+                                },
+                                "required": [
+                                    "auth_method_kind"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "register_auth_method"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "description": "There is missing identity data that must be collected",
+                                "type": "object",
+                                "properties": {
+                                    "missing_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    },
+                                    "optional_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    },
+                                    "populated_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    },
+                                    "recollect_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "missing_attributes",
+                                    "optional_attributes",
+                                    "populated_attributes",
+                                    "recollect_attributes"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "collect_data"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "description": "There is missing investor profile data that must be collected",
+                                "type": "object",
+                                "properties": {
+                                    "missing_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    },
+                                    "missing_document": {
+                                        "type": "boolean"
+                                    },
+                                    "populated_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "missing_attributes",
+                                    "missing_document",
+                                    "populated_attributes"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "collect_investor_profile"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "description": "The flow requires a business, and one hasn't yet been created / selected",
+                                "type": "object",
+                                "properties": {
+                                    "requires_business_selection": {
+                                        "description": "When true, requires either selecting an existing business, or will create a new one upon\n `POST /hosted/business/onboarding`.\n When false, there's already a business associated with this session, so we can\n immediately call `POST /hosted/business/onboarding`.",
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "requires_business_selection"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "create_business_onboarding"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "description": "There is missing business data that must be collected",
+                                "type": "object",
+                                "properties": {
+                                    "missing_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    },
+                                    "populated_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    },
+                                    "recollect_attributes": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CollectedDataOption"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "missing_attributes",
+                                    "populated_attributes",
+                                    "recollect_attributes"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "collect_business_data"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Register a passkey",
+                        "type": "object",
+                        "properties": {
+                            "kind": {
+                                "type": "string",
+                                "enum": [
+                                    "liveness"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "kind"
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "description": "A document needs to be collected",
+                                "type": "object",
+                                "properties": {
+                                    "config": {
+                                        "$ref": "#/components/schemas/CollectDocumentConfig"
+                                    },
+                                    "document_request_id": {
+                                        "type": "string"
+                                    },
+                                    "upload_settings": {
+                                        "$ref": "#/components/schemas/DocumentUploadSettings"
+                                    }
+                                },
+                                "required": [
+                                    "config",
+                                    "document_request_id",
+                                    "upload_settings"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "collect_document"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "description": "The client needs to display the authorization consent page and confirm the user authorizes\n access",
+                                "type": "object",
+                                "properties": {
+                                    "authorized_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "fields_to_authorize": {
+                                        "$ref": "#/components/schemas/AuthorizeFields"
+                                    }
+                                },
+                                "required": [
+                                    "fields_to_authorize"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "authorize"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "The client needs to tell us when user input is done in order for us to continue processing",
+                        "type": "object",
+                        "properties": {
+                            "kind": {
+                                "type": "string",
+                                "enum": [
+                                    "process"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "kind"
+                        ]
+                    }
                 ]
             },
             "OnboardingResponse": {
