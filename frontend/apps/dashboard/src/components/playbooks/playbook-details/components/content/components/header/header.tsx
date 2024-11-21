@@ -1,3 +1,4 @@
+import { IcoUpdated16 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, CodeInline } from '@onefootprint/ui';
@@ -57,11 +58,12 @@ const ManageVersions = ({ playbooks }: { playbooks: OnboardingConfiguration[] })
     <>
       <span>·</span>
       <button
-        className="text-label-3 text-secondary hover:cursor-pointer"
+        className="flex gap-2 items-center text-label-3 text-secondary hover:cursor-pointer"
         type="button"
         onClick={() => setIsOpen(true)}
       >
         {t('edited')}
+        <IcoUpdated16 />
       </button>
       <Suspense>
         <Versions open={isOpen} onClose={() => setIsOpen(false)} playbooks={playbooks} />
