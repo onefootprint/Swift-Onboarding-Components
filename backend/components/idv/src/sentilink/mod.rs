@@ -1,3 +1,4 @@
+use application_risk::request::AppRiskMetadata;
 use application_risk::response::ApplicationRiskResponse;
 use newtypes::sentilink::SentilinkProduct;
 use newtypes::vendor_credentials::SentilinkCredentials;
@@ -148,6 +149,7 @@ pub struct SentilinkApplicationRiskRequest {
     pub workflow_id: WorkflowId,
     pub ip_address: Option<PiiString>,
     pub fp_id: FpId,
+    pub metadata: Option<AppRiskMetadata>,
 }
 
 

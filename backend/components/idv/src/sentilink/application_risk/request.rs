@@ -7,7 +7,7 @@ use newtypes::sentilink::SentilinkProduct;
 use newtypes::FpId;
 use newtypes::IdentityDataKind;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::PiiJsonValue;
+use newtypes::ObConfigurationId;
 use newtypes::PiiString;
 use newtypes::WorkflowId;
 use serde::Deserialize;
@@ -71,9 +71,13 @@ pub struct Application {
     loan_currency: Option<PiiString>,
     // Any other data in JSON format.
     #[serde(skip_serializing_if = "Option::is_none")]
-    metadata: Option<PiiJsonValue>,
+    metadata: Option<AppRiskMetadata>,
 }
 
+#[derive(Serialize, Deserialize, Default)]
+pub struct AppRiskMetadata {
+    pub ob_configuration_id: Option<ObConfigurationId>,
+}
 
 impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
     type Error = SentilinkError;
@@ -86,6 +90,7 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             workflow_id,
             fp_id,
             ip_address,
+            metadata,
         } = value;
         // Check products
         if products.is_empty() {
@@ -149,6 +154,7 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             email: idv_data.get(IdentityDataKind::Email).cloned(),
             ip_address,
             user_id: fp_id,
+            metadata,
             ..Default::default()
         };
 

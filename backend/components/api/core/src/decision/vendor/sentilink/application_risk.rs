@@ -15,6 +15,8 @@ use db::models::insight_event::InsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
+use db::models::workflow::Workflow;
+use idv::sentilink::application_risk::request::AppRiskMetadata;
 use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use idv::sentilink::SentilinkApplicationRiskRequest;
 use newtypes::sentilink::SentilinkProduct;
@@ -34,7 +36,7 @@ pub async fn run_sentilink_application_risk(
     let svid = di.scoped_vault_id.clone();
     let wf_id2 = wf_id.clone();
 
-    let (vw, tenant_id, curr_seqno, ie, fp_id) = state
+    let (vw, tenant_id, curr_seqno, ie, fp_id, obc_id) = state
         .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
@@ -45,8 +47,9 @@ pub async fn run_sentilink_application_risk(
             // We want to freeze the moment we are going to verify someone, and then use
             // that to reconstruct the vault. For now in testing it doesn't matter
             let curr_seqno = DataLifetime::get_current_seqno(conn)?;
+            let wf = Workflow::get(conn, &wf_id2)?;
 
-            Ok((vw, tenant_id, curr_seqno, ie, sv.fp_id))
+            Ok((vw, tenant_id, curr_seqno, ie, sv.fp_id, wf.ob_configuration_id))
         })
         .await?;
 
@@ -81,6 +84,10 @@ pub async fn run_sentilink_application_risk(
     )
     .await?;
 
+    let metadata = AppRiskMetadata {
+        ob_configuration_id: Some(obc_id),
+    };
+
     let request = SentilinkApplicationRiskRequest {
         idv_data,
         credentials: tvc
@@ -92,6 +99,7 @@ pub async fn run_sentilink_application_risk(
         // Currently from the wf creation IE event
         ip_address: ie.and_then(|i| i.ip_address.map(|ip| ip.into())),
         fp_id,
+        metadata: Some(metadata),
     };
 
     // make request

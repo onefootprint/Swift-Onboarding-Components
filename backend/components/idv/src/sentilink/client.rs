@@ -63,10 +63,16 @@ impl SentilinkClientAdapter {
 mod tests {
     use super::*;
     use crate::footprint_http_client::FpVendorClientArgs;
-    use crate::sentilink::application_risk::request::Application;
+    use crate::sentilink::application_risk::request::AppRiskMetadata;
     use crate::sentilink::application_risk::response::ApplicationRiskResponse;
-    use chrono::Utc;
+    use crate::sentilink::SentilinkApplicationRiskRequest;
     use newtypes::sentilink::SentilinkProduct;
+    use newtypes::FpId;
+    use newtypes::IdvData;
+    use newtypes::ObConfigurationId;
+    use newtypes::WorkflowId;
+    use std::str::FromStr;
+    use strum::IntoEnumIterator;
 
     fn get_credentials() -> SentilinkCredentials {
         let auth_username = PiiString::from(dotenv::var("SENTILINK_AUTH_USERNAME").unwrap());
@@ -86,10 +92,7 @@ mod tests {
         let client_adapter = SentilinkClientAdapter::new(credentials);
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
 
-        let request = ApplicationRiskRequest {
-            application: test_application(),
-            products: vec![SentilinkProduct::IdTheftScore, SentilinkProduct::SyntheticScore],
-        };
+        let request = test_application_request();
 
         let raw_response = client_adapter
             .send_application_risk_request(&fp_client, request)
@@ -106,25 +109,38 @@ mod tests {
         assert!(!parsed.response_status.is_empty())
     }
 
-    fn test_application() -> Application {
-        let raw = serde_json::json!(
-        {
-            "user_id": "1234567",
-            "first_name": "John",
-            "user_created": Utc::now(),
-            "last_name": "Doe",
-            "dob": "1990-01-01",
-            "ssn": "123-45-6789",
-            "address_line_1": "123 Main Street",
-            "city": "Pleasantville",
-            "zipcode": "32407",
-            "state_code": "CA",
-            "country_code": "US",
-            "phone":"2223338999",
-            "email":"testuser@gmail.com",
-            "application_id": "APP-10848",
-            "application_created": Utc::now()
-        });
-        serde_json::from_value(raw).unwrap()
+    fn test_application_request() -> ApplicationRiskRequest {
+        let idv_data = IdvData {
+            first_name: Some("John".into()),
+            last_name: Some("Doe".into()),
+            dob: Some("1990-01-01".into()),
+            ssn9: Some("123456789".into()),
+            address_line1: Some("123 Main Street".into()),
+            address_line2: Some("Apt 4B".into()),
+            country: Some("US".into()),
+            city: Some("Pleasantville".into()),
+            state: Some("CA".into()),
+            zip: Some("32407".into()),
+            phone_number: Some("2223338999".into()),
+            email: Some("testuser@gmail.com".into()),
+            ..Default::default() // In case there are other fields we don't need to set
+        };
+        let meta = AppRiskMetadata {
+            ob_configuration_id: Some(ObConfigurationId::from_str("obc_12345").unwrap()),
+        };
+
+        let req = SentilinkApplicationRiskRequest {
+            idv_data,
+            credentials: get_credentials(),
+            products: SentilinkProduct::iter().collect(),
+            workflow_id: WorkflowId::from_str("wf_12345").unwrap(),
+            ip_address: None,
+            fp_id: FpId::from_str("fp_12345").unwrap(),
+            metadata: Some(meta),
+        };
+
+        // This is to make sure that we have some test coverage for creating the request
+        // and that sentilink accepts it in the ignored test above.
+        ApplicationRiskRequest::try_from(req).unwrap()
     }
 }
