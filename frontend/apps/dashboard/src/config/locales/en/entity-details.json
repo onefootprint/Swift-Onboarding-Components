@@ -1152,19 +1152,21 @@
         "pass-with-manual-review": "Pass + Manual review",
         "manual-review": "Fail + Manual review",
         "fail": "Fail",
-        "step-up": "Step-up ⋅ {{document}}",
-        "identity-proof-of-ssn": "Identity document and Proof of SSN",
-        "proof-of-address": "Proof of Address",
-        "identity": "Identity document"
+        "step-up": "Step-up",
+        "identity": "⋅ Identity document",
+        "proof-of-address": "⋅ Proof of Address",
+        "proof-of-ssn": "⋅ Proof of SSN",
+        "identity-proof-of-ssn-proof-of-address": "⋅ Identity document, Proof of SSN, Proof of Address",
+        "custom": "⋅ Custom"
       },
       "rule-row": {
         "if": "if",
         "and": "and",
         "op": {
           "eq": "is",
-          "not_eq": "is not",
-          "is_in": "is in",
-          "is_not_in": "is not in"
+          "not-eq": "is not",
+          "is-in": "is in",
+          "is-not-in": "is not in"
         },
         "value": {
           "risk-signal-value": "triggered",

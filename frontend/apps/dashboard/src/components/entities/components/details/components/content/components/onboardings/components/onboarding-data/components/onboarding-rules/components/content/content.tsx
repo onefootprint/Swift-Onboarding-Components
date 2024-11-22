@@ -1,6 +1,7 @@
 import type { Rule, RuleAction } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import RuleRow from '../rule-row';
 
 type ContentProps = {
   ruleResults: Partial<Record<RuleAction, Rule[]>>;
@@ -9,7 +10,7 @@ type ContentProps = {
 
 const Content = ({ ruleResults, showTriggered }: ContentProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'onboardings.rules.action',
+    keyPrefix: 'onboardings.rules',
   });
 
   const getRuleActionColor = (action: RuleAction) => {
@@ -20,14 +21,37 @@ const Content = ({ ruleResults, showTriggered }: ContentProps) => {
   };
 
   const getRuleActionText = (action: RuleAction) => {
-    if (action === 'pass_with_manual_review') return t('pass-with-manual-review');
-    if (action === 'manual_review') return t('manual-review');
-    if (action === 'fail') return t('fail');
-    if (action === 'step_up.identity') return t('step-up', { document: t('identity') });
-    if (action === 'step_up.proof_of_address') return t('step-up', { document: t('proof-of-address') });
-    if (action === 'step_up.identity_proof_of_ssn') return t('step-up', { document: t('identity-proof-of-ssn') });
+    if (action === 'pass_with_manual_review') return t('action.pass-with-manual-review');
+    if (action === 'manual_review') return t('action.manual-review');
+    if (action === 'fail') return t('action.fail');
+    if (action.includes('step_up')) return t('action.step-up');
+  };
+
+  const getStepUpActionText = (action: RuleAction) => {
+    if (action === 'step_up.identity') return t('action.identity');
+    if (action === 'step_up.proof_of_address') return t('action.proof-of-address');
+    if (action === 'step_up.identity_proof_of_ssn') return t('action.identity-proof-of-ssn');
     if (action === 'step_up.identity_proof_of_ssn_proof_of_address')
-      return t('step-up', { document: t('identity-proof-of-ssn-proof-of-address') });
+      return t('action.identity-proof-of-ssn-proof-of-address');
+  };
+
+  const renderRuleAction = (action: RuleAction) => {
+    const actionText = (
+      <Text variant="label-3" color={getRuleActionColor(action)}>
+        {getRuleActionText(action)}
+      </Text>
+    );
+    if (action.includes('step_up')) {
+      return (
+        <Stack gap={2} align="center">
+          {actionText}
+          <Text variant="label-3" color="secondary">
+            {getStepUpActionText(action)}
+          </Text>
+        </Stack>
+      );
+    }
+    return actionText;
   };
 
   if (Object.keys(ruleResults).length === 0) {
@@ -36,12 +60,10 @@ const Content = ({ ruleResults, showTriggered }: ContentProps) => {
 
   return Object.entries(ruleResults).map(([action, rules]) => (
     <Stack direction="column" gap={4}>
-      <Text variant="label-3" color={getRuleActionColor(action as RuleAction)}>
-        {getRuleActionText(action as RuleAction)}
-      </Text>
+      {renderRuleAction(action as RuleAction)}
       <Stack direction="column" gap={3}>
         {rules.map(({ ruleExpression }) => (
-          <Text variant="caption-1">{JSON.stringify(ruleExpression)}</Text>
+          <RuleRow ruleExpression={ruleExpression} />
         ))}
       </Stack>
     </Stack>
