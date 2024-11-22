@@ -1,4 +1,5 @@
 import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
+import type { FinancialDataItem } from '../../types';
 
 const getFinancialData = (fields: DataIdentifier[]) => {
   // Group card fields by ID
@@ -8,18 +9,16 @@ const getFinancialData = (fields: DataIdentifier[]) => {
       const [, id] = field.split('card.');
       const [cardId] = id.split('.');
       cardGroups[cardId] = cardGroups[cardId] || [];
-      cardGroups[cardId].push(field);
+      const aliasedField = field.replace(`card.${cardId}.`, 'card.*.');
+      cardGroups[cardId].push(aliasedField);
     }
   });
 
   // Build card objects
-  const cards = Object.entries(cardGroups).map(([cardId, cardFields]) => {
+  const cards: FinancialDataItem[] = Object.entries(cardGroups).map(([cardId, cardFields]) => {
     return {
       name: cardId,
-      fields: cardFields.map(f => {
-        const parts = f.split('.');
-        return parts[parts.length - 1];
-      }),
+      fields: cardFields as DataIdentifier[],
     };
   });
 
@@ -30,18 +29,16 @@ const getFinancialData = (fields: DataIdentifier[]) => {
       const [, id] = field.split('bank.');
       const [bankId] = id.split('.');
       bankGroups[bankId] = bankGroups[bankId] || [];
-      bankGroups[bankId].push(field);
+      const aliasedField = field.replace(`bank.${bankId}.`, 'bank.*.');
+      bankGroups[bankId].push(aliasedField);
     }
   });
 
   // Build bank account objects
-  const bankAccounts = Object.entries(bankGroups).map(([bankId, bankFields]) => {
+  const bankAccounts: FinancialDataItem[] = Object.entries(bankGroups).map(([bankId, bankFields]) => {
     return {
       name: bankId,
-      fields: bankFields.map(f => {
-        const parts = f.split('.');
-        return parts[parts.length - 1];
-      }),
+      fields: bankFields as DataIdentifier[],
     };
   });
 

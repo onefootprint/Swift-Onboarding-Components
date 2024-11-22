@@ -67,7 +67,29 @@
       "other-attribute": "other attribute",
       "other-attributes": "other attributes",
       "updated": "updated",
-      "deleted": "deleted"
+      "deleted": "deleted",
+      "card": "Card",
+      "bank-account": "Bank account",
+      "financial-data": "Financial data",
+      "financial": {
+        "card.*.issuer": "Issuer",
+        "card.*.number_last4": "Last 4 digits",
+        "card.*.name": "Name",
+        "card.*.billing_address.zip": "Billing ZIP code",
+        "card.*.billing_address.country": "Billing country",
+        "card.*.expiration_month": "Expiration month",
+        "card.*.expiration_year": "Expiration year",
+        "card.*.number": "Card number",
+        "card.*.expiration": "Expiration date",
+        "card.*.cvc": "CVC",
+        "card.*.fingerprint": "Card fingerprint",
+        "bank.*.name": "Bank name",
+        "bank.*.ach_routing_number": "Routing number",
+        "bank.*.ach_account_number": "Account number",
+        "bank.*.ach_account_id": "Account ID",
+        "bank.*.account_type": "Account type",
+        "bank.*.fingerprint": "Bank account fingerprint"
+      }
     },
     "invite": {
       "invited": "invited",
