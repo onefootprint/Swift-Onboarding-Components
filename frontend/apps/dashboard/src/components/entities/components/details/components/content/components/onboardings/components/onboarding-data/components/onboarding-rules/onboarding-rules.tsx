@@ -1,11 +1,11 @@
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
 import { getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions } from '@onefootprint/axios/dashboard';
-import { Text } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import ErrorComponent from 'src/components/error';
 import Loading from '../../../loading';
 import groupRuleResults from '../../utils/group-rule-results';
+import Content from './components/content';
 
 type OnboardingRulesProps = {
   ruleSetResultId: string;
@@ -27,11 +27,7 @@ const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
       {isPending && <Loading />}
       {error && <ErrorComponent error={error} />}
       {data && data.ruleResults.length > 0 && (
-        <div>
-          {Object.keys(groupRuleResults(data.ruleResults).notTriggered).map(action => (
-            <Text variant="label-3">{action}</Text>
-          ))}
-        </div>
+        <Content ruleResults={groupRuleResults(data.ruleResults).notTriggered} showTriggered={false} />
       )}
       {data?.ruleResults.length === 0 && <ErrorComponent error={t('no-rule-results')} />}
     </>

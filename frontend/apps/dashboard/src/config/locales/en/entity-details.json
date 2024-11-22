@@ -1156,6 +1156,20 @@
         "identity-proof-of-ssn": "Identity document and Proof of SSN",
         "proof-of-address": "Proof of Address",
         "identity": "Identity document"
+      },
+      "rule-row": {
+        "if": "if",
+        "and": "and",
+        "op": {
+          "eq": "is",
+          "not_eq": "is not",
+          "is_in": "is in",
+          "is_not_in": "is not in"
+        },
+        "value": {
+          "risk-signal-value": "triggered",
+          "list-fallback-value": "list {{value}}"
+        }
       }
     },
     "user-data": {

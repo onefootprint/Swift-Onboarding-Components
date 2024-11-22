@@ -68,7 +68,7 @@ const TopSection = styled.div`
   ${({ theme }) => css`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: ${theme.spacing[8]};
+    gap: ${theme.spacing[9]};
 
     & > *:only-child {
       grid-column: 1 / -1;
