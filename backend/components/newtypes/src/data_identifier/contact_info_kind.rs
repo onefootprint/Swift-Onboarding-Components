@@ -45,6 +45,7 @@ impl TryFrom<AuthEventKind> for AuthMethodKind {
             AuthEventKind::Email => Self::Email,
             AuthEventKind::Passkey => Self::Passkey,
             AuthEventKind::Sms => Self::Phone,
+            AuthEventKind::SmsLink => Self::Phone,
             AuthEventKind::ThirdParty => {
                 return Err(Error::Custom(
                     "Third party auth event kind does not correspond to an auth method".to_owned(),

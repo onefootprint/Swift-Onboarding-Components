@@ -4,6 +4,8 @@ use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crypto::aead::ScopedSealingKey;
 use db::PgConn;
+use db::TxnPgConn;
+use newtypes::Locked;
 
 /// Marker trait for Ts wrapped by SessionContext<T>. When this trait is implemented for T,
 /// you'll be able to call SessionContext<T>.update_session(...) to transparently replace the
@@ -36,6 +38,8 @@ pub trait UpdateSession {
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
     ) -> FpResult<()>;
+
+    fn lock(self, conn: &mut TxnPgConn, sealing_key: &ScopedSealingKey) -> FpResult<Locked<AuthSession>>;
 }
 
 impl<T> UpdateSession for T
@@ -50,5 +54,11 @@ where
     ) -> FpResult<()> {
         self.session().update(conn, session_sealing_key, data)?;
         Ok(())
+    }
+
+    fn lock(self, conn: &mut TxnPgConn, sealing_key: &ScopedSealingKey) -> FpResult<Locked<AuthSession>> {
+        let session = self.session();
+        let session = AuthSession::lock(conn, sealing_key, &session.key)?;
+        Ok(session)
     }
 }

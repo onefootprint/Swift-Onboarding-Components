@@ -14,6 +14,7 @@ use newtypes::IdentifyScope;
 use newtypes::ObConfigurationId;
 use newtypes::RequestedTokenScope;
 use newtypes::ScopedVaultId;
+use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
 use newtypes::WorkflowId;
@@ -346,4 +347,10 @@ pub struct ValidateUserToken {
 pub struct EmailVerifySession {
     // May contain old primary keys to Email rows (legacy) or primary keys to ContactInfo rows (modern)
     pub email_id: ContactInfoId,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct ContactInfoVerifySessionData {
+    pub user_token: SessionAuthToken,
+    pub auth_event_id: Option<AuthEventId>,
 }

@@ -8,8 +8,10 @@ use chrono::Utc;
 use crypto::aead::ScopedSealingKey;
 use db::models::session::Session;
 use db::PgConn;
+use db::TxnPgConn;
 use newtypes::AuthTokenHash;
 use newtypes::HasSessionKind;
+use newtypes::Locked;
 use newtypes::SealedSessionBytes;
 use newtypes::SessionAuthToken;
 
@@ -37,6 +39,20 @@ impl AuthSession {
         let Some(session) = session else {
             return Err(ErrorWithCode::NoSessionFound.into());
         };
+        Self::unseal_session(sealing_key, session)
+    }
+
+    pub fn lock(
+        conn: &mut TxnPgConn,
+        sealing_key: &ScopedSealingKey,
+        key: &AuthTokenHash,
+    ) -> FpResult<Locked<Self>> {
+        let session = Session::lock(conn, key)?;
+        let session = Self::unseal_session(sealing_key, session.into_inner())?;
+        Ok(Locked::new(session))
+    }
+
+    fn unseal_session(sealing_key: &ScopedSealingKey, session: Session) -> FpResult<Self> {
         let data = AuthSessionData::unseal(sealing_key, SealedSessionBytes(session.data));
         let data = if let Err(crypto::Error::Cbor(e)) = data {
             tracing::info!(e=?e, "Couldn't parse auth session");

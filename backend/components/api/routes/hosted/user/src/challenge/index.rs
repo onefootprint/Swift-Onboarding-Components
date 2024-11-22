@@ -160,7 +160,7 @@ fn allowed_challenge_kinds(
             AuthMethodKind::Phone,
             AuthMethodKind::Passkey,
         ],
-        (ActionKind::Replace, AuthEventKind::Email | AuthEventKind::Sms) => {
+        (ActionKind::Replace, AuthEventKind::Email | AuthEventKind::Sms | AuthEventKind::SmsLink) => {
             vec![AuthMethodKind::Email, AuthMethodKind::Phone]
         }
         (ActionKind::Replace, AuthEventKind::Passkey) => {

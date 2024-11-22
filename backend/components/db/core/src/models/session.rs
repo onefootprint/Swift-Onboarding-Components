@@ -1,4 +1,5 @@
 use crate::PgConn;
+use crate::TxnPgConn;
 use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
@@ -7,6 +8,7 @@ use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use newtypes::AuthTokenHash;
+use newtypes::Locked;
 use newtypes::SessionKind;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -39,6 +41,15 @@ impl Session {
             .first::<Session>(conn)
             .optional()?;
         Ok(session)
+    }
+
+    #[tracing::instrument("Session::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, key: &AuthTokenHash) -> FpResult<Locked<Session>> {
+        let session = session::table
+            .filter(session::key.eq(key))
+            .for_update()
+            .first::<Session>(conn.conn())?;
+        Ok(Locked::new(session))
     }
 
     #[tracing::instrument("Session::update_or_create", skip_all)]

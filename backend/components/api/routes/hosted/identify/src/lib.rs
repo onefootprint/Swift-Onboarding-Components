@@ -26,6 +26,7 @@ use paperclip::actix::web;
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::AuthenticationState;
 
+mod contact_info_verify;
 #[allow(clippy::module_inception)]
 pub mod identify;
 mod identify_lite;
@@ -44,6 +45,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(signup_challenge::post)
         .service(kba::post)
         .service(verify::post)
+        .service(contact_info_verify::post)
         .service(validation_token::post);
 }
 

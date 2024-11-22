@@ -1,0 +1,69 @@
+use crate::State;
+use api_core::auth::session::user::ContactInfoVerifySessionData;
+use api_core::auth::session::AuthSessionData;
+use api_core::auth::session::UpdateSession;
+use api_core::auth::user::ContactInfoVerifyAuth;
+use api_core::types::ApiResponse;
+use api_core::utils::headers::InsightHeaders;
+use api_errors::UnauthorizedInto;
+use api_wire_types::Empty;
+use chrono::Utc;
+use db::models::auth_event::AuthEvent;
+use db::models::auth_event::NewAuthEventArgs;
+use db::models::insight_event::CreateInsightEvent;
+use newtypes::ActionKind;
+use newtypes::AuthEventKind;
+use newtypes::IdentifyScope;
+use paperclip::actix;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
+
+#[api_v2_operation(
+    tags(Identify, Hosted),
+    description = "Creates an auth event to mark the provided contact info as verified."
+)]
+#[actix::post("/hosted/identify/verify_contact_info")]
+pub async fn post(
+    state: web::Data<State>,
+    insight_headers: InsightHeaders,
+    auth: ContactInfoVerifyAuth,
+) -> ApiResponse<Empty> {
+    let session_key = state.session_sealing_key.clone();
+    state
+        .db_transaction(move |conn| {
+            let session = auth.clone().lock(conn, &session_key)?.into_inner();
+            let AuthSessionData::ContactInfoVerify(session_data) = session.data else {
+                return UnauthorizedInto("Incorrect session kind");
+            };
+            if session_data.auth_event_id.is_some() {
+                // No-op if we've already verified this contact info
+                return Ok(());
+            }
+
+            // Specifically save the insight event from the phone that clicked on the link
+            let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
+            let ae_args = NewAuthEventArgs {
+                vault_id: auth.user_vault_id.clone(),
+                scoped_vault_id: auth.su_id.clone(),
+                insight_event_id: Some(insight.id),
+                kind: AuthEventKind::SmsLink,
+                webauthn_credential_id: None,
+                created_at: Utc::now(),
+                // This feature is generally unused, it's only displayed in the list of auth events on the
+                // dashboard. Perhaps not necessary
+                scope: IdentifyScope::Onboarding,
+                // Since we only support these links for signup challenges, we know this is always AddPrimary
+                new_auth_method_action: Some(ActionKind::AddPrimary),
+            };
+            let event = AuthEvent::save(ae_args, conn)?;
+            // Now, set the auth_event_id on the session data
+            let session_data = ContactInfoVerifySessionData {
+                auth_event_id: Some(event.id),
+                ..session_data
+            };
+            auth.update_session(conn, &session_key, session_data.into())?;
+            Ok(())
+        })
+        .await?;
+    Ok(Empty)
+}

@@ -69,7 +69,6 @@ pub fn load_auth_events(
 }
 
 // Allow calling SessionContext<UserSessionContext>::update
-// TODO this is now the only place where we mutate sessions. Probably want to get rid of it
 impl AllowSessionUpdate for SessionContext<UserSessionContext> {}
 
 #[derive(Debug, derive_more::From)]

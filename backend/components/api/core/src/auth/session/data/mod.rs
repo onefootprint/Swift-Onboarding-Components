@@ -35,8 +35,11 @@ pub enum AuthSessionData {
     /// Proxy permissions of a tenant into a short-lived token
     ClientTenant(tenant::ClientTenantAuth),
 
-    /// user-specific sessions
+    /// User-specific sessions
     User(user::UserSession),
+
+    /// Used to verify a piece of contact info via async link
+    ContactInfoVerify(user::ContactInfoVerifySessionData),
 
     /// Used for validating email challenges
     /// NOTE this is no longer used.
@@ -73,6 +76,7 @@ impl AuthSessionData {
             Self::TenantRb(_) => "db",
             Self::FirmEmployee(_) => "db",
             Self::OnboardingSession(_) => "pb",
+            Self::ContactInfoVerify(_) => "ci",
         }
     }
 }
@@ -90,6 +94,7 @@ impl HasSessionKind for AuthSessionData {
             Self::BusinessOwner(_) => SessionKind::BusinessOwner,
             Self::SdkArgs(_) => SessionKind::SdkArgs,
             Self::OnboardingSession(_) => SessionKind::OnboardingSession,
+            Self::ContactInfoVerify(_) => SessionKind::ContactInfoVerify,
         }
     }
 }

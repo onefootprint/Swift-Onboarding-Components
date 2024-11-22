@@ -12,6 +12,8 @@ mod it_user;
 pub use it_user::*;
 mod user_biz_wf;
 pub use user_biz_wf::*;
+mod contact_info_verify;
+pub use contact_info_verify::*;
 
 /// Computes the list of scopes to be granted to an auth token for a user.
 /// - `auth_events`: the auths that this user has performed
@@ -53,7 +55,7 @@ pub fn allowed_user_scopes(
 /// Returns the list of UserAuthScopes that are allowed to be granted for the auth method provided
 fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
     match k {
-        AuthEventKind::Sms | AuthEventKind::Email => vec![
+        AuthEventKind::Sms | AuthEventKind::Email | AuthEventKind::SmsLink => vec![
             UserAuthScope::SignUp,
             UserAuthScope::Auth,
             UserAuthScope::BasicProfile,

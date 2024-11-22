@@ -37,6 +37,7 @@ use strum_macros::EnumString;
 #[diesel(sql_type = Text)]
 pub enum AuthEventKind {
     Sms,
+    SmsLink,
     Email,
     Passkey,
     /// A third party tenant testification that the user authenticated with them.
@@ -69,6 +70,7 @@ impl From<ContactInfoKind> for AuthEventKind {
 #[serde(rename_all = "snake_case")]
 pub enum ModernAuthEventKind {
     Sms,
+    SmsLink,
     Email,
     Passkey,
     #[openapi(skip)]
@@ -81,6 +83,7 @@ impl From<AuthEventKind> for ModernAuthEventKind {
             AuthEventKind::Email => Self::Email,
             AuthEventKind::Passkey => Self::Passkey,
             AuthEventKind::Sms => Self::Sms,
+            AuthEventKind::SmsLink => Self::SmsLink,
             AuthEventKind::ThirdParty => Self::ThirdParty,
         }
     }
