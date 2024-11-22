@@ -4,10 +4,12 @@ import getFinancialData from './get-financial-data';
 describe('getFinancialData', () => {
   describe('with no financial data', () => {
     it('returns empty arrays and false flag', () => {
-      const data = getFinancialData(['id.first_name' as DataIdentifier, 'id.last_name' as DataIdentifier]);
+      const fields = ['id.first_name' as DataIdentifier, 'id.last_name' as DataIdentifier];
+      const data = getFinancialData(fields);
 
       expect(data.cards).toHaveLength(0);
       expect(data.bankAccounts).toHaveLength(0);
+      expect(data.nonFinancialFields).toEqual(fields);
       expect(data.hasFinancialData).toBe(false);
     });
   });
@@ -173,6 +175,22 @@ describe('getFinancialData', () => {
         name: 'ghi',
         fields: ['bank.*.name', 'bank.*.ach_routing_number'],
       });
+      expect(data.hasFinancialData).toBe(true);
+    });
+
+    it('correctly separates financial and non-financial data', () => {
+      const data = getFinancialData([
+        'card.123.issuer' as DataIdentifier,
+        'card.123.number_last4' as DataIdentifier,
+        'bank.456.name' as DataIdentifier,
+        'id.first_name' as DataIdentifier,
+        'id.last_name' as DataIdentifier,
+        'document.passport.number' as DataIdentifier,
+      ]);
+
+      expect(data.cards).toHaveLength(1);
+      expect(data.bankAccounts).toHaveLength(1);
+      expect(data.nonFinancialFields).toEqual(['id.first_name', 'id.last_name', 'document.passport.number']);
       expect(data.hasFinancialData).toBe(true);
     });
   });

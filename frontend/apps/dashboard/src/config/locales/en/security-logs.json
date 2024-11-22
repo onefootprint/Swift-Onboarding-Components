@@ -69,7 +69,7 @@
       "updated": "updated",
       "deleted": "deleted",
       "card": "Card",
-      "bank-account": "Bank account",
+      "bank-account": "Bank Account",
       "financial-data": "Financial data",
       "financial": {
         "card.*.issuer": "Issuer",

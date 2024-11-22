@@ -2,8 +2,10 @@ import { IcoArrowTopRight16 } from '@onefootprint/icons';
 import type { AuditEventDetail, DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { LinkButton, Text, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import FinancialData from './components/financial-data';
 import FirstFieldsText from './components/first-fields';
 import { MAX_VISIBLE_FIELDS } from './constants';
+import getFinancialData from './utils/get-financial-data';
 
 type UserDataProps = {
   detail: AuditEventDetail;
@@ -29,11 +31,13 @@ const UserData = ({ detail }: UserDataProps) => {
     return null;
   }
 
+  const { cards, bankAccounts, nonFinancialFields, hasFinancialData } = getFinancialData(fields);
+
   const fpId = detail.data.fpId;
-  const showTooltip = fields.length > MAX_VISIBLE_FIELDS;
-  const numRemainingFields = fields.length - MAX_VISIBLE_FIELDS;
+  const showTooltip = nonFinancialFields.length > MAX_VISIBLE_FIELDS;
+  const numRemainingFields = nonFinancialFields.length - MAX_VISIBLE_FIELDS;
   const remainingFieldsTranslated = showTooltip
-    ? fields
+    ? nonFinancialFields
         .slice(MAX_VISIBLE_FIELDS)
         .map(field => allT(field as DataIdentifier))
         .join('; ')
@@ -44,7 +48,10 @@ const UserData = ({ detail }: UserDataProps) => {
       <Text variant="body-3" color="tertiary" tag="span">
         {actionText}
       </Text>
-      <FirstFieldsText fields={fields} />
+      {hasFinancialData && (
+        <FinancialData cards={cards} bankAccounts={bankAccounts} nonFinancialFields={nonFinancialFields} />
+      )}
+      {nonFinancialFields.length > 0 && <FirstFieldsText fields={nonFinancialFields} />}
       {showTooltip && (
         <Tooltip text={remainingFieldsTranslated} position="bottom">
           <Text variant="label-3" tag="span" textDecoration="underline" cursor="default">

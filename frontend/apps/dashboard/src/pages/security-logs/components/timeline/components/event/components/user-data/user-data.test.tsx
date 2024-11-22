@@ -1,9 +1,12 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import UserData from './user-data';
 import {
+  financialWithManyFieldsFixture,
+  financialWithThreeFieldsFixture,
   fiveFieldsFixture,
   fourFieldsFixture,
   oneFieldFixture,
+  onlyFinancialFixture,
   sixteenFieldsFixture,
   threeFieldsFixture,
   twoFieldsFixture,
@@ -110,5 +113,82 @@ describe('UserData for different event types', () => {
     const fieldsText = screen.getByText('Email and Phone number');
     expect(updatedText).toBeInTheDocument();
     expect(fieldsText).toBeInTheDocument();
+  });
+});
+
+describe('UserData with financial data', () => {
+  it('should render correctly with only financial data', async () => {
+    customRender(<UserData detail={onlyFinancialFixture} />);
+
+    const decryptedText = screen.getByText('decrypted');
+    expect(decryptedText).toBeInTheDocument();
+
+    const financialData = screen.getByText('Financial data');
+    expect(financialData).toBeInTheDocument();
+
+    await userEvent.hover(financialData);
+    await waitFor(() => {
+      const hoverCard = screen.getByText('* (Card)');
+      expect(hoverCard).toBeInTheDocument();
+
+      const cardDetails = screen.getByText('Issuer');
+      expect(cardDetails).toBeInTheDocument();
+
+      const bankDetails = screen.getByText('Bank name');
+      expect(bankDetails).toBeInTheDocument();
+    });
+  });
+
+  it('should render correctly with financial data and three other fields', async () => {
+    customRender(<UserData detail={financialWithThreeFieldsFixture} />);
+
+    const financialData = screen.getByText('Financial data,');
+    expect(financialData).toBeInTheDocument();
+
+    const elements = screen.getAllByRole('paragraph');
+    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,First name,Last name,and Date of birth');
+
+    await userEvent.hover(financialData);
+    await waitFor(() => {
+      const hoverCard = screen.getByText('* (Card)');
+      expect(hoverCard).toBeInTheDocument();
+
+      const cardDetails = screen.getByText('Issuer');
+      expect(cardDetails).toBeInTheDocument();
+
+      const bankDetails = screen.getByText('Bank name');
+      expect(bankDetails).toBeInTheDocument();
+    });
+  });
+
+  it('should render correctly with financial data and many other fields', async () => {
+    customRender(<UserData detail={financialWithManyFieldsFixture} />);
+
+    const financialData = screen.getByText('Financial data,');
+    expect(financialData).toBeInTheDocument();
+
+    const elements = screen.getAllByRole('paragraph');
+    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,First name,Last name,Date of birth and');
+
+    const otherText = screen.getByText('3 other attributes');
+    expect(otherText).toBeInTheDocument();
+
+    await userEvent.hover(financialData);
+    await waitFor(() => {
+      const hoverCard = screen.getByText('* (Card)');
+      expect(hoverCard).toBeInTheDocument();
+
+      const cardDetails = screen.getByText('Issuer');
+      expect(cardDetails).toBeInTheDocument();
+
+      const bankDetails = screen.getByText('Bank name');
+      expect(bankDetails).toBeInTheDocument();
+    });
+
+    await userEvent.hover(otherText);
+    await waitFor(() => {
+      const tooltip = screen.getByRole('tooltip', { name: 'Email; Phone number; Nationality' });
+      expect(tooltip).toBeInTheDocument();
+    });
   });
 });

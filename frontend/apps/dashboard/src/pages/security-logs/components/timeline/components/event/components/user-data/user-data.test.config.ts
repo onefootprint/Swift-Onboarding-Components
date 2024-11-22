@@ -76,3 +76,50 @@ export const sixteenFieldsFixture = getAuditEventDetail({
     reason: 'Testing',
   },
 });
+
+// Financial data fixtures
+export const onlyFinancialFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
+  data: {
+    context: 'api',
+    decryptedFields: [
+      'card.*.issuer',
+      'card.*.number_last4',
+      'card.*.name',
+      'bank.*.name',
+      'bank.*.ach_routing_number',
+    ],
+    fpId: '1234',
+    reason: 'Testing',
+  },
+});
+
+export const financialWithThreeFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
+  data: {
+    context: 'api',
+    decryptedFields: ['card.*.issuer', 'card.*.number_last4', 'bank.*.name', 'id.first_name', 'id.last_name', 'id.dob'],
+    fpId: '1234',
+    reason: 'Testing',
+  },
+});
+
+export const financialWithManyFieldsFixture = getAuditEventDetail({
+  kind: 'decrypt_user_data',
+  data: {
+    context: 'api',
+    decryptedFields: [
+      'card.*.issuer',
+      'card.*.number_last4',
+      'bank.*.name',
+      'id.first_name',
+      'id.last_name',
+      'id.dob',
+      'id.email',
+      'id.phone_number',
+      'id.nationality',
+    ],
+    fpId: '1234',
+    reason: 'Testing',
+  },
+});

@@ -42,9 +42,13 @@ const getFinancialData = (fields: DataIdentifier[]) => {
     };
   });
 
+  // Get non-financial fields
+  const nonFinancialFields = fields.filter(field => !field.startsWith('card.') && !field.startsWith('bank.'));
+
   return {
     cards,
     bankAccounts,
+    nonFinancialFields,
     hasFinancialData: cards.length > 0 || bankAccounts.length > 0,
   };
 };
