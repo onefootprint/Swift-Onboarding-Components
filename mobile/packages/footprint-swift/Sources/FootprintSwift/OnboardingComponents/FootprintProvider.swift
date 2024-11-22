@@ -22,7 +22,7 @@ public final class FootprintProvider {
         language: .english
     )
     private var appearance: FootprintAppearance?
-    private(set) var isReady: Bool
+    private(set) var isReady: Bool = false
     
     public static let shared: FootprintProvider = {
         let instance = FootprintProvider()
@@ -32,7 +32,26 @@ public final class FootprintProvider {
     private init() {
         self.client = OpenAPIClient(
             basePath: FootprintSdkMetadata.apiBaseUrl
-        )
+        )        
+    }
+    
+    private func resetInternalState() {
+        self.configKey = ""
+        self.authToken = nil
+        self.verifiedAuthToken = nil
+        self.vaultingToken = nil
+        self.authTokenStatus = nil
+        self.authValidationToken = nil
+        self.vaultData = nil
+        self.queries = nil
+        self.onboardingConfig = nil
+        self.signupChallengeResponse = nil
+        self.loginChallengeResponse = nil
+        self.requirements = nil
+        self.sandboxId = nil
+        self.sandboxOutcome = nil
+        self.l10n = .init(locale: .enUS, language: .english)
+        self.appearance = nil
         self.isReady = false
     }
     
@@ -44,6 +63,8 @@ public final class FootprintProvider {
                            l10n: FootprintL10n? = nil,
                            appearance: FootprintAppearance? = nil
     ) async throws {
+        self.resetInternalState()
+        
         if let l10n {
             self.l10n = l10n
         }

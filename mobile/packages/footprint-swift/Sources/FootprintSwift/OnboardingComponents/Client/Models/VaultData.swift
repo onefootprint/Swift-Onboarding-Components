@@ -23,6 +23,7 @@ public struct VaultData: Codable, JSONEncodable, Hashable {
         case gt200kLe300k = "gt200k_le300k"
         case gt300kLe500k = "gt300k_le500k"
         case gt500kLe1200k = "gt500k_le1200k"
+        case gt1200k = "gt1200k"
     }
     public enum InvestorProfileNetWorth: String, Codable, CaseIterable {
         case le50k = "le50k"
@@ -92,7 +93,7 @@ public struct VaultData: Codable, JSONEncodable, Hashable {
     public var investorProfileEmployer: String?
     public var investorProfileAnnualIncome: InvestorProfileAnnualIncome?
     public var investorProfileNetWorth: InvestorProfileNetWorth?
-    public var investorProfileFundingSources: InvestorProfileFundingSources?
+    public var investorProfileFundingSources: [InvestorProfileFundingSources]?
     public var investorProfileInvestmentGoals: [InvestorProfileInvestmentGoals]?
     public var investorProfileRiskTolerance: InvestorProfileRiskTolerance?
     public var investorProfileDeclarations: [InvestorProfileDeclarations]?
@@ -101,7 +102,7 @@ public struct VaultData: Codable, JSONEncodable, Hashable {
     public var investorProfilePoliticalOrganization: String?
     public var investorProfileBrokerageFirmEmployer: String?
 
-    public init(idAddressLine1: String? = nil, idAddressLine2: String? = nil, idCitizenships: [String]? = nil, idCity: String? = nil, idCountry: String? = nil, idDob: String? = nil, idDriversLicenseNumber: String? = nil, idDriversLicenseState: String? = nil, idEmail: String? = nil, idFirstName: String? = nil, idItin: String? = nil, idLastName: String? = nil, idMiddleName: String? = nil, idNationality: String? = nil, idPhoneNumber: String? = nil, idSsn4: String? = nil, idSsn9: String? = nil, idState: String? = nil, idUsLegalStatus: String? = nil, idUsTaxId: String? = nil, idVisaExpirationDate: String? = nil, idVisaKind: String? = nil, idZip: String? = nil, investorProfileEmploymentStatus: InvestorProfileEmploymentStatus? = nil, investorProfileOccupation: String? = nil, investorProfileEmployer: String? = nil, investorProfileAnnualIncome: InvestorProfileAnnualIncome? = nil, investorProfileNetWorth: InvestorProfileNetWorth? = nil, investorProfileFundingSources: InvestorProfileFundingSources? = nil, investorProfileInvestmentGoals: [InvestorProfileInvestmentGoals]? = nil, investorProfileRiskTolerance: InvestorProfileRiskTolerance? = nil, investorProfileDeclarations: [InvestorProfileDeclarations]? = nil, investorProfileSeniorExecutiveSymbols: [String]? = nil, investorProfileFamilyMemberNames: [String]? = nil, investorProfilePoliticalOrganization: String? = nil, investorProfileBrokerageFirmEmployer: String? = nil) {
+    public init(idAddressLine1: String? = nil, idAddressLine2: String? = nil, idCitizenships: [String]? = nil, idCity: String? = nil, idCountry: String? = nil, idDob: String? = nil, idDriversLicenseNumber: String? = nil, idDriversLicenseState: String? = nil, idEmail: String? = nil, idFirstName: String? = nil, idItin: String? = nil, idLastName: String? = nil, idMiddleName: String? = nil, idNationality: String? = nil, idPhoneNumber: String? = nil, idSsn4: String? = nil, idSsn9: String? = nil, idState: String? = nil, idUsLegalStatus: String? = nil, idUsTaxId: String? = nil, idVisaExpirationDate: String? = nil, idVisaKind: String? = nil, idZip: String? = nil, investorProfileEmploymentStatus: InvestorProfileEmploymentStatus? = nil, investorProfileOccupation: String? = nil, investorProfileEmployer: String? = nil, investorProfileAnnualIncome: InvestorProfileAnnualIncome? = nil, investorProfileNetWorth: InvestorProfileNetWorth? = nil, investorProfileFundingSources: [InvestorProfileFundingSources]? = nil, investorProfileInvestmentGoals: [InvestorProfileInvestmentGoals]? = nil, investorProfileRiskTolerance: InvestorProfileRiskTolerance? = nil, investorProfileDeclarations: [InvestorProfileDeclarations]? = nil, investorProfileSeniorExecutiveSymbols: [String]? = nil, investorProfileFamilyMemberNames: [String]? = nil, investorProfilePoliticalOrganization: String? = nil, investorProfileBrokerageFirmEmployer: String? = nil) {
         self.idAddressLine1 = idAddressLine1
         self.idAddressLine2 = idAddressLine2
         self.idCitizenships = idCitizenships

@@ -17,7 +17,10 @@
   "paths": {
     "/hosted/business": {
       "get": {
-        "tags": ["Businesses", "Hosted"],
+        "tags": [
+          "Businesses",
+          "Hosted"
+        ],
         "description": "Get information about the business for which we started a KYC of a beneficial owner",
         "responses": {
           "200": {
@@ -40,7 +43,11 @@
     },
     "/hosted/business/vault": {
       "patch": {
-        "tags": ["Businesses", "Hosted", "Vault"],
+        "tags": [
+          "Businesses",
+          "Hosted",
+          "Vault"
+        ],
         "description": "Updates data in a business vault. Can be used to update `business.` data",
         "requestBody": {
           "content": {
@@ -73,7 +80,11 @@
     },
     "/hosted/business/vault/decrypt": {
       "post": {
-        "tags": ["Vault", "User", "Hosted"],
+        "tags": [
+          "Vault",
+          "User",
+          "Hosted"
+        ],
         "description": "Decrypts the specified list of fields from the provided vault.",
         "requestBody": {
           "content": {
@@ -106,7 +117,11 @@
     },
     "/hosted/business/vault/validate": {
       "post": {
-        "tags": ["Businesses", "Hosted", "Vault"],
+        "tags": [
+          "Businesses",
+          "Hosted",
+          "Vault"
+        ],
         "description": "Checks if provided vault data is valid before adding it to the business vault",
         "requestBody": {
           "content": {
@@ -139,7 +154,9 @@
     },
     "/hosted/check_session": {
       "get": {
-        "tags": ["Hosted"],
+        "tags": [
+          "Hosted"
+        ],
         "description": "Checks a hosted session token for expiration/validity",
         "responses": {
           "200": {
@@ -162,7 +179,10 @@
     },
     "/hosted/documents": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "Create a new document for the outstanding document request",
         "requestBody": {
           "content": {
@@ -195,7 +215,10 @@
     },
     "/hosted/documents/{id}/process": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "Process the document and run any vendor verifications.",
         "parameters": [
           {
@@ -229,7 +252,10 @@
     },
     "/hosted/documents/{id}/upload/{side}": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "Upload an image for the given side to the provided document.",
         "parameters": [
           {
@@ -247,7 +273,11 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["front", "back", "selfie"]
+              "enum": [
+                "front",
+                "back",
+                "selfie"
+              ]
             },
             "style": "simple"
           }
@@ -273,7 +303,10 @@
     },
     "/hosted/identify": {
       "post": {
-        "tags": ["Identify", "Hosted"],
+        "tags": [
+          "Identify",
+          "Hosted"
+        ],
         "description": "Tries to identify an existing user by either phone number or email. If the user is found, returns available challenge kinds.",
         "parameters": [
           {
@@ -342,7 +375,10 @@
     },
     "/hosted/identify/kba": {
       "post": {
-        "tags": ["Identify", "Hosted"],
+        "tags": [
+          "Identify",
+          "Hosted"
+        ],
         "description": "Respond to a KBA challenge to prove knowledge of existing data in the vault.",
         "requestBody": {
           "content": {
@@ -375,7 +411,10 @@
     },
     "/hosted/identify/lite": {
       "post": {
-        "tags": ["Identify", "Hosted"],
+        "tags": [
+          "Identify",
+          "Hosted"
+        ],
         "description": "Tries to identify an existing user by either phone number or email and returns whether a user exists. This is used exclusively in our SDK to check proactively if bootstrapped data identifies an existing user. This is very similar to the normal identify API, but it has a much simpler API will hopefully be more stable than the normal identify API since changes will break old SDK versions.",
         "requestBody": {
           "content": {
@@ -414,7 +453,10 @@
     },
     "/hosted/identify/login_challenge": {
       "post": {
-        "tags": ["Identify", "Hosted"],
+        "tags": [
+          "Identify",
+          "Hosted"
+        ],
         "description": "Sends a challenge to the phone number and returns an HTTP 200. When the challenge is completed through the identify/verify endpoint, the client can get or create the user with this phone number.",
         "requestBody": {
           "content": {
@@ -459,7 +501,10 @@
     },
     "/hosted/identify/signup_challenge": {
       "post": {
-        "tags": ["Identify", "Hosted"],
+        "tags": [
+          "Identify",
+          "Hosted"
+        ],
         "description": "Sends a challenge to a phone number or email and returns an HTTP 200. When the challenge is completed through the identify/verify endpoint, the client can begin onboarding the user.",
         "parameters": [
           {
@@ -528,7 +573,10 @@
     },
     "/hosted/identify/validation_token": {
       "post": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Generate a validation token after the user finishes the identify flow.",
         "responses": {
           "200": {
@@ -563,7 +611,10 @@
     },
     "/hosted/identify/verify": {
       "post": {
-        "tags": ["Identify", "Hosted"],
+        "tags": [
+          "Identify",
+          "Hosted"
+        ],
         "description": "Verifies the response to either an SMS or biometric challenge. When the challenge response is verified, we will return an auth token for the user. If no user exists (which may only happen after a phone challenge), we will create a new user with the provided phone number",
         "requestBody": {
           "content": {
@@ -616,7 +667,10 @@
     },
     "/hosted/onboarding": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Gets or creates the Onboarding for this (user, ob_config) pair.",
         "requestBody": {
           "description": "",
@@ -669,7 +723,10 @@
     },
     "/hosted/onboarding/authorize": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Mark the onboarding as authorized and initiate IDV checks",
         "responses": {
           "200": {
@@ -692,7 +749,11 @@
     },
     "/hosted/onboarding/config": {
       "get": {
-        "tags": ["Onboarding", "Organization", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Organization",
+          "Hosted"
+        ],
         "description": "Get the details of an onboarding configuration.",
         "responses": {
           "200": {
@@ -736,7 +797,10 @@
     },
     "/hosted/onboarding/d2p/generate": {
       "post": {
-        "tags": ["D2p", "Hosted"],
+        "tags": [
+          "D2p",
+          "Hosted"
+        ],
         "description": "Generates a new d2p session token for the currently authenticated user. The d2p session token has a limited scope, and also includes some status metadata for syncing state across the phone and desktop.",
         "operationId": "hosted-onboarding-d2p-generate",
         "requestBody": {
@@ -770,7 +834,10 @@
     },
     "/hosted/onboarding/d2p/sms": {
       "post": {
-        "tags": ["D2p", "Hosted"],
+        "tags": [
+          "D2p",
+          "Hosted"
+        ],
         "description": "Send an SMS with a link to the phone onboarding page.",
         "operationId": "hosted-onboarding-d2p-sms",
         "requestBody": {
@@ -804,7 +871,10 @@
     },
     "/hosted/onboarding/d2p/status": {
       "get": {
-        "tags": ["D2p", "Hosted"],
+        "tags": [
+          "D2p",
+          "Hosted"
+        ],
         "description": "Gets the status of the provided d2p session. Requires the d2p session token as the auth header.",
         "operationId": "hosted-onboarding-d2p-status",
         "responses": {
@@ -826,7 +896,10 @@
         ]
       },
       "post": {
-        "tags": ["D2p", "Hosted"],
+        "tags": [
+          "D2p",
+          "Hosted"
+        ],
         "description": "Update the status of the provided d2p session. Only allows updating to certain statuses.",
         "operationId": "hosted-onboarding-d2p-status-post",
         "requestBody": {
@@ -860,7 +933,10 @@
     },
     "/hosted/onboarding/fp": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Records a fingerprint visitorID for the Fingerprint SDK in the frontend",
         "requestBody": {
           "content": {
@@ -893,7 +969,10 @@
     },
     "/hosted/onboarding/nid": {
       "get": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Retrieve identifier used for NeuroId",
         "responses": {
           "200": {
@@ -916,7 +995,10 @@
     },
     "/hosted/onboarding/privacy_pass": {
       "get": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "initiates privacy pass protocol.",
         "responses": {
           "200": {
@@ -932,7 +1014,10 @@
     },
     "/hosted/onboarding/process": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Continue processing the onboarding after user this stage of user input has finished",
         "requestBody": {
           "description": "",
@@ -986,7 +1071,10 @@
     },
     "/hosted/onboarding/sds": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Records a deviceSessionId from the Socure Device SDK in the frontend",
         "requestBody": {
           "content": {
@@ -1019,7 +1107,10 @@
     },
     "/hosted/onboarding/session": {
       "get": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Fetch information from an existing onboarding session token.",
         "responses": {
           "200": {
@@ -1042,7 +1133,10 @@
     },
     "/hosted/onboarding/skip_passkey_register": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Tells us that a passkey registration was skipped",
         "requestBody": {
           "description": "",
@@ -1076,7 +1170,10 @@
     },
     "/hosted/onboarding/status": {
       "get": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Returns the status of the onboarding.",
         "responses": {
           "200": {
@@ -1110,7 +1207,10 @@
     },
     "/hosted/onboarding/tel": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Performs a lookup with Stytch on the passed up telemetry_id and records the response + risk signals",
         "requestBody": {
           "content": {
@@ -1143,7 +1243,10 @@
     },
     "/hosted/onboarding/timeline": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Log a timeline event for this user using a frontend-provided page identifier",
         "requestBody": {
           "content": {
@@ -1176,7 +1279,10 @@
     },
     "/hosted/onboarding/validate": {
       "post": {
-        "tags": ["Onboarding", "Hosted"],
+        "tags": [
+          "Onboarding",
+          "Hosted"
+        ],
         "description": "Finish onboarding the user. Returns the validation token that can be exchanged for a permanent Footprint user token.",
         "responses": {
           "200": {
@@ -1213,7 +1319,9 @@
     },
     "/hosted/user/attest_device": {
       "post": {
-        "tags": ["Hosted"],
+        "tags": [
+          "Hosted"
+        ],
         "summary": "receive the attestation",
         "description": "Parses and accepts a user's onboarding device attestation",
         "requestBody": {
@@ -1247,7 +1355,9 @@
     },
     "/hosted/user/attest_device/challenge": {
       "post": {
-        "tags": ["Hosted"],
+        "tags": [
+          "Hosted"
+        ],
         "summary": "initiate the attestation challenge",
         "description": "Generate a device attestation challenge",
         "requestBody": {
@@ -1281,7 +1391,10 @@
     },
     "/hosted/user/auth_methods": {
       "get": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Returns information about the auth methods this user has registered.",
         "responses": {
           "200": {
@@ -1307,7 +1420,10 @@
     },
     "/hosted/user/auth_requirements": {
       "get": {
-        "tags": ["Challenge", "Hosted"],
+        "tags": [
+          "Challenge",
+          "Hosted"
+        ],
         "description": "Returns the set of auth requirements to satisfy the auth portion of the playbook in the provided session",
         "responses": {
           "200": {
@@ -1330,7 +1446,10 @@
     },
     "/hosted/user/authorized_orgs": {
       "get": {
-        "tags": ["My1fp", "Hosted"],
+        "tags": [
+          "My1fp",
+          "Hosted"
+        ],
         "description": "Returns a list of organizations onto which the user has onboarded",
         "responses": {
           "200": {
@@ -1356,7 +1475,10 @@
     },
     "/hosted/user/challenge": {
       "post": {
-        "tags": ["Challenge", "Hosted"],
+        "tags": [
+          "Challenge",
+          "Hosted"
+        ],
         "description": "Sends a challenge of the requested kind",
         "requestBody": {
           "content": {
@@ -1389,7 +1511,10 @@
     },
     "/hosted/user/challenge/verify": {
       "post": {
-        "tags": ["Challenge", "Hosted"],
+        "tags": [
+          "Challenge",
+          "Hosted"
+        ],
         "description": "Verify the previously sent challenge and attach the new form of contact info to the vault",
         "requestBody": {
           "content": {
@@ -1422,7 +1547,10 @@
     },
     "/hosted/user/consent": {
       "post": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Records a user's consent to collection of their images.",
         "requestBody": {
           "content": {
@@ -1455,7 +1583,10 @@
     },
     "/hosted/user/documents": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "Create a new document for the outstanding document request",
         "requestBody": {
           "content": {
@@ -1488,7 +1619,10 @@
     },
     "/hosted/user/documents/{id}/process": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "Process the document and run any vendor verifications.",
         "parameters": [
           {
@@ -1522,7 +1656,10 @@
     },
     "/hosted/user/documents/{id}/upload/{side}": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "Upload an image for the given side to the provided document.",
         "parameters": [
           {
@@ -1540,7 +1677,11 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["front", "back", "selfie"]
+              "enum": [
+                "front",
+                "back",
+                "selfie"
+              ]
             },
             "style": "simple"
           }
@@ -1566,7 +1707,10 @@
     },
     "/hosted/user/email/verify": {
       "post": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Used to asynchronously verify a user's email address. Requires the token sent to the users email.",
         "requestBody": {
           "content": {
@@ -1595,7 +1739,10 @@
     },
     "/hosted/user/private_info": {
       "get": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Returns information about the auth token. Can only be used in sandbox mode for demo tenants.",
         "responses": {
           "200": {
@@ -1611,7 +1758,10 @@
     },
     "/hosted/user/token": {
       "get": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Returns information about a given auth token.",
         "responses": {
           "200": {
@@ -1634,7 +1784,10 @@
     },
     "/hosted/user/tokens": {
       "post": {
-        "tags": ["User", "Hosted"],
+        "tags": [
+          "User",
+          "Hosted"
+        ],
         "description": "Create a new token with the requested scopes using the permissions granted by the existing token. Used to create a secondary token with more limited scope. The new token's expiry time is the same as the old token's",
         "requestBody": {
           "content": {
@@ -1678,7 +1831,10 @@
     },
     "/hosted/user/upload/{document_identifier}": {
       "post": {
-        "tags": ["Document", "Hosted"],
+        "tags": [
+          "Document",
+          "Hosted"
+        ],
         "description": "POSTs a document to the vault",
         "parameters": [
           {
@@ -1946,7 +2102,11 @@
     },
     "/hosted/user/vault": {
       "patch": {
-        "tags": ["Vault", "Hosted", "Users"],
+        "tags": [
+          "Vault",
+          "Hosted",
+          "Users"
+        ],
         "description": "Updates data in a user vault",
         "requestBody": {
           "content": {
@@ -2000,7 +2160,11 @@
     },
     "/hosted/user/vault/decrypt": {
       "post": {
-        "tags": ["Vault", "User", "Hosted"],
+        "tags": [
+          "Vault",
+          "User",
+          "Hosted"
+        ],
         "description": "Decrypts the specified list of fields from the provided vault.",
         "requestBody": {
           "content": {
@@ -2044,7 +2208,11 @@
     },
     "/hosted/user/vault/validate": {
       "post": {
-        "tags": ["Vault", "Hosted", "Users"],
+        "tags": [
+          "Vault",
+          "Hosted",
+          "Users"
+        ],
         "description": "Checks if provided vault data is valid before adding it to the vault",
         "requestBody": {
           "content": {
@@ -2077,7 +2245,10 @@
     },
     "/org/sdk_args": {
       "get": {
-        "tags": ["SdkArgs", "Hosted"],
+        "tags": [
+          "SdkArgs",
+          "Hosted"
+        ],
         "description": "Fetch information from an existing SDK args session.",
         "responses": {
           "200": {
@@ -2098,7 +2269,10 @@
         ]
       },
       "post": {
-        "tags": ["SdkArgs", "Hosted"],
+        "tags": [
+          "SdkArgs",
+          "Hosted"
+        ],
         "description": "Create a new session containing args for the SDK.",
         "requestBody": {
           "content": {
@@ -2127,7 +2301,10 @@
     },
     "/org/sdk_telemetry": {
       "post": {
-        "tags": ["SdkArgs", "Hosted"],
+        "tags": [
+          "SdkArgs",
+          "Hosted"
+        ],
         "description": "Log contents of the HTTP body. ",
         "requestBody": {
           "content": {
@@ -2219,10 +2396,18 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["phone", "passkey", "email"]
+            "enum": [
+              "phone",
+              "passkey",
+              "email"
+            ]
           }
         },
-        "required": ["can_update", "is_verified", "kind"]
+        "required": [
+          "can_update",
+          "is_verified",
+          "kind"
+        ]
       },
       "AuthRequirementsResponse": {
         "type": "object",
@@ -2236,11 +2421,15 @@
                   "type": "boolean"
                 }
               },
-              "required": ["is_met"]
+              "required": [
+                "is_met"
+              ]
             }
           }
         },
-        "required": ["all_requirements"]
+        "required": [
+          "all_requirements"
+        ]
       },
       "AuthorizedOrg": {
         "type": "object",
@@ -2282,7 +2471,10 @@
             "type": "string"
           }
         },
-        "required": ["can_access_data", "org_name"]
+        "required": [
+          "can_access_data",
+          "org_name"
+        ]
       },
       "BusinessDecryptResponse": {
         "example": {
@@ -2318,11 +2510,18 @@
             "type": "object"
           }
         },
-        "required": ["<key>", "<value>"]
+        "required": [
+          "<key>",
+          "<value>"
+        ]
       },
       "CheckSessionResponse": {
         "type": "string",
-        "enum": ["active", "expired", "unknown"]
+        "enum": [
+          "active",
+          "expired",
+          "unknown"
+        ]
       },
       "ConsentRequest": {
         "type": "object",
@@ -2334,7 +2533,9 @@
             "type": "boolean"
           }
         },
-        "required": ["consent_language_text"]
+        "required": [
+          "consent_language_text"
+        ]
       },
       "CreateDeviceAttestationRequest": {
         "type": "object",
@@ -2348,7 +2549,10 @@
             "type": "string"
           }
         },
-        "required": ["attestation", "state"]
+        "required": [
+          "attestation",
+          "state"
+        ]
       },
       "CreateDocumentRequest": {
         "type": "object",
@@ -2609,7 +2813,10 @@
           },
           "device_type": {
             "type": "string",
-            "enum": ["desktop", "mobile"]
+            "enum": [
+              "desktop",
+              "mobile"
+            ]
           },
           "document_type": {
             "type": "string",
@@ -2629,7 +2836,11 @@
           },
           "fixture_result": {
             "type": "string",
-            "enum": ["fail", "pass", "real"]
+            "enum": [
+              "fail",
+              "pass",
+              "real"
+            ]
           },
           "request_id": {
             "type": "string"
@@ -2638,7 +2849,9 @@
             "type": "boolean"
           }
         },
-        "required": ["document_type"]
+        "required": [
+          "document_type"
+        ]
       },
       "CreateDocumentResponse": {
         "type": "object",
@@ -2647,7 +2860,9 @@
             "type": "string"
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "CreateOnboardingTimelineRequest": {
         "type": "object",
@@ -2656,7 +2871,9 @@
             "type": "string"
           }
         },
-        "required": ["event"]
+        "required": [
+          "event"
+        ]
       },
       "CreateSdkArgsTokenResponse": {
         "type": "object",
@@ -2671,17 +2888,27 @@
             "type": "string"
           }
         },
-        "required": ["expires_at", "token"]
+        "required": [
+          "expires_at",
+          "token"
+        ]
       },
       "CreateUserTokenRequest": {
         "type": "object",
         "properties": {
           "requested_scope": {
             "type": "string",
-            "enum": ["auth", "onboarding", "my1fp", "onboarding_components"]
+            "enum": [
+              "auth",
+              "onboarding",
+              "my1fp",
+              "onboarding_components"
+            ]
           }
         },
-        "required": ["requested_scope"],
+        "required": [
+          "requested_scope"
+        ],
         "title": ""
       },
       "CreateUserTokenResponse": {
@@ -2696,7 +2923,10 @@
             "type": "string"
           }
         },
-        "required": ["expires_at", "token"]
+        "required": [
+          "expires_at",
+          "token"
+        ]
       },
       "D2pGenerateRequest": {
         "type": "object",
@@ -2743,7 +2973,9 @@
             "type": "string"
           }
         },
-        "required": ["auth_token"]
+        "required": [
+          "auth_token"
+        ]
       },
       "D2pSmsRequest": {
         "type": "object",
@@ -2752,7 +2984,9 @@
             "type": "string"
           }
         },
-        "required": ["url"]
+        "required": [
+          "url"
+        ]
       },
       "D2pSmsResponse": {
         "type": "object",
@@ -2762,7 +2996,9 @@
             "format": "int64"
           }
         },
-        "required": ["time_before_retry_s"]
+        "required": [
+          "time_before_retry_s"
+        ]
       },
       "D2pStatusResponse": {
         "type": "object",
@@ -2801,20 +3037,36 @@
           },
           "status": {
             "type": "string",
-            "enum": ["waiting", "in_progress", "canceled", "failed", "completed"]
+            "enum": [
+              "waiting",
+              "in_progress",
+              "canceled",
+              "failed",
+              "completed"
+            ]
           }
         },
-        "required": ["status"]
+        "required": [
+          "status"
+        ]
       },
       "D2pUpdateStatusRequest": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["waiting", "in_progress", "canceled", "failed", "completed"]
+            "enum": [
+              "waiting",
+              "in_progress",
+              "canceled",
+              "failed",
+              "completed"
+            ]
           }
         },
-        "required": ["status"]
+        "required": [
+          "status"
+        ]
       },
       "DeviceAttestationChallengeResponse": {
         "type": "object",
@@ -2828,7 +3080,10 @@
             "type": "string"
           }
         },
-        "required": ["attestation_challenge", "state"]
+        "required": [
+          "attestation_challenge",
+          "state"
+        ]
       },
       "DocumentResponse": {
         "description": "Response for a identity document request. Errors are non-optional if the identity vendor.\n Requires additional images be collected.",
@@ -2883,10 +3138,17 @@
           },
           "next_side_to_collect": {
             "type": "string",
-            "enum": ["front", "back", "selfie"]
+            "enum": [
+              "front",
+              "back",
+              "selfie"
+            ]
           }
         },
-        "required": ["errors", "is_retry_limit_exceeded"]
+        "required": [
+          "errors",
+          "is_retry_limit_exceeded"
+        ]
       },
       "EmailVerifyRequest": {
         "type": "object",
@@ -2896,7 +3158,9 @@
             "type": "string"
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "Empty": {
         "description": "Empty JSON.",
@@ -2915,7 +3179,11 @@
             "type": "string"
           }
         },
-        "required": ["path", "request_id", "visitor_id"]
+        "required": [
+          "path",
+          "request_id",
+          "visitor_id"
+        ]
       },
       "GetDeviceAttestationChallengeRequest": {
         "type": "object",
@@ -2926,14 +3194,19 @@
           },
           "device_type": {
             "type": "string",
-            "enum": ["ios", "android"]
+            "enum": [
+              "ios",
+              "android"
+            ]
           },
           "ios_bundle_id": {
             "description": "required if running footprint sdk in ios",
             "type": "string"
           }
         },
-        "required": ["device_type"]
+        "required": [
+          "device_type"
+        ]
       },
       "GetSdkArgsTokenResponse": {
         "type": "object",
@@ -2990,7 +3263,12 @@
               },
               "kind": {
                 "type": "string",
-                "enum": ["kyc", "kyb", "auth", "document"]
+                "enum": [
+                  "kyc",
+                  "kyb",
+                  "auth",
+                  "document"
+                ]
               },
               "logo_url": {
                 "type": "string"
@@ -3015,7 +3293,11 @@
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": ["phone", "passkey", "email"]
+                  "enum": [
+                    "phone",
+                    "passkey",
+                    "email"
+                  ]
                 }
               },
               "requires_id_doc": {
@@ -3023,7 +3305,10 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["disabled", "enabled"]
+                "enum": [
+                  "disabled",
+                  "enabled"
+                ]
               },
               "support_email": {
                 "type": "string"
@@ -3314,7 +3599,9 @@
             ]
           }
         },
-        "required": ["args"]
+        "required": [
+          "args"
+        ]
       },
       "GetUserTokenResponse": {
         "type": "object",
@@ -3339,7 +3626,10 @@
             }
           }
         },
-        "required": ["expires_at", "scopes"]
+        "required": [
+          "expires_at",
+          "scopes"
+        ]
       },
       "HostedBusiness": {
         "type": "object",
@@ -3355,7 +3645,10 @@
                 "type": "string"
               }
             },
-            "required": ["email", "phone_number"]
+            "required": [
+              "email",
+              "phone_number"
+            ]
           },
           "inviter": {
             "description": "The primary business owner that invited you to fill out a KYC form",
@@ -3368,13 +3661,20 @@
                 "type": "string"
               }
             },
-            "required": ["first_name", "last_name"]
+            "required": [
+              "first_name",
+              "last_name"
+            ]
           },
           "name": {
             "type": "string"
           }
         },
-        "required": ["invited", "inviter", "name"]
+        "required": [
+          "invited",
+          "inviter",
+          "name"
+        ]
       },
       "HostedValidateResponse": {
         "type": "object",
@@ -3384,7 +3684,9 @@
             "type": "string"
           }
         },
-        "required": ["validation_token"],
+        "required": [
+          "validation_token"
+        ],
         "title": ""
       },
       "IdentifyRequest": {
@@ -3403,10 +3705,16 @@
           "scope": {
             "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your\n use case in order to get the least permissions required",
             "type": "string",
-            "enum": ["my1fp", "onboarding", "auth"]
+            "enum": [
+              "my1fp",
+              "onboarding",
+              "auth"
+            ]
           }
         },
-        "required": ["scope"]
+        "required": [
+          "scope"
+        ]
       },
       "IdentifyResponse": {
         "type": "object",
@@ -3425,17 +3733,28 @@
                     },
                     "kind": {
                       "type": "string",
-                      "enum": ["phone", "passkey", "email"]
+                      "enum": [
+                        "phone",
+                        "passkey",
+                        "email"
+                      ]
                     }
                   },
-                  "required": ["is_verified", "kind"]
+                  "required": [
+                    "is_verified",
+                    "kind"
+                  ]
                 }
               },
               "available_challenge_kinds": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": ["sms", "biometric", "email"]
+                  "enum": [
+                    "sms",
+                    "biometric",
+                    "email"
+                  ]
                 }
               },
               "can_initiate_signup_challenge": {
@@ -3745,10 +4064,18 @@
           "scope": {
             "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your\n use case in order to get the least permissions required",
             "type": "string",
-            "enum": ["my1fp", "onboarding", "auth"]
+            "enum": [
+              "my1fp",
+              "onboarding",
+              "auth"
+            ]
           }
         },
-        "required": ["challenge_response", "challenge_token", "scope"],
+        "required": [
+          "challenge_response",
+          "challenge_token",
+          "scope"
+        ],
         "title": ""
       },
       "IdentifyVerifyResponse": {
@@ -3759,7 +4086,9 @@
             "type": "string"
           }
         },
-        "required": ["auth_token"]
+        "required": [
+          "auth_token"
+        ]
       },
       "KbaResponse": {
         "type": "object",
@@ -3769,7 +4098,9 @@
             "type": "string"
           }
         },
-        "required": ["token"]
+        "required": [
+          "token"
+        ]
       },
       "LiteIdentifyRequest": {
         "type": "object",
@@ -3789,7 +4120,9 @@
             "type": "boolean"
           }
         },
-        "required": ["user_found"]
+        "required": [
+          "user_found"
+        ]
       },
       "LogBody": {
         "type": "object",
@@ -3823,10 +4156,16 @@
         "properties": {
           "challenge_kind": {
             "type": "string",
-            "enum": ["sms", "biometric", "email"]
+            "enum": [
+              "sms",
+              "biometric",
+              "email"
+            ]
           }
         },
-        "required": ["challenge_kind"]
+        "required": [
+          "challenge_kind"
+        ]
       },
       "LoginChallengeResponse": {
         "type": "object",
@@ -3839,7 +4178,11 @@
               },
               "challenge_kind": {
                 "type": "string",
-                "enum": ["sms", "biometric", "email"]
+                "enum": [
+                  "sms",
+                  "biometric",
+                  "email"
+                ]
               },
               "challenge_token": {
                 "description": "Encrypted, base64-encoded challenge information",
@@ -3854,13 +4197,20 @@
                 "type": "string"
               }
             },
-            "required": ["challenge_kind", "challenge_token", "time_before_retry_s", "token"]
+            "required": [
+              "challenge_kind",
+              "challenge_token",
+              "time_before_retry_s",
+              "token"
+            ]
           },
           "error": {
             "type": "string"
           }
         },
-        "required": ["challenge_data"]
+        "required": [
+          "challenge_data"
+        ]
       },
       "NeuroIdentityIdResponse": {
         "type": "object",
@@ -3869,7 +4219,9 @@
             "type": "string"
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "OnboardingResponse": {
         "type": "object",
@@ -3878,7 +4230,9 @@
             "type": "string"
           }
         },
-        "required": ["auth_token"]
+        "required": [
+          "auth_token"
+        ]
       },
       "OnboardingSessionResponse": {
         "type": "object",
@@ -3890,7 +4244,9 @@
             "type": "string"
           }
         },
-        "required": ["bootstrap_data"]
+        "required": [
+          "bootstrap_data"
+        ]
       },
       "OnboardingStatusResponse": {
         "type": "object",
@@ -3902,18 +4258,32 @@
             }
           }
         },
-        "required": ["all_requirements"]
+        "required": [
+          "all_requirements"
+        ]
       },
       "PostOnboardingRequest": {
         "type": "object",
         "properties": {
           "fixture_result": {
             "type": "string",
-            "enum": ["fail", "pass", "manual_review", "step_up", "use_rules_outcome"]
+            "enum": [
+              "fail",
+              "pass",
+              "manual_review",
+              "step_up",
+              "use_rules_outcome"
+            ]
           },
           "kyb_fixture_result": {
             "type": "string",
-            "enum": ["fail", "pass", "manual_review", "step_up", "use_rules_outcome"]
+            "enum": [
+              "fail",
+              "pass",
+              "manual_review",
+              "step_up",
+              "use_rules_outcome"
+            ]
           }
         }
       },
@@ -3922,7 +4292,13 @@
         "properties": {
           "fixture_result": {
             "type": "string",
-            "enum": ["fail", "pass", "manual_review", "step_up", "use_rules_outcome"]
+            "enum": [
+              "fail",
+              "pass",
+              "manual_review",
+              "step_up",
+              "use_rules_outcome"
+            ]
           }
         }
       },
@@ -3975,7 +4351,12 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["kyc", "kyb", "auth", "document"]
+            "enum": [
+              "kyc",
+              "kyb",
+              "auth",
+              "document"
+            ]
           },
           "logo_url": {
             "type": "string"
@@ -4000,7 +4381,11 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["phone", "passkey", "email"]
+              "enum": [
+                "phone",
+                "passkey",
+                "email"
+              ]
             }
           },
           "requires_id_doc": {
@@ -4008,7 +4393,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["disabled", "enabled"]
+            "enum": [
+              "disabled",
+              "enabled"
+            ]
           },
           "support_email": {
             "type": "string"
@@ -4332,7 +4720,10 @@
             "type": "object"
           }
         },
-        "required": ["<key>", "<value>"]
+        "required": [
+          "<key>",
+          "<value>"
+        ]
       },
       "RawUserDataRequest": {
         "$ref": "#/components/schemas/VaultData"
@@ -4345,7 +4736,11 @@
         "properties": {
           "challenge_kind": {
             "type": "string",
-            "enum": ["sms", "biometric", "email"]
+            "enum": [
+              "sms",
+              "biometric",
+              "email"
+            ]
           },
           "email": {
             "type": "object",
@@ -4357,7 +4752,10 @@
                 "type": "string"
               }
             },
-            "required": ["is_bootstrap", "value"]
+            "required": [
+              "is_bootstrap",
+              "value"
+            ]
           },
           "phone_number": {
             "type": "object",
@@ -4369,14 +4767,24 @@
                 "type": "string"
               }
             },
-            "required": ["is_bootstrap", "value"]
+            "required": [
+              "is_bootstrap",
+              "value"
+            ]
           },
           "scope": {
             "type": "string",
-            "enum": ["my1fp", "onboarding", "auth"]
+            "enum": [
+              "my1fp",
+              "onboarding",
+              "auth"
+            ]
           }
         },
-        "required": ["challenge_kind", "scope"]
+        "required": [
+          "challenge_kind",
+          "scope"
+        ]
       },
       "SignupChallengeResponse": {
         "type": "object",
@@ -4389,7 +4797,11 @@
               },
               "challenge_kind": {
                 "type": "string",
-                "enum": ["sms", "biometric", "email"]
+                "enum": [
+                  "sms",
+                  "biometric",
+                  "email"
+                ]
               },
               "challenge_token": {
                 "description": "Encrypted, base64-encoded challenge information",
@@ -4404,13 +4816,20 @@
                 "type": "string"
               }
             },
-            "required": ["challenge_kind", "challenge_token", "time_before_retry_s", "token"]
+            "required": [
+              "challenge_kind",
+              "challenge_token",
+              "time_before_retry_s",
+              "token"
+            ]
           },
           "error": {
             "type": "string"
           }
         },
-        "required": ["challenge_data"]
+        "required": [
+          "challenge_data"
+        ]
       },
       "SkipPasskeyRegisterRequest": {
         "type": "object",
@@ -4431,12 +4850,17 @@
                       "type": "string"
                     }
                   },
-                  "required": ["error_message"]
+                  "required": [
+                    "error_message"
+                  ]
                 }
               },
               "client_type": {
                 "type": "string",
-                "enum": ["web", "mobile"]
+                "enum": [
+                  "web",
+                  "mobile"
+                ]
               },
               "num_attempts": {
                 "type": "integer",
@@ -4446,7 +4870,12 @@
                 "type": "string"
               }
             },
-            "required": ["attempts", "client_type", "num_attempts", "reason"]
+            "required": [
+              "attempts",
+              "client_type",
+              "num_attempts",
+              "reason"
+            ]
           }
         }
       },
@@ -4457,7 +4886,9 @@
             "type": "string"
           }
         },
-        "required": ["device_session_id"]
+        "required": [
+          "device_session_id"
+        ]
       },
       "StytchTelemetryRequest": {
         "type": "object",
@@ -4466,7 +4897,9 @@
             "type": "string"
           }
         },
-        "required": ["telemetry_id"]
+        "required": [
+          "telemetry_id"
+        ]
       },
       "UserChallengeRequest": {
         "type": "object",
@@ -4474,7 +4907,10 @@
           "action_kind": {
             "description": "Specifies whether to add the new auth method alongside existing auth methods or replace the\n existing method.",
             "type": "string",
-            "enum": ["replace", "add_primary"]
+            "enum": [
+              "replace",
+              "add_primary"
+            ]
           },
           "email": {
             "description": "If the challenge kind is email, the email address to send the challenge to",
@@ -4483,14 +4919,21 @@
           "kind": {
             "description": "The kind of auth method for which to initiate a challenge",
             "type": "string",
-            "enum": ["phone", "passkey", "email"]
+            "enum": [
+              "phone",
+              "passkey",
+              "email"
+            ]
           },
           "phone_number": {
             "description": "If the challenge kind is SMS, the phone number to send the challenge to",
             "type": "string"
           }
         },
-        "required": ["action_kind", "kind"]
+        "required": [
+          "action_kind",
+          "kind"
+        ]
       },
       "UserChallengeResponse": {
         "type": "object",
@@ -4509,7 +4952,10 @@
             "format": "int64"
           }
         },
-        "required": ["challenge_token", "time_before_retry_s"]
+        "required": [
+          "challenge_token",
+          "time_before_retry_s"
+        ]
       },
       "UserChallengeVerifyRequest": {
         "type": "object",
@@ -4523,13 +4969,19 @@
             "type": "string"
           }
         },
-        "required": ["challenge_response", "challenge_token"]
+        "required": [
+          "challenge_response",
+          "challenge_token"
+        ]
       },
       "UserDecryptRequest": {
         "type": "object",
         "properties": {
           "fields": {
-            "example": ["id.first_name", "id.last_name"],
+            "example": [
+              "id.first_name",
+              "id.last_name"
+            ],
             "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
             "type": "array",
             "items": {
@@ -4662,7 +5114,12 @@
           },
           "investor_profile.employment_status": {
             "type": "string",
-            "enum": ["employed", "unemployed", "student", "retired"]
+            "enum": [
+              "employed",
+              "unemployed",
+              "student",
+              "retired"
+            ]
           },
           "investor_profile.occupation": {
             "type": "string"
@@ -4679,33 +5136,67 @@
               "gt100k_le200k",
               "gt200k_le300k",
               "gt300k_le500k",
-              "gt500k_le1200k"
+              "gt500k_le1200k",
+              "gt1200k"
             ]
           },
           "investor_profile.net_worth": {
             "type": "string",
-            "enum": ["le50k", "gt50k_le100k", "gt100k_le200k", "gt200k_le500k", "gt500k_le1m", "gt1m_le5m", "gt5m"]
+            "enum": [
+              "le50k",
+              "gt50k_le100k",
+              "gt100k_le200k",
+              "gt200k_le500k",
+              "gt500k_le1m",
+              "gt1m_le5m",
+              "gt5m"
+            ]
           },
           "investor_profile.funding_sources": {
-            "type": "string",
-            "enum": ["employment_income", "investments", "inheritance", "business_income", "savings", "family"]
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "employment_income",
+                "investments",
+                "inheritance",
+                "business_income",
+                "savings",
+                "family"
+              ]
+            }
           },
           "investor_profile.investment_goals": {
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["growth", "income", "preserve_capital", "speculation", "diversification", "other"]
+              "enum": [
+                "growth",
+                "income",
+                "preserve_capital",
+                "speculation",
+                "diversification",
+                "other"
+              ]
             }
           },
           "investor_profile.risk_tolerance": {
             "type": "string",
-            "enum": ["conservative", "moderate", "aggressive"]
+            "enum": [
+              "conservative",
+              "moderate",
+              "aggressive"
+            ]
           },
           "investor_profile.declarations": {
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["affiliated_with_us_broker", "senior_executive", "senior_political_figure"]
+              "enum": [
+                "affiliated_with_us_broker",
+                "senior_executive",
+                "senior_political_figure"
+              ]
             }
           },
           "investor_profile.senior_executive_symbols": {
@@ -4779,7 +5270,11 @@
             }
           }
         },
-        "required": ["debug", "message", "support_id"]
+        "required": [
+          "debug",
+          "message",
+          "support_id"
+        ]
       },
       "Requirement": {
         "oneOf": [
@@ -4811,24 +5306,36 @@
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["register_auth_method"]
+            "enum": [
+              "register_auth_method"
+            ]
           },
           "is_met": {
             "type": "boolean"
           },
           "auth_method_kind": {
             "type": "string",
-            "enum": ["phone", "email", "passkey"]
+            "enum": [
+              "phone",
+              "email",
+              "passkey"
+            ]
           }
         },
-        "required": ["kind", "is_met", "auth_method_kind"]
+        "required": [
+          "kind",
+          "is_met",
+          "auth_method_kind"
+        ]
       },
       "CollectInvestorProfileRequirement": {
         "type": "object",
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["investor_profile"]
+            "enum": [
+              "collect_investor_profile"
+            ]
           },
           "is_met": {
             "type": "boolean"
@@ -4837,31 +5344,57 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["investor_profile"]
+              "enum": [
+                "investor_profile"
+              ]
+            }
+          },
+          "populated_attributes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "investor_profile"
+              ],
+              "x-stoplight": {
+                "id": "b7fvzh54o7d6z"
+              }
             }
           }
         },
-        "required": ["kind", "is_met", "missing_attributes"]
+        "required": [
+          "kind",
+          "is_met",
+          "missing_attributes",
+          "populated_attributes"
+        ]
       },
       "RegisterPasskeyRequirement": {
         "type": "object",
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["liveness"]
+            "enum": [
+              "liveness"
+            ]
           },
           "is_met": {
             "type": "boolean"
           }
         },
-        "required": ["kind", "is_met"]
+        "required": [
+          "kind",
+          "is_met"
+        ]
       },
       "AuthorizeRequirement": {
         "type": "object",
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["authorize"]
+            "enum": [
+              "authorize"
+            ]
           },
           "is_met": {
             "type": "boolean"
@@ -4870,20 +5403,29 @@
             "$ref": "#/components/schemas/AuthorizeFields"
           }
         },
-        "required": ["kind", "is_met", "fields_to_authorize"]
+        "required": [
+          "kind",
+          "is_met",
+          "fields_to_authorize"
+        ]
       },
       "ProcessRequirement": {
         "type": "object",
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["process"]
+            "enum": [
+              "process"
+            ]
           },
           "is_met": {
             "type": "boolean"
           }
         },
-        "required": ["kind", "is_met"]
+        "required": [
+          "kind",
+          "is_met"
+        ]
       },
       "AuthorizeFields": {
         "type": "object",
@@ -4894,7 +5436,9 @@
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["collect_document"]
+            "enum": [
+              "collect_document"
+            ]
           },
           "is_met": {
             "type": "boolean"
@@ -4904,13 +5448,23 @@
           },
           "upload_settings": {
             "type": "string",
-            "enum": ["prefer_capture", "prefer_upload", "captureOnlyOnMobile"]
+            "enum": [
+              "prefer_capture",
+              "prefer_upload",
+              "captureOnlyOnMobile"
+            ]
           },
           "config": {
             "$ref": "#/components/schemas/DocumentRequirementConfig"
           }
         },
-        "required": ["kind", "is_met", "document_request_id", "upload_settings", "config"]
+        "required": [
+          "kind",
+          "is_met",
+          "document_request_id",
+          "upload_settings",
+          "config"
+        ]
       },
       "DocumentRequirementConfig": {
         "type": "object",
@@ -4928,7 +5482,9 @@
             "x-stoplight": {
               "id": "vbb7frow4y61h"
             },
-            "enum": ["collect_data"]
+            "enum": [
+              "collect_data"
+            ]
           },
           "is_met": {
             "type": "boolean",
@@ -4964,7 +5520,13 @@
             }
           }
         },
-        "required": ["kind", "is_met", "missing_attributes", "optional_attributes", "populated_attributes"]
+        "required": [
+          "kind",
+          "is_met",
+          "missing_attributes",
+          "optional_attributes",
+          "populated_attributes"
+        ]
       },
       "VaultDI": {
         "title": "VaultDI",

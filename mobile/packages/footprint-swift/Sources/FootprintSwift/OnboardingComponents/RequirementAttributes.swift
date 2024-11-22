@@ -43,35 +43,48 @@ public struct RequirementAttributes {
         requirements.isCompleted = requirements.missing.isEmpty
         requirements.isMissing = !requirements.isCompleted
         
-        let collectDataRequirement: CollectDataRequirement? = onboardingStatus.allRequirements.compactMap { requirement in
-            if case let .typeCollectDataRequirement(collectDataReq) = requirement {
-                return collectDataReq
+        let (collectDataRequirement, investorProfileRequirement): (CollectDataRequirement?, CollectInvestorProfileRequirement?) = onboardingStatus.allRequirements.reduce(into: (nil, nil)) { result, requirement in
+            switch requirement {
+            case let .typeCollectDataRequirement(collectDataReq):
+                result.0 = collectDataReq
+            case let .typeCollectInvestorProfileRequirement(investorProfileReq):
+                result.1 = investorProfileReq
+            default:
+                break
             }
-            return nil
-        }.first
-        
-        if let collectDataRequirement = collectDataRequirement {
-            let optionalAttributes = collectDataRequirement.optionalAttributes.flatMap { attribute in
-                return CdoToAllDisMap[attribute.rawValue] ?? []
-            }
-            let populatedAttributes = collectDataRequirement.populatedAttributes.flatMap { attribute in
-                return CdoToAllDisMap[attribute.rawValue] ?? []
-            }
-            let missingAttributes = collectDataRequirement.missingAttributes.flatMap { attribute in
-                return CdoToAllDisMap[attribute.rawValue] ?? []
-            }
-            let filteredMissingAttributes = missingAttributes.filter { attr in
-                if attr.rawValue == "id.address_line2" || attr.rawValue == "id.middle_name" {
-                    fields.optional.append(attr)
-                    return false
-                }
-                return true
-            }
-            
-            fields.optional.append(contentsOf: optionalAttributes)
-            fields.collected.append(contentsOf: populatedAttributes)
-            fields.missing.append(contentsOf: filteredMissingAttributes)
         }
+                
+        let optionalAttributes = collectDataRequirement?.optionalAttributes.flatMap { $0 }.flatMap { attribute in
+            return CdoToAllDisMap[attribute.rawValue] ?? []
+        } ?? []
+
+        let collectDataPopulated = collectDataRequirement?.populatedAttributes ?? []
+        let investorProfilePopulated = investorProfileRequirement?.populatedAttributes ?? []
+        let allPopulated = collectDataPopulated.map { CollectedAttributes(rawValue: $0.rawValue)! } +
+            investorProfilePopulated.map { CollectedAttributes(rawValue: $0.rawValue)! }
+        let populatedAttributes = allPopulated.flatMap { attribute in
+            return CdoToAllDisMap[attribute.rawValue] ?? []
+        }
+        
+        let collectDataMissing = collectDataRequirement?.missingAttributes ?? []
+        let investorProfileMissing = investorProfileRequirement?.missingAttributes ?? []
+        let allMissing = collectDataMissing.map { CollectedAttributes(rawValue: $0.rawValue)! } +
+            investorProfileMissing.map { CollectedAttributes(rawValue: $0.rawValue)! }
+        let missingAttributes = allMissing.flatMap { attribute in
+            return CdoToAllDisMap[attribute.rawValue] ?? []
+        }
+        
+        let filteredMissingAttributes = missingAttributes.filter { attr in
+            if attr.rawValue == "id.address_line2" || attr.rawValue == "id.middle_name" {
+                fields.optional.append(attr)
+                return false
+            }
+            return true
+        }
+        
+        fields.optional.append(contentsOf: optionalAttributes)
+        fields.collected.append(contentsOf: populatedAttributes)
+        fields.missing.append(contentsOf: filteredMissingAttributes)
         
         return RequirementAttributes(
             fields: fields,
