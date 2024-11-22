@@ -31,6 +31,7 @@ const SecurityLogs = () => {
     'invite_org_member',
     'update_org_member',
     'remote_org_member',
+    'decrypt_org_api_key',
     // 'create_org_api_key',
     // 'update_org_api_key_role',
     'update_user_data',

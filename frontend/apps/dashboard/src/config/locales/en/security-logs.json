@@ -89,7 +89,8 @@
         "bank.*.ach_account_id": "Account ID",
         "bank.*.account_type": "Account type",
         "bank.*.fingerprint": "Bank account fingerprint"
-      }
+      },
+      "an-api-key": "an API key"
     },
     "invite": {
       "invited": "invited",

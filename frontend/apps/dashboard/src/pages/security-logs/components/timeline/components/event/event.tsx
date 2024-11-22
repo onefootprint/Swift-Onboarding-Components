@@ -4,6 +4,7 @@ import { Stack } from '@onefootprint/ui';
 import CreateOrgApiKey from './components/create-org-api-key';
 import CreateOrgRole from './components/create-org-role';
 import DeactivateOrgRole from './components/deactivate-org-role';
+import DecryptOrgApiKey from './components/decrypt-org-api-key';
 import InviteOrgMember from './components/invite-org-member';
 import PrincipalActor from './components/principal-actor';
 import RemoveOrgMember from './components/remove-org-member';
@@ -46,6 +47,9 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
       )}
       {kind === 'update_org_api_key_role' && (
         <UpdateOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === 'decrypt_org_api_key' && (
+        <DecryptOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
     </Stack>
   );
