@@ -1,10 +1,10 @@
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, Stack, media } from '@onefootprint/ui';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { addCurrentParamsToUrl } from 'src/utils/dom';
+import ButtonLink from '../button-link';
 import ContactDialog from '../contact-dialog';
+import MarketingLink from '../marketing-link';
 
 type ContactButtonsProps = {
   bookADemoButton: string;
@@ -26,16 +26,11 @@ const ContactButtons = ({ signUpButton, bookADemoButton, justify = 'left' }: Con
   return (
     <>
       <Buttons width="100%" justify={justify} gap={4}>
-        <Button
-          variant="primary"
-          size="large"
-          onClick={() => {
-            const urlWithParams = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
-            window.open(urlWithParams, '_blank');
-          }}
-        >
-          {signUpButton}
-        </Button>
+        <MarketingLink app="dashboard" href="authentication/sign-up" target="_blank">
+          <ButtonLink variant="primary" size="large">
+            {signUpButton}
+          </ButtonLink>
+        </MarketingLink>
         <Button variant="secondary" size="large" onClick={handleClickTrigger}>
           {bookADemoButton}
         </Button>

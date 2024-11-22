@@ -1,10 +1,9 @@
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, Container, Stack, Text, media } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ButtonLink from 'src/components/button-link';
 import ContactDialog from 'src/components/contact-dialog';
-import { LINTRK_CONVERSION_ID } from 'src/config/constants';
-import { addCurrentParamsToUrl } from 'src/utils/dom';
+import MarketingLink from 'src/components/marketing-link';
 import styled, { css } from 'styled-components';
 import Logos from './logos';
 
@@ -16,12 +15,6 @@ const CustomersLogos = () => {
 
   const handleBookDemoClick = () => {
     setShowDialog(true);
-  };
-
-  const handleGetStartedClick = () => {
-    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-    const urlWithParams = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
-    window.open(urlWithParams, '_blank');
   };
 
   const handleCloseDialog = () => {
@@ -38,9 +31,11 @@ const CustomersLogos = () => {
         </Stack>
         <Logos />
         <ButtonContainer>
-          <Button variant="primary" size="large" onClick={handleGetStartedClick}>
-            {t('get-started')}
-          </Button>
+          <MarketingLink app="dashboard" href="authentication/sign-up" target="_blank">
+            <ButtonLink variant="primary" size="large">
+              {t('get-started')}
+            </ButtonLink>
+          </MarketingLink>
           <Button variant="secondary" size="large" onClick={handleBookDemoClick}>
             {t('book-a-demo')}
           </Button>

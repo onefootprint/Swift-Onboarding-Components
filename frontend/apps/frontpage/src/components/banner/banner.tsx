@@ -1,10 +1,10 @@
 import { Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ButtonLink from 'src/components/button-link';
 import ContactDialog from 'src/components/contact-dialog';
-import { SIGN_UP_URL } from 'src/config/constants';
-import { addCurrentParamsToUrl } from 'src/utils/dom';
+import MarketingLink from 'src/components/marketing-link';
 import styled, { css } from 'styled-components';
 import FishingPenguin from './components/fishing-penguin';
 
@@ -14,18 +14,8 @@ type BannerProps = {
 };
 
 const Banner = ({ title, imgSrc }: BannerProps) => {
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home.banner' });
   const [showDialog, setShowDialog] = useState(false);
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.home.banner',
-  });
-  const handleSignUpClick = () => {
-    const urlWithParams = addCurrentParamsToUrl(SIGN_UP_URL);
-    window.open(urlWithParams, '_blank');
-  };
-
-  const handleBookCall = useCallback(() => {
-    setShowDialog(true);
-  }, []);
 
   return (
     <>
@@ -40,12 +30,20 @@ const Banner = ({ title, imgSrc }: BannerProps) => {
             {title}
           </Text>
           <ButtonContainer>
-            <Button variant="primary" size="large" onClick={handleBookCall}>
+            <Button
+              variant="primary"
+              size="large"
+              onClick={() => {
+                setShowDialog(true);
+              }}
+            >
               {t('book-a-demo')}
             </Button>
-            <Button variant="secondary" size="large" onClick={handleSignUpClick}>
-              {t('sign-up-for-free')}
-            </Button>
+            <MarketingLink app="dashboard" href="authentication/sign-up" asChild>
+              <ButtonLink variant="secondary" size="large">
+                {t('sign-up-for-free')}
+              </ButtonLink>
+            </MarketingLink>
           </ButtonContainer>
         </TextContainer>
       </BannerContainer>

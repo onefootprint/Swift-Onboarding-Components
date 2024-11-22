@@ -6,7 +6,7 @@ const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:80
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live getform.io/f/pbgxoqza getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1;
+  connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live getform.io/f/pbgxoqza getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1 *.google.com *.googletagmanager.com google.com;
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
@@ -14,7 +14,7 @@ const ContentSecurityPolicy = `
   frame-src 'self' *.onefootprint.com vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net i.onefp.net i-dev.onefp.net *.i-dev.onefp.net;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com *.google.com *.googletagmanager.com google.com;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;

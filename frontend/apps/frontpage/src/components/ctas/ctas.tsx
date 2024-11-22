@@ -1,8 +1,8 @@
 import { Button, Stack, media } from '@onefootprint/ui';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LINTRK_CONVERSION_ID, SIGN_UP_URL } from 'src/config/constants';
-import { addCurrentParamsToUrl } from 'src/utils/dom';
+import ButtonLink from 'src/components/button-link';
+import MarketingLink from 'src/components/marketing-link';
 import styled, { css } from 'styled-components';
 import ContactDialog from '../contact-dialog';
 
@@ -26,17 +26,6 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
   const { t } = useTranslation('common', { keyPrefix: 'components.ctas' });
   const [showDialog, setShowDialog] = useState(false);
 
-  const handleSignUpClick = () => {
-    try {
-      window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID }); // linkedin conversion tracking
-    } catch (_) {
-      // ignore
-    }
-
-    const urlWithParams = addCurrentParamsToUrl(SIGN_UP_URL);
-    window.open(urlWithParams, '_blank');
-  };
-
   const handleBookCall = useCallback(() => {
     setShowDialog(true);
   }, []);
@@ -47,9 +36,11 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
         <Button variant="primary" size="large" onClick={handleBookCall}>
           {labels?.primary || t('book-a-call')}
         </Button>
-        <Button variant="secondary" size="large" onClick={handleSignUpClick}>
-          {labels?.secondary || t('sign-up-for-free')}
-        </Button>
+        <MarketingLink app="dashboard" href="authentication/sign-up" target="_blank">
+          <ButtonLink variant="secondary" size="large">
+            {labels?.secondary || t('sign-up-for-free')}
+          </ButtonLink>
+        </MarketingLink>
       </ButtonsContainer>
       <ContactDialog open={showDialog} onClose={() => setShowDialog(false)} />
     </>

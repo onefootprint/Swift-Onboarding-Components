@@ -4,19 +4,18 @@ export const getCurrentParams = (): URLSearchParams => {
   if (typeof window === 'undefined') return new URLSearchParams();
 
   const currentParams = new URLSearchParams(window.location.search);
-  return currentParams.toString().length > 0
-    ? currentParams
-    : new URLSearchParams(sessionStorage.getItem(CURRENT_PARAMS_KEY) || '');
+  if (currentParams.toString().length > 0) {
+    return currentParams;
+  }
+  return new URLSearchParams(sessionStorage.getItem(CURRENT_PARAMS_KEY) || '');
 };
 
 export const addCurrentParamsToUrl = (baseUrl: string): string => {
   if (typeof window === 'undefined') return baseUrl;
-  if (!baseUrl) return '';
   const params = getCurrentParams();
   if (params.toString().length === 0) {
     return baseUrl;
   }
-
   const [urlBase, hash] = baseUrl.split('#');
   const separator = urlBase.includes('?') ? '&' : '?';
   const newUrl = `${urlBase}${separator}${params.toString()}`;

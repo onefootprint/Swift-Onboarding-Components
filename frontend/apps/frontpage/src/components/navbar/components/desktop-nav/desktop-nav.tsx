@@ -1,14 +1,11 @@
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Box, Container, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
-import { useRouter } from 'next/router';
 import MessageBanner from 'src/components/layout/message-banner';
-import { LINTRK_CONVERSION_ID } from 'src/config/constants';
-import { addCurrentParamsToUrl } from 'src/utils/dom';
+import MarketingLink from 'src/components/marketing-link';
+import styled, { css } from 'styled-components';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import DesktopNavLink from './components/desktop-nav-link';
@@ -27,19 +24,9 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
   const router = useRouter();
   const isArticlePage = router.pathname.includes(ARTICLE_URL);
   const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
-  const signInUrl = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-in`);
-  const signUpUrl = addCurrentParamsToUrl(`${DASHBOARD_BASE_URL}/authentication/sign-up`);
 
   const handleCloseBanner = () => {
     setIsBannerVisible(false);
-  };
-
-  const handleLoginClick = () => {
-    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
-  };
-
-  const handleSignUpClick = () => {
-    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
   };
 
   return (
@@ -66,12 +53,12 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
             })}
           </MainNav>
           <SecondaryNav>
-            <Login href={signInUrl} onClick={handleLoginClick} target="_blank">
-              {t('login')}
-            </Login>
-            <Signup href={signUpUrl} onClick={handleSignUpClick} target="_blank">
-              {t('sign-up')}
-            </Signup>
+            <MarketingLink app="dashboard" href="authentication/sign-in" asChild>
+              <Login>{t('login')}</Login>
+            </MarketingLink>
+            <MarketingLink app="dashboard" href="authentication/sign-up" asChild>
+              <Signup>{t('sign-up')}</Signup>
+            </MarketingLink>
           </SecondaryNav>
         </StyledContainer>
       </NavContainer>

@@ -1,18 +1,18 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { GoogleTagManager } from '@next/third-parties/google';
-
+import '@onefootprint/ui/styles.css';
 import Intercom from '@intercom/messenger-js-sdk';
+import { GoogleTagManager } from '@next/third-parties/google';
 import type { AppProps } from 'next/app';
 import { DM_Mono, DM_Sans } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
 import { useEffect } from 'react';
-import { createGlobalStyle, css } from 'styled-components';
-
 import { storeCurrentUrlParamsInSession } from 'src/utils/dom';
+import { createGlobalStyle, css } from 'styled-components';
 import Layout from '../components/layout';
 import Providers from '../components/providers';
 import { INTERCOM_APP_ID, UNIFY_API_KEY } from '../config/constants';
+import '../styles/globals.css';
 
 const defaultFont = DM_Sans({
   display: 'swap',

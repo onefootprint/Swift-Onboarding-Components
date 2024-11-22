@@ -1,7 +1,7 @@
-import { Box, Button, Container, media } from '@onefootprint/ui';
+import { Box, Container, media } from '@onefootprint/ui';
 import { Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
-import { addCurrentParamsToUrl } from 'src/utils/dom';
+import ButtonLink from 'src/components/button-link';
 import styled, { css } from 'styled-components';
 import FeatureCard, { type FeatureCardProps } from './components/feature-card';
 
@@ -36,26 +36,14 @@ export const SectionLayout = ({ main, illustration, featureCards, $inverted }: S
           {main.mainCta && (
             <Stack direction="row" align="center" gap={3} marginTop={5}>
               {main.mainCta.href ? (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    const urlWithParams = addCurrentParamsToUrl(main.mainCta!.href);
-                    window.open(urlWithParams, '_blank');
-                  }}
-                >
+                <ButtonLink variant="secondary" href={main.mainCta.href}>
                   {main.mainCta.label}
-                </Button>
+                </ButtonLink>
               ) : null}
               {main.secondaryCta?.href ? (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    const urlWithParams = addCurrentParamsToUrl(main.secondaryCta!.href);
-                    window.open(urlWithParams, '_blank');
-                  }}
-                >
+                <ButtonLink variant="secondary" href={main.secondaryCta.href}>
                   {main.secondaryCta.label}
-                </Button>
+                </ButtonLink>
               ) : null}
             </Stack>
           )}

@@ -1,5 +1,3 @@
-import '@onefootprint/ui/styles.css';
-import '@onefootprint/footprint-js/dist/footprint-js.css';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { HubspotProvider } from 'next-hubspot';

@@ -1,14 +1,13 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
 import { Box, Divider, Stack, Text, media } from '@onefootprint/ui';
+import isString from 'lodash/isString';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Trans, useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-
-import isString from 'lodash/isString';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import useTrackingStorage from 'src/hooks/use-tracking-storage';
+import styled from 'styled-components';
 import Blur from '../components/blur';
 import ContainerBox from '../components/container-box';
 import EmailForm from '../components/email-form';
@@ -18,12 +17,13 @@ import PenguinWink from './components/penguin-wink';
 
 const Signup = () => {
   const { t } = useTranslation('authentication', { keyPrefix: 'sign-up' });
-  const { query, isReady } = useRouter();
-  const { update } = useTrackingStorage();
+  const { query } = useRouter();
+  const trackingStorage = useTrackingStorage();
+  const hasQuery = Object.keys(query).length > 0;
 
   useEffect(() => {
-    if (isReady) {
-      update({
+    if (hasQuery) {
+      trackingStorage.update({
         utmCampaign: isString(query.utm_campaign) ? query.utm_campaign : undefined,
         utmContent: isString(query.utm_content) ? query.utm_content : undefined,
         utmMedium: isString(query.utm_medium) ? query.utm_medium : undefined,
@@ -31,7 +31,7 @@ const Signup = () => {
         utmTerm: isString(query.utm_term) ? query.utm_term : undefined,
       });
     }
-  }, [isReady, query, update]);
+  }, [query, hasQuery]);
 
   return (
     <>
