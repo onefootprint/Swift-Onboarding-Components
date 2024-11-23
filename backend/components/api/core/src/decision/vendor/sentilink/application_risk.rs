@@ -8,6 +8,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpDbOptionalExtension;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -40,7 +41,7 @@ pub async fn run_sentilink_application_risk(
         .db_transaction(move |conn| {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
-            let ie = InsightEvent::get_for_workflow(conn, &wf_id2)?;
+            let ie = InsightEvent::get(conn, &wf_id2).optional()?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             // TODO: Fix this to read from DI
             // https://linear.app/footprint/issue/BE-1582/add-seqno-to-di

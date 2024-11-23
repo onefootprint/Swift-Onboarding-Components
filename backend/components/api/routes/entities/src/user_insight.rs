@@ -5,6 +5,7 @@ use api_core::serializers::user_insights;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
+use api_errors::FpDbOptionalExtension;
 use db::models::insight_event::InsightEvent;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -33,7 +34,7 @@ pub async fn get(
             let behavior = NeuroIdAnalyticsEvent::list(conn, &sv.id)?;
             let latest_completed_wf = Workflow::latest_reonboardable(conn, &sv.id, true)?.map(|(wf, _)| wf);
             let insight_event_for_latest_wf = if let Some(ref wf) = latest_completed_wf {
-                InsightEvent::get_for_workflow(conn, &wf.id)?
+                InsightEvent::get(conn, &wf.id).optional()?
             } else {
                 None
             };

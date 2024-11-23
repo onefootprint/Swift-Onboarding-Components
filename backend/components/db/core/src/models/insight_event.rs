@@ -108,17 +108,28 @@ impl CreateInsightEvent {
     }
 }
 
-impl InsightEvent {
-    #[tracing::instrument("InsightEvent::get_for_workflow", skip_all)]
-    pub fn get_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> FpResult<Option<InsightEvent>> {
-        let insight_event: Option<InsightEvent> = workflow::table
-            .inner_join(insight_event::table)
-            .filter(workflow::id.eq(wf_id))
-            .select(insight_event::all_columns)
-            .get_result(conn)
-            .optional()?;
+#[derive(derive_more::From)]
+pub enum InsightEventIdentifier<'a> {
+    Workflow(&'a WorkflowId),
+    Id(&'a InsightEventId),
+}
 
-        Ok(insight_event)
+impl InsightEvent {
+    #[tracing::instrument("InsightEvent::get", skip_all)]
+    pub fn get<'a>(conn: &mut PgConn, id: impl Into<InsightEventIdentifier<'a>>) -> FpResult<InsightEvent> {
+        let mut query = insight_event::table.into_boxed();
+        match id.into() {
+            InsightEventIdentifier::Id(id) => query = query.filter(insight_event::id.eq(id)),
+            InsightEventIdentifier::Workflow(wf_id) => {
+                let ie_ids = workflow::table
+                    .filter(workflow::id.eq(wf_id))
+                    .select(workflow::insight_event_id);
+                query = query.filter(insight_event::id.nullable().eq_any(ie_ids));
+            }
+        }
+        let result = query.get_result(conn)?;
+
+        Ok(result)
     }
 
     pub fn get_latest_for_obc(

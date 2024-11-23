@@ -29,6 +29,7 @@ use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpDbOptionalExtension;
 use async_trait::async_trait;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
@@ -522,9 +523,10 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         .collect();
 
         // TODO: Consider pulling in additional insight events?
-        let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
+        let insight_events = InsightEvent::get(conn, &self.wf_id)
+            .optional()?
             .into_iter()
-            .collect();
+            .collect_vec();
 
         // TODO should we be using evaluate_workflow_decision?
         let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
@@ -715,9 +717,10 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         .collect();
 
         // TODO: Consider pulling in additional insight events?
-        let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
+        let insight_events = InsightEvent::get(conn, &self.wf_id)
+            .optional()?
             .into_iter()
-            .collect();
+            .collect_vec();
 
         // TODO should we be using evaluate_workflow_decision?
         let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(

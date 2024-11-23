@@ -13,6 +13,7 @@ use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpDbOptionalExtension;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListWithDecryptedEntries;
@@ -92,8 +93,10 @@ pub fn evaluate_workflow_decision<'a>(
         .filter(|(k, _)| doc_collected || !matches!(k, RiskSignalGroupKind::Doc)).flat_map(|(_, v)| v.clone()).collect();
 
     // TODO: Consider pulling in additional insight events?
-    let insight_events: Vec<InsightEvent> =
-        InsightEvent::get_for_workflow(conn, wf_id)?.into_iter().collect();
+    let insight_events = InsightEvent::get(conn, wf_id)
+        .optional()?
+        .into_iter()
+        .collect_vec();
 
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules_output = evaluate_rules(

@@ -24,6 +24,7 @@ use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::FpDbOptionalExtension;
 use api_wire_types::AlpacaCipRequest;
 use api_wire_types::AlpacaCipResponse;
 use api_wire_types::DeprecatedAlpacaCipRequest;
@@ -300,7 +301,7 @@ pub(crate) async fn create_cip_request(
             let latest_identity_document_and_request = Document::get_latest_complete_identity(conn, &wf.id)?;
 
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let insight = InsightEvent::get_for_workflow(conn, &wf.id)?;
+            let insight = InsightEvent::get(conn, &wf.id).optional()?;
 
             let decision = manual_obd.unwrap_or(fp_obd);
 

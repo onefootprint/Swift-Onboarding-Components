@@ -171,7 +171,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
     };
     state
         .db_transaction(move |conn| {
-            let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
+            let ie = InsightEvent::get(conn, &wf_id)?;
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
             UserConsent::create(conn, Utc::now(), ie.id, note, false, wf_id)?;
