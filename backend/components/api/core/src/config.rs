@@ -282,6 +282,8 @@ pub enum LinkKind {
     VerifyBusinessOwner,
     /// Hosted auth to update login methods
     UpdateAuth,
+    /// Small app to verify contact info using a citok
+    ContactInfoVerify,
 }
 
 impl LinkKind {
@@ -334,6 +336,15 @@ impl ServiceEnvironmentConfig {
                     "https://auth.preview.onefootprint.com/user"
                 }
             }
+            LinkKind::ContactInfoVerify => {
+                if self.is_production() {
+                    "https://confirm.onefootprint.com"
+                } else if self.is_local() {
+                    "http://localhost:3006"
+                } else {
+                    "https://confirm.preview.onefootprint.com"
+                }
+            }
         };
         // Randomize the querystring so different links open in different tabs
         let r = rand::thread_rng().gen_range(0..1000);
@@ -342,6 +353,7 @@ impl ServiceEnvironmentConfig {
             LinkKind::VerifyUser => format!("type=user&r={}", r),
             LinkKind::VerifyBusinessOwner => format!("type=bo&r={}", r),
             LinkKind::UpdateAuth => format!("r={}", r),
+            LinkKind::ContactInfoVerify => format!("r={}", r),
         };
         // Send the auth token in the url fragment #, which isn't logged by default.
         // The auth token is a secret

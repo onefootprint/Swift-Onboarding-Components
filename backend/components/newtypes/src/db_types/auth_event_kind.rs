@@ -70,6 +70,8 @@ impl From<ContactInfoKind> for AuthEventKind {
 #[serde(rename_all = "snake_case")]
 pub enum ModernAuthEventKind {
     Sms,
+    #[openapi(skip)]
+    // TODO: no good way to feature gate enum variants
     SmsLink,
     Email,
     Passkey,

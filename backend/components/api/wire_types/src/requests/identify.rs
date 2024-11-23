@@ -126,6 +126,8 @@ pub struct SignupChallengeRequest {
 pub struct IdentifyVerifyRequest {
     /// Opaque challenge state token
     pub challenge_token: ChallengeToken,
+    #[serde(default)]
+    #[openapi(optional)]
     pub challenge_response: String,
     /// Determines which scopes the issued auth token will have. Request the correct scopes for your
     /// use case in order to get the least permissions required

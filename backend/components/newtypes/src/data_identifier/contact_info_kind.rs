@@ -8,6 +8,7 @@ use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
+use strum::IntoEnumIterator;
 use strum_macros::Display;
 
 #[derive(
@@ -73,12 +74,21 @@ pub enum ContactInfoKind {
     Email,
 }
 
-impl From<AuthMethodKind> for ChallengeKind {
-    fn from(value: AuthMethodKind) -> Self {
+impl AuthMethodKind {
+    pub fn supported_challenge_kinds(&self) -> Vec<ChallengeKind> {
+        ChallengeKind::iter()
+            .filter(|ck| Self::from(*ck) == *self)
+            .collect()
+    }
+}
+
+impl From<ChallengeKind> for AuthMethodKind {
+    fn from(value: ChallengeKind) -> Self {
         match value {
-            AuthMethodKind::Email => Self::Email,
-            AuthMethodKind::Phone => Self::Sms,
-            AuthMethodKind::Passkey => Self::Passkey,
+            ChallengeKind::Email => Self::Email,
+            ChallengeKind::Sms => Self::Phone,
+            ChallengeKind::SmsLink => Self::Phone,
+            ChallengeKind::Passkey => Self::Passkey,
         }
     }
 }

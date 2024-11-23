@@ -748,6 +748,32 @@
                 ]
             }
         },
+        "/hosted/identify/verify_contact_info": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Creates an auth event to mark the provided contact info as verified.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Async contact info verification token": []
+                    }
+                ]
+            }
+        },
         "/hosted/onboarding": {
             "post": {
                 "tags": [
@@ -2385,6 +2411,12 @@
     },
     "components": {
         "securitySchemes": {
+            "Async contact info verification token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Authorization",
+                "description": "Short-lived auth token for async verification of contact info."
+            },
             "Business Owner Token": {
                 "type": "apiKey",
                 "in": "header",
@@ -2671,6 +2703,7 @@
                 "type": "string",
                 "enum": [
                     "sms",
+                    "sms_link",
                     "biometric",
                     "email"
                 ]

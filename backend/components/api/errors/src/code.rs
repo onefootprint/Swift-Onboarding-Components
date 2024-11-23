@@ -91,6 +91,8 @@ pub enum FpErrorCode {
     MissingPlaybookKey,
     #[strum(serialize = "E127")]
     ConflictingPlaybookKey,
+    #[strum(serialize = "E128")]
+    ContactInfoNotYetVerified,
 
     // Tenant-facing errors
     #[strum(serialize = "T120")]
@@ -144,6 +146,7 @@ impl FpErrorCode {
             Self::LinkAlreadyUsed => true,
             Self::MissingPlaybookKey => true,
             Self::ConflictingPlaybookKey => true,
+            Self::ContactInfoNotYetVerified => true,
 
             // Tenant-facing errors
             Self::VaultDataValidationError => true,

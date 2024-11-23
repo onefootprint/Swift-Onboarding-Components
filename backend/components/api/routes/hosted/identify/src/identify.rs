@@ -22,7 +22,9 @@ use api_wire_types::IdentifyResponse;
 use db::models::scoped_vault::ScopedVault;
 use itertools::chain;
 use itertools::Itertools;
+use newtypes::ChallengeKind;
 use newtypes::IdentifyScope;
+use newtypes::PreviewApi::SmsLinkAuthentication;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
@@ -93,7 +95,7 @@ pub async fn post(
 
     let IdentifyChallengeContext {
         ctx,
-        tenant: _,
+        tenant,
         sv,
         can_initiate_signup_challenge,
         matching_fps,
@@ -125,7 +127,8 @@ pub async fn post(
         (auth_token, scopes)
     } else {
         // Otherwise, make a new identified token
-        create_identified_token(&state, v_id, scope, sv, ob_context).await?
+        let (token, _, scopes) = create_identified_token(&state, v_id, scope, sv, ob_context).await?;
+        (token, scopes)
     };
 
     let scrubbed_phone = ams.iter().find_map(|am| am.phone()).map(|p| p.scrubbed());
@@ -140,10 +143,12 @@ pub async fn post(
         .iter()
         .flat_map(|am| am.passkeys())
         .any(|cred| cred.backup_state);
+    let tenant_supports_sms_link = tenant.is_some_and(|t| t.can_access_preview(&SmsLinkAuthentication));
     let available_challenge_kinds = ams
         .iter()
         .filter(|m| m.can_initiate_login_challenge)
-        .map(|m| m.kind().into())
+        .flat_map(|m| m.kind().supported_challenge_kinds())
+        .filter(|k| k != &ChallengeKind::SmsLink || tenant_supports_sms_link)
         .collect_vec();
     let auth_methods = ams
         .into_iter()
@@ -181,7 +186,7 @@ pub(super) async fn create_identified_token(
     scope: IdentifyScope,
     sv: Option<ScopedVault>,
     ob_context: Option<ObConfigAuth>,
-) -> FpResult<(SessionAuthToken, Vec<UserAuthScope>)> {
+) -> FpResult<(SessionAuthToken, AuthSession, Vec<UserAuthScope>)> {
     let session_key = state.session_sealing_key.clone();
     // Add metadata from the onboarding session token
     let metadata = (ob_context.as_ref())
@@ -225,8 +230,8 @@ pub(super) async fn create_identified_token(
             };
             let data = UserSession::make(args)?;
             let duration = scope.token_ttl();
-            let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-            Ok((token, scopes))
+            let (token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            Ok((token, session, scopes))
         })
         .await?;
     Ok(token)

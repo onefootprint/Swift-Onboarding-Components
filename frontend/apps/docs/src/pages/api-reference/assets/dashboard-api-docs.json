@@ -10212,6 +10212,7 @@
                 "type": "string",
                 "enum": [
                     "sms",
+                    "sms_link",
                     "email",
                     "passkey",
                     "third_party"
@@ -17450,6 +17451,7 @@
                     "vault_integrity",
                     "soft_delete_users",
                     "post_kyc_stepup_links",
+                    "sms_link_authentication",
                     "client_vaulting_docs",
                     "list_duplicate_users"
                 ]

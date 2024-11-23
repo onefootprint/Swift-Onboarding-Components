@@ -334,6 +334,41 @@ pub async fn send_sms_challenge_non_blocking(
     Ok((rx, h_code))
 }
 
+#[tracing::instrument(skip_all)]
+pub async fn send_sms_link_challenge_non_blocking(
+    state: &State,
+    tenant: &Tenant,
+    destination: PhoneNumber,
+    sandbox_id: Option<SandboxId>,
+    vault_id: Option<VaultId>,
+    session_id: Option<String>,
+    url: PiiString,
+) -> FpResult<Receiver<FpError>> {
+    if destination.is_fixture_phone_number() && sandbox_id.is_none() {
+        return Err(UserError::FixtureCIInLive.into());
+    }
+
+    // Oneshot channel to send an error back from async message sending
+    let (tx, rx) = oneshot::channel();
+
+    let message = SmsMessage::SmsVerificationLink {
+        url,
+        tenant_name: tenant.name.clone(),
+        session_id: tenant
+            .id
+            .is_integration_test_tenant()
+            .then_some(session_id)
+            .flatten(),
+    };
+    let t_id = Some(tenant.id.clone());
+    state
+        .sms_client
+        .send_message_non_blocking(state, message, destination, t_id, vault_id, tx)
+        .await?;
+
+    Ok(rx)
+}
+
 pub struct BoSessionSmsInfo<'a> {
     pub destination: &'a PhoneNumber,
     pub inviter: &'a PiiString,

@@ -1,9 +1,18 @@
+import time
+from uuid import uuid4
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
-from tests.utils import _gen_random_sandbox_id, create_ob_config, post, get, patch
+from tests.utils import (
+    _gen_random_sandbox_id,
+    create_ob_config,
+    post,
+    get,
+    patch,
+    try_until_success,
+)
 from tests.identify_client import IdentifyClient
-from tests.headers import SandboxId, FpAuth, IsLive
+from tests.headers import SandboxId, FpAuth, IsLive, SessionId
 
 
 def test_entity_created_after_signup_challenge(sandbox_tenant):
@@ -12,6 +21,7 @@ def test_entity_created_after_signup_challenge(sandbox_tenant):
         phone_number=dict(value=FIXTURE_PHONE_NUMBER),
         email=dict(value=FIXTURE_EMAIL),
         scope="onboarding",
+        challenge_kind="sms",
     )
     post(
         "hosted/identify/signup_challenge",
@@ -51,6 +61,7 @@ def test_concurrent_signup_same_phone_number(sandbox_tenant):
         phone_number=dict(value=FIXTURE_PHONE_NUMBER),
         email=dict(value=FIXTURE_EMAIL),
         scope="onboarding",
+        challenge_kind="sms",
     )
     body = post("hosted/identify/signup_challenge", data, obc.key, sandbox_id_h)
     challenge_data1 = body["challenge_data"]
@@ -90,6 +101,7 @@ def vault1(sandbox_id, sandbox_tenant):
         phone_number=dict(value=FIXTURE_PHONE_NUMBER),
         email=dict(value=FIXTURE_EMAIL),
         scope="onboarding",
+        challenge_kind="sms",
     )
     post(
         "hosted/identify/signup_challenge",
@@ -332,6 +344,7 @@ def test_signup_flow(sandbox_tenant):
         phone_number=dict(value=FIXTURE_PHONE_NUMBER),
         email=dict(value=FIXTURE_EMAIL),
         scope="onboarding",
+        challenge_kind="sms",
     )
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     token = FpAuth(body["challenge_data"]["token"])
@@ -367,6 +380,7 @@ def test_modern_signup_flow(sandbox_tenant):
         phone_number=dict(value=FIXTURE_PHONE_NUMBER, is_bootstrap=True),
         email=dict(value=FIXTURE_EMAIL, is_bootstrap=False),
         scope="onboarding",
+        challenge_kind="sms",
     )
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     token = FpAuth(body["challenge_data"]["token"])
@@ -510,7 +524,9 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     assert not body["user"]["can_initiate_signup_challenge"]
 
     # We should block making the signup challenge for this tenant
-    data = dict(phone_number=dict(value=phone_number), scope="onboarding")
+    data = dict(
+        phone_number=dict(value=phone_number), scope="onboarding", challenge_kind="sms"
+    )
     body = post(
         "/hosted/identify/signup_challenge",
         data,
@@ -543,6 +559,7 @@ def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):
         phone_number=dict(value=phone_number),
         email=dict(value=FIXTURE_EMAIL),
         scope="onboarding",
+        challenge_kind="sms",
     )
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     data = {
@@ -563,7 +580,11 @@ def test_double_signup_challenge(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
     obc = sandbox_tenant.default_ob_config
-    data = dict(phone_number=dict(value=FIXTURE_PHONE_NUMBER), scope="onboarding")
+    data = dict(
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        scope="onboarding",
+        challenge_kind="sms",
+    )
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
 
@@ -573,7 +594,9 @@ def test_failed_verify(sandbox_tenant):
     sandbox_id_h = SandboxId(sandbox_id)
     obc = sandbox_tenant.default_ob_config
     data = dict(
-        phone_number=dict(value=FIXTURE_PHONE_NUMBER), scope="onboarding", kind="sms"
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        scope="onboarding",
+        challenge_kind="sms",
     )
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
 
@@ -599,3 +622,96 @@ def test_cannot_set_verified_ci(sandbox_tenant):
             body["message"]
             == "Can only set verified CI DIs in challenge verification flow"
         )
+
+
+def test_sms_link(twilio, sandbox_tenant, live_phone_number):
+    #
+    # First, create a user with the live phone number
+    #
+
+    obc = sandbox_tenant.default_ob_config
+
+    data = dict(
+        phone_number=dict(value=live_phone_number),
+        scope="onboarding",
+        challenge_kind="sms_link",
+    )
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    session_id_h = SessionId(str(uuid4()))
+    body = post(
+        "hosted/identify/signup_challenge", data, obc.key, sandbox_id_h, session_id_h
+    )
+    token = FpAuth(body["challenge_data"]["token"])
+
+    # Should not be able to verify yet since the link hasn't been clicked
+    verify_data = dict(
+        challenge_token=body["challenge_data"]["challenge_token"],
+        scope="onboarding",
+    )
+    body = post("hosted/identify/verify", verify_data, token, status_code=412)
+    assert body["message"] == "Contact info is not yet verified"
+    assert body["code"] == "E128"
+
+    (_, ci_token) = extract_sms_link_token(
+        twilio, live_phone_number, sandbox_tenant, session_id_h.value
+    )
+
+    # Click the link to verify the piece of contact info
+    post("hosted/identify/verify_contact_info", None, ci_token)
+    # Repeat request should no-op
+    post("hosted/identify/verify_contact_info", None, ci_token)
+
+    # Now we should be able to verify
+    body = post("hosted/identify/verify", verify_data, token, sandbox_id_h)
+    auth_token = FpAuth(body["auth_token"])
+
+    # Check that the validation token has the proper auth events
+    body = post("hosted/identify/validation_token", None, auth_token)
+    data = dict(validation_token=body["validation_token"])
+    body = post("onboarding/session/validate", data, sandbox_tenant.sk.key)
+    aes = body["user_auth"]["auth_events"]
+    assert len(aes) == 1
+    assert aes[0]["kind"] == "sms_link"
+
+    #
+    # Then, initiate a login challenge to sign into this existing user
+    #
+
+    data = dict(scope="onboarding", phone_number=live_phone_number)
+    body = post("hosted/identify", data, sandbox_id_h, obc.key)
+    assert "sms_link" in body["user"]["available_challenge_kinds"]
+    token = FpAuth(body["user"]["token"])
+
+    data = dict(preferred_challenge_kind="sms_link", scope="onboarding")
+    session_id_h = SessionId(str(uuid4()))
+    body = post("hosted/identify/login_challenge", data, token, session_id_h)
+
+    (_, ci_token) = extract_sms_link_token(
+        twilio, live_phone_number, sandbox_tenant, session_id_h.value
+    )
+
+    # Click the link to verify the piece of contact info
+    post("hosted/identify/verify_contact_info", None, ci_token)
+
+    # Now we should be able to verify
+    body = post("hosted/identify/verify", verify_data, token, sandbox_id_h)
+    auth_token = FpAuth(body["auth_token"])
+
+
+def extract_sms_link_token(twilio, phone_number, tenant, session_id):
+    def inner():
+        messages = twilio.messages.list(to=phone_number, limit=25)
+        print(f"Searching for SMS link verification sent to {phone_number}")
+        message = next(
+            m
+            for m in messages
+            if f"To verify your phone number for {tenant.name}, open this link:"
+            in m.body
+            and session_id in m.body
+        )
+        token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
+        return (message.body, FpAuth(token))
+
+    time.sleep(2)
+    return try_until_success(inner, 60)

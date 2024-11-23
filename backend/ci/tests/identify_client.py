@@ -111,10 +111,7 @@ class IdentifyClient:
         token = FpAuth(body["user"]["token"])
 
         # Issue the login challenge
-        data = dict(
-            preferred_challenge_kind=kind,
-            scope=scope,
-        )
+        data = dict(preferred_challenge_kind=kind, scope=scope)
         body = post("hosted/identify/login_challenge", data, token)
         assert body["challenge_data"]["challenge_kind"] == kind
         self.challenge_kind = kind

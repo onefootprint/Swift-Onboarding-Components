@@ -11,6 +11,11 @@ pub enum SmsMessage {
         tenant_name: Option<String>,
         code: PiiString,
     },
+    SmsVerificationLink {
+        tenant_name: String,
+        url: PiiString,
+        session_id: Option<String>,
+    },
     D2p {
         url: PiiString,
     },
@@ -49,6 +54,15 @@ impl SmsMessage {
                 tenant_name,
                 url.leak()
             ),
+            Self::SmsVerificationLink { tenant_name, url, session_id } => {
+                let session_id = session_id.as_ref().map(|s| format!("[Session ID: {}]\n\n", s)).unwrap_or_default();
+                format!(
+                    "{}To verify your phone number for {}, open this link: {}",
+                    session_id,
+                    tenant_name,
+                    url.leak()
+                )
+            }
             Self::Freeform { content } => content.leak_to_string()
         };
         let show_sent_via_footprint = !t_id.is_some_and(|t| t.is_wingspan());
@@ -65,6 +79,7 @@ impl SmsMessage {
             Self::Otp { .. } => "sms_challenge",
             Self::D2p { .. } => "d2p_session",
             Self::BoSession { .. } => "bo_session",
+            Self::SmsVerificationLink { .. } => "sms_link",
             Self::Freeform { .. } => "freeform",
         }
     }

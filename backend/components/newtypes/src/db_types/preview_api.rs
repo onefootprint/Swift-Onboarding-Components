@@ -74,6 +74,9 @@ pub enum PreviewApi {
     /// Generates a link if the user triggers a stepup rule in `POST /users/<>/kyc`
     PostKycStepupLinks,
 
+    /// Supports SMS link authentication (as opposed to SMS OTP verification)
+    SmsLinkAuthentication,
+
     //
     // The below variants are used to hide documentation on the API reference docs site
     /// Not used to gate any access on the backend - the docs site uses this to hide client vaulting

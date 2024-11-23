@@ -10,6 +10,8 @@ pub enum ErrorWithCode {
     InvalidStatusTransition,
     #[error("Incorrect PIN code")]
     IncorrectPin,
+    #[error("Contact info is not yet verified")]
+    ContactInfoNotYetVerified,
     #[error("Challenge has timed out. Please try again")]
     ChallengeExpired,
     #[error("Please wait a few more seconds")]
@@ -57,6 +59,7 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
         match self {
             Self::InvalidStatusTransition => StatusCode::BAD_REQUEST,
             Self::IncorrectPin => StatusCode::BAD_REQUEST,
+            Self::ContactInfoNotYetVerified => StatusCode::PRECONDITION_FAILED,
             Self::ChallengeExpired => StatusCode::BAD_REQUEST,
             Self::RateLimited(_) => StatusCode::TOO_MANY_REQUESTS,
             Self::UnsupportedChallengeKind(_) => StatusCode::BAD_REQUEST,
@@ -84,6 +87,7 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
         let code = match self {
             Self::InvalidStatusTransition => FpErrorCode::InvalidStatusTransition,
             Self::IncorrectPin => FpErrorCode::IncorrectPin,
+            Self::ContactInfoNotYetVerified => FpErrorCode::ContactInfoNotYetVerified,
             Self::ChallengeExpired => FpErrorCode::ChallengeExpired,
             Self::RateLimited(_) => FpErrorCode::RateLimited,
             Self::UnsupportedChallengeKind(_) => FpErrorCode::UnsupportedChallengeKind,

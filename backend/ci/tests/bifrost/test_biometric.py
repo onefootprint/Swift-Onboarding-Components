@@ -128,7 +128,7 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
         SandboxId(sandbox_id),
     )
     assert body["user"]
-    assert set(body["user"]["available_challenge_kinds"]) == {"sms", "biometric"}
+    assert set(body["user"]["available_challenge_kinds"]) >= {"sms", "biometric"}
 
     # Inherit the user via biometric
     auth_token = IdentifyClient.from_user(sandbox_user).login(kind="biometric")

@@ -1,6 +1,5 @@
 use crate::ChallengeData;
 use crate::ChallengeState;
-use crate::PhoneEmailChallengeState;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -25,6 +24,7 @@ use api_core::FpResult;
 use api_errors::BadRequest;
 use api_errors::FpDbOptionalExtension;
 use api_errors::ServerErr;
+use api_errors::ServerErrInto;
 use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
@@ -39,6 +39,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::ActionKind;
+use newtypes::AuthEventId;
 use newtypes::AuthEventKind;
 use newtypes::BoId;
 use newtypes::ContactInfoKind;
@@ -48,6 +49,7 @@ use newtypes::DataRequest;
 use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKind;
+use newtypes::PiiString;
 use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -84,8 +86,6 @@ pub async fn post(
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
-    let event_kind = AuthEventKind::from(&challenge_state.data);
-
     // Validate the playbook is consistent with the requested IdentifyScope
     let obc = user_auth.obc.as_ref();
     match scope {
@@ -104,20 +104,33 @@ pub async fn post(
     }
 
     // Verify the challenge response
-    let verified_credential = match challenge_state.data {
+    let (verified_credential, ae_result) = match challenge_state.data {
         ChallengeData::Sms(s) => {
             s.verify_response(&c_response)?;
-            on_otp_verify(&state, &user_auth, s, ContactInfoKind::Phone).await?
+            use ContactInfoKind::Phone;
+            let cred =
+                on_contact_info_verify(&state, &user_auth, s.contact_info, s.lifetime_id, Phone).await?;
+            (cred, AuthEventResult::Create(AuthEventKind::Sms))
+        }
+        ChallengeData::SmsLink(s) => {
+            let ae_id = s.verify_response(&state).await?;
+            use ContactInfoKind::Phone;
+            let cred = on_contact_info_verify(&state, &user_auth, s.e164, s.lifetime_id, Phone).await?;
+            (cred, AuthEventResult::Existing(ae_id))
         }
         ChallengeData::Email(s) => {
             s.verify_response(&c_response)?;
-            on_otp_verify(&state, &user_auth, s, ContactInfoKind::Email).await?
+            use ContactInfoKind::Email;
+            let cred =
+                on_contact_info_verify(&state, &user_auth, s.contact_info, s.lifetime_id, Email).await?;
+            (cred, AuthEventResult::Create(AuthEventKind::Email))
         }
         ChallengeData::Passkey(s) => {
             let webauthn = WebauthnConfig::new(&state.config);
             let c_resp = serde_json::from_str(&c_response)?;
             let result = webauthn.webauthn().authenticate_credential(&c_resp, &s.state)?;
-            VerifiedCredential::Passkey(result)
+            let cred = VerifiedCredential::Passkey(result);
+            (cred, AuthEventResult::Create(AuthEventKind::Passkey))
         }
     };
 
@@ -152,7 +165,7 @@ pub async fn post(
 
             // Apply auth-method-specific updates
             let (passkey_cred_id, added_auth_method) = match verified_credential {
-                VerifiedCredential::Otp(verified_data, ci_dl_id, ci_kind) => {
+                VerifiedCredential::ContactInfo(verified_data, ci_dl_id, ci_kind) => {
                     let added_auth_methods = if let Some((su, data)) = su.as_ref().zip(verified_data) {
                         // For bifrost logins that already have a SV (created in the signup challenge or via
                         // API) we can mark the contact info as OTP verified
@@ -204,19 +217,32 @@ pub async fn post(
                 }
             };
 
-            // Record the new auth event
-            let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
-            let ae_args = NewAuthEventArgs {
-                vault_id: uv_id.clone(),
-                scoped_vault_id: su.as_ref().map(|su| su.id.clone()),
-                insight_event_id: Some(insight.id),
-                kind: event_kind,
-                webauthn_credential_id: passkey_cred_id,
-                created_at: Utc::now(),
-                scope,
-                new_auth_method_action: added_auth_method.then_some(ActionKind::AddPrimary),
+            let event = match ae_result {
+                AuthEventResult::Create(kind) => {
+                    // Record the new auth event
+                    let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
+                    let ae_args = NewAuthEventArgs {
+                        vault_id: uv_id.clone(),
+                        scoped_vault_id: su.as_ref().map(|su| su.id.clone()),
+                        insight_event_id: Some(insight.id),
+                        kind,
+                        webauthn_credential_id: passkey_cred_id,
+                        created_at: Utc::now(),
+                        scope,
+                        new_auth_method_action: added_auth_method.then_some(ActionKind::AddPrimary),
+                    };
+                    AuthEvent::save(ae_args, conn)?
+                }
+                AuthEventResult::Existing(id) => {
+                    // The auth event was already created - only used for SmsLink challenges
+                    let ae = AuthEvent::get(conn, &id)?;
+                    let ae_sv_id = ae.scoped_vault_id.as_ref();
+                    if ae_sv_id.is_none() || ae_sv_id != su.as_ref().map(|su| &su.id) {
+                        return ServerErrInto("Auth event does not correspond to the correct user");
+                    }
+                    ae
+                }
             };
-            let event = AuthEvent::save(ae_args, conn)?;
 
             // Token-specific handling
             let su_id = match scope {
@@ -321,15 +347,16 @@ fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId)
     Ok(())
 }
 
-async fn on_otp_verify(
+async fn on_contact_info_verify(
     state: &State,
     user_auth: &CheckedUserAuthContext,
-    s: PhoneEmailChallengeState,
+    contact_info: PiiString,
+    lifetime_id: DataLifetimeId,
     cik: ContactInfoKind,
 ) -> FpResult<VerifiedCredential> {
     let data = if let Some(obc) = user_auth.obc.as_ref() {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
-        let data = HashMap::from_iter([(cik.verified_di(), s.contact_info)]);
+        let data = HashMap::from_iter([(cik.verified_di(), contact_info)]);
         // The vault should already have `id.phone_number` or `id.email`, let's not derive it here.
         let data = DataRequest::clean_and_validate_str(data, args)?
             .filter(|di| !matches!(di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)));
@@ -338,10 +365,15 @@ async fn on_otp_verify(
     } else {
         None
     };
-    Ok(VerifiedCredential::Otp(data, s.lifetime_id, cik))
+    Ok(VerifiedCredential::ContactInfo(data, lifetime_id, cik))
 }
 
 enum VerifiedCredential {
-    Otp(Option<FingerprintedDataRequest>, DataLifetimeId, ContactInfoKind),
+    ContactInfo(Option<FingerprintedDataRequest>, DataLifetimeId, ContactInfoKind),
     Passkey(WebauthnAuthenticationResult),
+}
+
+enum AuthEventResult {
+    Existing(AuthEventId),
+    Create(AuthEventKind),
 }

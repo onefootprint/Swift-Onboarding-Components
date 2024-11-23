@@ -13,11 +13,13 @@ use serde::Serialize;
     serde::Serialize,
     serde::Deserialize,
     strum_macros::Display,
+    strum_macros::EnumIter,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum ChallengeKind {
     Sms,
+    SmsLink,
     #[strum(serialize = "biometric")]
     #[serde(rename = "biometric")]
     #[serde(alias = "passkey")]

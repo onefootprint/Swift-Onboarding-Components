@@ -1,12 +1,15 @@
 #![recursion_limit = "256"]
 
 use api_core::auth::ob_config::ObConfigAuth;
+use api_core::auth::session::user::ContactInfoVerifySessionData;
+use api_core::auth::session::AuthSessionData;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserIdentifier;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::telemetry::RootSpan;
 use api_core::utils::identify::get_user_auth_methods;
 use api_core::utils::identify::UserAuthMethodsContext;
+use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::FpDbOptionalExtension;
@@ -17,11 +20,12 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
 use newtypes::output::Csv;
-use newtypes::AuthEventKind;
+use newtypes::AuthEventId;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::PiiString;
 use newtypes::SandboxId;
+use newtypes::SessionAuthToken;
 use paperclip::actix::web;
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::AuthenticationState;
@@ -61,6 +65,32 @@ pub enum ChallengeData {
     #[serde(alias = "Biometric")] // TODO: drop this alias after challenges expire
     Passkey(BiometricChallengeState),
     Email(PhoneEmailChallengeState),
+    SmsLink(SmsLinkChallengeState),
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SmsLinkChallengeState {
+    pub e164: PiiString,
+    pub lifetime_id: DataLifetimeId,
+    pub token: SessionAuthToken,
+}
+
+impl SmsLinkChallengeState {
+    pub async fn verify_response(&self, state: &State) -> FpResult<AuthEventId> {
+        let token = self.token.clone();
+        let sealing_key = state.session_sealing_key.clone();
+        let session = state
+            .db_query(move |conn| AuthSession::get(conn, &sealing_key, &token))
+            .await?;
+        let AuthSessionData::ContactInfoVerify(ContactInfoVerifySessionData {
+            auth_event_id: Some(auth_event_id),
+            ..
+        }) = session.data
+        else {
+            return Err(ErrorWithCode::ContactInfoNotYetVerified.into());
+        };
+        Ok(auth_event_id)
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -83,16 +113,6 @@ impl PhoneEmailChallengeState {
             return Err(ErrorWithCode::IncorrectPin.into());
         };
         Ok(())
-    }
-}
-
-impl<'a> From<&'a ChallengeData> for AuthEventKind {
-    fn from(value: &'a ChallengeData) -> Self {
-        match value {
-            ChallengeData::Email(_) => AuthEventKind::Email,
-            ChallengeData::Sms(_) => AuthEventKind::Sms,
-            ChallengeData::Passkey(_) => AuthEventKind::Passkey,
-        }
     }
 }
 

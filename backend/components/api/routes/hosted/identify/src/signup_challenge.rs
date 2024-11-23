@@ -1,5 +1,6 @@
 use crate::identify::create_identified_token;
 use crate::utils::initiate_challenge;
+use crate::utils::InitiateChallengeArgs;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::State;
@@ -8,6 +9,7 @@ use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
+use api_core::utils::headers::InsightHeaders;
 use api_core::utils::headers::IsComponentsSdk;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::identify::get_user_auth_methods;
@@ -37,6 +39,7 @@ use paperclip::actix::{
     self,
 };
 
+
 #[api_v2_operation(
     tags(Identify, Hosted),
     description = "Sends a challenge to a phone number or email and returns an HTTP 200. When the \
@@ -50,6 +53,7 @@ pub async fn post(
     // When provided, creates a sandbox user with the given suffix
     sandbox_id: SandboxId,
     is_components_sdk: IsComponentsSdk,
+    insight_headers: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<IdentifyChallengeResponse> {
     let SignupChallengeRequest {
@@ -103,7 +107,7 @@ pub async fn post(
         if !can_initiate_signup_challenge {
             // There's already a duplicate vault. Create the auth token that allows sending a
             // login challenge
-            let (token, _) =
+            let (token, _, _) =
                 create_identified_token(&state, vw.vault.id.clone(), scope, sv, Some(ob_context.clone()))
                     .await?;
             return Err(ErrorWithCode::ExistingVault(token).into());
@@ -127,18 +131,17 @@ pub async fn post(
         })
         .await?;
     let ctx = get_user_auth_methods(&state, sv.id.clone().into(), None).await?;
-    let (token, _) =
+    let (token, session, _) =
         create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
-
-    let Some(auth_method) = ctx
-        .auth_methods
-        .into_iter()
-        .find(|am| ChallengeKind::from(am.kind()) == challenge_kind)
-    else {
-        return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
-    };
     let tenant = Some(ob_context.tenant());
-    let response = initiate_challenge(&state, auth_method, ctx.vw.vault, tenant, token).await?;
+    let args = InitiateChallengeArgs {
+        challenge_kind,
+        tenant,
+        token,
+        session,
+        insight_headers,
+    };
+    let response = initiate_challenge(&state, ctx, args).await?;
     // Since these errors return an HTTP 200, log something special on the root span if there's an error
     match response.error {
         Some(_) => root_span.record("meta", "error"),
