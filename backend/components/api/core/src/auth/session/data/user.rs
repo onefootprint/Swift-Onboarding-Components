@@ -11,6 +11,7 @@ use newtypes::ContactInfoId;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::IdentifyScope;
+use newtypes::InsightEventId;
 use newtypes::ObConfigurationId;
 use newtypes::RequestedTokenScope;
 use newtypes::ScopedVaultId;
@@ -353,4 +354,6 @@ pub struct EmailVerifySession {
 pub struct ContactInfoVerifySessionData {
     pub user_token: SessionAuthToken,
     pub auth_event_id: Option<AuthEventId>,
+    /// The insight event created by the desktop session that sent the sms link
+    pub insight_event_id: InsightEventId,
 }

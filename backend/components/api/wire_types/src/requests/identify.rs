@@ -136,3 +136,11 @@ pub struct IdentifyVerifyRequest {
 pub struct IdentifyVerifyResponse {
     pub auth_token: SessionAuthToken,
 }
+
+#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
+pub struct GetVerifyContactInfoResponse {
+    /// The insight event from the machine that initiated the contact info verify session
+    pub origin_insight_event: InsightEvent,
+    pub tenant_name: String,
+    pub is_verified: bool,
+}

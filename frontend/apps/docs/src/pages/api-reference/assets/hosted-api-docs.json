@@ -749,6 +749,30 @@
             }
         },
         "/hosted/identify/verify_contact_info": {
+            "get": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Get context on a verify contact info session.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetVerifyContactInfoResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Async contact info verification token": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Identify",
@@ -3792,6 +3816,33 @@
                     "scopes"
                 ]
             },
+            "GetVerifyContactInfoResponse": {
+                "type": "object",
+                "properties": {
+                    "is_verified": {
+                        "type": "boolean"
+                    },
+                    "origin_insight_event": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/InsightEvent"
+                            },
+                            {
+                                "description": "The insight event from the machine that initiated the contact info verify session",
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "tenant_name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "is_verified",
+                    "origin_insight_event",
+                    "tenant_name"
+                ]
+            },
             "HandoffMetadata": {
                 "description": "Embeds extra information in the d2p token to pass from the desktop to handoff session.\n NOTE: changes to this struct should be backwards-compatible since we may use this struct\n to deserialize old versions",
                 "type": "object",
@@ -4169,7 +4220,6 @@
                     }
                 },
                 "required": [
-                    "challenge_response",
                     "challenge_token",
                     "scope"
                 ]
@@ -4183,6 +4233,56 @@
                 },
                 "required": [
                     "auth_token"
+                ]
+            },
+            "InsightEvent": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "ip_address": {
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "metro_code": {
+                        "type": "string"
+                    },
+                    "postal_code": {
+                        "type": "string"
+                    },
+                    "region": {
+                        "type": "string"
+                    },
+                    "region_name": {
+                        "type": "string"
+                    },
+                    "session_id": {
+                        "type": "string"
+                    },
+                    "time_zone": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "user_agent": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "timestamp"
                 ]
             },
             "InvestorProfileDeclaration": {

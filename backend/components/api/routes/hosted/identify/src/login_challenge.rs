@@ -61,7 +61,6 @@ pub async fn post(
     };
     let response = initiate_challenge(&state, ctx, args).await?;
 
-
     // Since these errors return an HTTP 200, log something special on the root span if there's an error
     match response.error {
         Some(_) => root_span.record("meta", "error"),

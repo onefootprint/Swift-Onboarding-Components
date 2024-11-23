@@ -4,13 +4,17 @@ use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::ContactInfoVerifyAuth;
 use api_core::types::ApiResponse;
+use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
+use api_errors::ServerErr;
 use api_errors::UnauthorizedInto;
 use api_wire_types::Empty;
+use api_wire_types::GetVerifyContactInfoResponse;
 use chrono::Utc;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::insight_event::InsightEvent;
 use newtypes::ActionKind;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
@@ -66,4 +70,27 @@ pub async fn post(
         })
         .await?;
     Ok(Empty)
+}
+
+
+#[api_v2_operation(
+    tags(Identify, Hosted),
+    description = "Get context on a verify contact info session."
+)]
+#[actix::get("/hosted/identify/verify_contact_info")]
+pub async fn get(
+    state: web::Data<State>,
+    auth: ContactInfoVerifyAuth,
+) -> ApiResponse<GetVerifyContactInfoResponse> {
+    let insight_event_id = auth.data.data.insight_event_id.clone();
+    let insight_event = state
+        .db_query(move |conn| InsightEvent::get(conn, &insight_event_id))
+        .await?;
+    let tenant = (auth.data.tenant.as_ref()).ok_or(ServerErr("No tenant found"))?;
+    let response = GetVerifyContactInfoResponse {
+        origin_insight_event: api_wire_types::InsightEvent::from_db(insight_event),
+        tenant_name: tenant.name.clone(),
+        is_verified: auth.data.data.auth_event_id.is_some(),
+    };
+    Ok(response)
 }

@@ -22,6 +22,7 @@ use api_errors::BadRequest;
 use api_errors::BadRequestInto;
 use api_wire_types::IdentifyChallengeResponse;
 use api_wire_types::UserChallengeData;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::passkey::Passkey;
 use db::models::tenant::Tenant;
 use itertools::Itertools;
@@ -79,23 +80,30 @@ pub(crate) async fn initiate_challenge<'a>(
                 return BadRequestInto("Organization not approved to initiate SMS link challenges");
             }
             let e164 = phone.e164();
-            let session_id = insight_headers.session_id;
+            let session_id = insight_headers.session_id.clone();
             let session_key = state.session_sealing_key.clone();
-            let session_data = ContactInfoVerifySessionData {
-                user_token: token.clone(),
-                auth_event_id: None,
-            };
-            let (token, _) = state
-                .db_query(move |conn| session.create_derived(conn, &session_key, session_data.into(), None))
+            let user_token = token.clone();
+            let ci_token = state
+                .db_query(move |conn| {
+                    let insight_event = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
+                    let session_data = ContactInfoVerifySessionData {
+                        user_token,
+                        auth_event_id: None,
+                        insight_event_id: insight_event.id,
+                    };
+                    let (ci_token, _) =
+                        session.create_derived(conn, &session_key, session_data.into(), None)?;
+                    Ok(ci_token)
+                })
                 .await?;
-            let url = (state.config.service_config).generate_link(LinkKind::ContactInfoVerify, &token);
+            let url = (state.config.service_config).generate_link(LinkKind::ContactInfoVerify, &ci_token);
             let v_id = Some(vault.id);
             let rx = send_sms_link_challenge_non_blocking(state, t, phone, sandbox_id, v_id, session_id, url)
                 .await?;
             let data = SmsLinkChallengeState {
                 e164,
                 lifetime_id,
-                token,
+                token: ci_token,
             };
             let challenge_data = ChallengeData::SmsLink(data);
             let time_before_retry = state.config.time_s_between_challenges;

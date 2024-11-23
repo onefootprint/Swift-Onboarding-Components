@@ -50,6 +50,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(kba::post)
         .service(verify::post)
         .service(contact_info_verify::post)
+        .service(contact_info_verify::get)
         .service(validation_token::post);
 }
 

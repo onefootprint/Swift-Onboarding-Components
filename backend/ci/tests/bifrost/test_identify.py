@@ -657,9 +657,15 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
         twilio, live_phone_number, sandbox_tenant, session_id_h.value
     )
 
+    # Get context on the verify_contact_info session
+    body = get("hosted/identify/verify_contact_info", None, ci_token)
+    assert body["tenant_name"] == sandbox_tenant.name
+    assert not body["is_verified"]
+
     # Click the link to verify the piece of contact info
     post("hosted/identify/verify_contact_info", None, ci_token)
-    # Repeat request should no-op
+    body = get("hosted/identify/verify_contact_info", None, ci_token)
+    assert body["is_verified"]
     post("hosted/identify/verify_contact_info", None, ci_token)
 
     # Now we should be able to verify
@@ -690,6 +696,10 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     (_, ci_token) = extract_sms_link_token(
         twilio, live_phone_number, sandbox_tenant, session_id_h.value
     )
+
+    # Get context on the verify_contact_info session
+    body = get("hosted/identify/verify_contact_info", None, ci_token)
+    assert not body["is_verified"]
 
     # Click the link to verify the piece of contact info
     post("hosted/identify/verify_contact_info", None, ci_token)
