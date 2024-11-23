@@ -37,6 +37,7 @@ def test_dupes(sandbox_tenant):
         email=dict(value=email),
         phone_number=dict(value=FIXTURE_PHONE_NUMBER),
         scope="onboarding",
+        challenge_kind="sms",
     )
     obc = sandbox_tenant.default_ob_config
     sandbox_id = _gen_random_sandbox_id()

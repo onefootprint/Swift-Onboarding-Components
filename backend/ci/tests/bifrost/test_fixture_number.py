@@ -92,12 +92,14 @@ def test_one_click_same_tenant_no_decryption_bleeding(
 )
 def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc):
     if "phone_number" in identifier:
+        challenge_kind = "sms"
         sandbox_obc = sandbox_tenant.default_ob_config
     if "email" in identifier:
         sandbox_obc = skip_phone_obc
+        challenge_kind = "email"
     # Should work with sandbox id
     sandbox_id = _gen_random_sandbox_id()
-    data = dict(**identifier, scope="onboarding")
+    data = dict(**identifier, scope="onboarding", challenge_kind=challenge_kind)
     post(
         "hosted/identify/signup_challenge", data, sandbox_obc.key, SandboxId(sandbox_id)
     )

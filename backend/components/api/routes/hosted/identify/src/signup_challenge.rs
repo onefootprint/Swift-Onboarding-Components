@@ -26,7 +26,6 @@ use api_wire_types::SignupChallengeRequest;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::email::Email;
-use newtypes::ChallengeKind;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::IdentityDataKind as IDK;
@@ -63,15 +62,6 @@ pub async fn post(
         challenge_kind,
     } = request.into_inner();
     let sandbox_id = sandbox_id.0;
-    // TODO remove fallback value
-    tracing::info!(has_challenge_kind=%challenge_kind.is_some(), "Challenge kind provided");
-    let challenge_kind = challenge_kind.unwrap_or_else(|| {
-        if ob_context.ob_config().is_no_phone_flow {
-            ChallengeKind::Email
-        } else {
-            ChallengeKind::Sms
-        }
-    });
 
     let is_fixture = phone.as_ref().is_some_and(|p| p.value.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.value.is_fixture());

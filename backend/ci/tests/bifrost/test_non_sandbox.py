@@ -87,6 +87,7 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
             phone_number=dict(value=live_phone_number),
             email=dict(value=EMAIL),
             scope="onboarding",
+            challenge_kind="sms",
         )
         body = post(
             "hosted/identify/signup_challenge", data, tenant.default_ob_config.key
