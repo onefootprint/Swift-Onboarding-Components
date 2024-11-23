@@ -639,9 +639,11 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
     session_id_h = SessionId(str(uuid4()))
-    body = post(
+    initiate_challenge = lambda: post(
         "hosted/identify/signup_challenge", data, obc.key, sandbox_id_h, session_id_h
     )
+    # Rate limiting may take a while
+    body = try_until_success(initiate_challenge, 20)
     token = FpAuth(body["challenge_data"]["token"])
 
     # Should not be able to verify yet since the link hasn't been clicked
@@ -691,7 +693,9 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
 
     data = dict(preferred_challenge_kind="sms_link", scope="onboarding")
     session_id_h = SessionId(str(uuid4()))
-    body = post("hosted/identify/login_challenge", data, token, session_id_h)
+    initiate_challenge = lambda: post("hosted/identify/login_challenge", data, token, session_id_h)
+    # Rate limiting may take a while
+    body = try_until_success(initiate_challenge, 20)
 
     (_, ci_token) = extract_sms_link_token(
         twilio, live_phone_number, sandbox_tenant, session_id_h.value
