@@ -136,11 +136,11 @@ where
             let (session, parsed_session_data, auth_token) = state
                 .db_query(move |conn| {
                     let session = AuthSession::get(conn, &ctx.sealing_key, &auth_token)?;
-                    let parsed_session_data = T::try_load_session(conn, session.data.clone(), ctx)?;
+                    let parsed_session_data = T::try_load_session(conn, session.data.clone(), ctx)
+                        .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers.join(" or "), e))?;
                     Ok((session, parsed_session_data, auth_token))
                 })
-                .await
-                .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers.join(" or "), e))?;
+                .await?;
 
             parsed_session_data.log_authed_principal(root_span);
 
