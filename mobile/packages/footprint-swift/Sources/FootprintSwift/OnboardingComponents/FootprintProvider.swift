@@ -32,7 +32,7 @@ public final class FootprintProvider {
     private init() {
         self.client = OpenAPIClient(
             basePath: FootprintSdkMetadata.apiBaseUrl
-        )        
+        )
     }
     
     private func resetInternalState() {
@@ -454,6 +454,48 @@ public final class FootprintProvider {
         
         guard let authToken = self.verifiedAuthToken else {
             throw FootprintError(kind: .authError, message: "Missing authentication token")
+        }
+        
+        let requirements = try await self.queries.getOnboardingStatus(authToken: authToken)
+        func handleUnmetRequirement() throws {
+            throw FootprintError(kind: .inlineProcessNotSupported, message: "Requirements not met. Please complete all the other requirements before process or call handoff")
+        }
+        
+        for requirement in requirements.requirements.all {
+            switch requirement {
+            case .typeAuthorizeRequirement(let authorizeReq):
+                if !authorizeReq.isMet {
+                    try handleUnmetRequirement()
+                }
+                
+            case .typeCollectDataRequirement(let dataReq):
+                if !dataReq.isMet {
+                    try handleUnmetRequirement()
+                }
+                
+            case .typeCollectInvestorProfileRequirement(let investorReq):
+                if !investorReq.isMet {
+                    try handleUnmetRequirement()
+                }
+                
+            case .typeDocumentRequirement(let docReq):
+                if !docReq.isMet {
+                    try handleUnmetRequirement()
+                }
+                
+            case .typeRegisterAuthMethodRequirement(let authMethodReq):
+                if !authMethodReq.isMet {
+                    try handleUnmetRequirement()
+                }
+                
+            case .typeRegisterPasskeyRequirement(let passkeyReq):
+                if !passkeyReq.isMet {
+                    try handleUnmetRequirement()
+                }
+                
+            case .typeProcessRequirement:
+                continue
+            }
         }
         
         try await self.queries.process(authToken: authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)
