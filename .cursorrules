@@ -153,7 +153,7 @@ In order to migrate Box components to Tailwind, follow these guidelines:
 - alignContent="center" -> content-center
 - flexWrap="wrap" -> flex-wrap
 - flexDirection="column" -> flex-col
-- gap={4} -> gap-4
+- gap={4} -> gap-3
 - width="100%" -> w-full
 - height="100%" -> h-full
 
@@ -166,6 +166,48 @@ The Stack component is a specialized Box with flex display. Convert it as follow
 
 #### Text Component:
 The Text component maps directly to HTML elements with Tailwind classes:
+- <Text variant="body-1" color="secondary"> -> <p className="text-body-1 text-secondary">
+
+
+#### Use cx to add conditional styles:
+
+```typescript
+import { cx } from 'class-variance-authority';
+
+const className = cx('text-label-3 truncate group-hover:text-accent', {
+  'text-accent': selected.id === playbook.id,
+  'text-primary': selected.id !== playbook.id,
+});
+```
+
+### Use cva to create component variants:
+
+```typescript
+import { type VariantProps, cva } from 'class-variance-authority';
+import type { HTMLAttributes } from 'react';
+
+export type BadgeProps = HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badge>;
+
+const Badge = ({ children, className, variant, ...props }: BadgeProps) => {
+  return (
+    <span className={badge({ variant, className })} {...props}>
+      {children}
+    </span>
+  );
+};
+
+const badge = cva(['inline-flex items-center justify-center', 'text-caption-1', 'rounded-lg', 'px-2 py-1'], {
+  variants: {
+    variant: {
+      accent: ['text-accent', 'bg-accent'],
+      error: ['text-error', 'bg-error'],
+      info: ['text-info', 'bg-info'],
+  },
+  defaultVariants: {
+    variant: 'neutral',
+  },
+});
+```
 
 ## Tests
 
