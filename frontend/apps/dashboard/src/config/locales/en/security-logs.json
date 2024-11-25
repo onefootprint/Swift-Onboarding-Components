@@ -90,7 +90,9 @@
         "bank.*.account_type": "Account type",
         "bank.*.fingerprint": "Bank account fingerprint"
       },
-      "an-api-key": "an API key"
+      "an-api-key": "an API key",
+      "enabled": "enabled",
+      "disabled": "disabled"
     },
     "invite": {
       "invited": "invited",

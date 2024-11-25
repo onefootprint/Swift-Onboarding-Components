@@ -8,7 +8,8 @@ import DecryptOrgApiKey from './components/decrypt-org-api-key';
 import InviteOrgMember from './components/invite-org-member';
 import PrincipalActor from './components/principal-actor';
 import RemoveOrgMember from './components/remove-org-member';
-import UpdateOrgApiKey from './components/update-org-api-key';
+import UpdateOrgApiKeyRole from './components/update-org-api-key-role';
+import UpdateOrgApiKeyStatus from './components/update-org-api-key-status';
 import UpdateOrgMember from './components/update-org-member';
 import UpdateOrgRole from './components/update-org-role';
 import UserData from './components/user-data';
@@ -46,10 +47,13 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
         <CreateOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
       {kind === 'update_org_api_key_role' && (
-        <UpdateOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+        <UpdateOrgApiKeyRole detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
       {kind === 'decrypt_org_api_key' && (
         <DecryptOrgApiKey detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
+      )}
+      {kind === 'update_org_api_key_status' && (
+        <UpdateOrgApiKeyStatus detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
     </Stack>
   );

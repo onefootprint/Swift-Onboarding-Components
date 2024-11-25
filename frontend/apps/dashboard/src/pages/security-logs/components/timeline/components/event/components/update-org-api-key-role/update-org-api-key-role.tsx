@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import ApiKeyDisplay from '../api-key-display';
 import RoleDisplay from '../role-display';
 
-type UpdateOrgApiKeyProps = { detail: AuditEventDetail; hasPrincipalActor: boolean };
+type UpdateOrgApiKeyRoleProps = { detail: AuditEventDetail; hasPrincipalActor: boolean };
 
-const UpdateOrgApiKey = ({ detail, hasPrincipalActor }: UpdateOrgApiKeyProps) => {
+const UpdateOrgApiKeyRole = ({ detail, hasPrincipalActor }: UpdateOrgApiKeyRoleProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.update' });
   if (detail.kind !== 'update_org_api_key_role') {
     return null;
@@ -31,4 +31,4 @@ const UpdateOrgApiKey = ({ detail, hasPrincipalActor }: UpdateOrgApiKeyProps) =>
   );
 };
 
-export default UpdateOrgApiKey;
+export default UpdateOrgApiKeyRole;
