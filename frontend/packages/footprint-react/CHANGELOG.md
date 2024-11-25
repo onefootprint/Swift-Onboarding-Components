@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.8.4
+
+### Patch Changes
+
+- e42334d24d: Check requirements before making process call
+
 ## 7.8.3
 
 ### Patch Changes
