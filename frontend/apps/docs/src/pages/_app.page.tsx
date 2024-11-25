@@ -1,7 +1,9 @@
+import '@onefootprint/ui/styles.css';
 import { media } from '@onefootprint/ui';
 import type { AppProps } from 'next/app';
 import { DM_Mono, DM_Sans } from 'next/font/google';
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Providers from '../components/providers';
@@ -24,6 +26,11 @@ const codeFont = DM_Mono({
 });
 
 const App = ({ Component, pageProps }: AppProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
   return (
     <>
       <Head>

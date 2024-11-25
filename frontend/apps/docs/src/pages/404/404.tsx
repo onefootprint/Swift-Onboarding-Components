@@ -11,7 +11,7 @@ const Page404 = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.404' });
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
   const redirectUrl = isApiReference ? `${API_REFERENCE_PATH}` : '/';
-  console.log('redirectUrl', redirectUrl);
+
   return (
     <>
       <SEO title={t('title')} />
