@@ -75,11 +75,6 @@ config:
     grafana:
       prometheusPushAuth:
         secure: v1:VdwOY1dTgkXEMk4W:i3PexS68jj8BwxdeHPPugmMQdl6ygvRTfBXb3K60uQwpJnuMy3N1HEERTa3t0tM2PBSJZbhCobPfOq2LtQG7ALfSKn32zpU75nujiT5KViRm7ZJWNHmaJ0kl15WZj/gRr/tvLsupnW8U/E3hAfkQoqN/IknVqW3qjeQdlL3oP88QHce1PBbAQM+oepcJlLFNrrVgaHdEqwsZJn/4
-    honeycomb:
-      apiKey:
-        secure: v1:x0zSJWGjGXy5N/8r:UfFqMqKMf6sCO9LLkl4d82oBxGYOdzRJYUailion7a5TaEqVueY=
-      ephemeralApiKey:
-        secure: v1:g2e85wuR8QP1jgJM:oHubF10POp7QIEIafYM6QOY+AwtvmMMAzKSByhVagmx40+kpUKE=
     idology:
       fractionalPassword:
         secure: v1:mp8/g1ishUpV++0P:cwGLEnx/X7/iwJALfSGlf8w=
@@ -223,9 +218,6 @@ config:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
   infra:datadogApiKey:
     secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
-  infra:honeycomb:
-    apiKey:
-      secure: v1:OvsQ2EQpwZgDtXX2:gnCIfaNIoMI6yGAeDyc0qBFzp9f3WgptY1RBtOtR9mZBEAsf2bo=
   infra:neon:
     apiKey:
       secure: v1:DTxrP6ue5m+XRElP:F0NmXy8+hG3p2oIqjwBxQReI8O5HHWNRMMYWm2gaSyacA6PMAEes/wjY6fuXfXximCNjjKsBsfw4YJr2BbSAf2/p82rljaWgCTMFHUd1z58=

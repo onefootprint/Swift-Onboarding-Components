@@ -26,7 +26,6 @@ import * as nitroService from './nitro_service';
 import * as dns from './dns';
 import * as assets from './asset_cdn';
 import { DatabaseOutput } from './db';
-import { ConfigureAlerts } from './alerts';
 import * as datadog from './datadog';
 import * as ecrSetup from './ecr';
 /**
@@ -161,8 +160,6 @@ export default async function main() {
   ecrSetup.Setup();
 
   const service = await createCoreService(globalState);
-
-  ConfigureAlerts(globalState, stackMetadata);
 
   if (stackMetadata.environment !== StackEnvironment.DevEphemeral) {
     // We want one of these per account, so skip for ephemeral.

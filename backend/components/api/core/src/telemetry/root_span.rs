@@ -35,13 +35,11 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         // fp_session_id is used in telemetry to avoid conflicting with session_id, which is reserved for
         // Datadog RUM.
         let fp_session_id = session_id.map(|s| format!("{}", s));
-        // Continue emitting session_id to support Honeycomb workflows.
-        let session_id = fp_session_id.clone();
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
-        // Put on the root_span the properties that are must useful to query by/view in aggregate in
-        // honeycomb. We have almost every other attribute logged as an event, rather than as an
+        // Put on the root_span the properties that are most useful to query by/view in aggregate.
+        // We have almost every other attribute logged as an event, rather than as an
         // attribute on the span. Note: It seems we can only provide a fixed number of args to the
         // root_span - you may have to remove some if you add more.
         // If we can increase the number of attributes on the span, maybe we can put everything here
@@ -57,7 +55,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             meta = tracing::field::Empty,
             client_version,
             fp_session_id,
-            session_id,
             git.commit.sha=%server_git_hash,
             git.repository_url="github.com/onefootprint/monorepo",
             // TODO: can we remove this now?

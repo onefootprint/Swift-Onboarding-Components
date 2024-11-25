@@ -28,8 +28,6 @@ processors:
     limit_percentage: 33
     spike_limit_percentage: 20
 
-  batch/honeycomb:
-
   batch/traces:
 
   batch/metrics:
@@ -50,33 +48,7 @@ processors:
           - ecs.task.storage.write_bytes
           - container.duration
 
-  attributes/remove_honeycomb_service_name:
-    # In Honeycomb, we use fpc-api as the service name even for workers and crons.
-    # In Datadog, we want to use the actual service name.
-    actions:
-      - key: service.name
-        action: upsert
-        value: "${DD_SERVICE}"
-
 exporters:
-  otlp/honeycomb:
-    endpoint: "api.honeycomb.io:443"
-    headers:
-      "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
-      "x-honeycomb-dataset": "fpc-otel"
-
-  otlp/honeycombprom:
-    endpoint: "api.honeycomb.io:443"
-    headers:
-      "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
-      "x-honeycomb-dataset": "fpc-prometheus"
-
-  otlp/honeycombaws:
-    endpoint: "api.honeycomb.io:443"
-    headers:
-      "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
-      "x-honeycomb-dataset": "fpc-aws-otel"
-
   otlp/datadog:
     # Exporting to the Datdog agent's OTLP receiver. This makes it easier to
     # switch to the Datadog agent directly.
@@ -87,37 +59,17 @@ exporters:
 
 service:
   pipelines:
-    metrics/application:
-      receivers: [otlp, prometheus]
-      processors: [memory_limiter]
-      exporters: [otlp/honeycombprom]
-    metrics/performance:
-      receivers: [awsecscontainermetrics]
-      processors: [memory_limiter, filter]
-      exporters: [otlp/honeycombaws]
-    traces/honeycomb:
-      receivers: [otlp]
-      processors: [memory_limiter, batch/honeycomb]
-      exporters: [otlp/honeycomb]
-    logs/honeycomb:
-      receivers: [otlp]
-      processors: [memory_limiter, batch/honeycomb]
-      exporters: [otlp/honeycomb]
-    metrics/honeycomb:
-      receivers: [otlp]
-      processors: [memory_limiter, batch/honeycomb]
-      exporters: [otlp/honeycomb]
     traces/datadog:
       receivers: [otlp]
-      processors: [memory_limiter, attributes/remove_honeycomb_service_name]
+      processors: [memory_limiter]
       exporters: [otlp/datadog]
     logs/datadog:
       receivers: [otlp]
-      processors: [memory_limiter, attributes/remove_honeycomb_service_name]
+      processors: [memory_limiter]
       exporters: [otlp/datadog]
     metrics/datadog:
       receivers: [otlp]
-      processors: [memory_limiter, attributes/remove_honeycomb_service_name]
+      processors: [memory_limiter]
       exporters: [otlp/datadog]
 
   extensions: [health_check]

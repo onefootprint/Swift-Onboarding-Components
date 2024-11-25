@@ -586,12 +586,7 @@ export abstract class ServiceContainers {
               {
                 name: 'OTEL_RESOURCE_ATTRIBUTES',
                 value: [
-                  // Using fpc-api as the service name for crons and workers
-                  // too so they are grouped under the same Honeycomb dataset.
-                  //
-                  // During the trial period, the Datadog service name is
-                  // overwritten by the otel.yml config.
-                  `service.name=fpc-api`,
+                  `service.name=${datadogTags.get('service') || 'unknown'}`,
                   `service.version=${constants.containers.apiVersion}`,
                   `deployment.environment=${pulumi.getStack()}`,
                   ...Array.from(otelExtraAttributes.entries()).map(
@@ -762,15 +757,11 @@ export abstract class ServiceContainers {
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const metadata = GetStackMetadata();
     const out = pulumi
-      .all([secrets.traceOtelConfig.arn, secrets.honeycombApiKey.arn])
-      .apply(([config, honeycombApiKey]) => [
+      .all([secrets.traceOtelConfig.arn])
+      .apply(([config]) => [
         {
           name: 'AOT_CONFIG_CONTENT',
           valueFrom: config,
-        },
-        {
-          name: 'HONEYCOMB_API_KEY',
-          valueFrom: honeycombApiKey,
         },
       ])
       .apply(secrets => {
@@ -798,10 +789,6 @@ export abstract class ServiceContainers {
             {
               name: 'DD_OTEL_PORT',
               value: `${DD_OTEL_PORT}`,
-            },
-            {
-              name: 'DD_SERVICE',
-              value: datadogTags.get('service') || 'unknown',
             },
           ],
           healthCheck: {

@@ -10,7 +10,7 @@ def assumed_token(tenant, sandbox_tenant_data):
     original_tenant = create_tenant(*sandbox_tenant_data)
     original_token = original_tenant.auth_token
 
-    # Check that the auth token is for the sandbox tenant
+    # Check that the auth token is for te sandbox tenant
     body = get("org", None, original_token)
     assert body["id"] == original_tenant.id
     assert body["name"] == "Footprint Sandbox Integration Testing"

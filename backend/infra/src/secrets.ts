@@ -36,7 +36,6 @@ export interface StaticSecrets {
   fractionalIdologyUsername: aws.ssm.Parameter;
   fractionalIdologyPassword: aws.ssm.Parameter;
   grafanaPrometheusPushAuth: aws.ssm.Parameter;
-  honeycombApiKey: aws.ssm.Parameter;
   socureSandboxApiKey: aws.ssm.Parameter;
   socureProductionApiKey: aws.ssm.Parameter;
   launchDarklySdkKey: aws.ssm.Parameter;
@@ -91,7 +90,6 @@ interface SecretConstants {
   sendgrid: Sendgrid;
   idology: IDology;
   grafana: Grafana;
-  honeycomb: Honeycomb;
   socure: Socure;
   launchDarkly: LaunchDarkly;
   svix: Svix;
@@ -144,10 +142,6 @@ interface Socure {
 
 interface Grafana {
   prometheusPushAuth: string;
-}
-
-interface Honeycomb {
-  apiKey: string;
 }
 
 interface LaunchDarkly {
@@ -396,10 +390,6 @@ export async function LoadSecrets(
     grafanaPrometheusPushAuth: createSecretParameter(
       `grafanaPrometheusPushAuth-${stack}`,
       secretConstants.grafana.prometheusPushAuth,
-    ),
-    honeycombApiKey: createSecretParameter(
-      `honeycombApiKey-${stack}`,
-      secretConstants.honeycomb.apiKey,
     ),
     socureSandboxApiKey: createSecretParameter(
       `socureSandboxApiKey-${stack}`,

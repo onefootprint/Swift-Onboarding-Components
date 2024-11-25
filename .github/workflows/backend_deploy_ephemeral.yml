@@ -112,7 +112,6 @@ jobs:
       stackName: "dev-${{ needs.detect_ephemeral_stack.outputs.stackName }}"
       prefixDomain: "api-${{ needs.detect_ephemeral_stack.outputs.stackName }}."
       useNeonDB: ${{ contains(github.event.pull_request.labels.*.name, 'FastEphemeral') && !(needs.detect_ephemeral_stack.outputs.needsFullInfra == 'true') }}
-      useEphemeralHoneycombApiKey: true
       # We deploy the images built for the PR HEAD commit to ephemeral.
       apiComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
       enclaveComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}

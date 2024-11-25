@@ -9,8 +9,3 @@ cp Pulumi.dev.yaml "Pulumi.dev-${name}.yaml"
 
 # Replace the stack name
 pulumi config --stack dev-${name} set --path constants.domain.prefix "api-${name}."
-
-# Replace the honeycomb API key with a key specifically for ephemeral environments. Had to store it
-# in the dev pulumi config since it's a secret, so we just decrypt it and then set it
-HC_API_KEY=$(pulumi config --stack dev-${name} get --path constants.honeycomb.ephemeralApiKey)
-pulumi config --stack dev-${name} set --secret --path constants.honeycomb.apiKey ${HC_API_KEY}
