@@ -1,4 +1,3 @@
-use newtypes::OrgMemberEmail;
 use newtypes::PiiString;
 use newtypes::PublishablePlaybookKey;
 use newtypes::TenantId;
@@ -7,8 +6,6 @@ use serde_json::json;
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]
 pub enum BoolFlag<'a> {
-    #[strum(to_string = "IsFirmEmployeeRiskOps")]
-    IsRiskOps(&'a OrgMemberEmail),
     #[strum(to_string = "IsDemoTenant")]
     IsDemoTenant(&'a TenantId),
     #[strum(to_string = "TenantCanViewSocureRiskSignal")]
@@ -104,7 +101,6 @@ impl<'a> BoolFlag<'a> {
 
     pub(crate) fn key(&self) -> Option<String> {
         match self {
-            Self::IsRiskOps(k) => Some(k.to_string()),
             Self::IsDemoTenant(k) => Some(k.to_string()),
             Self::CanViewSocureRiskSignals(k) => Some(k.to_string()),
             Self::EnableScanOnboardingInNonProd(k) => Some(k.to_string()),
@@ -151,7 +147,6 @@ impl<'a> BoolFlag<'a> {
 
     pub fn default(&self) -> bool {
         match self {
-            Self::IsRiskOps(_) => false,
             Self::IsDemoTenant(_) => false,
             Self::CanViewSocureRiskSignals(_) => false,
             Self::EnableScanOnboardingInNonProd(_) => false,
@@ -204,8 +199,7 @@ impl<'a> BoolFlag<'a> {
         // Note, most new flags should be migrated to the newer format that does evaluations on
         // here instead of in launch darkly
         match self {
-            Self::IsRiskOps(_)
-            | Self::IsDemoTenant(_)
+            Self::IsDemoTenant(_)
             | Self::CanViewSocureRiskSignals(_)
             | Self::EnableScanOnboardingInNonProd(_)
             | Self::EnableIdologyInNonProd(_)

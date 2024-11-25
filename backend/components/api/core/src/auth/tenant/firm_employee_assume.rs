@@ -17,7 +17,6 @@ use db::models::tenant_role::ImmutableRoleKind;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
-use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::InvokeVaultProxyPermission;
 use newtypes::TenantRoleKind;
@@ -32,7 +31,6 @@ pub struct FirmEmployeeAssumeAuth {
     pub(super) tenant: Tenant,
     tenant_user: TenantUser,
     role: TenantRole,
-    is_risk_ops: bool,
     is_live: bool,
     /// True if the request from the client includes a header to allow write operations.
     /// This forces clients to explicitly acknowledge they're performing write actions on behalf of
@@ -101,7 +99,6 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
         let kind = TenantRoleKind::DashboardUser;
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
 
-        let is_risk_ops = ctx.ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
         let is_live = get_is_live(&ctx.req).unwrap_or(!tenant.sandbox_restricted);
         let allow_writes = get_bool_header("x-allow-assumed-writes", &ctx.req.headers).unwrap_or(false);
 
@@ -110,7 +107,6 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
             tenant,
             tenant_user,
             role,
-            is_risk_ops,
             is_live,
             data,
             requested_allow_writes: allow_writes,
@@ -143,7 +139,7 @@ impl FirmEmployeeAssumeAuth {
             if !self.is_live {
                 // In sandbox mode, all firm employees are allowed to have write access
                 vec![TenantScope::Admin]
-            } else if self.is_risk_ops {
+            } else if self.tenant_user.is_risk_ops {
                 // Outside of sandbox, "risk ops" employees have extended permissions
                 vec![
                     TenantScope::OrgSettings,
@@ -280,7 +276,8 @@ mod test {
         let role_kind = TenantRoleKind::DashboardUser;
         let role =
             TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, role_kind).unwrap();
-        let tenant_user = db::tests::fixtures::tenant_user::create(conn);
+        let mut tenant_user = db::tests::fixtures::tenant_user::create(conn);
+        tenant_user.is_risk_ops = is_risk_ops;
         let session_data = FirmEmployeeSession {
             tenant_user_id: tenant_user.id.clone(),
             tenant_id: tenant.id.clone(),
@@ -291,7 +288,6 @@ mod test {
             tenant,
             tenant_user,
             role,
-            is_risk_ops,
             is_live,
             data: session_data.clone(),
             requested_allow_writes,

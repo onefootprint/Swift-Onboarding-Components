@@ -7,7 +7,6 @@ use crate::FpResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
-use feature_flag::BoolFlag;
 use newtypes::TenantSessionPurpose;
 use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
@@ -18,7 +17,6 @@ use paperclip::actix::Apiv2Security;
 /// This is generally only used for internal-facing APIs
 pub struct FirmEmployeeAuth {
     pub tenant_user: TenantUser,
-    pub is_risk_ops: bool,
     pub auth_method: WorkosAuthMethod,
     pub purpose: TenantSessionPurpose,
 }
@@ -46,7 +44,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
     fn try_load_session(
         conn: &mut PgConn,
         auth_session: AuthSessionData,
-        ctx: LoadSessionContext,
+        _: LoadSessionContext,
     ) -> FpResult<Self> {
         // Uniquely, this kind of auth allows extracting the user from two different types of tokens
         let (tenant_user, auth_method, purpose) = match auth_session {
@@ -67,12 +65,10 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
             // Double-checking for safety
             return Err(AuthError::NotFirmEmployee.into());
         }
-        let is_risk_ops = ctx.ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
         tracing::info!(tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
         Ok(Self(FirmEmployeeAuth {
             tenant_user,
-            is_risk_ops,
             auth_method,
             purpose,
         }))
@@ -96,7 +92,7 @@ impl FirmEmployeeAuthContext {
         match guard {
             FirmEmployeeGuard::Any => (),
             FirmEmployeeGuard::RiskOps => {
-                if !self.0.is_risk_ops {
+                if !self.0.tenant_user.is_risk_ops {
                     return Err(AuthError::NotRiskOpsFirmEmployee.into());
                 }
             }

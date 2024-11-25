@@ -184,11 +184,9 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
 #[cfg(test)]
 mod test {
     use super::BoolFlag as FF;
-    use newtypes::OrgMemberEmail;
     use newtypes::TenantId;
     use test_case::test_case;
 
-    #[test_case(FF::IsRiskOps(&OrgMemberEmail("e@e.com".to_string())) => "IsFirmEmployeeRiskOps")]
     #[test_case(FF::IsDemoTenant(&TenantId::test_data("org_id".to_string())) => "IsDemoTenant")]
     fn test_flag_name(ff: FF) -> String {
         ff.flag_name()

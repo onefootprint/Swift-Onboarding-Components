@@ -1498,6 +1498,7 @@ diesel::table! {
         first_name -> Nullable<Text>,
         last_name -> Nullable<Text>,
         is_firm_employee -> Bool,
+        is_risk_ops -> Bool,
     }
 }
 
