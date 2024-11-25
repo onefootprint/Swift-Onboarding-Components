@@ -167,3 +167,49 @@ The Stack component is a specialized Box with flex display. Convert it as follow
 #### Text Component:
 The Text component maps directly to HTML elements with Tailwind classes:
 
+## Tests
+
+We have 3 kinds of tests:
+- Unit tests - using jest and react-testing-library
+- Interactive tests - using storybook and vitest
+- E2E tests, using playwright
+
+Most of the time, you should write unit and interactive tests. 
+
+### General guidelines for tests
+- Prefer to write tests that are focused on the user's perspective and actions they would take.
+- Use this pattern to write tests:
+
+```typescript
+describe('when something happens', () => {
+  it('should do something', () => {
+    ...
+  })
+})
+```
+
+- If you need a fixture, use from `@onefootprint/fixtures`. If you're in the dashboard app, use from `@onefootprint/fixtures/dashboard`.
+- Name it as the fixture name + 'Fixture' (Always ending with Fixture)
+
+```typescript
+import { getOnboardingConfiguration } from '@onefootprint/fixtures/dashboard';
+
+const onboardingConfigFixture = getOnboardingConfiguration({ name: 'Identity verification' });
+
+```
+
+### React testing library guidelines
+- Use find* any time you want to query for something that may not be available right away. Avoid using `waitFor` when possible.
+- Avoid having multiple assertions in a single waitFor callback
+- Write using semantical roles - avoid using `getByTestId` and prefer `getByRole`
+- Do not use cleanup after each test - jest does this for you
+- Use userEvent for all interactions, instead of fireEvent
+
+### Unit tests
+- Use @onefootprint/testing-utils for importing anything related to tests
+
+```typescript
+import { customRender, screen, waitFor, userEvent } from '@onefootprint/testing-utils';
+```
+
+
