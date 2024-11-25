@@ -8,6 +8,7 @@ mod challenge;
 mod consent;
 pub mod documents;
 mod email;
+mod expire_session;
 mod private;
 mod token;
 mod upload;
@@ -32,6 +33,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(challenge::verify::post)
         .service(auth_methods::get)
         .service(private::token::get)
+        .service(expire_session::post)
         .service(attest_device::post_challenge)
         .service(attest_device::post_attestation);
 }
