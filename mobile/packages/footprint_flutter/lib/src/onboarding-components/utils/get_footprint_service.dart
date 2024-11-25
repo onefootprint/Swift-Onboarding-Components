@@ -8,6 +8,7 @@ import 'package:footprint_flutter/src/onboarding-components/models/auth_token_st
 import 'package:footprint_flutter/src/onboarding-components/models/footprint_configuration.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/inline_process_exception.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/onboarding_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/verification_response.dart';
@@ -400,23 +401,23 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
       throw Exception('No auth token found. Please authenticate first.');
     }
 
+    final requirementsBeforeProcess = await getOnboardingStatus(authToken);
+    for (var requirement in requirementsBeforeProcess.requirements.all) {
+      if (!requirement.isMet &&
+          requirement.kind != OnboardingRequirementKind.process) {
+        throw InlineProcessException(
+            "Process error. Onboarding requirements not met.");
+      }
+    }
+
     try {
       await process(authToken);
     } catch (e) {
       throw InlineProcessException("Failed to process onboarding. Error: $e");
     }
 
-    final requirements = await getOnboardingStatus(authToken);
     final validationToken =
         (await validateOnboarding(authToken)).validationToken;
-
-    for (var requirement in requirements.requirements.all) {
-      if (!requirement.isMet) {
-        throw InlineProcessException(
-            "Process error. Onboarding requirements not met.");
-      }
-    }
-
     return validationToken;
   }
 
