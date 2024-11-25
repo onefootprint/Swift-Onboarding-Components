@@ -1,26 +1,39 @@
 use crate::actions::EntityActionPostCommit;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
+use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_errors::FpDbOptionalExtension;
+use db::models::audit_event::AuditEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
+use newtypes::AuditEventDetail;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::ManualDecisionRequest;
+use newtypes::TenantId;
+
 
 pub(super) fn apply_manual_decision(
     conn: &mut TxnPgConn,
     request: ManualDecisionRequest,
     sv: &ScopedVault,
     actor: DbActor,
+    insight: InsightHeaders,
+    tenant_id: TenantId,
 ) -> FpResult<EntityActionPostCommit> {
     let wf = Workflow::get_active(conn, &sv.id)
         .optional()?
         .ok_or(OnboardingError::NoWorkflow)?;
     let ManualDecisionRequest { annotation, status } = request;
-    save_review_decision(conn, wf, status.into(), Some(annotation), actor)?;
+    let onboarding_decision_id =
+        save_review_decision(conn, wf, status.into(), Some(annotation), actor.clone())?;
+    let detail = AuditEventDetail::ManuallyReviewEntity {
+        onboarding_decision_id,
+        scoped_vault_id: sv.id.clone(),
+    };
+    AuditEvent::create_with_insight(conn, &tenant_id, actor, insight, detail)?;
     Ok(EntityActionPostCommit::FireWebhooks)
 }
 

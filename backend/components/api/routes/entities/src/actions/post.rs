@@ -8,6 +8,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
 use api_errors::BadRequestInto;
 use api_wire_types::EntityActionResponse;
@@ -31,6 +32,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<EntityActionsRequest>,
     auth: TenantSessionAuth,
+    insight: InsightHeaders,
 ) -> ApiListResponse<EntityActionResponse> {
     // TODO what should the auth guard be here?
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
@@ -59,9 +61,14 @@ pub async fn post(
                             apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
                         }
                         EntityAction::ClearReview => clear_review(conn, &sv, actor.clone())?,
-                        EntityAction::ManualDecision(d) => {
-                            apply_manual_decision(conn, d, &sv, actor.clone())?
-                        }
+                        EntityAction::ManualDecision(d) => apply_manual_decision(
+                            conn,
+                            d,
+                            &sv,
+                            actor.clone(),
+                            insight.clone(),
+                            tenant_id.clone(),
+                        )?,
                     };
                     Ok(action)
                 })

@@ -2,6 +2,10 @@ from tests.bifrost_client import BifrostClient
 from tests.identify_client import IdentifyClient
 from tests.utils import post, get
 from tests.headers import FpAuth
+from tests.dashboard.utils import (
+    assert_has_audit_event_with_details,
+    list_audit_events_with_details,
+)
 
 
 # TODO also test business
@@ -45,17 +49,41 @@ def test_manual_decision_action(sandbox_tenant, kyb_sandbox_ob_config):
     assert user.client.validate_response["user"]["status"] == "pass"
     assert user.client.validate_response["business"]["status"] == "pass"
 
-    # Should be able to manually review both the user and the business
-    for fp_id in [user.fp_id, user.fp_bid]:
-        md_action = dict(
-            kind="manual_decision",
-            status="fail",
-            annotation=dict(note="Flerp", is_pinned=False),
-        )
-        data = dict(actions=[md_action])
-        post(f"entities/{fp_id}/actions", data, *sandbox_tenant.db_auths)
-        body = get(f"entities/{fp_id}", data, *sandbox_tenant.db_auths)
-        assert body["status"] == "fail"
+    # Test manual review for user
+    md_action = dict(
+        kind="manual_decision",
+        status="fail",
+        annotation=dict(note="User manual review", is_pinned=False),
+    )
+    data = dict(actions=[md_action])
+    post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+    body = get(f"entities/{user.fp_id}", data, *sandbox_tenant.db_auths)
+    assert body["status"] == "fail"
+
+    assert_has_audit_event_with_details(
+        sandbox_tenant,
+        "manually_review_entity",
+        fp_id=user.fp_id,
+        decision_status="fail",
+    )
+
+    # Test manual review for business
+    md_action = dict(
+        kind="manual_decision",
+        status="fail",
+        annotation=dict(note="Business manual review", is_pinned=False),
+    )
+    data = dict(actions=[md_action])
+    post(f"entities/{user.fp_bid}/actions", data, *sandbox_tenant.db_auths)
+    body = get(f"entities/{user.fp_bid}", data, *sandbox_tenant.db_auths)
+    assert body["status"] == "fail"
+
+    assert_has_audit_event_with_details(
+        sandbox_tenant,
+        "manually_review_entity",
+        fp_id=user.fp_bid,
+        decision_status="fail",
+    )
 
 
 def test_clear_review(sandbox_tenant, kyb_sandbox_ob_config):

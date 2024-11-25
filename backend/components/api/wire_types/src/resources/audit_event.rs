@@ -3,6 +3,7 @@ use newtypes::ApiKeyStatus;
 use newtypes::AuditEventId;
 use newtypes::AuditEventName;
 use newtypes::DataIdentifier;
+use newtypes::DecisionStatus;
 use newtypes::DecryptionContext;
 use newtypes::FpId;
 use newtypes::ListEntryCreationId;
@@ -133,7 +134,10 @@ pub enum AuditEventDetail {
         ob_configuration_id: ObConfigurationId,
     },
     DisablePlaybook,
-    ManuallyReviewEntity,
+    ManuallyReviewEntity {
+        decision_status: DecisionStatus,
+        fp_id: FpId,
+    },
     EditPlaybook {
         ob_configuration_id: ObConfigurationId,
     },

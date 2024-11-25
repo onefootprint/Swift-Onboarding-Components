@@ -8,6 +8,8 @@ use crate::models::document_data::DocumentData;
 use crate::models::insight_event::CreateInsightEvent;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
+use crate::models::onboarding_decision::OnboardingDecision;
+use crate::models::onboarding_decision::SaturatedOnboardingDecisionInfo;
 use crate::models::scoped_vault::*;
 use crate::models::tenant::Tenant;
 use crate::models::tenant_api_key::TenantApiKey;
@@ -54,6 +56,7 @@ use newtypes::ListEntryCreationId;
 use newtypes::ListEntryId;
 use newtypes::ListId;
 use newtypes::ObConfigurationId;
+use newtypes::OnboardingDecisionId;
 use newtypes::ScopedVaultId;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantId;
@@ -419,6 +422,7 @@ impl AuditEvent {
 /// This data is bulk loaded in separate queries for all events in a batch of audit events.
 pub struct AuditEventBulkSecondaryData {
     pub tenant_roles: HashMap<TenantRoleId, TenantRole>,
+    pub onboarding_decisions: HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>,
 }
 
 impl AuditEventBulkSecondaryData {
@@ -454,7 +458,21 @@ impl AuditEventBulkSecondaryData {
             });
         let tenant_roles = TenantRole::get_bulk(conn, tr_ids.collect())?;
 
-        Ok(Self { tenant_roles })
+        let onboarding_decision_ids = joined_events
+            .iter()
+            .filter_map(|je| match &je.audit_event.metadata {
+                AuditEventMetadata::ManuallyReviewEntity {
+                    onboarding_decision_id,
+                } => Some(onboarding_decision_id),
+                _ => None,
+            })
+            .collect();
+        let onboarding_decisions = OnboardingDecision::get_bulk(conn, onboarding_decision_ids)?;
+
+        Ok(Self {
+            tenant_roles,
+            onboarding_decisions,
+        })
     }
 }
 

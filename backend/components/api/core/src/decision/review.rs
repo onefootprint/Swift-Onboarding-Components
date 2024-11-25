@@ -16,6 +16,7 @@ use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::DocumentReviewStatus;
 use newtypes::ManualReviewKind;
+use newtypes::OnboardingDecisionId;
 use newtypes::UserSpecificWebhookKind;
 use strum::IntoEnumIterator;
 
@@ -25,7 +26,7 @@ pub fn save_review_decision(
     status: DecisionStatus,
     annotation: Option<CreateAnnotationRequest>,
     actor: DbActor,
-) -> FpResult<()> {
+) -> FpResult<OnboardingDecisionId> {
     let wf = Workflow::lock(conn, &wf.id)?;
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
 
@@ -89,5 +90,5 @@ pub fn save_review_decision(
     let sv_delta = ScopedVault::update_status_if_valid(conn, &sv.id, obd.status.into())?;
     wf.maybe_fire_status_changed_webhook(conn, sv_delta, mr_deltas)?;
 
-    Ok(())
+    Ok(obd.id)
 }

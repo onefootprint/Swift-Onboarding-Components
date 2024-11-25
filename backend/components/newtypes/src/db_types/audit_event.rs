@@ -7,6 +7,7 @@ use crate::ListEntryCreationId;
 use crate::ListEntryId;
 use crate::ListId;
 use crate::ObConfigurationId;
+use crate::OnboardingDecisionId;
 use crate::ScopedVaultId;
 use crate::TenantApiKeyId;
 use crate::TenantRoleId;
@@ -130,7 +131,10 @@ pub enum AuditEventDetail {
         ob_configuration_id: ObConfigurationId,
     },
     DisablePlaybook,
-    ManuallyReviewEntity,
+    ManuallyReviewEntity {
+        onboarding_decision_id: OnboardingDecisionId,
+        scoped_vault_id: ScopedVaultId,
+    },
     EditPlaybook {
         ob_configuration_id: ObConfigurationId,
     },
@@ -412,7 +416,18 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
-            AuditEventDetail::ManuallyReviewEntity => todo!(),
+            AuditEventDetail::ManuallyReviewEntity {
+                onboarding_decision_id,
+                scoped_vault_id,
+            } => Self {
+                metadata: AuditEventMetadata::ManuallyReviewEntity {
+                    onboarding_decision_id,
+                },
+                args: AuditEventOptionalArgs {
+                    scoped_vault_id: Some(scoped_vault_id),
+                    ..Default::default()
+                },
+            },
         }
     }
 }
@@ -508,7 +523,9 @@ pub enum AuditEventMetadata {
     DeleteListEntry,
     CreatePlaybook,
     DisablePlaybook,
-    ManuallyReviewEntity,
+    ManuallyReviewEntity {
+        onboarding_decision_id: OnboardingDecisionId,
+    },
     EditPlaybook,
     DeactivateOrgRole,
 }

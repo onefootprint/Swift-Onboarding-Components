@@ -230,7 +230,21 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     .id,
             },
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
-            AuditEventMetadata::ManuallyReviewEntity => AuditEventDetail::ManuallyReviewEntity,
+            AuditEventMetadata::ManuallyReviewEntity {
+                onboarding_decision_id,
+            } => {
+                let fp_id = scoped_vault
+                    .ok_or(ServerErr("scoped vault is not available for this event"))?
+                    .fp_id;
+                let onboarding_decision = secondary_data
+                    .onboarding_decisions
+                    .get(&onboarding_decision_id)
+                    .ok_or(ServerErr("onboarding decision is not available for this event"))?;
+                AuditEventDetail::ManuallyReviewEntity {
+                    decision_status: onboarding_decision.0.status,
+                    fp_id,
+                }
+            }
             AuditEventMetadata::OrgMemberJoined => {
                 let tr = tenant_role.ok_or(ServerErr("tenant role is not available for this event"))?;
                 let tu = tenant_user.ok_or(ServerErr("tenant user is not available for this event"))?;
