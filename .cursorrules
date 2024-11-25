@@ -1,0 +1,169 @@
+# Backend rules
+
+# Frontend rules
+
+- You're an expert frontend developer
+- You write code that is clean, readable, and maintainable. 
+- You don't over-engineer solutions. You write simple code that works and is easy to understand.
+- You follow best practices and keep the UI consistent. 
+- You care about UI details and strive to make the product look and feel great. 
+
+## General guidelines
+
+- Use typescript and Next.js
+- Use react-query for data fetching, caching and mutations
+- Use react-hook-form for form handling
+- Use tailwind for styling. Look at /packages/tailwind-config for reference
+- Use our design system for components. Look at /packages/ui for reference.
+- When using a type from the backend, make sure to use from /packages/request-types
+- Avoid using @onefootprint/types - it's deprecated and will be removed in the future
+
+
+## Data fetching
+- When using react-query and integrating with the backend, use the queries from /packages/axios. If you're using from the dashboard app,
+you'll likely need to import from @onefootprint/axios/dashboard
+- Ideally, split the result into a ErrorComponent, LoadingComponent and ContentComponent:
+
+Data fetching:
+
+```tsx
+import { getEntitiesByFpIdBusinessOwnersOptions } from '@onefootprint/axios/dashboard';
+import { useQuery } from '@tanstack/react-query';
+
+const App = () => {
+  const { isPending, error, data } = useQuery(
+    getEntitiesByFpIdBusinessOwnersOptions({
+      path: { fpId: entity.id },
+    }),
+  );
+  if (isPending) {
+    return <Loading />;
+  }
+  if (error) {
+    return <ErrorComponent error={error} />;
+  }
+  return <Content data={data} />;
+};
+```
+
+Mutations:
+- When using mutations, make sure to handle errors. In most of the situations, you'll want to use useRequestErrorToast hook.
+
+```tsx
+import { postEntitiesByFpIdBusinessOwnersKycLinksMutation } from '@onefootprint/axios/dashboard';
+import { useMutation } from '@tanstack/react-query';
+import { useRequestErrorToast } from '@onefootprint/hooks';
+
+const App = () => {
+  const mutation = useMutation(postEntitiesByFpIdBusinessOwnersKycLinksMutation());
+  const showRequestErrorToast = useRequestErrorToast();
+
+  const handleSubmit = async () => {
+    try {
+      await mutation.mutateAsync({ path: { fpId }, body: {} });
+    } catch (error) {
+      showRequestErrorToast(error)
+    }
+  };
+};
+```
+
+## Forms
+- When using react-hook-form, make sure to always type the form data:
+
+```tsx
+import { useForm } from 'react-hook-form';
+
+type FormData = {
+  name: string;
+};
+
+const App = () => {
+  const formMethods = useForm<FormData>();
+  ...
+};
+```
+
+- When you need to conditionally render a field based on another field's value, use the `useWatch` hook (and not the `watch` function):
+
+```tsx
+import { useForm, useWatch } from 'react-hook-form';
+
+const App = () => {
+  const { control } = useForm();
+  const watchName = useWatch({ control: control, name: 'name' });
+  ...
+};
+```
+
+## Styling and components
+
+- We are moving to tailwind. Look at /packages/tailwind-config for reference, however, most of the code is still written with styled-components.
+- When touching a code, feel free to convert it to tailwind.
+
+### Guidelines
+- We use a lot of Box / Stack components from our design system. These components are deprecated and will be removed in the future.
+
+This is an example:
+
+```typescript
+import { Box } from '@onefootprint/ui';
+
+const App = () => {
+  return <Box backgroundColor="primary" color="secondary" borderRadius="default" borderWidth={1} borderStyle="solid" borderColor="primary" marginBottom={4} justifyContent="center">...</Box>
+};
+```
+
+In order to migrate Box components to Tailwind, follow these guidelines:
+
+#### Basic Properties:
+- Box components are replaced with a standard `div` element
+- `backgroundColor` -> `bg-{color}` (e.g., `bg-primary`)
+- `color` -> `text-{color}` (e.g., `text-secondary`)
+
+#### Border Properties:
+- Use combined classes: `border border-solid border-{color}`
+- Border radius: 
+  - Default: `rounded`
+  - Other sizes: `rounded-xl`
+
+#### Spacing Scale (in pixels):
+| Size | Padding     | Margin      | Gap         |
+|------|------------|-------------|-------------|
+| 0    | p-0        | m-0         | gap-0       |
+| 1    | p-0.5 (2)  | m-0.5       | gap-0.5     |
+| 2    | p-1 (4)    | m-1         | gap-1       |
+| 3    | p-2 (8)    | m-2         | gap-2       |
+| 4    | p-3 (12)   | m-3         | gap-3       |
+| 5    | p-4 (16)   | m-4         | gap-4       |
+| 6    | p-5 (20)   | m-5         | gap-5       |
+| 7    | p-6 (24)   | m-6         | gap-6       |
+| 8    | p-8 (32)   | m-8         | gap-8       |
+| 9    | p-10 (40)  | m-10        | gap-10      |
+| 10   | p-16 (64)  | m-16        | gap-16      |
+| 11   | p-24 (96)  | m-24        | gap-24      |
+| 12   | p-32 (128) | m-32        | gap-32      |
+| 13   | p-40 (156) | m-40        | gap-40      |
+| 14   | p-48 (192) | m-48        | gap-48      |
+| 15   | p-64 (256) | m-64        | gap-64      |
+
+#### Common Box Props to Tailwind Classes:
+- alignItems="center" -> items-center
+- justifyContent="center" -> justify-center
+- alignContent="center" -> content-center
+- flexWrap="wrap" -> flex-wrap
+- flexDirection="column" -> flex-col
+- gap={4} -> gap-4
+- width="100%" -> w-full
+- height="100%" -> h-full
+
+#### Stack Component:
+The Stack component is a specialized Box with flex display. Convert it as follows:
+- <Stack> -> <div className="flex">
+- <Stack center> -> <div className="flex items-center justify-center">
+- <Stack direction="column"> -> <div className="flex flex-col">
+- <Stack gap={4}> -> <div className="flex gap-4">
+
+#### Text Component:
+The Text component maps directly to HTML elements with Tailwind classes:
+
