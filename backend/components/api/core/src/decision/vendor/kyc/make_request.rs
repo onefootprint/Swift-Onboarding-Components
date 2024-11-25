@@ -13,7 +13,6 @@ use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
-use idv::experian::error::Error as ExperianError;
 use idv::experian::ExperianCrossCoreRequest;
 use idv::experian::ExperianCrossCoreResponse;
 use idv::idology::expectid::response::ExpectIDResponse;
@@ -48,19 +47,8 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
         make_idv_vendor_call_save_vreq(state, tvc, sv_id, di_id, ob_configuration_key, vendor_api).await?;
 
     if let Err(err) = vendor_result.as_ref() {
-        let VendorAPIError { vendor_api: _, error } = err;
-        let message = "Error making vendor call";
-        match error {
-            idv::Error::ExperianError(ExperianError::ErrorWithResponse(e)) => match e.is_known_error() {
-                true => {
-                    tracing::warn!(?err, message);
-                }
-                false => tracing::error!(?err, message),
-            },
-            _ => {
-                tracing::error!(?err, message);
-            }
-        };
+        let VendorAPIError { vendor_api, error } = err;
+        tracing::warn!(?vendor_api, ?error, "Error making KYC vendor call");
     }
 
     let sv_id = sv_id.clone();
