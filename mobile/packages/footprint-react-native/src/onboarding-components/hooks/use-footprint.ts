@@ -9,6 +9,7 @@ import useOtp from './use-otp';
 import getRequirementsReq from '../queries/get-onboarding-status';
 import processReq from '../queries/process';
 import validateOnboarding from '../queries/validate-onboarding';
+import { OnboardingRequirementKind } from '@onefootprint/types';
 
 const useFootprint = () => {
   const [context] = useContext(Context);
@@ -85,18 +86,25 @@ const useFootprint = () => {
     if (!context.verifiedAuthToken) {
       throw new Error('No authToken found. Please authenticate first');
     }
+    const { requirements: requirementsBeforeProcess } = await getRequirementsReq({
+      authToken: context.verifiedAuthToken,
+    });
+    requirementsBeforeProcess.all.forEach(req => {
+      if (req.kind !== OnboardingRequirementKind.process && !req.isMet) {
+        throw new InlineProcessError(
+          'Cannot process without meeting all requirements. Please complete all requirements first or try handoff',
+        );
+      }
+    });
     try {
       await processReq({ token: context.verifiedAuthToken });
     } catch (error: unknown) {
       throw new InlineProcessError((error as Error).message || 'Something happened');
     }
-    const { requirements } = await getRequirementsReq({ authToken: context.verifiedAuthToken });
-    requirements.all.forEach(req => {
-      if (!req.isMet) {
-        throw new InlineProcessError('Found a requirement not met. Handoff must be done');
-      }
-    });
-    const { validationToken } = await validateOnboarding({ authToken: context.verifiedAuthToken });
+    const [{ validationToken }, { requirements }] = await Promise.all([
+      validateOnboarding({ authToken: context.verifiedAuthToken }),
+      getRequirementsReq({ authToken: context.verifiedAuthToken }),
+    ]);
     return { validationToken, requirements };
   };
 

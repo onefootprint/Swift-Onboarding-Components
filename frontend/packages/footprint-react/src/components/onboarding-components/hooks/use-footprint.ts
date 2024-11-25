@@ -1,6 +1,7 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 
+import { OnboardingRequirementKind } from '@onefootprint/types';
 import type { FormValues } from '../../../types';
 import { InlineProcessError } from '../../../types/request';
 import { Context } from '../components/provider';
@@ -48,18 +49,25 @@ export const useFootprint = () => {
     if (!context.verifiedAuthToken) {
       throw new Error('No authToken found. Please authenticate first');
     }
+    const { requirements: requirementsBeforeProcess } = await getRequirementsReq({
+      authToken: context.verifiedAuthToken,
+    });
+    requirementsBeforeProcess.all.forEach(req => {
+      if (req.kind !== OnboardingRequirementKind.process && !req.isMet) {
+        throw new InlineProcessError(
+          'Cannot process without meeting all requirements. Please complete all requirements first or try handoff',
+        );
+      }
+    });
     try {
       await processReq({ token: context.verifiedAuthToken });
     } catch (error: unknown) {
       throw new InlineProcessError((error as Error).message || 'Something happened');
     }
-    const { requirements } = await getRequirementsReq({ authToken: context.verifiedAuthToken });
-    requirements.all.forEach(req => {
-      if (!req.isMet) {
-        throw new InlineProcessError('Found a requirement not met. Handoff must be done');
-      }
-    });
-    const { validationToken } = await validateOnboarding({ authToken: context.verifiedAuthToken });
+    const [{ validationToken }, { requirements }] = await Promise.all([
+      validateOnboarding({ authToken: context.verifiedAuthToken }),
+      getRequirementsReq({ authToken: context.verifiedAuthToken }),
+    ]);
     return { validationToken, requirements };
   };
 
