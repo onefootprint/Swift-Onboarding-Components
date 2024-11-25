@@ -1,6 +1,5 @@
 use super::playbook::Playbook;
 use super::rule_set::RuleSet;
-use super::tenant::Tenant;
 use super::workflow::Workflow;
 use crate::actor;
 use crate::actor::SaturatedActor;
@@ -16,6 +15,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::ob_configuration::BoxedQuery;
+use db_schema::schema::playbook;
 use db_schema::schema::tenant;
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -592,11 +592,14 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument("ObConfiguration::get", skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Self, Tenant)>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Playbook, Self)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
-        let mut query = ob_configuration::table.inner_join(tenant::table).into_boxed();
+        let mut query = ob_configuration::table
+            .inner_join(playbook::table)
+            .inner_join(tenant::table)
+            .into_boxed();
 
         match id.into() {
             ObConfigIdentifier::Id(id) => query = query.filter(ob_configuration::id.eq(id)),
@@ -619,8 +622,11 @@ impl ObConfiguration {
             }
         }
 
-        let result: (ObConfiguration, Tenant) = query.first(conn)?;
-        Ok(result)
+        let (playbook, obc): (Playbook, ObConfiguration) = query
+            .select((playbook::all_columns, ob_configuration::all_columns))
+            .first(conn)?;
+
+        Ok((playbook, obc))
     }
 
     #[tracing::instrument("ObConfiguration::get_bulk", skip_all)]
@@ -641,15 +647,15 @@ impl ObConfiguration {
     /// Gets the OBC, if it's enabled.
     /// The OBC may be deactivated (i.e. not the latest version of the playbook).
     #[tracing::instrument("ObConfiguration::get_enabled", skip_all)]
-    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Self, Tenant)>
+    pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Playbook, Self)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
-        let result = Self::get(conn, id)?;
-        if result.0.status != ApiKeyStatus::Enabled {
+        let (playbook, obc) = Self::get(conn, id)?;
+        if obc.status != ApiKeyStatus::Enabled {
             return Err(DbError::PlaybookDisabled.into());
         }
-        Ok(result)
+        Ok((playbook, obc))
     }
 
     #[tracing::instrument("ObConfiguration::create", skip_all)]

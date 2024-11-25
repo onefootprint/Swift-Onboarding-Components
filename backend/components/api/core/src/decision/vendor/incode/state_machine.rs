@@ -264,7 +264,7 @@ impl IncodeStateMachine {
 
                 let uvw: VaultWrapper<Person> =
                     VaultWrapper::build(conn, VwArgs::Tenant(&doc_req.scoped_vault_id))?;
-                let (obc, _) = ObConfiguration::get(conn, &doc_req.workflow_id)?;
+                let (_, obc) = ObConfiguration::get(conn, &doc_req.workflow_id)?;
 
                 Ok((di, id_doc, doc_req, obc, uvw))
             })

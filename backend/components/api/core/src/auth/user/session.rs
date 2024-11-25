@@ -113,17 +113,20 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
                     .map(|id| ScopedVault::get(conn, (id, &vault.id)))
                     .transpose()?;
-                let (obc, tenant) = data
+                let (playbook, obc) = data
                     .obc_id
                     .as_ref()
                     .map(|id| ObConfiguration::get(conn, id))
                     .transpose()?
                     .unzip();
-                let tenant = scoped_user
+
+                let tenant_id = scoped_user
                     .as_ref()
-                    .map(|sv| Tenant::get(conn, &sv.tenant_id))
-                    .transpose()?
-                    .or(tenant);
+                    .map(|su| &su.tenant_id)
+                    .or(playbook.as_ref().map(|p| &p.tenant_id));
+                let tenant = tenant_id
+                    .map(|tenant_id| Tenant::get(conn, tenant_id))
+                    .transpose()?;
 
                 if let Some(su) = scoped_user.as_ref() {
                     // Every few minutes, set the heartbeat when a user auth session authenticates

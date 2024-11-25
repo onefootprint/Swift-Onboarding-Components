@@ -229,7 +229,7 @@ impl Workflow {
             return BadRequestInto("Cannot add a fixture_result for live vault");
         }
 
-        let (obc, _) = ObConfiguration::get(conn, &ob_configuration_id)?;
+        let (_, obc) = ObConfiguration::get(conn, &ob_configuration_id)?;
 
         if !force_create {
             // Check if an active or completed workflow exists for this ob config.
@@ -591,7 +591,7 @@ impl Workflow {
             return Ok(());
         }
 
-        let (obc, _) = ObConfiguration::get(conn, &self.ob_configuration_id)?;
+        let (_, obc) = ObConfiguration::get(conn, &self.ob_configuration_id)?;
         let sv = ScopedVault::get(conn, &self.scoped_vault_id)?;
         let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
             fp_id: sv.fp_id.clone(),
@@ -613,7 +613,7 @@ impl Workflow {
         sv_delta: SvStatusDelta,
         mr_deltas: ManualReviewDelta,
     ) -> FpResult<()> {
-        let (_, tenant) = ObConfiguration::get(conn, &self.ob_configuration_id)?;
+        let tenant = Tenant::get(conn, &self.ob_configuration_id)?;
         // If this is a legacy tenant that can still see the old onboarding status webhooks, send out the
         // legacy webhook event
         let old_composite_status = (sv_delta.old_status, mr_deltas.old_has_mrs);

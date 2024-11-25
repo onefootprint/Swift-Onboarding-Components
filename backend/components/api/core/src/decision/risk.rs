@@ -46,7 +46,8 @@ pub fn save_final_decision(
 ) -> FpResult<()> {
     let wf = Workflow::lock(conn, wf_id)?;
     let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
-    let (obc, tenant) = ObConfiguration::get(conn, wf_id)?;
+    let (playbook, obc) = ObConfiguration::get(conn, wf_id)?;
+    let tenant = Tenant::get(conn, &playbook.tenant_id)?;
 
     // If we should commit, portablize all data for the onboarding
     // But, don't portabalize vaults from no-phone onboardings,

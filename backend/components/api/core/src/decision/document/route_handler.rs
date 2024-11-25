@@ -124,7 +124,7 @@ pub async fn handle_document_create(
         .db_transaction(move |conn| {
             let country_code =
                 country_code.ok_or(BadRequest("Identity document requires country code"))?;
-            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+            let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
             crate::decision::vendor::incode::validate_doc_type_is_allowed(
                 &obc,
                 document_type,
@@ -305,7 +305,7 @@ pub async fn handle_document_process(
                 DecisionIntentKind::DocScan,
             )?;
 
-            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+            let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
             let (id_doc, dr) = Document::get(conn, &doc_id)?;
             let side_from_session: Option<DocumentSide> = IncodeVerificationSession::get(conn, &id_doc.id)?
                 .and_then(|session| session.side_from_session());

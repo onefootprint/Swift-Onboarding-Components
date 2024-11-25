@@ -109,7 +109,7 @@ pub fn create_token(
         }
         TokenOperationKind::Onboard => {
             let obc = if let Some(wf) = wf {
-                let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
+                let (_, obc) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 obc
             } else {
                 let key = key.ok_or(BadRequest("key must be provided for a token of kind onboard"))?;

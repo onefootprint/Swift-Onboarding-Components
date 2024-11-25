@@ -28,7 +28,7 @@ async fn get_detail(
 
     let (obc, actor, rs) = state
         .db_query(move |conn| {
-            let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))

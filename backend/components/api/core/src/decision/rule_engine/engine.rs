@@ -98,7 +98,7 @@ pub fn evaluate_workflow_decision<'a>(
         .into_iter()
         .collect_vec();
 
-    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+    let (_, obc) = ObConfiguration::get(conn, obc_id)?;
     let rules_output = evaluate_rules(
         conn,
         sv_id,

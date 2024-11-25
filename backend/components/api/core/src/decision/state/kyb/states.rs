@@ -42,6 +42,7 @@ use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
@@ -197,7 +198,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
-        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+        let (_, obc) = ObConfiguration::get(conn, &wf.id)?;
         let bo_obds = async_res.try_get_ready_results()?;
 
         let scope = RiskSignalGroupScope::WorkflowId {
@@ -476,7 +477,8 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let (tenant, rules, vw, lists) = state
             .db_query(move |conn| {
                 let wf = DbWorkflow::get(conn, &wfid)?;
-                let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
+                let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
+                let tenant = Tenant::get(conn, &playbook.tenant_id)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 // TODO: should technically pass this seqno to RuleSetResult to store in pg instead
@@ -506,7 +508,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
-        let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
+        let (_, obc) = ObConfiguration::get(conn, &self.wf_id)?;
         let doc_req_configs = DocumentRequest::get_all(conn, &self.wf_id)?
             .into_iter()
             .map(|dr| dr.config)
@@ -676,7 +678,8 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let (tenant, rules, vw, lists) = state
             .db_query(move |conn| {
                 let wf = DbWorkflow::get(conn, &wfid)?;
-                let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
+                let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
+                let tenant = Tenant::get(conn, &playbook.tenant_id)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 // TODO: should technically pass this seqno to RuleSetResult to store in pg instead
@@ -704,7 +707,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
         let (vault_data_for_rules, lists_for_rules) = async_res;
-        let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
+        let (_, obc) = ObConfiguration::get(conn, &self.wf_id)?;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
         let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(

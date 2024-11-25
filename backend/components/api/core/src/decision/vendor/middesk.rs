@@ -264,7 +264,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let wf_id = self.middesk_request.workflow_id;
 
-        let (obc, _) = state
+        let (_, obc) = state
             .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
             .await?;
 
@@ -584,7 +584,7 @@ impl MiddeskState<Complete> {
         let wf_id = wf.id.clone();
         state
             .db_transaction(move |conn| {
-                let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+                let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
                 let billing_event_kind = if let Some(VerificationCheck::Kyb { ein_only }) =
                     obc.verification_checks().get(VerificationCheckKind::Kyb)
                 {

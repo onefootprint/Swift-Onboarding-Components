@@ -46,18 +46,21 @@ impl ExtractableAuthSession for ParsedBoSession {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.ob_config_id)?;
+        let (_, ob_config) = ObConfiguration::get_enabled(conn, &data.ob_config_id)?;
         if ob_config.kind != ObConfigurationKind::Kyb {
             return Err(AuthError::BusinessNotRequired.into());
         }
+
+        let tenant = Tenant::get(conn, &ob_config.tenant_id)?;
+
         let bo = BusinessOwner::get(conn, &data.bo_id)?;
         // Note: the bo may or may not have a populated user_vault_id
 
         tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, bo_id=%bo.id, user_vault_id=%format!("{:?}", bo.user_vault_id), "kyb session authenticated");
 
         Ok(Self {
-            ob_config,
             tenant,
+            ob_config,
             bo,
             data,
         })

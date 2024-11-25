@@ -149,7 +149,7 @@ pub async fn run_neuro_call(
     state
         .db_pool
         .db_transaction(move |conn| {
-            let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
+            let (_, obc) = ObConfiguration::get(conn, &wf_id3)?;
             BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::NeuroIdBehavioral)?;
 
             Ok(())

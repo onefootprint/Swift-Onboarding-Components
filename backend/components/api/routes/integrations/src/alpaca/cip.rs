@@ -252,7 +252,7 @@ pub(crate) async fn create_cip_request(
                 OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1))?;
             let (fp_obd, _, _) = decisions.pop().ok_or(CipError::EntityDecisionDoesNotExist)?;
             let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
-            let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+            let (_, obc) = ObConfiguration::get(conn, &wf.id)?;
 
             let risk_signals =
                 RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, RiskSignalFilter::LegacyLatest)?

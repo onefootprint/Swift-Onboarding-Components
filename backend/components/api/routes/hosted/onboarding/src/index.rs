@@ -56,7 +56,7 @@ pub async fn post(
         .db_query(move |conn| {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
-            let (ob_config, _) = ObConfiguration::get_enabled(conn, &obc_id)?;
+            let (_, ob_config) = ObConfiguration::get_enabled(conn, &obc_id)?;
             let portable_vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
             Ok((su, ob_config, portable_vw))
         })

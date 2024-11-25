@@ -66,7 +66,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
 
         // Get the obc and confirm it is active
-        let (ob_config, _) = ObConfiguration::get_enabled(conn, &workflow.ob_configuration_id)?;
+        let (_, ob_config) = ObConfiguration::get_enabled(conn, &workflow.ob_configuration_id)?;
 
         let onboarding_session = UserWfSession {
             user_session,

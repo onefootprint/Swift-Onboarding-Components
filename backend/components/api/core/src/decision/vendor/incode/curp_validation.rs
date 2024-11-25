@@ -201,7 +201,7 @@ pub async fn run_curp_validation_check(
                             let update = DocumentUpdate::set_curp_completed_seqno(seqno);
                             let _ = Document::update(conn, &iddoc_id, update)?;
 
-                            let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
+                            let (_, obc) = ObConfiguration::get(conn, &wf_id3)?;
                             // create billing event
                             BillingEvent::create(
                                 conn,

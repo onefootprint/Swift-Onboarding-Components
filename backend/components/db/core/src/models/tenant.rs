@@ -11,6 +11,7 @@ use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::billing_profile;
+use db_schema::schema::ob_configuration;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::tenant::BoxedQuery;
 use db_schema::schema::tenant::{
@@ -29,6 +30,7 @@ use itertools::Itertools;
 use newtypes::AppClipExperienceId;
 use newtypes::CompanySize;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::ObConfigurationId;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::StripeCustomerId;
@@ -105,6 +107,7 @@ pub struct PrivateTenantFilters {
 pub enum TenantIdentifier<'a> {
     Id(&'a TenantId),
     ScopedVaultId(&'a ScopedVaultId),
+    ObConfigurationId(&'a ObConfigurationId),
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -169,6 +172,12 @@ impl Tenant {
                 let tenant_id = scoped_vault::table
                     .filter(scoped_vault::id.eq(scoped_vault_id))
                     .select(scoped_vault::tenant_id);
+                tenant::table.filter(tenant::id.eq_any(tenant_id)).into_boxed()
+            }
+            TenantIdentifier::ObConfigurationId(ob_configuration_id) => {
+                let tenant_id = ob_configuration::table
+                    .filter(ob_configuration::id.eq(ob_configuration_id))
+                    .select(ob_configuration::tenant_id);
                 tenant::table.filter(tenant::id.eq_any(tenant_id)).into_boxed()
             }
         }

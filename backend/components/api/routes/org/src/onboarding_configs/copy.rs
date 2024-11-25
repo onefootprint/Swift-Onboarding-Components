@@ -71,7 +71,7 @@ async fn post(
 
     let (obc, rules) = state
         .db_query(move |conn| {
-            let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
             Ok((obc, rules))
         })

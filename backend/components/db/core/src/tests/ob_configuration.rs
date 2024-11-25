@@ -35,7 +35,7 @@ fn test_ob_config(conn: &mut TestPgConn) {
     let (playbook, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
 
     // Enforce it exists
-    let (fetched_ob_config, _) = ObConfiguration::get_enabled(conn, &ob_config.id).expect("Could not fetch");
+    let (_, fetched_ob_config) = ObConfiguration::get_enabled(conn, &ob_config.id).expect("Could not fetch");
     assert_eq!(ob_config.name, fetched_ob_config.name);
 
     // Mark as inactive
@@ -538,7 +538,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_forwards_compatible(conn: &mut 
         ))
         .execute(conn.conn())
         .unwrap();
-    let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+    let (_, obc) = ObConfiguration::get(conn, &obc.id).unwrap();
     assert_eq!(
         EnhancedAmlOption::Yes {
             ofac: true,
@@ -564,7 +564,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
         ))
         .execute(conn.conn())
         .unwrap();
-    let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+    let (_, obc) = ObConfiguration::get(conn, &obc.id).unwrap();
     assert_eq!(
         EnhancedAmlOption::Yes {
             ofac: true,
@@ -605,7 +605,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
         ))
         .execute(conn.conn())
         .unwrap();
-    let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+    let (_, obc) = ObConfiguration::get(conn, &obc.id).unwrap();
     assert_eq!(
         EnhancedAmlOption::Yes {
             ofac: true,
@@ -640,6 +640,6 @@ pub fn test_document_and_countries_roundtrip(conn: &mut TestPgConn) {
     };
     let (_, obc) = fixtures::ob_configuration::create_with_opts(conn, &t.id, opts);
 
-    let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+    let (_, obc) = ObConfiguration::get(conn, &obc.id).unwrap();
     assert_eq!(document_types_and_countries, obc.document_types_and_countries)
 }

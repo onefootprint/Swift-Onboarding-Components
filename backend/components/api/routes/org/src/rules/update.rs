@@ -45,7 +45,7 @@ pub async fn multi_update_rules(
             let update = validate_rules_request(conn, &tenant_id, is_live, req)?;
 
             let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
-            let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
             if obc.deactivated_at.is_some() {
                 return BadRequestInto("Cannot update rules for an outdated playbook version");

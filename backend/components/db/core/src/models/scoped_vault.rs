@@ -212,7 +212,7 @@ impl ScopedVault {
         vault: &Locked<Vault>,
         ob_configuration_id: &ObConfigurationId,
     ) -> FpResult<(Self, IsNew)> {
-        let (ob_config, _) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
+        let (_, ob_config) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table

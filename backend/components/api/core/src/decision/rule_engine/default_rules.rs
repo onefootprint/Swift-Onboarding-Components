@@ -366,7 +366,7 @@ pub fn save_default_rules_for_obc(
         return Ok(());
     }
 
-    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+    let (_, obc) = ObConfiguration::get(conn, obc_id)?;
     let rules = default_rules_for_obc(&obc);
     RuleInstance::bulk_create(
         conn,

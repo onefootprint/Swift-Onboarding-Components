@@ -46,6 +46,7 @@ use db::models::risk_signal::RiskSignalFilter;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
+use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
@@ -528,7 +529,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
             .db_query(move |conn| {
-                let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
+                let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
+                let tenant = Tenant::get(conn, &playbook.tenant_id)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
@@ -557,7 +559,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     ) -> FpResult<KycState> {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+        let (_, obc) = ObConfiguration::get(conn, &wf.id)?;
 
         let fixture_result = decision::utils::get_fixture_result(ff_client.clone(), &v, &wf, &self.t_id)?;
         let risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =

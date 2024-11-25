@@ -52,7 +52,7 @@ fn validate(
             recollect_attributes: attrs,
             reuse_existing_bo_kyc,
         } => {
-            let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
             if attrs.iter().any(|cdo| !obc.must_collect_data.contains(cdo)) {
                 return BadRequestInto("recollect_attributes must be a subset of the playbook's data");
             }
@@ -123,7 +123,7 @@ pub(super) fn apply_trigger_request(
     let obc = match &trigger {
         WorkflowRequestConfig::Onboard { playbook_id, .. } => {
             // Trigger specifically requested the playbook onto which the user should onboard
-            let (obc, _) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
             obc
         }
         WorkflowRequestConfig::Document { .. } => {

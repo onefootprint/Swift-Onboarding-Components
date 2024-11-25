@@ -122,7 +122,7 @@ pub async fn rerun_machine(
             let (id_doc, dr) = Document::get(conn, &old_session.identity_document_id)?;
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
             let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
-            let (obc, _) = ObConfiguration::get(conn, &dr.workflow_id)?;
+            let (_, obc) = ObConfiguration::get(conn, &dr.workflow_id)?;
             // TODO mark the latest DocumentUpload as not deactivated. Right now this needs to be done
             // manually
             let di =
@@ -419,7 +419,7 @@ pub async fn adhoc_document_process(
             }
             .insert(conn)?;
 
-            let (obc, _) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)?;
+            let (_, obc) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)?;
 
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let uvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, seqno)?;

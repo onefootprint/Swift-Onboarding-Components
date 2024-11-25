@@ -112,7 +112,7 @@ pub async fn post_restore(
             move |conn| {
                 let (_, latest_obc, _) =
                     Playbook::get_latest_version(conn, (&playbook_id, &tenant_id, is_live))?;
-                let (obc, _) = ObConfiguration::get(conn, &restore_obc_id)?;
+                let (_, obc) = ObConfiguration::get(conn, &restore_obc_id)?;
 
                 let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
 

@@ -94,7 +94,7 @@ pub fn get_vw_and_obc(
     seqno: DataLifetimeSeqno,
     wf_id: &WorkflowId,
 ) -> FpResult<(VaultWrapper, ObConfiguration)> {
-    let (obc, _) = ObConfiguration::get(conn, wf_id)?;
+    let (_, obc) = ObConfiguration::get(conn, wf_id)?;
 
     let vw = VaultWrapper::<_>::build(conn, VwArgs::Historical(sv_id, seqno))?;
 
@@ -261,7 +261,7 @@ pub async fn run_aml_call(
                 &wfid,
                 DecisionIntentKind::WatchlistCheck,
             )?;
-            let (obc, _) = ObConfiguration::get(conn, &wfid)?;
+            let (_, obc) = ObConfiguration::get(conn, &wfid)?;
             Ok((wf, obc, v, di))
         })
         .await?;
@@ -410,7 +410,7 @@ pub async fn maybe_generate_ocr_reason_codes(
     vw: &VaultWrapper,
 ) -> FpResult<Option<Vec<NewRiskSignalInfo>>> {
     let wfid = wf_id.clone();
-    let (obc, _) = state
+    let (_, obc) = state
         .db_query(move |conn| ObConfiguration::get(conn, &wfid))
         .await?;
 

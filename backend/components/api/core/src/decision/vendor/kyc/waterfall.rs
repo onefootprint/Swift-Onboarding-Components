@@ -43,7 +43,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         .db_query(move |conn| {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-            let obc = ObConfiguration::get(conn, &wf_id)?.0;
+            let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
 
             Ok((sv.tenant_id, vw, obc))
         })

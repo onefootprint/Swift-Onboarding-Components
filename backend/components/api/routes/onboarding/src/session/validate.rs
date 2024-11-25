@@ -64,7 +64,7 @@ pub async fn post(
                 let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
                 let mr_filters = ManualReviewFilters::get_active();
                 let user_mrs = ManualReview::get(conn, &sv.id, mr_filters.clone())?;
-                let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
+                let (_, obc) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let biz_wf = if requires_biz_workflow(&wf, &obc)? {
                     let biz_wf_id = biz_wf_id.ok_or(BadRequest("Missing business workflow"))?;
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf_id)?;
